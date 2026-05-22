@@ -122,14 +122,27 @@ const MARKER_HEIGHT_PX = 28
 const TOOLTIP_OFFSET_PX = 8
 const EDGE_PADDING_PX = 8
 const CLOSE_DELAY_MS = 120
-const EVENT_RANGE_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+const EVENT_RANGE_DATE_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
+	month: 'long',
+	day: 'numeric',
+	year: 'numeric',
+	hour: 'numeric',
+	minute: '2-digit',
+})
+const EVENT_RANGE_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'long',
 	day: 'numeric',
 	year: 'numeric',
 })
-const EVENT_RANGE_MONTH_DAY_FORMATTER = new Intl.DateTimeFormat('en-US', {
+const EVENT_RANGE_MONTH_DAY_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'long',
 	day: 'numeric',
+	hour: 'numeric',
+	minute: '2-digit',
+})
+const EVENT_RANGE_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
+	hour: 'numeric',
+	minute: '2-digit',
 })
 
 const hoveredGroupId = ref<string | null>(null)
@@ -312,6 +325,11 @@ function getDateBucketX(
 	startMs: number,
 	endMs: number,
 ) {
+	if (isTimeRelevantForGroupBy(props.groupBy)) {
+		const clampedMs = Math.max(startMs, Math.min(endMs, fallbackMs))
+		return getTimeAxisX(clampedMs, geometry, startMs, endMs)
+	}
+
 	const dateInputValue = getEventDateInputValue(value)
 	const xPositions = geometry.xPositions
 	const bucketMs = xPositions.length > 0 ? (endMs - startMs) / xPositions.length : 0
@@ -430,50 +448,41 @@ function getDateInputValue(date: Date): string {
 }
 
 function getEventDateInputValue(value: string): string | null {
-	const dateInputValue = value.match(/^\d{4}-\d{2}-\d{2}/)?.[0]
-	if (dateInputValue) return dateInputValue
-
 	const parsedDate = new Date(value)
 	if (Number.isNaN(parsedDate.getTime())) return null
 	return getDateInputValue(parsedDate)
 }
 
-function getDateFromInputValue(value: string): Date | undefined {
-	const date = new Date(`${value}T00:00:00`)
-	if (Number.isNaN(date.getTime()) || getDateInputValue(date) !== value) {
-		return undefined
-	}
-
-	return date
-}
-
 function formatEventRange(event: AnalyticsChartEvent) {
-	const startDateValue = getEventDateInputValue(event.starts)
-	const endDateValue = getEventDateInputValue(event.ends)
-	if (!startDateValue || !endDateValue) {
+	const startDate = new Date(event.starts)
+	const endDate = new Date(event.ends)
+	if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
 		return `${event.starts} - ${event.ends}`
 	}
 
-	const startDate = getDateFromInputValue(startDateValue)
-	const endDate = getDateFromInputValue(endDateValue)
-	if (!startDate || !endDate) {
-		return `${startDateValue} - ${endDateValue}`
-	}
+	const startDateValue = getDateInputValue(startDate)
+	const endDateValue = getDateInputValue(endDate)
 
 	const sameYear = startDate.getFullYear() === endDate.getFullYear()
 
+	if (startDate.getTime() === endDate.getTime()) {
+		return EVENT_RANGE_DATE_TIME_FORMATTER.format(startDate)
+	}
+
 	if (startDateValue === endDateValue) {
-		return EVENT_RANGE_DATE_FORMATTER.format(startDate)
+		return `${EVENT_RANGE_DATE_FORMATTER.format(startDate)}, ${EVENT_RANGE_TIME_FORMATTER.format(
+			startDate,
+		)} - ${EVENT_RANGE_TIME_FORMATTER.format(endDate)}`
 	}
 
 	if (sameYear) {
-		const startLabel = EVENT_RANGE_MONTH_DAY_FORMATTER.format(startDate)
-		const endLabel = EVENT_RANGE_MONTH_DAY_FORMATTER.format(endDate)
+		const startLabel = EVENT_RANGE_MONTH_DAY_TIME_FORMATTER.format(startDate)
+		const endLabel = EVENT_RANGE_MONTH_DAY_TIME_FORMATTER.format(endDate)
 		return `${startLabel} - ${endLabel}, ${startDate.getFullYear()}`
 	}
 
-	const startLabel = EVENT_RANGE_DATE_FORMATTER.format(startDate)
-	const endLabel = EVENT_RANGE_DATE_FORMATTER.format(endDate)
+	const startLabel = EVENT_RANGE_DATE_TIME_FORMATTER.format(startDate)
+	const endLabel = EVENT_RANGE_DATE_TIME_FORMATTER.format(endDate)
 	return `${startLabel} - ${endLabel}`
 }
 

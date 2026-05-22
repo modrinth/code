@@ -61,18 +61,34 @@
 			</div>
 
 			<div class="flex flex-col gap-2">
-				<span class="label__title font-semibold">Date range</span>
+				<div class="flex flex-col gap-1">
+					<span class="label__title font-semibold">Start date ({{ EVENT_TIME_ZONE_LABEL }})</span>
+				</div>
 				<DatePicker
-					id="analytics-event-date"
-					v-model="form.dateRange"
-					mode="range"
-					:show-months="2"
-					date-format="Y-m-d"
-					alt-format="F j, Y"
-					placeholder="Select date range"
+					id="analytics-event-starts"
+					v-model="form.startsAt"
+					enable-time
+					date-format="Y-m-d H:i"
+					alt-format="F j, Y at h:i K"
+					placeholder="Select start..."
 					input-class="w-full"
 					wrapper-class="w-full"
-					view-date-alignment="right"
+					show-today
+				/>
+			</div>
+			<div class="flex flex-col gap-2">
+				<span class="label__title font-semibold"
+					>End date ({{ EVENT_TIME_ZONE_LABEL }}, optional)</span
+				>
+				<DatePicker
+					id="analytics-event-ends"
+					v-model="form.endsAt"
+					enable-time
+					date-format="Y-m-d H:i"
+					alt-format="F j, Y at h:i K"
+					placeholder="Select end..."
+					input-class="w-full"
+					wrapper-class="w-full"
 					show-today
 				/>
 			</div>
@@ -150,7 +166,7 @@
 						Open link
 						<ExternalIcon class="size-4" aria-hidden="true" />
 					</a>
-					<span v-else class="text-sm font-medium text-primary">-</span>
+					<span v-else class="text-xs font-medium text-primary">—</span>
 				</template>
 
 				<template #cell-date="{ row }">
@@ -250,7 +266,8 @@ type AnalyticsEventRow = Labrinth.Analytics.v3.AnalyticsEvent & {
 type EventForm = {
 	title: string
 	announcementUrl: string
-	dateRange: DatePickerValue[]
+	startsAt: DatePickerValue
+	endsAt: DatePickerValue
 	metricKinds: AnalyticsEventMetricKind[]
 }
 
@@ -260,9 +277,11 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const analyticsEventsQueryKey = ['analytics-events'] as const
+const EVENT_TIME_ZONE = 'America/Los_Angeles'
+const EVENT_TIME_ZONE_LABEL = 'PST'
 
 const columns: TableColumn<EventColumnKey>[] = [
-	{ key: 'date', label: 'Date', width: '18%', enableSorting: true },
+	{ key: 'date', label: 'Date (PST)', width: '18%', enableSorting: true },
 	{ key: 'title', label: 'Title' },
 	{ key: 'announcement', label: 'Announcement link', width: '18%' },
 	{ key: 'metrics', label: 'Metric', width: '18%' },
@@ -388,7 +407,8 @@ function getEmptyForm(): EventForm {
 	return {
 		title: '',
 		announcementUrl: '',
-		dateRange: [],
+		startsAt: '',
+		endsAt: '',
 		metricKinds: [],
 	}
 }
@@ -411,7 +431,8 @@ function openEditModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
 	form.value = {
 		title: event.title,
 		announcementUrl: event.announcement_url ?? '',
-		dateRange: [getDateInputValue(event.starts), getDateInputValue(event.ends)],
+		startsAt: getDateTimeInputValue(event.starts),
+		endsAt: getDateTimeInputValue(event.ends),
 		metricKinds: event.for_metric_kind?.length ? [...event.for_metric_kind] : [...allMetricKinds],
 	}
 	committedAnnouncementUrl.value = event.announcement_url ?? ''
@@ -542,16 +563,11 @@ function commitAnnouncementUrl() {
 function buildEventPayload(): Labrinth.Analytics.v3.AnalyticsEventUpsert {
 	const selectedRange = getEventFormDateRange()
 	if (!selectedRange) {
-		throw new Error('Select a date range')
+		throw new Error('Select a valid start and end date')
 	}
 
-	const existingEvent =
-		editingEventId.value === null
-			? null
-			: analyticsEvents.value?.find((event) => event.id === editingEventId.value)
-	const [startDate, endDate] = selectedRange
-	const starts = buildDateTime(startDate, existingEvent?.starts)
-	const ends = buildDateTime(endDate, existingEvent?.ends)
+	const starts = parseDateTimeInputValue(selectedRange[0]).toISOString()
+	const ends = parseDateTimeInputValue(selectedRange[1]).toISOString()
 
 	return {
 		announcement_url: normalizedAnnouncementUrl.value ?? null,
@@ -570,81 +586,190 @@ function getMetricKindOptions(
 }
 
 function formatEventDateRange(event: Labrinth.Analytics.v3.AnalyticsEvent): string {
-	const startDate = parseDate(getDateInputValue(event.starts))
-	const endDate = parseDate(getDateInputValue(event.ends))
+	const startDate = new Date(event.starts)
+	const endDate = new Date(event.ends)
+	const startDateValue = getDateInputValueInTimeZone(startDate, EVENT_TIME_ZONE)
+	const endDateValue = getDateInputValueInTimeZone(endDate, EVENT_TIME_ZONE)
 
-	if (getDateInputValue(event.starts) === getDateInputValue(event.ends)) {
-		return formatLongDate(startDate)
+	if (startDate.getTime() === endDate.getTime()) {
+		return formatDateTime(startDate)
 	}
 
-	const sameYear = startDate.getFullYear() === endDate.getFullYear()
-	const sameMonth = sameYear && startDate.getMonth() === endDate.getMonth()
+	const sameYear = startDateValue.slice(0, 4) === endDateValue.slice(0, 4)
+	const sameMonth = sameYear && startDateValue.slice(5, 7) === endDateValue.slice(5, 7)
+	const sameDay = startDateValue === endDateValue
+
+	if (sameDay) {
+		return `${formatLongDate(startDate)}, ${formatTime(startDate)} - ${formatTime(endDate)}`
+	}
 
 	if (sameMonth) {
-		return `${formatMonthDay(startDate)} - ${formatMonthDay(endDate)}, ${endDate.getFullYear()}`
+		return `${formatMonthDayTime(startDate)} - ${formatMonthDayTime(endDate)}, ${endDateValue.slice(0, 4)}`
 	}
 
 	if (sameYear) {
-		return `${formatMonthDay(startDate)} - ${formatLongDate(endDate)}`
+		return `${formatMonthDayTime(startDate)} - ${formatLongDateTime(endDate)}`
 	}
 
-	return `${formatLongDate(startDate)} - ${formatLongDate(endDate)}`
-}
-
-function buildDateTime(dateValue: string, sourceDateTime?: string): string {
-	const [year, month, day] = dateValue.split('-').map(Number)
-	const sourceDate = sourceDateTime ? new Date(sourceDateTime) : null
-	const date =
-		sourceDate && !Number.isNaN(sourceDate.getTime())
-			? sourceDate
-			: new Date(Date.UTC(year, month - 1, day))
-
-	date.setUTCFullYear(year, month - 1, day)
-	return date.toISOString()
-}
-
-function getDateInputValue(value: string): string {
-	return value.split('T')[0]
+	return `${formatLongDateTime(startDate)} - ${formatLongDateTime(endDate)}`
 }
 
 function getEventFormDateRange(): [string, string] | null {
-	const dates = form.value.dateRange
-		.map(getDatePickerValueString)
-		.filter((value): value is string => Boolean(value))
-	if (dates.length === 0) {
+	const startValue = getDatePickerValueString(form.value.startsAt)
+	const endValue = isEmptyDatePickerValue(form.value.endsAt)
+		? startValue
+		: getDatePickerValueString(form.value.endsAt)
+
+	if (!startValue || !endValue) {
 		return null
 	}
 
-	const startDate = dates[0]
-	const endDate = dates[1] ?? dates[0]
-	return startDate <= endDate ? [startDate, endDate] : [endDate, startDate]
+	const startDate = parseDateTimeInputValue(startValue)
+	const endDate = parseDateTimeInputValue(endValue)
+
+	if (startDate.getTime() > endDate.getTime()) {
+		return null
+	}
+
+	return [startValue, endValue]
+}
+
+function isEmptyDatePickerValue(value: DatePickerValue): boolean {
+	return value === '' || value === null || value === undefined
 }
 
 function getDatePickerValueString(value: DatePickerValue): string | null {
 	if (typeof value === 'string') {
-		return isValidDateInputValue(value) ? value : null
+		return isValidDateTimeInputValue(value) ? value : null
 	}
 	if (value instanceof Date && !Number.isNaN(value.getTime())) {
-		return formatDateInputValue(value)
+		return formatDateTimeInputValue(value)
 	}
 
 	return null
 }
 
-function isValidDateInputValue(value: string): boolean {
-	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-		return false
-	}
+function isValidDateTimeInputValue(value: string): boolean {
+	if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value)) return false
 
-	const parsedDate = parseDate(value)
-	return !Number.isNaN(parsedDate.getTime()) && formatDateInputValue(parsedDate) === value
+	const parsedDate = parseDateTimeInputValue(value)
+	return (
+		!Number.isNaN(parsedDate.getTime()) &&
+		formatDateTimeInputValueInTimeZone(parsedDate, EVENT_TIME_ZONE) === value
+	)
 }
 
-function formatDateInputValue(date: Date): string {
-	const year = date.getFullYear()
-	const month = `${date.getMonth() + 1}`.padStart(2, '0')
-	const day = `${date.getDate()}`.padStart(2, '0')
+function getDateTimeInputValue(value: string): string {
+	const date = new Date(value)
+	return Number.isNaN(date.getTime())
+		? ''
+		: formatDateTimeInputValueInTimeZone(date, EVENT_TIME_ZONE)
+}
+
+function formatDateTimeInputValue(date: Date): string {
+	return formatDateTimeInputValueInTimeZone(date, EVENT_TIME_ZONE)
+}
+
+function formatDateTimeInputValueInTimeZone(date: Date, timeZone: string): string {
+	const parts = getTimeZoneDateParts(date, timeZone)
+	if (!parts) return ''
+
+	const year = `${parts.year}`.padStart(4, '0')
+	const month = `${parts.month}`.padStart(2, '0')
+	const day = `${parts.day}`.padStart(2, '0')
+	const hours = `${parts.hour}`.padStart(2, '0')
+	const minutes = `${parts.minute}`.padStart(2, '0')
+	return `${year}-${month}-${day} ${hours}:${minutes}`
+}
+
+function getDateInputValueInTimeZone(date: Date, timeZone: string): string {
+	const parts = getTimeZoneDateParts(date, timeZone)
+	if (!parts) return ''
+
+	const year = `${parts.year}`.padStart(4, '0')
+	const month = `${parts.month}`.padStart(2, '0')
+	const day = `${parts.day}`.padStart(2, '0')
 	return `${year}-${month}-${day}`
+}
+
+function parseDateTimeInputValue(value: string): Date {
+	return getDateTimeInTimeZone(value, EVENT_TIME_ZONE)
+}
+
+function getDateTimeInTimeZone(value: string, timeZone: string): Date {
+	const match = value.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/)
+	if (!match) return new Date(Number.NaN)
+
+	const [, yearValue, monthValue, dayValue, hourValue, minuteValue] = match
+	const year = Number(yearValue)
+	const month = Number(monthValue)
+	const day = Number(dayValue)
+	const hour = Number(hourValue)
+	const minute = Number(minuteValue)
+	const utcGuess = Date.UTC(year, month - 1, day, hour, minute)
+	let offset = getTimeZoneOffsetMs(new Date(utcGuess), timeZone)
+	offset = getTimeZoneOffsetMs(new Date(utcGuess - offset), timeZone)
+
+	return new Date(utcGuess - offset)
+}
+
+function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
+	const parts = getTimeZoneDateParts(date, timeZone)
+	if (!parts) return 0
+
+	const zonedDateAsUtc = Date.UTC(
+		parts.year,
+		parts.month - 1,
+		parts.day,
+		parts.hour,
+		parts.minute,
+		parts.second,
+	)
+	return zonedDateAsUtc - date.getTime()
+}
+
+function getTimeZoneDateParts(date: Date, timeZone: string) {
+	if (Number.isNaN(date.getTime())) return null
+
+	const parts = new Intl.DateTimeFormat('en-US', {
+		timeZone,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit',
+		hourCycle: 'h23',
+	}).formatToParts(date)
+
+	const valueByType = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+	return {
+		year: Number(valueByType.year),
+		month: Number(valueByType.month),
+		day: Number(valueByType.day),
+		hour: Number(valueByType.hour),
+		minute: Number(valueByType.minute),
+		second: Number(valueByType.second),
+	}
+}
+
+function formatDateTime(date: Date): string {
+	return new Intl.DateTimeFormat(undefined, {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit',
+		timeZone: EVENT_TIME_ZONE,
+	}).format(date)
+}
+
+function formatLongDateTime(date: Date): string {
+	return `${formatLongDate(date)}, ${formatTime(date)}`
+}
+
+function formatMonthDayTime(date: Date): string {
+	return `${formatMonthDay(date)}, ${formatTime(date)}`
 }
 
 function formatLongDate(date: Date): string {
@@ -652,6 +777,7 @@ function formatLongDate(date: Date): string {
 		month: 'short',
 		day: 'numeric',
 		year: 'numeric',
+		timeZone: EVENT_TIME_ZONE,
 	}).format(date)
 }
 
@@ -659,12 +785,16 @@ function formatMonthDay(date: Date): string {
 	return new Intl.DateTimeFormat(undefined, {
 		month: 'short',
 		day: 'numeric',
+		timeZone: EVENT_TIME_ZONE,
 	}).format(date)
 }
 
-function parseDate(value: string): Date {
-	const [year, month, day] = value.split('-').map(Number)
-	return new Date(year, month - 1, day)
+function formatTime(date: Date): string {
+	return new Intl.DateTimeFormat(undefined, {
+		hour: 'numeric',
+		minute: '2-digit',
+		timeZone: EVENT_TIME_ZONE,
+	}).format(date)
 }
 
 function getDateTime(value: string): number {
