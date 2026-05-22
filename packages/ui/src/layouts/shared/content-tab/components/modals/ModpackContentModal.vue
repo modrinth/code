@@ -260,7 +260,8 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			!!item.pack_client_retained ||
 			!!item.pack_client_depends,
 		clientWarning: getClientWarningType(item),
-		disabled: props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
+		disabled:
+			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
 		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		overflowOptions: [
 			...(props.switchVersion

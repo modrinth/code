@@ -77,7 +77,10 @@
 				v-else
 				class="flex flex-col border-0 border-t border-solid border-surface-5 bg-surface-4"
 			>
-				<div class="px-3 py-2" :class="draftSelectedTimeframeMode === 'last' ? 'bg-highlight-green' : ''">
+				<div
+					class="px-3 py-2"
+					:class="draftSelectedTimeframeMode === 'last' ? 'bg-highlight-green' : ''"
+				>
 					<div class="flex items-center gap-2.5 py-0.5 transition-colors">
 						<span
 							class="shrink-0 text-sm font-semibold"
@@ -123,7 +126,11 @@
 							:aria-label="formatMessage(messages.timeframeUnit)"
 							@change="handleLastTimeframeUnitChange"
 						>
-							<option v-for="option in lastTimeframeUnitOptions" :key="option.value" :value="option.value">
+							<option
+								v-for="option in lastTimeframeUnitOptions"
+								:key="option.value"
+								:value="option.value"
+							>
 								{{ option.label }}
 							</option>
 						</select>
@@ -189,15 +196,16 @@ const TIMEFRAME_DROPDOWN_MAX_HEIGHT = 500
 const TIMEFRAME_DROPDOWN_MIN_WIDTH = '20rem'
 const CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = '40.5rem'
 
-const DEFAULT_LAST_TIMEFRAME_VALUE_BY_PRESET: Partial<Record<TimeFramePreset, LastTimeframeValue>> = {
-	today: { amount: 1, unit: 'days' },
-	yesterday: { amount: 1, unit: 'days' },
-	last_7_days: { amount: 7, unit: 'days' },
-	last_14_days: { amount: 14, unit: 'days' },
-	last_30_days: { amount: 30, unit: 'days' },
-	last_90_days: { amount: 90, unit: 'days' },
-	last_180_days: { amount: 180, unit: 'days' },
-}
+const DEFAULT_LAST_TIMEFRAME_VALUE_BY_PRESET: Partial<Record<TimeFramePreset, LastTimeframeValue>> =
+	{
+		today: { amount: 1, unit: 'days' },
+		yesterday: { amount: 1, unit: 'days' },
+		last_7_days: { amount: 7, unit: 'days' },
+		last_14_days: { amount: 14, unit: 'days' },
+		last_30_days: { amount: 30, unit: 'days' },
+		last_90_days: { amount: 90, unit: 'days' },
+		last_180_days: { amount: 180, unit: 'days' },
+	}
 
 const messages = defineMessages({
 	today: {
@@ -915,22 +923,16 @@ function syncPickerRangeFromDraft() {
 	]
 }
 
-watch(
-	[mode, preset, lastAmount, lastUnit, customStartDate, customEndDate],
-	() => {
-		if (isTimeframeSelectOpen.value) {
-			return
-		}
+watch([mode, preset, lastAmount, lastUnit, customStartDate, customEndDate], () => {
+	if (isTimeframeSelectOpen.value) {
+		return
+	}
 
-		resetTimeframeDraft()
-	},
-)
+	resetTimeframeDraft()
+})
 
 watch(
-	[
-		draftSelectedCustomTimeframeStartDate,
-		draftSelectedCustomTimeframeEndDate,
-	],
+	[draftSelectedCustomTimeframeStartDate, draftSelectedCustomTimeframeEndDate],
 	syncPickerRangeFromDraft,
 )
 

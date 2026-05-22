@@ -408,6 +408,64 @@ const missingLookupActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 	],
 }
 
+const overflowAddonNames = [
+	"Alpha's Rise",
+	'Bookshelf',
+	'Diagonal Fences',
+	'Dragon Compass',
+	'Dragon Feed',
+	'Dragons of the Cosmos',
+	"Farmer's Delight",
+	'Fastload',
+	'Friendly Fire',
+	'Isle of Berk Addons',
+	'Jade',
+	'Kiwi',
+	"Nature's Compass",
+	'Off the Grid Dragons',
+	'Patchouli',
+	'Puzzles Lib',
+	'Resourceful Config',
+	'Waystones',
+]
+
+const overflowActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
+	next_offset: null,
+	users: actionLogResponse.users,
+	addons: Object.fromEntries(
+		overflowAddonNames.map((title, index) => [
+			`overflow-addon-${index}`,
+			{
+				title,
+				slug: `overflow-addon-${index}`,
+				icon_url: null,
+				version: null,
+			},
+		]),
+	) as Record<string, Archon.Actions.v1.AddonResp>,
+	versions: Object.fromEntries(
+		overflowAddonNames.map((title, index) => [
+			`overflow-version-${index}`,
+			{
+				name: `${title} 1.${index}.0`,
+				version_number: `1.${index}.0`,
+			},
+		]),
+	) as Record<string, Archon.Actions.v1.VersionResp>,
+	data: [
+		rawEntry({
+			action: 'addon_deleted',
+			metadata: {
+				addons: overflowAddonNames.map((_, index) => ({
+					addon_id: `overflow-addon-${index}`,
+					version_id: `overflow-version-${index}`,
+				})),
+			},
+			minutesAgo: 5,
+		}),
+	],
+}
+
 type RawEntryInput = {
 	action: Archon.Actions.v1.ActionName | string
 	metadata?: unknown
@@ -474,6 +532,7 @@ const fallbackEntries = toAuditEntries(missingLookupActionLogResponse, {
 	...serverFullResponse,
 	worlds: [],
 })
+const overflowEntries = toAuditEntries(overflowActionLogResponse)
 
 const meta = {
 	title: 'Servers/AuditLogTable',
@@ -546,6 +605,10 @@ function renderStory(entries: ServerAuditLogEntry[], initialQuery = '') {
 
 export const AllEvents: Story = {
 	render: renderStory(everyActionEntries),
+}
+
+export const LongOverflowTooltip: Story = {
+	render: renderStory(overflowEntries),
 }
 
 export const MissingLookupsAndFallbacks: Story = {

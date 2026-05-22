@@ -13,7 +13,7 @@
 			class="inline-flex shrink-0 items-center"
 			:triggers="['hover', 'focus']"
 			:popper-triggers="['hover', 'focus']"
-			popper-class="v-popper--interactive"
+			popper-class="v-popper--interactive audit-log-entity-list-popper"
 			placement="top"
 			:delay="{ show: 200, hide: 100 }"
 			no-auto-focus
@@ -26,13 +26,46 @@
 				{{ formatMessage(messages.hiddenCount, { count: hiddenCount }) }}
 			</button>
 			<template #popper>
-				<div class="flex max-w-[22rem] flex-col gap-2 py-0.5">
-					<EventEntityLink
-						v-for="entity in hiddenEntities"
-						:key="entity.id"
-						:entity="tooltipEntity(entity)"
-						class="min-w-0"
-					/>
+				<div class="relative max-w-[22rem]">
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-3"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-3"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showTopFade"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-3 bg-gradient-to-b from-bg-raised to-transparent"
+						/>
+					</Transition>
+					<div
+						ref="hiddenEntitiesScrollContainer"
+						class="flex flex-col gap-2 overflow-y-auto overscroll-contain py-0.5"
+						:style="{ maxHeight: hiddenEntitiesMaxHeight }"
+						@scroll="checkScrollState"
+					>
+						<EventEntityLink
+							v-for="entity in hiddenEntities"
+							:key="entity.id"
+							:entity="entity"
+							class="min-w-0 pr-4"
+						/>
+					</div>
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-3"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-3"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showBottomFade"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-3 bg-gradient-to-t from-bg-raised to-transparent"
+						/>
+					</Transition>
 				</div>
 			</template>
 		</Tooltip>
@@ -41,9 +74,10 @@
 
 <script setup lang="ts">
 import { Tooltip } from 'floating-vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../../composables/i18n'
+import { useScrollIndicator } from '../../../../composables/scroll-indicator'
 import EventEntityLink from './EventEntityLink.vue'
 import type { EventEntity } from './types'
 
@@ -60,6 +94,18 @@ const props = withDefaults(
 )
 
 const { formatMessage, locale } = useVIntl()
+const hiddenEntitiesScrollContainer = ref<HTMLElement | null>(null)
+const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(
+	hiddenEntitiesScrollContainer,
+)
+
+const TOOLTIP_VISIBLE_ROWS = 8
+const TOOLTIP_ENTITY_HEIGHT_REM = 1.75
+const TOOLTIP_ENTITY_GAP_REM = 0.5
+const hiddenEntitiesMaxHeight = `${
+	TOOLTIP_VISIBLE_ROWS * TOOLTIP_ENTITY_HEIGHT_REM +
+	(TOOLTIP_VISIBLE_ROWS - 1) * TOOLTIP_ENTITY_GAP_REM
+}rem`
 
 const messages = defineMessages({
 	hiddenCount: {
@@ -78,11 +124,12 @@ const hiddenTooltip = computed(() => {
 		type: 'conjunction',
 	}).format(hiddenEntities.value.map((entity) => entity.label))
 })
+</script>
 
-function tooltipEntity(entity: EventEntity): EventEntity {
-	return {
-		...entity,
-		secondaryLabel: undefined,
+<style lang="scss">
+.v-popper__popper.v-popper--theme-dismissable-prompt.audit-log-entity-list-popper {
+	.v-popper__inner {
+		padding-right: 0 !important;
 	}
 }
-</script>
+</style>

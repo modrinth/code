@@ -1,8 +1,6 @@
 <template>
 	<div class="@container flex flex-col gap-4">
-		<div
-			class="flex min-w-0 flex-col items-start gap-3 @[640px]:flex-row @[640px]:items-center"
-		>
+		<div class="flex min-w-0 flex-col items-start gap-3 @[640px]:flex-row @[640px]:items-center">
 			<TimeFramePicker
 				v-model:mode="timeframeMode"
 				v-model:preset="timeframePreset"
@@ -31,6 +29,42 @@
 					row-key="id"
 					row-transition-name="audit-log-row"
 				>
+					<template #header-world="{ column }">
+						<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
+							<span class="min-w-0 truncate">{{ column.label }}</span>
+							<Tooltip
+								theme="dismissable-prompt"
+								class="inline-flex shrink-0"
+								:triggers="['hover', 'focus']"
+								:popper-triggers="['hover', 'focus']"
+								popper-class="v-popper--interactive"
+								placement="top"
+								:delay="{ show: 200, hide: 100 }"
+								no-auto-focus
+							>
+								<button
+									type="button"
+									:aria-label="formatMessage(messages.instanceTooltipTitle)"
+									class="inline-flex cursor-help items-center justify-center border-0 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
+								>
+									<UnknownIcon class="size-4" aria-hidden="true" />
+								</button>
+								<template #popper>
+									<div class="grid !w-64 gap-1">
+										<h3 class="m-0 whitespace-nowrap text-base w-full font-bold text-contrast">
+											{{ formatMessage(messages.instanceTooltipTitle) }}
+										</h3>
+										<p
+											class="m-0 text-wrap text-sm w-full font-medium leading-tight text-secondary"
+										>
+											{{ formatMessage(messages.instanceTooltipDescription) }}
+										</p>
+									</div>
+								</template>
+							</Tooltip>
+						</span>
+					</template>
+
 					<template #cell-user="{ row: entry }">
 						<AutoLink
 							:to="actorProfilePath(entry)"
@@ -137,7 +171,37 @@
 							{{ formatMessage(messages.eventColumn) }}
 						</div>
 						<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
-							{{ formatMessage(messages.worldColumn) }}
+							<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
+								<span class="min-w-0 truncate">{{ formatMessage(messages.worldColumn) }}</span>
+								<Tooltip
+									theme="dismissable-prompt"
+									class="inline-flex shrink-0"
+									:triggers="['hover', 'focus']"
+									:popper-triggers="['hover', 'focus']"
+									popper-class="v-popper--interactive"
+									placement="top"
+									:delay="{ show: 200, hide: 100 }"
+									no-auto-focus
+								>
+									<button
+										type="button"
+										:aria-label="formatMessage(messages.instanceTooltipTitle)"
+										class="inline-flex cursor-help items-center justify-center border-0 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
+									>
+										<UnknownIcon class="size-4" aria-hidden="true" />
+									</button>
+									<template #popper>
+										<div class="grid !w-64 gap-1">
+											<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+												{{ formatMessage(messages.instanceTooltipTitle) }}
+											</h3>
+											<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+												{{ formatMessage(messages.instanceTooltipDescription) }}
+											</p>
+										</div>
+									</template>
+								</Tooltip>
+							</span>
 						</div>
 						<div
 							class="hidden items-center justify-end pr-4 font-semibold text-secondary @[640px]:flex"
@@ -172,7 +236,8 @@
 </template>
 
 <script setup lang="ts">
-import { IntercomBubbleIcon } from '@modrinth/assets'
+import { IntercomBubbleIcon, UnknownIcon } from '@modrinth/assets'
+import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 
 import { useFormatDateTime, useRelativeTime } from '../../../composables'
@@ -236,6 +301,15 @@ const messages = defineMessages({
 	worldColumn: {
 		id: 'servers.audit-log.column.world',
 		defaultMessage: 'Instance',
+	},
+	instanceTooltipTitle: {
+		id: 'servers.audit-log.column.world.tooltip-title',
+		defaultMessage: 'Coming soon!',
+	},
+	instanceTooltipDescription: {
+		id: 'servers.audit-log.column.world.tooltip-description',
+		defaultMessage:
+			'Server instances are contained environments with their own installed content and world files.',
 	},
 	eventColumn: {
 		id: 'servers.audit-log.column.event',

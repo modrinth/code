@@ -3,7 +3,10 @@ import { ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import GrantAccessModal from '../../components/servers/access/GrantAccessModal.vue'
-import type { GrantServerAccessPayload } from '../../components/servers/access/types'
+import type {
+	GrantServerAccessPayload,
+	ServerAccessMember,
+} from '../../components/servers/access/types'
 
 const meta = {
 	title: 'Servers/GrantAccessModal',
@@ -51,6 +54,44 @@ export const Default: Story = {
 				</ButtonStyled>
 				<p v-if="lastAddedUser" class="m-0 text-sm text-secondary">Last added: {{ lastAddedUser }}</p>
 				<GrantAccessModal ref="modalRef" :resolve-user="resolveUser" @grant="handleGrant" />
+			</div>
+		`,
+	}),
+}
+
+export const ExistingMember: Story = {
+	render: () => ({
+		components: { ButtonStyled, GrantAccessModal },
+		setup() {
+			const modalRef = ref<InstanceType<typeof GrantAccessModal> | null>(null)
+			const users = [
+				{ id: 'josh11', username: 'josh11' },
+				{ id: 'emma', username: 'Emma' },
+			]
+			const members: ServerAccessMember[] = [
+				{
+					id: 'story-josh11',
+					user: {
+						id: 'josh11',
+						username: 'josh11',
+					},
+					role: 'editor',
+					joinedAt: new Date().toISOString(),
+				},
+			]
+			async function resolveUser(target: string) {
+				await new Promise((resolve) => setTimeout(resolve, 250))
+				const normalizedTarget = target.trim().toLowerCase()
+				return users.find((user) => user.username.toLowerCase() === normalizedTarget) ?? null
+			}
+			return { modalRef, members, resolveUser }
+		},
+		template: /* html */ `
+			<div class="flex flex-col items-center gap-4">
+				<ButtonStyled color="brand">
+					<button @click="modalRef?.show($event)">Add existing user</button>
+				</ButtonStyled>
+				<GrantAccessModal ref="modalRef" :members="members" :resolve-user="resolveUser" />
 			</div>
 		`,
 	}),

@@ -79,6 +79,10 @@ export { default as StatItem } from './StatItem.vue'
 export { default as StyledInput } from './StyledInput.vue'
 export type { TableColumn } from './Table.vue'
 export { default as Table } from './Table.vue'
+export type { TabsTab, TabsValue } from './Tabs.vue'
+export { default as Tabs } from './Tabs.vue'
+export { default as TagItem } from './TagItem.vue'
+export { default as TagTagItem } from './TagTagItem.vue'
 export type {
 	TimeFrameLastUnit,
 	TimeFrameMode,
@@ -86,10 +90,6 @@ export type {
 	TimeFramePreset,
 } from './TimeFramePicker.vue'
 export { default as TimeFramePicker } from './TimeFramePicker.vue'
-export type { TabsTab, TabsValue } from './Tabs.vue'
-export { default as Tabs } from './Tabs.vue'
-export { default as TagItem } from './TagItem.vue'
-export { default as TagTagItem } from './TagTagItem.vue'
 export { default as Timeline } from './Timeline.vue'
 export { default as Toggle } from './Toggle.vue'
 export { default as UnsavedChangesPopup } from './UnsavedChangesPopup.vue'

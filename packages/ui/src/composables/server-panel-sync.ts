@@ -45,7 +45,10 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		]
 
 		void client.archon.sync.safeConnectServer(targetServerId, { intent: 'all' }).catch((error) => {
-			console.warn(`[server-panel-sync] Failed to connect sync stream for ${targetServerId}:`, error)
+			console.warn(
+				`[server-panel-sync] Failed to connect sync stream for ${targetServerId}:`,
+				error,
+			)
 		})
 	}
 
@@ -162,10 +165,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		}))
 	}
 
-	function handleWorldStartupPatch(
-		serverId: string,
-		event: Archon.Sync.v1.WorldStartupPatchEvent,
-	) {
+	function handleWorldStartupPatch(serverId: string, event: Archon.Sync.v1.WorldStartupPatchEvent) {
 		patchServerFullWorld(serverId, event.world_id, (world) =>
 			world.content
 				? {
@@ -191,15 +191,13 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			return
 		}
 
-		queryClient.setQueryData<Archon.Content.v1.Addons>(
-			contentListKey(serverId),
-			(current) =>
-				current
-					? {
-							...current,
-							addons: mergeAddonSpecs(current.addons ?? [], event.specs),
-						}
-					: current,
+		queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), (current) =>
+			current
+				? {
+						...current,
+						addons: mergeAddonSpecs(current.addons ?? [], event.specs),
+					}
+				: current,
 		)
 		void queryClient.invalidateQueries({ queryKey: contentListKey(serverId) })
 	}
@@ -209,9 +207,8 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		event: Archon.Sync.v1.WorldContentBaseUpdateEvent,
 	) {
 		if (event.world_id === options.worldId.value) {
-			queryClient.setQueryData<Archon.Content.v1.Addons>(
-				contentListKey(serverId),
-				(current) => (current ? { ...current, ...event.spec } : event.spec),
+			queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), (current) =>
+				current ? { ...current, ...event.spec } : event.spec,
 			)
 		} else {
 			void queryClient.invalidateQueries({ queryKey: contentListKey(serverId) })
@@ -230,13 +227,15 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		worldId: string,
 		patch: (world: Archon.Servers.v1.WorldFull) => Archon.Servers.v1.WorldFull,
 	) {
-		queryClient.setQueryData<Archon.Servers.v1.ServerFull>(serverV1DetailKey(serverId), (current) =>
-			current
-				? {
-						...current,
-						worlds: current.worlds.map((world) => (world.id === worldId ? patch(world) : world)),
-					}
-				: current,
+		queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
+			serverV1DetailKey(serverId),
+			(current) =>
+				current
+					? {
+							...current,
+							worlds: current.worlds.map((world) => (world.id === worldId ? patch(world) : world)),
+						}
+					: current,
 		)
 	}
 

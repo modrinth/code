@@ -36,7 +36,12 @@
 		>
 			{{ entity.label }}
 		</span>
-		<span v-if="entity.secondaryLabel" class="shrink-0 text-secondary">
+		<span
+			v-if="entity.secondaryLabel"
+			ref="secondaryLabelRef"
+			v-tooltip="truncatedTooltip(secondaryLabelRef, entity.secondaryLabel)"
+			class="min-w-0 truncate text-secondary"
+		>
 			{{ entity.secondaryLabel }}
 		</span>
 	</AutoLink>
@@ -51,9 +56,10 @@ import { truncatedTooltip } from '#ui/utils/truncate'
 
 import type { EventEntity } from './types'
 
-const props = defineProps<{
+defineProps<{
 	entity: EventEntity
 }>()
 
 const labelRef = ref<HTMLElement | null>(null)
+const secondaryLabelRef = ref<HTMLElement | null>(null)
 </script>

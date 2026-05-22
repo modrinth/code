@@ -419,7 +419,7 @@ function addonEntity(
 			icon: PackageIcon,
 			iconUrl: addon?.icon_url || undefined,
 			iconShape: 'square',
-			to: `/project/${encodeURIComponent(projectIdOrSlug)}`,
+			to: `/project/${encodeURIComponent(projectIdOrSlug)}/version/${encodeURIComponent(versionId)}`,
 		},
 	}
 }

@@ -79,6 +79,7 @@
 
 		<GrantAccessModal
 			ref="grantAccessModal"
+			:members="members"
 			:resolve-user="resolveInviteUser"
 			:can-grant="canManageUsers"
 			:permission-denied-message="permissionDeniedMessage"
@@ -119,11 +120,11 @@ import type {
 } from '#ui/components/base/TimeFramePicker.vue'
 import {
 	AccessTable,
+	apiPermissionsToAccessRole,
 	AuditLogTable,
 	GrantAccessModal,
 	type GrantServerAccessPayload,
 	RemoveAccessModal,
-	apiPermissionsToAccessRole,
 	type ServerAccessInviteSuggestion,
 	type ServerAccessMember,
 	type ServerAccessRole,
@@ -803,10 +804,9 @@ const hasActiveAuditLogDateFilter = computed(
 const hasActiveAuditLogFilters = computed(
 	() =>
 		hasActiveAuditLogDateFilter.value ||
-		(
-			isAuditLogWorldFilterVisible.value
-				? (['users', 'worlds', 'actions'] satisfies AuditLogFilterKey[])
-				: (['users', 'actions'] satisfies AuditLogFilterKey[])
+		(isAuditLogWorldFilterVisible.value
+			? (['users', 'worlds', 'actions'] satisfies AuditLogFilterKey[])
+			: (['users', 'actions'] satisfies AuditLogFilterKey[])
 		).some((key) => selectedAuditLogFilterValues(key).length > 0),
 )
 

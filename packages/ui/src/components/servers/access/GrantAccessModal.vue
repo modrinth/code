@@ -135,17 +135,20 @@ import NewModal from '../../modal/NewModal.vue'
 import type {
 	GrantServerAccessPayload,
 	ServerAccessInviteSuggestion,
+	ServerAccessMember,
 	ServerAccessRole,
 } from './types'
 
 const props = withDefaults(
 	defineProps<{
+		members?: ServerAccessMember[]
 		suggestions?: ServerAccessInviteSuggestion[]
 		resolveUser?: (target: string) => Promise<ServerAccessInviteSuggestion | null>
 		canGrant?: boolean
 		permissionDeniedMessage?: string
 	}>(),
 	{
+		members: () => [],
 		suggestions: () => [],
 		canGrant: true,
 	},
@@ -230,6 +233,10 @@ const messages = defineMessages({
 		id: 'servers.grant-access-modal.suggestion-avatar-alt',
 		defaultMessage: "{username}'s avatar",
 	},
+	alreadyMemberTooltip: {
+		id: 'servers.grant-access-modal.already-member-tooltip',
+		defaultMessage: 'This user is already in the users table.',
+	},
 })
 
 const grantableRoles = computed(() => [
@@ -249,20 +256,25 @@ const grantableRoles = computed(() => [
 
 const normalizedTarget = computed(() => target.value.trim())
 const usesRemoteLookup = computed(() => !!props.resolveUser)
+const matchedSuggestion = computed(() => findSuggestion(normalizedTarget.value))
+const existingMember = computed(() => findExistingMember())
 const canInvite = computed(
 	() =>
 		normalizedTarget.value.length > 0 &&
 		!!selectedRole.value &&
+		!existingMember.value &&
 		(!usesRemoteLookup.value ||
-			(targetLookupStatus.value === 'loaded' && !!findSuggestion(normalizedTarget.value))),
+			(targetLookupStatus.value === 'loaded' && !!matchedSuggestion.value)),
 )
 const canSubmit = computed(() => props.canGrant && canInvite.value)
 const permissionDeniedMessage = computed(
 	() => props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction),
 )
-const grantPermissionTooltip = computed(() =>
-	props.canGrant ? undefined : permissionDeniedMessage.value,
-)
+const grantPermissionTooltip = computed(() => {
+	if (!props.canGrant) return permissionDeniedMessage.value
+	if (existingMember.value) return formatMessage(messages.alreadyMemberTooltip)
+	return undefined
+})
 const targetLookupMessage = computed(() =>
 	usesRemoteLookup.value && targetLookupStatus.value !== 'loaded'
 		? formatMessage(messages.searching)
@@ -297,6 +309,27 @@ function findSuggestion(value: string) {
 			suggestion.id.toLowerCase() === normalizedValue ||
 			suggestion.email?.toLowerCase() === normalizedValue,
 	)
+}
+
+function findExistingMember() {
+	const normalizedValue = normalizedTarget.value.toLowerCase()
+	if (!normalizedValue) return undefined
+
+	const suggestion = matchedSuggestion.value
+	const normalizedSuggestionId = suggestion?.id.toLowerCase()
+	const normalizedSuggestionUsername = suggestion?.username.toLowerCase()
+
+	return props.members.find((member) => {
+		const normalizedMemberId = member.user.id.toLowerCase()
+		const normalizedMemberUsername = member.user.username.toLowerCase()
+
+		return (
+			normalizedMemberId === normalizedValue ||
+			normalizedMemberUsername === normalizedValue ||
+			(!!normalizedSuggestionId && normalizedMemberId === normalizedSuggestionId) ||
+			(!!normalizedSuggestionUsername && normalizedMemberUsername === normalizedSuggestionUsername)
+		)
+	})
 }
 
 const resolveTarget = useDebounceFn(async (query: string, requestId: number) => {

@@ -676,9 +676,7 @@ function getServerOwner(server: Archon.Servers.v0.Server): ServerListingOwner | 
 }
 
 const ownedServerList = computed<ServerWithOwner[]>(() =>
-	serverList.value.filter(
-		(server) => !filesExpired(server) && isServerOwnedByCurrentUser(server),
-	),
+	serverList.value.filter((server) => !filesExpired(server) && isServerOwnedByCurrentUser(server)),
 )
 const sharedServerList = computed<ServerWithOwner[]>(() =>
 	serverList.value

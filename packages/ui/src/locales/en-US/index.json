@@ -3494,6 +3494,12 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instance"
   },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Server instances are contained environments with their own installed content and world files."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Coming soon!"
+  },
   "servers.audit-log.empty": {
     "defaultMessage": "No activity matches your filters."
   },
@@ -3868,6 +3874,9 @@
   },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Also send a friend request"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "This user is already in the users table."
   },
   "servers.grant-access-modal.cancel": {
     "defaultMessage": "Cancel"
