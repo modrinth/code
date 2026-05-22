@@ -209,6 +209,7 @@ const modeBuildRequestIds: Record<TableMode, number> = {
 	date_breakdown: 0,
 	breakdown_only: 0,
 }
+const selectDefaultGraphDatasetsWhenSelectionEmpties = ref(false)
 let tableCacheGeneration = 0
 let displayedSortedRowsGeneration = 0
 const displayedTableMode = ref<TableMode>('breakdown_only')
@@ -592,24 +593,60 @@ watch(selectedBreakdown, () => {
 })
 
 watch(
+	[selectedProjectIds, selectedFilters],
+	() => {
+		selectDefaultGraphDatasetsWhenSelectionEmpties.value = true
+	},
+	{ deep: true },
+)
+
+watch(
 	[selectableGraphDatasetIds, showGraphDatasetSelection, hasExplicitGraphDatasetSelection],
-	([nextSelectableGraphDatasetIds, nextShowGraphDatasetSelection, nextHasExplicitSelection]) => {
+	(
+		[nextSelectableGraphDatasetIds, nextShowGraphDatasetSelection, nextHasExplicitSelection],
+		previousValues,
+	) => {
 		if (!nextShowGraphDatasetSelection) {
+			selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
 			return
 		}
 
+		const previousSelectableGraphDatasetIds = previousValues?.[0] ?? []
+		const didSelectableGraphDatasetsChange = !areStringArraysEqual(
+			previousSelectableGraphDatasetIds,
+			nextSelectableGraphDatasetIds,
+		)
 		const nextSelectableGraphDatasetIdSet = new Set(nextSelectableGraphDatasetIds)
 		const nextSelectedGraphDatasetIds = selectedGraphDatasetIds.value.filter((datasetId) =>
 			nextSelectableGraphDatasetIdSet.has(datasetId),
 		)
 
 		if (nextHasExplicitSelection) {
+			if (
+				selectDefaultGraphDatasetsWhenSelectionEmpties.value &&
+				didSelectableGraphDatasetsChange &&
+				nextSelectedGraphDatasetIds.length === 0 &&
+				nextSelectableGraphDatasetIds.length > 0
+			) {
+				selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
+				setSelectedGraphDatasetIds(
+					getDefaultSelectedGraphDatasetIds(nextSelectableGraphDatasetIds),
+					false,
+				)
+				return
+			}
+
+			if (didSelectableGraphDatasetsChange) {
+				selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
+			}
+
 			if (!areStringArraysEqual(selectedGraphDatasetIds.value, nextSelectedGraphDatasetIds)) {
 				setSelectedGraphDatasetIds(nextSelectedGraphDatasetIds, true)
 			}
 			return
 		}
 
+		selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
 		const defaultSelectedGraphDatasetIds = getDefaultSelectedGraphDatasetIds(
 			nextSelectableGraphDatasetIds,
 		)
