@@ -73,8 +73,10 @@
 					</span>
 				</button>
 				<span
-					class="font-semibold"
-					:class="entry.hidden ? 'text-secondary line-through opacity-70' : 'text-contrast'"
+					:class="[
+						entry.isPreviousPeriod ? 'font-medium text-secondary' : 'font-semibold',
+						entry.hidden ? 'text-primary line-through opacity-70' : 'text-contrast',
+					]"
 				>
 					{{ entry.formattedValue }}
 				</span>
