@@ -1,0 +1,39 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                WIDTH_BUCKET(\n                    EXTRACT(EPOCH FROM usa.created_at)::bigint,\n                    EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,\n                    EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,\n                    $3::integer\n                ) AS bucket,\n                CASE WHEN $5 THEN affiliate_code ELSE 0 END AS affiliate_code,\n                COUNT(*) AS conversions\n            FROM users_subscriptions_affiliations usa\n            INNER JOIN affiliate_codes ac ON ac.id = usa.affiliate_code\n            INNER JOIN users_subscriptions us ON us.id = usa.subscription_id\n            INNER JOIN charges c ON c.subscription_id = us.id\n            WHERE\n                ac.affiliate = $4\n                AND usa.created_at BETWEEN $1 AND $2\n                AND c.status = 'succeeded'\n                AND (cardinality($6::bigint[]) = 0 OR affiliate_code = ANY($6))\n            GROUP BY bucket, affiliate_code",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "bucket",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "affiliate_code",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "conversions",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz",
+        "Int4",
+        "Int8",
+        "Bool",
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "4b9d6d9533145f3d31eb6c0d15eb5efefeedfc0fe11eebe9c939725ea0dad677"
+}
