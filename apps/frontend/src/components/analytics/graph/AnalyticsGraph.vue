@@ -1,4 +1,27 @@
 <template>
+	<NewModal
+		ref="showAllSelectedGraphDatasetsModal"
+		:header="`Show all ${tableProjectCount} selected lines in graph?`"
+		fade="warning"
+		width="500px"
+		max-width="calc(100vw - 2rem)"
+	>
+		<p class="m-0 max-w-[32rem] text-primary">
+			Showing all selected lines may degrade page performance.
+		</p>
+
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled type="transparent">
+					<button @click="showAllSelectedGraphDatasetsModal?.hide()">Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="orange">
+					<button @click="confirmShowAllSelectedGraphDatasets">Show all</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
+
 	<section
 		class="relative flex flex-col rounded-2xl border border-solid border-surface-5 bg-surface-3"
 	>
@@ -10,9 +33,21 @@
 					<div class="text-xl font-semibold text-contrast">
 						{{ graphTitle }}
 					</div>
-					<p v-if="showTableSelectionSubheading" class="m-0 text-sm text-secondary">
-						{{ tableSelectionSubheading }}
-					</p>
+					<div
+						v-if="showTableSelectionSubheading"
+						class="m-0 flex flex-wrap items-center gap-2 text-sm text-secondary"
+					>
+						<span>{{ tableSelectionSubheading }}</span>
+
+						<button
+							v-if="showGraphRenderLimitButton"
+							type="button"
+							class="font-base border-0 bg-transparent p-0 text-sm underline transition-all hover:brightness-125"
+							@click="toggleGraphRenderLimit"
+						>
+							{{ graphRenderLimitButtonLabel }}
+						</button>
+					</div>
 				</div>
 
 				<div class="flex items-center gap-3">
@@ -257,7 +292,9 @@
 <script setup lang="ts">
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon, InfoIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	injectModrinthClient,
+	NewModal,
 	Tabs,
 	type TabsTab,
 	Toggle,
@@ -352,6 +389,7 @@ const dashboardStats: readonly AnalyticsDashboardStat[] = [
 	'revenue',
 	'playtime',
 ]
+const GRAPH_RENDER_DATASET_LIMIT = 250
 
 const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])
 const hasChartEvents = computed(() => localAnalyticsChartEvents.value.length > 0)
@@ -483,6 +521,10 @@ const isShowingTopTableItems = computed(() => {
 	return selectedGraphDatasetIds.value.every((datasetId) => topDatasetIds.has(datasetId))
 })
 const tableSelectionSubheading = computed(() => {
+	if (isGraphRenderDatasetLimitActive.value) {
+		return `Showing ${GRAPH_RENDER_DATASET_LIMIT} ${tableBreakdownItemLabel.value} from table`
+	}
+
 	if (isShowingAllTableItems.value) {
 		return `Showing all ${tableBreakdownItemLabel.value} from table`
 	}
@@ -567,7 +609,8 @@ const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset
 })
 const allChartDatasets = computed(() => chartDatasetsByStat.value[activeStat.value])
 const selectedGraphDatasetIdSet = computed(() => new Set(selectedGraphDatasetIds.value))
-const selectableChartDatasets = computed(() => {
+const showAllSelectedGraphDatasets = ref(false)
+const selectedChartDatasets = computed(() => {
 	if (!isGraphDatasetSelectionActive.value) {
 		return allChartDatasets.value
 	}
@@ -576,10 +619,45 @@ const selectableChartDatasets = computed(() => {
 		selectedGraphDatasetIdSet.value.has(dataset.projectId),
 	)
 })
+const sortedSelectedChartDatasetIds = computed(() =>
+	[...selectedChartDatasets.value]
+		.sort((a, b) => {
+			const totalDifference = getChartDatasetTotal(b) - getChartDatasetTotal(a)
+			return (
+				totalDifference || a.label.localeCompare(b.label) || a.projectId.localeCompare(b.projectId)
+			)
+		})
+		.map((dataset) => dataset.projectId),
+)
+const isGraphRenderDatasetOverLimit = computed(
+	() =>
+		isGraphDatasetSelectionActive.value &&
+		selectedChartDatasets.value.length > GRAPH_RENDER_DATASET_LIMIT,
+)
+const showGraphRenderLimitButton = computed(() => isGraphRenderDatasetOverLimit.value)
+const graphRenderLimitButtonLabel = computed(() =>
+	showAllSelectedGraphDatasets.value ? 'Show limited' : 'Show all',
+)
+const isGraphRenderDatasetLimitActive = computed(
+	() => isGraphRenderDatasetOverLimit.value && !showAllSelectedGraphDatasets.value,
+)
+const limitedGraphDatasetIds = computed(
+	() => new Set(sortedSelectedChartDatasetIds.value.slice(0, GRAPH_RENDER_DATASET_LIMIT)),
+)
+const selectableChartDatasets = computed(() => {
+	if (!isGraphRenderDatasetLimitActive.value) {
+		return selectedChartDatasets.value
+	}
+
+	return selectedChartDatasets.value.filter((dataset) =>
+		limitedGraphDatasetIds.value.has(dataset.projectId),
+	)
+})
 
 const chartContainer = ref<HTMLElement | null>(null)
 const legendContainer = ref<HTMLElement | null>(null)
 const chartTooltip = ref<InstanceType<typeof AnalyticsChartTooltip> | null>(null)
+const showAllSelectedGraphDatasetsModal = ref<InstanceType<typeof NewModal> | null>(null)
 const chartGeometry = ref<AnalyticsChartGeometryPayload | null>(null)
 const containerSize = reactive({ width: 0, height: 0 })
 const {
@@ -853,6 +931,24 @@ function promoteCollapsedLegendEntry(datasetId: string) {
 	promotedCollapsedLegendEntryIds.value = [...promotedCollapsedLegendEntryIds.value, datasetId]
 }
 
+function openShowAllSelectedGraphDatasetsModal(event: MouseEvent) {
+	showAllSelectedGraphDatasetsModal.value?.show(event)
+}
+
+function toggleGraphRenderLimit(event: MouseEvent) {
+	if (showAllSelectedGraphDatasets.value) {
+		showAllSelectedGraphDatasets.value = false
+		return
+	}
+
+	openShowAllSelectedGraphDatasetsModal(event)
+}
+
+function confirmShowAllSelectedGraphDatasets() {
+	showAllSelectedGraphDatasets.value = true
+	showAllSelectedGraphDatasetsModal.value?.hide()
+}
+
 watch(
 	displayedLegendEntries,
 	() => {
@@ -1054,6 +1150,10 @@ function areStringArraysEqual(left: string[], right: string[]) {
 watch([chartLabels, allChartDatasets], () => {
 	isHoverPinned.value = false
 	clearHoverState()
+})
+
+watch([() => selectedGraphDatasetIds.value.join('\u0000'), allChartDatasets], () => {
+	showAllSelectedGraphDatasets.value = false
 })
 
 watch(isDataLoading, (loading) => {
