@@ -3338,8 +3338,14 @@
   "servers.access-page.activity-log-filter.instances": {
     "defaultMessage": "Instances"
   },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Server"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "Support"
+  },
   "servers.access-page.activity-log-filter.users": {
-    "defaultMessage": "Users"
+    "defaultMessage": "Actors"
   },
   "servers.access-page.activity-log-title": {
     "defaultMessage": "Activity log"

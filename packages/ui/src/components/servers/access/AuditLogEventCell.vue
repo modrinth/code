@@ -4,11 +4,7 @@
 		v-tooltip="truncatedTooltip(eventRef, eventTooltipText)"
 		class="audit-log-table-event line-clamp-1 min-w-0"
 	>
-		<component
-			:is="event.component"
-			v-bind="event.props"
-			class="audit-log-table-event-component"
-		/>
+		<component :is="event.component" v-bind="event.props" class="audit-log-table-event-component" />
 	</div>
 </template>
 
