@@ -9,7 +9,7 @@
 
 mod old;
 
-use std::{num::NonZeroU64, sync::LazyLock};
+use std::{collections::HashMap, num::NonZeroU64, sync::LazyLock};
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
@@ -385,7 +385,7 @@ pub struct ProjectDownloads {
     downloads: u64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, utoipa::ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, utoipa::ToSchema)]
 pub enum DownloadSource {
     Website,
     ModrinthApp,
@@ -902,9 +902,8 @@ pub async fn fetch_analytics(
         use ProjectDownloadsField as F;
         let uses = |field| metrics.bucket_by.contains(&field);
 
-        query_clickhouse::<query::DownloadRow>(
+        query_clickhouse_downloads(
             &mut query_clickhouse_cx,
-            query::DOWNLOADS,
             &[
                 ("use_project_id", uses(F::ProjectId)),
                 ("use_domain", uses(F::Domain)),
@@ -916,37 +915,6 @@ pub async fn fetch_analytics(
                 ("use_game_version", uses(F::GameVersion)),
                 ("use_loader", uses(F::Loader)),
             ],
-            |row| row.bucket,
-            |row| {
-                let country = if uses(F::Country) {
-                    Some(condense_country(row.country, row.downloads))
-                } else {
-                    None
-                };
-                AnalyticsData::Project(ProjectAnalytics {
-                    source_project: row.project_id.into(),
-                    metrics: ProjectMetrics::Downloads(ProjectDownloads {
-                        domain: none_if_empty(row.domain),
-                        user_agent: if uses(F::UserAgent) {
-                            normalize_download_source(&row.user_agent)
-                        } else {
-                            None
-                        },
-                        version_id: none_if_zero_version_id(row.version_id),
-                        monetized: match row.monetized {
-                            0 => Some(false),
-                            1 => Some(true),
-                            _ => None,
-                        },
-                        country,
-                        reason: none_if_empty(row.reason)
-                            .and_then(|s| s.parse().ok()),
-                        game_version: none_if_empty(row.game_version),
-                        loader: none_if_empty(row.loader),
-                        downloads: row.downloads,
-                    }),
-                })
-            },
         )
         .await?;
     }
@@ -1327,6 +1295,105 @@ struct QueryClickhouseContext<'a> {
     parent_version_ids: &'a [DBVersionId],
     parent_version_project_ids: &'a [DBProjectId],
     affiliate_code_ids: &'a [DBAffiliateCodeId],
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct DownloadBucket {
+    bucket: u64,
+    project_id: DBProjectId,
+    domain: Option<String>,
+    user_agent: Option<DownloadSource>,
+    version_id: Option<DBVersionId>,
+    monetized: Option<bool>,
+    country: Option<String>,
+    reason: Option<DownloadReason>,
+    game_version: Option<String>,
+    loader: Option<String>,
+}
+
+async fn query_clickhouse_downloads(
+    cx: &mut QueryClickhouseContext<'_>,
+    use_columns: &[(&str, bool)],
+) -> Result<(), ApiError> {
+    let mut query = cx
+        .clickhouse
+        .query(query::DOWNLOADS)
+        .param("time_range_start", cx.req.time_range.start.timestamp())
+        .param("time_range_end", cx.req.time_range.end.timestamp())
+        .param("time_slices", cx.time_slices.len())
+        .param("project_ids", cx.project_ids)
+        .param("parent_version_ids", cx.parent_version_ids)
+        .param("parent_version_project_ids", cx.parent_version_project_ids)
+        .param("affiliate_code_ids", cx.affiliate_code_ids);
+    for (param_name, used) in use_columns {
+        query = query.param(param_name, used)
+    }
+
+    let uses = |name| {
+        use_columns
+            .iter()
+            .any(|(column_name, used)| *column_name == name && *used)
+    };
+    let mut cursor = query.fetch::<query::DownloadRow>()?;
+    let mut buckets = HashMap::<DownloadBucket, u64>::new();
+
+    while let Some(row) = cursor.next().await? {
+        let key = DownloadBucket {
+            bucket: row.bucket,
+            project_id: row.project_id,
+            domain: uses("use_domain").then(|| row.domain.clone()),
+            user_agent: uses("use_user_agent")
+                .then(|| normalize_download_source(&row.user_agent))
+                .flatten(),
+            version_id: uses("use_version_id").then_some(row.version_id),
+            monetized: if uses("use_monetized") {
+                match row.monetized {
+                    0 => Some(false),
+                    1 => Some(true),
+                    _ => None,
+                }
+            } else {
+                None
+            },
+            country: uses("use_country").then(|| row.country.clone()),
+            reason: if uses("use_reason") {
+                none_if_empty(row.reason.clone()).and_then(|s| s.parse().ok())
+            } else {
+                None
+            },
+            game_version: uses("use_game_version")
+                .then(|| row.game_version.clone()),
+            loader: uses("use_loader").then(|| row.loader.clone()),
+        };
+
+        *buckets.entry(key).or_default() += row.downloads;
+    }
+
+    for (key, downloads) in buckets {
+        let bucket = key.bucket as usize;
+        add_to_time_slice(
+            cx.time_slices,
+            bucket,
+            AnalyticsData::Project(ProjectAnalytics {
+                source_project: key.project_id.into(),
+                metrics: ProjectMetrics::Downloads(ProjectDownloads {
+                    domain: key.domain.and_then(none_if_empty),
+                    user_agent: key.user_agent,
+                    version_id: key.version_id.and_then(none_if_zero_version_id),
+                    monetized: key.monetized,
+                    country: key
+                        .country
+                        .map(|country| condense_country(country, downloads)),
+                    reason: key.reason,
+                    game_version: key.game_version.and_then(none_if_empty),
+                    loader: key.loader.and_then(none_if_empty),
+                    downloads,
+                }),
+            }),
+        )?;
+    }
+
+    Ok(())
 }
 
 async fn query_clickhouse<Row>(
