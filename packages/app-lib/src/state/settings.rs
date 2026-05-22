@@ -296,7 +296,7 @@ impl Settings {
                 self.version = 2;
             }
             2 => {
-				// Update old default memory setting from 2GB to 4GB (depending on system memory)
+                // Update old default memory setting from 2GB to 4GB (depending on system memory)
                 const LEGACY_DEFAULT_MEMORY_MB: u32 = 2048;
                 if self.memory.maximum == LEGACY_DEFAULT_MEMORY_MB {
                     self.memory.maximum =
