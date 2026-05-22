@@ -626,44 +626,6 @@ const searchInput = ref('')
 
 type ServerWithOwner = Archon.Servers.v0.Server & { owner?: ServerListingOwner }
 
-const sharedServerOwner: ServerListingOwner = {
-	username: 'Prospector',
-	avatarUrl: 'https://github.com/Prospector.png',
-}
-
-const demoSharedServers = computed<ServerWithOwner[]>(() => {
-	if (!loggedIn.value) return []
-
-	const template =
-		serverList.value.find((server) => server.status !== 'suspended') ?? serverList.value[0]
-	if (template) {
-		return [
-			{
-				...template,
-				name: template.name || 'A Minecraft Server',
-				owner: sharedServerOwner,
-			},
-		]
-	}
-
-	return [
-		{
-			server_id: 'shared-demo-server',
-			name: 'A Minecraft Server',
-			status: 'available',
-			game: 'Minecraft',
-			mc_version: '1.21.1',
-			loader: 'Fabric',
-			loader_version: '0.16.14',
-			net: {
-				domain: 'tough-ghast44',
-			},
-			online: true,
-			owner: sharedServerOwner,
-		} as ServerWithOwner,
-	]
-})
-
 function isSetToCancel(server: Archon.Servers.v0.Server): boolean {
 	return (
 		server.status !== 'suspended' &&
@@ -699,10 +661,33 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 	return new Date() > thirtyDaysLater
 }
 
+function isServerOwnedByCurrentUser(server: Archon.Servers.v0.Server): boolean {
+	return server.owner_id === auth.user.value?.id
+}
+
+function getServerOwner(server: Archon.Servers.v0.Server): ServerListingOwner | undefined {
+	const owner = serverResponse.value?.users?.[server.owner_id]
+	if (!owner) return undefined
+
+	return {
+		username: owner.username,
+		avatarUrl: owner.avatar_url ?? undefined,
+	}
+}
+
 const ownedServerList = computed<ServerWithOwner[]>(() =>
-	serverList.value.filter((server) => !filesExpired(server)),
+	serverList.value.filter(
+		(server) => !filesExpired(server) && isServerOwnedByCurrentUser(server),
+	),
 )
-const sharedServerList = computed<ServerWithOwner[]>(() => demoSharedServers.value)
+const sharedServerList = computed<ServerWithOwner[]>(() =>
+	serverList.value
+		.filter((server) => !filesExpired(server) && !isServerOwnedByCurrentUser(server))
+		.map((server) => ({
+			...server,
+			owner: getServerOwner(server),
+		})),
+)
 
 function filterServersBySearch(servers: ServerWithOwner[]): ServerWithOwner[] {
 	const normalizedSearch = searchInput.value.trim()

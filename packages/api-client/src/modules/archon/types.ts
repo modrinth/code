@@ -553,6 +553,7 @@ export namespace Archon {
 			export type ServerGetResponse = {
 				servers: Server[]
 				pagination: Pagination
+				users: Record<string, ServerOwner>
 			}
 
 			export type Pagination = {
@@ -560,6 +561,12 @@ export namespace Archon {
 				page_size: number
 				total_pages: number
 				total_items: number
+			}
+
+			export type ServerOwner = {
+				id: string
+				username: string
+				avatar_url?: string | null
 			}
 
 			export type Status = 'installing' | 'broken' | 'available' | 'suspended'
@@ -615,7 +622,7 @@ export namespace Archon {
 			export type UserScope = number
 
 			export type Net = {
-				ip: string
+				ip: string | null
 				port: number
 				domain: string
 			}
