@@ -1150,6 +1150,41 @@ function formatErrorMessage(error: unknown): string | undefined {
 	return error instanceof Error ? error.message : undefined
 }
 
+function isSuppressedFriendRequestError(error: unknown) {
+	return getErrorMessageParts(error).some((message) => {
+		const normalizedMessage = message.toLowerCase()
+		return (
+			normalizedMessage.includes('you are already friends with this user') ||
+			normalizedMessage.includes('you cannot add yourself as a friend')
+		)
+	})
+}
+
+function getErrorMessageParts(error: unknown): string[] {
+	const errorMessages: string[] = []
+
+	if (error instanceof Error) {
+		errorMessages.push(error.message)
+	}
+
+	if (!error || typeof error !== 'object') return errorMessages
+
+	const record = error as Record<string, unknown>
+	pushErrorDescription(errorMessages, record.responseData)
+	pushErrorDescription(errorMessages, record.v1Error)
+
+	return errorMessages
+}
+
+function pushErrorDescription(errorMessages: string[], value: unknown) {
+	if (!value || typeof value !== 'object') return
+
+	const record = value as Record<string, unknown>
+	if (typeof record.description === 'string') {
+		errorMessages.push(record.description)
+	}
+}
+
 function apiActionLogEntryToAuditEntry(
 	entry: Archon.Actions.v1.ActionEntry,
 	actionLog: Archon.Actions.v1.ActionLogResponse,
@@ -1415,6 +1450,8 @@ async function sendFriendRequest(userIdOrUsername: string) {
 	try {
 		await client.labrinth.friends_v3.add(userIdOrUsername)
 	} catch (error) {
+		if (isSuppressedFriendRequestError(error)) return
+
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.friendRequestFailedTitle),
