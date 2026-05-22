@@ -154,6 +154,11 @@ export namespace Archon {
 				metadata?: unknown
 			}
 
+			export type UserPermissionsActionMetadata = {
+				user_id: string
+				permissions?: ServerUsers.v1.UserScope | null
+			}
+
 			export type ActionUser =
 				| {
 						type: 'user'

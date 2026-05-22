@@ -123,6 +123,7 @@ import {
 	GrantAccessModal,
 	type GrantServerAccessPayload,
 	RemoveAccessModal,
+	apiPermissionsToAccessRole,
 	type ServerAccessInviteSuggestion,
 	type ServerAccessMember,
 	type ServerAccessRole,
@@ -131,7 +132,7 @@ import {
 } from '#ui/components/servers/access'
 import { parseAuditEvent } from '#ui/components/servers/access/events'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { hasServerPermission, useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -1039,27 +1040,6 @@ function accessRoleToApiPermissions(role: Exclude<ServerAccessRole, 'owner'>) {
 		case 'viewer':
 			return serializeUserScope(viewerScopes)
 	}
-}
-
-function apiPermissionsToAccessRole(
-	permissions: Archon.ServerUsers.v1.UserScope,
-): ServerAccessRole {
-	if (
-		hasServerPermission(permissions, 'SERVER_ADMIN') ||
-		hasServerPermission(permissions, 'MANAGE_USERS')
-	) {
-		return 'owner'
-	}
-	if (
-		hasServerPermission(permissions, 'FILES_WRITE') ||
-		hasServerPermission(permissions, 'SETUP') ||
-		hasServerPermission(permissions, 'BACKUPS') ||
-		hasServerPermission(permissions, 'ADVANCED') ||
-		hasServerPermission(permissions, 'RESET_SERVER')
-	) {
-		return 'editor'
-	}
-	return 'viewer'
 }
 
 function serializeUserScope(scopes: string[]): Archon.ServerUsers.v1.UserScope {

@@ -83,17 +83,16 @@ export function parseAuditEvent(
 			}
 			case 'user_invited':
 			case 'user_permission_modified': {
-				const record = metadataRecord(metadata)
-				const userId = stringField(record, 'user_id')
-				if (!userId) return unknown(base, action)
-				const permissions = permissionScopes(record?.permissions)
+				const actionMetadata = userPermissionsActionMetadata(metadataRecord(metadata))
+				if (!actionMetadata) return unknown(base, action)
 				const kind = action === 'user_invited' ? 'invited' : 'permission_modified'
-				const targetUser = userEntity(userId, lookups.users)
-				return parsed(UserAccessEvent, base, { kind, targetUser, permissions }, [
-					...actionSearchParts(action),
-					targetUser.label,
-					...permissions,
-				])
+				const targetUser = userEntity(actionMetadata.user_id, lookups.users)
+				return parsed(
+					UserAccessEvent,
+					base,
+					{ kind, targetUser, permissions: actionMetadata.permissions },
+					[...actionSearchParts(action), targetUser.label, actionMetadata.permissions],
+				)
 			}
 			case 'user_invite_revoked':
 			case 'user_removed': {
@@ -334,21 +333,29 @@ function actorFromEntry(
 	}
 }
 
-function permissionScopes(value: unknown): string[] {
-	if (typeof value === 'string') {
-		return value
-			.split('|')
-			.map((permission) => permission.trim())
-			.filter(Boolean)
+function userPermissionsActionMetadata(
+	record: Record<string, unknown> | null,
+): Archon.Actions.v1.UserPermissionsActionMetadata | null {
+	const userId = stringField(record, 'user_id')
+	if (!userId) return null
+
+	return {
+		user_id: userId,
+		permissions: permissionField(record?.permissions),
 	}
+}
+
+function permissionField(value: unknown): Archon.ServerUsers.v1.UserScope | null {
+	if (typeof value === 'number' && Number.isFinite(value)) return value
+	if (typeof value === 'string') return value.trim() || null
 	if (Array.isArray(value)) {
-		return value
+		const permissions = value
 			.filter((permission): permission is string => typeof permission === 'string')
 			.map((permission) => permission.trim())
 			.filter(Boolean)
+		return permissions.length > 0 ? permissions.join(' | ') : null
 	}
-	if (typeof value === 'number' || typeof value === 'boolean') return [String(value)]
-	return []
+	return null
 }
 
 function worldFromId(

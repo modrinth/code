@@ -199,7 +199,7 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 		}),
 		rawEntry({
 			action: 'user_invited',
-			metadata: { user_id: userIds.modmuss, permissions: 'BASE_READ | POWER_ACTIONS' },
+			metadata: { user_id: userIds.modmuss, permissions: -4611686018427387904n },
 			worldId: null,
 			minutesAgo: 30,
 		}),
@@ -213,7 +213,7 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 			action: 'user_permission_modified',
 			metadata: {
 				user_id: userIds.modmuss,
-				permissions: 'BASE_READ | POWER_ACTIONS | FILES_WRITE | SETUP | BACKUPS | ADVANCED',
+				permissions: -288230376151711744n,
 			},
 			worldId: null,
 			minutesAgo: 40,
@@ -369,7 +369,7 @@ const missingLookupActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 	data: [
 		rawEntry({
 			action: 'user_permission_modified',
-			metadata: { user_id: 'unknown-user', permissions: 'BASE_READ' },
+			metadata: { user_id: 'unknown-user', permissions: -9223372036854775808n },
 			worldId: 'unknown-world',
 			minutesAgo: 5,
 		}),
