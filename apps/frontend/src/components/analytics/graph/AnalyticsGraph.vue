@@ -91,6 +91,42 @@
 								{{ legendEntry.name }}
 							</span>
 						</button>
+						<Dropdown
+							v-if="isUnmonetizedLegendEntry(legendEntry)"
+							theme="analytics-monetization-popover"
+							:triggers="['hover', 'focus']"
+							:popper-triggers="['hover', 'focus']"
+							:delay="{ show: 0, hide: 250 }"
+							placement="top"
+							:aria-id="monetizationPopoverId"
+							no-auto-focus
+						>
+							<button
+								type="button"
+								class="-ml-1 mt-px inline-flex items-center justify-center rounded-full border-0 bg-transparent p-0 text-secondary transition-all hover:text-contrast focus-visible:text-contrast"
+								aria-label="View monetized analytics details"
+							>
+								<InfoIcon class="size-4" />
+							</button>
+							<template #popper>
+								<div
+									role="dialog"
+									aria-label="Monetized analytics details"
+									class="font-base w-[292px] rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 text-sm leading-snug shadow-2xl"
+								>
+									A view or download is monetized when ads can be shown and required consent or
+									region rules allow it.
+									<a
+										href="https://modrinth.com/legal/cmp-info"
+										target="_blank"
+										rel="noopener noreferrer"
+										class="text-link underline"
+									>
+										Learn more
+									</a>
+								</div>
+							</template>
+						</Dropdown>
 					</div>
 					<button
 						v-if="canToggleLegendExpansion"
@@ -219,7 +255,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
+import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon, InfoIcon } from '@modrinth/assets'
 import {
 	injectModrinthClient,
 	Tabs,
@@ -229,6 +265,7 @@ import {
 	useScrollIndicator,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
+import { Dropdown } from 'floating-vue'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
@@ -601,6 +638,7 @@ const ignoreNextChartClick = ref(false)
 const hoveredLegendEntryId = ref<string | null>(null)
 const isLegendExpanded = ref(false)
 const isShiftKeyPressed = ref(false)
+const monetizationPopoverId = useId()
 const promotedCollapsedLegendEntryIds = ref<string[]>([])
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 const promotedCollapsedLegendEntryIdSet = computed(
@@ -925,6 +963,10 @@ function getLegendEntryTooltip(legendEntry: LegendEntry) {
 	return legendEntry.projectName ?? ''
 }
 
+function isUnmonetizedLegendEntry(legendEntry: LegendEntry) {
+	return selectedBreakdown.value === 'monetization' && legendEntry.id === 'breakdown:unmonetized'
+}
+
 function setHoveredLegendEntryId(datasetId: string) {
 	hoveredLegendEntryId.value = datasetId
 }
@@ -1119,3 +1161,17 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 	})
 })
 </script>
+
+<style>
+.v-popper--theme-analytics-monetization-popover .v-popper__inner {
+	overflow: visible !important;
+	background: transparent !important;
+	padding: 0 !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+.v-popper--theme-analytics-monetization-popover .v-popper__arrow-container {
+	display: none;
+}
+</style>
