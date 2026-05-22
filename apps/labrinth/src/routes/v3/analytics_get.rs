@@ -9,7 +9,7 @@
 
 mod old;
 
-use std::{num::NonZeroU64, sync::LazyLock};
+use std::{collections::HashMap, num::NonZeroU64, sync::LazyLock};
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
@@ -576,6 +576,7 @@ mod query {
     pub struct PlaytimeRow {
         pub bucket: u64,
         pub project_id: DBProjectId,
+        pub parent_version_id: DBVersionId,
         pub version_id: DBVersionId,
         pub loader: String,
         pub game_version: String,
@@ -590,13 +591,12 @@ mod query {
         const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
         const USE_COUNTRY: &str = "{use_country: Bool}";
         const PARENT_VERSION_IDS: &str = "{parent_version_ids: Array(UInt64)}";
-        const PARENT_VERSION_PROJECT_IDS: &str =
-            "{parent_version_project_ids: Array(UInt64)}";
 
         formatcp!(
             "SELECT
                 bucket,
                 if({USE_PROJECT_ID}, source_project_id, 0) AS project_id,
+                parent_version_id,
                 version_id,
                 loader,
                 game_version,
@@ -606,6 +606,7 @@ mod query {
                 SELECT
                     widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
                     project_id AS source_project_id,
+                    0 AS parent_version_id,
                     if({USE_VERSION_ID}, version_id, 0) AS version_id,
                     if({USE_LOADER}, loader, '') AS loader,
                     if({USE_GAME_VERSION}, game_version, '') AS game_version,
@@ -620,7 +621,8 @@ mod query {
 
                 SELECT
                     widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-                    transform(parent, {PARENT_VERSION_IDS}, {PARENT_VERSION_PROJECT_IDS}) AS source_project_id,
+                    0 AS source_project_id,
+                    parent AS parent_version_id,
                     if({USE_VERSION_ID}, version_id, 0) AS version_id,
                     if({USE_LOADER}, loader, '') AS loader,
                     if({USE_GAME_VERSION}, game_version, '') AS game_version,
@@ -631,7 +633,7 @@ mod query {
                     recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
                     AND parent IN {PARENT_VERSION_IDS}
             )
-            GROUP BY bucket, project_id, version_id, loader, game_version, country"
+            GROUP BY bucket, project_id, parent_version_id, version_id, loader, game_version, country"
         )
     };
 
@@ -764,10 +766,10 @@ pub async fn fetch_analytics(
         .iter()
         .map(|version| DBVersionId(version.id))
         .collect::<Vec<_>>();
-    let parent_version_project_ids = parent_versions
+    let parent_version_projects = parent_versions
         .iter()
-        .map(|version| DBProjectId(version.mod_id))
-        .collect::<Vec<_>>();
+        .map(|version| (DBVersionId(version.id), DBProjectId(version.mod_id)))
+        .collect::<HashMap<_, _>>();
 
     let affiliate_code_ids =
         DBAffiliateCode::get_by_affiliate(user.id.into(), &**pool)
@@ -782,7 +784,6 @@ pub async fn fetch_analytics(
         time_slices: &mut time_slices,
         project_ids: &project_ids,
         parent_version_ids: &parent_version_ids,
-        parent_version_project_ids: &parent_version_project_ids,
         affiliate_code_ids: &affiliate_code_ids,
     };
 
@@ -793,6 +794,7 @@ pub async fn fetch_analytics(
         query_clickhouse::<query::ViewRow>(
             &mut query_clickhouse_cx,
             query::VIEWS,
+            ClickhouseQueryParams::PROJECT_IDS,
             &[
                 ("use_project_id", uses(F::ProjectId)),
                 ("use_domain", uses(F::Domain)),
@@ -833,6 +835,7 @@ pub async fn fetch_analytics(
         query_clickhouse::<query::DownloadRow>(
             &mut query_clickhouse_cx,
             query::DOWNLOADS,
+            ClickhouseQueryParams::PROJECT_IDS,
             &[
                 ("use_project_id", uses(F::ProjectId)),
                 ("use_domain", uses(F::Domain)),
@@ -883,9 +886,9 @@ pub async fn fetch_analytics(
         use ProjectPlaytimeField as F;
         let uses = |field| metrics.bucket_by.contains(&field);
 
-        query_clickhouse::<query::PlaytimeRow>(
+        query_clickhouse_playtime(
             &mut query_clickhouse_cx,
-            query::PLAYTIME,
+            &parent_version_projects,
             &[
                 ("use_project_id", uses(F::ProjectId)),
                 ("use_version_id", uses(F::VersionId)),
@@ -893,24 +896,6 @@ pub async fn fetch_analytics(
                 ("use_game_version", uses(F::GameVersion)),
                 ("use_country", uses(F::Country)),
             ],
-            |row| row.bucket,
-            |row| {
-                let country = if uses(F::Country) {
-                    Some(condense_country(row.country, row.seconds))
-                } else {
-                    None
-                };
-                AnalyticsData::Project(ProjectAnalytics {
-                    source_project: row.project_id.into(),
-                    metrics: ProjectMetrics::Playtime(ProjectPlaytime {
-                        version_id: none_if_zero_version_id(row.version_id),
-                        loader: none_if_empty(row.loader),
-                        game_version: none_if_empty(row.game_version),
-                        country,
-                        seconds: row.seconds,
-                    }),
-                })
-            },
         )
         .await?;
     }
@@ -924,6 +909,7 @@ pub async fn fetch_analytics(
         query_clickhouse::<query::AffiliateCodeClickRow>(
             &mut query_clickhouse_cx,
             query::AFFILIATE_CODE_CLICKS,
+            ClickhouseQueryParams::empty(),
             &[("use_affiliate_code_id", uses(F::AffiliateCodeId))],
             |row| row.bucket,
             |row| {
@@ -1201,13 +1187,132 @@ struct QueryClickhouseContext<'a> {
     time_slices: &'a mut [TimeSlice],
     project_ids: &'a [DBProjectId],
     parent_version_ids: &'a [DBVersionId],
-    parent_version_project_ids: &'a [DBProjectId],
     affiliate_code_ids: &'a [DBAffiliateCodeId],
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct PlaytimeBucket {
+    bucket: u64,
+    project_id: DBProjectId,
+    version_id: Option<DBVersionId>,
+    loader: Option<String>,
+    game_version: Option<String>,
+    country: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+struct ClickhouseQueryParams {
+    project_ids: bool,
+    parent_version_ids: bool,
+    affiliate_code_ids: bool,
+}
+
+impl ClickhouseQueryParams {
+    const PROJECT_IDS: Self = Self {
+        project_ids: true,
+        parent_version_ids: false,
+        affiliate_code_ids: false,
+    };
+
+    const fn empty() -> Self {
+        Self {
+            project_ids: false,
+            parent_version_ids: false,
+            affiliate_code_ids: false,
+        }
+    }
+}
+
+impl std::ops::BitOr for ClickhouseQueryParams {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self {
+            project_ids: self.project_ids || rhs.project_ids,
+            parent_version_ids: self.parent_version_ids
+                || rhs.parent_version_ids,
+            affiliate_code_ids: self.affiliate_code_ids
+                || rhs.affiliate_code_ids,
+        }
+    }
+}
+
+async fn query_clickhouse_playtime(
+    cx: &mut QueryClickhouseContext<'_>,
+    parent_version_projects: &HashMap<DBVersionId, DBProjectId>,
+    use_columns: &[(&str, bool)],
+) -> Result<(), ApiError> {
+    let uses = |name| {
+        use_columns
+            .iter()
+            .any(|(column_name, used)| *column_name == name && *used)
+    };
+    let mut query = cx
+        .clickhouse
+        .query(query::PLAYTIME)
+        .param("time_range_start", cx.req.time_range.start.timestamp())
+        .param("time_range_end", cx.req.time_range.end.timestamp())
+        .param("time_slices", cx.time_slices.len())
+        .param("project_ids", cx.project_ids)
+        .param("parent_version_ids", cx.parent_version_ids);
+    for (param_name, used) in use_columns {
+        query = query.param(param_name, used)
+    }
+
+    let mut cursor = query.fetch::<query::PlaytimeRow>()?;
+    let mut buckets = HashMap::<PlaytimeBucket, u64>::new();
+
+    while let Some(row) = cursor.next().await? {
+        let project_id = if uses("use_project_id") && row.project_id.0 == 0 {
+            parent_version_projects
+                .get(&row.parent_version_id)
+                .copied()
+                .unwrap_or(row.project_id)
+        } else {
+            row.project_id
+        };
+        let key = PlaytimeBucket {
+            bucket: row.bucket,
+            project_id,
+            version_id: uses("use_version_id").then_some(row.version_id),
+            loader: uses("use_loader").then(|| row.loader.clone()),
+            game_version: uses("use_game_version")
+                .then(|| row.game_version.clone()),
+            country: uses("use_country").then(|| row.country.clone()),
+        };
+
+        *buckets.entry(key).or_default() += row.seconds;
+    }
+
+    for (key, seconds) in buckets {
+        let bucket = key.bucket as usize;
+        add_to_time_slice(
+            cx.time_slices,
+            bucket,
+            AnalyticsData::Project(ProjectAnalytics {
+                source_project: key.project_id.into(),
+                metrics: ProjectMetrics::Playtime(ProjectPlaytime {
+                    version_id: key
+                        .version_id
+                        .and_then(none_if_zero_version_id),
+                    loader: key.loader.and_then(none_if_empty),
+                    game_version: key.game_version.and_then(none_if_empty),
+                    country: key
+                        .country
+                        .map(|country| condense_country(country, seconds)),
+                    seconds,
+                }),
+            }),
+        )?;
+    }
+
+    Ok(())
 }
 
 async fn query_clickhouse<Row>(
     cx: &mut QueryClickhouseContext<'_>,
     query: &str,
+    params: ClickhouseQueryParams,
     use_columns: &[(&str, bool)],
     // I hate using the hidden type Row::Value here, but it's what next() returns, so I see no other option
     row_get_bucket: impl Fn(&Row::Value<'_>) -> u64,
@@ -1221,11 +1326,16 @@ where
         .query(query)
         .param("time_range_start", cx.req.time_range.start.timestamp())
         .param("time_range_end", cx.req.time_range.end.timestamp())
-        .param("time_slices", cx.time_slices.len())
-        .param("project_ids", cx.project_ids)
-        .param("parent_version_ids", cx.parent_version_ids)
-        .param("parent_version_project_ids", cx.parent_version_project_ids)
-        .param("affiliate_code_ids", cx.affiliate_code_ids);
+        .param("time_slices", cx.time_slices.len());
+    if params.project_ids {
+        query = query.param("project_ids", cx.project_ids);
+    }
+    if params.parent_version_ids {
+        query = query.param("parent_version_ids", cx.parent_version_ids);
+    }
+    if params.affiliate_code_ids {
+        query = query.param("affiliate_code_ids", cx.affiliate_code_ids);
+    }
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
     }
