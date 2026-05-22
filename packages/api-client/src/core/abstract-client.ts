@@ -211,8 +211,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	 */
 	protected async executeFeatureChain<T>(
 		context: RequestContext,
-		executeTerminal: () => Promise<T> = () =>
-			this.executeRequest<T>(context.url, context.options),
+		executeTerminal: () => Promise<T> = () => this.executeRequest<T>(context.url, context.options),
 	): Promise<T> {
 		// Filter to only features that should apply
 		const applicableFeatures = this.features.filter((feature) => feature.shouldApply(context))

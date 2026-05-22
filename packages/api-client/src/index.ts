@@ -2,8 +2,8 @@ export { AbstractModrinthClient } from './core/abstract-client'
 export { AbstractFeature, type FeatureConfig } from './core/abstract-feature'
 export {
 	AbstractSyncClient,
-	type SyncConnectOptions,
 	type SyncConnection,
+	type SyncConnectOptions,
 	type SyncEventHandler,
 	type SyncEventOfType,
 	type SyncEventType,
@@ -42,12 +42,12 @@ export { TauriModrinthClient } from './platform/tauri'
 export { XHRUploadClient } from './platform/xhr-upload-client'
 export { clearNodeAuthState, nodeAuthState, setNodeAuthState } from './state/node-auth'
 export * from './types'
+export { withJWTRetry } from './utils/jwt-retry'
 export {
-	parseSyncEventData,
-	SseParser,
 	type ParsedSseEvent,
 	type ParsedSseItem,
 	type ParsedSseRetry,
+	parseSyncEventData,
+	SseParser,
 } from './utils/sse'
-export { withJWTRetry } from './utils/jwt-retry'
 export type { Override, RawDecimal } from './utils/types'

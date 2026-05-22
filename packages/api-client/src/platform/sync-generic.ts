@@ -2,12 +2,12 @@ import mitt from 'mitt'
 
 import {
 	AbstractSyncClient,
-	type SyncConnectOptions,
 	type SyncConnection,
+	type SyncConnectOptions,
 	type SyncEmitterEvents,
 } from '../core/abstract-sync'
 import type { Archon } from '../modules/archon/types'
-import { parseSyncEventData, SseParser, type ParsedSseItem } from '../utils/sse'
+import { type ParsedSseItem, parseSyncEventData, SseParser } from '../utils/sse'
 
 type StreamReadResult = 'closed' | 'protocol-reconnect'
 
@@ -143,10 +143,7 @@ export class GenericSyncClient extends AbstractSyncClient {
 		return 'closed'
 	}
 
-	private processParsedItems(
-		connection: SyncConnection,
-		items: ParsedSseItem[],
-	): StreamReadResult {
+	private processParsedItems(connection: SyncConnection, items: ParsedSseItem[]): StreamReadResult {
 		for (const item of items) {
 			if (item.kind === 'retry') {
 				connection.retryDelay = Math.min(item.retry, MAX_RECONNECT_DELAY)

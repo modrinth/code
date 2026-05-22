@@ -61,10 +61,7 @@ export abstract class AbstractSyncClient {
 
 	constructor(
 		protected client: {
-			stream: (
-				path: string,
-				options: RequestOptions,
-			) => Promise<ReadableStream<Uint8Array>>
+			stream: (path: string, options: RequestOptions) => Promise<ReadableStream<Uint8Array>>
 		},
 	) {}
 
@@ -130,7 +127,10 @@ export abstract class AbstractSyncClient {
 	): void {
 		connection.status = status
 		connection.error = error
-		this.emitter.emit(this.getStatusEventKey(connection.serverId), this.connectionToStatus(connection))
+		this.emitter.emit(
+			this.getStatusEventKey(connection.serverId),
+			this.connectionToStatus(connection),
+		)
 	}
 
 	protected clearListeners(serverId: string): void {
