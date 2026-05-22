@@ -1379,7 +1379,9 @@ async fn query_clickhouse_downloads(
                 metrics: ProjectMetrics::Downloads(ProjectDownloads {
                     domain: key.domain.and_then(none_if_empty),
                     user_agent: key.user_agent,
-                    version_id: key.version_id.and_then(none_if_zero_version_id),
+                    version_id: key
+                        .version_id
+                        .and_then(none_if_zero_version_id),
                     monetized: key.monetized,
                     country: key
                         .country
