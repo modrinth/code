@@ -7,6 +7,7 @@
 //!   requests, you have to zip together M arrays of N elements
 //!   - this makes it inconvenient to have separate endpoints
 
+mod facets;
 mod old;
 
 use std::{collections::HashMap, num::NonZeroU64, sync::LazyLock};
@@ -43,6 +44,7 @@ use crate::{
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(fetch_analytics);
+    cfg.configure(facets::config);
     cfg.configure(old::config);
 }
 
@@ -351,7 +353,7 @@ pub struct ProjectDownloads {
     downloads: u64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, utoipa::ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, utoipa::ToSchema)]
 pub enum DownloadSource {
     Website,
     ModrinthApp,
