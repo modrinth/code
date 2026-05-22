@@ -117,6 +117,17 @@ export const WithSelectedOption: Story = {
 	},
 }
 
+export const LongSelectedLabel: Story = {
+	args: {
+		modelValue: 'long',
+		options: [
+			{ value: 'short', label: 'Short label' },
+			{ value: 'long', label: 'A much longer selected value that should truncate cleanly' },
+		],
+		triggerClass: 'w-64',
+	},
+}
+
 export const SearchableNoFilter: Story = {
 	args: {
 		options: [

@@ -3,6 +3,11 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import DropdownFilterBar from '../../components/base/DropdownFilterBar.vue'
+import type {
+	TimeFrameLastUnit,
+	TimeFrameMode,
+	TimeFramePreset,
+} from '../../components/base/TimeFramePicker.vue'
 import AuditLogTable from '../../components/servers/access/AuditLogTable.vue'
 import { type AuditEventLookups, parseAuditEvent } from '../../components/servers/access/events'
 import type {
@@ -492,22 +497,46 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+function createTimeframeState(
+	initial: Partial<{
+		mode: TimeFrameMode
+		preset: TimeFramePreset
+		lastAmount: number
+		lastUnit: TimeFrameLastUnit
+		customStartDate: string
+		customEndDate: string
+	}> = {},
+) {
+	return {
+		timeframeCustomEndDate: ref(initial.customEndDate ?? ''),
+		timeframeCustomStartDate: ref(initial.customStartDate ?? ''),
+		timeframeLastAmount: ref(initial.lastAmount ?? 30),
+		timeframeLastUnit: ref<TimeFrameLastUnit>(initial.lastUnit ?? 'days'),
+		timeframeMode: ref<TimeFrameMode>(initial.mode ?? 'preset'),
+		timeframePreset: ref<TimeFramePreset>(initial.preset ?? 'all_time'),
+	}
+}
+
 function renderStory(entries: ServerAuditLogEntry[], initialQuery = '') {
 	return () => ({
 		components: { AuditLogTable },
 		setup() {
 			const query = ref(initialQuery)
-			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
 			})
-			return { dateRange, entries, query, filters }
+			return { entries, filters, query, ...createTimeframeState() }
 		},
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
-				v-model:date-range="dateRange"
+				v-model:timeframe-mode="timeframeMode"
+				v-model:timeframe-preset="timeframePreset"
+				v-model:timeframe-last-amount="timeframeLastAmount"
+				v-model:timeframe-last-unit="timeframeLastUnit"
+				v-model:timeframe-custom-start-date="timeframeCustomStartDate"
+				v-model:timeframe-custom-end-date="timeframeCustomEndDate"
 				v-model:filters="filters"
 				:entries="entries"
 			/>
@@ -532,7 +561,6 @@ export const WithExternalFilterControls: Story = {
 		components: { AuditLogTable, DropdownFilterBar },
 		setup() {
 			const query = ref('')
-			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
@@ -544,17 +572,22 @@ export const WithExternalFilterControls: Story = {
 			})
 			return {
 				categories: filterBarCategories,
-				dateRange,
 				entries: everyActionEntries,
 				externalFilters,
 				filters,
 				query,
+				...createTimeframeState(),
 			}
 		},
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
-				v-model:date-range="dateRange"
+				v-model:timeframe-mode="timeframeMode"
+				v-model:timeframe-preset="timeframePreset"
+				v-model:timeframe-last-amount="timeframeLastAmount"
+				v-model:timeframe-last-unit="timeframeLastUnit"
+				v-model:timeframe-custom-start-date="timeframeCustomStartDate"
+				v-model:timeframe-custom-end-date="timeframeCustomEndDate"
 				v-model:filters="filters"
 				:entries="entries"
 				has-active-external-filters
@@ -578,17 +611,21 @@ export const EmptyExternalFilters: Story = {
 		components: { AuditLogTable },
 		setup() {
 			const query = ref('')
-			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
 			})
-			return { dateRange, entries: [], query, filters }
+			return { entries: [], filters, query, ...createTimeframeState() }
 		},
 		template: /* html */ `
 			<AuditLogTable
 				v-model:query="query"
-				v-model:date-range="dateRange"
+				v-model:timeframe-mode="timeframeMode"
+				v-model:timeframe-preset="timeframePreset"
+				v-model:timeframe-last-amount="timeframeLastAmount"
+				v-model:timeframe-last-unit="timeframeLastUnit"
+				v-model:timeframe-custom-start-date="timeframeCustomStartDate"
+				v-model:timeframe-custom-end-date="timeframeCustomEndDate"
 				v-model:filters="filters"
 				:entries="entries"
 				has-active-external-filters
@@ -602,18 +639,27 @@ export const MobileCompact: Story = {
 		components: { AuditLogTable },
 		setup() {
 			const query = ref('')
-			const dateRange = ref<string[]>([])
 			const filters = ref<ServerAuditLogFilters>({
 				userId: null,
 				worldId: null,
 			})
-			return { dateRange, entries: everyActionEntries.slice(0, 8), query, filters }
+			return {
+				entries: everyActionEntries.slice(0, 8),
+				filters,
+				query,
+				...createTimeframeState(),
+			}
 		},
 		template: /* html */ `
 			<div style="max-width: 390px;">
 				<AuditLogTable
 					v-model:query="query"
-					v-model:date-range="dateRange"
+					v-model:timeframe-mode="timeframeMode"
+					v-model:timeframe-preset="timeframePreset"
+					v-model:timeframe-last-amount="timeframeLastAmount"
+					v-model:timeframe-last-unit="timeframeLastUnit"
+					v-model:timeframe-custom-start-date="timeframeCustomStartDate"
+					v-model:timeframe-custom-end-date="timeframeCustomEndDate"
 					v-model:filters="filters"
 					:entries="entries"
 				/>

@@ -50,7 +50,12 @@
 				{{ formatMessage(messages.activityLogTitle) }}
 			</span>
 			<AuditLogTable
-				v-model:date-range="auditLogDateRange"
+				v-model:timeframe-mode="auditLogTimeframeMode"
+				v-model:timeframe-preset="auditLogTimeframePreset"
+				v-model:timeframe-last-amount="auditLogTimeframeLastAmount"
+				v-model:timeframe-last-unit="auditLogTimeframeLastUnit"
+				v-model:timeframe-custom-start-date="auditLogTimeframeCustomStartDate"
+				v-model:timeframe-custom-end-date="auditLogTimeframeCustomEndDate"
 				:entries="auditEntries"
 				:has-active-external-filters="hasActiveAuditLogFilters"
 				:has-more="hasMoreActionLogEntries"
@@ -107,6 +112,11 @@ import DropdownFilterBar, {
 	type DropdownFilterBarOption,
 } from '#ui/components/base/DropdownFilterBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import type {
+	TimeFrameLastUnit,
+	TimeFrameMode,
+	TimeFramePreset,
+} from '#ui/components/base/TimeFramePicker.vue'
 import {
 	AccessTable,
 	AuditLogTable,
@@ -131,7 +141,6 @@ import {
 type RoleFilter = ServerAccessRole | 'all'
 type AuditLogFilterKey = 'users' | 'worlds' | 'actions'
 
-const SERVER_WORLD_FILTER_VALUE = '__server__'
 const ACTION_LOG_PAGE_SIZE = 200
 const ACTION_LOG_FILTER_OVERLAY_MS = 750
 
@@ -193,17 +202,9 @@ const messages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.users',
 		defaultMessage: 'Users',
 	},
-	userFilterSearch: {
-		id: 'servers.access-page.activity-log-filter.users-search',
-		defaultMessage: 'Search users...',
-	},
 	instanceFilter: {
 		id: 'servers.access-page.activity-log-filter.instances',
 		defaultMessage: 'Instances',
-	},
-	instanceFilterSearch: {
-		id: 'servers.access-page.activity-log-filter.instances-search',
-		defaultMessage: 'Search instances...',
 	},
 	actionTypeFilter: {
 		id: 'servers.access-page.activity-log-filter.action-types',
@@ -212,10 +213,6 @@ const messages = defineMessages({
 	actionTypeFilterSearch: {
 		id: 'servers.access-page.activity-log-filter.action-types-search',
 		defaultMessage: 'Search action types...',
-	},
-	serverScope: {
-		id: 'servers.access-page.activity-log-filter.server-scope',
-		defaultMessage: 'Server',
 	},
 	server_created: {
 		id: 'servers.access-page.activity-log-filter.action.server-created',
@@ -606,6 +603,7 @@ const members = computed<ServerAccessMember[]>(() =>
 const worldOptions = computed(
 	() => serverFull.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
 )
+const isAuditLogWorldFilterVisible = computed(() => worldOptions.value.length > 1)
 
 const worldById = computed(
 	() => new Map(worldOptions.value.map((world) => [world.id, world] as const)),
@@ -628,28 +626,25 @@ const auditLogFilters = ref<Record<string, string[]>>({
 	worlds: [],
 	actions: [],
 })
-const auditLogDateRange = ref(defaultAuditLogDateRange())
+const auditLogTimeframeMode = ref<TimeFrameMode>('preset')
+const auditLogTimeframePreset = ref<TimeFramePreset>('last_30_days')
+const auditLogTimeframeLastAmount = ref(30)
+const auditLogTimeframeLastUnit = ref<TimeFrameLastUnit>('days')
+const auditLogTimeframeCustomStartDate = ref('')
+const auditLogTimeframeCustomEndDate = ref('')
 
 const actionLogDateFilter = computed(() => {
-	const [startValue, endValue] = auditLogDateRange.value
-	const startDate = startValue ? parseDatePickerValue(startValue) : null
-	const endDate = endValue ? parseDatePickerValue(endValue) : null
-	const [minDate, maxDate] =
-		startDate && endDate && startDate.getTime() > endDate.getTime()
-			? [endDate, startDate]
-			: [startDate, endDate]
+	const range = getAuditLogTimeframeRange()
 
 	return {
-		min_datetime: minDate ? startOfDay(minDate).toISOString() : undefined,
-		max_datetime: maxDate ? endOfDay(maxDate).toISOString() : undefined,
+		min_datetime: range?.start.toISOString(),
+		max_datetime: range?.end.toISOString(),
 	}
 })
 
 const actionLogEndpointFilter = computed<Archon.Actions.v1.ActionLogFilter | undefined>(() => {
 	const users = selectedAuditLogFilterValues('users')
-	const worlds = selectedAuditLogFilterValues('worlds').map((world) =>
-		world === SERVER_WORLD_FILTER_VALUE ? null : world,
-	)
+	const worlds = isAuditLogWorldFilterVisible.value ? selectedAuditLogFilterValues('worlds') : []
 	const actions = selectedAuditLogFilterValues('actions').filter(isActionLogActionName)
 	const filter: Archon.Actions.v1.ActionLogFilter = {}
 
@@ -754,18 +749,13 @@ const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 	return [...options.values()].sort(compareFilterOptions)
 })
 
-const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() => [
-	{
-		value: SERVER_WORLD_FILTER_VALUE,
-		label: formatMessage(messages.serverScope),
-		searchTerms: [serverId],
-	},
-	...worldOptions.value.map((world) => ({
+const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() =>
+	worldOptions.value.map((world) => ({
 		value: world.id,
 		label: world.name,
 		searchTerms: [world.id, world.name],
 	})),
-])
+)
 
 const auditLogActionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	actionLogActionNames.map((action) => ({
@@ -775,22 +765,24 @@ const auditLogActionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	})),
 )
 
-const auditLogFilterCategories = computed<DropdownFilterBarCategory[]>(() => [
-	{
-		key: 'users',
-		label: formatMessage(messages.userFilter),
-		options: auditLogUserFilterOptions.value,
-		searchable: true,
-		searchPlaceholder: formatMessage(messages.userFilterSearch),
-	},
-	{
-		key: 'worlds',
-		label: formatMessage(messages.instanceFilter),
-		options: auditLogWorldFilterOptions.value,
-		searchable: true,
-		searchPlaceholder: formatMessage(messages.instanceFilterSearch),
-	},
-	{
+const auditLogFilterCategories = computed<DropdownFilterBarCategory[]>(() => {
+	const categories: DropdownFilterBarCategory[] = [
+		{
+			key: 'users',
+			label: formatMessage(messages.userFilter),
+			options: auditLogUserFilterOptions.value,
+		},
+	]
+
+	if (isAuditLogWorldFilterVisible.value) {
+		categories.push({
+			key: 'worlds',
+			label: formatMessage(messages.instanceFilter),
+			options: auditLogWorldFilterOptions.value,
+		})
+	}
+
+	categories.push({
 		key: 'actions',
 		label: formatMessage(messages.actionTypeFilter),
 		options: auditLogActionFilterOptions.value,
@@ -798,8 +790,10 @@ const auditLogFilterCategories = computed<DropdownFilterBarCategory[]>(() => [
 		searchPlaceholder: formatMessage(messages.actionTypeFilterSearch),
 		submenuClass: 'w-[22rem]',
 		previewDropdownMinWidth: '20rem',
-	},
-])
+	})
+
+	return categories
+})
 
 const hasActiveAuditLogDateFilter = computed(
 	() => !!actionLogDateFilter.value.min_datetime || !!actionLogDateFilter.value.max_datetime,
@@ -808,9 +802,11 @@ const hasActiveAuditLogDateFilter = computed(
 const hasActiveAuditLogFilters = computed(
 	() =>
 		hasActiveAuditLogDateFilter.value ||
-		(['users', 'worlds', 'actions'] satisfies AuditLogFilterKey[]).some(
-			(key) => selectedAuditLogFilterValues(key).length > 0,
-		),
+		(
+			isAuditLogWorldFilterVisible.value
+				? (['users', 'worlds', 'actions'] satisfies AuditLogFilterKey[])
+				: (['users', 'actions'] satisfies AuditLogFilterKey[])
+		).some((key) => selectedAuditLogFilterValues(key).length > 0),
 )
 
 const filteredMembers = computed(() => {
@@ -836,22 +832,7 @@ function selectedAuditLogFilterValues(key: AuditLogFilterKey): string[] {
 	return values ? [...values] : []
 }
 
-function defaultAuditLogDateRange() {
-	const endDate = new Date()
-	const startDate = new Date(endDate)
-	startDate.setDate(startDate.getDate() - 29)
-
-	return [formatDatePickerValue(startDate), formatDatePickerValue(endDate)]
-}
-
-function formatDatePickerValue(date: Date) {
-	const year = date.getFullYear()
-	const month = String(date.getMonth() + 1).padStart(2, '0')
-	const day = String(date.getDate()).padStart(2, '0')
-	return `${year}-${month}-${day}`
-}
-
-function parseDatePickerValue(value: string) {
+function parseDateInputValue(value: string) {
 	const [yearValue, monthValue, dayValue] = value.split('-').map(Number)
 	if (!yearValue || !monthValue || !dayValue) return null
 
@@ -865,6 +846,106 @@ function parseDatePickerValue(value: string) {
 	}
 
 	return date
+}
+
+function parseDateTimeInputValue(value: string) {
+	const date = new Date(value)
+	return Number.isNaN(date.getTime()) ? null : date
+}
+
+function addDays(date: Date, days: number) {
+	const nextDate = new Date(date)
+	nextDate.setDate(nextDate.getDate() + days)
+	return nextDate
+}
+
+function subtractCalendarMonths(date: Date, months: number) {
+	const nextDate = new Date(date)
+	const day = nextDate.getDate()
+	nextDate.setDate(1)
+	nextDate.setMonth(nextDate.getMonth() - months)
+	const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate()
+	nextDate.setDate(Math.min(day, daysInMonth))
+	return nextDate
+}
+
+function getRoundedNow() {
+	const now = Date.now()
+	return new Date(Math.floor(now / 60000) * 60000)
+}
+
+function getAuditLogTimeframeRange(): { start: Date; end: Date } | null {
+	const now = getRoundedNow()
+
+	if (auditLogTimeframeMode.value === 'last') {
+		return getLastAuditLogTimeframeRange(now)
+	}
+
+	if (auditLogTimeframeMode.value === 'custom_range') {
+		const startDate = parseDateInputValue(auditLogTimeframeCustomStartDate.value)
+		const endDate = parseDateInputValue(auditLogTimeframeCustomEndDate.value)
+		if (!startDate || !endDate) return null
+
+		const [minDate, maxDate] =
+			startDate.getTime() > endDate.getTime() ? [endDate, startDate] : [startDate, endDate]
+
+		return {
+			start: startOfDay(minDate),
+			end: endOfDay(maxDate),
+		}
+	}
+
+	if (auditLogTimeframeMode.value === 'custom_datetime_range') {
+		const startDate = parseDateTimeInputValue(auditLogTimeframeCustomStartDate.value)
+		const endDate = parseDateTimeInputValue(auditLogTimeframeCustomEndDate.value)
+		if (!startDate || !endDate) return null
+
+		return startDate.getTime() > endDate.getTime()
+			? { start: endDate, end: startDate }
+			: { start: startDate, end: endDate }
+	}
+
+	return getPresetAuditLogTimeframeRange(now)
+}
+
+function getPresetAuditLogTimeframeRange(now: Date): { start: Date; end: Date } | null {
+	switch (auditLogTimeframePreset.value) {
+		case 'today':
+			return { start: startOfDay(now), end: endOfDay(now) }
+		case 'yesterday': {
+			const yesterday = addDays(now, -1)
+			return { start: startOfDay(yesterday), end: endOfDay(yesterday) }
+		}
+		case 'last_7_days':
+			return { start: startOfDay(addDays(now, -6)), end: endOfDay(now) }
+		case 'last_14_days':
+			return { start: startOfDay(addDays(now, -13)), end: endOfDay(now) }
+		case 'last_30_days':
+			return { start: startOfDay(addDays(now, -29)), end: endOfDay(now) }
+		case 'last_90_days':
+			return { start: startOfDay(addDays(now, -89)), end: endOfDay(now) }
+		case 'last_180_days':
+			return { start: startOfDay(addDays(now, -179)), end: endOfDay(now) }
+		case 'year_to_date':
+			return { start: new Date(now.getFullYear(), 0, 1), end: endOfDay(now) }
+		case 'all_time':
+			return null
+	}
+}
+
+function getLastAuditLogTimeframeRange(now: Date): { start: Date; end: Date } {
+	const amount = Math.max(1, Math.floor(auditLogTimeframeLastAmount.value))
+
+	switch (auditLogTimeframeLastUnit.value) {
+		case 'hours':
+			return { start: new Date(now.getTime() - amount * 60 * 60 * 1000), end: now }
+		case 'days':
+			return { start: new Date(now.getTime() - amount * 24 * 60 * 60 * 1000), end: now }
+		case 'weeks':
+			return { start: new Date(now.getTime() - amount * 7 * 24 * 60 * 60 * 1000), end: now }
+		case 'months':
+			return { start: subtractCalendarMonths(now, amount), end: now }
+	}
 }
 
 function startOfDay(date: Date) {

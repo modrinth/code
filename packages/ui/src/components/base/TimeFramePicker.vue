@@ -4,6 +4,7 @@
 		:options="timeframeDropdownOptions"
 		:display-value="selectedTimeframeLabel"
 		:max-height="maxHeight"
+		:trigger-class="triggerClass"
 		:dropdown-min-width="timeframeDropdownMinWidth"
 		:dropdown-class="
 			activeTimeframePanel === 'custom_range'
@@ -326,6 +327,7 @@ const props = withDefaults(
 		maxDate?: string
 		nowTimestamp?: number
 		maxHeight?: number
+		triggerClass?: string
 		dropdownMinWidth?: string | number
 		customRangeDropdownMinWidth?: string | number
 	}>(),

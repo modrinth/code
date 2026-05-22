@@ -94,7 +94,7 @@
 				<Checkbox
 					v-model="addAsFriend"
 					:label="formatMessage(messages.addAsFriend)"
-					label-class="text-base font-semibold text-contrast"
+					label-class="text-base text-contrast"
 					class="mt-2"
 				/>
 			</div>

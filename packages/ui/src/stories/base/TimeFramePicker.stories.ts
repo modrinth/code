@@ -24,14 +24,17 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-function renderPicker(initial: {
-	mode?: TimeFrameMode
-	preset?: TimeFramePreset
-	lastAmount?: number
-	lastUnit?: TimeFrameLastUnit
-	customStartDate?: string
-	customEndDate?: string
-} = {}) {
+function renderPicker(
+	initial: {
+		mode?: TimeFrameMode
+		preset?: TimeFramePreset
+		lastAmount?: number
+		lastUnit?: TimeFrameLastUnit
+		customStartDate?: string
+		customEndDate?: string
+	} = {},
+	triggerClass?: string,
+) {
 	return () => ({
 		components: { TimeFramePicker },
 		setup() {
@@ -49,6 +52,7 @@ function renderPicker(initial: {
 				lastUnit,
 				mode,
 				preset,
+				triggerClass,
 			}
 		},
 		template: /* html */ `
@@ -59,6 +63,7 @@ function renderPicker(initial: {
 				v-model:last-unit="lastUnit"
 				v-model:custom-start-date="customStartDate"
 				v-model:custom-end-date="customEndDate"
+				:trigger-class="triggerClass"
 				min-date="2023-01-01"
 			/>
 		`,
@@ -83,4 +88,11 @@ export const CustomRange: Story = {
 		customStartDate: '2026-04-23',
 		customEndDate: '2026-05-22',
 	}),
+}
+
+export const CompactTrigger: Story = {
+	render: renderPicker(
+		{},
+		'!h-10 !min-h-10 !rounded-[14px] !bg-surface-4 !py-2.5 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]',
+	),
 }

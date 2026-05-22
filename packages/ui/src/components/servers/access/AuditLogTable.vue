@@ -1,15 +1,15 @@
 <template>
 	<div class="@container flex flex-col gap-4">
 		<div class="flex min-w-0 flex-col items-start gap-3 @[640px]:flex-row @[640px]:items-center">
-			<DatePicker
-				v-model="dateRange"
-				mode="range"
-				:placeholder="formatMessage(messages.dateRangePlaceholder)"
-				:wrapper-class="dateRangePickerWrapperClass"
-				:input-class="dateRangePickerInputClass"
-				date-format="Y-m-d"
-				alt-format="M j, Y"
-				position="below left"
+			<TimeFramePicker
+				v-model:mode="timeframeMode"
+				v-model:preset="timeframePreset"
+				v-model:last-amount="timeframeLastAmount"
+				v-model:last-unit="timeframeLastUnit"
+				v-model:custom-start-date="timeframeCustomStartDate"
+				v-model:custom-end-date="timeframeCustomEndDate"
+				:class="timeframePickerClass"
+				:trigger-class="timeframePickerTriggerClass"
 			/>
 			<template v-if="slots.filters">
 				<div class="hidden h-8 w-[1px] shrink-0 bg-surface-5 @[640px]:ml-4 @[640px]:block"></div>
@@ -178,8 +178,12 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import BulletDivider from '../../base/BulletDivider.vue'
-import DatePicker from '../../base/DatePicker.vue'
 import Table, { type TableColumn } from '../../base/Table.vue'
+import TimeFramePicker, {
+	type TimeFrameLastUnit,
+	type TimeFrameMode,
+	type TimeFramePreset,
+} from '../../base/TimeFramePicker.vue'
 import type { ServerAuditLogEntry, ServerAuditLogFilters } from './types'
 
 const props = defineProps<{
@@ -195,7 +199,12 @@ const emit = defineEmits<{
 }>()
 
 const query = defineModel<string>('query', { default: '' })
-const dateRange = defineModel<string[]>('dateRange', { default: () => [] })
+const timeframeMode = defineModel<TimeFrameMode>('timeframeMode', { default: 'preset' })
+const timeframePreset = defineModel<TimeFramePreset>('timeframePreset', { default: 'all_time' })
+const timeframeLastAmount = defineModel<number>('timeframeLastAmount', { default: 30 })
+const timeframeLastUnit = defineModel<TimeFrameLastUnit>('timeframeLastUnit', { default: 'days' })
+const timeframeCustomStartDate = defineModel<string>('timeframeCustomStartDate', { default: '' })
+const timeframeCustomEndDate = defineModel<string>('timeframeCustomEndDate', { default: '' })
 const filters = defineModel<ServerAuditLogFilters>('filters', {
 	default: () => ({
 		userId: null,
@@ -214,10 +223,6 @@ let loadMoreObserver: IntersectionObserver | null = null
 let contentResizeObserver: ResizeObserver | null = null
 
 const messages = defineMessages({
-	dateRangePlaceholder: {
-		id: 'servers.audit-log.date-range.placeholder',
-		defaultMessage: 'Select date range...',
-	},
 	supportActor: {
 		id: 'servers.audit-log.actor.support',
 		defaultMessage: 'Support',
@@ -256,13 +261,11 @@ const messages = defineMessages({
 	},
 })
 
-const dateRangePickerWrapperClass = computed(() =>
+const timeframePickerClass = computed(() =>
 	slots.filters ? '!w-full @[640px]:!w-[285px] shrink-0' : '!w-full @[640px]:!w-[285px]',
 )
-const dateRangePickerInputClass = computed(
-	() =>
-		'!h-10 !w-full !rounded-[14px] !bg-surface-4 !py-2.5 !pl-10 !pr-4 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]',
-)
+const timeframePickerTriggerClass =
+	'!h-10 !min-h-10 !w-full !rounded-[14px] !bg-surface-4 !py-2.5 !pl-4 !pr-3 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]'
 
 onMounted(() => {
 	updateLoadMoreObserver()
@@ -319,11 +322,23 @@ watch(
 	{ flush: 'post' },
 )
 
+const hasActiveTimeframeFilter = computed(() => {
+	if (timeframeMode.value === 'preset') {
+		return timeframePreset.value !== 'all_time'
+	}
+
+	if (timeframeMode.value === 'last') {
+		return true
+	}
+
+	return Boolean(timeframeCustomStartDate.value || timeframeCustomEndDate.value)
+})
+
 const hasActiveFilters = computed(
 	() =>
 		props.hasActiveExternalFilters ||
 		query.value.trim().length > 0 ||
-		dateRange.value.length > 0 ||
+		hasActiveTimeframeFilter.value ||
 		!!filters.value.userId ||
 		!!filters.value.worldId,
 )

@@ -62,18 +62,18 @@
 			@click="handleTriggerClick($event)"
 			@keydown="handleTriggerKeydown"
 		>
-			<div class="flex items-center gap-2">
+			<div class="flex min-w-0 items-center gap-2">
 				<slot name="prefix"></slot>
 				<component
 					:is="selectedOption?.icon"
 					v-if="showIconInSelected && selectedOption?.icon"
 					class="h-5 w-5"
 				/>
-				<span class="text-primary font-semibold leading-tight">
+				<span class="min-w-0 truncate text-primary font-semibold leading-tight">
 					<slot name="selected">{{ triggerText }}</slot>
 				</span>
 			</div>
-			<div class="flex items-center gap-1">
+			<div class="flex shrink-0 items-center gap-1">
 				<slot name="suffix"></slot>
 				<ChevronLeftIcon
 					v-if="showChevron"
