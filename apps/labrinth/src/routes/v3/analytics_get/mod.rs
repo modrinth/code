@@ -10,11 +10,19 @@
 mod facets;
 mod old;
 
-use std::{collections::HashMap, num::NonZeroU64, sync::LazyLock};
+use std::{
+    collections::HashMap,
+    num::NonZeroU64,
+    sync::{
+        LazyLock,
+        atomic::{AtomicUsize, Ordering},
+    },
+};
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
 use chrono::{DateTime, TimeDelta, Utc};
+use dashmap::DashMap;
 use eyre::eyre;
 use futures::StreamExt;
 use regex::Regex;
@@ -1168,7 +1176,43 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
         .collect()
     });
 
+// Put a cap of 100MB on the download source cache. We can adjust this as needed,
+// if we find we're getting too few cache hits, or too much memory usage.
+const MAX_DOWNLOAD_SOURCE_CACHE_BYTES: usize = 100 * 1024 * 1024;
+
+static DOWNLOAD_SOURCE_CACHE: LazyLock<
+    DashMap<String, Option<DownloadSource>>,
+> = LazyLock::new(DashMap::new);
+
+static DOWNLOAD_SOURCE_CACHE_BYTES: AtomicUsize = AtomicUsize::new(0);
+
 fn normalize_download_source(user_agent: &str) -> Option<DownloadSource> {
+    if let Some(source) = DOWNLOAD_SOURCE_CACHE.get(user_agent) {
+        return source.clone();
+    }
+
+    let source = normalize_download_source_uncached(user_agent);
+
+    // This is intentionally a simple bounded cache. Reads are the hot path,
+    // and the distinct UA set should settle after common launchers are seen.
+    // If this becomes lock-contentious, ArcSwap plus an immutable map would
+    // avoid DashMap's shard locks while keeping misses cheaper than cloning a
+    // std HashMap.
+    let key_bytes = user_agent.len();
+    let previous_bytes =
+        DOWNLOAD_SOURCE_CACHE_BYTES.fetch_add(key_bytes, Ordering::Relaxed);
+    if previous_bytes + key_bytes <= MAX_DOWNLOAD_SOURCE_CACHE_BYTES {
+        DOWNLOAD_SOURCE_CACHE.insert(user_agent.to_owned(), source.clone());
+    } else {
+        DOWNLOAD_SOURCE_CACHE_BYTES.fetch_sub(key_bytes, Ordering::Relaxed);
+    }
+
+    source
+}
+
+fn normalize_download_source_uncached(
+    user_agent: &str,
+) -> Option<DownloadSource> {
     DOWNLOAD_SOURCE_PATTERNS.iter().find_map(|(regex, source)| {
         regex.is_match(user_agent).then(|| source.into_source())
     })
