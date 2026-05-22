@@ -6,8 +6,13 @@
 			<div
 				class="flex w-full items-center justify-between rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4"
 			>
-				<div class="text-xl font-semibold text-contrast">
-					{{ graphTitle }}
+				<div class="flex flex-col gap-0.5">
+					<div class="text-xl font-semibold text-contrast">
+						{{ graphTitle }}
+					</div>
+					<p v-if="showTableSelectionSubheading" class="m-0 text-sm text-secondary">
+						{{ tableSelectionSubheading }}
+					</p>
 				</div>
 
 				<div class="flex items-center gap-3">
@@ -121,7 +126,7 @@
 			>
 				<div :class="['h-full']">
 					<div
-						v-if="selectedProjects.length === 0"
+						v-if="showEmptyChartState"
 						class="flex h-full items-center justify-center rounded-xl"
 					>
 						<div
@@ -326,8 +331,19 @@ const selectedProjects = computed(() =>
 const showProjectVersionNames = computed(
 	() => selectedBreakdown.value === 'version_id' && selectedProjects.value.length > 1,
 )
+const tableProjectCount = computed(() => selectedGraphDatasetIds.value.length)
+const isTableGraphSelectionEmpty = computed(
+	() => isGraphDatasetSelectionActive.value && tableProjectCount.value === 0,
+)
+const showEmptyChartState = computed(
+	() => selectedProjects.value.length === 0 || isTableGraphSelectionEmpty.value,
+)
 
 const emptyChartMessage = computed(() => {
+	if (isTableGraphSelectionEmpty.value) {
+		return 'Select items from table below to visualize your data.'
+	}
+
 	if (hasProjectContext.value) {
 		return 'No data available for analytics'
 	}
@@ -381,6 +397,65 @@ const legendPalette = computed(() =>
 )
 
 const graphTitle = computed(() => titleByStat[activeStat.value])
+const showTableSelectionSubheading = computed(
+	() => isGraphDatasetSelectionActive.value && tableProjectCount.value > 0,
+)
+const tableBreakdownItemLabel = computed(() => {
+	const isSingular = tableProjectCount.value === 1
+
+	switch (selectedBreakdown.value) {
+		case 'project':
+			return isSingular ? 'project' : 'projects'
+		case 'country':
+			return isSingular ? 'country' : 'countries'
+		case 'monetization':
+			return isSingular ? 'monetization value' : 'monetization values'
+		case 'user_agent':
+			return isSingular ? 'download source' : 'download sources'
+		case 'download_reason':
+			return isSingular ? 'download type' : 'download types'
+		case 'version_id':
+			return isSingular ? 'project version' : 'project versions'
+		case 'loader':
+			return isSingular ? 'loader' : 'loaders'
+		case 'game_version':
+			return isSingular ? 'game version' : 'game versions'
+		default:
+			return isSingular ? 'item' : 'items'
+	}
+})
+const sortedChartDatasetIds = computed(() =>
+	[...allChartDatasets.value]
+		.sort((a, b) => {
+			const totalDifference = getChartDatasetTotal(b) - getChartDatasetTotal(a)
+			return (
+				totalDifference || a.label.localeCompare(b.label) || a.projectId.localeCompare(b.projectId)
+			)
+		})
+		.map((dataset) => dataset.projectId),
+)
+const isShowingAllTableItems = computed(() => {
+	if (selectedGraphDatasetIds.value.length !== sortedChartDatasetIds.value.length) return false
+	const selectedDatasetIds = new Set(selectedGraphDatasetIds.value)
+	return sortedChartDatasetIds.value.every((datasetId) => selectedDatasetIds.has(datasetId))
+})
+const isShowingTopTableItems = computed(() => {
+	const topDatasetIds = new Set(
+		sortedChartDatasetIds.value.slice(0, selectedGraphDatasetIds.value.length),
+	)
+	return selectedGraphDatasetIds.value.every((datasetId) => topDatasetIds.has(datasetId))
+})
+const tableSelectionSubheading = computed(() => {
+	if (isShowingAllTableItems.value) {
+		return `Showing all ${tableBreakdownItemLabel.value} from table`
+	}
+
+	if (isShowingTopTableItems.value) {
+		return `Showing top ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
+	}
+
+	return `Showing ${tableProjectCount.value} from table`
+})
 const shouldCapitalizeDatasetLabels = computed(
 	() =>
 		selectedBreakdown.value === 'download_reason' ||
@@ -541,6 +616,10 @@ type LegendEntry = {
 	color: string
 	totalValue: number
 	hidden: boolean
+}
+
+function getChartDatasetTotal(dataset: ChartDataset) {
+	return dataset.data.reduce((sum, value) => sum + value, 0)
 }
 
 function setHoverState(payload: HoverState) {
