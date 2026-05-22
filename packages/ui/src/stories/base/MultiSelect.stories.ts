@@ -157,9 +157,19 @@ export const WithRightCheckbox: Story = {
 export const WithSelectionActions: Story = {
 	args: {
 		...Default.args,
+		modelValue: [],
 		searchable: true,
 		showSelectionActions: true,
 		searchPlaceholder: 'Search versions',
+		maxHeight: 180,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Selection actions stay above the scrollable options and compensate the scroll position when they appear.',
+			},
+		},
 	},
 }
 

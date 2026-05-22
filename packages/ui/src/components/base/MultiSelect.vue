@@ -194,8 +194,9 @@
 						</div>
 
 						<div
-							v-if="shouldShowSelectionActions"
-							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-3 py-2.5 text-sm"
+							v-if="shouldShowSelectionActions && hasFilteredOptions"
+							ref="selectionActionsRef"
+							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 bg-surface-4 px-3 py-2.5 text-sm"
 						>
 							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
 							<button
@@ -330,15 +331,32 @@
 							</div>
 						</div>
 					</div>
-					<div
-						v-else-if="isNoOptionsState && noOptionsMessage"
-						class="p-4 mb-2 text-center text-sm text-secondary"
-					>
-						{{ noOptionsMessage }}
-					</div>
-					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
-						{{ noResultsMessage }}
-					</div>
+					<template v-else>
+						<div
+							v-if="shouldShowSelectionActions"
+							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-3 py-2.5 text-sm"
+						>
+							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
+							<button
+								type="button"
+								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
+								@click="clearAll"
+								@keydown.enter.stop
+								@keydown.space.stop
+							>
+								{{ selectionActionsClearLabel }}
+							</button>
+						</div>
+						<div
+							v-if="isNoOptionsState && noOptionsMessage"
+							class="p-4 mb-2 text-center text-sm text-secondary"
+						>
+							{{ noOptionsMessage }}
+						</div>
+						<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
+							{{ noResultsMessage }}
+						</div>
+					</template>
 
 					<div v-if="$slots.bottom" @keydown.stop>
 						<slot name="bottom"></slot>
@@ -493,10 +511,12 @@ const triggerRef = ref<HTMLElement>()
 const dropdownRef = ref<HTMLElement>()
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
+const selectionActionsRef = ref<HTMLElement>()
 const searchInputRef = ref<InstanceType<typeof StyledInput>>()
 const rafId = ref<number | null>(null)
 const tagsContainerRef = ref<HTMLElement>()
 const optionsOverlayScrollbars = ref<OverlayScrollbarsInstance | null>(null)
+const lastSelectionActionsHeight = ref(0)
 
 const dropdownStyle = ref({
 	top: '0px',
@@ -893,7 +913,11 @@ async function initializeOptionsOverlayScrollbars() {
 		return
 	}
 
-	if (!optionsScrollbarRef.value || !optionsContainerRef.value || !listContainer.value) {
+	if (
+		!optionsScrollbarRef.value ||
+		!optionsContainerRef.value ||
+		!listContainer.value
+	) {
 		return
 	}
 
@@ -912,6 +936,15 @@ async function initializeOptionsOverlayScrollbars() {
 		},
 		OPTIONS_OVERLAY_SCROLLBARS_OPTIONS,
 	)
+}
+
+function getSelectionActionsHeight() {
+	return shouldShowSelectionActions.value ? (selectionActionsRef.value?.offsetHeight ?? 0) : 0
+}
+
+async function syncSelectionActionsHeight() {
+	await nextTick()
+	lastSelectionActionsHeight.value = getSelectionActionsHeight()
 }
 
 function updateOptionsOverlayScrollbars() {
@@ -934,6 +967,7 @@ async function openDropdown() {
 	await nextTick()
 	await updateDropdownPosition()
 	await initializeOptionsOverlayScrollbars()
+	await syncSelectionActionsHeight()
 
 	if (props.searchable && searchInputRef.value) {
 		;(searchInputRef.value as unknown as { focus: () => void }).focus()
@@ -1054,7 +1088,14 @@ function scrollOptionIndexIntoView(index: number) {
 
 	const optionElement = container.querySelector<HTMLElement>(`[data-option-index="${index}"]`)
 	if (optionElement) {
-		optionElement.scrollIntoView({ block: 'nearest' })
+		const containerRect = container.getBoundingClientRect()
+		const optionRect = optionElement.getBoundingClientRect()
+
+		if (optionRect.top < containerRect.top) {
+			container.scrollTop -= containerRect.top - optionRect.top
+		} else if (optionRect.bottom > containerRect.bottom) {
+			container.scrollTop += optionRect.bottom - containerRect.bottom
+		}
 		return
 	}
 
@@ -1240,10 +1281,35 @@ watch(filteredOptions, () => {
 		updateDropdownPosition()
 		if (hasFilteredOptions.value) {
 			initializeOptionsOverlayScrollbars()
+			syncSelectionActionsHeight()
 		} else {
 			destroyOptionsOverlayScrollbars()
+			lastSelectionActionsHeight.value = 0
 		}
 	}
+})
+
+watch(shouldShowSelectionActions, async () => {
+	const container = optionsContainerRef.value
+	const previousHeight = lastSelectionActionsHeight.value
+	const previousScrollTop = container?.scrollTop ?? 0
+
+	await nextTick()
+
+	const nextHeight = hasFilteredOptions.value ? getSelectionActionsHeight() : 0
+	lastSelectionActionsHeight.value = nextHeight
+
+	if (!isOpen.value || !hasFilteredOptions.value || !container || previousHeight === nextHeight) {
+		if (isOpen.value) {
+			updateDropdownPosition()
+		}
+		updateOptionsOverlayScrollbars()
+		return
+	}
+
+	container.scrollTop = Math.max(0, previousScrollTop + nextHeight - previousHeight)
+	updateDropdownPosition()
+	updateOptionsOverlayScrollbars()
 })
 
 watch(
