@@ -87,6 +87,14 @@ export type { TabsTab, TabsValue } from './Tabs.vue'
 export { default as Tabs } from './Tabs.vue'
 export { default as TagItem } from './TagItem.vue'
 export { default as TagTagItem } from './TagTagItem.vue'
+export type {
+	TimeFrameLastUnit,
+	TimeFrameLastUnitOption,
+	TimeFrameMode,
+	TimeFramePickerSelection,
+	TimeFramePreset,
+} from './TimeFramePicker.vue'
+export { default as TimeFramePicker } from './TimeFramePicker.vue'
 export { default as Timeline } from './Timeline.vue'
 export { default as Toggle } from './Toggle.vue'
 export { default as UnsavedChangesPopup } from './UnsavedChangesPopup.vue'
