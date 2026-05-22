@@ -64,7 +64,7 @@ pub enum FeatureFlag {
 }
 
 impl Settings {
-    const CURRENT_VERSION: usize = 2;
+    const CURRENT_VERSION: usize = 3;
 
     pub async fn get(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
@@ -294,6 +294,16 @@ impl Settings {
                 }
 
                 self.version = 2;
+            }
+            2 => {
+				// Update old default memory setting from 2GB to 4GB (depending on system memory)
+                const LEGACY_DEFAULT_MEMORY_MB: u32 = 2048;
+                if self.memory.maximum == LEGACY_DEFAULT_MEMORY_MB {
+                    self.memory.maximum =
+                        crate::api::jre::default_memory_max_mb();
+                }
+
+                self.version = 3;
             }
             version => {
                 return Err(crate::ErrorKind::OtherError(format!(
