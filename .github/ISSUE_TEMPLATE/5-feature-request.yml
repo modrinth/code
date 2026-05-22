@@ -9,8 +9,6 @@ body:
       options:
         - label: I checked the [existing issues](https://github.com/modrinth/code/issues?q=is%3Aissue) for duplicate feature requests
           required: true
-        - label: I have checked that this feature request is not on our [roadmap](https://roadmap.modrinth.com)
-          required: true
   - type: dropdown
     id: projects
     attributes:
