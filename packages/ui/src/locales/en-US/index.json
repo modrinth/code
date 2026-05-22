@@ -3602,14 +3602,14 @@
   "servers.audit-log.event.java-version-modified": {
     "defaultMessage": "Changed Java version to <java-version></java-version>"
   },
-  "servers.audit-log.event.loader-version-changed": {
-    "defaultMessage": "Changed loader version to <version></version>"
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Changed loader to <loader></loader> <version></version>"
   },
   "servers.audit-log.event.loader-changed": {
     "defaultMessage": "Changed loader to <loader></loader>"
   },
-  "servers.audit-log.event.loader-and-version-changed": {
-    "defaultMessage": "Changed loader to <loader></loader> <version></version>"
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "Changed loader version to <version></version>"
   },
   "servers.audit-log.event.loader-version-cleared": {
     "defaultMessage": "Cleared loader version"
