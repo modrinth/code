@@ -1284,40 +1284,15 @@ onMounted(async () => {
 	notifications.setNotificationLocation('left')
 
 	if (projectV2.value.status !== 'processing') {
-		if (moderationQueue.isQueueMode && moderationQueue.queueLength > 1) {
-			addNotification({
-				title: 'Project already moderated',
-				text: 'Skipping to the next project in the queue.',
-				type: 'info',
-			})
-			await skipToNextProject()
-			return
-		}
-
 		alreadyReviewed.value = true
 		return
 	}
 
-	// Try to acquire lock
 	const result = await moderationQueue.acquireLock(projectV2.value.id)
 
 	if (result.success) {
 		handleLockAcquired()
 	} else if (result.locked_by) {
-		// Actually locked by another moderator
-		// In queue mode with more projects - auto-skip to next project
-		if (moderationQueue.isQueueMode && moderationQueue.queueLength > 1) {
-			addNotification({
-				title: 'Project locked',
-				text: `Skipped project locked by @${result.locked_by.username}.`,
-				type: 'info',
-			})
-			// skipToNextProject already calls completeCurrentProject
-			await skipToNextProject()
-			return
-		}
-
-		// Single project mode or last in queue - show locked UI
 		lockStatus.value = {
 			locked: true,
 			lockedBy: result.locked_by,
