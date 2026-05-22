@@ -277,6 +277,7 @@ const props = withDefaults(
 		addLabel?: string
 		clearLabel?: string
 		useFilterIcon?: boolean
+		applyImmediately?: boolean
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 	}>(),
@@ -285,6 +286,7 @@ const props = withDefaults(
 		addLabel: 'Add',
 		clearLabel: 'Clear',
 		useFilterIcon: false,
+		applyImmediately: false,
 		emptyOptionsLabel: 'No options available.',
 		emptySearchLabel: 'No options found.',
 	},
@@ -493,6 +495,9 @@ function setSelectedValues(
 		if (isAddMenuOpen.value && activeCategoryKey.value === categoryKey) {
 			scheduleSubmenuPositionUpdate()
 		}
+		if (props.applyImmediately) {
+			emit('update:modelValue', nextFilters)
+		}
 	} else {
 		emit('update:modelValue', nextFilters)
 	}
@@ -672,9 +677,13 @@ function getPreviewSelectedValues(categoryKey: string): string[] {
 }
 
 function setPreviewSelectedValues(categoryKey: string, values: string[]) {
+	const normalizedValues = normalizeSelectedValues(values)
 	previewSelectedValueDrafts.value = {
 		...previewSelectedValueDrafts.value,
-		[categoryKey]: normalizeSelectedValues(values),
+		[categoryKey]: normalizedValues,
+	}
+	if (props.applyImmediately) {
+		setSelectedValues(categoryKey, normalizedValues)
 	}
 }
 

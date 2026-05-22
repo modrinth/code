@@ -73,6 +73,7 @@
 						:clear-label="formatMessage(messages.clearFilters)"
 						:empty-options-label="formatMessage(messages.emptyFilterOptions)"
 						:empty-search-label="formatMessage(messages.emptyFilterSearch)"
+						apply-immediately
 						use-filter-icon
 					/>
 				</template>
@@ -147,6 +148,8 @@ type AuditLogFilterKey = 'users' | 'worlds' | 'actions'
 
 const ACTION_LOG_PAGE_SIZE = 200
 const ACTION_LOG_FILTER_OVERLAY_MS = 750
+const SUPPORT_ACTION_LOG_USER_FILTER = 'support'
+const SERVER_SCOPED_ACTION_LOG_WORLD_FILTER = '__server_scoped__'
 
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
@@ -204,11 +207,19 @@ const messages = defineMessages({
 	},
 	userFilter: {
 		id: 'servers.access-page.activity-log-filter.users',
-		defaultMessage: 'Users',
+		defaultMessage: 'Actors',
+	},
+	supportActor: {
+		id: 'servers.access-page.activity-log-filter.support-actor',
+		defaultMessage: 'Support',
 	},
 	instanceFilter: {
 		id: 'servers.access-page.activity-log-filter.instances',
 		defaultMessage: 'Instances',
+	},
+	serverScopedInstance: {
+		id: 'servers.access-page.activity-log-filter.server-scoped-instance',
+		defaultMessage: 'Server',
 	},
 	actionTypeFilter: {
 		id: 'servers.access-page.activity-log-filter.action-types',
@@ -582,19 +593,20 @@ const serverUsersQuery = useQuery({
 const members = computed<ServerAccessMember[]>(() =>
 	(serverUsersQuery.data.value ?? [])
 		.map((serverUser) => {
-			const username = serverUser.user.username
+			const userId = serverUser.user.id
+			const username = serverUser.user.username || userId
 			const role = apiPermissionsToAccessRole(serverUser.permissions)
 
 			return {
-				id: `${serverId}-${username}`,
+				id: `${serverId}-${userId}`,
 				user: {
-					id: username,
+					id: userId,
 					username,
 					avatarUrl: serverUser.user.avatar_url || undefined,
 				},
 				role,
 				joinedAt: serverUser.added_on ?? null,
-				pending: false,
+				pending: !serverUser.added_on,
 				isOwner: role === 'owner',
 			}
 		})
@@ -607,7 +619,7 @@ const members = computed<ServerAccessMember[]>(() =>
 const worldOptions = computed(
 	() => serverFull.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
 )
-const isAuditLogWorldFilterVisible = computed(() => worldOptions.value.length > 1)
+const isAuditLogWorldFilterVisible = computed(() => worldOptions.value.length > 0)
 
 const worldById = computed(
 	() => new Map(worldOptions.value.map((world) => [world.id, world] as const)),
@@ -649,7 +661,7 @@ const actionLogDateFilter = computed(() => {
 
 const actionLogEndpointFilter = computed<Archon.Actions.v1.ActionLogFilter | undefined>(() => {
 	const users = selectedAuditLogFilterValues('users')
-	const worlds = isAuditLogWorldFilterVisible.value ? selectedAuditLogFilterValues('worlds') : []
+	const worlds = isAuditLogWorldFilterVisible.value ? selectedAuditLogWorldFilterValues() : []
 	const actions = selectedAuditLogFilterValues('actions').filter(isActionLogActionName)
 	const filter: Archon.Actions.v1.ActionLogFilter = {}
 
@@ -765,12 +777,34 @@ const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 	const options = new Map<string, DropdownFilterBarOption>()
 
 	for (const page of actionLogQuery.data.value?.pages ?? []) {
-		for (const [id, user] of Object.entries(page.users)) {
+		for (const entry of page.data) {
+			if (entry.actor.type === 'support') {
+				const userId = entry.actor.user_id ?? null
+				const user = userId ? page.users[userId] : undefined
+				if (!options.has(SUPPORT_ACTION_LOG_USER_FILTER)) {
+					options.set(SUPPORT_ACTION_LOG_USER_FILTER, {
+						value: SUPPORT_ACTION_LOG_USER_FILTER,
+						label: user?.username
+							? `${formatMessage(messages.supportActor)} (${user.username})`
+							: formatMessage(messages.supportActor),
+						searchTerms: [
+							SUPPORT_ACTION_LOG_USER_FILTER,
+							formatMessage(messages.supportActor),
+							userId,
+							user?.username,
+						].filter(Boolean) as string[],
+					})
+				}
+				continue
+			}
+
+			const id = entry.actor.user_id
+			const user = page.users[id]
 			if (!options.has(id)) {
 				options.set(id, {
 					value: id,
-					label: user.username,
-					searchTerms: [id, user.username],
+					label: user?.username ?? id,
+					searchTerms: [id, user?.username].filter(Boolean) as string[],
 				})
 			}
 		}
@@ -779,13 +813,21 @@ const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 	return [...options.values()].sort(compareFilterOptions)
 })
 
-const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() =>
-	worldOptions.value.map((world) => ({
+const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() => [
+	{
+		value: SERVER_SCOPED_ACTION_LOG_WORLD_FILTER,
+		label: formatMessage(messages.serverScopedInstance),
+		searchTerms: [
+			SERVER_SCOPED_ACTION_LOG_WORLD_FILTER,
+			formatMessage(messages.serverScopedInstance),
+		],
+	},
+	...worldOptions.value.map((world) => ({
 		value: world.id,
 		label: world.name,
 		searchTerms: [world.id, world.name],
 	})),
-)
+])
 
 const auditLogActionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	actionLogActionNames.map((action) => ({
@@ -859,6 +901,12 @@ function formatRole(role: ServerAccessRole) {
 function selectedAuditLogFilterValues(key: AuditLogFilterKey): string[] {
 	const values = auditLogFilters.value[key]
 	return values ? [...values] : []
+}
+
+function selectedAuditLogWorldFilterValues(): Array<string | null> {
+	return selectedAuditLogFilterValues('worlds').map((world) =>
+		world === SERVER_SCOPED_ACTION_LOG_WORLD_FILTER ? null : world,
+	)
 }
 
 function parseDateInputValue(value: string) {
@@ -1165,14 +1213,19 @@ async function invalidateActionLog() {
 }
 
 function setCachedMemberRole(member: ServerAccessMember, role: Exclude<ServerAccessRole, 'owner'>) {
+	const normalizedUserId = member.user.id.toLowerCase()
 	const normalizedUsername = member.user.username.toLowerCase()
 
 	queryClient.setQueryData<Archon.ServerUsers.v1.ServerUser[]>(serverUsersQueryKey, (serverUsers) =>
-		serverUsers?.map((serverUser) =>
-			serverUser.user.username.toLowerCase() === normalizedUsername
+		serverUsers?.map((serverUser) => {
+			const isTargetUser =
+				serverUser.user.id.toLowerCase() === normalizedUserId ||
+				serverUser.user.username.toLowerCase() === normalizedUsername
+
+			return isTargetUser
 				? { ...serverUser, permissions: accessRoleToApiPermissions(role) }
-				: serverUser,
-		),
+				: serverUser
+		}),
 	)
 }
 
@@ -1194,13 +1247,8 @@ async function resolveInviteUser(target: string): Promise<ServerAccessInviteSugg
 	}
 }
 
-async function resolveMemberUserId(member: ServerAccessMember): Promise<string> {
-	try {
-		const user = await client.labrinth.users_v2.get(member.user.username)
-		return user.id
-	} catch {
-		return member.user.id
-	}
+function resolveMemberUserId(member: ServerAccessMember): string {
+	return member.user.id
 }
 
 async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {

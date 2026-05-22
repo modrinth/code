@@ -96,16 +96,7 @@
 					</template>
 
 					<template #cell-event="{ row: entry }">
-						<div
-							v-tooltip="entry.event.searchText"
-							class="audit-log-table-event line-clamp-1 min-w-0"
-						>
-							<component
-								:is="entry.event.component"
-								v-bind="entry.event.props"
-								class="audit-log-table-event-component"
-							/>
-						</div>
+						<AuditLogEventCell :event="entry.event" />
 					</template>
 
 					<template #cell-world="{ row: entry }">
@@ -266,6 +257,7 @@ import TimeFramePicker, {
 	type TimeFrameMode,
 	type TimeFramePreset,
 } from '../../base/TimeFramePicker.vue'
+import AuditLogEventCell from './AuditLogEventCell.vue'
 import type { ServerAuditLogEntry, ServerAuditLogFilters } from './types'
 
 const props = defineProps<{

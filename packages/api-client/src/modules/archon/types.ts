@@ -529,6 +529,7 @@ export namespace Archon {
 			export type UserScope = string | number
 
 			export type UserResp = {
+				id: string
 				username: string
 				avatar_url: string
 			}

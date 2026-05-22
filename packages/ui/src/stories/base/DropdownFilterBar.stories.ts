@@ -107,6 +107,29 @@ export const WithAppliedFilters: Story = {
 	},
 }
 
+export const ImmediateApply: Story = {
+	render: () => ({
+		components: { DropdownFilterBar },
+		setup() {
+			const selected = ref<Record<string, string[]>>({})
+			return { categories: defaultCategories, selected }
+		},
+		template: /* html */ `
+			<div class="flex flex-col items-start gap-3">
+				<div class="flex flex-wrap items-center gap-2">
+					<DropdownFilterBar v-model="selected" :categories="categories" apply-immediately />
+				</div>
+				<pre class="m-0 rounded-lg bg-surface-2 px-3 py-2 text-sm text-secondary">{{ selected }}</pre>
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {},
+		categories: defaultCategories,
+		applyImmediately: true,
+	},
+}
+
 export const WithFilterIcon: Story = {
 	render: () => ({
 		components: { DropdownFilterBar },
