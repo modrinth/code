@@ -267,8 +267,6 @@ const sortTypes = computed(() => {
 	return baseSortTypes
 })
 
-const sortTypeValues = computed(() => sortTypes.value.map((option) => option.value))
-
 const itemsPerPageOptions: ComboboxOption<number>[] = [
 	{ value: 20, label: '20' },
 	{ value: 40, label: '40' },
