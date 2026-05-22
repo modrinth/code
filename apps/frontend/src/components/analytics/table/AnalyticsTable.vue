@@ -2,7 +2,7 @@
 	<div class="relative overflow-hidden rounded-2xl">
 		<AnalyticsLoadingBar :loading="isDataLoading" />
 		<Table
-			v-model:selected-ids="selectedGraphDatasetIds"
+			v-model:selected-ids="tableSelectedGraphDatasetIds"
 			:sort-column="displayedSortColumn"
 			:sort-direction="displayedSortDirection"
 			:columns="columns"
@@ -122,6 +122,7 @@ import {
 	injectAnalyticsDashboardContext,
 	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
+import { areStringArraysEqual } from '~/providers/analytics/query-builder-url'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
@@ -177,6 +178,7 @@ const {
 	displayedFetchRequest: fetchRequest,
 	displayedTimeSlices: timeSlices,
 	activeStat,
+	hasExplicitGraphDatasetSelection,
 	isGraphDatasetSelectionActive,
 	selectedGraphDatasetIds,
 	getRelevantAnalyticsDashboardStats,
@@ -549,6 +551,20 @@ const selectableGraphDatasetIds = computed(() => getSelectableGraphDatasetIds(so
 const filteredSelectableGraphDatasetIds = computed(() =>
 	getSelectableGraphDatasetIds(filteredRows.value),
 )
+const tableSelectedGraphDatasetIds = computed({
+	get: () => selectedGraphDatasetIds.value,
+	set: (ids: string[]) => {
+		selectedGraphDatasetIds.value = ids
+		if (showGraphDatasetSelection.value) {
+			hasExplicitGraphDatasetSelection.value = true
+		}
+	},
+})
+
+function setSelectedGraphDatasetIds(ids: string[], explicit: boolean) {
+	selectedGraphDatasetIds.value = ids
+	hasExplicitGraphDatasetSelection.value = explicit
+}
 
 watch(
 	showGraphDatasetSelection,
@@ -557,7 +573,7 @@ watch(
 		if (nextShowSelection) {
 			applyActiveStatSort()
 		} else {
-			selectedGraphDatasetIds.value = []
+			setSelectedGraphDatasetIds([], false)
 		}
 	},
 	{ immediate: true },
@@ -572,15 +588,30 @@ watch(activeStat, () => {
 })
 
 watch(
-	[selectableGraphDatasetIds, showGraphDatasetSelection],
-	() => {
-		if (!showGraphDatasetSelection.value) {
+	[selectableGraphDatasetIds, showGraphDatasetSelection, hasExplicitGraphDatasetSelection],
+	([nextSelectableGraphDatasetIds, nextShowGraphDatasetSelection, nextHasExplicitSelection]) => {
+		if (!nextShowGraphDatasetSelection) {
 			return
 		}
 
-		selectedGraphDatasetIds.value = getDefaultSelectedGraphDatasetIds(
-			selectableGraphDatasetIds.value,
+		const nextSelectableGraphDatasetIdSet = new Set(nextSelectableGraphDatasetIds)
+		const nextSelectedGraphDatasetIds = selectedGraphDatasetIds.value.filter((datasetId) =>
+			nextSelectableGraphDatasetIdSet.has(datasetId),
 		)
+
+		if (nextHasExplicitSelection) {
+			if (!areStringArraysEqual(selectedGraphDatasetIds.value, nextSelectedGraphDatasetIds)) {
+				setSelectedGraphDatasetIds(nextSelectedGraphDatasetIds, true)
+			}
+			return
+		}
+
+		const defaultSelectedGraphDatasetIds = getDefaultSelectedGraphDatasetIds(
+			nextSelectableGraphDatasetIds,
+		)
+		if (!areStringArraysEqual(selectedGraphDatasetIds.value, defaultSelectedGraphDatasetIds)) {
+			setSelectedGraphDatasetIds(defaultSelectedGraphDatasetIds, false)
+		}
 	},
 	{ immediate: true },
 )

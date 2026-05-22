@@ -63,6 +63,7 @@ export type AnalyticsGraphState = {
 	showChartEvents: boolean
 	showPreviousPeriod: boolean
 	hiddenGraphDatasetIds: string[]
+	selectedGraphDatasetIds: string[] | null
 }
 
 type MutableRouteQuery = Record<string, LocationQueryValueRaw | LocationQueryValueRaw[] | undefined>
@@ -169,6 +170,7 @@ const QUERY_KEY_GRAPH_RATIO_MODE = 'a_ratio'
 const QUERY_KEY_GRAPH_EVENTS_VISIBILITY = 'a_events'
 const QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY = 'a_prev_period'
 const QUERY_KEY_GRAPH_HIDDEN_SERIES = 'a_hidden_series'
+const QUERY_KEY_GRAPH_SELECTED_SERIES = 'a_selected_series'
 const QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER = 'a_top_breakdown'
 const QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
 
@@ -222,6 +224,7 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_GRAPH_EVENTS_VISIBILITY,
 	QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 	QUERY_KEY_GRAPH_HIDDEN_SERIES,
+	QUERY_KEY_GRAPH_SELECTED_SERIES,
 	QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER,
 	QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION,
 ]
@@ -394,6 +397,7 @@ export function buildDefaultAnalyticsGraphState(): AnalyticsGraphState {
 		showChartEvents: DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
 		showPreviousPeriod: DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 		hiddenGraphDatasetIds: [],
+		selectedGraphDatasetIds: null,
 	}
 }
 
@@ -468,12 +472,17 @@ export function isAnalyticsGraphStateDefault(state: AnalyticsGraphState): boolea
 		state.isRatioMode === defaultState.isRatioMode &&
 		state.showChartEvents === defaultState.showChartEvents &&
 		state.showPreviousPeriod === defaultState.showPreviousPeriod &&
-		areStringArraysEqual(state.hiddenGraphDatasetIds, defaultState.hiddenGraphDatasetIds)
+		areStringArraysEqual(state.hiddenGraphDatasetIds, defaultState.hiddenGraphDatasetIds) &&
+		state.selectedGraphDatasetIds === defaultState.selectedGraphDatasetIds
 	)
 }
 
 function serializeListQueryValue(values: string[]): string | undefined {
 	if (values.length === 0) return undefined
+	return values.join(',')
+}
+
+function serializeExplicitListQueryValue(values: string[]): string {
 	return values.join(',')
 }
 
@@ -566,6 +575,10 @@ export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphSta
 		showChartEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_EVENTS_VISIBILITY]),
 		showPreviousPeriod: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY]),
 		hiddenGraphDatasetIds: parseListQueryValue(query[QUERY_KEY_GRAPH_HIDDEN_SERIES]),
+		selectedGraphDatasetIds:
+			query[QUERY_KEY_GRAPH_SELECTED_SERIES] === undefined
+				? null
+				: parseListQueryValue(query[QUERY_KEY_GRAPH_SELECTED_SERIES]),
 	}
 }
 
@@ -737,6 +750,10 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		nextRouteQuery[QUERY_KEY_GRAPH_HIDDEN_SERIES] = serializeListQueryValue(
 			[...graphState.hiddenGraphDatasetIds].sort((left, right) => left.localeCompare(right)),
 		)
+		nextRouteQuery[QUERY_KEY_GRAPH_SELECTED_SERIES] =
+			graphState.selectedGraphDatasetIds === null
+				? undefined
+				: serializeExplicitListQueryValue(graphState.selectedGraphDatasetIds)
 	}
 
 	return nextRouteQuery

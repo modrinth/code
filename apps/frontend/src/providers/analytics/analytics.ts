@@ -213,6 +213,7 @@ export interface AnalyticsDashboardContextValue {
 	showChartEvents: Ref<boolean>
 	showPreviousPeriod: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
+	hasExplicitGraphDatasetSelection: Ref<boolean>
 	isGraphDatasetSelectionActive: Ref<boolean>
 	selectedGraphDatasetIds: Ref<string[]>
 	currentTotals: ComputedRef<AnalyticsDashboardTotals>
@@ -1212,8 +1213,9 @@ export function createAnalyticsDashboardContext(
 	const showChartEvents = ref(initialGraphState.showChartEvents)
 	const showPreviousPeriod = ref(initialGraphState.showPreviousPeriod)
 	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
+	const hasExplicitGraphDatasetSelection = ref(initialGraphState.selectedGraphDatasetIds !== null)
 	const isGraphDatasetSelectionActive = ref(false)
-	const selectedGraphDatasetIds = ref<string[]>([])
+	const selectedGraphDatasetIds = ref<string[]>(initialGraphState.selectedGraphDatasetIds ?? [])
 	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
 	const selectedTimeframeMode = ref<AnalyticsTimeframeMode>(initialQueryState.selectedTimeframeMode)
 	const selectedTimeframe = ref<AnalyticsTimeframePreset>(initialQueryState.selectedTimeframe)
@@ -1602,6 +1604,9 @@ export function createAnalyticsDashboardContext(
 			showChartEvents: showChartEvents.value,
 			showPreviousPeriod: showPreviousPeriod.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
+			selectedGraphDatasetIds: hasExplicitGraphDatasetSelection.value
+				? selectedGraphDatasetIds.value
+				: null,
 		})
 
 		return isQueryBuilderDefault && isGraphDefault
@@ -1688,6 +1693,9 @@ export function createAnalyticsDashboardContext(
 			showChartEvents: showChartEvents.value,
 			showPreviousPeriod: showPreviousPeriod.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
+			selectedGraphDatasetIds: hasExplicitGraphDatasetSelection.value
+				? selectedGraphDatasetIds.value
+				: null,
 		}
 	}
 
@@ -1878,6 +1886,14 @@ export function createAnalyticsDashboardContext(
 				hiddenGraphDatasetIds.value,
 				nextGraphState.hiddenGraphDatasetIds,
 			)
+			const nextHasExplicitGraphDatasetSelection =
+				nextGraphState.selectedGraphDatasetIds !== null
+			const nextSelectedGraphDatasetIds = nextGraphState.selectedGraphDatasetIds ?? []
+			const shouldUpdateHasExplicitGraphDatasetSelection =
+				hasExplicitGraphDatasetSelection.value !== nextHasExplicitGraphDatasetSelection
+			const shouldUpdateSelectedGraphDatasetIds =
+				(nextHasExplicitGraphDatasetSelection || hasExplicitGraphDatasetSelection.value) &&
+				!areStringArraysEqual(selectedGraphDatasetIds.value, nextSelectedGraphDatasetIds)
 			const hasRouteStateUpdate =
 				shouldUpdateSelectedProjectIds ||
 				shouldUpdateSelectedTimeframeMode ||
@@ -1894,7 +1910,9 @@ export function createAnalyticsDashboardContext(
 				shouldUpdateIsRatioMode ||
 				shouldUpdateShowChartEvents ||
 				shouldUpdateShowPreviousPeriod ||
-				shouldUpdateHiddenGraphDatasetIds
+				shouldUpdateHiddenGraphDatasetIds ||
+				shouldUpdateHasExplicitGraphDatasetSelection ||
+				shouldUpdateSelectedGraphDatasetIds
 
 			if (hasRouteStateUpdate) {
 				replaceNextAnalyticsRouteNavigation()
@@ -1948,6 +1966,12 @@ export function createAnalyticsDashboardContext(
 			if (shouldUpdateHiddenGraphDatasetIds) {
 				hiddenGraphDatasetIds.value = nextGraphState.hiddenGraphDatasetIds
 			}
+			if (shouldUpdateHasExplicitGraphDatasetSelection) {
+				hasExplicitGraphDatasetSelection.value = nextHasExplicitGraphDatasetSelection
+			}
+			if (shouldUpdateSelectedGraphDatasetIds) {
+				selectedGraphDatasetIds.value = nextSelectedGraphDatasetIds
+			}
 
 			if (!hasRouteStateUpdate) {
 				syncAnalyticsRouteQuery('replace')
@@ -1991,6 +2015,8 @@ export function createAnalyticsDashboardContext(
 			showChartEvents,
 			showPreviousPeriod,
 			hiddenGraphDatasetIds,
+			hasExplicitGraphDatasetSelection,
+			selectedGraphDatasetIds,
 		],
 		() => {
 			syncAnalyticsRouteQuery('replace')
@@ -2512,6 +2538,7 @@ export function createAnalyticsDashboardContext(
 		showChartEvents.value = defaultGraphState.showChartEvents
 		showPreviousPeriod.value = defaultGraphState.showPreviousPeriod
 		hiddenGraphDatasetIds.value = defaultGraphState.hiddenGraphDatasetIds
+		hasExplicitGraphDatasetSelection.value = false
 		isGraphDatasetSelectionActive.value = false
 		selectedGraphDatasetIds.value = []
 		queryResetToken.value += 1
@@ -2598,6 +2625,7 @@ export function createAnalyticsDashboardContext(
 		showChartEvents,
 		showPreviousPeriod,
 		hiddenGraphDatasetIds,
+		hasExplicitGraphDatasetSelection,
 		isGraphDatasetSelectionActive,
 		selectedGraphDatasetIds,
 		currentTotals,
