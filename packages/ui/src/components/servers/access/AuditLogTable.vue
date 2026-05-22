@@ -23,11 +23,13 @@
 			<div ref="contentBody" class="min-w-0">
 				<Table
 					v-if="filteredEntries.length > 0"
-					class="hidden @[640px]:block"
+					v-model:sort-column="sortColumn"
+					v-model:sort-direction="sortDirection"
+					class="audit-log-table hidden @[800px]:block @[800px]:text-sm @[1040px]:text-base"
 					:columns="columns"
 					:data="tableEntries"
 					row-key="id"
-					row-transition-name="audit-log-row"
+					:row-transition-name="rowTransitionName"
 				>
 					<template #header-world="{ column }">
 						<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
@@ -67,8 +69,9 @@
 
 					<template #cell-user="{ row: entry }">
 						<AutoLink
+							v-tooltip="actorName(entry)"
 							:to="actorProfilePath(entry)"
-							class="flex min-w-0 items-center gap-2"
+							class="flex min-w-0 items-center gap-2 whitespace-nowrap"
 							:class="actorProfilePath(entry) ? 'text-primary hover:underline' : ''"
 						>
 							<Avatar
@@ -93,13 +96,22 @@
 					</template>
 
 					<template #cell-event="{ row: entry }">
-						<component :is="entry.event.component" v-bind="entry.event.props" />
+						<div
+							v-tooltip="entry.event.searchText"
+							class="audit-log-table-event line-clamp-1 min-w-0"
+						>
+							<component
+								:is="entry.event.component"
+								v-bind="entry.event.props"
+								class="audit-log-table-event-component"
+							/>
+						</div>
 					</template>
 
 					<template #cell-world="{ row: entry }">
 						<span
 							v-tooltip="entry.world?.name"
-							class="truncate"
+							class="block min-w-0 truncate whitespace-nowrap"
 							:class="entry.world ? 'text-primary' : 'text-secondary'"
 						>
 							{{ entry.world?.name ?? '—' }}
@@ -107,8 +119,11 @@
 					</template>
 
 					<template #cell-time="{ row: entry }">
-						<span v-tooltip="formatDate(entry.timestamp)">
-							{{ formatRelativeTime(entry.timestamp) }}
+						<span
+							v-tooltip="formatDate(entry.timestamp)"
+							class="inline-block max-w-full truncate whitespace-nowrap align-middle leading-5 @[1040px]:leading-6"
+						>
+							{{ formatCompactRelativeTime(entry.timestamp) }}
 						</span>
 					</template>
 				</Table>
@@ -117,7 +132,7 @@
 					v-if="filteredEntries.length > 0"
 					name="audit-log-card"
 					tag="div"
-					class="flex flex-col gap-3 @[640px]:hidden"
+					class="flex flex-col gap-3 @[800px]:hidden"
 				>
 					<div
 						v-for="entry in filteredEntries"
@@ -162,15 +177,15 @@
 
 				<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
 					<div
-						class="hidden min-h-14 bg-surface-3 @[640px]:grid @[640px]:h-14 @[640px]:grid-cols-[22%_48%_18%_12%]"
+						class="hidden min-h-14 bg-surface-3 @[800px]:grid @[800px]:h-14 @[800px]:grid-cols-[18%_52%_20%_10%] @[800px]:text-sm @[1040px]:text-base"
 					>
-						<div class="hidden items-center pl-4 font-semibold text-secondary @[640px]:flex">
+						<div class="hidden items-center pl-4 pr-2 font-semibold text-secondary @[800px]:flex">
 							{{ formatMessage(messages.userColumn) }}
 						</div>
-						<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
+						<div class="hidden items-center px-2 font-semibold text-secondary @[800px]:flex">
 							{{ formatMessage(messages.eventColumn) }}
 						</div>
-						<div class="hidden items-center font-semibold text-secondary @[640px]:flex">
+						<div class="hidden items-center px-2 font-semibold text-secondary @[800px]:flex">
 							<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
 								<span class="min-w-0 truncate">{{ formatMessage(messages.worldColumn) }}</span>
 								<Tooltip
@@ -204,13 +219,13 @@
 							</span>
 						</div>
 						<div
-							class="hidden items-center justify-end pr-4 font-semibold text-secondary @[640px]:flex"
+							class="hidden items-center justify-end pl-2 pr-4 font-semibold text-secondary @[800px]:flex"
 						>
 							{{ formatMessage(messages.timeColumn) }}
 						</div>
 					</div>
 					<div
-						class="border-0 border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary @[640px]:border-t"
+						class="border-0 border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary @[800px]:border-t"
 					>
 						{{ formatMessage(emptyStateMessage) }}
 					</div>
@@ -220,7 +235,7 @@
 			<Transition name="audit-log-loading-fade">
 				<div
 					v-if="loading"
-					class="pointer-events-none absolute inset-0 z-20 animate-audit-log-bpulse rounded-2xl bg-surface-3"
+					class="pointer-events-none absolute bottom-0 left-0 right-0 top-0 z-20 animate-audit-log-bpulse rounded-2xl bg-surface-3 @[800px]:top-14 @[800px]:rounded-t-none"
 					aria-hidden="true"
 				/>
 			</Transition>
@@ -245,7 +260,7 @@ import { defineMessages, useVIntl } from '../../../composables/i18n'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import BulletDivider from '../../base/BulletDivider.vue'
-import Table, { type TableColumn } from '../../base/Table.vue'
+import Table, { type SortDirection, type TableColumn } from '../../base/Table.vue'
 import TimeFramePicker, {
 	type TimeFrameLastUnit,
 	type TimeFrameMode,
@@ -259,6 +274,7 @@ const props = defineProps<{
 	hasMore?: boolean
 	loading?: boolean
 	loadingMore?: boolean
+	suppressRowTransitions?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -272,6 +288,7 @@ const timeframeLastAmount = defineModel<number>('timeframeLastAmount', { default
 const timeframeLastUnit = defineModel<TimeFrameLastUnit>('timeframeLastUnit', { default: 'days' })
 const timeframeCustomStartDate = defineModel<string>('timeframeCustomStartDate', { default: '' })
 const timeframeCustomEndDate = defineModel<string>('timeframeCustomEndDate', { default: '' })
+const sortDirection = defineModel<SortDirection>('sortDirection', { default: 'desc' })
 const filters = defineModel<ServerAuditLogFilters>('filters', {
 	default: () => ({
 		userId: null,
@@ -281,13 +298,17 @@ const filters = defineModel<ServerAuditLogFilters>('filters', {
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatCompactRelativeTime = useRelativeTime({ numeric: 'always', style: 'narrow' })
 const formatDate = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
 const slots = useSlots()
+const sortColumn = ref<string | undefined>('time')
+const suppressSortRowTransitions = ref(false)
 const loadMoreSentinel = ref<HTMLElement | null>(null)
 const contentBody = ref<HTMLElement | null>(null)
 const contentHeight = ref<number | null>(null)
 let loadMoreObserver: IntersectionObserver | null = null
 let contentResizeObserver: ResizeObserver | null = null
+let sortTransitionResetTimeout: ReturnType<typeof setTimeout> | null = null
 
 const messages = defineMessages({
 	supportActor: {
@@ -351,6 +372,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
 	loadMoreObserver?.disconnect()
 	contentResizeObserver?.disconnect()
+	if (sortTransitionResetTimeout) {
+		clearTimeout(sortTransitionResetTimeout)
+	}
 })
 
 watch(
@@ -359,15 +383,44 @@ watch(
 	{ flush: 'post' },
 )
 
+watch(
+	sortDirection,
+	(_direction, previousDirection) => {
+		if (previousDirection === undefined) return
+		suppressSortRowTransitions.value = true
+		scheduleSortTransitionReset(1500)
+	},
+	{ flush: 'sync' },
+)
+
+watch(
+	() => props.entries,
+	() => {
+		if (suppressSortRowTransitions.value) {
+			scheduleSortTransitionReset(120)
+		}
+	},
+	{ flush: 'post' },
+)
+
 type AuditLogTableColumn = 'user' | 'event' | 'world' | 'time'
 type AuditLogTableRow = ServerAuditLogEntry & Record<string, unknown>
 
 const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => [
-	{ key: 'user', label: formatMessage(messages.userColumn), width: '22%' },
-	{ key: 'event', label: formatMessage(messages.eventColumn), width: '48%' },
-	{ key: 'world', label: formatMessage(messages.worldColumn), width: '18%' },
-	{ key: 'time', label: formatMessage(messages.timeColumn), align: 'right', width: '12%' },
+	{ key: 'user', label: formatMessage(messages.userColumn), width: '18%' },
+	{ key: 'event', label: formatMessage(messages.eventColumn), width: '52%' },
+	{ key: 'world', label: formatMessage(messages.worldColumn), width: '20%' },
+	{
+		key: 'time',
+		label: formatMessage(messages.timeColumn),
+		align: 'right',
+		enableSorting: true,
+		width: '10%',
+	},
 ])
+const rowTransitionName = computed(() =>
+	props.suppressRowTransitions || suppressSortRowTransitions.value ? undefined : 'audit-log-row',
+)
 
 const filteredEntries = computed(() => {
 	const normalizedQuery = query.value.trim().toLowerCase()
@@ -384,7 +437,13 @@ const filteredEntries = computed(() => {
 				.some((value) => value.toLowerCase().includes(normalizedQuery))
 		})
 		.slice()
-		.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+		.sort((a, b) => {
+			const leftTimestamp = new Date(a.timestamp).getTime()
+			const rightTimestamp = new Date(b.timestamp).getTime()
+			return sortDirection.value === 'asc'
+				? leftTimestamp - rightTimestamp
+				: rightTimestamp - leftTimestamp
+		})
 })
 
 const tableEntries = computed<AuditLogTableRow[]>(() => filteredEntries.value as AuditLogTableRow[])
@@ -496,6 +555,17 @@ function updateContentHeight() {
 function setContentHeight(height: number) {
 	contentHeight.value = Math.ceil(height)
 }
+
+function scheduleSortTransitionReset(delay: number) {
+	if (sortTransitionResetTimeout) {
+		clearTimeout(sortTransitionResetTimeout)
+	}
+
+	sortTransitionResetTimeout = setTimeout(() => {
+		suppressSortRowTransitions.value = false
+		sortTransitionResetTimeout = null
+	}, delay)
+}
 </script>
 
 <style>
@@ -513,6 +583,65 @@ function setContentHeight(height: number) {
 
 .animate-audit-log-bpulse {
 	animation: audit-log-bpulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.audit-log-table :is(th, td) {
+	height: 54px;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	vertical-align: middle;
+}
+
+.audit-log-table :is(th, td):first-child {
+	padding-left: 1rem;
+}
+
+.audit-log-table :is(th, td):last-child {
+	padding-right: 1rem;
+}
+
+.audit-log-table tbody tr {
+	height: 54px;
+	max-height: 54px;
+}
+
+.audit-log-table tbody td {
+	height: 54px;
+	max-height: 54px;
+	padding-bottom: 0;
+	padding-top: 0;
+}
+
+.audit-log-table-event {
+	line-height: 1.375rem;
+}
+
+.audit-log-table-event-component {
+	display: inline;
+	line-height: inherit;
+}
+
+.audit-log-table-event-component > span {
+	line-height: inherit;
+}
+
+@container (min-width: 1040px) {
+	.audit-log-table :is(th, td) {
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+
+	.audit-log-table :is(th, td):first-child {
+		padding-left: 1rem;
+	}
+
+	.audit-log-table :is(th, td):last-child {
+		padding-right: 1rem;
+	}
+
+	.audit-log-table-event {
+		line-height: 1.375rem;
+	}
 }
 
 .audit-log-loading-fade-enter-active,

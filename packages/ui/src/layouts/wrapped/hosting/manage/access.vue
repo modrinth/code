@@ -50,6 +50,7 @@
 				{{ formatMessage(messages.activityLogTitle) }}
 			</span>
 			<AuditLogTable
+				v-model:sort-direction="auditLogSortDirection"
 				v-model:timeframe-mode="auditLogTimeframeMode"
 				v-model:timeframe-preset="auditLogTimeframePreset"
 				v-model:timeframe-last-amount="auditLogTimeframeLastAmount"
@@ -61,6 +62,7 @@
 				:has-more="hasMoreActionLogEntries"
 				:loading="isActionLogFiltering"
 				:loading-more="isLoadingMoreActionLogEntries"
+				:suppress-row-transitions="isActionLogSortTransitioning"
 				@load-more="loadMoreActionLogEntries"
 			>
 				<template #filters>
@@ -634,6 +636,7 @@ const auditLogTimeframeLastAmount = ref(30)
 const auditLogTimeframeLastUnit = ref<TimeFrameLastUnit>('days')
 const auditLogTimeframeCustomStartDate = ref('')
 const auditLogTimeframeCustomEndDate = ref('')
+const auditLogSortDirection = ref<Archon.Actions.v1.SortOrder>('desc')
 
 const actionLogDateFilter = computed(() => {
 	const range = getAuditLogTimeframeRange()
@@ -666,6 +669,7 @@ const actionLogQueryKey = computed(() => {
 		filter ?? null,
 		dateFilter.min_datetime ?? null,
 		dateFilter.max_datetime ?? null,
+		auditLogSortDirection.value,
 	]
 })
 const actionLogQuery = useInfiniteQuery({
@@ -675,7 +679,7 @@ const actionLogQuery = useInfiniteQuery({
 		return client.archon.actions_v1.list(serverId, {
 			limit: ACTION_LOG_PAGE_SIZE,
 			offset,
-			order: 'desc',
+			order: auditLogSortDirection.value,
 			filter: actionLogEndpointFilter.value,
 			...actionLogDateFilter.value,
 		})
@@ -694,16 +698,40 @@ const actionLogFilterSignature = computed(() =>
 	]),
 )
 const isActionLogFilterTransitioning = ref(false)
+const isActionLogSortTransitioning = ref(false)
 let actionLogFilterTransitionTimeout: ReturnType<typeof setTimeout> | null = null
+let actionLogSortTransitionTimeout: ReturnType<typeof setTimeout> | null = null
 
 watch(actionLogFilterSignature, (_signature, previousSignature) => {
 	if (previousSignature === undefined) return
 	startActionLogFilterTransition()
 })
 
+watch(
+	auditLogSortDirection,
+	(_direction, previousDirection) => {
+		if (previousDirection === undefined) return
+		startActionLogSortTransition()
+	},
+	{ flush: 'sync' },
+)
+
+watch(
+	() => actionLogQuery.isFetching.value,
+	(isFetching) => {
+		if (!isFetching && isActionLogSortTransitioning.value) {
+			finishActionLogSortTransition()
+		}
+	},
+	{ flush: 'post' },
+)
+
 onBeforeUnmount(() => {
 	if (actionLogFilterTransitionTimeout) {
 		clearTimeout(actionLogFilterTransitionTimeout)
+	}
+	if (actionLogSortTransitionTimeout) {
+		clearTimeout(actionLogSortTransitionTimeout)
 	}
 })
 
@@ -992,6 +1020,30 @@ function startActionLogFilterTransition() {
 		isActionLogFilterTransitioning.value = false
 		actionLogFilterTransitionTimeout = null
 	}, ACTION_LOG_FILTER_OVERLAY_MS)
+}
+
+function startActionLogSortTransition() {
+	isActionLogSortTransitioning.value = true
+
+	if (actionLogSortTransitionTimeout) {
+		clearTimeout(actionLogSortTransitionTimeout)
+	}
+
+	actionLogSortTransitionTimeout = setTimeout(() => {
+		isActionLogSortTransitioning.value = false
+		actionLogSortTransitionTimeout = null
+	}, 2500)
+}
+
+function finishActionLogSortTransition() {
+	if (actionLogSortTransitionTimeout) {
+		clearTimeout(actionLogSortTransitionTimeout)
+	}
+
+	actionLogSortTransitionTimeout = setTimeout(() => {
+		isActionLogSortTransitioning.value = false
+		actionLogSortTransitionTimeout = null
+	}, 120)
 }
 
 watch(

@@ -697,6 +697,40 @@ export const EmptyExternalFilters: Story = {
 	}),
 }
 
+export const MediumAppWindow: Story = {
+	render: () => ({
+		components: { AuditLogTable },
+		setup() {
+			const query = ref('')
+			const filters = ref<ServerAuditLogFilters>({
+				userId: null,
+				worldId: null,
+			})
+			return {
+				entries: everyActionEntries.slice(0, 8),
+				filters,
+				query,
+				...createTimeframeState(),
+			}
+		},
+		template: /* html */ `
+			<div style="max-width: 860px;">
+				<AuditLogTable
+					v-model:query="query"
+					v-model:timeframe-mode="timeframeMode"
+					v-model:timeframe-preset="timeframePreset"
+					v-model:timeframe-last-amount="timeframeLastAmount"
+					v-model:timeframe-last-unit="timeframeLastUnit"
+					v-model:timeframe-custom-start-date="timeframeCustomStartDate"
+					v-model:timeframe-custom-end-date="timeframeCustomEndDate"
+					v-model:filters="filters"
+					:entries="entries"
+				/>
+			</div>
+		`,
+	}),
+}
+
 export const MobileCompact: Story = {
 	render: () => ({
 		components: { AuditLogTable },
