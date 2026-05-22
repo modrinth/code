@@ -264,6 +264,12 @@ function parseListQueryValue(
 	return Array.from(new Set(parsedValues))
 }
 
+function parseSelectedSeriesQueryValue(
+	value: LocationQueryValue | LocationQueryValue[] | undefined,
+): string[] {
+	return parseListQueryValue(value).filter((item) => item.toLowerCase() !== 'null')
+}
+
 function normalizeFilterQueryValues(
 	category: Exclude<AnalyticsQueryFilterCategory, 'project'>,
 	values: string[],
@@ -578,7 +584,7 @@ export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphSta
 		selectedGraphDatasetIds:
 			query[QUERY_KEY_GRAPH_SELECTED_SERIES] === undefined
 				? null
-				: parseListQueryValue(query[QUERY_KEY_GRAPH_SELECTED_SERIES]),
+				: parseSelectedSeriesQueryValue(query[QUERY_KEY_GRAPH_SELECTED_SERIES]),
 	}
 }
 

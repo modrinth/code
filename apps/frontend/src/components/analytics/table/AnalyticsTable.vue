@@ -587,6 +587,10 @@ watch(activeStat, () => {
 	applyActiveStatSort()
 })
 
+watch(selectedBreakdown, () => {
+	setSelectedGraphDatasetIds([], false)
+})
+
 watch(
 	[selectableGraphDatasetIds, showGraphDatasetSelection, hasExplicitGraphDatasetSelection],
 	([nextSelectableGraphDatasetIds, nextShowGraphDatasetSelection, nextHasExplicitSelection]) => {
