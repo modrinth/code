@@ -183,7 +183,7 @@
 					<button
 						v-if="canToggleLegendExpansion"
 						type="button"
-						class="ml-1 text-sm font-medium underline"
+						class="font-base ml-1 text-sm text-secondary underline !transition-all hover:text-contrast"
 						:aria-expanded="isLegendExpanded"
 						@click="toggleLegendExpansion"
 					>
