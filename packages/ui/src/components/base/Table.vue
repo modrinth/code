@@ -6,118 +6,123 @@
 		>
 			<slot name="header" />
 		</div>
-		<table class="w-full table-fixed border-separate border-spacing-0 border-surface-5">
-			<colgroup>
-				<col v-if="showSelection" class="w-12" />
-				<col
-					v-for="column in columns"
-					:key="column.key"
-					:style="column.width ? { width: column.width } : undefined"
-				/>
-			</colgroup>
-			<thead class="">
-				<tr class="bg-surface-3">
-					<th v-if="showSelection" class="w-12">
-						<Checkbox
-							:model-value="allSelected"
-							:indeterminate="someSelected"
-							class="shrink-0 p-4 focus-visible:!outline-none"
-							@update:model-value="toggleSelectAll"
-						/>
-					</th>
-					<th
+		<div class="overflow-x-auto overflow-y-hidden">
+			<table
+				class="w-full table-fixed border-separate border-spacing-0 border-surface-5"
+				:style="tableMinWidth ? { minWidth: tableMinWidth } : undefined"
+			>
+				<colgroup>
+					<col v-if="showSelection" class="w-12" />
+					<col
 						v-for="column in columns"
 						:key="column.key"
-						class="h-14 first:pl-4 last:pr-4"
-						:class="[
-							`text-${column.align ?? 'left'}`,
-							column.enableSorting ? 'cursor-pointer select-none' : '',
-						]"
 						:style="column.width ? { width: column.width } : undefined"
-						@click="column.enableSorting ? handleSort(column.key) : undefined"
-					>
-						<slot :name="`header-${column.key}`" :column="column">
-							<span
-								v-if="column.label || column.enableSorting"
-								class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold"
-								:class="`${sortColumn === column.key ? 'text-contrast' : ''}`"
-							>
-								<span class="min-w-0 truncate">{{ column.label ?? '' }}</span>
-								<template v-if="column.enableSorting">
-									<ChevronUpIcon
-										v-if="sortColumn === column.key && sortDirection === 'asc'"
-										class="size-4 shrink-0"
-									/>
-									<ChevronDownIcon
-										v-else-if="sortColumn === column.key && sortDirection === 'desc'"
-										class="size-4 shrink-0"
-									/>
-								</template>
-							</span>
-						</slot>
-					</th>
-				</tr>
-			</thead>
-			<tbody :ref="setListContainer">
-				<tr v-if="data.length === 0" class="bg-surface-2">
-					<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-5 p-0">
-						<slot name="empty-state">
-							<div class="text-secondary flex h-64 items-center justify-center">
-								No data available.
-							</div>
-						</slot>
-					</td>
-				</tr>
-				<template v-else>
-					<tr v-if="virtualized && topSpacerHeight > 0" aria-hidden="true">
-						<td
-							:colspan="columnSpan"
-							class="border-0 p-0"
-							:style="{ height: `${topSpacerHeight}px` }"
-						></td>
-					</tr>
-					<tr
-						v-for="(row, rowIndex) in renderedRows"
-						:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-						:class="getAbsoluteRowIndex(rowIndex) % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
-					>
-						<td
-							v-if="showSelection"
-							class="w-12 border-solid border-0 border-t border-surface-5 focus:outline-none"
-						>
+					/>
+				</colgroup>
+				<thead class="">
+					<tr class="bg-surface-3">
+						<th v-if="showSelection" class="w-12">
 							<Checkbox
-								:model-value="isSelected(row)"
-								class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
-								@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
+								:model-value="allSelected"
+								:indeterminate="someSelected"
+								class="shrink-0 p-4 focus-visible:!outline-none"
+								@update:model-value="toggleSelectAll"
 							/>
-						</td>
-						<td
+						</th>
+						<th
 							v-for="column in columns"
 							:key="column.key"
-							class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
-							:class="`text-${column.align ?? 'left'}`"
+							class="h-14 first:pl-4 last:pr-4"
+							:class="[
+								`text-${column.align ?? 'left'}`,
+								column.enableSorting ? 'cursor-pointer select-none' : '',
+							]"
+							:style="column.width ? { width: column.width } : undefined"
+							@click="column.enableSorting ? handleSort(column.key) : undefined"
 						>
-							<slot
-								:name="`cell-${column.key}`"
-								:row="row"
-								:value="row[column.key]"
-								:column="column"
-								:index="getAbsoluteRowIndex(rowIndex)"
-							>
-								{{ row[column.key] ?? '' }}
+							<slot :name="`header-${column.key}`" :column="column">
+								<span
+									v-if="column.label || column.enableSorting"
+									class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold"
+									:class="`${sortColumn === column.key ? 'text-contrast' : ''}`"
+								>
+									<span class="min-w-0 truncate">{{ column.label ?? '' }}</span>
+									<template v-if="column.enableSorting">
+										<ChevronUpIcon
+											v-if="sortColumn === column.key && sortDirection === 'asc'"
+											class="size-4 shrink-0"
+										/>
+										<ChevronDownIcon
+											v-else-if="sortColumn === column.key && sortDirection === 'desc'"
+											class="size-4 shrink-0"
+										/>
+									</template>
+								</span>
+							</slot>
+						</th>
+					</tr>
+				</thead>
+				<tbody :ref="setListContainer">
+					<tr v-if="data.length === 0" class="bg-surface-2">
+						<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-5 p-0">
+							<slot name="empty-state">
+								<div class="text-secondary flex h-64 items-center justify-center">
+									No data available.
+								</div>
 							</slot>
 						</td>
 					</tr>
-					<tr v-if="virtualized && bottomSpacerHeight > 0" aria-hidden="true">
-						<td
-							:colspan="columnSpan"
-							class="border-0 p-0"
-							:style="{ height: `${bottomSpacerHeight}px` }"
-						></td>
-					</tr>
-				</template>
-			</tbody>
-		</table>
+					<template v-else>
+						<tr v-if="virtualized && topSpacerHeight > 0" aria-hidden="true">
+							<td
+								:colspan="columnSpan"
+								class="border-0 p-0"
+								:style="{ height: `${topSpacerHeight}px` }"
+							></td>
+						</tr>
+						<tr
+							v-for="(row, rowIndex) in renderedRows"
+							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
+							:class="getAbsoluteRowIndex(rowIndex) % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
+						>
+							<td
+								v-if="showSelection"
+								class="w-12 border-solid border-0 border-t border-surface-5 focus:outline-none"
+							>
+								<Checkbox
+									:model-value="isSelected(row)"
+									class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
+									@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
+								/>
+							</td>
+							<td
+								v-for="column in columns"
+								:key="column.key"
+								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
+								:class="`text-${column.align ?? 'left'}`"
+							>
+								<slot
+									:name="`cell-${column.key}`"
+									:row="row"
+									:value="row[column.key]"
+									:column="column"
+									:index="getAbsoluteRowIndex(rowIndex)"
+								>
+									{{ row[column.key] ?? '' }}
+								</slot>
+							</td>
+						</tr>
+						<tr v-if="virtualized && bottomSpacerHeight > 0" aria-hidden="true">
+							<td
+								:colspan="columnSpan"
+								class="border-0 p-0"
+								:style="{ height: `${bottomSpacerHeight}px` }"
+							></td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </template>
 
@@ -164,6 +169,10 @@ const props = withDefaults(
 		virtualized?: boolean
 		virtualRowHeight?: number
 		virtualBufferSize?: number /* The number of extra rows rendered above and below the visible viewport */
+		/**
+		 * Sets a minimum width for the table content, allowing horizontal overflow below that width.
+		 */
+		tableMinWidth?: string
 	}>(),
 	{
 		showSelection: false,

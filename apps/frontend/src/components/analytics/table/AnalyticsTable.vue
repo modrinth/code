@@ -11,6 +11,7 @@
 			selection-key="graphDatasetId"
 			:selection-ids="filteredSelectableGraphDatasetIds"
 			:show-selection="showGraphDatasetSelection"
+			table-min-width="44rem"
 			virtualized
 			:virtual-row-height="56"
 			@sort="applyRequestedSort"

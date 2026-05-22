@@ -27,9 +27,9 @@
 	>
 		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
 			<div
-				class="flex w-full items-center justify-between rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4"
+				class="flex w-full flex-col items-start gap-3 rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
 			>
-				<div class="flex flex-col gap-0.5">
+				<div class="flex min-w-0 flex-col gap-0.5">
 					<div class="text-xl font-semibold text-contrast">
 						{{ graphTitle }}
 					</div>
@@ -50,7 +50,7 @@
 					</div>
 				</div>
 
-				<div class="flex items-center gap-3">
+				<div class="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:justify-end">
 					<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
 						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
 							>Ratio</label

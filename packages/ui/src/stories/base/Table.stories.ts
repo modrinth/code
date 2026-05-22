@@ -71,6 +71,35 @@ export const Default: StoryObj = {
 	}),
 }
 
+export const HorizontalOverflow: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status' },
+				{ key: 'role', label: 'Role' },
+			]
+			const data = sampleUsers
+			return { columns, data }
+		},
+		template: /* html */ `
+			<div class="max-w-80">
+				<Table :columns="columns" :data="data" table-min-width="44rem">
+					<template #header>
+						<div class="flex items-center justify-between gap-4">
+							<div class="text-lg font-semibold text-contrast">Members</div>
+							<div class="text-sm text-secondary">{{ data.length }} rows</div>
+						</div>
+					</template>
+				</Table>
+			</div>
+		`,
+	}),
+}
+
 export const WithSelection: StoryObj = {
 	args: {},
 	render: () => ({
