@@ -110,25 +110,31 @@ pub enum TimeRangeResolution {
 #[derive(Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ReturnMetrics {
     /// How many times a project page has been viewed.
-    pub project_views: Option<Metrics<ProjectViewsField>>,
+    pub project_views: Option<Metrics<ProjectViewsField, ProjectViewsFilters>>,
     /// How many times a project has been downloaded.
-    pub project_downloads: Option<Metrics<ProjectDownloadsField>>,
+    pub project_downloads:
+        Option<Metrics<ProjectDownloadsField, ProjectDownloadsFilters>>,
     /// How long users have been playing a project.
-    pub project_playtime: Option<Metrics<ProjectPlaytimeField>>,
+    pub project_playtime:
+        Option<Metrics<ProjectPlaytimeField, ProjectPlaytimeFilters>>,
     /// How much payout revenue a project has generated.
-    pub project_revenue: Option<Metrics<ProjectRevenueField>>,
+    pub project_revenue:
+        Option<Metrics<ProjectRevenueField, ProjectRevenueFilters>>,
     /// How many times an affiliate code has been clicked.
-    pub affiliate_code_clicks: Option<Metrics<AffiliateCodeClicksField>>,
+    pub affiliate_code_clicks:
+        Option<Metrics<AffiliateCodeClicksField, AffiliateCodeClicksFilters>>,
     /// How many times a product has been purchased with an affiliate code.
-    pub affiliate_code_conversions:
-        Option<Metrics<AffiliateCodeConversionsField>>,
+    pub affiliate_code_conversions: Option<
+        Metrics<AffiliateCodeConversionsField, AffiliateCodeConversionsFilters>,
+    >,
     /// How much payout revenue an affiliate code has generated.
-    pub affiliate_code_revenue: Option<Metrics<AffiliateCodeRevenueField>>,
+    pub affiliate_code_revenue:
+        Option<Metrics<AffiliateCodeRevenueField, AffiliateCodeRevenueFilters>>,
 }
 
 /// See [`ReturnMetrics`].
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct Metrics<F> {
+pub struct Metrics<BucketBy, FilterBy> {
     /// When collecting metrics, what fields do we want to group the results by?
     ///
     /// For example, if we have two views entries:
@@ -143,7 +149,13 @@ pub struct Metrics<F> {
     /// aggregate of the two rows:
     /// - `{ "project_id": "abcdefgh", "count": 8 }`
     #[serde(default = "Vec::default")]
-    pub bucket_by: Vec<F>,
+    pub bucket_by: Vec<BucketBy>,
+    /// Filters to apply before aggregating this metric.
+    ///
+    /// Values within one field are ORed together. Different fields are ANDed
+    /// together. An empty list means that field is not filtered.
+    #[serde(default)]
+    pub filter_by: FilterBy,
 }
 
 /// Fields for [`ReturnMetrics::project_views`].
@@ -164,6 +176,23 @@ pub enum ProjectViewsField {
     ///
     /// To anonymize the data, the country may be reported as `XX`.
     Country,
+}
+
+/// Filters for [`ReturnMetrics::project_views`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectViewsFilters {
+    /// Referrer domains to include.
+    #[serde(default)]
+    pub domain: Vec<String>,
+    /// Modrinth site paths to include.
+    #[serde(default)]
+    pub site_path: Vec<String>,
+    /// Monetization states to include.
+    #[serde(default)]
+    pub monetized: Vec<bool>,
+    /// Country codes to include.
+    #[serde(default)]
+    pub country: Vec<String>,
 }
 
 /// Fields for [`ReturnMetrics::project_downloads`].
@@ -194,6 +223,35 @@ pub enum ProjectDownloadsField {
     Loader,
 }
 
+/// Filters for [`ReturnMetrics::project_downloads`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectDownloadsFilters {
+    /// Version IDs to include.
+    #[serde(default)]
+    pub version_id: Vec<VersionId>,
+    /// Referrer domains to include.
+    #[serde(default)]
+    pub domain: Vec<String>,
+    /// Normalized download sources to include.
+    #[serde(default)]
+    pub user_agent: Vec<DownloadSource>,
+    /// Monetization states to include.
+    #[serde(default)]
+    pub monetized: Vec<bool>,
+    /// Country codes to include.
+    #[serde(default)]
+    pub country: Vec<String>,
+    /// Download reasons to include.
+    #[serde(default)]
+    pub reason: Vec<DownloadReason>,
+    /// Game versions to include.
+    #[serde(default)]
+    pub game_version: Vec<String>,
+    /// Loaders to include.
+    #[serde(default)]
+    pub loader: Vec<String>,
+}
+
 /// Fields for [`ReturnMetrics::project_playtime`].
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
@@ -214,6 +272,23 @@ pub enum ProjectPlaytimeField {
     Country,
 }
 
+/// Filters for [`ReturnMetrics::project_playtime`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectPlaytimeFilters {
+    /// Version IDs to include.
+    #[serde(default)]
+    pub version_id: Vec<VersionId>,
+    /// Loaders to include.
+    #[serde(default)]
+    pub loader: Vec<String>,
+    /// Game versions to include.
+    #[serde(default)]
+    pub game_version: Vec<String>,
+    /// Country codes to include.
+    #[serde(default)]
+    pub country: Vec<String>,
+}
+
 /// Fields for [`ReturnMetrics::project_revenue`].
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
@@ -224,6 +299,10 @@ pub enum ProjectRevenueField {
     ProjectId,
 }
 
+/// Filters for [`ReturnMetrics::project_revenue`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectRevenueFilters {}
+
 /// Fields for [`ReturnMetrics::affiliate_code_clicks`].
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
@@ -232,6 +311,14 @@ pub enum ProjectRevenueField {
 pub enum AffiliateCodeClicksField {
     /// Affiliate code ID.
     AffiliateCodeId,
+}
+
+/// Filters for [`ReturnMetrics::affiliate_code_clicks`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeClicksFilters {
+    /// Affiliate code IDs to include.
+    #[serde(default)]
+    pub affiliate_code_id: Vec<AffiliateCodeId>,
 }
 
 /// Fields for [`ReturnMetrics::affiliate_code_conversions`].
@@ -244,6 +331,14 @@ pub enum AffiliateCodeConversionsField {
     AffiliateCodeId,
 }
 
+/// Filters for [`ReturnMetrics::affiliate_code_conversions`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeConversionsFilters {
+    /// Affiliate code IDs to include.
+    #[serde(default)]
+    pub affiliate_code_id: Vec<AffiliateCodeId>,
+}
+
 /// Fields for [`ReturnMetrics::affiliate_code_revenue`].
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
@@ -252,6 +347,14 @@ pub enum AffiliateCodeConversionsField {
 pub enum AffiliateCodeRevenueField {
     /// Affiliate code ID.
     AffiliateCodeId,
+}
+
+/// Filters for [`ReturnMetrics::affiliate_code_revenue`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeRevenueFilters {
+    /// Affiliate code IDs to include.
+    #[serde(default)]
+    pub affiliate_code_id: Vec<AffiliateCodeId>,
 }
 
 /// Minimum width of a [`TimeSlice`], controlled by [`TimeRange::resolution`].
@@ -510,6 +613,10 @@ mod query {
         const USE_SITE_PATH: &str = "{use_site_path: Bool}";
         const USE_MONETIZED: &str = "{use_monetized: Bool}";
         const USE_COUNTRY: &str = "{use_country: Bool}";
+        const FILTER_DOMAIN: &str = "{filter_domain: Array(String)}";
+        const FILTER_SITE_PATH: &str = "{filter_site_path: Array(String)}";
+        const FILTER_MONETIZED: &str = "{filter_monetized: UInt8}";
+        const FILTER_COUNTRY: &str = "{filter_country: Array(String)}";
 
         formatcp!(
             "SELECT
@@ -527,6 +634,10 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `views.project_id` instead of `project_id`
                 AND views.project_id IN {PROJECT_IDS}
+                AND (empty({FILTER_DOMAIN}) OR views.domain IN {FILTER_DOMAIN})
+                AND (empty({FILTER_SITE_PATH}) OR views.site_path IN {FILTER_SITE_PATH})
+                AND ({FILTER_MONETIZED} = 2 OR CAST(views.monetized AS UInt8) = {FILTER_MONETIZED})
+                AND (empty({FILTER_COUNTRY}) OR views.country IN {FILTER_COUNTRY})
             GROUP BY bucket, project_id, domain, site_path, monetized, country
             "
         )
@@ -557,6 +668,14 @@ mod query {
         const USE_REASON: &str = "{use_reason: Bool}";
         const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
         const USE_LOADER: &str = "{use_loader: Bool}";
+        const FILTER_DOMAIN: &str = "{filter_domain: Array(String)}";
+        const FILTER_VERSION_ID: &str = "{filter_version_id: Array(UInt64)}";
+        const FILTER_MONETIZED: &str = "{filter_monetized: UInt8}";
+        const FILTER_COUNTRY: &str = "{filter_country: Array(String)}";
+        const FILTER_REASON: &str = "{filter_reason: Array(String)}";
+        const FILTER_GAME_VERSION: &str =
+            "{filter_game_version: Array(String)}";
+        const FILTER_LOADER: &str = "{filter_loader: Array(String)}";
 
         formatcp!(
             "SELECT
@@ -578,6 +697,13 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `downloads.project_id` instead of `project_id`
                 AND downloads.project_id IN {PROJECT_IDS}
+                AND (empty({FILTER_DOMAIN}) OR downloads.domain IN {FILTER_DOMAIN})
+                AND (empty({FILTER_VERSION_ID}) OR downloads.version_id IN {FILTER_VERSION_ID})
+                AND ({FILTER_MONETIZED} = 2 OR CAST(downloads.user_id != 0 AS UInt8) = {FILTER_MONETIZED})
+                AND (empty({FILTER_COUNTRY}) OR downloads.country IN {FILTER_COUNTRY})
+                AND (empty({FILTER_REASON}) OR downloads.reason IN {FILTER_REASON})
+                AND (empty({FILTER_GAME_VERSION}) OR downloads.game_version IN {FILTER_GAME_VERSION})
+                AND (empty({FILTER_LOADER}) OR downloads.loader IN {FILTER_LOADER})
             GROUP BY bucket, project_id, domain, user_agent, version_id, monetized, country, reason, game_version, loader"
         )
     };
@@ -601,6 +727,11 @@ mod query {
         const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
         const USE_COUNTRY: &str = "{use_country: Bool}";
         const PARENT_VERSION_IDS: &str = "{parent_version_ids: Array(UInt64)}";
+        const FILTER_VERSION_ID: &str = "{filter_version_id: Array(UInt64)}";
+        const FILTER_LOADER: &str = "{filter_loader: Array(String)}";
+        const FILTER_GAME_VERSION: &str =
+            "{filter_game_version: Array(String)}";
+        const FILTER_COUNTRY: &str = "{filter_country: Array(String)}";
 
         formatcp!(
             "SELECT
@@ -626,6 +757,10 @@ mod query {
                 WHERE
                     recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
                     AND playtime.project_id IN {PROJECT_IDS}
+                    AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
+                    AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})
+                    AND (empty({FILTER_GAME_VERSION}) OR playtime.game_version IN {FILTER_GAME_VERSION})
+                    AND (empty({FILTER_COUNTRY}) OR playtime.country IN {FILTER_COUNTRY})
 
                 UNION ALL
 
@@ -642,6 +777,10 @@ mod query {
                 WHERE
                     recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
                     AND parent IN {PARENT_VERSION_IDS}
+                    AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
+                    AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})
+                    AND (empty({FILTER_GAME_VERSION}) OR playtime.game_version IN {FILTER_GAME_VERSION})
+                    AND (empty({FILTER_COUNTRY}) OR playtime.country IN {FILTER_COUNTRY})
             )
             GROUP BY bucket, project_id, parent_version_id, version_id, loader, game_version, country"
         )
@@ -657,6 +796,8 @@ mod query {
     pub const AFFILIATE_CODE_CLICKS: &str = {
         const USE_AFFILIATE_CODE_ID: &str = "{use_affiliate_code_id: Bool}";
         const AFFILIATE_CODE_IDS: &str = "{affiliate_code_ids: Array(UInt64)}";
+        const FILTER_AFFILIATE_CODE_ID: &str =
+            "{filter_affiliate_code_id: Array(UInt64)}";
 
         formatcp!(
             "SELECT
@@ -670,6 +811,7 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `affiliate_code_clicks.affiliate_code_id` instead of `project_id`
                 -- AND affiliate_code_clicks.affiliate_code_id IN {AFFILIATE_CODE_IDS}
+                AND (empty({FILTER_AFFILIATE_CODE_ID}) OR affiliate_code_id IN {FILTER_AFFILIATE_CODE_ID})
             GROUP BY bucket, affiliate_code_id"
         )
     };
@@ -812,6 +954,25 @@ pub async fn fetch_analytics(
                 ("use_monetized", uses(F::Monetized)),
                 ("use_country", uses(F::Country)),
             ],
+            vec![
+                ClickhouseFilterParam::String(
+                    "filter_domain",
+                    &metrics.filter_by.domain,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_site_path",
+                    &metrics.filter_by.site_path,
+                ),
+                ClickhouseFilterParam::Bool(
+                    "filter_monetized",
+                    &metrics.filter_by.monetized,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_country",
+                    &metrics.filter_by.country,
+                ),
+            ],
+            |_| true,
             |row| row.bucket,
             |row| {
                 let country = if uses(F::Country) {
@@ -842,14 +1003,16 @@ pub async fn fetch_analytics(
         use ProjectDownloadsField as F;
         let uses = |field| metrics.bucket_by.contains(&field);
 
-        query_clickhouse::<query::DownloadRow>(
+        query_clickhouse_downloads(
             &mut query_clickhouse_cx,
-            query::DOWNLOADS,
-            ClickhouseQueryParams::PROJECT_IDS,
             &[
                 ("use_project_id", uses(F::ProjectId)),
                 ("use_domain", uses(F::Domain)),
-                ("use_user_agent", uses(F::UserAgent)),
+                (
+                    "use_user_agent",
+                    uses(F::UserAgent)
+                        || !metrics.filter_by.user_agent.is_empty(),
+                ),
                 ("use_version_id", uses(F::VersionId)),
                 ("use_monetized", uses(F::Monetized)),
                 ("use_country", uses(F::Country)),
@@ -857,37 +1020,38 @@ pub async fn fetch_analytics(
                 ("use_game_version", uses(F::GameVersion)),
                 ("use_loader", uses(F::Loader)),
             ],
-            |row| row.bucket,
-            |row| {
-                let country = if uses(F::Country) {
-                    Some(condense_country(row.country, row.downloads))
-                } else {
-                    None
-                };
-                AnalyticsData::Project(ProjectAnalytics {
-                    source_project: row.project_id.into(),
-                    metrics: ProjectMetrics::Downloads(ProjectDownloads {
-                        domain: none_if_empty(row.domain),
-                        user_agent: if uses(F::UserAgent) {
-                            normalize_download_source(&row.user_agent)
-                        } else {
-                            None
-                        },
-                        version_id: none_if_zero_version_id(row.version_id),
-                        monetized: match row.monetized {
-                            0 => Some(false),
-                            1 => Some(true),
-                            _ => None,
-                        },
-                        country,
-                        reason: none_if_empty(row.reason)
-                            .and_then(|s| s.parse().ok()),
-                        game_version: none_if_empty(row.game_version),
-                        loader: none_if_empty(row.loader),
-                        downloads: row.downloads,
-                    }),
-                })
-            },
+            &metrics.filter_by,
+            uses(F::UserAgent),
+            vec![
+                ClickhouseFilterParam::String(
+                    "filter_domain",
+                    &metrics.filter_by.domain,
+                ),
+                ClickhouseFilterParam::VersionId(
+                    "filter_version_id",
+                    &metrics.filter_by.version_id,
+                ),
+                ClickhouseFilterParam::Bool(
+                    "filter_monetized",
+                    &metrics.filter_by.monetized,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_country",
+                    &metrics.filter_by.country,
+                ),
+                ClickhouseFilterParam::DownloadReason(
+                    "filter_reason",
+                    &metrics.filter_by.reason,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_game_version",
+                    &metrics.filter_by.game_version,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_loader",
+                    &metrics.filter_by.loader,
+                ),
+            ],
         )
         .await?;
     }
@@ -906,6 +1070,24 @@ pub async fn fetch_analytics(
                 ("use_game_version", uses(F::GameVersion)),
                 ("use_country", uses(F::Country)),
             ],
+            vec![
+                ClickhouseFilterParam::VersionId(
+                    "filter_version_id",
+                    &metrics.filter_by.version_id,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_loader",
+                    &metrics.filter_by.loader,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_game_version",
+                    &metrics.filter_by.game_version,
+                ),
+                ClickhouseFilterParam::String(
+                    "filter_country",
+                    &metrics.filter_by.country,
+                ),
+            ],
         )
         .await?;
     }
@@ -921,6 +1103,11 @@ pub async fn fetch_analytics(
             query::AFFILIATE_CODE_CLICKS,
             ClickhouseQueryParams::empty(),
             &[("use_affiliate_code_id", uses(F::AffiliateCodeId))],
+            vec![ClickhouseFilterParam::AffiliateCodeId(
+                "filter_affiliate_code_id",
+                &metrics.filter_by.affiliate_code_id,
+            )],
+            |_| true,
             |row| row.bucket,
             |row| {
                 AnalyticsData::AffiliateCode(AffiliateCodeAnalytics {
@@ -990,6 +1177,12 @@ pub async fn fetch_analytics(
     }
 
     if let Some(metrics) = &req.return_metrics.affiliate_code_conversions {
+        let filter_affiliate_code_ids = metrics
+            .filter_by
+            .affiliate_code_id
+            .iter()
+            .map(|id| DBAffiliateCodeId::from(*id).0)
+            .collect::<Vec<_>>();
         let mut rows = sqlx::query!(
             "SELECT
                 WIDTH_BUCKET(
@@ -1008,12 +1201,14 @@ pub async fn fetch_analytics(
                 ac.affiliate = $4
                 AND usa.created_at BETWEEN $1 AND $2
                 AND c.status = 'succeeded'
+                AND (cardinality($6::bigint[]) = 0 OR affiliate_code = ANY($6))
             GROUP BY bucket, affiliate_code",
             req.time_range.start,
             req.time_range.end,
             num_time_slices as i64,
             DBUserId::from(user.id) as DBUserId,
             metrics.bucket_by.contains(&AffiliateCodeConversionsField::AffiliateCodeId),
+            &filter_affiliate_code_ids,
         )
         .fetch(&**pool);
         while let Some(row) = rows.next().await.transpose()? {
@@ -1049,6 +1244,12 @@ pub async fn fetch_analytics(
             return Err(AuthenticationError::InvalidCredentials.into());
         }
 
+        let filter_affiliate_code_ids = metrics
+            .filter_by
+            .affiliate_code_id
+            .iter()
+            .map(|id| DBAffiliateCodeId::from(*id).0)
+            .collect::<Vec<_>>();
         let mut rows = sqlx::query!(
             "SELECT
                 WIDTH_BUCKET(
@@ -1064,12 +1265,14 @@ pub async fn fetch_analytics(
                 user_id = $4
                 AND payouts_values.affiliate_code_source IS NOT NULL
                 AND created BETWEEN $1 AND $2
+                AND (cardinality($6::bigint[]) = 0 OR affiliate_code_source = ANY($6))
             GROUP BY bucket, affiliate_code_source",
             req.time_range.start,
             req.time_range.end,
             num_time_slices as i64,
             DBUserId::from(user.id) as DBUserId,
             metrics.bucket_by.contains(&AffiliateCodeRevenueField::AffiliateCodeId),
+            &filter_affiliate_code_ids,
         )
         .fetch(&**pool);
         while let Some(row) = rows.next().await.transpose()? {
@@ -1246,11 +1449,68 @@ struct PlaytimeBucket {
     country: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct DownloadBucket {
+    bucket: u64,
+    project_id: DBProjectId,
+    domain: Option<String>,
+    user_agent: Option<DownloadSource>,
+    version_id: Option<DBVersionId>,
+    monetized: Option<bool>,
+    country: Option<String>,
+    reason: Option<DownloadReason>,
+    game_version: Option<String>,
+    loader: Option<String>,
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 struct ClickhouseQueryParams {
     project_ids: bool,
     parent_version_ids: bool,
     affiliate_code_ids: bool,
+}
+
+enum ClickhouseFilterParam<'a> {
+    String(&'static str, &'a [String]),
+    Bool(&'static str, &'a [bool]),
+    VersionId(&'static str, &'a [VersionId]),
+    AffiliateCodeId(&'static str, &'a [AffiliateCodeId]),
+    DownloadReason(&'static str, &'a [DownloadReason]),
+}
+
+impl ClickhouseFilterParam<'_> {
+    fn bind(self, query: clickhouse::query::Query) -> clickhouse::query::Query {
+        match self {
+            Self::String(name, values) => query.param(name, values),
+            Self::Bool(name, values) => {
+                let value = match values {
+                    [false] => 0,
+                    [true] => 1,
+                    _ => 2,
+                };
+                query.param(name, value)
+            }
+            Self::VersionId(name, values) => {
+                let values = values
+                    .iter()
+                    .map(|id| DBVersionId::from(*id))
+                    .collect::<Vec<_>>();
+                query.param(name, values)
+            }
+            Self::AffiliateCodeId(name, values) => {
+                let values = values
+                    .iter()
+                    .map(|id| DBAffiliateCodeId::from(*id))
+                    .collect::<Vec<_>>();
+                query.param(name, values)
+            }
+            Self::DownloadReason(name, values) => {
+                let values =
+                    values.iter().map(ToString::to_string).collect::<Vec<_>>();
+                query.param(name, values)
+            }
+        }
+    }
 }
 
 impl ClickhouseQueryParams {
@@ -1287,6 +1547,7 @@ async fn query_clickhouse_playtime(
     cx: &mut QueryClickhouseContext<'_>,
     parent_version_projects: &HashMap<DBVersionId, DBProjectId>,
     use_columns: &[(&str, bool)],
+    filter_params: Vec<ClickhouseFilterParam<'_>>,
 ) -> Result<(), ApiError> {
     let uses = |name| {
         use_columns
@@ -1303,6 +1564,9 @@ async fn query_clickhouse_playtime(
         .param("parent_version_ids", cx.parent_version_ids);
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
+    }
+    for filter_param in filter_params {
+        query = filter_param.bind(query);
     }
 
     let mut cursor = query.fetch::<query::PlaytimeRow>()?;
@@ -1355,11 +1619,111 @@ async fn query_clickhouse_playtime(
     Ok(())
 }
 
+async fn query_clickhouse_downloads(
+    cx: &mut QueryClickhouseContext<'_>,
+    use_columns: &[(&str, bool)],
+    filters: &ProjectDownloadsFilters,
+    bucket_by_user_agent: bool,
+    filter_params: Vec<ClickhouseFilterParam<'_>>,
+) -> Result<(), ApiError> {
+    let uses = |name| {
+        use_columns
+            .iter()
+            .any(|(column_name, used)| *column_name == name && *used)
+    };
+    let mut query = cx
+        .clickhouse
+        .query(query::DOWNLOADS)
+        .param("time_range_start", cx.req.time_range.start.timestamp())
+        .param("time_range_end", cx.req.time_range.end.timestamp())
+        .param("time_slices", cx.time_slices.len())
+        .param("project_ids", cx.project_ids);
+    for (param_name, used) in use_columns {
+        query = query.param(param_name, used)
+    }
+    for filter_param in filter_params {
+        query = filter_param.bind(query);
+    }
+
+    let mut cursor = query.fetch::<query::DownloadRow>()?;
+    let mut buckets = HashMap::<DownloadBucket, u64>::new();
+
+    while let Some(row) = cursor.next().await? {
+        let normalized_source = normalize_download_source(&row.user_agent);
+        if !filters.user_agent.is_empty()
+            && !normalized_source
+                .as_ref()
+                .is_some_and(|source| filters.user_agent.contains(source))
+        {
+            continue;
+        }
+
+        let key = DownloadBucket {
+            bucket: row.bucket,
+            project_id: row.project_id,
+            domain: uses("use_domain").then(|| row.domain.clone()),
+            user_agent: bucket_by_user_agent
+                .then_some(normalized_source)
+                .flatten(),
+            version_id: uses("use_version_id").then_some(row.version_id),
+            monetized: if uses("use_monetized") {
+                match row.monetized {
+                    0 => Some(false),
+                    1 => Some(true),
+                    _ => None,
+                }
+            } else {
+                None
+            },
+            country: uses("use_country").then(|| row.country.clone()),
+            reason: if uses("use_reason") {
+                none_if_empty(row.reason.clone()).and_then(|s| s.parse().ok())
+            } else {
+                None
+            },
+            game_version: uses("use_game_version")
+                .then(|| row.game_version.clone()),
+            loader: uses("use_loader").then(|| row.loader.clone()),
+        };
+
+        *buckets.entry(key).or_default() += row.downloads;
+    }
+
+    for (key, downloads) in buckets {
+        add_to_time_slice(
+            cx.time_slices,
+            key.bucket as usize,
+            AnalyticsData::Project(ProjectAnalytics {
+                source_project: key.project_id.into(),
+                metrics: ProjectMetrics::Downloads(ProjectDownloads {
+                    domain: key.domain.and_then(none_if_empty),
+                    user_agent: key.user_agent,
+                    version_id: key
+                        .version_id
+                        .and_then(none_if_zero_version_id),
+                    monetized: key.monetized,
+                    country: key
+                        .country
+                        .map(|country| condense_country(country, downloads)),
+                    reason: key.reason,
+                    game_version: key.game_version.and_then(none_if_empty),
+                    loader: key.loader.and_then(none_if_empty),
+                    downloads,
+                }),
+            }),
+        )?;
+    }
+
+    Ok(())
+}
+
 async fn query_clickhouse<Row>(
     cx: &mut QueryClickhouseContext<'_>,
     query: &str,
     params: ClickhouseQueryParams,
     use_columns: &[(&str, bool)],
+    filter_params: Vec<ClickhouseFilterParam<'_>>,
+    row_filter: impl Fn(&Row::Value<'_>) -> bool,
     // I hate using the hidden type Row::Value here, but it's what next() returns, so I see no other option
     row_get_bucket: impl Fn(&Row::Value<'_>) -> u64,
     row_to_analytics: impl Fn(Row::Value<'_>) -> AnalyticsData,
@@ -1385,9 +1749,15 @@ where
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
     }
+    for filter_param in filter_params {
+        query = filter_param.bind(query);
+    }
     let mut cursor = query.fetch::<Row>()?;
 
     while let Some(row) = cursor.next().await? {
+        if !row_filter(&row) {
+            continue;
+        }
         let bucket = row_get_bucket(&row) as usize;
         add_to_time_slice(cx.time_slices, bucket, row_to_analytics(row))?;
     }

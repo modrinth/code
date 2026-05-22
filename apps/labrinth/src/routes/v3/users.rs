@@ -88,8 +88,8 @@ pub async fn all_projects(
 
     let user_project_ids =
         DBUser::get_projects(user.id.into(), &**pool, &redis).await?;
-    let organization_ids = DBUser::get_organizations(user.id.into(), &**pool)
-        .await?;
+    let organization_ids =
+        DBUser::get_organizations(user.id.into(), &**pool).await?;
     let organizations_data =
         DBOrganization::get_many_ids(&organization_ids, &**pool, &redis)
             .await?;
@@ -115,7 +115,10 @@ pub async fn all_projects(
 
     let mut team_groups = HashMap::new();
     for member in teams_data {
-        team_groups.entry(member.team_id).or_insert(vec![]).push(member);
+        team_groups
+            .entry(member.team_id)
+            .or_insert(vec![])
+            .push(member);
     }
 
     let mut organizations = HashMap::new();

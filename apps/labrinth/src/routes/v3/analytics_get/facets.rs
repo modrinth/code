@@ -11,11 +11,7 @@ use crate::{
         models::{DBProjectId, DBUser, DBVersionId},
         redis::RedisPool,
     },
-    models::{
-        ids::VersionId,
-        pats::Scopes,
-        v3::analytics::DownloadReason,
-    },
+    models::{ids::VersionId, pats::Scopes, v3::analytics::DownloadReason},
     queue::session::AuthQueue,
     routes::ApiError,
 };
