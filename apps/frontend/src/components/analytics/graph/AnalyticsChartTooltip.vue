@@ -2,13 +2,13 @@
 	<div
 		v-show="visible"
 		ref="tooltipElement"
-		class="analytics-chart-tooltip absolute left-0 top-0 z-10 max-h-[360px] min-w-[14rem] overflow-y-auto overscroll-contain rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
+		class="analytics-chart-tooltip absolute left-0 top-0 z-10 flex max-h-[360px] min-w-[14rem] flex-col overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
 		:class="pinned ? '' : 'pointer-events-none'"
 		:style="positionStyle"
 		@click.stop
 	>
 		<div
-			class="mb-1.5 flex items-center justify-between gap-2 border-0 border-b border-solid border-surface-5 px-3 pb-1.5 font-medium text-contrast"
+			class="mb-1.5 flex shrink-0 items-center justify-between gap-2 border-0 border-b border-solid border-surface-5 px-3 pb-1.5 font-medium text-contrast"
 		>
 			<span>
 				{{ rangeLabel }}
@@ -23,11 +23,14 @@
 				aria-label="Pinned"
 			/>
 		</div>
-		<div v-if="!ratioMode" class="mb-1.5 flex items-center justify-between gap-4 px-3">
-			<span class="font-medium text-primary">Total</span>
-			<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
-		</div>
-		<div class="flex flex-col gap-1 px-3">
+		<div
+			ref="entriesElement"
+			class="flex min-h-0 flex-col gap-1 overflow-y-auto overscroll-contain px-3"
+		>
+			<div v-if="!ratioMode" class="flex shrink-0 items-center justify-between gap-4">
+				<span class="font-medium text-primary">Total</span>
+				<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
+			</div>
 			<div
 				v-for="entry in entries"
 				:key="entry.projectId"
@@ -243,6 +246,7 @@ const durationLabel = computed(() =>
 )
 
 const tooltipElement = ref<HTMLDivElement | null>(null)
+const entriesElement = ref<HTMLDivElement | null>(null)
 const tooltipWidth = ref(0)
 const tooltipHeight = ref(0)
 const tooltipOffsetParentLeft = ref(0)
@@ -300,7 +304,7 @@ function getNormalizedWheelDeltaY(event: WheelEvent, element: HTMLElement) {
 }
 
 function consumeWheel(event: WheelEvent): boolean {
-	const element = tooltipElement.value
+	const element = entriesElement.value
 	if (!props.visible || !element) return false
 
 	const maxScrollTop = element.scrollHeight - element.clientHeight
