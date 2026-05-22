@@ -875,24 +875,6 @@
   "dashboard.head-title": {
     "message": "Kontrollpanel"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Marker alt som lest"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Gå gjennom historie"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Du har ingen uleste varslinger."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Error innen lasting av varsler:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Historie"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Varslingshistorie"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Se alle"
   },
@@ -901,9 +883,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Vis {extraNotifs} flere {extraNotifs, plural, one {varsling} other {varslinger}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Laster inn varsler..."
   },
   "dashboard.organizations.button.create": {
     "message": "Lag organisering"
@@ -1594,9 +1573,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Error når det kom til å generer tilstanden fra API-en når den blei bygd."
-  },
-  "layout.banner.preview.description": {
-    "message": "Viss du meinte å gå til den offisielle Modrinth-nettsida, gå til <link>https://modrinth.com</link>. Denne forhandsvisnigsutplasseringa blir brukt av Modrinth-personalet for testing. Den blei bygd ved å bruke <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Dette er ei forhandsvisning av distribusjonen til Modrinth-nettsida."

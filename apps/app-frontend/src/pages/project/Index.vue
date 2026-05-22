@@ -334,7 +334,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	backToBrowse: {
 		id: 'app.project.install-context.back-to-browse',
-		defaultMessage: 'Back to browse',
+		defaultMessage: 'Back to discover',
 	},
 	installContentToInstance: {
 		id: 'app.project.install-context.install-content-to-instance',
@@ -415,7 +415,7 @@ const projectGalleryHref = computed(() => buildProjectHref(`/project/${route.par
 const projectBrowseBackUrl = computed(() => {
 	const browsePath = route.query.b
 	if (typeof browsePath === 'string' && browsePath.startsWith('/browse/')) return browsePath
-	const type = data.value?.project_type ? `${data.value.project_type}s` : 'mods'
+	const type = data.value?.project_type ? `${data.value.project_type}` : 'mod'
 	return `/browse/${type}`
 })
 

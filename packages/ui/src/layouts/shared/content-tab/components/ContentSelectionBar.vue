@@ -74,6 +74,7 @@ interface Props {
 	bulkTotal?: number
 	bulkWaiting?: boolean
 	ariaLabel?: string
+	getItemId?: (item: ContentItem) => string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -85,6 +86,7 @@ const props = withDefaults(defineProps<Props>(), {
 	bulkTotal: 0,
 	bulkWaiting: false,
 	ariaLabel: undefined,
+	getItemId: undefined,
 })
 
 const emit = defineEmits<{
@@ -101,6 +103,10 @@ const iconStackWidth = computed(() => {
 	if (props.selectedItems.length === 0) return 0
 	return 32 + (visibleItems.value.length - 1 + (overflowCount.value > 0 ? 1 : 0)) * iconStackOffset
 })
+
+function resolveItemId(item: ContentItem) {
+	return props.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
+}
 
 const allDisabled = computed(() => props.selectedItems.every((m) => !m.enabled))
 const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
@@ -146,7 +152,7 @@ const bulkProgressMessage = computed(() => {
 			>
 				<div
 					v-for="(item, index) in visibleItems"
-					:key="item.id"
+					:key="resolveItemId(item)"
 					v-tooltip="item.project?.title ?? item.file_name"
 					class="absolute top-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4"
 					:style="{ left: `${index * iconStackOffset}px`, zIndex: visibleItems.length - index }"
@@ -154,7 +160,7 @@ const bulkProgressMessage = computed(() => {
 					<Avatar
 						:src="item.project?.icon_url"
 						:alt="item.project?.title ?? item.file_name"
-						:tint-by="item.id"
+						:tint-by="resolveItemId(item)"
 						size="100%"
 						no-shadow
 						class="selected-content-avatar"

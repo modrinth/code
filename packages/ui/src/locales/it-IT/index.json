@@ -96,10 +96,10 @@
     "defaultMessage": "Riabbonamento al server"
   },
   "browse.filter-results": {
-    "defaultMessage": "Risultati dei filtri..."
+    "defaultMessage": "Filtra..."
   },
   "browse.no-results": {
-    "defaultMessage": "Non è stato trovato alcun risultato!"
+    "defaultMessage": "Nessun risultato trovato!"
   },
   "browse.offline": {
     "defaultMessage": "Al momento sembri offline. Connettiti a Internet per usare Modrinth!"
@@ -561,7 +561,7 @@
     "defaultMessage": "Seleziona un numero di build"
   },
   "creation-flow.modal.custom-setup.build-number.search-placeholder": {
-    "defaultMessage": "Cerca numeri di build..."
+    "defaultMessage": "Cerca tra i numeri di build..."
   },
   "creation-flow.modal.custom-setup.content-loader.label": {
     "defaultMessage": "Loader"
@@ -570,7 +570,7 @@
     "defaultMessage": "Seleziona la versione del gioco"
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
-    "defaultMessage": "Cerca versioni del gioco..."
+    "defaultMessage": "Cerca tra le versioni del gioco..."
   },
   "creation-flow.modal.custom-setup.icon.remove": {
     "defaultMessage": "Rimuovi icona"
@@ -594,7 +594,7 @@
     "defaultMessage": "Seleziona la versione del loader"
   },
   "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
-    "defaultMessage": "Cerca versioni del loader..."
+    "defaultMessage": "Cerca tra le versioni del loader..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Loader"
@@ -651,7 +651,7 @@
     "defaultMessage": "Genera strutture"
   },
   "creation-flow.modal.final-config.generator-settings-json.placeholder": {
-    "defaultMessage": "Inserisci impostazioni del generatore in JSON"
+    "defaultMessage": "Inserisci le impostazioni del generatore in JSON"
   },
   "creation-flow.modal.final-config.generator-settings.custom": {
     "defaultMessage": "Personalizzato"
@@ -660,7 +660,7 @@
     "defaultMessage": "Predefinito"
   },
   "creation-flow.modal.final-config.generator-settings.description": {
-    "defaultMessage": "Permette una personalizzazione ulteriore, per esempio gli strati nei mondi piatti."
+    "defaultMessage": "Permette una generazione avanzata, come gli strati nei mondi piatti."
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
     "defaultMessage": "Piatto"
@@ -726,7 +726,7 @@
     "defaultMessage": "Percorso del launcher..."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.text": {
-    "defaultMessage": "Nessuna istanza importabile trovata al percorso specificato."
+    "defaultMessage": "Nessuna istanza importabile trovata nel percorso specificato."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.title": {
     "defaultMessage": "Nessuna istanza trovata"
@@ -1422,7 +1422,7 @@
     "defaultMessage": "Scegli un'icona"
   },
   "input.search-version.placeholder": {
-    "defaultMessage": "Cerca versione..."
+    "defaultMessage": "Cerca tra le versioni..."
   },
   "input.search.placeholder": {
     "defaultMessage": "Cerca..."
@@ -1527,7 +1527,7 @@
     "defaultMessage": "Salvando..."
   },
   "installation-settings.search-game-version": {
-    "defaultMessage": "Cerca versioni del gioco..."
+    "defaultMessage": "Cerca tra le versioni del gioco..."
   },
   "installation-settings.unlink": {
     "defaultMessage": "Scollega"
@@ -2035,6 +2035,150 @@
   },
   "locale.zh-TW": {
     "defaultMessage": "Cinese (Tradizionale)"
+  },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "Inserisci una descrizione dell'immagine"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Errore"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "Descrivi l'immagine come faresti con uno che non può vederla."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Descrivi l'immagine..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Descrizione (testo alternativo)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Inserisci immagine"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Fonte dell'immagine"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Carica"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "Trascina e rilascia per caricare o clicca per selezionare"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Inserisci l'URL dell'immagine..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Inserisci"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Inserisci link"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Inserisci il testo..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Testo"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Inserisci il link..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "Questo editor supporta la <markdown-link>formattazione in Markdown</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Lunghezza massima:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Senza limiti"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Scrivi qualcosa..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Anteprima"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Anteprima"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Grassetto"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Elenco puntato"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Codice"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Intestazione 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Intestazione 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Intestazione 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Immagine"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Corsivo"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Elenco numerato"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Citazione"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Barrato"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Video"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "Nessun file selezionato"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "Nessuna immagine selezionata"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "URL non valido. Questo dominio è vietato."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "URL non valido. Assicurati che sia scritto correttamente."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "Protocollo non supportato. Usa http o https."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "Riproduttore YouTube"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Inserisci video di YouTube"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Inserisci un link di YouTube valido."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Inserisci il link del video di YouTube"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "Link del video di YouTube"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Aggiungi un metodo di pagamento"

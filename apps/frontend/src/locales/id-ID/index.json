@@ -1499,9 +1499,6 @@
   "layout.banner.build-fail.title": {
     "message": "Terjadi kesalahan saat menghasilkan keadaan dari API saat membangun."
   },
-  "layout.banner.preview.description": {
-    "message": "Bila Anda bermaksud untuk mengakses situs resmi Modrinth, kunjungi <link>https://modrinth.com</link>. Penerapan pratinjau ini digunakan oleh staf Modrinth untuk tujuan pengujian dan dibangun menggunakan <branch-link>{owner}/{branch}</branch-link> @ {commit}."
-  },
   "layout.banner.preview.title": {
     "message": "Ini adalah penerapan pratinjau dari situs web Modrinth."
   },

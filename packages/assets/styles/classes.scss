@@ -711,6 +711,8 @@ a:not(.no-click-animation),
 }
 
 .v-popper--theme-tooltip {
+	pointer-events: none;
+
 	.v-popper__inner {
 		background: var(--color-tooltip-bg) !important;
 		color: var(--color-tooltip-text) !important;

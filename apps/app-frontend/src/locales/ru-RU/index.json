@@ -3,7 +3,7 @@
     "message": "Скачивание Java {version}"
   },
   "app.action-bar.downloads": {
-    "message": "Скачивания"
+    "message": "Скачивание"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Скрыть другие активные сборки"
@@ -741,7 +741,7 @@
     "message": "Загрузчик управляется сервером"
   },
   "unknown-pack-warning-modal.body": {
-    "message": "Файлы любого формата проверены на безопасность, если они загружены на Modrinth (в том числе файлы⠀.mrpack)."
+    "message": "Файлы любого формата проверены на безопасность, если они загружены на Modrinth (в том числе файлы .mrpack)."
   },
   "unknown-pack-warning-modal.dont-show-again": {
     "message": "Больше не предупреждать"

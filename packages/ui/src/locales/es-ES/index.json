@@ -95,6 +95,27 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resuscribirse al servidor"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Filtrar resultados..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "¡No se encontraron resultados para su consulta!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Actualmente no estás conectado a internet. ¡Conéctate para navegar por Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} server {servers} other {projects}}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Proyectos seleccionados"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Instalar {count, plural, one {# proyecto} other {# proyectos}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural,one {#proyecto seleccionado} other {proyectos seleccionados}}"
+  },
   "button.accept": {
     "defaultMessage": "Aceptar"
   },

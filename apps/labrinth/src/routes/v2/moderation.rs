@@ -61,6 +61,7 @@ pub async fn get_projects(
         web::Query(internal::moderation::ProjectsRequestOptions {
             count: count.count,
             offset: 0,
+            has_external_dependencies: None,
         }),
         session_queue,
     )

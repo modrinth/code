@@ -34,25 +34,39 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<RussiaBanner v-if="isRussia" />
-		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
-		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
+		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
+		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
 		<VerifyEmailBanner
-			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
+			v-if="
+				flags.showAllBanners ||
+				(auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email')
+			"
 			:has-email="!!auth?.user?.email"
 		/>
 		<SubscriptionPaymentFailedBanner
 			v-if="
-				user.subscriptions.some((x) => x.status === 'payment-failed') &&
-				route.path !== '/settings/billing'
+				flags.showAllBanners ||
+				(user.subscriptions.some((x) => x.status === 'payment-failed') &&
+					route.path !== '/settings/billing')
 			"
 		/>
-		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
-		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
+		<PreviewBanner
+			v-if="
+				flags.showAllBanners || (config.public.buildEnv === 'production' && config.public.preview)
+			"
+		/>
+		<StagingBanner
+			v-if="
+				flags.showAllBanners ||
+				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')
+			"
+		/>
 		<GeneratedStateErrorsBanner
 			:errors="generatedStateErrors"
 			:api-url="config.public.apiBaseUrl"
 		/>
+		<ViewOnModrinthBanner />
 		<header
 			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
@@ -747,9 +761,13 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonSettingsMessages,
+	createHostingIntercomIdentityKey,
 	defineMessages,
 	injectModrinthClient,
+	injectPageContext,
 	OverflowMenu,
+	providePageContext,
+	useHostingIntercom,
 	useVIntl,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
@@ -767,6 +785,7 @@ import SubscriptionPaymentFailedBanner from '~/components/ui/banner/Subscription
 import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
 import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
 import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
+import ViewOnModrinthBanner from '~/components/ui/banner/ViewOnModrinthBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
@@ -793,6 +812,25 @@ const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
+const pageContext = injectPageContext()
+const hostingIntercomActive = computed(() => route.path.startsWith('/hosting') && !!auth.value.user)
+const hostingIntercomServerId = computed(() => {
+	const rawId = route.params.id
+	return Array.isArray(rawId) ? rawId[0] : rawId
+})
+const hostingIntercom = useHostingIntercom({
+	enabled: hostingIntercomActive,
+	appId: computed(() => config.public.intercomAppId),
+	fetchToken: fetchIntercomToken,
+	identityKey: computed(() =>
+		createHostingIntercomIdentityKey(auth.value.user, hostingIntercomServerId.value),
+	),
+})
+
+providePageContext({
+	...pageContext,
+	intercomBubble: hostingIntercom.intercomBubble,
+})
 
 const { data: payoutBalance } = useQuery({
 	queryKey: ['payout', 'balance'],
@@ -820,6 +858,12 @@ const showTinMismatchBanner = computed(() => {
 })
 
 const basePopoutId = useId()
+
+async function fetchIntercomToken() {
+	return $fetch('/api/intercom/messenger-jwt', {
+		query: hostingIntercomServerId.value ? { server_id: hostingIntercomServerId.value } : {},
+	})
+}
 
 const navMenuMessages = defineMessages({
 	home: {
@@ -1133,7 +1177,7 @@ const isDiscovering = computed(
 )
 
 const isDiscoveringSubpage = computed(
-	() => route.name && route.name.startsWith('type-id') && !route.query.sid,
+	() => route.name && route.name.startsWith('type-project') && !route.query.sid,
 )
 
 const isRussia = computed(() => country.value === 'ru')

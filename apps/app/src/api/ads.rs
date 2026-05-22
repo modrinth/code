@@ -11,13 +11,22 @@ use tokio::sync::RwLock;
 pub struct AdsState {
     pub shown: bool,
     pub modal_shown: bool,
+    pub occluded: bool,
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+#[cfg(any(windows, target_os = "macos"))]
+pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
 #[cfg(not(target_os = "linux"))]
-const ADS_USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36";
+const ADS_USER_AGENT: &str = concat!(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
+    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 ",
+    "ModrinthApp/",
+    env!("CARGO_PKG_VERSION"),
+    " (Modrinth App)",
+);
 
 #[cfg(windows)]
 fn ads_user_agent_override_params() -> String {
@@ -28,12 +37,14 @@ fn ads_user_agent_override_params() -> String {
             "brands": [
                 { "brand": "Chromium", "version": "128" },
                 { "brand": "Google Chrome", "version": "128" },
+                { "brand": "Modrinth App", "version": env!("CARGO_PKG_VERSION") },
                 { "brand": "Not=A?Brand", "version": "99" },
             ],
             "fullVersion": "128.0.0.0",
             "fullVersionList": [
                 { "brand": "Chromium", "version": "128.0.0.0" },
                 { "brand": "Google Chrome", "version": "128.0.0.0" },
+                { "brand": "Modrinth App", "version": env!("CARGO_PKG_VERSION") },
                 { "brand": "Not=A?Brand", "version": "99.0.0.0" },
             ],
             "platform": "Windows",
@@ -52,8 +63,8 @@ fn configure_ads_cookie_settings(
     core_webview2: &webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2,
 ) {
     use webview2_com::Microsoft::Web::WebView2::Win32::{
-        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2,
-        ICoreWebView2_13, ICoreWebView2Profile3,
+        COREWEBVIEW2_TRACKING_PREVENTION_LEVEL_NONE, ICoreWebView2_13,
+        ICoreWebView2Profile3,
     };
     use windows_core::Interface;
 
@@ -83,10 +94,12 @@ fn configure_ads_cookie_settings(
     }
 }
 
-fn set_webview_visible<R: Runtime>(
-    webview: &tauri::Webview<R>,
-    _visible: bool,
-) {
+fn set_webview_visible<R: Runtime>(webview: &tauri::Webview<R>, visible: bool) {
+    #[cfg(not(any(windows, target_os = "macos")))]
+    {
+        _ = visible;
+    }
+
     webview
         .with_webview(
             #[allow(unused_variables)]
@@ -94,11 +107,18 @@ fn set_webview_visible<R: Runtime>(
                 #[cfg(windows)]
                 {
                     let controller = wv.controller();
-                    unsafe { controller.SetIsVisible(_visible) }.ok();
+                    unsafe { controller.SetIsVisible(visible) }.ok();
                 }
             },
         )
         .ok();
+
+    #[cfg(target_os = "macos")]
+    if visible {
+        webview.show().ok();
+    } else {
+        webview.hide().ok();
+    }
 }
 
 fn set_webview_visible_for_window<R: Runtime>(
@@ -111,7 +131,76 @@ fn set_webview_visible_for_window<R: Runtime>(
         .and_then(|window| window.is_minimized().ok())
         .unwrap_or(false);
 
-    set_webview_visible(webview, visible && !is_minimized);
+    let is_occluded = app
+        .state::<RwLock<AdsState>>()
+        .try_read()
+        .map(|state| state.occluded)
+        .unwrap_or(false);
+
+    set_webview_visible(webview, visible && !is_minimized && !is_occluded);
+}
+
+#[cfg(any(windows, target_os = "macos"))]
+fn compute_ads_webview_occlusion<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> Option<bool> {
+    let main_window = app.get_window("main")?;
+    let webviews = app.webviews();
+    let webview = webviews.get("ads-window")?;
+
+    #[cfg(target_os = "macos")]
+    {
+        let position = webview.position().ok()?;
+        let size = webview.size().ok()?;
+
+        Some(
+            crate::api::ads_occlusion_macos::is_ads_webview_occluded(
+                &main_window,
+                position.x,
+                position.y,
+                size.width,
+                size.height,
+            )
+            .unwrap_or(false),
+        )
+    }
+
+    #[cfg(windows)]
+    {
+        let position = webview.position().ok()?;
+        let size = webview.size().ok()?;
+        let hwnd = main_window.hwnd().ok()?;
+
+        Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
+            hwnd,
+            position.x,
+            position.y,
+            size.width,
+            size.height,
+        ))
+    }
+}
+
+#[cfg(any(windows, target_os = "macos"))]
+async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
+    let Some(occluded) = compute_ads_webview_occlusion(app) else {
+        return;
+    };
+
+    let state = app.state::<RwLock<AdsState>>();
+    let mut state = state.write().await;
+
+    if state.occluded == occluded {
+        return;
+    }
+
+    state.occluded = occluded;
+    let visible = state.shown && !state.modal_shown;
+    drop(state);
+
+    if let Some(webview) = app.webviews().get("ads-window") {
+        set_webview_visible_for_window(app, webview, visible);
+    }
 }
 
 fn sync_webview_visibility_for_main_window<R: Runtime>(
@@ -132,7 +221,7 @@ fn sync_webview_visibility_for_main_window<R: Runtime>(
         false
     } else {
         match app.state::<RwLock<AdsState>>().try_read() {
-            Ok(state) => state.shown && !state.modal_shown,
+            Ok(state) => state.shown && !state.modal_shown && !state.occluded,
             Err(_) => false,
         }
     };
@@ -165,20 +254,28 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             app.manage(RwLock::new(AdsState {
                 shown: true,
                 modal_shown: false,
+                occluded: false,
                 last_click: None,
                 malicious_origins: HashSet::new(),
             }));
 
-            // We refresh the ads window every 5 minutes to mitigate memory leak issues.
-            // While this loop doesn't include explicit checks to see if the window is still
-            // visible when we refresh, the Aditude wrapper will not make any ad requests
-            // unless Chromium reports the page as visible. The refresh does not reset the
-            // visibility state.
+            // We refresh the ads window periodically to mitigate memory leak issues.
+            // Skip refreshes when app state has hidden the ads WebView. The refresh does
+            // not reset the visibility state.
             let refresh_app = app.clone();
             tauri::async_runtime::spawn(async move {
                 loop {
-                    if let Some(webview) =
-                        refresh_app.webviews().get_mut("ads-window")
+                    let should_refresh = refresh_app
+                        .state::<RwLock<AdsState>>()
+                        .try_read()
+                        .map(|state| {
+                            state.shown && !state.modal_shown && !state.occluded
+                        })
+                        .unwrap_or(false);
+
+                    if should_refresh
+                        && let Some(webview) =
+                            refresh_app.webviews().get_mut("ads-window")
                     {
                         let _ = webview.navigate(AD_LINK.parse().unwrap());
                     }
@@ -213,6 +310,19 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                             &delayed_was_minimized,
                         );
                     });
+                });
+            }
+
+            #[cfg(any(windows, target_os = "macos"))]
+            {
+                let app_handle = app.clone();
+
+                tauri::async_runtime::spawn(async move {
+                    loop {
+                        sync_ads_occlusion(&app_handle).await;
+
+                        tokio::time::sleep(Duration::from_millis(200)).await;
+                    }
                 });
             }
 

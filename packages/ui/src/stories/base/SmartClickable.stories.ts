@@ -18,6 +18,13 @@ const meta = {
 				<div style="padding: 1rem; background: var(--color-button-bg); border-radius: 0.5rem;">
 					<h3>Clickable Card</h3>
 					<p>The entire card is clickable</p>
+					<span
+						v-tooltip="'Tooltip child keeps the card hover state'"
+						class="smart-clickable:allow-pointer-events"
+						style="display: inline-flex; margin-top: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 999px; background: var(--color-raised-bg);"
+					>
+						Hover tooltip
+					</span>
 				</div>
 			</SmartClickable>
 		`,

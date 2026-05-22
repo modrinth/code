@@ -875,24 +875,6 @@
   "dashboard.head-title": {
     "message": "Kontrol Paneli"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Hepsini okundu işaretle"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Geçmişi görüntüle"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Okunmamış bildiriminiz yok."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Bildirimler yüklenirken hata oluştu:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Geçmiş"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Bildirim geçmişi"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Hepsi"
   },
@@ -901,9 +883,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "{extraNotifs} daha fazla {extraNotifs, plural, one {notification} other {notifications}} görüntüle"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Bildirimler yükleniyor..."
   },
   "dashboard.organizations.button.create": {
     "message": "Organizasyon oluştur"
@@ -1723,9 +1702,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Derleme esnasında API'den durum oluştururken hata."
-  },
-  "layout.banner.preview.description": {
-    "message": "Modrinth'in resmi web sitesine erişmek istediyseniz, <link>https://modrinth.com</link> adresini ziyaret edin. Bu önizleme dağıtımı, Modrinth yetkilileri tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak oluşturulmuştur."
   },
   "layout.banner.preview.title": {
     "message": "Bu, Modrinth web sitesinin önizleme dağıtımıdır."

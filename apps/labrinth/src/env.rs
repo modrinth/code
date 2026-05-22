@@ -120,42 +120,50 @@ impl FromStr for StringCsv {
 }
 
 vars! {
-    SENTRY_ENVIRONMENT: String;
-    SENTRY_TRACES_SAMPLE_RATE: f32;
-    SITE_URL: String;
-    CDN_URL: String;
-    LABRINTH_ADMIN_KEY: String;
-    LABRINTH_MEDAL_KEY: String;
-    LABRINTH_EXTERNAL_NOTIFICATION_KEY: String;
-    RATE_LIMIT_IGNORE_KEY: String;
-    DATABASE_URL: String;
-    REDIS_URL: String;
-    BIND_ADDR: String;
-    SELF_ADDR: String;
+    SENTRY_ENVIRONMENT: String = "development";
+    SENTRY_TRACES_SAMPLE_RATE: f32 = 0.1f32;
+    SITE_URL: String = "http://localhost:3000";
+    CDN_URL: String = "file:///tmp/modrinth";
+    LABRINTH_ADMIN_KEY: String = "";
+    LABRINTH_MEDAL_KEY: String = "";
+    LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "";
+    RATE_LIMIT_IGNORE_KEY: String = "";
+    DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
+    REDIS_URL: String = "redis://localhost";
+    BIND_ADDR: String = "";
+    SELF_ADDR: String = "";
 
-    LOCAL_INDEX_INTERVAL: u64;
-    VERSION_INDEX_INTERVAL: u64;
+    LOCAL_INDEX_INTERVAL: u64 = 3600u64;
+    VERSION_INDEX_INTERVAL: u64 = 1800u64;
 
-    WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>>;
-    ALLOWED_CALLBACK_URLS: Json<Vec<String>>;
-    ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>>;
+    WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>> = Json(vec![
+        "cdn.modrinth.com".into(),
+        "github.com".into(),
+        "raw.githubusercontent.com".into(),
+    ]);
+    ALLOWED_CALLBACK_URLS: Json<Vec<String>> = Json(vec![
+        "localhost".into(),
+        ".modrinth.com".into(),
+        "127.0.0.1".into(),
+        "[::1]".into(),
+    ]);
+    ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>> = Json(vec![
+        "http://127.0.0.1:3000".into(),
+        "http://localhost:3000".into(),
+        "https://modrinth.com".into(),
+        "https://www.modrinth.com".into(),
+        "*".into(),
+    ]);
 
     // search
     SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
-    MEILISEARCH_READ_ADDR: String;
-    MEILISEARCH_WRITE_ADDRS: StringCsv;
-    MEILISEARCH_KEY: String;
-    ELASTICSEARCH_URL: String;
-    ELASTICSEARCH_INDEX_PREFIX: String;
-    ELASTICSEARCH_USERNAME: String = "";
-    ELASTICSEARCH_PASSWORD: String = "";
     SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
     TYPESENSE_URL: String = "http://localhost:8108";
     TYPESENSE_API_KEY: String = "modrinth";
     TYPESENSE_INDEX_PREFIX: String = "labrinth";
 
     // storage
-    STORAGE_BACKEND: crate::file_hosting::FileHostKind;
+    STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;
 
     // s3
     S3_PUBLIC_BUCKET_NAME: String = "";
@@ -173,98 +181,98 @@ vars! {
     S3_PRIVATE_SECRET: String = "";
 
     // local
-    MOCK_FILE_PATH: String = "";
+    MOCK_FILE_PATH: String = "/tmp/modrinth";
 
-    GITHUB_CLIENT_ID: String;
-    GITHUB_CLIENT_SECRET: String;
-    GITLAB_CLIENT_ID: String;
-    GITLAB_CLIENT_SECRET: String;
-    DISCORD_CLIENT_ID: String;
-    DISCORD_CLIENT_SECRET: String;
-    MICROSOFT_CLIENT_ID: String;
-    MICROSOFT_CLIENT_SECRET: String;
-    GOOGLE_CLIENT_ID: String;
-    GOOGLE_CLIENT_SECRET: String;
-    STEAM_API_KEY: String;
+    GITHUB_CLIENT_ID: String = "none";
+    GITHUB_CLIENT_SECRET: String = "none";
+    GITLAB_CLIENT_ID: String = "none";
+    GITLAB_CLIENT_SECRET: String = "none";
+    DISCORD_CLIENT_ID: String = "none";
+    DISCORD_CLIENT_SECRET: String = "none";
+    MICROSOFT_CLIENT_ID: String = "none";
+    MICROSOFT_CLIENT_SECRET: String = "none";
+    GOOGLE_CLIENT_ID: String = "none";
+    GOOGLE_CLIENT_SECRET: String = "none";
+    STEAM_API_KEY: String = "none";
 
-    TREMENDOUS_API_URL: String;
-    TREMENDOUS_API_KEY: String;
-    TREMENDOUS_PRIVATE_KEY: String;
+    TREMENDOUS_API_URL: String = "https://testflight.tremendous.com/api/v2/";
+    TREMENDOUS_API_KEY: String = "none";
+    TREMENDOUS_PRIVATE_KEY: String = "none";
 
-    PAYPAL_API_URL: String;
-    PAYPAL_WEBHOOK_ID: String;
-    PAYPAL_CLIENT_ID: String;
-    PAYPAL_CLIENT_SECRET: String;
-    PAYPAL_NVP_USERNAME: String;
-    PAYPAL_NVP_PASSWORD: String;
-    PAYPAL_NVP_SIGNATURE: String;
+    PAYPAL_API_URL: String = "https://api-m.sandbox.paypal.com/v1/";
+    PAYPAL_WEBHOOK_ID: String = "none";
+    PAYPAL_CLIENT_ID: String = "none";
+    PAYPAL_CLIENT_SECRET: String = "none";
+    PAYPAL_NVP_USERNAME: String = "none";
+    PAYPAL_NVP_PASSWORD: String = "none";
+    PAYPAL_NVP_SIGNATURE: String = "none";
 
     PAYPAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
     BREX_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
     TREMENDOUS_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
     MURAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
 
-    HCAPTCHA_SECRET: String;
+    HCAPTCHA_SECRET: String = "none";
 
-    SMTP_USERNAME: String;
-    SMTP_PASSWORD: String;
-    SMTP_HOST: String;
-    SMTP_PORT: u16;
-    SMTP_TLS: String;
-    SMTP_FROM_NAME: String;
-    SMTP_FROM_ADDRESS: String;
+    SMTP_USERNAME: String = "";
+    SMTP_PASSWORD: String = "";
+    SMTP_HOST: String = "localhost";
+    SMTP_PORT: u16 = 1025u16;
+    SMTP_TLS: String = "none";
+    SMTP_FROM_NAME: String = "Modrinth";
+    SMTP_FROM_ADDRESS: String = "no-reply@mail.modrinth.com";
 
-    SITE_VERIFY_EMAIL_PATH: String;
-    SITE_RESET_PASSWORD_PATH: String;
-    SITE_BILLING_PATH: String;
+    SITE_VERIFY_EMAIL_PATH: String = "auth/verify-email";
+    SITE_RESET_PASSWORD_PATH: String = "auth/reset-password";
+    SITE_BILLING_PATH: String = "none";
 
-    SENDY_URL: String;
-    SENDY_LIST_ID: String;
-    SENDY_API_KEY: String;
+    SENDY_URL: String = "none";
+    SENDY_LIST_ID: String = "none";
+    SENDY_API_KEY: String = "none";
 
-    CLICKHOUSE_REPLICATED: bool;
-    CLICKHOUSE_URL: String;
-    CLICKHOUSE_USER: String;
-    CLICKHOUSE_PASSWORD: String;
-    CLICKHOUSE_DATABASE: String;
+    CLICKHOUSE_REPLICATED: bool = false;
+    CLICKHOUSE_URL: String = "http://localhost:8123";
+    CLICKHOUSE_USER: String = "default";
+    CLICKHOUSE_PASSWORD: String = "default";
+    CLICKHOUSE_DATABASE: String = "staging_ariadne";
 
-    FLAME_ANVIL_URL: String;
+    FLAME_ANVIL_URL: String = "none";
 
-    GOTENBERG_URL: String;
-    GOTENBERG_CALLBACK_BASE: String;
-    GOTENBERG_TIMEOUT: u64;
+    GOTENBERG_URL: String = "http://localhost:13000";
+    GOTENBERG_CALLBACK_BASE: String = "http://host.docker.internal:8000/_internal/gotenberg";
+    GOTENBERG_TIMEOUT: u64 = 30000u64;
 
-    STRIPE_API_KEY: String;
-    STRIPE_WEBHOOK_SECRET: String;
+    STRIPE_API_KEY: String = "none";
+    STRIPE_WEBHOOK_SECRET: String = "none";
 
-    ADITUDE_API_KEY: String;
+    ADITUDE_API_KEY: String = "none";
 
-    PYRO_API_KEY: String;
+    PYRO_API_KEY: String = "none";
 
-    BREX_API_URL: String;
-    BREX_API_KEY: String;
+    BREX_API_URL: String = "https://platform.brexapis.com/v2/";
+    BREX_API_KEY: String = "none";
 
-    DELPHI_URL: String;
+    DELPHI_URL: String = "";
 
-    AVALARA_1099_API_URL: String;
-    AVALARA_1099_API_KEY: String;
-    AVALARA_1099_API_TEAM_ID: String;
-    AVALARA_1099_COMPANY_ID: String;
+    AVALARA_1099_API_URL: String = "https://www.track1099.com/api";
+    AVALARA_1099_API_KEY: String = "none";
+    AVALARA_1099_API_TEAM_ID: String = "none";
+    AVALARA_1099_COMPANY_ID: String = "207337084";
 
-    ANROK_API_URL: String;
-    ANROK_API_KEY: String;
+    ANROK_API_URL: String = "";
+    ANROK_API_KEY: String = "";
 
-    PAYOUT_ALERT_SLACK_WEBHOOK: String;
+    PAYOUT_ALERT_SLACK_WEBHOOK: String = "none";
     CLOUDFLARE_INTEGRATION: bool = false;
 
-    ARCHON_URL: String;
+    ARCHON_URL: String = "";
 
-    MURALPAY_API_URL: String;
-    MURALPAY_API_KEY: String;
-    MURALPAY_TRANSFER_API_KEY: String;
+    MURALPAY_API_URL: String = "https://api-staging.muralpay.com";
+    MURALPAY_API_KEY: String = "none";
+    MURALPAY_TRANSFER_API_KEY: String = "none";
     MURALPAY_SOURCE_ACCOUNT_ID: muralpay::AccountId = muralpay::AccountId(uuid::Uuid::nil());
 
-    DEFAULT_AFFILIATE_REVENUE_SPLIT: Decimal;
+    DEFAULT_AFFILIATE_REVENUE_SPLIT: Decimal = Decimal::new(1, 1);
 
     DATABASE_ACQUIRE_TIMEOUT_MS: u64 = 30000u64;
     DATABASE_MIN_CONNECTIONS: u32 = 0u32;
@@ -286,7 +294,7 @@ vars! {
     MODERATION_SLACK_WEBHOOK: String = "";
     DELPHI_SLACK_WEBHOOK: String = "";
 
-    TREMENDOUS_CAMPAIGN_ID: String = "";
+    TREMENDOUS_CAMPAIGN_ID: String = "none";
 
     // server pinging
     SERVER_PING_MAX_CONCURRENT: usize = 16usize;

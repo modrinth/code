@@ -407,6 +407,117 @@
   "collection.title": {
     "message": "{name} - Kolekcja"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Dodaj prywatną notatkę"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Zatwierdź"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Zatwierdź z odpowiedzią "
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Zamknij wątek"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Zamknij z odpowiedzią"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Odrzuć"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Odrzuć z odpowiedzią"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Otwórz ponownie wątek "
+  },
+  "conversation-thread.action.reply": {
+    "message": "Odpowiedz"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Odpowiedz na wątek"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Wyślij ponownie do przeglądu"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Wyślij ponownie do przeglądu z odpowiedzią"
+  },
+  "conversation-thread.action.send": {
+    "message": "Wyślij "
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Wyślij do sprawdzenia"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Wyślij do przeglądu z odpowiedzią"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Ustaw jako wersję roboczą"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Ustaw jako wersję roboczą z odpowiedzią"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Wstrzymaj"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Wstrzymaj z odpowiedzią"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Ten wątek jest zamknięty i nie można wysyłać do niego nowych wiadomości."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Błąd podczas zamykania zgłoszenia"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Błąd podczas ponownego otwierania zgłoszenia"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Błąd podczas wysyłania wiadomości"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Odpowiedz na wątek..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Wyślij wiadomość..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Potwierdź, że moderatorzy nie monitorują aktywnie tego wątku"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Rozumiem, że moderatorzy nie monitorują aktywnie tego wątku."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Twój projekt jest już zaakceptowany. Oznacza to, że moderatorzy nie monitorują aktywnie tego wątku. Mogą jednak nadal odczytywać Twoje wiadomości, jeśli wystąpią dalsze problemy z Twoim projektem."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Odpowiedz na wątek"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Jeżeli musisz skontaktować się z zespołem moderatorów, odwiedź <help-center-link>centrum pomocy Modrinth</help-center-link> i kliknij w niebieskie kółko, by skontaktować się z obsługą."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Potwierdzenie, że komentarze od zespołu moderacji zostały zaadresowane"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Potwierdzam, że komentarze od zespołu moderacji zostały zaadresowane."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Wysyłasz <project-title>{projectTitle}</project-title> do ponownego przeglądu przez naszych moderatorów."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Ponowne wysyłanie do przeglądu"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Wysyłanie do przeglądu"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Upewnij się, że wszystkie komentarze od zespołu moderacji zostały zaadresowane."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Powtórne wysyłanie projektu do sprawdzenia bez zaadresowania komentarzy moderatorów może skutkować zawieszeniem konta."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Pliki uzupełniające to np. kod źródłowy, a nie alternatywne wersje lub wariacje."
   },
@@ -875,23 +986,8 @@
   "dashboard.head-title": {
     "message": "Kokpit"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Oznacz wszystkie jako przeczytane"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Pokaż historię"
-  },
   "dashboard.notifications.empty.no-unread": {
     "message": "Nie masz żadnych nieprzeczytanych powiadomień."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Wystąpił błąd podczas ładowania powiadomień:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Historia"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Historia powiadomień"
   },
   "dashboard.notifications.link.see-all": {
     "message": "Zobacz wszystkie"
@@ -901,9 +997,6 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Pokaż jeszcze {extraNotifs} {extraNotifs, plural, one {powiadomienie} few {powiadomienia} other {powiadomień}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Ładowanie powiadomień..."
   },
   "dashboard.organizations.button.create": {
     "message": "Utwórz organizację"
@@ -919,6 +1012,27 @@
   },
   "dashboard.organizations.title": {
     "message": "Organizacje"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Oznacz wszystkie jako przeczytane"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Pokaż historię"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Nie masz żadnych nieprzeczytanych powiadomień."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Wystąpił błąd podczas ładowania powiadomień:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Historia"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Historia powiadomień"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Ładowanie powiadomień..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Możesz edytować kilka projektów naraz, zaznaczając je poniżej."
@@ -1229,8 +1343,32 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Wypełnij formularz podatkowy"
   },
+  "discover.install.back-to-server": {
+    "message": "Powróć do serwera"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Powróć do ustawiania"
+  },
   "discover.install.cancel-reset": {
     "message": "Anuluj resetowanie"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Brak świata serwera do zainstalowania."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Ten rodzaj zawartości nie może być zainstalowany na serwerze z przeglądania."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Wybieranie paczki modów do zainstalowania po zresetowaniu"
+  },
+  "discover.seo.description": {
+    "message": "Szukaj i przeglądaj tysiące {projectType, select, mod {modów} modpack {paczek modów} resourcepack {paczek zasobów} shader {shaderów} plugin {pluginów} datapack {paczek danych} other {projektów}} Minecraft na Modrinth z natychmiastowymi, trafnymi wynikami wyszukiwania. Nasze filtry pomogą CI szybko znaleźć najlepsze projectType, select, mod {mody} modpack {paczki modów} resourcepack {paczki zasobów} shader {shadery} plugin {pluginy} datapack {paczki danych} other {projekty}} Minecraft."
+  },
+  "discover.seo.title": {
+    "message": "Szukaj {projectType, select, mod {modów} modpack {paczek modów} resourcepack {paczek zasobów} shader {shaderów} plugin {pluginów} datapack {paczek danych} other {projektów}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Szukaj {projectType, select, mod {modów} modpack {paczek modów} resourcepack {paczek zasobów} shader {shaderów} plugin {pluginów} datapack {paczek danych} other {projektów}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Mogłeś źle napisać URL kolekcji."
@@ -1239,7 +1377,7 @@
     "message": "Ta kolekcja może być prywatna."
   },
   "error.collection.404.list_item.3": {
-    "message": "Ta kolekcja została usunięta przez zespół moderacji Modrinth za naruszanie naszych <tou-link>Warunków użytkowania</tou-link>."
+    "message": "Ta kolekcja została usunięta przez zespół moderacji Modrinth za naruszenie naszych <tou-link>Warunków użytkowania</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Dlaczego?"
@@ -1730,14 +1868,20 @@
   "layout.banner.add-email.description": {
     "message": "Dla bezpieczeństwa, Modrinth musi zweryfikować e-maila powiązanego z twoim kontem."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Zawsze ignoruj"
+  },
   "layout.banner.build-fail.description": {
     "message": "Wdrożenie interfejsu użytkownika Modrinth nie udało się wygenerować stanu z API. Może to wynikać z awarii lub błędu w konfiguracji. Odbuduj, gdy API będzie dostępne. Kody błędów: {errors}; Aktualny adres URL interfejsu API to: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Ignoruj"
   },
   "layout.banner.build-fail.title": {
     "message": "Błąd podczas generowania stanu z API przy kompilacji."
   },
   "layout.banner.preview.description": {
-    "message": "Jeśli chciałeś wejść na oficjalną stronę Modrinth, odwiedź <link>https://modrinth.com</link>. To wydanie poglądowe jest używane przez administrację Modrinth do testów. Zostało utworzone z <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Jeśli chciałeś/aś wejść na oficjalną stronę Modrinth, odwiedź {url}. To wydanie poglądowe jest używane przez administrację Modrinth do testów. Zostało utworzone z <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "To jest wydanie poglądowe strony Modrinth."
@@ -2567,6 +2711,84 @@
   "project.license.title": {
     "message": "Licencja"
   },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Twój projekt jest prywatny, co oznacza, że jest widoczny tylko dla ciebie i tych, których zaprosisz."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Twój projekt jest opublikowany i widoczny na Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Twój projekt jest niewymieniony, co oznacza, że nie jest odkrywalny na Modrinth i można go otworzyć tylko poprzez bezpośrednie łącze."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Możesz zmienić widoczność projektu w jego <visibility-settings-link>ustawieniach widoczności</visibility-settings-link>."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Projekt został zaakceptowany"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Ten projekt jest ustawiony jako wersja robocza, więc nie może być oglądany przez innych, dopóki nie zostanie wysłany do przeglądu i sprawdzony przez zespół moderacji Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Projekt ustawiony jako wersja robocza"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Po zakończeniu wszystkich wymaganych kroków i sprawdzeniu, czy Twój projekt jest zgodny z <rules-link>zasadami dotyczącymi treści</rules-link> na Modrinth, możesz wysłać swój projekt do przeglądu."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Zaadresuj wszystkie uwagi moderatorów, w tym jakiekolwiek problemy wspomniane w poniższych wiadomościach, zanim ponownie wyślesz projekt do przeglądu."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Zmiany wymagane"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Powtórne wysyłanie Twojego projektu do sprawdzenia bez uprzedniego zaadresowania wszystkich komentarzy moderatorów może skutkować zawieszeniem konta."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Twój projekt jest w kolejce do sprawdzenia przez zespół Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Twój projekt zostanie zeskanowany i sprawdzony przez ludzi by upewnić się, że jest zgodny z <rules-link>zasadami dotyczącymi treści</rules-link> i <terms-link>Warunkami użytkowania</terms-link> Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Możesz dalej zmieniać swój projekt, nie wpłynie to na Twoją pozycję w kolejce."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Staramy się zakończyć przegląd w 24-48 godzin, ale sprawdzanie niektórych projektów może zająć dłużej. Nie oznacza to, że coś jest nie tak z Twoim projektem."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Dziękujemy za cierpliwość podczas gdy nasi moderatorzy pracują ciężko by zapewnić, że Modrinth jest bezpiecznym miejscem i żeby Twój projekt został opublikowany! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Projekt w trakcie przeglądu"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Twój projekt nie będzie widoczny publicznie i będzie go można otworzyć tylko poprzez bezpośrednie łącze. {requestedStatus, select, unlisted {Z uwagi na wybrane <visibility-settings-link>ustawienia widoczności</visibility-settings-link>, najprawdopodobniej nic nie musisz z tym zrobić.} other {Zaadresuj wszystkie uwagi moderatorów, w tym jakiekolwiek problemy wspomniane w poniższych wiadomościach, zanim ponownie wyślesz projekt do przeglądu.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Ukryte przez moderację"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Brak autoryzacji"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Ten wątek nie jest aktywnie monitorowany, ale może być sprawdzany w celu znalezienia informacji o Twoim projekcie."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Moderatorzy zawartości nie mogą udzielać wsparcia z większością problemów i wiadomości w tym wątku nie powiadamiają reszty zespołu Modrinth."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Jeżeli potrzebujesz pomocy lub masz więcej pytań, odwiedź <help-center-link>centrum pomocy Modrinth</help-center-link> i kliknij w niebieskie kółko, by skontaktować się z obsługą."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Pokaż UI członków"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Prywatny wątek konwersacji z moderatorami Modrinth. Mogą skontaktować się z Tobą w razie problemów z Twoim projektem."
+  },
+  "project.moderation.thread.title": {
+    "message": "Wiadomości od moderatorów"
+  },
   "project.moderation.title": {
     "message": "Moderacja"
   },
@@ -3064,6 +3286,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Synchronizuj z serwerem"
+  },
+  "servers.manage.content.title": {
+    "message": "Zawartość - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "Akcje"

@@ -104,11 +104,29 @@
   "browse.offline": {
     "defaultMessage": "你目前处于离线状态。连接互联网来浏览Modrinth！"
   },
+  "browse.search.placeholder": {
+    "defaultMessage": "搜索{projectType, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} server {服务器} other {项目}}……"
+  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "选定的项目"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "安装{count, plural, other {#个项目}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {#个已选择的项目}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "你已经选择了{count, plural, other {#个}}要安装的项目。立即安装它们，或不安装并返回。"
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "选定的项目尚未安装"
+  },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "丢弃"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "选定的项目尚未安装"
   },
   "browse.view-prefix": {
     "defaultMessage": "查看："
@@ -2018,6 +2036,150 @@
   "locale.zh-TW": {
     "defaultMessage": "中文（繁体）"
   },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "用文字描述替代"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "出错"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "尽可能地描述这张图片，以此关照不能加载图片的人。"
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "描述此图片…"
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "描述（替代文本）"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "插入图片"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "图片来源"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "链接"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "上传"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "拖放上传或单击选择文件"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "输入图片URL…"
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "插入"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "插入链接"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "输入标签……"
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "标签"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "输入链接URL…"
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "此编辑器支持 <markdown-link>Markdown 格式</markdown-link>。"
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "长度限制："
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "无限制"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "写点什么……"
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "预览"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "预览"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "加粗"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "项目清单"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "代码"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "一级标题"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "二级标题"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "三级标题"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "图片"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "斜体"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "链接"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "已排序列表"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "引用"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "折叠内容"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "删除线"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "视频"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "没有提供文件"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "未提供图像上传处理程序"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL链接"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "无效的URL。此域名不被允许使用。"
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "无效的URL。请确保URL格式正确。"
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "不支持的协议。请使用 http 或 https。"
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "YouTube 视频播放器"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "插入 YouTube 视频"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "输入一个有效的 YouTube 视频链接。"
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "输入 YouTube 视频 URL"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "YouTube视频URL"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "添加支付方式"
   },
@@ -3179,8 +3341,23 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "安装失败"
   },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "安装平台时发生内部错误，请重试。"
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "指定的加载器或 Minecraft 版本无法安装。它可能无效或不受支持。"
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "整合包无法安装。它可能已损坏或不兼容。"
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "这个整合包版本不包含可下载的文件，可能是打包方式有问题。"
+  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "安装过程中发生意外错误。"
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Modrinth Hosting 目前尚不支持此版本的 Minecraft 或加载器。"
   },
   "servers.installing-banner.phase.installing-addons": {
     "defaultMessage": "正在安装组件……"

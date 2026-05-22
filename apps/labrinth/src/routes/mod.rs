@@ -141,6 +141,10 @@ pub enum ApiError {
     NotFound,
     #[error("Conflict: {0}")]
     Conflict(String),
+    #[error("precondition required: {0}")]
+    PreconditionRequired(String),
+    #[error("precondition failed: {0}")]
+    PreconditionFailed(String),
     #[error("External tax compliance API error")]
     TaxComplianceApi,
     #[error(transparent)]
@@ -194,6 +198,8 @@ impl ApiError {
                 Self::Reroute(..) => "reroute_error",
                 Self::NotFound => "not_found",
                 Self::Conflict(..) => "conflict",
+                Self::PreconditionRequired(..) => "precondition_required",
+                Self::PreconditionFailed(..) => "precondition_failed",
                 Self::TaxComplianceApi => "tax_compliance_api_error",
                 Self::Zip(..) => "zip_error",
                 Self::Io(..) => "io_error",
@@ -256,6 +262,8 @@ impl actix_web::ResponseError for ApiError {
             Self::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::NotFound => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,
+            Self::PreconditionRequired(..) => StatusCode::PRECONDITION_REQUIRED,
+            Self::PreconditionFailed(..) => StatusCode::PRECONDITION_FAILED,
             Self::TaxComplianceApi => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Zip(..) => StatusCode::BAD_REQUEST,
             Self::Io(..) => StatusCode::BAD_REQUEST,

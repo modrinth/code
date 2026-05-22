@@ -51,8 +51,21 @@ tauri-build = { workspace = true, features = ["codegen"] }
 [target.'cfg(target_os = "linux")'.dependencies]
 tauri-plugin-updater = { workspace = true, optional = true }
 
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation.workspace = true
+core-graphics.workspace = true
+objc2-app-kit = { workspace = true, features = [
+  "NSWindow",
+] }
+
 [target.'cfg(windows)'.dependencies]
 webview2-com.workspace = true
+windows = { workspace = true, features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Dwm",
+  "Win32_Graphics_Gdi",
+  "Win32_UI_WindowsAndMessaging",
+] }
 windows-core.workspace = true
 
 [features]

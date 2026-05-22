@@ -5,6 +5,15 @@
   "app.action-bar.downloads": {
     "message": "التنزيلات"
   },
+  "app.action-bar.offline": {
+    "message": "غير متصل"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "صفحة الرئيسية"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "مكتبة"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "قد تكون خوادم مصادقة ماينكرافت معطلة حاليًا. تحقق من اتصالك بالإنترنت وحاول مرة أخرى لاحقًا."
   },
@@ -565,6 +574,12 @@
   },
   "instance.worlds.world_in_use": {
     "message": "العالم قيد الاستخدام"
+  },
+  "minecraft-account.add-account": {
+    "message": "إضافة حساب"
+  },
+  "minecraft-account.select-account": {
+    "message": "اختيار الحساب"
   },
   "search.filter.locked.instance": {
     "message": "مقدَّم من النسخة"

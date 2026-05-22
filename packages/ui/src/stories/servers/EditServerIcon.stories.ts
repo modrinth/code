@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 
 import EditServerIcon from '../../components/servers/edit-server-icon/EditServerIcon.vue'
 import { provideModrinthServerContext } from '../../providers'
-import type { ModrinthServerContext } from '../../providers/server-context'
+import type { CancelUploadHandler, ModrinthServerContext } from '../../providers/server-context'
 
 const meta = {
 	title: 'Servers/EditServerIcon',
@@ -73,7 +73,7 @@ const meta = {
 					fsQueuedOps: ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([]),
 					refreshFsAuth: async () => {},
 					uploadState,
-					cancelUpload: ref(null),
+					cancelUpload: ref<CancelUploadHandler | null>(null),
 					activeOperations: computed(() => []),
 					dismissOperation: async () => {},
 				}

@@ -64,6 +64,8 @@ clickhouse = "0.14.0"
 color-eyre = "0.6.5"
 color-thief = "0.2.2"
 const_format = "0.2.34"
+core-foundation = "0.10.1"
+core-graphics = "0.24.0"
 daedalus = { path = "packages/daedalus" }
 darling = { version = "0.23" }
 dashmap = "6.1.0"
@@ -77,7 +79,6 @@ dotenv-build = "0.1.1"
 dotenvy = "0.15.7"
 dunce = "1.0.5"
 either = "1.15.0"
-elasticsearch = "9.1.0-alpha.1"
 encoding_rs = "0.8.35"
 enumset = "1.1.10"
 eyre = "0.6.12"
@@ -124,6 +125,7 @@ murmur2 = "0.1.0"
 native-dialog = "0.9.2"
 notify = { version = "8.2.0", default-features = false }
 notify-debouncer-mini = { version = "0.7.0", default-features = false }
+objc2-app-kit = { version = "0.3.2", default-features = false }
 p256 = "0.13.2"
 parking_lot = "0.12.5"
 paste = "1.0.15"
