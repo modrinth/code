@@ -1,11 +1,14 @@
 <template>
 	<BaseEvent>
 		<IntlFormatted :message-id="message">
+			<template #modpack>
+				<EventEntityLink v-if="modpack" :entity="modpack" />
+			</template>
 			<template #version>
 				<span
 					class="inline-block max-w-full min-w-0 truncate align-middle font-mono text-secondary"
 				>
-					{{ shortVersionId }}
+					{{ versionLabel }}
 				</span>
 			</template>
 		</IntlFormatted>
@@ -18,9 +21,13 @@ import { computed } from 'vue'
 import { defineMessages } from '../../../../composables/i18n'
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
+import EventEntityLink from './EventEntityLink.vue'
+import type { EventEntity } from './types'
 
 const props = defineProps<{
-	newVersionId?: string | null
+	kind: 'changed' | 'unlinked'
+	modpack?: EventEntity | null
+	versionLabel?: string | null
 }>()
 
 const messages = defineMessages({
@@ -28,17 +35,37 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.modpack-changed',
 		defaultMessage: 'Changed modpack',
 	},
+	changedToModpack: {
+		id: 'servers.audit-log.event.modpack-changed-to-modpack',
+		defaultMessage: 'Changed modpack to <modpack></modpack>',
+	},
 	changedToVersion: {
 		id: 'servers.audit-log.event.modpack-changed-to-version',
 		defaultMessage: 'Changed modpack to version <version></version>',
 	},
+	unlinked: {
+		id: 'servers.audit-log.event.modpack-unlinked',
+		defaultMessage: 'Unlinked modpack',
+	},
+	unlinkedModpack: {
+		id: 'servers.audit-log.event.modpack-unlinked-modpack',
+		defaultMessage: 'Unlinked modpack <modpack></modpack>',
+	},
+	unlinkedVersion: {
+		id: 'servers.audit-log.event.modpack-unlinked-version',
+		defaultMessage: 'Unlinked modpack version <version></version>',
+	},
 })
 
-const message = computed(() => (props.newVersionId ? messages.changedToVersion : messages.changed))
+const message = computed(() => {
+	if (props.kind === 'unlinked') {
+		if (props.modpack) return messages.unlinkedModpack
+		return props.versionLabel ? messages.unlinkedVersion : messages.unlinked
+	}
 
-const shortVersionId = computed(() =>
-	props.newVersionId && props.newVersionId.length > 12
-		? props.newVersionId.slice(0, 8)
-		: props.newVersionId,
-)
+	if (props.modpack) return messages.changedToModpack
+	return props.versionLabel ? messages.changedToVersion : messages.changed
+})
+
+const versionLabel = computed(() => props.versionLabel ?? '')
 </script>

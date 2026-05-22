@@ -19,58 +19,53 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	serverCreated: {
 		id: 'servers.audit-log.event.server-created',
-		defaultMessage: 'Server created',
+		defaultMessage: 'Created server',
 	},
 	serverReallocated: {
 		id: 'servers.audit-log.event.server-reallocated',
-		defaultMessage: 'Server reallocated',
-	},
-	modpackUnlinked: {
-		id: 'servers.audit-log.event.modpack-unlinked',
-		defaultMessage: 'Modpack unlinked',
+		defaultMessage: 'Reallocated server',
 	},
 	serverRepaired: {
 		id: 'servers.audit-log.event.server-repaired',
-		defaultMessage: 'Server repaired',
+		defaultMessage: 'Repaired server',
 	},
 	serverReset: {
 		id: 'servers.audit-log.event.server-reset',
-		defaultMessage: 'Server reset',
+		defaultMessage: 'Reset server',
 	},
 	serverStarted: {
 		id: 'servers.audit-log.event.server-started',
-		defaultMessage: 'Server started',
+		defaultMessage: 'Started server',
 	},
 	serverStopped: {
 		id: 'servers.audit-log.event.server-stopped',
-		defaultMessage: 'Server stopped',
+		defaultMessage: 'Stopped server',
 	},
 	serverRestarted: {
 		id: 'servers.audit-log.event.server-restarted',
-		defaultMessage: 'Server restarted',
+		defaultMessage: 'Restarted server',
 	},
 	serverKilled: {
 		id: 'servers.audit-log.event.server-killed',
-		defaultMessage: 'Server killed',
+		defaultMessage: 'Killed server',
 	},
 	sftpLogin: {
 		id: 'servers.audit-log.event.sftp-login',
-		defaultMessage: 'SFTP login',
+		defaultMessage: 'Logged in via SFTP',
 	},
 	consoleCleared: {
 		id: 'servers.audit-log.event.console-cleared',
-		defaultMessage: 'Console cleared',
+		defaultMessage: 'Cleared console',
 	},
 	unknown: {
 		id: 'servers.audit-log.event.unknown-basic',
-		defaultMessage: 'Server activity',
+		defaultMessage: 'Recorded server activity',
 	},
 })
 
 const actionMessages: Record<string, MessageDescriptor> = {
 	server_created: messages.serverCreated,
 	server_reallocated: messages.serverReallocated,
-	modpack_unlinked: messages.modpackUnlinked,
 	server_repaired: messages.serverRepaired,
 	server_reset: messages.serverReset,
 	server_started: messages.serverStarted,

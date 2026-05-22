@@ -21,6 +21,13 @@
 					{{ newVersion }}
 				</span>
 			</template>
+			<template #loader>
+				<span
+					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
+				>
+					{{ newLoaderLabel }}
+				</span>
+			</template>
 			<template #command>
 				<span
 					v-tooltip="command"
@@ -66,6 +73,7 @@ const props = defineProps<{
 		| 'java_runtime'
 		| 'java_version'
 	newVersion?: string | null
+	newLoader?: string | null
 	properties?: EventEntity[]
 	command?: string
 	vendor?: string
@@ -76,6 +84,14 @@ const messages = defineMessages({
 	loaderVersionChanged: {
 		id: 'servers.audit-log.event.loader-version-changed',
 		defaultMessage: 'Changed loader version to <version></version>',
+	},
+	loaderChanged: {
+		id: 'servers.audit-log.event.loader-changed',
+		defaultMessage: 'Changed loader to <loader></loader>',
+	},
+	loaderAndVersionChanged: {
+		id: 'servers.audit-log.event.loader-and-version-changed',
+		defaultMessage: 'Changed loader to <loader></loader> <version></version>',
 	},
 	loaderVersionCleared: {
 		id: 'servers.audit-log.event.loader-version-cleared',
@@ -116,6 +132,7 @@ const propertiesRef = ref<HTMLElement | null>(null)
 const propertiesLabel = computed(
 	() => props.properties?.map((property) => property.label).join(', ') ?? '',
 )
+const newLoaderLabel = computed(() => formatLoader(props.newLoader))
 
 const kindMessages: Record<string, MessageDescriptor> = {
 	game_version: messages.gameVersionChanged,
@@ -127,8 +144,19 @@ const kindMessages: Record<string, MessageDescriptor> = {
 
 const message = computed(() => {
 	if (props.kind === 'loader_version') {
+		if (props.newLoader && props.newVersion) return messages.loaderAndVersionChanged
+		if (props.newLoader) return messages.loaderChanged
 		return props.newVersion == null ? messages.loaderVersionCleared : messages.loaderVersionChanged
 	}
 	return kindMessages[props.kind] ?? messages.configChanged
 })
+
+function formatLoader(loader: string | null | undefined): string {
+	if (!loader) return ''
+	return loader
+		.split(/[-_]/)
+		.filter(Boolean)
+		.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+		.join(' ')
+}
 </script>

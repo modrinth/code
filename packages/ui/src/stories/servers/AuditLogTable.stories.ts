@@ -50,9 +50,9 @@ const filterBarCategories = [
 		key: 'actions',
 		label: 'Action types',
 		options: [
-			{ value: 'server_started', label: 'Server started' },
-			{ value: 'console_command_executed', label: 'Console command run' },
-			{ value: 'backup_restored', label: 'Backup restored' },
+			{ value: 'server_started', label: 'Started server' },
+			{ value: 'console_command_executed', label: 'Ran console command' },
+			{ value: 'backup_restored', label: 'Restored backup' },
 		],
 	},
 ]
@@ -170,11 +170,18 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 			icon_url: 'https://cdn.modrinth.com/data/P7dR8mSH/icon.png',
 			version: null,
 		},
+		'project-modpack-001': {
+			title: 'Vault Hunters',
+			slug: 'vault-hunters',
+			icon_url: null,
+			version: null,
+		},
 	},
 	versions: {
 		HY8u0JqC: { name: 'Create Aeronautics 1.0.0', version_number: '1.0.0' },
 		yaoBL9D9: { name: 'Sodium 0.6.0', version_number: '0.6.0' },
 		KZS9tylY: { name: 'Fabric API 0.116.0', version_number: '0.116.0' },
+		'version-modpack-001': { name: 'Vault Hunters 3.15.1', version_number: '3.15.1' },
 	},
 	data: [
 		rawEntry({ action: 'server_created', worldId: null, minutesAgo: 5 }),
@@ -270,7 +277,17 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 			},
 			minutesAgo: 80,
 		}),
-		rawEntry({ action: 'modpack_unlinked', minutesAgo: 85 }),
+		rawEntry({
+			action: 'modpack_unlinked',
+			metadata: {
+				spec: {
+					platform: 'modrinth',
+					project_id: 'project-modpack-001',
+					version_id: 'version-modpack-001',
+				},
+			},
+			minutesAgo: 85,
+		}),
 		rawEntry({ action: 'server_repaired', minutesAgo: 90 }),
 		rawEntry({ action: 'server_reset', minutesAgo: 95 }),
 		rawEntry({ action: 'server_started', minutesAgo: 100 }),
@@ -291,7 +308,7 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 		}),
 		rawEntry({
 			action: 'loader_version_edited',
-			metadata: { new_version: '0.16.10' },
+			metadata: { new_loader: 'fabric', new_version: '0.16.10' },
 			minutesAgo: 130,
 		}),
 		rawEntry({

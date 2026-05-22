@@ -179,7 +179,7 @@ export namespace Archon {
 
 			export type UserResp = {
 				username: string
-				avatar_url: string
+				avatar_url?: string | null
 			}
 
 			export type AddonResp = {
@@ -531,7 +531,7 @@ export namespace Archon {
 			export type UserResp = {
 				id: string
 				username: string
-				avatar_url: string
+				avatar_url?: string | null
 			}
 
 			export type ServerUser = {

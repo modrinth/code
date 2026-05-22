@@ -13,7 +13,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	sftpLogin: {
 		id: 'servers.audit-log.event.sftp-login',
-		defaultMessage: 'SFTP login',
+		defaultMessage: 'Logged in via SFTP',
 	},
 })
 </script>

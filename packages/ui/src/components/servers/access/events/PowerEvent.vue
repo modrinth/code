@@ -13,7 +13,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	powerEvent: {
 		id: 'servers.audit-log.event.power-event',
-		defaultMessage: 'Server power event',
+		defaultMessage: 'Changed server power state',
 	},
 })
 </script>

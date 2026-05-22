@@ -3198,130 +3198,130 @@
     "defaultMessage": "Search action types..."
   },
   "servers.access-page.activity-log-filter.action.addon-added": {
-    "defaultMessage": "Content added"
+    "defaultMessage": "Added content"
   },
   "servers.access-page.activity-log-filter.action.addon-deleted": {
-    "defaultMessage": "Content deleted"
+    "defaultMessage": "Deleted content"
   },
   "servers.access-page.activity-log-filter.action.addon-disabled": {
-    "defaultMessage": "Content disabled"
+    "defaultMessage": "Disabled content"
   },
   "servers.access-page.activity-log-filter.action.addon-enabled": {
-    "defaultMessage": "Content enabled"
+    "defaultMessage": "Enabled content"
   },
   "servers.access-page.activity-log-filter.action.addon-updated": {
-    "defaultMessage": "Content updated"
+    "defaultMessage": "Updated content"
   },
   "servers.access-page.activity-log-filter.action.addon-uploaded": {
-    "defaultMessage": "Content uploaded"
+    "defaultMessage": "Uploaded content"
   },
   "servers.access-page.activity-log-filter.action.backup-created": {
-    "defaultMessage": "Backup created"
+    "defaultMessage": "Created backup"
   },
   "servers.access-page.activity-log-filter.action.backup-deleted": {
-    "defaultMessage": "Backup deleted"
+    "defaultMessage": "Deleted backup"
   },
   "servers.access-page.activity-log-filter.action.backup-renamed": {
-    "defaultMessage": "Backup renamed"
+    "defaultMessage": "Renamed backup"
   },
   "servers.access-page.activity-log-filter.action.backup-restored": {
-    "defaultMessage": "Backup restored"
+    "defaultMessage": "Restored backup"
   },
   "servers.access-page.activity-log-filter.action.changed-server-name": {
-    "defaultMessage": "Server name changed"
+    "defaultMessage": "Changed server name"
   },
   "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
-    "defaultMessage": "Server subdomain changed"
+    "defaultMessage": "Changed server subdomain"
   },
   "servers.access-page.activity-log-filter.action.console-cleared": {
-    "defaultMessage": "Console cleared"
+    "defaultMessage": "Cleared console"
   },
   "servers.access-page.activity-log-filter.action.console-command-executed": {
-    "defaultMessage": "Console command run"
+    "defaultMessage": "Ran console command"
   },
   "servers.access-page.activity-log-filter.action.file-deleted": {
-    "defaultMessage": "File deleted"
+    "defaultMessage": "Deleted file"
   },
   "servers.access-page.activity-log-filter.action.file-edited": {
-    "defaultMessage": "File edited"
+    "defaultMessage": "Edited file"
   },
   "servers.access-page.activity-log-filter.action.file-renamed": {
-    "defaultMessage": "File renamed"
+    "defaultMessage": "Renamed file"
   },
   "servers.access-page.activity-log-filter.action.file-uploaded": {
-    "defaultMessage": "File uploaded"
+    "defaultMessage": "Uploaded file"
   },
   "servers.access-page.activity-log-filter.action.game-version-edited": {
-    "defaultMessage": "Minecraft version changed"
+    "defaultMessage": "Changed Minecraft version"
   },
   "servers.access-page.activity-log-filter.action.java-runtime-modified": {
-    "defaultMessage": "Java runtime changed"
+    "defaultMessage": "Changed Java runtime"
   },
   "servers.access-page.activity-log-filter.action.java-version-modified": {
-    "defaultMessage": "Java version changed"
+    "defaultMessage": "Changed Java version"
   },
   "servers.access-page.activity-log-filter.action.loader-version-edited": {
-    "defaultMessage": "Loader version changed"
+    "defaultMessage": "Changed loader version"
   },
   "servers.access-page.activity-log-filter.action.modpack-changed": {
-    "defaultMessage": "Modpack changed"
+    "defaultMessage": "Changed modpack"
   },
   "servers.access-page.activity-log-filter.action.modpack-unlinked": {
-    "defaultMessage": "Modpack unlinked"
+    "defaultMessage": "Unlinked modpack"
   },
   "servers.access-page.activity-log-filter.action.port-allocation-added": {
-    "defaultMessage": "Port allocation added"
+    "defaultMessage": "Added port allocation"
   },
   "servers.access-page.activity-log-filter.action.port-allocation-removed": {
-    "defaultMessage": "Port allocation removed"
+    "defaultMessage": "Removed port allocation"
   },
   "servers.access-page.activity-log-filter.action.server-created": {
-    "defaultMessage": "Server created"
+    "defaultMessage": "Created server"
   },
   "servers.access-page.activity-log-filter.action.server-killed": {
-    "defaultMessage": "Server killed"
+    "defaultMessage": "Killed server"
   },
   "servers.access-page.activity-log-filter.action.server-plan-changed": {
-    "defaultMessage": "Plan changed"
+    "defaultMessage": "Changed plan"
   },
   "servers.access-page.activity-log-filter.action.server-properties-modified": {
-    "defaultMessage": "Server properties modified"
+    "defaultMessage": "Modified server properties"
   },
   "servers.access-page.activity-log-filter.action.server-reallocated": {
-    "defaultMessage": "Server reallocated"
+    "defaultMessage": "Reallocated server"
   },
   "servers.access-page.activity-log-filter.action.server-repaired": {
-    "defaultMessage": "Server repaired"
+    "defaultMessage": "Repaired server"
   },
   "servers.access-page.activity-log-filter.action.server-reset": {
-    "defaultMessage": "Server reset"
+    "defaultMessage": "Reset server"
   },
   "servers.access-page.activity-log-filter.action.server-restarted": {
-    "defaultMessage": "Server restarted"
+    "defaultMessage": "Restarted server"
   },
   "servers.access-page.activity-log-filter.action.server-started": {
-    "defaultMessage": "Server started"
+    "defaultMessage": "Started server"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
-    "defaultMessage": "Server stopped"
+    "defaultMessage": "Stopped server"
   },
   "servers.access-page.activity-log-filter.action.sftp-login": {
-    "defaultMessage": "SFTP login"
+    "defaultMessage": "Logged in via SFTP"
   },
   "servers.access-page.activity-log-filter.action.startup-command-modified": {
-    "defaultMessage": "Startup command changed"
+    "defaultMessage": "Changed startup command"
   },
   "servers.access-page.activity-log-filter.action.user-invite-revoked": {
-    "defaultMessage": "User invite revoked"
+    "defaultMessage": "Revoked user invite"
   },
   "servers.access-page.activity-log-filter.action.user-invited": {
-    "defaultMessage": "User invited"
+    "defaultMessage": "Invited user"
   },
   "servers.access-page.activity-log-filter.action.user-permission-modified": {
-    "defaultMessage": "User permissions changed"
+    "defaultMessage": "Changed user permissions"
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
-    "defaultMessage": "User removed"
+    "defaultMessage": "Removed user"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "Add filter"
@@ -3570,7 +3570,7 @@
     "defaultMessage": "Changed server configuration"
   },
   "servers.audit-log.event.console-cleared": {
-    "defaultMessage": "Console cleared"
+    "defaultMessage": "Cleared console"
   },
   "servers.audit-log.event.console-command-executed": {
     "defaultMessage": "Ran console command <command></command>"
@@ -3605,17 +3605,32 @@
   "servers.audit-log.event.loader-version-changed": {
     "defaultMessage": "Changed loader version to <version></version>"
   },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Changed loader to <loader></loader>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Changed loader to <loader></loader> <version></version>"
+  },
   "servers.audit-log.event.loader-version-cleared": {
     "defaultMessage": "Cleared loader version"
   },
   "servers.audit-log.event.modpack-changed": {
     "defaultMessage": "Changed modpack"
   },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Changed modpack to <modpack></modpack>"
+  },
   "servers.audit-log.event.modpack-changed-to-version": {
     "defaultMessage": "Changed modpack to version <version></version>"
   },
   "servers.audit-log.event.modpack-unlinked": {
-    "defaultMessage": "Modpack unlinked"
+    "defaultMessage": "Unlinked modpack"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Unlinked modpack <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Unlinked modpack version <version></version>"
   },
   "servers.audit-log.event.port-allocation-added": {
     "defaultMessage": "Added port allocation <port></port>"
@@ -3624,13 +3639,13 @@
     "defaultMessage": "Removed port allocation <port></port>"
   },
   "servers.audit-log.event.power-event": {
-    "defaultMessage": "Server power event"
+    "defaultMessage": "Changed server power state"
   },
   "servers.audit-log.event.server-created": {
-    "defaultMessage": "Server created"
+    "defaultMessage": "Created server"
   },
   "servers.audit-log.event.server-killed": {
-    "defaultMessage": "Server killed"
+    "defaultMessage": "Killed server"
   },
   "servers.audit-log.event.server-metadata-changed": {
     "defaultMessage": "Changed server metadata"
@@ -3666,28 +3681,28 @@
     "defaultMessage": "Modified server properties"
   },
   "servers.audit-log.event.server-reallocated": {
-    "defaultMessage": "Server reallocated"
+    "defaultMessage": "Reallocated server"
   },
   "servers.audit-log.event.server-repaired": {
-    "defaultMessage": "Server repaired"
+    "defaultMessage": "Repaired server"
   },
   "servers.audit-log.event.server-reset": {
-    "defaultMessage": "Server reset"
+    "defaultMessage": "Reset server"
   },
   "servers.audit-log.event.server-restarted": {
-    "defaultMessage": "Server restarted"
+    "defaultMessage": "Restarted server"
   },
   "servers.audit-log.event.server-started": {
-    "defaultMessage": "Server started"
+    "defaultMessage": "Started server"
   },
   "servers.audit-log.event.server-stopped": {
-    "defaultMessage": "Server stopped"
+    "defaultMessage": "Stopped server"
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Changed server subdomain to <subdomain></subdomain>"
   },
   "servers.audit-log.event.sftp-login": {
-    "defaultMessage": "SFTP login"
+    "defaultMessage": "Logged in via SFTP"
   },
   "servers.audit-log.event.startup-command-modified": {
     "defaultMessage": "Changed startup command to <command></command>"
@@ -3696,7 +3711,7 @@
     "defaultMessage": "Unknown event"
   },
   "servers.audit-log.event.unknown-basic": {
-    "defaultMessage": "Server activity"
+    "defaultMessage": "Recorded server activity"
   },
   "servers.audit-log.event.user-invite-revoked": {
     "defaultMessage": "Revoked invite for <target-user></target-user>"

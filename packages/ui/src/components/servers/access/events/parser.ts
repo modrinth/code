@@ -27,7 +27,6 @@ import UserAccessEvent from './UserAccessEvent.vue'
 const basicEvents = new Set([
 	'server_created',
 	'server_reallocated',
-	'modpack_unlinked',
 	'server_repaired',
 	'server_reset',
 	'server_started',
@@ -134,10 +133,27 @@ export function parseAuditEvent(
 				])
 			}
 			case 'modpack_changed': {
-				const newVersionId = modpackVersionFromMetadata(metadataRecord(metadata))
-				return parsed(ModpackEvent, base, { newVersionId }, [
+				const record = metadataRecord(metadata)
+				const modpack = modpackEntityFromMetadata(record, lookups)
+				const versionLabel = modpack ? null : modpackVersionLabelFromMetadata(record, lookups)
+				return parsed(ModpackEvent, base, { kind: 'changed', modpack, versionLabel }, [
 					...actionSearchParts(action),
-					newVersionId,
+					modpack?.id,
+					modpack?.label,
+					modpack?.secondaryLabel,
+					versionLabel,
+				])
+			}
+			case 'modpack_unlinked': {
+				const record = metadataRecord(metadata)
+				const modpack = modpackEntityFromMetadata(record, lookups)
+				const versionLabel = modpack ? null : modpackVersionLabelFromMetadata(record, lookups)
+				return parsed(ModpackEvent, base, { kind: 'unlinked', modpack, versionLabel }, [
+					...actionSearchParts(action),
+					modpack?.id,
+					modpack?.label,
+					modpack?.secondaryLabel,
+					versionLabel,
 				])
 			}
 			case 'port_allocation_added':
@@ -154,9 +170,11 @@ export function parseAuditEvent(
 			case 'loader_version_edited': {
 				const record = metadataRecord(metadata)
 				if (!record || !('new_version' in record)) return unknown(base, action)
+				const newLoader = record.new_loader == null ? null : valueToString(record.new_loader)
 				const newVersion = record.new_version == null ? null : valueToString(record.new_version)
-				return parsed(ConfigEvent, base, { kind: 'loader_version', newVersion }, [
+				return parsed(ConfigEvent, base, { kind: 'loader_version', newLoader, newVersion }, [
 					...actionSearchParts(action),
+					newLoader,
 					newVersion,
 				])
 			}
@@ -495,7 +513,64 @@ function stringArrayField(record: Record<string, unknown> | null, key: string): 
 	return array
 }
 
-function modpackVersionFromMetadata(record: Record<string, unknown> | null): string | null {
+function modpackEntityFromMetadata(
+	record: Record<string, unknown> | null,
+	lookups: AuditEventLookups,
+): EventEntity | null {
+	const spec = metadataRecord(record?.spec)
+	if (!spec) return null
+
+	const platform = stringField(spec, 'platform')
+	if (platform === 'modrinth') {
+		const projectId = stringField(spec, 'project_id')
+		const versionId = stringField(spec, 'version_id')
+		if (!projectId && !versionId) return null
+
+		const project = projectId ? lookups.addons[projectId] : undefined
+		const versionLabel = versionId ? resolveVersionLabel(versionId, lookups.versions) : undefined
+		const projectIdOrSlug = project?.slug || projectId
+		const label = project?.title || (projectId ? shortId(projectId) : versionLabel)
+
+		return {
+			id: projectId || versionId || 'modrinth',
+			label: label || 'Modrinth modpack',
+			secondaryLabel: versionLabel,
+			icon: PackageIcon,
+			iconUrl: project?.icon_url || undefined,
+			iconShape: 'square',
+			to: projectIdOrSlug
+				? versionId
+					? `/project/${encodeURIComponent(projectIdOrSlug)}/version/${encodeURIComponent(versionId)}`
+					: `/project/${encodeURIComponent(projectIdOrSlug)}`
+				: undefined,
+			title: project?.title ? undefined : projectId || versionId || undefined,
+		}
+	}
+
+	if (platform === 'local_file') {
+		const filename = stringField(spec, 'filename')
+		const name = stringField(spec, 'name')
+		const versionId = stringField(spec, 'version_id')
+		if (!filename && !name && !versionId) return null
+
+		return {
+			id: filename || name || versionId || 'local-file',
+			label: name || filename || versionId || 'Local modpack',
+			secondaryLabel: name && filename ? filename : versionId || undefined,
+			icon: PackageIcon,
+			iconShape: 'square',
+			mono: !name,
+			title: filename || name || undefined,
+		}
+	}
+
+	return null
+}
+
+function modpackVersionLabelFromMetadata(
+	record: Record<string, unknown> | null,
+	lookups: AuditEventLookups,
+): string | null {
 	const direct = valueToString(record?.new_version)
 	if (direct != null) return direct
 
@@ -503,9 +578,13 @@ function modpackVersionFromMetadata(record: Record<string, unknown> | null): str
 	if (!spec) return null
 
 	const versionId = valueToString(spec.version_id)
-	if (versionId != null) return versionId
+	if (versionId != null) return resolveVersionLabel(versionId, lookups.versions)
 
-	return spec.platform === 'local_file' ? stringField(spec, 'filename') : null
+	if (spec.platform === 'local_file') {
+		return stringField(spec, 'name') ?? stringField(spec, 'filename')
+	}
+
+	return null
 }
 
 function stringField(record: Record<string, unknown> | null, key: string): string | null {
