@@ -913,11 +913,7 @@ async function initializeOptionsOverlayScrollbars() {
 		return
 	}
 
-	if (
-		!optionsScrollbarRef.value ||
-		!optionsContainerRef.value ||
-		!listContainer.value
-	) {
+	if (!optionsScrollbarRef.value || !optionsContainerRef.value || !listContainer.value) {
 		return
 	}
 

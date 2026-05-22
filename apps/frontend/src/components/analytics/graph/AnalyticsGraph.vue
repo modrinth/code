@@ -314,6 +314,7 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
 	ensureMinimumTimeRange,
 	getDefaultAnalyticsGroupByForDurationMinutes,

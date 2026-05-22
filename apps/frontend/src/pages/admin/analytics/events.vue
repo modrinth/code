@@ -607,19 +607,6 @@ function getDateInputValue(value: string): string {
 	return value.split('T')[0]
 }
 
-function getDefaultDateRange(): DatePickerValue[] {
-	const today = getTodayDateInputValue()
-	return [today, today]
-}
-
-function getTodayDateInputValue(): string {
-	const date = new Date()
-	const year = date.getFullYear()
-	const month = `${date.getMonth() + 1}`.padStart(2, '0')
-	const day = `${date.getDate()}`.padStart(2, '0')
-	return `${year}-${month}-${day}`
-}
-
 function getEventFormDateRange(): [string, string] | null {
 	const dates = form.value.dateRange
 		.map(getDatePickerValueString)

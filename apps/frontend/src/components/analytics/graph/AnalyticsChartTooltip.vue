@@ -311,8 +311,7 @@ const positionStyle = computed(() => {
 	const desiredViewportRight = tooltipOffsetParentLeft.value + desiredLeft + tooltipWidth.value
 	const shouldPlaceLeft =
 		props.x <= props.containerWidth / 4 || desiredViewportRight > viewportRight - EDGE_PADDING
-	const candidateLeft =
-		shouldPlaceLeft ? props.x - tooltipWidth.value - CURSOR_OFFSET : desiredLeft
+	const candidateLeft = shouldPlaceLeft ? props.x - tooltipWidth.value - CURSOR_OFFSET : desiredLeft
 	const minLeft = EDGE_PADDING - tooltipOffsetParentLeft.value
 	const maxLeft = Math.max(
 		minLeft,

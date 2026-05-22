@@ -61,7 +61,8 @@ export const DeselectFocusState: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Mouse focus after deselecting an option should not keep the selected brightness state applied.',
+				story:
+					'Mouse focus after deselecting an option should not keep the selected brightness state applied.',
 			},
 		},
 	},
