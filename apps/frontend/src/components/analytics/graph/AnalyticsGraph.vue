@@ -47,6 +47,14 @@
 						>
 							{{ graphRenderLimitButtonLabel }}
 						</button>
+						<button
+							v-if="showTopGraphDatasetsButton"
+							type="button"
+							class="font-base border-0 bg-transparent p-0 text-sm underline transition-all hover:brightness-125"
+							@click="showTopGraphDatasets"
+						>
+							Show top 8
+						</button>
 					</div>
 				</div>
 
@@ -359,6 +367,7 @@ const {
 	showChartEvents,
 	showPreviousPeriod,
 	hiddenGraphDatasetIds,
+	hasExplicitGraphDatasetSelection,
 	isGraphDatasetSelectionActive,
 	selectedGraphDatasetIds,
 	hasPreviousPeriodComparison,
@@ -410,6 +419,7 @@ const dashboardStats: readonly AnalyticsDashboardStat[] = [
 	'revenue',
 	'playtime',
 ]
+const TOP_GRAPH_DATASET_LIMIT = 8
 const GRAPH_RENDER_DATASET_LIMIT = 250
 const PREVIOUS_PERIOD_DATASET_ID_PREFIX = 'previous-period:'
 const PREVIOUS_PERIOD_BORDER_DASH = [6, 4]
@@ -532,10 +542,18 @@ const sortedChartDatasetIds = computed(() =>
 		})
 		.map((dataset) => dataset.projectId),
 )
+const topGraphDatasetIds = computed(() =>
+	sortedChartDatasetIds.value.slice(0, TOP_GRAPH_DATASET_LIMIT),
+)
 const isShowingAllTableItems = computed(() => {
 	if (selectedGraphDatasetIds.value.length !== sortedChartDatasetIds.value.length) return false
 	const selectedDatasetIds = new Set(selectedGraphDatasetIds.value)
 	return sortedChartDatasetIds.value.every((datasetId) => selectedDatasetIds.has(datasetId))
+})
+const isShowingTopGraphDatasets = computed(() => {
+	if (selectedGraphDatasetIds.value.length !== topGraphDatasetIds.value.length) return false
+	const selectedDatasetIds = new Set(selectedGraphDatasetIds.value)
+	return topGraphDatasetIds.value.every((datasetId) => selectedDatasetIds.has(datasetId))
 })
 const isShowingTopTableItems = computed(() => {
 	const topDatasetIds = new Set(
@@ -695,6 +713,12 @@ const isGraphRenderDatasetOverLimit = computed(
 const showGraphRenderLimitButton = computed(() => isGraphRenderDatasetOverLimit.value)
 const graphRenderLimitButtonLabel = computed(() =>
 	showAllSelectedGraphDatasets.value ? 'Show limited' : 'Show all',
+)
+const showTopGraphDatasetsButton = computed(
+	() =>
+		isGraphDatasetSelectionActive.value &&
+		topGraphDatasetIds.value.length > 0 &&
+		!isShowingTopGraphDatasets.value,
 )
 const isGraphRenderDatasetLimitActive = computed(
 	() => isGraphRenderDatasetOverLimit.value && !showAllSelectedGraphDatasets.value,
@@ -1038,6 +1062,12 @@ function toggleGraphRenderLimit(event: MouseEvent) {
 function confirmShowAllSelectedGraphDatasets() {
 	showAllSelectedGraphDatasets.value = true
 	showAllSelectedGraphDatasetsModal.value?.hide()
+}
+
+function showTopGraphDatasets() {
+	selectedGraphDatasetIds.value = topGraphDatasetIds.value
+	hasExplicitGraphDatasetSelection.value = true
+	showAllSelectedGraphDatasets.value = false
 }
 
 watch(
