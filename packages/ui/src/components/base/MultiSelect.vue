@@ -196,7 +196,7 @@
 						<div
 							v-if="shouldShowSelectionActions && hasFilteredOptions"
 							ref="selectionActionsRef"
-							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 bg-surface-4 px-3 py-2.5 text-sm"
+							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 bg-surface-4 px-4 py-2.5 text-sm"
 						>
 							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
 							<button
