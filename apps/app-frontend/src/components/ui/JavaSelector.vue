@@ -28,6 +28,7 @@
 				color-fill="text"
 			>
 				<button
+					class="!shadow-none"
 					:disabled="testingJava || props.disabled"
 					@click="runTest(props.modelValue?.path)"
 					@mouseenter="!props.disabled && (hoveringTest = true)"
@@ -45,19 +46,24 @@
 		</div>
 		<span class="installation-buttons">
 			<ButtonStyled v-if="props.version">
-				<button :disabled="props.disabled || installingJava" @click="reinstallJava">
+				<button
+					v-tooltip="testingJavaSuccess === true ? 'Already installed' : undefined"
+					class="!shadow-none"
+					:disabled="props.disabled || installingJava || testingJavaSuccess === true"
+					@click="reinstallJava"
+				>
 					<DownloadIcon />
 					{{ installingJava ? 'Installing...' : 'Install recommended' }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled>
-				<button :disabled="props.disabled" @click="autoDetect">
+				<button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
 					<SearchIcon />
 					Detect
 				</button>
 			</ButtonStyled>
 			<ButtonStyled>
-				<button :disabled="props.disabled" @click="handleJavaFileInput()">
+				<button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
 					<FolderSearchIcon />
 					Browse
 				</button>
