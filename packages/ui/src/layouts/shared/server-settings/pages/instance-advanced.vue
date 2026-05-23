@@ -70,8 +70,8 @@
 						</div>
 					</div>
 					<span>
-						The Java version your instance runs on. By default, only versions compatible with
-						your Minecraft version are shown.
+						The Java version your instance runs on. By default, only versions compatible with your
+						Minecraft version are shown.
 					</span>
 				</div>
 

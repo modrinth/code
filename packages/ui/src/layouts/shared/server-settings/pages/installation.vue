@@ -885,10 +885,7 @@ watch(
 watch(
 	[worldId, currentPlatform, currentGameVersion],
 	([, newPlatform, newGameVersion], [, oldPlatform, oldGameVersion]) => {
-		if (
-			editingPlatform.value === oldPlatform &&
-			editingGameVersion.value === oldGameVersion
-		) {
+		if (editingPlatform.value === oldPlatform && editingGameVersion.value === oldGameVersion) {
 			editingPlatform.value = newPlatform
 			editingGameVersion.value = newGameVersion
 		}
