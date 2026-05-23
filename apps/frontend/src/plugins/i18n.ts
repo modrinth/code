@@ -203,10 +203,14 @@ export default defineNuxtPlugin({
 
 		debug('init: detected locale', { detectedLocale, cookieLocale, isServer: import.meta.server })
 
-		// Load locales (hits cache after first request)
-		await loadLocale(DEFAULT_LOCALE)
-		if (detectedLocale !== DEFAULT_LOCALE) await loadLocale(detectedLocale)
+		await loadLocale(detectedLocale)
 		locale.value = detectedLocale
+
+		if (import.meta.client && detectedLocale !== DEFAULT_LOCALE) {
+			nuxtApp.hook('app:mounted', () => {
+				loadLocale(DEFAULT_LOCALE).catch(() => {})
+			})
+		}
 
 		debug('init: complete', { locale: locale.value })
 

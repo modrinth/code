@@ -1874,6 +1874,7 @@ const isSettings = computed(() => route.name.startsWith('type-project-settings')
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
+	if (!versionsEnabled.value) return []
 	return (versionsV3.value ?? []).map((v) => {
 		const isModpack = v.project_types?.includes('modpack')
 
@@ -1886,7 +1887,7 @@ const versionsRaw = computed(() => {
 
 // Apply version computations (slug generation, author lookup, etc.)
 const versions = computed(() => {
-	if (!versionsRaw.value.length || !allMembers.value.length) return versionsRaw.value
+	if (!versionsEnabled.value || !versionsRaw.value.length || !allMembers.value.length) return versionsRaw.value
 	return data.$computeVersions(versionsRaw.value, allMembers.value)
 })
 
