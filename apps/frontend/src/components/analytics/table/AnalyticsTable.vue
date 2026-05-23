@@ -126,8 +126,8 @@ import {
 	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 import {
-	type AnalyticsTableSortDirection as SortDirection,
 	type AnalyticsTableSortColumn as TableColumnKey,
+	type AnalyticsTableSortDirection as SortDirection,
 	areStringArraysEqual,
 	buildAnalyticsTableSortRouteQuery,
 	hasAnalyticsTableSortQuery,
@@ -212,7 +212,6 @@ const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_BREAKDOWN_VALUE = 'all'
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE
-const SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR
 const SEARCHABLE_COLUMN_KEYS = new Set<TableColumnKey>(['date', 'project', 'breakdown'])
 const currentPage = ref(1)
 const searchQuery = ref('')
