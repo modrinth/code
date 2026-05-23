@@ -320,6 +320,22 @@ const startSplitActions = computed<JoinedButtonAction[]>(() => [
 	})),
 ])
 
+const restartSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'restart',
+		label: primaryActionText.value,
+		icon: UpdatedIcon,
+		action: () => initiateAction('Restart'),
+	},
+	// TODO: Implement world scoping when Archon/Kyros support target worlds in power requests.
+	...startableWorlds.value.map((world) => ({
+		id: `restart-${world.id}`,
+		label: `Restart with ${world.name}`,
+		icon: GlobeIcon,
+		action: () => initiateAction('Restart'),
+	})),
+])
+
 const stopSplitActions = computed<JoinedButtonAction[]>(() => [
 	{
 		id: 'stop',
@@ -353,11 +369,10 @@ const powerActions = computed<HeaderAction[]>(() => {
 			{
 				id: 'restart',
 				label: primaryActionText.value,
-				icon: UpdatedIcon,
 				color: 'orange',
-				tooltip: busyTooltip.value,
-				disabled: !canTakeAction.value,
-				onClick: handlePrimaryAction,
+				joinedActions: restartSplitActions.value,
+				primaryDisabled: !canTakeAction.value,
+				dropdownDisabled: !canTakeAction.value,
 			},
 			{
 				id: 'stop',

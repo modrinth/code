@@ -1,3 +1,4 @@
+import type { Archon } from '@modrinth/api-client'
 import { computed, type Ref } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
@@ -8,7 +9,7 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 
-export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
+export type PowerAction = Archon.Servers.v0.PowerAction
 
 export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { formatMessage } = useVIntl()

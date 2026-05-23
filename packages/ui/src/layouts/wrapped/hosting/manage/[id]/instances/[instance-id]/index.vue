@@ -24,9 +24,10 @@ import {
 	BoxesIcon,
 	DatabaseBackupIcon,
 	FolderOpenIcon,
+	GlobeIcon,
 	LoaderCircleIcon,
 	PlayIcon,
-	SettingsIcon,
+	Settings2Icon,
 	SlashIcon,
 	StopCircleIcon,
 	UpdatedIcon,
@@ -35,6 +36,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import type { JoinedButtonAction } from '#ui/components/base/JoinedButtons.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import { WorldManageHeader } from '#ui/components/servers/server-header'
 import { useServerPowerAction } from '#ui/components/servers/server-header/use-server-power-action'
@@ -167,6 +169,24 @@ const stopSplitActions = computed(() => [
 		action: () => initiateAction('Kill'),
 	},
 ])
+const restartableWorlds = computed(() =>
+	(serverFull.value?.worlds ?? []).filter((world) => world.id !== worldId.value),
+)
+const restartSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'restart',
+		label: primaryActionText.value,
+		icon: UpdatedIcon,
+		action: () => initiateAction('Restart'),
+	},
+	// TODO: Implement world scoping when Archon/Kyros support target worlds in power requests.
+	...restartableWorlds.value.map((world) => ({
+		id: `restart-${world.id}`,
+		label: `Restart with ${world.name}`,
+		icon: GlobeIcon,
+		action: () => initiateAction('Restart'),
+	})),
+])
 const powerActions = computed(() => {
 	if (isInstalling.value) {
 		return [
@@ -185,11 +205,10 @@ const powerActions = computed(() => {
 			{
 				id: 'restart',
 				label: primaryActionText.value,
-				icon: UpdatedIcon,
 				color: 'orange' as const,
-				tooltip: busyTooltip.value,
-				disabled: !canTakeAction.value,
-				onClick: handlePrimaryAction,
+				joinedActions: restartSplitActions.value,
+				primaryDisabled: !canTakeAction.value,
+				dropdownDisabled: !canTakeAction.value,
 			},
 			{
 				id: 'stop',
@@ -231,7 +250,7 @@ const headerActions = computed(() => [
 	{
 		id: 'settings',
 		label: formatMessage(messages.instanceSettings),
-		icon: SettingsIcon,
+		icon: Settings2Icon,
 		labelHidden: true,
 		tooltip: formatMessage(messages.instanceSettings),
 		onClick: () => openServerSettings({ tabId: 'installation' }),
