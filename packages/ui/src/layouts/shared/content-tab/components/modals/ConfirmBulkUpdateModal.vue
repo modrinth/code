@@ -15,6 +15,7 @@
 				:backup-name="
 					visibleBackupTip ? `Before bulk update (${visibleBackupTip})` : 'Before bulk update'
 				"
+				:target-type="props.targetType"
 				:shift-click-hint-override="formatMessage(messages.shiftClickHint)"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
@@ -88,6 +89,7 @@ const props = defineProps<{
 	backupTip?: string
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string
+	targetType?: 'server' | 'instance'
 }>()
 
 const emit = defineEmits<{

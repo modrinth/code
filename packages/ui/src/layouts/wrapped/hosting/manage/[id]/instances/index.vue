@@ -124,7 +124,7 @@ const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed
 
 const client = injectModrinthClient()
 const { serverId, server, isServerRunning } = injectModrinthServerContext()
-const { openServerSettings } = injectServerSettingsModal()
+const { openServerInstanceSettings } = injectServerSettingsModal()
 const { formatMessage } = useVIntl()
 const router = useRouter()
 const instanceInfoAdmonitionDismissed = useStorage(INSTANCE_INFO_ADMONITION_KEY, false)
@@ -322,12 +322,12 @@ function handleEditWorld(worldId: string) {
 	)
 }
 
-function handleWorldSettings() {
-	openServerSettings({ tabId: 'installation' })
+function handleWorldSettings(worldId: string) {
+	openServerInstanceSettings({ tabId: 'general', worldId })
 }
 
 function handleCreateWorld() {
-	openServerSettings({ tabId: 'installation' })
+	openServerInstanceSettings({ tabId: 'installation' })
 }
 
 function dismissInstanceInfoAdmonition() {

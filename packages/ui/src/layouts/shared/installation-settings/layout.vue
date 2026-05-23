@@ -189,7 +189,9 @@ const platformDisabledItems = computed(() =>
 const platformDisabledTooltip = computed(() =>
 	ctx.isBusy.value
 		? (ctx.busyMessage?.value ?? undefined)
-		: formatMessage(messages.platformLockTooltip),
+		: formatMessage(messages.platformLockTooltip, {
+				type: ctx.isServer ? 'server' : 'instance',
+			}),
 )
 
 const showModpackVersionActions = computed(() => {
@@ -205,6 +207,19 @@ const isLocalFile = computed(() => {
 })
 
 const isLinkedModpack = computed(() => showModpackVersionActions.value || isLocalFile.value)
+
+const showBackupCreator = computed(() => {
+	const val = ctx.showBackupCreator
+	if (val == null) return ctx.isServer
+	return typeof val === 'boolean' ? val : val.value
+})
+
+const repairDescriptionMessage = computed(() => {
+	const kind = ctx.repairDescriptionKind ?? (ctx.isServer ? 'server' : 'app-instance')
+	if (kind === 'server') return messages.repairServerDescription
+	if (kind === 'server-instance') return messages.repairServerInstanceDescription
+	return messages.repairInstanceDescription
+})
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	debug('handleModpackUpdateRequest: start', {
@@ -468,6 +483,11 @@ const messages = defineMessages({
 		defaultMessage:
 			'Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly.',
 	},
+	repairServerInstanceDescription: {
+		id: 'installation-settings.repair.server-instance-description',
+		defaultMessage:
+			'Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if this instance is not starting correctly.',
+	},
 	editWarningInstance: {
 		id: 'installation-settings.edit.warning-instance',
 		defaultMessage:
@@ -540,7 +560,8 @@ const messages = defineMessages({
 	},
 	platformLockTooltip: {
 		id: 'installation-settings.platform-lock-tooltip',
-		defaultMessage: 'You will need to reset your server to switch loader.',
+		defaultMessage:
+			'You will need to reset your {type, select, server {server} other {instance}} to switch loader.',
 	},
 	confirmVersionChangeHeader: {
 		id: 'installation-settings.confirm-version-change-header',
@@ -552,7 +573,8 @@ const messages = defineMessages({
 	},
 	confirmVersionChangeDescription: {
 		id: 'installation-settings.confirm-version-change-description',
-		defaultMessage: 'Changing to {gameVersion} will modify the following content on your server.',
+		defaultMessage:
+			'Changing to {gameVersion} will modify the following content on your {type, select, server {server} other {instance}}.',
 	},
 	removedIncompatible: {
 		id: 'installation-settings.removed-incompatible',
@@ -771,13 +793,7 @@ const messages = defineMessages({
 						</ButtonStyled>
 					</div>
 					<span class="text-primary">
-						{{
-							formatMessage(
-								ctx.isServer
-									? messages.repairServerDescription
-									: messages.repairInstanceDescription,
-							)
-						}}
+						{{ formatMessage(repairDescriptionMessage) }}
 					</span>
 				</div>
 			</template>
@@ -1009,13 +1025,7 @@ const messages = defineMessages({
 						</ButtonStyled>
 					</div>
 					<span class="text-primary">
-						{{
-							formatMessage(
-								ctx.isServer
-									? messages.repairServerDescription
-									: messages.repairInstanceDescription,
-							)
-						}}
+						{{ formatMessage(repairDescriptionMessage) }}
 					</span>
 				</div>
 			</template>
@@ -1073,6 +1083,7 @@ const messages = defineMessages({
 				ref="incompatibleContentModal"
 				:variant="form.incompatibleContentVariant.value"
 				:loading="form.isVerifying.value || form.isSaving.value"
+				:server="ctx.isServer"
 				@confirm-loader-change="form.confirmLoaderChange()"
 				@auto-fix="form.confirmAutoFix()"
 				@disable-conflicts="form.confirmDisableConflicts()"
@@ -1087,6 +1098,7 @@ const messages = defineMessages({
 				:description="
 					formatMessage(messages.confirmVersionChangeDescription, {
 						gameVersion: form.pendingPreview.value.newGameVersion,
+						type: ctx.isServer ? 'server' : 'instance',
 					})
 				"
 				:admonition-header="formatMessage(messages.confirmVersionChangeHeader)"
@@ -1094,8 +1106,9 @@ const messages = defineMessages({
 				:has-unknown-content="form.pendingPreview.value.hasUnknownContent"
 				:confirm-label="formatMessage(messages.confirmVersionChange)"
 				:confirm-icon="SaveIcon"
+				:target-type="ctx.isServer ? 'server' : 'instance'"
 				:removed-label="formatMessage(messages.removedIncompatible)"
-				:show-backup-creator="ctx.isServer"
+				:show-backup-creator="showBackupCreator"
 				@confirm="form.confirmSave()"
 				@cancel="form.cancelPreview()"
 			/>

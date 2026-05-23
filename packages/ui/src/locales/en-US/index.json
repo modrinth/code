@@ -35,6 +35,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "View analytics"
   },
+  "app.server-instance-settings.failed-to-load-server": {
+    "defaultMessage": "Failed to load instance settings"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Failed to load server settings"
   },
@@ -345,7 +348,7 @@
     "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again."
+    "defaultMessage": "Deleting a mod can permanently affect your instance and may cause missing content or unexpected issues when it starts again."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Deletion warning"
@@ -438,7 +441,7 @@
     "defaultMessage": "{count} removed"
   },
   "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
+    "defaultMessage": "Some content on your {type, select, server {server} other {instance}} could not be analyzed and may be affected by this change."
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
@@ -468,22 +471,16 @@
     "defaultMessage": "A backup is in progress, it's recommended to wait for it to finish before performing this action."
   },
   "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Creating a backup may take several minutes depending on the size of your server."
+    "defaultMessage": "Creating a backup may take several minutes depending on the size of your {type, select, server {server} other {instance}}."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Create backup"
-  },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "instance"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Hold Shift while clicking to skip confirmation."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type} if anything breaks."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "world"
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {server} other {instance}} if anything breaks."
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Your modpack's content can now be found here!"
@@ -687,7 +684,7 @@
     "defaultMessage": "Additional settings"
   },
   "creation-flow.modal.final-config.backup.before-reset-server.name": {
-    "defaultMessage": "Before reset server"
+    "defaultMessage": "Before reset instance"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "Easy"
@@ -876,7 +873,7 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.title.reset-server": {
-    "defaultMessage": "Reset server"
+    "defaultMessage": "Reset instance"
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
@@ -1692,10 +1689,10 @@
     "defaultMessage": "Failed to reinstall modpack"
   },
   "hosting.loader.failed-to-repair": {
-    "defaultMessage": "Failed to repair server"
+    "defaultMessage": "Failed to repair instance"
   },
   "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Failed to reset server to onboarding"
+    "defaultMessage": "Failed to reset instance to onboarding"
   },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Failed to save installation settings"
@@ -1707,31 +1704,25 @@
     "defaultMessage": "{loader, select, null {Loader} other {{loader}}} version"
   },
   "hosting.loader.repair-started-text": {
-    "defaultMessage": "Your server installation has been repaired."
+    "defaultMessage": "Your instance installation has been repaired."
   },
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Repair completed"
-  },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Reset server"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reset to onboarding"
   },
   "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?"
+    "defaultMessage": "This will send the instance back into onboarding so setup can be completed again. Are you sure you want to continue?"
   },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Reset to onboarding"
   },
   "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "The server has been returned to the onboarding flow."
+    "defaultMessage": "The instance has been returned to the onboarding flow."
   },
   "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Server reset to onboarding"
+    "defaultMessage": "Instance reset to onboarding"
   },
   "hosting.loader.support-options-title": {
     "defaultMessage": "Support options"
@@ -1794,7 +1785,7 @@
     "defaultMessage": "Confirm"
   },
   "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Changing to {gameVersion} will modify the following content on your server."
+    "defaultMessage": "Changing to {gameVersion} will modify the following content on your {type, select, server {server} other {instance}}."
   },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Review content changes"
@@ -1827,10 +1818,13 @@
     "defaultMessage": "Incompatible content installed"
   },
   "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "When changing the loader, all installed content will be disabled. We recommend resetting your server instead."
+    "defaultMessage": "When changing the loader, all installed content will be disabled. We recommend resetting your {type, select, server {server} other {instance}} instead."
   },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Changing loaders is destructive"
+  },
+  "installation-settings.incompatible-content.reset-button": {
+    "defaultMessage": "Reset {type, select, server {server} other {instance}}"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Linked {projectType}"
@@ -1845,7 +1839,7 @@
     "defaultMessage": "{loader} version"
   },
   "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "You will need to reset your server to switch loader."
+    "defaultMessage": "You will need to reset your {type, select, server {server} other {instance}} to switch loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added."
@@ -1867,6 +1861,9 @@
   },
   "installation-settings.repair.server-description": {
     "defaultMessage": "Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly."
+  },
+  "installation-settings.repair.server-instance-description": {
+    "defaultMessage": "Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if this instance is not starting correctly."
   },
   "installation-settings.repair.server-title": {
     "defaultMessage": "Repair server"
@@ -2075,11 +2072,8 @@
   "instances.updater-modal.update-to": {
     "defaultMessage": "Update to {version}"
   },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Updating can break your instance. Review version changelogs and back up first."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Updating can break your world. Review version changelogs and back up first."
+  "instances.updater-modal.warning": {
+    "defaultMessage": "Updating can break your {type, select, server {server} other {instance}}. Review version changelogs and back up first."
   },
   "label.actions": {
     "defaultMessage": "Actions"
@@ -3896,6 +3890,33 @@
   "servers.access-table.user-avatar-alt": {
     "defaultMessage": "{username}'s avatar"
   },
+  "server.instance-settings.general.danger-zone.label": {
+    "defaultMessage": "Danger zone"
+  },
+  "server.instance-settings.general.instance-name.description": {
+    "defaultMessage": "This name is only visible on Modrinth."
+  },
+  "server.instance-settings.general.instance-name.fallback": {
+    "defaultMessage": "Instance"
+  },
+  "server.instance-settings.general.instance-name.label": {
+    "defaultMessage": "Instance name"
+  },
+  "server.instance-settings.general.not-implemented": {
+    "defaultMessage": "Not yet implemented"
+  },
+  "server.instance-settings.general.reset-everything.button": {
+    "defaultMessage": "Reset everything"
+  },
+  "server.instance-settings.general.reset-everything.description": {
+    "defaultMessage": "Reset your instance completely. This removes world data, content, and any configuration. A backup of the previous instance will remain available."
+  },
+  "server.instance-settings.general.reset-world-files.button": {
+    "defaultMessage": "Reset world data"
+  },
+  "server.instance-settings.general.reset-world-files.description": {
+    "defaultMessage": "Delete the current world data and generate a new one. Your content and files will stay the same."
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Background task running"
   },
@@ -4179,7 +4200,7 @@
     "defaultMessage": "Backup timed out"
   },
   "servers.backups.admonition.creating-backup.description": {
-    "defaultMessage": "Saving world data and server configuration for {backupName}. This can take a few minutes."
+    "defaultMessage": "Saving instance data and server configuration for {backupName}. This can take a few minutes."
   },
   "servers.backups.admonition.creating-backup.title": {
     "defaultMessage": "Creating backup"
@@ -4700,8 +4721,8 @@
   "servers.manage.instances.card.last-active": {
     "defaultMessage": "Last active"
   },
-  "servers.manage.instances.card.none": {
-    "defaultMessage": "None"
+  "servers.manage.instances.card.no-modpack": {
+    "defaultMessage": "—"
   },
   "servers.manage.instances.card.not-tracked-yet": {
     "defaultMessage": "Not tracked yet"
@@ -4709,17 +4730,14 @@
   "servers.manage.instances.card.settings": {
     "defaultMessage": "Instance settings"
   },
-  "servers.manage.instances.info.definition": {
-    "defaultMessage": "An instance is a separate server setup."
+  "servers.manage.instances.info.body": {
+    "defaultMessage": "An instance is a separate setup of your server with its own content, files, worlds, and settings. You can switch which instance your server runs at any time."
   },
-  "servers.manage.instances.info.files": {
-    "defaultMessage": "Each instance has its own server files, worlds, installed content, and settings."
+  "servers.manage.instances.info.dismiss": {
+    "defaultMessage": "Don't show this again"
   },
   "servers.manage.instances.info.header": {
-    "defaultMessage": "What is an instance?"
-  },
-  "servers.manage.instances.info.switching": {
-    "defaultMessage": "You can switch which instance your server runs."
+    "defaultMessage": "What is a server instance?"
   },
   "servers.manage.instances.slot-name": {
     "defaultMessage": "Instance #{index}"
@@ -5091,7 +5109,7 @@
     "defaultMessage": "You are being rate limited. Please try again later."
   },
   "servers.setup.rate-limit.title": {
-    "defaultMessage": "Cannot reinstall server"
+    "defaultMessage": "Cannot reinstall instance"
   },
   "servers.setup.reinstall-failed.text": {
     "defaultMessage": "An unexpected error occurred while reinstalling. Please try again later."

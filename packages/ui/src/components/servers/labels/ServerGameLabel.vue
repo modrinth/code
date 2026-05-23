@@ -17,7 +17,7 @@
 		</AutoLink>
 		<div
 			v-else
-			v-tooltip="'Change server version'"
+			v-tooltip="'Change instance version'"
 			class="pointer-events-none flex min-w-0 flex-row items-center gap-1 truncate text-sm font-medium"
 		>
 			{{ game[0].toUpperCase() + game.slice(1) }}
@@ -46,7 +46,7 @@ defineProps<{
 const settingsModal = injectServerSettingsModal(null)
 const settingsLinkTarget = computed(() => {
 	if (settingsModal) {
-		return () => settingsModal.openServerSettings({ tabId: 'installation' })
+		return () => settingsModal.openServerInstanceSettings({ tabId: 'installation' })
 	}
 	return ''
 })

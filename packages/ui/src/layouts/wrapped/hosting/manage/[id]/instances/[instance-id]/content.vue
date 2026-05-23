@@ -124,7 +124,7 @@ const contentUploadSession = useUploadSessionUpload({
 	cancelUpload,
 })
 const { addNotification } = injectNotificationManager()
-const { openServerSettings, browseServerContent } = injectServerSettingsModal()
+const { openServerInstanceSettings, browseServerContent } = injectServerSettingsModal()
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -1345,14 +1345,14 @@ provideContentManager({
 	},
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
-	deletionContext: 'server',
+	deletionContext: 'instance',
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
 	bulkUpdateItems: handleBulkUpdate,
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	openSettings: () => openServerSettings({ tabId: 'installation' }),
+	openSettings: () => openServerInstanceSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	getItemId: getContentItemId,
@@ -1386,9 +1386,9 @@ provideContentManager({
 			<template #modals>
 				<ConfirmUnlinkModal
 					ref="modpackUnlinkModal"
-					server
 					:action-disabled="setupActionDisabled"
 					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
+					target-type="instance"
 					@unlink="handleModpackUnlinkConfirm"
 				/>
 				<ModpackContentModal
@@ -1430,6 +1430,7 @@ provideContentManager({
 					:loading-changelog="loadingChangelog"
 					:action-disabled="setupActionDisabled"
 					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
+					target-type="instance"
 					@update="handleModalUpdate"
 					@cancel="resetUpdateState"
 					@version-select="handleVersionSelect"
@@ -1446,9 +1447,9 @@ provideContentManager({
 				.filter(Boolean)
 				.join(' ')
 		"
-		server
 		:action-disabled="setupActionDisabled"
 		:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
+		target-type="instance"
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
 	/>

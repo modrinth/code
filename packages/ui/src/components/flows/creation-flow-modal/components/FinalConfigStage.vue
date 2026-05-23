@@ -285,7 +285,7 @@ const messages = defineMessages({
 	},
 	beforeResetServerBackupName: {
 		id: 'creation-flow.modal.final-config.backup.before-reset-server.name',
-		defaultMessage: 'Before reset server',
+		defaultMessage: 'Before reset instance',
 	},
 })
 

@@ -17,6 +17,7 @@
 			<InlineBackupCreator
 				ref="backupCreator"
 				:backup-name="props.backupTip ? `Before deletion (${props.backupTip})` : 'Before deletion'"
+				:target-type="props.targetType"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -75,7 +76,7 @@ const messages = defineMessages({
 	admonitionBody: {
 		id: 'content.confirm-deletion.admonition-body',
 		defaultMessage:
-			'Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again.',
+			'Deleting a mod can permanently affect your instance and may cause missing content or unexpected issues when it starts again.',
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
@@ -91,12 +92,14 @@ const props = withDefaults(
 		backupTip?: string
 		actionDisabled?: boolean
 		actionDisabledTooltip?: string
+		targetType?: 'server' | 'instance'
 	}>(),
 	{
 		variant: 'instance',
 		backupTip: undefined,
 		actionDisabled: false,
 		actionDisabledTooltip: undefined,
+		targetType: undefined,
 	},
 )
 

@@ -46,7 +46,7 @@ export const creationFlowMessages = defineMessages({
 	},
 	resetServerTitle: {
 		id: 'creation-flow.title.reset-server',
-		defaultMessage: 'Reset server',
+		defaultMessage: 'Reset instance',
 	},
 	createInstanceTitle: {
 		id: 'creation-flow.title.create-instance',

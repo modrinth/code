@@ -10,14 +10,11 @@ import {
 } from '@modrinth/assets'
 import type { Component } from 'vue'
 
-export type ServerSettingsTabId =
-	| 'general'
-	| 'installation'
-	| 'network'
-	| 'properties'
-	| 'advanced'
-	| 'billing'
-	| 'admin-billing'
+export type ServerSettingsTabId = 'general' | 'network' | 'advanced' | 'billing' | 'admin-billing'
+
+export type ServerInstanceSettingsTabId = 'general' | 'installation' | 'properties' | 'advanced'
+
+export type AnyServerSettingsTabId = ServerSettingsTabId | ServerInstanceSettingsTabId
 
 export interface ServerSettingsTabContext {
 	serverId: string
@@ -36,6 +33,13 @@ export interface ServerSettingsTabDefinition {
 	shown?: (ctx: ServerSettingsTabContext) => boolean
 }
 
+export interface ServerInstanceSettingsTabDefinition {
+	id: ServerInstanceSettingsTabId
+	label: string
+	icon: Component
+	shown?: (ctx: ServerSettingsTabContext) => boolean
+}
+
 export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 	{
 		id: 'general',
@@ -43,20 +47,9 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		icon: SettingsIcon,
 	},
 	{
-		id: 'installation',
-		label: 'Installation',
-		icon: WrenchIcon,
-	},
-	{
 		id: 'network',
 		label: 'Network',
 		icon: VersionIcon,
-	},
-	{
-		id: 'properties',
-		label: 'Properties',
-		icon: ListIcon,
-		shown: ({ serverStatus }) => serverStatus !== 'installing',
 	},
 	{
 		id: 'advanced',
@@ -78,5 +71,29 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		href: ({ ownerId }) => `/admin/billing/${ownerId}`,
 		external: true,
 		shown: ({ isAdmin }) => isAdmin,
+	},
+]
+
+export const serverInstanceSettingsTabDefinitions: ServerInstanceSettingsTabDefinition[] = [
+	{
+		id: 'general',
+		label: 'General',
+		icon: SettingsIcon,
+	},
+	{
+		id: 'installation',
+		label: 'Installation',
+		icon: WrenchIcon,
+	},
+	{
+		id: 'properties',
+		label: 'Properties',
+		icon: ListIcon,
+		shown: ({ serverStatus }) => serverStatus !== 'installing',
+	},
+	{
+		id: 'advanced',
+		label: 'Advanced',
+		icon: TextQuoteIcon,
 	},
 ]
