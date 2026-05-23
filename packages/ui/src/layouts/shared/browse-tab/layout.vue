@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { computed, toValue } from 'vue'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
@@ -21,6 +22,7 @@ import { injectBrowseManager } from './providers/browse-manager'
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
+const installWarning = computed(() => ctx.installContext?.value?.warning)
 
 const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
 	ctx.effectiveSortTypes.value.map((st) => ({
@@ -61,6 +63,10 @@ const messages = defineMessages({
 </script>
 
 <template>
+	<Admonition v-if="installWarning" type="warning">
+		{{ installWarning }}
+	</Admonition>
+
 	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
 
 	<StyledInput

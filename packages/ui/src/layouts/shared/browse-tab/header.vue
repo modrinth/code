@@ -4,7 +4,6 @@ import type { Component } from 'vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import Admonition from '#ui/components/base/Admonition.vue'
 import PageHeader from '#ui/components/base/PageHeader.vue'
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
 import { useServerImage } from '#ui/composables/servers/use-server-image.ts'
@@ -166,8 +165,5 @@ async function handleSelectedProjectsLeaveResult(
 			title-class="leading-8"
 			truncate-title
 		/>
-		<Admonition v-if="installContext.warning" type="warning" class="mb-1">
-			{{ installContext.warning }}
-		</Admonition>
 	</template>
 </template>

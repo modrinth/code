@@ -6,6 +6,11 @@ import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
 import * as Project from '@/pages/project'
 
+function getQueryParam(value) {
+	if (Array.isArray(value)) return value[0] ?? ''
+	return value ?? ''
+}
+
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
  */
@@ -131,6 +136,17 @@ export default new createRouter({
 			component: Pages.Browse,
 			meta: {
 				useContext: true,
+				keepAliveComponent: 'Browse',
+				keepAliveKey: (route) => {
+					return [
+						'browse',
+						getQueryParam(route.params.projectType),
+						getQueryParam(route.query.i),
+						getQueryParam(route.query.sid),
+						getQueryParam(route.query.wid),
+						getQueryParam(route.query.from),
+					].join(':')
+				},
 				breadcrumb: [{ name: '?BrowseTitle' }],
 			},
 		},

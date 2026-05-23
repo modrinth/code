@@ -145,6 +145,7 @@ const APP_LEFT_NAV_WIDTH = '4rem'
 const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
 const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
+const ROUTE_SUSPENSE_TIMEOUT_MS = 60_000
 const credentials = ref()
 const sidebarToggled = ref(true)
 const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
@@ -154,6 +155,22 @@ const forceSidebar = computed(
 	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
+const keepAliveRouteComponents = computed(() => [
+	...new Set(
+		router
+			.getRoutes()
+			.map((route) => route.meta.keepAliveComponent)
+			.filter((name) => typeof name === 'string'),
+	),
+])
+
+function getRouteViewKey(viewRoute) {
+	const keepAliveKey = viewRoute.meta.keepAliveKey
+	if (typeof keepAliveKey === 'function') return keepAliveKey(viewRoute)
+	if (typeof keepAliveKey === 'string') return keepAliveKey
+	return undefined
+}
+
 const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
 const prideFundraiserEnabled = computed(
 	() => themeStore.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
@@ -1656,11 +1673,17 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				{{ formatMessage(messages.authUnreachableBody) }}
 			</Admonition>
-			<RouterView v-slot="{ Component }">
+			<RouterView v-slot="{ Component, route: viewRoute }">
 				<template v-if="Component">
-					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
-						<component :is="Component"></component>
-					</Suspense>
+					<KeepAlive :include="keepAliveRouteComponents" :max="3">
+						<Suspense
+							:timeout="ROUTE_SUSPENSE_TIMEOUT_MS"
+							@pending="onSuspensePending"
+							@resolve="onSuspenseResolve"
+						>
+							<component :is="Component" :key="getRouteViewKey(viewRoute)"></component>
+						</Suspense>
+					</KeepAlive>
 				</template>
 			</RouterView>
 		</div>
