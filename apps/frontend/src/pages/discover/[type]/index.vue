@@ -33,6 +33,7 @@ import { cycleValue } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
+import type { LocationQueryRaw } from 'vue-router'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -217,6 +218,28 @@ function mapV3ProjectHit(hit: Labrinth.Search.v3.ResultSearchProject): DiscoverP
 		client_side: 'unknown',
 		server_side: 'unknown',
 	}
+}
+
+const hostingContextQuery = computed(() => {
+	const query: LocationQueryRaw = {}
+	const hasHostingContext = route.query.sid != null
+
+	for (const key of ['sid', 'wid', 'from', 'shi']) {
+		const value = route.query[key]
+		if (value != null) {
+			query[key] = value
+		}
+	}
+
+	if (hasHostingContext) {
+		query.b = route.fullPath
+	}
+
+	return Object.keys(query).length > 0 ? query : undefined
+})
+
+function withHostingContext(path: string) {
+	return hostingContextQuery.value ? { path, query: hostingContextQuery.value } : path
 }
 
 async function fetchSearch(requestParams: string) {
@@ -468,9 +491,11 @@ provideBrowseManager({
 	projectType: projectTypeId,
 	...searchState,
 	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) =>
-		`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
+		withHostingContext(
+			`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
+		),
 	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
-		`/server/${result.slug ?? result.project_id}`,
+		withHostingContext(`/server/${result.slug ?? result.project_id}`),
 	selectableProjectTypes: computed(() => []),
 	showProjectTypeTabs: computed(() => false),
 	variant: 'web',
