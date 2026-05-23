@@ -1062,8 +1062,8 @@ function confirmShowAllSelectedGraphDatasets() {
 }
 
 function showTopGraphDatasets() {
-	selectedGraphDatasetIds.value = topGraphDatasetIds.value
-	hasExplicitGraphDatasetSelection.value = true
+	selectedGraphDatasetIds.value = []
+	hasExplicitGraphDatasetSelection.value = false
 	showAllSelectedGraphDatasets.value = false
 }
 
