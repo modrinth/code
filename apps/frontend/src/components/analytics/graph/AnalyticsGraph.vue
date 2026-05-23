@@ -572,7 +572,11 @@ const tableSelectionSubheading = computed(() => {
 	}
 
 	if (isShowingTopTableItems.value) {
-		return `Showing top ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
+		if (tableProjectCount.value === 1) {
+			return `Showing top ${tableBreakdownItemLabel.value} from table`
+		} else {
+			return `Showing top ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
+		}
 	}
 
 	return `Showing ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
