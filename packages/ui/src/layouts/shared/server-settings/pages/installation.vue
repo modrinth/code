@@ -16,30 +16,6 @@
 			ref="installationSettingsLayout"
 			@reset-server="showResetServerModal"
 		>
-			<template #extra>
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">{{
-						formatMessage(messages.resetServerTitle)
-					}}</span>
-					<div>
-						<ButtonStyled color="red">
-							<button
-								v-tooltip="resetServerDisabledTooltip"
-								class="!shadow-none"
-								:disabled="resetServerDisabled"
-								@click="showResetServerModal"
-							>
-								<RotateCounterClockwiseIcon class="size-5" />
-								{{ formatMessage(commonMessages.resetServerButton) }}
-							</button>
-						</ButtonStyled>
-					</div>
-					<span class="text-primary">
-						{{ formatMessage(messages.resetServerDescription) }}
-					</span>
-				</div>
-			</template>
-
 			<template #extra-modals>
 				<Teleport to="body">
 					<div class="relative z-[100]">
@@ -121,15 +97,6 @@ const uploadProgressModal =
 	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 const messages = defineMessages({
-	resetServerTitle: {
-		id: 'hosting.loader.reset-server',
-		defaultMessage: 'Reset server',
-	},
-	resetServerDescription: {
-		id: 'hosting.loader.reset-server-description',
-		defaultMessage:
-			'Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored.',
-	},
 	loaderVersionLabel: {
 		id: 'hosting.loader.loader-version',
 		defaultMessage: '{loader, select, null {Loader} other {{loader}}} version',
@@ -152,11 +119,11 @@ const messages = defineMessages({
 	},
 	repairStartedText: {
 		id: 'hosting.loader.repair-started-text',
-		defaultMessage: 'Your server installation has been repaired.',
+		defaultMessage: 'Your instance installation has been repaired.',
 	},
 	failedToRepair: {
 		id: 'hosting.loader.failed-to-repair',
-		defaultMessage: 'Failed to repair server',
+		defaultMessage: 'Failed to repair instance',
 	},
 	failedToReinstall: {
 		id: 'hosting.loader.failed-to-reinstall',
@@ -181,19 +148,19 @@ const messages = defineMessages({
 	resetToOnboardingModalDescription: {
 		id: 'hosting.loader.reset-to-onboarding-modal-description',
 		defaultMessage:
-			'This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?',
+			'This will send the instance back into onboarding so setup can be completed again. Are you sure you want to continue?',
 	},
 	resetToOnboardingSuccessTitle: {
 		id: 'hosting.loader.reset-to-onboarding-success-title',
-		defaultMessage: 'Server reset to onboarding',
+		defaultMessage: 'Instance reset to onboarding',
 	},
 	resetToOnboardingSuccessDescription: {
 		id: 'hosting.loader.reset-to-onboarding-success-description',
-		defaultMessage: 'The server has been returned to the onboarding flow.',
+		defaultMessage: 'The instance has been returned to the onboarding flow.',
 	},
 	failedToResetToOnboarding: {
 		id: 'hosting.loader.failed-to-reset-to-onboarding',
-		defaultMessage: 'Failed to reset server to onboarding',
+		defaultMessage: 'Failed to reset instance to onboarding',
 	},
 })
 
@@ -221,10 +188,6 @@ const setupActionDisabledMessage = computed(() => {
 	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : null
 })
 const resetServerDisabled = computed(() => !canResetServer.value || isInstalling.value)
-const resetServerDisabledTooltip = computed(() => {
-	if (!canResetServer.value) return permissionDeniedMessage.value
-	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
-})
 const installationSettingsLayout = ref<InstanceType<typeof InstallationSettingsLayout>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
 const contentListQueryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
@@ -268,8 +231,24 @@ const modpackVersionsQuery = useQuery({
 
 const isSiteAdmin = computed(() => serverSettings.currentUserRole.value === 'admin')
 
-const editingPlatform = ref(server.value?.loader?.toLowerCase() ?? 'vanilla')
-const editingGameVersion = ref(server.value?.mc_version ?? '')
+function normalizeLoader(loader?: string | null) {
+	const normalized = loader?.toLowerCase()
+	if (!normalized) return 'vanilla'
+	if (normalized === 'neo_forge') return 'neoforge'
+	return normalized
+}
+
+const currentPlatform = computed(() =>
+	normalizeLoader(addonsQuery.data.value?.modloader ?? server.value?.loader),
+)
+const currentGameVersion = computed(
+	() => addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
+)
+const currentLoaderVersion = computed(
+	() => addonsQuery.data.value?.modloader_version ?? server.value?.loader_version ?? '',
+)
+const editingPlatform = ref(currentPlatform.value)
+const editingGameVersion = ref(currentGameVersion.value)
 const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
 const isResettingToOnboarding = ref(false)
 const supportResetToOnboardingDisabled = computed(
@@ -456,9 +435,9 @@ provideInstallationSettings({
 				: undefined,
 		}
 	}),
-	currentPlatform: computed(() => server.value?.loader?.toLowerCase() ?? 'vanilla'),
-	currentGameVersion: computed(() => server.value?.mc_version ?? ''),
-	currentLoaderVersion: computed(() => server.value?.loader_version ?? ''),
+	currentPlatform,
+	currentGameVersion,
+	currentLoaderVersion,
 	availablePlatforms: ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur'],
 
 	editingPlatformRef: editingPlatform,
@@ -540,11 +519,10 @@ provideInstallationSettings({
 	async save(platform, gameVersion, loaderVersionId) {
 		if (setupActionDisabled.value) return
 		debug('save: called with', { platform, gameVersion, loaderVersionId })
-		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
-		const platformChanged = platform !== currentPlatform
-		const gameVersionChanged = gameVersion !== (server.value?.mc_version ?? '')
+		const platformChanged = platform !== currentPlatform.value
+		const gameVersionChanged = gameVersion !== currentGameVersion.value
 		const loaderVersionChanged =
-			loaderVersionId !== null && loaderVersionId !== (server.value?.loader_version ?? '')
+			loaderVersionId !== null && loaderVersionId !== currentLoaderVersion.value
 
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -776,10 +754,12 @@ provideInstallationSettings({
 		currentLoader: addonsQuery.data.value?.modloader ?? server.value?.loader ?? '',
 	})),
 
-	isServer: true,
+	isServer: false,
 	isApp: serverSettings.isApp.value,
 	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
 	isLocalFile: computed(() => modpack.value?.spec.platform === 'local_file'),
+	showBackupCreator: true,
+	repairDescriptionKind: 'server-instance',
 
 	lockPlatform: false,
 	hideLoaderVersion: false,
@@ -896,8 +876,21 @@ watch(
 		})
 		if (oldStatus === 'installing' && newStatus === 'available') {
 			debug('status installing->available, resetting editing refs')
-			editingPlatform.value = server.value?.loader?.toLowerCase() ?? 'vanilla'
-			editingGameVersion.value = server.value?.mc_version ?? ''
+			editingPlatform.value = currentPlatform.value
+			editingGameVersion.value = currentGameVersion.value
+		}
+	},
+)
+
+watch(
+	[worldId, currentPlatform, currentGameVersion],
+	([, newPlatform, newGameVersion], [, oldPlatform, oldGameVersion]) => {
+		if (
+			editingPlatform.value === oldPlatform &&
+			editingGameVersion.value === oldGameVersion
+		) {
+			editingPlatform.value = newPlatform
+			editingGameVersion.value = newGameVersion
 		}
 	},
 )

@@ -131,7 +131,6 @@ import {
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
-	TagCategoryGamepad2Icon as Gamepad2Icon,
 	GlobeIcon,
 	HashIcon,
 	MoreVerticalIcon,
@@ -140,6 +139,7 @@ import {
 	PlusIcon,
 	SettingsIcon,
 	StopCircleIcon,
+	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TerminalSquareIcon,
 	TimerIcon,
 	UpdatedIcon,
@@ -149,9 +149,9 @@ import {
 	Avatar,
 	formatLoaderLabel,
 	injectNotificationManager,
+	LoaderIcon as ServerLoaderIcon,
 	NavTabs,
 	PageHeader,
-	LoaderIcon as ServerLoaderIcon,
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRecentPlays,
@@ -165,7 +165,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref } from 'vue'
-import { onBeforeRouteUpdate, useRoute, useRouter, type LocationQuery } from 'vue-router'
+import { type LocationQuery, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'

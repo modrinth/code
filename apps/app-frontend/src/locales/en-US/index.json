@@ -329,6 +329,9 @@
   "app.project.install-context.install-content-to-instance": {
     "message": "Install content to instance"
   },
+  "app.project.install-context.world-fallback-name": {
+    "message": "Instance"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },

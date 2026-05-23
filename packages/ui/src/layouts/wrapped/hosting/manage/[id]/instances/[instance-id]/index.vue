@@ -88,7 +88,7 @@ const messages = defineMessages({
 
 const client = injectModrinthClient()
 const { serverId, server, worldId, isServerRunning } = injectModrinthServerContext()
-const { openServerSettings } = injectServerSettingsModal()
+const { openServerInstanceSettings } = injectServerSettingsModal()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const router = useRouter()
@@ -253,7 +253,7 @@ const headerActions = computed(() => [
 		icon: Settings2Icon,
 		labelHidden: true,
 		tooltip: formatMessage(messages.instanceSettings),
-		onClick: () => openServerSettings({ tabId: 'installation' }),
+		onClick: () => openServerInstanceSettings({ tabId: 'general' }),
 	},
 ])
 

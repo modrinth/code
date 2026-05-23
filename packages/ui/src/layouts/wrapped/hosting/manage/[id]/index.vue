@@ -221,7 +221,7 @@
 										<ButtonStyled color="red" type="standard">
 											<button
 												class="whitespace-pre"
-												@click="openServerSettingsModal('installation')"
+												@click="openServerInstanceSettingsModal('installation')"
 											>
 												<RightArrowIcon />
 												{{ formatMessage(messages.changeLoader) }}
@@ -289,6 +289,13 @@
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
+	<Suspense>
+		<ServerInstanceSettingsModal
+			ref="serverInstanceSettingsModal"
+			:resolve-viewer="resolveViewer"
+			:browse-modpacks="handleBrowseModpacks"
+		/>
+	</Suspense>
 	<ConfirmLeaveModal
 		ref="confirmLeaveModal"
 		:header="formatMessage(leaveMessages.uploadInProgress)"
@@ -328,6 +335,7 @@ import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { ServerManageHeader } from '#ui/components/servers/server-header'
+import ServerInstanceSettingsModal from '#ui/components/servers/ServerInstanceSettingsModal.vue'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	hasServerPermission,
@@ -343,7 +351,10 @@ import { useServerPanelSync } from '#ui/composables/server-panel-sync'
 import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import { useServerManageCoreRuntime } from '#ui/composables/servers/server-manage-core-runtime.ts'
 import type { LogLine } from '#ui/layouts/shared/console'
-import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
+import type {
+	ServerInstanceSettingsTabId,
+	ServerSettingsTabId,
+} from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectNotificationManager,
@@ -714,6 +725,9 @@ function dismissInstancesHint() {
 }
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
+const serverInstanceSettingsModal = ref<InstanceType<typeof ServerInstanceSettingsModal> | null>(
+	null,
+)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 
 const {
@@ -1490,6 +1504,18 @@ function openServerSettingsModal(tabId?: ServerSettingsTabId) {
 	serverSettingsModal.value?.show({ serverId: props.serverId, tabId })
 }
 
+function openServerInstanceSettingsModal(
+	tabId?: ServerInstanceSettingsTabId,
+	targetWorldId?: string | null,
+) {
+	if (!props.serverId) return
+	serverInstanceSettingsModal.value?.show({
+		serverId: props.serverId,
+		tabId,
+		worldId: targetWorldId,
+	})
+}
+
 function handleBrowseModpacks(args: {
 	serverId: string
 	worldId: string | null
@@ -1508,6 +1534,8 @@ function handleBrowseContent(args: {
 
 provideServerSettingsModal({
 	openServerSettings: (options) => openServerSettingsModal(options?.tabId),
+	openServerInstanceSettings: (options) =>
+		openServerInstanceSettingsModal(options?.tabId, options?.worldId),
 	browseServerContent: (args) => handleBrowseContent(args),
 })
 
@@ -1669,12 +1697,23 @@ onMounted(() => {
 	}
 
 	if (route.query.openSettings) {
-		const tabId = route.query.openSettings as ServerSettingsTabId
+		const tabId =
+			typeof route.query.openSettings === 'string' ? route.query.openSettings : undefined
 		router.replace({ query: { ...route.query, openSettings: undefined } })
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
 		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 		queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', props.serverId] })
-		nextTick(() => openServerSettingsModal(tabId))
+		if (tabId === 'installation' || tabId === 'properties') {
+			nextTick(() => openServerInstanceSettingsModal(tabId))
+		} else if (
+			tabId === 'general' ||
+			tabId === 'network' ||
+			tabId === 'advanced' ||
+			tabId === 'billing' ||
+			tabId === 'admin-billing'
+		) {
+			nextTick(() => openServerSettingsModal(tabId))
+		}
 	}
 })
 

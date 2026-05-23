@@ -427,7 +427,11 @@
 				class="sticky top-0 z-20 mx-auto max-w-[80rem] border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
 				:class="[isInstallHeaderStuck ? 'border-t' : '']"
 			>
-				<BrowseInstallHeader :install-context="projectHeaderInstallContext" divider bottom-padding />
+				<BrowseInstallHeader
+					:install-context="projectHeaderInstallContext"
+					divider
+					bottom-padding
+				/>
 			</div>
 			<SelectedProjectsFloatingBar
 				v-if="projectInstallContext && !isSettings"
@@ -1390,12 +1394,7 @@ const projectDiscoverBackUrl = computed(() => {
 			? (project.value?.actualProjectType ?? project.value?.project_type ?? 'mod')
 			: (routeProjectType.value ?? project.value?.actualProjectType ?? 'mod')
 
-	return `/discover/${discoverType}s${getInstallContextQueryString([
-		'sid',
-		'wid',
-		'from',
-		'shi',
-	])}`
+	return `/discover/${discoverType}s${getInstallContextQueryString(['sid', 'wid', 'from', 'shi'])}`
 })
 const projectInstallContext = computed(() => {
 	const context = serverBrowseInstallContext.value

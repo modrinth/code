@@ -146,7 +146,9 @@
 							</span>
 						</AutoLink>
 					</div>
-					<span v-else class="font-semibold text-contrast">{{ formatMessage(messages.noModpack) }}</span>
+					<span v-else class="font-semibold text-contrast">{{
+						formatMessage(messages.noModpack)
+					}}</span>
 				</div>
 				<div
 					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,25%)] items-center gap-4 text-base text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"

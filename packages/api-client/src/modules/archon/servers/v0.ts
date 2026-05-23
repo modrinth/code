@@ -101,10 +101,7 @@ export class ArchonServersV0Module extends AbstractModule {
 	 * Send a power action to a server (Start, Stop, Restart, Kill)
 	 * POST /modrinth/v0/servers/:id/power
 	 */
-	public async power(
-		serverId: string,
-		action: Archon.Servers.v0.PowerAction,
-	): Promise<void> {
+	public async power(serverId: string, action: Archon.Servers.v0.PowerAction): Promise<void> {
 		await this.client.request(`/servers/${serverId}/power`, {
 			api: 'archon',
 			method: 'POST',

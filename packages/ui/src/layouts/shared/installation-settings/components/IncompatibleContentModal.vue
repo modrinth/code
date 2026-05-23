@@ -13,7 +13,9 @@
 					<span>
 						{{
 							variant === 'loader-change'
-								? formatMessage(messages.loaderChangeBody)
+								? formatMessage(messages.loaderChangeBody, {
+										type: server ? 'server' : 'instance',
+									})
 								: formatMessage(messages.gameVersionWarningBody)
 						}}
 					</span>
@@ -21,7 +23,11 @@
 						<ButtonStyled color="red">
 							<button :disabled="loading" @click="handleResetServer">
 								<TrashIcon class="size-5" />
-								{{ formatMessage(commonMessages.resetServerButton) }}
+								{{
+									formatMessage(messages.resetButton, {
+										type: server ? 'server' : 'instance',
+									})
+								}}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -33,6 +39,7 @@
 				:backup-name="
 					variant === 'loader-change' ? 'Before loader change' : 'Before version change'
 				"
+				:target-type="server ? 'server' : 'instance'"
 				hide-shift-click-hint
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
@@ -104,6 +111,7 @@ import InlineBackupCreator from '../../content-tab/components/modals/InlineBacku
 defineProps<{
 	variant: 'loader-change' | 'game-version-change'
 	loading?: boolean
+	server?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -165,7 +173,7 @@ const messages = defineMessages({
 	loaderChangeBody: {
 		id: 'installation-settings.incompatible-content.loader-change-body',
 		defaultMessage:
-			'When changing the loader, all installed content will be disabled. We recommend resetting your server instead.',
+			'When changing the loader, all installed content will be disabled. We recommend resetting your {type, select, server {server} other {instance}} instead.',
 	},
 	gameVersionWarningTitle: {
 		id: 'installation-settings.incompatible-content.game-version-warning-title',
@@ -187,6 +195,10 @@ const messages = defineMessages({
 	disableConflictsButton: {
 		id: 'installation-settings.incompatible-content.disable-conflicts-button',
 		defaultMessage: 'Disable conflicts',
+	},
+	resetButton: {
+		id: 'installation-settings.incompatible-content.reset-button',
+		defaultMessage: 'Reset {type, select, server {server} other {instance}}',
 	},
 })
 
