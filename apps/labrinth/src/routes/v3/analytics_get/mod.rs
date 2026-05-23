@@ -574,6 +574,7 @@ async fn filter_allowed_project_ids(
 
 #[cfg(test)]
 mod tests {
+    use rust_decimal::Decimal;
     use serde_json::json;
 
     use super::*;
