@@ -336,6 +336,8 @@ export namespace Archon {
 				token: string // JWT token for filesystem access
 			}
 
+			export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
+
 			export type ReinstallLoaderRequest = {
 				loader: string
 				loader_version?: string
