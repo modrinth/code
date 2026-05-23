@@ -250,9 +250,14 @@ export const [injectAnalyticsDashboardContext, provideAnalyticsDashboardContext]
 
 type AnalyticsQueryBuilderRouteNavigationMode = 'push' | 'replace'
 
-function buildPreviousFetchRequest(
+type AnalyticsTimeSliceSplit = {
+	currentTimeSlices: Labrinth.Analytics.v3.TimeSlice[]
+	previousTimeSlices: Labrinth.Analytics.v3.TimeSlice[]
+}
+
+function buildComparisonFetchRequest(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
-): Labrinth.Analytics.v3.FetchRequest | null {
+): AnalyticsProjectFetchRequest | null {
 	if (!isAnalyticsFetchRequestReady(fetchRequest)) {
 		return null
 	}
@@ -265,7 +270,6 @@ function buildPreviousFetchRequest(
 		return null
 	}
 
-	const previousEnd = new Date(startTimestamp)
 	const previousStart = new Date(startTimestamp - duration)
 
 	if (previousStart.getTime() < ANALYTICS_START_TIME) {
@@ -273,13 +277,17 @@ function buildPreviousFetchRequest(
 	}
 
 	return {
+		...fetchRequest,
 		time_range: {
 			start: previousStart.toISOString(),
-			end: previousEnd.toISOString(),
-			resolution: fetchRequest.time_range.resolution,
+			end: fetchRequest.time_range.end,
+			resolution:
+				'slices' in fetchRequest.time_range.resolution
+					? {
+							slices: fetchRequest.time_range.resolution.slices * 2,
+						}
+					: fetchRequest.time_range.resolution,
 		},
-		return_metrics: fetchRequest.return_metrics,
-		project_ids: fetchRequest.project_ids,
 	}
 }
 
@@ -287,6 +295,45 @@ function isAnalyticsFetchRequestReady(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 ): fetchRequest is AnalyticsProjectFetchRequest {
 	return Array.isArray(fetchRequest?.project_ids) && fetchRequest.project_ids.length > 0
+}
+
+function getAnalyticsTimeSliceCount(
+	timeRange: Labrinth.Analytics.v3.TimeRange,
+	fallback: number,
+): number {
+	if ('slices' in timeRange.resolution) {
+		return Math.max(1, timeRange.resolution.slices)
+	}
+
+	const startTime = new Date(timeRange.start).getTime()
+	const endTime = new Date(timeRange.end).getTime()
+	const bucketMs = timeRange.resolution.minutes * 60 * 1000
+	if (bucketMs > 0 && endTime > startTime) {
+		return Math.max(1, Math.floor((endTime - startTime) / bucketMs))
+	}
+
+	return Math.max(1, fallback)
+}
+
+function splitAnalyticsTimeSlices(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+): AnalyticsTimeSliceSplit {
+	if (!isAnalyticsFetchRequestReady(fetchRequest) || !buildComparisonFetchRequest(fetchRequest)) {
+		return {
+			currentTimeSlices: timeSlices,
+			previousTimeSlices: [],
+		}
+	}
+
+	const currentSliceCount = getAnalyticsTimeSliceCount(fetchRequest.time_range, timeSlices.length)
+	const currentStartIndex = Math.max(0, timeSlices.length - currentSliceCount)
+	const previousStartIndex = Math.max(0, currentStartIndex - currentSliceCount)
+
+	return {
+		currentTimeSlices: timeSlices.slice(currentStartIndex),
+		previousTimeSlices: timeSlices.slice(previousStartIndex, currentStartIndex),
+	}
 }
 
 function buildAnalyticsFetchRequestBatches(
@@ -1886,8 +1933,7 @@ export function createAnalyticsDashboardContext(
 				hiddenGraphDatasetIds.value,
 				nextGraphState.hiddenGraphDatasetIds,
 			)
-			const nextHasExplicitGraphDatasetSelection =
-				nextGraphState.selectedGraphDatasetIds !== null
+			const nextHasExplicitGraphDatasetSelection = nextGraphState.selectedGraphDatasetIds !== null
 			const nextSelectedGraphDatasetIds = nextGraphState.selectedGraphDatasetIds ?? []
 			const shouldUpdateHasExplicitGraphDatasetSelection =
 				hasExplicitGraphDatasetSelection.value !== nextHasExplicitGraphDatasetSelection
@@ -2024,6 +2070,12 @@ export function createAnalyticsDashboardContext(
 		{ deep: true },
 	)
 
+	const comparisonFetchRequest = computed(() => buildComparisonFetchRequest(fetchRequest.value))
+	const analyticsTimeSlicesFetchRequest = computed(
+		() => comparisonFetchRequest.value ?? fetchRequest.value,
+	)
+	const hasPreviousPeriodComparison = computed(() => comparisonFetchRequest.value !== null)
+
 	const {
 		data: currentTimeSliceData,
 		isPending: currentTimeSlicePending,
@@ -2033,28 +2085,31 @@ export function createAnalyticsDashboardContext(
 		queryKey: computed(() =>
 			buildAnalyticsCurrentTimeSlicesQueryKey(
 				analyticsQueryUserId.value,
-				fetchRequest.value,
+				analyticsTimeSlicesFetchRequest.value,
 				queryRefreshTimestamp.value,
 			),
 		),
 		queryFn: () => {
-			if (!isAnalyticsFetchRequestReady(fetchRequest.value)) {
+			const nextFetchRequest = analyticsTimeSlicesFetchRequest.value
+			if (!isAnalyticsFetchRequestReady(nextFetchRequest)) {
 				return []
 			}
 
-			return fetchAnalyticsTimeSlices(fetchRequest.value, (request) =>
+			return fetchAnalyticsTimeSlices(nextFetchRequest, (request) =>
 				client.labrinth.analytics_v3.fetch(request),
 			)
 		},
-		enabled: computed(() => isAnalyticsFetchRequestReady(fetchRequest.value)),
+		enabled: computed(() => isAnalyticsFetchRequestReady(analyticsTimeSlicesFetchRequest.value)),
 		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
 	})
 	const isCurrentTimeSliceLoading = computed(
-		() => isAnalyticsFetchRequestReady(fetchRequest.value) && currentTimeSlicePending.value,
+		() =>
+			isAnalyticsFetchRequestReady(analyticsTimeSlicesFetchRequest.value) &&
+			currentTimeSlicePending.value,
 	)
 	const hasCompletedCurrentTimeSliceFetch = computed(
 		() =>
-			isAnalyticsFetchRequestReady(fetchRequest.value) &&
+			isAnalyticsFetchRequestReady(analyticsTimeSlicesFetchRequest.value) &&
 			currentTimeSliceData.value !== undefined &&
 			!currentTimeSlicePending.value &&
 			!currentFetching.value,
@@ -2069,7 +2124,8 @@ export function createAnalyticsDashboardContext(
 			return null
 		}
 
-		return buildDailyAnalyticsFetchRequest(fetchRequest.value)
+		const dailyFetchRequest = buildDailyAnalyticsFetchRequest(fetchRequest.value)
+		return buildComparisonFetchRequest(dailyFetchRequest) ?? dailyFetchRequest
 	})
 
 	watch(
@@ -2236,39 +2292,6 @@ export function createAnalyticsDashboardContext(
 		{ deep: true },
 	)
 
-	const previousFetchRequest = computed(() => buildPreviousFetchRequest(fetchRequest.value))
-	const hasPreviousPeriodComparison = computed(() => previousFetchRequest.value !== null)
-
-	const {
-		data: previousTimeSliceData,
-		isFetching: previousFetching,
-		refetch: refetchPreviousTimeSlices,
-	} = useQuery({
-		queryKey: computed(() => [
-			'analytics',
-			'dashboard',
-			analyticsQueryUserId.value,
-			'previous',
-			previousFetchRequest.value,
-			queryRefreshTimestamp.value,
-		]),
-		queryFn: () => {
-			if (!isAnalyticsFetchRequestReady(previousFetchRequest.value)) {
-				return []
-			}
-
-			return fetchAnalyticsTimeSlices(previousFetchRequest.value, (request) =>
-				client.labrinth.analytics_v3.fetch(request),
-			)
-		},
-		enabled: computed(
-			() =>
-				isAnalyticsFetchRequestReady(previousFetchRequest.value) &&
-				hasCompletedCurrentTimeSliceFetch.value,
-		),
-		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
-	})
-
 	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const displayedSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
@@ -2303,15 +2326,9 @@ export function createAnalyticsDashboardContext(
 			if (nextTimeSlices === undefined) {
 				return
 			}
-			timeSlices.value = nextTimeSlices
-		},
-		{ immediate: true },
-	)
-
-	watch(
-		previousTimeSliceData,
-		(nextTimeSlices) => {
-			previousTimeSlices.value = nextTimeSlices ?? []
+			const splitTimeSlices = splitAnalyticsTimeSlices(nextTimeSlices, fetchRequest.value)
+			timeSlices.value = splitTimeSlices.currentTimeSlices
+			previousTimeSlices.value = splitTimeSlices.previousTimeSlices
 		},
 		{ immediate: true },
 	)
@@ -2460,12 +2477,11 @@ export function createAnalyticsDashboardContext(
 	}))
 
 	const isLoading = computed(() => isCurrentTimeSliceLoading.value)
-	const isRefetching = computed(() => currentFetching.value || previousFetching.value)
+	const isRefetching = computed(() => currentFetching.value)
 	watch(
 		[
 			isLoading,
 			currentTimeSliceData,
-			previousTimeSliceData,
 			fetchRequest,
 			selectedProjectIds,
 			selectedGroupBy,
@@ -2505,13 +2521,6 @@ export function createAnalyticsDashboardContext(
 		}
 
 		await refetchCurrentTimeSlices()
-
-		if (fetchRequest.value === null || JSON.stringify(fetchRequest.value) !== fetchRequestKey) {
-			return
-		}
-		if (previousFetchRequest.value !== null) {
-			await refetchPreviousTimeSlices()
-		}
 	}
 
 	function resetAnalyticsQueryBuilder() {
