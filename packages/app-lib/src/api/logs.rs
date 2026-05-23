@@ -1,3 +1,4 @@
+use std::fmt::Write as _;
 use std::io::{BufRead, SeekFrom};
 use std::time::SystemTime;
 
@@ -102,9 +103,7 @@ fn push_compacted_log_run(
 ) {
     if count >= LOG_COMPACTION_THRESHOLD {
         output.push_str(line);
-        output.push_str(&format!(
-            " (x{count} times - compacted by Modrinth App)"
-        ));
+        let _ = write!(output, " (x{count} times - compacted by Modrinth App)");
         output.push_str(line_ending);
         stats.compacted_runs += 1;
         stats.compacted_lines += count;
@@ -184,7 +183,7 @@ fn format_count(count: usize) -> String {
     let raw = count.to_string();
     let mut formatted = String::with_capacity(raw.len() + raw.len() / 3);
     for (index, character) in raw.chars().enumerate() {
-        if index > 0 && (raw.len() - index) % 3 == 0 {
+        if index > 0 && (raw.len() - index).is_multiple_of(3) {
             formatted.push(',');
         }
         formatted.push(character);
