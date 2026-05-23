@@ -110,6 +110,17 @@ export function formatBreakdownLabel(
 	return breakdownValue
 }
 
+export function shouldCapitalizeBreakdownLabel(
+	selectedBreakdown: AnalyticsBreakdownPreset,
+): boolean {
+	return (
+		selectedBreakdown === 'download_reason' ||
+		selectedBreakdown === 'monetization' ||
+		selectedBreakdown === 'loader' ||
+		selectedBreakdown === 'country'
+	)
+}
+
 function getBreakdownColor(
 	breakdownValue: string,
 	selectedBreakdown: AnalyticsBreakdownPreset,

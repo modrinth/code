@@ -358,6 +358,7 @@ import {
 	getShortHourlyAxisTickLimit,
 	getSliceBucketRange,
 	getSliceCount,
+	shouldCapitalizeBreakdownLabel,
 } from './utils'
 
 const {
@@ -576,12 +577,8 @@ const tableSelectionSubheading = computed(() => {
 
 	return `Showing ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
 })
-const shouldCapitalizeDatasetLabels = computed(
-	() =>
-		selectedBreakdown.value === 'download_reason' ||
-		selectedBreakdown.value === 'monetization' ||
-		selectedBreakdown.value === 'loader' ||
-		selectedBreakdown.value === 'country',
+const shouldCapitalizeDatasetLabels = computed(() =>
+	shouldCapitalizeBreakdownLabel(selectedBreakdown.value),
 )
 
 const chartType = computed<'line' | 'bar'>(() =>

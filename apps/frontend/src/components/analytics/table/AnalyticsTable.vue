@@ -53,7 +53,7 @@
 				<span
 					class="text-primary"
 					:class="{
-						capitalize: selectedBreakdown === 'monetization',
+						capitalize: shouldCapitalizeBreakdownDisplay,
 					}"
 					>{{ row.breakdownDisplay }}</span
 				>
@@ -133,6 +133,7 @@ import {
 	getSliceCount,
 	isTimeRelevantForGroupBy,
 	isYearRelevantForTimeRange,
+	shouldCapitalizeBreakdownLabel,
 } from '../graph/utils'
 
 type TableMode = 'date_breakdown' | 'breakdown_only'
@@ -325,6 +326,9 @@ const breakdownColumnLabel = computed(() => {
 })
 const relevantStats = computed(
 	() => new Set(getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)),
+)
+const shouldCapitalizeBreakdownDisplay = computed(() =>
+	shouldCapitalizeBreakdownLabel(selectedBreakdown.value),
 )
 
 const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
