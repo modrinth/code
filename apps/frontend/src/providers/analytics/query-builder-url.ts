@@ -40,6 +40,15 @@ export type AnalyticsBreakdownPreset =
 
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
+export type AnalyticsTableSortColumn =
+	| 'date'
+	| 'project'
+	| 'breakdown'
+	| 'views'
+	| 'downloads'
+	| 'revenue'
+	| 'playtime'
+export type AnalyticsTableSortDirection = 'asc' | 'desc'
 
 export type AnalyticsSelectedFilters = Record<AnalyticsQueryFilterCategory, string[]>
 
@@ -64,6 +73,11 @@ export type AnalyticsGraphState = {
 	showPreviousPeriod: boolean
 	hiddenGraphDatasetIds: string[]
 	selectedGraphDatasetIds: string[] | null
+}
+
+export type AnalyticsTableSortState = {
+	sortColumn: AnalyticsTableSortColumn | undefined
+	sortDirection: AnalyticsTableSortDirection
 }
 
 type MutableRouteQuery = Record<string, LocationQueryValueRaw | LocationQueryValueRaw[] | undefined>
@@ -134,6 +148,16 @@ const ANALYTICS_DASHBOARD_STAT_VALUES: AnalyticsDashboardStat[] = [
 ]
 
 const ANALYTICS_GRAPH_VIEW_MODE_VALUES: AnalyticsGraphViewMode[] = ['line', 'area', 'bar']
+const ANALYTICS_TABLE_SORT_COLUMN_VALUES: AnalyticsTableSortColumn[] = [
+	'date',
+	'project',
+	'breakdown',
+	'views',
+	'downloads',
+	'revenue',
+	'playtime',
+]
+const ANALYTICS_TABLE_SORT_DIRECTION_VALUES: AnalyticsTableSortDirection[] = ['asc', 'desc']
 
 const PROJECT_STATUS_FILTER_VALUES = [
 	'approved',
@@ -171,6 +195,8 @@ const QUERY_KEY_GRAPH_EVENTS_VISIBILITY = 'a_events'
 const QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY = 'a_prev_period'
 const QUERY_KEY_GRAPH_HIDDEN_SERIES = 'a_hidden_series'
 const QUERY_KEY_GRAPH_SELECTED_SERIES = 'a_selected_series'
+const QUERY_KEY_TABLE_SORT = 'a_table_sort'
+const QUERY_KEY_TABLE_SORT_DIRECTION = 'a_table_sort_direction'
 const QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER = 'a_top_breakdown'
 const QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
 
@@ -588,6 +614,34 @@ export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphSta
 	}
 }
 
+export function readAnalyticsTableSortState(
+	query: LocationQuery,
+	defaultState: AnalyticsTableSortState,
+): AnalyticsTableSortState {
+	const rawSortColumn = Array.isArray(query[QUERY_KEY_TABLE_SORT])
+		? query[QUERY_KEY_TABLE_SORT][0]
+		: query[QUERY_KEY_TABLE_SORT]
+	const rawSortDirection = Array.isArray(query[QUERY_KEY_TABLE_SORT_DIRECTION])
+		? query[QUERY_KEY_TABLE_SORT_DIRECTION][0]
+		: query[QUERY_KEY_TABLE_SORT_DIRECTION]
+
+	if (
+		!rawSortColumn ||
+		!rawSortDirection ||
+		!ANALYTICS_TABLE_SORT_COLUMN_VALUES.includes(rawSortColumn as AnalyticsTableSortColumn) ||
+		!ANALYTICS_TABLE_SORT_DIRECTION_VALUES.includes(
+			rawSortDirection as AnalyticsTableSortDirection,
+		)
+	) {
+		return defaultState
+	}
+
+	return {
+		sortColumn: rawSortColumn as AnalyticsTableSortColumn,
+		sortDirection: rawSortDirection as AnalyticsTableSortDirection,
+	}
+}
+
 export function readAnalyticsQueryBuilderState(
 	query: LocationQuery,
 	availableProjectIds: string[],
@@ -689,6 +743,13 @@ export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean
 	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).length > 0
 }
 
+export function hasAnalyticsTableSortQuery(query: LocationQuery): boolean {
+	return (
+		query[QUERY_KEY_TABLE_SORT] !== undefined ||
+		query[QUERY_KEY_TABLE_SORT_DIRECTION] !== undefined
+	)
+}
+
 export function buildAnalyticsQueryBuilderRouteQuery(
 	currentRouteQuery: LocationQuery,
 	state: AnalyticsQueryBuilderState,
@@ -765,11 +826,47 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	return nextRouteQuery
 }
 
+export function buildAnalyticsTableSortRouteQuery(
+	currentRouteQuery: LocationQuery,
+	state: AnalyticsTableSortState,
+	defaultState: AnalyticsTableSortState,
+): MutableRouteQuery {
+	const nextRouteQuery = {
+		...currentRouteQuery,
+	} as MutableRouteQuery
+	const isDefaultSort =
+		state.sortColumn === defaultState.sortColumn &&
+		state.sortDirection === defaultState.sortDirection
+
+	nextRouteQuery[QUERY_KEY_TABLE_SORT] =
+		isDefaultSort || state.sortColumn === undefined ? undefined : state.sortColumn
+	nextRouteQuery[QUERY_KEY_TABLE_SORT_DIRECTION] =
+		isDefaultSort || state.sortColumn === undefined ? undefined : state.sortDirection
+
+	return nextRouteQuery
+}
+
 export function hasAnalyticsQueryBuilderRouteChange(
 	currentRouteQuery: LocationQuery,
 	nextRouteQuery: MutableRouteQuery,
 ): boolean {
 	return ANALYTICS_QUERY_KEYS.some(
 		(key) => !areQueryValuesEqual(currentRouteQuery[key], nextRouteQuery[key]),
+	)
+}
+
+export function hasAnalyticsTableSortRouteChange(
+	currentRouteQuery: LocationQuery,
+	nextRouteQuery: MutableRouteQuery,
+): boolean {
+	return (
+		!areQueryValuesEqual(
+			currentRouteQuery[QUERY_KEY_TABLE_SORT],
+			nextRouteQuery[QUERY_KEY_TABLE_SORT],
+		) ||
+		!areQueryValuesEqual(
+			currentRouteQuery[QUERY_KEY_TABLE_SORT_DIRECTION],
+			nextRouteQuery[QUERY_KEY_TABLE_SORT_DIRECTION],
+		)
 	)
 }

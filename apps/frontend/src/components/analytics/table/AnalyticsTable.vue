@@ -113,6 +113,7 @@ import {
 	type TableColumn,
 	useFormatNumber,
 } from '@modrinth/ui'
+import type { LocationQuery } from 'vue-router'
 
 import {
 	type AnalyticsBreakdownPreset,
@@ -122,7 +123,15 @@ import {
 	injectAnalyticsDashboardContext,
 	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
-import { areStringArraysEqual } from '~/providers/analytics/query-builder-url'
+import {
+	type AnalyticsTableSortColumn as TableColumnKey,
+	type AnalyticsTableSortDirection as SortDirection,
+	buildAnalyticsTableSortRouteQuery,
+	areStringArraysEqual,
+	hasAnalyticsTableSortQuery,
+	hasAnalyticsTableSortRouteChange,
+	readAnalyticsTableSortState,
+} from '~/providers/analytics/query-builder-url'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
@@ -137,15 +146,6 @@ import {
 } from '../graph/utils'
 
 type TableMode = 'date_breakdown' | 'breakdown_only'
-type SortDirection = 'asc' | 'desc'
-type TableColumnKey =
-	| 'date'
-	| 'project'
-	| 'breakdown'
-	| 'views'
-	| 'downloads'
-	| 'revenue'
-	| 'playtime'
 
 type AnalyticsTableRow = {
 	id: string
@@ -191,12 +191,18 @@ const {
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const isDataLoading = computed(() => isLoading.value)
+const route = useRoute()
+const router = useRouter()
+const initialTableSortState = readAnalyticsTableSortState(route.query, {
+	sortColumn: 'date',
+	sortDirection: 'desc',
+})
 
 const tableMode = ref<TableMode>('breakdown_only')
-const sortColumn = ref<TableColumnKey | undefined>('date')
-const sortDirection = ref<SortDirection>('desc')
-const displayedSortColumn = ref<TableColumnKey | undefined>('date')
-const displayedSortDirection = ref<SortDirection>('desc')
+const sortColumn = ref<TableColumnKey | undefined>(initialTableSortState.sortColumn)
+const sortDirection = ref<SortDirection>(initialTableSortState.sortDirection)
+const displayedSortColumn = ref<TableColumnKey | undefined>(initialTableSortState.sortColumn)
+const displayedSortDirection = ref<SortDirection>(initialTableSortState.sortDirection)
 const PAGE_SIZE = 500
 const GRAPH_DATASET_SELECTION_LIMIT = 8
 const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
@@ -524,19 +530,10 @@ function buildColumns(includeDate: boolean): TableColumn<TableColumnKey>[] {
 watch(
 	activeColumns,
 	(nextColumns) => {
-		const availableColumns = new Set(nextColumns.map((column) => column.key))
-		if (sortColumn.value && availableColumns.has(sortColumn.value)) {
-			return
-		}
-
-		applyDefaultSort(nextColumns)
+		applyRouteOrDefaultSort(nextColumns)
 	},
 	{ immediate: true },
 )
-
-watch(includeDateColumn, () => {
-	applyDefaultSort(activeColumns.value)
-})
 
 const sortedRows = computed<AnalyticsTableRow[]>(() => {
 	return displayedSortedRows.value
@@ -575,9 +572,7 @@ watch(
 	showGraphDatasetSelection,
 	(nextShowSelection) => {
 		isGraphDatasetSelectionActive.value = nextShowSelection
-		if (nextShowSelection) {
-			applyActiveStatSort()
-		} else {
+		if (!nextShowSelection) {
 			setSelectedGraphDatasetIds([], false)
 		}
 	},
@@ -586,6 +581,9 @@ watch(
 
 watch(activeStat, () => {
 	if (!showGraphDatasetSelection.value) {
+		return
+	}
+	if (hasAnalyticsTableSortQuery(route.query)) {
 		return
 	}
 
@@ -687,7 +685,22 @@ watch(activeTableMode, () => {
 	scheduleInactiveModeWarmup()
 })
 
+watch(
+	() => route.query,
+	(nextQuery) => {
+		const nextSortState = getRouteTableSortState(nextQuery, activeColumns.value)
+		if (!isCurrentSortState(nextSortState)) {
+			applyTableSortState(nextSortState)
+			return
+		}
+
+		syncTableSortRouteQuery()
+	},
+)
+
 watch([sortColumn, sortDirection], () => {
+	syncTableSortRouteQuery()
+
 	if (resortDisplayedRowsForCurrentSort()) {
 		scheduleInactiveModeWarmup()
 		return
@@ -993,6 +1006,90 @@ function getMetricColumnForStat(stat: AnalyticsDashboardStat): TableColumn<Table
 		default:
 			return null
 	}
+}
+
+function applyRouteOrDefaultSort(nextColumns = activeColumns.value) {
+	const nextSortState = getRouteTableSortState(route.query, nextColumns)
+	if (!isCurrentSortState(nextSortState)) {
+		applyTableSortState(nextSortState)
+	}
+
+	syncTableSortRouteQuery()
+}
+
+function applyTableSortState(state: {
+	sortColumn: TableColumnKey | undefined
+	sortDirection: SortDirection
+}) {
+	sortColumn.value = state.sortColumn
+	sortDirection.value = state.sortDirection
+}
+
+function getRouteTableSortState(
+	query: LocationQuery,
+	nextColumns = activeColumns.value,
+): { sortColumn: TableColumnKey | undefined; sortDirection: SortDirection } {
+	return getAvailableTableSortState(
+		readAnalyticsTableSortState(query, getDefaultTableSortState(nextColumns)),
+		nextColumns,
+	)
+}
+
+function getAvailableTableSortState(
+	state: { sortColumn: TableColumnKey | undefined; sortDirection: SortDirection },
+	nextColumns = activeColumns.value,
+): { sortColumn: TableColumnKey | undefined; sortDirection: SortDirection } {
+	const availableColumns = new Set(nextColumns.map((column) => column.key))
+	if (state.sortColumn && availableColumns.has(state.sortColumn)) {
+		return state
+	}
+
+	return getDefaultTableSortState(nextColumns)
+}
+
+function getDefaultTableSortState(
+	nextColumns = activeColumns.value,
+): { sortColumn: TableColumnKey | undefined; sortDirection: SortDirection } {
+	const nextSortColumn = getDefaultSortColumn(nextColumns)
+	return {
+		sortColumn: nextSortColumn,
+		sortDirection: getDefaultSortDirection(nextSortColumn, nextColumns),
+	}
+}
+
+function isCurrentSortState(state: {
+	sortColumn: TableColumnKey | undefined
+	sortDirection: SortDirection
+}): boolean {
+	return sortColumn.value === state.sortColumn && sortDirection.value === state.sortDirection
+}
+
+function syncTableSortRouteQuery() {
+	if (import.meta.server) {
+		return
+	}
+
+	const nextSortState = getAvailableTableSortState(
+		{
+			sortColumn: sortColumn.value,
+			sortDirection: sortDirection.value,
+		},
+		activeColumns.value,
+	)
+	const nextRouteQuery = buildAnalyticsTableSortRouteQuery(
+		route.query,
+		nextSortState,
+		getDefaultTableSortState(),
+	)
+
+	if (!hasAnalyticsTableSortRouteChange(route.query, nextRouteQuery)) {
+		return
+	}
+
+	router.replace({
+		path: route.path,
+		query: nextRouteQuery,
+	})
 }
 
 function applyDefaultSort(nextColumns = activeColumns.value) {
