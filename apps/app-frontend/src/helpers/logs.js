@@ -6,12 +6,11 @@
 import { invoke } from '@tauri-apps/api/core'
 
 /*
-A log is a struct containing the filename string, stdout, and stderr, as follows:
+A log is a struct containing the filename string and optional output, as follows:
 
 pub struct Logs {
     pub filename:  String,
-    pub stdout: String,
-    pub stderr: String,
+    pub output: Option<String>,
 }
 */
 
