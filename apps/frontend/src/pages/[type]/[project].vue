@@ -1887,7 +1887,8 @@ const versionsRaw = computed(() => {
 
 // Apply version computations (slug generation, author lookup, etc.)
 const versions = computed(() => {
-	if (!versionsEnabled.value || !versionsRaw.value.length || !allMembers.value.length) return versionsRaw.value
+	if (!versionsEnabled.value || !versionsRaw.value.length || !allMembers.value.length)
+		return versionsRaw.value
 	return data.$computeVersions(versionsRaw.value, allMembers.value)
 })
 
