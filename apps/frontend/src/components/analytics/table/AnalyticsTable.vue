@@ -943,39 +943,10 @@ function formatRevenue(value: number): string {
 
 function formatCompactPlaytime(value: number): string {
 	const totalSeconds = Math.max(0, Math.round(value))
-	const totalMinutes = Math.round(totalSeconds / SECONDS_PER_MINUTE)
-
-	if (totalMinutes < 60) {
-		return `${formatNumber(totalMinutes)}min`
-	}
-
-	if (totalMinutes < 24 * 60) {
-		const hours = Math.floor(totalMinutes / 60)
-		const minutes = totalMinutes % 60
-		if (minutes === 0) {
-			return `${formatNumber(hours)}h`
-		}
-		return `${formatNumber(hours)}h ${formatNumber(minutes)}min`
-	}
-
-	const totalHours = Math.round(totalSeconds / SECONDS_PER_HOUR)
-	if (totalHours < 365 * 24) {
-		const days = Math.floor(totalHours / 24)
-		const hours = totalHours % 24
-		if (hours === 0) {
-			return `${formatNumber(days)}d`
-		}
-		return `${formatNumber(days)}d ${formatNumber(hours)}h`
-	}
-
-	const totalDays = Math.round(totalSeconds / SECONDS_PER_DAY)
-	const years = Math.floor(totalDays / 365)
-	const days = totalDays % 365
-	if (days === 0) {
-		return `${formatNumber(years)}y`
-	}
-
-	return `${formatNumber(years)}y ${formatNumber(days)}d`
+	return `${(totalSeconds / SECONDS_PER_HOUR).toLocaleString(undefined, {
+		minimumFractionDigits: 1,
+		maximumFractionDigits: 1,
+	})}h`
 }
 
 function formatFullPlaytime(value: number): string {
