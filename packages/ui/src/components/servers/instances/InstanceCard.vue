@@ -116,7 +116,7 @@
 				class="flex flex-1 flex-col gap-3 border-0 border-y bg-surface-2 border-solid border-surface-5 my-auto px-5 py-4"
 			>
 				<div
-					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,70%)] items-center gap-4 text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
+					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,70%)] items-center gap-4 text-base text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
 				>
 					<span>{{ formatMessage(commonMessages.modpackLabel) }}</span>
 					<div
@@ -146,22 +146,22 @@
 							</span>
 						</AutoLink>
 					</div>
-					<span v-else class="font-semibold text-contrast">{{ formatMessage(messages.none) }}</span>
+					<span v-else class="font-semibold text-contrast">{{ formatMessage(messages.noModpack) }}</span>
 				</div>
 				<div
-					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,25%)] items-center gap-4 text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
+					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,25%)] items-center gap-4 text-base text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
 				>
 					<span>{{ formatMessage(messages.installedContent) }}</span>
 					<span class="font-semibold text-contrast">{{ installedContentLabel }}</span>
 				</div>
 				<div
-					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-center gap-4 text-base font-medium text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
+					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-center gap-4 text-base text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
 				>
 					<span>{{ formatMessage(messages.lastActive) }}</span>
 					<span class="font-semibold text-contrast">{{ lastActiveLabel }}</span>
 				</div>
 				<div
-					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-center gap-4 text-base font-medium text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
+					class="grid min-h-6 grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-center gap-4 text-base text-secondary [&>*:last-child]:max-w-full [&>*:last-child]:justify-self-end"
 				>
 					<span>{{ formatMessage(messages.created) }}</span>
 					<span class="font-semibold text-contrast">{{ createdLabel }}</span>
@@ -191,6 +191,7 @@
 
 <script setup lang="ts">
 import { PencilIcon, PlusIcon, Settings2Icon } from '@modrinth/assets'
+import { capitalizeString } from '@modrinth/utils'
 import { computed, useId, useTemplateRef } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
@@ -215,9 +216,9 @@ const messages = defineMessages({
 		id: 'servers.manage.instances.card.active',
 		defaultMessage: 'Active',
 	},
-	none: {
-		id: 'servers.manage.instances.card.none',
-		defaultMessage: 'None',
+	noModpack: {
+		id: 'servers.manage.instances.card.no-modpack',
+		defaultMessage: '—',
 	},
 	installedContent: {
 		id: 'servers.manage.instances.card.installed-content',
@@ -298,7 +299,7 @@ const installedContentLabel = computed(() => {
 const lastActiveLabel = computed(() => {
 	if (props.world.type === 'empty') return ''
 	return props.world.lastActiveAt
-		? formatRelativeTime(props.world.lastActiveAt)
+		? capitalizeString(formatRelativeTime(props.world.lastActiveAt))
 		: formatMessage(messages.notTrackedYet)
 })
 

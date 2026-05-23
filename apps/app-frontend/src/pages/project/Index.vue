@@ -47,9 +47,9 @@
 		<div class="flex flex-col gap-4 p-6">
 			<div
 				v-if="projectInstallContext"
-				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
+				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid border-divider bg-surface-1 px-6 pt-6"
 			>
-				<BrowseInstallHeader :install-context="projectInstallContext" />
+				<BrowseInstallHeader :install-context="projectInstallContext" bottom-padding />
 			</div>
 			<InstanceIndicator v-if="instance && !projectInstallContext" :instance="instance" />
 			<template v-if="data">
@@ -172,6 +172,7 @@ import {
 	SelectedProjectsFloatingBar,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -181,6 +182,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import {
 	get_organization,
 	get_project,
@@ -199,7 +204,6 @@ import {
 	list as listInstances,
 } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
@@ -213,6 +217,7 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+const queryClient = useQueryClient()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
@@ -225,6 +230,10 @@ const messages = defineMessages({
 	installContentToInstance: {
 		id: 'app.project.install-context.install-content-to-instance',
 		defaultMessage: 'Install content to instance',
+	},
+	worldFallbackName: {
+		id: 'app.project.install-context.world-fallback-name',
+		defaultMessage: 'Instance',
 	},
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
@@ -256,7 +265,10 @@ const serverStatusOnline = ref(false)
 const serverInstancePath = ref(null)
 const serverPlaying = ref(false)
 const serverSetupModalRef = ref(null)
-const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = createServerInstallContent({
+	serverSetupModalRef,
+	isRouteInContext: (targetRoute) => targetRoute.path.startsWith('/project/'),
+})
 
 serverInstallContent.watchServerContextChanges()
 await serverInstallContent.initServerContext()
@@ -309,7 +321,9 @@ const projectInstallContext = computed(() => {
 	const serverData = serverInstallContent.serverContextServerData.value
 	if (serverData) {
 		return {
-			name: serverData.name,
+			name:
+				serverInstallContent.serverContextWorldName.value ??
+				formatMessage(messages.worldFallbackName),
 			loader: serverData.loader ?? '',
 			gameVersion: serverData.mc_version ?? '',
 			serverId: serverInstallContent.serverIdQuery.value,
@@ -598,10 +612,19 @@ async function fetchProjectData() {
 function fetchDeferredServerData(project) {
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
 	if (serverAddress) {
-		serverPing.value = undefined
-		getServerLatency(serverAddress)
-			.then((latency) => {
-				serverPing.value = latency
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			serverPing.value = cachedStatus.ping
+			serverStatusOnline.value = true
+		} else {
+			serverPing.value = undefined
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
+			.then((status) => {
+				if (projectV3.value?.minecraft_java_server?.address !== serverAddress) return
+				serverPing.value = status.ping
+				serverStatusOnline.value = true
 			})
 			.catch((error) => {
 				console.error(`Failed to ping server ${serverAddress}:`, error)
