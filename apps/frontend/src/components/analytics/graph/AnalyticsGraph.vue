@@ -1,13 +1,13 @@
 <template>
 	<NewModal
 		ref="showAllSelectedGraphDatasetsModal"
-		:header="`Show all ${tableProjectCount} selected lines in graph?`"
+		:header="`Show all ${tableProjectCount} lines in graph?`"
 		fade="warning"
 		width="500px"
 		max-width="calc(100vw - 2rem)"
 	>
 		<p class="m-0 max-w-[32rem] text-primary">
-			Showing all selected lines may degrade page performance.
+			Showing all selected lines from table may degrade page performance.
 		</p>
 
 		<template #actions>
@@ -16,7 +16,9 @@
 					<button @click="showAllSelectedGraphDatasetsModal?.hide()">Cancel</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button @click="confirmShowAllSelectedGraphDatasets">Show all</button>
+					<button class="!shadow-none" @click="confirmShowAllSelectedGraphDatasets">
+						Show all
+					</button>
 				</ButtonStyled>
 			</div>
 		</template>
@@ -442,7 +444,10 @@ const showProjectVersionNames = computed(
 )
 const tableProjectCount = computed(() => selectedGraphDatasetIds.value.length)
 const isTableGraphSelectionEmpty = computed(
-	() => isGraphDatasetSelectionActive.value && tableProjectCount.value === 0,
+	() =>
+		isGraphDatasetSelectionActive.value &&
+		hasExplicitGraphDatasetSelection.value &&
+		tableProjectCount.value === 0,
 )
 const showEmptyChartState = computed(
 	() => selectedProjects.value.length === 0 || isTableGraphSelectionEmpty.value,
@@ -685,8 +690,20 @@ const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, Char
 })
 const allChartDatasets = computed(() => chartDatasetsByStat.value[activeStat.value])
 const previousChartDatasets = computed(() => previousChartDatasetsByStat.value[activeStat.value])
-const selectedGraphDatasetIdSet = computed(() => new Set(selectedGraphDatasetIds.value))
 const showAllSelectedGraphDatasets = ref(false)
+const shouldUseDefaultGraphDatasetSelection = computed(
+	() =>
+		isGraphDatasetSelectionActive.value &&
+		!hasExplicitGraphDatasetSelection.value &&
+		selectedGraphDatasetIds.value.length === 0,
+)
+const selectedGraphDatasetIdSet = computed(() => {
+	if (shouldUseDefaultGraphDatasetSelection.value) {
+		return new Set(topGraphDatasetIds.value)
+	}
+
+	return new Set(selectedGraphDatasetIds.value)
+})
 const selectedChartDatasets = computed(() => {
 	if (!isGraphDatasetSelectionActive.value) {
 		return allChartDatasets.value
