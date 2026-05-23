@@ -126,8 +126,8 @@ import {
 	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 import {
-	type AnalyticsTableSortColumn as TableColumnKey,
 	type AnalyticsTableSortDirection as SortDirection,
+	type AnalyticsTableSortColumn as TableColumnKey,
 	areStringArraysEqual,
 	buildAnalyticsTableSortRouteQuery,
 	hasAnalyticsTableSortQuery,
@@ -1383,6 +1383,44 @@ function getCsvColumns(mode: TableMode): TableColumn<TableColumnKey>[] {
 	return buildColumns(mode === 'date_breakdown' || !showBreakdownColumn.value)
 }
 
+function formatCsvFilenameDate(date: Date): string {
+	return date.toLocaleDateString(undefined, {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+	})
+}
+
+function getCsvFilenameDateRange(): string {
+	const timeRange = fetchRequest.value?.time_range
+	if (!timeRange) {
+		return 'Selected Range'
+	}
+
+	const start = new Date(timeRange.start)
+	const end = new Date(timeRange.end)
+	if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+		return 'Selected Range'
+	}
+
+	const startLabel = formatCsvFilenameDate(start)
+	const endLabel = formatCsvFilenameDate(end)
+	return startLabel === endLabel ? startLabel : `${startLabel} to ${endLabel}`
+}
+
+function sanitizeCsvFilename(value: string): string {
+	return value
+		.replace(/[<>:"/\\|?*]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim()
+}
+
+function getCsvFilename(): string {
+	return `${sanitizeCsvFilename(
+		`Modrinth Analytics ${breakdownColumnLabel.value} Breakdown - ${getCsvFilenameDateRange()}`,
+	)}.csv`
+}
+
 function downloadCsv(mode: TableMode) {
 	if (!import.meta.client) {
 		return
@@ -1394,9 +1432,7 @@ function downloadCsv(mode: TableMode) {
 	}
 
 	const visibleColumns = getCsvColumns(mode)
-	const header = visibleColumns
-		.map((column) => escapeCsvField(getCsvHeaderLabel(column)))
-		.join(',')
+	const header = visibleColumns.map((column) => escapeCsvField(getCsvHeaderLabel(column))).join(',')
 
 	const rows = csvRows.map((row) =>
 		visibleColumns.map((column) => escapeCsvField(getCsvCellValue(row, column.key))).join(','),
@@ -1408,10 +1444,7 @@ function downloadCsv(mode: TableMode) {
 
 	const downloadLink = document.createElement('a')
 	downloadLink.setAttribute('href', url)
-	downloadLink.setAttribute(
-		'download',
-		`analytics-${mode === 'date_breakdown' ? 'date-breakdown' : 'breakdown-only'}.csv`,
-	)
+	downloadLink.setAttribute('download', getCsvFilename())
 	downloadLink.style.visibility = 'hidden'
 
 	document.body.appendChild(downloadLink)
