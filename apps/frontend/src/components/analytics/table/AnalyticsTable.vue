@@ -71,7 +71,9 @@
 				<span>{{ formatRevenue(row.revenue) }}</span>
 			</template>
 			<template #cell-playtime="{ row }">
-				<span>{{ formatInteger(row.playtime) }}</span>
+				<span v-tooltip="formatFullPlaytime(row.playtime)">
+					{{ formatCompactPlaytime(row.playtime) }}
+				</span>
 			</template>
 			<template #empty-state>
 				<div class="flex h-64 items-center justify-center text-secondary">
@@ -208,6 +210,9 @@ const GRAPH_DATASET_SELECTION_LIMIT = 8
 const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
 const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_BREAKDOWN_VALUE = 'all'
+const SECONDS_PER_MINUTE = 60
+const SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE
+const SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR
 const SEARCHABLE_COLUMN_KEYS = new Set<TableColumnKey>(['date', 'project', 'breakdown'])
 const currentPage = ref(1)
 const searchQuery = ref('')
@@ -936,6 +941,60 @@ function formatRevenue(value: number): string {
 	return `$${revenueFormatter.value.format(rounded)}`
 }
 
+function formatCompactPlaytime(value: number): string {
+	const totalSeconds = Math.max(0, Math.round(value))
+	const totalMinutes = Math.round(totalSeconds / SECONDS_PER_MINUTE)
+
+	if (totalMinutes < 60) {
+		return `${formatNumber(totalMinutes)}min`
+	}
+
+	if (totalMinutes < 24 * 60) {
+		const hours = Math.floor(totalMinutes / 60)
+		const minutes = totalMinutes % 60
+		if (minutes === 0) {
+			return `${formatNumber(hours)}h`
+		}
+		return `${formatNumber(hours)}h ${formatNumber(minutes)}min`
+	}
+
+	const totalHours = Math.round(totalSeconds / SECONDS_PER_HOUR)
+	if (totalHours < 365 * 24) {
+		const days = Math.floor(totalHours / 24)
+		const hours = totalHours % 24
+		if (hours === 0) {
+			return `${formatNumber(days)}d`
+		}
+		return `${formatNumber(days)}d ${formatNumber(hours)}h`
+	}
+
+	const totalDays = Math.round(totalSeconds / SECONDS_PER_DAY)
+	const years = Math.floor(totalDays / 365)
+	const days = totalDays % 365
+	if (days === 0) {
+		return `${formatNumber(years)}y`
+	}
+
+	return `${formatNumber(years)}y ${formatNumber(days)}d`
+}
+
+function formatFullPlaytime(value: number): string {
+	const totalMinutes = Math.max(0, Math.round(value / SECONDS_PER_MINUTE))
+	const days = Math.floor(totalMinutes / (24 * 60))
+	const hours = Math.floor((totalMinutes % (24 * 60)) / 60)
+	const minutes = totalMinutes % 60
+
+	return [
+		formatDurationTooltipPart(days, 'day'),
+		formatDurationTooltipPart(hours, 'hour'),
+		formatDurationTooltipPart(minutes, 'minute'),
+	].join(', ')
+}
+
+function formatDurationTooltipPart(value: number, unit: string): string {
+	return `${formatNumber(value)} ${unit}${value === 1 ? '' : 's'}`
+}
+
 function addMetricToRow(row: AnalyticsTableRow, point: Labrinth.Analytics.v3.ProjectAnalytics) {
 	switch (point.metric_kind) {
 		case 'views':
@@ -1283,6 +1342,14 @@ function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | 
 	}
 }
 
+function getCsvHeaderLabel(column: TableColumn<TableColumnKey>): string {
+	if (column.key === 'playtime') {
+		return 'Playtime (seconds)'
+	}
+
+	return column.label ?? column.key
+}
+
 function escapeCsvField(value: string | number): string {
 	const stringValue = String(value)
 	if (
@@ -1328,7 +1395,7 @@ function downloadCsv(mode: TableMode) {
 
 	const visibleColumns = getCsvColumns(mode)
 	const header = visibleColumns
-		.map((column) => escapeCsvField(column.label ?? column.key))
+		.map((column) => escapeCsvField(getCsvHeaderLabel(column)))
 		.join(',')
 
 	const rows = csvRows.map((row) =>
