@@ -521,7 +521,7 @@ const tableBreakdownItemLabel = computed(() => {
 		case 'user_agent':
 			return isSingular ? 'download source' : 'download sources'
 		case 'download_reason':
-			return isSingular ? 'download type' : 'download types'
+			return isSingular ? 'download reason' : 'download reasons'
 		case 'version_id':
 			return isSingular ? 'project version' : 'project versions'
 		case 'loader':

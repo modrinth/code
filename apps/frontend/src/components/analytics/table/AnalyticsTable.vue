@@ -312,7 +312,7 @@ const breakdownColumnLabel = computed(() => {
 		case 'user_agent':
 			return 'Download source'
 		case 'download_reason':
-			return 'Download type'
+			return 'Download reason'
 		case 'version_id':
 			return 'Project version'
 		case 'loader':

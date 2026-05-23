@@ -629,7 +629,7 @@ const breakdownOptions = computed<ComboboxOption<AnalyticsBreakdownPreset>[]>(()
 	{ value: 'country', label: 'Country' },
 	{ value: 'monetization', label: 'Monetization' },
 	{ value: 'user_agent', label: 'Download source' },
-	{ value: 'download_reason', label: 'Download type' },
+	{ value: 'download_reason', label: 'Download reason' },
 	{ value: 'version_id', label: 'Project version' },
 	{ value: 'loader', label: 'Loader' },
 	{ value: 'game_version', label: 'Game version' },
