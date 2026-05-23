@@ -127,6 +127,7 @@ import {
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
+	TagCategoryGamepad2Icon as Gamepad2Icon,
 	GlobeIcon,
 	HashIcon,
 	MoreVerticalIcon,
@@ -135,7 +136,6 @@ import {
 	PlusIcon,
 	SettingsIcon,
 	StopCircleIcon,
-	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TerminalSquareIcon,
 	TimerIcon,
 	UpdatedIcon,
@@ -145,9 +145,9 @@ import {
 	Avatar,
 	formatLoaderLabel,
 	injectNotificationManager,
-	LoaderIcon as ServerLoaderIcon,
 	NavTabs,
 	PageHeader,
+	LoaderIcon as ServerLoaderIcon,
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRecentPlays,
@@ -161,12 +161,16 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute, useRouter, type LocationQuery } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
@@ -177,7 +181,7 @@ import { type InstanceContentData, loadInstanceContentData } from '@/helpers/ins
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
-import { get_server_status, refreshWorlds } from '@/helpers/worlds'
+import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
@@ -222,13 +226,16 @@ const selected = ref<unknown[]>([])
 
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
-const statusOnline = computed(() => !!javaServerPingData.value)
+const liveServerStatusOnline = ref(false)
+const statusOnline = computed(() => liveServerStatusOnline.value || !!javaServerPingData.value)
 const recentPlays = computed(
 	() => linkedProjectV3.value?.minecraft_java_server?.verified_plays_2w ?? undefined,
 )
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
+const activeInstanceId = ref<string>()
+let fetchInstanceRequestId = 0
 
 watch(
 	() => router.currentRoute.value,
@@ -240,24 +247,68 @@ watch(
 	{ immediate: true },
 )
 
-function isContentSubpageRoute(routeName = displayedInstanceRoute.value.name) {
+type InstanceRouteContext = {
+	name: unknown
+	path: string
+	query: LocationQuery
+}
+
+type InstancePageData = {
+	instanceId: string
+	instance?: GameInstance
+	linkedProjectV3?: Labrinth.Projects.v3.Project
+	isServerInstance: boolean
+	preloadedContent: InstanceContentData | null
+}
+
+function applyServerStatus(status: ServerStatus) {
+	playersOnline.value = status.players?.online
+	ping.value = status.ping
+	liveServerStatusOnline.value = true
+	loadingServerPing.value = true
+}
+
+function isContentSubpageRoute(routeName: unknown = displayedInstanceRoute.value.name) {
 	return typeof routeName === 'string' && contentSubpageRouteNames.has(routeName)
 }
 
-async function fetchInstance() {
-	isServerInstance.value = false
-	linkedProjectV3.value = undefined
-	preloadedContent.value = null
+function resetServerStatus() {
 	ping.value = undefined
 	playersOnline.value = undefined
+	liveServerStatusOnline.value = false
 	loadingServerPing.value = false
+}
 
-	const nextInstance = await get(route.params.id as string).catch(handleError)
+function isCurrentInstanceRequest(requestId: number, instanceId: string) {
+	return (
+		requestId === fetchInstanceRequestId &&
+		route.path.startsWith('/instance') &&
+		route.params.id === instanceId
+	)
+}
+
+function setInstanceBreadcrumbs(nextInstance: GameInstance, routeContext: InstanceRouteContext) {
+	breadcrumbs.setName(
+		'Instance',
+		nextInstance.name.length > 40 ? nextInstance.name.substring(0, 40) + '...' : nextInstance.name,
+	)
+	breadcrumbs.setContext({
+		name: nextInstance.name,
+		link: routeContext.path,
+		query: routeContext.query,
+	})
+}
+
+async function loadInstancePageData(
+	instanceId: string,
+	routeName: unknown = displayedInstanceRoute.value.name,
+): Promise<InstancePageData> {
+	const nextInstance = await get(instanceId).catch(handleError)
 	let nextLinkedProjectV3: Labrinth.Projects.v3.Project | undefined
 	let nextIsServerInstance = false
 
 	const contentPreloadPromise =
-		nextInstance && isContentSubpageRoute()
+		nextInstance && isContentSubpageRoute(routeName)
 			? loadInstanceContentData(nextInstance.id, undefined, handleError)
 			: Promise.resolve(null)
 
@@ -275,59 +326,113 @@ async function fetchInstance() {
 
 	const nextPreloadedContent = await contentPreloadPromise
 
-	instance.value = nextInstance ?? undefined
-	linkedProjectV3.value = nextLinkedProjectV3
-	isServerInstance.value = nextIsServerInstance
-	preloadedContent.value = nextPreloadedContent
+	return {
+		instanceId,
+		instance: nextInstance ?? undefined,
+		linkedProjectV3: nextLinkedProjectV3,
+		isServerInstance: nextIsServerInstance,
+		preloadedContent: nextPreloadedContent,
+	}
+}
 
-	fetchDeferredData()
+function applyInstancePageData(data: InstancePageData, routeContext: InstanceRouteContext) {
+	activeInstanceId.value = data.instanceId
+	resetServerStatus()
+	playing.value = false
 
-	if (nextInstance) {
+	instance.value = data.instance
+	linkedProjectV3.value = data.linkedProjectV3
+	isServerInstance.value = data.isServerInstance
+	preloadedContent.value = data.preloadedContent
+
+	if (data.instance) {
+		setInstanceBreadcrumbs(data.instance, routeContext)
+	}
+
+	fetchDeferredData(data.instanceId)
+
+	if (data.instance) {
 		queryClient.prefetchQuery({
-			queryKey: ['worlds', nextInstance.id],
-			queryFn: () => refreshWorlds(nextInstance.id),
+			queryKey: ['worlds', data.instance.id],
+			queryFn: () => refreshWorlds(data.instance!.id),
 			staleTime: 30_000,
 		})
 	}
 }
 
-function fetchDeferredData() {
+async function fetchInstance(instanceId = route.params.id as string) {
+	const requestId = ++fetchInstanceRequestId
+	const data = await loadInstancePageData(instanceId)
+	if (!isCurrentInstanceRequest(requestId, instanceId)) return
+
+	applyInstancePageData(data, {
+		name: route.name,
+		path: route.path,
+		query: route.query,
+	})
+}
+
+function fetchDeferredData(instanceId: string) {
 	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
 	if (isServerInstance.value && serverAddress) {
-		get_server_status(serverAddress)
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			applyServerStatus(cachedStatus)
+		} else {
+			playersOnline.value = undefined
+			ping.value = undefined
+			loadingServerPing.value = false
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
 			.then((status) => {
-				playersOnline.value = status.players?.online
-				ping.value = status.ping
+				if (
+					activeInstanceId.value !== instanceId ||
+					linkedProjectV3.value?.minecraft_java_server?.address !== serverAddress
+				)
+					return
+				applyServerStatus(status)
 			})
 			.catch((error) => {
 				console.error(`Failed to fetch server status for ${serverAddress}:`, error)
 			})
 			.finally(() => {
+				if (activeInstanceId.value !== instanceId) return
 				loadingServerPing.value = true
 			})
 	} else {
 		loadingServerPing.value = true
 	}
 
-	updatePlayState()
+	updatePlayState(instanceId)
 }
 
-async function updatePlayState() {
-	if (!route.params.id) return
-	const runningProcesses = await get_by_instance_id(route.params.id as string).catch(handleError)
+async function updatePlayState(instanceId = route.params.id as string) {
+	if (!instanceId) return
+	const runningProcesses = await get_by_instance_id(instanceId).catch(handleError)
+	if (activeInstanceId.value !== instanceId) return
 
 	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
 }
 
-await fetchInstance()
-watch(
-	() => route.params.id,
-	async () => {
-		if (route.params.id && route.path.startsWith('/instance')) {
-			await fetchInstance()
-		}
-	},
-)
+await fetchInstance(route.params.id as string)
+
+onBeforeRouteUpdate(async (to) => {
+	if (!to.path.startsWith('/instance')) return
+	const instanceId = Array.isArray(to.params.id) ? to.params.id[0] : to.params.id
+	if (typeof instanceId !== 'string') return false
+
+	const requestId = ++fetchInstanceRequestId
+	const data = await loadInstancePageData(instanceId, to.name)
+	if (requestId !== fetchInstanceRequestId) return false
+
+	displayedInstanceRoute.value = to
+	applyInstancePageData(data, {
+		name: to.name,
+		path: to.path,
+		query: to.query,
+	})
+})
 
 const basePath = computed(
 	() => `/instance/${encodeURIComponent(displayedInstanceRoute.value.params.id as string)}`,
@@ -371,20 +476,6 @@ const tabs = computed(() => [
 		icon: TerminalSquareIcon,
 	},
 ])
-
-if (instance.value) {
-	breadcrumbs.setName(
-		'Instance',
-		instance.value.name.length > 40
-			? instance.value.name.substring(0, 40) + '...'
-			: instance.value.name,
-	)
-	breadcrumbs.setContext({
-		name: instance.value.name,
-		link: displayedInstanceRoute.value.path,
-		query: displayedInstanceRoute.value.query,
-	})
-}
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 

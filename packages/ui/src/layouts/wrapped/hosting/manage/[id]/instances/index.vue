@@ -1,18 +1,29 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<Admonition
+		<div
 			v-if="!instanceInfoAdmonitionDismissed"
-			type="info"
-			:header="formatMessage(messages.instanceInfoHeader)"
-			dismissible
-			@dismiss="dismissInstanceInfoAdmonition"
+			class="grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-x-3 rounded-2xl border border-solid border-brand-blue bg-bg-blue p-5 pr-4 text-contrast"
 		>
-			<ul class="m-0 pl-4">
-				<li>{{ formatMessage(messages.instanceInfoDefinition) }}</li>
-				<li>{{ formatMessage(messages.instanceInfoSwitching) }}</li>
-				<li>{{ formatMessage(messages.instanceInfoFiles) }}</li>
-			</ul>
-		</Admonition>
+			<InfoIcon class="mt-0.5 size-6 text-brand-blue" aria-hidden="true" />
+			<div class="flex min-w-0 flex-col gap-1">
+				<h2 class="m-0 text-xl font-bold leading-7">
+					{{ formatMessage(messages.instanceInfoHeader) }}
+				</h2>
+				<p class="m-0 text-lg leading-7 text-contrast/85">
+					{{ formatMessage(messages.instanceInfoBody) }}
+				</p>
+			</div>
+			<ButtonStyled circular type="transparent" color="blue" hover-color-fill="background">
+				<button
+					type="button"
+					class="mt-0.5"
+					:aria-label="formatMessage(messages.instanceInfoDismiss)"
+					@click="dismissInstanceInfoAdmonition"
+				>
+					<XIcon aria-hidden="true" />
+				</button>
+			</ButtonStyled>
+		</div>
 
 		<div
 			v-if="worldsPending"
@@ -39,12 +50,13 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
+import { InfoIcon, XIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import Admonition from '#ui/components/base/Admonition.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import InstanceCard from '#ui/components/servers/instances/InstanceCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
@@ -61,20 +73,16 @@ const messages = defineMessages({
 	},
 	instanceInfoHeader: {
 		id: 'servers.manage.instances.info.header',
-		defaultMessage: 'What is an instance?',
+		defaultMessage: 'What is a server instance?',
 	},
-	instanceInfoDefinition: {
-		id: 'servers.manage.instances.info.definition',
-		defaultMessage: 'An instance is a separate server setup.',
-	},
-	instanceInfoSwitching: {
-		id: 'servers.manage.instances.info.switching',
-		defaultMessage: 'You can switch which instance your server runs.',
-	},
-	instanceInfoFiles: {
-		id: 'servers.manage.instances.info.files',
+	instanceInfoBody: {
+		id: 'servers.manage.instances.info.body',
 		defaultMessage:
-			'Each instance has its own server files, worlds, installed content, and settings.',
+			'An instance is a separate setup of your server with its own content, files, worlds, and settings. You can switch which instance your server runs at any time.',
+	},
+	instanceInfoDismiss: {
+		id: 'servers.manage.instances.info.dismiss',
+		defaultMessage: "Don't show this again",
 	},
 })
 
