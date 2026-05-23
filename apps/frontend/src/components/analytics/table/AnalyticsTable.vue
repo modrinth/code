@@ -126,8 +126,8 @@ import {
 import {
 	type AnalyticsTableSortColumn as TableColumnKey,
 	type AnalyticsTableSortDirection as SortDirection,
-	buildAnalyticsTableSortRouteQuery,
 	areStringArraysEqual,
+	buildAnalyticsTableSortRouteQuery,
 	hasAnalyticsTableSortQuery,
 	hasAnalyticsTableSortRouteChange,
 	readAnalyticsTableSortState,
@@ -1047,9 +1047,10 @@ function getAvailableTableSortState(
 	return getDefaultTableSortState(nextColumns)
 }
 
-function getDefaultTableSortState(
-	nextColumns = activeColumns.value,
-): { sortColumn: TableColumnKey | undefined; sortDirection: SortDirection } {
+function getDefaultTableSortState(nextColumns = activeColumns.value): {
+	sortColumn: TableColumnKey | undefined
+	sortDirection: SortDirection
+} {
 	const nextSortColumn = getDefaultSortColumn(nextColumns)
 	return {
 		sortColumn: nextSortColumn,
@@ -1090,12 +1091,6 @@ function syncTableSortRouteQuery() {
 		path: route.path,
 		query: nextRouteQuery,
 	})
-}
-
-function applyDefaultSort(nextColumns = activeColumns.value) {
-	const nextSortColumn = getDefaultSortColumn(nextColumns)
-	sortColumn.value = nextSortColumn
-	sortDirection.value = getDefaultSortDirection(nextSortColumn, nextColumns)
 }
 
 function applyActiveStatSort() {

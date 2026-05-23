@@ -629,9 +629,7 @@ export function readAnalyticsTableSortState(
 		!rawSortColumn ||
 		!rawSortDirection ||
 		!ANALYTICS_TABLE_SORT_COLUMN_VALUES.includes(rawSortColumn as AnalyticsTableSortColumn) ||
-		!ANALYTICS_TABLE_SORT_DIRECTION_VALUES.includes(
-			rawSortDirection as AnalyticsTableSortDirection,
-		)
+		!ANALYTICS_TABLE_SORT_DIRECTION_VALUES.includes(rawSortDirection as AnalyticsTableSortDirection)
 	) {
 		return defaultState
 	}
@@ -745,8 +743,7 @@ export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean
 
 export function hasAnalyticsTableSortQuery(query: LocationQuery): boolean {
 	return (
-		query[QUERY_KEY_TABLE_SORT] !== undefined ||
-		query[QUERY_KEY_TABLE_SORT_DIRECTION] !== undefined
+		query[QUERY_KEY_TABLE_SORT] !== undefined || query[QUERY_KEY_TABLE_SORT_DIRECTION] !== undefined
 	)
 }
 

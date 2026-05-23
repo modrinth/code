@@ -24,14 +24,16 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-function renderPicker(initial: {
-	mode?: TimeFrameMode
-	preset?: TimeFramePreset
-	lastAmount?: number
-	lastUnit?: TimeFrameLastUnit
-	customStartDate?: string
-	customEndDate?: string
-} = {}) {
+function renderPicker(
+	initial: {
+		mode?: TimeFrameMode
+		preset?: TimeFramePreset
+		lastAmount?: number
+		lastUnit?: TimeFrameLastUnit
+		customStartDate?: string
+		customEndDate?: string
+	} = {},
+) {
 	return () => ({
 		components: { TimeFramePicker },
 		setup() {

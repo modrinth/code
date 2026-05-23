@@ -18,10 +18,10 @@
 
 <script setup lang="ts">
 import {
-	TimeFramePicker as BaseTimeFramePicker,
 	type ComboboxOption,
-	type TimeFramePreset,
+	TimeFramePicker as BaseTimeFramePicker,
 	type TimeFramePickerSelection,
+	type TimeFramePreset,
 } from '@modrinth/ui'
 
 import {
