@@ -103,7 +103,7 @@ export class ArchonServersV0Module extends AbstractModule {
 	 */
 	public async power(
 		serverId: string,
-		action: 'Start' | 'Stop' | 'Restart' | 'Kill',
+		action: Archon.Servers.v0.PowerAction,
 	): Promise<void> {
 		await this.client.request(`/servers/${serverId}/power`, {
 			api: 'archon',
