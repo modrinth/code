@@ -109,10 +109,7 @@ import { computed, ref } from 'vue'
 
 import { ButtonStyled } from '#ui/components'
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import {
-	injectModrinthServerContext,
-	injectNotificationManager,
-} from '#ui/providers'
+import { injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
 const { server } = injectModrinthServerContext()

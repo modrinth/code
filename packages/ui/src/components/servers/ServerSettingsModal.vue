@@ -170,7 +170,6 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 		}
 
 		await Promise.all(fetchPromises)
-
 	} catch (error) {
 		console.error(error)
 		addNotification({
