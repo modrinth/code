@@ -872,6 +872,7 @@ function notifySkippedQueueProjects(count: number) {
 		title: 'Skipped projects',
 		text: `Skipped ${count} project(s) already moderated or locked by others.`,
 		type: 'info',
+		autoCloseMs: 2000,
 	})
 }
 
