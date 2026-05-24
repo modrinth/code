@@ -25,7 +25,7 @@ const VERSIONS: VersionEntry[] = [
 		date: `2026-05-24T05:00:37+00:00`,
 		product: 'web',
 		body: `## Fixed
-- Fixed an issue where the page fails to load sometimes, requiring you to delete your cookies.
+- Fixed an issue where the page fails to load sometimes, requiring you to delete your cookies.`,
 	},
 	{
 		date: `2026-05-21T22:13:35+00:00`,
