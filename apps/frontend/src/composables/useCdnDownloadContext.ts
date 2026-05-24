@@ -63,7 +63,11 @@ export function useCdnDownloadContext() {
 	})
 
 	function createProjectDownloadUrl(originalUrl: string, context?: DownloadContext): string {
-		if (!originalUrl.startsWith('https://cdn.modrinth.com')) {
+		if (
+			typeof originalUrl !== 'string' ||
+			!originalUrl ||
+			!originalUrl.startsWith('https://cdn.modrinth.com')
+		) {
 			return originalUrl
 		}
 
