@@ -11,6 +11,19 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-24T16:26:23+00:00`,
+		product: 'app',
+		version: '0.13.23',
+		body: `## Fixed
+- Fixed the discover page not working when the spanish language is selected.`,
+	},
+	{
+		date: `2026-05-24T16:26:23+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed the discover page not working when the spanish language is selected.`,
+	},
+	{
 		date: `2026-05-24T05:00:37+00:00`,
 		product: 'app',
 		version: '0.13.22',
