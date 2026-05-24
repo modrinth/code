@@ -1362,13 +1362,13 @@
     "message": "Selecionando o pacote de mods para instalar após a redefinição"
   },
   "discover.seo.description": {
-    "message": "Busque e explore milhares de {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}} de Minecraft no Modrinth com resultados de busca instantâneos e precisos. Nossos filtros ajudam você a encontrar rapidamente os melhores {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}} de Minecraft."
+    "message": "Busque e explore milhares de {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}} de Minecraft no Modrinth com resultados de busca instantâneos e precisos. Nossos filtros ajudam você a encontrar rapidamente os melhores {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}} de Minecraft."
   },
   "discover.seo.title": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}}"
+    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}}"
   },
   "discover.seo.title-with-query": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} other {projetos}} | {query}"
+    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Você pode ter digitado incorretamente o URL da coleção."
@@ -2565,10 +2565,10 @@
     "message": "Servidor"
   },
   "project-type.shader.plural": {
-    "message": "Shaders"
+    "message": "Sombreadores"
   },
   "project-type.shader.singular": {
-    "message": "Shader"
+    "message": "Sombreador"
   },
   "project.about.details.created": {
     "message": "Criado {date}"

@@ -656,6 +656,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Taguin ang di-magkakatugma"
   },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "I-update sa di-magkatugmang bersiyon?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "I-update pa rin"
+  },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Walang changelog para bersiyong ito."
   },
@@ -2059,9 +2065,6 @@
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
-  },
-  "servers.region.north-america": {
-    "defaultMessage": "Hilagang Amerika"
   },
   "servers.region.prompt": {
     "defaultMessage": "Saan mo nais malagay ang server mo?"

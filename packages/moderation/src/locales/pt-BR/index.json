@@ -225,7 +225,7 @@
     "defaultMessage": "Selecione etiquetas específicas"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Pelo menos uma imagem da galeria é requerida para mostrar o conteúdo do seu {type, select, resourcepack {pacto de recursos, com excessão do áudio e pacotes de localização. Se isto descreve seu pacote, por favor selecione a etiqueta apropriada} shader {shader} other {projeto}}."
+    "defaultMessage": "Pelo menos uma imagem da galeria é requerida para mostrar o conteúdo do seu {type, select, resourcepack {pacote de recursos, com exceção do áudio e pacotes de localização. Se isto descreve seu pacote, por favor selecione a etiqueta apropriada} shader {sombreador} other {projeto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Envie uma imagem para a galeria"

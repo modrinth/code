@@ -407,11 +407,20 @@
   "collection.title": {
     "message": "{name} - Collectie"
   },
+  "conversation-thread.reply-modal.description": {
+    "message": "Je project is al goedgekeurd. Daarom houdt het moderatieteam deze thread niet actief in de gaten. Mocht er echter een probleem met je project zijn, dan kunnen zij je bericht wel zien."
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Als je contact wilt opnemen met het moderatorteam, ga dan naar het <help-center-link>Modrinth Helpcentrum</help-center-link> en klik op het blauwe ballonnetje rechtsonder om contact op te nemen met de ondersteuning."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Herhaaldelijk berichten plaatsen zonder in te gaan op de opmerkingen van de moderators kan leiden tot een opschorting van je account."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Aanvullende bestanden zijn bedoeld voor ondersteunende bronnen zoals source code, niet voor alternatieve versies of varianten."
   },
   "create.collection.collection-info": {
-    "message": "Je nieuwe collectie wordt gemaakt als een publieke collectie met {{count, plural,=0 {geen projecten}one {# project}other {# projecten}}."
+    "message": "Je nieuwe collectie wordt gemaakt als een publieke collectie met {count, plural,=0 {geen projecten}one {# project}other {# projecten}}."
   },
   "create.collection.create-collection": {
     "message": "Collectie aanmaken"
@@ -571,6 +580,9 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Zoek affiliatelinks..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "van {count} {count, plural, one {project} other {projects}}"
   },
   "dashboard.collections.button.create-new": {
     "message": "Maak nieuwe"
@@ -848,6 +860,18 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Je hebt je opnamelimiet <b>{withdrawLimit}</b> bereikt. Je moet een belastingformulier invullen om meer geld op te nemen."
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Bekijk {extraNotifs} meer {extraNotifs, plural, one {notification} other {notifications}}"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {member} other {members}}"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "De wijzigingen worden toegepast op <strong>{count}</strong> {count, plural, one {project} other {projects}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Alle links die u hieronder opgeeft, worden in elk van de geselecteerde projecten overschreven. Links die u leeg laat, worden genegeerd. U kunt een link uit alle geselecteerde projecten verwijderen met de prullenbakknop."
+  },
   "dashboard.revenue.available-now": {
     "message": "Nu beschikbaar"
   },
@@ -1003,6 +1027,15 @@
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Gelieve het belastingformulier in te vullen"
+  },
+  "discover.seo.description": {
+    "message": "Zoek en blader door duizenden Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} op Modrinth met directe, nauwkeurige zoekresultaten. Onze filters helpen je snel de beste Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+  },
+  "discover.seo.title": {
+    "message": "Zoek {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Zoek {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "U heeft mogelijk de URL van de collectie fout ingetypt."
@@ -1164,7 +1197,7 @@
     "message": "Waar bevinden de servers van Modrinth Hosting zich? Kan ik een regio kiezen?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "We hebben momenteel servers beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië, waaruit u bij aankoop kunt kiezen. In de toekomst zullen er meer regio's volgen! Als u uw regio wilt wijzigen, neem dan contact op met de klantenservice."
+    "message": "Op dit moment hebben we servers beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië, waaruit u bij aankoop kunt kiezen. In de toekomst komen er nog meer regio’s bij! Als u van regio wilt wisselen, neem dan contact op met de klantenservice."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Welke Minecraft-versies en loaders kunnen worden gebruikt?"

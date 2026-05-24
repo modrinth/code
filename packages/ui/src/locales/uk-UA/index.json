@@ -398,6 +398,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} оновлено"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Вимкнено"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Увімкнено"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Оновлює"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Попереджає"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Створення резервної копії…"
   },
@@ -1657,6 +1669,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Приховати несумісні"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} не позначено як сумісну з цією інсталяцією. Вона може не запускатися або поводитися несподівано."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Оновитися до несумісної версії?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Усе одно оновитися"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Завантаження журналу змін…"
@@ -3701,8 +3722,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "ОЗП"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Північна Америка"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Центральна частина Північної Америки"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Східна частина Північної Америки"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Західна частина Північної Америки"
   },
   "servers.region.prompt": {
     "defaultMessage": "Де б ви хотіли розмістити свій сервер?"
