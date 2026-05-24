@@ -93,7 +93,7 @@ export abstract class AbstractWebNotificationManager {
 
 		if (notification.autoCloseMs === null) return
 
-		const delay = notification.autoCloseMs ?? DEFAULT_AUTO_DISMISS_DELAY_MS
+		const delay = notification.autoCloseMs ?? this.DEFAULT_AUTO_DISMISS_DELAY_MS
 
 		notification.timer = setTimeout(() => {
 			this.removeNotification(notification.id)
