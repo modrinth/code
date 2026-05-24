@@ -105,7 +105,7 @@
     "defaultMessage": "Estás actualmente desconectado. ¡Conéctate a internet para buscar en Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos  {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} servidores {servers} otros {projects}}..."
+    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} server {servers} other {projects}}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Proyectos seleccionados"
@@ -348,10 +348,10 @@
     "defaultMessage": "Advertencia de borrado"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Eliminar {count} {itemType}{count, plural, uno {} otro {s}}"
+    "defaultMessage": "Eliminar {count} {itemType}{count, plural, one {} other {s}}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Eliminar {itemType}{count, plural, uno {} otro {s}}"
+    "defaultMessage": "Eliminar {itemType}{count, plural, one {} other {s}}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Bajar de versión} other {Actualizar}} puede causar problemas de compatibilidad. Los mods o contenido que agregaste sobre el modpack se mantendrán, pero podrían no ser compatibles con la nueva versión."
