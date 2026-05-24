@@ -84,7 +84,7 @@
     "message": "Decorazioni native"
   },
   "app.appearance-settings.select-option": {
-    "message": "Scegli una pagina"
+    "message": "Seleziona"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Scegli se mostrare o nascondere la barra laterale."
@@ -611,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java e memoria"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variabili d'ambiente"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argomenti JVM"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Eseguibile di Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Memoria allocata"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Inserisci le variabili d'ambiente..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Inserisci gli argomenti JVM..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variabili d'ambiente"
   },
@@ -625,6 +643,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memoria allocata"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/percorso/di/java"
   },
   "instance.settings.tabs.window": {
     "message": "Finestra"

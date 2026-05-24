@@ -687,7 +687,7 @@
     "message": "제휴 링크 검색..."
   },
   "dashboard.analytics.from-projects": {
-    "message": "프로젝트 {count}개"
+    "message": "{count} {count, plural, one {프로젝트} other {프로젝트}}로"
   },
   "dashboard.analytics.total-downloads": {
     "message": "다운로드 수"
@@ -1536,7 +1536,7 @@
     "message": "Modrinth 호스팅 서버는 어디에 위치해 있나요? 지역을 선택할 수 있나요?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "현재 서버는 구매 시 북미, 유럽, 동남아 지역 중에서 선택할 수 있습니다. 향후 더 많은 지역에서 서비스를 제공할 예정입니다! 지역을 변경이 필요하면 지원팀에 문의해 주세요."
+    "message": "현재 북미, 유럽, 동남아시아 전역에서 구매 시 선택할 수 있는 서버가 있습니다. 앞으로 더 많은 지역이 추가될 예정입니다! 지역을 변경하고 싶으시면 지원팀에 문의해 주세요."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "어떤 마인크래프트 버전과 로더를 사용할 수 있나요?"

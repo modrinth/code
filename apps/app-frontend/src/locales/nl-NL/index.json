@@ -189,7 +189,7 @@
     "message": "Verwijder instantie"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Deze modpakket is al in de <bold>{instanceName}<bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
+    "message": "Deze modpakket is al in de <bold>{instanceName}</bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Maak"

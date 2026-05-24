@@ -656,6 +656,9 @@
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Bir yükleyici ve sürüm seçerek başlayın."
   },
+  "creation-flow.modal.setup-type.option.import-instance.description": {
+    "defaultMessage": "Prism, CurseForge veya benzeri bir platformdan bir oturum/profil içe aktarın."
+  },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
     "defaultMessage": "Vanilla Minecraft"
   },
@@ -2980,9 +2983,6 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Sunucun ne kadar RAM'e sahip olsun istersin?"
-  },
-  "servers.region.north-america": {
-    "defaultMessage": "Kuzey Amerika"
   },
   "servers.region.prompt": {
     "defaultMessage": "Sunucunun nerede bulunmasını istersin?"

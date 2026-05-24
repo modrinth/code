@@ -11,6 +11,7 @@ import { ISO3166Module } from './iso3166'
 import { KyrosContentV1Module } from './kyros/content/v1'
 import { KyrosFilesV0Module } from './kyros/files/v0'
 import { KyrosLogsV1Module } from './kyros/logs/v1'
+import { KyrosUploadSessionsV1Module } from './kyros/upload-sessions/v1'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
 import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
@@ -73,6 +74,7 @@ export const MODULE_REGISTRY = {
 	kyros_content_v1: KyrosContentV1Module,
 	kyros_files_v0: KyrosFilesV0Module,
 	kyros_logs_v1: KyrosLogsV1Module,
+	kyros_upload_sessions_v1: KyrosUploadSessionsV1Module,
 	labrinth_affiliate_internal: LabrinthAffiliateInternalModule,
 	labrinth_auth_internal: LabrinthAuthInternalModule,
 	labrinth_auth_v2: LabrinthAuthV2Module,

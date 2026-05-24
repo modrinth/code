@@ -1373,9 +1373,6 @@
   "hosting-marketing.faq.location": {
     "message": "Modrinthでホストするサーバーはどこにありますか？地域を選択できますか？"
   },
-  "hosting-marketing.faq.location.answer": {
-    "message": "現時点では、北アメリカ、ヨーロッパ、東南アジアのサーバーを購入時に選択できます。今後、より多くの地域に対応予定です！地域を変更したい場合はサポートまでお問い合わせください。"
-  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "どのMinecraftのバージョンとローダーが使えますか？"
   },

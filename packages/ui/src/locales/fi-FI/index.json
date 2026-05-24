@@ -524,9 +524,6 @@
   "servers.region.central-europe": {
     "defaultMessage": "Keski-Eurooppa"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Pohjois-Amerikka"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Missä haluaisit palvelimesi sijaitsevan?"
   },

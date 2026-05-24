@@ -14,6 +14,7 @@ export class KyrosContentV1Module extends AbstractModule {
 	 * @param files - Files to upload as addons
 	 * @param options - Optional progress callback
 	 * @returns UploadHandle with promise, onProgress, and cancel
+	 * @deprecated Use `kyros.upload_sessions_v1` so cancellation can remove staged addon files before finalize.
 	 */
 	public uploadAddonFile(
 		worldId: string,

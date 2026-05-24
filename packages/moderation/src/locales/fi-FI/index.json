@@ -11,6 +11,9 @@
   "nags.add-icon.title": {
     "defaultMessage": "Lisää kuvake"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Lisää IP osoite ja portti jota Java Edition pelaajat voivat käyttää liittyäksesi sinun palvelimelle."
+  },
   "nags.add-java-address.title": {
     "defaultMessage": "Lisää Java-osoite"
   },
@@ -47,8 +50,20 @@
   "nags.edit-title.title": {
     "defaultMessage": "Muokkaa nimeä"
   },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Esittele galleria kuvaa"
+  },
   "nags.gallery.title": {
     "defaultMessage": "Käy galleria sivulla"
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Anna lähdekoodi"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Identtiset Linkit"
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Varmista esteettömyys"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisenssin URL-osoite on virheellinen."
