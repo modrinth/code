@@ -515,6 +515,16 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
+function notifySkippedProjects(skippedCount: number) {
+	if (skippedCount <= 0) return
+	addNotification({
+		title: 'Skipped projects',
+		text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
+		type: 'info',
+		autoCloseMs: 2000,
+	})
+}
+
 async function findFirstEligibleProject(): Promise<ModerationProject | null> {
 	let skippedCount = 0
 
@@ -539,13 +549,7 @@ async function findFirstEligibleProject(): Promise<ModerationProject | null> {
 			const lockStatus = await moderationQueue.checkLock(currentId)
 
 			if (!lockStatus.locked || lockStatus.expired || lockStatus.is_own_lock) {
-				if (skippedCount > 0) {
-					addNotification({
-						title: 'Skipped projects',
-						text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
-						type: 'info',
-					})
-				}
+				notifySkippedProjects(skippedCount)
 				return project
 			}
 
@@ -556,13 +560,7 @@ async function findFirstEligibleProject(): Promise<ModerationProject | null> {
 		}
 	}
 
-	if (skippedCount > 0) {
-		addNotification({
-			title: 'Skipped projects',
-			text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
-			type: 'info',
-		})
-	}
+	notifySkippedProjects(skippedCount)
 
 	return null
 }
