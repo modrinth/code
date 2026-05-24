@@ -400,14 +400,17 @@ export function useServerSearch(opts: {
 		return parts.join(' AND ')
 	})
 
-	const serverRequestParams = computed(() => {
-		const params = [`limit=${maxResults.value}`, `index=${serverCurrentSortType.value.name}`]
+	function buildRequestParams(options?: { limit?: number; offset?: number }): string {
+		const limit = options?.limit ?? maxResults.value
+		const params = [`limit=${limit}`, `index=${serverCurrentSortType.value.name}`]
 		if (query.value) params.push(`query=${encodeURIComponent(query.value)}`)
-		const offset = (currentPage.value - 1) * maxResults.value
+		const offset = options?.offset ?? (currentPage.value - 1) * maxResults.value
 		if (offset > 0) params.push(`offset=${offset}`)
 		params.push(`new_filters=${encodeURIComponent(newFilters.value)}`)
 		return `?${params.join('&')}`
-	})
+	}
+
+	const serverRequestParams = computed(() => buildRequestParams())
 
 	function readServerQueryParams() {
 		const q = route.query
@@ -497,6 +500,7 @@ export function useServerSearch(opts: {
 		serverFilterTypes,
 		newFilters,
 		serverRequestParams,
+		buildRequestParams,
 		createServerPageParams,
 	}
 }

@@ -25,6 +25,7 @@ import {
 	SelectedProjectsFloatingBar,
 	useBrowseSearch,
 	useDebugLogger,
+	useFeelingLucky,
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
@@ -414,6 +415,25 @@ watch(
 debug('calling initial refreshSearch')
 searchState.refreshSearch()
 
+function getProjectLink(result: Labrinth.Search.v2.ResultSearchProject) {
+	return `/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`
+}
+
+function getServerProjectLink(result: Labrinth.Search.v3.ResultSearchProject) {
+	return `/server/${result.slug ?? result.project_id}`
+}
+
+const { feelingLuckyLoading, pickRandomProject } = useFeelingLucky({
+	search,
+	totalHits: searchState.totalHits,
+	refreshSearch: searchState.refreshSearch,
+	isServerType: searchState.isServerType,
+	buildRequestParams: searchState.buildRequestParams,
+	getProjectLink,
+	getServerProjectLink,
+	navigate: navigateTo,
+})
+
 const ogTitle = computed(() =>
 	searchState.query.value
 		? formatMessage(messages.seoTitleWithQuery, {
@@ -437,16 +457,16 @@ provideBrowseManager({
 	tags,
 	projectType: projectTypeId,
 	...searchState,
-	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) =>
-		`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
-	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
-		`/server/${result.slug ?? result.project_id}`,
+	getProjectLink,
+	getServerProjectLink,
 	selectableProjectTypes: computed(() => []),
 	showProjectTypeTabs: computed(() => false),
 	variant: 'web',
 	getCardActions,
 	installContext,
 	providedFilters: serverFilters,
+	feelingLuckyLoading,
+	onFeelingLucky: pickRandomProject,
 	hideInstalled: serverHideInstalled,
 	showHideInstalled: computed(() => !!serverData.value && projectType.value?.id !== 'modpack'),
 	hideInstalledLabel: computed(() => formatMessage(commonMessages.hideInstalledContentLabel)),

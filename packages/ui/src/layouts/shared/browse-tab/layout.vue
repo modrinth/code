@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { SearchIcon } from '@modrinth/assets'
+import { SearchIcon, SparklesIcon, SpinnerIcon } from '@modrinth/assets'
 import { computed, ref, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -66,6 +66,31 @@ const messages = defineMessages({
 		id: 'browse.no-results',
 		defaultMessage: 'No results found for your query!',
 	},
+	feelingLucky: {
+		id: 'browse.feeling-lucky',
+		defaultMessage: "I'm feeling lucky",
+	},
+	feelingLuckyTooltip: {
+		id: 'browse.feeling-lucky.tooltip',
+		defaultMessage:
+			'Open a random {projectType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {datapack} server {server} other {project}} matching your filters',
+	},
+	feelingLuckyNoResults: {
+		id: 'browse.feeling-lucky.no-results-tooltip',
+		defaultMessage: 'No projects match your current filters.',
+	},
+})
+
+const feelingLuckyDisabled = computed(
+	() =>
+		!!ctx.feelingLuckyLoading?.value || ctx.loading.value || ctx.totalHits.value === 0,
+)
+
+const feelingLuckyTooltip = computed(() => {
+	if (!ctx.loading.value && ctx.totalHits.value === 0) {
+		return formatMessage(messages.feelingLuckyNoResults)
+	}
+	return formatMessage(messages.feelingLuckyTooltip, { projectType: ctx.projectType.value })
 })
 </script>
 
@@ -83,17 +108,35 @@ const messages = defineMessages({
 
 	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
 
-	<StyledInput
-		v-model="ctx.query.value"
-		:icon="SearchIcon"
-		type="text"
-		autocomplete="off"
-		:placeholder="formatMessage(messages.searchPlaceholder, { projectType: ctx.projectType.value })"
-		clearable
-		wrapper-class="w-full"
-		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
-		@clear="ctx.clearSearch()"
-	/>
+	<div class="flex w-full gap-2">
+		<StyledInput
+			v-model="ctx.query.value"
+			:icon="SearchIcon"
+			type="text"
+			autocomplete="off"
+			:placeholder="
+				formatMessage(messages.searchPlaceholder, { projectType: ctx.projectType.value })
+			"
+			clearable
+			wrapper-class="min-w-0 flex-1"
+			:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
+			@clear="ctx.clearSearch()"
+		/>
+
+		<ButtonStyled v-if="ctx.onFeelingLucky">
+			<button
+				v-tooltip="feelingLuckyTooltip"
+				class="flex shrink-0 items-center gap-2 whitespace-nowrap px-4"
+				:class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
+				:disabled="feelingLuckyDisabled"
+				@click="ctx.onFeelingLucky!()"
+			>
+				<SpinnerIcon v-if="ctx.feelingLuckyLoading?.value" class="size-5 animate-spin" />
+				<SparklesIcon v-else class="size-5" />
+				<span class="hidden sm:inline">{{ formatMessage(messages.feelingLucky) }}</span>
+			</button>
+		</ButtonStyled>
+	</div>
 
 	<div class="flex flex-wrap items-center gap-2">
 		<Combobox

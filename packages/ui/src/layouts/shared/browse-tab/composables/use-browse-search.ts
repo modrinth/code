@@ -54,6 +54,7 @@ export interface BrowseSearchState {
 	deprioritizedTags: ComputedRef<string[]>
 	excludeLoaders: ComputedRef<boolean>
 
+	buildRequestParams: (options?: { limit?: number; offset?: number }) => string
 	refreshSearch: () => Promise<void>
 	setPage: (page: number) => Promise<void>
 	clearSearch: () => void
@@ -81,6 +82,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		filters,
 		sortTypes,
 		requestParams,
+		buildRequestParams: buildProjectRequestParams,
 		createPageParams,
 	} = useSearch(projectTypes, options.tags, options.providedFilters ?? computed(() => []))
 
@@ -91,6 +93,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		serverSortTypes,
 		serverFilterTypes,
 		serverRequestParams,
+		buildRequestParams: buildServerRequestParams,
 		createServerPageParams,
 	} = useServerSearch({
 		tags: options.tags,
@@ -103,6 +106,12 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	const effectiveRequestParams = computed(() =>
 		isServerType.value ? serverRequestParams.value : requestParams.value,
 	)
+
+	function buildRequestParams(options?: { limit?: number; offset?: number }): string {
+		return isServerType.value
+			? buildServerRequestParams(options)
+			: buildProjectRequestParams(options)
+	}
 	const effectiveSortTypes = computed(() =>
 		isServerType.value ? (serverSortTypes as readonly SortType[]) : sortTypes,
 	)
@@ -323,6 +332,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		effectiveLayout,
 		deprioritizedTags,
 		excludeLoaders,
+		buildRequestParams,
 		refreshSearch,
 		setPage,
 		clearSearch,

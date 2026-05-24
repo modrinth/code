@@ -101,6 +101,9 @@ export interface BrowseManagerContext {
 	}>
 
 	loadingComponent?: Component
+
+	feelingLuckyLoading?: Ref<boolean>
+	onFeelingLucky?: () => void | Promise<void>
 }
 
 export const [injectBrowseManager, provideBrowseManager] = createContext<BrowseManagerContext>(

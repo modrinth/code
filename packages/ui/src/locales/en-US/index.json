@@ -95,6 +95,21 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resubscribe to Server"
   },
+  "browse.feeling-lucky": {
+    "defaultMessage": "I'm feeling lucky"
+  },
+  "browse.feeling-lucky.failed": {
+    "defaultMessage": "Could not load a random project. Please try again."
+  },
+  "browse.feeling-lucky.no-results": {
+    "defaultMessage": "No projects match your current filters."
+  },
+  "browse.feeling-lucky.no-results-tooltip": {
+    "defaultMessage": "No projects match your current filters."
+  },
+  "browse.feeling-lucky.tooltip": {
+    "defaultMessage": "Open a random {projectType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {datapack} server {server} other {project}} matching your filters"
+  },
   "browse.filter-results": {
     "defaultMessage": "Filter results..."
   },

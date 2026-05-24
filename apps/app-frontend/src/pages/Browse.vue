@@ -24,6 +24,7 @@ import {
 	requestInstall,
 	useBrowseSearch,
 	useDebugLogger,
+	useFeelingLucky,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -974,24 +975,45 @@ function getProjectBrowseQuery() {
 	}
 }
 
+function getProjectLink(result: Labrinth.Search.v2.ResultSearchProject) {
+	return {
+		path: `/project/${result.project_id ?? result.slug}`,
+		query: getProjectBrowseQuery(),
+	}
+}
+
+function getServerProjectLink(result: Labrinth.Search.v3.ResultSearchProject) {
+	return {
+		path: `/project/${result.slug ?? result.project_id}`,
+		query: getProjectBrowseQuery(),
+	}
+}
+
+const { feelingLuckyLoading, pickRandomProject } = useFeelingLucky({
+	search,
+	totalHits: searchState.totalHits,
+	refreshSearch: searchState.refreshSearch,
+	isServerType: searchState.isServerType,
+	buildRequestParams: searchState.buildRequestParams,
+	getProjectLink,
+	getServerProjectLink,
+	navigate: (to) => router.push(to),
+})
+
 provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
-	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
-		path: `/project/${result.project_id ?? result.slug}`,
-		query: getProjectBrowseQuery(),
-	}),
-	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
-		path: `/project/${result.slug ?? result.project_id}`,
-		query: getProjectBrowseQuery(),
-	}),
+	getProjectLink,
+	getServerProjectLink,
 	selectableProjectTypes,
 	showProjectTypeTabs: computed(() => !isServerContext.value),
 	variant: 'app',
 	getCardActions,
 	installContext,
 	providedFilters: combinedProvidedFilters,
+	feelingLuckyLoading,
+	onFeelingLucky: pickRandomProject,
 	hideInstalled: computed({
 		get: () => (isServerContext.value ? serverHideInstalled.value : instanceHideInstalled.value),
 		set: (val: boolean) => {

@@ -534,8 +534,9 @@ export function useSearch(
 		return parts.join(' AND ')
 	})
 
-	const requestParams: Ref<string> = computed(() => {
-		const params = [`limit=${maxResults.value}`, `index=${currentSortType.value.name}`]
+	function buildRequestParams(options?: { limit?: number; offset?: number }): string {
+		const limit = options?.limit ?? maxResults.value
+		const params = [`limit=${limit}`, `index=${currentSortType.value.name}`]
 
 		if (query.value.length > 0) {
 			params.push(`query=${encodeURIComponent(query.value)}`)
@@ -545,13 +546,15 @@ export function useSearch(
 			params.push(`new_filters=${encodeURIComponent(newFilters.value)}`)
 		}
 
-		const offset = (currentPage.value - 1) * maxResults.value
-		if (currentPage.value !== 1) {
+		const offset = options?.offset ?? (currentPage.value - 1) * maxResults.value
+		if (offset > 0) {
 			params.push(`offset=${offset}`)
 		}
 
 		return `?${params.join('&')}`
-	})
+	}
+
+	const requestParams: Ref<string> = computed(() => buildRequestParams())
 
 	readQueryParams()
 
@@ -759,6 +762,7 @@ export function useSearch(
 		requestParams,
 
 		// Functions
+		buildRequestParams,
 		createPageParams,
 		createPageParamsString,
 	}

@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-23T00:00:00+00:00`,
+		product: 'web',
+		body: `## Added
+- Added an "I'm feeling lucky" button on Discover that opens a random project matching your current filters.`,
+	},
+	{
+		date: `2026-05-23T00:00:00+00:00`,
+		product: 'app',
+		body: `## Added
+- Added an "I'm feeling lucky" button on Browse that opens a random project matching your current filters.`,
+	},
+	{
 		date: `2026-05-21T22:13:35+00:00`,
 		product: 'web',
 		body: `## Fixed
