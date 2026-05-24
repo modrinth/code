@@ -11,6 +11,23 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-24T05:00:37+00:00`,
+		product: 'app',
+		version: '0.13.22',
+		body: `## Added
+- Added log spam detection and line compacting logic to prevent Modrinth App from crashing when viewing large log files.
+
+## Changed
+- Increased the default memory for instances from 2GB to 4GB (depending on your system memory).
+- Improved "Java installation" settings page design. Thanks [@creeperkatze](https://github.com/creeperkatze)`,
+	},
+	{
+		date: `2026-05-24T05:00:37+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed an issue where the page fails to load sometimes, requiring you to delete your cookies.
+	},
+	{
 		date: `2026-05-21T22:13:35+00:00`,
 		product: 'web',
 		body: `## Fixed
