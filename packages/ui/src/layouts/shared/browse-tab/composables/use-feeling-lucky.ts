@@ -41,11 +41,8 @@ export function useFeelingLucky(options: UseFeelingLuckyOptions) {
 
 		feelingLuckyLoading.value = true
 		try {
-			let total = options.totalHits.value
-			if (total === 0) {
-				await options.refreshSearch()
-				total = options.totalHits.value
-			}
+			await options.refreshSearch()
+			const total = options.totalHits.value
 
 			if (total === 0) {
 				addNotification({
