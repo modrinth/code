@@ -1335,13 +1335,13 @@
     "message": "Seleccionando modpack para instalar antes del reinicio"
   },
   "discover.seo.description": {
-    "message": "Busca y navega miles de Minecraft {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} en Modrinth con resultados de busqueda instantáneos y precisos. Nuestros filtradores te ayudan a encontrar rápidamente lo mejor de Minecraft {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+    "message": "Busca y navega miles de Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} en Modrinth con resultados de busqueda instantáneos y precisos. Nuestros filtradores te ayudan a encontrar rápidamente lo mejor de Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
   },
   "discover.seo.title": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}"
+    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
   },
   "discover.seo.title-with-query": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects} | {query}"
+    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Puede que hayas escrito mal la URL de la colección."
