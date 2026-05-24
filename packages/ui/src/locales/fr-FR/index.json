@@ -24,7 +24,7 @@
     "defaultMessage": "Créé par {user}"
   },
   "affiliate.creating.button": {
-    "defaultMessage": "Création d'un lien d'affiliation..."
+    "defaultMessage": "Création du lien en cours..."
   },
   "affiliate.revoke": {
     "defaultMessage": "Révoquer un lien d'affiliation"
@@ -51,40 +51,40 @@
     "defaultMessage": "Annuler"
   },
   "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} processeurs partagés"
+    "defaultMessage": "{sharedCpus} CPU partagés"
   },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "Vous êtes sur le point de vous réabonner à <server-name>{serverName}</server-name>. Votre abonnement sera réactivé et votre serveur pourra continuer à être exécuté sans interruption."
+    "defaultMessage": "Vous êtes sur le point de vous réabonner à <server-name>{serverName}</server-name>. Votre abonnement sera réactivé et votre serveur pourra continuer à fonctionner sans interruption."
   },
   "billing.resubscribe-modal.error.text": {
-    "defaultMessage": "Vous ne pouvez pas vous réabonner, impossible de charger les détails d'abonnement."
+    "defaultMessage": "Vous ne pouvez pas vous réabonner, car il est impossible de charger les détails de l'abonnement."
   },
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Erreur"
   },
   "billing.resubscribe-modal.failed-load": {
-    "defaultMessage": "Impossible de charger les détails d'abonnement."
+    "defaultMessage": "Impossible de charger les détails de l'abonnement."
   },
   "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": " / 5 jours"
+    "defaultMessage": "/ 5 jours"
   },
   "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "  / mois"
+    "defaultMessage": "/ mois"
   },
   "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": " / trimestre"
+    "defaultMessage": "/ trimestre"
   },
   "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": " / an"
+    "defaultMessage": "/ an"
   },
   "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Votre prochaine charge sera le <charge-date>{date}</charge-date>."
+    "defaultMessage": "Votre prochain paiement sera le <charge-date>{date}</charge-date>."
   },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Forfait"
   },
   "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} Go de mémoire vive"
+    "defaultMessage": "{ramGb} Go de mémoire RAM"
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Se réabonner"
@@ -1657,6 +1657,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Cacher les incompatibles"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} n'est pas compatible avec cette installation. Le lancement peut échouer ou le comportement peut être inattendu."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Mettre à jour vers une version incompatible ?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Mettre à jour quand même"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Chargement du journal de modification..."
@@ -3701,8 +3710,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "Mémoire vive"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Amérique du Nord"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Amérique du Nord centrale"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Est de l'Amérique du Nord"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Ouest de l'Amérique du Nord"
   },
   "servers.region.prompt": {
     "defaultMessage": "Où souhaitez-vous que votre serveur soit situé ?"

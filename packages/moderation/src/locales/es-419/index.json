@@ -102,7 +102,7 @@
     "defaultMessage": "No use acortadores de enlaces"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# encabezado} other {# encabezados}} en tu descripción {count, plural, one {es} other {son}} demasiado largo(s). Los encabezados deben ser concisos y actuar como títulos de sección, no como frases completas."
+    "defaultMessage": "{count, plural, one {# encabezado} other {# encabezados}} en tu descripción {count, plural, one {es} other {son}} demasiado {count, plural, one {largo} other {largos}}. Los encabezados deben ser concisos y actuar como títulos de sección, no como frases completas."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Acortar encabezados"
@@ -225,7 +225,7 @@
     "defaultMessage": "Selecciona etiquetas adecuadas"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": ""
+    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type, select, resourcepack {paquete de recursos, excepto para paquetes de audio o de traducción. Si esto describe tu paquete, selecciona la etiqueta correspondiente} shader {shader} other {proyecto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

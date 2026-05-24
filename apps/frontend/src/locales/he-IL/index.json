@@ -1163,9 +1163,6 @@
   "hosting-marketing.faq.location": {
     "message": "היכן ממוקמים שרתי האחסון של Modrinth? האם ניתן לבחור אזור?"
   },
-  "hosting-marketing.faq.location.answer": {
-    "message": "כרגע זמינים עבורכם שרתים בצפון אמריקה, אירופה ודרום-מזרח אסיה, אותם ניתן לבחור בעמד הרכישה. אזורים נוספים יתווספו בעתיד! אם תרצו להחליף את האזור שלכם, אנא צרו קשר עם התמיכה."
-  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "באילו גרסאות של מיינקראפט ובאילו Loaders ניתן להשתמש?"
   },
