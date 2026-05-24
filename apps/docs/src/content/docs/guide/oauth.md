@@ -28,7 +28,7 @@ After you've registered your application, it is important that you take note of 
 
 ## Getting authorization
 
-Once the user is ready to authorize your application, you need to construct a URL to redirect them to. The authorization URL for Modrinth is `https://api.modrinth.com/_internal/oauth/token`. Supply the following query parameters:
+Once the user is ready to authorize your application, you need to construct a URL to redirect them to. The authorization URL for Modrinth is `https://modrinth.com/auth/authorize`. Supply the following query parameters:
 
 | Query parameter | Description                                                                               |
 | --------------- | ----------------------------------------------------------------------------------------- |
