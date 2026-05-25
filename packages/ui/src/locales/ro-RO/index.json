@@ -1430,9 +1430,6 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Cât de mult RAM vrei ca serverul tău să aibă?"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "America de Nord"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Unde ți-ar plăcea ca serverul să fie localizat?"
   },

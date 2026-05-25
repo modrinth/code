@@ -199,17 +199,20 @@ export type ModerationOwnership = ModerationOwnershipUser | ModerationOwnershipO
 
 export interface ProjectWithOwnership {
 	ownership: ModerationOwnership
+	external_dependencies_count: number
 	[key: string]: any
 }
 
 export interface ModerationProject {
 	project: any
 	ownership: ModerationOwnership | null
+	external_dependencies_count: number
 }
 
 export function toModerationProjects(projects: ProjectWithOwnership[]): ModerationProject[] {
-	return projects.map(({ ownership, ...project }) => ({
+	return projects.map(({ ownership, external_dependencies_count, ...project }) => ({
 		project,
 		ownership: ownership ?? null,
+		external_dependencies_count: external_dependencies_count,
 	}))
 }

@@ -291,7 +291,7 @@
     "message": "Már van fiókod?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Iratkozzon fel a Modrinth frissítéseiről szóló értesítésekre"
+    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
   },
   "auth.sign-up.title": {
     "message": "Regisztráció"
@@ -333,7 +333,7 @@
     "message": "Email-cím hitelesítése"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Iratkozzon fel a Modrinth frissítéseiről szóló értesítésekre"
+    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
   },
   "auth.welcome.description": {
     "message": "Most már része vagy annak a fantasztikus fejlesztők és felfedezők közösségének, akik már építenek, letöltenek és naprakészek maradnak a csodálatos modokkal kapcsolatban."
@@ -415,6 +415,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Jóváhagyás és válasz"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Gondolatmenet lezárása"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Bezárás és válasz"
@@ -950,6 +953,9 @@
   "dashboard.head-title": {
     "message": "Irányítópult"
   },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Nincsenek olvasatlan értesítéseid."
+  },
   "dashboard.notifications.link.see-all": {
     "message": "Összes megtekintése"
   },
@@ -1478,9 +1484,6 @@
   "hosting-marketing.faq.location": {
     "message": "Hol találhatók a Modrinth Hosting szerverei? Kiválaszthatom a régiót?"
   },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Jelenleg Észak-Amerikában, Európában és Délkelet-Ázsiában állnak rendelkezésre szerverek, amelyek közül vásárláskor választhatsz. A jövőben további régiók is elérhetővé válnak! Ha szeretnéd megváltoztatni a régiót, vedd fel a kapcsolatot az ügyfélszolgálattal."
-  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Melyik Minecraft verziók és betöltők használhatók?"
   },
@@ -1749,7 +1752,7 @@
     "message": "Játékosoknak"
   },
   "landing.section.for-players.tagline": {
-    "message": "Fedez fel több mint {count, number} alkotást"
+    "message": "Fedezz fel több mint {count, number} alkotást"
   },
   "landing.subheading": {
     "message": "Fedezz fel, játssz és ossz meg Minecraft-tartalmakat a közösség számára létrehozott nyílt forráskódú platformunkon."
@@ -1815,7 +1818,7 @@
     "message": "Mindig mellőzd"
   },
   "layout.banner.build-fail.description": {
-    "message": "A Modrinth felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérünk, próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
+    "message": "A Modrinth felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérlek próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
   },
   "layout.banner.build-fail.ignore": {
     "message": "Mellőz"
@@ -1827,7 +1830,7 @@
     "message": "Ha a hivatalos Modrinth weboldalt szeretnéd elérni, látogass el a {url} oldalra. Ezt az előzetes verziót a Modrinth munkatársai tesztelési célokra használják. A <branch-link>{owner}/{branch</branch-link> @ {commit} használatával készült."
   },
   "layout.banner.preview.title": {
-    "message": "Ez a Modrinth weboldal előzetes telepítése."
+    "message": "Ez a Modrinth weboldal előzetes verziója."
   },
   "layout.banner.staging.description": {
     "message": "A tesztelési környezet teljesen elkülönül az éles Modrinth adatbázistól. Ezt tesztelési és hibakeresési célokra használják, és a Modrinth backend vagy frontend fejlesztés alatt álló, az éles példánynál újabb verzióit futtathatja."
@@ -2628,10 +2631,10 @@
     "message": "Átdolgoztuk a Modrinth Környezetek rendszerét, és új lehetőségek érhetők el. Kérjük, ellenőrizd, hogy a metaadatok helyesek-e."
   },
   "project.environment.migration.review-button": {
-    "message": "Környezet beállítások Átnézése"
+    "message": "Környezeti beállítások áttekintése"
   },
   "project.environment.migration.title": {
-    "message": "Kérjük, tekintse át a környezet metaadatait"
+    "message": "Kérlek tekintsd át a környezeti metaadatokat"
   },
   "project.error.loading": {
     "message": "Hiba a projektadatok {message} betöltése közben"
@@ -2669,11 +2672,17 @@
   "project.moderation.admonition.draft.submit-for-review": {
     "message": "Miután elvégezted az összes szükséges lépést, és meggyőződtél arról, hogy a projekted megfelel a Modrinth <rules-link>Tartalmi szabályainak</rules-link>, benyújthatod a projektedet felülvizsgálatra."
   },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Változtatások kérve lettek"
+  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Köszönjük türelmedet, amíg moderátoraink keményen dolgoznak a Modrinth biztonságának fenntartásán, és alig várjuk, hogy segíthessünk tartalmaid megosztásában! 💚</emphasis>"
   },
   "project.moderation.admonition.under-review.header": {
     "message": "Projekt áttekintés alatt"
+  },
+  "project.moderation.thread.title": {
+    "message": "Moderációs üzenetek"
   },
   "project.moderation.title": {
     "message": "Moderáció"
@@ -3489,7 +3498,7 @@
     "message": "Amikor engedélyezel egy alkalmazást a Modrinth fiókoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
   },
   "settings.authorizations.empty-state": {
-    "message": "Jelenleg nem tudjuk megjeleníteni a jogosult alkalmazásait, dolgozunk a probléma megoldásán. Kérjük, látogassa meg ezt az oldalt később!"
+    "message": "Jelenleg nem tudjuk megjeleníteni az azonosított alkalmazásokat, dolgozunk a probléma megoldásán. Kérlek látogasd meg ezt az oldalt később!"
   },
   "settings.authorizations.head-title": {
     "message": "Engedélyek"

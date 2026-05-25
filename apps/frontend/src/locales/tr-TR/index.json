@@ -407,6 +407,108 @@
   "collection.title": {
     "message": "{name} - Koleksiyon"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Özel not ekle"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Onaylandı"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Onaylandı, işlem tamamlandı"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Konuyu kapat"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Cevapla ve kapat"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Reddet"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Cevap vererek reddet"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Konuyu yeniden aç"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Yanıtla"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Konuya yanıt ver"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "İnceleme için yeniden gönder"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Yanıtla birlikte yeniden incelemeye gönder"
+  },
+  "conversation-thread.action.send": {
+    "message": "Gönder"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "İncelemeye gönder"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Yanıtla birlikte incelemeye gönder"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Yanıtla birlikte taslağa çevir"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Yanıtla birlikte beklet"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Bu konu kapatılmıştır ve yeni mesaj gönderilemez."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Rapor kapatılırken hata oluştu"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Mesaj gönderilirken hata oluştu"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Konuya yanıt ver..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Mesaj gönder..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Moderatörlerin bunu aktif olarak izlemediğini onayla"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Moderatörlerin bu konuyu aktif olarak denetlemediğini kabul ediyorum."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Projeniz zaten onaylanmış durumda. Bu nedenle moderasyon ekibi bu konuyu aktif olarak takip etmez. Ancak projenizle ilgili bir sorun oluşursa mesajınızı yine de görebilirler."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Konuyu yanıtla"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Moderasyon ekibiyle iletişime geçmeniz gerekiyorsa, lütfen <help-center-link>Modrinth Yardım Merkezi</help-center-link> adresini kullanın ve destekle iletişime geçmek için sağ alt köşedeki mavi sohbet simgesine tıklayın."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Moderatörlerin mesajlarını yanıtladığımı onaylıyorum"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Moderatörlerin yorumlarını uygun şekilde yanıtladığımı onaylıyorum."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "<project-title>{projectTitle}</project-title> projesini moderatörler tarafından yeniden incelenmek üzere gönderiyorsunuz."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "İnceleme için yeniden gönderiliyor"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "İncelemeye gönderiliyor"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Moderatör ekibinin tüm yorumlarını ele aldığınızdan emin olun."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Moderatörlerin yorumlarını ele almadan tekrar tekrar gönderim yapmak, hesabınızın askıya alınmasına neden olabilir."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
   },
@@ -875,6 +977,9 @@
   "dashboard.head-title": {
     "message": "Kontrol Paneli"
   },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Okunmamış bildiriminiz yok."
+  },
   "dashboard.notifications.link.see-all": {
     "message": "Hepsi"
   },
@@ -898,6 +1003,27 @@
   },
   "dashboard.organizations.title": {
     "message": "Organizasyonlar"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Tümünü okundu olarak işaretle"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Geçmişi görüntüle"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Okunmamış bildiriminiz yok."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Bildirimler yüklenirken hata oluştu:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Geçmiş"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Bildirim geçmişi"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Bildirimler yükleniyor..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Aşağıdan seçerek birden fazla projeyi düzenleyebilirsiniz."
@@ -1208,6 +1334,30 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Lütfen vergi formunu tamamlayınız"
   },
+  "discover.install.back-to-setup": {
+    "message": "Sunucuya geri dön"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Sıfırlamayı iptal et"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Yüklenebilecek hiçbir sunucu dünyası mevcut değil."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Bu içerik türü, tarayıcıdan bir sunucuya yüklenemez."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Sıfırlama sonrası yüklenecek mod paketi seçiliyor"
+  },
+  "discover.seo.description": {
+    "message": "Modrinth üzerinde anında ve doğru arama sonuçlarıyla binlerce Minecraft {projectType, select, mod {mod} modpack {modpack} resourcepack {kaynak paketi} shader {shader} plugin {eklenti} datapack {veri paketi} other {proje}} arasında arama yap ve göz at. Filtrelerimiz en iyi Minecraft {projectType, select, mod {modları} modpack {mod paketlerini} resourcepack {kaynak paketlerini} shader {shaderları} plugin {eklentileri} datapack {veri paketlerini} other {projeleri}} hızlıca bulmana yardımcı olur."
+  },
+  "discover.seo.title": {
+    "message": "Ara {projectType, select, mod {modları} modpack {mod paketleri} resourcepack {kaynak paketleri} shader {shaderlar} plugin {eklentiler} datapack {veri paketleri} other {projeler}}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Ara {projectType, select, mod {modları} modpack {mod paketleri} resourcepack {kaynak paketleri} shader {shaderlar} plugin {eklentiler} datapack {veri paketleri} other {projeler}} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Koleksiyonun URL'ini yanlış yazmış olabilirsin."
   },
@@ -1222,6 +1372,12 @@
   },
   "error.collection.404.title": {
     "message": "Koleksiyon bulunamadı"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Şu anda şu hesapla oturum açtınız:"
+  },
+  "error.generic.401.title": {
+    "message": "Bu sayfaya erişiminiz yok"
   },
   "error.generic.404.subtitle": {
     "message": "Aradığın sayfa yokmuş gibi duruyor."
@@ -1368,7 +1524,7 @@
     "message": "Modrinth Hosting sunucuları nerede bulunuyor? Bölge seçebilir miyim?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Şu anda Kuzey Amerika, Avrupa ve Güneydoğu Asya'da satın alabileceğiniz sunucularımız bulunmaktadır. Gelecekte daha fazla bölge eklenecektir! Bölgenizi değiştirmek isterseniz, lütfen destek ekibiyle iletişime geçin."
+    "message": "Şu anda satın alma sırasında seçebileceğiniz sunucular Kuzey Amerika, Avrupa ve Güneydoğu Asya bölgelerinde mevcuttur. Yakında daha fazla bölge eklenecektir. Bölgenizi değiştirmek isterseniz lütfen destek ekibiyle iletişime geçin."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Hangi Minecraft sürümleri ve yükleyiciler kullanılabilir?"
@@ -1649,6 +1805,9 @@
   "layout.action.create-new": {
     "message": "Yeni oluştur..."
   },
+  "layout.action.external-projects": {
+    "message": "Harici projeler"
+  },
   "layout.action.file-lookup": {
     "message": "Dosya bulma"
   },
@@ -1697,11 +1856,20 @@
   "layout.banner.add-email.description": {
     "message": "Güvenlik sebebiyle Modrinth hesabınıza bir e-posta adresi kaydetmeniz gerek."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Her zaman yok say"
+  },
   "layout.banner.build-fail.description": {
     "message": "Modrinth'in önucunun bu dağıtımı API'den durum oluşturamadı. Bu bir kesintiden veya yapılandırmadaki bir hatadan kaynaklı olabilir. API mevcutken tekrar derleyin. Hata kodları: {errors}; şu anki API adresi: {url}"
   },
+  "layout.banner.build-fail.ignore": {
+    "message": "Yok say"
+  },
   "layout.banner.build-fail.title": {
     "message": "Derleme esnasında API'den durum oluştururken hata."
+  },
+  "layout.banner.preview.description": {
+    "message": "Eğer resmi Modrinth web sitesine erişmek istiyorsanız, {url} adresini ziyaret edin. Bu önizleme sürümü Modrinth ekibi tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak derlenmiştir."
   },
   "layout.banner.preview.title": {
     "message": "Bu, Modrinth web sitesinin önizleme dağıtımıdır."
@@ -1897,6 +2065,9 @@
   },
   "moderation.moderate": {
     "message": "Yönet"
+  },
+  "moderation.page.external-projects": {
+    "message": "Harici projeler"
   },
   "moderation.page.projects": {
     "message": "Projeler"
@@ -3332,6 +3503,9 @@
   "settings.billing.charges.description": {
     "message": "Modrinth hesabınıza geçmişte yapılan tüm ödemeleriniz burada listelenir:"
   },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Barındırma"
+  },
   "settings.billing.charges.title": {
     "message": "Past charges"
   },
@@ -3439,6 +3613,9 @@
   },
   "settings.billing.pyro.ram": {
     "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Modrinth sunucuna yeniden abone olurken hata oluştu."
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Yeniden abone olurken hata"

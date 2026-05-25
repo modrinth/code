@@ -2033,9 +2033,6 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Berapa besar RAM yang diinginkan untuk server Anda?"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Amerika Utara"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Lokasi manakah yang Anda inginkan untuk server Anda?"
   },

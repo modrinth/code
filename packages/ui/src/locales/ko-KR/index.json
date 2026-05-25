@@ -398,6 +398,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count}개 업데이트됨"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "비활성화"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "활성화"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "업데이트"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "경고"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "백업 생성 중..."
   },
@@ -1657,6 +1669,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "호환되지 않는 항목 숨기기"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version}이 설치와 호환되지 않는 것으로 표시되어 있습니다. 실행에 실패하거나 예기치 않게 작동할 수 있습니다."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "호환되지 않는 버전으로 업데이트하시겠습니까?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "업데이트"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "변경사항 불러오는 중..."
@@ -3444,7 +3465,7 @@
     "defaultMessage": "새로운"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "파일은 <days-remaining>{daysRemaining}일 동안 보관됩니다. 삭제되기 전에 파일을 다운로드하려면 지원팀에 문의하세요."
+    "defaultMessage": "파일은 <days-remaining>{daysRemaining}일 동안 보관됩니다</days-remaining>. 삭제되기 전에 파일을 다운로드하려면 지원팀에 문의하세요. "
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "취소 후 30일 동안 파일이 보존됩니다."
@@ -3701,8 +3722,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "북아메리카"
+  "servers.region.north-america-central": {
+    "defaultMessage": "중앙 북미"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "동부 북미"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "서부 북미"
   },
   "servers.region.prompt": {
     "defaultMessage": "서버가 어디에 위치했으면 좋겠나요?"

@@ -11,6 +11,72 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-24T17:46:23+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed occasional error when loading version pages.`,
+	},
+	{
+		date: `2026-05-24T17:46:23+00:00`,
+		product: 'app',
+		version: '0.13.24',
+		body: `## Changed
+- Updated translations.`,
+	},
+	{
+		date: `2026-05-24T16:26:23+00:00`,
+		product: 'app',
+		version: '0.13.23',
+		body: `## Fixed
+- Fixed the discover page not working when the spanish language is selected.`,
+	},
+	{
+		date: `2026-05-24T16:26:23+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed the discover page not working when the spanish language is selected.`,
+	},
+	{
+		date: `2026-05-24T05:00:37+00:00`,
+		product: 'app',
+		version: '0.13.22',
+		body: `## Added
+- Added log spam detection and line compacting logic to prevent Modrinth App from crashing when viewing large log files.
+
+## Changed
+- Increased the default memory for instances from 2GB to 4GB (depending on your system memory).
+- Improved "Java installation" settings page design. Thanks [@creeperkatze](https://github.com/creeperkatze)`,
+	},
+	{
+		date: `2026-05-24T05:00:37+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed an issue where the page fails to load sometimes, requiring you to delete your cookies.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project embeds not loading in correctly.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'app',
+		version: '0.13.21',
+		body: `## Fixed
+- Fixed issue with content items visually duplicating over other content items in the Content tab table.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed issue with content items visually duplicating over other content items in the Content tab table.
+- Fixed issue when cancelling a multi-file upload to the Files tab or Content tab, any files fully uploaded before cancelling are not removed on cancel.`,
+	},
+	{
 		date: `2026-05-20T19:48:04+00:00`,
 		product: 'web',
 		body: `## Changed

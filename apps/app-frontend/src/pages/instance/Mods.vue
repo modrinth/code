@@ -230,8 +230,12 @@ function fileNameFromPath(path: string) {
 	return path.split('/').pop() ?? path
 }
 
+function getContentItemId(item: ContentItem | null | undefined) {
+	return item?.file_path ?? item?.file_name ?? item?.id ?? ''
+}
+
 function getContentOperationKeys(item: ContentItem) {
-	return [item.id, item.file_path, item.file_name, item.project?.id, item.version?.id].filter(
+	return [getContentItemId(item), item.file_path, item.file_name].filter(
 		(key): key is string => !!key,
 	)
 }
@@ -478,10 +482,11 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 }
 
 async function handleUpdate(id: string) {
-	const item = projects.value.find((p) => p.id === id)
+	const item = projects.value.find((p) => getContentItemId(p) === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
+	const itemId = getContentItemId(item)
 
 	debug('handleUpdate triggered', {
 		fileName: item.file_name,
@@ -542,7 +547,8 @@ async function handleUpdate(id: string) {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
 
-	if (!isActiveUpdateRequest(requestId) || updatingProject.value?.id !== item.id) return
+	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
+		return
 
 	loadingVersions.value = false
 
@@ -595,6 +601,7 @@ async function handleSwitchVersion(item: ContentItem) {
 	if (!item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
+	const itemId = getContentItemId(item)
 
 	updatingModpack.value = false
 	updatingProject.value = item
@@ -610,7 +617,8 @@ async function handleSwitchVersion(item: ContentItem) {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
 
-	if (!isActiveUpdateRequest(requestId) || updatingProject.value?.id !== item.id) return
+	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
+		return
 
 	loadingVersions.value = false
 
@@ -1055,8 +1063,9 @@ provideContentManager({
 	showContentHint,
 	dismissContentHint,
 	shareItems: handleShareItems,
+	getItemId: getContentItemId,
 	mapToTableItem: (item: ContentItem) => ({
-		id: item.id,
+		id: getContentItemId(item),
 		project: item.project ?? {
 			id: item.file_name,
 			slug: null,

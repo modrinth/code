@@ -225,7 +225,7 @@
     "defaultMessage": "Chọn các thẻ chính xác"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Cần có ít nhất một hình ảnh trong thư viện để giới thiệu nội dung của {type, select, resourcepack {gói tài nguyên} shader {shader} other {dự án}} của bạn, ngoại trừ các gói âm thanh hoặc bản địa hóa. Nếu điều này đúng với gói của bạn, vui lòng chọn thẻ phù hợp {shader {shader} other {project}}."
+    "defaultMessage": "Cần có ít nhất một hình ảnh trong thư viện để giới thiệu nội dung của {type, select, resourcepack {gói tài nguyên của bạn, ngoại trừ các gói âm thanh hoặc bản địa hóa. Nếu điều này đúng với gói của bạn, vui lòng chọn thẻ phù hợp} shader {shader} other {dự án}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tải lên hình ảnh thư viện"
