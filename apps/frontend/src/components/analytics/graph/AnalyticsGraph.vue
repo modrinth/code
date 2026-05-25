@@ -417,6 +417,10 @@ const TOP_GRAPH_DATASET_LIMIT = 8
 const GRAPH_RENDER_DATASET_LIMIT = 250
 const PREVIOUS_PERIOD_DATASET_ID_PREFIX = 'previous-period:'
 const PREVIOUS_PERIOD_BORDER_DASH = [6, 4]
+const MONETIZATION_LEGEND_ENTRY_ORDER = new Map([
+	['breakdown:monetized', 0],
+	['breakdown:unmonetized', 1],
+])
 
 const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])
 const hasChartEvents = computed(() => localAnalyticsChartEvents.value.length > 0)
@@ -841,6 +845,19 @@ function getPreviousPeriodDatasetId(datasetId: string) {
 	return `${PREVIOUS_PERIOD_DATASET_ID_PREFIX}${datasetId}`
 }
 
+function compareLegendEntries(a: LegendEntry, b: LegendEntry) {
+	if (selectedBreakdown.value === 'monetization') {
+		const aOrder = MONETIZATION_LEGEND_ENTRY_ORDER.get(a.id)
+		const bOrder = MONETIZATION_LEGEND_ENTRY_ORDER.get(b.id)
+
+		if (aOrder !== undefined || bOrder !== undefined) {
+			return (aOrder ?? Number.MAX_SAFE_INTEGER) - (bOrder ?? Number.MAX_SAFE_INTEGER)
+		}
+	}
+
+	return b.totalValue - a.totalValue || a.name.localeCompare(b.name)
+}
+
 function setHoverState(payload: HoverState) {
 	hoverState.visible = payload.visible
 	hoverState.x = payload.x
@@ -1000,7 +1017,7 @@ const currentLegendEntries = computed<LegendEntry[]>(() =>
 				hidden: hiddenDatasetIds.value.has(dataset.projectId),
 			}
 		})
-		.sort((a, b) => b.totalValue - a.totalValue || a.name.localeCompare(b.name)),
+		.sort(compareLegendEntries),
 )
 
 const legendEntries = computed<LegendEntry[]>(() => {

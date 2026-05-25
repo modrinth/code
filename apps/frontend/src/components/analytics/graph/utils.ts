@@ -49,6 +49,10 @@ const OTHER_COUNTRY_CODE = 'XX'
 const UNKNOWN_BREAKDOWN_LABEL = 'Unknown'
 const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_DATASET_LABEL = 'All projects'
+const MONETIZATION_CHART_COLOR_INDEX: Record<string, number> = {
+	monetized: 0,
+	unmonetized: 1,
+}
 const regionDisplayNamesByLocale = new Map<string, Intl.DisplayNames | null>()
 
 function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
@@ -125,7 +129,15 @@ function getBreakdownColor(
 	breakdownValue: string,
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	fallbackColor: string,
+	palette: string[],
 ): string {
+	if (selectedBreakdown === 'monetization') {
+		const colorIndex = MONETIZATION_CHART_COLOR_INDEX[breakdownValue]
+		if (colorIndex !== undefined) {
+			return getPaletteColorForIndex(colorIndex, palette)
+		}
+	}
+
 	if (selectedBreakdown !== 'loader') {
 		return fallbackColor
 	}
@@ -258,7 +270,7 @@ export function buildChartDatasets(
 
 		return Array.from(dataByBreakdown.entries()).map(([breakdownValue, data]) => {
 			const fallbackColor = colorsByBreakdown.get(breakdownValue) ?? ''
-			const color = getBreakdownColor(breakdownValue, selectedBreakdown, fallbackColor)
+			const color = getBreakdownColor(breakdownValue, selectedBreakdown, fallbackColor, palette)
 			return {
 				projectId: `breakdown:${breakdownValue}`,
 				label: formatBreakdownLabel(breakdownValue, selectedBreakdown, getVersionDisplayName),
