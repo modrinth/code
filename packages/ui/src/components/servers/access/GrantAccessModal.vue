@@ -175,11 +175,11 @@ const messages = defineMessages({
 	},
 	targetLabel: {
 		id: 'servers.grant-access-modal.target.label',
-		defaultMessage: 'Username',
+		defaultMessage: 'Modrinth username',
 	},
 	targetPlaceholder: {
 		id: 'servers.grant-access-modal.target.placeholder',
-		defaultMessage: 'Enter a username',
+		defaultMessage: 'Enter Modrinth username',
 	},
 	noSuggestions: {
 		id: 'servers.grant-access-modal.target.no-suggestions',
@@ -191,7 +191,7 @@ const messages = defineMessages({
 	},
 	targetHelp: {
 		id: 'servers.grant-access-modal.target.help',
-		defaultMessage: 'Use their Modrinth username.',
+		defaultMessage: 'Do not use their Minecraft username.',
 	},
 	roleLabel: {
 		id: 'servers.grant-access-modal.role.label',
@@ -235,7 +235,7 @@ const messages = defineMessages({
 	},
 	alreadyMemberTooltip: {
 		id: 'servers.grant-access-modal.already-member-tooltip',
-		defaultMessage: 'This user is already in the users table.',
+		defaultMessage: 'This user has already been invited',
 	},
 })
 

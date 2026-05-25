@@ -55,6 +55,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showModeratorProjectMemberUi: false,
 	showModeratorPrivateMessageHighlight: true,
 	archonApiStaging: false,
+	showHostingAccessInstanceAuditLog: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

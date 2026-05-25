@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 const client = injectModrinthClient()
 const { server, serverId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
+const flags = useFeatureFlags()
 const ACTION_LOG_PAGE_SIZE = 200
 const ACTION_LOG_SORT_DIRECTION = 'desc'
 const actionLogDateFilter = defaultActionLogDateFilter()
@@ -59,7 +60,7 @@ useHead({
 function defaultActionLogDateFilter() {
 	const endDate = new Date()
 	const startDate = new Date(endDate)
-	startDate.setDate(startDate.getDate() - 29)
+	startDate.setDate(startDate.getDate() - 6)
 
 	return {
 		min_datetime: startOfDay(startDate).toISOString(),
@@ -77,5 +78,5 @@ function endOfDay(date: Date) {
 </script>
 
 <template>
-	<ServersManageAccessPage />
+	<ServersManageAccessPage :show-audit-log-instances="flags.showHostingAccessInstanceAuditLog" />
 </template>

@@ -3345,7 +3345,7 @@
     "defaultMessage": "Support"
   },
   "servers.access-page.activity-log-filter.users": {
-    "defaultMessage": "Actors"
+    "defaultMessage": "User"
   },
   "servers.access-page.activity-log-title": {
     "defaultMessage": "Activity log"
@@ -3930,16 +3930,16 @@
     "defaultMessage": "{username}'s avatar"
   },
   "servers.grant-access-modal.target.help": {
-    "defaultMessage": "Use their Modrinth username."
+    "defaultMessage": "Do not use their Minecraft username."
   },
   "servers.grant-access-modal.target.label": {
-    "defaultMessage": "Username"
+    "defaultMessage": "Modrinth username"
   },
   "servers.grant-access-modal.target.no-suggestions": {
     "defaultMessage": "No matching users found."
   },
   "servers.grant-access-modal.target.placeholder": {
-    "defaultMessage": "Enter a username"
+    "defaultMessage": "Enter Modrinth username"
   },
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Searching..."

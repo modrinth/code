@@ -55,6 +55,7 @@
 			<button
 				ref="addMenuTrigger"
 				type="button"
+				class="!border"
 				:aria-expanded="isAddMenuOpen"
 				aria-haspopup="menu"
 				@click="handleAddMenuTriggerClick"

@@ -62,6 +62,7 @@
 				:has-more="hasMoreActionLogEntries"
 				:loading="isActionLogFiltering"
 				:loading-more="isLoadingMoreActionLogEntries"
+				:show-world-column="showAuditLogInstances"
 				:suppress-row-transitions="isActionLogSortTransitioning"
 				@load-more="loadMoreActionLogEntries"
 			>
@@ -146,6 +147,13 @@ import {
 type RoleFilter = ServerAccessRole | 'all'
 type AuditLogFilterKey = 'users' | 'worlds' | 'actions'
 
+const props = withDefaults(defineProps<{
+	showAuditLogInstances?: boolean
+}>(), {
+	showAuditLogInstances: true,
+})
+const showAuditLogInstances = computed(() => props.showAuditLogInstances)
+
 const ACTION_LOG_PAGE_SIZE = 200
 const ACTION_LOG_FILTER_OVERLAY_MS = 750
 const SUPPORT_ACTION_LOG_USER_FILTER = 'support'
@@ -207,7 +215,7 @@ const messages = defineMessages({
 	},
 	userFilter: {
 		id: 'servers.access-page.activity-log-filter.users',
-		defaultMessage: 'Actors',
+		defaultMessage: 'User',
 	},
 	supportActor: {
 		id: 'servers.access-page.activity-log-filter.support-actor',
@@ -619,7 +627,9 @@ const members = computed<ServerAccessMember[]>(() =>
 const worldOptions = computed(
 	() => serverFull.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
 )
-const isAuditLogWorldFilterVisible = computed(() => worldOptions.value.length > 0)
+const isAuditLogWorldFilterVisible = computed(
+	() => showAuditLogInstances.value && worldOptions.value.length > 0,
+)
 
 const worldById = computed(
 	() => new Map(worldOptions.value.map((world) => [world.id, world] as const)),
@@ -643,7 +653,7 @@ const auditLogFilters = ref<Record<string, string[]>>({
 	actions: [],
 })
 const auditLogTimeframeMode = ref<TimeFrameMode>('preset')
-const auditLogTimeframePreset = ref<TimeFramePreset>('last_30_days')
+const auditLogTimeframePreset = ref<TimeFramePreset>('last_7_days')
 const auditLogTimeframeLastAmount = ref(30)
 const auditLogTimeframeLastUnit = ref<TimeFrameLastUnit>('days')
 const auditLogTimeframeCustomStartDate = ref('')
@@ -830,11 +840,13 @@ const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() => [
 ])
 
 const auditLogActionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
-	actionLogActionNames.map((action) => ({
-		value: action,
-		label: formatActionLogAction(action),
-		searchTerms: [action, action.replaceAll('_', ' ')],
-	})),
+	actionLogActionNames
+		.map((action) => ({
+			value: action,
+			label: formatActionLogAction(action),
+			searchTerms: [action, action.replaceAll('_', ' ')],
+		}))
+		.sort(compareFilterOptions),
 )
 
 const auditLogFilterCategories = computed<DropdownFilterBarCategory[]>(() => {

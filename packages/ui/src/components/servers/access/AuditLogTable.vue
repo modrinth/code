@@ -155,10 +155,14 @@
 							<component :is="entry.event.component" v-bind="entry.event.props" />
 						</div>
 						<div class="flex min-w-0 items-center gap-1 text-sm text-secondary">
-							<span v-tooltip="entry.world?.name" class="min-w-0 truncate">
+							<span
+								v-if="showWorldColumn"
+								v-tooltip="entry.world?.name"
+								class="min-w-0 truncate"
+							>
 								{{ entry.world?.name ?? formatMessage(messages.serverScope) }}
 							</span>
-							<BulletDivider class="shrink-0" />
+							<BulletDivider v-if="showWorldColumn" class="shrink-0" />
 							<span v-tooltip="formatDate(entry.timestamp)" class="shrink-0">
 								{{ formatRelativeTime(entry.timestamp) }}
 							</span>
@@ -168,7 +172,12 @@
 
 				<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
 					<div
-						class="hidden min-h-14 bg-surface-3 @[800px]:grid @[800px]:h-14 @[800px]:grid-cols-[18%_52%_20%_10%] @[800px]:text-sm @[1040px]:text-base"
+						class="hidden min-h-14 bg-surface-3 @[800px]:grid @[800px]:h-14 @[800px]:text-sm @[1040px]:text-base"
+						:class="
+							showWorldColumn
+								? '@[800px]:grid-cols-[18%_52%_20%_10%]'
+								: '@[800px]:grid-cols-[18%_72%_10%]'
+						"
 					>
 						<div class="hidden items-center pl-4 pr-2 font-semibold text-secondary @[800px]:flex">
 							{{ formatMessage(messages.userColumn) }}
@@ -176,7 +185,10 @@
 						<div class="hidden items-center px-2 font-semibold text-secondary @[800px]:flex">
 							{{ formatMessage(messages.eventColumn) }}
 						</div>
-						<div class="hidden items-center px-2 font-semibold text-secondary @[800px]:flex">
+						<div
+							v-if="showWorldColumn"
+							class="hidden items-center px-2 font-semibold text-secondary @[800px]:flex"
+						>
 							<span class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold">
 								<span class="min-w-0 truncate">{{ formatMessage(messages.worldColumn) }}</span>
 								<Tooltip
@@ -226,7 +238,7 @@
 			<Transition name="audit-log-loading-fade">
 				<div
 					v-if="loading"
-					class="pointer-events-none absolute bottom-0 left-0 right-0 top-0 z-20 animate-audit-log-bpulse rounded-2xl bg-surface-3 @[800px]:top-14 @[800px]:rounded-t-none"
+					class="pointer-events-none absolute bottom-px left-px right-px top-0 z-20 animate-audit-log-bpulse rounded-[15px] bg-surface-3 @[800px]:top-[57px] @[800px]:rounded-t-none @[800px]:border-0 @[800px]:border-t @[800px]:border-solid @[800px]:border-surface-5"
 					aria-hidden="true"
 				/>
 			</Transition>
@@ -266,6 +278,7 @@ const props = defineProps<{
 	hasMore?: boolean
 	loading?: boolean
 	loadingMore?: boolean
+	showWorldColumn?: boolean
 	suppressRowTransitions?: boolean
 }>()
 
@@ -298,6 +311,7 @@ const suppressSortRowTransitions = ref(false)
 const loadMoreSentinel = ref<HTMLElement | null>(null)
 const contentBody = ref<HTMLElement | null>(null)
 const contentHeight = ref<number | null>(null)
+const showWorldColumn = computed(() => props.showWorldColumn !== false)
 let loadMoreObserver: IntersectionObserver | null = null
 let contentResizeObserver: ResizeObserver | null = null
 let sortTransitionResetTimeout: ReturnType<typeof setTimeout> | null = null
@@ -351,7 +365,7 @@ const messages = defineMessages({
 })
 
 const timeframePickerClass = computed(() =>
-	slots.filters ? '!w-full @[640px]:!w-[285px] shrink-0' : '!w-full @[640px]:!w-[285px]',
+	slots.filters ? '!w-full @[640px]:!w-[225px] shrink-0' : '!w-full @[640px]:!w-[225px]',
 )
 const timeframePickerTriggerClass =
 	'!h-10 !min-h-10 !w-full !rounded-[14px] !bg-surface-4 !py-2.5 !pl-4 !pr-3 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]'
@@ -398,18 +412,34 @@ watch(
 type AuditLogTableColumn = 'user' | 'event' | 'world' | 'time'
 type AuditLogTableRow = ServerAuditLogEntry & Record<string, unknown>
 
-const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => [
-	{ key: 'user', label: formatMessage(messages.userColumn), width: '18%' },
-	{ key: 'event', label: formatMessage(messages.eventColumn), width: '52%' },
-	{ key: 'world', label: formatMessage(messages.worldColumn), width: '20%' },
-	{
+const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => {
+	const tableColumns: TableColumn<AuditLogTableColumn>[] = [
+		{ key: 'user', label: formatMessage(messages.userColumn), width: '18%' },
+		{
+			key: 'event',
+			label: formatMessage(messages.eventColumn),
+			width: showWorldColumn.value ? '52%' : '72%',
+		},
+	]
+
+	if (showWorldColumn.value) {
+		tableColumns.push({
+			key: 'world',
+			label: formatMessage(messages.worldColumn),
+			width: '20%',
+		})
+	}
+
+	tableColumns.push({
 		key: 'time',
 		label: formatMessage(messages.timeColumn),
 		align: 'right',
 		enableSorting: true,
 		width: '10%',
-	},
-])
+	})
+
+	return tableColumns
+})
 const rowTransitionName = computed(() =>
 	props.suppressRowTransitions || suppressSortRowTransitions.value ? undefined : 'audit-log-row',
 )
@@ -420,11 +450,22 @@ const filteredEntries = computed(() => {
 	return props.entries
 		.filter((entry) => {
 			if (filters.value.userId && entry.actor.id !== filters.value.userId) return false
-			if (filters.value.worldId && entry.world?.id !== filters.value.worldId) return false
+			if (
+				showWorldColumn.value &&
+				filters.value.worldId &&
+				entry.world?.id !== filters.value.worldId
+			) {
+				return false
+			}
 
 			if (!normalizedQuery) return true
 
-			return [entry.actor.username, entry.world?.name, entry.event.searchText, entry.event.key]
+			return [
+				entry.actor.username,
+				showWorldColumn.value ? entry.world?.name : undefined,
+				entry.event.searchText,
+				entry.event.key,
+			]
 				.filter((value): value is string => typeof value === 'string' && value.length > 0)
 				.some((value) => value.toLowerCase().includes(normalizedQuery))
 		})
@@ -467,7 +508,7 @@ const hasActiveFilters = computed(
 		query.value.trim().length > 0 ||
 		hasActiveTimeframeFilter.value ||
 		!!filters.value.userId ||
-		!!filters.value.worldId,
+		(showWorldColumn.value && !!filters.value.worldId),
 )
 
 const emptyStateMessage = computed(() =>
