@@ -12,6 +12,7 @@ use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use url::Url;
 use validator::Validate;
 
 /// A project returned from the API
@@ -677,18 +678,20 @@ pub enum AttributionLicense {
 pub enum AttributionResolutionKind {
     License {
         license: AttributionLicense,
-        link_to_work: url::Url,
+        link_to_work: Url,
     },
     GloballyAllowed {
-        link_to_work: url::Url,
+        link_to_work: Url,
     },
     MyProject {
         license: AttributionLicense,
     },
     SpecialPermissions {
-        link_to_work: url::Url,
+        link_to_work: Url,
     },
-    NoPermission,
+    NoPermission {
+        link_to_work: Option<Url>,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
@@ -714,7 +717,7 @@ pub struct AttributionResolution {
     #[serde(default)]
     pub moderation_status: Option<AttributionModerationStatus>,
     pub notes: String,
-    pub image_urls: Vec<url::Url>,
+    pub image_urls: Vec<Url>,
 }
 
 /// A specific version of a project
@@ -985,9 +988,9 @@ pub struct Dependency {
 )]
 pub struct DependencyAttribution {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub link: Option<url::Url>,
+    pub link: Option<Url>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon_url: Option<url::Url>,
+    pub icon_url: Option<Url>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub license: Option<AttributionLicense>,
 }

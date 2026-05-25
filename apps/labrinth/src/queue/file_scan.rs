@@ -549,13 +549,18 @@ fn default_external_license_attribution(
                 })
                 .ok()
             }),
-        ApprovalType::No => serde_json::to_value(AttributionResolution {
-            kind: AttributionResolutionKind::NoPermission,
-            moderation_status: None,
-            notes: String::new(),
-            image_urls: Vec::new(),
-        })
-        .ok(),
+        ApprovalType::No => {
+            let link_to_work =
+                link.and_then(|link| url::Url::parse(&link).ok());
+
+            serde_json::to_value(AttributionResolution {
+                kind: AttributionResolutionKind::NoPermission { link_to_work },
+                moderation_status: None,
+                notes: String::new(),
+                image_urls: Vec::new(),
+            })
+            .ok()
+        }
         ApprovalType::PermanentNo | ApprovalType::Unidentified => None,
     }
 }

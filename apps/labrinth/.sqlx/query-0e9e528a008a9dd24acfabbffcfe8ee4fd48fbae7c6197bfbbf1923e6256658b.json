@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            mel.id,\n            mel.title,\n            mel.status,\n            mel.link,\n            mel.exceptions,\n            mel.proof,\n            mel.flame_project_id,\n            mel.inserted_at,\n            mel.inserted_by,\n            mel.updated_at,\n            mel.updated_by\n        FROM moderation_external_licenses mel\n        WHERE ($1::text IS NULL OR mel.title ILIKE '%' || $1 || '%')\n          AND ($2::integer IS NULL OR mel.flame_project_id = $2)\n        ORDER BY mel.id\n        ",
+  "query": "\n        SELECT\n            mel.id,\n            mel.title,\n            mel.status,\n            mel.link,\n            mel.exceptions,\n            mel.proof,\n            mel.flame_project_id,\n            mel.inserted_at,\n            mel.inserted_by,\n            mel.updated_at,\n            mel.updated_by\n        FROM moderation_external_licenses mel\n        WHERE ($1::text IS NULL OR mel.title ILIKE '%' || $1 || '%')\n          AND (\n            ($2::integer IS NULL AND $3::integer[] IS NULL)\n            OR mel.flame_project_id = $2\n            OR mel.flame_project_id = ANY($3)\n          )\n        ORDER BY mel.id\n        ",
   "describe": {
     "columns": [
       {
@@ -62,7 +62,8 @@
     "parameters": {
       "Left": [
         "Text",
-        "Int4"
+        "Int4",
+        "Int4Array"
       ]
     },
     "nullable": [
@@ -79,5 +80,5 @@
       true
     ]
   },
-  "hash": "6542c79dffa73e462c527f1bd4ba67e658814d7a788259dc4b3874c54cb5ae57"
+  "hash": "0e9e528a008a9dd24acfabbffcfe8ee4fd48fbae7c6197bfbbf1923e6256658b"
 }

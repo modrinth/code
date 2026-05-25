@@ -283,6 +283,7 @@ export namespace Labrinth {
 				  })
 				| (AttributionResolutionBase & {
 						kind: 'no_permission'
+						link_to_work?: string
 				  })
 
 			export type FlameProject = {
