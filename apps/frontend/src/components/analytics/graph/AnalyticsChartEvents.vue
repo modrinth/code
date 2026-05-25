@@ -20,12 +20,12 @@
 			v-for="group in eventGroups"
 			:key="group.id"
 			type="button"
-			class="pointer-events-auto absolute -top-[26px] left-0 z-20 inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-full bg-surface-3 px-1 text-secondary shadow-lg transition-colors hover:text-contrast focus-visible:border-brand focus-visible:text-contrast"
+			class="pointer-events-auto absolute -top-[26px] left-0 z-20 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 text-secondary shadow-lg transition-colors hover:text-contrast focus-visible:border-brand focus-visible:text-contrast"
 			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : ''"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"
 			@click.stop
-			@mouseenter="showHoveredGroup(group.id)"
+			@mouseenter="scheduleHoveredGroupOpen(group.id)"
 			@mouseleave="scheduleHoverClose"
 			@focus="showHoveredGroup(group.id)"
 			@blur="scheduleHoverClose"
@@ -121,6 +121,7 @@ const GROUP_DISTANCE_PX = 32
 const MARKER_HEIGHT_PX = 28
 const TOOLTIP_OFFSET_PX = 8
 const EDGE_PADDING_PX = 8
+const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 120
 const EVENT_RANGE_DATE_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'long',
@@ -156,6 +157,7 @@ const chartRect = reactive({
 	top: 0,
 })
 let closeTimeout: ReturnType<typeof setTimeout> | null = null
+let openTimeout: ReturnType<typeof setTimeout> | null = null
 
 const chartStartMs = computed(() => props.chartStart?.getTime() ?? null)
 const chartEndMs = computed(() => props.chartEnd?.getTime() ?? null)
@@ -408,13 +410,37 @@ function clearCloseTimeout() {
 	closeTimeout = null
 }
 
+function clearOpenTimeout() {
+	if (!openTimeout) return
+	clearTimeout(openTimeout)
+	openTimeout = null
+}
+
 function showHoveredGroup(groupId: string) {
+	clearOpenTimeout()
 	clearCloseTimeout()
 	updateChartRect()
 	hoveredGroupId.value = groupId
 }
 
+function scheduleHoveredGroupOpen(groupId: string) {
+	clearOpenTimeout()
+	clearCloseTimeout()
+	if (hoveredGroupId.value === groupId) {
+		updateChartRect()
+		return
+	}
+
+	hoveredGroupId.value = null
+	isTooltipHovered.value = false
+	openTimeout = setTimeout(() => {
+		showHoveredGroup(groupId)
+		openTimeout = null
+	}, OPEN_DELAY_MS)
+}
+
 function scheduleHoverClose() {
+	clearOpenTimeout()
 	clearCloseTimeout()
 	closeTimeout = setTimeout(() => {
 		if (!isTooltipHovered.value) {
@@ -425,12 +451,14 @@ function scheduleHoverClose() {
 }
 
 function clearActiveGroup() {
+	clearOpenTimeout()
 	clearCloseTimeout()
 	hoveredGroupId.value = null
 	isTooltipHovered.value = false
 }
 
 function onTooltipMouseEnter() {
+	clearOpenTimeout()
 	clearCloseTimeout()
 	isTooltipHovered.value = true
 }
@@ -513,6 +541,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+	clearOpenTimeout()
 	clearCloseTimeout()
 	window.removeEventListener('resize', updateChartRect)
 	window.removeEventListener('scroll', updateChartRect, true)

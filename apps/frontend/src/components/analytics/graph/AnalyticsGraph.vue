@@ -163,13 +163,10 @@
 							:aria-id="monetizationPopoverId"
 							no-auto-focus
 						>
-							<button
-								type="button"
-								class="-ml-1 mt-px inline-flex items-center justify-center rounded-full border-0 bg-transparent p-0 text-secondary transition-all hover:text-contrast focus-visible:text-contrast"
+							<InfoIcon
+								class="-ml-1 mt-px inline-flex size-4 items-center justify-center rounded-full border-0 bg-transparent p-0 text-secondary transition-all hover:text-contrast focus-visible:text-contrast"
 								aria-label="View monetized analytics details"
-							>
-								<InfoIcon class="size-4" />
-							</button>
+							/>
 							<template #popper>
 								<div
 									role="dialog"
