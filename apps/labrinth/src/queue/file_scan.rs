@@ -232,13 +232,9 @@ pub enum OverrideResolution {
         id: i64,
         status: ApprovalType,
         link: Option<String>,
+        flame_project: Option<AttributionFlameProject>,
     },
-    Flame {
-        project_id: u32,
-        title: String,
-        url: String,
-        icon_url: String,
-    },
+    Flame(AttributionFlameProject),
     Unknown,
 }
 
@@ -333,6 +329,7 @@ async fn persist_attribution_results(
         i64,
         ApprovalType,
         Option<String>,
+        Option<AttributionFlameProject>,
     )> = Vec::new();
     let mut unknown_files: Vec<&OverrideFile> = Vec::new();
 
@@ -346,15 +343,22 @@ async fn persist_attribution_results(
 
         match resolved.get(&file.sha1) {
             Some(OverrideResolution::OnModrinth) => continue,
-            Some(OverrideResolution::ExternalLicense { id, status, link }) => {
-                external_license_files.push((file, *id, *status, link.clone()));
+            Some(OverrideResolution::ExternalLicense {
+                id,
+                status,
+                link,
+                flame_project,
+            }) => {
+                external_license_files.push((
+                    file,
+                    *id,
+                    *status,
+                    link.clone(),
+                    flame_project.clone(),
+                ));
             }
-            Some(
-                res @ OverrideResolution::Flame {
-                    project_id: fp_id, ..
-                },
-            ) => {
-                let entry = flame_groups.entry(*fp_id).or_default();
+            Some(res @ OverrideResolution::Flame(flame_project)) => {
+                let entry = flame_groups.entry(flame_project.id).or_default();
                 entry.0.push(file);
                 if entry.1.is_none() {
                     entry.1 = Some(res);
@@ -366,18 +370,23 @@ async fn persist_attribution_results(
         }
     }
 
-    for (file, external_license_id, status, link) in external_license_files {
+    for (file, external_license_id, status, link, flame_project) in
+        external_license_files
+    {
         let attribution = default_external_license_attribution(status, link);
+        let flame_project =
+            flame_project.and_then(|fp| serde_json::to_value(fp).ok());
         let group_id = generate_attribution_group_id(&mut *txn).await?;
         sqlx::query!(
-            "
-            insert into project_attribution_groups (id, project_id, attribution)
-            values ($1, $2, $3)
+			"
+            insert into project_attribution_groups (id, project_id, attribution, flame_project)
+            values ($1, $2, $3, $4)
             ",
-            group_id as DBAttributionGroupId,
-            project_id as DBProjectId,
-            attribution,
-        )
+			group_id as DBAttributionGroupId,
+			project_id as DBProjectId,
+			attribution,
+			flame_project,
+		)
         .execute(&mut *txn)
         .await
         .wrap_err("inserting external license attribution group")?;
@@ -427,22 +436,8 @@ async fn persist_attribution_results(
         } else {
             let fp = resolution
                 .and_then(|r| {
-                    if let OverrideResolution::Flame {
-                        project_id,
-                        title,
-                        url,
-                        icon_url,
-                    } = r
-                    {
-                        Some(
-                            serde_json::to_value(AttributionFlameProject {
-                                id: *project_id,
-                                title: title.clone(),
-                                url: url.clone(),
-                                icon_url: icon_url.clone(),
-                            })
-                            .ok(),
-                        )
+                    if let OverrideResolution::Flame(flame_project) = r {
+                        Some(serde_json::to_value(flame_project).ok())
                     } else {
                         None
                     }
@@ -615,7 +610,7 @@ async fn resolve_overrides(
     }
 
     let rows = sqlx::query!(
-        "
+		"
         SELECT encode(mef.sha1, 'escape') sha1, mel.id, mel.status status, mel.link
         FROM moderation_external_files mef
         INNER JOIN moderation_external_licenses mel ON mef.external_license_id = mel.id
@@ -627,29 +622,22 @@ async fn resolve_overrides(
             .collect::<Vec<_>>()
     )
     .fetch_all(&mut *txn)
-    .await
-    .wrap_err("fetching external file licenses")?;
+	.await
+	.wrap_err("fetching external file licenses")?;
 
+    let mut direct_external_licenses = HashMap::new();
     for row in rows {
-        if let Some(sha1) = row.sha1
-            && let Some(pos) =
-                remaining.iter().position(|i| overrides[*i].sha1 == sha1)
-        {
-            let idx = remaining.remove(pos);
-            results.insert(
-                overrides[idx].sha1.clone(),
-                OverrideResolution::ExternalLicense {
-                    id: row.id,
-                    status: ApprovalType::from_string(&row.status)
+        if let Some(sha1) = row.sha1 {
+            direct_external_licenses.insert(
+                sha1,
+                (
+                    row.id,
+                    ApprovalType::from_string(&row.status)
                         .unwrap_or(ApprovalType::Unidentified),
-                    link: row.link,
-                },
+                    row.link,
+                ),
             );
         }
-    }
-
-    if remaining.is_empty() {
-        return Ok(results);
     }
 
     let fingerprints: Vec<u32> =
@@ -696,7 +684,7 @@ async fn resolve_overrides(
             }
         }
 
-        let rows = sqlx::query!(
+        let project_license_rows = sqlx::query!(
             "
             SELECT mel.id, mel.flame_project_id, mel.status status, mel.link
             FROM moderation_external_licenses mel
@@ -708,35 +696,104 @@ async fn resolve_overrides(
         .await
         .wrap_err("fetching Flame project licenses")?;
 
+        let mut project_external_licenses = HashMap::new();
+        for row in project_license_rows {
+            if let Some(flame_project_id) = row.flame_project_id {
+                project_external_licenses.insert(
+                    flame_project_id as u32,
+                    (
+                        row.id,
+                        ApprovalType::from_string(&row.status)
+                            .unwrap_or(ApprovalType::Unidentified),
+                        row.link,
+                    ),
+                );
+            }
+        }
+
+        let flame_projects_res = HTTP_CLIENT
+            .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
+            .json(&serde_json::json!({
+                "modIds": flame_matches.iter().map(|x| x.1).collect::<Vec<_>>()
+            }))
+            .send()
+            .await;
+
+        let flame_projects = match flame_projects_res {
+            Ok(res) => res
+                .text()
+                .await
+                .ok()
+                .and_then(|t| {
+                    serde_json::from_str::<FlameResponse<Vec<FlameProject>>>(&t)
+                        .ok()
+                })
+                .map(|x| x.data)
+                .unwrap_or_default(),
+            Err(e) => {
+                warn!("Flame projects request failed: {e}");
+                Vec::new()
+            }
+        };
+
         let mut insert_hashes = Vec::new();
         let mut insert_filenames = Vec::new();
         let mut insert_ids = Vec::new();
 
-        for row in &rows {
-            if let Some((curse_idx, (hash, _))) = flame_matches
-                .iter()
-                .enumerate()
-                .find(|(_, x)| Some(x.1 as i32) == row.flame_project_id)
-                && let Some(remaining_pos) =
-                    remaining.iter().position(|i| overrides[*i].sha1 == *hash)
+        for (sha1, flame_project_id) in &flame_matches {
+            if let Some(remaining_pos) =
+                remaining.iter().position(|i| overrides[*i].sha1 == *sha1)
             {
                 let idx = remaining.remove(remaining_pos);
+                let project =
+                    flame_projects.iter().find(|p| p.id == *flame_project_id);
+                let flame_project = AttributionFlameProject {
+                    id: *flame_project_id,
+                    title: project.map(|p| p.name.clone()).unwrap_or_else(
+                        || format!("Flame project {flame_project_id}"),
+                    ),
+                    url: project
+                        .map(|p| p.links.website_url.clone())
+                        .unwrap_or_default(),
+                    icon_url: project
+                        .map(|p| p.logo.thumbnail_url.clone())
+                        .unwrap_or_default(),
+                };
 
-                results.insert(
-                    overrides[idx].sha1.clone(),
-                    OverrideResolution::ExternalLicense {
-                        id: row.id,
-                        status: ApprovalType::from_string(&row.status)
-                            .unwrap_or(ApprovalType::Unidentified),
-                        link: row.link.clone(),
-                    },
-                );
+                if let Some((id, status, link)) =
+                    direct_external_licenses.remove(&overrides[idx].sha1)
+                {
+                    results.insert(
+                        overrides[idx].sha1.clone(),
+                        OverrideResolution::ExternalLicense {
+                            id,
+                            status,
+                            link,
+                            flame_project: Some(flame_project),
+                        },
+                    );
+                } else if let Some((id, status, link)) =
+                    project_external_licenses.get(flame_project_id)
+                {
+                    results.insert(
+                        overrides[idx].sha1.clone(),
+                        OverrideResolution::ExternalLicense {
+                            id: *id,
+                            status: *status,
+                            link: link.clone(),
+                            flame_project: Some(flame_project),
+                        },
+                    );
 
-                insert_hashes.push(overrides[idx].sha1.as_bytes().to_vec());
-                insert_filenames.push(Some(overrides[idx].path.clone()));
-                insert_ids.push(row.id);
-
-                flame_matches.remove(curse_idx);
+                    insert_hashes.push(overrides[idx].sha1.as_bytes().to_vec());
+                    insert_filenames.push(Some(overrides[idx].path.clone()));
+                    insert_ids.push(*id);
+                } else {
+                    results.insert(
+                        overrides[idx].sha1.clone(),
+                        OverrideResolution::Flame(flame_project),
+                    );
+                }
             }
         }
 
@@ -751,66 +808,26 @@ async fn resolve_overrides(
             .await
             .wrap_err("inserting external license files")?;
         }
-
-        if !flame_matches.is_empty() {
-            let flame_projects_res = HTTP_CLIENT
-                .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
-                .json(&serde_json::json!({
-                    "modIds": flame_matches.iter().map(|x| x.1).collect::<Vec<_>>()
-                }))
-                .send()
-                .await;
-
-            let flame_projects = match flame_projects_res {
-                Ok(res) => res
-                    .text()
-                    .await
-                    .ok()
-                    .and_then(|t| {
-                        serde_json::from_str::<
-                                FlameResponse<Vec<FlameProject>>,
-                            >(&t)
-                            .ok()
-                    })
-                    .map(|x| x.data)
-                    .unwrap_or_default(),
-                Err(e) => {
-                    warn!("Flame projects request failed: {e}");
-                    Vec::new()
-                }
-            };
-
-            for (sha1, flame_project_id) in &flame_matches {
-                if let Some(pos) =
-                    remaining.iter().position(|i| overrides[*i].sha1 == *sha1)
-                {
-                    let idx = remaining.remove(pos);
-
-                    let project = flame_projects
-                        .iter()
-                        .find(|p| p.id == *flame_project_id);
-
-                    results.insert(
-                        overrides[idx].sha1.clone(),
-                        OverrideResolution::Flame {
-                            project_id: *flame_project_id,
-                            title: project
-                                .map(|p| p.name.clone())
-                                .unwrap_or_else(|| {
-                                    format!("Flame project {flame_project_id}")
-                                }),
-                            url: project
-                                .map(|p| p.links.website_url.clone())
-                                .unwrap_or_default(),
-                            icon_url: project
-                                .map(|p| p.logo.thumbnail_url.clone())
-                                .unwrap_or_default(),
-                        },
-                    );
-                }
-            }
-        }
     }
+
+    remaining.retain(|idx| {
+        if let Some((id, status, link)) =
+            direct_external_licenses.remove(&overrides[*idx].sha1)
+        {
+            results.insert(
+                overrides[*idx].sha1.clone(),
+                OverrideResolution::ExternalLicense {
+                    id,
+                    status,
+                    link,
+                    flame_project: None,
+                },
+            );
+            false
+        } else {
+            true
+        }
+    });
 
     for idx in remaining {
         results
