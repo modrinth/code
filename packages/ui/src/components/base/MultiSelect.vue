@@ -250,7 +250,7 @@
 											<button
 												v-if="hasSelectableSectionHeaderOptions(item)"
 												type="button"
-												class="shrink-0 border-0 bg-transparent p-0 text-sm font-medium text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
+												class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
 												@click.stop="toggleSectionHeaderOptions(item)"
 												@keydown.enter.stop
 												@keydown.space.stop

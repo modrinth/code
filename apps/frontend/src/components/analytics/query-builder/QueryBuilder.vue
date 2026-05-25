@@ -32,6 +32,10 @@
 									loading="lazy"
 									decoding="async"
 								/>
+								<LayersIcon
+									v-else-if="isAllProjectsOptionSelected || areAllProjectsSelected"
+									class="size-6 shrink-0 text-primary"
+								/>
 								<BoxIcon v-else class="size-6 shrink-0 text-primary" />
 								<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-semibold text-primary">
 									{{ selectedProjectLabel }}
