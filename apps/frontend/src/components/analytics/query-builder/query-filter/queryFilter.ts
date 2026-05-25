@@ -100,6 +100,8 @@ export type FilterOption = {
 	searchTerms?: string[]
 }
 
+type AnalyticsBreakdownInput = AnalyticsBreakdownPreset | readonly AnalyticsBreakdownPreset[]
+
 function intersectAnalyticsStats(
 	left: readonly AnalyticsDashboardStat[],
 	right: readonly AnalyticsDashboardStat[],
@@ -127,6 +129,40 @@ export function getAnalyticsStatsForBreakdown(
 	return getAnalyticsStatsForDimension(ANALYTICS_DIMENSION_BY_BREAKDOWN[breakdown])
 }
 
+function normalizeAnalyticsBreakdowns(
+	breakdowns: AnalyticsBreakdownInput,
+): Exclude<AnalyticsBreakdownPreset, 'none'>[] {
+	const values = Array.isArray(breakdowns) ? breakdowns : [breakdowns]
+	const normalizedBreakdowns: Exclude<AnalyticsBreakdownPreset, 'none'>[] = []
+
+	for (const breakdown of values) {
+		if (breakdown === 'none') {
+			continue
+		}
+		if (!normalizedBreakdowns.includes(breakdown)) {
+			normalizedBreakdowns.push(breakdown)
+		}
+	}
+
+	return normalizedBreakdowns
+}
+
+export function getAnalyticsStatsForBreakdowns(
+	breakdowns: AnalyticsBreakdownInput,
+): readonly AnalyticsDashboardStat[] {
+	const normalizedBreakdowns = normalizeAnalyticsBreakdowns(breakdowns)
+	if (normalizedBreakdowns.length === 0) {
+		return getAnalyticsStatsForBreakdown('none')
+	}
+
+	let stats = [...getAnalyticsStatsForBreakdown(normalizedBreakdowns[0])]
+	for (const breakdown of normalizedBreakdowns.slice(1)) {
+		stats = intersectAnalyticsStats(stats, getAnalyticsStatsForBreakdown(breakdown))
+	}
+
+	return stats
+}
+
 export function getAnalyticsStatsForFilterCategory(
 	category: AnalyticsQueryFilterCategory,
 ): readonly AnalyticsDashboardStat[] {
@@ -144,11 +180,11 @@ export function getAnalyticsFilterCategoryForBreakdown(
 }
 
 function getAnalyticsStatsForFilterScope(
-	breakdown: AnalyticsBreakdownPreset,
+	breakdowns: AnalyticsBreakdownInput,
 	filters: AnalyticsSelectedFilters,
 	ignoredCategory?: AnalyticsQueryFilterCategory,
 ): readonly AnalyticsDashboardStat[] {
-	let stats = [...getAnalyticsStatsForBreakdown(breakdown)]
+	let stats = [...getAnalyticsStatsForBreakdowns(breakdowns)]
 
 	for (const category of FILTER_VALUE_CATEGORIES) {
 		if (category === ignoredCategory || filters[category].length === 0) {
@@ -162,30 +198,30 @@ function getAnalyticsStatsForFilterScope(
 }
 
 export function getEnabledAnalyticsStatsForState(
-	breakdown: AnalyticsBreakdownPreset,
+	breakdowns: AnalyticsBreakdownInput,
 	filters: AnalyticsSelectedFilters,
 ): readonly AnalyticsDashboardStat[] {
-	return getAnalyticsStatsForFilterScope(breakdown, filters)
+	return getAnalyticsStatsForFilterScope(breakdowns, filters)
 }
 
 export function getVisibleAnalyticsFilterCategoriesForState(
-	breakdown: AnalyticsBreakdownPreset,
+	breakdowns: AnalyticsBreakdownInput,
 	filters: AnalyticsSelectedFilters,
 ): readonly Exclude<AnalyticsQueryFilterCategory, 'project'>[] {
 	return FILTER_VALUE_CATEGORIES.filter((category) =>
 		haveAnalyticsStatOverlap(
-			getAnalyticsStatsForFilterScope(breakdown, filters, category),
+			getAnalyticsStatsForFilterScope(breakdowns, filters, category),
 			getAnalyticsStatsForFilterCategory(category),
 		),
 	)
 }
 
 export function sanitizeAnalyticsSelectedFilters(
-	breakdown: AnalyticsBreakdownPreset,
+	breakdowns: AnalyticsBreakdownInput,
 	filters: AnalyticsSelectedFilters,
 ): AnalyticsSelectedFilters {
 	const nextFilters = cloneSelectedFilters(filters)
-	let availableStats = [...getAnalyticsStatsForBreakdown(breakdown)]
+	let availableStats = [...getAnalyticsStatsForBreakdowns(breakdowns)]
 
 	for (const category of FILTER_VALUE_CATEGORIES) {
 		if (filters[category].length === 0) {

@@ -184,7 +184,10 @@ import {
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
-import { getDefaultAnalyticsBreakdownPreset } from '~/providers/analytics/query-builder-url'
+import {
+	areStringArraysEqual,
+	getDefaultAnalyticsBreakdownPresets,
+} from '~/providers/analytics/query-builder-url'
 
 import { getDownloadSourceLabel } from '../../breakdown'
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
@@ -216,7 +219,7 @@ const {
 	gameVersionDownloadsByVersion,
 	countryDownloadsByCode,
 	isAnalyticsFilterOptionsLoading,
-	selectedBreakdown,
+	selectedBreakdowns,
 	selectedFilters,
 	queryResetToken,
 	refreshAnalyticsQuery,
@@ -284,10 +287,10 @@ const projectVersionOptionProjectMetadataById = computed(() => {
 	return metadataById
 })
 const defaultSelectedBreakdown = computed(() =>
-	getDefaultAnalyticsBreakdownPreset(selectedProjectIds.value),
+	getDefaultAnalyticsBreakdownPresets(selectedProjectIds.value),
 )
 const canClearSelectedBreakdown = computed(
-	() => selectedBreakdown.value !== defaultSelectedBreakdown.value,
+	() => !areStringArraysEqual(selectedBreakdowns.value, defaultSelectedBreakdown.value),
 )
 const analyticsFilterOptionsEmptyLabel = computed(() =>
 	isAnalyticsFilterOptionsLoading.value ? 'Loading...' : undefined,
@@ -320,7 +323,7 @@ function getSelectedFilterBarValue(): AnalyticsSelectedFilters {
 }
 
 function clearSelectedBreakdown() {
-	selectedBreakdown.value = defaultSelectedBreakdown.value
+	selectedBreakdowns.value = defaultSelectedBreakdown.value
 }
 
 function clearFilterBar() {
@@ -375,7 +378,7 @@ function waitForDeferredQueryFilterCommit(): Promise<void> {
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const visibleCategoryKeys = new Set(
-		getVisibleAnalyticsFilterCategoriesForState(selectedBreakdown.value, selectedFilters.value),
+		getVisibleAnalyticsFilterCategoriesForState(selectedBreakdowns.value, selectedFilters.value),
 	)
 	const categories: DropdownFilterBarCategory[] = []
 

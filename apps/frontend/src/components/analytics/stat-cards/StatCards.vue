@@ -30,7 +30,7 @@ const {
 	currentTotals,
 	percentChanges,
 	hasPreviousPeriodComparison,
-	selectedBreakdown,
+	selectedBreakdowns,
 	isAnalyticsDashboardStatRelevant,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
@@ -83,7 +83,7 @@ const statCards = computed<
 		statLabel: formatStatNumber(currentTotals.value.views),
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.views),
 		icon: 'eye',
-		disabled: !isAnalyticsDashboardStatRelevant('views', selectedBreakdown.value),
+		disabled: !isAnalyticsDashboardStatRelevant('views', selectedBreakdowns.value),
 	},
 	{
 		key: 'downloads',
@@ -91,7 +91,7 @@ const statCards = computed<
 		statLabel: formatStatNumber(currentTotals.value.downloads),
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.downloads),
 		icon: 'download',
-		disabled: !isAnalyticsDashboardStatRelevant('downloads', selectedBreakdown.value),
+		disabled: !isAnalyticsDashboardStatRelevant('downloads', selectedBreakdowns.value),
 	},
 	{
 		key: 'revenue',
@@ -99,7 +99,7 @@ const statCards = computed<
 		statLabel: `$${formatStatNumber(currentTotals.value.revenue)}`,
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.revenue),
 		icon: 'dollar',
-		disabled: !isAnalyticsDashboardStatRelevant('revenue', selectedBreakdown.value),
+		disabled: !isAnalyticsDashboardStatRelevant('revenue', selectedBreakdowns.value),
 	},
 	{
 		key: 'playtime',
@@ -107,7 +107,7 @@ const statCards = computed<
 		statLabel: `${formatStatNumber(currentTotals.value.playtime / 3600)} hrs`,
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.playtime),
 		icon: 'clock',
-		disabled: !isAnalyticsDashboardStatRelevant('playtime', selectedBreakdown.value),
+		disabled: !isAnalyticsDashboardStatRelevant('playtime', selectedBreakdowns.value),
 	},
 ])
 </script>

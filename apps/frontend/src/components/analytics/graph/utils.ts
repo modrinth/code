@@ -10,7 +10,13 @@ import {
 	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
-import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
+import {
+	ALL_BREAKDOWN_VALUE,
+	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
+	getAnalyticsBreakdownDatasetId,
+	getAnalyticsBreakdownKey,
+	getAnalyticsBreakdownValues,
+} from '../breakdown'
 
 export type ChartDataset = {
 	projectId: string
@@ -114,14 +120,53 @@ export function formatBreakdownLabel(
 	return breakdownValue
 }
 
+export function formatBreakdownLabels(
+	breakdownValues: readonly string[],
+	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
+): string {
+	return collapseRepeatedUnknownBreakdownLabels(
+		selectedBreakdowns
+			.filter((breakdown) => breakdown !== 'none')
+			.map((breakdown, index) =>
+				formatBreakdownLabel(breakdownValues[index] ?? '', breakdown, getVersionDisplayName),
+			),
+	).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
+}
+
+function collapseRepeatedUnknownBreakdownLabels(labels: string[]): string[] {
+	let hasUnknownLabel = false
+	const collapsedLabels: string[] = []
+
+	for (const label of labels) {
+		if (label === UNKNOWN_BREAKDOWN_LABEL) {
+			if (hasUnknownLabel) {
+				continue
+			}
+			hasUnknownLabel = true
+		}
+
+		collapsedLabels.push(label)
+	}
+
+	return collapsedLabels
+}
+
 export function shouldCapitalizeBreakdownLabel(
-	selectedBreakdown: AnalyticsBreakdownPreset,
+	selectedBreakdown: AnalyticsBreakdownPreset | readonly AnalyticsBreakdownPreset[],
 ): boolean {
+	const selectedBreakdowns = Array.isArray(selectedBreakdown)
+		? selectedBreakdown
+		: [selectedBreakdown]
 	return (
-		selectedBreakdown === 'download_reason' ||
-		selectedBreakdown === 'monetization' ||
-		selectedBreakdown === 'loader' ||
-		selectedBreakdown === 'country'
+		selectedBreakdowns.length > 0 &&
+		selectedBreakdowns.every(
+			(breakdown) =>
+				breakdown === 'download_reason' ||
+				breakdown === 'monetization' ||
+				breakdown === 'loader' ||
+				breakdown === 'country',
+		)
 	)
 }
 
@@ -213,7 +258,7 @@ export function buildChartDatasets(
 	selectedProjects: AnalyticsDashboardProject[],
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
-	selectedBreakdown: AnalyticsBreakdownPreset,
+	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
 	selectedFilters: AnalyticsSelectedFilters,
 	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
 	getVersionProjectName?: (versionId: string) => string | undefined,
@@ -226,9 +271,28 @@ export function buildChartDatasets(
 
 	const dataLength = Math.max(sliceCount, timeSlices.length)
 	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
+	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
+	const projectNamesById = new Map(selectedProjects.map((project) => [project.id, project.name]))
 
-	if (selectedBreakdown !== 'none' && selectedBreakdown !== 'project') {
+	function formatChartBreakdownLabels(breakdownValues: readonly string[]): string {
+		return collapseRepeatedUnknownBreakdownLabels(
+			normalizedBreakdowns.map((breakdown, index) => {
+				const breakdownValue = breakdownValues[index] ?? ''
+				if (breakdown === 'project') {
+					return projectNamesById.get(breakdownValue) ?? breakdownValue
+				}
+
+				return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName)
+			}),
+		).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
+	}
+
+	if (
+		normalizedBreakdowns.length > 0 &&
+		!(normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'project')
+	) {
 		const dataByBreakdown = new Map<string, number[]>()
+		const breakdownValuesByKey = new Map<string, string[]>()
 		const downloadTotalsByBreakdown = new Map<string, number>()
 
 		timeSlices.forEach((slice, sliceIndex) => {
@@ -236,46 +300,60 @@ export function buildChartDatasets(
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
 				if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
-				const breakdownValue = getAnalyticsBreakdownValue(point, selectedBreakdown)
-				if (breakdownValue === ALL_BREAKDOWN_VALUE) continue
+				const breakdownValues = getAnalyticsBreakdownValues(point, normalizedBreakdowns)
+				if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
+					continue
+				}
+				const breakdownKey = getAnalyticsBreakdownKey(breakdownValues)
 
-				if (!dataByBreakdown.has(breakdownValue)) {
-					dataByBreakdown.set(breakdownValue, new Array(dataLength).fill(0))
+				if (!dataByBreakdown.has(breakdownKey)) {
+					dataByBreakdown.set(breakdownKey, new Array(dataLength).fill(0))
+					breakdownValuesByKey.set(breakdownKey, breakdownValues)
 				}
 
 				if (point.metric_kind === 'downloads') {
 					downloadTotalsByBreakdown.set(
-						breakdownValue,
-						(downloadTotalsByBreakdown.get(breakdownValue) ?? 0) +
-							getMetricValue(point, 'downloads'),
+						breakdownKey,
+						(downloadTotalsByBreakdown.get(breakdownKey) ?? 0) + getMetricValue(point, 'downloads'),
 					)
 				}
 
 				if (!isMetricKindForStat(point, activeStat)) continue
 
-				const breakdownData = dataByBreakdown.get(breakdownValue)
+				const breakdownData = dataByBreakdown.get(breakdownKey)
 				if (!breakdownData) continue
 				breakdownData[sliceIndex] += getMetricValue(point, activeStat)
 			}
 		})
 
 		const colorsByBreakdown = buildPaletteColorsByDownloadRank(
-			Array.from(dataByBreakdown.keys()).map((breakdownValue) => ({
-				key: breakdownValue,
-				label: formatBreakdownLabel(breakdownValue, selectedBreakdown, getVersionDisplayName),
-				total: downloadTotalsByBreakdown.get(breakdownValue) ?? 0,
+			Array.from(dataByBreakdown.keys()).map((breakdownKey) => ({
+				key: breakdownKey,
+				label: formatChartBreakdownLabels(breakdownValuesByKey.get(breakdownKey) ?? []),
+				total: downloadTotalsByBreakdown.get(breakdownKey) ?? 0,
 			})),
 			palette,
 		)
 
-		return Array.from(dataByBreakdown.entries()).map(([breakdownValue, data]) => {
-			const fallbackColor = colorsByBreakdown.get(breakdownValue) ?? ''
-			const color = getBreakdownColor(breakdownValue, selectedBreakdown, fallbackColor, palette)
+		return Array.from(dataByBreakdown.entries()).map(([breakdownKey, data]) => {
+			const breakdownValues = breakdownValuesByKey.get(breakdownKey) ?? []
+			const fallbackColor = colorsByBreakdown.get(breakdownKey) ?? ''
+			const color =
+				normalizedBreakdowns.length === 1
+					? getBreakdownColor(
+							breakdownValues[0] ?? '',
+							normalizedBreakdowns[0],
+							fallbackColor,
+							palette,
+						)
+					: fallbackColor
 			return {
-				projectId: `breakdown:${breakdownValue}`,
-				label: formatBreakdownLabel(breakdownValue, selectedBreakdown, getVersionDisplayName),
+				projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
+				label: formatChartBreakdownLabels(breakdownValues),
 				projectName:
-					selectedBreakdown === 'version_id' ? getVersionProjectName?.(breakdownValue) : undefined,
+					normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
+						? getVersionProjectName?.(breakdownValues[0] ?? '')
+						: undefined,
 				data,
 				borderColor: color,
 				backgroundColor: color,
@@ -283,7 +361,7 @@ export function buildChartDatasets(
 		})
 	}
 
-	if (selectedBreakdown === 'none') {
+	if (normalizedBreakdowns.length === 0) {
 		const data = new Array(dataLength).fill(0)
 		let downloadTotal = 0
 
@@ -326,11 +404,15 @@ export function buildChartDatasets(
 		]
 	}
 
-	const dataByProjectId = new Map<string, number[]>()
-	const downloadTotalsByProjectId = new Map<string, number>()
+	const dataByProjectBreakdown = new Map<string, number[]>()
+	const breakdownValuesByKey = new Map<string, string[]>()
+	const downloadTotalsByProjectBreakdown = new Map<string, number>()
 	for (const project of selectedProjects) {
-		dataByProjectId.set(project.id, new Array(dataLength).fill(0))
-		downloadTotalsByProjectId.set(project.id, 0)
+		const breakdownValues = [project.id]
+		const breakdownKey = getAnalyticsBreakdownKey(breakdownValues)
+		dataByProjectBreakdown.set(breakdownKey, new Array(dataLength).fill(0))
+		breakdownValuesByKey.set(breakdownKey, breakdownValues)
+		downloadTotalsByProjectBreakdown.set(breakdownKey, 0)
 	}
 
 	timeSlices.forEach((slice, sliceIndex) => {
@@ -338,38 +420,63 @@ export function buildChartDatasets(
 			if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
 			if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
+			const breakdownValues = getAnalyticsBreakdownValues(point, normalizedBreakdowns)
+			if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
+				continue
+			}
+			const breakdownKey = getAnalyticsBreakdownKey(breakdownValues)
+			if (!dataByProjectBreakdown.has(breakdownKey)) {
+				dataByProjectBreakdown.set(breakdownKey, new Array(dataLength).fill(0))
+				breakdownValuesByKey.set(breakdownKey, breakdownValues)
+				downloadTotalsByProjectBreakdown.set(breakdownKey, 0)
+			}
+
 			if (point.metric_kind === 'downloads') {
-				downloadTotalsByProjectId.set(
-					point.source_project,
-					(downloadTotalsByProjectId.get(point.source_project) ?? 0) +
+				downloadTotalsByProjectBreakdown.set(
+					breakdownKey,
+					(downloadTotalsByProjectBreakdown.get(breakdownKey) ?? 0) +
 						getMetricValue(point, 'downloads'),
 				)
 			}
 
 			if (!isMetricKindForStat(point, activeStat)) continue
 
-			const projectData = dataByProjectId.get(point.source_project)
+			const projectData = dataByProjectBreakdown.get(breakdownKey)
 			if (!projectData) continue
 
 			projectData[sliceIndex] += getMetricValue(point, activeStat)
 		}
 	})
 
-	const colorsByProjectId = buildPaletteColorsByDownloadRank(
-		selectedProjects.map((project) => ({
-			key: project.id,
-			label: project.name,
-			total: downloadTotalsByProjectId.get(project.id) ?? 0,
+	const colorsByBreakdown = buildPaletteColorsByDownloadRank(
+		Array.from(dataByProjectBreakdown.keys()).map((breakdownKey) => ({
+			key: breakdownKey,
+			label: formatChartBreakdownLabels(breakdownValuesByKey.get(breakdownKey) ?? []),
+			total: downloadTotalsByProjectBreakdown.get(breakdownKey) ?? 0,
 		})),
 		palette,
 	)
 
-	return selectedProjects.map((project) => {
-		const color = colorsByProjectId.get(project.id) ?? ''
+	return Array.from(dataByProjectBreakdown.entries()).map(([breakdownKey, data]) => {
+		const breakdownValues = breakdownValuesByKey.get(breakdownKey) ?? []
+		const fallbackColor = colorsByBreakdown.get(breakdownKey) ?? ''
+		const color =
+			normalizedBreakdowns.length === 1
+				? getBreakdownColor(
+						breakdownValues[0] ?? '',
+						normalizedBreakdowns[0],
+						fallbackColor,
+						palette,
+					)
+				: fallbackColor
 		return {
-			projectId: project.id,
-			label: project.name,
-			data: dataByProjectId.get(project.id) ?? [],
+			projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
+			label: formatChartBreakdownLabels(breakdownValues),
+			projectName:
+				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
+					? getVersionProjectName?.(breakdownValues[0] ?? '')
+					: undefined,
+			data,
 			borderColor: color,
 			backgroundColor: color,
 		}

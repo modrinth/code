@@ -166,31 +166,51 @@
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-wrap items-center gap-2">
 						<div>
-							<Combobox
+							<MultiSelect
 								v-model="selectedBreakdownValue"
 								:options="breakdownOptions"
 								:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+								:max-tag-rows="1"
+								placeholder="No breakdown"
+								checkbox-position="right"
+								clearable
 							>
-								<template #suffix>
-									<div class="mr-0.5 flex gap-1.5">
-										<button
-											v-if="canClearSelectedBreakdown"
-											type="button"
-											class="inline-flex size-5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent shadow-none transition-colors hover:bg-transparent hover:text-contrast"
-											aria-label="Clear breakdown"
-											@click.stop="clearSelectedBreakdown"
-											@keydown.stop
+								<template #input-content="{ isOpen, openDirection }">
+									<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
+										<span
+											class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary"
+											:title="selectedBreakdownLabel"
 										>
-											<XIcon class="size-4 text-primary" />
-										</button>
-										<div
-											v-if="canClearSelectedBreakdown"
-											class="h-5 w-[1px] shrink-0 bg-surface-5"
-										></div>
+											{{ selectedBreakdownLabel }}
+										</span>
+										<div class="flex shrink-0 items-center gap-1.5">
+											<template v-if="canClearSelectedBreakdowns">
+												<button
+													type="button"
+													class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+													aria-label="Clear breakdowns"
+													@click.stop="clearSelectedBreakdowns"
+												>
+													<XIcon class="size-4 text-primary" />
+												</button>
+												<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+											</template>
+
+											<ChevronLeftIcon
+												class="size-5 shrink-0 text-primary transition-transform duration-150"
+												:class="
+													isOpen
+														? openDirection === 'down'
+															? 'rotate-90'
+															: '-rotate-90'
+														: '-rotate-90'
+												"
+											/>
+										</div>
 									</div>
 								</template>
-							</Combobox>
+							</MultiSelect>
 						</div>
 					</div>
 				</div>
@@ -225,14 +245,15 @@ import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardProject,
 	type AnalyticsGroupByPreset,
+	type AnalyticsSelectedBreakdowns,
 	type AnalyticsSelectedFilters,
 	getProjectIdsMatchingStatusFilter,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 import {
 	buildDefaultAnalyticsQueryBuilderState,
-	getAnalyticsBreakdownPresetForProjectSelection,
-	getDefaultAnalyticsBreakdownPreset,
+	getAnalyticsBreakdownPresetsForProjectSelection,
+	MAX_ANALYTICS_BREAKDOWN_PRESETS,
 } from '~/providers/analytics/query-builder-url'
 
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
@@ -266,7 +287,7 @@ const {
 	selectedCustomTimeframeStartDate,
 	selectedCustomTimeframeEndDate,
 	selectedGroupBy,
-	selectedBreakdown,
+	selectedBreakdowns,
 	selectedFilters,
 	activeStat,
 	projectStatusById,
@@ -384,7 +405,7 @@ watch(draftSelectedProjectIds, (nextSelectedProjectIds) => {
 watch(queryResetToken, () => {
 	isProjectSelectOpen.value = false
 	selectedBreakdownCommitRequestId++
-	draftSelectedBreakdown.value = selectedBreakdown.value
+	draftSelectedBreakdowns.value = [...selectedBreakdowns.value]
 	clearProjectDownloadsThreshold()
 	draftSelectedProjectIds.value = isSameProjectSelection(
 		selectedProjectIds.value,
@@ -478,33 +499,28 @@ function selectAllProjectsMode() {
 	draftSelectedProjectIds.value = []
 }
 
-const draftSelectedBreakdown = ref<AnalyticsBreakdownPreset>(selectedBreakdown.value)
+const draftSelectedBreakdowns = ref<AnalyticsSelectedBreakdowns>([...selectedBreakdowns.value])
 let selectedBreakdownCommitRequestId = 0
 
-const selectedBreakdownValue = computed<AnalyticsBreakdownPreset>({
-	get: () => draftSelectedBreakdown.value,
-	set: (nextBreakdown) => {
-		draftSelectedBreakdown.value = getAnalyticsBreakdownPresetForProjectSelection(
-			nextBreakdown,
+const selectedBreakdownValue = computed<AnalyticsSelectedBreakdowns>({
+	get: () => draftSelectedBreakdowns.value,
+	set: (nextBreakdowns) => {
+		draftSelectedBreakdowns.value = getAnalyticsBreakdownPresetsForProjectSelection(
+			nextBreakdowns.slice(0, MAX_ANALYTICS_BREAKDOWN_PRESETS),
 			selectedProjectIds.value,
 		)
 		void scheduleSelectedBreakdownCommit()
 	},
 })
 
-function clearSelectedBreakdown() {
-	draftSelectedBreakdown.value = defaultSelectedBreakdown.value
-	void scheduleSelectedBreakdownCommit()
-}
-
-watch(selectedBreakdown, (nextBreakdown) => {
+watch(selectedBreakdowns, (nextBreakdowns) => {
 	selectedBreakdownCommitRequestId++
-	draftSelectedBreakdown.value = nextBreakdown
+	draftSelectedBreakdowns.value = [...nextBreakdowns]
 })
 
 async function scheduleSelectedBreakdownCommit() {
 	const requestId = ++selectedBreakdownCommitRequestId
-	const nextBreakdown = draftSelectedBreakdown.value
+	const nextBreakdowns = [...draftSelectedBreakdowns.value]
 
 	await waitForDeferredQueryBuilderCommit()
 
@@ -512,9 +528,20 @@ async function scheduleSelectedBreakdownCommit() {
 		return
 	}
 
-	if (selectedBreakdown.value !== nextBreakdown) {
-		selectedBreakdown.value = nextBreakdown
+	if (!areSelectedBreakdownsEqual(selectedBreakdowns.value, nextBreakdowns)) {
+		selectedBreakdowns.value = nextBreakdowns
 	}
+}
+
+function areSelectedBreakdownsEqual(
+	left: readonly AnalyticsBreakdownPreset[],
+	right: readonly AnalyticsBreakdownPreset[],
+) {
+	if (left.length !== right.length) return false
+	for (let index = 0; index < left.length; index += 1) {
+		if (left[index] !== right[index]) return false
+	}
+	return true
 }
 
 function waitForDeferredQueryBuilderCommit(): Promise<void> {
@@ -621,23 +648,46 @@ const groupByPresetOptions: Array<{
 ]
 
 const selectedProjectCount = computed(() => selectedProjectIds.value.length)
-const defaultSelectedBreakdown = computed(() =>
-	getDefaultAnalyticsBreakdownPreset(selectedProjectIds.value),
+const selectedBreakdownLabel = computed(() => {
+	if (selectedBreakdownValue.value.length === 0) {
+		return 'No breakdown'
+	}
+
+	return selectedBreakdownValue.value
+		.map((breakdown) => getBreakdownOptionLabel(breakdown))
+		.join(' + ')
+})
+const canClearSelectedBreakdowns = computed(() => selectedBreakdownValue.value.length > 0)
+const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[]>(
+	() => {
+		const selectedBreakdownSet = new Set(selectedBreakdownValue.value)
+		const hasReachedBreakdownLimit =
+			selectedBreakdownValue.value.length >= MAX_ANALYTICS_BREAKDOWN_PRESETS
+		const options: MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[] = [
+			...(selectedProjectCount.value > 1 ? [{ value: 'project' as const, label: 'Project' }] : []),
+			{ value: 'country', label: 'Country' },
+			{ value: 'monetization', label: 'Monetization' },
+			{ value: 'user_agent', label: 'Download source' },
+			{ value: 'download_reason', label: 'Download reason' },
+			{ value: 'version_id', label: 'Project version' },
+			{ value: 'loader', label: 'Loader' },
+			{ value: 'game_version', label: 'Game version' },
+		]
+
+		return options.map((option) => ({
+			...option,
+			disabled: hasReachedBreakdownLimit && !selectedBreakdownSet.has(option.value),
+		}))
+	},
 )
-const canClearSelectedBreakdown = computed(
-	() => selectedBreakdownValue.value !== defaultSelectedBreakdown.value,
-)
-const breakdownOptions = computed<ComboboxOption<AnalyticsBreakdownPreset>[]>(() => [
-	...(selectedProjectCount.value <= 1 ? [{ value: 'none' as const, label: 'None' }] : []),
-	...(selectedProjectCount.value > 1 ? [{ value: 'project' as const, label: 'Project' }] : []),
-	{ value: 'country', label: 'Country' },
-	{ value: 'monetization', label: 'Monetization' },
-	{ value: 'user_agent', label: 'Download source' },
-	{ value: 'download_reason', label: 'Download reason' },
-	{ value: 'version_id', label: 'Project version' },
-	{ value: 'loader', label: 'Loader' },
-	{ value: 'game_version', label: 'Game version' },
-])
+
+function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
+	return breakdownOptions.value.find((option) => option.value === breakdown)?.label ?? breakdown
+}
+
+function clearSelectedBreakdowns() {
+	selectedBreakdownValue.value = []
+}
 
 function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
 	return groupBy === '1h' || groupBy === '6h'
@@ -707,7 +757,7 @@ function includesStat(stats: readonly string[], stat: string): boolean {
 }
 
 function withBreakdownFields(
-	breakdown: AnalyticsBreakdownPreset,
+	breakdowns: readonly AnalyticsBreakdownPreset[],
 	filters: AnalyticsSelectedFilters,
 ): {
 	views: Labrinth.Analytics.v3.ProjectViewsField[]
@@ -719,67 +769,71 @@ function withBreakdownFields(
 	const downloads: Labrinth.Analytics.v3.ProjectDownloadsField[] = ['project_id']
 	const playtime: Labrinth.Analytics.v3.ProjectPlaytimeField[] = ['project_id']
 	const revenue: Labrinth.Analytics.v3.ProjectRevenueField[] = ['project_id']
-	const breakdownStats = getAnalyticsStatsForBreakdown(breakdown)
-	const enabledStats = getEnabledAnalyticsStatsForState(breakdown, filters)
+	const enabledStats = getEnabledAnalyticsStatsForState(breakdowns, filters)
 
-	switch (breakdown) {
-		case 'project':
-			break
-		case 'country':
-			if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
-				views.push('country')
-			}
-			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('country')
-			}
-			if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-				playtime.push('country')
-			}
-			break
-		case 'monetization':
-			if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
-				views.push('monetized')
-			}
-			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('monetized')
-			}
-			break
-		case 'user_agent':
-			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('user_agent')
-			}
-			break
-		case 'download_reason':
-			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('reason')
-			}
-			break
-		case 'version_id':
-			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('version_id')
-			}
-			if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-				playtime.push('version_id')
-			}
-			break
-		case 'loader':
-			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('loader')
-			}
-			if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-				playtime.push('loader')
-			}
-			break
-		case 'game_version':
-			if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-				downloads.push('game_version')
-			}
-			if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-				playtime.push('game_version')
-			}
-			break
-		default:
-			break
+	for (const breakdown of breakdowns) {
+		const breakdownStats = getAnalyticsStatsForBreakdown(breakdown)
+
+		switch (breakdown) {
+			case 'project':
+			case 'none':
+				break
+			case 'country':
+				if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
+					views.push('country')
+				}
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('country')
+				}
+				if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+					playtime.push('country')
+				}
+				break
+			case 'monetization':
+				if (includesStat(breakdownStats, 'views') && includesStat(enabledStats, 'views')) {
+					views.push('monetized')
+				}
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('monetized')
+				}
+				break
+			case 'user_agent':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('user_agent')
+				}
+				break
+			case 'download_reason':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('reason')
+				}
+				break
+			case 'version_id':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('version_id')
+				}
+				if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+					playtime.push('version_id')
+				}
+				break
+			case 'loader':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('loader')
+				}
+				if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+					playtime.push('loader')
+				}
+				break
+			case 'game_version':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('game_version')
+				}
+				if (includesStat(breakdownStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
+					playtime.push('game_version')
+				}
+				break
+			default:
+				break
+		}
 	}
 
 	if (filters.country.length > 0) {
@@ -871,7 +925,7 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 	const desiredSlices = Math.max(1, Math.floor((end.getTime() - start.getTime()) / groupByMs))
 	const resolutionSlices = Math.min(MAX_ANALYTICS_TIME_SLICES, desiredSlices)
 
-	const bucketBy = withBreakdownFields(selectedBreakdown.value, selectedFilters.value)
+	const bucketBy = withBreakdownFields(selectedBreakdowns.value, selectedFilters.value)
 	const filteredProjectIds = getProjectIdsMatchingStatusFilter(
 		selectedProjectIds.value,
 		projectStatusById.value,

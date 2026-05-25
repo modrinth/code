@@ -49,14 +49,29 @@
 			<template #cell-date="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
-			<template #cell-breakdown="{ row }">
-				<span
-					class="text-primary"
-					:class="{
-						capitalize: shouldCapitalizeBreakdownDisplay,
-					}"
-					>{{ row.breakdownDisplay }}</span
-				>
+			<template #cell-breakdown_project="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown_country="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown_monetization="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown_user_agent="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown_download_reason="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown_version_id="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown_loader="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-breakdown_game_version="{ value }">
+				<span class="text-primary">{{ value }}</span>
 			</template>
 			<template #cell-project="{ value }">
 				<span class="text-primary">{{ value }}</span>
@@ -136,7 +151,13 @@ import {
 } from '~/providers/analytics/query-builder-url'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
-import { ALL_BREAKDOWN_VALUE, getAnalyticsBreakdownValue } from '../breakdown'
+import {
+	ALL_BREAKDOWN_VALUE,
+	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
+	getAnalyticsBreakdownDatasetId,
+	getAnalyticsBreakdownKey,
+	getAnalyticsBreakdownValues,
+} from '../breakdown'
 import {
 	formatBreakdownLabel,
 	formatBucketEndLabel,
@@ -144,17 +165,22 @@ import {
 	getSliceCount,
 	isTimeRelevantForGroupBy,
 	isYearRelevantForTimeRange,
-	shouldCapitalizeBreakdownLabel,
 } from '../graph/utils'
 
 type TableMode = 'date_breakdown' | 'breakdown_only'
+type BreakdownPreset = Exclude<AnalyticsBreakdownPreset, 'none'>
+type BreakdownColumnKey = `breakdown_${BreakdownPreset}`
+type BreakdownDisplayValues = Partial<Record<BreakdownPreset, string>>
 
 type AnalyticsTableRow = {
+	[key: string]: string | number | BreakdownDisplayValues
 	id: string
 	date: string
 	dateMs: number
 	project: string
 	breakdown: string
+	breakdownValues: BreakdownDisplayValues
+	breakdownDisplays: BreakdownDisplayValues
 	graphDatasetId: string
 	breakdownDisplay: string
 	views: number
@@ -176,7 +202,7 @@ const {
 	projects,
 	displayedSelectedProjectIds: selectedProjectIds,
 	displayedSelectedGroupBy: selectedGroupBy,
-	displayedSelectedBreakdown: selectedBreakdown,
+	displayedSelectedBreakdowns: selectedBreakdowns,
 	displayedSelectedFilters: selectedFilters,
 	displayedFetchRequest: fetchRequest,
 	displayedTimeSlices: timeSlices,
@@ -208,11 +234,10 @@ const displayedSortDirection = ref<SortDirection>(initialTableSortState.sortDire
 const PAGE_SIZE = 500
 const GRAPH_DATASET_SELECTION_LIMIT = 8
 const INACTIVE_MODE_WARMUP_POINT_LIMIT = 12000
-const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_BREAKDOWN_VALUE = 'all'
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE
-const SEARCHABLE_COLUMN_KEYS = new Set<TableColumnKey>(['date', 'project', 'breakdown'])
+const SEARCHABLE_COLUMN_KEYS = new Set<TableColumnKey>(['date', 'project'])
 const currentPage = ref(1)
 const searchQuery = ref('')
 const sortCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
@@ -239,29 +264,33 @@ const selectedProjectIdSet = computed(
 				.map((project) => project.id),
 		),
 )
-const showBreakdownColumn = computed(() => selectedBreakdown.value !== 'none')
+const selectedBreakdownSet = computed(() => new Set(selectedBreakdowns.value))
+const showBreakdownColumn = computed(() => selectedBreakdowns.value.length > 0)
 const showGraphDatasetSelection = computed(() =>
-	selectedBreakdown.value === 'project'
+	selectedBreakdowns.value.length === 1 && selectedBreakdowns.value[0] === 'project'
 		? selectedProjectIdSet.value.size > 1
-		: selectedBreakdown.value !== 'none',
+		: selectedBreakdowns.value.length > 0,
 )
 const showProjectVersionProjectColumn = computed(
-	() => selectedBreakdown.value === 'version_id' && selectedProjectIdSet.value.size > 1,
+	() =>
+		selectedBreakdownSet.value.has('version_id') &&
+		!selectedBreakdownSet.value.has('project') &&
+		selectedProjectIdSet.value.size > 1,
 )
 const includeDateColumn = computed(
 	() =>
-		selectedBreakdown.value === 'none' ||
+		selectedBreakdowns.value.length === 0 ||
 		(!showGraphDatasetSelection.value && tableMode.value === 'date_breakdown'),
 )
 const activeTableMode = computed<TableMode>(() =>
-	selectedBreakdown.value === 'none'
+	selectedBreakdowns.value.length === 0
 		? 'date_breakdown'
 		: showGraphDatasetSelection.value
 			? 'breakdown_only'
 			: tableMode.value,
 )
 const displayedIncludeDateColumn = computed(() =>
-	selectedBreakdown.value === 'none'
+	selectedBreakdowns.value.length === 0
 		? true
 		: showGraphDatasetSelection.value
 			? false
@@ -310,8 +339,8 @@ const emptyTableMessage = computed(() => {
 	return hasAvailableProjects.value ? 'No data available' : 'No projects available for analytics'
 })
 
-const breakdownColumnLabel = computed(() => {
-	switch (selectedBreakdown.value) {
+function getBreakdownColumnLabel(breakdown: AnalyticsBreakdownPreset): string {
+	switch (breakdown) {
 		case 'none':
 			return 'Project'
 		case 'project':
@@ -333,12 +362,16 @@ const breakdownColumnLabel = computed(() => {
 		default:
 			return 'Breakdown'
 	}
-})
-const relevantStats = computed(
-	() => new Set(getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)),
+}
+
+const breakdownColumnLabel = computed(() =>
+	selectedBreakdowns.value.length === 1
+		? getBreakdownColumnLabel(selectedBreakdowns.value[0])
+		: 'Breakdown',
 )
-const shouldCapitalizeBreakdownDisplay = computed(() =>
-	shouldCapitalizeBreakdownLabel(selectedBreakdown.value),
+const relevantStats = computed(
+	() =>
+		new Set(getRelevantAnalyticsDashboardStats(selectedBreakdowns.value, selectedFilters.value)),
 )
 
 const showTimeInBucketLabel = computed(() => isTimeRelevantForGroupBy(selectedGroupBy.value))
@@ -352,7 +385,7 @@ const showYearInBucketLabel = computed(() => {
 function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	const nextFetchRequest = fetchRequest.value
 	const nextTimeSlices = timeSlices.value
-	const nextSelectedBreakdown = selectedBreakdown.value
+	const nextSelectedBreakdowns = selectedBreakdowns.value
 	const nextSelectedProjectIds = selectedProjectIdSet.value
 	const nextRelevantStats = relevantStats.value
 	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters.value)
@@ -369,22 +402,50 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	const nextRows = new Map<string, AnalyticsTableRow>()
 	const bucketLabelsBySliceIndex = new Map<number, { date: string; dateMs: number }>()
 
-	function getBreakdownDisplayValue(breakdown: string) {
-		let displayValue = breakdownDisplayValues.get(breakdown)
+	function getBreakdownDisplayValue(breakdownValue: string, breakdown: BreakdownPreset) {
+		const key = `${breakdown}:${breakdownValue}`
+		let displayValue = breakdownDisplayValues.get(key)
 		if (displayValue === undefined) {
-			displayValue = formatBreakdownDisplayValue(breakdown)
-			breakdownDisplayValues.set(breakdown, displayValue)
+			displayValue = formatBreakdownDisplayValue(breakdownValue, breakdown)
+			breakdownDisplayValues.set(key, displayValue)
 		}
 		return displayValue
 	}
 
-	function getProjectDisplayValueForBreakdown(breakdown: string) {
-		let displayValue = projectDisplayValues.get(breakdown)
+	function getProjectDisplayValueForBreakdownValues(breakdownValues: readonly string[]) {
+		const versionBreakdownIndex = nextSelectedBreakdowns.indexOf('version_id')
+		if (versionBreakdownIndex === -1 || nextSelectedBreakdowns.includes('project')) {
+			return ''
+		}
+
+		const versionId = breakdownValues[versionBreakdownIndex]
+		if (!versionId) {
+			return ''
+		}
+
+		let displayValue = projectDisplayValues.get(versionId)
 		if (displayValue === undefined) {
-			displayValue = getProjectDisplayValue(breakdown, nextSelectedBreakdown)
-			projectDisplayValues.set(breakdown, displayValue)
+			displayValue = getVersionProjectName(versionId) ?? ''
+			projectDisplayValues.set(versionId, displayValue)
 		}
 		return displayValue
+	}
+
+	function getBreakdownDisplays(breakdownValues: readonly string[]) {
+		const displays: BreakdownDisplayValues = {}
+
+		nextSelectedBreakdowns.forEach((breakdown, index) => {
+			displays[breakdown] = getBreakdownDisplayValue(breakdownValues[index] ?? '', breakdown)
+		})
+
+		return displays
+	}
+
+	function getCombinedBreakdownDisplay(displays: BreakdownDisplayValues) {
+		return nextSelectedBreakdowns
+			.map((breakdown) => displays[breakdown])
+			.filter((displayValue): displayValue is string => Boolean(displayValue))
+			.join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 	}
 
 	function getBucketLabel(sliceIndex: number) {
@@ -406,33 +467,51 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 
 	function createRow(
 		rowId: string,
-		breakdown: string,
+		breakdownValues: readonly string[],
 		bucketLabel?: { date: string; dateMs: number },
 	) {
-		const row = {
+		const breakdownKey =
+			breakdownValues.length === 0
+				? ALL_PROJECTS_BREAKDOWN_VALUE
+				: getAnalyticsBreakdownKey(breakdownValues)
+		const breakdownDisplays = getBreakdownDisplays(breakdownValues)
+		const row: AnalyticsTableRow = {
 			id: rowId,
 			date: bucketLabel?.date ?? '',
 			dateMs: bucketLabel?.dateMs ?? 0,
-			project: getProjectDisplayValueForBreakdown(breakdown),
-			breakdown,
-			graphDatasetId: getGraphDatasetId(breakdown, nextSelectedBreakdown),
-			breakdownDisplay: getBreakdownDisplayValue(breakdown),
+			project: getProjectDisplayValueForBreakdownValues(breakdownValues),
+			breakdown: breakdownKey,
+			breakdownValues: Object.fromEntries(
+				nextSelectedBreakdowns.map((breakdown, index) => [breakdown, breakdownValues[index] ?? '']),
+			),
+			breakdownDisplays,
+			graphDatasetId: getGraphDatasetId(breakdownValues, nextSelectedBreakdowns),
+			breakdownDisplay: getCombinedBreakdownDisplay(breakdownDisplays),
 			views: 0,
 			downloads: 0,
 			revenue: 0,
 			playtime: 0,
 		}
+
+		for (const breakdown of nextSelectedBreakdowns) {
+			row[getBreakdownColumnKey(breakdown)] = breakdownDisplays[breakdown] ?? ''
+		}
+
 		nextRows.set(rowId, row)
 		return row
 	}
 
-	if (!includeDate && nextSelectedBreakdown === 'none') {
-		createRow(ALL_PROJECTS_BREAKDOWN_VALUE, ALL_PROJECTS_BREAKDOWN_VALUE)
+	if (!includeDate && nextSelectedBreakdowns.length === 0) {
+		createRow(ALL_PROJECTS_BREAKDOWN_VALUE, [])
 	}
 
-	if (!includeDate && nextSelectedBreakdown === 'project') {
+	if (
+		!includeDate &&
+		nextSelectedBreakdowns.length === 1 &&
+		nextSelectedBreakdowns[0] === 'project'
+	) {
 		for (const projectId of nextSelectedProjectIds) {
-			createRow(projectId, projectId)
+			createRow(projectId, [projectId])
 		}
 	}
 
@@ -457,19 +536,21 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 				continue
 			}
 
-			const breakdown =
-				nextSelectedBreakdown === 'none'
-					? ALL_PROJECTS_BREAKDOWN_VALUE
-					: nextSelectedBreakdown === 'project'
-						? point.source_project
-						: getBreakdownValue(point, nextSelectedBreakdown)
-			if (nextSelectedBreakdown !== 'none' && breakdown === ALL_BREAKDOWN_VALUE) {
+			const breakdownValues =
+				nextSelectedBreakdowns.length === 0
+					? []
+					: getAnalyticsBreakdownValues(point, nextSelectedBreakdowns)
+			if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
 				continue
 			}
 
 			const nextBucketLabel = includeDate ? (bucketLabel ?? getBucketLabel(sliceIndex)) : undefined
-			const rowId = includeDate ? `${nextBucketLabel?.dateMs ?? 0}::${breakdown}` : breakdown
-			const row = nextRows.get(rowId) ?? createRow(rowId, breakdown, nextBucketLabel)
+			const breakdownKey =
+				breakdownValues.length === 0
+					? ALL_PROJECTS_BREAKDOWN_VALUE
+					: getAnalyticsBreakdownKey(breakdownValues)
+			const rowId = includeDate ? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}` : breakdownKey
+			const row = nextRows.get(rowId) ?? createRow(rowId, breakdownValues, nextBucketLabel)
 			addMetricToRow(row, point)
 		}
 	})
@@ -493,7 +574,7 @@ const activeColumns = computed<TableColumn<TableColumnKey>[]>(() =>
 function buildColumns(includeDate: boolean): TableColumn<TableColumnKey>[] {
 	const nextColumns: TableColumn<TableColumnKey>[] = []
 
-	const stats = getRelevantAnalyticsDashboardStats(selectedBreakdown.value, selectedFilters.value)
+	const stats = getRelevantAnalyticsDashboardStats(selectedBreakdowns.value, selectedFilters.value)
 
 	if (includeDate) {
 		nextColumns.push({
@@ -506,11 +587,13 @@ function buildColumns(includeDate: boolean): TableColumn<TableColumnKey>[] {
 	}
 
 	if (showBreakdownColumn.value) {
-		nextColumns.push({
-			key: 'breakdown',
-			label: breakdownColumnLabel.value,
-			enableSorting: true,
-		})
+		for (const breakdown of selectedBreakdowns.value) {
+			nextColumns.push({
+				key: getBreakdownColumnKey(breakdown),
+				label: getBreakdownColumnLabel(breakdown),
+				enableSorting: true,
+			})
+		}
 	}
 
 	if (showProjectVersionProjectColumn.value) {
@@ -544,7 +627,9 @@ const sortedRows = computed<AnalyticsTableRow[]>(() => {
 })
 const trimmedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
 const searchableColumns = computed(() =>
-	columns.value.filter((column) => SEARCHABLE_COLUMN_KEYS.has(column.key)),
+	columns.value.filter(
+		(column) => SEARCHABLE_COLUMN_KEYS.has(column.key) || isBreakdownColumnKey(column.key),
+	),
 )
 const filteredRows = computed<AnalyticsTableRow[]>(() => {
 	if (!trimmedSearchQuery.value) {
@@ -557,10 +642,10 @@ const selectableGraphDatasetIds = computed(() => getSelectableGraphDatasetIds(so
 const filteredSelectableGraphDatasetIds = computed(() =>
 	getSelectableGraphDatasetIds(filteredRows.value),
 )
-const tableSelectedGraphDatasetIds = computed({
+const tableSelectedGraphDatasetIds = computed<unknown[]>({
 	get: () => selectedGraphDatasetIds.value,
-	set: (ids: string[]) => {
-		selectedGraphDatasetIds.value = ids
+	set: (ids) => {
+		selectedGraphDatasetIds.value = ids.filter((id): id is string => typeof id === 'string')
 		if (showGraphDatasetSelection.value) {
 			hasExplicitGraphDatasetSelection.value = true
 		}
@@ -594,7 +679,7 @@ watch(activeStat, () => {
 	applyActiveStatSort()
 })
 
-watch(selectedBreakdown, () => {
+watch(selectedBreakdowns, () => {
 	setSelectedGraphDatasetIds([], false)
 })
 
@@ -669,7 +754,7 @@ watch(
 		timeSlices,
 		selectedProjectIds,
 		selectedGroupBy,
-		selectedBreakdown,
+		selectedBreakdowns,
 		selectedFilters,
 		projects,
 		versionNumbersById,
@@ -909,7 +994,7 @@ function getSearchableCellValue(row: AnalyticsTableRow, key: TableColumnKey): st
 		case 'breakdown':
 			return row.breakdownDisplay
 		default:
-			return ''
+			return isBreakdownColumnKey(key) ? String(row[key] ?? '') : ''
 	}
 }
 
@@ -1072,6 +1157,15 @@ function getAvailableTableSortState(
 	if (state.sortColumn && availableColumns.has(state.sortColumn)) {
 		return state
 	}
+	if (state.sortColumn === 'breakdown') {
+		const firstBreakdownColumn = nextColumns.find((column) => isBreakdownColumnKey(column.key))
+		if (firstBreakdownColumn) {
+			return {
+				sortColumn: firstBreakdownColumn.key,
+				sortDirection: state.sortDirection,
+			}
+		}
+	}
 
 	return getDefaultTableSortState(nextColumns)
 }
@@ -1174,22 +1268,19 @@ function getDefaultSortDirection(
 	return nextColumns.find((nextColumn) => nextColumn.key === column)?.defaultSortDirection ?? 'asc'
 }
 
-function getBreakdownValue(
-	point: Labrinth.Analytics.v3.ProjectAnalytics,
-	selectedBreakdown: AnalyticsBreakdownPreset,
-): string {
-	return getAnalyticsBreakdownValue(point, selectedBreakdown)
+function getBreakdownColumnKey(breakdown: BreakdownPreset): BreakdownColumnKey {
+	return `breakdown_${breakdown}`
 }
 
-function getGraphDatasetId(breakdown: string, selectedBreakdown: AnalyticsBreakdownPreset): string {
-	if (selectedBreakdown === 'none') {
-		return ALL_PROJECTS_DATASET_ID
-	}
-	if (selectedBreakdown === 'project') {
-		return breakdown
-	}
+function isBreakdownColumnKey(key: TableColumnKey): key is BreakdownColumnKey {
+	return key.startsWith('breakdown_')
+}
 
-	return `breakdown:${breakdown}`
+function getGraphDatasetId(
+	breakdownValues: readonly string[],
+	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+): string {
+	return getAnalyticsBreakdownDatasetId(breakdownValues, selectedBreakdowns)
 }
 
 function getDefaultSelectedGraphDatasetIds(ids: string[]): string[] {
@@ -1251,6 +1342,16 @@ function getRowComparator(
 			return (left, right) =>
 				compareRows(left, right, left.playtime - right.playtime, directionFactor)
 		default:
+			if (isBreakdownColumnKey(column)) {
+				return (left, right) =>
+					compareRows(
+						left,
+						right,
+						sortCollator.compare(String(left[column] ?? ''), String(right[column] ?? '')),
+						directionFactor,
+					)
+			}
+
 			return () => 0
 	}
 }
@@ -1273,22 +1374,11 @@ function compareRows(
 	return sortCollator.compare(left.breakdown, right.breakdown) * directionFactor
 }
 
-function formatBreakdownDisplayValue(value: string): string {
-	if (selectedBreakdown.value === 'project') {
+function formatBreakdownDisplayValue(value: string, breakdown: BreakdownPreset): string {
+	if (breakdown === 'project') {
 		return projectNamesById.value.get(value) ?? value
 	}
-	return formatBreakdownLabel(value, selectedBreakdown.value, getVersionDisplayName)
-}
-
-function getProjectDisplayValue(
-	breakdown: string,
-	selectedBreakdown: AnalyticsBreakdownPreset,
-): string {
-	if (selectedBreakdown !== 'version_id') {
-		return ''
-	}
-
-	return getVersionProjectName(breakdown) ?? ''
+	return formatBreakdownLabel(value, breakdown, getVersionDisplayName)
 }
 
 function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | number {
@@ -1308,7 +1398,7 @@ function getCsvCellValue(row: AnalyticsTableRow, key: TableColumnKey): string | 
 		case 'playtime':
 			return row.playtime
 		default:
-			return ''
+			return isBreakdownColumnKey(key) ? String(row[key] ?? '') : ''
 	}
 }
 

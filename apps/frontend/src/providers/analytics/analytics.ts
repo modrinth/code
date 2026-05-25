@@ -19,6 +19,7 @@ import {
 	type AnalyticsGraphViewMode,
 	type AnalyticsGroupByPreset,
 	type AnalyticsLastTimeframeUnit,
+	type AnalyticsSelectedBreakdowns,
 	type AnalyticsSelectedFilters,
 	type AnalyticsTimeframeMode,
 	type AnalyticsTimeframePreset,
@@ -27,8 +28,8 @@ import {
 	buildAnalyticsQueryBuilderRouteQuery,
 	buildDefaultAnalyticsGraphState,
 	buildDefaultAnalyticsQueryBuilderState,
-	getAnalyticsBreakdownPresetForProjectSelection,
-	getDefaultAnalyticsBreakdownPreset,
+	getAnalyticsBreakdownPresetsForProjectSelection,
+	getDefaultAnalyticsBreakdownPresets,
 	hasAnalyticsBreakdownQuery,
 	hasAnalyticsProjectSelectionQuery,
 	hasAnalyticsQueryBuilderRouteChange,
@@ -46,6 +47,7 @@ export type {
 	AnalyticsGroupByPreset,
 	AnalyticsLastTimeframeUnit,
 	AnalyticsQueryFilterCategory,
+	AnalyticsSelectedBreakdowns,
 	AnalyticsSelectedFilters,
 	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
@@ -178,7 +180,7 @@ export interface AnalyticsDashboardContextValue {
 	selectedCustomTimeframeStartDate: Ref<string>
 	selectedCustomTimeframeEndDate: Ref<string>
 	selectedGroupBy: Ref<AnalyticsGroupByPreset>
-	selectedBreakdown: Ref<AnalyticsBreakdownPreset>
+	selectedBreakdowns: Ref<AnalyticsSelectedBreakdowns>
 	selectedFilters: Ref<AnalyticsSelectedFilters>
 	queryRefreshTimestamp: Ref<number>
 	queryResetToken: Ref<number>
@@ -186,7 +188,7 @@ export interface AnalyticsDashboardContextValue {
 	fetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	displayedSelectedProjectIds: Ref<string[]>
 	displayedSelectedGroupBy: Ref<AnalyticsGroupByPreset>
-	displayedSelectedBreakdown: Ref<AnalyticsBreakdownPreset>
+	displayedSelectedBreakdowns: Ref<AnalyticsSelectedBreakdowns>
 	displayedSelectedFilters: Ref<AnalyticsSelectedFilters>
 	displayedFetchRequest: Ref<Labrinth.Analytics.v3.FetchRequest | null>
 	displayedFilterOptions: Ref<AnalyticsDashboardFilterOptions>
@@ -221,12 +223,12 @@ export interface AnalyticsDashboardContextValue {
 	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
 	hasPreviousPeriodComparison: ComputedRef<boolean>
 	getRelevantAnalyticsDashboardStats: (
-		breakdown: AnalyticsBreakdownPreset,
+		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters?: AnalyticsSelectedFilters,
 	) => readonly AnalyticsDashboardStat[]
 	isAnalyticsDashboardStatRelevant: (
 		stat: AnalyticsDashboardStat,
-		breakdown: AnalyticsBreakdownPreset,
+		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters?: AnalyticsSelectedFilters,
 	) => boolean
 	refreshAnalyticsQuery: () => Promise<void>
@@ -1277,7 +1279,7 @@ export function createAnalyticsDashboardContext(
 		initialQueryState.selectedCustomTimeframeEndDate,
 	)
 	const selectedGroupBy = ref<AnalyticsGroupByPreset>(initialQueryState.selectedGroupBy)
-	const selectedBreakdown = ref<AnalyticsBreakdownPreset>(initialQueryState.selectedBreakdown)
+	const selectedBreakdowns = ref<AnalyticsSelectedBreakdowns>(initialQueryState.selectedBreakdowns)
 	const selectedFilters = ref<AnalyticsSelectedFilters>(initialQueryState.selectedFilters)
 	const queryRefreshTimestamp = ref(Date.now())
 	const queryResetToken = ref(0)
@@ -1639,7 +1641,7 @@ export function createAnalyticsDashboardContext(
 				selectedCustomTimeframeStartDate: selectedCustomTimeframeStartDate.value,
 				selectedCustomTimeframeEndDate: selectedCustomTimeframeEndDate.value,
 				selectedGroupBy: selectedGroupBy.value,
-				selectedBreakdown: selectedBreakdown.value,
+				selectedBreakdowns: selectedBreakdowns.value,
 				selectedFilters: selectedFilters.value,
 			},
 			availableProjectIds.value,
@@ -1676,27 +1678,27 @@ export function createAnalyticsDashboardContext(
 	}
 
 	function getRelevantAnalyticsDashboardStats(
-		breakdown: AnalyticsBreakdownPreset,
+		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters: AnalyticsSelectedFilters = selectedFilters.value,
 	): readonly AnalyticsDashboardStat[] {
-		return getEnabledAnalyticsStatsForState(breakdown, filters).filter((stat) =>
+		return getEnabledAnalyticsStatsForState(breakdowns, filters).filter((stat) =>
 			isAnalyticsDashboardStatAvailableForTimeframe(stat),
 		)
 	}
 
 	function isAnalyticsDashboardStatRelevant(
 		stat: AnalyticsDashboardStat,
-		breakdown: AnalyticsBreakdownPreset,
+		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters: AnalyticsSelectedFilters = selectedFilters.value,
 	): boolean {
-		return getRelevantAnalyticsDashboardStats(breakdown, filters).includes(stat)
+		return getRelevantAnalyticsDashboardStats(breakdowns, filters).includes(stat)
 	}
 
 	function sanitizeAnalyticsSelectedFiltersForContext(
-		breakdown: AnalyticsBreakdownPreset,
+		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters: AnalyticsSelectedFilters,
 	): AnalyticsSelectedFilters {
-		const nextFilters = sanitizeAnalyticsSelectedFilters(breakdown, filters)
+		const nextFilters = sanitizeAnalyticsSelectedFilters(breakdowns, filters)
 		if (hasProjectContext.value && nextFilters.project_status.length > 0) {
 			return {
 				...nextFilters,
@@ -1727,7 +1729,7 @@ export function createAnalyticsDashboardContext(
 			selectedCustomTimeframeStartDate: selectedCustomTimeframeStartDate.value,
 			selectedCustomTimeframeEndDate: selectedCustomTimeframeEndDate.value,
 			selectedGroupBy: selectedGroupBy.value,
-			selectedBreakdown: selectedBreakdown.value,
+			selectedBreakdowns: selectedBreakdowns.value,
 			selectedFilters: selectedFilters.value,
 		}
 	}
@@ -1799,13 +1801,13 @@ export function createAnalyticsDashboardContext(
 	}
 
 	watch(
-		[selectedBreakdown, selectedFilters, activeStat, isRevenueTimeframeAvailable],
-		([nextBreakdown, nextFilters, nextActiveStat]) => {
-			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdown, nextFilters)) {
+		[selectedBreakdowns, selectedFilters, activeStat, isRevenueTimeframeAvailable],
+		([nextBreakdowns, nextFilters, nextActiveStat]) => {
+			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdowns, nextFilters)) {
 				return
 			}
 
-			const fallbackStat = getRelevantAnalyticsDashboardStats(nextBreakdown, nextFilters)[0]
+			const fallbackStat = getRelevantAnalyticsDashboardStats(nextBreakdowns, nextFilters)[0]
 			if (fallbackStat && fallbackStat !== nextActiveStat) {
 				activeStat.value = fallbackStat
 			}
@@ -1814,10 +1816,10 @@ export function createAnalyticsDashboardContext(
 	)
 
 	watch(
-		[selectedBreakdown, selectedFilters],
-		([nextBreakdown, nextFilters]) => {
+		[selectedBreakdowns, selectedFilters],
+		([nextBreakdowns, nextFilters]) => {
 			const sanitizedFilters = sanitizeAnalyticsSelectedFiltersForContext(
-				nextBreakdown,
+				nextBreakdowns,
 				nextFilters,
 			)
 			if (!areSelectedFiltersEqual(nextFilters, sanitizedFilters)) {
@@ -1864,20 +1866,23 @@ export function createAnalyticsDashboardContext(
 	watch(
 		[selectedProjectIds, hasExplicitBreakdownQuery],
 		([nextSelectedProjectIds, nextHasExplicitBreakdownQuery]) => {
-			const validBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
-				selectedBreakdown.value,
+			const validBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
+				selectedBreakdowns.value,
 				nextSelectedProjectIds,
 			)
-			if (selectedBreakdown.value !== validBreakdown) {
+			if (!areStringArraysEqual(selectedBreakdowns.value, validBreakdowns)) {
 				replaceNextAnalyticsRouteNavigation()
-				selectedBreakdown.value = validBreakdown
+				selectedBreakdowns.value = validBreakdowns
 				return
 			}
 
-			const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(nextSelectedProjectIds)
-			if (!nextHasExplicitBreakdownQuery && selectedBreakdown.value !== defaultBreakdown) {
+			const defaultBreakdowns = getDefaultAnalyticsBreakdownPresets(nextSelectedProjectIds)
+			if (
+				!nextHasExplicitBreakdownQuery &&
+				!areStringArraysEqual(selectedBreakdowns.value, defaultBreakdowns)
+			) {
 				replaceNextAnalyticsRouteNavigation()
-				selectedBreakdown.value = defaultBreakdown
+				selectedBreakdowns.value = defaultBreakdowns
 			}
 		},
 		{ deep: true, immediate: true },
@@ -1892,12 +1897,12 @@ export function createAnalyticsDashboardContext(
 			const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
 				availableProjectIdSet.has(projectId),
 			)
-			const nextSelectedBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
-				nextQueryState.selectedBreakdown,
+			const nextSelectedBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
+				nextQueryState.selectedBreakdowns,
 				nextSelectedProjectIds,
 			)
 			const nextSelectedFilters = sanitizeAnalyticsSelectedFiltersForContext(
-				nextSelectedBreakdown,
+				nextSelectedBreakdowns,
 				nextQueryState.selectedFilters,
 			)
 			const shouldUpdateSelectedProjectIds = !areStringArraysEqual(
@@ -1917,7 +1922,10 @@ export function createAnalyticsDashboardContext(
 			const shouldUpdateSelectedCustomTimeframeEndDate =
 				selectedCustomTimeframeEndDate.value !== nextQueryState.selectedCustomTimeframeEndDate
 			const shouldUpdateSelectedGroupBy = selectedGroupBy.value !== nextQueryState.selectedGroupBy
-			const shouldUpdateSelectedBreakdown = selectedBreakdown.value !== nextSelectedBreakdown
+			const shouldUpdateSelectedBreakdowns = !areStringArraysEqual(
+				selectedBreakdowns.value,
+				nextSelectedBreakdowns,
+			)
 			const shouldUpdateSelectedFilters = !areSelectedFiltersEqual(
 				selectedFilters.value,
 				nextSelectedFilters,
@@ -1949,7 +1957,7 @@ export function createAnalyticsDashboardContext(
 				shouldUpdateSelectedCustomTimeframeStartDate ||
 				shouldUpdateSelectedCustomTimeframeEndDate ||
 				shouldUpdateSelectedGroupBy ||
-				shouldUpdateSelectedBreakdown ||
+				shouldUpdateSelectedBreakdowns ||
 				shouldUpdateSelectedFilters ||
 				shouldUpdateActiveStat ||
 				shouldUpdateActiveGraphViewMode ||
@@ -1988,8 +1996,8 @@ export function createAnalyticsDashboardContext(
 			if (shouldUpdateSelectedGroupBy) {
 				selectedGroupBy.value = nextQueryState.selectedGroupBy
 			}
-			if (shouldUpdateSelectedBreakdown) {
-				selectedBreakdown.value = nextSelectedBreakdown
+			if (shouldUpdateSelectedBreakdowns) {
+				selectedBreakdowns.value = nextSelectedBreakdowns
 			}
 			if (shouldUpdateSelectedFilters) {
 				selectedFilters.value = nextSelectedFilters
@@ -2043,7 +2051,7 @@ export function createAnalyticsDashboardContext(
 			selectedCustomTimeframeStartDate,
 			selectedCustomTimeframeEndDate,
 			selectedGroupBy,
-			selectedBreakdown,
+			selectedBreakdowns,
 			selectedFilters,
 			availableProjectIds,
 		],
@@ -2119,7 +2127,7 @@ export function createAnalyticsDashboardContext(
 			return null
 		}
 		if (
-			!isAnalyticsDashboardStatRelevant('revenue', selectedBreakdown.value, selectedFilters.value)
+			!isAnalyticsDashboardStatRelevant('revenue', selectedBreakdowns.value, selectedFilters.value)
 		) {
 			return null
 		}
@@ -2296,7 +2304,9 @@ export function createAnalyticsDashboardContext(
 	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const displayedSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 	const displayedSelectedGroupBy = ref<AnalyticsGroupByPreset>(selectedGroupBy.value)
-	const displayedSelectedBreakdown = ref<AnalyticsBreakdownPreset>(selectedBreakdown.value)
+	const displayedSelectedBreakdowns = ref<AnalyticsSelectedBreakdowns>([
+		...selectedBreakdowns.value,
+	])
 	const displayedSelectedFilters = ref<AnalyticsSelectedFilters>(
 		cloneAnalyticsSelectedFilters(selectedFilters.value),
 	)
@@ -2312,7 +2322,7 @@ export function createAnalyticsDashboardContext(
 	function commitDisplayedAnalyticsState() {
 		displayedSelectedProjectIds.value = [...selectedProjectIds.value]
 		displayedSelectedGroupBy.value = selectedGroupBy.value
-		displayedSelectedBreakdown.value = selectedBreakdown.value
+		displayedSelectedBreakdowns.value = [...selectedBreakdowns.value]
 		displayedSelectedFilters.value = cloneAnalyticsSelectedFilters(selectedFilters.value)
 		displayedFetchRequest.value = cloneAnalyticsFetchRequest(fetchRequest.value)
 		displayedFilterOptions.value = cloneAnalyticsFilterOptions(filterOptions.value)
@@ -2351,7 +2361,10 @@ export function createAnalyticsDashboardContext(
 			}
 		}
 
-		if (selectedBreakdown.value === 'version_id' || selectedFilters.value.version_id.length > 0) {
+		if (
+			selectedBreakdowns.value.includes('version_id') ||
+			selectedFilters.value.version_id.length > 0
+		) {
 			addVersionIdsFromTimeSlices(versionIds, timeSlices.value)
 			addVersionIdsFromTimeSlices(versionIds, previousTimeSlices.value)
 		}
@@ -2485,7 +2498,7 @@ export function createAnalyticsDashboardContext(
 			fetchRequest,
 			selectedProjectIds,
 			selectedGroupBy,
-			selectedBreakdown,
+			selectedBreakdowns,
 			selectedFilters,
 			filterOptions,
 		],
@@ -2539,7 +2552,7 @@ export function createAnalyticsDashboardContext(
 		selectedCustomTimeframeStartDate.value = defaultQueryState.selectedCustomTimeframeStartDate
 		selectedCustomTimeframeEndDate.value = defaultQueryState.selectedCustomTimeframeEndDate
 		selectedGroupBy.value = defaultQueryState.selectedGroupBy
-		selectedBreakdown.value = defaultQueryState.selectedBreakdown
+		selectedBreakdowns.value = defaultQueryState.selectedBreakdowns
 		selectedFilters.value = defaultQueryState.selectedFilters
 		activeStat.value = defaultGraphState.activeStat
 		activeGraphViewMode.value = defaultGraphState.activeGraphViewMode
@@ -2579,7 +2592,7 @@ export function createAnalyticsDashboardContext(
 
 	function setActiveStat(nextStat: AnalyticsDashboardStat) {
 		if (
-			!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdown.value, selectedFilters.value)
+			!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdowns.value, selectedFilters.value)
 		) {
 			return
 		}
@@ -2599,7 +2612,7 @@ export function createAnalyticsDashboardContext(
 		selectedCustomTimeframeStartDate,
 		selectedCustomTimeframeEndDate,
 		selectedGroupBy,
-		selectedBreakdown,
+		selectedBreakdowns,
 		selectedFilters,
 		queryRefreshTimestamp,
 		queryResetToken,
@@ -2607,7 +2620,7 @@ export function createAnalyticsDashboardContext(
 		fetchRequest,
 		displayedSelectedProjectIds,
 		displayedSelectedGroupBy,
-		displayedSelectedBreakdown,
+		displayedSelectedBreakdowns,
 		displayedSelectedFilters,
 		displayedFetchRequest,
 		displayedFilterOptions,

@@ -374,7 +374,7 @@ const {
 	displayedTimeSlices: timeSlices,
 	displayedPreviousTimeSlices: previousTimeSlices,
 	displayedSelectedGroupBy: selectedGroupBy,
-	displayedSelectedBreakdown: selectedBreakdown,
+	displayedSelectedBreakdowns: selectedBreakdowns,
 	displayedSelectedFilters: selectedFilters,
 	isLoading,
 	getVersionDisplayName,
@@ -433,7 +433,7 @@ const selectedProjects = computed(() =>
 	),
 )
 const showProjectVersionNames = computed(
-	() => selectedBreakdown.value === 'version_id' && selectedProjects.value.length > 1,
+	() => selectedBreakdowns.value.includes('version_id') && selectedProjects.value.length > 1,
 )
 const tableProjectCount = computed(() => selectedGraphDatasetIds.value.length)
 const isTableGraphSelectionEmpty = computed(
@@ -509,8 +509,11 @@ const showTableSelectionSubheading = computed(
 )
 const tableBreakdownItemLabel = computed(() => {
 	const isSingular = tableProjectCount.value === 1
+	if (selectedBreakdowns.value.length !== 1) {
+		return isSingular ? 'item' : 'items'
+	}
 
-	switch (selectedBreakdown.value) {
+	switch (selectedBreakdowns.value[0]) {
 		case 'project':
 			return isSingular ? 'project' : 'projects'
 		case 'country':
@@ -580,7 +583,7 @@ const tableSelectionSubheading = computed(() => {
 	return `Showing ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
 })
 const shouldCapitalizeDatasetLabels = computed(() =>
-	shouldCapitalizeBreakdownLabel(selectedBreakdown.value),
+	shouldCapitalizeBreakdownLabel(selectedBreakdowns.value),
 )
 
 const chartType = computed<'line' | 'bar'>(() =>
@@ -630,7 +633,7 @@ const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset
 	const nextTimeSlices = timeSlices.value
 	const nextSelectedProjects = selectedProjects.value
 	const nextPalette = legendPalette.value
-	const nextSelectedBreakdown = selectedBreakdown.value
+	const nextSelectedBreakdowns = selectedBreakdowns.value
 	const nextSelectedFilters = selectedFilters.value
 	const nextGetVersionProjectName = showProjectVersionNames.value
 		? getVersionProjectName
@@ -643,7 +646,7 @@ const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset
 			nextSelectedProjects,
 			stat,
 			nextPalette,
-			nextSelectedBreakdown,
+			nextSelectedBreakdowns,
 			nextSelectedFilters,
 			getVersionDisplayName,
 			nextGetVersionProjectName,
@@ -658,7 +661,7 @@ const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, Char
 	const nextTimeSlices = previousTimeSlices.value
 	const nextSelectedProjects = selectedProjects.value
 	const nextPalette = legendPalette.value
-	const nextSelectedBreakdown = selectedBreakdown.value
+	const nextSelectedBreakdowns = selectedBreakdowns.value
 	const nextSelectedFilters = selectedFilters.value
 	const nextGetVersionProjectName = showProjectVersionNames.value
 		? getVersionProjectName
@@ -671,7 +674,7 @@ const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, Char
 			nextSelectedProjects,
 			stat,
 			nextPalette,
-			nextSelectedBreakdown,
+			nextSelectedBreakdowns,
 			nextSelectedFilters,
 			getVersionDisplayName,
 			nextGetVersionProjectName,
@@ -844,7 +847,7 @@ function getPreviousPeriodDatasetId(datasetId: string) {
 }
 
 function compareLegendEntries(a: LegendEntry, b: LegendEntry) {
-	if (selectedBreakdown.value === 'monetization') {
+	if (selectedBreakdowns.value.length === 1 && selectedBreakdowns.value[0] === 'monetization') {
 		const aOrder = MONETIZATION_LEGEND_ENTRY_ORDER.get(a.id)
 		const bOrder = MONETIZATION_LEGEND_ENTRY_ORDER.get(b.id)
 
@@ -1224,7 +1227,11 @@ function getLegendEntryTooltip(legendEntry: LegendEntry) {
 }
 
 function isUnmonetizedLegendEntry(legendEntry: LegendEntry) {
-	return selectedBreakdown.value === 'monetization' && legendEntry.id === 'breakdown:unmonetized'
+	return (
+		selectedBreakdowns.value.length === 1 &&
+		selectedBreakdowns.value[0] === 'monetization' &&
+		legendEntry.id === 'breakdown:unmonetized'
+	)
 }
 
 function setHoveredLegendEntryId(datasetId: string) {

@@ -38,12 +38,14 @@ export type AnalyticsBreakdownPreset =
 	| 'loader'
 	| 'game_version'
 
+export type AnalyticsSelectedBreakdowns = Exclude<AnalyticsBreakdownPreset, 'none'>[]
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
 export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
 export type AnalyticsTableSortColumn =
 	| 'date'
 	| 'project'
 	| 'breakdown'
+	| `breakdown_${Exclude<AnalyticsBreakdownPreset, 'none'>}`
 	| 'views'
 	| 'downloads'
 	| 'revenue'
@@ -61,7 +63,7 @@ export type AnalyticsQueryBuilderState = {
 	selectedCustomTimeframeStartDate: string
 	selectedCustomTimeframeEndDate: string
 	selectedGroupBy: AnalyticsGroupByPreset
-	selectedBreakdown: AnalyticsBreakdownPreset
+	selectedBreakdowns: AnalyticsSelectedBreakdowns
 	selectedFilters: AnalyticsSelectedFilters
 }
 
@@ -93,6 +95,7 @@ export const DEFAULT_ANALYTICS_GRAPH_VIEW_MODE: AnalyticsGraphViewMode = 'line'
 export const DEFAULT_ANALYTICS_GRAPH_RATIO_MODE = false
 export const DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY = true
 export const DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY = false
+export const MAX_ANALYTICS_BREAKDOWN_PRESETS = 3
 
 const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'today',
@@ -152,6 +155,14 @@ const ANALYTICS_TABLE_SORT_COLUMN_VALUES: AnalyticsTableSortColumn[] = [
 	'date',
 	'project',
 	'breakdown',
+	'breakdown_project',
+	'breakdown_country',
+	'breakdown_monetization',
+	'breakdown_user_agent',
+	'breakdown_download_reason',
+	'breakdown_version_id',
+	'breakdown_loader',
+	'breakdown_game_version',
 	'views',
 	'downloads',
 	'revenue',
@@ -326,13 +337,24 @@ function parsePresetQueryValue<T extends string>(
 	return rawValue as T
 }
 
-function parseAnalyticsBreakdownQueryValue(
+function parseAnalyticsBreakdownsQueryValue(
 	value: LocationQueryValue | LocationQueryValue[] | undefined,
-	fallbackValue: AnalyticsBreakdownPreset,
-): AnalyticsBreakdownPreset {
-	const rawValue = Array.isArray(value) ? value[0] : value
-	if (rawValue === 'download_source') return 'user_agent'
-	return parsePresetQueryValue(value, BREAKDOWN_PRESET_VALUES, fallbackValue)
+	fallbackValues: AnalyticsSelectedBreakdowns,
+): AnalyticsBreakdownPreset[] {
+	const rawValues = parseListQueryValue(value)
+	if (rawValues.length === 0) {
+		return [...fallbackValues]
+	}
+
+	const parsedBreakdowns: AnalyticsBreakdownPreset[] = []
+	for (const rawValue of rawValues) {
+		const normalizedValue = rawValue === 'download_source' ? 'user_agent' : rawValue
+		if (BREAKDOWN_PRESET_VALUES.includes(normalizedValue as AnalyticsBreakdownPreset)) {
+			parsedBreakdowns.push(normalizedValue as AnalyticsBreakdownPreset)
+		}
+	}
+
+	return parsedBreakdowns
 }
 
 function parsePositiveIntegerQueryValue(
@@ -445,15 +467,45 @@ export function buildDefaultAnalyticsQueryBuilderState(
 		selectedCustomTimeframeStartDate: getDefaultCustomStartDate(),
 		selectedCustomTimeframeEndDate: getDefaultCustomEndDate(),
 		selectedGroupBy: DEFAULT_GROUP_BY_PRESET,
-		selectedBreakdown: getDefaultAnalyticsBreakdownPreset(availableProjectIds),
+		selectedBreakdowns: getDefaultAnalyticsBreakdownPresets(availableProjectIds),
 		selectedFilters: buildEmptySelectedFilters(),
 	}
+}
+
+export function getDefaultAnalyticsBreakdownPresets(
+	selectedProjectIds: readonly string[],
+): AnalyticsSelectedBreakdowns {
+	return selectedProjectIds.length > 1 ? ['project'] : []
 }
 
 export function getDefaultAnalyticsBreakdownPreset(
 	selectedProjectIds: readonly string[],
 ): AnalyticsBreakdownPreset {
 	return selectedProjectIds.length > 1 ? 'project' : DEFAULT_BREAKDOWN_PRESET
+}
+
+export function getAnalyticsBreakdownPresetsForProjectSelection(
+	breakdowns: readonly AnalyticsBreakdownPreset[],
+	selectedProjectIds: readonly string[],
+): AnalyticsSelectedBreakdowns {
+	const normalizedBreakdowns: AnalyticsSelectedBreakdowns = []
+
+	for (const breakdown of breakdowns) {
+		if (breakdown === 'none') {
+			continue
+		}
+		if (breakdown === 'project' && selectedProjectIds.length <= 1) {
+			continue
+		}
+		if (!normalizedBreakdowns.includes(breakdown)) {
+			normalizedBreakdowns.push(breakdown)
+		}
+		if (normalizedBreakdowns.length >= MAX_ANALYTICS_BREAKDOWN_PRESETS) {
+			break
+		}
+	}
+
+	return normalizedBreakdowns
 }
 
 export function getAnalyticsBreakdownPresetForProjectSelection(
@@ -490,7 +542,10 @@ export function isAnalyticsQueryBuilderStateDefault(
 		state.selectedCustomTimeframeStartDate === defaultState.selectedCustomTimeframeStartDate &&
 		state.selectedCustomTimeframeEndDate === defaultState.selectedCustomTimeframeEndDate &&
 		state.selectedGroupBy === defaultState.selectedGroupBy &&
-		state.selectedBreakdown === getDefaultAnalyticsBreakdownPreset(state.selectedProjectIds) &&
+		areStringArraysEqual(
+			state.selectedBreakdowns,
+			getDefaultAnalyticsBreakdownPresets(state.selectedProjectIds),
+		) &&
 		areSelectedFiltersEqual(state.selectedFilters, defaultState.selectedFilters)
 	)
 }
@@ -696,10 +751,10 @@ export function readAnalyticsQueryBuilderState(
 		? selectedCustomTimeframeStartDate
 		: rawCustomTimeframeEndDate
 
-	const selectedBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
-		parseAnalyticsBreakdownQueryValue(
+	const selectedBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
+		parseAnalyticsBreakdownsQueryValue(
 			query[QUERY_KEY_BREAKDOWN],
-			getDefaultAnalyticsBreakdownPreset(selectedProjectIds),
+			getDefaultAnalyticsBreakdownPresets(selectedProjectIds),
 		),
 		selectedProjectIds,
 	)
@@ -728,7 +783,7 @@ export function readAnalyticsQueryBuilderState(
 			GROUP_BY_PRESET_VALUES,
 			defaultState.selectedGroupBy,
 		),
-		selectedBreakdown,
+		selectedBreakdowns,
 		selectedFilters,
 	}
 }
@@ -783,13 +838,16 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 		: undefined
 	nextRouteQuery[QUERY_KEY_GROUP_BY] =
 		state.selectedGroupBy !== DEFAULT_GROUP_BY_PRESET ? state.selectedGroupBy : undefined
-	const defaultBreakdown = getDefaultAnalyticsBreakdownPreset(state.selectedProjectIds)
-	const selectedBreakdown = getAnalyticsBreakdownPresetForProjectSelection(
-		state.selectedBreakdown,
+	const defaultBreakdowns = getDefaultAnalyticsBreakdownPresets(state.selectedProjectIds)
+	const selectedBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
+		state.selectedBreakdowns,
 		state.selectedProjectIds,
 	)
-	nextRouteQuery[QUERY_KEY_BREAKDOWN] =
-		selectedBreakdown !== defaultBreakdown ? selectedBreakdown : undefined
+	nextRouteQuery[QUERY_KEY_BREAKDOWN] = areStringArraysEqual(selectedBreakdowns, defaultBreakdowns)
+		? undefined
+		: selectedBreakdowns.length === 0
+			? 'none'
+			: serializeListQueryValue(selectedBreakdowns)
 
 	for (const category of URL_FILTER_CATEGORIES) {
 		const categoryQueryKey = FILTER_QUERY_KEY_BY_CATEGORY[category]

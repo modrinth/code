@@ -4,6 +4,8 @@ import type { AnalyticsBreakdownPreset } from '~/providers/analytics/analytics'
 
 export const ALL_BREAKDOWN_VALUE = 'All'
 export const UNKNOWN_BREAKDOWN_VALUE = 'Unknown'
+export const COMBINED_BREAKDOWN_LABEL_SEPARATOR = ' + '
+export const COMBINED_BREAKDOWN_DATASET_ID_PREFIX = 'breakdowns:'
 
 export function getAnalyticsBreakdownValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
@@ -46,6 +48,37 @@ export function getAnalyticsBreakdownValue(
 		default:
 			return ALL_BREAKDOWN_VALUE
 	}
+}
+
+export function getAnalyticsBreakdownValues(
+	point: Labrinth.Analytics.v3.ProjectAnalytics,
+	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+): string[] {
+	return selectedBreakdowns
+		.filter((breakdown) => breakdown !== 'none')
+		.map((breakdown) => getAnalyticsBreakdownValue(point, breakdown))
+}
+
+export function getAnalyticsBreakdownKey(values: readonly string[]): string {
+	return values.map((value) => encodeURIComponent(value)).join('+')
+}
+
+export function getAnalyticsBreakdownDatasetId(
+	values: readonly string[],
+	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+): string {
+	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
+	if (normalizedBreakdowns.length === 0) {
+		return 'all'
+	}
+	if (normalizedBreakdowns.length === 1) {
+		if (normalizedBreakdowns[0] === 'project') {
+			return values[0] ?? 'all'
+		}
+		return `breakdown:${values[0] ?? 'all'}`
+	}
+
+	return `${COMBINED_BREAKDOWN_DATASET_ID_PREFIX}${getAnalyticsBreakdownKey(values)}`
 }
 
 export function getDownloadSourceLabel(value: string): string {
