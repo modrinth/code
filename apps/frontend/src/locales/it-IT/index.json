@@ -1881,7 +1881,7 @@
     "message": "Errore nella generazione dello stato da API durante il build."
   },
   "layout.banner.preview.description": {
-    "message": "Se volevi accedere al sito ufficiale, visita {url}. Questa versione serve allo staff di Modrinth per condurre test; basata su <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Se volevi accedere al sito ufficiale, visita {url}. Questa versione serve allo staff di Modrinth per condurre test; basata su {ref}."
   },
   "layout.banner.preview.title": {
     "message": "Questa versione del sito di Modrinth è un'anteprima."

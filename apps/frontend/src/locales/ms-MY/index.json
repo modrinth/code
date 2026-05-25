@@ -1727,9 +1727,6 @@
   "layout.banner.build-fail.title": {
     "message": "Ralat menjana keadaan daripada API semasa membina."
   },
-  "layout.banner.preview.description": {
-    "message": "Jika anda bermaksud untuk mengakses laman sesawang rasmi Modrinth, kunjungi {url}. Pralihat pelaksanaan ini digunakan oleh kakitangan Modrinth untuk tujuan pengujian. Ia dibina menggunakan <branch-link>{owner}/{branch}</branch-link> @ {commit}."
-  },
   "layout.banner.preview.title": {
     "message": "Ini ialah pengaturan pralihat laman sesawang Modrinth."
   },

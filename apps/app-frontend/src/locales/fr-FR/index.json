@@ -611,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java et mémoire"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variables d'environnement personnalisé"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Arguments Java personnalisée"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Installation Java personnalisée"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Allocation de mémoire personnalisée"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Entrer une variable d'environnement..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Entrer un argument Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variables d'environnement"
   },

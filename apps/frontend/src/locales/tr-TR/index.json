@@ -1334,6 +1334,9 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Lütfen vergi formunu tamamlayınız"
   },
+  "discover.install.back-to-server": {
+    "message": "Sunucuya geri dön"
+  },
   "discover.install.back-to-setup": {
     "message": "Sunucuya geri dön"
   },
@@ -1867,9 +1870,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Derleme esnasında API'den durum oluştururken hata."
-  },
-  "layout.banner.preview.description": {
-    "message": "Eğer resmi Modrinth web sitesine erişmek istiyorsanız, {url} adresini ziyaret edin. Bu önizleme sürümü Modrinth ekibi tarafından test amaçlı kullanılmaktadır. <branch-link>{owner}/{branch}</branch-link> @ {commit} kullanılarak derlenmiştir."
   },
   "layout.banner.preview.title": {
     "message": "Bu, Modrinth web sitesinin önizleme dağıtımıdır."
@@ -2696,6 +2696,9 @@
   "project.license.title": {
     "message": "Lisans"
   },
+  "project.moderation.admonition.approved.header": {
+    "message": "Proje onaylandı"
+  },
   "project.moderation.title": {
     "message": "Moderasyon"
   },
@@ -2758,6 +2761,12 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Hazırsınız!"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Daha Fazla Bilgi edinin"
   },
   "project.settings.title": {
     "message": "Ayarlar"
