@@ -5,6 +5,7 @@
 		:show-clear="canClearSelectedBreakdown"
 		clear-label="Reset"
 		@clear="clearFilterBar"
+		checkbox-position="right"
 	>
 		<template #search-actions="{ category, setSelectedValues }">
 			<div v-if="category.key === 'game_version'" class="mr-2 flex w-[150px] justify-end">

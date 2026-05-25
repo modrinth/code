@@ -165,6 +165,44 @@ export const WithAppliedFilters: Story = {
 	},
 }
 
+export const WithRightCheckmarks: Story = {
+	render: () => ({
+		components: { DropdownFilterBar },
+		setup() {
+			const selected = ref<Record<string, string[]>>({
+				status: ['active'],
+				type: ['mod', 'plugin'],
+			})
+			return { categories: defaultCategories, selected }
+		},
+		template: /* html */ `
+			<div class="flex flex-wrap items-center gap-2">
+				<DropdownFilterBar
+					v-model="selected"
+					:categories="categories"
+					checkbox-position="right"
+				/>
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {
+			status: ['active'],
+			type: ['mod', 'plugin'],
+		},
+		categories: defaultCategories,
+		checkboxPosition: 'right',
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Renders selected options with the same right-side checkmark placement as MultiSelect.',
+			},
+		},
+	},
+}
+
 export const WithClearOverride: Story = {
 	render: () => ({
 		components: { DropdownFilterBar },

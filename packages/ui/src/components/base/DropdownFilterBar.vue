@@ -21,6 +21,7 @@
 		:trigger-class="previewTriggerClass"
 		:dropdown-width="getPreviewDropdownWidth(preview.category)"
 		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
+		:checkbox-position="checkboxPosition"
 		show-selection-actions
 		@update:model-value="(nextValue) => setPreviewSelectedValues(preview.key, nextValue)"
 		@open="openPreviewFilterDraft(preview.key)"
@@ -120,7 +121,7 @@
 					:key="category.key"
 					:ref="(element) => setCategoryButtonRef(category.key, element)"
 					type="button"
-					class="group/filter-menu-button flex h-12 w-full appearance-none items-center justify-between gap-1 border-0 px-3 text-left text-base font-semibold text-primary shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110 bg-surface-4"
+					class="group/filter-menu-button flex h-12 w-full appearance-none items-center justify-between gap-1 border-0 px-4 text-left text-base font-semibold text-primary shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110 bg-surface-4"
 					:class="category.key === activeCategoryKey ? '!brightness-110' : ''"
 					role="menuitem"
 					@mouseenter="handleCategoryMouseEnter(category.key)"
@@ -155,7 +156,7 @@
 					:icon="SearchIcon"
 					type="text"
 					:placeholder="activeCategory.searchPlaceholder ?? 'Search...'"
-					wrapper-class="grow bg-surface-4 mx-0"
+					wrapper-class="grow bg-surface-4 mx-1"
 					input-class="ps-9 mx-1.5"
 				/>
 				<slot
@@ -179,7 +180,7 @@
 
 			<div
 				v-if="activeCategorySelectionCount > 0"
-				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-3 py-2.5 text-sm"
+				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-4 py-2.5 text-sm"
 			>
 				<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
 				<button
@@ -204,7 +205,7 @@
 				>
 					<div
 						v-if="filteredActiveCategoryOptions.length === 0"
-						class="px-3 py-3.5 text-base font-medium text-secondary"
+						class="px-4 py-3.5 text-base font-medium text-secondary"
 					>
 						{{ activeCategoryEmptyStateLabel }}
 					</div>
@@ -222,10 +223,13 @@
 						>
 							<button
 								type="button"
-								class="flex w-full cursor-pointer items-center gap-2.5 border-0 p-3 py-3.5 text-left text-contrast shadow-none transition-colors duration-150 bg-surface-4 hover:brightness-110 focus-visible:outline-none"
+								class="flex w-full cursor-pointer items-center gap-2.5 border-0 px-4 py-3.5 text-left text-contrast shadow-none transition-all duration-150 bg-surface-4 hover:brightness-[115%] focus-visible:brightness-[115%] focus-visible:outline-none"
 								:class="[
 									shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
-									{ 'pointer-events-none opacity-50': option.disabled },
+									{
+										'brightness-[115%]': option.selected,
+										'pointer-events-none cursor-not-allowed opacity-50': option.disabled,
+									},
 								]"
 								:aria-disabled="option.disabled || undefined"
 								:aria-checked="option.selected"
@@ -233,6 +237,7 @@
 								@click="toggleFilterOption(activeCategory.key, option)"
 							>
 								<span
+									v-if="checkboxPosition === 'left'"
 									class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
 									:class="
 										option.selected
@@ -244,7 +249,7 @@
 								</span>
 								<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
 									<span
-										class="min-w-0 truncate font-medium leading-tight"
+										class="min-w-0 truncate font-semibold leading-tight"
 										:class="option.selected ? 'text-contrast' : 'text-primary'"
 									>
 										{{ option.label }}
@@ -256,6 +261,12 @@
 										:selected="option.selected"
 									></slot>
 								</div>
+								<span
+									v-if="checkboxPosition === 'right'"
+									class="flex shrink-0 items-center justify-center text-brand"
+								>
+									<CheckIcon v-if="option.selected" aria-hidden="true" class="size-5" />
+								</span>
 							</button>
 						</div>
 					</div>
@@ -392,6 +403,7 @@ const props = withDefaults(
 		useFilterIcon?: boolean
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
+		checkboxPosition?: 'left' | 'right'
 	}>(),
 	{
 		label: 'Filtered by',
@@ -401,6 +413,7 @@ const props = withDefaults(
 		useFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',
 		emptySearchLabel: 'No options found.',
+		checkboxPosition: 'left',
 	},
 )
 
@@ -562,7 +575,7 @@ const appliedFilterPreviews = computed(() =>
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
 const previewTriggerClass =
-	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-3 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
+	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-4 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
 
 function cloneSelectedFilters(filters: DropdownFilterBarValue): DropdownFilterBarValue {
 	return Object.fromEntries(
