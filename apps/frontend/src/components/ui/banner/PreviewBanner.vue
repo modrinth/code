@@ -5,7 +5,6 @@ import {
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
-	normalizeChildren,
 	PagewideBanner,
 	useVIntl,
 } from '@modrinth/ui'
@@ -22,7 +21,7 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'layout.banner.preview.description',
-		defaultMessage: `If you meant to access the official Modrinth website, visit {url}. This preview deploy is used by Modrinth staff for testing purposes. It was built using <branch-link>{owner}/{branch}</branch-link> @ {commit}.`,
+		defaultMessage: `If you meant to access the official Modrinth website, visit {url}. This preview deploy is used by Modrinth staff for testing purposes. It was built using {ref}.`,
 	},
 })
 
@@ -41,30 +40,22 @@ const url = computed(() => `https://modrinth.com${route.fullPath}`)
 		</template>
 		<template #description>
 			<span>
-				<IntlFormatted
-					:message-id="messages.description"
-					:values="{
-						owner: config.public.owner,
-						branch: config.public.branch,
-					}"
-				>
+				<IntlFormatted :message-id="messages.description">
 					<template #url>
 						<a :href="url" target="_blank" rel="noopener" class="text-link">
 							{{ url }}
 						</a>
 					</template>
-					<template #branch-link="{ children }">
+					<template #ref>
 						<a
 							:href="`https://github.com/${config.public.owner}/code/tree/${config.public.branch}`"
 							target="_blank"
 							rel="noopener"
 							class="hover:underline"
 						>
-							<component :is="() => normalizeChildren(children)" />
+							{{ config.public.owner }} / {{ config.public.branch }}
 						</a>
-					</template>
-					<template #commit>
-						<span v-if="config.public.hash === 'unknown'">unknown</span>
+						@ <span v-if="config.public.hash === 'unknown'">unknown</span>
 						<a
 							v-else
 							:href="`https://github.com/${config.public.owner}/code/commit/${config.public.hash}`"

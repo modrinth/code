@@ -1658,6 +1658,15 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Inkompatible ausblenden"
   },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} ist nicht als kompatibel mit dieser Installation markiert. Sie wird sich villeicht unerwartet verhalten."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Auf eine kompatible Version aktualisieren?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Trotzdem aktualisieren"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Lade Änderungsprotokoll..."
   },
@@ -3701,8 +3710,8 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Nordamerika"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Zentral Nordamerika"
   },
   "servers.region.prompt": {
     "defaultMessage": "Wo soll dein Server sich befinden?"

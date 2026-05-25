@@ -105,7 +105,7 @@
     "defaultMessage": "Estás actualmente desconectado. ¡Conéctate a internet para buscar en Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos  {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} servidores {servers} otros {projects}}..."
+    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {modpacks} resourcepack {paquetes de recursos} shader {shaders} plugin {plugins} datapack {datapacks} server {servidores} other {proyectos}}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Proyectos seleccionados"
@@ -348,10 +348,10 @@
     "defaultMessage": "Advertencia de borrado"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Eliminar {count} {itemType}{count, plural, uno {} otro {s}}"
+    "defaultMessage": "Eliminar {count} {itemType}{count, plural, one {} other{s}}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Eliminar {itemType}{count, plural, uno {} otro {s}}"
+    "defaultMessage": "Eliminar {itemType}{count, plural, one {} other {s}}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Bajar de versión} other {Actualizar}} puede causar problemas de compatibilidad. Los mods o contenido que agregaste sobre el modpack se mantendrán, pero podrían no ser compatibles con la nueva versión."
@@ -1658,6 +1658,15 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Ocultar incompatible"
   },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} no está marcada como compatible con esta instalación. Puede lanzar error al iniciar o comportarse de manera inesperada."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "¿Actualizar a una versión incompatible?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Actualizar aún así"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Cargando el registro de cambios..."
   },
@@ -2149,6 +2158,9 @@
   },
   "markdown-editor.upload-error.no-file": {
     "defaultMessage": "Falta el archivo"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "No se especificó un método de subida de imagen"
   },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
@@ -2904,7 +2916,7 @@
     "defaultMessage": "Este de EE. UU."
   },
   "project.server.region.us_west": {
-    "defaultMessage": "Oste de EE. UU."
+    "defaultMessage": "Oeste de EE. UU."
   },
   "project.server.status.offline": {
     "defaultMessage": "Sin conexión"
@@ -2973,7 +2985,7 @@
     "defaultMessage": "Solo los proyectos de tipo mod o modpack pueden tener metadatos de entorno."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
-    "defaultMessage": "Este tipo de proyecto no es compatible con metadatos de entorno."
+    "defaultMessage": "Este tipo de proyecto no es compatible con metadatos de entorno"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Solo servidor dedicado"
@@ -3698,8 +3710,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Norteamérica"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Norteamérica Central"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Norteamérica del Este"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Norteamérica del Oeste"
   },
   "servers.region.prompt": {
     "defaultMessage": "¿Dónde te gustaría que se ubicara tu servidor?"

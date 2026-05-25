@@ -1469,9 +1469,6 @@
   "hosting-marketing.faq.location": {
     "message": "Wo befinden sich Server von Modrinth Hosting? Kann ich eine Region auswählen?"
   },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Derzeit sind Server in Nordamerika, Europa und Südostasien verfügbar, die du beim Kauf auswählen kannst. Weitere Regionen werden in Zukunft dazukommen! Falls du deine Region wechseln möchtest, wende dich bitte an den Support."
-  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Welche Minecraft-Versionen und Loader können verwendet werden?"
   },

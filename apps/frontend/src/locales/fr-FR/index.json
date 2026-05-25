@@ -1014,7 +1014,7 @@
     "message": "Organisations"
   },
   "dashboard.overview.notifications.button.mark-all-as-read": {
-    "message": "Mettre tout comme étant lu."
+    "message": "Marquer tout comme lu"
   },
   "dashboard.overview.notifications.button.view-history": {
     "message": "Voire l'historique"
@@ -1536,7 +1536,7 @@
     "message": "Où se trouvent les serveurs de Modrinth Hosting ? Puis-je choisir une région ?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Nous avons des serveurs disponibles en Amérique du Nord, en Europe et en Asie du Sud-Est en ce moment-même que vous pouvez choisir dès l'achat. Plus de régions à venir dans le futur ! Si vous souhaitez changer de région, veuillez contacter le support."
+    "message": "Nous avons des serveurs disponibles en Amérique du Nord, en Europe et en Asie du Sud-Est pour le moment que vous pouvez choisir lors de l'achat. Plus de régions sont à venir ! Si vous voulez changer de région, contactez le support."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Quelles versions de Minecraft et loaders peuvent-être utilisés ?"

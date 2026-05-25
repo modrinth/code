@@ -452,9 +452,21 @@ const filteredProjects = computed(() => {
 	const filtered = [...typeFiltered.value]
 
 	if (currentSortType.value === 'Most external deps') {
-		filtered.sort((a, b) => b.external_dependencies_count - a.external_dependencies_count)
+		filtered.sort((a, b) => {
+			const depsDiff = b.external_dependencies_count - a.external_dependencies_count
+			if (depsDiff !== 0) return depsDiff
+			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
+			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
+			return dateA - dateB
+		})
 	} else if (currentSortType.value === 'Least external deps') {
-		filtered.sort((a, b) => a.external_dependencies_count - b.external_dependencies_count)
+		filtered.sort((a, b) => {
+			const depsDiff = a.external_dependencies_count - b.external_dependencies_count
+			if (depsDiff !== 0) return depsDiff
+			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
+			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
+			return dateA - dateB
+		})
 	} else if (currentSortType.value === 'Oldest') {
 		filtered.sort((a, b) => {
 			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
@@ -503,7 +515,17 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
+function notifySkippedProjects(skippedCount: number) {
+	if (skippedCount <= 0) return
+	addNotification({
+		title: 'Skipped projects',
+		text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
+		type: 'info',
+		autoCloseMs: 2000,
+	})
+}
+
+async function findFirstEligibleProject(): Promise<ModerationProject | null> {
 	let skippedCount = 0
 
 	while (moderationQueue.hasItems) {
@@ -513,30 +535,32 @@ async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 		const project = filteredProjects.value.find((p) => p.project.id === currentId)
 		if (!project) {
 			await moderationQueue.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
+			continue
+		}
+
+		if (project.project.status !== 'processing') {
+			await moderationQueue.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
 			continue
 		}
 
 		try {
 			const lockStatus = await moderationQueue.checkLock(currentId)
 
-			if (!lockStatus.locked || lockStatus.expired) {
-				if (skippedCount > 0) {
-					addNotification({
-						title: 'Skipped locked projects',
-						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
-						type: 'info',
-					})
-				}
+			if (!lockStatus.locked || lockStatus.expired || lockStatus.is_own_lock) {
+				notifySkippedProjects(skippedCount)
 				return project
 			}
 
-			// Project is locked, skip it
 			await moderationQueue.completeCurrentProject(currentId, 'skipped')
 			skippedCount++
 		} catch {
 			return project
 		}
 	}
+
+	notifySkippedProjects(skippedCount)
 
 	return null
 }
@@ -549,12 +573,12 @@ async function moderateAllInFilter() {
 	await moderationQueue.setQueue(projectIds)
 
 	// Find first unlocked project
-	const targetProject = await findFirstUnlockedProject()
+	const targetProject = await findFirstEligibleProject()
 
 	if (!targetProject) {
 		addNotification({
-			title: 'All projects locked',
-			text: 'All projects in queue are currently being moderated by others.',
+			title: 'No projects available',
+			text: 'All projects in queue are already moderated or locked by others.',
 			type: 'warning',
 		})
 		return
@@ -585,13 +609,12 @@ async function startFromProject(projectId: string) {
 		await moderationQueue.setQueue(projectIds)
 	}
 
-	// Find first unlocked project
-	const targetProject = await findFirstUnlockedProject()
+	const targetProject = await findFirstEligibleProject()
 
 	if (!targetProject) {
 		addNotification({
-			title: 'All projects locked',
-			text: 'All projects in queue are currently being moderated by others.',
+			title: 'No projects available',
+			text: 'All projects in queue are already moderated or locked by others.',
 			type: 'warning',
 		})
 		return

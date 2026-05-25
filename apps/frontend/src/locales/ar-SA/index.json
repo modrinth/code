@@ -942,7 +942,7 @@
     "message": "موعد"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "ستتلقى رسالة بريد إلكتروني في <b>{email}<b> مع تعليمات لاسترداد المبلغ المسحوب. "
+    "message": "ستتلقى رسالة بريد إلكتروني في <b>{email}</b> مع تعليمات لاسترداد المبلغ المسحوب. "
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "سعر الصرف "

@@ -71,6 +71,9 @@
   "app.appearance-settings.select-option": {
     "message": "Pilih opsi"
   },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Peringatkan saya sebelum memasang paket mod tidak dikenal"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Server autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
   },
@@ -268,6 +271,9 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} perlu diperbarui sebelum dimainkan. Mohon perbarui ke versi terkini untuk meluncurkan permainan."
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Pasang konten ke instans"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
@@ -659,6 +665,21 @@
   "instance.worlds.world_in_use": {
     "message": "Dunia sedang dimainkan"
   },
+  "minecraft-account.add-account": {
+    "message": "Tambah akun"
+  },
+  "minecraft-account.label": {
+    "message": "Akun Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Tidak masuk"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Hapus akun"
+  },
+  "minecraft-account.select-account": {
+    "message": "Pilih akun"
+  },
   "search.filter.locked.instance": {
     "message": "Disediakan oleh instans"
   },
@@ -682,5 +703,20 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Pemuat disediakan oleh server"
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Jangan tampilkan peringatan ini lagi"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Konfirmasi pemasangan"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Tetap pasang"
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Kami tidak dapat menemukan berkas ini di Modrinth. Kami sangat menyarankan Anda untuk hanya memasang berkas dari sumber-sumber terpercaya."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Peringatan berkas tidak dikenal"
   }
 }

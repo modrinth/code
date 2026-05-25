@@ -465,7 +465,7 @@
     "defaultMessage": "Kérjük, várjon"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Keresés {count} {contentType} között..."
+    "defaultMessage": "Keresés {count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {tartalom}} között..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Fájlnevek"
@@ -510,7 +510,7 @@
     "defaultMessage": "{progress}/{total} {contentType} törlése..."
   },
   "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "{contentType} törlése..."
+    "defaultMessage": "{contentType, select, mod {Mod} mods {Modok} plugin {Bővítmény} plugins {Bővítmények} datapack {Adatcsomag} datapacks {Adatcsomagok} project {Projekt} projects {Projektek} other {Tartalom}} törlése..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "{progress}/{total} {contentType} letiltása..."
@@ -531,7 +531,7 @@
     "defaultMessage": "{contentType} frissítése..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} kiválasztva"
+    "defaultMessage": "{count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {tartalom}} kiválasztva"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} kiválasztva"
@@ -756,7 +756,7 @@
     "defaultMessage": "Profil importálása"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Böngészd a modcsomagokat a Modrinthon, vagy tölts be egyet fájlból."
+    "defaultMessage": "Böngéssz modcsomagokat a Modrinthon, vagy tölts be egyet fájlból."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Modcsomag letöltése"
@@ -2796,7 +2796,7 @@
     "defaultMessage": "Mindkettőn opcionális; mindkét oldalon történő letöltés esetén működik a legjobban"
   },
   "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
-    "defaultMessage": "Mindkettőn opciónális; legjobb ha mindkét oldalon telepítve van"
+    "defaultMessage": "Mindkettőn opcionális; legjobb ha mindkét oldalon telepítve van"
   },
   "project.settings.environment.client_and_server.optional_client.title": {
     "defaultMessage": "Opcionális kliensen"
@@ -2805,7 +2805,7 @@
     "defaultMessage": "Opcionális szerveren"
   },
   "project.settings.environment.client_and_server.required_both.title": {
-    "defaultMessage": "Minda kettön kell"
+    "defaultMessage": "Mindkettőn kötelező"
   },
   "project.settings.environment.client_and_server.title": {
     "defaultMessage": "Kliens és szerver"
@@ -2838,7 +2838,7 @@
     "defaultMessage": "Minden funkció szerveroldalon történik, és kompatibilis a vanilla klinesekkel."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
-    "defaultMessage": "Mükszik Egyjátékos módban is"
+    "defaultMessage": "Működik egyjátékos módban is"
   },
   "project.settings.environment.server_only.title": {
     "defaultMessage": "Csak szerveroldali"
@@ -3397,9 +3397,6 @@
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "memória"
-  },
-  "servers.region.north-america": {
-    "defaultMessage": "Észak-Amerika"
   },
   "servers.region.prompt": {
     "defaultMessage": "Hol szeretnéd elhelyezni a szerveredet?"

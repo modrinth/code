@@ -398,6 +398,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count, plural, one {# aggiornamento} other {# aggiornamenti}}"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Disabilitati"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Abilitati"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Aggiornamenti"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Avvisi"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando il backup..."
   },
@@ -1658,6 +1670,15 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Nascondi incompatibili"
   },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "La {version} non è contrassegnata come compatibile per questa installazione. Potrebbe avere comportamenti imprevisti o errori nell'avvio."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Aggiornare alla versione incompatibile?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Aggiorna comunque"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Caricando le informazioni..."
   },
@@ -2898,7 +2919,7 @@
     "defaultMessage": "Russia"
   },
   "project.server.region.south_america": {
-    "defaultMessage": "America meridionale"
+    "defaultMessage": "Sud America"
   },
   "project.server.region.tooltip": {
     "defaultMessage": "Server situato in {regionName}"
@@ -3701,8 +3722,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "America settentrionale"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Nord America centrale"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Nord America orientale"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Nord America occidentale"
   },
   "servers.region.prompt": {
     "defaultMessage": "Dove vorresti che il tuo server sia situato?"
