@@ -2874,7 +2874,7 @@
     "message": "You're all set!"
   },
   "project.settings.permissions.fail.description": {
-    "message": "You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content."
+    "message": "You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content or provide proof that you do have permission to use it."
   },
   "project.settings.permissions.fail.title": {
     "message": "Some content can't be included"
@@ -2892,7 +2892,7 @@
     "message": "No external projects match your search."
   },
   "project.settings.permissions.search-placeholder": {
-    "message": "Search {count} {count, plural, one {external project} other {external projects}}..."
+    "message": "Search {count} {count, plural, one {project} other {projects}}..."
   },
   "project.settings.permissions.sort.most-files": {
     "message": "Most files"

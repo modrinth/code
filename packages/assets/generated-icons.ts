@@ -11,8 +11,10 @@ import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
 import _ArrowDownIcon from './icons/arrow-down.svg?component'
+import _ArrowDown10Icon from './icons/arrow-down-1-0.svg?component'
 import _ArrowDownAZIcon from './icons/arrow-down-a-z.svg?component'
 import _ArrowDownLeftIcon from './icons/arrow-down-left.svg?component'
+import _ArrowDownWideNarrowIcon from './icons/arrow-down-wide-narrow.svg?component'
 import _ArrowDownZAIcon from './icons/arrow-down-z-a.svg?component'
 import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
@@ -405,8 +407,10 @@ export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
 export const ArrowDownIcon = _ArrowDownIcon
+export const ArrowDown10Icon = _ArrowDown10Icon
 export const ArrowDownAZIcon = _ArrowDownAZIcon
 export const ArrowDownLeftIcon = _ArrowDownLeftIcon
+export const ArrowDownWideNarrowIcon = _ArrowDownWideNarrowIcon
 export const ArrowDownZAIcon = _ArrowDownZAIcon
 export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon

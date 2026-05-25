@@ -248,9 +248,7 @@ export namespace Labrinth {
 				| 'no_permission'
 			export type AttributionResolutionKind = AttributionPermissionKind
 
-			export type AttributionLicense =
-				| string
-				| { name: string }
+			export type AttributionLicense = string | { name: string }
 
 			export type AttributionModerationStatusKind = 'not_allowed' | 'approved' | 'bad_proof'
 
@@ -262,7 +260,7 @@ export namespace Labrinth {
 			export type AttributionResolutionBase = {
 				notes: string
 				image_urls: string[]
-				moderation_status: AttributionModerationStatus | null
+				moderation_status?: AttributionModerationStatus | null
 			}
 
 			export type AttributionResolution =
@@ -1631,7 +1629,7 @@ export namespace Labrinth {
 				inserted_by: number | null
 				updated_at: string | null
 				updated_by: number | null
-				linked_files: LinkedFile[]
+				linked_files?: LinkedFile[]
 			}
 
 			export type SearchRequest = {
@@ -1646,6 +1644,20 @@ export namespace Labrinth {
 				exceptions?: string
 				proof?: string
 				flame_project_id?: number
+			}
+
+			export type CreateExternalLicenseRequest = {
+				title?: string
+				status: ExternalLicenseStatus
+				link?: string
+				proof?: string
+				flame_project_id?: number
+				files: LinkedFile[]
+			}
+
+			export type AddFileRequest = {
+				hash: string
+				license_id: number
 			}
 		}
 	}

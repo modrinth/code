@@ -902,9 +902,6 @@
   "external-files.permissions-card.license-label": {
     "defaultMessage": "License"
   },
-  "external-files.permissions-card.license.description": {
-    "defaultMessage": "The license of this work permits you to redistribute it in your modpack."
-  },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Unknown"
   },
@@ -919,12 +916,6 @@
   },
   "external-files.permissions-card.link-to-work-url-placeholder": {
     "defaultMessage": "link-to-work"
-  },
-  "external-files.permissions-card.my-project.description": {
-    "defaultMessage": "Original work created by you."
-  },
-  "external-files.permissions-card.no-permission.description": {
-    "defaultMessage": "You don't have permission to use this work."
   },
   "external-files.permissions-card.not-used-in-versions": {
     "defaultMessage": "These files are not currently used by any version."
@@ -941,20 +932,11 @@
   "external-files.permissions-card.original-project-page": {
     "defaultMessage": "Original project"
   },
-  "external-files.permissions-card.proof-description": {
-    "defaultMessage": "Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack."
-  },
   "external-files.permissions-card.proof-image-alt": {
     "defaultMessage": "Proof screenshot {n}"
   },
   "external-files.permissions-card.proof-image-remove": {
     "defaultMessage": "Remove image"
-  },
-  "external-files.permissions-card.proof-images-description.license": {
-    "defaultMessage": "Upload supporting documentation related to this license."
-  },
-  "external-files.permissions-card.proof-images-description.my-project": {
-    "defaultMessage": "Upload files that help verify you created this work."
   },
   "external-files.permissions-card.proof-images-label": {
     "defaultMessage": "Proof images"
@@ -962,35 +944,56 @@
   "external-files.permissions-card.proof-images-upload-prompt": {
     "defaultMessage": "Drag and drop to upload or click to select an image"
   },
-  "external-files.permissions-card.proof-label": {
-    "defaultMessage": "Proof and explanation"
-  },
   "external-files.permissions-card.proof-warning.body": {
     "defaultMessage": "If you are found to have lied or manipulated the images uploaded, your project and account may be terminated."
   },
   "external-files.permissions-card.proof-warning.title": {
     "defaultMessage": "Modrinth staff may verify submitted proof"
   },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Automatically attributed"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "We've seen this file before and have prepared an attribution for you. If something seems wrong, please contact Modrinth Support via the Help Center"
+  },
   "external-files.permissions-card.reason.license": {
     "defaultMessage": "License"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "The license of this work permits you to redistribute it in your modpack."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Upload supporting documentation related to this license."
   },
   "external-files.permissions-card.reason.my-project": {
     "defaultMessage": "My project"
   },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Original work created by you."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Upload files that help verify you created this work."
+  },
   "external-files.permissions-card.reason.no-permission": {
     "defaultMessage": "No permission"
   },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "You don't have permission to use this work."
+  },
+  "external-files.permissions-card.reason.proof-description": {
+    "defaultMessage": "Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack."
+  },
   "external-files.permissions-card.reason.special-permission": {
     "defaultMessage": "Special permission"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
   },
   "external-files.permissions-card.save": {
     "defaultMessage": "Save attribution"
   },
   "external-files.permissions-card.select-license-label": {
     "defaultMessage": "Select a license..."
-  },
-  "external-files.permissions-card.special-permission.description": {
-    "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Remove from group"
@@ -1000,6 +1003,21 @@
   },
   "external-files.permissions-card.type-label": {
     "defaultMessage": "Permission reason"
+  },
+  "external-files.permissions-card.moderation.approved": {
+    "defaultMessage": "Seems legit"
+  },
+  "external-files.permissions-card.moderation.bad-proof": {
+    "defaultMessage": "Insufficient proof"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Could not save moderation review"
+  },
+  "external-files.permissions-card.moderation.not-allowed": {
+    "defaultMessage": "Breaks rules"
+  },
+  "external-files.permissions-card.review-explanation-placeholder": {
+    "defaultMessage": "Explanation of review"
   },
   "external-files.permissions-card.unnamed-multi-group-title": {
     "defaultMessage": "{filename} + {count} more"

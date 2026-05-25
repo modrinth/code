@@ -47,4 +47,33 @@ export class LabrinthExternalProjectsInternalModule extends AbstractModule {
 			},
 		)
 	}
+
+	// TODO: Backend routes don't exist yet
+	public async create(
+		data: Labrinth.ExternalProjects.Internal.CreateExternalLicenseRequest,
+	): Promise<Labrinth.ExternalProjects.Internal.ExternalProject> {
+		return this.client.request<Labrinth.ExternalProjects.Internal.ExternalProject>(
+			'/moderation/external-license',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: data,
+			},
+		)
+	}
+
+	public async addFile(
+		data: Labrinth.ExternalProjects.Internal.AddFileRequest,
+	): Promise<Labrinth.ExternalProjects.Internal.ExternalProject> {
+		return this.client.request<Labrinth.ExternalProjects.Internal.ExternalProject>(
+			'/moderation/external-license/file',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: data,
+			},
+		)
+	}
 }

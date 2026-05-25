@@ -1,5 +1,6 @@
 <template>
 	<button
+		type="button"
 		class="group bg-transparent border-none p-0 m-0 flex items-center text-left gap-3 checkbox-outer outline-offset-4 text-contrast"
 		:disabled="disabled"
 		:class="

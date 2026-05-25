@@ -1,63 +1,68 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	CheckIcon,
+	CheckCircleIcon,
 	ChevronDownIcon,
 	EditIcon,
-	ExternalIcon,
 	FileIcon,
 	PlusIcon,
-	SaveIcon,
+	ScaleIcon,
 	SpinnerIcon,
-	TrashIcon,
-	UploadIcon,
-	UserRoundIcon,
 	VersionIcon,
+	XCircleIcon,
+	ReportIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { builtinLicenses } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 
-import {
-	Admonition,
-	ButtonStyled,
-	Chips,
-	Collapsible,
-	Combobox,
-	type ComboboxOption,
-	IntlFormatted,
-	StyledInput,
-	TagItem,
-} from '#ui/components'
-import { Avatar, FileInput } from '#ui/components/base'
+import { ButtonStyled, Collapsible } from '#ui/components'
 import { commonMessages } from '#ui/utils'
 
-import { useFormatDateTime } from '../../composables/format-date-time'
-import {
-	defineMessage,
-	defineMessages,
-	type MessageDescriptor,
-	useVIntl,
-} from '../../composables/i18n'
+import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 } from '../../providers'
-import ExternalProjectAddFilesToGroupModal from './ExternalProjectAddFilesToGroupModal.vue'
+import AddFilesToAttributionGroupModal from './AddFilesToAttributionGroupModal.vue'
+import AddToExistingExternalProjectModal from './AddToExistingExternalProjectModal.vue'
+import AddToGlobalPermissionsDatabaseModal from './AddToGlobalPermissionsDatabaseModal.vue'
+import AttributionDisplay from './AttributionDisplay.vue'
+import AttributionEditor from './AttributionEditor.vue'
+import AttributionModerationDbBadge from './AttributionModerationDbBadge.vue'
+import AttributionStatusTag from './AttributionStatusTag.vue'
+import {
+	attributionLinkToWork,
+	createAttributionGroupTitle,
+	MODERATION_DB_BADGE,
+	parseInitialAttribution,
+} from './external-project-utils'
+import OriginalPageLink from './OriginalPageLink.vue'
+import StyledInput from '../base/StyledInput.vue'
 
-const props = defineProps<{
-	projectId: string
-	group: Labrinth.Attribution.Internal.AttributionGroup
-}>()
+const props = withDefaults(
+	defineProps<{
+		projectId: string
+		group: Labrinth.Attribution.Internal.AttributionGroup
+		isModerator?: boolean
+	}>(),
+	{
+		isModerator: false,
+	},
+)
 
 const emit = defineEmits<{
 	(e: 'updated'): void
 }>()
 
+const addFilesModalRef = useTemplateRef<typeof AddFilesToAttributionGroupModal>('addFilesModalRef')
+const addToGlobalModalRef =
+	useTemplateRef<typeof AddToGlobalPermissionsDatabaseModal>('addToGlobalModalRef')
+const addToExistingModalRef =
+	useTemplateRef<typeof AddToExistingExternalProjectModal>('addToExistingModalRef')
+
 const { formatMessage } = useVIntl()
-const formatDate = useFormatDateTime({ dateStyle: 'long' })
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
@@ -73,29 +78,21 @@ const attributorMember = computed(() => {
 
 const attributorLink = computed(() => {
 	const id = props.group.attributed_by
-	if (!id) return null
-	if (attributorMember.value) return `/user/${attributorMember.value.user.username}`
-	return `/user/${id}`
+	if (!id) {
+		return null
+	}
+	const slug = attributorMember.value?.user?.username ?? id
+	return `/user/${slug}`
 })
 
 const attributorLabel = computed(() => {
-	if (attributorMember.value) return attributorMember.value.user.username
-	return props.group.attributed_by ?? ''
+	if (attributorMember.value) {
+		return attributorMember.value.user.username
+	}
+	return props.group.attributed_by ?? 'unknown'
 })
 
 const messages = defineMessages({
-	pendingBadge: {
-		id: 'external-files.permissions-card.badge.pending',
-		defaultMessage: 'Pending',
-	},
-	attributedBadge: {
-		id: 'external-files.permissions-card.badge.attributed',
-		defaultMessage: 'Attributed',
-	},
-	noPermissionBadge: {
-		id: 'external-files.permissions-card.badge.no-permission',
-		defaultMessage: 'No permission',
-	},
 	fileCount: {
 		id: 'external-files.permissions-card.file-count',
 		defaultMessage: '{count, plural, one {# file} other {# files}}',
@@ -112,98 +109,6 @@ const messages = defineMessages({
 		id: 'external-files.permissions-card.not-used-in-versions',
 		defaultMessage: 'These files are not currently used by any version.',
 	},
-	typeLabel: {
-		id: 'external-files.permissions-card.type-label',
-		defaultMessage: 'Permission reason',
-	},
-	licenseLabel: {
-		id: 'external-files.permissions-card.license-label',
-		defaultMessage: 'License',
-	},
-	selectLicenseLabel: {
-		id: 'external-files.permissions-card.select-license-label',
-		defaultMessage: 'Select a license...',
-	},
-	licensedAs: {
-		id: 'external-files.permissions-card.licensed-as',
-		defaultMessage: 'Licensed:',
-	},
-	linkLabel: {
-		id: 'external-files.permissions-card.link-label',
-		defaultMessage: 'Link to work',
-	},
-	linkToWorkUrlPlaceholder: {
-		id: 'external-files.permissions-card.link-to-work-url-placeholder',
-		defaultMessage: 'link-to-work',
-	},
-	notesLabel: {
-		id: 'external-files.permissions-card.notes-label',
-		defaultMessage: 'Notes',
-	},
-	optional: {
-		id: 'external-files.permissions-card.input-optional',
-		defaultMessage: '(optional)',
-	},
-	notesPlaceholder: {
-		id: 'external-files.permissions-card.notes-placeholder',
-		defaultMessage: 'Write something here...',
-	},
-	proofLabel: {
-		id: 'external-files.permissions-card.proof-label',
-		defaultMessage: 'Proof and explanation',
-	},
-	proofWarningTitle: {
-		id: 'external-files.permissions-card.proof-warning.title',
-		defaultMessage: 'Modrinth staff may verify submitted proof',
-	},
-	proofWarningBody: {
-		id: 'external-files.permissions-card.proof-warning.body',
-		defaultMessage: `If you are found to have lied or manipulated the images uploaded, your project and account may be terminated.`,
-	},
-	saveAttribution: {
-		id: 'external-files.permissions-card.save',
-		defaultMessage: 'Save attribution',
-	},
-	addAttribution: {
-		id: 'external-files.permissions-card.add',
-		defaultMessage: 'Add attribution',
-	},
-	lastUpdated: {
-		id: 'external-files.permissions-card.last-updated',
-		defaultMessage: 'Last updated on {date} by {user}',
-	},
-	licenseRequired: {
-		id: 'external-files.permissions-card.error.license-required',
-		defaultMessage: 'Please select a license.',
-	},
-	customLicenseLabel: {
-		id: 'external-files.permissions-card.custom-license-label',
-		defaultMessage: 'Link to license',
-	},
-	linkToLicenseUrlPlaceholder: {
-		id: 'external-files.permissions-card.link-to-license-url-placeholder',
-		defaultMessage: 'link-to-license',
-	},
-	linkInvalidUrl: {
-		id: 'external-files.permissions-card.error.link-invalid-url',
-		defaultMessage: 'Link must be a valid URL.',
-	},
-	proofImagesLabel: {
-		id: 'external-files.permissions-card.proof-images-label',
-		defaultMessage: 'Proof images',
-	},
-	proofImagesUploadPrompt: {
-		id: 'external-files.permissions-card.proof-images-upload-prompt',
-		defaultMessage: 'Drag and drop to upload or click to select an image',
-	},
-	proofImageThumbnailAlt: {
-		id: 'external-files.permissions-card.proof-image-alt',
-		defaultMessage: 'Proof screenshot {n}',
-	},
-	proofImageRemove: {
-		id: 'external-files.permissions-card.proof-image-remove',
-		defaultMessage: 'Remove image',
-	},
 	splitFile: {
 		id: 'external-files.permissions-card.split-file',
 		defaultMessage: 'Remove from group',
@@ -212,59 +117,45 @@ const messages = defineMessages({
 		id: 'external-files.permissions-card.add-files-to-group',
 		defaultMessage: 'Add files...',
 	},
-	originalProjectPage: {
-		id: 'external-files.permissions-card.original-project-page',
-		defaultMessage: 'Original project',
+	reviewExplanationPlaceholder: {
+		id: 'external-files.permissions-card.review-explanation-placeholder',
+		defaultMessage: 'Explanation of review',
+	},
+	moderationApproved: {
+		id: 'external-files.permissions-card.moderation.approved',
+		defaultMessage: 'Seems legit',
+	},
+	moderationBadProof: {
+		id: 'external-files.permissions-card.moderation.bad-proof',
+		defaultMessage: 'Insufficient proof',
+	},
+	moderationNotAllowed: {
+		id: 'external-files.permissions-card.moderation.not-allowed',
+		defaultMessage: 'Breaks rules',
 	},
 })
 
-const collapsed = ref(true)
+const collapsed = ref(!!props.group.attribution)
+const editing = ref(false)
+const editorResumeKey = ref(0)
 
-const MAX_PROOF_IMAGE_BYTES = 1_048_576
-
-const isAttributed = computed(
-	() => props.group.attribution !== null && props.group.attribution !== undefined,
+const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionResolution | null>(
+	() => parseInitialAttribution(props.group.attribution),
 )
-const fileCount = computed(() => props.group.files?.length ?? 0)
 
-function isValidUrl(raw: string): boolean {
-	const s = raw.trim()
-	if (!s) return false
-	let parsed: URL
-	try {
-		parsed = new URL(s)
-	} catch {
-		return false
+const isAttributed = computed(() => initialAttribution.value !== null)
+const attributionStatusVariant = computed<'pending' | 'attributed' | 'no_permission'>(() => {
+	if (isAttributed.value && props.group.attribution?.kind === 'no_permission') {
+		return 'no_permission'
 	}
-	return parsed.protocol === 'http:' || parsed.protocol === 'https:'
-}
-
-const effectiveTitle = computed(() => {
-	if (props.group.flame_project?.title) {
-		return props.group.flame_project.title
+	if (isAttributed.value) {
+		return 'attributed'
 	}
-	const firstFileName = props.group.files[0]?.name ?? props.group.files[0]?.sha1 ?? ''
-	if (firstFileName) {
-		const base = firstFileName.split('/').pop() ?? firstFileName
-		if (fileCount.value === 1) {
-			return base
-		}
-		return formatMessage(
-			defineMessage({
-				id: 'external-files.permissions-card.unnamed-multi-group-title',
-				defaultMessage: '{filename} + {count} more',
-			}),
-			{ filename: base, count: fileCount.value - 1 },
-		)
-	}
-	return formatMessage(
-		defineMessage({
-			id: 'external-files.permissions-card.fallback-group-title',
-			defaultMessage: 'Attribution group {id}',
-		}),
-		{ id: props.group.id },
-	)
+	return 'pending'
 })
+
+const title = computed(() => createAttributionGroupTitle(props.group, formatMessage))
+const fileCount = computed(() => props.group.files?.length ?? 0)
 
 const containingVersions = computed(() => {
 	const versionIds = new Set<string>()
@@ -276,401 +167,6 @@ const containingVersions = computed(() => {
 	return props.group.versions?.filter((v) => versionIds.has(v.id))
 })
 
-const permissionKinds: Labrinth.Attribution.Internal.AttributionResolutionKind[] = [
-	'license',
-	'my_project',
-	'special_permissions',
-	'no_permission',
-]
-
-function isCustomAttributionLicense(
-	license: Labrinth.Attribution.Internal.AttributionLicense,
-): license is { name: string } {
-	return typeof license === 'object' && license !== null && 'name' in license
-}
-
-function parseAttributionLicense(
-	license: Labrinth.Attribution.Internal.AttributionLicense | undefined,
-): {
-	spdx: string
-	custom: string
-} {
-	if (!license) {
-		return { spdx: '', custom: '' }
-	}
-	if (isCustomAttributionLicense(license)) {
-		return { spdx: CUSTOM_LICENSE_VALUE, custom: license.name }
-	}
-	return { spdx: license, custom: '' }
-}
-
-function attributionLinkToWork(
-	attribution: Labrinth.Attribution.Internal.AttributionResolution | null | undefined,
-): string | undefined {
-	if (!attribution) {
-		return undefined
-	}
-	if (attribution.kind === 'license' || attribution.kind === 'special_permissions') {
-		return attribution.link_to_work
-	}
-	return undefined
-}
-
-const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionResolution | null>(
-	() => {
-		const raw = props.group.attribution
-		if (!raw || typeof raw !== 'object') {
-			return null
-		}
-		const obj = raw as Record<string, unknown>
-		const kind = obj.kind
-		if (typeof kind !== 'string' || !(permissionKinds as string[]).includes(kind)) {
-			return null
-		}
-		return obj as Labrinth.Attribution.Internal.AttributionResolution
-	},
-)
-
-const editing = ref(!isAttributed.value)
-const selectedKind = ref<Labrinth.Attribution.Internal.AttributionResolutionKind>(
-	initialAttribution.value?.kind ?? 'license',
-)
-
-/** Combobox value when the user picks a non-SPDX custom license (stored as `{ name }`). */
-const CUSTOM_LICENSE_VALUE = '__custom__'
-
-const licenseIdInput = ref('')
-const customLicenseInput = ref('')
-const linkInput = ref('')
-const notesInput = ref('')
-const inputError = ref<string | null>(null)
-const proofImageUrls = ref<string[]>([])
-
-function extFromImageFile(file: File): Labrinth.Images.v3.ImageExtension | null {
-	const byMime: Partial<Record<string, Labrinth.Images.v3.ImageExtension>> = {
-		'image/png': 'png',
-		'image/gif': 'gif',
-		'image/webp': 'webp',
-		'image/bmp': 'bmp',
-		'image/jpeg': 'jpg',
-	}
-	const mime = byMime[file.type]
-	if (mime) {
-		return mime
-	}
-	const ext = file.name.toLowerCase().split('.').pop()
-	if (ext === 'jpg' || ext === 'jpeg') {
-		return 'jpg'
-	}
-	if (ext === 'png' || ext === 'gif' || ext === 'webp' || ext === 'bmp') {
-		return ext
-	}
-	return null
-}
-
-function resetInputs() {
-	const payload = initialAttribution.value
-	selectedKind.value = payload?.kind ?? 'license'
-	const license =
-		payload && (payload.kind === 'license' || payload.kind === 'my_project')
-			? parseAttributionLicense(payload.license)
-			: { spdx: '', custom: '' }
-	licenseIdInput.value = license.spdx
-	customLicenseInput.value = license.custom
-	const linkFallback = props.group.flame_project?.url ?? ''
-	linkInput.value = attributionLinkToWork(payload) ?? linkFallback
-	notesInput.value = payload?.notes ?? ''
-	proofImageUrls.value = payload?.image_urls ?? []
-	inputError.value = null
-}
-
-resetInputs()
-
-watch(licenseIdInput, (value) => {
-	if (value !== CUSTOM_LICENSE_VALUE) {
-		customLicenseInput.value = ''
-	}
-})
-
-watch(
-	() => props.group.attribution,
-	() => {
-		resetInputs()
-	},
-	{ deep: true },
-)
-
-type ProjectPermissionField =
-	| 'license_id'
-	| 'custom_license'
-	| 'link_to_work'
-	| 'notes'
-	| 'image_urls'
-
-const PERMISSION_REASONS = {
-	license: {
-		label: defineMessage({
-			id: 'external-files.permissions-card.reason.license',
-			defaultMessage: 'License',
-		}),
-		description: defineMessage({
-			id: 'external-files.permissions-card.license.description',
-			defaultMessage: 'The license of this work permits you to redistribute it in your modpack.',
-		}),
-		proofImagesDescription: defineMessage({
-			id: 'external-files.permissions-card.proof-images-description.license',
-			defaultMessage: 'Upload supporting documentation related to this license.',
-		}),
-		proofImagesOptional: true,
-		fields: ['license_id', 'custom_license', 'link_to_work', 'notes', 'image_urls'] as const,
-	},
-	my_project: {
-		label: defineMessage({
-			id: 'external-files.permissions-card.reason.my-project',
-			defaultMessage: 'My project',
-		}),
-		description: defineMessage({
-			id: 'external-files.permissions-card.my-project.description',
-			defaultMessage: 'Original work created by you.',
-		}),
-		proofImagesDescription: defineMessage({
-			id: 'external-files.permissions-card.proof-images-description.my-project',
-			defaultMessage: 'Upload files that help verify you created this work.',
-		}),
-		proofImagesOptional: true,
-		fields: ['license_id', 'custom_license', 'notes', 'image_urls'] as const,
-	},
-	special_permissions: {
-		label: defineMessage({
-			id: 'external-files.permissions-card.reason.special-permission',
-			defaultMessage: 'Special permission',
-		}),
-		description: defineMessage({
-			id: 'external-files.permissions-card.special-permission.description',
-			defaultMessage:
-				'You have obtained special permission to redistribute this work in your modpack.',
-		}),
-		proofImagesDescription: defineMessage({
-			id: 'external-files.permissions-card.proof-description',
-			defaultMessage:
-				'Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack.',
-		}),
-		proofImagesOptional: false,
-		fields: ['link_to_work', 'notes', 'image_urls'] as const,
-	},
-	no_permission: {
-		label: defineMessage({
-			id: 'external-files.permissions-card.reason.no-permission',
-			defaultMessage: 'No permission',
-		}),
-		description: defineMessage({
-			id: 'external-files.permissions-card.no-permission.description',
-			defaultMessage: "You don't have permission to use this work.",
-		}),
-		proofImagesDescription: null,
-		proofImagesOptional: null,
-		fields: ['notes'] as const,
-	},
-} satisfies Record<
-	Labrinth.Attribution.Internal.AttributionResolutionKind,
-	{
-		label: MessageDescriptor
-		description: MessageDescriptor
-		proofImagesDescription: MessageDescriptor | null
-		proofImagesOptional: boolean | null
-		fields: ProjectPermissionField[]
-	}
->
-
-const permissionReasonFields = computed<ProjectPermissionField[]>(() => {
-	return PERMISSION_REASONS[selectedKind.value]?.fields ?? []
-})
-
-const readViewFields = computed<ProjectPermissionField[]>(() => {
-	const kind = initialAttribution.value?.kind
-	if (!kind) return []
-	return PERMISSION_REASONS[kind]?.fields ?? []
-})
-
-const unknownLicenseMessage = defineMessage({
-	id: 'external-files.permissions-card.license.unknown',
-	defaultMessage: 'Unknown',
-})
-
-const notesNoneMessage = defineMessage({
-	id: 'external-files.permissions-card.notes-none',
-	defaultMessage: 'None',
-})
-
-const isCustomLicense = computed(() => licenseIdInput.value === CUSTOM_LICENSE_VALUE)
-
-const licenseOptions = computed<ComboboxOption<string>[]>(() => [
-	...builtinLicenses
-		.filter((license) => license.short !== '' && license.short !== 'All-Rights-Reserved')
-		.map((license) => ({
-			value: license.short,
-			label: license.short,
-		})),
-	{
-		value: CUSTOM_LICENSE_VALUE,
-		label: formatMessage(
-			defineMessage({
-				id: 'external-files.permissions-card.custom-license-option',
-				defaultMessage: 'Other',
-			}),
-		),
-	},
-])
-
-const licenseReadDisplay = computed(() => {
-	const attr = initialAttribution.value
-	if (!attr || (attr.kind !== 'license' && attr.kind !== 'my_project')) {
-		return null
-	}
-	if (isCustomAttributionLicense(attr.license)) {
-		return { kind: 'custom' as const, value: attr.license.name }
-	}
-	const licenseId = attr.license
-	if (licenseId) {
-		const friendly =
-			builtinLicenses.find((license) => license.short === licenseId)?.friendly ?? licenseId
-		return { kind: 'standard' as const, value: friendly }
-	}
-	return { kind: 'unknown' as const, value: formatMessage(unknownLicenseMessage) }
-})
-
-function buildAttributionLicense(): Labrinth.Attribution.Internal.AttributionLicense | null {
-	const custom = isCustomLicense.value
-	if (!licenseIdInput.value) {
-		inputError.value = formatMessage(messages.licenseRequired)
-		return null
-	}
-	const customLicense = customLicenseInput.value.trim()
-	if (custom && !customLicense) {
-		inputError.value = formatMessage(
-			defineMessage({
-				id: 'external-files.permissions-card.error.custom-license-required',
-				defaultMessage: 'Please describe the custom license.',
-			}),
-		)
-		return null
-	}
-	return custom ? { name: customLicense } : licenseIdInput.value
-}
-
-function buildEditedData(): Labrinth.Attribution.Internal.AttributionResolution | null {
-	inputError.value = null
-	const notes = notesInput.value.trim()
-	const image_urls = [...proofImageUrls.value]
-	switch (selectedKind.value) {
-		case 'license': {
-			const license = buildAttributionLicense()
-			if (!license) {
-				return null
-			}
-			const linkRaw = linkInput.value.trim()
-			if (!linkRaw) {
-				inputError.value = formatMessage(
-					defineMessage({
-						id: 'external-files.permissions-card.error.link-required',
-						defaultMessage: 'Please provide a link.',
-					}),
-				)
-				return null
-			}
-			if (!isValidUrl(linkRaw)) {
-				inputError.value = formatMessage(messages.linkInvalidUrl)
-				return null
-			}
-			return {
-				kind: 'license',
-				license,
-				link_to_work: linkRaw,
-				notes,
-				image_urls,
-			}
-		}
-		case 'my_project': {
-			const license = buildAttributionLicense()
-			if (!license) {
-				return null
-			}
-			return {
-				kind: 'my_project',
-				license,
-				notes,
-				image_urls,
-			}
-		}
-		case 'special_permissions': {
-			const linkRaw = linkInput.value.trim()
-			if (!linkRaw) {
-				inputError.value = formatMessage(
-					defineMessage({
-						id: 'external-files.permissions-card.error.link-required',
-						defaultMessage: 'Please provide a link.',
-					}),
-				)
-				return null
-			}
-			if (!isValidUrl(linkRaw)) {
-				inputError.value = formatMessage(messages.linkInvalidUrl)
-				return null
-			}
-			return {
-				kind: 'special_permissions',
-				link_to_work: linkRaw,
-				notes,
-				image_urls,
-			}
-		}
-		case 'no_permission':
-			return {
-				kind: 'no_permission',
-				notes,
-				image_urls,
-			}
-	}
-}
-
-const uploadProofImageMutation = useMutation({
-	mutationFn: async (file: File) => {
-		const ext = extFromImageFile(file)
-		if (!ext) {
-			throw new Error(
-				formatMessage(
-					defineMessage({
-						id: 'external-files.permissions-card.error.proof-image-invalid-type',
-						defaultMessage: 'Please upload a PNG, JPEG, GIF, WebP, or BMP image.',
-					}),
-				),
-			)
-		}
-		const result = await client.labrinth.images_v3.uploadImage(file, ext, {
-			context: 'project',
-			project_id: props.projectId,
-		}).promise
-		return result.url
-	},
-	onSuccess(url) {
-		proofImageUrls.value = [...proofImageUrls.value, url]
-	},
-})
-
-function handleProofImagesSelected(files: File[]) {
-	const file = files[0]
-	if (!file) {
-		return
-	}
-	inputError.value = null
-	uploadProofImageMutation.mutate(file)
-}
-
-function removeProofImage(index: number) {
-	proofImageUrls.value = proofImageUrls.value.filter((_, i) => i !== index)
-}
-
-const addFilesModalRef = ref<InstanceType<typeof ExternalProjectAddFilesToGroupModal> | null>(null)
 const pendingSplitSha1 = ref<string | null>(null)
 
 const assignFilesMutation = useMutation({
@@ -731,37 +227,18 @@ const splitFileMutation = useMutation({
 	},
 })
 
-const saveMutation = useMutation({
-	mutationFn: (payload: Labrinth.Attribution.Internal.AttributionResolution) =>
-		client.labrinth.attribution_internal.updateGroup(props.group.id, {
-			attribution: payload,
-		}),
-	onSuccess: async () => {
-		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.projectId] })
-		editing.value = false
-		emit('updated')
-	},
-})
-
-function handleSave() {
-	const data = buildEditedData()
-	if (!data) {
-		return
-	}
-	saveMutation.mutate(data)
-}
-
-function cancelEditing() {
-	resetInputs()
-	if (isAttributed.value) {
-		editing.value = false
-	}
-}
-
 function startEditing() {
 	editing.value = true
 	collapsed.value = false
-	resetInputs()
+	editorResumeKey.value += 1
+}
+
+function stopEditingAfterSaveOrCancel() {
+	editing.value = false
+}
+
+function handleEditorUpdated() {
+	emit('updated')
 }
 
 function handleSplitFile(sha1: string) {
@@ -792,6 +269,105 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 		})
 	}
 }
+
+async function handleModerationDbUpdated() {
+	await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.projectId] })
+	emit('updated')
+}
+
+function handleAddToGlobalDatabase(event: MouseEvent) {
+	addToGlobalModalRef.value?.show(event)
+}
+
+function handleAddToExistingEntry(event: MouseEvent) {
+	addToExistingModalRef.value?.show(event)
+}
+
+const originalProjectUrl = computed(
+	() => attributionLinkToWork(initialAttribution.value) ?? props.group.flame_project?.url,
+)
+
+const moderationStatusKind = computed(
+	() => props.group.attribution?.moderation_status?.kind ?? null,
+)
+
+const moderationStatusIndicator = computed(() => {
+	if (!props.isModerator || !moderationStatusKind.value) {
+		return null
+	}
+	switch (moderationStatusKind.value) {
+		case 'approved':
+			return { icon: CheckCircleIcon, class: 'text-green size-5 shrink-0' }
+		case 'bad_proof':
+			return { icon: XCircleIcon, class: 'text-red size-5 shrink-0' }
+		case 'not_allowed':
+			return { icon: ReportIcon, class: 'text-red size-5 shrink-0' }
+	}
+})
+
+const reviewReasonInput = ref('')
+
+function syncReviewReasonInput() {
+	reviewReasonInput.value = props.group.attribution?.moderation_status?.reason ?? ''
+}
+
+syncReviewReasonInput()
+
+watch(
+	() => props.group.attribution?.moderation_status,
+	() => {
+		syncReviewReasonInput()
+	},
+	{ deep: true },
+)
+
+const pendingModerationStatusKind =
+	ref<Labrinth.Attribution.Internal.AttributionModerationStatusKind | null>(null)
+
+const setModerationStatusMutation = useMutation({
+	mutationFn: (kind: Labrinth.Attribution.Internal.AttributionModerationStatusKind) => {
+		if (!initialAttribution.value) {
+			throw new Error('Attribution is required')
+		}
+		return client.labrinth.attribution_internal.updateGroup(props.group.id, {
+			attribution: {
+				...initialAttribution.value,
+				moderation_status: {
+					kind,
+					reason: reviewReasonInput.value.trim(),
+				},
+			},
+		})
+	},
+	onMutate(kind) {
+		pendingModerationStatusKind.value = kind
+	},
+	onSettled() {
+		pendingModerationStatusKind.value = null
+	},
+	onSuccess: async () => {
+		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.projectId] })
+		emit('updated')
+	},
+	onError: (error: Error) => {
+		addNotification({
+			type: 'error',
+			title: formatMessage(
+				defineMessage({
+					id: 'external-files.permissions-card.moderation.error.title',
+					defaultMessage: 'Could not save moderation review',
+				}),
+			),
+			text: error.message,
+		})
+	},
+})
+
+function handleSetModerationStatus(
+	kind: Labrinth.Attribution.Internal.AttributionModerationStatusKind,
+) {
+	setModerationStatusMutation.mutate(kind)
+}
 </script>
 
 <template>
@@ -801,7 +377,10 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 		<div class="flex items-center bg-surface-3 gap-3">
 			<button
 				class="flex grow items-center m-0 appearance-none p-4 bg-transparent group transition-all gap-3 text-left min-w-0 outline-offset-[-3px] rounded-2xl"
-				:class="{ 'rounded-b-none': !collapsed, 'rounded-r-none': group.flame_project?.url }"
+				:class="{
+					'rounded-b-none': !collapsed,
+					'rounded-r-none': group.flame_project?.url || isModerator,
+				}"
 				@click="collapsed = !collapsed"
 			>
 				<ChevronDownIcon
@@ -809,45 +388,26 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 					:class="{ 'rotate-180': !collapsed }"
 				/>
 				<span class="flex flex-col items-start min-w-0 group-active:scale-[0.98]">
-					<span class="flex items-center gap-2 text-contrast font-semibold min-w-0">
-						<span class="truncate">{{ effectiveTitle }}</span>
-						<TagItem
-							v-if="isAttributed && group.attribution?.kind === 'no_permission'"
-							:style="{ '--_bg-color': 'var(--color-red-bg)', '--_color': 'var(--color-red)' }"
-						>
-							{{ formatMessage(messages.noPermissionBadge) }}
-						</TagItem>
-						<TagItem
-							v-else-if="isAttributed"
-							:style="{ '--_bg-color': 'var(--color-green-bg)', '--_color': 'var(--color-green)' }"
-						>
-							{{ formatMessage(messages.attributedBadge) }}
-						</TagItem>
-						<TagItem
-							v-else
-							:style="{
-								'--_bg-color': 'var(--color-orange-bg)',
-								'--_color': 'var(--color-orange)',
-							}"
-						>
-							{{ formatMessage(messages.pendingBadge) }}
-						</TagItem>
+					<span class="flex items-center gap-2 min-w-0">
+						<span class="text-contrast truncate font-semibold">{{ title }}</span>
+						<component
+							:is="moderationStatusIndicator.icon"
+							v-if="moderationStatusIndicator"
+							:class="moderationStatusIndicator.class"
+							aria-hidden="true"
+						/>
+						<AttributionStatusTag :variant="attributionStatusVariant" />
+						<OriginalPageLink v-if="originalProjectUrl && isModerator" :href="originalProjectUrl" />
 					</span>
 					<span v-if="fileCount > 1" class="text-secondary text-sm font-normal">
 						{{ formatMessage(messages.fileCount, { count: fileCount }) }}
 					</span>
 				</span>
 			</button>
-			<a
-				v-if="!!group.flame_project?.url || !!attributionLinkToWork(initialAttribution)"
-				:href="attributionLinkToWork(initialAttribution) ?? group.flame_project?.url"
-				target="_blank"
-				rel="noopener"
-				class="text-link flex items-center mr-4 outline-offset-[4px] rounded-sm"
-			>
-				{{ formatMessage(messages.originalProjectPage) }}
-				<ExternalIcon class="size-3 shrink-0 mb-2 ml-1" />
-			</a>
+			<div class="mr-4 flex items-center gap-2">
+				<AttributionModerationDbBadge v-if="isModerator" :files="group.files" />
+				<OriginalPageLink v-else-if="originalProjectUrl" :href="originalProjectUrl" />
+			</div>
 		</div>
 
 		<Collapsible
@@ -862,27 +422,39 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 					<span
 						v-for="file in group.files"
 						:key="file.sha1"
-						class="pl-3 rounded-xl grid grid-cols-[auto_1fr_auto] items-center gap-2 border-[1px] border-solid border-surface-5 bg-surface-2"
+						class="pl-3 rounded-xl grid grid-cols-[auto_1fr_auto] gap-2 items-start border-[1px] border-solid border-surface-5 bg-surface-2"
+						:style="{
+							'border-color': file.moderation_external_license
+								? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
+								: undefined,
+							color: file.moderation_external_license
+								? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
+								: undefined,
+						}"
 					>
-						<FileIcon class="size-4 shrink-0 my-2" />
-						<span class="max-w-[22rem] truncate my-2">
-							{{ file.name.split('/').pop() }}
-						</span>
-						<ButtonStyled v-if="group.files.length > 1" circular size="small">
-							<button
-								v-tooltip="formatMessage(messages.splitFile)"
-								class="m-1"
-								type="button"
-								:disabled="splitFileMutation.isPending.value"
-								@click="handleSplitFile(file.sha1)"
-							>
-								<SpinnerIcon
-									v-if="splitFileMutation.isPending.value && pendingSplitSha1 === file.sha1"
-									class="size-4 shrink-0 animate-spin"
-								/>
-								<XIcon v-else class="size-4 shrink-0" />
-							</button>
-						</ButtonStyled>
+						<FileIcon class="size-4 shrink-0 mt-2.5" />
+						<div class="max-w-[22rem] min-w-0 flex flex-col gap-1 py-2">
+							<span class="truncate">
+								{{ file.name.split('/').pop() }}
+							</span>
+						</div>
+						<div class="flex items-center gap-1 my-auto">
+							<ButtonStyled v-if="group.files.length > 1" circular size="small">
+								<button
+									v-tooltip="formatMessage(messages.splitFile)"
+									type="button"
+									class="m-1"
+									:disabled="splitFileMutation.isPending.value"
+									@click="handleSplitFile(file.sha1)"
+								>
+									<SpinnerIcon
+										v-if="splitFileMutation.isPending.value && pendingSplitSha1 === file.sha1"
+										class="size-4 shrink-0 animate-spin"
+									/>
+									<XIcon v-else class="size-4 shrink-0" />
+								</button>
+							</ButtonStyled>
+						</div>
 					</span>
 					<div>
 						<ButtonStyled>
@@ -892,9 +464,11 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 						</ButtonStyled>
 					</div>
 				</div>
-				<template v-if="containingVersions.length > 0">
+				<template v-if="(containingVersions?.length ?? 0) > 0">
 					<span class="text-contrast font-semibold">
-						{{ formatMessage(messages.includedInVersions, { count: containingVersions.length }) }}
+						{{
+							formatMessage(messages.includedInVersions, { count: containingVersions?.length ?? 0 })
+						}}
 					</span>
 					<div class="flex flex-wrap gap-2">
 						<nuxt-link
@@ -902,7 +476,7 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 							:key="version.id"
 							:to="`/project/${projectId}/version/${version.id}`"
 							target="_blank"
-							class="px-3 py-2 rounded-xl flex items-center gap-2 border-[1px] border-solid border-surface-5 bg-surface-3"
+							class="px-3 py-2 rounded-xl flex items-center gap-2 border-[1px] border-solid border-surface-5 bg-surface-3 hover:bg-surface-4"
 						>
 							<VersionIcon class="size-4 shrink-0" />
 							<span class="max-w-[22rem] truncate">
@@ -917,309 +491,127 @@ async function handleAddFilesToGroup(event: MouseEvent) {
 					</span>
 				</template>
 
-				<div
+				<AttributionDisplay
 					v-if="!editing && initialAttribution"
-					class="flex gap-4 flex-col rounded-2xl p-4 mt-2 bg-surface-3"
+					:attribution="initialAttribution"
+					:attributed-at="group.attributed_at"
+					:attributor-href="attributorLink"
+					:attributor-label="attributorLabel"
+					:attributor-avatar-url="attributorMember?.user.avatar_url"
 				>
-					<div class="flex gap-4">
-						<div class="flex flex-col gap-3 w-full">
-							<div class="flex items-start justify-between gap-3">
-								<span class="text-contrast font-semibold">
-									{{ formatMessage(PERMISSION_REASONS[initialAttribution.kind].label) }}
-								</span>
-							</div>
-							<div class="flex flex-col gap-3">
-								<div class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 items-baseline">
-									<template
+					<template v-if="group.attribution?.kind !== 'globally_allowed'" #actions>
+						<ButtonStyled>
+							<button @click="startEditing">
+								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+							</button>
+						</ButtonStyled>
+					</template>
+					<template v-if="isModerator" #footer>
+						<StyledInput
+							v-model="reviewReasonInput"
+							multiline
+							:placeholder="formatMessage(messages.reviewExplanationPlaceholder)"
+						/>
+						<div class="flex items-center gap-2 flex-wrap mt-3">
+							<ButtonStyled color="green" color-fill="text">
+								<button
+									type="button"
+									:disabled="setModerationStatusMutation.isPending.value"
+									@click="handleSetModerationStatus('approved')"
+								>
+									<SpinnerIcon
 										v-if="
-											initialAttribution.kind === 'license' ||
-											initialAttribution.kind === 'my_project'
+											setModerationStatusMutation.isPending.value &&
+											pendingModerationStatusKind === 'approved'
 										"
-									>
-										<span class="text-secondary font-medium">
-											{{ formatMessage(messages.licensedAs) }}
-										</span>
-										<a
-											v-if="
-												licenseReadDisplay?.kind === 'custom' &&
-												isValidUrl(licenseReadDisplay.value)
-											"
-											:href="licenseReadDisplay.value"
-											target="_blank"
-											rel="noopener"
-											class="text-link truncate"
-										>
-											{{ licenseReadDisplay.value }}
-										</a>
-										<span v-else class="text-primary whitespace-pre-wrap break-words">
-											{{ licenseReadDisplay?.value }}
-										</span>
-									</template>
-									<template
+										class="size-4 shrink-0 animate-spin"
+									/>
+									<CheckCircleIcon v-else />
+									{{ formatMessage(messages.moderationApproved) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="red" color-fill="text">
+								<button
+									type="button"
+									:disabled="setModerationStatusMutation.isPending.value"
+									@click="handleSetModerationStatus('bad_proof')"
+								>
+									<SpinnerIcon
 										v-if="
-											readViewFields.includes('link_to_work') &&
-											attributionLinkToWork(initialAttribution)
+											setModerationStatusMutation.isPending.value &&
+											pendingModerationStatusKind === 'bad_proof'
 										"
-									>
-										<span class="text-secondary font-medium">
-											{{ formatMessage(messages.linkLabel) }}
-										</span>
-										<a
-											:href="attributionLinkToWork(initialAttribution)"
-											target="_blank"
-											rel="noopener"
-											class="text-link truncate"
-										>
-											{{ attributionLinkToWork(initialAttribution) }}
-										</a>
-									</template>
-									<template v-if="readViewFields.includes('notes')">
-										<span class="text-secondary font-medium">
-											{{ formatMessage(messages.notesLabel) }}
-										</span>
-										<span class="text-primary whitespace-pre-wrap break-words">
-											{{
-												initialAttribution.notes?.trim()
-													? initialAttribution.notes
-													: formatMessage(notesNoneMessage)
-											}}
-										</span>
-									</template>
-								</div>
-								<div v-if="initialAttribution.image_urls?.length" class="flex flex-col gap-2">
-									<span class="text-secondary font-medium">
-										{{ formatMessage(messages.proofImagesLabel) }}
-									</span>
-									<div class="flex flex-wrap gap-2">
-										<a
-											v-for="(src, idx) in initialAttribution.image_urls"
-											:key="`${src}-${idx}`"
-											:href="src"
-											target="_blank"
-											rel="noopener"
-											class="block rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
-										>
-											<img
-												:src="src"
-												:alt="formatMessage(messages.proofImageThumbnailAlt, { n: idx + 1 })"
-												class="max-h-40 max-w-full object-contain"
-											/>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div>
-							<ButtonStyled>
-								<button @click="startEditing">
-									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+										class="size-4 shrink-0 animate-spin"
+									/>
+									<XCircleIcon v-else />
+									{{ formatMessage(messages.moderationBadProof) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="red" color-fill="text">
+								<button
+									type="button"
+									:disabled="setModerationStatusMutation.isPending.value"
+									@click="handleSetModerationStatus('not_allowed')"
+								>
+									<SpinnerIcon
+										v-if="
+											setModerationStatusMutation.isPending.value &&
+											pendingModerationStatusKind === 'not_allowed'
+										"
+										class="size-4 shrink-0 animate-spin"
+									/>
+									<ReportIcon v-else />
+									{{ formatMessage(messages.moderationNotAllowed) }}
 								</button>
 							</ButtonStyled>
 						</div>
-					</div>
-
-					<div
-						v-if="group.attributed_at"
-						class="inline-flex items-center flex-wrap gap-x-2 gap-y-1 pt-3 mt-1 border-0 border-t border-solid border-surface-5"
-					>
-						<IntlFormatted
-							:message-id="messages.lastUpdated"
-							:values="{ date: formatDate(group.attributed_at) }"
-						>
-							<template #user>
-								<nuxt-link
-									:to="attributorLink"
-									class="inline-flex items-center gap-1.5 text-primary font-medium hover:underline max-w-full min-w-0"
-								>
-									<Avatar
-										v-if="attributorMember"
-										:src="attributorMember.user.avatar_url"
-										:alt="attributorMember.user.username"
-										size="1rem"
-										class="shrink-0"
-									/>
-									<UserRoundIcon v-else class="size-4 shrink-0" />
-									<span class="truncate">{{ attributorLabel }}</span>
-								</nuxt-link>
-							</template>
-						</IntlFormatted>
-					</div>
-				</div>
+						<div class="flex items-center gap-2 flex-wrap mt-3">
+							<ButtonStyled>
+								<button type="button" @click="handleAddToGlobalDatabase">
+									<ScaleIcon /> Add files to database...
+								</button>
+							</ButtonStyled>
+							<ButtonStyled>
+								<button type="button" @click="handleAddToExistingEntry">
+									<ScaleIcon /> Add to existing entry...
+								</button>
+							</ButtonStyled>
+						</div>
+					</template>
+				</AttributionDisplay>
 
 				<div
 					v-else
 					class="rounded-2xl p-4 mt-2 border-[1px] border-solid border-surface-5 flex flex-col gap-3"
 				>
-					<span class="text-contrast font-semibold">
-						{{ formatMessage(messages.typeLabel) }}
-					</span>
-					<Chips
-						v-model="selectedKind"
-						:items="permissionKinds"
-						:format-label="(kind) => formatMessage(PERMISSION_REASONS[kind].label)"
-						:capitalize="false"
+					<AttributionEditor
+						:project-id="projectId"
+						:group-id="group.id"
+						:attribution="group.attribution"
+						:flame-project-url="group.flame_project?.url"
+						:resume-key="editorResumeKey"
+						@updated="handleEditorUpdated"
+						@saved="stopEditingAfterSaveOrCancel"
+						@cancel="stopEditingAfterSaveOrCancel"
 					/>
-					<span>{{ formatMessage(PERMISSION_REASONS[selectedKind].description) }}</span>
-					<div v-if="permissionReasonFields.includes('link_to_work')" class="flex flex-col gap-2">
-						<span class="text-contrast font-semibold mt-1">
-							{{ formatMessage(messages.linkLabel) }}
-						</span>
-						<StyledInput
-							v-model="linkInput"
-							type="text"
-							class="max-w-[40rem]"
-							:placeholder="`https://example.com/${formatMessage(messages.linkToWorkUrlPlaceholder)}`"
-						/>
-					</div>
-					<div v-if="permissionReasonFields.includes('license_id')" class="flex flex-col gap-2">
-						<span class="text-contrast font-semibold mt-1">
-							{{ formatMessage(messages.licenseLabel) }}
-						</span>
-						<Combobox
-							v-model="licenseIdInput"
-							class="max-w-80"
-							:options="licenseOptions"
-							searchable
-							:search-placeholder="formatMessage(messages.selectLicenseLabel)"
-						/>
-					</div>
-					<div
-						v-if="permissionReasonFields.includes('custom_license') && isCustomLicense"
-						class="flex flex-col gap-2"
-					>
-						<span class="text-contrast font-semibold mt-1">
-							{{ formatMessage(messages.customLicenseLabel) }}
-						</span>
-						<StyledInput
-							v-model="customLicenseInput"
-							type="text"
-							class="max-w-[40rem]"
-							:placeholder="`https://example.com/${formatMessage(messages.linkToLicenseUrlPlaceholder)}`"
-						/>
-					</div>
-					<div v-if="permissionReasonFields.includes('notes')" class="flex flex-col gap-2">
-						<span class="text-contrast font-semibold mt-1">
-							{{ formatMessage(messages.notesLabel) }}
-							<span class="font-normal text-primary">{{ formatMessage(messages.optional) }}</span>
-						</span>
-						<StyledInput
-							v-model="notesInput"
-							type="text"
-							resize="both"
-							multiline
-							class="max-w-[40rem]"
-							:placeholder="formatMessage(messages.notesPlaceholder)"
-						/>
-					</div>
-					<div v-if="permissionReasonFields.includes('image_urls')" class="flex flex-col gap-2">
-						<div class="flex flex-col gap-2 mt-1">
-							<div class="flex flex-col gap-1 mt-1">
-								<span class="text-contrast font-semibold">
-									{{ formatMessage(messages.proofImagesLabel) }}
-									<span
-										v-if="!!PERMISSION_REASONS[selectedKind].proofImagesOptional"
-										class="font-normal text-primary"
-										>{{ formatMessage(messages.optional) }}</span
-									>
-								</span>
-								<span v-if="PERMISSION_REASONS[selectedKind].proofImagesDescription">{{
-									formatMessage(PERMISSION_REASONS[selectedKind].proofImagesDescription!)
-								}}</span>
-							</div>
-							<div v-if="proofImageUrls.length > 0" class="grid grid-cols-2 gap-4">
-								<div
-									v-for="(src, idx) in proofImageUrls"
-									:key="`${src}-${idx}`"
-									class="relative rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
-								>
-									<img
-										:src="src"
-										:alt="formatMessage(messages.proofImageThumbnailAlt, { n: idx + 1 })"
-										class="flex w-full object-contain bg-surface-3"
-									/>
-									<div class="absolute top-2 right-2">
-										<ButtonStyled circular>
-											<button
-												v-tooltip="formatMessage(messages.proofImageRemove)"
-												type="button"
-												@click="removeProofImage(idx)"
-											>
-												<TrashIcon />
-											</button>
-										</ButtonStyled>
-									</div>
-								</div>
-							</div>
-							<div class="grid grid-cols-2 gap-4 mt-2">
-								<FileInput
-									accept="image/png,image/jpeg,image/gif,image/webp,image/bmp"
-									:prompt="formatMessage(messages.proofImagesUploadPrompt)"
-									long-style
-									should-always-reset
-									:max-size="MAX_PROOF_IMAGE_BYTES"
-									:disabled="
-										uploadProofImageMutation.isPending.value || saveMutation.isPending.value
-									"
-									class="!bg-surface-3"
-									@change="handleProofImagesSelected"
-								>
-									<UploadIcon class="size-5 shrink-0" />
-								</FileInput>
-							</div>
-							<p v-if="uploadProofImageMutation.isError.value" class="text-red text-sm m-0">
-								{{ String(uploadProofImageMutation.error.value) }}
-							</p>
-						</div>
-					</div>
-					<Admonition
-						v-if="selectedKind === 'special_permissions'"
-						type="warning"
-						:header="formatMessage(messages.proofWarningTitle)"
-						:body="formatMessage(messages.proofWarningBody)"
-					/>
-
-					<p v-if="inputError" class="text-red text-sm m-0">{{ inputError }}</p>
-					<p v-else-if="saveMutation.isError.value" class="text-red text-sm m-0">
-						{{ String(saveMutation.error.value) }}
-					</p>
-
-					<hr class="mt-1 bg-surface-5 border-none h-[1px] w-full" />
-					<div class="flex items-center gap-2 justify-end">
-						<ButtonStyled v-if="editing && isAttributed" type="outlined">
-							<button
-								:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
-								@click="cancelEditing"
-							>
-								<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button
-								:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
-								@click="handleSave"
-							>
-								<template v-if="saveMutation.isPending.value">
-									<SpinnerIcon class="animate-spin" />
-									{{ formatMessage(commonMessages.savingButton) }}
-								</template>
-								<template v-else-if="isAttributed">
-									<SaveIcon /> {{ formatMessage(messages.saveAttribution) }}
-								</template>
-								<template v-else>
-									<CheckIcon /> {{ formatMessage(messages.addAttribution) }}
-								</template>
-							</button>
-						</ButtonStyled>
-					</div>
 				</div>
 			</div>
 		</Collapsible>
-
-		<ExternalProjectAddFilesToGroupModal
+		<AddFilesToAttributionGroupModal
 			ref="addFilesModalRef"
 			:group-id="group.id"
 			:pending="assignFilesMutation.isPending.value"
 			@confirm="handleConfirmAddFiles"
+		/>
+		<AddToGlobalPermissionsDatabaseModal
+			ref="addToGlobalModalRef"
+			:group="group"
+			@success="handleModerationDbUpdated"
+		/>
+		<AddToExistingExternalProjectModal
+			ref="addToExistingModalRef"
+			:group="group"
+			@success="handleModerationDbUpdated"
 		/>
 	</div>
 </template>

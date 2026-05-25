@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	CircleDashedIcon,
-	FileIcon,
-	HistoryIcon,
+	ArrowDown10Icon,
+	ArrowDownWideNarrowIcon,
+	ClockArrowDownIcon,
 	RightArrowIcon,
 	SearchIcon,
 } from '@modrinth/assets'
@@ -13,6 +13,7 @@ import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
+	createAttributionGroupTitle,
 	defineMessage,
 	defineMessages,
 	EmptyState,
@@ -23,8 +24,15 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
+
+const auth = await useAuth()
+
+const isModerator = computed(() => {
+	return isStaff(auth.value?.user)
+})
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
@@ -80,26 +88,27 @@ const currentSortLabel = computed(() => {
 })
 
 function isAttributed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
-	return group.attribution !== null && group.attribution !== undefined
+	return !!group.attribution && !isNoPermission(group)
 }
 
 function isNoPermission(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
 	return group.attribution?.kind === 'no_permission'
 }
 
-function isPendingGroup(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
-	return !isNoPermission(group) && !isAttributed(group)
-}
-
 function statusSortRank(group: Labrinth.Attribution.Internal.AttributionGroup): number {
-	if (isNoPermission(group)) return 0
-	if (isPendingGroup(group)) return 1
-	return 2
+	if (isNoPermission(group)) {
+		return 0
+	} else if (!group.attribution) {
+		return 1
+	} else if (group.attribution?.kind === 'globally_allowed') {
+		return 3
+	} else {
+		return 2
+	}
 }
 
 function alphabetSortKey(group: Labrinth.Attribution.Internal.AttributionGroup): string {
-	const title = group.flame_project?.title?.trim()
-	return title && title.length > 0 ? title : group.id
+	return createAttributionGroupTitle(group, formatMessage)
 }
 
 function compareAlphabetical(
@@ -115,14 +124,22 @@ function attributedTimestamp(group: Labrinth.Attribution.Internal.AttributionGro
 	return Number.isNaN(t) ? Number.NEGATIVE_INFINITY : t
 }
 
+function groupMatchesPermissionsSearch(
+	group: Labrinth.Attribution.Internal.AttributionGroup,
+	queryTrimmed: string,
+): boolean {
+	const query = queryTrimmed.toLowerCase()
+	if (group.flame_project?.title?.toLowerCase().includes(query)) {
+		return true
+	}
+	return (group.files ?? []).some((file) => file.name.toLowerCase().includes(query))
+}
+
 const filteredGroups = computed(() => {
 	const groups = attributionData.value ?? []
-	const query = searchQuery.value.trim().toLowerCase()
-	const filtered = query
-		? groups.filter((group) => {
-				if (group.flame_project?.title?.toLowerCase().includes(query)) return true
-				return (group.files ?? []).some((file) => file.name.toLowerCase().includes(query))
-			})
+	const queryTrimmed = searchQuery.value.trim()
+	const filtered = queryTrimmed
+		? groups.filter((group) => groupMatchesPermissionsSearch(group, queryTrimmed))
 		: [...groups]
 	const sortMode = currentSortType.value
 	filtered.sort(compareAlphabetical)
@@ -166,8 +183,7 @@ const projectIsApproved = computed(() => project.value.status === 'approved')
 const messages = defineMessages({
 	searchPlaceholder: {
 		id: 'project.settings.permissions.search-placeholder',
-		defaultMessage:
-			'Search {count} {count, plural, one {external project} other {external projects}}...',
+		defaultMessage: 'Search {count} {count, plural, one {project} other {projects}}...',
 	},
 	infoBannerTitle: {
 		id: 'project.settings.permissions.info-banner.title',
@@ -203,7 +219,7 @@ const messages = defineMessages({
 	},
 	failDescription: {
 		id: 'project.settings.permissions.fail.description',
-		defaultMessage: `You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content.`,
+		defaultMessage: `You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content or provide proof that you do have permission to use it.`,
 	},
 	attentionNeededTitle: {
 		id: 'project.settings.permissions.attention-needed.title',
@@ -310,15 +326,15 @@ function dismissInfoBanner() {
 				>
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
-							<CircleDashedIcon
+							<ArrowDownWideNarrowIcon
 								v-if="currentSortType === 'status'"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
-							<FileIcon
+							<ArrowDown10Icon
 								v-else-if="currentSortType === 'most_files'"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
-							<HistoryIcon
+							<ClockArrowDownIcon
 								v-else-if="currentSortType === 'recently_edited'"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
@@ -335,6 +351,7 @@ function dismissInfoBanner() {
 					:key="group.id"
 					:project-id="project.id"
 					:group="group"
+					:is-moderator="isModerator"
 				/>
 				<EmptyState
 					v-if="filteredGroups.length === 0"
