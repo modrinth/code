@@ -39,7 +39,7 @@
 					<span
 						v-for="tag in visibleTags"
 						:key="String(tag.value)"
-						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-primary transition-all hover:brightness-[115%]"
+						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2 py-1 text-sm font-medium text-primary transition-all hover:brightness-[115%]"
 						@click.stop="removeTag(tag.value)"
 					>
 						{{ tag.label }}

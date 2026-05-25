@@ -22,7 +22,7 @@
 					@close="handleProjectSelectClose"
 				>
 					<template #input-content="{ isOpen, openDirection }">
-						<div class="flex min-h-8 min-w-0 flex-1 items-center gap-2 pr-1">
+						<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
 							<div class="flex items-center gap-0.5">
 								<img
 									v-if="selectedProjectIconUrl"
@@ -37,7 +37,7 @@
 									class="size-6 shrink-0 text-primary"
 								/>
 								<BoxIcon v-else class="size-6 shrink-0 text-primary" />
-								<span class="min-w-0 flex-1 truncate px-1.5 py-1 font-semibold text-primary">
+								<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary">
 									{{ selectedProjectLabel }}
 								</span>
 							</div>
