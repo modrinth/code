@@ -170,11 +170,13 @@
 								v-model="selectedBreakdownValue"
 								:options="breakdownOptions"
 								:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+								:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-								:max-tag-rows="1"
-								placeholder="No breakdown"
 								checkbox-position="right"
+								placeholder="None"
 								clearable
+								@open="handleBreakdownSelectOpen"
+								@close="handleBreakdownSelectClose"
 							>
 								<template #input-content="{ isOpen, openDirection }">
 									<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
@@ -404,7 +406,7 @@ watch(draftSelectedProjectIds, (nextSelectedProjectIds) => {
 
 watch(queryResetToken, () => {
 	isProjectSelectOpen.value = false
-	selectedBreakdownCommitRequestId++
+	isBreakdownSelectOpen.value = false
 	draftSelectedBreakdowns.value = [...selectedBreakdowns.value]
 	clearProjectDownloadsThreshold()
 	draftSelectedProjectIds.value = isSameProjectSelection(
@@ -500,7 +502,7 @@ function selectAllProjectsMode() {
 }
 
 const draftSelectedBreakdowns = ref<AnalyticsSelectedBreakdowns>([...selectedBreakdowns.value])
-let selectedBreakdownCommitRequestId = 0
+const isBreakdownSelectOpen = ref(false)
 
 const selectedBreakdownValue = computed<AnalyticsSelectedBreakdowns>({
 	get: () => draftSelectedBreakdowns.value,
@@ -509,25 +511,28 @@ const selectedBreakdownValue = computed<AnalyticsSelectedBreakdowns>({
 			nextBreakdowns.slice(0, MAX_ANALYTICS_BREAKDOWN_PRESETS),
 			selectedProjectIds.value,
 		)
-		void scheduleSelectedBreakdownCommit()
 	},
 })
 
 watch(selectedBreakdowns, (nextBreakdowns) => {
-	selectedBreakdownCommitRequestId++
+	if (isBreakdownSelectOpen.value) {
+		return
+	}
 	draftSelectedBreakdowns.value = [...nextBreakdowns]
 })
 
-async function scheduleSelectedBreakdownCommit() {
-	const requestId = ++selectedBreakdownCommitRequestId
+function handleBreakdownSelectOpen() {
+	isBreakdownSelectOpen.value = true
+	draftSelectedBreakdowns.value = [...selectedBreakdowns.value]
+}
+
+function handleBreakdownSelectClose() {
+	isBreakdownSelectOpen.value = false
+	commitDraftSelectedBreakdowns()
+}
+
+function commitDraftSelectedBreakdowns() {
 	const nextBreakdowns = [...draftSelectedBreakdowns.value]
-
-	await waitForDeferredQueryBuilderCommit()
-
-	if (requestId !== selectedBreakdownCommitRequestId) {
-		return
-	}
-
 	if (!areSelectedBreakdownsEqual(selectedBreakdowns.value, nextBreakdowns)) {
 		selectedBreakdowns.value = nextBreakdowns
 	}
@@ -542,20 +547,6 @@ function areSelectedBreakdownsEqual(
 		if (left[index] !== right[index]) return false
 	}
 	return true
-}
-
-function waitForDeferredQueryBuilderCommit(): Promise<void> {
-	if (!import.meta.client) {
-		return nextTick()
-	}
-
-	return new Promise((resolve) => {
-		nextTick(() => {
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => resolve())
-			})
-		})
-	})
 }
 
 const isDashboardAnalyticsRoute = computed(
@@ -650,7 +641,7 @@ const groupByPresetOptions: Array<{
 const selectedProjectCount = computed(() => selectedProjectIds.value.length)
 const selectedBreakdownLabel = computed(() => {
 	if (selectedBreakdownValue.value.length === 0) {
-		return 'No breakdown'
+		return 'None'
 	}
 
 	return selectedBreakdownValue.value
@@ -687,6 +678,9 @@ function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'n
 
 function clearSelectedBreakdowns() {
 	selectedBreakdownValue.value = []
+	if (!isBreakdownSelectOpen.value) {
+		commitDraftSelectedBreakdowns()
+	}
 }
 
 function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
