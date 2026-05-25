@@ -83,7 +83,7 @@ pub struct UpdateLicenseRequest {
 
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct FileLicenseRequest {
-    pub hash: String,
+    pub hashes: Vec<String>,
     pub license_id: LicenseId,
 }
 
@@ -514,12 +514,18 @@ async fn upsert_file_license(
 
     let body = body.into_inner();
     let license_id = body.license_id.parse()?;
-    let hash = body.hash.trim();
-    if hash.len() != 40 || !hash.chars().all(|c| c.is_ascii_hexdigit()) {
+    if body.hashes.is_empty() {
         return Err(ApiError::InvalidInput(
-            "hash must be a valid SHA1 hex string".to_string(),
+            "hashes must contain at least one SHA1 hex string".to_string(),
         ));
     }
+    let hashes = normalize_sha1_hashes(&body.hashes)?;
+    let hash_bytes = hashes
+        .iter()
+        .map(|hash| hash.as_bytes().to_vec())
+        .collect::<Vec<_>>();
+    let filenames = vec![None; hashes.len()];
+    let license_ids = vec![license_id; hashes.len()];
 
     let mut transaction = pool.begin().await?;
 
@@ -548,9 +554,9 @@ async fn upsert_file_license(
 
     ExternalLicense::insert_files(
         &mut transaction,
-        &[hash.as_bytes().to_vec()],
-        &[None],
-        &[license_id],
+        &hash_bytes,
+        &filenames,
+        &license_ids,
         DBUserId(user.id.0 as i64),
     )
     .await?;

@@ -1657,7 +1657,7 @@ export namespace Labrinth {
 			}
 
 			export type AddFileRequest = {
-				hash: string
+				hashes: string[]
 				license_id: number
 			}
 		}

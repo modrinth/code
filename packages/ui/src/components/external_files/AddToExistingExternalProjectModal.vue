@@ -88,15 +88,10 @@ const addFilesMutation = useMutation({
 			throw new Error('No external project selected')
 		}
 
-		const sha1s = [...selectedSha1s.value]
-		await Promise.all(
-			sha1s.map((sha1) =>
-				client.labrinth.external_projects_internal.addFile({
-					hash: sha1,
-					license_id: selectedProjectId.value!,
-				}),
-			),
-		)
+		await client.labrinth.external_projects_internal.addFile({
+			hashes: [...selectedSha1s.value],
+			license_id: selectedProjectId.value,
+		})
 	},
 	onSuccess: async () => {
 		addNotification({
