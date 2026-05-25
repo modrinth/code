@@ -95,7 +95,7 @@ export const DEFAULT_ANALYTICS_GRAPH_VIEW_MODE: AnalyticsGraphViewMode = 'line'
 export const DEFAULT_ANALYTICS_GRAPH_RATIO_MODE = false
 export const DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY = true
 export const DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY = false
-export const MAX_ANALYTICS_BREAKDOWN_PRESETS = 3
+export const MAX_ANALYTICS_BREAKDOWN_PRESETS = 2
 
 const TIMEFRAME_PRESET_VALUES: AnalyticsTimeframePreset[] = [
 	'today',

@@ -274,7 +274,7 @@ import {
 import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
-const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
+const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '17rem'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
 const {

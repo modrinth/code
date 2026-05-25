@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { formatLoaderLabel } from '@modrinth/ui'
 
 import {
 	type AnalyticsBreakdownPreset,
@@ -55,6 +56,16 @@ const OTHER_COUNTRY_CODE = 'XX'
 const UNKNOWN_BREAKDOWN_LABEL = 'Unknown'
 const ALL_PROJECTS_DATASET_ID = 'all'
 const ALL_PROJECTS_DATASET_LABEL = 'All projects'
+const MONETIZATION_BREAKDOWN_LABELS: Record<string, string> = {
+	monetized: 'Monetized',
+	unmonetized: 'Unmonetized',
+}
+const DOWNLOAD_REASON_BREAKDOWN_LABELS: Record<string, string> = {
+	standalone: 'Standalone',
+	dependency: 'Dependency',
+	modpack: 'Modpack',
+	update: 'Update',
+}
 const MONETIZATION_CHART_COLOR_INDEX: Record<string, number> = {
 	monetized: 0,
 	unmonetized: 1,
@@ -107,14 +118,26 @@ export function formatBreakdownLabel(
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
 ): string {
-	if (breakdownValue.trim().toLowerCase() === 'other') {
+	const normalizedValue = breakdownValue.trim()
+	const normalizedLowercaseValue = normalizedValue.toLowerCase()
+
+	if (normalizedLowercaseValue === 'other') {
 		return UNKNOWN_BREAKDOWN_LABEL
 	}
 	if (selectedBreakdown === 'country') {
 		return formatCountryCode(breakdownValue)
 	}
+	if (selectedBreakdown === 'monetization') {
+		return MONETIZATION_BREAKDOWN_LABELS[normalizedLowercaseValue] ?? breakdownValue
+	}
+	if (selectedBreakdown === 'download_reason') {
+		return DOWNLOAD_REASON_BREAKDOWN_LABELS[normalizedLowercaseValue] ?? breakdownValue
+	}
 	if (selectedBreakdown === 'version_id') {
 		return getVersionDisplayName(breakdownValue)
+	}
+	if (selectedBreakdown === 'loader') {
+		return formatLoaderLabel(normalizedValue)
 	}
 
 	return breakdownValue
