@@ -417,7 +417,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 		},
 		{
 			key: 'download_reason',
-			label: 'Download Type',
+			label: 'Download reason',
 			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
 			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('download_reason', downloadReasonFilterOptions.value),
