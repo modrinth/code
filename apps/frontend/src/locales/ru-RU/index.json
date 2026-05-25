@@ -408,25 +408,25 @@
     "message": "{name} — Коллекция"
   },
   "conversation-thread.action.add-private-note": {
-    "message": "Добавить примечание для себя"
+    "message": "Добавить приватную заметку"
   },
   "conversation-thread.action.approve": {
     "message": "Одобрить"
   },
   "conversation-thread.action.approve-with-reply": {
-    "message": "Одобрить с ответом"
+    "message": "Одобрить с ответом"
   },
   "conversation-thread.action.close-thread": {
     "message": "Закрыть ветку"
   },
   "conversation-thread.action.close-with-reply": {
-    "message": "Закрыть с ответом"
+    "message": "Закрыть с ответом"
   },
   "conversation-thread.action.reject": {
     "message": "Отклонить"
   },
   "conversation-thread.action.reject-with-reply": {
-    "message": "Отклонить с ответом"
+    "message": "Отклонить с ответом"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Возобновить ветку"
@@ -435,34 +435,34 @@
     "message": "Ответить"
   },
   "conversation-thread.action.reply-to-thread": {
-    "message": "Ответить на ветку"
+    "message": "Ответить в ветке"
   },
   "conversation-thread.action.resubmit-for-review": {
-    "message": "Запросить перепроверку"
+    "message": "Отправить на перепроверку"
   },
   "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Запросить перепроверку с ответом"
+    "message": "Отправить на перепроверку с ответом"
   },
   "conversation-thread.action.send": {
     "message": "Отправить"
   },
   "conversation-thread.action.send-to-review": {
-    "message": "Отправить на проверку"
+    "message": "Отправить на проверку"
   },
   "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Отправить на проверку с ответом"
+    "message": "Отправить на проверку с ответом"
   },
   "conversation-thread.action.set-to-draft": {
-    "message": "Установить в черновик"
+    "message": "Установить в черновик"
   },
   "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Установить в черновик с ответом"
+    "message": "Установить в черновик с ответом"
   },
   "conversation-thread.action.withhold": {
     "message": "Удержать"
   },
   "conversation-thread.action.withhold-with-reply": {
-    "message": "Удержать с ответом"
+    "message": "Удержать с ответом"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Эта ветка закрыта, новые сообщения в неё нельзя отправить."
@@ -477,10 +477,10 @@
     "message": "Ошибка отправки сообщения"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
-    "message": "Ответить в ветку..."
+    "message": "Ответьте в ветке..."
   },
   "conversation-thread.reply-editor.placeholder.send": {
-    "message": "Отправить сообщение..."
+    "message": "Отправьте сообщение..."
   },
   "conversation-thread.reply-modal.confirmation.description": {
     "message": "Подтвердить, что модераторы не проводят активный просмотр"
@@ -492,7 +492,7 @@
     "message": "Ваш проект уже одобрен. Из-за этого модерация не проводит активный просмотр этой ветки. Однако, если возникнет проблема с вашим проектом, она сможет увидеть ваше сообщение."
   },
   "conversation-thread.reply-modal.header": {
-    "message": "Ответить на ветку"
+    "message": "Ответ в ветке"
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Если вам нужно выйти на контакт с командой модерации, используйте <help-center-link>справочный центр Modrinth</help-center-link> и нажмите на синий значок в правом нижнем углу для связи с поддержкой."
@@ -2496,7 +2496,7 @@
     "message": "Запросите проверку"
   },
   "project-moderation-nags.submit-for-review-button": {
-    "message": "Отправить на проверку"
+    "message": "Отправить на проверку"
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Проект сейчас виден только участникам. Для публикации он должен пройти проверку модераторами."

@@ -159,7 +159,7 @@
     "defaultMessage": "Selectați o limbă"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selectați licența sub care este distribuit {type, select mod {mod} modpack {modpack} resourcepack {resourcepack} shader {shader} plugin {plugin} datapack {datapack} other {project}} dumneavoastră."
+    "defaultMessage": "Selectați licența sub care este distribuit {type, select, mod {mod} modpack {modpack} resourcepack {resourcepack} shader {shader} plugin {plugin} datapack {datapack} other {project}} dumneavoastră."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selectează o licență"

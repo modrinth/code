@@ -1376,9 +1376,6 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Kolik RAM chcete, aby váš server měl?"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Severní Amerika"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Kde byste chtěli umístit svůj server?"
   },

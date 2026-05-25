@@ -24,7 +24,7 @@
     "message": "실행 중인 인스턴스 보이기"
   },
   "app.action-bar.stop-instance": {
-    "message": "인스턴스 중지"
+    "message": "인스턴스 멈추기"
   },
   "app.action-bar.view-active-downloads": {
     "message": "다운로드 목록 보기"
@@ -192,10 +192,10 @@
     "message": "이 모드팩은 이미 <bold>{instanceName}</bold> 인스턴스에 설치되어 있습니다. 정말로 복제하시겠습니까?"
   },
   "app.instance.modpack-already-installed.create": {
-    "message": "생성"
+    "message": "만들기"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "모드팩 이미 설치됨"
+    "message": "이미 설치된 모드팩"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "인스턴스"
@@ -611,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java 및 메모리"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "사용자 지정 환경 변수"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "사용자 지정 Java 매개변수"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "사용자 지정 Java 설치"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "사용자 지정 메모리 할당"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "환경 변수를 입력하세요..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Java 인수를 입력하세요..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "환경 변수"
   },
@@ -625,6 +643,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "할당된 메모리"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "창"

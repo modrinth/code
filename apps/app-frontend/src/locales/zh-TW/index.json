@@ -147,10 +147,10 @@
     "message": "{fileName}"
   },
   "app.creation-modal.installing-modpack.title": {
-    "message": "正在安裝模組包..."
+    "message": "正在安裝模組包……"
   },
   "app.export-modal.description-placeholder": {
-    "message": "輸入模組包描述..."
+    "message": "輸入模組包描述……"
   },
   "app.export-modal.export-button": {
     "message": "匯出"
@@ -252,13 +252,13 @@
     "message": "「{name}」將從你的清單中移除（包含遊戲內），且無法還原。"
   },
   "app.instance.worlds.remove-server-description-with-address": {
-    "message": "「{name}」({address}) 將從你的清單中移除（包含遊戲內），且無法還原。"
+    "message": "「{name}」({address}) 將從你的清單中移除(包含遊戲內），且無法還原。"
   },
   "app.instance.worlds.remove-server-title": {
     "message": "確定要移除「{name}」嗎？"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "搜尋 {count} 個世界..."
+    "message": "搜尋 {count} 個世界……"
   },
   "app.instance.worlds.this-server": {
     "message": "這個伺服器"
@@ -301,6 +301,9 @@
   },
   "app.project.install-button.already-installed": {
     "message": "這個專案已安裝"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "返回瀏覽"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "將內容安裝至實例"
@@ -608,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java 和記憶體"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "自訂環境變數"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "自訂 Java 參數"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "自訂 Java 安裝"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "自訂記憶體分配"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "輸入環境變數……"
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "輸入 Java 參數……"
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "環境變數"
   },
@@ -622,6 +643,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "記憶體配置"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "視窗"

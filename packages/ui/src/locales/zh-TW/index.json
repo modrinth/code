@@ -95,8 +95,35 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "重新訂閱伺服器"
   },
+  "browse.filter-results": {
+    "defaultMessage": "篩選結果..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "找不到符合你查詢的結果！"
+  },
+  "browse.offline": {
+    "defaultMessage": "你目前處於離線狀態，請連線至網路以瀏覽 Modrinth！"
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "已選取專案"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "安裝 {count} 個專案"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "已選取 {count} 個專案"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "捨棄"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "檢視模式："
+  },
   "button.accept": {
     "defaultMessage": "接受"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "將伺服器新增至實例"
   },
   "button.affiliate-links": {
     "defaultMessage": "聯盟連結"
@@ -167,6 +194,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "隱藏快照版本"
   },
+  "button.install": {
+    "defaultMessage": "安裝"
+  },
   "button.max": {
     "defaultMessage": "最大值"
   },
@@ -184,6 +214,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "在資料夾中開啟"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "在 Modrinth 中開啟"
   },
   "button.play": {
     "defaultMessage": "遊玩"
@@ -277,6 +310,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "私人"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "選取「{project}」"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "確定要將這 {count} 個專案更新至最新的相容版本嗎？建議你逐一進行更新。"
@@ -1721,20 +1757,35 @@
   "label.filter-by": {
     "defaultMessage": "篩選依據"
   },
+  "label.filters": {
+    "defaultMessage": "篩選器"
+  },
   "label.followed-projects": {
     "defaultMessage": "追蹤的專案"
   },
   "label.game-version": {
     "defaultMessage": "遊戲版本"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "隱藏已安裝的內容"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "隱藏已選取的內容"
+  },
   "label.installation-info": {
     "defaultMessage": "安裝資訊"
+  },
+  "label.installed": {
+    "defaultMessage": "已安裝"
   },
   "label.installed-modpack": {
     "defaultMessage": "已安裝模組包"
   },
   "label.installing": {
     "defaultMessage": "安裝中..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "正在安裝內容"
   },
   "label.loading": {
     "defaultMessage": "載入中..."
@@ -1811,6 +1862,9 @@
   "label.select-all": {
     "defaultMessage": "選擇全部"
   },
+  "label.selected": {
+    "defaultMessage": "已選取"
+  },
   "label.selection-actions": {
     "defaultMessage": "選擇動作"
   },
@@ -1853,8 +1907,14 @@
   "label.username": {
     "defaultMessage": "使用者名稱"
   },
+  "label.validating": {
+    "defaultMessage": "驗證中"
+  },
   "label.version": {
     "defaultMessage": "版本"
+  },
+  "label.view": {
+    "defaultMessage": "檢視方式"
   },
   "label.visibility": {
     "defaultMessage": "瀏覽權限"
@@ -3119,6 +3179,33 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "正在同步內容"
   },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "無法安裝"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "安裝平臺時發生內部錯誤，請再試一次。"
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "正在安裝模組包..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "正在安裝平臺..."
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "正在新增 Java..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "正在設定伺服器..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "正在下載模組..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "正在整理檔案..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "正在設定環境..."
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已經有伺服器了嗎？"
   },
@@ -3433,9 +3520,6 @@
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "記憶體"
-  },
-  "servers.region.north-america": {
-    "defaultMessage": "北美洲"
   },
   "servers.region.prompt": {
     "defaultMessage": "你希望伺服器部署在何處？"

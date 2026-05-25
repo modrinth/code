@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "צפה ניתוחים"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "טעינת הגרסה נכשלה"
+  },
   "badge.beta": {
     "defaultMessage": "בטא"
   },
@@ -40,6 +43,12 @@
   },
   "badge.new": {
     "defaultMessage": "חדש"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "הפרויקטים שנבחרו עוד לא הותקנו"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "לראות:"
   },
   "button.accept": {
     "defaultMessage": "קבל"
@@ -1078,9 +1087,6 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "כמה זיכרון RAM תרצה שהשרת שלך יקבל?"
-  },
-  "servers.region.north-america": {
-    "defaultMessage": "צפון אמריקה"
   },
   "servers.region.prompt": {
     "defaultMessage": "באיזה מיקום תרצה שהשרת שלך יימצא?"

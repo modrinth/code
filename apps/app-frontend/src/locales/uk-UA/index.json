@@ -168,7 +168,7 @@
     "message": "Назва збірки"
   },
   "app.export-modal.select-files-label": {
-    "message": "Змінити які файли додані до експорту"
+    "message": "Змініть файли, які додані до експорту"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версії"
@@ -222,7 +222,7 @@
     "message": "Додати сервер"
   },
   "app.instance.worlds.browse-servers": {
-    "message": "Переглянути сервера"
+    "message": "Переглянути сервери"
   },
   "app.instance.worlds.delete-world-description": {
     "message": "«{name}» буде **назавжди видалено** й у вас не буде можливости відновлення."
@@ -611,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java та пам’ять"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Власні змінні середовища"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Власні аргументи Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Власна інсталяція Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Власний розподіл пам'яті"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Уведіть змінні середовища…"
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Уведіть аргументи Java…"
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Змінні середовища"
   },
@@ -625,6 +643,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Виділена пам’ять"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/шлях/до/java"
   },
   "instance.settings.tabs.window": {
     "message": "Вікно"
