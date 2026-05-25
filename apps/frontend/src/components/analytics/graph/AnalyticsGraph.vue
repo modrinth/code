@@ -176,16 +176,7 @@
 									aria-label="Monetized analytics details"
 									class="font-base w-[292px] rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 text-sm leading-snug shadow-2xl"
 								>
-									A view or download is monetized when ads can be shown and required consent or
-									region rules allow it.
-									<a
-										href="https://modrinth.com/legal/cmp-info"
-										target="_blank"
-										rel="noopener noreferrer"
-										class="text-link underline"
-									>
-										Learn more
-									</a>
+									Only views and downloads made through Modrinth count toward monetization, and downloads require users to be logged in.
 								</div>
 							</template>
 						</Dropdown>
