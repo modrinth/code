@@ -779,6 +779,7 @@ onMounted(() => {
 	window.addEventListener('keydown', updateShiftKeyState)
 	window.addEventListener('keyup', updateShiftKeyState)
 	window.addEventListener('blur', clearShiftKeyState)
+	document.addEventListener('click', onDocumentClick, true)
 })
 
 onBeforeUnmount(() => {
@@ -787,6 +788,7 @@ onBeforeUnmount(() => {
 	window.removeEventListener('keydown', updateShiftKeyState)
 	window.removeEventListener('keyup', updateShiftKeyState)
 	window.removeEventListener('blur', clearShiftKeyState)
+	document.removeEventListener('click', onDocumentClick, true)
 	if (clearIgnoredChartClickTimeout) {
 		clearTimeout(clearIgnoredChartClickTimeout)
 		clearIgnoredChartClickTimeout = null
@@ -871,12 +873,23 @@ function clearHoverState() {
 	hoverState.sliceIndex = null
 }
 
+function unpinHoverState() {
+	isHoverPinned.value = false
+	clearHoverState()
+}
+
 function updateShiftKeyState(event: KeyboardEvent) {
 	isShiftKeyPressed.value = event.shiftKey
 }
 
 function clearShiftKeyState() {
 	isShiftKeyPressed.value = false
+}
+
+function onDocumentClick(event: MouseEvent) {
+	if (!isHoverPinned.value) return
+	if (event.target instanceof Node && chartContainer.value?.contains(event.target)) return
+	unpinHoverState()
 }
 
 function onChartHover(payload: HoverState) {
@@ -951,8 +964,7 @@ function onRangeSelect(payload: AnalyticsChartRangeSelectPayload) {
 	}
 
 	ignoreUpcomingChartClick()
-	isHoverPinned.value = false
-	clearHoverState()
+	unpinHoverState()
 	selectedTimeframeMode.value = 'custom_datetime_range'
 	selectedCustomTimeframeStartDate.value = start.toISOString()
 	selectedCustomTimeframeEndDate.value = end.toISOString()
@@ -968,15 +980,13 @@ function onChartClick() {
 
 	if (!hoverState.visible || hoverState.sliceIndex === null) {
 		if (isHoverPinned.value) {
-			isHoverPinned.value = false
-			clearHoverState()
+			unpinHoverState()
 		}
 		return
 	}
 
 	if (isHoverPinned.value) {
-		isHoverPinned.value = false
-		clearHoverState()
+		unpinHoverState()
 		return
 	}
 
