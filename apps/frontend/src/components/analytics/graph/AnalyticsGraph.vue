@@ -176,7 +176,8 @@
 									aria-label="Monetized analytics details"
 									class="font-base w-[292px] rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 text-sm leading-snug shadow-2xl"
 								>
-									Only views and downloads made through Modrinth count toward monetization, and downloads require users to be logged in.
+									Only views and downloads made through Modrinth count toward monetization, and
+									downloads require users to be logged in.
 								</div>
 							</template>
 						</Dropdown>
