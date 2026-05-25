@@ -3638,9 +3638,6 @@
   "servers.audit-log.event.port-allocation-removed": {
     "defaultMessage": "Removed port allocation <port></port>"
   },
-  "servers.audit-log.event.power-event": {
-    "defaultMessage": "Changed server power state"
-  },
   "servers.audit-log.event.server-created": {
     "defaultMessage": "Created server"
   },
@@ -3897,7 +3894,7 @@
     "defaultMessage": "Also send a friend request"
   },
   "servers.grant-access-modal.already-member-tooltip": {
-    "defaultMessage": "This user is already in the users table."
+    "defaultMessage": "This user has already been invited"
   },
   "servers.grant-access-modal.cancel": {
     "defaultMessage": "Cancel"

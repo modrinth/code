@@ -2,7 +2,6 @@ import type { Archon } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import auditLogEntryExamplesJson from './audit-log-entry-examples.json?raw'
 import DropdownFilterBar from '../../components/base/DropdownFilterBar.vue'
 import type {
 	TimeFrameLastUnit,
@@ -15,6 +14,7 @@ import type {
 	ServerAuditLogEntry,
 	ServerAuditLogFilters,
 } from '../../components/servers/access/types'
+import auditLogEntryExamplesJson from './audit-log-entry-examples.json?raw'
 
 const serverId = 'story-server'
 const createWorldId = 'create-smp'
@@ -234,26 +234,26 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 			worldId: null,
 			minutesAgo: 25,
 		}),
-			rawEntry({
-				action: 'user_invited',
-				metadata: { user_id: userIds.modmuss, permissions: -4611686018427387904 },
-				worldId: null,
-				minutesAgo: 30,
-			}),
+		rawEntry({
+			action: 'user_invited',
+			metadata: { user_id: userIds.modmuss, permissions: -4611686018427387904 },
+			worldId: null,
+			minutesAgo: 30,
+		}),
 		rawEntry({
 			action: 'user_invite_revoked',
 			metadata: { user_id: userIds.modmuss },
 			worldId: null,
 			minutesAgo: 35,
 		}),
-			rawEntry({
-				action: 'user_permission_modified',
-				metadata: {
-					user_id: userIds.modmuss,
-					permissions: -288230376151711744,
-				},
-				worldId: null,
-				minutesAgo: 40,
+		rawEntry({
+			action: 'user_permission_modified',
+			metadata: {
+				user_id: userIds.modmuss,
+				permissions: -288230376151711744,
+			},
+			worldId: null,
+			minutesAgo: 40,
 		}),
 		rawEntry({
 			action: 'user_removed',

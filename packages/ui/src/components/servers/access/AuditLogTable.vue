@@ -155,11 +155,7 @@
 							<component :is="entry.event.component" v-bind="entry.event.props" />
 						</div>
 						<div class="flex min-w-0 items-center gap-1 text-sm text-secondary">
-							<span
-								v-if="showWorldColumn"
-								v-tooltip="entry.world?.name"
-								class="min-w-0 truncate"
-							>
+							<span v-if="showWorldColumn" v-tooltip="entry.world?.name" class="min-w-0 truncate">
 								{{ entry.world?.name ?? formatMessage(messages.serverScope) }}
 							</span>
 							<BulletDivider v-if="showWorldColumn" class="shrink-0" />

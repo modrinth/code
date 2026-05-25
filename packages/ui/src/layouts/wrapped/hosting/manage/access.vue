@@ -147,11 +147,14 @@ import {
 type RoleFilter = ServerAccessRole | 'all'
 type AuditLogFilterKey = 'users' | 'worlds' | 'actions'
 
-const props = withDefaults(defineProps<{
-	showAuditLogInstances?: boolean
-}>(), {
-	showAuditLogInstances: true,
-})
+const props = withDefaults(
+	defineProps<{
+		showAuditLogInstances?: boolean
+	}>(),
+	{
+		showAuditLogInstances: true,
+	},
+)
 const showAuditLogInstances = computed(() => props.showAuditLogInstances)
 
 const ACTION_LOG_PAGE_SIZE = 200

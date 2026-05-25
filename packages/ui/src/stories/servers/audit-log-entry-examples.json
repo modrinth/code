@@ -240,9 +240,7 @@
 			"action": {
 				"action": "addon_uploaded",
 				"metadata": {
-					"file_names": [
-						"sodium-fabric-0.6.13+mc1.21.1.jar"
-					]
+					"file_names": ["sodium-fabric-0.6.13+mc1.21.1.jar"]
 				}
 			},
 			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
@@ -257,10 +255,7 @@
 			"action": {
 				"action": "addon_uploaded",
 				"metadata": {
-					"file_names": [
-						"fabric-api-0.116.12+1.21.1.jar",
-						"lithium-fabric-0.15.3+mc1.21.1.jar"
-					]
+					"file_names": ["fabric-api-0.116.12+1.21.1.jar", "lithium-fabric-0.15.3+mc1.21.1.jar"]
 				}
 			},
 			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
