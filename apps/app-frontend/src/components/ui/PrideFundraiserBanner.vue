@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CalendarIcon, ExternalIcon, UsersIcon } from '@modrinth/assets'
+import { ProgressBar } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed } from 'vue'
 
@@ -16,14 +17,6 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 
 const formattedGoalAmount = computed(() => currencyFormatter.format(props.goal_amount))
 const formattedLiveAmount = computed(() => currencyFormatter.format(props.live_amount))
-const progressPercent = computed(() => {
-	if (props.goal_amount <= 0) {
-		return 0
-	}
-
-	return Math.min(Math.max((props.live_amount / props.goal_amount) * 100, 0), 100)
-})
-const progressWidth = computed(() => `${progressPercent.value}%`)
 const progressLabel = computed(
 	() => `${formattedLiveAmount.value} of ${formattedGoalAmount.value} raised`,
 )
@@ -58,29 +51,38 @@ async function openPrideFundraiser() {
 				</span>
 				<span class="text-xs font-medium leading-4">of {{ formattedGoalAmount }}</span>
 			</div>
-			<div
-				class="h-2 w-full overflow-hidden rounded-full bg-surface-5"
-				role="progressbar"
+			<ProgressBar
+				class="pride-fundraiser-banner__progress"
+				:progress="live_amount"
+				:max="goal_amount"
+				color="purple"
+				full-width
+				:gradient-border="false"
 				:aria-label="progressLabel"
-				:aria-valuenow="Math.round(progressPercent)"
-				aria-valuemin="0"
-				aria-valuemax="100"
-			>
-				<div
-					class="h-full rounded-l-full bg-[linear-gradient(90deg,var(--color-red)_0%,var(--color-orange)_25%,var(--color-green)_50%,var(--color-blue)_75%,var(--color-purple)_100%)]"
-					:style="{ width: progressWidth }"
-				/>
-			</div>
+			/>
 			<div class="flex flex-wrap items-center gap-2 text-xs font-medium leading-4">
 				<span class="flex items-center gap-1">
 					<UsersIcon aria-hidden="true" class="size-4 shrink-0" />
-					312 supporters
+					6767 supporters
 				</span>
 				<span class="flex items-center gap-1">
 					<CalendarIcon aria-hidden="true" class="size-4 shrink-0" />
-					9 days left
+					6 days left
 				</span>
 			</div>
 		</div>
 	</section>
 </template>
+
+<style scoped>
+.pride-fundraiser-banner__progress :deep(.progress-bar) {
+	background: linear-gradient(
+		90deg,
+		var(--color-red) 0%,
+		var(--color-orange) 20%,
+		var(--color-green) 50%,
+		var(--color-blue) 75%,
+		var(--color-purple) 100%
+	);
+}
+</style>
