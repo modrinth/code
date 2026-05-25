@@ -8,7 +8,7 @@
 				<EventEntityLink v-if="renamedBackup" :entity="renamedBackup" />
 			</template>
 			<template #from>
-				<span class="font-semibold text-contrast">{{ from }}</span>
+				<EventInlineText :text="from ?? ''" class="align-middle font-medium text-contrast" />
 			</template>
 		</IntlFormatted>
 	</BaseEvent>
@@ -21,6 +21,7 @@ import { defineMessages, type MessageDescriptor } from '../../../../composables/
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
 import EventEntityLink from './EventEntityLink.vue'
+import EventInlineText from './EventInlineText.vue'
 import type { AuditBackupEventItem } from './types'
 
 const props = defineProps<{

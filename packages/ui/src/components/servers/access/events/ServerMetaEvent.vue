@@ -8,7 +8,7 @@
 				<EventEntityLink :entity="subdomainEntity" />
 			</template>
 			<template #specs>
-				<span class="font-semibold text-contrast">{{ specsLabel }}</span>
+				<EventInlineText :text="specsLabel" class="align-middle font-medium text-contrast" />
 			</template>
 		</IntlFormatted>
 	</BaseEvent>
@@ -21,6 +21,7 @@ import { defineMessages, type MessageDescriptor, useVIntl } from '../../../../co
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
 import EventEntityLink from './EventEntityLink.vue'
+import EventInlineText from './EventInlineText.vue'
 import type { EventEntity } from './types'
 
 const props = defineProps<{

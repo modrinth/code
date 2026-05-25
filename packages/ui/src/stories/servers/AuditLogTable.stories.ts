@@ -2,6 +2,7 @@ import type { Archon } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import auditLogEntryExamplesJson from './audit-log-entry-examples.json?raw'
 import DropdownFilterBar from '../../components/base/DropdownFilterBar.vue'
 import type {
 	TimeFrameLastUnit,
@@ -19,6 +20,22 @@ const serverId = 'story-server'
 const createWorldId = 'create-smp'
 const activeWorldId = 'smp-season-4'
 const backupId = '00000000-0000-4000-8000-000000000001'
+
+type AuditLogEntryExamplesFixture = Archon.Actions.v1.ActionLogResponse & {
+	server_id: string
+	server: {
+		id: string
+		name: string
+		subdomain: string
+	}
+	worlds: Array<{
+		id: string
+		name: string
+	}>
+	backups: Archon.Backups.v1.Backup[]
+}
+
+const auditLogEntryExamples = JSON.parse(auditLogEntryExamplesJson) as AuditLogEntryExamplesFixture
 
 const userIds = {
 	geometrically: 'MpxzqsyW',
@@ -131,6 +148,19 @@ const serverFullResponse: Archon.Servers.v1.ServerFull = {
 	],
 }
 
+const auditLogEntryExamplesServerFullResponse: Archon.Servers.v1.ServerFull = {
+	...serverFullResponse,
+	id: auditLogEntryExamples.server_id,
+	name: auditLogEntryExamples.server.name,
+	subdomain: auditLogEntryExamples.server.subdomain,
+	worlds: auditLogEntryExamples.worlds.map((world, index) => ({
+		...serverFullResponse.worlds[Math.min(index, serverFullResponse.worlds.length - 1)],
+		id: world.id,
+		name: world.name,
+		backups: index === 0 ? auditLogEntryExamples.backups : [],
+	})),
+}
+
 const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 	next_offset: null,
 	users: {
@@ -204,26 +234,26 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 			worldId: null,
 			minutesAgo: 25,
 		}),
-		rawEntry({
-			action: 'user_invited',
-			metadata: { user_id: userIds.modmuss, permissions: -4611686018427387904n },
-			worldId: null,
-			minutesAgo: 30,
-		}),
+			rawEntry({
+				action: 'user_invited',
+				metadata: { user_id: userIds.modmuss, permissions: -4611686018427387904 },
+				worldId: null,
+				minutesAgo: 30,
+			}),
 		rawEntry({
 			action: 'user_invite_revoked',
 			metadata: { user_id: userIds.modmuss },
 			worldId: null,
 			minutesAgo: 35,
 		}),
-		rawEntry({
-			action: 'user_permission_modified',
-			metadata: {
-				user_id: userIds.modmuss,
-				permissions: -288230376151711744n,
-			},
-			worldId: null,
-			minutesAgo: 40,
+			rawEntry({
+				action: 'user_permission_modified',
+				metadata: {
+					user_id: userIds.modmuss,
+					permissions: -288230376151711744,
+				},
+				worldId: null,
+				minutesAgo: 40,
 		}),
 		rawEntry({
 			action: 'user_removed',
@@ -386,7 +416,7 @@ const missingLookupActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 	data: [
 		rawEntry({
 			action: 'user_permission_modified',
-			metadata: { user_id: 'unknown-user', permissions: -9223372036854775808n },
+			metadata: { user_id: 'unknown-user', permissions: -9223372036854775808 },
 			worldId: 'unknown-world',
 			minutesAgo: 5,
 		}),
@@ -449,27 +479,88 @@ const overflowAddonNames = [
 const overflowActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 	next_offset: null,
 	users: actionLogResponse.users,
-	addons: Object.fromEntries(
-		overflowAddonNames.map((title, index) => [
-			`overflow-addon-${index}`,
-			{
-				title,
-				slug: `overflow-addon-${index}`,
-				icon_url: null,
-				version: null,
-			},
-		]),
-	) as Record<string, Archon.Actions.v1.AddonResp>,
-	versions: Object.fromEntries(
-		overflowAddonNames.map((title, index) => [
-			`overflow-version-${index}`,
-			{
-				name: `${title} 1.${index}.0`,
-				version_number: `1.${index}.0`,
-			},
-		]),
-	) as Record<string, Archon.Actions.v1.VersionResp>,
+	addons: {
+		...Object.fromEntries(
+			overflowAddonNames.map((title, index) => [
+				`overflow-addon-${index}`,
+				{
+					title,
+					slug: `overflow-addon-${index}`,
+					icon_url: null,
+					version: null,
+				},
+			]),
+		),
+		'overflow-sodium': {
+			title: 'Sodium',
+			slug: 'sodium',
+			icon_url: null,
+			version: null,
+		},
+		'overflow-iris': {
+			title: 'Iris Shaders',
+			slug: 'iris',
+			icon_url: null,
+			version: null,
+		},
+	} as Record<string, Archon.Actions.v1.AddonResp>,
+	versions: {
+		...Object.fromEntries(
+			overflowAddonNames.map((title, index) => [
+				`overflow-version-${index}`,
+				{
+					name: `${title} 1.${index}.0`,
+					version_number: `1.${index}.0`,
+				},
+			]),
+		),
+		'overflow-sodium-version': {
+			name: 'Sodium mc1.21.1-0.6.13-fabric',
+			version_number: 'mc1.21.1-0.6.13-fabric',
+		},
+		'overflow-iris-version': {
+			name: 'Iris Shaders 1.8.8+1.21.1-fabric',
+			version_number: '1.8.8+1.21.1-fabric',
+		},
+	} as Record<string, Archon.Actions.v1.VersionResp>,
 	data: [
+		rawEntry({
+			action: 'addon_uploaded',
+			metadata: {
+				file_names: ['fabric-api-0.116.12+1.21.1.jar', 'lithium-fabric-0.15.3+mc1.21.1.jar'],
+			},
+			minutesAgo: 1,
+		}),
+		rawEntry({
+			action: 'addon_added',
+			metadata: {
+				addons: [
+					{ addon_id: 'overflow-sodium', version_id: 'overflow-sodium-version' },
+					{ addon_id: 'overflow-iris', version_id: 'overflow-iris-version' },
+				],
+			},
+			minutesAgo: 2,
+		}),
+		rawEntry({
+			action: 'addon_enabled',
+			metadata: {
+				addons: [
+					{ addon_id: 'overflow-sodium', version_id: 'overflow-sodium-version' },
+					{ addon_id: 'overflow-iris', version_id: 'overflow-iris-version' },
+				],
+			},
+			minutesAgo: 3,
+		}),
+		rawEntry({
+			action: 'addon_disabled',
+			metadata: {
+				addons: [
+					{ addon_id: 'overflow-sodium', version_id: 'overflow-sodium-version' },
+					{ addon_id: 'overflow-iris', version_id: 'overflow-iris-version' },
+				],
+			},
+			minutesAgo: 4,
+		}),
 		rawEntry({
 			action: 'addon_deleted',
 			metadata: {
@@ -479,6 +570,26 @@ const overflowActionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 				})),
 			},
 			minutesAgo: 5,
+		}),
+		rawEntry({
+			action: 'startup_command_modified',
+			metadata: {
+				command:
+					'java -Xmx8192M -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -jar fabric-server-launch.jar nogui',
+			},
+			minutesAgo: 6,
+		}),
+		rawEntry({
+			action: 'server_properties_modified',
+			metadata: {
+				properties: {
+					difficulty: 'hard',
+					'enforce-whitelist': 'true',
+					'max-players': '20',
+					'resource-pack': 'https://cdn.example.invalid/very-long-resource-pack-name.zip',
+				},
+			},
+			minutesAgo: 7,
 		}),
 	],
 }
@@ -544,7 +655,34 @@ function toAuditEntries(
 	})
 }
 
-const everyActionEntries = toAuditEntries(actionLogResponse)
+const everyActionEntries = toAuditEntries(
+	auditLogEntryExamples,
+	auditLogEntryExamplesServerFullResponse,
+)
+const sampleEntries = toAuditEntries(actionLogResponse)
+const permissionBadgeEntries = sampleEntries.filter((entry) =>
+	['user_invited', 'user_permission_modified'].includes(entry.event.key),
+)
+const loaderVersionEntries = toAuditEntries({
+	...actionLogResponse,
+	data: [
+		rawEntry({
+			action: 'loader_version_edited',
+			metadata: { new_loader: 'fabric', new_version: '0.19.2' },
+			minutesAgo: 1,
+		}),
+		rawEntry({
+			action: 'loader_version_edited',
+			metadata: { new_loader: null, new_version: '0.30.0-beta.7' },
+			minutesAgo: 2,
+		}),
+		rawEntry({
+			action: 'loader_version_edited',
+			metadata: { new_loader: null, new_version: null },
+			minutesAgo: 3,
+		}),
+	],
+})
 const fallbackEntries = toAuditEntries(missingLookupActionLogResponse, {
 	...serverFullResponse,
 	worlds: [],
@@ -624,6 +762,14 @@ export const AllEvents: Story = {
 	render: renderStory(everyActionEntries),
 }
 
+export const PermissionBadges: Story = {
+	render: renderStory(permissionBadgeEntries),
+}
+
+export const LoaderVersionEvents: Story = {
+	render: renderStory(loaderVersionEntries),
+}
+
 export const LongOverflowTooltip: Story = {
 	render: renderStory(overflowEntries),
 }
@@ -633,7 +779,7 @@ export const MissingLookupsAndFallbacks: Story = {
 }
 
 export const Filtered: Story = {
-	render: renderStory(everyActionEntries, 'Create Aeronautics'),
+	render: renderStory(sampleEntries, 'Create Aeronautics'),
 }
 
 export const WithExternalFilterControls: Story = {
@@ -652,7 +798,7 @@ export const WithExternalFilterControls: Story = {
 			})
 			return {
 				categories: filterBarCategories,
-				entries: everyActionEntries,
+				entries: sampleEntries,
 				externalFilters,
 				filters,
 				query,

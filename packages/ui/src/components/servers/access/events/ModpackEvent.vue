@@ -5,11 +5,7 @@
 				<EventEntityLink v-if="modpack" :entity="modpack" />
 			</template>
 			<template #version>
-				<span
-					class="inline-block max-w-full min-w-0 truncate align-middle font-mono text-secondary"
-				>
-					{{ versionLabel }}
-				</span>
+				<EventInlineText :text="versionLabel" class="align-middle font-mono text-secondary" />
 			</template>
 		</IntlFormatted>
 	</BaseEvent>
@@ -22,6 +18,7 @@ import { defineMessages } from '../../../../composables/i18n'
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
 import EventEntityLink from './EventEntityLink.vue'
+import EventInlineText from './EventInlineText.vue'
 import type { EventEntity } from './types'
 
 const props = defineProps<{

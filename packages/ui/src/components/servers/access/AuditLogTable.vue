@@ -649,11 +649,6 @@ function scheduleSortTransitionReset(delay: number) {
 	line-height: 1.375rem;
 }
 
-.audit-log-table-event-component {
-	display: inline;
-	line-height: inherit;
-}
-
 .audit-log-table-event-component > span {
 	line-height: inherit;
 }

@@ -2,7 +2,7 @@
 	<BaseEvent>
 		<IntlFormatted :message-id="message">
 			<template #port>
-				<span class="font-mono font-semibold text-contrast">{{ port }}</span>
+				<span class="font-mono font-medium text-contrast">{{ port }}</span>
 			</template>
 		</IntlFormatted>
 	</BaseEvent>

@@ -5,7 +5,11 @@
 				<EventEntityLink :entity="targetUser" />
 			</template>
 			<template #permission-label="{ children }">
-				<span v-if="permissionRole" class="font-semibold text-contrast">
+				<span
+					v-if="permissionRole"
+					class="inline-flex h-7 items-center rounded-full border border-solid px-2.5 py-1 text-sm font-semibold leading-none align-middle"
+					:class="roleClasses(permissionRole)"
+				>
 					<component :is="() => children" />
 				</span>
 				<component :is="() => children" v-else />
@@ -105,4 +109,15 @@ const permissionRole = computed(() =>
 		? null
 		: apiPermissionsToAccessRole(props.permissions),
 )
+
+function roleClasses(role: ServerAccessRole): string {
+	switch (role) {
+		case 'owner':
+			return 'border-orange bg-highlight-orange text-orange'
+		case 'editor':
+			return 'border-green bg-highlight-green text-brand'
+		case 'viewer':
+			return 'border-blue bg-highlight-blue text-blue'
+	}
+}
 </script>

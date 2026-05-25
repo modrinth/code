@@ -2,7 +2,7 @@
 	<BaseEvent>
 		<span
 			v-if="isDeleted"
-			class="inline-flex min-w-0 max-w-full items-center gap-1 whitespace-nowrap align-middle"
+			class="inline-flex min-w-0 max-w-full flex-wrap items-center gap-1 whitespace-normal align-middle @[800px]:flex-nowrap @[800px]:whitespace-nowrap"
 		>
 			<span class="shrink-0">{{ formatMessage(messages.deletedLabel) }}</span>
 			<EventEntityList class="min-w-0" :entities="addonEntities" :limit="1" single-line />
@@ -12,7 +12,7 @@
 				<EventEntityList :entities="addonEntities" :single-line="true" :limit="contentLimit" />
 			</template>
 			<template #files>
-				<EventEntityList :entities="fileNames ?? []" :single-line="true" />
+				<EventEntityList :entities="fileNames ?? []" :single-line="true" :limit="1" />
 			</template>
 		</IntlFormatted>
 	</BaseEvent>
@@ -82,6 +82,8 @@ const kindMessages: Record<string, MessageDescriptor> = {
 const message = computed(() => kindMessages[props.kind] ?? messages.changed)
 const addonEntities = computed(() => props.addons?.map((addon) => addon.project) ?? [])
 const isDeleted = computed(() => props.kind === 'deleted')
-const shouldShowSingleItem = computed(() => props.kind === 'updated')
+const shouldShowSingleItem = computed(() =>
+	['added', 'disabled', 'enabled', 'updated'].includes(props.kind),
+)
 const contentLimit = computed(() => (shouldShowSingleItem.value ? 1 : undefined))
 </script>

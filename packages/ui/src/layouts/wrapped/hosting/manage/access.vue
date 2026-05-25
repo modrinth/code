@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { Archon, type Labrinth } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
@@ -168,16 +168,15 @@ const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 const pendingRemovalMember = ref<ServerAccessMember | null>(null)
 const shouldCancelInvite = ref(false)
-const UserScope = Archon.ServerUsers.v1.UserScope
 const editorScopes = [
-	UserScope.BASE_READ,
-	UserScope.POWER_ACTIONS,
-	UserScope.FILES_WRITE,
-	UserScope.SETUP,
-	UserScope.BACKUPS,
-	UserScope.ADVANCED,
-]
-const viewerScopes = [UserScope.BASE_READ, UserScope.POWER_ACTIONS]
+	'BASE_READ',
+	'POWER_ACTIONS',
+	'FILES_WRITE',
+	'SETUP',
+	'BACKUPS',
+	'ADVANCED',
+] as const
+const viewerScopes = ['BASE_READ', 'POWER_ACTIONS'] as const
 
 const { canManageUsers, permissionDeniedMessage } = useServerPermissions()
 const manageUsersActionTooltip = computed(() =>
@@ -1154,7 +1153,7 @@ function accessRoleToApiPermissions(role: Exclude<ServerAccessRole, 'owner'>) {
 	}
 }
 
-function serializeUserScope(scopes: string[]): Archon.ServerUsers.v1.UserScope {
+function serializeUserScope(scopes: readonly string[]): Archon.ServerUsers.v1.UserScope {
 	return scopes.join(' | ')
 }
 

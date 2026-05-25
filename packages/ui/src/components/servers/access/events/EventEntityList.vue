@@ -1,11 +1,15 @@
 <template>
 	<span
 		class="inline-flex max-w-full min-w-0 items-center gap-x-1 align-middle"
-		:class="singleLine ? 'flex-nowrap whitespace-nowrap' : 'flex-wrap gap-y-0.5'"
+		:class="
+			singleLine
+				? 'flex-wrap gap-y-0.5 whitespace-normal @[800px]:flex-nowrap @[800px]:overflow-hidden @[800px]:whitespace-nowrap'
+				: 'flex-wrap gap-y-0.5'
+		"
 	>
 		<template v-for="(entity, index) in visibleEntities" :key="entity.id">
-			<EventEntityLink :entity="entity" :class="singleLine ? 'min-w-0' : ''" />
-			<span v-if="index < visibleEntities.length - 1" class="text-secondary">,</span>
+			<EventEntityLink :entity="entity" :class="singleLine ? 'min-w-0 shrink' : ''" />
+			<span v-if="index < visibleEntities.length - 1" class="shrink-0 text-secondary">,</span>
 		</template>
 		<Tooltip
 			v-if="hiddenCount > 0"
@@ -20,7 +24,7 @@
 		>
 			<button
 				type="button"
-				class="inline-flex min-w-0 cursor-help items-center rounded-full border border-solid border-surface-5 bg-surface-4 px-1.5 py-1 leading-none text-xs font-semibold text-secondary"
+				class="inline-flex min-w-0 cursor-help items-center rounded-full border border-solid border-surface-5 bg-surface-4 px-1.5 py-1 leading-none text-xs text-secondary"
 				:aria-label="hiddenTooltip"
 			>
 				{{ formatMessage(messages.hiddenCount, { count: hiddenCount }) }}

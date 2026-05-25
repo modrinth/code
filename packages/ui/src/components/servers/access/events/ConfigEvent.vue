@@ -2,66 +2,44 @@
 	<BaseEvent>
 		<span
 			v-if="props.kind === 'properties'"
-			class="inline-flex max-w-full min-w-0 items-center gap-1 align-middle whitespace-nowrap"
+			class="inline-flex max-w-full min-w-0 flex-wrap items-center gap-1 whitespace-normal align-middle @[800px]:flex-nowrap @[800px]:whitespace-nowrap"
 		>
 			<span class="shrink-0">{{ formatMessage(messages.propertiesModifiedLabel) }}</span>
-			<span
-				ref="propertiesRef"
-				v-tooltip="truncatedTooltip(propertiesRef, propertiesLabel)"
-				class="min-w-0 truncate align-middle font-mono text-[0.925em] font-semibold text-contrast"
-			>
-				{{ propertiesLabel }}
-			</span>
+			<EventInlineText
+				:text="propertiesLabel"
+				class="align-middle font-mono text-[0.925em] font-medium text-contrast"
+			/>
 		</span>
 		<IntlFormatted v-else :message-id="message">
 			<template #version>
-				<span
-					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
-				>
-					{{ newVersion }}
-				</span>
+				<EventInlineText :text="newVersion ?? ''" class="align-middle font-medium text-contrast" />
 			</template>
 			<template #loader>
-				<span
-					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
-				>
-					{{ newLoaderLabel }}
-				</span>
+				<EventInlineText :text="newLoaderLabel" class="align-middle font-medium text-contrast" />
 			</template>
 			<template #command>
-				<span
-					v-tooltip="command"
-					class="inline-block max-w-full truncate align-middle font-mono text-contrast"
-				>
-					{{ command }}
-				</span>
+				<EventInlineText
+					:text="command ?? ''"
+					class="align-middle font-mono font-medium text-contrast"
+				/>
 			</template>
 			<template #vendor>
-				<span
-					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
-				>
-					{{ vendor }}
-				</span>
+				<EventInlineText :text="vendor ?? ''" class="align-middle font-medium text-contrast" />
 			</template>
 			<template #java-version>
-				<span
-					class="inline-block max-w-full min-w-0 truncate align-middle font-semibold text-contrast"
-				>
-					{{ version }}
-				</span>
+				<EventInlineText :text="version ?? ''" class="align-middle font-medium text-contrast" />
 			</template>
 		</IntlFormatted>
 	</BaseEvent>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-
-import { truncatedTooltip } from '#ui/utils/truncate'
+import { computed } from 'vue'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../../../composables/i18n'
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
+import EventInlineText from './EventInlineText.vue'
 import type { EventEntity } from './types'
 
 const props = defineProps<{
@@ -128,11 +106,13 @@ const messages = defineMessages({
 })
 
 const { formatMessage } = useVIntl()
-const propertiesRef = ref<HTMLElement | null>(null)
 const propertiesLabel = computed(
 	() => props.properties?.map((property) => property.label).join(', ') ?? '',
 )
-const newLoaderLabel = computed(() => formatLoader(props.newLoader))
+const newLoader = computed(() =>
+	props.kind === 'loader_version' && props.newLoader == null ? 'vanilla' : props.newLoader,
+)
+const newLoaderLabel = computed(() => formatLoader(newLoader.value))
 
 const kindMessages: Record<string, MessageDescriptor> = {
 	game_version: messages.gameVersionChanged,
@@ -144,8 +124,8 @@ const kindMessages: Record<string, MessageDescriptor> = {
 
 const message = computed(() => {
 	if (props.kind === 'loader_version') {
-		if (props.newLoader && props.newVersion) return messages.loaderAndVersionChanged
-		if (props.newLoader) return messages.loaderChanged
+		if (newLoader.value && props.newVersion) return messages.loaderAndVersionChanged
+		if (newLoader.value) return messages.loaderChanged
 		return props.newVersion == null ? messages.loaderVersionCleared : messages.loaderVersionChanged
 	}
 	return kindMessages[props.kind] ?? messages.configChanged

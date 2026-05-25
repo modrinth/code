@@ -1,13 +1,13 @@
 <template>
 	<AutoLink
 		:to="entity.to"
-		class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold"
+		class="inline-flex min-w-0 max-w-full flex-wrap items-center gap-1 @[800px]:flex-nowrap"
 		:class="[
 			entity.to
-				? 'text-contrast hover:underline'
+				? 'font-medium text-contrast hover:underline'
 				: entity.muted
 					? 'text-secondary'
-					: 'text-contrast',
+					: 'font-medium text-contrast',
 			entity.mono ? 'font-mono text-[0.925em]' : '',
 			'align-middle',
 		]"
@@ -20,19 +20,19 @@
 			no-shadow
 			raised
 			:circle="entity.iconShape === 'circle'"
-			class="inline-flex shrink-0 border border-solid border-surface-5"
+			class="ml-1 inline-flex shrink-0 border border-solid border-surface-5"
 			:class="entity.iconShape === 'circle' ? '!rounded-full' : '!rounded-lg'"
 		/>
 		<span
 			v-else-if="entity.icon"
-			class="inline-flex size-7 shrink-0 items-center justify-center rounded-lg border border-solid border-surface-5 bg-surface-4 text-secondary"
+			class="ml-1 inline-flex size-7 shrink-0 items-center justify-center rounded-lg border border-solid border-surface-5 bg-surface-4 text-secondary"
 		>
 			<component :is="entity.icon" class="size-4" />
 		</span>
 		<span
 			ref="labelRef"
 			v-tooltip="truncatedTooltip(labelRef, entity.title ?? entity.label)"
-			class="min-w-0 truncate leading-7"
+			class="min-w-0 whitespace-normal break-words leading-7 @[800px]:truncate @[800px]:whitespace-nowrap"
 		>
 			{{ entity.label }}
 		</span>
@@ -40,7 +40,7 @@
 			v-if="entity.secondaryLabel"
 			ref="secondaryLabelRef"
 			v-tooltip="truncatedTooltip(secondaryLabelRef, entity.secondaryLabel)"
-			class="min-w-0 truncate text-secondary"
+			class="min-w-0 whitespace-normal break-words text-secondary @[800px]:truncate @[800px]:whitespace-nowrap"
 		>
 			{{ entity.secondaryLabel }}
 		</span>

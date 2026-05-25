@@ -2,12 +2,7 @@
 	<BaseEvent>
 		<IntlFormatted :message-id="messages.commandExecuted">
 			<template #command>
-				<span
-					v-tooltip="command"
-					class="inline-block max-w-full truncate align-middle font-mono text-contrast"
-				>
-					{{ command }}
-				</span>
+				<EventInlineText :text="command" class="align-middle font-mono font-medium text-contrast" />
 			</template>
 		</IntlFormatted>
 	</BaseEvent>
@@ -17,6 +12,7 @@
 import { defineMessages } from '../../../../composables/i18n'
 import IntlFormatted from '../../../base/IntlFormatted.vue'
 import BaseEvent from './BaseEvent.vue'
+import EventInlineText from './EventInlineText.vue'
 
 defineProps<{
 	command: string
