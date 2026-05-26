@@ -7,7 +7,7 @@ use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
 use crate::models::users::Role;
 use crate::models::v3::notifications::{
-    NotificationBody, NotificationDeliveryStatus, NotificationType,
+    NotificationBody, NotificationDeliveryStatus,
 };
 use crate::models::v3::pats::Scopes;
 use crate::queue::email::EmailQueue;
@@ -160,18 +160,45 @@ pub async fn create_direct_email(
     Ok(web::Json(failed).customize().with_status(status))
 }
 
+#[derive(Deserialize)]
+struct NotificationFilter {
+    pub user_ids: Vec<UserId>,
+    #[serde(flatten)]
+    pub body: serde_json::Map<String, serde_json::Value>,
+}
+
 #[delete("external_notifications", guard = "external_notification_key_guard")]
 pub async fn remove(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    notification_filter: web::Json<serde_json::Value>,
+    notification_filter: web::Json<NotificationFilter>,
 ) -> Result<HttpResponse, ApiError> {
+    let NotificationFilter { user_ids, body } =
+        notification_filter.into_inner();
+
+    if user_ids.is_empty() {
+        return Err(ApiError::Request(eyre!(
+            "at least one user must be provided to remove notifications from"
+        )));
+    }
+
+    if body.is_empty() {
+        return Err(ApiError::Request(eyre!(
+            "at least one `body` field must be provided to match notifications"
+        )));
+    }
+
+    let filters = serde_json::Value::Object(body);
+
+    let user_ids = user_ids
+        .into_iter()
+        .map(|x| DBUserId(x.0 as i64))
+        .collect::<Vec<_>>();
+
     let mut txn = pool.begin().await?;
 
     DBNotification::remove_many_matching_body(
-        &notification_filter,
-        &mut txn,
-        &redis,
+        &filters, &user_ids, &mut txn, &redis,
     )
     .await?;
 
