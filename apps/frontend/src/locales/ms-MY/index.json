@@ -449,6 +449,27 @@
   "conversation-thread.action.send-to-review-with-reply": {
     "message": "Hantar untuk semakan dengan balasan"
   },
+  "conversation-thread.error.closing-report": {
+    "message": "Ralat semasa menutup laporan"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Ralat semasa membuka semula laporan"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Ralat semasa menghantar mesej"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Balas bebenang..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Hantar mesej..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Sahkan bahawa penyederhana tidak memantau bebenang ini secara aktif"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Saya akui bahawa penyederhana tidak memantau bebenang ini secara aktif."
+  },
   "conversation-thread.resubmit-modal.description": {
     "message": "Anda sedang menghantar <project-title>{projectTitle}</project-title> untuk disemak semula oleh penyederhana."
   },
@@ -1372,9 +1393,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Di manakah pelayan Modrinth Hosting terletak? Bolehkah saya memilih rantau?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Kami mempunyai pelayan yang tersedia di Amerika Utara, Eropah dan Asia Tenggara pada masa ini yang boleh anda pilih semasa pembelian. Lebih banyak rantau akan datang pada masa hadapan! Jika anda ingin menukar rantau anda, sila hubungi sokongan."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Versi Minecraft dan pemuat apa yang boleh digunakan?"

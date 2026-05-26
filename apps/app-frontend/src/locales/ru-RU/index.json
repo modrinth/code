@@ -360,7 +360,7 @@
     "message": "Доступно обновление"
   },
   "app.update.complete-toast.text": {
-    "message": "Нажмите здесь, чтобы посмотреть изменения."
+    "message": "Нажмите, чтобы посмотреть список изменений."
   },
   "app.update.complete-toast.title": {
     "message": "Версия {version} успешно установлена!"
@@ -611,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java и память"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Пользовательские настройки запуска"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Пользовательские аргументы Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Пользовательская установка Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Пользовательский объём памяти"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Введите дополнительные параметры системы..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Введите аргументы Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Переменные среды"
   },
@@ -625,6 +643,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Выделенная память"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "Окно"
@@ -741,7 +762,7 @@
     "message": "Загрузчик управляется сервером"
   },
   "unknown-pack-warning-modal.body": {
-    "message": "Файлы любого формата проверены на безопасность, если они загружены на Modrinth (в том числе файлы .mrpack)."
+    "message": "Файл проверяется только в том случае, если он загружен на Modrinth, независимо от его формата (включая .mrpack)."
   },
   "unknown-pack-warning-modal.dont-show-again": {
     "message": "Больше не предупреждать"

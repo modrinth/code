@@ -1163,9 +1163,6 @@
   "hosting-marketing.faq.location": {
     "message": "Di mana server Modrinth Hosting terletak? Dapatkah saya memilih wilayah?"
   },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Server kami tersedia di Amerika Utara, Eropa, dan Asia Tenggara dan Anda dapat memilihnya saat membeli. Wilayah-wilayah lain akan segera hadir di masa mendatang! Bila Anda ingin mengganti wilayah Anda, mohon hubungi dukungan."
-  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Versi dan pemuat Minecraft apa sajakah yang dapat digunakan?"
   },

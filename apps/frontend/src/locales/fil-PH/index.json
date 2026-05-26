@@ -1235,9 +1235,6 @@
   "hosting-marketing.faq.location": {
     "message": "Nasaan ang mga server ng Modrinth Hosting? Makapipili ba ako ng rehiyon?"
   },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Mayroon kaming mga server na magagamit sa Hilagang Amerika, Yuropa, at Timog-silangang Asya sa kasalukuyang sandali na maaari mong piliin pagkatapos bumili. Dadating ang higit pang rehiyon sa hinaharap! Kung nais mong magpalit ng rehiyon, mangyaring abutin ang suporta."
-  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Ano bang bersiyon ng Minecraft at loader ang magagamit?"
   },

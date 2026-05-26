@@ -1391,9 +1391,6 @@
   "hosting-marketing.faq.location": {
     "message": "Modrinth Hosting 伺服器位於哪裡？我可以選擇區域嗎？"
   },
-  "hosting-marketing.faq.location.answer": {
-    "message": "我們目前在北美、歐洲與東南亞設有伺服器，你可以在購買時選擇。未來還會推出更多區域！如果你想切換區域，請聯絡支援團隊。"
-  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "可以使用哪些 Minecraft 版本與載入器？"
   },
@@ -3055,6 +3052,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "與伺服器同步"
+  },
+  "servers.manage.content.title": {
+    "message": "內容 - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "動作"

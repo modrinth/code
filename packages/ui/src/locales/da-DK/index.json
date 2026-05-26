@@ -1154,9 +1154,6 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Hvor meget RAM vil du have din server har?"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Nordamerika"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Hvor vil du gerne have din server er lokaliseret?"
   },

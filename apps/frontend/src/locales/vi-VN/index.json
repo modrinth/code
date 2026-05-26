@@ -407,6 +407,81 @@
   "collection.title": {
     "message": "{name} - Bộ sưu tập"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Thêm ghi chú bí mật"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Chấp thuận"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Chấp thuận với phản hồi"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Đóng luồng"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Đóng với phản hồi"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Từ chối"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Từ chối với phản hồi"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Mở lại luồng"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Phản hồi"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Phản hồi đến luồng"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Gửi lại để xét duyệt"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Gửi lại để xét duyệt kèm phản hồi"
+  },
+  "conversation-thread.action.send": {
+    "message": "Gửi"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Gửi để xem xét"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Gửi để xem xét với phản hồi"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Chuyển sang bản nháp"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Chuyển sang bản nháp kèm phản hồi"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Thu hồi"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Thu hồi với phản hồi"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Luồng này đã bị đóng và tin nhắn mới không thể gửi được vào."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Lỗi khi đóng báo cáo"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Lỗi khi mở lại báo cáo"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Lỗi khi gửi tin nhắn"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Đang phản hồi vào luồng..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Gửi một tin nhắn..."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
   },
@@ -768,7 +843,7 @@
     "message": "Mạng"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Bạn sắp chạm đến ngưỡng rút tiền. Bạn có thể rút <b>{amountRemaining}<b> ngay bây giờ, nhưng cần có biểu mẫu thuế để rút thêm."
+    "message": "Bạn sắp chạm đến ngưỡng rút tiền. Bạn có thể rút <b>{amountRemaining}</b> ngay bây giờ, nhưng cần có biểu mẫu thuế để rút thêm."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Tài khoản"
@@ -1198,9 +1273,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Những máy chủ Modrinth Hosting được nằm ở đâu? Tôi có thể chọn khu vực không?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Chúng tôi có các máy chủ có sẵn ở Bắc Mỹ, Châu Âu và Đông Nam Á tại thời điểm này mà bạn có thể chọn khi mua. Nhiều khu vực sẽ đến trong tương lai! Nếu bạn muốn chuyển đổi khu vực của mình, vui lòng liên hệ với bộ phận hỗ trợ."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Những phiên bản Minecraft và modloader nào có thể được sử dụng?"

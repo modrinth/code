@@ -398,6 +398,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count, plural, one {# обновление} few {# обновления} other {# обновлений}}"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Отключён"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Включён"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Обновления"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Предупреждения"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Создание резервной копии..."
   },
@@ -1658,6 +1670,15 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Скрыть несовместимые"
   },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} не помечена как совместимая с этой сборкой. Возможны неудачные запуски и непредсказуемое поведение."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Обновить до несовместимой версии?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Всё равно обновить"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Загрузка списка изменений..."
   },
@@ -2037,7 +2058,7 @@
     "defaultMessage": "Китайский (традиционный)"
   },
   "markdown-editor.default-image-alt-text": {
-    "defaultMessage": "Замените это описанием"
+    "defaultMessage": "Подставьте сюда описание"
   },
   "markdown-editor.error-label": {
     "defaultMessage": "Ошибка"
@@ -2061,10 +2082,10 @@
     "defaultMessage": "Ссылка"
   },
   "markdown-editor.image-modal.upload-mode.upload": {
-    "defaultMessage": "Загрузить"
+    "defaultMessage": "Файл"
   },
   "markdown-editor.image-modal.upload.prompt": {
-    "defaultMessage": "Перетащите файл или нажмите сюда, чтобы его выбрать"
+    "defaultMessage": "Перетащите файл или нажмите, чтобы выбрать"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
     "defaultMessage": "Введите адрес изображения..."
@@ -2097,7 +2118,7 @@
     "defaultMessage": "{currentLength, number}/⁠{maxLength, number}"
   },
   "markdown-editor.placeholder": {
-    "defaultMessage": "Введите что-нибудь..."
+    "defaultMessage": "Напишите что‑нибудь..."
   },
   "markdown-editor.preview-label": {
     "defaultMessage": "Предпросмотр"
@@ -2148,22 +2169,22 @@
     "defaultMessage": "Видео"
   },
   "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Файл не предоставлен"
+    "defaultMessage": "Файл не предоставлен"
   },
   "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Обработчик загрузки изображений не предоставлен"
+    "defaultMessage": "Обработчик загрузки изображений не задан"
   },
   "markdown-editor.url-label": {
     "defaultMessage": "Адрес"
   },
   "markdown-editor.url-validation-error.blocked-domain": {
-    "defaultMessage": "Некорректная ссылка. Этот домен не разрешён."
+    "defaultMessage": "Неверный адрес. Указанный домен не поддерживается."
   },
   "markdown-editor.url-validation-error.malformed": {
-    "defaultMessage": "Некорректная ссылка. Перепроверьте формат ссылки."
+    "defaultMessage": "Неверный адрес. Проверьте формат ссылки."
   },
   "markdown-editor.url-validation-error.unsupported-protocol": {
-    "defaultMessage": "Этот протокол не поддерживается. Используйте http или https."
+    "defaultMessage": "Неподдерживаемый протокол. Используйте http или https."
   },
   "markdown-editor.video-embed.title": {
     "defaultMessage": "Проигрыватель YouTube"
@@ -3701,8 +3722,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "ОЗУ"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Северная Америка"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Центральная часть Северной Америки"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Восточная часть Северной Америки"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Западная часть Северной Америки"
   },
   "servers.region.prompt": {
     "defaultMessage": "Где вы хотите разместить свой сервер?"

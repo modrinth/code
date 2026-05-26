@@ -105,7 +105,7 @@
     "defaultMessage": "Jesteś offline. Połącz się z internetem, aby przeglądać Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Wyszukaj {projectType, select, mod {mody} modpack {paczki modów} resourcepack {paczki zasobów} shader {shadery} plugin {pluginy} datapack {paczki danych} server {serwery} other {projekty}}..."
+    "defaultMessage": "Szukaj {projectType, select, mod {modów} modpack {paczek modów} resourcepack {paczek zasobów} shader {shaderów} plugin {pluginów} datapack {paczek danych} server {serwerów} other {projektów}}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Wybrane projekty"
@@ -397,6 +397,12 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "Zaktualizowano {count}"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Aktualizacje"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Ostrzeżenia"
   },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Tworzenie kopii zapasowej..."
@@ -834,7 +840,7 @@
     "defaultMessage": "Ponad 100 plików zostanie podmienionych, jeśli rozpakujesz ten plik; niektóre z nich są pokazane poniżej."
   },
   "files.conflict-modal.overwrite-warning": {
-    "defaultMessage": "{count, plural, one {Podany plik istnieje już na Twoim serwerze i zostanie nadpisany} few {Podane {count} pliki istnieją już na Twoim serwerze i zostaną nadpisane} other {Podane {count} plików istnieje już na Twoim serwerze i zostanie nadpisanych}, jeżeli rozpakujesz ten plik."
+    "defaultMessage": "{count, plural, one {Podany plik istnieje już na Twoim serwerze i zostanie nadpisany} few {Podane {count} pliki istnieją już na Twoim serwerze i zostaną nadpisane} other {Podane {count} plików istnieje już na Twoim serwerze i zostanie nadpisanych}}, jeżeli rozpakujesz ten plik."
   },
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} {count, plural, one {nadpisany} other {nadpisanych}}"
@@ -1657,6 +1663,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Ukryj niekompatybilne"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "Wersja {version} nie jest kompatybilna z tą instalacją. Może się nie uruchomić lub zachowywać się niepoprawnie."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Aktualizować do niekompatybilnej wersji?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Aktualizuj mimo to"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Ładowanie dziennika zmian..."
@@ -3701,8 +3716,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Ameryka Północna"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Centralna Ameryka Północna"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Wschodnia Ameryka Północna"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Zachodnia Ameryka Północna"
   },
   "servers.region.prompt": {
     "defaultMessage": "Gdzie chciałbyś(-abyś), aby znajdował się Twój serwer?"

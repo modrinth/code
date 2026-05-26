@@ -105,7 +105,7 @@
     "defaultMessage": "Você está offline. Conecte a internet para navegar no Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {shaders} plugin {plugins} datapack {pacotes de dados} server {servidores} other {projetos}}..."
+    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {sombreadores} plugin {plugins} datapack {pacotes de dados} server {servidores} other {projetos}}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Selecione projetos"
@@ -397,6 +397,18 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} atualizado"
+  },
+  "content.filter.disabled": {
+    "defaultMessage": "Desativado"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Ativado"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Atualizações"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Avisos"
   },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Criando cópia de segurança..."
@@ -1657,6 +1669,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Ocultar incompatíveis"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} não está marcado como compatível com esta instalação. Pode não iniciar ou apresentar comportamento inesperado."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Atualizar para versão incompatível?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Atualizar mesmo assim"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Carregando registro de alterações..."
@@ -3701,8 +3722,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "América do Norte"
+  "servers.region.north-america-central": {
+    "defaultMessage": "América do Norte Central"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "América do Norte Oriental"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "América do Norte Ocidental"
   },
   "servers.region.prompt": {
     "defaultMessage": "Onde deseja que seu servidor esteja localizado?"

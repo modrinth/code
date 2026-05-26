@@ -136,7 +136,7 @@
 				</ButtonStyled>
 			</div>
 			<div v-else class="input-group mt-2">
-				<ButtonStyled v-if="primaryFile && !currentMember" color="brand">
+				<ButtonStyled v-if="primaryFile?.url && !currentMember" color="brand">
 					<a
 						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
 						:href="decoratedPrimaryFileUrl"

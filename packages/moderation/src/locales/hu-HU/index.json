@@ -66,7 +66,7 @@
     "defaultMessage": "Látogasd meg a Képek fület"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "A {type, select, mod {mod} plugin {bővítmény} other {projekt}} licensze megköveteli, hogy a forráskód elérhető legyen. Kérünk, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licensz használatát."
+    "defaultMessage": "A {type, select, mod {mod} plugin {bővítmény} other {projekt}} licensze megköveteli, hogy a forráskód elérhető legyen. Kérlek, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licensz használatát."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
@@ -96,7 +96,7 @@
     "defaultMessage": "Adj meg egy érvényes licenszlinket"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Tilos linkrövidítők vagy más módszerek használata a külső linkek vagy licenszkapcsolatok céljának elrejtésére. Kérünk, csak megfelelő, teljes hosszúságú linkeket használj."
+    "defaultMessage": "Tilos linkrövidítők vagy más módszerek használata a külső linkek vagy licenszkapcsolatok céljának elrejtésére. Kérlek csak megfelelő, teljes hosszúságú linkeket használj."
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Ne használj linkrövidítőket"
@@ -120,7 +120,7 @@
     "defaultMessage": "Adj hozzá helyettesítő szöveget"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "A Discord meghívók más típusú linkekhez nem használhatók. Kérünk, a Discord linkedet csak a Discord meghívó link mezőbe írd be."
+    "defaultMessage": "A Discord meghívók más típusú linkekhez nem használhatók. Kérlek a Discord linkedet csak a Discord meghívó link mezőbe írd be."
   },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Discord meghívó áthelyezése"
@@ -225,7 +225,7 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Legalább egy kép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
+    "defaultMessage": "Legalább egy kép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérlek válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy képet"

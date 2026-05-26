@@ -42,7 +42,7 @@
     "message": "Al descargar la Modrinth App, aceptas nuestros <terms-link>Términos</terms-link> y <privacy-link>Política de Privacidad</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Descargar la Modrinth App (Beta)"
+    "message": "Descarga Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -496,6 +496,27 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Si necesitas ponerte en contacto con el equipo de moderación, por favor utiliza el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz clic en la burbuja azúl en la esquina inferior derecha para contactar soporte."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Confirma que has atendido las observaciones de los moderadores"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Confirmo que he atendido correctamente las observaciones de los moderadores."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Estás enviando <project-title>{projectTitle}</project-title> para ser revisado de nuevo por los moderadores."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Enviando de nuevo para revisión"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Enviando para revisión"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Asegúrate de haber leído y resuelto todas las observaciones del equipo de moderación."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Envíos repetidos sin atender las observaciones de los moderadores pueden resultar en la suspensión de la cuenta."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Los archivos complementarios sirven para recursos de apoyo, como código fuente, no para versiones o variantes alternativas."
@@ -965,6 +986,9 @@
   "dashboard.head-title": {
     "message": "Panel de control"
   },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "No tienes notificaciones sin leer."
+  },
   "dashboard.notifications.link.see-all": {
     "message": "Ver todas"
   },
@@ -994,6 +1018,9 @@
   },
   "dashboard.overview.notifications.button.view-history": {
     "message": "Ver historial"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "No tienes notificaciones sin leer."
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Error cargando notificaciones:"
@@ -1335,13 +1362,13 @@
     "message": "Seleccionando modpack para instalar antes del reinicio"
   },
   "discover.seo.description": {
-    "message": "Busca y navega miles de Minecraft {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} en Modrinth con resultados de busqueda instantáneos y precisos. Nuestros filtradores te ayudan a encontrar rápidamente lo mejor de Minecraft {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+    "message": "Busca y navega miles de {projectType, select, mod {mods} modpack {modpacks}  resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {proyectos}} para Minecraft en Modrinth con resultados de busqueda instantáneos y precisos. Nuestros filtradores te ayudarán a encontrar rápidamente los mejores {projectType, select, mod {mods} modpack {modpacks}  resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} para Minecraft."
   },
   "discover.seo.title": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}"
+    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} resourcepack {paquetes de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
   },
   "discover.seo.title-with-query": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} packs de recursos {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects} | {query}"
+    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks}  resourcepack {paquetes de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Puede que hayas escrito mal la URL de la colección."
@@ -1509,7 +1536,7 @@
     "message": "¿Dónde se encuentran los servidores de Modrinth Hosting? ¿Puedo elegir una región?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Actualmente disponemos de servidores en Norteamérica, Europa y el Sudeste Asiático entre los que puede elegir al realizar la compra. ¡En el futuro añadiremos más regiones! Si deseas cambiar de región, ponte en contacto con soporte."
+    "message": "Tenemos servidores disponibles a través de Norteamérica, Europa y el sudeste asiático que puedes seleccionar en el momento de tu compra. ¡Más regiones en el futuro! Si deseas cambiar tu región, por favor contacta con soporte."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "¿Qué versiones y loaders de Minecraft se pueden utilizar?"
@@ -1852,6 +1879,9 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Error al generar el estado desde la API durante la compilación."
+  },
+  "layout.banner.preview.description": {
+    "message": "Si buscas acceder al sitio oficial de Modrinth visita {url}. Este sitio de previsualización es usado por el staff de Modrinth para fines de pruebas. Fue creado usando <branch-link>{owner}/{branch}</branch-link> @{commit}."
   },
   "layout.banner.preview.title": {
     "message": "Esta es una vista previa de la implementación del sitio web de Modrinth."
@@ -2680,6 +2710,81 @@
   },
   "project.license.title": {
     "message": "Licencia"
+  },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Tu proyecto es privado, lo que significa que solo pueden acceder tú y las personas a las que invites."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Tu proyecto está publicado y aparece en las búsquedas de Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Tu proyecto no está listado, lo que significa que solo se puede acceder a él a través de un link directo y no aparece en las búsquedas de Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Puedes cambiar la visibilidad de tu proyecto en la <visibility-settings-link>configuración de visibilidad</visibility-settings-link> de tu proyecto."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Proyecto aprobado"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Este es un borrador de tu proyecto que nadie puede ver hasta que sea enviado para ser revisado y aprobado por el equipo de moderación de Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Borrador"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Una vez que hayas completado todos los pasos necesarios y te hayas asegurado de que tu proyecto cumple con las <rules-link>Reglas de contenido</rules-link> de Modrinth, puedes enviar tu proyecto a revisión."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Por favor resuelve todas las observaciones de moderación, incluyendo cualquiera listada abajo, antes de enviar de nuevo el proyecto."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Cambios solicitados"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Enviar en repetidas ocasiones tu proyecto sin atender antes todas las observaciones de moderación puede resultar en la suspensión de la cuenta."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Tu proyecto está en lista de espera para ser revisado por el equipo de moderación de Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Tu proyecto será escaneado y después revisado por moderadores humanos para asegurarnos de que esté de acuerdo con las <rules-link>Reglas de contenido</rules-link> y los <terms-link>Términos de uso</terms-link> de Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Aún puedes modificar tu proyecto, no afectará tu posición en la cola."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Buscamos revisar envíos en un plazo de 24-48 horas, pero algunos proyectos pueden sufrir retrasos. Esto no indica ningún problema con tu envío."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>¡Apreciamos tu paciencia mientras nuestros moderadores trabajan duro para mantener Modrinth seguro y estaremos encantados de poder ayudarte a compartir tu contenido! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Proyecto bajo revisión"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Tu proyecto no aparecerá públicamente y solo se podrá acceder a él por un enlace directo.{requestedStatus, select,unlisted { Según tu <visibility-settings-link>configuración de visibilidad</visibility-settings-link>, es muy probable que no se necesite ninguna acción adicional.} other { Por favor resuelve todas las observaciones de moderación, incluyendo las listadas abajo, antes de enviar de nuevo el proyecto.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Deslistado por el staff"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Sin autorización"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Este hilo no esta siendo monitorizado de manera activa, pero puede ser revisado para más información sobre tu proyecto de ser necesario."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Los moderadores de contenido no pueden dar soporte a la mayoría de los problemas y los mensajes de este hilo no notifican al staff."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz click en la burbuja azúl para contactar con soporte."
+  },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Mostrar vista de miembro"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Este es un hilo de conversación con los moderadores de Modrinth. Podrían enviarte un mensaje con observaciones relacionadas a este proyecto."
   },
   "project.moderation.thread.title": {
     "message": "Mensajes de moredación"
@@ -3684,7 +3789,7 @@
     "message": "Error al renovar la suscripción"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Si el servidor se encuentra cancelado, puede tomar 10-15 minutos en preparar el servidor"
+    "message": "Si el servidor se encuentra cancelado, puede tomar de 10 a 15 minutos en preparar el servidor."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Solicitud de renovación de suscripción enviada"

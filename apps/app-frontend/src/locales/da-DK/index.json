@@ -104,6 +104,12 @@
   "app.browse.discover-servers": {
     "message": "Opdag servere"
   },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
   },

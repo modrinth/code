@@ -611,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java e memória"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variáveis ​​de ambiente personalizadas"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumentos Java personalizados"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Instalação personalizada do Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Alocação de memória personalizada"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Insira as variáveis ​​de ambiente..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Insira os argumentos Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variáveis de ambiente"
   },
@@ -625,6 +643,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memória alocada"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/caminho/para/java"
   },
   "instance.settings.tabs.window": {
     "message": "Janela"

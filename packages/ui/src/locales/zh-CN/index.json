@@ -1658,6 +1658,15 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "隐藏不兼容项"
   },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} 未被标记为与当前安装兼容。它可能无法启动或出现不可预期的行为。"
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "更新至不兼容版本？"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "仍然更新"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "正在加载更新日志..."
   },
@@ -3701,8 +3710,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "内存"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "北美"
+  "servers.region.north-america-central": {
+    "defaultMessage": "北美中部"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "北美东部"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "北美西部"
   },
   "servers.region.prompt": {
     "defaultMessage": "你希望服务器位于何处？"
