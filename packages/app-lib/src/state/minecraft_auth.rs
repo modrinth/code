@@ -295,7 +295,7 @@ impl Credentials {
         Ok(())
     }
 
-    /// Returns online profile data using the normal cache window.
+    /// Returns online profile data when the cached copy is still recent enough.
     #[tracing::instrument(skip(self))]
     pub async fn online_profile(&self) -> Option<Arc<MinecraftProfile>> {
         self.online_profile_with_cache_intent(
@@ -304,10 +304,10 @@ impl Credentials {
         .await
     }
 
-    /// Returns profile data fresh enough for live skin and cape state.
+    /// Returns profile data recent enough for skin and cape state.
     ///
-    /// Very recent profile reads are reused so opening the skins page does not
-    /// burst several identical Mojang profile requests.
+    /// Reuses a profile read from the last few seconds so opening the skins page
+    /// does not send several identical Mojang requests.
     #[tracing::instrument(skip(self))]
     pub async fn online_profile_fresh(&self) -> Option<Arc<MinecraftProfile>> {
         self.online_profile_with_cache_intent(
@@ -316,8 +316,7 @@ impl Credentials {
         .await
     }
 
-    /// Refreshes the online profile cache after a skin or cape operation may
-    /// have changed Mojang state.
+    /// Fetches the online profile from Mojang after a skin or cape change.
     #[tracing::instrument(skip(self))]
     pub async fn refresh_online_profile(
         &self,

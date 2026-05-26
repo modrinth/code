@@ -76,7 +76,11 @@ impl DefaultMinecraftCape {
     }
 }
 
-/// Represents a custom skin for a Minecraft player.
+/// Represents a saved custom skin for a Minecraft player.
+///
+/// The same player, `texture_key`, and model variant always point to the same
+/// saved skin. Changing the cape updates that saved skin instead of creating a
+/// second copy.
 #[derive(Debug, Clone)]
 pub struct CustomMinecraftSkin {
     /// The key for the texture skin, which is akin to a hash that identifies it.

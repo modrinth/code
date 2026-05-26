@@ -3,34 +3,35 @@
 //! ## Data Flow
 //!
 //! 1. Frontend calls `get_available_skins()` and `get_available_capes()`
-//! 2. Backend fetches the selected Minecraft account and a fresh-ish Mojang profile
-//! 3. Skins are merged from three sources:
+//! 2. Backend gets the selected Minecraft account and a recent Mojang profile.
+//!    If skins and capes load at the same time, they share the recent profile
+//!    instead of sending the same request twice.
+//! 3. The skin list is built from three places:
 //!    - saved custom skins in the local app database
 //!    - bundled Minecraft default skins
 //!    - the active Mojang skin, if it is not already known locally
-//! 4. Before any skin-changing Mojang request, the current remote-only skin is
-//!    saved locally so switching to a default skin does not lose a user's current skin
-//! 5. After Mojang mutations, profile cache is refreshed on partial failures so
-//!    later reads do not trust stale state
+//! 4. Before changing a skin, the current Mojang-only skin is saved locally so
+//!    switching to a default skin does not lose it.
+//! 5. After a Mojang change, the returned profile is saved in memory when
+//!    possible. If that response cannot be read, or a later step fails, the
+//!    backend asks Mojang for the profile again.
 //!
 //! ## Ownership
 //!
-//! Mojang is the source of truth for the currently equipped skin and cape.
-//! The local database stores recoverable custom skins and the app's selected
-//! default cape. A saved skin is identified by `texture_key` and `variant`;
-//! cape changes are treated as profile state, not a reason to create another
-//! saved skin row.
+//! Mojang decides which skin and cape are currently equipped. The local database
+//! stores saved custom skins and the app's selected default cape. A saved skin is
+//! the same saved skin when its `texture_key` and `variant` match; changing its
+//! cape updates that saved skin instead of creating another row.
 //!
-//! `cape_id = Some(_)` means a skin has an explicit cape override when applied.
+//! `cape_id = Some(_)` means a skin should apply that specific cape.
 //! `cape_id = None` means the skin follows the app's default cape.
 //!
 //! ## Consistency
 //!
-//! Mojang skin and cape operations cannot be made transactionally atomic with
-//! local SQLite writes. The API therefore prefers recoverability: save the
-//! outgoing remote-only skin before mutation, persist the new custom skin before
-//! optional cape sync, and force-refresh the profile cache when a later step
-//! fails after Mojang may already have accepted a change.
+//! A Mojang request and a SQLite write cannot be one all-or-nothing operation.
+//! The backend handles this by saving skins that might be lost before changing
+//! Mojang, saving uploaded skins with the texture key Mojang returns, and asking
+//! Mojang for the latest profile again whenever the result is unclear.
 
 use std::sync::Arc;
 
@@ -81,7 +82,7 @@ pub struct Cape {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Skin {
-    /// An opaque identifier for the skin texture, which can be used to identify it.
+    /// A key used to recognize this skin texture.
     pub texture_key: Arc<str>,
     /// The name of the skin, if available.
     pub name: Option<Arc<str>>,
@@ -89,8 +90,7 @@ pub struct Skin {
     pub variant: MinecraftSkinVariant,
     /// The UUID of the cape that this skin uses, if any.
     ///
-    /// If `None`, the skin does not have an explicit cape set, and the default cape for
-    /// this player, if any, should be used.
+    /// If `None`, this skin uses the app's default cape for this player.
     pub cape_id: Option<Uuid>,
     /// The URL of the skin PNG texture. Can also be a data URL.
     pub texture: Arc<Url>,
@@ -120,8 +120,8 @@ pub enum UrlOrBlob {
     Blob(Bytes),
 }
 
-/// Retrieves the available capes for the currently selected Minecraft profile. At most one cape
-/// can be equipped at a time. Also, at most one cape can be set as the default cape.
+/// Gets the capes for the selected Minecraft profile.
+/// Only one cape can be equipped, and only one cape can be the app default.
 #[tracing::instrument]
 pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
     let state = State::get().await?;
@@ -156,7 +156,7 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
         .collect())
 }
 
-/// Retrieves the available skins for the currently selected Minecraft profile.
+/// Gets the skins for the selected Minecraft profile.
 /// Returns saved custom skins, bundled default skins, and the active Mojang skin
 /// if it is not already represented by texture key and model variant.
 /// Exactly one returned skin is marked as equipped.
@@ -274,7 +274,9 @@ pub async fn add_and_equip_custom_skin(
 
     preserve_current_profile_skin(&state, &previous_profile).await?;
 
-    // Mojang computes the texture key only after accepting the uploaded skin.
+    // Mojang only gives us the new texture key after accepting the uploaded skin.
+    // Use the profile from that response when possible, and fetch it only if that
+    // response cannot be read.
     let profile = mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         stream::iter([Ok::<_, String>(Bytes::clone(&texture_blob))]),
@@ -316,14 +318,12 @@ pub async fn add_and_equip_custom_skin(
     Ok(())
 }
 
-/// Sets the default cape for the currently selected Minecraft profile. If `None`,
-/// the default cape will be removed.
+/// Sets the default cape for the selected Minecraft profile. If `None`, the
+/// default cape is removed.
 ///
-/// This cape will be used by any custom skin that does not have a cape override
-/// set. If the currently equipped skin does not have a cape override set, the equipped
-/// cape will also be changed to the new default cape. When neither the equipped skin
-/// defines a cape override nor the default cape is set, the player will have no
-/// cape equipped.
+/// Saved skins without their own cape use this cape. If the equipped skin uses
+/// the default cape, the equipped cape is changed too. If there is no default
+/// cape in that case, the equipped cape is removed.
 #[tracing::instrument]
 pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
     let state = State::get().await?;
@@ -343,8 +343,7 @@ pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
         current_skin_follows_default_cape(&state, &profile).await?;
 
     if let Some(cape) = cape {
-        // Synchronize the equipped cape with the new default cape, if the current skin uses
-        // the default cape
+        // Change the equipped cape too when the current skin follows the default cape.
         if current_skin_uses_default_cape {
             if let Err(error) = mojang_api::MinecraftCapeOperation::equip(
                 &selected_credentials,
@@ -389,8 +388,7 @@ pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
 /// Equips the given skin for the currently selected Minecraft profile. If the skin is already
 /// equipped, it will be re-equipped.
 ///
-/// This function does not check that the passed skin, if custom, exists in the app database,
-/// giving the caller complete freedom to equip any skin at any time.
+/// This does not check whether a custom skin exists in the app database.
 #[tracing::instrument]
 pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     let state = State::get().await?;
@@ -495,7 +493,7 @@ pub async fn unequip_skin() -> crate::Result<()> {
 /// PNG encoding speed over compression density, so the resulting textures are better
 /// suited for display purposes, not persistent storage or transmission.
 ///
-/// The normalized, processed is returned texture as a byte array in PNG format.
+/// The normalized texture is returned as PNG bytes.
 #[tracing::instrument]
 pub async fn normalize_skin_texture(
     texture: &UrlOrBlob,
@@ -626,9 +624,7 @@ async fn current_skin_follows_default_cape(
     .is_some_and(|skin| skin.cape_id.is_none()))
 }
 
-/// Synchronizes the equipped cape with the selected cape if necessary, taking into
-/// account the currently equipped cape, the default cape for the player, and if a
-/// cape override is provided.
+/// Sets the equipped cape to the selected cape, the app default cape, or no cape.
 async fn sync_cape(
     state: &State,
     selected_credentials: &Credentials,
