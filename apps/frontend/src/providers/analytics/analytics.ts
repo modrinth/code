@@ -66,6 +66,7 @@ const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
 const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 20
 const ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS = 300
+const ANALYTICS_MOBILE_LAYOUT_QUERY = '(pointer: coarse), (max-width: 800px)'
 
 type ProjectTypeMetadata = {
 	project_type?: string | null
@@ -214,6 +215,7 @@ export interface AnalyticsDashboardContextValue {
 	isRatioMode: Ref<boolean>
 	showChartEvents: Ref<boolean>
 	showPreviousPeriod: Ref<boolean>
+	isMobileLayout: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
 	hasExplicitGraphDatasetSelection: Ref<boolean>
 	isGraphDatasetSelectionActive: Ref<boolean>
@@ -1261,6 +1263,7 @@ export function createAnalyticsDashboardContext(
 	const isRatioMode = ref(initialGraphState.isRatioMode)
 	const showChartEvents = ref(initialGraphState.showChartEvents)
 	const showPreviousPeriod = ref(initialGraphState.showPreviousPeriod)
+	const isMobileLayout = ref(false)
 	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
 	const hasExplicitGraphDatasetSelection = ref(initialGraphState.selectedGraphDatasetIds !== null)
 	const isGraphDatasetSelectionActive = ref(false)
@@ -1286,6 +1289,34 @@ export function createAnalyticsDashboardContext(
 	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
 	let revenueHourlyGroupByBeforeOverride: AnalyticsGroupByPreset | null = null
 	let nextAnalyticsRouteNavigationMode: AnalyticsQueryBuilderRouteNavigationMode = 'replace'
+	let mobileLayoutMedia: MediaQueryList | null = null
+
+	function syncMobileLayoutState() {
+		isMobileLayout.value = mobileLayoutMedia?.matches ?? false
+	}
+
+	function setupMobileLayoutMedia() {
+		if (typeof window === 'undefined') {
+			return
+		}
+
+		mobileLayoutMedia = window.matchMedia(ANALYTICS_MOBILE_LAYOUT_QUERY)
+		syncMobileLayoutState()
+		mobileLayoutMedia.addEventListener('change', syncMobileLayoutState)
+	}
+
+	function teardownMobileLayoutMedia() {
+		mobileLayoutMedia?.removeEventListener('change', syncMobileLayoutState)
+		mobileLayoutMedia = null
+	}
+
+	onMounted(() => {
+		setupMobileLayoutMedia()
+	})
+
+	onBeforeUnmount(() => {
+		teardownMobileLayoutMedia()
+	})
 
 	const hasProjectContext = computed(() => Boolean(options.projectPageContext))
 	const hasOrganizationContext = computed(
@@ -2646,6 +2677,7 @@ export function createAnalyticsDashboardContext(
 		isRatioMode,
 		showChartEvents,
 		showPreviousPeriod,
+		isMobileLayout,
 		hiddenGraphDatasetIds,
 		hasExplicitGraphDatasetSelection,
 		isGraphDatasetSelectionActive,

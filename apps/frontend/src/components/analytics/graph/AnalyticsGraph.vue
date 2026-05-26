@@ -65,17 +65,29 @@
 						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
 							>Ratio</label
 						>
-						<Toggle id="ratio-mode-toggle" v-model="isRatioMode" small />
+						<Toggle
+							id="ratio-mode-toggle"
+							v-model="isRatioMode"
+							:small="!isMobileLayout"
+						/>
 					</div>
 					<div v-if="canShowPreviousPeriodToggle" class="inline-flex items-center gap-2">
 						<label for="previous-period-toggle" class="cursor-pointer text-sm text-secondary"
 							>Prev. period</label
 						>
-						<Toggle id="previous-period-toggle" v-model="showPreviousPeriod" small />
+						<Toggle
+							id="previous-period-toggle"
+							v-model="showPreviousPeriod"
+							:small="!isMobileLayout"
+						/>
 					</div>
 					<div v-if="hasChartEvents" class="inline-flex items-center gap-2">
 						<label for="events-toggle" class="cursor-pointer text-sm text-secondary">Events</label>
-						<Toggle id="events-toggle" v-model="showChartEvents" small />
+						<Toggle
+							id="events-toggle"
+							v-model="showChartEvents"
+							:small="!isMobileLayout"
+						/>
 					</div>
 					<Tabs
 						:value="activeGraphViewMode"
@@ -240,7 +252,7 @@
 								@geometry="onChartGeometry"
 								@pinned-drag="onPinnedDrag"
 								@range-select="onRangeSelect"
-								@touch-drag="ignoreUpcomingChartClick"
+								@touch-drag="onTouchDragEnd"
 							/>
 						</ClientOnly>
 						<AnalyticsChartEvents
@@ -359,6 +371,7 @@ const {
 	isRatioMode,
 	showChartEvents,
 	showPreviousPeriod,
+	isMobileLayout,
 	hiddenGraphDatasetIds,
 	hasExplicitGraphDatasetSelection,
 	isGraphDatasetSelectionActive,
@@ -914,6 +927,13 @@ function onPinnedDrag(payload: HoverState) {
 	if (isDataLoading.value || !isHoverPinned.value) return
 	ignoreUpcomingChartClick()
 	setHoverState(payload)
+}
+
+function onTouchDragEnd() {
+	ignoreUpcomingChartClick()
+	if (!isHoverPinned.value) {
+		clearHoverState()
+	}
 }
 
 function onChartGeometry(payload: AnalyticsChartGeometryPayload) {

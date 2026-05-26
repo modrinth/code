@@ -30,7 +30,10 @@ import {
 	Tooltip,
 } from 'chart.js'
 
-import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
+import {
+	injectAnalyticsDashboardContext,
+	type AnalyticsDashboardStat,
+} from '~/providers/analytics/analytics'
 
 import { type ChartDataset, DEFAULT_X_AXIS_TICK_LIMIT, formatAxisValue } from './utils'
 
@@ -116,6 +119,7 @@ const DIMMED_SERIES_OPACITY = 0.5
 const BAR_BACKGROUND_OPACITY = 0.85
 const AREA_BACKGROUND_OPACITY = 0.3
 const SERIES_OPACITY_TRANSITION_MS = 150
+const MOBILE_X_AXIS_TICK_LIMIT = 5
 const CSS_VARIABLE_COLOR_PATTERN = /^var\(\s*(--[a-z0-9-_]+)\s*\)$/i
 const HSL_COLOR_PATTERN = /^hsl\(\s*([0-9.]+)(?:deg)?\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)$/i
 
@@ -135,6 +139,8 @@ let chartRefreshAnimationFrame: number | null = null
 let currentDatasetOpacities: number[] = []
 let suppressGeometryEmit = false
 let lastGeometryPayload: AnalyticsChartGeometryPayload | null = null
+
+const { isMobileLayout } = injectAnalyticsDashboardContext()
 
 const geometryPlugin = {
 	id: 'analytics-chart-geometry',
@@ -548,6 +554,11 @@ function getVisibleXAxisLabelIndexes(labelCount: number, limit: number): Set<num
 	return indexes
 }
 
+function getEffectiveXAxisTickLimit() {
+	const tickLimit = props.xAxisTickLimit ?? DEFAULT_X_AXIS_TICK_LIMIT
+	return isMobileLayout.value ? Math.min(tickLimit, MOBILE_X_AXIS_TICK_LIMIT) : tickLimit
+}
+
 function hasMetricData() {
 	return props.datasets.some((dataset) =>
 		dataset.data.some((value) => Number.isFinite(value) && value > 0),
@@ -568,10 +579,11 @@ function getEmptyDataYAxisStepSize() {
 
 function buildConfig(): ChartConfiguration {
 	const hasData = hasMetricData()
+	const effectiveXAxisTickLimit = getEffectiveXAxisTickLimit()
 	const visibleXAxisLabelIndexes =
-		props.xAxisTickLimit === undefined
+		props.xAxisTickLimit === undefined && !isMobileLayout.value
 			? null
-			: getVisibleXAxisLabelIndexes(props.labels.length, props.xAxisTickLimit)
+			: getVisibleXAxisLabelIndexes(props.labels.length, effectiveXAxisTickLimit)
 
 	return {
 		type: props.type,
@@ -604,8 +616,8 @@ function buildConfig(): ChartConfiguration {
 					grid: { display: false },
 					ticks: {
 						align: 'inner',
-						maxTicksLimit: props.xAxisTickLimit ?? DEFAULT_X_AXIS_TICK_LIMIT,
-						autoSkip: !props.xAxisTickLimit,
+						maxTicksLimit: effectiveXAxisTickLimit,
+						autoSkip: !props.xAxisTickLimit && !isMobileLayout.value,
 						color: 'rgba(148, 163, 184, 0.9)',
 						callback: (tickValue, index) => {
 							if (visibleXAxisLabelIndexes && !visibleXAxisLabelIndexes.has(index)) {
@@ -899,7 +911,14 @@ watch(
 )
 
 watch(
-	() => [props.datasets, props.labels, props.xAxisTickLimit, props.activeStat, props.ratioMode],
+	() => [
+		props.datasets,
+		props.labels,
+		props.xAxisTickLimit,
+		props.activeStat,
+		props.ratioMode,
+		isMobileLayout.value,
+	],
 	() => {
 		scheduleChartRefresh()
 	},
