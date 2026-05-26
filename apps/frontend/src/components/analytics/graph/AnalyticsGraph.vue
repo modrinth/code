@@ -240,6 +240,7 @@
 								@geometry="onChartGeometry"
 								@pinned-drag="onPinnedDrag"
 								@range-select="onRangeSelect"
+								@touch-drag="ignoreUpcomingChartClick"
 							/>
 						</ClientOnly>
 						<AnalyticsChartEvents

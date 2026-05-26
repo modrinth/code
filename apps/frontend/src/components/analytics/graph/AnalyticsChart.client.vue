@@ -85,6 +85,7 @@ const emit = defineEmits<{
 	(event: 'hover' | 'pinned-drag', payload: AnalyticsChartHoverPayload): void
 	(event: 'range-select', payload: AnalyticsChartRangeSelectPayload): void
 	(event: 'geometry', payload: AnalyticsChartGeometryPayload): void
+	(event: 'touch-drag'): void
 }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -127,6 +128,7 @@ let rangeSelectStartX = 0
 let rangeSelectStartY = 0
 let rangeSelectStartSliceIndex: number | null = null
 let rangeSelectLastSliceIndex: number | null = null
+let rangeSelectPointerType: string | null = null
 let isRangeSelecting = false
 let seriesOpacityAnimationFrame: number | null = null
 let chartRefreshAnimationFrame: number | null = null
@@ -789,6 +791,7 @@ function handleRangePointerDown(event: PointerEvent) {
 	rangeSelectStartY = event.clientY
 	rangeSelectStartSliceIndex = sliceIndex
 	rangeSelectLastSliceIndex = sliceIndex
+	rangeSelectPointerType = event.pointerType
 	isRangeSelecting = false
 	rangeSelection.startX = chartPosition.x
 	rangeSelection.currentX = chartPosition.x
@@ -809,6 +812,11 @@ function handleRangePointerMove(event: PointerEvent) {
 	isRangeSelecting = true
 	rangeSelectLastSliceIndex = sliceIndex
 	event.preventDefault()
+	if (rangeSelectPointerType === 'touch') {
+		emitRangeDragHover(sliceIndex)
+		return
+	}
+
 	updateRangeSelection(sliceIndex)
 	emitRangeDragHover(sliceIndex)
 }
@@ -820,7 +828,10 @@ function handleRangePointerEnd(event: PointerEvent) {
 	const startSliceIndex = rangeSelectStartSliceIndex
 	const endSliceIndex = rangeSelectLastSliceIndex
 
-	if (isRangeSelecting && startSliceIndex !== null && endSliceIndex !== null) {
+	if (isRangeSelecting && rangeSelectPointerType === 'touch') {
+		event.preventDefault()
+		emit('touch-drag')
+	} else if (isRangeSelecting && startSliceIndex !== null && endSliceIndex !== null) {
 		event.preventDefault()
 		emit('range-select', { startSliceIndex, endSliceIndex })
 	}
@@ -828,6 +839,7 @@ function handleRangePointerEnd(event: PointerEvent) {
 	rangeSelectPointerId = null
 	rangeSelectStartSliceIndex = null
 	rangeSelectLastSliceIndex = null
+	rangeSelectPointerType = null
 	isRangeSelecting = false
 	clearRangeSelection()
 }
@@ -839,6 +851,7 @@ function handleRangePointerCancel(event: PointerEvent) {
 	rangeSelectPointerId = null
 	rangeSelectStartSliceIndex = null
 	rangeSelectLastSliceIndex = null
+	rangeSelectPointerType = null
 	isRangeSelecting = false
 	clearRangeSelection()
 }
