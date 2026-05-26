@@ -38,7 +38,7 @@
 
 		<div class="flex flex-col gap-2.5">
 			<div
-				class="text-4xl font-semibold leading-none"
+				class="text-2xl font-semibold leading-none md:text-4xl"
 				:class="{
 					'text-primary': disabled,
 					'text-contrast': !disabled,
@@ -70,13 +70,22 @@
 						{{ vsPrevPeriodPercent }}
 					</span>
 					<span
-						class="mt-px text-xs"
+						class="mt-px text-xs max-sm:hidden"
 						:class="{
 							'text-secondary': disabled,
 							'text-primary': !disabled,
 						}"
 					>
-						vs prev period
+						vs prev. period
+					</span>
+					<span
+						class="visible mt-px text-xs sm:hidden"
+						:class="{
+							'text-secondary': disabled,
+							'text-primary': !disabled,
+						}"
+					>
+						vs prev.
 					</span>
 				</div>
 			</template>
