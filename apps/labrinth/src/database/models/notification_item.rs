@@ -599,16 +599,21 @@ impl DBNotification {
 
     pub async fn remove_many_matching_body(
         body_filter: &serde_json::Value,
+        users: &[DBUserId],
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<usize, DatabaseError> {
+        let user_ids = users.iter().map(|x| x.0).collect::<Vec<i64>>();
+
         let ids = sqlx::query!(
             "
             SELECT id
             FROM notifications
             WHERE body @> $1::jsonb
+              AND user_id = ANY($2::bigint[])
             ",
-            body_filter
+            body_filter,
+            &user_ids
         )
         .fetch(&mut *transaction)
         .map_ok(|x| DBNotificationId(x.id))
