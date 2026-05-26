@@ -107,7 +107,7 @@
 			leave-to-class="opacity-0"
 		>
 			<div
-				v-if="isAddMenuOpen"
+				v-if="isAddMenuOpen && !isMobileActiveSubmenu"
 				ref="menuContainer"
 				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
 				:style="addMenuStyle"
@@ -138,15 +138,29 @@
 
 	<Teleport to="#teleports">
 		<div
-			v-if="isAddMenuOpen && activeCategory && hasSubmenuPosition"
+			v-if="isAddMenuOpen && activeCategory && (isMobileAddMenuLayout || hasSubmenuPosition)"
 			ref="submenu"
 			class="fixed z-[10000] flex max-h-[min(70vh,32rem)] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
 			:class="activeCategory.submenuClass ?? DEFAULT_SUBMENU_CLASS"
 			:style="submenuStyle"
 			@mouseenter="handleSubmenuMouseEnter"
 			@mouseleave="handleSubmenuMouseLeave"
+			@keydown="handleAddMenuKeydown"
 			@mousemove="(event) => handleMenuMouseMove(event, 'submenu')"
 		>
+			<div
+				v-if="isMobileAddMenuLayout"
+				class="flex items-center border-0 border-b border-solid border-b-surface-5 bg-surface-4"
+			>
+				<button
+					type="button"
+					class="flex h-12 w-full items-center gap-2 border-0 bg-transparent px-4 text-left text-base font-semibold text-primary shadow-none transition-all hover:brightness-110 focus-visible:brightness-110"
+					@click="returnToCategoryMenu"
+				>
+					<ChevronLeftIcon class="size-5 shrink-0 text-secondary" />
+					<span class="min-w-0 truncate">{{ activeCategory.label }}</span>
+				</button>
+			</div>
 			<div
 				v-if="activeCategory.searchable"
 				class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 w-full"
@@ -377,6 +391,7 @@ const DEFAULT_SUBMENU_WIDTH = '18rem'
 const DEFAULT_PREVIEW_DROPDOWN_MIN_WIDTH = '18rem'
 const DROPDOWN_FILTER_OPTION_ROW_HEIGHT = 48
 const DROPDOWN_FILTER_VIRTUALIZATION_THRESHOLD = 80
+const MOBILE_ADD_MENU_LAYOUT_QUERY = '(pointer: coarse), (max-width: 800px)'
 const OPTIONS_OVERLAY_SCROLLBARS_OPTIONS = Object.freeze<PartialOptions>({
 	overflow: {
 		x: 'hidden',
@@ -431,6 +446,7 @@ const categorySearchQuery = ref('')
 const lastMousePosition = ref<Point | null>(null)
 const isCursorInsideSubmenu = ref(false)
 const hasSubmenuPosition = ref(false)
+const isMobileAddMenuLayout = ref(false)
 const submenuOpenDirection = ref<SubmenuOpenDirection>('right')
 const addMenuTrigger = ref<HTMLElement | null>(null)
 const menuContainer = ref<HTMLElement | null>(null)
@@ -554,10 +570,24 @@ const activeCategoryEmptyStateLabel = computed(() => {
 		: (category.emptyOptionsLabel ?? props.emptyOptionsLabel)
 })
 
-const submenuStyle = computed<CSSProperties>(() => ({
-	left: `${submenuPosition.value.x}px`,
-	top: `${submenuPosition.value.y}px`,
-}))
+const submenuStyle = computed<CSSProperties>(() => {
+	if (isMobileAddMenuLayout.value) {
+		return {
+			left: addMenuStyle.value.left,
+			minWidth: addMenuStyle.value.minWidth,
+			top: addMenuStyle.value.top,
+			width: addMenuStyle.value.width,
+		}
+	}
+
+	return {
+		left: `${submenuPosition.value.x}px`,
+		top: `${submenuPosition.value.y}px`,
+	}
+})
+const isMobileActiveSubmenu = computed(
+	() => isMobileAddMenuLayout.value && activeCategory.value !== undefined,
+)
 
 const appliedFilterPreviews = computed(() =>
 	filterCategories.value
@@ -717,6 +747,20 @@ function commitAddMenuDraft() {
 	}
 }
 
+function syncMobileAddMenuLayout(): boolean {
+	if (typeof window === 'undefined') {
+		return false
+	}
+
+	const nextValue = window.matchMedia(MOBILE_ADD_MENU_LAYOUT_QUERY).matches
+	if (nextValue === isMobileAddMenuLayout.value) {
+		return false
+	}
+
+	isMobileAddMenuLayout.value = nextValue
+	return true
+}
+
 function openAddMenu() {
 	if (isAddMenuOpen.value) {
 		return
@@ -724,6 +768,7 @@ function openAddMenu() {
 
 	commitPreviewFilterDrafts()
 	resetAddMenuDraft()
+	syncMobileAddMenuLayout()
 	isAddMenuOpen.value = true
 }
 
@@ -735,6 +780,13 @@ function closeAddMenu() {
 	commitAddMenuDraft()
 	categorySearchQuery.value = ''
 	isAddMenuOpen.value = false
+}
+
+function returnToCategoryMenu() {
+	activeCategoryKey.value = null
+	categorySearchQuery.value = ''
+	hasSubmenuPosition.value = false
+	nextTick(() => scheduleAddMenuPositionUpdate())
 }
 
 function handleAddMenuTriggerClick(event: MouseEvent) {
@@ -1249,7 +1301,9 @@ function triangleArea(a: Point, b: Point, c: Point): number {
 }
 
 function updateAddMenuPosition(): boolean {
-	if (typeof window === 'undefined' || !addMenuTrigger.value || !menuContainer.value) {
+	const positioningElement =
+		menuContainer.value ?? (isMobileActiveSubmenu.value ? submenu.value : null)
+	if (typeof window === 'undefined' || !addMenuTrigger.value || !positioningElement) {
 		return false
 	}
 
@@ -1262,7 +1316,7 @@ function updateAddMenuPosition(): boolean {
 		width: `${dropdownWidth}px`,
 	}
 
-	const dropdownRect = menuContainer.value.getBoundingClientRect()
+	const dropdownRect = positioningElement.getBoundingClientRect()
 	addMenuStyle.value = getAddMenuPosition({
 		triggerRect,
 		dropdownRect,
@@ -1296,7 +1350,9 @@ function scheduleAddMenuPositionUpdate(retries = 8) {
 		}
 
 		if (updateAddMenuPosition()) {
-			updateSubmenuOpenDirection()
+			if (!isMobileAddMenuLayout.value) {
+				updateSubmenuOpenDirection()
+			}
 			return
 		}
 
@@ -1315,6 +1371,11 @@ function updateSubmenuPosition(): boolean {
 
 	if (!activeCategoryKey.value) {
 		return false
+	}
+
+	if (isMobileAddMenuLayout.value) {
+		hasSubmenuPosition.value = true
+		return true
 	}
 
 	const activeButton = categoryButtonRefs.get(activeCategoryKey.value)
@@ -1391,8 +1452,16 @@ function updateMenuPositions() {
 		return
 	}
 
+	if (syncMobileAddMenuLayout()) {
+		scheduleAddMenuPositionUpdate()
+		scheduleSubmenuPositionUpdate()
+		return
+	}
+
 	updateAddMenuPosition()
-	updateSubmenuOpenDirection()
+	if (!isMobileAddMenuLayout.value) {
+		updateSubmenuOpenDirection()
+	}
 	updateSubmenuPosition()
 }
 

@@ -294,6 +294,14 @@ export const SearchableCategories: Story = {
 		modelValue: {},
 		categories: searchableCategories,
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'On mobile and narrow viewports, selecting a category replaces the add menu with the category submenu.',
+			},
+		},
+	},
 }
 
 export const MixedSubmenuWidthsNearEdge: Story = {
