@@ -338,8 +338,6 @@ pub async fn fetch_analytics(
             .await?;
     }
 
-    drop(query_clickhouse_cx);
-
     if req.return_metrics.project_revenue.is_some() {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());

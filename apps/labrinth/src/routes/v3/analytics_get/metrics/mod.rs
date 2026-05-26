@@ -89,7 +89,7 @@ pub struct Metrics<BucketBy, FilterBy> {
     pub bucket_by: Vec<BucketBy>,
     /// Filters to apply before aggregating this metric.
     ///
-    /// Values within one field are ORed together. Different fields are ANDed
+    /// Values within one field are ORed together. Different fields are AND'ed
     /// together. An empty list means that field is not filtered.
     #[serde(default)]
     pub filter_by: FilterBy,
