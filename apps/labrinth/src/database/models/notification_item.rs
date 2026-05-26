@@ -597,6 +597,33 @@ impl DBNotification {
         Ok(Some(()))
     }
 
+    pub async fn remove_many_matching_body(
+        body_filter: &serde_json::Value,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<usize, DatabaseError> {
+        let ids = sqlx::query!(
+            "
+            SELECT id
+            FROM notifications
+            WHERE body @> $1::jsonb
+            ",
+            body_filter
+        )
+        .fetch(&mut *transaction)
+        .map_ok(|x| DBNotificationId(x.id))
+        .try_collect::<Vec<_>>()
+        .await?;
+
+        if ids.is_empty() {
+            return Ok(0);
+        }
+
+        Self::remove_many(&ids, transaction, redis).await?;
+
+        Ok(ids.len())
+    }
+
     pub async fn clear_user_notifications_cache(
         user_ids: impl IntoIterator<Item = &DBUserId>,
         redis: &RedisPool,
