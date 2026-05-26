@@ -1,12 +1,13 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::ids::DBUserId;
+use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
 use crate::models::users::Role;
 use crate::models::v3::notifications::{
-    NotificationBody, NotificationDeliveryStatus,
+    NotificationBody, NotificationDeliveryStatus, NotificationType,
 };
 use crate::models::v3::pats::Scopes;
 use crate::queue::email::EmailQueue;
@@ -16,7 +17,7 @@ use crate::util::guards::external_notification_key_guard;
 use actix_web::http::StatusCode;
 use actix_web::web;
 use actix_web::{
-    CustomizeResponder, HttpRequest, HttpResponse, Responder, post,
+    CustomizeResponder, HttpRequest, HttpResponse, Responder, delete, post,
 };
 use ariadne::ids::UserId;
 use eyre::eyre;
@@ -26,6 +27,7 @@ use serde::Deserialize;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(create)
         .service(create_direct_email)
+        .service(remove)
         .service(send_custom_email);
 }
 
@@ -156,6 +158,26 @@ pub async fn create_direct_email(
     };
 
     Ok(web::Json(failed).customize().with_status(status))
+}
+
+#[delete("external_notifications", guard = "external_notification_key_guard")]
+pub async fn remove(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    notification_filter: web::Json<serde_json::Value>,
+) -> Result<HttpResponse, ApiError> {
+    let mut txn = pool.begin().await?;
+
+    DBNotification::remove_many_matching_body(
+        &notification_filter,
+        &mut txn,
+        &redis,
+    )
+    .await?;
+
+    txn.commit().await?;
+
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[derive(Deserialize)]
