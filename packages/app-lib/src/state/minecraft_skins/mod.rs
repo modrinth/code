@@ -23,12 +23,23 @@ impl DefaultMinecraftCape {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
         let cape_id = cape_id.as_hyphenated();
 
+        let mut transaction = db.begin().await?;
+
+        sqlx::query(
+            "DELETE FROM default_minecraft_capes WHERE minecraft_user_uuid = ?",
+        )
+        .bind(minecraft_user_id.to_string())
+        .execute(&mut *transaction)
+        .await?;
+
         sqlx::query!(
             "INSERT OR REPLACE INTO default_minecraft_capes (minecraft_user_uuid, id) VALUES (?, ?)",
             minecraft_user_id, cape_id
         )
-        .execute(&mut *db.acquire().await?)
+        .execute(&mut *transaction)
         .await?;
+
+        transaction.commit().await?;
 
         Ok(())
     }
@@ -94,6 +105,17 @@ impl CustomMinecraftSkin {
 
         let mut transaction = db.begin().await?;
 
+        sqlx::query(
+            "DELETE FROM custom_minecraft_skins \
+            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ? AND cape_id IS ?",
+        )
+        .bind(minecraft_user_id.to_string())
+        .bind(texture_key)
+        .bind(variant)
+        .bind(cape_id.as_ref().map(ToString::to_string))
+        .execute(&mut *transaction)
+        .await?;
+
         sqlx::query!(
             "INSERT OR REPLACE INTO custom_minecraft_skin_textures (texture_key, texture) VALUES (?, ?)",
             texture_key, texture
@@ -142,9 +164,9 @@ impl CustomMinecraftSkin {
         minecraft_user_id: Uuid,
         db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<impl Stream<Item = Self>> {
-        // Limit ourselves to 2048 skins, so that memory usage even when storing base64
-        // PNG data of a 64x64 texture with random pixels stays around ~150 MiB
-        Self::get_many(minecraft_user_id, 0, 2048, db).await
+        // Limit the first-load IPC payload. Full skin textures are returned inline,
+        // so very large libraries can otherwise block the skins page while serializing.
+        Self::get_many(minecraft_user_id, 0, 256, db).await
     }
 
     pub async fn texture_blob(

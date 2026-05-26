@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import {
+	CheckIcon,
 	EditIcon,
 	ExcitedRinthbot,
 	LogInIcon,
 	PlusIcon,
 	SpinnerIcon,
 	TrashIcon,
+	UndoIcon,
 	UpdatedIcon,
 } from '@modrinth/assets'
 import {
@@ -61,6 +63,7 @@ const currentUserId = ref<string | undefined>(undefined)
 const username = computed(() => currentUser.value?.profile?.name ?? undefined)
 const selectedSkin = ref<Skin | null>(null)
 const defaultCape = ref<Cape>()
+const isApplyingSkin = ref(false)
 
 const originalSelectedSkin = ref<Skin | null>(null)
 const originalDefaultCape = ref<Cape>()
@@ -96,6 +99,9 @@ const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
 const skinNametag = computed(() =>
 	settings.value.hide_nametag_skins_page ? undefined : username.value,
+)
+const hasPendingSkinChange = computed(
+	() => !skinsMatch(selectedSkin.value, originalSelectedSkin.value),
 )
 
 let userCheckInterval: number | null = null
@@ -140,28 +146,46 @@ async function loadSkins() {
 	}
 }
 
-async function changeSkin(newSkin: Skin) {
-	const previousSkin = selectedSkin.value
-	const previousSkinsList = [...skins.value]
+function skinKey(skin: Skin, prefix: string) {
+	return `${prefix}-${skin.source}-${skin.texture_key}-${skin.variant}-${skin.cape_id ?? 'no-cape'}`
+}
 
-	skins.value = skins.value.map((skin) => {
-		return {
-			...skin,
-			is_equipped: skin.texture_key === newSkin.texture_key,
-		}
-	})
+function skinsMatch(a?: Skin | null, b?: Skin | null) {
+	return (
+		a?.source === b?.source &&
+		a?.texture_key === b?.texture_key &&
+		a?.variant === b?.variant &&
+		(a?.cape_id ?? null) === (b?.cape_id ?? null)
+	)
+}
 
-	selectedSkin.value = skins.value.find((s) => s.texture_key === newSkin.texture_key) || null
+function isSkinSelected(skin: Skin) {
+	return skinsMatch(selectedSkin.value, skin)
+}
 
+function changeSkin(newSkin: Skin) {
+	selectedSkin.value = newSkin
+}
+
+function resetSelectedSkin() {
+	selectedSkin.value =
+		skins.value.find((skin) => skinsMatch(skin, originalSelectedSkin.value)) ??
+		originalSelectedSkin.value
+}
+
+async function applySelectedSkin() {
+	const skinToApply = selectedSkin.value
+	if (!skinToApply || !hasPendingSkinChange.value || isApplyingSkin.value) return
+
+	isApplyingSkin.value = true
 	try {
-		await equip_skin(newSkin)
+		await equip_skin(skinToApply)
 		if (accountsCard.value) {
 			await accountsCard.value.refreshValues()
 		}
+		await loadCapes()
+		await loadSkins()
 	} catch (error) {
-		selectedSkin.value = previousSkin
-		skins.value = previousSkinsList
-
 		if ((error as { message?: string })?.message?.includes('429 Too Many Requests')) {
 			notifications.addNotification({
 				type: 'error',
@@ -171,6 +195,8 @@ async function changeSkin(newSkin: Skin) {
 		} else {
 			handleError(error as Error)
 		}
+	} finally {
+		isApplyingSkin.value = false
 	}
 }
 
@@ -204,7 +230,8 @@ async function handleCapeSelected(cape: Cape | undefined) {
 }
 
 async function onSkinSaved() {
-	await Promise.all([loadCapes(), loadSkins()])
+	await loadCapes()
+	await loadSkins()
 }
 
 async function loadCurrentUser() {
@@ -292,7 +319,8 @@ async function checkUserChanges() {
 	}
 }
 
-await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
+await Promise.all([loadCapes(), loadCurrentUser()])
+await loadSkins()
 </script>
 
 <template>
@@ -333,7 +361,22 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 					:initial-rotation="Math.PI / 8"
 				>
 					<template #subtitle>
-						<ButtonStyled :disabled="!!selectedSkin?.cape_id">
+						<div v-if="hasPendingSkinChange" class="flex gap-2">
+							<ButtonStyled>
+								<button :disabled="isApplyingSkin" @click="resetSelectedSkin">
+									<UndoIcon />
+									Reset
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand">
+								<button :disabled="isApplyingSkin" @click="applySelectedSkin">
+									<SpinnerIcon v-if="isApplyingSkin" class="animate-spin" />
+									<CheckIcon v-else />
+									Apply
+								</button>
+							</ButtonStyled>
+						</div>
+						<ButtonStyled v-else :disabled="!!selectedSkin?.cape_id">
 							<button
 								v-tooltip="
 									selectedSkin?.cape_id
@@ -374,11 +417,11 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 
 					<SkinButton
 						v-for="skin in savedSkins"
-						:key="`saved-skin-${skin.texture_key}`"
+						:key="skinKey(skin, 'saved-skin')"
 						class="skin-card"
 						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
 						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
-						:selected="selectedSkin === skin"
+						:selected="isSkinSelected(skin)"
 						@select="changeSkin(skin)"
 					>
 						<template #overlay-buttons>
@@ -411,11 +454,11 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 				<div class="skin-card-grid">
 					<SkinButton
 						v-for="skin in defaultSkins"
-						:key="`default-skin-${skin.texture_key}`"
+						:key="skinKey(skin, 'default-skin')"
 						class="skin-card"
 						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
 						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
-						:selected="selectedSkin === skin"
+						:selected="isSkinSelected(skin)"
 						:tooltip="skin.name"
 						@select="changeSkin(skin)"
 					/>

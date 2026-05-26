@@ -1,9 +1,38 @@
-//! Theseus skin management interface
+//! # Minecraft Skins API
+//!
+//! ## Data Flow
+//!
+//! 1. Frontend calls `get_available_skins()` and `get_available_capes()`
+//! 2. Backend fetches the selected Minecraft account and a fresh-ish Mojang profile
+//! 3. Skins are merged from three sources:
+//!    - saved custom skins in the local app database
+//!    - bundled Minecraft default skins
+//!    - the active Mojang skin, if it is not already known locally
+//! 4. Before any skin-changing Mojang request, the current remote-only skin is
+//!    saved locally so switching to a default skin does not lose a user's current skin
+//! 5. After Mojang mutations, profile cache is refreshed on partial failures so
+//!    later reads do not trust stale state
+//!
+//! ## Ownership
+//!
+//! Mojang is the source of truth for the currently equipped skin and cape.
+//! The local database stores recoverable custom skins and the app's selected
+//! default cape. A saved skin is identified by `texture_key` and `variant`;
+//! cape changes are treated as profile state, not a reason to create another
+//! saved skin row.
+//!
+//! `cape_id = Some(_)` means a skin has an explicit cape override when applied.
+//! `cape_id = None` means the skin follows the app's default cape.
+//!
+//! ## Consistency
+//!
+//! Mojang skin and cape operations cannot be made transactionally atomic with
+//! local SQLite writes. The API therefore prefers recoverability: save the
+//! outgoing remote-only skin before mutation, persist the new custom skin before
+//! optional cape sync, and force-refresh the profile cache when a later step
+//! fails after Mojang may already have accepted a change.
 
-use std::sync::{
-    Arc,
-    atomic::{AtomicBool, Ordering},
-};
+use std::sync::Arc;
 
 pub use bytes::Bytes;
 use futures::{StreamExt, TryStreamExt, stream};
@@ -33,6 +62,9 @@ mod assets {
 }
 
 mod png_util;
+
+const SKIN_PROFILE_CACHE_MAX_AGE: std::time::Duration =
+    std::time::Duration::from_secs(5);
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Cape {
@@ -101,11 +133,11 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    let profile =
-        selected_credentials.online_profile().await.ok_or_else(|| {
-            ErrorKind::OnlineMinecraftProfileUnavailable {
-                user_name: selected_credentials.offline_profile.name.clone(),
-            }
+    let profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
         })?;
 
     let default_cape_id = DefaultMinecraftCape::get(profile.id, &state.pool)
@@ -127,10 +159,10 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
         .collect())
 }
 
-/// Retrieves the available skins for the currently selected Minecraft profile. At the moment,
-/// this includes custom skins stored in the app database, default Mojang skins, and the currently
-/// equipped skin, if different from the previous skins. Exactly one of the returned skins is
-/// marked as equipped.
+/// Retrieves the available skins for the currently selected Minecraft profile.
+/// Returns saved custom skins, bundled default skins, and the active Mojang skin
+/// if it is not already represented by texture key and model variant.
+/// Exactly one returned skin is marked as equipped.
 #[tracing::instrument]
 pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     let state = State::get().await?;
@@ -139,95 +171,72 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    let profile =
-        selected_credentials.online_profile().await.ok_or_else(|| {
-            ErrorKind::OnlineMinecraftProfileUnavailable {
-                user_name: selected_credentials.offline_profile.name.clone(),
-            }
+    let profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
         })?;
 
     let current_skin = profile.current_skin()?;
     let current_cape_id = profile.current_cape().map(|cape| cape.id);
-    let default_cape_id = DefaultMinecraftCape::get(profile.id, &state.pool)
+
+    let current_skin_texture_key = current_skin.texture_key();
+    let mut found_equipped_skin = false;
+    let mut available_skins = Vec::new();
+
+    for custom_skin in CustomMinecraftSkin::get_all(profile.id, &state.pool)
         .await?
-        .map(|cape| cape.id);
+        .collect::<Vec<_>>()
+        .await
+    {
+        let is_equipped = !found_equipped_skin
+            && custom_skin.texture_key == *current_skin_texture_key
+            && custom_skin.variant == current_skin.variant;
 
-    // Keep track of whether we have found the currently equipped skin, to potentially avoid marking
-    // several skins as equipped, and know if the equipped skin was found (see below)
-    let found_equipped_skin = Arc::new(AtomicBool::new(false));
+        found_equipped_skin |= is_equipped;
 
-    let custom_skins = CustomMinecraftSkin::get_all(profile.id, &state.pool)
-        .await?
-        .then(|custom_skin| {
-            let found_equipped_skin = Arc::clone(&found_equipped_skin);
-            let state = Arc::clone(&state);
-            async move {
-                // Several custom skins may reuse the same texture for different cape or skin model
-                // variations, so check all attributes for correctness
-                let is_equipped = !found_equipped_skin.load(Ordering::Acquire)
-                    && custom_skin.texture_key == *current_skin.texture_key()
-                    && custom_skin.variant == current_skin.variant
-                    && custom_skin.cape_id
-                        == if custom_skin.cape_id.is_some() {
-                            current_cape_id
-                        } else {
-                            default_cape_id
-                        };
-
-                found_equipped_skin.fetch_or(is_equipped, Ordering::AcqRel);
-
-                Ok::<_, crate::Error>(Skin {
-                    name: None,
-                    variant: custom_skin.variant,
-                    cape_id: custom_skin.cape_id,
-                    texture: png_util::blob_to_data_url(
-                        custom_skin.texture_blob(&state.pool).await?,
-                    )
-                    .or_else(|| {
-                        // Fall back to a placeholder texture if the DB somehow contains corrupt data
-                        png_util::blob_to_data_url(include_bytes!(
-                            "minecraft_skins/assets/default/MissingNo.png"
-                        ))
-                    })
-                    .unwrap(),
-                    source: SkinSource::Custom,
-                    is_equipped,
-                    texture_key: custom_skin.texture_key.into(),
-                })
-            }
-        });
-
-    let default_skins =
-        stream::iter(assets::DEFAULT_SKINS.iter().map(|default_skin| {
-            let is_equipped = !found_equipped_skin.load(Ordering::Acquire)
-                && default_skin.texture_key == current_skin.texture_key()
-                && default_skin.variant == current_skin.variant;
-
-            found_equipped_skin.fetch_or(is_equipped, Ordering::AcqRel);
-
-            Ok::<_, crate::Error>(Skin {
-                texture_key: Arc::clone(&default_skin.texture_key),
-                name: default_skin.name.as_ref().cloned(),
-                variant: default_skin.variant,
-                cape_id: None,
-                texture: Arc::clone(&default_skin.texture),
-                source: SkinSource::Default,
-                is_equipped,
-            })
-        }));
-
-    let mut available_skins = custom_skins
-        .chain(default_skins)
-        .try_collect::<Vec<_>>()
-        .await?;
-
-    // If the currently equipped skin does not match any of the skins we know about,
-    // add it to the list of available skins as a custom external skin, set by an
-    // external service (e.g., the Minecraft launcher or website). This way we guarantee
-    // that the currently equipped skin is always returned as available
-    if !found_equipped_skin.load(Ordering::Acquire) {
         available_skins.push(Skin {
-            texture_key: current_skin.texture_key(),
+            name: None,
+            variant: custom_skin.variant,
+            cape_id: custom_skin.cape_id,
+            texture: png_util::blob_to_data_url(
+                custom_skin.texture_blob(&state.pool).await?,
+            )
+            .or_else(|| {
+                png_util::blob_to_data_url(include_bytes!(
+                    "minecraft_skins/assets/default/MissingNo.png"
+                ))
+            })
+            .unwrap(),
+            source: SkinSource::Custom,
+            is_equipped,
+            texture_key: custom_skin.texture_key.into(),
+        });
+    }
+
+    for default_skin in assets::DEFAULT_SKINS.iter() {
+        let is_equipped = !found_equipped_skin
+            && default_skin.texture_key == current_skin_texture_key
+            && default_skin.variant == current_skin.variant;
+
+        found_equipped_skin |= is_equipped;
+
+        available_skins.push(Skin {
+            texture_key: Arc::clone(&default_skin.texture_key),
+            name: default_skin.name.as_ref().cloned(),
+            variant: default_skin.variant,
+            cape_id: None,
+            texture: Arc::clone(&default_skin.texture),
+            source: SkinSource::Default,
+            is_equipped,
+        });
+    }
+
+    // Keep the active Mojang skin visible even if the app has never saved it.
+    if !found_equipped_skin {
+        available_skins.push(Skin {
+            texture_key: current_skin_texture_key,
             name: current_skin.name.as_deref().map(Arc::from),
             variant: current_skin.variant,
             cape_id: current_cape_id,
@@ -240,8 +249,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     Ok(available_skins)
 }
 
-/// Adds a custom skin to the app database and equips it for the currently selected
-/// Minecraft profile.
+/// Adds a custom skin to the app database and equips it for the current profile.
 #[tracing::instrument(skip(texture_blob))]
 pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
@@ -260,9 +268,16 @@ pub async fn add_and_equip_custom_skin(
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    // We have to equip the skin first, as it's the Mojang API backend who knows
-    // how to compute the texture key we require, which we can then read from the
-    // updated player profile
+    let previous_profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
+        })?;
+
+    preserve_current_profile_skin(&state, &previous_profile).await?;
+
+    // Mojang computes the texture key only after accepting the uploaded skin.
     mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         stream::iter([Ok::<_, String>(Bytes::clone(&texture_blob))]),
@@ -270,16 +285,14 @@ pub async fn add_and_equip_custom_skin(
     )
     .await?;
 
-    let profile =
-        selected_credentials.online_profile().await.ok_or_else(|| {
-            ErrorKind::OnlineMinecraftProfileUnavailable {
-                user_name: selected_credentials.offline_profile.name.clone(),
-            }
+    let profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
         })?;
 
-    sync_cape(&state, &selected_credentials, &profile, cape_override).await?;
-
-    CustomMinecraftSkin::add(
+    if let Err(error) = CustomMinecraftSkin::add(
         profile.id,
         &profile.current_skin()?.texture_key(),
         &texture_blob,
@@ -287,7 +300,18 @@ pub async fn add_and_equip_custom_skin(
         cape_override,
         &state.pool,
     )
-    .await?;
+    .await
+    {
+        refresh_profile_cache(&selected_credentials).await;
+        return Err(error);
+    }
+
+    if let Err(error) =
+        sync_cape(&state, &selected_credentials, &profile, cape_override).await
+    {
+        refresh_profile_cache(&selected_credentials).await;
+        return Err(error);
+    }
 
     Ok(())
 }
@@ -308,39 +332,58 @@ pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    let profile =
-        selected_credentials.online_profile().await.ok_or_else(|| {
-            ErrorKind::OnlineMinecraftProfileUnavailable {
-                user_name: selected_credentials.offline_profile.name.clone(),
-            }
+    let profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
         })?;
-    let current_skin = get_available_skins()
+
+    let current_cape_id = profile.current_cape().map(|cape| cape.id);
+    let default_cape_id = DefaultMinecraftCape::get(profile.id, &state.pool)
         .await?
-        .into_iter()
-        .find(|skin| skin.is_equipped)
-        .unwrap();
+        .map(|cape| cape.id);
+    let current_skin_uses_default_cape = current_cape_id == default_cape_id;
 
     if let Some(cape) = cape {
         // Synchronize the equipped cape with the new default cape, if the current skin uses
         // the default cape
-        if current_skin.cape_id.is_none() {
-            mojang_api::MinecraftCapeOperation::equip(
+        if current_skin_uses_default_cape {
+            if let Err(error) = mojang_api::MinecraftCapeOperation::equip(
                 &selected_credentials,
                 cape.id,
             )
-            .await?;
+            .await
+            {
+                refresh_profile_cache(&selected_credentials).await;
+                return Err(error);
+            }
         }
 
-        DefaultMinecraftCape::set(profile.id, cape.id, &state.pool).await?;
+        if let Err(error) =
+            DefaultMinecraftCape::set(profile.id, cape.id, &state.pool).await
+        {
+            refresh_profile_cache(&selected_credentials).await;
+            return Err(error);
+        }
     } else {
-        if current_skin.cape_id.is_none() {
-            mojang_api::MinecraftCapeOperation::unequip_any(
+        if current_skin_uses_default_cape {
+            if let Err(error) = mojang_api::MinecraftCapeOperation::unequip_any(
                 &selected_credentials,
             )
-            .await?;
+            .await
+            {
+                refresh_profile_cache(&selected_credentials).await;
+                return Err(error);
+            }
         }
 
-        DefaultMinecraftCape::remove(profile.id, &state.pool).await?;
+        if let Err(error) =
+            DefaultMinecraftCape::remove(profile.id, &state.pool).await
+        {
+            refresh_profile_cache(&selected_credentials).await;
+            return Err(error);
+        }
     }
 
     Ok(())
@@ -359,12 +402,14 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    let profile =
-        selected_credentials.online_profile().await.ok_or_else(|| {
-            ErrorKind::OnlineMinecraftProfileUnavailable {
-                user_name: selected_credentials.offline_profile.name.clone(),
-            }
+    let profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
         })?;
+
+    preserve_current_profile_skin(&state, &profile).await?;
 
     mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
@@ -373,7 +418,12 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     )
     .await?;
 
-    sync_cape(&state, &selected_credentials, &profile, skin.cape_id).await?;
+    if let Err(error) =
+        sync_cape(&state, &selected_credentials, &profile, skin.cape_id).await
+    {
+        refresh_profile_cache(&selected_credentials).await;
+        return Err(error);
+    }
 
     Ok(())
 }
@@ -392,15 +442,19 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
+    let profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
+        })?;
+
     CustomMinecraftSkin {
         texture_key: skin.texture_key.to_string(),
         variant: skin.variant,
         cape_id: skin.cape_id,
     }
-    .remove(
-        selected_credentials.maybe_online_profile().await.id,
-        &state.pool,
-    )
+    .remove(profile.id, &state.pool)
     .await?;
 
     Ok(())
@@ -417,17 +471,24 @@ pub async fn unequip_skin() -> crate::Result<()> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    let profile =
-        selected_credentials.online_profile().await.ok_or_else(|| {
-            ErrorKind::OnlineMinecraftProfileUnavailable {
-                user_name: selected_credentials.offline_profile.name.clone(),
-            }
+    let profile = selected_credentials
+        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .await
+        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+            user_name: selected_credentials.offline_profile.name.clone(),
         })?;
+
+    preserve_current_profile_skin(&state, &profile).await?;
 
     mojang_api::MinecraftSkinOperation::unequip_any(&selected_credentials)
         .await?;
 
-    sync_cape(&state, &selected_credentials, &profile, None).await?;
+    if let Err(error) =
+        sync_cape(&state, &selected_credentials, &profile, None).await
+    {
+        refresh_profile_cache(&selected_credentials).await;
+        return Err(error);
+    }
 
     Ok(())
 }
@@ -489,6 +550,61 @@ pub async fn get_dragged_skin_data(
             Err(ErrorKind::InvalidSkinTexture.into())
         }
     }
+}
+
+async fn preserve_current_profile_skin(
+    state: &State,
+    profile: &MinecraftProfile,
+) -> crate::Result<()> {
+    let current_skin = profile.current_skin()?;
+    let current_skin_texture_key = current_skin.texture_key();
+
+    if assets::DEFAULT_SKINS.iter().any(|default_skin| {
+        default_skin.texture_key == current_skin_texture_key
+            && default_skin.variant == current_skin.variant
+    }) {
+        return Ok(());
+    }
+
+    for custom_skin in CustomMinecraftSkin::get_all(profile.id, &state.pool)
+        .await?
+        .collect::<Vec<_>>()
+        .await
+    {
+        if custom_skin.texture_key == *current_skin_texture_key
+            && custom_skin.variant == current_skin.variant
+        {
+            return Ok(());
+        }
+    }
+
+    let current_cape_id = profile.current_cape().map(|cape| cape.id);
+
+    let texture = png_util::url_to_data_stream(&current_skin.url)
+        .await?
+        .try_fold(Vec::new(), |mut texture, chunk| async move {
+            texture.extend_from_slice(&chunk);
+            Ok(texture)
+        })
+        .await?;
+
+    CustomMinecraftSkin::add(
+        profile.id,
+        &current_skin_texture_key,
+        &texture,
+        current_skin.variant,
+        current_cape_id,
+        &state.pool,
+    )
+    .await?;
+
+    Ok(())
+}
+
+async fn refresh_profile_cache(selected_credentials: &Credentials) {
+    let _ = selected_credentials
+        .online_profile_with_max_age(std::time::Duration::ZERO)
+        .await;
 }
 
 /// Synchronizes the equipped cape with the selected cape if necessary, taking into

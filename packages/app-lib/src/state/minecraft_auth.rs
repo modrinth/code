@@ -20,7 +20,6 @@ use serde_json::json;
 use sha2::Digest;
 use std::borrow::Cow;
 use std::collections::HashMap;
-use std::collections::hash_map::Entry;
 use std::future::Future;
 use std::hash::{BuildHasherDefault, DefaultHasher};
 use std::io;
@@ -270,22 +269,29 @@ impl Credentials {
 
     #[tracing::instrument(skip(self))]
     pub async fn online_profile(&self) -> Option<Arc<MinecraftProfile>> {
-        let mut profile_cache = PROFILE_CACHE.lock().await;
+        self.online_profile_with_max_age(std::time::Duration::from_secs(60))
+            .await
+    }
 
+    #[tracing::instrument(skip(self))]
+    pub async fn online_profile_with_max_age(
+        &self,
+        max_age: std::time::Duration,
+    ) -> Option<Arc<MinecraftProfile>> {
         loop {
-            match profile_cache.entry(self.offline_profile.id) {
-                Entry::Occupied(entry) => {
-                    match entry.get() {
+            {
+                let mut profile_cache = PROFILE_CACHE.lock().await;
+
+                if let Some(cache_entry) =
+                    profile_cache.get(&self.offline_profile.id)
+                {
+                    match cache_entry {
                         ProfileCacheEntry::Hit(profile)
-                            if profile.is_fresh() =>
+                            if profile.is_fresh(max_age) =>
                         {
                             return Some(Arc::clone(profile));
                         }
-                        ProfileCacheEntry::Hit(_) => {
-                            // The profile is stale, so remove it and try again
-                            entry.remove();
-                            continue;
-                        }
+                        ProfileCacheEntry::Hit(_) => {}
                         // Auth errors must be handled with a backoff strategy because it
                         // has been experimentally found that Mojang quickly rate limits
                         // the profile data endpoint on repeated attempts with bad auth
@@ -295,65 +301,59 @@ impl Credentials {
                         } if &self.access_token != likely_expired_token
                             || Instant::now()
                                 .saturating_duration_since(*last_attempt)
-                                > std::time::Duration::from_secs(60) =>
-                        {
-                            entry.remove();
-                            continue;
-                        }
+                                > std::time::Duration::from_secs(60) => {}
                         ProfileCacheEntry::AuthErrorBackoff { .. } => {
                             return None;
                         }
                     }
+
+                    profile_cache.remove(&self.offline_profile.id);
                 }
-                Entry::Vacant(entry) => {
-                    match minecraft_profile(&self.access_token).await {
-                        Ok(profile) => {
-                            let profile = Arc::new(profile);
-                            let cache_entry =
-                                ProfileCacheEntry::Hit(Arc::clone(&profile));
+            }
 
-                            // When fetching a profile for the first time, the player UUID may
-                            // be unknown (i.e., set to a dummy value), so make sure we don't
-                            // cache it in the wrong place
-                            if entry.key() != &profile.id {
-                                profile_cache.insert(profile.id, cache_entry);
-                            } else {
-                                entry.insert(cache_entry);
-                            }
+            match minecraft_profile(&self.access_token).await {
+                Ok(profile) => {
+                    let profile = Arc::new(profile);
+                    let cache_entry =
+                        ProfileCacheEntry::Hit(Arc::clone(&profile));
 
-                            return Some(profile);
-                        }
-                        Err(
-                            err @ MinecraftAuthenticationError::DeserializeResponse {
-                                status_code: StatusCode::UNAUTHORIZED,
-                                ..
-                            },
-                        ) => {
-                            tracing::warn!(
-                                "Failed to fetch online profile for UUID {} likely due to stale credentials, backing off: {err}",
-                                self.offline_profile.id
-                            );
-
-                            // We have to assume the player UUID key we have is correct here, which
-                            // should always be the case assuming a non-adversarial server. In any
-                            // case, any cache poisoning is inconsequential due to the entry expiration
-                            // and the fact that we use at most one single dummy UUID
-                            entry.insert(ProfileCacheEntry::AuthErrorBackoff {
-                                likely_expired_token: self.access_token.clone(),
-                                last_attempt: Instant::now(),
-                            });
-
-                            return None;
-                        }
-                        Err(err) => {
-                            tracing::warn!(
-                                "Failed to fetch online profile for UUID {}: {err}",
-                                self.offline_profile.id
-                            );
-
-                            return None;
-                        }
+                    let mut profile_cache = PROFILE_CACHE.lock().await;
+                    if self.offline_profile.id != profile.id {
+                        profile_cache.remove(&self.offline_profile.id);
                     }
+                    profile_cache.insert(profile.id, cache_entry);
+
+                    return Some(profile);
+                }
+                Err(
+                    err @ MinecraftAuthenticationError::DeserializeResponse {
+                        status_code: StatusCode::UNAUTHORIZED,
+                        ..
+                    },
+                ) => {
+                    tracing::warn!(
+                        "Failed to fetch online profile for UUID {} likely due to stale credentials, backing off: {err}",
+                        self.offline_profile.id
+                    );
+
+                    let mut profile_cache = PROFILE_CACHE.lock().await;
+                    profile_cache.insert(
+                        self.offline_profile.id,
+                        ProfileCacheEntry::AuthErrorBackoff {
+                            likely_expired_token: self.access_token.clone(),
+                            last_attempt: Instant::now(),
+                        },
+                    );
+
+                    return None;
+                }
+                Err(err) => {
+                    tracing::warn!(
+                        "Failed to fetch online profile for UUID {}: {err}",
+                        self.offline_profile.id
+                    );
+
+                    return None;
                 }
             }
         }
@@ -1224,10 +1224,10 @@ impl MinecraftProfile {
     /// from the Mojang API: the vanilla launcher was seen refreshing profile
     /// data every 60 seconds when re-entering the skin selection screen, and
     /// external applications may change this data at any time.
-    fn is_fresh(&self) -> bool {
+    fn is_fresh(&self, max_age: std::time::Duration) -> bool {
         self.fetch_time.is_some_and(|last_profile_fetch_time| {
             Instant::now().saturating_duration_since(last_profile_fetch_time)
-                < std::time::Duration::from_secs(60)
+                < max_age
         })
     }
 
