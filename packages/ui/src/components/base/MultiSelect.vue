@@ -219,7 +219,7 @@
 					>
 						<div
 							ref="optionsContainerRef"
-							class="overflow-y-auto select-none"
+							class="overflow-y-auto overscroll-contain select-none"
 							:style="{ maxHeight: `${maxHeight}px` }"
 							data-overlayscrollbars-viewport
 						>
@@ -427,6 +427,7 @@ const DROPDOWN_GAP = 8
 const DEFAULT_MAX_HEIGHT = 300
 const MULTI_SELECT_OPTION_ROW_HEIGHT = 48
 const MULTI_SELECT_VIRTUALIZATION_THRESHOLD = 80
+const MOBILE_SEARCH_AUTO_FOCUS_QUERY = '(pointer: coarse), (max-width: 800px)'
 const OPTIONS_OVERLAY_SCROLLBARS_OPTIONS = Object.freeze<PartialOptions>({
 	overflow: {
 		x: 'hidden',
@@ -954,6 +955,14 @@ function destroyOptionsOverlayScrollbars() {
 	optionsOverlayScrollbars.value = null
 }
 
+function shouldAutoFocusSearch() {
+	return (
+		props.searchable &&
+		typeof window !== 'undefined' &&
+		!window.matchMedia(MOBILE_SEARCH_AUTO_FOCUS_QUERY).matches
+	)
+}
+
 async function openDropdown() {
 	if (props.disabled || isOpen.value) return
 
@@ -965,7 +974,7 @@ async function openDropdown() {
 	await initializeOptionsOverlayScrollbars()
 	await syncSelectionActionsHeight()
 
-	if (props.searchable && searchInputRef.value) {
+	if (shouldAutoFocusSearch() && searchInputRef.value) {
 		;(searchInputRef.value as unknown as { focus: () => void }).focus()
 	}
 

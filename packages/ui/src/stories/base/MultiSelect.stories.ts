@@ -74,6 +74,14 @@ export const WithSearch: Story = {
 		searchable: true,
 		searchPlaceholder: 'Search versions',
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Searchable dropdowns avoid auto-focusing search on mobile so opening the menu does not summon the soft keyboard.',
+			},
+		},
+	},
 }
 
 export const WithOptionRightSlot: Story = {
