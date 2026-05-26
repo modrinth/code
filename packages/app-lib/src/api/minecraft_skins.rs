@@ -275,19 +275,22 @@ pub async fn add_and_equip_custom_skin(
     preserve_current_profile_skin(&state, &previous_profile).await?;
 
     // Mojang computes the texture key only after accepting the uploaded skin.
-    mojang_api::MinecraftSkinOperation::equip(
+    let profile = mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         stream::iter([Ok::<_, String>(Bytes::clone(&texture_blob))]),
         variant,
     )
     .await?;
 
-    let profile = selected_credentials
-        .refresh_online_profile()
-        .await
-        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
-            user_name: selected_credentials.offline_profile.name.clone(),
-        })?;
+    let profile = match profile {
+        Some(profile) => profile,
+        None => selected_credentials
+            .refresh_online_profile()
+            .await
+            .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+                user_name: selected_credentials.offline_profile.name.clone(),
+            })?,
+    };
 
     if let Err(error) = CustomMinecraftSkin::add(
         profile.id,
@@ -336,11 +339,8 @@ pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
             user_name: selected_credentials.offline_profile.name.clone(),
         })?;
 
-    let current_cape_id = profile.current_cape().map(|cape| cape.id);
-    let default_cape_id = DefaultMinecraftCape::get(profile.id, &state.pool)
-        .await?
-        .map(|cape| cape.id);
-    let current_skin_uses_default_cape = current_cape_id == default_cape_id;
+    let current_skin_uses_default_cape =
+        current_skin_follows_default_cape(&state, &profile).await?;
 
     if let Some(cape) = cape {
         // Synchronize the equipped cape with the new default cape, if the current skin uses
@@ -408,7 +408,7 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
 
     preserve_current_profile_skin(&state, &profile).await?;
 
-    mojang_api::MinecraftSkinOperation::equip(
+    let _ = mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         png_util::url_to_data_stream(&skin.texture).await?,
         skin.variant,
@@ -563,16 +563,16 @@ async fn preserve_current_profile_skin(
         return Ok(());
     }
 
-    for custom_skin in CustomMinecraftSkin::get_all(profile.id, &state.pool)
-        .await?
-        .collect::<Vec<_>>()
-        .await
+    if CustomMinecraftSkin::get_by_texture_and_variant(
+        profile.id,
+        &current_skin_texture_key,
+        current_skin.variant,
+        &state.pool,
+    )
+    .await?
+    .is_some()
     {
-        if custom_skin.texture_key == *current_skin_texture_key
-            && custom_skin.variant == current_skin.variant
-        {
-            return Ok(());
-        }
+        return Ok(());
     }
 
     let current_cape_id = profile.current_cape().map(|cape| cape.id);
@@ -600,6 +600,30 @@ async fn preserve_current_profile_skin(
 
 async fn refresh_profile_cache(selected_credentials: &Credentials) {
     let _ = selected_credentials.refresh_online_profile().await;
+}
+
+async fn current_skin_follows_default_cape(
+    state: &State,
+    profile: &MinecraftProfile,
+) -> crate::Result<bool> {
+    let current_skin = profile.current_skin()?;
+    let current_skin_texture_key = current_skin.texture_key();
+
+    if assets::DEFAULT_SKINS.iter().any(|default_skin| {
+        default_skin.texture_key == current_skin_texture_key
+            && default_skin.variant == current_skin.variant
+    }) {
+        return Ok(true);
+    }
+
+    Ok(CustomMinecraftSkin::get_by_texture_and_variant(
+        profile.id,
+        &current_skin_texture_key,
+        current_skin.variant,
+        &state.pool,
+    )
+    .await?
+    .is_some_and(|skin| skin.cape_id.is_none()))
 }
 
 /// Synchronizes the equipped cape with the selected cape if necessary, taking into

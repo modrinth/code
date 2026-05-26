@@ -107,12 +107,11 @@ impl CustomMinecraftSkin {
 
         sqlx::query(
             "DELETE FROM custom_minecraft_skins \
-            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ? AND cape_id IS ?",
+            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ?",
         )
         .bind(minecraft_user_id.to_string())
         .bind(texture_key)
         .bind(variant)
-        .bind(cape_id.as_ref().map(ToString::to_string))
         .execute(&mut *transaction)
         .await?;
 
@@ -133,6 +132,45 @@ impl CustomMinecraftSkin {
         transaction.commit().await?;
 
         Ok(())
+    }
+
+    pub async fn get_by_texture_and_variant(
+        minecraft_user_id: Uuid,
+        texture_key: &str,
+        variant: MinecraftSkinVariant,
+        db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<Self>> {
+        let minecraft_user_id = minecraft_user_id.as_hyphenated();
+
+        sqlx::query_as::<_, (String, MinecraftSkinVariant, Option<String>)>(
+            "SELECT texture_key, variant, cape_id \
+            FROM custom_minecraft_skins \
+            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ?",
+        )
+        .bind(minecraft_user_id.to_string())
+        .bind(texture_key)
+        .bind(variant)
+        .fetch_optional(&mut *db.acquire().await?)
+        .await?
+        .map(|(texture_key, variant, cape_id)| {
+            let cape_id = cape_id
+                .map(|id| {
+                    Uuid::parse_str(&id).map_err(|err| {
+                        crate::ErrorKind::OtherError(format!(
+                            "Invalid saved Minecraft cape UUID {id}: {err}"
+                        ))
+                        .as_error()
+                    })
+                })
+                .transpose()?;
+
+            Ok(Self {
+                texture_key,
+                variant,
+                cape_id,
+            })
+        })
+        .transpose()
     }
 
     pub async fn get_many(
@@ -187,13 +225,14 @@ impl CustomMinecraftSkin {
         db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
-        let cape_id = self.cape_id.map(|id| id.hyphenated());
 
-        sqlx::query!(
+        sqlx::query(
             "DELETE FROM custom_minecraft_skins \
-            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ? AND cape_id IS ?",
-            minecraft_user_id, self.texture_key, self.variant, cape_id
+            WHERE minecraft_user_uuid = ? AND texture_key = ? AND variant = ?",
         )
+        .bind(minecraft_user_id.to_string())
+        .bind(&self.texture_key)
+        .bind(self.variant)
         .execute(&mut *db.acquire().await?)
         .await?;
 

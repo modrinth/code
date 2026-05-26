@@ -64,7 +64,7 @@ impl MinecraftSkinOperation {
         credentials: &Credentials,
         texture: TextureStream,
         variant: MinecraftSkinVariant,
-    ) -> crate::Result<()>
+    ) -> crate::Result<Option<Arc<MinecraftProfile>>>
     where
         TextureStream: TryStream + Send + 'static,
         TextureStream::Error: Into<Box<dyn Error + Send + Sync>>,
@@ -91,7 +91,7 @@ impl MinecraftSkinOperation {
                     .file_name("skin.png"),
             );
 
-        update_profile_cache_from_response(
+        let profile = update_profile_cache_from_response(
             INSECURE_REQWEST_CLIENT
                 .post(
                     "https://api.minecraftservices.com/minecraft/profile/skins",
@@ -105,7 +105,7 @@ impl MinecraftSkinOperation {
         )
         .await;
 
-        Ok(())
+        Ok(profile)
     }
 
     pub async fn unequip_any(credentials: &Credentials) -> crate::Result<()> {
@@ -124,19 +124,24 @@ impl MinecraftSkinOperation {
     }
 }
 
-async fn update_profile_cache_from_response(response: reqwest::Response) {
+async fn update_profile_cache_from_response(
+    response: reqwest::Response,
+) -> Option<Arc<MinecraftProfile>> {
     let Some(mut profile) = response.json::<MinecraftProfile>().await.ok()
     else {
         tracing::warn!(
             "Failed to parse player profile from skin or cape operation response, not updating profile cache"
         );
-        return;
+        return None;
     };
 
     profile.fetch_time = Some(Instant::now());
+    let profile = Arc::new(profile);
 
     PROFILE_CACHE
         .lock()
         .await
-        .insert(profile.id, ProfileCacheEntry::Hit(Arc::new(profile)));
+        .insert(profile.id, ProfileCacheEntry::Hit(Arc::clone(&profile)));
+
+    Some(profile)
 }

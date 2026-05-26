@@ -218,12 +218,15 @@ pub(super) static PROFILE_CACHE: Mutex<
 
 const ONLINE_PROFILE_CACHE_MAX_AGE: std::time::Duration =
     std::time::Duration::from_secs(60);
+const ONLINE_PROFILE_LIVE_STATE_MAX_AGE: std::time::Duration =
+    std::time::Duration::from_secs(5);
 const ONLINE_PROFILE_AUTH_ERROR_BACKOFF: std::time::Duration =
     std::time::Duration::from_secs(60);
 
 #[derive(Debug, Clone, Copy)]
 enum OnlineProfileCacheIntent {
     NormalRead,
+    LiveStateRead,
     RefreshFromMojang,
 }
 
@@ -231,8 +234,13 @@ impl OnlineProfileCacheIntent {
     fn max_age(self) -> std::time::Duration {
         match self {
             Self::NormalRead => ONLINE_PROFILE_CACHE_MAX_AGE,
+            Self::LiveStateRead => ONLINE_PROFILE_LIVE_STATE_MAX_AGE,
             Self::RefreshFromMojang => std::time::Duration::ZERO,
         }
+    }
+
+    fn can_use_stale_on_fetch_error(self) -> bool {
+        matches!(self, Self::LiveStateRead)
     }
 }
 
@@ -296,12 +304,14 @@ impl Credentials {
         .await
     }
 
-    /// Fetches the online profile from Mojang instead of accepting cached
-    /// skin or cape state. Authentication-error backoff is still respected.
+    /// Returns profile data fresh enough for live skin and cape state.
+    ///
+    /// Very recent profile reads are reused so opening the skins page does not
+    /// burst several identical Mojang profile requests.
     #[tracing::instrument(skip(self))]
     pub async fn online_profile_fresh(&self) -> Option<Arc<MinecraftProfile>> {
         self.online_profile_with_cache_intent(
-            OnlineProfileCacheIntent::RefreshFromMojang,
+            OnlineProfileCacheIntent::LiveStateRead,
         )
         .await
     }
@@ -323,83 +333,96 @@ impl Credentials {
         cache_intent: OnlineProfileCacheIntent,
     ) -> Option<Arc<MinecraftProfile>> {
         let max_age = cache_intent.max_age();
+        let stale_profile = {
+            let mut profile_cache = PROFILE_CACHE.lock().await;
+            let mut remove_cached_entry = false;
 
-        loop {
+            let stale_profile = if let Some(cache_entry) =
+                profile_cache.get(&self.offline_profile.id)
             {
-                let mut profile_cache = PROFILE_CACHE.lock().await;
-
-                if let Some(cache_entry) =
-                    profile_cache.get(&self.offline_profile.id)
-                {
-                    match cache_entry {
-                        ProfileCacheEntry::Hit(profile)
-                            if profile.is_fresh(max_age) =>
-                        {
-                            return Some(Arc::clone(profile));
-                        }
-                        ProfileCacheEntry::Hit(_) => {}
-                        // Auth errors must be handled with a backoff strategy because it
-                        // has been experimentally found that Mojang quickly rate limits
-                        // the profile data endpoint on repeated attempts with bad auth
-                        ProfileCacheEntry::AuthErrorBackoff {
-                            likely_expired_token,
-                            last_attempt,
-                        } if &self.access_token != likely_expired_token
-                            || Instant::now()
-                                .saturating_duration_since(*last_attempt)
-                                > ONLINE_PROFILE_AUTH_ERROR_BACKOFF => {}
-                        ProfileCacheEntry::AuthErrorBackoff { .. } => {
-                            return None;
-                        }
+                match cache_entry {
+                    ProfileCacheEntry::Hit(profile)
+                        if profile.is_fresh(max_age) =>
+                    {
+                        return Some(Arc::clone(profile));
                     }
-
-                    profile_cache.remove(&self.offline_profile.id);
+                    ProfileCacheEntry::Hit(profile) => {
+                        Some(Arc::clone(profile))
+                    }
+                    // Auth errors must be handled with a backoff strategy because it
+                    // has been experimentally found that Mojang quickly rate limits
+                    // the profile data endpoint on repeated attempts with bad auth
+                    ProfileCacheEntry::AuthErrorBackoff {
+                        likely_expired_token,
+                        last_attempt,
+                    } if &self.access_token != likely_expired_token
+                        || Instant::now()
+                            .saturating_duration_since(*last_attempt)
+                            > ONLINE_PROFILE_AUTH_ERROR_BACKOFF =>
+                    {
+                        remove_cached_entry = true;
+                        None
+                    }
+                    ProfileCacheEntry::AuthErrorBackoff { .. } => {
+                        return None;
+                    }
                 }
+            } else {
+                None
+            };
+
+            if remove_cached_entry {
+                profile_cache.remove(&self.offline_profile.id);
             }
 
-            match minecraft_profile(&self.access_token).await {
-                Ok(profile) => {
-                    let profile = Arc::new(profile);
-                    let cache_entry =
-                        ProfileCacheEntry::Hit(Arc::clone(&profile));
+            stale_profile
+        };
 
-                    let mut profile_cache = PROFILE_CACHE.lock().await;
-                    if self.offline_profile.id != profile.id {
-                        profile_cache.remove(&self.offline_profile.id);
-                    }
-                    profile_cache.insert(profile.id, cache_entry);
+        match minecraft_profile(&self.access_token).await {
+            Ok(profile) => {
+                let profile = Arc::new(profile);
+                let cache_entry = ProfileCacheEntry::Hit(Arc::clone(&profile));
 
-                    return Some(profile);
+                let mut profile_cache = PROFILE_CACHE.lock().await;
+                if self.offline_profile.id != profile.id {
+                    profile_cache.remove(&self.offline_profile.id);
                 }
-                Err(
-                    err @ MinecraftAuthenticationError::DeserializeResponse {
-                        status_code: StatusCode::UNAUTHORIZED,
-                        ..
+                profile_cache.insert(profile.id, cache_entry);
+
+                Some(profile)
+            }
+            Err(
+                err @ MinecraftAuthenticationError::DeserializeResponse {
+                    status_code: StatusCode::UNAUTHORIZED,
+                    ..
+                },
+            ) => {
+                tracing::warn!(
+                    "Failed to fetch online profile for UUID {} likely due to stale credentials, backing off: {err}",
+                    self.offline_profile.id
+                );
+
+                let mut profile_cache = PROFILE_CACHE.lock().await;
+                profile_cache.insert(
+                    self.offline_profile.id,
+                    ProfileCacheEntry::AuthErrorBackoff {
+                        likely_expired_token: self.access_token.clone(),
+                        last_attempt: Instant::now(),
                     },
-                ) => {
-                    tracing::warn!(
-                        "Failed to fetch online profile for UUID {} likely due to stale credentials, backing off: {err}",
-                        self.offline_profile.id
-                    );
+                );
 
-                    let mut profile_cache = PROFILE_CACHE.lock().await;
-                    profile_cache.insert(
-                        self.offline_profile.id,
-                        ProfileCacheEntry::AuthErrorBackoff {
-                            likely_expired_token: self.access_token.clone(),
-                            last_attempt: Instant::now(),
-                        },
-                    );
+                None
+            }
+            Err(err) => {
+                tracing::warn!(
+                    "Failed to fetch online profile for UUID {}: {err}",
+                    self.offline_profile.id
+                );
 
-                    return None;
-                }
-                Err(err) => {
-                    tracing::warn!(
-                        "Failed to fetch online profile for UUID {}: {err}",
-                        self.offline_profile.id
-                    );
-
-                    return None;
+                if cache_intent.can_use_stale_on_fetch_error() {
+                    stale_profile
+                } else {
+                    None
                 }
             }
         }
