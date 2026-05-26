@@ -359,11 +359,17 @@ type Point = {
 	y: number
 }
 
+type ViewportRect = {
+	width: number
+	height: number
+	offsetTop: number
+	offsetLeft: number
+}
+
 type MenuPositionOptions = {
 	triggerRect: DOMRect
 	dropdownRect: DOMRect
-	viewportWidth: number
-	viewportHeight: number
+	viewport: ViewportRect
 }
 
 type SubmenuPositionOptions = {
@@ -371,8 +377,7 @@ type SubmenuPositionOptions = {
 	openDirection: SubmenuOpenDirection
 	submenuWidth: number
 	submenuHeight: number
-	viewportWidth: number
-	viewportHeight: number
+	viewport: ViewportRect
 }
 
 type SubmenuOpenDirection = 'left' | 'right'
@@ -380,7 +385,7 @@ type SubmenuOpenDirection = 'left' | 'right'
 type SubmenuOpenDirectionOptions = {
 	menuRect: DOMRect
 	widestSubmenuWidth: number
-	viewportWidth: number
+	viewport: ViewportRect
 }
 
 const ADD_MENU_WIDTH = 250
@@ -465,6 +470,7 @@ const submenuPosition = ref<Point>({ x: 0, y: 0 })
 const categoryButtonRefs = new Map<string, HTMLElement>()
 let pendingCategoryTimeout: ReturnType<typeof setTimeout> | null = null
 let previousMousePosition: Point | null = null
+let addMenuPositionRafId: number | null = null
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const source = isAddMenuOpen.value ? 'draft' : 'committed'
@@ -1203,28 +1209,46 @@ function clearPendingCategoryTimeout() {
 	}
 }
 
+function getViewportRect(): ViewportRect {
+	const visualViewport = window.visualViewport
+
+	return {
+		width: visualViewport?.width ?? window.innerWidth,
+		height: visualViewport?.height ?? window.innerHeight,
+		offsetTop: visualViewport?.offsetTop ?? 0,
+		offsetLeft: visualViewport?.offsetLeft ?? 0,
+	}
+}
+
 function getAddMenuPosition({
 	triggerRect,
 	dropdownRect,
-	viewportWidth,
-	viewportHeight,
+	viewport,
 }: MenuPositionOptions) {
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
+	const triggerTop = triggerRect.top + viewport.offsetTop
+	const triggerBottom = triggerRect.bottom + viewport.offsetTop
+	const triggerLeft = triggerRect.left + viewport.offsetLeft
+	const viewportTop = viewport.offsetTop
+	const viewportBottom = viewport.offsetTop + viewport.height
+	const viewportLeft = viewport.offsetLeft
+	const viewportRight = viewport.offsetLeft + viewport.width
+	const minLeft = viewportLeft + DROPDOWN_VIEWPORT_MARGIN
+	const maxLeft = Math.max(minLeft, viewportRight - dropdownWidth - DROPDOWN_VIEWPORT_MARGIN)
 	const hasSpaceBelow =
-		triggerRect.bottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <=
-		viewportHeight
+		triggerBottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <= viewportBottom
 	const hasSpaceAbove =
-		triggerRect.top - dropdownRect.height - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN > 0
+		triggerTop - dropdownRect.height - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN > viewportTop
 	const opensUp = !hasSpaceBelow && hasSpaceAbove
 	const top = opensUp
-		? triggerRect.top - dropdownRect.height - DROPDOWN_GAP
-		: triggerRect.bottom + DROPDOWN_GAP
-	const left = Math.min(triggerRect.left, viewportWidth - dropdownWidth - DROPDOWN_VIEWPORT_MARGIN)
+		? triggerTop - dropdownRect.height - DROPDOWN_GAP
+		: triggerBottom + DROPDOWN_GAP
+	const left = Math.min(Math.max(minLeft, triggerLeft), maxLeft)
 
 	return {
-		left: `${Math.max(DROPDOWN_VIEWPORT_MARGIN, left)}px`,
+		left: `${left}px`,
 		minWidth: `${triggerRect.width}px`,
-		top: `${Math.max(DROPDOWN_VIEWPORT_MARGIN, top)}px`,
+		top: `${Math.max(viewportTop + DROPDOWN_VIEWPORT_MARGIN, top)}px`,
 		width: `${dropdownWidth}px`,
 	}
 }
@@ -1234,21 +1258,29 @@ function getSubmenuPosition({
 	openDirection,
 	submenuWidth,
 	submenuHeight,
-	viewportWidth,
-	viewportHeight,
+	viewport,
 }: SubmenuPositionOptions): Point {
+	const buttonTop = buttonRect.top + viewport.offsetTop
+	const buttonLeft = buttonRect.left + viewport.offsetLeft
+	const buttonRight = buttonRect.right + viewport.offsetLeft
+	const viewportTop = viewport.offsetTop
+	const viewportBottom = viewport.offsetTop + viewport.height
+	const viewportLeft = viewport.offsetLeft
+	const viewportRight = viewport.offsetLeft + viewport.width
+	const minLeft = viewportLeft + DROPDOWN_VIEWPORT_MARGIN
 	const preferredLeft =
 		openDirection === 'right'
-			? buttonRect.right + DROPDOWN_GAP
-			: buttonRect.left - submenuWidth - DROPDOWN_GAP
+			? buttonRight + DROPDOWN_GAP
+			: buttonLeft - submenuWidth - DROPDOWN_GAP
 	const maxLeft = Math.max(
-		DROPDOWN_VIEWPORT_MARGIN,
-		viewportWidth - submenuWidth - DROPDOWN_VIEWPORT_MARGIN,
+		minLeft,
+		viewportRight - submenuWidth - DROPDOWN_VIEWPORT_MARGIN,
 	)
-	const left = Math.min(Math.max(DROPDOWN_VIEWPORT_MARGIN, preferredLeft), maxLeft)
+	const left = Math.min(Math.max(minLeft, preferredLeft), maxLeft)
+	const minTop = viewportTop + DROPDOWN_VIEWPORT_MARGIN
 	const top = Math.min(
-		Math.max(DROPDOWN_VIEWPORT_MARGIN, buttonRect.top),
-		Math.max(DROPDOWN_VIEWPORT_MARGIN, viewportHeight - submenuHeight - DROPDOWN_VIEWPORT_MARGIN),
+		Math.max(minTop, buttonTop),
+		Math.max(minTop, viewportBottom - submenuHeight - DROPDOWN_VIEWPORT_MARGIN),
 	)
 
 	return {
@@ -1260,10 +1292,14 @@ function getSubmenuPosition({
 function getSubmenuOpenDirection({
 	menuRect,
 	widestSubmenuWidth,
-	viewportWidth,
+	viewport,
 }: SubmenuOpenDirectionOptions): SubmenuOpenDirection {
-	const rightSpace = viewportWidth - menuRect.right - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
-	const leftSpace = menuRect.left - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
+	const menuLeft = menuRect.left + viewport.offsetLeft
+	const menuRight = menuRect.right + viewport.offsetLeft
+	const viewportLeft = viewport.offsetLeft
+	const viewportRight = viewport.offsetLeft + viewport.width
+	const rightSpace = viewportRight - menuRight - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
+	const leftSpace = menuLeft - viewportLeft - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
 
 	if (rightSpace >= widestSubmenuWidth) {
 		return 'right'
@@ -1335,11 +1371,11 @@ function updateAddMenuPosition(): boolean {
 	}
 
 	const dropdownRect = positioningElement.getBoundingClientRect()
+	const viewport = getViewportRect()
 	addMenuStyle.value = getAddMenuPosition({
 		triggerRect,
 		dropdownRect,
-		viewportWidth: window.innerWidth,
-		viewportHeight: window.innerHeight,
+		viewport,
 	})
 	return true
 }
@@ -1352,7 +1388,7 @@ function updateSubmenuOpenDirection(): boolean {
 	submenuOpenDirection.value = getSubmenuOpenDirection({
 		menuRect: menuContainer.value.getBoundingClientRect(),
 		widestSubmenuWidth: getWidestSubmenuWidthInPixels(filterCategories.value),
-		viewportWidth: window.innerWidth,
+		viewport: getViewportRect(),
 	})
 	return true
 }
@@ -1409,13 +1445,13 @@ function updateSubmenuPosition(): boolean {
 	const submenuHeight = submenuRect?.height ?? 320
 
 	updateSubmenuOpenDirection()
+	const viewport = getViewportRect()
 	submenuPosition.value = getSubmenuPosition({
 		buttonRect,
 		openDirection: submenuOpenDirection.value,
 		submenuWidth,
 		submenuHeight,
-		viewportWidth: window.innerWidth,
-		viewportHeight: window.innerHeight,
+		viewport,
 	})
 	hasSubmenuPosition.value = true
 	return true
@@ -1483,13 +1519,30 @@ function updateMenuPositions() {
 	updateSubmenuPosition()
 }
 
+function scheduleMenuPositionsUpdate() {
+	if (typeof window === 'undefined' || addMenuPositionRafId !== null) {
+		return
+	}
+
+	addMenuPositionRafId = window.requestAnimationFrame(() => {
+		addMenuPositionRafId = null
+		updateMenuPositions()
+	})
+}
+
+function handleViewportChange() {
+	scheduleMenuPositionsUpdate()
+}
+
 function startAddMenuPositionTracking() {
 	if (typeof window === 'undefined') {
 		return
 	}
 
-	window.addEventListener('resize', updateMenuPositions)
-	window.addEventListener('scroll', updateMenuPositions, true)
+	window.addEventListener('resize', handleViewportChange)
+	window.addEventListener('scroll', handleViewportChange, true)
+	window.visualViewport?.addEventListener('scroll', handleViewportChange)
+	window.visualViewport?.addEventListener('resize', handleViewportChange)
 }
 
 function stopAddMenuPositionTracking() {
@@ -1497,8 +1550,15 @@ function stopAddMenuPositionTracking() {
 		return
 	}
 
-	window.removeEventListener('resize', updateMenuPositions)
-	window.removeEventListener('scroll', updateMenuPositions, true)
+	window.removeEventListener('resize', handleViewportChange)
+	window.removeEventListener('scroll', handleViewportChange, true)
+	window.visualViewport?.removeEventListener('scroll', handleViewportChange)
+	window.visualViewport?.removeEventListener('resize', handleViewportChange)
+
+	if (addMenuPositionRafId !== null) {
+		window.cancelAnimationFrame(addMenuPositionRafId)
+		addMenuPositionRafId = null
+	}
 }
 
 onClickOutside(

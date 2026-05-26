@@ -298,7 +298,7 @@ export const SearchableCategories: Story = {
 		docs: {
 			description: {
 				story:
-					'On mobile and narrow viewports, tapping a category replaces the add menu with the category submenu; clicking outside either surface should close the add filter dropdown.',
+					'On mobile and narrow viewports, tapping a category replaces the add menu with the category submenu; both surfaces should stay anchored while scrolling or when the visual viewport changes.',
 			},
 		},
 	},
