@@ -4331,6 +4331,9 @@
   "time-frame-picker.empty-range": {
     "defaultMessage": "No date range selected."
   },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "End date"
+  },
   "time-frame-picker.increase-amount": {
     "defaultMessage": "Increase timeframe amount"
   },
@@ -4375,6 +4378,9 @@
   },
   "time-frame-picker.selecting-range": {
     "defaultMessage": "Selecting"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "Start date"
   },
   "time-frame-picker.timeframe-amount": {
     "defaultMessage": "Timeframe amount"

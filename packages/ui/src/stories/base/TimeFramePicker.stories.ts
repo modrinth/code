@@ -85,4 +85,12 @@ export const CustomRange: Story = {
 		customStartDate: '2026-04-23',
 		customEndDate: '2026-05-22',
 	}),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'On mobile and narrow viewports, the custom range panel uses separate one-month start and end date pickers.',
+			},
+		},
+	},
 }
