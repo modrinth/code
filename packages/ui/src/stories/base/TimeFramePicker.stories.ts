@@ -89,7 +89,7 @@ export const CustomRange: Story = {
 		docs: {
 			description: {
 				story:
-					'On mobile and narrow viewports, the custom range panel uses separate one-month start and end date pickers.',
+					'On mobile and narrow viewports, the custom range panel uses separate one-month start and end date pickers whose portaled calendars should not close the timeframe dropdown when selecting dates.',
 			},
 		},
 	},

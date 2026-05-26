@@ -442,3 +442,38 @@ export const Empty: Story = {
 		modelValue: [],
 	},
 }
+
+export const ScrollRepositioning: Story = {
+	args: {
+		options: Array.from({ length: 16 }, (_, index) => ({
+			value: `version-${index + 1}`,
+			label: `Version ${index + 1}`,
+		})),
+		modelValue: [],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+	},
+	render: (args) => ({
+		components: { MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			return { args, selected }
+		},
+		template: /*html*/ `
+			<div style="min-height: 150vh; padding-top: 45vh;">
+				<div style="width: min(100%, 22rem);">
+					<MultiSelect v-bind="args" v-model="selected" />
+				</div>
+			</div>
+		`,
+	}),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers fixed dropdown repositioning while the page scrolls with the menu open.',
+			},
+		},
+	},
+}

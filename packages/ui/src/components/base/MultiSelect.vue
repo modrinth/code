@@ -421,6 +421,12 @@ type VisibleMultiSelectItem<T> = {
 }
 
 type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
+type ViewportRect = {
+	width: number
+	height: number
+	offsetTop: number
+	offsetLeft: number
+}
 
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DROPDOWN_GAP = 8
@@ -821,15 +827,18 @@ async function calculateVisibleTags() {
 function determineOpenDirection(
 	triggerRect: DOMRect,
 	dropdownRect: DOMRect,
-	viewportHeight: number,
+	viewport: ViewportRect,
 ): 'up' | 'down' {
 	if (props.forceDirection) return props.forceDirection
 
+	const triggerTop = triggerRect.top + viewport.offsetTop
+	const triggerBottom = triggerRect.bottom + viewport.offsetTop
+	const viewportTop = viewport.offsetTop
+	const viewportBottom = viewport.offsetTop + viewport.height
 	const hasSpaceBelow =
-		triggerRect.bottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <=
-		viewportHeight
+		triggerBottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <= viewportBottom
 	const hasSpaceAbove =
-		triggerRect.top - dropdownRect.height - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN > 0
+		triggerTop - dropdownRect.height - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN > viewportTop
 
 	return !hasSpaceBelow && hasSpaceAbove ? 'up' : 'down'
 }
@@ -838,25 +847,40 @@ function calculateVerticalPosition(
 	triggerRect: DOMRect,
 	dropdownRect: DOMRect,
 	direction: 'up' | 'down',
+	viewport: ViewportRect,
 ): number {
-	return direction === 'up'
-		? triggerRect.top - dropdownRect.height - DROPDOWN_GAP
-		: triggerRect.bottom + DROPDOWN_GAP
+	const top =
+		direction === 'up'
+			? triggerRect.top - dropdownRect.height - DROPDOWN_GAP
+			: triggerRect.bottom + DROPDOWN_GAP
+
+	return top + viewport.offsetTop
 }
 
 function calculateHorizontalPosition(
 	triggerRect: DOMRect,
 	dropdownRect: DOMRect,
-	viewportWidth: number,
+	viewport: ViewportRect,
 ): number {
-	let left = triggerRect.left
-	if (left + dropdownRect.width > viewportWidth - DROPDOWN_VIEWPORT_MARGIN) {
-		left = Math.max(
-			DROPDOWN_VIEWPORT_MARGIN,
-			viewportWidth - dropdownRect.width - DROPDOWN_VIEWPORT_MARGIN,
-		)
+	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
+	const maxRight = viewport.offsetLeft + viewport.width - DROPDOWN_VIEWPORT_MARGIN
+	let left = triggerRect.left + viewport.offsetLeft
+
+	if (left + dropdownRect.width > maxRight) {
+		left = Math.max(minLeft, maxRight - dropdownRect.width)
 	}
 	return left
+}
+
+function getViewportRect(): ViewportRect {
+	const visualViewport = window.visualViewport
+
+	return {
+		width: visualViewport?.width ?? window.innerWidth,
+		height: visualViewport?.height ?? window.innerHeight,
+		offsetTop: visualViewport?.offsetTop ?? 0,
+		offsetLeft: visualViewport?.offsetLeft ?? 0,
+	}
 }
 
 function resolveDropdownWidth(triggerWidth: number): string {
@@ -889,12 +913,11 @@ async function updateDropdownPosition() {
 	await nextTick()
 
 	const dropdownRect = dropdownRef.value.getBoundingClientRect()
-	const viewportHeight = window.innerHeight
-	const viewportWidth = window.innerWidth
+	const viewport = getViewportRect()
 
-	const direction = determineOpenDirection(triggerRect, dropdownRect, viewportHeight)
-	const top = calculateVerticalPosition(triggerRect, dropdownRect, direction)
-	const left = calculateHorizontalPosition(triggerRect, dropdownRect, viewportWidth)
+	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
+	const top = calculateVerticalPosition(triggerRect, dropdownRect, direction, viewport)
+	const left = calculateHorizontalPosition(triggerRect, dropdownRect, viewport)
 
 	dropdownStyle.value = {
 		top: `${top}px`,
@@ -1237,19 +1260,36 @@ function handleSearchInput() {
 
 function handleWindowResize() {
 	if (isOpen.value) {
+		scheduleDropdownPositionUpdate()
+	}
+}
+
+function scheduleDropdownPositionUpdate() {
+	if (rafId.value !== null) return
+
+	rafId.value = requestAnimationFrame(() => {
+		rafId.value = null
 		updateDropdownPosition()
+	})
+}
+
+function handleViewportChange() {
+	if (isOpen.value) {
+		scheduleDropdownPositionUpdate()
 	}
 }
 
 function startPositionTracking() {
-	function track() {
-		updateDropdownPosition()
-		rafId.value = requestAnimationFrame(track)
-	}
-	rafId.value = requestAnimationFrame(track)
+	window.addEventListener('scroll', handleViewportChange, true)
+	window.visualViewport?.addEventListener('scroll', handleViewportChange)
+	window.visualViewport?.addEventListener('resize', handleViewportChange)
 }
 
 function stopPositionTracking() {
+	window.removeEventListener('scroll', handleViewportChange, true)
+	window.visualViewport?.removeEventListener('scroll', handleViewportChange)
+	window.visualViewport?.removeEventListener('resize', handleViewportChange)
+
 	if (rafId.value !== null) {
 		cancelAnimationFrame(rafId.value)
 		rafId.value = null

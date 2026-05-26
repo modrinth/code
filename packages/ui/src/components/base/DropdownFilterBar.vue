@@ -124,8 +124,9 @@
 					class="group/filter-menu-button flex h-12 w-full appearance-none items-center justify-between gap-1 border-0 px-4 text-left text-base font-semibold text-primary shadow-none transition-all duration-150 hover:brightness-110 focus:brightness-110 bg-surface-4"
 					:class="category.key === activeCategoryKey ? '!brightness-110' : ''"
 					role="menuitem"
+					@click="activateCategory(category.key)"
 					@mouseenter="handleCategoryMouseEnter(category.key)"
-					@focus="activateCategory(category.key)"
+					@focus="handleCategoryFocus(category.key)"
 				>
 					<span>{{ category.label }}</span>
 					<div class="flex items-center gap-1">
@@ -588,6 +589,8 @@ const submenuStyle = computed<CSSProperties>(() => {
 const isMobileActiveSubmenu = computed(
 	() => isMobileAddMenuLayout.value && activeCategory.value !== undefined,
 )
+const addMenuOutsideClickTarget = computed(() => menuContainer.value ?? submenu.value)
+const addMenuOutsideClickIgnore = computed(() => [addMenuTrigger, menuContainer, submenu])
 
 const appliedFilterPreviews = computed(() =>
 	filterCategories.value
@@ -1115,9 +1118,24 @@ function activateCategory(categoryKey: string) {
 	}
 	activeCategoryKey.value = categoryKey
 	scheduleSubmenuPositionUpdate()
+	if (isMobileAddMenuLayout.value) {
+		scheduleAddMenuPositionUpdate()
+	}
+}
+
+function handleCategoryFocus(categoryKey: string) {
+	if (isMobileAddMenuLayout.value) {
+		return
+	}
+
+	activateCategory(categoryKey)
 }
 
 function handleCategoryMouseEnter(categoryKey: string) {
+	if (isMobileAddMenuLayout.value) {
+		return
+	}
+
 	if (!activeCategoryKey.value) {
 		activateCategory(categoryKey)
 		return
@@ -1484,11 +1502,11 @@ function stopAddMenuPositionTracking() {
 }
 
 onClickOutside(
-	menuContainer,
+	addMenuOutsideClickTarget,
 	() => {
 		closeAddMenu()
 	},
-	{ ignore: [addMenuTrigger, submenu] },
+	{ ignore: addMenuOutsideClickIgnore },
 )
 
 watch(isAddMenuOpen, (isOpen) => {

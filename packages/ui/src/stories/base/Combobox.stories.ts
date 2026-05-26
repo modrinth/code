@@ -367,3 +367,37 @@ export const ManyOptionsOverflow: Story = {
 		},
 	},
 }
+
+export const ScrollRepositioning: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: Array.from({ length: 16 }, (_, index) => ({
+				value: `loader-${index + 1}`,
+				label: `Loader ${index + 1}`,
+			})),
+		}),
+		template: /*html*/ `
+			<div style="min-height: 150vh; padding-top: 45vh;">
+				<div style="width: min(100%, 22rem);">
+					<Combobox
+						v-model="selected"
+						:options="options"
+						searchable
+						placeholder="Select loader"
+						search-placeholder="Search loaders..."
+					/>
+				</div>
+			</div>
+		`,
+	}),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers fixed dropdown repositioning while the page scrolls with a searchable input open.',
+			},
+		},
+	},
+}

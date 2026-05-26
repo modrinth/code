@@ -5,6 +5,7 @@
 		:display-value="selectedTimeframeLabel"
 		:max-height="maxHeight"
 		:dropdown-min-width="timeframeDropdownMinWidth"
+		:outside-click-ignore="timeframeDropdownOutsideClickIgnore"
 		:dropdown-class="
 			activeTimeframePanel === 'custom_range'
 				? 'bg-transparent border-0 -mt-1 pb-2 shadow-none'
@@ -236,6 +237,7 @@ const TIMEFRAME_DROPDOWN_MIN_WIDTH = '20rem'
 const CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = '40.5rem'
 const MOBILE_CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = 'min(calc(100vw - 1rem), 20rem)'
 const MOBILE_CUSTOM_RANGE_PICKER_QUERY = '(pointer: coarse), (max-width: 800px)'
+const DATE_PICKER_PORTAL_SELECTOR = '.modrinth-date-picker-portal'
 
 const DEFAULT_LAST_TIMEFRAME_VALUE_BY_PRESET: Partial<Record<TimeFramePreset, LastTimeframeValue>> =
 	{
@@ -456,6 +458,11 @@ const timeframeDropdownMinWidth = computed(() =>
 			? MOBILE_CUSTOM_RANGE_DROPDOWN_MIN_WIDTH
 			: props.customRangeDropdownMinWidth
 		: props.dropdownMinWidth,
+)
+const timeframeDropdownOutsideClickIgnore = computed(() =>
+	activeTimeframePanel.value === 'custom_range' && isMobileCustomRangePicker.value
+		? [DATE_PICKER_PORTAL_SELECTOR]
+		: [],
 )
 const highlightedTimeframePreset = computed<TimeFramePreset | undefined>(() =>
 	draftSelectedTimeframeMode.value === 'preset' ? draftSelectedTimeframe.value : undefined,
