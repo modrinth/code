@@ -1,5 +1,4 @@
 import type { Stage } from '../types/stage'
-import modpackPermissionsStage from './modpack-permissions-stage'
 import categories from './stages/categories'
 import description from './stages/description'
 import environment from './stages/environment/environment'
@@ -7,6 +6,7 @@ import environmentMultiple from './stages/environment/environment-multiple'
 import gallery from './stages/gallery'
 import license from './stages/license'
 import links from './stages/links'
+import permissions from './stages/permissions'
 import postApproval from './stages/post-approval'
 import reupload from './stages/reupload'
 import ruleFollowing from './stages/rule-following'
@@ -29,7 +29,7 @@ export default [
 	versions,
 	reupload,
 	ruleFollowing,
-	modpackPermissionsStage,
+	permissions,
 	statusAlerts,
 	undefinedProject,
 	postApproval,
