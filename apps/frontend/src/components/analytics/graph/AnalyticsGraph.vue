@@ -1051,6 +1051,12 @@ const legendEntries = computed<LegendEntry[]>(() => {
 		return [entry, previousEntry]
 	})
 })
+const hiddenCurrentLegendEntryIds = computed(() =>
+	currentLegendEntries.value.filter((entry) => entry.hidden).map((entry) => entry.id),
+)
+const hiddenCurrentLegendEntryIdsKey = computed(() =>
+	hiddenCurrentLegendEntryIds.value.join('\u0000'),
+)
 
 const canToggleLegendExpansion = computed(() => legendEntries.value.length > LEGEND_MAX_ITEMS)
 
@@ -1107,6 +1113,20 @@ function showTopGraphDatasets() {
 	showAllSelectedGraphDatasets.value = false
 }
 
+function hidePreviousPeriodEntriesForHiddenCurrentEntries() {
+	if (hiddenCurrentLegendEntryIds.value.length === 0) return
+
+	const nextHiddenDatasetIds = new Set(hiddenGraphDatasetIds.value)
+	for (const datasetId of hiddenCurrentLegendEntryIds.value) {
+		nextHiddenDatasetIds.add(getPreviousPeriodDatasetId(datasetId))
+	}
+
+	const nextHiddenDatasetIdList = Array.from(nextHiddenDatasetIds)
+	if (!areStringArraysEqual(hiddenGraphDatasetIds.value, nextHiddenDatasetIdList)) {
+		hiddenGraphDatasetIds.value = nextHiddenDatasetIdList
+	}
+}
+
 watch(
 	displayedLegendEntries,
 	() => {
@@ -1128,6 +1148,15 @@ watch(canUseRatioMode, (canUse) => {
 		isRatioMode.value = false
 	}
 })
+
+watch(
+	[shouldShowPreviousPeriod, hiddenCurrentLegendEntryIdsKey],
+	([showPreviousPeriod]) => {
+		if (!showPreviousPeriod) return
+		hidePreviousPeriodEntriesForHiddenCurrentEntries()
+	},
+	{ immediate: true },
+)
 
 const chartDatasetById = computed(() => {
 	const datasets = new Map<string, ChartDataset>()
