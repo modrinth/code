@@ -63,9 +63,6 @@ mod assets {
 
 mod png_util;
 
-const SKIN_PROFILE_CACHE_MAX_AGE: std::time::Duration =
-    std::time::Duration::from_secs(5);
-
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Cape {
     /// An identifier for this cape, potentially unique to the owning player.
@@ -134,7 +131,7 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
         .ok_or(ErrorKind::NoCredentialsError)?;
 
     let profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .online_profile_fresh()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -172,7 +169,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         .ok_or(ErrorKind::NoCredentialsError)?;
 
     let profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .online_profile_fresh()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -269,7 +266,7 @@ pub async fn add_and_equip_custom_skin(
         .ok_or(ErrorKind::NoCredentialsError)?;
 
     let previous_profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .online_profile_fresh()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -286,7 +283,7 @@ pub async fn add_and_equip_custom_skin(
     .await?;
 
     let profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .refresh_online_profile()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -333,7 +330,7 @@ pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
         .ok_or(ErrorKind::NoCredentialsError)?;
 
     let profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .online_profile_fresh()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -403,7 +400,7 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
         .ok_or(ErrorKind::NoCredentialsError)?;
 
     let profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .online_profile_fresh()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -443,7 +440,7 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
         .ok_or(ErrorKind::NoCredentialsError)?;
 
     let profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .online_profile_fresh()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -472,7 +469,7 @@ pub async fn unequip_skin() -> crate::Result<()> {
         .ok_or(ErrorKind::NoCredentialsError)?;
 
     let profile = selected_credentials
-        .online_profile_with_max_age(SKIN_PROFILE_CACHE_MAX_AGE)
+        .online_profile_fresh()
         .await
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
@@ -602,9 +599,7 @@ async fn preserve_current_profile_skin(
 }
 
 async fn refresh_profile_cache(selected_credentials: &Credentials) {
-    let _ = selected_credentials
-        .online_profile_with_max_age(std::time::Duration::ZERO)
-        .await;
+    let _ = selected_credentials.refresh_online_profile().await;
 }
 
 /// Synchronizes the equipped cape with the selected cape if necessary, taking into

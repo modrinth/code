@@ -216,6 +216,26 @@ pub(super) static PROFILE_CACHE: Mutex<
     HashMap<Uuid, ProfileCacheEntry, BuildHasherDefault<DefaultHasher>>,
 > = Mutex::const_new(HashMap::with_hasher(BuildHasherDefault::new()));
 
+const ONLINE_PROFILE_CACHE_MAX_AGE: std::time::Duration =
+    std::time::Duration::from_secs(60);
+const ONLINE_PROFILE_AUTH_ERROR_BACKOFF: std::time::Duration =
+    std::time::Duration::from_secs(60);
+
+#[derive(Debug, Clone, Copy)]
+enum OnlineProfileCacheIntent {
+    NormalRead,
+    RefreshFromMojang,
+}
+
+impl OnlineProfileCacheIntent {
+    fn max_age(self) -> std::time::Duration {
+        match self {
+            Self::NormalRead => ONLINE_PROFILE_CACHE_MAX_AGE,
+            Self::RefreshFromMojang => std::time::Duration::ZERO,
+        }
+    }
+}
+
 impl Credentials {
     /// Refreshes the authentication tokens for this user if they are expired, or
     /// very close to expiration.
@@ -267,17 +287,43 @@ impl Credentials {
         Ok(())
     }
 
+    /// Returns online profile data using the normal cache window.
     #[tracing::instrument(skip(self))]
     pub async fn online_profile(&self) -> Option<Arc<MinecraftProfile>> {
-        self.online_profile_with_max_age(std::time::Duration::from_secs(60))
-            .await
+        self.online_profile_with_cache_intent(
+            OnlineProfileCacheIntent::NormalRead,
+        )
+        .await
     }
 
+    /// Fetches the online profile from Mojang instead of accepting cached
+    /// skin or cape state. Authentication-error backoff is still respected.
     #[tracing::instrument(skip(self))]
-    pub async fn online_profile_with_max_age(
+    pub async fn online_profile_fresh(&self) -> Option<Arc<MinecraftProfile>> {
+        self.online_profile_with_cache_intent(
+            OnlineProfileCacheIntent::RefreshFromMojang,
+        )
+        .await
+    }
+
+    /// Refreshes the online profile cache after a skin or cape operation may
+    /// have changed Mojang state.
+    #[tracing::instrument(skip(self))]
+    pub async fn refresh_online_profile(
         &self,
-        max_age: std::time::Duration,
     ) -> Option<Arc<MinecraftProfile>> {
+        self.online_profile_with_cache_intent(
+            OnlineProfileCacheIntent::RefreshFromMojang,
+        )
+        .await
+    }
+
+    async fn online_profile_with_cache_intent(
+        &self,
+        cache_intent: OnlineProfileCacheIntent,
+    ) -> Option<Arc<MinecraftProfile>> {
+        let max_age = cache_intent.max_age();
+
         loop {
             {
                 let mut profile_cache = PROFILE_CACHE.lock().await;
@@ -301,7 +347,7 @@ impl Credentials {
                         } if &self.access_token != likely_expired_token
                             || Instant::now()
                                 .saturating_duration_since(*last_attempt)
-                                > std::time::Duration::from_secs(60) => {}
+                                > ONLINE_PROFILE_AUTH_ERROR_BACKOFF => {}
                         ProfileCacheEntry::AuthErrorBackoff { .. } => {
                             return None;
                         }
