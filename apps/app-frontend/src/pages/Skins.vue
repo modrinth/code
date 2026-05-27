@@ -10,9 +10,12 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	ConfirmModal,
+	defineMessages,
 	injectNotificationManager,
 	SkinPreviewRenderer,
+	useVIntl,
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
 import { type DragDropEvent, getCurrentWebview } from '@tauri-apps/api/webview'
@@ -50,11 +53,108 @@ type VirtualSkinSectionListExpose = {
 }
 
 const PENDING_SKIN_REFRESH_DELAY_MS = 11_000
+const messages = defineMessages({
+	skinSelectorTitle: {
+		id: 'app.skins.title',
+		defaultMessage: 'Skin selector',
+	},
+	defaultSkinsSection: {
+		id: 'app.skins.section.default-skins',
+		defaultMessage: 'Default skins',
+	},
+	mineconEarth2017Section: {
+		id: 'app.skins.section.minecon-earth-2017',
+		defaultMessage: 'MINECON Earth 2017',
+	},
+	buildersAndBiomesSection: {
+		id: 'app.skins.section.builders-and-biomes',
+		defaultMessage: 'Builders & Biomes',
+	},
+	stridingHeroSection: {
+		id: 'app.skins.section.striding-hero',
+		defaultMessage: 'Striding Hero',
+	},
+	theGardenAwakensSection: {
+		id: 'app.skins.section.the-garden-awakens',
+		defaultMessage: 'The Garden Awakens',
+	},
+	chaseTheSkiesSection: {
+		id: 'app.skins.section.chase-the-skies',
+		defaultMessage: 'Chase the Skies',
+	},
+	theCopperAgeSection: {
+		id: 'app.skins.section.the-copper-age',
+		defaultMessage: 'The Copper Age',
+	},
+	mountsOfMayhemSection: {
+		id: 'app.skins.section.mounts-of-mayhem',
+		defaultMessage: 'Mounts of Mayhem',
+	},
+	tinyTakeoverSection: {
+		id: 'app.skins.section.tiny-takeover',
+		defaultMessage: 'Tiny Takeover',
+	},
+	rateLimitTitle: {
+		id: 'app.skins.rate-limit.title',
+		defaultMessage: 'Slow down!',
+	},
+	rateLimitText: {
+		id: 'app.skins.rate-limit.text',
+		defaultMessage:
+			"You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again.",
+	},
+	droppedFileErrorTitle: {
+		id: 'app.skins.dropped-file-error.title',
+		defaultMessage: 'Error processing file',
+	},
+	droppedFileErrorText: {
+		id: 'app.skins.dropped-file-error.text',
+		defaultMessage: 'Failed to read the dropped file.',
+	},
+	deleteSkinTitle: {
+		id: 'app.skins.delete-modal.title',
+		defaultMessage: 'Are you sure you want to delete this skin?',
+	},
+	deleteSkinDescription: {
+		id: 'app.skins.delete-modal.description',
+		defaultMessage: 'This will permanently delete the selected skin. This action cannot be undone.',
+	},
+	previewingBadge: {
+		id: 'app.skins.previewing-badge',
+		defaultMessage: 'Previewing',
+	},
+	applyButton: {
+		id: 'app.skins.apply-button',
+		defaultMessage: 'Apply',
+	},
+	editSkinButton: {
+		id: 'app.skins.preview.edit-button',
+		defaultMessage: 'Edit skin',
+	},
+	excitedRinthbotAlt: {
+		id: 'app.skins.sign-in.rinthbot-alt',
+		defaultMessage: 'Excited Modrinth Bot',
+	},
+	signInTitle: {
+		id: 'app.skins.sign-in.title',
+		defaultMessage: 'Please sign in',
+	},
+	signInDescription: {
+		id: 'app.skins.sign-in.description',
+		defaultMessage:
+			'Please sign into your Minecraft account to use the skin management features of the Modrinth app.',
+	},
+	signInButton: {
+		id: 'app.skins.sign-in.button',
+		defaultMessage: 'Sign In',
+	},
+})
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const addSkinFileInput = useTemplateRef<HTMLInputElement>('addSkinFileInput')
 const skinSectionList = useTemplateRef<VirtualSkinSectionListExpose>('skinSectionList')
 
+const { formatMessage } = useVIntl()
 const notifications = injectNotificationManager()
 const { addNotification, handleError } = notifications
 
@@ -85,7 +185,7 @@ const defaultSkinSections = computed(() => {
 	const sections = new Map<string, Skin[]>()
 
 	for (const skin of defaultSkins.value) {
-		const sectionTitle = skin.section ?? 'Default skins'
+		const sectionTitle = getDefaultSkinSectionTitle(skin.section)
 		const sectionSkins = sections.get(sectionTitle)
 
 		if (sectionSkins) {
@@ -192,6 +292,31 @@ function getErrorMessage(error: unknown) {
 function isMinecraftSkinRateLimitError(error: unknown) {
 	const message = getErrorMessage(error)
 	return message.includes('429 Too Many Requests') || message.includes('client error (429')
+}
+
+function getDefaultSkinSectionTitle(section?: string) {
+	switch (section) {
+		case 'MINECON Earth 2017':
+			return formatMessage(messages.mineconEarth2017Section)
+		case 'Builders & Biomes':
+			return formatMessage(messages.buildersAndBiomesSection)
+		case 'Striding Hero':
+			return formatMessage(messages.stridingHeroSection)
+		case 'The Garden Awakens':
+			return formatMessage(messages.theGardenAwakensSection)
+		case 'Chase the Skies':
+			return formatMessage(messages.chaseTheSkiesSection)
+		case 'The Copper Age':
+			return formatMessage(messages.theCopperAgeSection)
+		case 'Mounts of Mayhem':
+			return formatMessage(messages.mountsOfMayhemSection)
+		case 'Tiny Takeover':
+			return formatMessage(messages.tinyTakeoverSection)
+		case 'Default skins':
+			return formatMessage(messages.defaultSkinsSection)
+		default:
+			return section ?? formatMessage(messages.defaultSkinsSection)
+	}
 }
 
 function changeSkin(newSkin: Skin) {
@@ -311,8 +436,8 @@ async function applySelectedSkin() {
 		if (isMinecraftSkinRateLimitError(error)) {
 			notifications.addNotification({
 				type: 'error',
-				title: 'Slow down!',
-				text: "You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again.",
+				title: formatMessage(messages.rateLimitTitle),
+				text: formatMessage(messages.rateLimitText),
 			})
 		} else {
 			handleError(error as Error)
@@ -455,8 +580,8 @@ async function handleAddSkinNativeDragDrop(event: { payload: DragDropEvent }) {
 		await processSkinFileBuffer(data)
 	} catch (error) {
 		addNotification({
-			title: 'Error processing file',
-			text: error instanceof Error ? error.message : 'Failed to read the dropped file.',
+			title: formatMessage(messages.droppedFileErrorTitle),
+			text: error instanceof Error ? error.message : formatMessage(messages.droppedFileErrorText),
 			type: 'error',
 		})
 	}
@@ -581,15 +706,17 @@ await loadSkins()
 	/>
 	<ConfirmModal
 		ref="deleteSkinModal"
-		title="Are you sure you want to delete this skin?"
-		description="This will permanently delete the selected skin. This action cannot be undone."
-		proceed-label="Delete"
+		:title="formatMessage(messages.deleteSkinTitle)"
+		:description="formatMessage(messages.deleteSkinDescription)"
+		:proceed-label="formatMessage(commonMessages.deleteLabel)"
 		@proceed="deleteSkin"
 	/>
 
 	<div v-if="currentUser" class="skin-layout box-border min-h-full p-4">
 		<div class="sticky top-6 self-start p-2 pt-0">
-			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">Skin selector</h1>
+			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
+				{{ formatMessage(messages.skinSelectorTitle) }}
+			</h1>
 			<div class="ml-5 flex h-[80vh] items-center justify-center max-[700px]:h-[50vh]">
 				<SkinPreviewRenderer
 					:cape-src="capeTexture"
@@ -603,7 +730,7 @@ await loadSkins()
 							class="flex items-center justify-center gap-1.5 rounded-full border border-solid border-brand-blue bg-bg-blue px-3 py-1 text-base font-semibold leading-6 text-brand-blue"
 						>
 							<EyeIcon class="size-5 shrink-0" />
-							Previewing
+							{{ formatMessage(messages.previewingBadge) }}
 						</div>
 					</template>
 					<template #subtitle>
@@ -617,7 +744,7 @@ await loadSkins()
 								@click="resetSelectedSkin"
 							>
 								<RotateCounterClockwiseIcon />
-								Reset
+								{{ formatMessage(commonMessages.resetButton) }}
 							</button>
 							<button
 								class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-brand px-4 py-2.5 text-base font-semibold leading-5 text-[rgba(0,0,0,0.9)] shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
@@ -626,7 +753,7 @@ await loadSkins()
 							>
 								<SpinnerIcon v-if="isApplyingSkin" class="animate-spin" />
 								<CheckIcon v-else />
-								Apply
+								{{ formatMessage(messages.applyButton) }}
 							</button>
 						</div>
 						<button
@@ -636,7 +763,7 @@ await loadSkins()
 							@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
 						>
 							<EditIcon />
-							Edit skin
+							{{ formatMessage(messages.editSkinButton) }}
 						</button>
 					</template>
 				</SkinPreviewRenderer>
@@ -670,7 +797,7 @@ await loadSkins()
 		>
 			<img
 				:src="ExcitedRinthbot"
-				alt="Excited Modrinth Bot"
+				:alt="formatMessage(messages.excitedRinthbotAlt)"
 				class="absolute -top-28 right-8 md:right-20 h-28 w-auto"
 			/>
 			<div
@@ -687,16 +814,15 @@ await loadSkins()
 			></div>
 
 			<div class="flex flex-col gap-5">
-				<h1 class="text-3xl font-extrabold m-0">Please sign-in</h1>
+				<h1 class="text-3xl font-extrabold m-0">{{ formatMessage(messages.signInTitle) }}</h1>
 				<p class="text-lg m-0">
-					Please sign into your Minecraft account to use the skin management features of the
-					Modrinth app.
+					{{ formatMessage(messages.signInDescription) }}
 				</p>
 				<ButtonStyled v-show="accountsCard" color="brand" :disabled="accountsCard.loginDisabled">
 					<button :disabled="accountsCard.loginDisabled" @click="login">
 						<LogInIcon v-if="!accountsCard.loginDisabled" />
 						<SpinnerIcon v-else class="animate-spin" />
-						Sign In
+						{{ formatMessage(messages.signInButton) }}
 					</button>
 				</ButtonStyled>
 			</div>

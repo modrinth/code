@@ -3,9 +3,12 @@ import { DropdownIcon, EditIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	ButtonStyled,
+	commonMessages,
+	defineMessages,
 	SkinButton,
 	SkinLikeTextButton,
 	useScrollViewport,
+	useVIntl,
 } from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
@@ -46,6 +49,28 @@ const SKIN_SECTION_HEADER_HEIGHT = 28
 const SKIN_SECTION_CONTENT_SPACING = 8
 const SKIN_SECTION_OVERSCAN = 900
 const FALLBACK_CARD_WIDTH = 220
+const messages = defineMessages({
+	savedSkinsSection: {
+		id: 'app.skins.section.saved-skins',
+		defaultMessage: 'Saved skins',
+	},
+	addSkinButton: {
+		id: 'app.skins.add-button',
+		defaultMessage: 'Add skin',
+	},
+	dragAndDropSubtitle: {
+		id: 'app.skins.add-button.drag-and-drop',
+		defaultMessage: 'Drag and drop',
+	},
+	editSkinButton: {
+		id: 'app.skins.edit-button',
+		defaultMessage: 'Edit skin',
+	},
+	deleteSkinButton: {
+		id: 'app.skins.delete-button',
+		defaultMessage: 'Delete skin',
+	},
+})
 
 const props = defineProps<{
 	savedSkins: Skin[]
@@ -68,6 +93,7 @@ const emit = defineEmits<{
 }>()
 
 const addSkinButton = useTemplateRef<AddSkinButtonRef>('addSkinButton')
+const { formatMessage } = useVIntl()
 const { listContainer, relativeScrollTop, scrollContainer, viewportHeight } = useScrollViewport()
 const openSectionKeys = ref<Set<string>>(new Set())
 const hasSettledInitialLayout = ref(false)
@@ -111,7 +137,7 @@ const cardHeight = computed(
 const sections = computed<SkinSection[]>(() => [
 	{
 		key: 'saved-skins',
-		title: 'Saved skins',
+		title: formatMessage(messages.savedSkinsSection),
 		kind: 'saved',
 		skins: props.savedSkins,
 	},
@@ -324,8 +350,8 @@ defineExpose({ getAddSkinButtonElement })
 						<template #icon>
 							<PlusIcon class="size-8" />
 						</template>
-						Add skin
-						<template #subtitle>Drag and drop</template>
+						{{ formatMessage(messages.addSkinButton) }}
+						<template #subtitle>{{ formatMessage(messages.dragAndDropSubtitle) }}</template>
 					</SkinLikeTextButton>
 
 					<SkinButton
@@ -341,17 +367,17 @@ defineExpose({ getAddSkinButtonElement })
 						<template #overlay-buttons>
 							<ButtonStyled color="brand">
 								<button
-									aria-label="Edit skin"
+									:aria-label="formatMessage(messages.editSkinButton)"
 									class="pointer-events-auto"
 									@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
 								>
-									<EditIcon /> Edit
+									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
 								</button>
 							</ButtonStyled>
 							<ButtonStyled v-show="!skin.is_equipped" circular color="red">
 								<button
-									v-tooltip="'Delete skin'"
-									aria-label="Delete skin"
+									v-tooltip="formatMessage(messages.deleteSkinButton)"
+									:aria-label="formatMessage(messages.deleteSkinButton)"
 									class="!rounded-[100%] pointer-events-auto"
 									@click.stop="emit('delete', skin)"
 								>

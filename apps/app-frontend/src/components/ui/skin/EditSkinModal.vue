@@ -2,7 +2,7 @@
 	<NewModal ref="modal" :on-hide="handleModalHide">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">
-				{{ mode === 'edit' ? 'Editing skin' : 'Adding a skin' }}
+				{{ formatMessage(mode === 'edit' ? messages.editSkinTitle : messages.addSkinTitle) }}
 			</span>
 		</template>
 
@@ -20,10 +20,10 @@
 
 			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
 				<section v-if="mode === 'edit' && canEditTextureAndModel">
-					<h2 class="text-base font-semibold mb-2">Texture</h2>
+					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.textureSection) }}</h2>
 					<ButtonStyled>
 						<button class="!shadow-none" @click="openTextureFileBrowser">
-							<UploadIcon /> Replace texture
+							<UploadIcon /> {{ formatMessage(messages.replaceTextureButton) }}
 						</button>
 					</ButtonStyled>
 					<input
@@ -36,16 +36,20 @@
 				</section>
 
 				<section v-if="canEditTextureAndModel">
-					<h2 class="text-base font-semibold mb-2">Arm style</h2>
+					<h2 class="text-base font-semibold mb-2">
+						{{ formatMessage(messages.armStyleSection) }}
+					</h2>
 					<RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']">
 						<template #default="{ item }">
-							{{ item === 'CLASSIC' ? 'Wide' : 'Slim' }}
+							{{
+								formatMessage(item === 'CLASSIC' ? messages.wideArmStyle : messages.slimArmStyle)
+							}}
 						</template>
 					</RadioButtons>
 				</section>
 
 				<section>
-					<h2 class="text-base font-semibold mb-2">Cape</h2>
+					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.capeSection) }}</h2>
 					<div class="relative w-fit max-w-full">
 						<Transition
 							enter-active-class="transition-all duration-200 ease-out"
@@ -68,12 +72,12 @@
 							@scroll="checkCapeScrollState"
 						>
 							<CapeLikeTextButton
-								tooltip="No cape"
+								:tooltip="formatMessage(messages.noCapeTooltip)"
 								:highlighted="!selectedCape"
 								@click="selectCape(undefined)"
 							>
 								<template #icon><XIcon /></template>
-								<span>None</span>
+								<span>{{ formatMessage(messages.noneCapeOption) }}</span>
 							</CapeLikeTextButton>
 
 							<CapeButton
@@ -81,7 +85,7 @@
 								:id="cape.id"
 								:key="cape.id"
 								:texture="cape.texture"
-								:name="cape.name || 'Cape'"
+								:name="cape.name || formatMessage(messages.capeFallbackName)"
 								:selected="selectedCape?.id === cape.id"
 								@select="selectCape(cape)"
 							/>
@@ -108,14 +112,16 @@
 		<template #actions>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button :disabled="isSaving" @click="hide"><XIcon />Cancel</button>
+					<button :disabled="isSaving" @click="hide">
+						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
 						<SpinnerIcon v-if="isSaving" class="animate-spin" />
 						<CheckIcon v-else-if="mode === 'new'" />
 						<SaveIcon v-else />
-						{{ mode === 'new' ? 'Add skin' : 'Save skin' }}
+						{{ formatMessage(mode === 'new' ? messages.addSkinButton : messages.saveSkinButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -129,11 +135,14 @@ import {
 	ButtonStyled,
 	CapeButton,
 	CapeLikeTextButton,
+	commonMessages,
+	defineMessages,
 	injectNotificationManager,
 	NewModal,
 	RadioButtons,
 	SkinPreviewRenderer,
 	useScrollIndicator,
+	useVIntl,
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
@@ -152,7 +161,74 @@ import {
 } from '@/helpers/skins.ts'
 
 const CAPE_LIST_MAX_HEIGHT = 334
+const messages = defineMessages({
+	editSkinTitle: {
+		id: 'app.skins.modal.edit-title',
+		defaultMessage: 'Editing skin',
+	},
+	addSkinTitle: {
+		id: 'app.skins.modal.add-title',
+		defaultMessage: 'Adding a skin',
+	},
+	textureSection: {
+		id: 'app.skins.modal.texture-section',
+		defaultMessage: 'Texture',
+	},
+	replaceTextureButton: {
+		id: 'app.skins.modal.replace-texture-button',
+		defaultMessage: 'Replace texture',
+	},
+	armStyleSection: {
+		id: 'app.skins.modal.arm-style-section',
+		defaultMessage: 'Arm style',
+	},
+	wideArmStyle: {
+		id: 'app.skins.modal.arm-style-wide',
+		defaultMessage: 'Wide',
+	},
+	slimArmStyle: {
+		id: 'app.skins.modal.arm-style-slim',
+		defaultMessage: 'Slim',
+	},
+	capeSection: {
+		id: 'app.skins.modal.cape-section',
+		defaultMessage: 'Cape',
+	},
+	noCapeTooltip: {
+		id: 'app.skins.modal.no-cape-tooltip',
+		defaultMessage: 'No cape',
+	},
+	noneCapeOption: {
+		id: 'app.skins.modal.none-cape-option',
+		defaultMessage: 'None',
+	},
+	capeFallbackName: {
+		id: 'app.skins.modal.cape-fallback-name',
+		defaultMessage: 'Cape',
+	},
+	savingTooltip: {
+		id: 'app.skins.modal.saving-tooltip',
+		defaultMessage: 'Saving...',
+	},
+	uploadSkinFirstTooltip: {
+		id: 'app.skins.modal.upload-skin-first-tooltip',
+		defaultMessage: 'Upload a skin first!',
+	},
+	makeEditFirstTooltip: {
+		id: 'app.skins.modal.make-edit-first-tooltip',
+		defaultMessage: 'Make an edit to the skin first!',
+	},
+	addSkinButton: {
+		id: 'app.skins.modal.add-skin-button',
+		defaultMessage: 'Add skin',
+	},
+	saveSkinButton: {
+		id: 'app.skins.modal.save-skin-button',
+		defaultMessage: 'Save skin',
+	},
+})
 
+const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 
 const modal = useTemplateRef('modal')
@@ -251,9 +327,13 @@ const disableSave = computed(
 )
 
 const saveTooltip = computed(() => {
-	if (isSaving.value) return 'Saving...'
-	if (mode.value === 'new' && !uploadedTextureUrl.value) return 'Upload a skin first!'
-	if (mode.value === 'edit' && !hasEdits.value) return 'Make an edit to the skin first!'
+	if (isSaving.value) return formatMessage(messages.savingTooltip)
+	if (mode.value === 'new' && !uploadedTextureUrl.value) {
+		return formatMessage(messages.uploadSkinFirstTooltip)
+	}
+	if (mode.value === 'edit' && !hasEdits.value) {
+		return formatMessage(messages.makeEditFirstTooltip)
+	}
 	return undefined
 })
 
