@@ -187,11 +187,11 @@ const messages = defineMessages({
 	},
 	infoBannerTitle: {
 		id: 'project.settings.permissions.info-banner.title',
-		defaultMessage: 'Learn how attributions work',
+		defaultMessage: 'Learn about distribution permissions',
 	},
 	infoBannerDescription: {
 		id: 'project.settings.permissions.info-banner.description',
-		defaultMessage: `If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn about how to do this properly!`,
+		defaultMessage: `If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn more and get started!`,
 	},
 	learnMore: {
 		id: 'project.settings.permissions.learn-more',
@@ -203,15 +203,16 @@ const messages = defineMessages({
 	},
 	emptyStateDescription: {
 		id: 'project.settings.permissions.empty-state.description',
-		defaultMessage: `None of your versions contain external content, so you don't need to worry about obtaining permissions.`,
+		defaultMessage: `None of your project's versions contain external content, so you don't need to worry about obtaining permissions.`,
 	},
 	completedTitle: {
 		id: 'project.settings.permissions.completed.title',
-		defaultMessage: `Attributions completed!`,
+		defaultMessage: `Permissions completed!`,
 	},
 	completedDescription: {
 		id: 'project.settings.permissions.completed.description',
-		defaultMessage: 'All external content has attributions provided.',
+		defaultMessage:
+			'All external content has permission information and attributions have been provided.',
 	},
 	failTitle: {
 		id: 'project.settings.permissions.fail.title',
@@ -219,23 +220,23 @@ const messages = defineMessages({
 	},
 	failDescription: {
 		id: 'project.settings.permissions.fail.description',
-		defaultMessage: `You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content or provide proof that you do have permission to use it.`,
+		defaultMessage: `You may not have permission to redistribute some of the external content in your project. In order to publish on Modrinth, please remove this content or provide proof that you do have permission to use it.`,
 	},
 	attentionNeededTitle: {
 		id: 'project.settings.permissions.attention-needed.title',
-		defaultMessage: `Unknown embedded content`,
+		defaultMessage: `Unknown external content`,
 	},
 	attentionNeededDescriptionApproved: {
 		id: 'project.settings.permissions.attention-needed.description.proj-approved',
-		defaultMessage: `Please provide proof that you have permission to redistribute all of the following files and any withheld versions will be automatically published.`,
+		defaultMessage: `Please provide proof that you have permission to redistribute all of the following files. Once completed, withheld versions will be automatically published.`,
 	},
 	attentionNeededDescriptionDraft: {
 		id: 'project.settings.permissions.attention-needed.description.proj-draft',
-		defaultMessage: `Please provide proof that you have permission to redistribute all of the following files before you can submit your project for review.`,
+		defaultMessage: `Please provide proof that you have permission to redistribute all of the following files before submitting your project for review.`,
 	},
 	noResults: {
 		id: 'project.settings.permissions.no-results',
-		defaultMessage: 'No external projects match your search.',
+		defaultMessage: 'No external files match your search.',
 	},
 })
 
