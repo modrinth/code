@@ -821,7 +821,7 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 		const hasReachedBreakdownLimit =
 			selectedBreakdownValue.value.length >= MAX_ANALYTICS_BREAKDOWN_PRESETS
 		const options: MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[] = [
-			...(selectedProjectCount.value > 1 ? [{ value: 'project' as const, label: 'Project' }] : []),
+			...(selectedProjectCount.value > 1 ? [{ value: 'project' as const, label: 'Projects' }] : []),
 			{ value: 'country', label: 'Country' },
 			{ value: 'monetization', label: 'Monetization' },
 			{ value: 'user_agent', label: 'Download source' },

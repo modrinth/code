@@ -519,6 +519,10 @@ export function getAnalyticsBreakdownPresetsForProjectSelection(
 		}
 	}
 
+	if (normalizedBreakdowns.length === 0 && selectedProjectIds.length > 1) {
+		return ['project']
+	}
+
 	return normalizedBreakdowns
 }
 
