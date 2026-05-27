@@ -36,7 +36,7 @@
     "message": "Mac"
   },
   "app-marketing.download.options-title": {
-    "message": "Opções de transferência"
+    "message": "Opções de download"
   },
   "app-marketing.download.terms": {
     "message": "Ao baixar o Modrinth App, você concorda com nossos <terms-link>Termos</terms-link> e <privacy-link>Política de Privacidade</privacy-link>."
@@ -1881,7 +1881,7 @@
     "message": "Erro ao gerar o estado da API durante a compilação."
   },
   "layout.banner.preview.description": {
-    "message": "Se você pretendia acessar o site oficial do Modrinth, visite {url}. Essa versão de pré-lançamento é usada pela equipe da Modrinth para fins de teste. Ela foi construída com base em <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Se você pretendia acessar o site oficial do Modrinth, visite {url}. Essa versão de pré-lançamento é usada pela equipe da Modrinth para fins de teste. Ela foi criada usando {ref}."
   },
   "layout.banner.preview.title": {
     "message": "Esta é uma versão de pré-lançamento do site Modrinth."

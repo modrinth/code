@@ -398,6 +398,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} mis à jour"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Désactiver"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Activer"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Mises à jour"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Avertissements"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Création d'une sauvegarde..."
   },

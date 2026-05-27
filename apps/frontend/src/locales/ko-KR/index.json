@@ -1880,9 +1880,6 @@
   "layout.banner.build-fail.title": {
     "message": "빌드 중 API에서 상태 생성 오류가 발생했습니다."
   },
-  "layout.banner.preview.description": {
-    "message": "공식 Modrinth 웹사이트에 접속하려는 경우, {url}을(를) 방문하세요. 이 미리보기 배포판은 Modrinth 운영진이 테스트 목적으로 사용하며, 이는 <branch-link>{owner}/{branch}</branch-link> @ {commit} 기반으로 빌드되었습니다."
-  },
   "layout.banner.preview.title": {
     "message": "이 웹사이트는 Modrinth의 미리보기입니다."
   },

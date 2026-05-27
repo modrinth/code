@@ -465,7 +465,7 @@
     "defaultMessage": "Kérjük, várjon"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Keresés {count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {tartalom}} között..."
+    "defaultMessage": "Keresés {count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {projekt}} között..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Fájlnevek"
@@ -507,31 +507,31 @@
     "defaultMessage": "Az összes kijelölt tartalom már engedélyezve lett"
   },
   "content.selection-bar.bulk.deleting": {
-    "defaultMessage": "{progress}/{total} {contentType} törlése..."
+    "defaultMessage": "{progress}/{total} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {projekt}} törlése..."
   },
   "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "{contentType, select, mod {Mod} mods {Modok} plugin {Bővítmény} plugins {Bővítmények} datapack {Adatcsomag} datapacks {Adatcsomagok} project {Projekt} projects {Projektek} other {Tartalom}} törlése..."
+    "defaultMessage": "{contentType, select, mod {Mod} mods {Modok} plugin {Bővítmény} plugins {Bővítmények} datapack {Adatcsomag} datapacks {Adatcsomagok} project {Projekt} projects {Projektek} other {{count, plural, one {Projekt} other {Projektek}}}} törlése..."
   },
   "content.selection-bar.bulk.disabling": {
-    "defaultMessage": "{progress}/{total} {contentType} letiltása..."
+    "defaultMessage": "{progress}/{total} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {projekt}} letiltása..."
   },
   "content.selection-bar.bulk.disabling-waiting": {
-    "defaultMessage": "{contentType} letiltása..."
+    "defaultMessage": "{contentType, select, mod {Mod} mods {Modok} plugin {Bővítmény} plugins {Bővítmények} datapack {Adatcsomag} datapacks {Adatcsomagok} project {Projekt} projects {Projektek} other {{count, plural, one {Projekt} other {Projektek}}}} letiltása..."
   },
   "content.selection-bar.bulk.enabling": {
-    "defaultMessage": "{progress}/{total} {contentType} engedélyezése..."
+    "defaultMessage": "{progress}/{total} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {projekt}} engedélyezése..."
   },
   "content.selection-bar.bulk.enabling-waiting": {
-    "defaultMessage": "{contentType} engedélyezése..."
+    "defaultMessage": "{contentType, select, mod {Mod} mods {Modok} plugin {Bővítmény} plugins {Bővítmények} datapack {Adatcsomag} datapacks {Adatcsomagok} project {Projekt} projects {Projektek} other {{count, plural, one {Projekt} other {Projektek}}}} engedélyezése..."
   },
   "content.selection-bar.bulk.updating": {
-    "defaultMessage": "{progress}/{total} {contentType} frisstése..."
+    "defaultMessage": "{progress}/{total} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {projekt}} frisstése..."
   },
   "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "{contentType} frissítése..."
+    "defaultMessage": "{contentType, select, mod {Mod} mods {Modok} plugin {Bővítmény} plugins {Bővítmények} datapack {Adatcsomag} datapacks {Adatcsomagok} project {Projekt} projects {Projektek} other {{count, plural, one {Projekt} other {Projektek}}}} frissítése..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {tartalom}} kiválasztva"
+    "defaultMessage": "{count} {contentType, select, mod {mod} mods {mod} plugin {bővítmény} plugins {bővítmény} datapack {adatcsomag} datapacks {adatcsomag} project {projekt} projects {projekt} other {projekt}} kiválasztva"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} kiválasztva"
