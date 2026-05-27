@@ -5,6 +5,7 @@
 		class="analytics-chart-tooltip absolute left-0 top-0 z-10 flex max-h-[360px] flex-col overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
 		:class="pinned ? '' : 'pointer-events-none'"
 		:style="positionStyle"
+		@wheel.stop
 		@click.stop
 	>
 		<div
@@ -25,7 +26,11 @@
 		</div>
 		<div
 			ref="entriesElement"
-			class="flex min-h-0 flex-col gap-1 overflow-y-auto overscroll-contain px-3"
+			class="analytics-chart-tooltip-entries flex min-h-0 flex-col gap-1 overflow-y-auto overscroll-contain px-3"
+			@touchstart="onEntriesTouchStart"
+			@touchmove="onEntriesTouchMove"
+			@touchend="clearEntriesTouchScroll"
+			@touchcancel="clearEntriesTouchScroll"
 		>
 			<div v-if="!ratioMode" class="flex shrink-0 items-center justify-between gap-4">
 				<span class="font-medium text-primary">Total</span>
@@ -254,6 +259,8 @@ const tooltipWidth = ref(0)
 const tooltipHeight = ref(0)
 const tooltipOffsetParentLeft = ref(0)
 const viewportWidth = ref(0)
+let entriesTouchStartY = 0
+let entriesTouchStartScrollTop = 0
 
 const CURSOR_OFFSET = 12
 const EDGE_PADDING = 8
@@ -313,11 +320,15 @@ function getNormalizedWheelDeltaY(event: WheelEvent, element: HTMLElement) {
 	return event.deltaY
 }
 
+function getMaxScrollTop(element: HTMLElement) {
+	return Math.max(0, element.scrollHeight - element.clientHeight)
+}
+
 function consumeWheel(event: WheelEvent): boolean {
 	const element = entriesElement.value
 	if (!props.visible || !element) return false
 
-	const maxScrollTop = element.scrollHeight - element.clientHeight
+	const maxScrollTop = getMaxScrollTop(element)
 	if (maxScrollTop <= 0) return false
 
 	const deltaY = getNormalizedWheelDeltaY(event, element)
@@ -327,6 +338,37 @@ function consumeWheel(event: WheelEvent): boolean {
 	element.scrollTop = Math.min(maxScrollTop, Math.max(0, scrollTop + deltaY))
 	event.preventDefault()
 	return true
+}
+
+function onEntriesTouchStart(event: TouchEvent) {
+	const element = entriesElement.value
+	const touch = event.touches[0]
+	if (!element || !touch) return
+
+	entriesTouchStartY = touch.clientY
+	entriesTouchStartScrollTop = element.scrollTop
+}
+
+function onEntriesTouchMove(event: TouchEvent) {
+	const element = entriesElement.value
+	const touch = event.touches[0]
+	if (!props.visible || !element || !touch) return
+
+	const maxScrollTop = getMaxScrollTop(element)
+	if (maxScrollTop <= 0) return
+
+	const nextScrollTop = Math.min(
+		maxScrollTop,
+		Math.max(0, entriesTouchStartScrollTop + entriesTouchStartY - touch.clientY),
+	)
+	element.scrollTop = nextScrollTop
+	event.preventDefault()
+	event.stopPropagation()
+}
+
+function clearEntriesTouchScroll() {
+	entriesTouchStartY = 0
+	entriesTouchStartScrollTop = 0
 }
 
 defineExpose({
@@ -368,5 +410,17 @@ const positionStyle = computed(() => {
 	max-width: var(--analytics-chart-tooltip-max-width, min(26rem, calc(100vw - 1rem)));
 	transition: transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
 	will-change: transform;
+}
+
+.analytics-chart-tooltip-entries {
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
+	touch-action: pan-y;
+}
+
+@media (pointer: coarse) {
+	.analytics-chart-tooltip {
+		pointer-events: auto;
+	}
 }
 </style>

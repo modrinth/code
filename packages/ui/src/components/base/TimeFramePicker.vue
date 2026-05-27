@@ -150,7 +150,7 @@
 								type="number"
 								min="1"
 								step="1"
-								class="h-8 w-12 touch-manipulation border-0 bg-transparent px-1 text-center text-sm font-semibold text-primary outline-none ring-0 focus:outline-none focus-visible:shadow-none"
+								class="h-8 w-12 touch-manipulation border-0 bg-transparent px-1 text-center text-sm font-semibold text-primary outline-none ring-0 focus:outline-none focus-visible:shadow-none max-sm:text-base"
 								:aria-label="formatMessage(messages.timeframeAmount)"
 								@focus="activateLastTimeframe"
 								@input="handleAmountInput"
