@@ -142,13 +142,13 @@ import {
 	add_and_equip_custom_skin,
 	type Cape,
 	determineModelType,
+	equip_skin,
 	get_normalized_skin_texture,
 	normalize_skin_texture,
-	remove_custom_skin,
+	save_custom_skin,
 	type Skin,
 	type SkinModel,
 	type SkinTextureUrl,
-	unequip_skin,
 } from '@/helpers/skins.ts'
 
 const CAPE_LIST_MAX_HEIGHT = 334
@@ -357,19 +357,28 @@ async function save() {
 			textureUrl = currentSkin.value!.texture
 		}
 
-		await unequip_skin()
-
 		const bytes: Uint8Array = new Uint8Array(await (await fetch(textureUrl)).arrayBuffer())
 
 		if (mode.value === 'new') {
 			await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
-			emit('saved')
+			emit('saved', { applied: true })
 		} else {
-			await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
-			if (uploadedTextureUrl.value && textureUrl !== currentSkin.value?.texture) {
-				await remove_custom_skin(currentSkin.value!)
+			const updatedSkin = await save_custom_skin(
+				currentSkin.value!,
+				bytes,
+				variant.value,
+				selectedCape.value,
+				!!uploadedTextureUrl.value && textureUrl !== currentSkin.value?.texture,
+			)
+
+			if (currentSkin.value?.is_equipped) {
+				await equip_skin(updatedSkin)
 			}
-			emit('saved')
+
+			emit('saved', {
+				applied: !!currentSkin.value?.is_equipped,
+				skin: updatedSkin,
+			})
 		}
 
 		hide()
@@ -422,7 +431,7 @@ watch(
 )
 
 const emit = defineEmits<{
-	(event: 'saved'): void
+	(event: 'saved', options: { applied: boolean; skin?: Skin }): void
 	(event: 'deleted', skin: Skin): void
 }>()
 

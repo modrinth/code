@@ -50,7 +50,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 
 		<span
 			v-if="active && !selected"
-			class="pointer-events-none absolute right-3 top-3 z-20 size-3 rounded-full border-2 border-solid border-surface-3 bg-green shadow-[0_0_0_3px_var(--color-green-highlight),0_0_14px_var(--color-green)]"
+			class="pointer-events-none absolute right-3 top-3 z-20 size-3 rounded-full border-2 border-solid border-surface-3 bg-green"
 		></span>
 
 		<div

@@ -32,6 +32,8 @@ import {
 	equip_skin,
 	filterDefaultSkins,
 	filterSavedSkins,
+	flush_pending_skin_change,
+	flush_pending_skin_change_for_profile,
 	get_available_capes,
 	get_available_skins,
 	get_dragged_skin_data,
@@ -46,6 +48,8 @@ type UnlistenFn = () => void
 type VirtualSkinSectionListExpose = {
 	getAddSkinButtonElement: () => HTMLElement | null | undefined
 }
+
+const PENDING_SKIN_REFRESH_DELAY_MS = 11_000
 
 const editSkinModal = useTemplateRef('editSkinModal')
 const addSkinFileInput = useTemplateRef<HTMLInputElement>('addSkinFileInput')
@@ -119,6 +123,7 @@ const hasPendingSkinChange = computed(
 )
 
 let userCheckInterval: number | null = null
+let pendingSkinRefreshTimeout: number | null = null
 let unlistenAddSkinDragDrop: UnlistenFn | null = null
 let isUnmounted = false
 
@@ -199,6 +204,100 @@ function resetSelectedSkin() {
 		originalSelectedSkin.value
 }
 
+function setLocallyEquippedSkin(skinToApply: Skin) {
+	skins.value = skins.value.map((skin) => ({
+		...skin,
+		is_equipped: skinsMatch(skin, skinToApply),
+	}))
+	originalSelectedSkin.value =
+		skins.value.find((skin) => skinsMatch(skin, skinToApply)) ?? skinToApply
+	selectedSkin.value = originalSelectedSkin.value
+	void accountsCard.value?.setEquippedSkin(originalSelectedSkin.value)
+}
+
+function updateLocalSkin(savedSkin: Skin, applied: boolean) {
+	let foundSkin = false
+	const replacesSelectedSkin = selectedSkin.value?.texture_key === savedSkin.texture_key
+	const replacesOriginalSkin = originalSelectedSkin.value?.texture_key === savedSkin.texture_key
+
+	skins.value = skins.value.map((skin) => {
+		if (skin.texture_key === savedSkin.texture_key || (applied && skin.is_equipped)) {
+			foundSkin = true
+			return {
+				...savedSkin,
+				is_equipped: applied || savedSkin.is_equipped,
+			}
+		}
+
+		return {
+			...skin,
+			is_equipped: applied ? false : skin.is_equipped,
+		}
+	})
+
+	if (!foundSkin) {
+		skins.value.unshift({
+			...savedSkin,
+			is_equipped: applied || savedSkin.is_equipped,
+		})
+	}
+
+	if (applied) {
+		const locallyEquippedSkin =
+			skins.value.find((skin) => skin.texture_key === savedSkin.texture_key) ?? savedSkin
+
+		originalSelectedSkin.value = locallyEquippedSkin
+		selectedSkin.value = locallyEquippedSkin
+		void accountsCard.value?.setEquippedSkin(locallyEquippedSkin)
+	} else {
+		const locallySavedSkin =
+			skins.value.find((skin) => skin.texture_key === savedSkin.texture_key) ?? savedSkin
+
+		if (replacesSelectedSkin) {
+			selectedSkin.value = locallySavedSkin
+		}
+
+		if (replacesOriginalSkin) {
+			originalSelectedSkin.value = locallySavedSkin
+		}
+	}
+
+	generateSkinPreviews(skins.value, capes.value)
+}
+
+function schedulePendingSkinRefresh() {
+	if (pendingSkinRefreshTimeout !== null) {
+		window.clearTimeout(pendingSkinRefreshTimeout)
+	}
+
+	const pendingProfileId = currentUserId.value
+
+	pendingSkinRefreshTimeout = window.setTimeout(async () => {
+		pendingSkinRefreshTimeout = null
+
+		if (isUnmounted) {
+			return
+		}
+
+		try {
+			if (pendingProfileId) {
+				await flush_pending_skin_change_for_profile(pendingProfileId)
+			} else {
+				await flush_pending_skin_change()
+			}
+		} catch (error) {
+			handleError(error as Error)
+		}
+
+		if (accountsCard.value) {
+			await accountsCard.value.refreshValues()
+		}
+
+		await loadCapes()
+		await loadSkins()
+	}, PENDING_SKIN_REFRESH_DELAY_MS)
+}
+
 async function applySelectedSkin() {
 	const skinToApply = selectedSkin.value
 	if (!skinToApply || !hasPendingSkinChange.value || isApplyingSkin.value) return
@@ -206,11 +305,8 @@ async function applySelectedSkin() {
 	isApplyingSkin.value = true
 	try {
 		await equip_skin(skinToApply)
-		if (accountsCard.value) {
-			await accountsCard.value.refreshValues()
-		}
-		await loadCapes()
-		await loadSkins()
+		setLocallyEquippedSkin(skinToApply)
+		schedulePendingSkinRefresh()
 	} catch (error) {
 		if (isMinecraftSkinRateLimitError(error)) {
 			notifications.addNotification({
@@ -226,9 +322,19 @@ async function applySelectedSkin() {
 	}
 }
 
-async function onSkinSaved() {
-	await loadCapes()
-	await loadSkins()
+async function onSkinSaved(options: { applied: boolean; skin?: Skin }) {
+	if (options.skin) {
+		updateLocalSkin(options.skin, options.applied)
+	}
+
+	if (options.applied) {
+		schedulePendingSkinRefresh()
+	} else {
+		if (!options.skin) {
+			await loadCapes()
+			await loadSkins()
+		}
+	}
 }
 
 async function loadCurrentUser() {
@@ -427,6 +533,11 @@ onUnmounted(() => {
 
 	if (userCheckInterval !== null) {
 		window.clearInterval(userCheckInterval)
+	}
+
+	if (pendingSkinRefreshTimeout !== null) {
+		window.clearTimeout(pendingSkinRefreshTimeout)
+		pendingSkinRefreshTimeout = null
 	}
 
 	if (unlistenAddSkinDragDrop) {

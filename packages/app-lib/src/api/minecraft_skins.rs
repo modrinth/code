@@ -46,11 +46,17 @@
 //! uploaded skins with the texture key Mojang returns, and asking Mojang for the
 //! latest profile again whenever the result is unclear.
 
-use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    sync::{Arc, LazyLock},
+    time::Duration,
+};
 
 pub use bytes::Bytes;
 use futures::{StreamExt, TryStreamExt, stream};
 use serde::{Deserialize, Serialize};
+use sha2::Digest;
+use tokio::sync::Mutex;
 use url::Url;
 use uuid::Uuid;
 
@@ -74,6 +80,60 @@ mod assets {
 }
 
 mod png_util;
+
+const SKIN_CHANGE_DEBOUNCE: Duration = Duration::from_secs(10);
+
+static PENDING_SKIN_CHANGE: LazyLock<Mutex<PendingSkinChangeState>> =
+    LazyLock::new(|| Mutex::new(PendingSkinChangeState::default()));
+static SKIN_CHANGE_FLUSH_LOCK: LazyLock<Mutex<()>> =
+    LazyLock::new(|| Mutex::new(()));
+
+#[derive(Debug, Default)]
+struct PendingSkinChangeState {
+    pending: HashMap<Uuid, PendingSkinChangeEntry>,
+}
+
+#[derive(Debug)]
+struct PendingSkinChangeEntry {
+    change: PendingSkinChange,
+    generation: u64,
+}
+
+#[derive(Debug)]
+enum PendingSkinChange {
+    AddAndEquipCustomSkin {
+        selected_credentials: Credentials,
+        texture_blob: Bytes,
+        variant: MinecraftSkinVariant,
+        cape_id: Option<Uuid>,
+        local_texture_key: Arc<str>,
+    },
+    EquipSkin {
+        selected_credentials: Credentials,
+        skin: Skin,
+    },
+    UnequipSkin {
+        selected_credentials: Credentials,
+    },
+}
+
+impl PendingSkinChange {
+    fn profile_id(&self) -> Uuid {
+        match self {
+            Self::AddAndEquipCustomSkin {
+                selected_credentials,
+                ..
+            }
+            | Self::EquipSkin {
+                selected_credentials,
+                ..
+            }
+            | Self::UnequipSkin {
+                selected_credentials,
+            } => selected_credentials.offline_profile.id,
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Cape {
@@ -322,12 +382,43 @@ pub async fn add_and_equip_custom_skin(
         return Err(ErrorKind::InvalidSkinTexture)?;
     }
 
-    let cape_id = cape.map(|cape| cape.id);
     let state = State::get().await?;
-
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
+    let cape_id = cape.map(|cape| cape.id);
+    let local_texture_key = local_skin_texture_key(&texture_blob);
+
+    CustomMinecraftSkin::add(
+        selected_credentials.offline_profile.id,
+        &local_texture_key,
+        &texture_blob,
+        variant,
+        cape_id,
+        &state.pool,
+    )
+    .await?;
+
+    set_pending_skin_change(PendingSkinChange::AddAndEquipCustomSkin {
+        selected_credentials,
+        texture_blob,
+        variant,
+        cape_id,
+        local_texture_key,
+    })
+    .await;
+
+    Ok(())
+}
+
+async fn add_and_equip_custom_skin_now(
+    selected_credentials: &Credentials,
+    texture_blob: Bytes,
+    variant: MinecraftSkinVariant,
+    cape_id: Option<Uuid>,
+    local_texture_key: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
 
     let previous_profile = selected_credentials
         .online_profile_fresh()
@@ -389,6 +480,16 @@ pub async fn add_and_equip_custom_skin(
         return Err(error);
     }
 
+    if local_texture_key != equipped_skin_texture_key.as_ref() {
+        CustomMinecraftSkin {
+            texture_key: local_texture_key.to_string(),
+            variant,
+            cape_id,
+        }
+        .remove(profile.id, &state.pool)
+        .await?;
+    }
+
     if let Err(error) =
         sync_cape(&selected_credentials, &profile, cape_id).await
     {
@@ -406,10 +507,24 @@ pub async fn add_and_equip_custom_skin(
 #[tracing::instrument]
 pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     let state = State::get().await?;
-
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
+
+    set_pending_skin_change(PendingSkinChange::EquipSkin {
+        selected_credentials,
+        skin,
+    })
+    .await;
+
+    Ok(())
+}
+
+async fn equip_skin_now(
+    selected_credentials: &Credentials,
+    skin: &Skin,
+) -> crate::Result<()> {
+    let state = State::get().await?;
 
     let profile = selected_credentials
         .online_profile_fresh()
@@ -472,15 +587,102 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
     Ok(())
 }
 
-/// Unequips the currently equipped skin for the currently selected Minecraft profile, resetting
-/// it to one of the default skins and unequipping any cape.
-#[tracing::instrument]
-pub async fn unequip_skin() -> crate::Result<()> {
+/// Adds or updates a saved skin locally without applying it to Mojang.
+///
+/// This is used by the skin editor. If the edited skin is currently equipped, the caller should
+/// queue a separate equip operation after saving the local row.
+#[tracing::instrument(skip(texture_blob))]
+pub async fn save_custom_skin(
+    mut skin: Skin,
+    texture_blob: Bytes,
+    variant: MinecraftSkinVariant,
+    cape: Option<Cape>,
+    replace_texture: bool,
+) -> crate::Result<Skin> {
+    let (skin_width, skin_height) = png_util::dimensions(&texture_blob)?;
+    if skin_width != 64 || ![32, 64].contains(&skin_height) {
+        return Err(ErrorKind::InvalidSkinTexture)?;
+    }
+
     let state = State::get().await?;
 
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
+
+    let old_texture_key = Arc::clone(&skin.texture_key);
+    let texture_key = if replace_texture {
+        local_skin_texture_key(&texture_blob)
+    } else {
+        Arc::clone(&skin.texture_key)
+    };
+    let cape_id = cape.map(|cape| cape.id);
+
+    if cape_id.is_none() && is_bundled_skin(&texture_key, variant) {
+        CustomMinecraftSkin {
+            texture_key: texture_key.to_string(),
+            variant,
+            cape_id: None,
+        }
+        .remove(selected_credentials.offline_profile.id, &state.pool)
+        .await?;
+    } else {
+        CustomMinecraftSkin::add(
+            selected_credentials.offline_profile.id,
+            &texture_key,
+            &texture_blob,
+            variant,
+            cape_id,
+            &state.pool,
+        )
+        .await?;
+    }
+
+    if replace_texture && old_texture_key != texture_key {
+        CustomMinecraftSkin {
+            texture_key: old_texture_key.to_string(),
+            variant: skin.variant,
+            cape_id: skin.cape_id,
+        }
+        .remove(selected_credentials.offline_profile.id, &state.pool)
+        .await?;
+    }
+
+    skin.texture_key = texture_key;
+    skin.variant = variant;
+    skin.cape_id = cape_id;
+    skin.texture = png_util::blob_to_data_url(texture_blob)
+        .or_else(|| {
+            png_util::blob_to_data_url(include_bytes!(
+                "minecraft_skins/assets/default/MissingNo.png"
+            ))
+        })
+        .unwrap();
+
+    Ok(skin)
+}
+
+/// Unequips the currently equipped skin for the currently selected Minecraft profile, resetting
+/// it to one of the default skins and unequipping any cape.
+#[tracing::instrument]
+pub async fn unequip_skin() -> crate::Result<()> {
+    let state = State::get().await?;
+    let selected_credentials = Credentials::get_default_credential(&state.pool)
+        .await?
+        .ok_or(ErrorKind::NoCredentialsError)?;
+
+    set_pending_skin_change(PendingSkinChange::UnequipSkin {
+        selected_credentials,
+    })
+    .await;
+
+    Ok(())
+}
+
+async fn unequip_skin_now(
+    selected_credentials: &Credentials,
+) -> crate::Result<()> {
+    let state = State::get().await?;
 
     let profile = selected_credentials
         .online_profile_fresh()
@@ -513,6 +715,153 @@ pub async fn normalize_skin_texture(
     texture: &UrlOrBlob,
 ) -> crate::Result<Bytes> {
     png_util::normalize_skin_texture(texture).await
+}
+
+/// Sends any pending skin change immediately.
+///
+/// This is used before launching Minecraft and before closing the app so the debounced
+/// skin selection is still applied for those boundary cases.
+#[tracing::instrument]
+pub async fn flush_pending_skin_change() -> crate::Result<()> {
+    flush_pending_skin_change_inner(None).await
+}
+
+/// Sends any pending skin change for a specific Minecraft account immediately.
+#[tracing::instrument]
+pub async fn flush_pending_skin_change_for_profile(
+    profile_id: Uuid,
+) -> crate::Result<()> {
+    flush_pending_skin_change_inner(Some(PendingSkinChangeFilter::Profile(
+        profile_id,
+    )))
+    .await
+}
+
+async fn set_pending_skin_change(change: PendingSkinChange) {
+    let profile_id = change.profile_id();
+    let generation = {
+        let mut state = PENDING_SKIN_CHANGE.lock().await;
+        let generation = state
+            .pending
+            .get(&profile_id)
+            .map_or(1, |entry| entry.generation.wrapping_add(1));
+
+        state
+            .pending
+            .insert(profile_id, PendingSkinChangeEntry { change, generation });
+
+        generation
+    };
+
+    tokio::spawn(async move {
+        tokio::time::sleep(SKIN_CHANGE_DEBOUNCE).await;
+
+        if let Err(error) = flush_pending_skin_change_inner(Some(
+            PendingSkinChangeFilter::Generation {
+                profile_id,
+                generation,
+            },
+        ))
+        .await
+        {
+            let _ = crate::event::emit::emit_warning(&format!(
+                "Failed to apply pending Minecraft skin change: {error}"
+            ))
+            .await;
+        }
+    });
+}
+
+#[derive(Clone, Copy, Debug)]
+enum PendingSkinChangeFilter {
+    Generation { profile_id: Uuid, generation: u64 },
+    Profile(Uuid),
+}
+
+async fn flush_pending_skin_change_inner(
+    filter: Option<PendingSkinChangeFilter>,
+) -> crate::Result<()> {
+    let _guard = SKIN_CHANGE_FLUSH_LOCK.lock().await;
+
+    loop {
+        let entry = {
+            let mut state = PENDING_SKIN_CHANGE.lock().await;
+
+            match filter {
+                Some(PendingSkinChangeFilter::Generation {
+                    profile_id,
+                    generation,
+                }) => {
+                    let Some(entry) = state.pending.get(&profile_id) else {
+                        return Ok(());
+                    };
+
+                    if entry.generation != generation {
+                        return Ok(());
+                    }
+
+                    state.pending.remove(&profile_id)
+                }
+                Some(PendingSkinChangeFilter::Profile(profile_id)) => {
+                    state.pending.remove(&profile_id)
+                }
+                None => {
+                    let profile_id = state.pending.keys().next().copied();
+                    profile_id.and_then(|profile_id| {
+                        state.pending.remove(&profile_id)
+                    })
+                }
+            }
+        };
+
+        let Some(entry) = entry else {
+            return Ok(());
+        };
+
+        if let Err(error) = execute_pending_skin_change(&entry.change).await {
+            let profile_id = entry.change.profile_id();
+            let mut state = PENDING_SKIN_CHANGE.lock().await;
+            if !state.pending.contains_key(&profile_id) {
+                state.pending.insert(profile_id, entry);
+            }
+
+            return Err(error);
+        }
+
+        if filter.is_some() {
+            return Ok(());
+        }
+    }
+}
+
+async fn execute_pending_skin_change(
+    change: &PendingSkinChange,
+) -> crate::Result<()> {
+    match change {
+        PendingSkinChange::AddAndEquipCustomSkin {
+            selected_credentials,
+            texture_blob,
+            variant,
+            cape_id,
+            local_texture_key,
+        } => {
+            add_and_equip_custom_skin_now(
+                selected_credentials,
+                Bytes::clone(texture_blob),
+                *variant,
+                *cape_id,
+                local_texture_key,
+            )
+            .await
+        }
+        PendingSkinChange::EquipSkin {
+            selected_credentials,
+            skin,
+        } => equip_skin_now(selected_credentials, skin).await,
+        PendingSkinChange::UnequipSkin {
+            selected_credentials,
+        } => unequip_skin_now(selected_credentials).await,
+    }
 }
 
 /// Reads and validates a skin texture file from the given path.
@@ -636,6 +985,10 @@ fn is_bundled_skin(texture_key: &str, variant: MinecraftSkinVariant) -> bool {
         default_skin.texture_key.as_ref() == texture_key
             && default_skin.variant == variant
     })
+}
+
+fn local_skin_texture_key(texture_blob: &[u8]) -> Arc<str> {
+    Arc::from(format!("local-{:x}", sha2::Sha256::digest(texture_blob)))
 }
 
 #[derive(Debug, PartialEq, Eq)]

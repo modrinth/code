@@ -2,7 +2,7 @@
 	<!-- eslint-disable vue/no-undef-components -->
 	<div
 		ref="skinPreviewContainer"
-		class="relative w-full h-full overflow-hidden cursor-grab"
+		class="relative w-full h-full overflow-visible cursor-grab"
 		@click="onCanvasClick"
 	>
 		<div

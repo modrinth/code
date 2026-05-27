@@ -13,7 +13,10 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             add_and_equip_custom_skin,
             equip_skin,
             remove_custom_skin,
+            save_custom_skin,
             unequip_skin,
+            flush_pending_skin_change,
+            flush_pending_skin_change_for_profile,
             normalize_skin_texture,
             get_dragged_skin_data,
         ])
@@ -67,12 +70,54 @@ pub async fn remove_custom_skin(skin: Skin) -> Result<()> {
     Ok(minecraft_skins::remove_custom_skin(skin).await?)
 }
 
+/// `invoke('plugin:minecraft-skins|save_custom_skin', skin, texture_blob, variant, cape, replace_texture)`
+///
+/// See also: [minecraft_skins::save_custom_skin]
+#[tauri::command]
+pub async fn save_custom_skin(
+    skin: Skin,
+    texture_blob: Bytes,
+    variant: MinecraftSkinVariant,
+    cape: Option<Cape>,
+    replace_texture: bool,
+) -> Result<Skin> {
+    Ok(minecraft_skins::save_custom_skin(
+        skin,
+        texture_blob,
+        variant,
+        cape,
+        replace_texture,
+    )
+    .await?)
+}
+
 /// `invoke('plugin:minecraft-skins|unequip_skin')`
 ///
 /// See also: [minecraft_skins::unequip_skin]
 #[tauri::command]
 pub async fn unequip_skin() -> Result<()> {
     Ok(minecraft_skins::unequip_skin().await?)
+}
+
+/// `invoke('plugin:minecraft-skins|flush_pending_skin_change')`
+///
+/// See also: [minecraft_skins::flush_pending_skin_change]
+#[tauri::command]
+pub async fn flush_pending_skin_change() -> Result<()> {
+    Ok(minecraft_skins::flush_pending_skin_change().await?)
+}
+
+/// `invoke('plugin:minecraft-skins|flush_pending_skin_change_for_profile', profile_id)`
+///
+/// See also: [minecraft_skins::flush_pending_skin_change_for_profile]
+#[tauri::command]
+pub async fn flush_pending_skin_change_for_profile(
+    profile_id: uuid::Uuid,
+) -> Result<()> {
+    Ok(
+        minecraft_skins::flush_pending_skin_change_for_profile(profile_id)
+            .await?,
+    )
 }
 
 /// `invoke('plugin:minecraft-skins|normalize_skin_texture')`

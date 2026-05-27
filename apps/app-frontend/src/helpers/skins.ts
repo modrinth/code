@@ -142,6 +142,22 @@ export async function remove_custom_skin(skin: Skin): Promise<void> {
 	})
 }
 
+export async function save_custom_skin(
+	skin: Skin,
+	textureBlob: Uint8Array,
+	variant: SkinModel,
+	cape: Cape | undefined,
+	replaceTexture: boolean,
+): Promise<Skin> {
+	return await invoke('plugin:minecraft-skins|save_custom_skin', {
+		skin,
+		textureBlob,
+		variant,
+		cape,
+		replaceTexture,
+	})
+}
+
 export async function get_normalized_skin_texture(skin: Skin): Promise<string> {
 	const data = await normalize_skin_texture(skin.texture)
 	const base64 = arrayBufferToBase64(data)
@@ -154,6 +170,16 @@ export async function normalize_skin_texture(texture: Uint8Array | string): Prom
 
 export async function unequip_skin(): Promise<void> {
 	await invoke('plugin:minecraft-skins|unequip_skin')
+}
+
+export async function flush_pending_skin_change(): Promise<void> {
+	await invoke('plugin:minecraft-skins|flush_pending_skin_change')
+}
+
+export async function flush_pending_skin_change_for_profile(profileId: string): Promise<void> {
+	await invoke('plugin:minecraft-skins|flush_pending_skin_change_for_profile', {
+		profileId,
+	})
 }
 
 export async function get_dragged_skin_data(path: string): Promise<Uint8Array> {
