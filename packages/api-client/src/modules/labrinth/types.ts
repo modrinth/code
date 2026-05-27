@@ -325,9 +325,28 @@ export namespace Labrinth {
 
 			export type FetchResponse = {
 				metrics: TimeSlice[]
+				project_events: ProjectAnalyticsEvent[]
 			}
 
 			export type TimeSlice = AnalyticsData[]
+
+			export type ProjectAnalyticsEvent = {
+				project_id: string
+				timestamp: string
+			} & ProjectAnalyticsEventKind
+
+			export type ProjectAnalyticsEventKind =
+				| {
+						kind: 'version_uploaded'
+						version_id: string
+						version_name: string
+						version_number: string
+				  }
+				| {
+						kind: 'status_changed'
+						status_from: Projects.v2.ProjectStatus
+						status_to: Projects.v2.ProjectStatus
+				  }
 
 			export type AnalyticsData = ProjectAnalytics | AffiliateCodeAnalytics
 

@@ -89,6 +89,16 @@
 							:small="!isMobileLayout"
 						/>
 					</div>
+					<div v-if="hasProjectEvents" class="inline-flex items-center gap-2">
+						<label for="project-events-toggle" class="cursor-pointer text-sm text-secondary">
+							Project events
+						</label>
+						<Toggle
+							id="project-events-toggle"
+							v-model="showProjectEvents"
+							:small="!isMobileLayout"
+						/>
+					</div>
 					<Tabs
 						:value="activeGraphViewMode"
 						:tabs="viewModeTabs"
@@ -256,8 +266,8 @@
 							/>
 						</ClientOnly>
 						<AnalyticsChartEvents
-							v-if="showChartEvents"
-							:events="localAnalyticsChartEvents"
+							v-if="hasVisibleTimelineEvents"
+							:events="visibleTimelineEvents"
 							:active-stat="activeStat"
 							:group-by="selectedGroupBy"
 							:chart-start="chartRangeBounds?.start ?? null"
@@ -319,6 +329,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon, InfoIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -352,7 +363,7 @@ import AnalyticsChart, {
 	type AnalyticsChartGeometryPayload,
 	type AnalyticsChartRangeSelectPayload,
 } from './AnalyticsChart.client.vue'
-import AnalyticsChartEvents from './AnalyticsChartEvents.vue'
+import AnalyticsChartEvents, { type AnalyticsChartEvent } from './AnalyticsChartEvents.vue'
 import AnalyticsChartTooltip, { type AnalyticsChartTooltipEntry } from './AnalyticsChartTooltip.vue'
 import {
 	buildChartDatasets,
@@ -370,6 +381,7 @@ const {
 	activeGraphViewMode,
 	isRatioMode,
 	showChartEvents,
+	showProjectEvents,
 	showPreviousPeriod,
 	isMobileLayout,
 	hiddenGraphDatasetIds,
@@ -387,6 +399,7 @@ const {
 	displayedFetchRequest: fetchRequest,
 	displayedTimeSlices: timeSlices,
 	displayedPreviousTimeSlices: previousTimeSlices,
+	displayedProjectEvents: projectEvents,
 	displayedSelectedGroupBy: selectedGroupBy,
 	displayedSelectedBreakdowns: selectedBreakdowns,
 	displayedSelectedFilters: selectedFilters,
@@ -429,6 +442,11 @@ const TOP_GRAPH_DATASET_LIMIT = 8
 const GRAPH_RENDER_DATASET_LIMIT = 250
 const PREVIOUS_PERIOD_DATASET_ID_PREFIX = 'previous-period:'
 const PREVIOUS_PERIOD_BORDER_DASH = [6, 4]
+const PROJECT_EVENT_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
+	month: 'short',
+	day: 'numeric',
+	year: 'numeric',
+})
 const MONETIZATION_LEGEND_ENTRY_ORDER = new Map([
 	['breakdown:monetized', 0],
 	['breakdown:unmonetized', 1],
@@ -436,6 +454,15 @@ const MONETIZATION_LEGEND_ENTRY_ORDER = new Map([
 
 const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])
 const hasChartEvents = computed(() => localAnalyticsChartEvents.value.length > 0)
+const visibleModrinthChartEvents = computed<AnalyticsChartEvent[]>(() =>
+	showChartEvents.value
+		? localAnalyticsChartEvents.value.map((event) => ({
+				...event,
+				markerIcon: 'info' as const,
+				groupKey: 'modrinth',
+			}))
+		: [],
+)
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 const hasAvailableProjects = computed(() => projects.value.length > 0)
 
@@ -446,6 +473,57 @@ const selectedProjects = computed(() =>
 			doesProjectStatusMatchFilters(project.status, selectedFilters.value),
 	),
 )
+const selectedProjectEventIdSet = computed(
+	() => new Set(selectedProjects.value.map((project) => project.id)),
+)
+const localProjectChartEvents = computed<AnalyticsChartEvent[]>(() =>
+	projectEvents.value
+		.filter((event) => selectedProjectEventIdSet.value.has(event.project_id))
+		.map((event) => ({
+			title: getProjectEventTitle(event),
+			starts: event.timestamp,
+			ends: event.timestamp,
+			subtitle: formatProjectEventDate(event.timestamp),
+			markerIcon: 'flag' as const,
+			groupKey: 'project',
+		})),
+)
+const hasProjectEvents = computed(() => localProjectChartEvents.value.length > 0)
+const visibleProjectChartEvents = computed(() =>
+	showProjectEvents.value ? localProjectChartEvents.value : [],
+)
+const visibleTimelineEvents = computed(() => [
+	...visibleModrinthChartEvents.value,
+	...visibleProjectChartEvents.value,
+])
+const hasVisibleTimelineEvents = computed(
+	() =>
+		visibleModrinthChartEvents.value.length > 0 ||
+		visibleProjectChartEvents.value.length > 0,
+)
+
+function formatProjectStatusLabel(status: Labrinth.Projects.v2.ProjectStatus) {
+	return status
+		.replace(/[_-]/g, ' ')
+		.replace(/\b\w/g, (character) => character.toUpperCase())
+}
+
+function getProjectEventTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
+	if (event.kind === 'version_uploaded') {
+		return event.version_name.trim() || event.version_number.trim() || 'Version uploaded'
+	}
+
+	const statusFrom = formatProjectStatusLabel(event.status_from)
+	const statusTo = formatProjectStatusLabel(event.status_to)
+	return `Status changed from ${statusFrom} to ${statusTo}`
+}
+
+function formatProjectEventDate(timestamp: string) {
+	const date = new Date(timestamp)
+	if (Number.isNaN(date.getTime())) return timestamp
+	return PROJECT_EVENT_DATE_FORMATTER.format(date)
+}
+
 const showProjectVersionNames = computed(
 	() => selectedBreakdowns.value.includes('version_id') && selectedProjects.value.length > 1,
 )

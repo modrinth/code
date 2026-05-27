@@ -208,12 +208,15 @@ export interface AnalyticsDashboardContextValue {
 	displayedTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	previousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	displayedPreviousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
+	projectEvents: Ref<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>
+	displayedProjectEvents: Ref<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>
 	isLoading: ComputedRef<boolean>
 	isRefetching: ComputedRef<boolean>
 	activeStat: Ref<AnalyticsDashboardStat>
 	activeGraphViewMode: Ref<AnalyticsGraphViewMode>
 	isRatioMode: Ref<boolean>
 	showChartEvents: Ref<boolean>
+	showProjectEvents: Ref<boolean>
 	showPreviousPeriod: Ref<boolean>
 	isMobileLayout: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
@@ -257,6 +260,11 @@ type AnalyticsQueryBuilderRouteNavigationMode = 'push' | 'replace'
 type AnalyticsTimeSliceSplit = {
 	currentTimeSlices: Labrinth.Analytics.v3.TimeSlice[]
 	previousTimeSlices: Labrinth.Analytics.v3.TimeSlice[]
+}
+
+type AnalyticsFetchData = {
+	metrics: Labrinth.Analytics.v3.TimeSlice[]
+	project_events: Labrinth.Analytics.v3.ProjectAnalyticsEvent[]
 }
 
 function buildComparisonFetchRequest(
@@ -340,6 +348,26 @@ function splitAnalyticsTimeSlices(
 	}
 }
 
+function getAnalyticsProjectEventsInTimeRange(
+	projectEvents: Labrinth.Analytics.v3.ProjectAnalyticsEvent[],
+	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+): Labrinth.Analytics.v3.ProjectAnalyticsEvent[] {
+	if (!isAnalyticsFetchRequestReady(fetchRequest)) {
+		return projectEvents
+	}
+
+	const startTime = new Date(fetchRequest.time_range.start).getTime()
+	const endTime = new Date(fetchRequest.time_range.end).getTime()
+	if (!Number.isFinite(startTime) || !Number.isFinite(endTime) || endTime < startTime) {
+		return []
+	}
+
+	return projectEvents.filter((event) => {
+		const eventTime = new Date(event.timestamp).getTime()
+		return Number.isFinite(eventTime) && eventTime >= startTime && eventTime <= endTime
+	})
+}
+
 function buildAnalyticsFetchRequestBatches(
 	fetchRequest: AnalyticsProjectFetchRequest,
 ): AnalyticsProjectFetchRequest[] {
@@ -385,18 +413,41 @@ function mergeAnalyticsTimeSlices(
 	return mergedTimeSlices
 }
 
+function mergeAnalyticsProjectEvents(
+	projectEventGroups: Labrinth.Analytics.v3.ProjectAnalyticsEvent[][],
+): Labrinth.Analytics.v3.ProjectAnalyticsEvent[] {
+	const mergedProjectEvents: Labrinth.Analytics.v3.ProjectAnalyticsEvent[] = []
+
+	for (const projectEvents of projectEventGroups) {
+		for (const projectEvent of projectEvents) {
+			mergedProjectEvents.push(projectEvent)
+		}
+	}
+
+	return mergedProjectEvents.sort((left, right) => {
+		const timestampDifference =
+			new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime()
+		return (
+			timestampDifference ||
+			left.project_id.localeCompare(right.project_id) ||
+			left.kind.localeCompare(right.kind)
+		)
+	})
+}
+
 function waitForAnalyticsFetchBatchDelay(): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS))
 }
 
-async function fetchAnalyticsTimeSlices(
+async function fetchAnalyticsData(
 	fetchRequest: AnalyticsProjectFetchRequest,
 	fetchAnalytics: (
 		request: Labrinth.Analytics.v3.FetchRequest,
 	) => Promise<Labrinth.Analytics.v3.FetchResponse>,
-): Promise<Labrinth.Analytics.v3.TimeSlice[]> {
+): Promise<AnalyticsFetchData> {
 	const fetchRequests = buildAnalyticsFetchRequestBatches(fetchRequest)
 	const timeSliceGroups: Labrinth.Analytics.v3.TimeSlice[][] = []
+	const projectEventGroups: Labrinth.Analytics.v3.ProjectAnalyticsEvent[][] = []
 
 	for (let index = 0; index < fetchRequests.length; index++) {
 		if (index > 0) {
@@ -405,9 +456,23 @@ async function fetchAnalyticsTimeSlices(
 
 		const response = await fetchAnalytics(fetchRequests[index])
 		timeSliceGroups.push(response.metrics)
+		projectEventGroups.push(response.project_events ?? [])
 	}
 
-	return mergeAnalyticsTimeSlices(timeSliceGroups)
+	return {
+		metrics: mergeAnalyticsTimeSlices(timeSliceGroups),
+		project_events: mergeAnalyticsProjectEvents(projectEventGroups),
+	}
+}
+
+async function fetchAnalyticsTimeSlices(
+	fetchRequest: AnalyticsProjectFetchRequest,
+	fetchAnalytics: (
+		request: Labrinth.Analytics.v3.FetchRequest,
+	) => Promise<Labrinth.Analytics.v3.FetchResponse>,
+): Promise<Labrinth.Analytics.v3.TimeSlice[]> {
+	const response = await fetchAnalyticsData(fetchRequest, fetchAnalytics)
+	return response.metrics
 }
 
 function areAnalyticsFetchRequestsEqual(
@@ -1262,6 +1327,7 @@ export function createAnalyticsDashboardContext(
 	const activeGraphViewMode = ref<AnalyticsGraphViewMode>(initialGraphState.activeGraphViewMode)
 	const isRatioMode = ref(initialGraphState.isRatioMode)
 	const showChartEvents = ref(initialGraphState.showChartEvents)
+	const showProjectEvents = ref(initialGraphState.showProjectEvents)
 	const showPreviousPeriod = ref(initialGraphState.showPreviousPeriod)
 	const isMobileLayout = ref(false)
 	const hiddenGraphDatasetIds = ref<string[]>(initialGraphState.hiddenGraphDatasetIds)
@@ -1682,6 +1748,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
+			showProjectEvents: showProjectEvents.value,
 			showPreviousPeriod: showPreviousPeriod.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 			selectedGraphDatasetIds: hasExplicitGraphDatasetSelection.value
@@ -1771,6 +1838,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode: activeGraphViewMode.value,
 			isRatioMode: isRatioMode.value,
 			showChartEvents: showChartEvents.value,
+			showProjectEvents: showProjectEvents.value,
 			showPreviousPeriod: showPreviousPeriod.value,
 			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
 			selectedGraphDatasetIds: hasExplicitGraphDatasetSelection.value
@@ -1966,6 +2034,8 @@ export function createAnalyticsDashboardContext(
 				activeGraphViewMode.value !== nextGraphState.activeGraphViewMode
 			const shouldUpdateIsRatioMode = isRatioMode.value !== nextGraphState.isRatioMode
 			const shouldUpdateShowChartEvents = showChartEvents.value !== nextGraphState.showChartEvents
+			const shouldUpdateShowProjectEvents =
+				showProjectEvents.value !== nextGraphState.showProjectEvents
 			const shouldUpdateShowPreviousPeriod =
 				showPreviousPeriod.value !== nextGraphState.showPreviousPeriod
 			const shouldUpdateHiddenGraphDatasetIds = !areStringArraysEqual(
@@ -1994,6 +2064,7 @@ export function createAnalyticsDashboardContext(
 				shouldUpdateActiveGraphViewMode ||
 				shouldUpdateIsRatioMode ||
 				shouldUpdateShowChartEvents ||
+				shouldUpdateShowProjectEvents ||
 				shouldUpdateShowPreviousPeriod ||
 				shouldUpdateHiddenGraphDatasetIds ||
 				shouldUpdateHasExplicitGraphDatasetSelection ||
@@ -2044,6 +2115,9 @@ export function createAnalyticsDashboardContext(
 			}
 			if (shouldUpdateShowChartEvents) {
 				showChartEvents.value = nextGraphState.showChartEvents
+			}
+			if (shouldUpdateShowProjectEvents) {
+				showProjectEvents.value = nextGraphState.showProjectEvents
 			}
 			if (shouldUpdateShowPreviousPeriod) {
 				showPreviousPeriod.value = nextGraphState.showPreviousPeriod
@@ -2098,6 +2172,7 @@ export function createAnalyticsDashboardContext(
 			activeGraphViewMode,
 			isRatioMode,
 			showChartEvents,
+			showProjectEvents,
 			showPreviousPeriod,
 			hiddenGraphDatasetIds,
 			hasExplicitGraphDatasetSelection,
@@ -2116,7 +2191,7 @@ export function createAnalyticsDashboardContext(
 	const hasPreviousPeriodComparison = computed(() => comparisonFetchRequest.value !== null)
 
 	const {
-		data: currentTimeSliceData,
+		data: currentAnalyticsData,
 		isPending: currentTimeSlicePending,
 		isFetching: currentFetching,
 		refetch: refetchCurrentTimeSlices,
@@ -2131,10 +2206,13 @@ export function createAnalyticsDashboardContext(
 		queryFn: () => {
 			const nextFetchRequest = analyticsTimeSlicesFetchRequest.value
 			if (!isAnalyticsFetchRequestReady(nextFetchRequest)) {
-				return []
+				return {
+					metrics: [],
+					project_events: [],
+				}
 			}
 
-			return fetchAnalyticsTimeSlices(nextFetchRequest, (request) =>
+			return fetchAnalyticsData(nextFetchRequest, (request) =>
 				client.labrinth.analytics_v3.fetch(request),
 			)
 		},
@@ -2149,7 +2227,7 @@ export function createAnalyticsDashboardContext(
 	const hasCompletedCurrentTimeSliceFetch = computed(
 		() =>
 			isAnalyticsFetchRequestReady(analyticsTimeSlicesFetchRequest.value) &&
-			currentTimeSliceData.value !== undefined &&
+			currentAnalyticsData.value !== undefined &&
 			!currentTimeSlicePending.value &&
 			!currentFetching.value,
 	)
@@ -2333,6 +2411,7 @@ export function createAnalyticsDashboardContext(
 
 	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const projectEvents = shallowRef<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>([])
 	const displayedSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 	const displayedSelectedGroupBy = ref<AnalyticsGroupByPreset>(selectedGroupBy.value)
 	const displayedSelectedBreakdowns = ref<AnalyticsSelectedBreakdowns>([
@@ -2349,6 +2428,7 @@ export function createAnalyticsDashboardContext(
 	)
 	const displayedTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const displayedPreviousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const displayedProjectEvents = shallowRef<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>([])
 
 	function commitDisplayedAnalyticsState() {
 		displayedSelectedProjectIds.value = [...selectedProjectIds.value]
@@ -2359,17 +2439,22 @@ export function createAnalyticsDashboardContext(
 		displayedFilterOptions.value = cloneAnalyticsFilterOptions(filterOptions.value)
 		displayedTimeSlices.value = timeSlices.value
 		displayedPreviousTimeSlices.value = previousTimeSlices.value
+		displayedProjectEvents.value = projectEvents.value
 	}
 
 	watch(
-		currentTimeSliceData,
-		(nextTimeSlices) => {
-			if (nextTimeSlices === undefined) {
+		currentAnalyticsData,
+		(nextAnalyticsData) => {
+			if (nextAnalyticsData === undefined) {
 				return
 			}
-			const splitTimeSlices = splitAnalyticsTimeSlices(nextTimeSlices, fetchRequest.value)
+			const splitTimeSlices = splitAnalyticsTimeSlices(nextAnalyticsData.metrics, fetchRequest.value)
 			timeSlices.value = splitTimeSlices.currentTimeSlices
 			previousTimeSlices.value = splitTimeSlices.previousTimeSlices
+			projectEvents.value = getAnalyticsProjectEventsInTimeRange(
+				nextAnalyticsData.project_events,
+				fetchRequest.value,
+			)
 		},
 		{ immediate: true },
 	)
@@ -2381,6 +2466,7 @@ export function createAnalyticsDashboardContext(
 		}
 		timeSlices.value = []
 		previousTimeSlices.value = []
+		projectEvents.value = []
 	})
 
 	const analyticsVersionIds = computed(() => {
@@ -2525,7 +2611,7 @@ export function createAnalyticsDashboardContext(
 	watch(
 		[
 			isLoading,
-			currentTimeSliceData,
+			currentAnalyticsData,
 			fetchRequest,
 			selectedProjectIds,
 			selectedGroupBy,
@@ -2539,7 +2625,7 @@ export function createAnalyticsDashboardContext(
 			}
 			if (
 				isAnalyticsFetchRequestReady(fetchRequest.value) &&
-				currentTimeSliceData.value === undefined
+				currentAnalyticsData.value === undefined
 			) {
 				return
 			}
@@ -2589,6 +2675,7 @@ export function createAnalyticsDashboardContext(
 		activeGraphViewMode.value = defaultGraphState.activeGraphViewMode
 		isRatioMode.value = defaultGraphState.isRatioMode
 		showChartEvents.value = defaultGraphState.showChartEvents
+		showProjectEvents.value = defaultGraphState.showProjectEvents
 		showPreviousPeriod.value = defaultGraphState.showPreviousPeriod
 		hiddenGraphDatasetIds.value = defaultGraphState.hiddenGraphDatasetIds
 		hasExplicitGraphDatasetSelection.value = false
@@ -2670,12 +2757,15 @@ export function createAnalyticsDashboardContext(
 		displayedTimeSlices,
 		previousTimeSlices,
 		displayedPreviousTimeSlices,
+		projectEvents,
+		displayedProjectEvents,
 		isLoading,
 		isRefetching,
 		activeStat,
 		activeGraphViewMode,
 		isRatioMode,
 		showChartEvents,
+		showProjectEvents,
 		showPreviousPeriod,
 		isMobileLayout,
 		hiddenGraphDatasetIds,

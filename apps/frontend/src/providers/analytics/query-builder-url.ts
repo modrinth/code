@@ -72,6 +72,7 @@ export type AnalyticsGraphState = {
 	activeGraphViewMode: AnalyticsGraphViewMode
 	isRatioMode: boolean
 	showChartEvents: boolean
+	showProjectEvents: boolean
 	showPreviousPeriod: boolean
 	hiddenGraphDatasetIds: string[]
 	selectedGraphDatasetIds: string[] | null
@@ -94,6 +95,7 @@ export const DEFAULT_ANALYTICS_DASHBOARD_STAT: AnalyticsDashboardStat = 'views'
 export const DEFAULT_ANALYTICS_GRAPH_VIEW_MODE: AnalyticsGraphViewMode = 'line'
 export const DEFAULT_ANALYTICS_GRAPH_RATIO_MODE = false
 export const DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY = true
+export const DEFAULT_ANALYTICS_GRAPH_PROJECT_EVENTS_VISIBILITY = true
 export const DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY = false
 export const MAX_ANALYTICS_BREAKDOWN_PRESETS = 2
 
@@ -203,6 +205,7 @@ const QUERY_KEY_STAT = 'a_stat'
 const QUERY_KEY_GRAPH_VIEW_MODE = 'a_chart'
 const QUERY_KEY_GRAPH_RATIO_MODE = 'a_ratio'
 const QUERY_KEY_GRAPH_EVENTS_VISIBILITY = 'a_events'
+const QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY = 'a_project_events'
 const QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY = 'a_prev_period'
 const QUERY_KEY_GRAPH_HIDDEN_SERIES = 'a_hidden_series'
 const QUERY_KEY_GRAPH_SELECTED_SERIES = 'a_selected_series'
@@ -259,6 +262,7 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_GRAPH_VIEW_MODE,
 	QUERY_KEY_GRAPH_RATIO_MODE,
 	QUERY_KEY_GRAPH_EVENTS_VISIBILITY,
+	QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY,
 	QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 	QUERY_KEY_GRAPH_HIDDEN_SERIES,
 	QUERY_KEY_GRAPH_SELECTED_SERIES,
@@ -449,6 +453,7 @@ export function buildDefaultAnalyticsGraphState(): AnalyticsGraphState {
 		activeGraphViewMode: DEFAULT_ANALYTICS_GRAPH_VIEW_MODE,
 		isRatioMode: DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
 		showChartEvents: DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
+		showProjectEvents: DEFAULT_ANALYTICS_GRAPH_PROJECT_EVENTS_VISIBILITY,
 		showPreviousPeriod: DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 		hiddenGraphDatasetIds: [],
 		selectedGraphDatasetIds: null,
@@ -558,6 +563,7 @@ export function isAnalyticsGraphStateDefault(state: AnalyticsGraphState): boolea
 		state.activeGraphViewMode === defaultState.activeGraphViewMode &&
 		state.isRatioMode === defaultState.isRatioMode &&
 		state.showChartEvents === defaultState.showChartEvents &&
+		state.showProjectEvents === defaultState.showProjectEvents &&
 		state.showPreviousPeriod === defaultState.showPreviousPeriod &&
 		areStringArraysEqual(state.hiddenGraphDatasetIds, defaultState.hiddenGraphDatasetIds) &&
 		state.selectedGraphDatasetIds === defaultState.selectedGraphDatasetIds
@@ -660,6 +666,7 @@ export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphSta
 		),
 		isRatioMode: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_RATIO_MODE]),
 		showChartEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_EVENTS_VISIBILITY]),
+		showProjectEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY]),
 		showPreviousPeriod: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY]),
 		hiddenGraphDatasetIds: parseListQueryValue(query[QUERY_KEY_GRAPH_HIDDEN_SERIES]),
 		selectedGraphDatasetIds:
@@ -864,6 +871,9 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 				: undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_RATIO_MODE] = graphState.isRatioMode ? '1' : undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_EVENTS_VISIBILITY] = graphState.showChartEvents ? undefined : '0'
+		nextRouteQuery[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY] = graphState.showProjectEvents
+			? undefined
+			: '0'
 		nextRouteQuery[QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY] = graphState.showPreviousPeriod
 			? '1'
 			: undefined
