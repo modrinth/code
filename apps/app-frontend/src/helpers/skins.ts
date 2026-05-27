@@ -5,7 +5,6 @@ export interface Cape {
 	id: string
 	name: string
 	texture: string
-	is_default: boolean
 	is_equipped: boolean
 }
 
@@ -15,6 +14,7 @@ export type SkinSource = 'default' | 'custom_external' | 'custom'
 export interface Skin {
 	texture_key: string
 	name?: string
+	section?: string
 	variant: SkinModel
 	cape_id?: string
 	texture: string
@@ -121,17 +121,11 @@ export async function get_available_skins(): Promise<Skin[]> {
 export async function add_and_equip_custom_skin(
 	textureBlob: Uint8Array,
 	variant: SkinModel,
-	capeOverride?: Cape,
-): Promise<void> {
-	await invoke('plugin:minecraft-skins|add_and_equip_custom_skin', {
+	cape?: Cape,
+): Promise<Skin> {
+	return await invoke('plugin:minecraft-skins|add_and_equip_custom_skin', {
 		textureBlob,
 		variant,
-		capeOverride,
-	})
-}
-
-export async function set_default_cape(cape?: Cape): Promise<void> {
-	await invoke('plugin:minecraft-skins|set_default_cape', {
 		cape,
 	})
 }
@@ -148,6 +142,22 @@ export async function remove_custom_skin(skin: Skin): Promise<void> {
 	})
 }
 
+export async function save_custom_skin(
+	skin: Skin,
+	textureBlob: Uint8Array,
+	variant: SkinModel,
+	cape: Cape | undefined,
+	replaceTexture: boolean,
+): Promise<Skin> {
+	return await invoke('plugin:minecraft-skins|save_custom_skin', {
+		skin,
+		textureBlob,
+		variant,
+		cape,
+		replaceTexture,
+	})
+}
+
 export async function get_normalized_skin_texture(skin: Skin): Promise<string> {
 	const data = await normalize_skin_texture(skin.texture)
 	const base64 = arrayBufferToBase64(data)
@@ -160,6 +170,16 @@ export async function normalize_skin_texture(texture: Uint8Array | string): Prom
 
 export async function unequip_skin(): Promise<void> {
 	await invoke('plugin:minecraft-skins|unequip_skin')
+}
+
+export async function flush_pending_skin_change(): Promise<void> {
+	await invoke('plugin:minecraft-skins|flush_pending_skin_change')
+}
+
+export async function flush_pending_skin_change_for_profile(profileId: string): Promise<void> {
+	await invoke('plugin:minecraft-skins|flush_pending_skin_change_for_profile', {
+		profileId,
+	})
 }
 
 export async function get_dragged_skin_data(path: string): Promise<Uint8Array> {

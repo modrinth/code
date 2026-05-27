@@ -160,7 +160,16 @@ watch(
 			</h2>
 			<p class="m-0 mt-1">{{ formatMessage(messages.hideNametagDescription) }}</p>
 		</div>
-		<Toggle id="hide-nametag-skins-page" v-model="settings.hide_nametag_skins_page" />
+		<Toggle
+			id="hide-nametag-skins-page"
+			:model-value="themeStore.hideNametagSkinsPage"
+			@update:model-value="
+				(e) => {
+					themeStore.hideNametagSkinsPage = !!e
+					settings.hide_nametag_skins_page = themeStore.hideNametagSkinsPage
+				}
+			"
+		/>
 	</div>
 
 	<div v-if="os !== 'MacOS'" class="mt-6 flex items-center justify-between gap-4">
