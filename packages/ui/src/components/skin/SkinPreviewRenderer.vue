@@ -112,6 +112,7 @@ import {
 	useSkinPreviewLoading,
 	useSkinPreviewScene,
 } from '#ui/composables/skin-rendering'
+
 import { useDynamicFontSize } from '../../composables'
 import { createRadialSpotlightShader } from './skin-preview-shader'
 

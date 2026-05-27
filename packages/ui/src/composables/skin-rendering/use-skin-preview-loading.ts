@@ -1,4 +1,4 @@
-import { computed, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue'
+import { computed, type ComputedRef, onUnmounted, type Ref, ref, watch } from 'vue'
 
 const LOADING_INDICATOR_DELAY_MS = 200
 const LOADING_INDICATOR_MIN_MS = 250

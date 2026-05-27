@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue'
+import { computed, type ComputedRef, onMounted, onUnmounted, type Ref, ref, watch } from 'vue'
 
 import type {
 	SkinPreviewFitLock,
@@ -19,7 +19,10 @@ const FRAMING_PRESETS = {
 		zoom: 1,
 		padding: { top: 0.1, right: 0.1, bottom: 0.18, left: 0.1 },
 	},
-} satisfies Record<SkinPreviewFraming, { fov: number; zoom: number; padding: SkinPreviewFitPadding }>
+} satisfies Record<
+	SkinPreviewFraming,
+	{ fov: number; zoom: number; padding: SkinPreviewFitPadding }
+>
 
 function cloneModelTuple(tuple: SkinPreviewTuple): SkinPreviewTuple {
 	return [tuple[0], tuple[1], tuple[2]]
@@ -82,8 +85,7 @@ export function useSkinPreviewFit({
 	)
 	const hasResolvedFit = computed(
 		() =>
-			!fitEnabled.value ||
-			(lockFitEnabled.value ? fitLock.value !== null : hasUsableFitSize.value),
+			!fitEnabled.value || (lockFitEnabled.value ? fitLock.value !== null : hasUsableFitSize.value),
 	)
 
 	const fitContainerSize = computed(() =>

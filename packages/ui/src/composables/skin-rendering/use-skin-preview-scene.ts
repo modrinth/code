@@ -1,23 +1,24 @@
+import { useGLTF } from '@tresjs/cientos'
+import { useTexture } from '@tresjs/core'
+import * as THREE from 'three'
+import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
+import {
+	type ComputedRef,
+	markRaw,
+	onBeforeMount,
+	onUnmounted,
+	type Ref,
+	ref,
+	shallowRef,
+	watch,
+} from 'vue'
+
 import {
 	applyCapeTexture,
 	applyTexture,
 	createTransparentTexture,
 	loadTexture as loadSkinTexture,
 } from '#ui/utils/webgl/skin-rendering.ts'
-import { useGLTF } from '@tresjs/cientos'
-import { useTexture } from '@tresjs/core'
-import * as THREE from 'three'
-import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
-import {
-	markRaw,
-	onBeforeMount,
-	onUnmounted,
-	ref,
-	shallowRef,
-	watch,
-	type ComputedRef,
-	type Ref,
-} from 'vue'
 
 import type { SkinPreviewTuple } from './types'
 

@@ -1,6 +1,6 @@
 import { useRenderLoop } from '@tresjs/core'
 import * as THREE from 'three'
-import { computed, ref, watch, type ComputedRef, type Ref } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
 
 import type { SkinPreviewAnimationConfig } from './types'
 

@@ -1,4 +1,4 @@
-import { ref, type ComputedRef, type Ref } from 'vue'
+import { type ComputedRef, type Ref, ref } from 'vue'
 
 type MaybeReadonlyRef<T> = Ref<T> | ComputedRef<T>
 
