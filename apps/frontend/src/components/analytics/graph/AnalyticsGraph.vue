@@ -106,7 +106,7 @@
 								ref="eventsMenuPanel"
 								role="dialog"
 								aria-label="Event display settings"
-								class="flex min-w-48 flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 text-sm shadow-2xl"
+								class="mt-1 flex min-w-48 flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 text-sm shadow-2xl"
 							>
 								<div v-if="hasChartEvents" class="inline-flex items-center justify-between gap-4">
 									<label
@@ -486,6 +486,7 @@ const TOP_GRAPH_DATASET_LIMIT = 8
 const GRAPH_RENDER_DATASET_LIMIT = 250
 const PREVIOUS_PERIOD_DATASET_ID_PREFIX = 'previous-period:'
 const PREVIOUS_PERIOD_BORDER_DASH = [6, 4]
+const PROJECT_VERSION_UPLOAD_DEDUPE_WINDOW_MS = 24 * 60 * 60 * 1000
 const PROJECT_EVENT_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'short',
 	day: 'numeric',
@@ -524,16 +525,16 @@ const selectedProjectEventIdSet = computed(
 	() => new Set(selectedProjects.value.map((project) => project.id)),
 )
 const localProjectChartEvents = computed<AnalyticsChartEvent[]>(() =>
-	projectEvents.value
-		.filter((event) => selectedProjectEventIdSet.value.has(event.project_id))
-		.map((event) => ({
-			title: getProjectEventDisplayTitle(event),
-			starts: event.timestamp,
-			ends: event.timestamp,
-			subtitle: formatProjectEventDate(event.timestamp),
-			markerIcon: 'flag' as const,
-			groupKey: 'project',
-		})),
+	dedupeProjectVersionUploadEvents(
+		projectEvents.value.filter((event) => selectedProjectEventIdSet.value.has(event.project_id)),
+	).map((event) => ({
+		title: getProjectEventDisplayTitle(event),
+		starts: event.timestamp,
+		ends: event.timestamp,
+		subtitle: formatProjectEventDate(event.timestamp),
+		markerIcon: 'flag' as const,
+		groupKey: 'project',
+	})),
 )
 const hasProjectEvents = computed(() => localProjectChartEvents.value.length > 0)
 const hasTimelineEventSettings = computed(() => hasChartEvents.value || hasProjectEvents.value)
@@ -554,7 +555,8 @@ function formatProjectStatusLabel(status: Labrinth.Projects.v2.ProjectStatus) {
 
 function getProjectEventTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
 	if (event.kind === 'version_uploaded') {
-		return event.version_number.trim() || 'Version uploaded'
+		const versionNumber = event.version_number.trim()
+		return versionNumber ? `${versionNumber} released` : 'Version uploaded'
 	}
 
 	const statusFrom = formatProjectStatusLabel(event.status_from)
@@ -570,6 +572,57 @@ function getProjectEventDisplayTitle(event: Labrinth.Analytics.v3.ProjectAnalyti
 
 	const projectName = selectedProjectNameById.value.get(event.project_id)
 	return projectName ? `${projectName}: ${title}` : title
+}
+
+function dedupeProjectVersionUploadEvents(events: Labrinth.Analytics.v3.ProjectAnalyticsEvent[]) {
+	const keptEvents: Labrinth.Analytics.v3.ProjectAnalyticsEvent[] = []
+	const keptVersionUploadEventsByKey = new Map<
+		string,
+		Labrinth.Analytics.v3.ProjectAnalyticsEvent[]
+	>()
+
+	for (const event of events) {
+		const key = getProjectVersionUploadDedupeKey(event)
+		if (!key) {
+			keptEvents.push(event)
+			continue
+		}
+
+		const matchingEvents = keptVersionUploadEventsByKey.get(key) ?? []
+		if (
+			matchingEvents.some((matchingEvent) =>
+				areProjectEventsWithinDedupeWindow(event, matchingEvent),
+			)
+		) {
+			continue
+		}
+
+		keptEvents.push(event)
+		matchingEvents.push(event)
+		keptVersionUploadEventsByKey.set(key, matchingEvents)
+	}
+
+	return keptEvents
+}
+
+function getProjectVersionUploadDedupeKey(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
+	if (event.kind !== 'version_uploaded') return null
+
+	const versionNumber = event.version_number.trim()
+	if (versionNumber.length === 0) return null
+
+	return `${event.project_id}:${versionNumber}`
+}
+
+function areProjectEventsWithinDedupeWindow(
+	left: Labrinth.Analytics.v3.ProjectAnalyticsEvent,
+	right: Labrinth.Analytics.v3.ProjectAnalyticsEvent,
+) {
+	const leftTimestamp = new Date(left.timestamp).getTime()
+	const rightTimestamp = new Date(right.timestamp).getTime()
+	if (!Number.isFinite(leftTimestamp) || !Number.isFinite(rightTimestamp)) return false
+
+	return Math.abs(leftTimestamp - rightTimestamp) <= PROJECT_VERSION_UPLOAD_DEDUPE_WINDOW_MS
 }
 
 function formatProjectEventDate(timestamp: string) {
