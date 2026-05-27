@@ -156,7 +156,7 @@ const props = withDefaults(
 	}>(),
 	{
 		disabled: false,
-		readonly: false,
+		readonly: true,
 		enableTime: false,
 		mode: 'single',
 		showMonths: 1,
