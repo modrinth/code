@@ -121,6 +121,9 @@ export function useSkinPreviewScene({
 }) {
 	const scene = shallowRef<THREE.Object3D | null>(null)
 	const lastCapeSrc = ref<string | undefined>(undefined)
+	const loadedModelSrc = ref<string | undefined>(undefined)
+	const loadedTextureSrc = ref<string | undefined>(undefined)
+	const loadedCapeSrc = ref<string | undefined>(undefined)
 	const texture = shallowRef<THREE.Texture | null>(null)
 	const capeTexture = shallowRef<THREE.Texture | null>(null)
 	const transparentTexture = createTransparentTexture()
@@ -129,7 +132,32 @@ export function useSkinPreviewScene({
 	const isModelLoaded = ref(false)
 	const isTextureLoaded = ref(false)
 	let modelLoadVersion = 0
+	let textureLoadVersion = 0
+	let capeLoadVersion = 0
 	let isUnmounted = false
+
+	function applyTextureToLoadedModel() {
+		if (
+			!scene.value ||
+			!texture.value ||
+			loadedModelSrc.value !== selectedModelSrc.value ||
+			loadedTextureSrc.value !== textureSrc.value
+		) {
+			return
+		}
+
+		applyTexture(scene.value, texture.value)
+	}
+
+	function applyCapeTextureToLoadedModel() {
+		if (!scene.value || loadedModelSrc.value !== selectedModelSrc.value) return
+
+		applyCapeTexture(
+			scene.value,
+			loadedCapeSrc.value === capeSrc.value ? capeTexture.value : null,
+			transparentTexture,
+		)
+	}
 
 	async function loadModel(src: string) {
 		const loadVersion = ++modelLoadVersion
@@ -147,12 +175,11 @@ export function useSkinPreviewScene({
 			cleanupAnimationState(previousScene)
 			disposeSceneMaterials(previousScene)
 			scene.value = clonedScene
+			loadedModelSrc.value = src
 
-			if (texture.value) {
-				applyTexture(clonedScene, texture.value)
-			}
+			applyTextureToLoadedModel()
 
-			applyCapeTexture(clonedScene, capeTexture.value, transparentTexture)
+			applyCapeTextureToLoadedModel()
 
 			if (animations && animations.length > 0) {
 				initializeAnimations(clonedScene, animations)
@@ -191,17 +218,18 @@ export function useSkinPreviewScene({
 	async function loadAndApplyCapeTexture(src: string | undefined) {
 		if (src === lastCapeSrc.value) return
 
+		const loadVersion = ++capeLoadVersion
 		lastCapeSrc.value = src
 
+		let loadedCapeTexture: THREE.Texture | null = null
 		if (src) {
-			capeTexture.value = await loadAndApplyTexture(src)
-		} else {
-			capeTexture.value = null
+			loadedCapeTexture = await loadAndApplyTexture(src)
 		}
+		if (isUnmounted || loadVersion !== capeLoadVersion) return
 
-		if (scene.value) {
-			applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
-		}
+		capeTexture.value = loadedCapeTexture
+		loadedCapeSrc.value = src
+		applyCapeTextureToLoadedModel()
 	}
 
 	function updateModelInfo() {
@@ -230,11 +258,15 @@ export function useSkinPreviewScene({
 	watch(
 		() => textureSrc.value,
 		async (newSrc) => {
+			const loadVersion = ++textureLoadVersion
+
 			isTextureLoaded.value = false
-			texture.value = await loadAndApplyTexture(newSrc)
-			if (scene.value && texture.value) {
-				applyTexture(scene.value, texture.value)
-			}
+			const loadedTexture = await loadAndApplyTexture(newSrc)
+			if (isUnmounted || loadVersion !== textureLoadVersion) return
+
+			texture.value = loadedTexture
+			loadedTextureSrc.value = newSrc
+			applyTextureToLoadedModel()
 			isTextureLoaded.value = true
 		},
 	)
@@ -249,6 +281,7 @@ export function useSkinPreviewScene({
 		try {
 			isTextureLoaded.value = false
 			texture.value = await loadAndApplyTexture(textureSrc.value)
+			loadedTextureSrc.value = textureSrc.value
 			isTextureLoaded.value = true
 
 			await loadModel(selectedModelSrc.value)
@@ -264,6 +297,8 @@ export function useSkinPreviewScene({
 	onUnmounted(() => {
 		isUnmounted = true
 		modelLoadVersion++
+		textureLoadVersion++
+		capeLoadVersion++
 
 		cleanupAnimationState(scene.value)
 		disposeSceneMaterials(scene.value)

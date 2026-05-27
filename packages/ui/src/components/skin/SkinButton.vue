@@ -11,11 +11,13 @@ const props = withDefaults(
 		forwardImageSrc?: string
 		backwardImageSrc?: string
 		selected: boolean
+		active?: boolean
 		tooltip?: string
 	}>(),
 	{
 		forwardImageSrc: undefined,
 		backwardImageSrc: undefined,
+		active: false,
 		tooltip: undefined,
 	},
 )
@@ -33,7 +35,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 <template>
 	<div
 		v-tooltip="tooltip ?? undefined"
-		class="skin-button group relative flex items-end justify-center overflow-clip border border-solid transition-[background,border-color,box-shadow] duration-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand"
+		class="skin-button group relative flex items-end justify-center overflow-hidden border border-solid transition-[border-color,box-shadow] duration-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand"
 		:class="[
 			selected ? 'skin-button--selected' : '',
 			{ 'skin-button--with-actions': $slots['overlay-buttons'] },
@@ -46,6 +48,11 @@ function onImageLoad(type: 'forward' | 'backward') {
 			@click="emit('select')"
 		></button>
 
+		<span
+			v-if="active && !selected"
+			class="pointer-events-none absolute right-3 top-3 z-20 size-3 rounded-full border-2 border-solid border-surface-3 bg-green shadow-[0_0_0_3px_var(--color-green-highlight),0_0_14px_var(--color-green)]"
+		></span>
+
 		<div
 			v-if="!(imagesLoaded.forward && imagesLoaded.backward)"
 			class="skeleton-loader h-full w-full"
@@ -55,21 +62,22 @@ function onImageLoad(type: 'forward' | 'backward') {
 
 		<span
 			v-show="imagesLoaded.forward && imagesLoaded.backward"
+			:key="`${selected}-${active}`"
 			:class="[
-				'skin-button__image-parent pointer-events-none relative z-0 mb-[1.5px] grid [transform-style:preserve-3d] place-items-stretch transition-transform duration-500 group-hover:[transform:rotateY(180deg)] with-shadow',
+				'skin-button__image-parent pointer-events-none relative z-0 mb-[1.5px] grid place-items-stretch with-shadow',
 			]"
 		>
 			<img
 				alt=""
 				:src="forwardImageSrc"
-				class="skin-button__image-facing col-start-1 row-start-1 h-full w-full object-contain [backface-visibility:hidden]"
+				class="skin-button__image-facing col-start-1 row-start-1 h-full w-full object-contain"
 				height="504"
 				@load="onImageLoad('forward')"
 			/>
 			<img
 				alt=""
 				:src="backwardImageSrc"
-				class="skin-button__image-away col-start-1 row-start-1 h-full w-full object-contain [backface-visibility:hidden] [transform:rotateY(180deg)]"
+				class="skin-button__image-away col-start-1 row-start-1 h-full w-full object-contain"
 				height="504"
 				@load="onImageLoad('backward')"
 			/>
@@ -114,6 +122,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 	border-color: var(--surface-4);
 	border-radius: 20px;
 	background: var(--surface-3);
+	isolation: isolate;
 	box-shadow:
 		0 1px 1px rgba(0, 0, 0, 0.25),
 		0 1px 2px rgba(0, 0, 0, 0.15);
@@ -148,7 +157,28 @@ function onImageLoad(type: 'forward' | 'backward') {
 
 .skin-button__image-parent {
 	width: 100%;
-	height: 80%;
+	height: 95%;
+	transform: rotateY(0deg) translateZ(0);
+	transform-style: preserve-3d;
+	transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+	will-change: transform;
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+
+.skin-button:hover .skin-button__image-parent {
+	transform: rotateY(180deg) translateZ(0);
+}
+
+.skin-button__image-facing,
+.skin-button__image-away {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	transform: translateZ(0.1px);
+}
+
+.skin-button__image-away {
+	transform: rotateY(180deg) translateZ(0.1px);
 }
 
 .with-shadow img {

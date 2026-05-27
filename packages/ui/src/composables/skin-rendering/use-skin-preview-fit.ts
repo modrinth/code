@@ -1,5 +1,14 @@
 import * as THREE from 'three'
-import { computed, type ComputedRef, onMounted, onUnmounted, type Ref, ref, watch } from 'vue'
+import {
+	computed,
+	type ComputedRef,
+	type CSSProperties,
+	onMounted,
+	onUnmounted,
+	type Ref,
+	ref,
+	watch,
+} from 'vue'
 
 import type {
 	SkinPreviewFitLock,
@@ -24,6 +33,10 @@ const FRAMING_PRESETS = {
 	{ fov: number; zoom: number; padding: SkinPreviewFitPadding }
 >
 
+const PREVIEW_CONTROLS_FOOT_OFFSET = 64
+const SUBTITLE_CONTROLS_OFFSET = 48
+const NAMETAG_HEAD_OFFSET = 16
+
 function cloneModelTuple(tuple: SkinPreviewTuple): SkinPreviewTuple {
 	return [tuple[0], tuple[1], tuple[2]]
 }
@@ -39,9 +52,11 @@ export function useSkinPreviewFit({
 	fitPadding,
 	scale,
 	fov,
+	modelRotation,
 	nametag,
 	hasSubtitle,
 	hasNametagBadge,
+	subtitleWrapped,
 	modelCenter,
 	modelSize,
 	isModelLoaded,
@@ -54,9 +69,11 @@ export function useSkinPreviewFit({
 	fitPadding: MaybeReadonlyRef<Partial<SkinPreviewFitPadding> | undefined>
 	scale: MaybeReadonlyRef<number | undefined>
 	fov: MaybeReadonlyRef<number | undefined>
+	modelRotation: MaybeReadonlyRef<number>
 	nametag: MaybeReadonlyRef<string | undefined>
 	hasSubtitle: MaybeReadonlyRef<boolean>
 	hasNametagBadge: MaybeReadonlyRef<boolean>
+	subtitleWrapped: MaybeReadonlyRef<boolean>
 	modelCenter: MaybeReadonlyRef<SkinPreviewTuple>
 	modelSize: MaybeReadonlyRef<SkinPreviewTuple>
 	isModelLoaded: MaybeReadonlyRef<boolean>
@@ -70,15 +87,9 @@ export function useSkinPreviewFit({
 		return scale.value === undefined && fov.value === undefined
 	})
 	const currentFraming = computed<SkinPreviewFraming>(() => framing.value ?? 'page')
-	const lockFitEnabled = computed(() => lockFit.value ?? true)
+	const lockFitEnabled = computed(() => currentFraming.value === 'page' || (lockFit.value ?? true))
 	const legacyScale = computed(() => scale.value ?? 1)
 	const legacyFov = computed(() => fov.value ?? 40)
-	const previewControlsPositionClass = computed(() =>
-		currentFraming.value === 'modal' ? 'bottom-[calc(6%)]' : 'bottom-[calc(15%+64px)]',
-	)
-	const subtitlePositionClass = computed(() =>
-		currentFraming.value === 'modal' ? 'bottom-[6%]' : 'bottom-[calc(15%)]',
-	)
 
 	const hasUsableFitSize = computed(
 		() => containerSize.value.width > 1 && containerSize.value.height > 1,
@@ -99,6 +110,9 @@ export function useSkinPreviewFit({
 	const fitModelSize = computed(() =>
 		lockFitEnabled.value ? (fitLock.value?.modelSize ?? modelSize.value) : modelSize.value,
 	)
+	const fitModelRotation = computed(() =>
+		lockFitEnabled.value ? (fitLock.value?.rotation ?? modelRotation.value) : modelRotation.value,
+	)
 
 	const resolvedFitPadding = computed<SkinPreviewFitPadding>(() => {
 		const preset = FRAMING_PRESETS[currentFraming.value].padding
@@ -111,6 +125,11 @@ export function useSkinPreviewFit({
 			...(fitPadding.value ?? {}),
 		}
 	})
+	const fitResolvedPadding = computed(() =>
+		lockFitEnabled.value
+			? (fitLock.value?.padding ?? resolvedFitPadding.value)
+			: resolvedFitPadding.value,
+	)
 
 	const modelOffset = computed<SkinPreviewTuple>(() => {
 		if (!fitEnabled.value) return [0, 0, 0]
@@ -136,7 +155,7 @@ export function useSkinPreviewFit({
 		const height = Math.max(fitContainerSize.value.height, 1)
 		const aspect = width / height
 		const preset = FRAMING_PRESETS[currentFraming.value]
-		const padding = resolvedFitPadding.value
+		const padding = fitResolvedPadding.value
 
 		const usableWidth = Math.max(width * (1 - padding.left - padding.right), 1)
 		const usableHeight = Math.max(height * (1 - padding.top - padding.bottom), 1)
@@ -179,19 +198,74 @@ export function useSkinPreviewFit({
 		}
 	})
 
-	const nametagTop = computed(() => {
-		if (!fitEnabled.value) return '18%'
+	const modelFeetTop = computed(() => {
+		if (!fitEnabled.value) return null
 
+		const height = Math.max(containerSize.value.height, 1)
 		const [, sizeY] = fitModelSize.value
 		const { fov: resolvedFov, position, target } = cameraConfig.value
 		const distance = Math.max(Math.abs(position[2] - target[2]), 0.001)
 		const verticalFov = THREE.MathUtils.degToRad(resolvedFov)
+		const modelFeetY = -sizeY / 2
+		const projectedY =
+			(modelFeetY - target[1]) / distance / Math.max(Math.tan(verticalFov / 2), 0.001)
+		const topPercent = THREE.MathUtils.clamp(((1 - projectedY) / 2) * 100, 0, 100)
+
+		return (topPercent / 100) * height
+	})
+
+	const previewControlsTop = computed(() =>
+		modelFeetTop.value === null ? null : modelFeetTop.value + PREVIEW_CONTROLS_FOOT_OFFSET,
+	)
+
+	const previewControlsPositionStyle = computed<CSSProperties>(() => {
+		if (!fitEnabled.value || currentFraming.value !== 'page' || previewControlsTop.value === null) {
+			return {
+				bottom: currentFraming.value === 'modal' ? '6%' : 'calc(15% + 64px)',
+			}
+		}
+
+		return {
+			top: `${previewControlsTop.value}px`,
+		}
+	})
+
+	const subtitlePositionStyle = computed<CSSProperties>(() => {
+		if (!fitEnabled.value || currentFraming.value !== 'page' || previewControlsTop.value === null) {
+			return {
+				bottom:
+					currentFraming.value === 'modal'
+						? '6%'
+						: subtitleWrapped.value
+							? 'calc(15% - 32px)'
+							: '15%',
+			}
+		}
+
+		return {
+			top: `${previewControlsTop.value + SUBTITLE_CONTROLS_OFFSET}px`,
+		}
+	})
+
+	const nametagTop = computed(() => {
+		if (!fitEnabled.value) return '18%'
+
+		const height = Math.max(containerSize.value.height, 1)
+		const [sizeX, sizeY, sizeZ] = fitModelSize.value
+		const { fov: resolvedFov, position, target } = cameraConfig.value
+		const verticalFov = THREE.MathUtils.degToRad(resolvedFov)
 		const modelTopY = sizeY / 2
+		const halfX = sizeX / 2
+		const halfZ = sizeZ / 2
+		const sinRotation = Math.sin(fitModelRotation.value)
+		const cosRotation = Math.cos(fitModelRotation.value)
+		const modelTopZ = -Math.abs(halfX * sinRotation) - Math.abs(halfZ * cosRotation)
+		const distance = Math.max(Math.abs(position[2] - target[2]) + modelTopZ, 0.001)
 		const projectedY =
 			(modelTopY - target[1]) / distance / Math.max(Math.tan(verticalFov / 2), 0.001)
-		const topPercent = THREE.MathUtils.clamp(((1 - projectedY) / 2) * 100, 8, 40)
+		const topPercent = ((1 - projectedY) / 2) * 100
 
-		return `${topPercent - 2}%`
+		return `${(topPercent / 100) * height - NAMETAG_HEAD_OFFSET}px`
 	})
 
 	const spotlightY = computed(() => {
@@ -228,7 +302,16 @@ export function useSkinPreviewFit({
 			containerSize: { width, height },
 			modelCenter: cloneModelTuple(modelCenter.value),
 			modelSize: cloneModelTuple(modelSize.value),
+			padding: { ...resolvedFitPadding.value },
+			rotation: modelRotation.value,
 		}
+	}
+
+	function resetFitLockForLayoutChange() {
+		if (!fitEnabled.value || !lockFitEnabled.value) return
+
+		fitLock.value = null
+		lockFitState()
 	}
 
 	onMounted(() => {
@@ -237,13 +320,18 @@ export function useSkinPreviewFit({
 
 		resizeObserver = new ResizeObserver(([entry]) => {
 			const { width, height } = entry.contentRect
-			containerSize.value = {
+			const nextContainerSize = {
 				width: Math.max(width, 1),
 				height: Math.max(height, 1),
 			}
+			const didContainerSizeChange =
+				nextContainerSize.width !== containerSize.value.width ||
+				nextContainerSize.height !== containerSize.value.height
 
-			if (lockFitEnabled.value) {
-				lockFitState()
+			containerSize.value = nextContainerSize
+
+			if (didContainerSizeChange) {
+				resetFitLockForLayoutChange()
 			}
 		})
 
@@ -253,17 +341,12 @@ export function useSkinPreviewFit({
 	watch(
 		() => isModelLoaded.value,
 		(loaded) => {
-			if (!loaded) {
-				fitLock.value = null
-				return
-			}
-
-			lockFitState()
+			if (loaded) lockFitState()
 		},
 	)
 
 	watch(
-		() => lockFit.value,
+		() => lockFitEnabled.value,
 		() => {
 			fitLock.value = null
 			lockFitState()
@@ -289,9 +372,9 @@ export function useSkinPreviewFit({
 		modelGroupScale,
 		modelOffset,
 		nametagTop,
-		previewControlsPositionClass,
+		previewControlsPositionStyle,
 		spotlightPosition,
 		spotlightScale,
-		subtitlePositionClass,
+		subtitlePositionStyle,
 	}
 }

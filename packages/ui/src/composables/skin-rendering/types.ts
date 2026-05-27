@@ -21,6 +21,8 @@ export interface SkinPreviewFitLock {
 	}
 	modelCenter: SkinPreviewTuple
 	modelSize: SkinPreviewTuple
+	padding: SkinPreviewFitPadding
+	rotation: number
 }
 
 export type SkinPreviewTuple = [number, number, number]

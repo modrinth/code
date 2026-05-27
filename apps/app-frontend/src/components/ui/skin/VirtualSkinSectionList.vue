@@ -17,6 +17,7 @@ type SkinSectionKind = 'saved' | 'default'
 type SkinLikeTextButtonExpose = {
 	getRootElement: () => HTMLElement | null | undefined
 }
+type AddSkinButtonRef = SkinLikeTextButtonExpose | SkinLikeTextButtonExpose[]
 
 interface DefaultSkinSection {
 	title: string
@@ -51,6 +52,7 @@ const props = defineProps<{
 	defaultSkinSections: DefaultSkinSection[]
 	getBakedSkinTextures: (skin: Skin) => RenderResult | undefined
 	isSkinSelected: (skin: Skin) => boolean
+	isSkinActive: (skin: Skin) => boolean
 	isAddSkinButtonDragActive: boolean
 }>()
 
@@ -65,7 +67,7 @@ const emit = defineEmits<{
 	'add-skin-drop': [event: DragEvent]
 }>()
 
-const addSkinButton = useTemplateRef<SkinLikeTextButtonExpose>('addSkinButton')
+const addSkinButton = useTemplateRef<AddSkinButtonRef>('addSkinButton')
 const { listContainer, relativeScrollTop, scrollContainer, viewportHeight } = useScrollViewport()
 const openSectionKeys = ref<Set<string>>(new Set())
 const hasSettledInitialLayout = ref(false)
@@ -256,7 +258,11 @@ function getSectionHeightEstimate(section: SkinSection, index: number) {
 }
 
 function getAddSkinButtonElement() {
-	return addSkinButton.value?.getRootElement()
+	const button = Array.isArray(addSkinButton.value)
+		? addSkinButton.value.find((candidate) => candidate.getRootElement())
+		: addSkinButton.value
+
+	return button?.getRootElement()
 }
 
 defineExpose({ getAddSkinButtonElement })
@@ -329,6 +335,7 @@ defineExpose({ getAddSkinButtonElement })
 						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
 						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 						:selected="isSkinSelected(skin)"
+						:active="isSkinActive(skin)"
 						@select="emit('select', skin)"
 					>
 						<template #overlay-buttons>
@@ -366,6 +373,7 @@ defineExpose({ getAddSkinButtonElement })
 						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
 						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 						:selected="isSkinSelected(skin)"
+						:active="isSkinActive(skin)"
 						:tooltip="skin.name"
 						@select="emit('select', skin)"
 					/>

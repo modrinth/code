@@ -5,14 +5,15 @@ use super::MinecraftSkinVariant;
 
 pub mod mojang_api;
 
-/// Represents a saved custom skin for a Minecraft player.
+/// Represents a saved skin row for a Minecraft player.
 ///
 /// The same player and `texture_key` always point to the same saved skin.
 /// Changing the model variant or cape updates that saved skin instead of
-/// creating a second copy.
+/// creating a second copy. Bundled default skins with a cape are also stored
+/// here so the cape can stay associated with the default skin card.
 #[derive(Debug, Clone)]
 pub struct CustomMinecraftSkin {
-    /// The key for the texture skin, which is akin to a hash that identifies it.
+    /// The key for the skin texture, which is akin to a hash that identifies it.
     pub texture_key: String,
     /// The variant of the skin model.
     pub variant: MinecraftSkinVariant,

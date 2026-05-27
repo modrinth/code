@@ -7,21 +7,21 @@
 	>
 		<div
 			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
-			:class="previewControlsPositionClass"
+			:style="previewControlsPositionStyle"
 		>
 			<span
 				class="flex items-center justify-center gap-1.5 text-base font-medium leading-6 text-primary"
 			>
-				<ArrowLeftRightIcon class="size-5 shrink-0" />
+				<UnfoldHorizontalIcon class="size-5 shrink-0" />
 				Drag to rotate
 			</span>
 		</div>
 		<div
 			v-if="$slots.subtitle"
 			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
-			:class="subtitlePositionClass"
+			:style="subtitlePositionStyle"
 		>
-			<div class="pointer-events-auto" @click="ignoreControlClick">
+			<div ref="subtitleElement" class="pointer-events-auto" @click="ignoreControlClick">
 				<slot name="subtitle" />
 			</div>
 		</div>
@@ -94,10 +94,20 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeftRightIcon, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { ClassicPlayerModel, SlimPlayerModel, UnfoldHorizontalIcon } from '@modrinth/assets'
 import { TresCanvas } from '@tresjs/core'
 import * as THREE from 'three'
-import { computed, toRef, useSlots, useTemplateRef } from 'vue'
+import {
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	toRef,
+	useSlots,
+	useTemplateRef,
+	watch,
+} from 'vue'
 
 import type {
 	SkinPreviewAnimationConfig,
@@ -153,13 +163,68 @@ const props = withDefaults(
 )
 
 const skinPreviewContainer = useTemplateRef<HTMLElement>('skinPreviewContainer')
+const subtitleElement = useTemplateRef<HTMLElement>('subtitleElement')
 const slots = useSlots()
 const nametagText = computed(() => props.nametag)
 const hasSubtitle = computed(() => Boolean(slots.subtitle))
 const hasNametagBadge = computed(() => Boolean(slots['nametag-badge']))
+const isSubtitleWrapped = ref(false)
 const selectedModelSrc = computed(() =>
 	props.variant === 'SLIM' ? SlimPlayerModel : ClassicPlayerModel,
 )
+
+let subtitleResizeObserver: ResizeObserver | undefined
+
+function getSubtitleLayoutRoot(element: HTMLElement) {
+	const elementChildren = Array.from(element.children).filter(
+		(child): child is HTMLElement => child instanceof HTMLElement,
+	)
+
+	return elementChildren.length === 1 ? elementChildren[0] : element
+}
+
+function updateSubtitleWrapped() {
+	const element = subtitleElement.value
+	if (!element) {
+		isSubtitleWrapped.value = false
+		return
+	}
+
+	const layoutRoot = getSubtitleLayoutRoot(element)
+	const children = Array.from(layoutRoot.children).filter(
+		(child): child is HTMLElement => child instanceof HTMLElement,
+	)
+
+	if (children.length < 2) {
+		isSubtitleWrapped.value = false
+		return
+	}
+
+	const firstTop = children[0].getBoundingClientRect().top
+	isSubtitleWrapped.value = children.some(
+		(child) => Math.abs(child.getBoundingClientRect().top - firstTop) > 1,
+	)
+}
+
+function observeSubtitleElement() {
+	subtitleResizeObserver?.disconnect()
+
+	const element = subtitleElement.value
+	if (!element) {
+		isSubtitleWrapped.value = false
+		return
+	}
+
+	const layoutRoot = getSubtitleLayoutRoot(element)
+
+	subtitleResizeObserver = new ResizeObserver(updateSubtitleWrapped)
+	subtitleResizeObserver.observe(element)
+	if (layoutRoot !== element) {
+		subtitleResizeObserver.observe(layoutRoot)
+	}
+
+	void nextTick(updateSubtitleWrapped)
+}
 
 const {
 	cleanupAnimationState,
@@ -174,6 +239,20 @@ const {
 	playClickInteraction,
 	stopAnimations,
 } = useSkinPreviewAnimation(toRef(props, 'animationConfig'))
+
+const {
+	ignoreControlClick,
+	modelRotation,
+	onCanvasClick,
+	onPointerDown,
+	onPointerMove,
+	onPointerUp,
+} = useSkinPreviewControls({
+	initialRotation: toRef(props, 'initialRotation'),
+	onClickWithoutDrag: () => {
+		playClickInteraction()
+	},
+})
 
 const { isModelLoaded, isTextureLoaded, modelCenter, modelSize, scene } = useSkinPreviewScene({
 	selectedModelSrc,
@@ -191,10 +270,10 @@ const {
 	modelGroupScale,
 	modelOffset,
 	nametagTop,
-	previewControlsPositionClass,
+	previewControlsPositionStyle,
 	spotlightPosition,
 	spotlightScale,
-	subtitlePositionClass,
+	subtitlePositionStyle,
 } = useSkinPreviewFit({
 	containerElement: computed(() => skinPreviewContainer.value),
 	fit: toRef(props, 'fit'),
@@ -204,9 +283,11 @@ const {
 	fitPadding: toRef(props, 'fitPadding'),
 	scale: toRef(props, 'scale'),
 	fov: toRef(props, 'fov'),
+	modelRotation,
 	nametag: toRef(props, 'nametag'),
 	hasSubtitle,
 	hasNametagBadge,
+	subtitleWrapped: isSubtitleWrapped,
 	modelCenter,
 	modelSize,
 	isModelLoaded,
@@ -216,6 +297,14 @@ const rendererDpr: [number, number] = [1, 1.5]
 const radialSpotlightShader = createRadialSpotlightShader()
 const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value && hasResolvedFit.value)
 const { isPreviewVisible, showLoading } = useSkinPreviewLoading(isReady)
+
+onMounted(observeSubtitleElement)
+
+watch(hasSubtitle, () => nextTick(observeSubtitleElement), { flush: 'post' })
+
+onUnmounted(() => {
+	subtitleResizeObserver?.disconnect()
+})
 
 const { fontSize: nametagFontSize } = useDynamicFontSize({
 	containerElement: skinPreviewContainer,
@@ -232,20 +321,6 @@ const nametagStyle = computed(() => ({
 	top: nametagTop.value,
 	transform: fitEnabled.value ? 'translate(-50%, calc(-100% - 0.75rem))' : 'translateX(-50%)',
 }))
-
-const {
-	ignoreControlClick,
-	modelRotation,
-	onCanvasClick,
-	onPointerDown,
-	onPointerMove,
-	onPointerUp,
-} = useSkinPreviewControls({
-	initialRotation: toRef(props, 'initialRotation'),
-	onClickWithoutDrag: () => {
-		playClickInteraction()
-	},
-})
 
 const animatedModelGroupRotation = computed<SkinPreviewTuple>(() => [
 	0,

@@ -41,6 +41,7 @@ const meta = {
 		forwardImageSrc: frontImage,
 		backwardImageSrc: backImage,
 		selected: false,
+		active: false,
 		tooltip: 'Steve',
 	},
 	render: (args) => ({
@@ -64,6 +65,12 @@ export const Default: Story = {}
 export const Selected: Story = {
 	args: {
 		selected: true,
+	},
+}
+
+export const ActiveUnselected: Story = {
+	args: {
+		active: true,
 	},
 }
 

@@ -178,6 +178,19 @@ function isSkinSelected(skin: Skin) {
 	return skinsMatch(selectedSkin.value, skin)
 }
 
+function isSkinActive(skin: Skin) {
+	return hasPendingSkinChange.value && skinsMatch(originalSelectedSkin.value, skin)
+}
+
+function getErrorMessage(error: unknown) {
+	return error instanceof Error ? error.message : String(error)
+}
+
+function isMinecraftSkinRateLimitError(error: unknown) {
+	const message = getErrorMessage(error)
+	return message.includes('429 Too Many Requests') || message.includes('client error (429')
+}
+
 function changeSkin(newSkin: Skin) {
 	selectedSkin.value = newSkin
 }
@@ -201,7 +214,7 @@ async function applySelectedSkin() {
 		await loadCapes()
 		await loadSkins()
 	} catch (error) {
-		if ((error as { message?: string })?.message?.includes('429 Too Many Requests')) {
+		if (isMinecraftSkinRateLimitError(error)) {
 			notifications.addNotification({
 				type: 'error',
 				title: 'Slow down!',
@@ -467,7 +480,7 @@ await loadSkins()
 
 	<div v-if="currentUser" class="skin-layout box-border min-h-full p-4">
 		<div class="sticky top-6 self-start p-2 pt-0">
-			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">Skins</h1>
+			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">Skin selector</h1>
 			<div class="ml-5 flex h-[80vh] items-center justify-center max-[700px]:h-[50vh]">
 				<SkinPreviewRenderer
 					:cape-src="capeTexture"
@@ -475,7 +488,6 @@ await loadSkins()
 					:variant="skinVariant"
 					:nametag="skinNametag"
 					:initial-rotation="Math.PI / 8"
-					:lock-fit="false"
 				>
 					<template v-if="hasPendingSkinChange" #nametag-badge>
 						<div
@@ -510,7 +522,7 @@ await loadSkins()
 						</div>
 						<button
 							v-else
-							class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 text-contrast shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
+							class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
 							:disabled="!selectedSkin"
 							@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
 						>
@@ -529,6 +541,7 @@ await loadSkins()
 				:default-skin-sections="defaultSkinSections"
 				:get-baked-skin-textures="getBakedSkinTextures"
 				:is-skin-selected="isSkinSelected"
+				:is-skin-active="isSkinActive"
 				:is-add-skin-button-drag-active="isAddSkinButtonDragActive"
 				@select="changeSkin"
 				@edit="(skin, event) => editSkinModal?.show(event, skin)"

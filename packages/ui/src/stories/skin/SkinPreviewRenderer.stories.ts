@@ -40,7 +40,7 @@ const meta = {
 						</div>
 					</template>
 					<template #subtitle>
-						<div class="flex items-center gap-2">
+						<div class="flex max-w-40 flex-wrap items-center justify-center gap-2 px-2">
 							<button class="flex h-10 items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 text-contrast shadow-md">
 								<RotateCounterClockwiseIcon class="size-5" /> Reset
 							</button>
@@ -136,6 +136,31 @@ export const ResponsiveFit: Story = {
 	args: {
 		lockFit: false,
 	},
+}
+
+export const WrappedSubtitle: Story = {
+	render: (args) => ({
+		components: { CheckIcon, RotateCounterClockwiseIcon, SkinPreviewRenderer },
+		setup() {
+			return { args }
+		},
+		template: /* html */ `
+			<div class="h-[42rem] w-[15rem]">
+				<SkinPreviewRenderer v-bind="args" nametag="Steve">
+					<template #subtitle>
+						<div class="flex max-w-[calc(100vw-2rem)] flex-wrap items-center justify-center gap-2 px-2">
+							<button class="flex h-10 items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 text-contrast shadow-md">
+								<RotateCounterClockwiseIcon class="size-5" /> Reset
+							</button>
+							<button class="flex h-10 items-center justify-center gap-2 rounded-[14px] border-0 bg-brand px-4 py-2.5 text-base font-semibold leading-5 text-[rgba(0,0,0,0.9)] shadow-md">
+								<CheckIcon class="size-5" /> Apply
+							</button>
+						</div>
+					</template>
+				</SkinPreviewRenderer>
+			</div>
+		`,
+	}),
 }
 
 export const LayerSeparation: Story = {

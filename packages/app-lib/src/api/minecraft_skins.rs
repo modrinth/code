@@ -7,23 +7,33 @@
 //!    If skins and capes load at the same time, they share the recent profile
 //!    instead of sending the same request twice.
 //! 3. The skin list is built from three places:
-//!    - saved custom skins in the local app database
+//!    - saved skin rows in the local app database
 //!    - bundled Minecraft default skins
-//!    - the active Mojang skin, if it is not already known locally
-//! 4. Before changing a skin, the current Mojang-only skin is saved locally so
-//!    switching to a default skin does not lose it.
-//! 5. After a Mojang change, the returned profile is saved in memory when
+//!    - the active Mojang skin, if its texture is not represented by a saved
+//!      skin or matching bundled default
+//! 4. While building the list, any saved skin with Mojang's active texture is
+//!    updated to Mojang's current model variant and cape, then returned as the
+//!    equipped skin.
+//! 5. Before changing a skin, the current non-default Mojang skin is preserved
+//!    locally so switching away from an external skin does not lose it.
+//! 6. After a Mojang change, the returned profile is saved in memory when
 //!    possible. If that response cannot be read, or a later step fails, the
 //!    backend asks Mojang for the profile again.
 //!
 //! ## Ownership
 //!
 //! Mojang decides which skin and cape are currently equipped. The local database
-//! stores saved custom skins. A saved skin is the same saved skin when its
+//! stores saved skin rows. A saved skin is the same saved skin when its
 //! `texture_key` matches; changing its model variant or cape updates that saved
 //! skin instead of creating another row.
+//! When a refreshed Mojang profile reports the same texture as a saved skin but
+//! a different cape or model variant, the saved skin is updated to match Mojang
+//! and returned as the equipped skin.
 //! A bundled default skin with no cape is redundant, so it is removed from the
-//! saved-skin database and represented by the default skin list instead.
+//! saved-skin database and represented by the default skin list instead. A
+//! bundled default skin with a cape is stored so the cape stays associated with
+//! that default card, but it is still returned as a default skin rather than a
+//! saved custom skin.
 //!
 //! `cape_id = Some(_)` means a skin should apply that specific cape.
 //! `cape_id = None` means the skin should have no cape.
@@ -31,9 +41,10 @@
 //! ## Consistency
 //!
 //! A Mojang request and a SQLite write cannot be one all-or-nothing operation.
-//! The backend handles this by saving skins that might be lost before changing
-//! Mojang, saving uploaded skins with the texture key Mojang returns, and asking
-//! Mojang for the latest profile again whenever the result is unclear.
+//! The backend handles this by reconciling refreshed Mojang profile data with
+//! saved rows, saving skins that might be lost before changing Mojang, saving
+//! uploaded skins with the texture key Mojang returns, and asking Mojang for the
+//! latest profile again whenever the result is unclear.
 
 use std::sync::Arc;
 
@@ -151,8 +162,11 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
 }
 
 /// Gets the skins for the selected Minecraft profile.
-/// Returns saved custom skins, bundled default skins, and the active Mojang skin
-/// if it is not already represented by texture key, model variant, and cape.
+/// Returns saved custom skins, bundled default skins, and the active Mojang skin if its texture
+/// is not represented by a saved skin or matching bundled default.
+///
+/// Saved skins are identified by texture key. If Mojang reports that a saved skin is active with
+/// a different model variant or cape, the saved row is updated and returned as equipped.
 /// Exactly one returned skin is marked as equipped.
 #[tracing::instrument]
 pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
@@ -175,37 +189,73 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     let current_skin_texture_key = current_skin.texture_key();
     let mut found_equipped_skin = false;
     let mut available_skins = Vec::new();
+    let mut saved_default_skins = Vec::new();
 
-    for custom_skin in CustomMinecraftSkin::get_all(profile.id, &state.pool)
+    for mut custom_skin in CustomMinecraftSkin::get_all(profile.id, &state.pool)
         .await?
         .collect::<Vec<_>>()
         .await
     {
-        let is_equipped = !found_equipped_skin
-            && custom_skin.texture_key == *current_skin_texture_key
-            && custom_skin.variant == current_skin.variant
-            && custom_skin.cape_id == current_cape_id;
+        let is_saved_default_skin =
+            is_bundled_skin(&custom_skin.texture_key, custom_skin.variant);
+        let current_skin_sync = sync_saved_skin_with_current_profile(
+            &mut custom_skin,
+            &current_skin_texture_key,
+            current_skin.variant,
+            current_cape_id,
+        );
+
+        let synced_texture_blob = if current_skin_sync.settings_changed {
+            let texture_blob = custom_skin.texture_blob(&state.pool).await?;
+
+            if is_saved_default_skin && custom_skin.cape_id.is_none() {
+                custom_skin.remove(profile.id, &state.pool).await?;
+            } else {
+                CustomMinecraftSkin::add(
+                    profile.id,
+                    &custom_skin.texture_key,
+                    &texture_blob,
+                    custom_skin.variant,
+                    custom_skin.cape_id,
+                    &state.pool,
+                )
+                .await?;
+            }
+
+            Some(texture_blob)
+        } else {
+            None
+        };
+
+        if is_saved_default_skin {
+            if custom_skin.cape_id.is_some() {
+                saved_default_skins.push(custom_skin);
+            }
+            continue;
+        }
+
+        let is_equipped =
+            !found_equipped_skin && current_skin_sync.is_current_skin;
 
         found_equipped_skin |= is_equipped;
+
+        let texture_blob = match synced_texture_blob {
+            Some(texture_blob) => texture_blob,
+            None => custom_skin.texture_blob(&state.pool).await?,
+        };
 
         available_skins.push(Skin {
             name: None,
             section: None,
-            variant: if is_equipped {
-                current_skin.variant
-            } else {
-                custom_skin.variant
-            },
+            variant: custom_skin.variant,
             cape_id: custom_skin.cape_id,
-            texture: png_util::blob_to_data_url(
-                custom_skin.texture_blob(&state.pool).await?,
-            )
-            .or_else(|| {
-                png_util::blob_to_data_url(include_bytes!(
-                    "minecraft_skins/assets/default/MissingNo.png"
-                ))
-            })
-            .unwrap(),
+            texture: png_util::blob_to_data_url(texture_blob)
+                .or_else(|| {
+                    png_util::blob_to_data_url(include_bytes!(
+                        "minecraft_skins/assets/default/MissingNo.png"
+                    ))
+                })
+                .unwrap(),
             source: SkinSource::Custom,
             is_equipped,
             texture_key: custom_skin.texture_key.into(),
@@ -216,6 +266,13 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         let is_equipped = !found_equipped_skin
             && default_skin.texture_key == current_skin_texture_key
             && default_skin.variant == current_skin.variant;
+        let saved_cape_id = saved_default_skins
+            .iter()
+            .find(|skin| {
+                skin.texture_key.as_str() == default_skin.texture_key.as_ref()
+                    && skin.variant == default_skin.variant
+            })
+            .and_then(|skin| skin.cape_id);
 
         found_equipped_skin |= is_equipped;
 
@@ -224,7 +281,11 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
             name: default_skin.name.as_ref().cloned(),
             section: default_skin.section.as_ref().cloned(),
             variant: default_skin.variant,
-            cape_id: is_equipped.then_some(current_cape_id).flatten(),
+            cape_id: if is_equipped {
+                current_cape_id
+            } else {
+                saved_cape_id
+            },
             texture: Arc::clone(&default_skin.texture),
             source: SkinSource::Default,
             is_equipped,
@@ -248,7 +309,8 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     Ok(available_skins)
 }
 
-/// Adds a custom skin to the app database and equips it for the current profile.
+/// Adds or updates a skin in the app database and equips it for the current profile.
+/// Bundled default skins are only persisted when they have an associated cape.
 #[tracing::instrument(skip(texture_blob))]
 pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
@@ -337,8 +399,8 @@ pub async fn add_and_equip_custom_skin(
     Ok(())
 }
 
-/// Equips the given skin for the currently selected Minecraft profile. If the skin is already
-/// equipped, it will be re-equipped.
+/// Equips the given skin for the currently selected Minecraft profile, then applies its cape.
+/// If the skin is already equipped, it will be re-equipped.
 ///
 /// This does not check whether a custom skin exists in the app database.
 #[tracing::instrument]
@@ -574,6 +636,39 @@ fn is_bundled_skin(texture_key: &str, variant: MinecraftSkinVariant) -> bool {
         default_skin.texture_key.as_ref() == texture_key
             && default_skin.variant == variant
     })
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct SavedSkinSync {
+    is_current_skin: bool,
+    settings_changed: bool,
+}
+
+fn sync_saved_skin_with_current_profile(
+    saved_skin: &mut CustomMinecraftSkin,
+    current_skin_texture_key: &str,
+    current_skin_variant: MinecraftSkinVariant,
+    current_cape_id: Option<Uuid>,
+) -> SavedSkinSync {
+    if saved_skin.texture_key != current_skin_texture_key {
+        return SavedSkinSync {
+            is_current_skin: false,
+            settings_changed: false,
+        };
+    }
+
+    let settings_changed = saved_skin.variant != current_skin_variant
+        || saved_skin.cape_id != current_cape_id;
+
+    if settings_changed {
+        saved_skin.variant = current_skin_variant;
+        saved_skin.cape_id = current_cape_id;
+    }
+
+    SavedSkinSync {
+        is_current_skin: true,
+        settings_changed,
+    }
 }
 
 /// Sets the equipped cape to the skin's associated cape, or no cape.
