@@ -74,6 +74,37 @@ export const RepeatInteract: Story = {
 	}),
 }
 
+export const DamageFlash: Story = {
+	render: (args) => ({
+		components: { SkinPreviewRenderer },
+		setup() {
+			type SkinPreviewRendererExpose = {
+				playClickInteraction: () => void
+			}
+
+			const preview = ref<SkinPreviewRendererExpose | null>(null)
+
+			function triggerDamageFlash() {
+				for (let i = 0; i < 5; i++) {
+					preview.value?.playClickInteraction()
+				}
+			}
+
+			return { args, preview, triggerDamageFlash }
+		},
+		template: /* html */ `
+			<div class="flex items-start gap-6">
+				<div class="h-[80vh] min-h-[32rem] max-h-[48rem] w-[22rem]">
+					<SkinPreviewRenderer ref="preview" v-bind="args" />
+				</div>
+				<button class="rounded-lg border-0 bg-surface-4 px-4 py-2 text-primary" @click="triggerDamageFlash">
+					Trigger damage flash
+				</button>
+			</div>
+		`,
+	}),
+}
+
 export const AnimationControls: Story = {
 	render: (args) => ({
 		components: { SkinPreviewRenderer },

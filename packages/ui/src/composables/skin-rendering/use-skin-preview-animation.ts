@@ -23,6 +23,9 @@ const CLICK_IMPULSE_OFFSET_X = 0.035
 const CLICK_IMPULSE_ROTATION_Z = 0.055
 const CLICK_IMPULSE_SCALE_X = 0.018
 const CLICK_IMPULSE_SCALE_Y = 0.025
+const DAMAGE_FLASH_DURATION_SECONDS = 0.2
+const DAMAGE_FLASH_REPEAT_DELAY_SECONDS = 0.5
+const DAMAGE_FLASH_MAX_INTENSITY = 0.7
 
 type MaybeReadonlyRef<T> = Ref<T> | ComputedRef<T>
 
@@ -43,6 +46,10 @@ export function useSkinPreviewAnimation(
 	const clickImpulseRotationZ = ref(0)
 	const clickImpulseScaleX = ref(1)
 	const clickImpulseScaleY = ref(1)
+	const damageFlashIntensity = ref(0)
+
+	let damageFlashRemainingSeconds = 0
+	let damageFlashCooldownSeconds = 0
 
 	const baseAnimation = computed(() => animationConfig.value?.baseAnimation ?? '')
 	const randomAnimations = computed(() => animationConfig.value?.randomAnimations ?? [])
@@ -243,6 +250,10 @@ export function useSkinPreviewAnimation(
 			CLICK_IMPULSE_MAX_ENERGY,
 			clickImpulseEnergy.value + CLICK_IMPULSE_ENERGY_PER_CLICK,
 		)
+
+		if (clickImpulseEnergy.value >= CLICK_IMPULSE_MAX_ENERGY && damageFlashCooldownSeconds <= 0) {
+			triggerDamageFlash()
+		}
 	}
 
 	function updateClickImpulse(delta: number) {
@@ -268,6 +279,25 @@ export function useSkinPreviewAnimation(
 		clickImpulseRotationZ.value = shake * CLICK_IMPULSE_ROTATION_Z
 		clickImpulseScaleX.value = 1 + squash * CLICK_IMPULSE_SCALE_X
 		clickImpulseScaleY.value = 1 - squash * CLICK_IMPULSE_SCALE_Y
+	}
+
+	function triggerDamageFlash() {
+		damageFlashRemainingSeconds = DAMAGE_FLASH_DURATION_SECONDS
+		damageFlashCooldownSeconds = DAMAGE_FLASH_DURATION_SECONDS + DAMAGE_FLASH_REPEAT_DELAY_SECONDS
+		damageFlashIntensity.value = DAMAGE_FLASH_MAX_INTENSITY
+	}
+
+	function updateDamageFlash(delta: number) {
+		damageFlashCooldownSeconds = Math.max(0, damageFlashCooldownSeconds - delta)
+
+		if (damageFlashRemainingSeconds <= 0) {
+			damageFlashIntensity.value = 0
+			return
+		}
+
+		damageFlashRemainingSeconds = Math.max(0, damageFlashRemainingSeconds - delta)
+		damageFlashIntensity.value =
+			DAMAGE_FLASH_MAX_INTENSITY * (damageFlashRemainingSeconds / DAMAGE_FLASH_DURATION_SECONDS)
 	}
 
 	function stopAnimations() {
@@ -329,6 +359,9 @@ export function useSkinPreviewAnimation(
 		actions.value = {}
 		currentAnimation.value = ''
 		lastRandomAnimation.value = ''
+		damageFlashRemainingSeconds = 0
+		damageFlashCooldownSeconds = 0
+		damageFlashIntensity.value = 0
 	}
 
 	watch(
@@ -353,6 +386,7 @@ export function useSkinPreviewAnimation(
 		}
 
 		updateClickImpulse(delta)
+		updateDamageFlash(delta)
 	})
 
 	return {
@@ -362,6 +396,7 @@ export function useSkinPreviewAnimation(
 		clickImpulseScaleY,
 		cleanupAnimationState,
 		currentAnimation,
+		damageFlashIntensity,
 		getAvailableAnimations,
 		initializeAnimations,
 		playAnimation,

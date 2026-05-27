@@ -128,7 +128,7 @@ import {
 } from '#ui/composables/skin-rendering'
 
 import { useDynamicFontSize } from '../../composables'
-import { createRadialSpotlightShader } from './skin-preview-shader'
+import { createRadialSpotlightShader, syncDamageFlashShader } from './skin-preview-shader'
 
 const props = withDefaults(
 	defineProps<{
@@ -237,6 +237,7 @@ const {
 	clickImpulseScaleX,
 	clickImpulseScaleY,
 	currentAnimation,
+	damageFlashIntensity,
 	getAvailableAnimations,
 	initializeAnimations,
 	playAnimation,
@@ -265,6 +266,10 @@ const { isModelLoaded, isTextureLoaded, modelCenter, modelSize, scene } = useSki
 	initializeAnimations,
 	cleanupAnimationState,
 })
+
+function syncDamageFlashShaderMaterials() {
+	syncDamageFlashShader(scene.value, damageFlashIntensity.value)
+}
 
 const {
 	cameraConfig,
@@ -305,6 +310,8 @@ const { isPreviewVisible, showLoading } = useSkinPreviewLoading(isReady)
 onMounted(observeSubtitleElement)
 
 watch(hasSubtitle, () => nextTick(observeSubtitleElement), { flush: 'post' })
+watch(scene, syncDamageFlashShaderMaterials, { immediate: true })
+watch(damageFlashIntensity, syncDamageFlashShaderMaterials)
 
 onUnmounted(() => {
 	subtitleResizeObserver?.disconnect()
@@ -344,6 +351,7 @@ const animatedModelGroupScale = computed<SkinPreviewTuple>(() => {
 
 defineExpose({
 	playAnimation,
+	playClickInteraction,
 	stopAnimations,
 	getAvailableAnimations,
 	getCurrentAnimation: () => currentAnimation.value,
