@@ -440,8 +440,11 @@ async function save() {
 		const bytes: Uint8Array = new Uint8Array(await (await fetch(textureUrl)).arrayBuffer())
 
 		if (mode.value === 'new') {
-			await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
-			emit('saved', { applied: true })
+			const addedSkin = await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
+			emit('saved', {
+				applied: true,
+				skin: addedSkin,
+			})
 		} else {
 			const updatedSkin = await save_custom_skin(
 				currentSkin.value!,
@@ -458,6 +461,7 @@ async function save() {
 			emit('saved', {
 				applied: !!currentSkin.value?.is_equipped,
 				skin: updatedSkin,
+				previousSkin: currentSkin.value!,
 			})
 		}
 
@@ -511,7 +515,7 @@ watch(
 )
 
 const emit = defineEmits<{
-	(event: 'saved', options: { applied: boolean; skin?: Skin }): void
+	(event: 'saved', options: { applied: boolean; skin?: Skin; previousSkin?: Skin }): void
 	(event: 'deleted', skin: Skin): void
 }>()
 

@@ -200,6 +200,9 @@ export const headBlobUrlMap = reactive(new Map<string, string>())
 const DEBUG_MODE = false
 
 let sharedRenderer: BatchSkinRenderer | null = null
+let latestPreviewGeneration = 0
+let previewGenerationQueue: Promise<void> = Promise.resolve()
+
 function getSharedRenderer(): BatchSkinRenderer {
 	if (!sharedRenderer) {
 		sharedRenderer = new BatchSkinRenderer()
@@ -362,7 +365,27 @@ export async function getPlayerHeadUrl(skin: Skin): Promise<string> {
 	return await generateHeadRender(skin)
 }
 
-export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
+export function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
+	const generation = ++latestPreviewGeneration
+	const skinsSnapshot = [...skins]
+	const capesSnapshot = [...capes]
+
+	const generationPromise = previewGenerationQueue.then(() =>
+		generateSkinPreviewsForGeneration(skinsSnapshot, capesSnapshot, generation),
+	)
+
+	previewGenerationQueue = generationPromise.catch(() => {})
+
+	return generationPromise
+}
+
+async function generateSkinPreviewsForGeneration(
+	skins: Skin[],
+	capes: Cape[],
+	generation: number,
+): Promise<void> {
+	const isCurrentGeneration = () => generation === latestPreviewGeneration
+
 	try {
 		const skinKeys = skins.map(
 			(skin) => `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`,
@@ -373,6 +396,8 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
 			skinPreviewStorage.batchRetrieve(skinKeys),
 			headStorage.batchRetrieve(headKeys),
 		])
+
+		if (!isCurrentGeneration()) return
 
 		for (let i = 0; i < skins.length; i++) {
 			const skinKey = skinKeys[i]
@@ -394,6 +419,8 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
 		}
 
 		for (const skin of skins) {
+			if (!isCurrentGeneration()) return
+
 			const key = `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`
 
 			if (skinBlobUrlMap.has(key)) {
@@ -425,6 +452,8 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
 				cape?.texture,
 			)
 
+			if (!isCurrentGeneration()) return
+
 			const renderResult: RenderResult = {
 				forwards: URL.createObjectURL(rawRenderResult.forwards),
 				backwards: URL.createObjectURL(rawRenderResult.backwards),
@@ -445,9 +474,12 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
 		}
 	} finally {
 		disposeSharedRenderer()
-		await cleanupUnusedPreviews(skins)
 
-		await skinPreviewStorage.debugCalculateStorage()
-		await headStorage.debugCalculateStorage()
+		if (isCurrentGeneration()) {
+			await cleanupUnusedPreviews(skins)
+
+			await skinPreviewStorage.debugCalculateStorage()
+			await headStorage.debugCalculateStorage()
+		}
 	}
 }

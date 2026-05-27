@@ -239,10 +239,17 @@ function confirmDeleteSkin(skin: Skin) {
 }
 
 async function deleteSkin() {
-	if (!skinToDelete.value) return
-	await remove_custom_skin(skinToDelete.value).catch(handleError)
-	await loadSkins()
-	skinToDelete.value = null
+	const deletedSkin = skinToDelete.value
+	if (!deletedSkin) return
+
+	try {
+		await remove_custom_skin(deletedSkin)
+		removeLocalSkin(deletedSkin)
+	} catch (error) {
+		handleError(error as Error)
+	} finally {
+		skinToDelete.value = null
+	}
 }
 
 async function loadCapes() {
@@ -329,6 +336,24 @@ function resetSelectedSkin() {
 		originalSelectedSkin.value
 }
 
+function removeLocalSkin(deletedSkin: Skin) {
+	const nextSkins = skins.value.filter((skin) => !skinsMatch(skin, deletedSkin))
+	skins.value = nextSkins
+
+	if (selectedSkin.value && skinsMatch(selectedSkin.value, deletedSkin)) {
+		selectedSkin.value =
+			nextSkins.find((skin) => skinsMatch(skin, originalSelectedSkin.value)) ??
+			nextSkins.find((skin) => skin.is_equipped) ??
+			null
+	}
+
+	if (originalSelectedSkin.value && skinsMatch(originalSelectedSkin.value, deletedSkin)) {
+		originalSelectedSkin.value = nextSkins.find((skin) => skin.is_equipped) ?? null
+	}
+
+	generateSkinPreviews(skins.value, capes.value)
+}
+
 function setLocallyEquippedSkin(skinToApply: Skin) {
 	skins.value = skins.value.map((skin) => ({
 		...skin,
@@ -340,13 +365,20 @@ function setLocallyEquippedSkin(skinToApply: Skin) {
 	void accountsCard.value?.setEquippedSkin(originalSelectedSkin.value)
 }
 
-function updateLocalSkin(savedSkin: Skin, applied: boolean) {
+function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin) {
 	let foundSkin = false
-	const replacesSelectedSkin = selectedSkin.value?.texture_key === savedSkin.texture_key
-	const replacesOriginalSkin = originalSelectedSkin.value?.texture_key === savedSkin.texture_key
+	const replacesSelectedSkin =
+		selectedSkin.value?.texture_key === savedSkin.texture_key ||
+		(previousSkin ? skinsMatch(selectedSkin.value, previousSkin) : false)
+	const replacesOriginalSkin =
+		originalSelectedSkin.value?.texture_key === savedSkin.texture_key ||
+		(previousSkin ? skinsMatch(originalSelectedSkin.value, previousSkin) : false)
 
 	skins.value = skins.value.map((skin) => {
-		if (skin.texture_key === savedSkin.texture_key || (applied && skin.is_equipped)) {
+		const isUpdatedSkin = skin.texture_key === savedSkin.texture_key
+		const isPreviousSkin = previousSkin && skinsMatch(skin, previousSkin)
+
+		if (isUpdatedSkin || isPreviousSkin) {
 			foundSkin = true
 			return {
 				...savedSkin,
@@ -412,6 +444,8 @@ function schedulePendingSkinRefresh() {
 			}
 		} catch (error) {
 			handleError(error as Error)
+			schedulePendingSkinRefresh()
+			return
 		}
 
 		if (accountsCard.value) {
@@ -447,18 +481,18 @@ async function applySelectedSkin() {
 	}
 }
 
-async function onSkinSaved(options: { applied: boolean; skin?: Skin }) {
+async function onSkinSaved(options: { applied: boolean; skin?: Skin; previousSkin?: Skin }) {
 	if (options.skin) {
-		updateLocalSkin(options.skin, options.applied)
+		updateLocalSkin(options.skin, options.applied, options.previousSkin)
+	}
+
+	if (!options.skin) {
+		await loadCapes()
+		await loadSkins()
 	}
 
 	if (options.applied) {
 		schedulePendingSkinRefresh()
-	} else {
-		if (!options.skin) {
-			await loadCapes()
-			await loadSkins()
-		}
 	}
 }
 
@@ -717,7 +751,9 @@ await loadSkins()
 			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
 				{{ formatMessage(messages.skinSelectorTitle) }}
 			</h1>
-			<div class="ml-5 flex h-[80vh] items-center justify-center max-[700px]:h-[50vh]">
+			<div
+				class="ml-5 mt-4 flex h-[calc(80vh-1rem)] items-center justify-center max-[700px]:h-[calc(50vh-1rem)]"
+			>
 				<SkinPreviewRenderer
 					:cape-src="capeTexture"
 					:texture-src="skinTexture || ''"

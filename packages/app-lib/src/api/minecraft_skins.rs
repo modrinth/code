@@ -99,6 +99,61 @@ struct PendingSkinChangeEntry {
     generation: u64,
 }
 
+enum PendingEffectiveSkinChange {
+    AddAndEquipCustom {
+        texture_key: Arc<str>,
+        texture_blob: Bytes,
+        variant: MinecraftSkinVariant,
+        cape_id: Option<Uuid>,
+    },
+    Equip {
+        skin: Skin,
+    },
+    Unequip,
+}
+
+impl PendingEffectiveSkinChange {
+    fn is_unequip(&self) -> bool {
+        matches!(self, Self::Unequip)
+    }
+
+    fn cape_id(&self) -> Option<Uuid> {
+        match self {
+            Self::AddAndEquipCustom { cape_id, .. } => *cape_id,
+            Self::Equip { skin } => skin.cape_id,
+            Self::Unequip => None,
+        }
+    }
+
+    fn skin(&self) -> Option<Skin> {
+        match self {
+            Self::AddAndEquipCustom {
+                texture_key,
+                texture_blob,
+                variant,
+                cape_id,
+            } => Some(Skin {
+                texture_key: Arc::clone(texture_key),
+                name: None,
+                section: None,
+                variant: *variant,
+                cape_id: *cape_id,
+                texture: png_util::blob_to_data_url(texture_blob)
+                    .or_else(|| {
+                        png_util::blob_to_data_url(include_bytes!(
+                            "minecraft_skins/assets/default/MissingNo.png"
+                        ))
+                    })
+                    .unwrap(),
+                source: SkinSource::Custom,
+                is_equipped: true,
+            }),
+            Self::Equip { skin } => Some(skin.clone()),
+            Self::Unequip => None,
+        }
+    }
+}
+
 #[derive(Debug)]
 enum PendingSkinChange {
     AddAndEquipCustom {
@@ -133,9 +188,21 @@ impl PendingSkinChange {
             } => selected_credentials.offline_profile.id,
         }
     }
+
+    fn matches_skin(&self, skin: &Skin) -> bool {
+        match self {
+            Self::AddAndEquipCustom {
+                local_texture_key, ..
+            } => local_texture_key.as_ref() == skin.texture_key.as_ref(),
+            Self::Equip {
+                skin: pending_skin, ..
+            } => pending_skin.texture_key == skin.texture_key,
+            Self::Unequip { .. } => false,
+        }
+    }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct Cape {
     /// An identifier for this cape, potentially unique to the owning player.
     pub id: Uuid,
@@ -148,7 +215,7 @@ pub struct Cape {
     pub is_equipped: bool,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 pub struct Skin {
     /// A key used to recognize this skin texture.
     pub texture_key: Arc<str>,
@@ -172,7 +239,7 @@ pub struct Skin {
     pub is_equipped: bool,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Clone, Deserialize, Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum SkinSource {
     /// A default Minecraft skin, which may be assigned to players at random by default.
@@ -207,6 +274,10 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
         .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
         })?;
+    let pending_skin_change = pending_effective_skin_change(profile.id).await;
+    let pending_cape_id = pending_skin_change
+        .as_ref()
+        .map(PendingEffectiveSkinChange::cape_id);
 
     Ok(profile
         .capes
@@ -215,8 +286,10 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
             id: cape.id,
             name: Arc::clone(&cape.name),
             texture: Arc::clone(&cape.url),
-            is_equipped: cape.state
-                == MinecraftCharacterExpressionState::Active,
+            is_equipped: pending_cape_id.map_or_else(
+                || cape.state == MinecraftCharacterExpressionState::Active,
+                |cape_id| cape_id == Some(cape.id),
+            ),
         })
         .collect())
 }
@@ -245,8 +318,47 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 
     let current_skin = profile.current_skin()?;
     let current_cape_id = profile.current_cape().map(|cape| cape.id);
+    let pending_skin_change = pending_effective_skin_change(profile.id).await;
+    let pending_unequip = pending_skin_change
+        .as_ref()
+        .is_some_and(PendingEffectiveSkinChange::is_unequip);
+    let pending_skin = pending_skin_change
+        .as_ref()
+        .and_then(PendingEffectiveSkinChange::skin);
 
-    let current_skin_texture_key = current_skin.texture_key();
+    let fallback_default_skin = assets::DEFAULT_SKINS.first();
+    let current_skin_texture_key = pending_skin.as_ref().map_or_else(
+        || {
+            if pending_unequip {
+                fallback_default_skin.map_or_else(
+                    || current_skin.texture_key(),
+                    |skin| Arc::clone(&skin.texture_key),
+                )
+            } else {
+                current_skin.texture_key()
+            }
+        },
+        |skin| skin.texture_key.clone(),
+    );
+    let current_skin_variant = pending_skin.as_ref().map_or_else(
+        || {
+            if pending_unequip {
+                fallback_default_skin
+                    .map_or(current_skin.variant, |skin| skin.variant)
+            } else {
+                current_skin.variant
+            }
+        },
+        |skin| skin.variant,
+    );
+    let current_cape_id = pending_skin.as_ref().map_or(
+        if pending_unequip {
+            None
+        } else {
+            current_cape_id
+        },
+        |skin| skin.cape_id,
+    );
     let mut found_equipped_skin = false;
     let mut available_skins = Vec::new();
     let mut saved_default_skins = Vec::new();
@@ -258,12 +370,22 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     {
         let is_saved_default_skin =
             is_bundled_skin(&custom_skin.texture_key, custom_skin.variant);
-        let current_skin_sync = sync_saved_skin_with_current_profile(
-            &mut custom_skin,
-            &current_skin_texture_key,
-            current_skin.variant,
-            current_cape_id,
-        );
+        let current_skin_sync = if pending_skin.is_some() {
+            SavedSkinSync {
+                is_current_skin: custom_skin.texture_key
+                    == current_skin_texture_key.as_ref()
+                    && custom_skin.variant == current_skin_variant
+                    && custom_skin.cape_id == current_cape_id,
+                settings_changed: false,
+            }
+        } else {
+            sync_saved_skin_with_current_profile(
+                &mut custom_skin,
+                &current_skin_texture_key,
+                current_skin_variant,
+                current_cape_id,
+            )
+        };
 
         let synced_texture_blob = if current_skin_sync.settings_changed {
             let texture_blob = custom_skin.texture_blob(&state.pool).await?;
@@ -325,7 +447,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     for default_skin in assets::DEFAULT_SKINS.iter() {
         let is_equipped = !found_equipped_skin
             && default_skin.texture_key == current_skin_texture_key
-            && default_skin.variant == current_skin.variant;
+            && default_skin.variant == current_skin_variant;
         let saved_cape_id = saved_default_skins
             .iter()
             .find(|skin| {
@@ -354,16 +476,21 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 
     // Keep the active Mojang skin visible even if the app has never saved it.
     if !found_equipped_skin {
-        available_skins.push(Skin {
-            texture_key: current_skin_texture_key,
-            name: current_skin.name.as_deref().map(Arc::from),
-            section: None,
-            variant: current_skin.variant,
-            cape_id: current_cape_id,
-            texture: Arc::clone(&current_skin.url),
-            source: SkinSource::CustomExternal,
-            is_equipped: true,
-        });
+        if let Some(mut skin) = pending_skin {
+            skin.is_equipped = true;
+            available_skins.push(skin);
+        } else {
+            available_skins.push(Skin {
+                texture_key: current_skin_texture_key,
+                name: current_skin.name.as_deref().map(Arc::from),
+                section: None,
+                variant: current_skin_variant,
+                cape_id: current_cape_id,
+                texture: Arc::clone(&current_skin.url),
+                source: SkinSource::CustomExternal,
+                is_equipped: true,
+            });
+        }
     }
 
     Ok(available_skins)
@@ -376,7 +503,7 @@ pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
     variant: MinecraftSkinVariant,
     cape: Option<Cape>,
-) -> crate::Result<()> {
+) -> crate::Result<Skin> {
     let (skin_width, skin_height) = png_util::dimensions(&texture_blob)?;
     if skin_width != 64 || ![32, 64].contains(&skin_height) {
         return Err(ErrorKind::InvalidSkinTexture)?;
@@ -401,14 +528,29 @@ pub async fn add_and_equip_custom_skin(
 
     set_pending_skin_change(PendingSkinChange::AddAndEquipCustom {
         selected_credentials,
-        texture_blob,
+        texture_blob: Bytes::clone(&texture_blob),
         variant,
         cape_id,
-        local_texture_key,
+        local_texture_key: Arc::clone(&local_texture_key),
     })
     .await;
 
-    Ok(())
+    Ok(Skin {
+        texture_key: local_texture_key,
+        name: None,
+        section: None,
+        variant,
+        cape_id,
+        texture: png_util::blob_to_data_url(texture_blob)
+            .or_else(|| {
+                png_util::blob_to_data_url(include_bytes!(
+                    "minecraft_skins/assets/default/MissingNo.png"
+                ))
+            })
+            .unwrap(),
+        source: SkinSource::Custom,
+        is_equipped: true,
+    })
 }
 
 async fn add_and_equip_custom_skin_now(
@@ -583,6 +725,12 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
     .remove(selected_credentials.offline_profile.id, &state.pool)
     .await?;
 
+    cancel_pending_skin_change_for_skin(
+        selected_credentials.offline_profile.id,
+        &skin,
+    )
+    .await;
+
     Ok(())
 }
 
@@ -752,6 +900,10 @@ async fn set_pending_skin_change(change: PendingSkinChange) {
         generation
     };
 
+    schedule_pending_skin_change_flush(profile_id, generation);
+}
+
+fn schedule_pending_skin_change_flush(profile_id: Uuid, generation: u64) {
     tokio::spawn(async move {
         tokio::time::sleep(SKIN_CHANGE_DEBOUNCE).await;
 
@@ -769,6 +921,48 @@ async fn set_pending_skin_change(change: PendingSkinChange) {
             .await;
         }
     });
+}
+
+async fn pending_effective_skin_change(
+    profile_id: Uuid,
+) -> Option<PendingEffectiveSkinChange> {
+    let state = PENDING_SKIN_CHANGE.lock().await;
+
+    state
+        .pending
+        .get(&profile_id)
+        .map(|entry| match &entry.change {
+            PendingSkinChange::AddAndEquipCustom {
+                texture_blob,
+                variant,
+                cape_id,
+                local_texture_key,
+                ..
+            } => PendingEffectiveSkinChange::AddAndEquipCustom {
+                texture_key: Arc::clone(local_texture_key),
+                texture_blob: Bytes::clone(texture_blob),
+                variant: *variant,
+                cape_id: *cape_id,
+            },
+            PendingSkinChange::Equip { skin, .. } => {
+                PendingEffectiveSkinChange::Equip { skin: skin.clone() }
+            }
+            PendingSkinChange::Unequip { .. } => {
+                PendingEffectiveSkinChange::Unequip
+            }
+        })
+}
+
+async fn cancel_pending_skin_change_for_skin(profile_id: Uuid, skin: &Skin) {
+    let mut state = PENDING_SKIN_CHANGE.lock().await;
+    let should_cancel = state
+        .pending
+        .get(&profile_id)
+        .is_some_and(|entry| entry.change.matches_skin(skin));
+
+    if should_cancel {
+        state.pending.remove(&profile_id);
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -819,8 +1013,10 @@ async fn flush_pending_skin_change_inner(
 
         if let Err(error) = execute_pending_skin_change(&entry.change).await {
             let profile_id = entry.change.profile_id();
+            let generation = entry.generation;
             let mut state = PENDING_SKIN_CHANGE.lock().await;
             state.pending.entry(profile_id).or_insert(entry);
+            schedule_pending_skin_change_flush(profile_id, generation);
 
             return Err(error);
         }

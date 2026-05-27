@@ -122,8 +122,8 @@ export async function add_and_equip_custom_skin(
 	textureBlob: Uint8Array,
 	variant: SkinModel,
 	cape?: Cape,
-): Promise<void> {
-	await invoke('plugin:minecraft-skins|add_and_equip_custom_skin', {
+): Promise<Skin> {
+	return await invoke('plugin:minecraft-skins|add_and_equip_custom_skin', {
 		textureBlob,
 		variant,
 		cape,

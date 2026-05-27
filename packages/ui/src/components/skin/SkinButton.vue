@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const emit = defineEmits<{
 	(e: 'select'): void
@@ -23,13 +23,27 @@ const props = withDefaults(
 )
 
 const imagesLoaded = ref({
-	forward: Boolean(props.forwardImageSrc),
-	backward: Boolean(props.backwardImageSrc),
+	forward: false,
+	backward: false,
 })
 
 function onImageLoad(type: 'forward' | 'backward') {
 	imagesLoaded.value[type] = true
 }
+
+watch(
+	() => props.forwardImageSrc,
+	() => {
+		imagesLoaded.value.forward = false
+	},
+)
+
+watch(
+	() => props.backwardImageSrc,
+	() => {
+		imagesLoaded.value.backward = false
+	},
+)
 </script>
 
 <template>

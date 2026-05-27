@@ -47,7 +47,7 @@ pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
     variant: MinecraftSkinVariant,
     cape: Option<Cape>,
-) -> Result<()> {
+) -> Result<Skin> {
     Ok(
         minecraft_skins::add_and_equip_custom_skin(texture_blob, variant, cape)
             .await?,
