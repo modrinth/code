@@ -25,6 +25,7 @@
 			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : 'text-secondary'"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"
+			@pointerdown.stop="showHoveredGroup(group.id)"
 			@click.stop
 			@mouseenter="scheduleHoveredGroupOpen(group.id)"
 			@mouseleave="scheduleHoverClose"
