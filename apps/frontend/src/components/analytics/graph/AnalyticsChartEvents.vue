@@ -25,8 +25,8 @@
 			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : 'text-secondary'"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"
-			@pointerdown.stop="showHoveredGroup(group.id)"
-			@click.stop
+			@pointerdown.stop="handleGroupPointerDown(group.id)"
+			@click.stop="handleGroupClick(group.id)"
 			@mouseenter="scheduleHoveredGroupOpen(group.id)"
 			@mouseleave="scheduleHoverClose"
 			@focus="showHoveredGroup(group.id)"
@@ -197,6 +197,8 @@ const chartRect = reactive({
 })
 let closeTimeout: ReturnType<typeof setTimeout> | null = null
 let openTimeout: ReturnType<typeof setTimeout> | null = null
+let pointerDownGroupId: string | null = null
+let wasPointerDownGroupActive = false
 
 const chartStartMs = computed(() => props.chartStart?.getTime() ?? null)
 const chartEndMs = computed(() => props.chartEnd?.getTime() ?? null)
@@ -231,22 +233,8 @@ const visibleEvents = computed<PositionedEvent[]>(() => {
 			if (eventEndMs < eventStartMs) return null
 			if (eventEndMs < startMs || eventStartMs > endMs) return null
 
-			const x = getDateBucketX(
-				event.starts,
-				eventStartMs,
-				geometry,
-				startMs,
-				endMs,
-				bucketXByDate,
-			)
-			const endX = getDateBucketX(
-				event.ends,
-				eventEndMs,
-				geometry,
-				startMs,
-				endMs,
-				bucketXByDate,
-			)
+			const x = getDateBucketX(event.starts, eventStartMs, geometry, startMs, endMs, bucketXByDate)
+			const endX = getDateBucketX(event.ends, eventEndMs, geometry, startMs, endMs, bucketXByDate)
 			if (x === null || endX === null) return null
 
 			return {
@@ -631,11 +619,7 @@ function getClampedMarkerCenterX(group: EventGroup) {
 	return clamp(group.x + group.markerOffsetX, minX, maxX)
 }
 
-function getBucketXByDate(
-	geometry: AnalyticsChartGeometryPayload,
-	startMs: number,
-	endMs: number,
-) {
+function getBucketXByDate(geometry: AnalyticsChartGeometryPayload, startMs: number, endMs: number) {
 	if (isTimeRelevantForGroupBy(props.groupBy)) return null
 
 	const xPositions = geometry.xPositions
@@ -751,6 +735,21 @@ function showHoveredGroup(groupId: string) {
 	clearCloseTimeout()
 	updateChartRect()
 	hoveredGroupId.value = groupId
+}
+
+function handleGroupPointerDown(groupId: string) {
+	pointerDownGroupId = groupId
+	wasPointerDownGroupActive = hoveredGroupId.value === groupId
+	showHoveredGroup(groupId)
+}
+
+function handleGroupClick(groupId: string) {
+	if (pointerDownGroupId === groupId && wasPointerDownGroupActive) {
+		clearActiveGroup()
+	}
+
+	pointerDownGroupId = null
+	wasPointerDownGroupActive = false
 }
 
 function scheduleHoveredGroupOpen(groupId: string) {
