@@ -95,7 +95,7 @@
 							type="button"
 							:aria-expanded="isEventsMenuOpen"
 							:aria-controls="eventsMenuId"
-							class="font-base btn-dropdown-animation inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-sm font-medium text-secondary transition-all hover:text-contrast focus-visible:text-contrast"
+							class="font-base btn-dropdown-animation inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-sm font-medium text-secondary transition-all hover:brightness-125 focus-visible:brightness-125"
 							@click="toggleEventsMenu"
 						>
 							<span>Events</span>

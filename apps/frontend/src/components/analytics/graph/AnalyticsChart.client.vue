@@ -106,8 +106,6 @@ const chartInteractionEvents: ChartEvents = [
 	'mousemove',
 	'mouseout',
 	'click',
-	'touchstart',
-	'touchmove',
 ]
 const PINNED_DRAG_THRESHOLD_PX = 6
 const RANGE_SELECT_THRESHOLD_PX = 8
@@ -140,6 +138,8 @@ let chartRefreshAnimationFrame: number | null = null
 let currentDatasetOpacities: number[] = []
 let suppressGeometryEmit = false
 let lastGeometryPayload: AnalyticsChartGeometryPayload | null = null
+let suppressNextChartClick = false
+let clearSuppressedChartClickTimeout: ReturnType<typeof setTimeout> | null = null
 
 const { isMobileLayout } = injectAnalyticsDashboardContext()
 
@@ -747,6 +747,49 @@ function clearChartActiveState() {
 	chartInstance.tooltip?.setActiveElements([], { x: 0, y: 0 })
 }
 
+function clearSuppressNextChartClickTimeout() {
+	if (!clearSuppressedChartClickTimeout) return
+
+	clearTimeout(clearSuppressedChartClickTimeout)
+	clearSuppressedChartClickTimeout = null
+}
+
+function suppressUpcomingChartClick() {
+	suppressNextChartClick = true
+	clearSuppressNextChartClickTimeout()
+	clearSuppressedChartClickTimeout = setTimeout(() => {
+		suppressNextChartClick = false
+		clearSuppressedChartClickTimeout = null
+	}, 350)
+}
+
+function clearUnpinnedTouchInteraction(ignoreClick: boolean) {
+	if (props.pinnedSliceIndex !== null) return
+
+	clearChartActiveState()
+	updateChartWithoutGeometry()
+
+	if (ignoreClick) {
+		suppressUpcomingChartClick()
+		emit('touch-drag')
+		return
+	}
+
+	emit('hover', { visible: false, x: 0, y: 0, sliceIndex: null })
+}
+
+function handleCanvasClickCapture(event: MouseEvent) {
+	if (!suppressNextChartClick) return
+
+	suppressNextChartClick = false
+	clearSuppressNextChartClickTimeout()
+	event.preventDefault()
+	event.stopImmediatePropagation()
+	emit('hover', { visible: false, x: 0, y: 0, sliceIndex: null })
+	clearChartActiveState()
+	updateChartWithoutGeometry()
+}
+
 function applyPinnedSliceState() {
 	if (!chartInstance) return
 
@@ -822,8 +865,23 @@ function handleRangePointerDown(event: PointerEvent) {
 function handleRangePointerMove(event: PointerEvent) {
 	if (event.pointerId !== rangeSelectPointerId) return
 
-	const distance = Math.hypot(event.clientX - rangeSelectStartX, event.clientY - rangeSelectStartY)
-	if (!isRangeSelecting && distance < RANGE_SELECT_THRESHOLD_PX) return
+	const deltaX = event.clientX - rangeSelectStartX
+	const deltaY = event.clientY - rangeSelectStartY
+
+	if (!isRangeSelecting) {
+		if (rangeSelectPointerType === 'touch') {
+			const horizontalDistance = Math.abs(deltaX)
+			const verticalDistance = Math.abs(deltaY)
+			if (
+				horizontalDistance < RANGE_SELECT_THRESHOLD_PX ||
+				horizontalDistance <= verticalDistance
+			) {
+				return
+			}
+		} else if (Math.hypot(deltaX, deltaY) < RANGE_SELECT_THRESHOLD_PX) {
+			return
+		}
+	}
 
 	const sliceIndex = getNearestSliceIndex(event.clientX)
 	if (sliceIndex === null) return
@@ -849,10 +907,12 @@ function handleRangePointerEnd(event: PointerEvent) {
 
 	if (isRangeSelecting && rangeSelectPointerType === 'touch') {
 		event.preventDefault()
-		emit('touch-drag')
+		clearUnpinnedTouchInteraction(true)
 	} else if (isRangeSelecting && startSliceIndex !== null && endSliceIndex !== null) {
 		event.preventDefault()
 		emit('range-select', { startSliceIndex, endSliceIndex })
+	} else if (rangeSelectPointerType === 'touch') {
+		clearUnpinnedTouchInteraction(false)
 	}
 
 	rangeSelectPointerId = null
@@ -867,6 +927,9 @@ function handleRangePointerCancel(event: PointerEvent) {
 	if (event.pointerId !== rangeSelectPointerId) return
 
 	canvasRef.value?.releasePointerCapture(event.pointerId)
+	if (rangeSelectPointerType === 'touch') {
+		clearUnpinnedTouchInteraction(isRangeSelecting)
+	}
 	rangeSelectPointerId = null
 	rangeSelectStartSliceIndex = null
 	rangeSelectLastSliceIndex = null
@@ -876,6 +939,7 @@ function handleRangePointerCancel(event: PointerEvent) {
 }
 
 onMounted(() => {
+	canvasRef.value?.addEventListener('click', handleCanvasClickCapture, true)
 	createChart()
 	canvasRef.value?.addEventListener('mouseleave', handleCanvasLeave)
 	canvasRef.value?.addEventListener('pointerdown', handleRangePointerDown)
@@ -889,6 +953,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+	canvasRef.value?.removeEventListener('click', handleCanvasClickCapture, true)
 	canvasRef.value?.removeEventListener('mouseleave', handleCanvasLeave)
 	canvasRef.value?.removeEventListener('pointerdown', handleRangePointerDown)
 	canvasRef.value?.removeEventListener('pointermove', handleRangePointerMove)
@@ -900,6 +965,7 @@ onBeforeUnmount(() => {
 	canvasRef.value?.removeEventListener('pointercancel', handlePinnedPointerEnd)
 	cancelSeriesOpacityAnimation()
 	cancelScheduledChartRefresh()
+	clearSuppressNextChartClickTimeout()
 	chartInstance?.destroy()
 	chartInstance = null
 })
