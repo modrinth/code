@@ -785,6 +785,7 @@ impl DeviceTokenPair {
 const MICROSOFT_CLIENT_ID: &str = "00000000402b5328";
 const AUTH_REPLY_URL: &str = "https://login.live.com/oauth20_desktop.srf";
 const REQUESTED_SCOPE: &str = "service::user.auth.xboxlive.com::MBI_SSL";
+pub const MINECRAFT_SERVICES_USER_AGENT: &str = "Modrinth App (support@modrinth.com; https://modrinth.com/app)";
 
 pub struct RequestWithDate<T> {
     pub date: DateTime<Utc>,
@@ -1119,6 +1120,7 @@ async fn minecraft_token(
         INSECURE_REQWEST_CLIENT
             .post("https://api.minecraftservices.com/launcher/login")
             .header("Accept", "application/json")
+            .header("User-Agent", MINECRAFT_SERVICES_USER_AGENT)
             .json(&json!({
                 "platform": "PC_LAUNCHER",
                 "xtoken": format!("XBL3.0 x={uhs};{token}"),
@@ -1347,6 +1349,7 @@ async fn minecraft_profile(
         INSECURE_REQWEST_CLIENT
             .get("https://api.minecraftservices.com/minecraft/profile")
             .header("Accept", "application/json")
+            .header("User-Agent", MINECRAFT_SERVICES_USER_AGENT)
             .bearer_auth(token)
             // Profiles may be refreshed periodically in response to user actions,
             // so we want each refresh to be fast
@@ -1395,12 +1398,13 @@ async fn minecraft_entitlements(
     token: &str,
 ) -> Result<MinecraftEntitlements, MinecraftAuthenticationError> {
     let res = auth_retry(|| {
-        INSECURE_REQWEST_CLIENT
-            .get(format!("https://api.minecraftservices.com/entitlements/license?requestId={}", Uuid::new_v4()))
-            .header("Accept", "application/json")
-            .bearer_auth(token)
-            .send()
-    })
+		INSECURE_REQWEST_CLIENT
+			.get(format!("https://api.minecraftservices.com/entitlements/license?requestId={}", Uuid::new_v4()))
+			.header("Accept", "application/json")
+			.header("User-Agent", MINECRAFT_SERVICES_USER_AGENT)
+			.bearer_auth(token)
+			.send()
+	})
     .await.map_err(|source| MinecraftAuthenticationError::Request { source, step: MinecraftAuthStep::MinecraftEntitlements })?;
 
     let status = res.status();
