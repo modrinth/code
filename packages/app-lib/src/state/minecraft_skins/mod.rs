@@ -133,7 +133,7 @@ impl CustomMinecraftSkin {
     ) -> crate::Result<impl Stream<Item = Self>> {
         // Limit the first-load IPC payload. Full skin textures are returned inline,
         // so very large libraries can otherwise block the skins page while serializing.
-        Self::get_many(minecraft_user_id, 0, 256, db).await
+        Self::get_many(minecraft_user_id, 0, 2048, db).await
     }
 
     pub async fn texture_blob(

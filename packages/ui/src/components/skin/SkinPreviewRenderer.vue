@@ -21,7 +21,7 @@
 			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
 			:class="subtitlePositionClass"
 		>
-			<div class="pointer-events-auto">
+			<div class="pointer-events-auto" @click="ignoreControlClick">
 				<slot name="subtitle" />
 			</div>
 		</div>
@@ -43,7 +43,7 @@
 				toneMappingExposure: 10.0,
 			}"
 			class="transition-opacity duration-500"
-			:class="{ 'opacity-0': !isReady, 'opacity-100': isReady }"
+			:class="{ 'opacity-0': !isPreviewVisible, 'opacity-100': isPreviewVisible }"
 			@pointerdown="onPointerDown"
 			@pointermove="onPointerMove"
 			@pointerup="onPointerUp"
@@ -84,9 +84,8 @@
 		</TresCanvas>
 
 		<div
-			v-if="!isReady"
-			class="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
-			:class="{ 'opacity-100': !isReady, 'opacity-0': isReady }"
+			v-if="showLoading"
+			class="absolute inset-0 flex items-center justify-center"
 		>
 			<div class="text-primary">Loading...</div>
 		</div>
@@ -249,6 +248,8 @@ const texture = shallowRef<THREE.Texture | null>(null)
 const capeTexture = shallowRef<THREE.Texture | null>(null)
 const transparentTexture = createTransparentTexture()
 const rendererDpr: [number, number] = [1, 1.5]
+const LOADING_INDICATOR_DELAY_MS = 200
+const LOADING_INDICATOR_MIN_MS = 250
 const modelCenter = ref<[number, number, number]>([0, 1, 0])
 const modelSize = ref<[number, number, number]>([1, 2, 1])
 
@@ -262,6 +263,11 @@ const hasResolvedFit = computed(
 	() => !fitEnabled.value || (props.lockFit ? fitLock.value !== null : hasUsableFitSize.value),
 )
 const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value && hasResolvedFit.value)
+const showLoading = ref(false)
+const isPreviewVisible = computed(() => isReady.value && !showLoading.value)
+let loadingIndicatorDelayTimer: number | null = null
+let loadingIndicatorMinTimer: number | null = null
+let loadingIndicatorShownAt = 0
 
 const fitContainerSize = computed(() =>
 	props.lockFit ? (fitLock.value?.containerSize ?? containerSize.value) : containerSize.value,
@@ -663,6 +669,35 @@ function clearRandomAnimationTimer() {
 	}
 }
 
+function clearLoadingIndicatorDelayTimer() {
+	if (loadingIndicatorDelayTimer !== null) {
+		clearTimeout(loadingIndicatorDelayTimer)
+		loadingIndicatorDelayTimer = null
+	}
+}
+
+function clearLoadingIndicatorMinTimer() {
+	if (loadingIndicatorMinTimer !== null) {
+		clearTimeout(loadingIndicatorMinTimer)
+		loadingIndicatorMinTimer = null
+	}
+}
+
+function hideLoadingIndicatorAfterMinimum() {
+	const visibleFor = Date.now() - loadingIndicatorShownAt
+	const remaining = LOADING_INDICATOR_MIN_MS - visibleFor
+
+	if (remaining <= 0) {
+		showLoading.value = false
+		return
+	}
+
+	loadingIndicatorMinTimer = window.setTimeout(() => {
+		showLoading.value = false
+		loadingIndicatorMinTimer = null
+	}, remaining)
+}
+
 function addAnimationFinishedListener(listener: AnimationFinishedListener) {
 	mixer.value?.addEventListener('finished', listener)
 	animationFinishedListeners.push(listener)
@@ -956,6 +991,44 @@ function onCanvasClick() {
 	hasDragged.value = false
 }
 
+function ignoreControlClick(event: MouseEvent) {
+	event.stopPropagation()
+}
+
+watch(
+	isReady,
+	(ready) => {
+		clearLoadingIndicatorDelayTimer()
+
+		if (ready) {
+			if (showLoading.value) {
+				clearLoadingIndicatorMinTimer()
+				hideLoadingIndicatorAfterMinimum()
+			}
+
+			return
+		}
+
+		clearLoadingIndicatorMinTimer()
+
+		if (showLoading.value || typeof window === 'undefined') {
+			return
+		}
+
+		loadingIndicatorDelayTimer = window.setTimeout(() => {
+			loadingIndicatorDelayTimer = null
+
+			if (isReady.value) {
+				return
+			}
+
+			showLoading.value = true
+			loadingIndicatorShownAt = Date.now()
+		}, LOADING_INDICATOR_DELAY_MS)
+	},
+	{ immediate: true },
+)
+
 watch(selectedModelSrc, (src) => loadModel(src))
 watch(
 	() => props.lockFit,
@@ -1015,6 +1088,8 @@ onUnmounted(() => {
 	isUnmounted = true
 	modelLoadVersion++
 	resizeObserver?.disconnect()
+	clearLoadingIndicatorDelayTimer()
+	clearLoadingIndicatorMinTimer()
 
 	cleanupAnimationState(scene.value)
 	disposeSceneMaterials(scene.value)

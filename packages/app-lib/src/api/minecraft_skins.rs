@@ -358,12 +358,22 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
 
     preserve_current_profile_skin(&state, &profile).await?;
 
-    let _ = mojang_api::MinecraftSkinOperation::equip(
+    let profile = mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         png_util::url_to_data_stream(&skin.texture).await?,
         skin.variant,
     )
     .await?;
+
+    let profile = match profile {
+        Some(profile) => profile,
+        None => selected_credentials
+            .refresh_online_profile()
+            .await
+            .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+                user_name: selected_credentials.offline_profile.name.clone(),
+            })?,
+    };
 
     if let Err(error) =
         sync_cape(&selected_credentials, &profile, skin.cape_id).await

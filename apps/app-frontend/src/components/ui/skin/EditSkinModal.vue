@@ -84,14 +84,6 @@
 								:name="cape.name || 'Cape'"
 								:selected="selectedCape?.id === cape.id"
 								@select="selectCape(cape)"
-							/><CapeButton
-								v-for="cape in sortedCapes"
-								:id="cape.id"
-								:key="cape.id"
-								:texture="cape.texture"
-								:name="cape.name || 'Cape'"
-								:selected="selectedCape?.id === cape.id"
-								@select="selectCape(cape)"
 							/>
 						</div>
 
