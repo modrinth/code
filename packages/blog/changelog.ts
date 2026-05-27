@@ -39,7 +39,7 @@ const VERSIONS: VersionEntry[] = [
 		date: `2026-05-27T22:30:20+00:00`,
 		product: 'web',
 		body: `## Changed
-- Images from \`user-images.githubusercontent.com\` will no longer be proxied.`,
+- Images from \`user-images.githubusercontent.com\` are no longer proxied.`,
 	},
 	{
 		date: `2026-05-24T17:46:23+00:00`,
