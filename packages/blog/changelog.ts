@@ -27,7 +27,7 @@ const VERSIONS: VersionEntry[] = [
 - Moved cape selection into the Edit skin modal, with a \`None\` option for saving skins without capes.
 - Updated skin previews for more consistent framing across the Skin selector, skin editor, and skin cards.
 - Skin and cape changes made outside Modrinth App are now reflected when the Skin selector refreshes or on app launch safely.
-- Images from \`user-images.githubusercontent.com\` will no longer be proxied.
+- Images from \`user-images.githubusercontent.com\` are no longer proxied.
 
 ## Fixed
 - Fixed duplicate saved skin cards appearing when the same texture was saved with different arm or cape settings.
