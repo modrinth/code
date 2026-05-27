@@ -26,7 +26,7 @@ use serde::Deserialize;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(create)
-        .service(create_direct_email)
+        .service(create_email_sync)
         .service(remove)
         .service(send_custom_email);
 }
@@ -73,10 +73,10 @@ pub async fn create(
 /// - `200` if every recipient was emailed (empty list)
 /// - `207` if some recipients could not be emailed (list of failed IDs)
 #[post(
-    "external_notifications/direct-email",
+    "external_notifications/email-sync",
     guard = "external_notification_key_guard"
 )]
-pub async fn create_direct_email(
+pub async fn create_email_sync(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     email_queue: web::Data<EmailQueue>,
