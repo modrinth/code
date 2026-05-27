@@ -25,12 +25,16 @@
 				<slot name="subtitle" />
 			</div>
 		</div>
-		<div
-			v-if="nametag"
-			class="absolute left-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-gray nametag-bg"
-			:style="nametagStyle"
-		>
-			{{ nametagText }}
+		<div v-if="nametag" class="absolute left-1/2 pointer-events-none z-10" :style="nametagStyle">
+			<div
+				v-if="$slots['nametag-badge']"
+				class="absolute bottom-[calc(100%+1rem)] left-1/2 flex -translate-x-1/2 items-center justify-center"
+			>
+				<slot name="nametag-badge" />
+			</div>
+			<div class="px-3 py-1 rounded-md font-minecraft text-gray nametag-bg">
+				{{ nametagText }}
+			</div>
 		</div>
 
 		<TresCanvas
@@ -371,7 +375,7 @@ const resolvedFitPadding = computed<FitPadding>(() => {
 	const preset = FRAMING_PRESETS[currentFraming.value].padding
 
 	return {
-		top: Math.max(preset.top, props.nametag ? 0.2 : 0),
+		top: Math.max(preset.top, props.nametag ? (slots['nametag-badge'] ? 0.28 : 0.2) : 0),
 		right: preset.right,
 		bottom: Math.max(preset.bottom, slots.subtitle ? 0.28 : preset.bottom),
 		left: preset.left,
@@ -688,7 +692,6 @@ function playRandomAnimation(name: string) {
 	}
 
 	addAnimationFinishedListener(onFinished)
-	randomAnimationFinishedListeners.set(action, onFinished)
 }
 
 function addClickImpulse() {

@@ -399,19 +399,12 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    let profile = selected_credentials
-        .online_profile_fresh()
-        .await
-        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
-            user_name: selected_credentials.offline_profile.name.clone(),
-        })?;
-
     CustomMinecraftSkin {
         texture_key: skin.texture_key.to_string(),
         variant: skin.variant,
         cape_id: skin.cape_id,
     }
-    .remove(profile.id, &state.pool)
+    .remove(selected_credentials.offline_profile.id, &state.pool)
     .await?;
 
     Ok(())
@@ -512,23 +505,38 @@ async fn preserve_current_profile_skin(
 ) -> crate::Result<()> {
     let current_skin = profile.current_skin()?;
     let current_skin_texture_key = current_skin.texture_key();
+    let current_cape_id = profile.current_cape().map(|cape| cape.id);
 
     if is_bundled_skin_texture(&current_skin_texture_key) {
         return Ok(());
     }
 
-    if CustomMinecraftSkin::get_by_texture(
+    if let Some(saved_skin) = CustomMinecraftSkin::get_by_texture(
         profile.id,
         &current_skin_texture_key,
         &state.pool,
     )
     .await?
-    .is_some()
     {
+        if saved_skin.variant == current_skin.variant
+            && saved_skin.cape_id == current_cape_id
+        {
+            return Ok(());
+        }
+
+        let texture = saved_skin.texture_blob(&state.pool).await?;
+        CustomMinecraftSkin::add(
+            profile.id,
+            &current_skin_texture_key,
+            &texture,
+            current_skin.variant,
+            current_cape_id,
+            &state.pool,
+        )
+        .await?;
+
         return Ok(());
     }
-
-    let current_cape_id = profile.current_cape().map(|cape| cape.id);
 
     let texture = png_util::url_to_data_stream(&current_skin.url)
         .await?
