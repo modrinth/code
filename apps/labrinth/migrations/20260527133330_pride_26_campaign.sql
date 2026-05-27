@@ -1,5 +1,6 @@
 create table campaign_donations (
     id bigint primary key,
+    tiltify_event_id uuid not null unique,
     raw_data jsonb not null,
     donated_at timestamptz not null,
     amount_usd numeric(96, 48),

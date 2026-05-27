@@ -62,6 +62,7 @@ pub struct TiltifyMeta {
 
 pub struct CampaignDonation {
     pub id: DBCampaignDonationId,
+    pub tiltify_event_id: Uuid,
     pub raw_data: serde_json::Value,
     pub donated_at: DateTime<Utc>,
     pub amount_usd: Option<Decimal>,
@@ -72,24 +73,27 @@ impl CampaignDonation {
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<(), ApiError> {
+    ) -> Result<bool, ApiError> {
         let user_id = self.user_id.map(|id| id.0);
-        sqlx::query!(
+        let inserted = sqlx::query!(
             "
-            insert into campaign_donations (id, raw_data, donated_at, amount_usd, user_id)
-            values ($1, $2, $3, $4, $5)
+            insert into campaign_donations (id, tiltify_event_id, raw_data, donated_at, amount_usd, user_id)
+            values ($1, $2::text::uuid, $3, $4, $5, $6)
+            on conflict (tiltify_event_id) do nothing
+            returning id
             ",
             self.id.0,
+            self.tiltify_event_id.to_string(),
             self.raw_data,
             self.donated_at,
             self.amount_usd,
             user_id,
         )
-        .execute(transaction)
+        .fetch_optional(transaction)
         .await
         .wrap_internal_err("inserting campaign donation")?;
 
-        Ok(())
+        Ok(inserted.is_some())
     }
 }
 
@@ -123,6 +127,7 @@ pub async fn tiltify_webhook(
 
     let mut donation = CampaignDonation {
         id,
+        tiltify_event_id: payload.meta.id,
         raw_data: raw_payload,
         donated_at: payload.meta.generated_at,
         amount_usd: None,
@@ -170,10 +175,19 @@ pub async fn tiltify_webhook(
             .unwrap_or_else(|| "<unknown>".to_string())
     );
 
-    donation
+    let inserted = donation
         .insert(&mut transaction)
         .await
         .wrap_internal_err("inserting donation")?;
+
+    if !inserted {
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing duplicate donation transaction")?;
+        info!("Ignoring duplicate Tiltify webhook {}", payload.meta.id);
+        return Ok(());
+    }
 
     transaction
         .commit()
