@@ -1,5 +1,5 @@
 <template>
-	<div class="pl-1">
+	<div class="md:pl-1">
 		<div class="flex flex-wrap items-center gap-2 md:hidden">
 			<MultiSelect
 				v-if="showProjectRow"
@@ -390,8 +390,8 @@ import {
 
 import {
 	type AnalyticsBreakdownPreset,
-	type AnalyticsDashboardStat,
 	type AnalyticsDashboardProject,
+	type AnalyticsDashboardStat,
 	type AnalyticsGroupByPreset,
 	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedBreakdowns,
@@ -1008,7 +1008,9 @@ function getFilterValuesForStat(
 	}
 
 	const filterStats = getAnalyticsStatsForFilterCategory(category)
-	return includesStat(filterStats, stat) && includesStat(enabledStats, stat) ? sortStrings(values) : []
+	return includesStat(filterStats, stat) && includesStat(enabledStats, stat)
+		? sortStrings(values)
+		: []
 }
 
 function getMonetizationFilterValues(
@@ -1016,12 +1018,7 @@ function getMonetizationFilterValues(
 	enabledStats: readonly AnalyticsDashboardStat[],
 	filters: AnalyticsSelectedFilters,
 ): boolean[] {
-	const values = getFilterValuesForStat(
-		'monetization',
-		stat,
-		enabledStats,
-		filters.monetization,
-	)
+	const values = getFilterValuesForStat('monetization', stat, enabledStats, filters.monetization)
 	const monetizedValues: boolean[] = []
 	if (values.includes('monetized')) {
 		monetizedValues.push(true)
@@ -1090,12 +1087,7 @@ function buildMetricFilters(
 				enabledStats,
 				filters.game_version,
 			),
-			loader: getFilterValuesForStat(
-				'loader_type',
-				'downloads',
-				enabledStats,
-				filters.loader_type,
-			),
+			loader: getFilterValuesForStat('loader_type', 'downloads', enabledStats, filters.loader_type),
 		},
 		playtime: {
 			country: getFilterValuesForStat('country', 'playtime', enabledStats, filters.country),
@@ -1111,12 +1103,7 @@ function buildMetricFilters(
 				enabledStats,
 				filters.game_version,
 			),
-			loader: getFilterValuesForStat(
-				'loader_type',
-				'playtime',
-				enabledStats,
-				filters.loader_type,
-			),
+			loader: getFilterValuesForStat('loader_type', 'playtime', enabledStats, filters.loader_type),
 		},
 		revenue: {},
 	}

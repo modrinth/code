@@ -2,7 +2,7 @@
 	<button
 		v-tooltip="disabled ? 'Stat unavailable for current qeury' : ''"
 		type="button"
-		class="flex h-full appearance-none flex-col gap-4 rounded-2xl border border-solid p-5 px-4 text-left transition-colors"
+		class="flex h-full appearance-none flex-col gap-2.5 rounded-2xl border border-solid p-5 px-4 text-left transition-colors sm:gap-4"
 		:class="{
 			'cursor-not-allowed border-surface-5 bg-surface-2 opacity-60': disabled,
 			'cursor-default border-brand bg-highlight-green': !disabled && active,
@@ -26,7 +26,7 @@
 				<component
 					:is="iconComponent"
 					aria-hidden="true"
-					class="size-6"
+					class="size-5 sm:size-6"
 					:class="{
 						'text-secondary': disabled,
 						'text-brand': !disabled && active,

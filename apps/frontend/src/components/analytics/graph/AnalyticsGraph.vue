@@ -71,7 +71,7 @@
 						<label
 							for="previous-period-toggle"
 							class="cursor-pointer text-sm font-medium text-secondary"
-							>Prev. period</label
+							>Prev. <span class="max-sm:hidden">period</span></label
 						>
 						<Toggle
 							id="previous-period-toggle"
@@ -464,11 +464,11 @@ const { data: analyticsEvents } = useQuery({
 	staleTime: 0,
 })
 
-const viewModeTabs: TabsTab[] = [
-	{ value: 'line', label: 'Line', icon: ChartSplineIcon },
-	{ value: 'area', label: 'Area', icon: ChartAreaIcon },
-	{ value: 'bar', label: 'Bar', icon: ChartColumnBigIcon },
-]
+const viewModeTabs = computed<TabsTab[]>(() => [
+	{ value: 'line', label: isMobileLayout.value ? '' : 'Line', icon: ChartSplineIcon },
+	{ value: 'area', label: isMobileLayout.value ? '' : 'Area', icon: ChartAreaIcon },
+	{ value: 'bar', label: isMobileLayout.value ? '' : 'Bar', icon: ChartColumnBigIcon },
+])
 
 const titleByStat: Record<AnalyticsDashboardStat, string> = {
 	views: 'Views Over Time',

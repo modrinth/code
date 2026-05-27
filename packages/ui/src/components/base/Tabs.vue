@@ -27,7 +27,7 @@
 				class="size-5 shrink-0"
 				:class="tab.value === value ? 'text-green' : 'text-secondary'"
 			/>
-			<span class="text-nowrap">{{ tab.label }}</span>
+			<span v-if="tab.label" class="text-nowrap">{{ tab.label }}</span>
 		</button>
 	</div>
 </template>
