@@ -258,7 +258,9 @@ fn normalize_download_source_facets(
         .collect::<HashSet<_>>()
         .into_iter()
         .collect::<Vec<_>>();
-    sources.sort_by(|a, b| download_source_sort_key(a).cmp(download_source_sort_key(b)));
+    sources.sort_by(|a, b| {
+        download_source_sort_key(a).cmp(download_source_sort_key(b))
+    });
     sources
 }
 
