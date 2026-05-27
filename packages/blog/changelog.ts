@@ -14,7 +14,12 @@ const VERSIONS: VersionEntry[] = [
 		date: `2026-05-27T22:30:20+00:00`,
 		product: 'app',
 		version: '0.14.0',
-		body: `## Changed
+		body: `## Added
+- Skin selections can now be previewed in the Skin selector before applying or resetting them.
+- The Tiny Takeover default skin pack in the Skin selector.
+- The skin preview in the Skin selections page now feels pain.
+
+## Changed
 - Renamed the Skins page to Skin selector and removed its beta label.
 - Redesigned the Skin selector with a sticky preview, larger skin cards, and collapsible skin pack sections.
 - Moved PNG skin uploads from a separate modal to the Add skin card in Saved skins.
