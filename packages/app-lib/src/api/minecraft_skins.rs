@@ -101,18 +101,18 @@ struct PendingSkinChangeEntry {
 
 #[derive(Debug)]
 enum PendingSkinChange {
-    AddAndEquipCustomSkin {
+    AddAndEquipCustom {
         selected_credentials: Credentials,
         texture_blob: Bytes,
         variant: MinecraftSkinVariant,
         cape_id: Option<Uuid>,
         local_texture_key: Arc<str>,
     },
-    EquipSkin {
+    Equip {
         selected_credentials: Credentials,
         skin: Skin,
     },
-    UnequipSkin {
+    Unequip {
         selected_credentials: Credentials,
     },
 }
@@ -120,15 +120,15 @@ enum PendingSkinChange {
 impl PendingSkinChange {
     fn profile_id(&self) -> Uuid {
         match self {
-            Self::AddAndEquipCustomSkin {
+            Self::AddAndEquipCustom {
                 selected_credentials,
                 ..
             }
-            | Self::EquipSkin {
+            | Self::Equip {
                 selected_credentials,
                 ..
             }
-            | Self::UnequipSkin {
+            | Self::Unequip {
                 selected_credentials,
             } => selected_credentials.offline_profile.id,
         }
@@ -399,7 +399,7 @@ pub async fn add_and_equip_custom_skin(
     )
     .await?;
 
-    set_pending_skin_change(PendingSkinChange::AddAndEquipCustomSkin {
+    set_pending_skin_change(PendingSkinChange::AddAndEquipCustom {
         selected_credentials,
         texture_blob,
         variant,
@@ -433,7 +433,7 @@ async fn add_and_equip_custom_skin_now(
     // Use the profile from that response when possible, and fetch it only if that
     // response cannot be read.
     let profile = mojang_api::MinecraftSkinOperation::equip(
-        &selected_credentials,
+        selected_credentials,
         stream::iter([Ok::<_, String>(Bytes::clone(&texture_blob))]),
         variant,
     )
@@ -476,7 +476,7 @@ async fn add_and_equip_custom_skin_now(
     };
 
     if let Err(error) = persistence_result {
-        refresh_profile_cache(&selected_credentials).await;
+        refresh_profile_cache(selected_credentials).await;
         return Err(error);
     }
 
@@ -490,10 +490,9 @@ async fn add_and_equip_custom_skin_now(
         .await?;
     }
 
-    if let Err(error) =
-        sync_cape(&selected_credentials, &profile, cape_id).await
+    if let Err(error) = sync_cape(selected_credentials, &profile, cape_id).await
     {
-        refresh_profile_cache(&selected_credentials).await;
+        refresh_profile_cache(selected_credentials).await;
         return Err(error);
     }
 
@@ -511,7 +510,7 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    set_pending_skin_change(PendingSkinChange::EquipSkin {
+    set_pending_skin_change(PendingSkinChange::Equip {
         selected_credentials,
         skin,
     })
@@ -536,7 +535,7 @@ async fn equip_skin_now(
     preserve_current_profile_skin(&state, &profile).await?;
 
     let profile = mojang_api::MinecraftSkinOperation::equip(
-        &selected_credentials,
+        selected_credentials,
         png_util::url_to_data_stream(&skin.texture).await?,
         skin.variant,
     )
@@ -553,9 +552,9 @@ async fn equip_skin_now(
     };
 
     if let Err(error) =
-        sync_cape(&selected_credentials, &profile, skin.cape_id).await
+        sync_cape(selected_credentials, &profile, skin.cape_id).await
     {
-        refresh_profile_cache(&selected_credentials).await;
+        refresh_profile_cache(selected_credentials).await;
         return Err(error);
     }
 
@@ -671,7 +670,7 @@ pub async fn unequip_skin() -> crate::Result<()> {
         .await?
         .ok_or(ErrorKind::NoCredentialsError)?;
 
-    set_pending_skin_change(PendingSkinChange::UnequipSkin {
+    set_pending_skin_change(PendingSkinChange::Unequip {
         selected_credentials,
     })
     .await;
@@ -693,11 +692,11 @@ async fn unequip_skin_now(
 
     preserve_current_profile_skin(&state, &profile).await?;
 
-    mojang_api::MinecraftSkinOperation::unequip_any(&selected_credentials)
+    mojang_api::MinecraftSkinOperation::unequip_any(selected_credentials)
         .await?;
 
-    if let Err(error) = sync_cape(&selected_credentials, &profile, None).await {
-        refresh_profile_cache(&selected_credentials).await;
+    if let Err(error) = sync_cape(selected_credentials, &profile, None).await {
+        refresh_profile_cache(selected_credentials).await;
         return Err(error);
     }
 
@@ -821,9 +820,7 @@ async fn flush_pending_skin_change_inner(
         if let Err(error) = execute_pending_skin_change(&entry.change).await {
             let profile_id = entry.change.profile_id();
             let mut state = PENDING_SKIN_CHANGE.lock().await;
-            if !state.pending.contains_key(&profile_id) {
-                state.pending.insert(profile_id, entry);
-            }
+            state.pending.entry(profile_id).or_insert(entry);
 
             return Err(error);
         }
@@ -838,7 +835,7 @@ async fn execute_pending_skin_change(
     change: &PendingSkinChange,
 ) -> crate::Result<()> {
     match change {
-        PendingSkinChange::AddAndEquipCustomSkin {
+        PendingSkinChange::AddAndEquipCustom {
             selected_credentials,
             texture_blob,
             variant,
@@ -854,11 +851,11 @@ async fn execute_pending_skin_change(
             )
             .await
         }
-        PendingSkinChange::EquipSkin {
+        PendingSkinChange::Equip {
             selected_credentials,
             skin,
         } => equip_skin_now(selected_credentials, skin).await,
-        PendingSkinChange::UnequipSkin {
+        PendingSkinChange::Unequip {
             selected_credentials,
         } => unequip_skin_now(selected_credentials).await,
     }
