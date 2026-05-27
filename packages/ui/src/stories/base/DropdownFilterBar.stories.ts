@@ -111,6 +111,24 @@ const mixedWidthCategories = [
 	},
 ]
 
+const mobileWidthCategories = [
+	{
+		key: 'country',
+		label: 'Country',
+		searchable: true,
+		searchPlaceholder: 'Search countries...',
+		submenuClass: 'w-[360px]',
+		options: [
+			{ value: 'US', label: 'United States' },
+			{ value: 'CA', label: 'Canada' },
+			{ value: 'DE', label: 'Germany' },
+			{ value: 'JP', label: 'Japan' },
+			{ value: 'BR', label: 'Brazil' },
+			{ value: 'AU', label: 'Australia' },
+		],
+	},
+]
+
 export const Default: Story = {
 	render: () => ({
 		components: { DropdownFilterBar },
@@ -326,6 +344,33 @@ export const MixedSubmenuWidthsNearEdge: Story = {
 			description: {
 				story:
 					'Covers mixed submenu widths near the viewport edge so all add-menu submenus open on the same side.',
+			},
+		},
+	},
+}
+
+export const MobileSubmenuWidth: Story = {
+	render: () => ({
+		components: { DropdownFilterBar },
+		setup() {
+			const selected = ref<Record<string, string[]>>({})
+			return { categories: mobileWidthCategories, selected }
+		},
+		template: /* html */ `
+			<div class="flex min-h-96 max-w-[390px] items-start px-4 py-8">
+				<DropdownFilterBar v-model="selected" :categories="categories" />
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {},
+		categories: mobileWidthCategories,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers mobile submenu page swaps where the submenu keeps its assigned width instead of inheriting the add-menu width.',
 			},
 		},
 	},

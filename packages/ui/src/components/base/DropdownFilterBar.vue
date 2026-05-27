@@ -109,9 +109,9 @@
 
 	<Teleport to="#teleports">
 		<Transition
-			enter-active-class="transition-opacity duration-150"
+			:enter-active-class="addMenuTransitionEnterActiveClass"
 			leave-active-class="transition-none duration-0"
-			enter-from-class="opacity-0"
+			:enter-from-class="addMenuTransitionEnterFromClass"
 			leave-to-class="opacity-0"
 		>
 			<div
@@ -595,9 +595,7 @@ const submenuStyle = computed<CSSProperties>(() => {
 	if (isMobileAddMenuLayout.value) {
 		return {
 			left: addMenuStyle.value.left,
-			minWidth: addMenuStyle.value.minWidth,
 			top: addMenuStyle.value.top,
-			width: addMenuStyle.value.width,
 		}
 	}
 
@@ -607,7 +605,14 @@ const submenuStyle = computed<CSSProperties>(() => {
 	}
 })
 const isMobileActiveSubmenu = computed(
-	() => isMobileAddMenuLayout.value && activeCategory.value !== undefined,
+	() =>
+		isMobileAddMenuLayout.value && activeCategory.value !== undefined && hasSubmenuPosition.value,
+)
+const addMenuTransitionEnterActiveClass = computed(() =>
+	isMobileAddMenuLayout.value ? 'transition-none duration-0' : 'transition-opacity duration-150',
+)
+const addMenuTransitionEnterFromClass = computed(() =>
+	isMobileAddMenuLayout.value ? 'opacity-100' : 'opacity-0',
 )
 const addMenuOutsideClickTarget = computed(() => menuContainer.value ?? submenu.value)
 const addMenuOutsideClickIgnore = computed(() => [addMenuTrigger, menuContainer, submenu])
@@ -1254,6 +1259,7 @@ function getViewportRect(): ViewportRect {
 
 function getAddMenuPosition({ triggerRect, dropdownRect, viewport }: MenuPositionOptions) {
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
+	const positionedDropdownWidth = Math.max(dropdownRect.width, dropdownWidth)
 	const triggerTop = triggerRect.top + viewport.offsetTop
 	const triggerBottom = triggerRect.bottom + viewport.offsetTop
 	const triggerLeft = triggerRect.left + viewport.offsetLeft
@@ -1262,7 +1268,10 @@ function getAddMenuPosition({ triggerRect, dropdownRect, viewport }: MenuPositio
 	const viewportLeft = viewport.offsetLeft
 	const viewportRight = viewport.offsetLeft + viewport.width
 	const minLeft = viewportLeft + DROPDOWN_VIEWPORT_MARGIN
-	const maxLeft = Math.max(minLeft, viewportRight - dropdownWidth - DROPDOWN_VIEWPORT_MARGIN)
+	const maxLeft = Math.max(
+		minLeft,
+		viewportRight - positionedDropdownWidth - DROPDOWN_VIEWPORT_MARGIN,
+	)
 	const hasSpaceBelow =
 		triggerBottom + dropdownRect.height + DROPDOWN_GAP + DROPDOWN_VIEWPORT_MARGIN <= viewportBottom
 	const hasSpaceAbove =
