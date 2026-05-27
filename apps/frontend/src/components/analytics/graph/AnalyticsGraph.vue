@@ -1135,9 +1135,6 @@ function onPinnedDrag(payload: HoverState) {
 
 function onTouchDragEnd() {
 	ignoreUpcomingChartClick()
-	if (!isHoverPinned.value) {
-		clearHoverState()
-	}
 }
 
 function onChartGeometry(payload: AnalyticsChartGeometryPayload) {

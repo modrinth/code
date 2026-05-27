@@ -785,7 +785,6 @@ function handleCanvasClickCapture(event: MouseEvent) {
 	clearSuppressNextChartClickTimeout()
 	event.preventDefault()
 	event.stopImmediatePropagation()
-	emit('hover', { visible: false, x: 0, y: 0, sliceIndex: null })
 	clearChartActiveState()
 	updateChartWithoutGeometry()
 }
