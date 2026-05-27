@@ -8,7 +8,7 @@
 			type="text"
 			inputmode="numeric"
 			placeholder="0"
-			class="h-8 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-center text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
+			class="h-8 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-center text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow max-sm:text-base"
 			:class="props.inputWidthClass"
 			:aria-label="props.inputAriaLabel"
 			@blur="formatInput"
