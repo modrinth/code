@@ -21,7 +21,7 @@
 			v-for="group in eventGroups"
 			:key="group.id"
 			type="button"
-			class="pointer-events-auto absolute -top-[26px] left-0 z-20 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 shadow-lg transition-colors focus-visible:border-brand focus-visible:text-contrast"
+			class="pointer-events-auto absolute left-0 top-0 z-20 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 transition-colors focus-visible:border-brand focus-visible:text-contrast"
 			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : 'text-secondary'"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"
@@ -48,7 +48,7 @@
 			<div
 				v-if="activeGroup"
 				ref="tooltipElement"
-				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] max-h-[360px] w-[min(12rem,calc(100vw-1rem))] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-xl"
+				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] max-h-[330px] w-[12rem] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-xl"
 				:style="tooltipStyle"
 				@mouseenter="onTooltipMouseEnter"
 				@mouseleave="onTooltipMouseLeave"
@@ -148,6 +148,7 @@ const MARKER_HORIZONTAL_PADDING_PX = 8
 const MARKER_COUNT_GAP_PX = 4
 const MARKER_COUNT_DIGIT_WIDTH_PX = 7
 const MARKER_HEIGHT_PX = 28
+const MARKER_TOP_OFFSET_PX = -26
 const TOOLTIP_OFFSET_PX = 8
 const EDGE_PADDING_PX = 8
 const OPEN_DELAY_MS = 300
@@ -346,34 +347,45 @@ const rangeHighlight = computed(() => {
 const markerTop = computed(() => {
 	const geometry = props.geometry
 	if (!geometry) return 0
-	const preferredTop = geometry.top
+	const preferredTop = geometry.top - MARKER_HEIGHT_PX
 	const availableHeight =
 		containerHeight.value -
 		MARKER_HEIGHT_PX -
 		EDGE_PADDING_PX -
 		Math.max(props.markerOffsetY ?? 0, 0)
-	return Math.min(availableHeight, preferredTop)
+	const maxTop = Math.max(EDGE_PADDING_PX, availableHeight)
+	return clamp(preferredTop, EDGE_PADDING_PX, maxTop)
 })
-const markerOffsetTop = computed(() => markerTop.value + (props.markerOffsetY ?? 0))
+const markerOffsetTop = computed(() => {
+	const maxTop = Math.max(
+		EDGE_PADDING_PX,
+		containerHeight.value - MARKER_HEIGHT_PX - EDGE_PADDING_PX,
+	)
+	return clamp(markerTop.value + (props.markerOffsetY ?? 0), EDGE_PADDING_PX, maxTop)
+})
 
 const tooltipStyle = computed(() => {
 	const group = activeGroup.value
 	if (!group) return {}
 
-	const viewportWidth = typeof window === 'undefined' ? containerWidth.value : window.innerWidth
-	const viewportHeight = typeof window === 'undefined' ? containerHeight.value : window.innerHeight
-	const desiredLeft = chartRect.left + group.x + group.markerOffsetX - tooltipWidth.value / 2
-	const maxLeft = Math.max(EDGE_PADDING_PX, viewportWidth - tooltipWidth.value - EDGE_PADDING_PX)
-	const left = Math.min(maxLeft, Math.max(EDGE_PADDING_PX, desiredLeft))
+	const maxTooltipWidth = Math.max(0, containerWidth.value - EDGE_PADDING_PX * 2)
+	const maxTooltipHeight = Math.max(0, containerHeight.value - EDGE_PADDING_PX * 2)
+	const resolvedTooltipWidth = Math.min(tooltipWidth.value, maxTooltipWidth)
+	const resolvedTooltipHeight = Math.min(tooltipHeight.value, maxTooltipHeight)
+	const markerX = getClampedMarkerCenterX(group)
+	const markerViewportLeft = chartRect.left + markerX
+	const markerViewportTop = chartRect.top + MARKER_TOP_OFFSET_PX + markerOffsetTop.value
+	const desiredLeft = markerViewportLeft - resolvedTooltipWidth / 2
+	const maxLeft = Math.max(
+		chartRect.left + EDGE_PADDING_PX,
+		chartRect.left + containerWidth.value - resolvedTooltipWidth - EDGE_PADDING_PX,
+	)
+	const left = clamp(desiredLeft, chartRect.left + EDGE_PADDING_PX, maxLeft)
 
-	const desiredTop =
-		chartRect.top +
-		markerOffsetTop.value -
-		tooltipHeight.value -
-		TOOLTIP_OFFSET_PX -
-		MARKER_HEIGHT_PX
-	const maxTop = Math.max(EDGE_PADDING_PX, viewportHeight - tooltipHeight.value - EDGE_PADDING_PX)
-	const top = Math.min(maxTop, Math.max(EDGE_PADDING_PX, desiredTop))
+	const desiredTop = markerViewportTop - resolvedTooltipHeight - TOOLTIP_OFFSET_PX
+	const viewportHeight = typeof window === 'undefined' ? containerHeight.value : window.innerHeight
+	const maxTop = Math.max(EDGE_PADDING_PX, viewportHeight - resolvedTooltipHeight - EDGE_PADDING_PX)
+	const top = clamp(desiredTop, EDGE_PADDING_PX, maxTop)
 
 	return {
 		transform: `translate3d(${left}px, ${top}px, 0)`,
@@ -452,6 +464,10 @@ function getGroupRightEdge(group: EventGroup) {
 	return group.x + getEstimatedMarkerWidth(group) / 2
 }
 
+function clamp(value: number, min: number, max: number) {
+	return Math.min(max, Math.max(min, value))
+}
+
 function applyCollisionOffsets(groups: EventGroup[]): EventGroup[] {
 	const sortedGroups = [...groups].sort(
 		(left, right) =>
@@ -460,11 +476,9 @@ function applyCollisionOffsets(groups: EventGroup[]): EventGroup[] {
 			left.groupKey.localeCompare(right.groupKey),
 	)
 	const offsetByGroupId = new Map<string, number>()
-	let cluster: EventGroup[] = []
+	const clusterLayouts = getStableCollisionClusterLayouts(sortedGroups.map((group) => [group]))
 
-	function commitCluster() {
-		if (cluster.length === 0) return
-		const layout = getCollisionClusterLayout(cluster)
+	for (const layout of clusterLayouts) {
 		let cursor = layout.left
 		layout.groups.forEach((group, index) => {
 			const markerWidth = layout.markerWidths[index]
@@ -472,19 +486,7 @@ function applyCollisionOffsets(groups: EventGroup[]): EventGroup[] {
 			offsetByGroupId.set(group.id, targetX - group.x)
 			cursor += markerWidth + GROUP_MARKER_GAP_PX
 		})
-		cluster = []
 	}
-
-	for (const group of sortedGroups) {
-		const groupLeftEdge = getGroupLeftEdge(group)
-		const clusterRightEdge =
-			cluster.length > 0 ? getCollisionClusterLayout(cluster).right : Number.NEGATIVE_INFINITY
-		if (cluster.length > 0 && groupLeftEdge - clusterRightEdge > GROUP_MARKER_GAP_PX) {
-			commitCluster()
-		}
-		cluster.push(group)
-	}
-	commitCluster()
 
 	return groups.map((group) => ({
 		...group,
@@ -494,6 +496,45 @@ function applyCollisionOffsets(groups: EventGroup[]): EventGroup[] {
 
 function getMarkerIconOrder(markerIcon: AnalyticsChartEventMarkerIcon) {
 	return markerIcon === 'info' ? 0 : 1
+}
+
+function getStableCollisionClusterLayouts(clusters: EventGroup[][]) {
+	let nextClusters = clusters
+	let didMerge = true
+
+	while (didMerge) {
+		const mergedClusters: EventGroup[][] = []
+		const layouts = nextClusters.map(getCollisionClusterLayout).sort(compareCollisionClusterLayouts)
+		didMerge = false
+
+		for (const layout of layouts) {
+			const previousCluster = mergedClusters[mergedClusters.length - 1]
+			if (!previousCluster) {
+				mergedClusters.push([...layout.groups])
+				continue
+			}
+
+			const previousLayout = getCollisionClusterLayout(previousCluster)
+			if (layout.left - previousLayout.right <= GROUP_MARKER_GAP_PX) {
+				previousCluster.push(...layout.groups)
+				didMerge = true
+				continue
+			}
+
+			mergedClusters.push([...layout.groups])
+		}
+
+		nextClusters = mergedClusters
+	}
+
+	return nextClusters.map(getCollisionClusterLayout).sort(compareCollisionClusterLayouts)
+}
+
+function compareCollisionClusterLayouts(
+	left: ReturnType<typeof getCollisionClusterLayout>,
+	right: ReturnType<typeof getCollisionClusterLayout>,
+) {
+	return left.left - right.left || left.right - right.right
 }
 
 function getCollisionClusterLayout(groups: EventGroup[]) {
@@ -510,7 +551,9 @@ function getCollisionClusterLayout(groups: EventGroup[]) {
 	const originalLeft = Math.min(...groups.map(getGroupLeftEdge))
 	const originalRight = Math.max(...groups.map(getGroupRightEdge))
 	const center = (originalLeft + originalRight) / 2
-	const left = center - totalWidth / 2
+	const preferredLeft = center - totalWidth / 2
+	const maxLeft = Math.max(EDGE_PADDING_PX, containerWidth.value - totalWidth - EDGE_PADDING_PX)
+	const left = clamp(preferredLeft, EDGE_PADDING_PX, maxLeft)
 	return {
 		groups: sortedGroups,
 		markerWidths,
@@ -525,6 +568,13 @@ function getEstimatedMarkerWidth(group: EventGroup) {
 			? MARKER_COUNT_GAP_PX + String(group.events.length).length * MARKER_COUNT_DIGIT_WIDTH_PX
 			: 0
 	return MARKER_ICON_WIDTH_PX + MARKER_HORIZONTAL_PADDING_PX + countWidth
+}
+
+function getClampedMarkerCenterX(group: EventGroup) {
+	const markerWidth = getEstimatedMarkerWidth(group)
+	const minX = markerWidth / 2 + EDGE_PADDING_PX
+	const maxX = Math.max(minX, containerWidth.value - markerWidth / 2 - EDGE_PADDING_PX)
+	return clamp(group.x + group.markerOffsetX, minX, maxX)
 }
 
 function getDateBucketX(
@@ -588,9 +638,9 @@ function getTimeAxisX(
 
 function getMarkerStyle(group: EventGroup) {
 	return {
-		transform: `translate(-50%, 0) translate(${
-			group.x + group.markerOffsetX
-		}px, ${markerOffsetTop.value}px)`,
+		transform: `translate(-50%, 0) translate(${getClampedMarkerCenterX(
+			group,
+		)}px, ${MARKER_TOP_OFFSET_PX + markerOffsetTop.value}px)`,
 	}
 }
 
