@@ -40,10 +40,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("user", web::get().to(user_auth_get));
     cfg.route("users", web::get().to(users_get));
     cfg.route("user_email", web::get().to(admin_user_email));
-    cfg.route("all-projects", web::get().to(all_projects));
 
     cfg.service(
         web::scope("user")
+            .route("{user_id}/all-projects", web::get().to(all_projects))
             .route("{user_id}/projects", web::get().to(projects_list))
             .route("{id}/notes", web::patch().to(user_notes_edit))
             .route("{id}", web::get().to(user_get))
@@ -72,6 +72,7 @@ pub struct UserEmailQuery {
 
 pub async fn all_projects(
     req: HttpRequest,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -81,15 +82,19 @@ pub async fn all_projects(
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
+        Scopes::PROJECT_READ,
     )
-    .await?
-    .1;
+    .await
+    .map(|x| x.1)
+    .ok();
+    let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await?
+        .ok_or(ApiError::NotFound)?;
 
     let user_project_ids =
-        DBUser::get_projects(user.id.into(), &**pool, &redis).await?;
+        DBUser::get_projects(target_user.id, &**pool, &redis).await?;
     let organization_ids =
-        DBUser::get_organizations(user.id.into(), &**pool).await?;
+        DBUser::get_organizations(target_user.id, &**pool).await?;
     let organizations_data =
         DBOrganization::get_many_ids(&organization_ids, &**pool, &redis)
             .await?;
@@ -124,7 +129,7 @@ pub async fn all_projects(
     let mut organizations = HashMap::new();
     let mut visible_organization_ids = Vec::new();
     for data in organizations_data {
-        if !is_visible_organization(&data, &Some(user.clone()), &pool, &redis)
+        if !is_visible_organization(&data, &user, &pool, &redis)
             .await?
         {
             continue;
@@ -132,14 +137,23 @@ pub async fn all_projects(
 
         visible_organization_ids.push(data.id);
         let members_data = team_groups.remove(&data.team_id).unwrap_or(vec![]);
+        let logged_in = user
+            .as_ref()
+            .and_then(|user| {
+                members_data
+                    .iter()
+                    .find(|x| x.user_id == user.id.into() && x.accepted)
+            })
+            .is_some();
         let team_members = members_data
             .into_iter()
+            .filter(|x| logged_in || x.accepted || target_user.id == x.user_id)
             .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|member| {
                     crate::models::teams::TeamMember::from(
                         data,
                         member.clone(),
-                        false,
+                        !logged_in,
                     )
                 })
             })
@@ -179,8 +193,7 @@ pub async fn all_projects(
         crate::database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await?;
     let projects =
-        filter_visible_projects(projects_data, &Some(user), &pool, true)
-            .await?;
+        filter_visible_projects(projects_data, &user, &pool, true).await?;
 
     Ok(web::Json(AllProjectsResponse {
         projects,
