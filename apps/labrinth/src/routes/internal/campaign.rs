@@ -4,7 +4,7 @@ use eyre::eyre;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use tracing::warn;
+use tracing::{info, warn};
 use uuid::Uuid;
 
 use crate::{
@@ -129,10 +129,10 @@ pub async fn tiltify_webhook(
         user_id: None,
     };
 
-    let result = async {
+    let username = async {
         // then we can attempt user lookups
-        let username = &payload.data.user.username;
-        let user = DBUser::get(username, &**pool, &redis)
+        let username = payload.data.user.username;
+        let user = DBUser::get(&username, &**pool, &redis)
             .await
             .wrap_err("fetching user from database")?
             .wrap_err_with(|| {
@@ -140,15 +140,15 @@ pub async fn tiltify_webhook(
             })?;
 
         donation.user_id = Some(user.id);
-        eyre::Ok(())
+        eyre::Ok(username)
     }
-    .await;
+    .await
+    .inspect_err(|err| {
+        warn!("Failed to resolve donation to Modrinth user: {err:?}")
+    })
+    .ok();
 
-    if let Err(err) = result {
-        warn!("Failed to resolve donation to Modrinth user: {err:?}");
-    }
-
-    let result = async {
+    let amount_usd = async {
         // and insert value amount
         let amount_usd =
             amount_raised_usd(&payload.data.amount_raised, &payouts_queue)
@@ -156,13 +156,19 @@ pub async fn tiltify_webhook(
                 .wrap_err("failed to get donation amount")?;
 
         donation.amount_usd = Some(amount_usd);
-        eyre::Ok(())
+        eyre::Ok(amount_usd)
     }
-    .await;
+    .await
+    .inspect_err(|err| warn!("Failed to resolve donation amount: {err:?}"))
+    .ok();
 
-    if let Err(err) = result {
-        warn!("Failed to resolve donation amount: {err:?}");
-    }
+    info!(
+        "Resolved donation from {} for US${}",
+        username.as_deref().unwrap_or("<unknown>"),
+        amount_usd
+            .map(|a| a.to_string())
+            .unwrap_or_else(|| "<unknown>".to_string())
+    );
 
     donation
         .insert(&mut transaction)
