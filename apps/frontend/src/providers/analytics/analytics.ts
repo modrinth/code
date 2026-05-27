@@ -149,6 +149,15 @@ interface AnalyticsDataFilterOptionSummary {
 	countryDownloadsByCode: Map<string, number>
 }
 
+interface AnalyticsFacetsFilterOptionSummary {
+	countries: string[]
+	downloadSources: string[]
+	downloadReasons: string[]
+	gameVersions: string[]
+	loaderTypes: string[]
+	versionIds: string[]
+}
+
 interface ProjectVersionFilterOptionSummary {
 	gameVersions: string[]
 	loaderTypes: string[]
@@ -523,51 +532,21 @@ function buildDailyAnalyticsFetchRequest(
 	}
 }
 
-function buildAnalyticsFilterOptionsRequests(
+function buildAnalyticsFacetsRequest(
 	projectIds: string[],
-	endTimestamp: string,
-): Labrinth.Analytics.v3.FetchRequest[] {
-	const buildRequest = (
-		returnMetrics: Labrinth.Analytics.v3.ReturnMetrics,
-	): Labrinth.Analytics.v3.FetchRequest => ({
+	timeRange: Labrinth.Analytics.v3.TimeRange,
+): Labrinth.Analytics.v3.FetchRequest {
+	return {
 		time_range: {
-			start: ANALYTICS_START_TIMESTAMP,
-			end: endTimestamp,
+			start: timeRange.start,
+			end: timeRange.end,
 			resolution: {
 				slices: 1,
 			},
 		},
 		project_ids: projectIds,
-		return_metrics: returnMetrics,
-	})
-
-	return [
-		buildRequest({
-			project_views: {
-				bucket_by: ['country'],
-			},
-		}),
-		buildRequest({
-			project_downloads: {
-				bucket_by: ['country'],
-			},
-		}),
-		buildRequest({
-			project_playtime: {
-				bucket_by: ['country'],
-			},
-		}),
-		buildRequest({
-			project_downloads: {
-				bucket_by: ['user_agent'],
-			},
-		}),
-		buildRequest({
-			project_downloads: {
-				bucket_by: ['reason'],
-			},
-		}),
-	]
+		return_metrics: {},
+	}
 }
 
 function addAnalyticsDays(date: Date, days: number): Date {
@@ -1056,6 +1035,57 @@ function getAnalyticsDataFilterOptionSummary(
 	}
 }
 
+function getAnalyticsFacetsFilterOptionSummary(
+	facets: Labrinth.Analytics.v3.AnalyticsFacets | null | undefined,
+): AnalyticsFacetsFilterOptionSummary {
+	if (!facets) {
+		return {
+			countries: [],
+			downloadSources: [],
+			downloadReasons: [],
+			gameVersions: [],
+			loaderTypes: [],
+			versionIds: [],
+		}
+	}
+
+	const countries = new Set([
+		...facets.project_views.country,
+		...facets.project_downloads.country,
+		...facets.project_playtime.country,
+	])
+	const gameVersions = new Set([
+		...facets.project_downloads.game_version,
+		...facets.project_playtime.game_version,
+	])
+	const loaderTypes = new Set<string>()
+	for (const loader of [...facets.project_downloads.loader, ...facets.project_playtime.loader]) {
+		const normalizedLoader = loader.trim().toLowerCase()
+		if (normalizedLoader.length > 0 && normalizedLoader !== 'mrpack') {
+			loaderTypes.add(normalizedLoader)
+		}
+	}
+
+	return {
+		countries: sortStringValues(
+			[...countries]
+				.map((country) => country.trim().toUpperCase())
+				.filter((country) => country.length > 0),
+		),
+		downloadSources: sortStringValues(facets.project_downloads.user_agent),
+		downloadReasons: sortStringValues(facets.project_downloads.reason),
+		gameVersions: sortStringValues(
+			[...gameVersions]
+				.map((gameVersion) => gameVersion.trim())
+				.filter((gameVersion) => gameVersion.length > 0),
+		),
+		loaderTypes: sortStringValues([...loaderTypes]),
+		versionIds: sortStringValues([
+			...new Set([...facets.project_downloads.version_id, ...facets.project_playtime.version_id]),
+		]),
+	}
+}
+
 function addVersionIdsFromTimeSlices(
 	versionIds: Set<string>,
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
@@ -1415,6 +1445,18 @@ export function createAnalyticsDashboardContext(
 			!hasOrganizationContext.value &&
 			(effectiveUserId.value !== options.auth.value.user?.id || !options.auth.value.user?.username),
 	)
+	const shouldFetchDashboardAllProjects = computed(
+		() =>
+			Boolean(options.auth.value.user?.id) &&
+			isDashboardAnalyticsRoute.value &&
+			!isUsingDashboardUserOverride.value,
+	)
+	const shouldFetchLegacyDashboardProjects = computed(
+		() =>
+			Boolean(effectiveUserId.value) &&
+			isDashboardAnalyticsRoute.value &&
+			isUsingDashboardUserOverride.value,
+	)
 
 	const { data: effectiveUser } = useQuery({
 		queryKey: computed(() => ['analytics', 'dashboard', effectiveUserId.value, 'user']),
@@ -1445,6 +1487,17 @@ export function createAnalyticsDashboardContext(
 		return effectiveUser.value?.username ?? effectiveUserId.value ?? 'User'
 	})
 
+	const { data: dashboardAllProjects, isFetched: hasFetchedDashboardAllProjects } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			options.auth.value.user?.id,
+			'all-projects',
+		]),
+		queryFn: () => client.labrinth.users_v3.getAllProjects(),
+		enabled: shouldFetchDashboardAllProjects,
+	})
+
 	const { data: userProjects, isFetched: hasFetchedUserProjects } = useQuery({
 		queryKey: computed(() => ['analytics', 'dashboard', effectiveUserId.value, 'projects']),
 		queryFn: async () => {
@@ -1460,7 +1513,9 @@ export function createAnalyticsDashboardContext(
 		},
 		enabled: computed(
 			() =>
-				Boolean(effectiveUserId.value) && !hasProjectContext.value && !hasOrganizationContext.value,
+				shouldFetchLegacyDashboardProjects.value &&
+				!hasProjectContext.value &&
+				!hasOrganizationContext.value,
 		),
 		placeholderData: [],
 	})
@@ -1480,7 +1535,9 @@ export function createAnalyticsDashboardContext(
 		},
 		enabled: computed(
 			() =>
-				Boolean(effectiveUserId.value) && !hasProjectContext.value && !hasOrganizationContext.value,
+				shouldFetchLegacyDashboardProjects.value &&
+				!hasProjectContext.value &&
+				!hasOrganizationContext.value,
 		),
 		placeholderData: [],
 	})
@@ -1537,7 +1594,7 @@ export function createAnalyticsDashboardContext(
 		},
 		enabled: computed(
 			() =>
-				Boolean(effectiveUserId.value) &&
+				shouldFetchLegacyDashboardProjects.value &&
 				hasFetchedUserProjects.value &&
 				extraUserProjectOrganizationIds.value.length > 0 &&
 				!hasProjectContext.value &&
@@ -1577,7 +1634,7 @@ export function createAnalyticsDashboardContext(
 				),
 			enabled: computed(
 				() =>
-					Boolean(effectiveUserId.value) &&
+					shouldFetchLegacyDashboardProjects.value &&
 					hasFetchedUserOrganizations.value &&
 					!hasProjectContext.value &&
 					!hasOrganizationContext.value,
@@ -1592,6 +1649,10 @@ export function createAnalyticsDashboardContext(
 
 		if (hasOrganizationContext.value) {
 			return options.organizationContext?.projects.value !== null
+		}
+
+		if (shouldFetchDashboardAllProjects.value) {
+			return hasFetchedDashboardAllProjects.value
 		}
 
 		const areExtraUserProjectOrganizationsLoaded =
@@ -1626,6 +1687,53 @@ export function createAnalyticsDashboardContext(
 						new Set(),
 					),
 				},
+			]
+		}
+
+		if (shouldFetchDashboardAllProjects.value) {
+			const response = dashboardAllProjects.value
+			if (!response) {
+				return []
+			}
+
+			const seenProjectIds = new Set<string>()
+			const personalProjects: AnalyticsDashboardProject[] = []
+			const organizationGroupsById = new Map<string, AnalyticsDashboardProjectGroup>()
+
+			for (const project of response.projects) {
+				if (seenProjectIds.has(project.id) || !isAnalyticsEligibleProject(project)) {
+					continue
+				}
+
+				seenProjectIds.add(project.id)
+				const organizationId = getProjectOrganizationId(project)
+				const analyticsProject = toAnalyticsDashboardProject(project)
+				if (!organizationId) {
+					personalProjects.push(analyticsProject)
+					continue
+				}
+
+				const organizationGroup = organizationGroupsById.get(organizationId) ?? {
+					key: organizationId,
+					title: response.organizations[organizationId]?.name ?? organizationId,
+					projects: [],
+				}
+				organizationGroup.projects.push(analyticsProject)
+				organizationGroupsById.set(organizationId, organizationGroup)
+			}
+
+			const organizationGroups = [...organizationGroupsById.values()]
+			if (personalProjects.length === 0) {
+				return organizationGroups
+			}
+
+			return [
+				{
+					key: organizationGroups.length > 0 ? `user-${options.auth.value.user?.id}` : undefined,
+					title: organizationGroups.length > 0 ? effectiveUsername.value : undefined,
+					projects: personalProjects,
+				},
+				...organizationGroups,
 			]
 		}
 
@@ -2307,21 +2415,17 @@ export function createAnalyticsDashboardContext(
 		{ deep: true, immediate: true },
 	)
 
-	const analyticsFilterOptionsRequests = computed<Labrinth.Analytics.v3.FetchRequest[] | null>(
-		() => {
-			if (sortedSelectedProjectIds.value.length === 0) {
-				return null
-			}
+	const analyticsFacetsRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
+		const nextFetchRequest = fetchRequest.value
+		if (!nextFetchRequest || sortedSelectedProjectIds.value.length === 0) {
+			return null
+		}
 
-			return buildAnalyticsFilterOptionsRequests(
-				sortedSelectedProjectIds.value,
-				new Date(queryRefreshTimestamp.value).toISOString(),
-			)
-		},
-	)
+		return buildAnalyticsFacetsRequest(sortedSelectedProjectIds.value, nextFetchRequest.time_range)
+	})
 
 	const {
-		data: analyticsFilterOptionsData,
+		data: analyticsFacetsData,
 		isFetched: hasFetchedAnalyticsFilterOptions,
 		isFetching: isAnalyticsFilterOptionsFetching,
 	} = useQuery({
@@ -2330,27 +2434,44 @@ export function createAnalyticsDashboardContext(
 			'dashboard',
 			analyticsQueryUserId.value,
 			'filter-options',
-			'analytics-fields',
-			sortedSelectedProjectIds.value,
+			'facets',
+			analyticsFacetsRequest.value,
 			queryRefreshTimestamp.value,
 		]),
-		queryFn: async () => {
-			const requests = (analyticsFilterOptionsRequests.value ?? []).filter(
-				isAnalyticsFetchRequestReady,
-			)
-			const timeSliceGroups = await Promise.all(
-				requests.map((request) =>
-					fetchAnalyticsTimeSlices(request, (nextRequest) =>
-						client.labrinth.analytics_v3.fetch(nextRequest),
-					),
-				),
-			)
-			return timeSliceGroups.flat()
+		queryFn: () => {
+			const nextRequest = analyticsFacetsRequest.value
+			if (!isAnalyticsFetchRequestReady(nextRequest)) {
+				return {
+					facets: {
+						project_views: {
+							domain: [],
+							site_path: [],
+							monetized: [],
+							country: [],
+						},
+						project_downloads: {
+							domain: [],
+							user_agent: [],
+							version_id: [],
+							monetized: [],
+							country: [],
+							reason: [],
+							game_version: [],
+							loader: [],
+						},
+						project_playtime: {
+							version_id: [],
+							loader: [],
+							game_version: [],
+							country: [],
+						},
+					},
+				}
+			}
+
+			return client.labrinth.analytics_v3.fetchFacets(nextRequest)
 		},
-		enabled: computed(
-			() =>
-				analyticsFilterOptionsRequests.value !== null && hasCompletedCurrentTimeSliceFetch.value,
-		),
+		enabled: computed(() => isAnalyticsFetchRequestReady(analyticsFacetsRequest.value)),
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})
 
@@ -2370,39 +2491,37 @@ export function createAnalyticsDashboardContext(
 					(ids) => client.labrinth.projects_v3.getMultiple(ids),
 					(ids) => client.labrinth.versions_v3.getVersions(ids),
 				),
-			enabled: computed(
-				() => sortedSelectedProjectIds.value.length > 0 && hasCompletedCurrentTimeSliceFetch.value,
-			),
+			enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
 			placeholderData: [],
 			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 		})
 
-	const analyticsDataFilterOptionSummary = computed(() =>
-		getAnalyticsDataFilterOptionSummary(analyticsFilterOptionsData.value ?? []),
+	const analyticsFacetsFilterOptionSummary = computed(() =>
+		getAnalyticsFacetsFilterOptionSummary(analyticsFacetsData.value?.facets),
 	)
 	const projectVersionFilterOptionSummary = computed(() =>
 		getProjectVersionFilterOptionSummary(filterOptionProjectVersions.value ?? []),
 	)
 	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() => ({
-		countries: analyticsDataFilterOptionSummary.value.countries,
-		downloadSources: analyticsDataFilterOptionSummary.value.downloadSources,
-		downloadReasons: analyticsDataFilterOptionSummary.value.downloadReasons,
+		countries: analyticsFacetsFilterOptionSummary.value.countries,
+		downloadSources: analyticsFacetsFilterOptionSummary.value.downloadSources,
+		downloadReasons: analyticsFacetsFilterOptionSummary.value.downloadReasons,
 		gameVersions: sortStringValues([
 			...new Set([
 				...projectVersionFilterOptionSummary.value.gameVersions,
-				...analyticsDataFilterOptionSummary.value.gameVersions,
+				...analyticsFacetsFilterOptionSummary.value.gameVersions,
 			]),
 		]),
 		loaderTypes: sortStringValues([
 			...new Set([
 				...projectVersionFilterOptionSummary.value.loaderTypes,
-				...analyticsDataFilterOptionSummary.value.loaderTypes,
+				...analyticsFacetsFilterOptionSummary.value.loaderTypes,
 			]),
 		]),
 		versionIds: sortStringValues([
 			...new Set([
 				...projectVersionFilterOptionSummary.value.versionIds,
-				...analyticsDataFilterOptionSummary.value.versionIds,
+				...analyticsFacetsFilterOptionSummary.value.versionIds,
 			]),
 		]),
 	}))
@@ -2584,8 +2703,11 @@ export function createAnalyticsDashboardContext(
 	const projectVersionDownloadsById = computed(
 		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.downloads])),
 	)
+	const currentAnalyticsDataFilterOptionSummary = computed(() =>
+		getAnalyticsDataFilterOptionSummary(timeSlices.value),
+	)
 	const countryDownloadsByCode = computed(
-		() => analyticsDataFilterOptionSummary.value.countryDownloadsByCode,
+		() => currentAnalyticsDataFilterOptionSummary.value.countryDownloadsByCode,
 	)
 	const gameVersionDownloadsByVersion = computed(() => {
 		const downloadsByVersion = new Map<string, number>()

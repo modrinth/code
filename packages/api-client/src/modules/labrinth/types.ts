@@ -275,17 +275,24 @@ export namespace Labrinth {
 			export type TimeRangeResolution = { slices: number } | { minutes: number }
 
 			export type ReturnMetrics = {
-				project_views?: Metrics<ProjectViewsField>
-				project_downloads?: Metrics<ProjectDownloadsField>
-				project_playtime?: Metrics<ProjectPlaytimeField>
-				project_revenue?: Metrics<ProjectRevenueField>
-				affiliate_code_clicks?: Metrics<AffiliateCodeClicksField>
-				affiliate_code_conversions?: Metrics<AffiliateCodeConversionsField>
-				affiliate_code_revenue?: Metrics<AffiliateCodeRevenueField>
+				project_views?: Metrics<ProjectViewsField, ProjectViewsFilters>
+				project_downloads?: Metrics<ProjectDownloadsField, ProjectDownloadsFilters>
+				project_playtime?: Metrics<ProjectPlaytimeField, ProjectPlaytimeFilters>
+				project_revenue?: Metrics<ProjectRevenueField, ProjectRevenueFilters>
+				affiliate_code_clicks?: Metrics<AffiliateCodeClicksField, AffiliateCodeClicksFilters>
+				affiliate_code_conversions?: Metrics<
+					AffiliateCodeConversionsField,
+					AffiliateCodeConversionsFilters
+				>
+				affiliate_code_revenue?: Metrics<
+					AffiliateCodeRevenueField,
+					AffiliateCodeRevenueFilters
+				>
 			}
 
-			export type Metrics<F> = {
-				bucket_by?: F[]
+			export type Metrics<BucketBy, FilterBy> = {
+				bucket_by?: BucketBy[]
+				filter_by?: FilterBy
 			}
 
 			export type ProjectViewsField =
@@ -299,7 +306,7 @@ export namespace Labrinth {
 				| 'project_id'
 				| 'version_id'
 				| 'user_agent'
-				| 'site_path'
+				| 'domain'
 				| 'country'
 				| 'monetized'
 				| 'reason'
@@ -323,9 +330,83 @@ export namespace Labrinth {
 
 			export type AffiliateCodeRevenueField = 'affiliate_code_id'
 
+			export type ProjectViewsFilters = {
+				domain?: string[]
+				site_path?: string[]
+				monetized?: boolean[]
+				country?: string[]
+			}
+
+			export type ProjectDownloadsFilters = {
+				version_id?: string[]
+				domain?: string[]
+				user_agent?: string[]
+				monetized?: boolean[]
+				country?: string[]
+				reason?: DownloadReason[]
+				game_version?: string[]
+				loader?: string[]
+			}
+
+			export type ProjectPlaytimeFilters = {
+				version_id?: string[]
+				loader?: string[]
+				game_version?: string[]
+				country?: string[]
+			}
+
+			export type ProjectRevenueFilters = Record<string, never>
+
+			export type AffiliateCodeClicksFilters = {
+				affiliate_code_id?: string[]
+			}
+
+			export type AffiliateCodeConversionsFilters = {
+				affiliate_code_id?: string[]
+			}
+
+			export type AffiliateCodeRevenueFilters = {
+				affiliate_code_id?: string[]
+			}
+
 			export type FetchResponse = {
 				metrics: TimeSlice[]
 				project_events: ProjectAnalyticsEvent[]
+			}
+
+			export type FacetsResponse = {
+				facets: AnalyticsFacets
+			}
+
+			export type AnalyticsFacets = {
+				project_views: ProjectViewsFacets
+				project_downloads: ProjectDownloadsFacets
+				project_playtime: ProjectPlaytimeFacets
+			}
+
+			export type ProjectViewsFacets = {
+				domain: string[]
+				site_path: string[]
+				monetized: boolean[]
+				country: string[]
+			}
+
+			export type ProjectDownloadsFacets = {
+				domain: string[]
+				user_agent: string[]
+				version_id: string[]
+				monetized: boolean[]
+				country: string[]
+				reason: DownloadReason[]
+				game_version: string[]
+				loader: string[]
+			}
+
+			export type ProjectPlaytimeFacets = {
+				version_id: string[]
+				loader: string[]
+				game_version: string[]
+				country: string[]
 			}
 
 			export type TimeSlice = AnalyticsData[]
@@ -370,7 +451,7 @@ export namespace Labrinth {
 
 			export type ProjectDownloads = {
 				user_agent?: string
-				site_path?: string
+				domain?: string
 				version_id?: string
 				country?: string
 				monetized?: boolean
@@ -1236,6 +1317,11 @@ export namespace Labrinth {
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
 				github_id?: number
+			}
+
+			export type AllProjectsResponse = {
+				projects: Projects.v3.Project[]
+				organizations: Record<string, Organizations.v3.Organization>
 			}
 		}
 	}

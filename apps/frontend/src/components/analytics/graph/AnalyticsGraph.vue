@@ -32,7 +32,7 @@
 				class="flex w-full flex-col items-start justify-between gap-3 rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4 sm:flex-row sm:items-center"
 			>
 				<div class="flex flex-col gap-0.5">
-					<div class="text-xl font-semibold text-contrast">
+					<div class="w-max text-xl font-semibold text-contrast">
 						{{ graphTitle }}
 					</div>
 					<div
@@ -60,7 +60,7 @@
 					</div>
 				</div>
 
-				<div class="flex w-full select-none flex-wrap-reverse items-center justify-end gap-3">
+				<div class="flex grow select-none flex-wrap-reverse items-center justify-end gap-3 gap-y-2">
 					<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
 						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
 							>Ratio</label

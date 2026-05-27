@@ -390,8 +390,10 @@ import {
 
 import {
 	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardStat,
 	type AnalyticsDashboardProject,
 	type AnalyticsGroupByPreset,
+	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedBreakdowns,
 	type AnalyticsSelectedFilters,
 	getProjectIdsMatchingStatusFilter,
@@ -987,78 +989,136 @@ function withBreakdownFields(
 		}
 	}
 
-	if (filters.country.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('country')
-		if (includesStat(filterStats, 'views') && includesStat(enabledStats, 'views')) {
-			views.push('country')
-		}
-		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('country')
-		}
-		if (includesStat(filterStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-			playtime.push('country')
-		}
-	}
-
-	if (filters.monetization.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('monetization')
-		if (includesStat(filterStats, 'views') && includesStat(enabledStats, 'views')) {
-			views.push('monetized')
-		}
-		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('monetized')
-		}
-	}
-
-	if (filters.user_agent.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('user_agent')
-		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('user_agent')
-		}
-	}
-
-	if (filters.download_reason.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('download_reason')
-		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('reason')
-		}
-	}
-
-	if (filters.version_id.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('version_id')
-		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('version_id')
-		}
-		if (includesStat(filterStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-			playtime.push('version_id')
-		}
-	}
-
-	if (filters.game_version.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('game_version')
-		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('game_version')
-		}
-		if (includesStat(filterStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-			playtime.push('game_version')
-		}
-	}
-
-	if (filters.loader_type.length > 0) {
-		const filterStats = getAnalyticsStatsForFilterCategory('loader_type')
-		if (includesStat(filterStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
-			downloads.push('loader')
-		}
-		if (includesStat(filterStats, 'playtime') && includesStat(enabledStats, 'playtime')) {
-			playtime.push('loader')
-		}
-	}
-
 	return {
 		views: unique(views),
 		downloads: unique(downloads),
 		playtime: unique(playtime),
 		revenue: unique(revenue),
+	}
+}
+
+function getFilterValuesForStat(
+	category: AnalyticsQueryFilterCategory,
+	stat: AnalyticsDashboardStat,
+	enabledStats: readonly AnalyticsDashboardStat[],
+	values: string[],
+): string[] {
+	if (values.length === 0) {
+		return []
+	}
+
+	const filterStats = getAnalyticsStatsForFilterCategory(category)
+	return includesStat(filterStats, stat) && includesStat(enabledStats, stat) ? sortStrings(values) : []
+}
+
+function getMonetizationFilterValues(
+	stat: AnalyticsDashboardStat,
+	enabledStats: readonly AnalyticsDashboardStat[],
+	filters: AnalyticsSelectedFilters,
+): boolean[] {
+	const values = getFilterValuesForStat(
+		'monetization',
+		stat,
+		enabledStats,
+		filters.monetization,
+	)
+	const monetizedValues: boolean[] = []
+	if (values.includes('monetized')) {
+		monetizedValues.push(true)
+	}
+	if (values.includes('unmonetized')) {
+		monetizedValues.push(false)
+	}
+	return monetizedValues
+}
+
+function getDownloadReasonFilterValues(
+	enabledStats: readonly AnalyticsDashboardStat[],
+	filters: AnalyticsSelectedFilters,
+): Labrinth.Analytics.v3.DownloadReason[] {
+	const validReasons = new Set<Labrinth.Analytics.v3.DownloadReason>([
+		'standalone',
+		'dependency',
+		'modpack',
+		'update',
+	])
+	return getFilterValuesForStat(
+		'download_reason',
+		'downloads',
+		enabledStats,
+		filters.download_reason,
+	).filter((reason): reason is Labrinth.Analytics.v3.DownloadReason =>
+		validReasons.has(reason as Labrinth.Analytics.v3.DownloadReason),
+	)
+}
+
+function buildMetricFilters(
+	breakdowns: readonly AnalyticsBreakdownPreset[],
+	filters: AnalyticsSelectedFilters,
+): {
+	views: Labrinth.Analytics.v3.ProjectViewsFilters
+	downloads: Labrinth.Analytics.v3.ProjectDownloadsFilters
+	playtime: Labrinth.Analytics.v3.ProjectPlaytimeFilters
+	revenue: Labrinth.Analytics.v3.ProjectRevenueFilters
+} {
+	const enabledStats = getEnabledAnalyticsStatsForState(breakdowns, filters)
+
+	return {
+		views: {
+			country: getFilterValuesForStat('country', 'views', enabledStats, filters.country),
+			monetized: getMonetizationFilterValues('views', enabledStats, filters),
+		},
+		downloads: {
+			country: getFilterValuesForStat('country', 'downloads', enabledStats, filters.country),
+			monetized: getMonetizationFilterValues('downloads', enabledStats, filters),
+			user_agent: getFilterValuesForStat(
+				'user_agent',
+				'downloads',
+				enabledStats,
+				filters.user_agent,
+			),
+			reason: getDownloadReasonFilterValues(enabledStats, filters),
+			version_id: getFilterValuesForStat(
+				'version_id',
+				'downloads',
+				enabledStats,
+				filters.version_id,
+			),
+			game_version: getFilterValuesForStat(
+				'game_version',
+				'downloads',
+				enabledStats,
+				filters.game_version,
+			),
+			loader: getFilterValuesForStat(
+				'loader_type',
+				'downloads',
+				enabledStats,
+				filters.loader_type,
+			),
+		},
+		playtime: {
+			country: getFilterValuesForStat('country', 'playtime', enabledStats, filters.country),
+			version_id: getFilterValuesForStat(
+				'version_id',
+				'playtime',
+				enabledStats,
+				filters.version_id,
+			),
+			game_version: getFilterValuesForStat(
+				'game_version',
+				'playtime',
+				enabledStats,
+				filters.game_version,
+			),
+			loader: getFilterValuesForStat(
+				'loader_type',
+				'playtime',
+				enabledStats,
+				filters.loader_type,
+			),
+		},
+		revenue: {},
 	}
 }
 
@@ -1077,6 +1137,7 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 	const resolutionSlices = Math.min(MAX_ANALYTICS_TIME_SLICES, desiredSlices)
 
 	const bucketBy = withBreakdownFields(selectedBreakdowns.value, selectedFilters.value)
+	const filterBy = buildMetricFilters(selectedBreakdowns.value, selectedFilters.value)
 	const filteredProjectIds = getProjectIdsMatchingStatusFilter(
 		selectedProjectIds.value,
 		projectStatusById.value,
@@ -1095,15 +1156,19 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 		return_metrics: {
 			project_views: {
 				bucket_by: sortStrings(bucketBy.views),
+				filter_by: filterBy.views,
 			},
 			project_downloads: {
 				bucket_by: sortStrings(bucketBy.downloads),
+				filter_by: filterBy.downloads,
 			},
 			project_playtime: {
 				bucket_by: sortStrings(bucketBy.playtime),
+				filter_by: filterBy.playtime,
 			},
 			project_revenue: {
 				bucket_by: sortStrings(bucketBy.revenue),
+				filter_by: filterBy.revenue,
 			},
 		},
 	}

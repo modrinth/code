@@ -37,6 +37,25 @@ export class LabrinthAnalyticsV3Module extends AbstractModule {
 			version: 3,
 			method: 'POST',
 			body: data,
+			timeout: 100 * 1000,
+		})
+	}
+
+	/**
+	 * Fetch available analytics filter facets for the authenticated user's
+	 * accessible projects.
+	 *
+	 * POST /v3/analytics/facets
+	 */
+	public async fetchFacets(
+		data: Labrinth.Analytics.v3.FetchRequest,
+	): Promise<Labrinth.Analytics.v3.FacetsResponse> {
+		return this.client.request<Labrinth.Analytics.v3.FacetsResponse>('/analytics/facets', {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+			body: data,
+			timeout: 100 * 1000,
 		})
 	}
 
