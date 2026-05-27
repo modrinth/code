@@ -60,7 +60,7 @@
 					</div>
 				</div>
 
-				<div class="flex w-full flex-wrap-reverse items-center justify-end gap-3">
+				<div class="flex w-full select-none flex-wrap-reverse items-center justify-end gap-3">
 					<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
 						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
 							>Ratio</label
