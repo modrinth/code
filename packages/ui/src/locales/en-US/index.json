@@ -917,6 +917,18 @@
   "external-files.permissions-card.link-to-work-url-placeholder": {
     "defaultMessage": "link-to-work"
   },
+  "external-files.permissions-card.moderation.approved": {
+    "defaultMessage": "Seems legit"
+  },
+  "external-files.permissions-card.moderation.bad-proof": {
+    "defaultMessage": "Insufficient proof"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Could not save moderation review"
+  },
+  "external-files.permissions-card.moderation.not-allowed": {
+    "defaultMessage": "Breaks rules"
+  },
   "external-files.permissions-card.not-used-in-versions": {
     "defaultMessage": "These files are not currently used by any version."
   },
@@ -989,6 +1001,9 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
   },
+  "external-files.permissions-card.review-explanation-placeholder": {
+    "defaultMessage": "Explanation of review"
+  },
   "external-files.permissions-card.save": {
     "defaultMessage": "Save attribution"
   },
@@ -1003,21 +1018,6 @@
   },
   "external-files.permissions-card.type-label": {
     "defaultMessage": "Permission reason"
-  },
-  "external-files.permissions-card.moderation.approved": {
-    "defaultMessage": "Seems legit"
-  },
-  "external-files.permissions-card.moderation.bad-proof": {
-    "defaultMessage": "Insufficient proof"
-  },
-  "external-files.permissions-card.moderation.error.title": {
-    "defaultMessage": "Could not save moderation review"
-  },
-  "external-files.permissions-card.moderation.not-allowed": {
-    "defaultMessage": "Breaks rules"
-  },
-  "external-files.permissions-card.review-explanation-placeholder": {
-    "defaultMessage": "Explanation of review"
   },
   "external-files.permissions-card.unnamed-multi-group-title": {
     "defaultMessage": "{filename} + {count} more"

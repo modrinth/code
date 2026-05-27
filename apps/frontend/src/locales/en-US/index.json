@@ -2853,43 +2853,43 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Please provide proof that you have permission to redistribute all of the following files and any withheld versions will be automatically published."
+    "message": "Please provide proof that you have permission to redistribute all of the following files. Once completed, withheld versions will be automatically published."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Please provide proof that you have permission to redistribute all of the following files before you can submit your project for review."
+    "message": "Please provide proof that you have permission to redistribute all of the following files before submitting your project for review."
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "Unknown embedded content"
+    "message": "Unknown external content"
   },
   "project.settings.permissions.completed.description": {
-    "message": "All external content has attributions provided."
+    "message": "All external content has permission information and attributions have been provided."
   },
   "project.settings.permissions.completed.title": {
-    "message": "Attributions completed!"
+    "message": "Permissions completed!"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "None of your versions contain external content, so you don't need to worry about obtaining permissions."
+    "message": "None of your project's versions contain external content, so you don't need to worry about obtaining permissions."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "You're all set!"
   },
   "project.settings.permissions.fail.description": {
-    "message": "You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content or provide proof that you do have permission to use it."
+    "message": "You may not have permission to redistribute some of the external content in your project. In order to publish on Modrinth, please remove this content or provide proof that you do have permission to use it."
   },
   "project.settings.permissions.fail.title": {
     "message": "Some content can't be included"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn about how to do this properly!"
+    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn more and get started!"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "Learn how attributions work"
+    "message": "Learn about distribution permissions"
   },
   "project.settings.permissions.learn-more": {
     "message": "Learn more"
   },
   "project.settings.permissions.no-results": {
-    "message": "No external projects match your search."
+    "message": "No external files match your search."
   },
   "project.settings.permissions.search-placeholder": {
     "message": "Search {count} {count, plural, one {project} other {projects}}..."

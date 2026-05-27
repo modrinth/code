@@ -6,11 +6,11 @@ import {
 	EditIcon,
 	FileIcon,
 	PlusIcon,
+	ReportIcon,
 	ScaleIcon,
 	SpinnerIcon,
 	VersionIcon,
 	XCircleIcon,
-	ReportIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -25,6 +25,7 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 } from '../../providers'
+import StyledInput from '../base/StyledInput.vue'
 import AddFilesToAttributionGroupModal from './AddFilesToAttributionGroupModal.vue'
 import AddToExistingExternalProjectModal from './AddToExistingExternalProjectModal.vue'
 import AddToGlobalPermissionsDatabaseModal from './AddToGlobalPermissionsDatabaseModal.vue'
@@ -39,7 +40,6 @@ import {
 	parseInitialAttribution,
 } from './external-project-utils'
 import OriginalPageLink from './OriginalPageLink.vue'
-import StyledInput from '../base/StyledInput.vue'
 
 const props = withDefaults(
 	defineProps<{
