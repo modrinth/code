@@ -21,8 +21,8 @@
 			v-for="group in eventGroups"
 			:key="group.id"
 			type="button"
-			class="pointer-events-auto absolute -top-[26px] left-0 z-20 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 text-secondary shadow-lg transition-colors hover:text-contrast focus-visible:border-brand focus-visible:text-contrast"
-			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : ''"
+			class="pointer-events-auto absolute -top-[26px] left-0 z-20 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 shadow-lg transition-colors focus-visible:border-brand focus-visible:text-contrast"
+			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : 'text-secondary'"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"
 			@click.stop
@@ -150,6 +150,7 @@ const MARKER_COUNT_DIGIT_WIDTH_PX = 7
 const MARKER_HEIGHT_PX = 28
 const TOOLTIP_OFFSET_PX = 8
 const EDGE_PADDING_PX = 8
+const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 120
 const EVENT_RANGE_DATE_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'long',
@@ -641,7 +642,10 @@ function scheduleHoveredGroupOpen(groupId: string) {
 
 	hoveredGroupId.value = null
 	isTooltipHovered.value = false
-	showHoveredGroup(groupId)
+	openTimeout = setTimeout(() => {
+		showHoveredGroup(groupId)
+		openTimeout = null
+	}, OPEN_DELAY_MS)
 }
 
 function scheduleHoverClose() {
