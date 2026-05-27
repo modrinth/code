@@ -26,24 +26,17 @@
 			</div>
 		</div>
 		<div
-			v-if="nametag || $slots['nametag-badge']"
-			class="absolute left-1/2 z-10 flex flex-col items-center gap-2 pointer-events-none transition-all duration-200"
-			:style="nametagContainerStyle"
+			v-if="nametag"
+			class="absolute left-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-gray nametag-bg transition-all duration-200"
+			:style="nametagStyle"
 		>
-			<slot name="nametag-badge" />
-			<div
-				v-if="nametag"
-				class="px-3 py-1 rounded-md font-minecraft text-gray nametag-bg"
-				:style="nametagStyle"
-			>
-				{{ nametagText }}
-			</div>
+			{{ nametagText }}
 		</div>
 
 		<TresCanvas
-			shadows
 			alpha
 			:antialias="true"
+			:dpr="rendererDpr"
 			:renderer-options="{
 				outputColorSpace: THREE.SRGBColorSpace,
 				toneMapping: THREE.NoToneMapping,
@@ -69,12 +62,6 @@
 			</Suspense>
 
 			<Suspense>
-				<EffectComposerPmndrs>
-					<FXAAPmndrs />
-				</EffectComposerPmndrs>
-			</Suspense>
-
-			<Suspense>
 				<TresMesh
 					:position="spotlightPosition"
 					:rotation="[-Math.PI / 2, 0, 0]"
@@ -93,7 +80,7 @@
 			/>
 
 			<TresAmbientLight :intensity="2" />
-			<TresDirectionalLight :position="[-3, 4, -2]" :intensity="1.2" :cast-shadow="true" />
+			<TresDirectionalLight :position="[-3, 4, -2]" :intensity="1.2" />
 		</TresCanvas>
 
 		<div
@@ -116,7 +103,6 @@ import {
 } from '@modrinth/utils'
 import { useGLTF } from '@tresjs/cientos'
 import { TresCanvas, useRenderLoop, useTexture } from '@tresjs/core'
-import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'
 import * as THREE from 'three'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import {
@@ -159,6 +145,13 @@ interface FitLock {
 	modelCenter: [number, number, number]
 	modelSize: [number, number, number]
 }
+
+type AnimationFinishedListener = (
+	event: THREE.AnimationMixerEventMap['finished'] & {
+		readonly type: 'finished'
+		readonly target: THREE.AnimationMixer
+	},
+) => void
 
 const props = withDefaults(
 	defineProps<{
@@ -255,6 +248,7 @@ const lastCapeSrc = ref<string | undefined>(undefined)
 const texture = shallowRef<THREE.Texture | null>(null)
 const capeTexture = shallowRef<THREE.Texture | null>(null)
 const transparentTexture = createTransparentTexture()
+const rendererDpr: [number, number] = [1, 1.5]
 const modelCenter = ref<[number, number, number]>([0, 1, 0])
 const modelSize = ref<[number, number, number]>([1, 2, 1])
 
@@ -285,6 +279,9 @@ const clock = new THREE.Clock()
 const currentAnimation = ref<string>('')
 const randomAnimationTimer = ref<number | null>(null)
 const lastRandomAnimation = ref<string>('')
+const animationFinishedListeners: AnimationFinishedListener[] = []
+let modelLoadVersion = 0
+let isUnmounted = false
 
 const radialSpotlightShader = computed(() => ({
 	uniforms: {
@@ -440,13 +437,10 @@ const nametagTop = computed(() => {
 	return `${topPercent - 2}%`
 })
 
-const nametagContainerStyle = computed(() => ({
-	top: nametagTop.value,
-	transform: fitEnabled.value ? 'translate(-50%, calc(-100% - 0.75rem))' : 'translateX(-50%)',
-}))
-
 const nametagStyle = computed(() => ({
 	fontSize: nametagFontSize.value,
+	top: nametagTop.value,
+	transform: fitEnabled.value ? 'translate(-50%, calc(-100% - 0.75rem))' : 'translateX(-50%)',
 }))
 
 const spotlightY = computed(() => {
@@ -536,10 +530,9 @@ function playAnimation(name: string) {
 		action.setLoop(THREE.LoopOnce, 1)
 		action.clampWhenFinished = true
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const onFinished = (event: any) => {
+		const onFinished: AnimationFinishedListener = (event) => {
 			if (event.action === action) {
-				mixer.value?.removeEventListener('finished', onFinished)
+				removeAnimationFinishedListener(onFinished)
 				if (currentAnimation.value === name && baseAnimation.value) {
 					action.fadeOut(transitionDuration)
 					const baseAction = actions.value[baseAnimation.value]
@@ -551,7 +544,7 @@ function playAnimation(name: string) {
 			}
 		}
 
-		mixer.value.addEventListener('finished', onFinished)
+		addAnimationFinishedListener(onFinished)
 	}
 
 	action.fadeIn(transitionDuration)
@@ -623,10 +616,9 @@ function playRandomAnimation(name: string) {
 
 	currentAnimation.value = name
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const onFinished = (event: any) => {
+	const onFinished: AnimationFinishedListener = (event) => {
 		if (event.action === action) {
-			mixer.value?.removeEventListener('finished', onFinished)
+			removeAnimationFinishedListener(onFinished)
 			if (currentAnimation.value === name && baseAnimation.value) {
 				action.fadeOut(transitionDuration)
 				const baseAction = actions.value[baseAnimation.value]
@@ -641,7 +633,7 @@ function playRandomAnimation(name: string) {
 		}
 	}
 
-	mixer.value.addEventListener('finished', onFinished)
+	addAnimationFinishedListener(onFinished)
 }
 
 function stopAnimations() {
@@ -653,6 +645,72 @@ function stopAnimations() {
 
 function getAvailableAnimations(): string[] {
 	return Object.keys(actions.value)
+}
+
+function clearRandomAnimationTimer() {
+	if (randomAnimationTimer.value) {
+		clearTimeout(randomAnimationTimer.value)
+		randomAnimationTimer.value = null
+	}
+}
+
+function addAnimationFinishedListener(listener: AnimationFinishedListener) {
+	mixer.value?.addEventListener('finished', listener)
+	animationFinishedListeners.push(listener)
+}
+
+function removeAnimationFinishedListener(
+	listener: AnimationFinishedListener,
+	targetMixer = mixer.value,
+) {
+	targetMixer?.removeEventListener('finished', listener)
+
+	const index = animationFinishedListeners.indexOf(listener)
+	if (index !== -1) {
+		animationFinishedListeners.splice(index, 1)
+	}
+}
+
+function clearAnimationFinishedListeners(targetMixer = mixer.value) {
+	animationFinishedListeners.forEach((listener) => {
+		targetMixer?.removeEventListener('finished', listener)
+	})
+	animationFinishedListeners.length = 0
+}
+
+function cleanupAnimationState(root: THREE.Object3D | null) {
+	clearRandomAnimationTimer()
+
+	const currentMixer = mixer.value
+	if (currentMixer) {
+		clearAnimationFinishedListeners(currentMixer)
+		currentMixer.stopAllAction()
+
+		if (root) {
+			currentMixer.uncacheRoot(root)
+		}
+	}
+
+	mixer.value = null
+	actions.value = {}
+	currentAnimation.value = ''
+	lastRandomAnimation.value = ''
+}
+
+function disposeSceneMaterials(root: THREE.Object3D | null) {
+	if (!root) return
+
+	const materials = new Set<THREE.Material>()
+
+	root.traverse((object) => {
+		const mesh = object as THREE.Mesh
+		if (!mesh.isMesh || !mesh.material) return
+
+		const meshMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+		meshMaterials.forEach((material) => materials.add(material))
+	})
+
+	materials.forEach((material) => material.dispose())
 }
 
 defineExpose({
@@ -733,11 +791,21 @@ function lockFitState() {
 }
 
 async function loadModel(src: string) {
+	const loadVersion = ++modelLoadVersion
+
 	try {
 		isModelLoaded.value = false
 		fitLock.value = null
 		const { scene: loadedScene, animations } = await useGLTF(src)
 		const clonedScene = cloneSceneForRenderer(loadedScene)
+		if (isUnmounted || loadVersion !== modelLoadVersion) {
+			disposeSceneMaterials(clonedScene)
+			return
+		}
+
+		const previousScene = scene.value
+		cleanupAnimationState(previousScene)
+		disposeSceneMaterials(previousScene)
 		scene.value = clonedScene
 
 		if (texture.value) {
@@ -755,7 +823,9 @@ async function loadModel(src: string) {
 		lockFitState()
 	} catch (error) {
 		console.error('Failed to load model:', error)
-		isModelLoaded.value = false
+		if (!isUnmounted && loadVersion === modelLoadVersion) {
+			isModelLoaded.value = false
+		}
 	}
 }
 
@@ -906,10 +976,7 @@ watch(
 watch(
 	() => props.animationConfig,
 	(newConfig) => {
-		if (randomAnimationTimer.value) {
-			clearTimeout(randomAnimationTimer.value)
-			randomAnimationTimer.value = null
-		}
+		clearRandomAnimationTimer()
 
 		if (mixer.value && newConfig.baseAnimation && actions.value[newConfig.baseAnimation]) {
 			playAnimation(newConfig.baseAnimation)
@@ -936,16 +1003,14 @@ onBeforeMount(async () => {
 })
 
 onUnmounted(() => {
+	isUnmounted = true
+	modelLoadVersion++
 	resizeObserver?.disconnect()
 
-	if (randomAnimationTimer.value) {
-		clearTimeout(randomAnimationTimer.value)
-	}
-
-	if (mixer.value) {
-		mixer.value.stopAllAction()
-		mixer.value = null
-	}
+	cleanupAnimationState(scene.value)
+	disposeSceneMaterials(scene.value)
+	scene.value = null
+	transparentTexture.dispose()
 })
 </script>
 

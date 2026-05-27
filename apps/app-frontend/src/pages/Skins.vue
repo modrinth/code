@@ -1,23 +1,17 @@
 <script setup lang="ts">
 import {
 	CheckIcon,
-	DropdownIcon,
 	EditIcon,
 	ExcitedRinthbot,
 	EyeIcon,
 	LogInIcon,
-	PlusIcon,
 	RotateCounterClockwiseIcon,
 	SpinnerIcon,
-	TrashIcon,
 } from '@modrinth/assets'
 import {
-	Accordion,
 	ButtonStyled,
 	ConfirmModal,
 	injectNotificationManager,
-	SkinButton,
-	SkinLikeTextButton,
 	SkinPreviewRenderer,
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
@@ -28,6 +22,7 @@ import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } 
 
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
+import VirtualSkinSectionList from '@/components/ui/skin/VirtualSkinSectionList.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_default_user, login as login_flow, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
@@ -48,13 +43,13 @@ import {
 import { handleSevereError } from '@/store/error'
 
 type UnlistenFn = () => void
-type SkinLikeTextButtonExpose = {
-	getRootElement: () => HTMLElement | null | undefined
+type VirtualSkinSectionListExpose = {
+	getAddSkinButtonElement: () => HTMLElement | null | undefined
 }
 
 const editSkinModal = useTemplateRef('editSkinModal')
-const addSkinButton = useTemplateRef<SkinLikeTextButtonExpose>('addSkinButton')
 const addSkinFileInput = useTemplateRef<HTMLInputElement>('addSkinFileInput')
+const skinSectionList = useTemplateRef<VirtualSkinSectionListExpose>('skinSectionList')
 
 const notifications = injectNotificationManager()
 const { addNotification, handleError } = notifications
@@ -168,10 +163,6 @@ async function loadSkins() {
 			handleError(error)
 		}
 	}
-}
-
-function skinKey(skin: Skin, prefix: string) {
-	return `${prefix}-${skin.source}-${skin.texture_key}-${skin.variant}-${skin.cape_id ?? 'no-cape'}`
 }
 
 function skinsMatch(a?: Skin | null, b?: Skin | null) {
@@ -294,7 +285,7 @@ function isSkinFileDrag(event: DragEvent) {
 }
 
 function isPositionOverAddSkinButton(position: { x: number; y: number }) {
-	const element = addSkinButton.value?.getRootElement()
+	const element = skinSectionList.value?.getAddSkinButtonElement()
 
 	if (!element) {
 		return false
@@ -534,108 +525,22 @@ await loadSkins()
 		</div>
 
 		<div class="pt-2">
-			<Accordion
-				class="mt-1"
-				button-class="group flex w-full items-center gap-[6px] bg-transparent m-0 p-0 border-none cursor-pointer text-left"
-				content-class="pt-2"
-				open-by-default
-			>
-				<template #title>Saved skins</template>
-				<template #button="{ open }">
-					<DropdownIcon
-						class="size-6 shrink-0 text-primary transition-transform duration-300"
-						:class="{ 'rotate-180': open }"
-					/>
-					<span class="min-w-0 text-xl font-semibold leading-7 text-primary">
-						Saved skins
-					</span>
-				</template>
-				<div class="skin-card-grid">
-					<SkinLikeTextButton
-						ref="addSkinButton"
-						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
-						dropzone
-						:drag-active="isAddSkinButtonDragActive"
-						@click="openAddSkinFileBrowser"
-						@dragenter="onAddSkinDragOver"
-						@dragover="onAddSkinDragOver"
-						@dragleave="onAddSkinDragLeave"
-						@drop="onAddSkinDrop"
-					>
-						<template #icon>
-							<PlusIcon class="size-8" />
-						</template>
-						Add skin
-						<template #subtitle>Drag and drop</template>
-					</SkinLikeTextButton>
-
-					<SkinButton
-						v-for="skin in savedSkins"
-						:key="skinKey(skin, 'saved-skin')"
-						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
-						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
-						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
-						:selected="isSkinSelected(skin)"
-						@select="changeSkin(skin)"
-					>
-						<template #overlay-buttons>
-							<ButtonStyled color="brand">
-								<button
-									aria-label="Edit skin"
-									class="pointer-events-auto"
-									@click.stop="(e: MouseEvent) => editSkinModal?.show(e, skin)"
-								>
-									<EditIcon /> Edit
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-show="!skin.is_equipped" circular color="red">
-								<button
-									v-tooltip="'Delete skin'"
-									aria-label="Delete skin"
-									class="!rounded-[100%] pointer-events-auto"
-									@click.stop="() => confirmDeleteSkin(skin)"
-								>
-									<TrashIcon />
-								</button>
-							</ButtonStyled>
-						</template>
-					</SkinButton>
-				</div>
-			</Accordion>
-
-			<Accordion
-				v-for="section in defaultSkinSections"
-				:key="section.title"
-				class="mt-6"
-				button-class="group flex w-full items-center gap-[6px] bg-transparent m-0 p-0 border-none cursor-pointer text-left"
-				content-class="pt-2"
-				open-by-default
-			>
-				<template #title>
-					{{ section.title }}
-				</template>
-				<template #button="{ open }">
-					<DropdownIcon
-						class="size-6 shrink-0 text-primary transition-transform duration-300"
-						:class="{ 'rotate-180': open }"
-					/>
-					<span class="min-w-0 text-xl font-semibold leading-7 text-primary">
-						{{ section.title }}
-					</span>
-				</template>
-				<div class="skin-card-grid">
-					<SkinButton
-						v-for="skin in section.skins"
-						:key="skinKey(skin, section.title)"
-						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
-						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
-						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
-						:selected="isSkinSelected(skin)"
-						:tooltip="skin.name"
-						@select="changeSkin(skin)"
-					/>
-				</div>
-			</Accordion>
+			<VirtualSkinSectionList
+				ref="skinSectionList"
+				:saved-skins="savedSkins"
+				:default-skin-sections="defaultSkinSections"
+				:get-baked-skin-textures="getBakedSkinTextures"
+				:is-skin-selected="isSkinSelected"
+				:is-add-skin-button-drag-active="isAddSkinButtonDragActive"
+				@select="changeSkin"
+				@edit="(skin, event) => editSkinModal?.show(event, skin)"
+				@delete="confirmDeleteSkin"
+				@add-skin="openAddSkinFileBrowser"
+				@add-skin-dragenter="onAddSkinDragOver"
+				@add-skin-dragover="onAddSkinDragOver"
+				@add-skin-dragleave="onAddSkinDragLeave"
+				@add-skin-drop="onAddSkinDrop"
+			/>
 		</div>
 	</div>
 
@@ -687,25 +592,6 @@ await loadSkins()
 
 	@media (max-width: 700px) {
 		grid-template-columns: 1fr;
-	}
-}
-
-.skin-card-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 0.75rem;
-	width: 100%;
-
-	@media (min-width: 1300px) {
-		grid-template-columns: repeat(4, 1fr);
-	}
-
-	@media (min-width: 1750px) {
-		grid-template-columns: repeat(5, 1fr);
-	}
-
-	@media (min-width: 2050px) {
-		grid-template-columns: repeat(6, 1fr);
 	}
 }
 </style>

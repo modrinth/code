@@ -3,7 +3,6 @@ import {
 	applyCapeTexture,
 	createTransparentTexture,
 	disposeCaches,
-	loadTexture,
 	setupSkinModel,
 } from '@modrinth/utils'
 import * as THREE from 'three'
@@ -29,6 +28,7 @@ class BatchSkinRenderer {
 	private scene: THREE.Scene | null = null
 	private camera: THREE.PerspectiveCamera | null = null
 	private currentModel: THREE.Group | null = null
+	private transparentTexture: THREE.Texture | null = null
 	private readonly width: number
 	private readonly height: number
 
@@ -52,6 +52,7 @@ class BatchSkinRenderer {
 		})
 
 		this.renderer.outputColorSpace = THREE.SRGBColorSpace
+		this.renderer.shadowMap.enabled = false
 		this.renderer.toneMapping = THREE.NoToneMapping
 		this.renderer.toneMappingExposure = 10.0
 		this.renderer.setClearColor(0x000000, 0)
@@ -62,7 +63,7 @@ class BatchSkinRenderer {
 
 		const ambientLight = new THREE.AmbientLight(0xffffff, 2)
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
-		directionalLight.castShadow = true
+		directionalLight.castShadow = false
 		directionalLight.position.set(2, 4, 3)
 		this.scene.add(ambientLight)
 		this.scene.add(directionalLight)
@@ -112,9 +113,19 @@ class BatchSkinRenderer {
 
 		this.renderer.render(this.scene, this.camera)
 
-		const dataUrl = this.renderer.domElement.toDataURL('image/webp', 0.9)
-		const response = await fetch(dataUrl)
-		return await response.blob()
+		return await new Promise<Blob>((resolve, reject) => {
+			this.renderer!.domElement.toBlob(
+				(blob) => {
+					if (blob) {
+						resolve(blob)
+					} else {
+						reject(new Error('Failed to create blob from rendered canvas'))
+					}
+				},
+				'image/webp',
+				0.9,
+			)
+		})
 	}
 
 	private async setupModel(modelUrl: string, textureUrl: string, capeUrl?: string): Promise<void> {
@@ -122,14 +133,10 @@ class BatchSkinRenderer {
 			throw new Error('Renderer not initialized')
 		}
 
-		const { model } = await setupSkinModel(modelUrl, textureUrl)
+		const { model } = await setupSkinModel(modelUrl, textureUrl, capeUrl)
 
-		if (capeUrl) {
-			const capeTexture = await loadTexture(capeUrl)
-			applyCapeTexture(model, capeTexture)
-		} else {
-			const transparentTexture = createTransparentTexture()
-			applyCapeTexture(model, null, transparentTexture)
+		if (!capeUrl) {
+			applyCapeTexture(model, null, this.getTransparentTexture())
 		}
 
 		const group = new THREE.Group()
@@ -141,39 +148,38 @@ class BatchSkinRenderer {
 		this.currentModel = group
 	}
 
-	private clearScene(): void {
-		if (!this.scene) return
-
-		while (this.scene.children.length > 0) {
-			const child = this.scene.children[0]
-			this.scene.remove(child)
-
-			if (child instanceof THREE.Mesh) {
-				if (child.geometry) child.geometry.dispose()
-				if (child.material) {
-					if (Array.isArray(child.material)) {
-						child.material.forEach((material) => material.dispose())
-					} else {
-						child.material.dispose()
-					}
-				}
-			}
+	private getTransparentTexture(): THREE.Texture {
+		if (!this.transparentTexture) {
+			this.transparentTexture = createTransparentTexture()
 		}
 
-		const ambientLight = new THREE.AmbientLight(0xffffff, 2)
-		const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
-		directionalLight.castShadow = true
-		directionalLight.position.set(2, 4, 3)
-		this.scene.add(ambientLight)
-		this.scene.add(directionalLight)
+		return this.transparentTexture
+	}
 
+	private clearScene(): void {
+		if (!this.scene || !this.currentModel) return
+
+		this.scene.remove(this.currentModel)
+		this.currentModel.clear()
 		this.currentModel = null
 	}
 
 	public dispose(): void {
+		this.clearScene()
+
+		if (this.transparentTexture) {
+			this.transparentTexture.dispose()
+			this.transparentTexture = null
+		}
+
 		if (this.renderer) {
 			this.renderer.dispose()
 		}
+
+		this.renderer = null
+		this.scene = null
+		this.camera = null
+
 		disposeCaches()
 	}
 }
