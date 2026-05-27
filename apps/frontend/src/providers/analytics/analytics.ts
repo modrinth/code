@@ -106,6 +106,8 @@ export interface AnalyticsDashboardProjectGroup {
 	projects: AnalyticsDashboardProject[]
 }
 
+const UNKNOWN_ORGANIZATION_NAME = 'Organization'
+
 export interface AnalyticsDashboardTotals {
 	views: number
 	downloads: number
@@ -1715,7 +1717,7 @@ export function createAnalyticsDashboardContext(
 
 				const organizationGroup = organizationGroupsById.get(organizationId) ?? {
 					key: organizationId,
-					title: response.organizations[organizationId]?.name ?? organizationId,
+					title: response.organizations[organizationId]?.name ?? UNKNOWN_ORGANIZATION_NAME,
 					projects: [],
 				}
 				organizationGroup.projects.push(analyticsProject)
@@ -1793,7 +1795,7 @@ export function createAnalyticsDashboardContext(
 
 			organizationGroups.push({
 				key: organizationId,
-				title: organizationNamesById.get(organizationId) ?? organizationId,
+				title: organizationNamesById.get(organizationId) ?? UNKNOWN_ORGANIZATION_NAME,
 				projects,
 			})
 		}
