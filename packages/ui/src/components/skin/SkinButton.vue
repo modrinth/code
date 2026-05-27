@@ -125,11 +125,7 @@ function onImageLoad(type: 'forward' | 'backward') {
 	z-index: 5;
 	pointer-events: none;
 	content: '';
-	background: linear-gradient(
-		180deg,
-		rgba(0, 0, 0, 0) 0%,
-		rgba(37, 39, 45, 0.2) 100%
-	);
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(37, 39, 45, 0.2) 100%);
 }
 
 .skin-button:hover,

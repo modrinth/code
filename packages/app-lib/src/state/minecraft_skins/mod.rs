@@ -19,88 +19,88 @@ pub struct CustomMinecraftSkin {
     /// The UUID of the cape that this skin uses, which should match one of the
     /// cape UUIDs the player has in its profile.
     ///
-	/// If `None`, the skin is saved without a cape.
-	pub cape_id: Option<Uuid>,
+    /// If `None`, the skin is saved without a cape.
+    pub cape_id: Option<Uuid>,
 }
 
 impl CustomMinecraftSkin {
-	pub async fn add(
-		minecraft_user_id: Uuid,
-		texture_key: &str,
-		texture: &[u8],
-		variant: MinecraftSkinVariant,
-		cape_id: Option<Uuid>,
-		db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
-	) -> crate::Result<()> {
-		let minecraft_user_id = minecraft_user_id.as_hyphenated();
-		let cape_id = cape_id.map(|id| id.hyphenated());
+    pub async fn add(
+        minecraft_user_id: Uuid,
+        texture_key: &str,
+        texture: &[u8],
+        variant: MinecraftSkinVariant,
+        cape_id: Option<Uuid>,
+        db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let minecraft_user_id = minecraft_user_id.as_hyphenated();
+        let cape_id = cape_id.map(|id| id.hyphenated());
 
-		let mut transaction = db.begin().await?;
+        let mut transaction = db.begin().await?;
 
-		sqlx::query(
-			"DELETE FROM custom_minecraft_skins \
+        sqlx::query(
+            "DELETE FROM custom_minecraft_skins \
 			WHERE minecraft_user_uuid = ? AND texture_key = ?",
-		)
-		.bind(minecraft_user_id.to_string())
-		.bind(texture_key)
-		.execute(&mut *transaction)
-		.await?;
+        )
+        .bind(minecraft_user_id.to_string())
+        .bind(texture_key)
+        .execute(&mut *transaction)
+        .await?;
 
-		sqlx::query!(
+        sqlx::query!(
 			"INSERT OR REPLACE INTO custom_minecraft_skin_textures (texture_key, texture) VALUES (?, ?)",
 			texture_key, texture
 		)
 		.execute(&mut *transaction)
 		.await?;
 
-		sqlx::query!(
+        sqlx::query!(
 			"INSERT OR REPLACE INTO custom_minecraft_skins (minecraft_user_uuid, texture_key, variant, cape_id) VALUES (?, ?, ?, ?)",
 			minecraft_user_id, texture_key, variant, cape_id
 		)
 		.execute(&mut *transaction)
 		.await?;
 
-		transaction.commit().await?;
+        transaction.commit().await?;
 
-		Ok(())
-	}
+        Ok(())
+    }
 
-	pub async fn get_by_texture(
-		minecraft_user_id: Uuid,
-		texture_key: &str,
-		db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
-	) -> crate::Result<Option<Self>> {
-		let minecraft_user_id = minecraft_user_id.as_hyphenated();
+    pub async fn get_by_texture(
+        minecraft_user_id: Uuid,
+        texture_key: &str,
+        db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<Self>> {
+        let minecraft_user_id = minecraft_user_id.as_hyphenated();
 
-		sqlx::query_as::<_, (String, MinecraftSkinVariant, Option<String>)>(
-			"SELECT texture_key, variant, cape_id \
+        sqlx::query_as::<_, (String, MinecraftSkinVariant, Option<String>)>(
+            "SELECT texture_key, variant, cape_id \
 			FROM custom_minecraft_skins \
 			WHERE minecraft_user_uuid = ? AND texture_key = ?",
-		)
-		.bind(minecraft_user_id.to_string())
-		.bind(texture_key)
-		.fetch_optional(&mut *db.acquire().await?)
-		.await?
-		.map(|(texture_key, variant, cape_id)| {
-			let cape_id = cape_id
-				.map(|id| {
-					Uuid::parse_str(&id).map_err(|err| {
-						crate::ErrorKind::OtherError(format!(
-							"Invalid saved Minecraft cape UUID {id}: {err}"
-						))
-						.as_error()
-					})
-				})
-				.transpose()?;
+        )
+        .bind(minecraft_user_id.to_string())
+        .bind(texture_key)
+        .fetch_optional(&mut *db.acquire().await?)
+        .await?
+        .map(|(texture_key, variant, cape_id)| {
+            let cape_id = cape_id
+                .map(|id| {
+                    Uuid::parse_str(&id).map_err(|err| {
+                        crate::ErrorKind::OtherError(format!(
+                            "Invalid saved Minecraft cape UUID {id}: {err}"
+                        ))
+                        .as_error()
+                    })
+                })
+                .transpose()?;
 
-			Ok(Self {
-				texture_key,
-				variant,
-				cape_id,
-			})
-		})
-		.transpose()
-	}
+            Ok(Self {
+                texture_key,
+                variant,
+                cape_id,
+            })
+        })
+        .transpose()
+    }
 
     pub async fn get_many(
         minecraft_user_id: Uuid,
@@ -155,14 +155,14 @@ impl CustomMinecraftSkin {
     ) -> crate::Result<()> {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
 
-		sqlx::query(
-			"DELETE FROM custom_minecraft_skins \
+        sqlx::query(
+            "DELETE FROM custom_minecraft_skins \
 			WHERE minecraft_user_uuid = ? AND texture_key = ?",
-		)
-		.bind(minecraft_user_id.to_string())
-		.bind(&self.texture_key)
-		.execute(&mut *db.acquire().await?)
-		.await?;
+        )
+        .bind(minecraft_user_id.to_string())
+        .bind(&self.texture_key)
+        .execute(&mut *db.acquire().await?)
+        .await?;
 
         Ok(())
     }

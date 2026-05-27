@@ -15,7 +15,7 @@ import {
 	SkinPreviewRenderer,
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
-import { getCurrentWebview, type DragDropEvent } from '@tauri-apps/api/webview'
+import { type DragDropEvent, getCurrentWebview } from '@tauri-apps/api/webview'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
@@ -467,9 +467,7 @@ await loadSkins()
 
 	<div v-if="currentUser" class="skin-layout box-border min-h-full p-4">
 		<div class="sticky top-6 self-start p-2 pt-0">
-			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
-				Skins
-			</h1>
+			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">Skins</h1>
 			<div class="ml-5 flex h-[80vh] items-center justify-center max-[700px]:h-[50vh]">
 				<SkinPreviewRenderer
 					:cape-src="capeTexture"

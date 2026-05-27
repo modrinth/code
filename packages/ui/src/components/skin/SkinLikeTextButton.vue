@@ -18,10 +18,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	(e: 'click', event: MouseEvent): void
-	(e: 'dragenter', event: DragEvent): void
-	(e: 'dragover', event: DragEvent): void
-	(e: 'dragleave', event: DragEvent): void
-	(e: 'drop', event: DragEvent): void
+	(e: 'dragenter' | 'dragover' | 'dragleave' | 'drop', event: DragEvent): void
 }>()
 
 const root = useTemplateRef<HTMLElement>('root')

@@ -22,7 +22,7 @@
 				<section v-if="mode === 'edit' && canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">Texture</h2>
 					<ButtonStyled>
-						<button @click="openTextureFileBrowser" class="!shadow-none">
+						<button class="!shadow-none" @click="openTextureFileBrowser">
 							<UploadIcon /> Replace texture
 						</button>
 					</ButtonStyled>

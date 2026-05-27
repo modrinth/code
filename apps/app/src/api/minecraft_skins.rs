@@ -45,12 +45,10 @@ pub async fn add_and_equip_custom_skin(
     variant: MinecraftSkinVariant,
     cape: Option<Cape>,
 ) -> Result<()> {
-    Ok(minecraft_skins::add_and_equip_custom_skin(
-        texture_blob,
-        variant,
-        cape,
+    Ok(
+        minecraft_skins::add_and_equip_custom_skin(texture_blob, variant, cape)
+            .await?,
     )
-    .await?)
 }
 
 /// `invoke('plugin:minecraft-skins|equip_skin', skin)`

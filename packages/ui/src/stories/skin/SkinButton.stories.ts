@@ -19,7 +19,7 @@ const frontImage = `data:image/svg+xml,${encodeURIComponent(`
 	<rect x="36" y="117" width="18" height="55" fill="#263F5E"/>
 	<rect x="60" y="117" width="18" height="55" fill="#1D334F"/>
 </svg>
-)}` 
+)}`)}`
 
 const backImage = `data:image/svg+xml,${encodeURIComponent(`
 <svg width="114" height="176" viewBox="0 0 114 176" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -32,7 +32,7 @@ const backImage = `data:image/svg+xml,${encodeURIComponent(`
 	<rect x="36" y="117" width="18" height="55" fill="#1D334F"/>
 	<rect x="60" y="117" width="18" height="55" fill="#162B45"/>
 </svg>
-)}` 
+)}`)}`
 
 const meta = {
 	title: 'Skin/SkinButton',
