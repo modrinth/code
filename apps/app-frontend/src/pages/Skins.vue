@@ -8,7 +8,6 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 	UndoIcon,
-	UpdatedIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -25,7 +24,6 @@ import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } 
 
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
-import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_default_user, login as login_flow, users } from '@/helpers/auth'
@@ -42,11 +40,9 @@ import {
 	get_normalized_skin_texture,
 	normalize_skin_texture,
 	remove_custom_skin,
-	set_default_cape,
 } from '@/helpers/skins.ts'
 import { handleSevereError } from '@/store/error'
 const editSkinModal = useTemplateRef('editSkinModal')
-const selectCapeModal = useTemplateRef('selectCapeModal')
 const uploadSkinModal = useTemplateRef('uploadSkinModal')
 
 const notifications = injectNotificationManager()
@@ -62,11 +58,9 @@ const currentUserId = ref<string | undefined>(undefined)
 
 const username = computed(() => currentUser.value?.profile?.name ?? undefined)
 const selectedSkin = ref<Skin | null>(null)
-const defaultCape = ref<Cape>()
 const isApplyingSkin = ref(false)
 
 const originalSelectedSkin = ref<Skin | null>(null)
-const originalDefaultCape = ref<Cape>()
 
 const savedSkins = computed(() => {
 	try {
@@ -85,7 +79,7 @@ const currentCape = computed(() => {
 			return overrideCape
 		}
 	}
-	return defaultCape.value
+	return undefined
 })
 
 const skinTexture = computedAsync(async () => {
@@ -124,8 +118,6 @@ async function deleteSkin() {
 async function loadCapes() {
 	try {
 		capes.value = (await get_available_capes()) ?? []
-		defaultCape.value = capes.value.find((c) => c.is_equipped)
-		originalDefaultCape.value = defaultCape.value
 	} catch (error) {
 		if (currentUser.value && error instanceof Error) {
 			handleError(error)
@@ -197,35 +189,6 @@ async function applySelectedSkin() {
 		}
 	} finally {
 		isApplyingSkin.value = false
-	}
-}
-
-async function handleCapeSelected(cape: Cape | undefined) {
-	const previousDefaultCape = defaultCape.value
-	const previousCapesList = [...capes.value]
-
-	capes.value = capes.value.map((c) => ({
-		...c,
-		is_equipped: cape ? c.id === cape.id : false,
-	}))
-
-	defaultCape.value = cape ? capes.value.find((c) => c.id === cape.id) : undefined
-
-	try {
-		await set_default_cape(cape)
-	} catch (error) {
-		defaultCape.value = previousDefaultCape
-		capes.value = previousCapesList
-
-		if ((error as { message?: string })?.message?.includes('429 Too Many Requests')) {
-			notifications.addNotification({
-				type: 'error',
-				title: 'Slow down!',
-				text: "You're changing your cape too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again.",
-			})
-		} else {
-			handleError(error as Error)
-		}
 	}
 }
 
@@ -327,12 +290,10 @@ await loadSkins()
 	<EditSkinModal
 		ref="editSkinModal"
 		:capes="capes"
-		:default-cape="defaultCape"
 		@saved="onSkinSaved"
 		@deleted="() => loadSkins()"
 		@open-upload-modal="openUploadSkinModal"
 	/>
-	<SelectCapeModal ref="selectCapeModal" :capes="capes" @select="handleCapeSelected" />
 	<UploadSkinModal
 		ref="uploadSkinModal"
 		@uploaded="onSkinFileUploaded"
@@ -376,27 +337,13 @@ await loadSkins()
 								</button>
 							</ButtonStyled>
 						</div>
-						<ButtonStyled v-else :disabled="!!selectedSkin?.cape_id">
+						<ButtonStyled v-else>
 							<button
-								v-tooltip="
-									selectedSkin?.cape_id
-										? 'The equipped skin is overriding the default cape.'
-										: undefined
-								"
-								:disabled="!!selectedSkin?.cape_id"
-								@click="
-									(e: MouseEvent) =>
-										selectCapeModal?.show(
-											e,
-											selectedSkin?.texture_key,
-											currentCape,
-											skinTexture,
-											skinVariant,
-										)
-								"
+								:disabled="!selectedSkin"
+								@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
 							>
-								<UpdatedIcon />
-								Change cape
+								<EditIcon />
+								Edit skin
 							</button>
 						</ButtonStyled>
 					</template>

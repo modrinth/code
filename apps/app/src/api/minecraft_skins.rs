@@ -11,7 +11,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_available_capes,
             get_available_skins,
             add_and_equip_custom_skin,
-            set_default_cape,
             equip_skin,
             remove_custom_skin,
             unequip_skin,
@@ -37,29 +36,21 @@ pub async fn get_available_skins() -> Result<Vec<Skin>> {
     Ok(minecraft_skins::get_available_skins().await?)
 }
 
-/// `invoke('plugin:minecraft-skins|add_and_equip_custom_skin', texture_blob, variant, cape_override)`
+/// `invoke('plugin:minecraft-skins|add_and_equip_custom_skin', texture_blob, variant, cape)`
 ///
 /// See also: [minecraft_skins::add_and_equip_custom_skin]
 #[tauri::command]
 pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
     variant: MinecraftSkinVariant,
-    cape_override: Option<Cape>,
+    cape: Option<Cape>,
 ) -> Result<()> {
     Ok(minecraft_skins::add_and_equip_custom_skin(
         texture_blob,
         variant,
-        cape_override,
+        cape,
     )
     .await?)
-}
-
-/// `invoke('plugin:minecraft-skins|set_default_cape', cape)`
-///
-/// See also: [minecraft_skins::set_default_cape]
-#[tauri::command]
-pub async fn set_default_cape(cape: Option<Cape>) -> Result<()> {
-    Ok(minecraft_skins::set_default_cape(cape).await?)
 }
 
 /// `invoke('plugin:minecraft-skins|equip_skin', skin)`

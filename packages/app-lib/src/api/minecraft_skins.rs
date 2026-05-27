@@ -19,12 +19,12 @@
 //! ## Ownership
 //!
 //! Mojang decides which skin and cape are currently equipped. The local database
-//! stores saved custom skins and the app's selected default cape. A saved skin is
-//! the same saved skin when its `texture_key` and `variant` match; changing its
-//! cape updates that saved skin instead of creating another row.
+//! stores saved custom skins. A saved skin is the same saved skin when its
+//! `texture_key` matches; changing its model variant or cape updates that saved
+//! skin instead of creating another row.
 //!
 //! `cape_id = Some(_)` means a skin should apply that specific cape.
-//! `cape_id = None` means the skin follows the app's default cape.
+//! `cape_id = None` means the skin should have no cape.
 //!
 //! ## Consistency
 //!
@@ -46,9 +46,7 @@ use crate::{
     ErrorKind, State,
     state::{
         MinecraftCharacterExpressionState, MinecraftProfile,
-        minecraft_skins::{
-            CustomMinecraftSkin, DefaultMinecraftCape, mojang_api,
-        },
+        minecraft_skins::{CustomMinecraftSkin, mojang_api},
     },
 };
 
@@ -72,9 +70,6 @@ pub struct Cape {
     pub name: Arc<str>,
     /// The URL of the cape PNG texture.
     pub texture: Arc<Url>,
-    /// Whether the cape is the default one, used when the currently selected cape does not
-    /// override it.
-    pub is_default: bool,
     /// Whether the cape is currently equipped in the Minecraft profile of its corresponding
     /// player.
     pub is_equipped: bool,
@@ -90,7 +85,7 @@ pub struct Skin {
     pub variant: MinecraftSkinVariant,
     /// The UUID of the cape that this skin uses, if any.
     ///
-    /// If `None`, this skin uses the app's default cape for this player.
+    /// If `None`, this skin uses no cape.
     pub cape_id: Option<Uuid>,
     /// The URL of the skin PNG texture. Can also be a data URL.
     pub texture: Arc<Url>,
@@ -121,7 +116,7 @@ pub enum UrlOrBlob {
 }
 
 /// Gets the capes for the selected Minecraft profile.
-/// Only one cape can be equipped, and only one cape can be the app default.
+/// Only one cape can be equipped.
 #[tracing::instrument]
 pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
     let state = State::get().await?;
@@ -137,10 +132,6 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
             user_name: selected_credentials.offline_profile.name.clone(),
         })?;
 
-    let default_cape_id = DefaultMinecraftCape::get(profile.id, &state.pool)
-        .await?
-        .map(|cape| cape.id);
-
     Ok(profile
         .capes
         .iter()
@@ -148,8 +139,6 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
             id: cape.id,
             name: Arc::clone(&cape.name),
             texture: Arc::clone(&cape.url),
-            is_default: default_cape_id
-                .is_some_and(|default_cape_id| default_cape_id == cape.id),
             is_equipped: cape.state
                 == MinecraftCharacterExpressionState::Active,
         })
@@ -188,14 +177,17 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         .await
     {
         let is_equipped = !found_equipped_skin
-            && custom_skin.texture_key == *current_skin_texture_key
-            && custom_skin.variant == current_skin.variant;
+            && custom_skin.texture_key == *current_skin_texture_key;
 
         found_equipped_skin |= is_equipped;
 
         available_skins.push(Skin {
             name: None,
-            variant: custom_skin.variant,
+            variant: if is_equipped {
+                current_skin.variant
+            } else {
+                custom_skin.variant
+            },
             cape_id: custom_skin.cape_id,
             texture: png_util::blob_to_data_url(
                 custom_skin.texture_blob(&state.pool).await?,
@@ -214,8 +206,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 
     for default_skin in assets::DEFAULT_SKINS.iter() {
         let is_equipped = !found_equipped_skin
-            && default_skin.texture_key == current_skin_texture_key
-            && default_skin.variant == current_skin.variant;
+            && default_skin.texture_key == current_skin_texture_key;
 
         found_equipped_skin |= is_equipped;
 
@@ -223,7 +214,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
             texture_key: Arc::clone(&default_skin.texture_key),
             name: default_skin.name.as_ref().cloned(),
             variant: default_skin.variant,
-            cape_id: None,
+            cape_id: is_equipped.then_some(current_cape_id).flatten(),
             texture: Arc::clone(&default_skin.texture),
             source: SkinSource::Default,
             is_equipped,
@@ -251,14 +242,14 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 pub async fn add_and_equip_custom_skin(
     texture_blob: Bytes,
     variant: MinecraftSkinVariant,
-    cape_override: Option<Cape>,
+    cape: Option<Cape>,
 ) -> crate::Result<()> {
     let (skin_width, skin_height) = png_util::dimensions(&texture_blob)?;
     if skin_width != 64 || ![32, 64].contains(&skin_height) {
         return Err(ErrorKind::InvalidSkinTexture)?;
     }
 
-    let cape_override = cape_override.map(|cape| cape.id);
+    let cape_id = cape.map(|cape| cape.id);
     let state = State::get().await?;
 
     let selected_credentials = Credentials::get_default_credential(&state.pool)
@@ -299,7 +290,7 @@ pub async fn add_and_equip_custom_skin(
         &profile.current_skin()?.texture_key(),
         &texture_blob,
         variant,
-        cape_override,
+        cape_id,
         &state.pool,
     )
     .await
@@ -308,78 +299,10 @@ pub async fn add_and_equip_custom_skin(
         return Err(error);
     }
 
-    if let Err(error) =
-        sync_cape(&state, &selected_credentials, &profile, cape_override).await
+    if let Err(error) = sync_cape(&selected_credentials, &profile, cape_id).await
     {
         refresh_profile_cache(&selected_credentials).await;
         return Err(error);
-    }
-
-    Ok(())
-}
-
-/// Sets the default cape for the selected Minecraft profile. If `None`, the
-/// default cape is removed.
-///
-/// Saved skins without their own cape use this cape. If the equipped skin uses
-/// the default cape, the equipped cape is changed too. If there is no default
-/// cape in that case, the equipped cape is removed.
-#[tracing::instrument]
-pub async fn set_default_cape(cape: Option<Cape>) -> crate::Result<()> {
-    let state = State::get().await?;
-
-    let selected_credentials = Credentials::get_default_credential(&state.pool)
-        .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
-
-    let profile = selected_credentials
-        .online_profile_fresh()
-        .await
-        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
-            user_name: selected_credentials.offline_profile.name.clone(),
-        })?;
-
-    let current_skin_uses_default_cape =
-        current_skin_follows_default_cape(&state, &profile).await?;
-
-    if let Some(cape) = cape {
-        // Change the equipped cape too when the current skin follows the default cape.
-        if current_skin_uses_default_cape {
-            if let Err(error) = mojang_api::MinecraftCapeOperation::equip(
-                &selected_credentials,
-                cape.id,
-            )
-            .await
-            {
-                refresh_profile_cache(&selected_credentials).await;
-                return Err(error);
-            }
-        }
-
-        if let Err(error) =
-            DefaultMinecraftCape::set(profile.id, cape.id, &state.pool).await
-        {
-            refresh_profile_cache(&selected_credentials).await;
-            return Err(error);
-        }
-    } else {
-        if current_skin_uses_default_cape {
-            if let Err(error) = mojang_api::MinecraftCapeOperation::unequip_any(
-                &selected_credentials,
-            )
-            .await
-            {
-                refresh_profile_cache(&selected_credentials).await;
-                return Err(error);
-            }
-        }
-
-        if let Err(error) =
-            DefaultMinecraftCape::remove(profile.id, &state.pool).await
-        {
-            refresh_profile_cache(&selected_credentials).await;
-            return Err(error);
-        }
     }
 
     Ok(())
@@ -413,8 +336,7 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     )
     .await?;
 
-    if let Err(error) =
-        sync_cape(&state, &selected_credentials, &profile, skin.cape_id).await
+    if let Err(error) = sync_cape(&selected_credentials, &profile, skin.cape_id).await
     {
         refresh_profile_cache(&selected_credentials).await;
         return Err(error);
@@ -456,8 +378,7 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
 }
 
 /// Unequips the currently equipped skin for the currently selected Minecraft profile, resetting
-/// it to one of the default skins. The cape will be set to the default cape, or unequipped if
-/// no default cape is set.
+/// it to one of the default skins and unequipping any cape.
 #[tracing::instrument]
 pub async fn unequip_skin() -> crate::Result<()> {
     let state = State::get().await?;
@@ -478,8 +399,7 @@ pub async fn unequip_skin() -> crate::Result<()> {
     mojang_api::MinecraftSkinOperation::unequip_any(&selected_credentials)
         .await?;
 
-    if let Err(error) =
-        sync_cape(&state, &selected_credentials, &profile, None).await
+    if let Err(error) = sync_cape(&selected_credentials, &profile, None).await
     {
         refresh_profile_cache(&selected_credentials).await;
         return Err(error);
@@ -554,17 +474,13 @@ async fn preserve_current_profile_skin(
     let current_skin = profile.current_skin()?;
     let current_skin_texture_key = current_skin.texture_key();
 
-    if assets::DEFAULT_SKINS.iter().any(|default_skin| {
-        default_skin.texture_key == current_skin_texture_key
-            && default_skin.variant == current_skin.variant
-    }) {
+    if is_bundled_skin_texture(&current_skin_texture_key) {
         return Ok(());
     }
 
-    if CustomMinecraftSkin::get_by_texture_and_variant(
+    if CustomMinecraftSkin::get_by_texture(
         profile.id,
         &current_skin_texture_key,
-        current_skin.variant,
         &state.pool,
     )
     .await?
@@ -600,44 +516,19 @@ async fn refresh_profile_cache(selected_credentials: &Credentials) {
     let _ = selected_credentials.refresh_online_profile().await;
 }
 
-async fn current_skin_follows_default_cape(
-    state: &State,
-    profile: &MinecraftProfile,
-) -> crate::Result<bool> {
-    let current_skin = profile.current_skin()?;
-    let current_skin_texture_key = current_skin.texture_key();
-
-    if assets::DEFAULT_SKINS.iter().any(|default_skin| {
-        default_skin.texture_key == current_skin_texture_key
-            && default_skin.variant == current_skin.variant
-    }) {
-        return Ok(true);
-    }
-
-    Ok(CustomMinecraftSkin::get_by_texture_and_variant(
-        profile.id,
-        &current_skin_texture_key,
-        current_skin.variant,
-        &state.pool,
-    )
-    .await?
-    .is_some_and(|skin| skin.cape_id.is_none()))
+fn is_bundled_skin_texture(texture_key: &str) -> bool {
+    assets::DEFAULT_SKINS
+        .iter()
+        .any(|default_skin| default_skin.texture_key.as_ref() == texture_key)
 }
 
-/// Sets the equipped cape to the selected cape, the app default cape, or no cape.
+/// Sets the equipped cape to the skin's associated cape, or no cape.
 async fn sync_cape(
-    state: &State,
     selected_credentials: &Credentials,
     profile: &MinecraftProfile,
-    cape_override: Option<Uuid>,
+    target_cape_id: Option<Uuid>,
 ) -> crate::Result<()> {
     let current_cape_id = profile.current_cape().map(|cape| cape.id);
-    let target_cape_id = match cape_override {
-        Some(cape_id) => Some(cape_id),
-        None => DefaultMinecraftCape::get(profile.id, &state.pool)
-            .await?
-            .map(|cape| cape.id),
-    };
 
     if current_cape_id != target_cape_id {
         match target_cape_id {

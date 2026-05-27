@@ -5,7 +5,6 @@ export interface Cape {
 	id: string
 	name: string
 	texture: string
-	is_default: boolean
 	is_equipped: boolean
 }
 
@@ -121,17 +120,11 @@ export async function get_available_skins(): Promise<Skin[]> {
 export async function add_and_equip_custom_skin(
 	textureBlob: Uint8Array,
 	variant: SkinModel,
-	capeOverride?: Cape,
+	cape?: Cape,
 ): Promise<void> {
 	await invoke('plugin:minecraft-skins|add_and_equip_custom_skin', {
 		textureBlob,
 		variant,
-		capeOverride,
-	})
-}
-
-export async function set_default_cape(cape?: Cape): Promise<void> {
-	await invoke('plugin:minecraft-skins|set_default_cape', {
 		cape,
 	})
 }

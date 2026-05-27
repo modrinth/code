@@ -78,7 +78,7 @@ defineExpose({
 	<ModalWrapper ref="modal" @on-hide="onModalHide">
 		<template #title>
 			<div class="flex flex-col">
-				<span class="text-lg font-extrabold text-heading">Change cape</span>
+				<span class="text-lg font-extrabold text-heading">Select cape</span>
 			</div>
 		</template>
 		<div class="flex flex-col md:flex-row gap-6">

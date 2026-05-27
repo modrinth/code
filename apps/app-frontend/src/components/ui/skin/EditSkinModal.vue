@@ -23,14 +23,14 @@
 			</div>
 
 			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
-				<section>
+				<section v-if="mode === 'edit' && canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">Texture</h2>
 					<ButtonStyled>
 						<button @click="openUploadSkinModal"><UploadIcon /> Replace texture</button>
 					</ButtonStyled>
 				</section>
 
-				<section>
+				<section v-if="canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">Arm style</h2>
 					<RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']">
 						<template #default="{ item }">
@@ -42,19 +42,13 @@
 				<section>
 					<h2 class="text-base font-semibold mb-2">Cape</h2>
 					<div class="flex gap-2">
-						<CapeButton
-							v-if="defaultCape"
-							:id="defaultCape.id"
-							:texture="defaultCape.texture"
-							:name="undefined"
-							:selected="!selectedCape"
-							faded
-							@select="selectCape(undefined)"
+						<CapeLikeTextButton
+							tooltip="No cape"
+							:highlighted="!selectedCape"
+							@click="selectCape(undefined)"
 						>
-							<span>Use default cape</span>
-						</CapeButton>
-						<CapeLikeTextButton v-else :highlighted="!selectedCape" @click="selectCape(undefined)">
-							<span>Use default cape</span>
+							<template #icon><XIcon /></template>
+							<span>None</span>
 						</CapeLikeTextButton>
 
 						<CapeButton
@@ -151,9 +145,10 @@ const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
-const props = defineProps<{ capes?: Cape[]; defaultCape?: Cape }>()
+const props = defineProps<{ capes?: Cape[] }>()
 
 const selectedCapeTexture = computed(() => selectedCape.value?.texture)
+const canEditTextureAndModel = computed(() => currentSkin.value?.source !== 'default')
 const visibleCapeList = ref<Cape[]>([])
 
 const sortedCapes = computed(() => {
@@ -379,7 +374,9 @@ async function save() {
 			emit('saved')
 		} else {
 			await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
-			await remove_custom_skin(currentSkin.value!)
+			if (uploadedTextureUrl.value && textureUrl !== currentSkin.value?.texture) {
+				await remove_custom_skin(currentSkin.value!)
+			}
 			emit('saved')
 		}
 
