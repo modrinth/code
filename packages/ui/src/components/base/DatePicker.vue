@@ -194,6 +194,8 @@ let rangeClickSuppressionTimeout: number | null = null
 let monthSelectSyncFrame: number | null = null
 let calendarPortal: HTMLElement | null = null
 let inputFocusScrollSuppressionTarget: HTMLInputElement | null = null
+let originalInputFocus: HTMLInputElement['focus'] | null = null
+let suppressNextInputFocusScroll = false
 const calendarBaseClass = 'modrinth-date-picker-calendar'
 const calendarStateClasses = [
 	'calendar-only',
@@ -952,12 +954,41 @@ function openPickerWithoutInputFocus(event: PointerEvent) {
 	if (event.pointerType === 'mouse') return
 
 	event.preventDefault()
+	suppressNextInputFocusScroll = true
 	picker.value?.open()
+}
+
+function suppressInputFocusScrollForCalendarPointer(event: PointerEvent) {
+	if (!props.readonly || props.disabled || props.calendarOnly || !props.closeOnSelect) return
+	if (event.button !== 0) return
+	if (event.pointerType === 'mouse') return
+
+	const dayElem = getRangeDayElement(event.target)
+	if (!dayElem || !isSelectableDay(dayElem)) return
+
+	suppressNextInputFocusScroll = true
+}
+
+function patchInputFocusScrollSuppression(target: HTMLInputElement) {
+	originalInputFocus = target.focus
+	target.focus = ((options?: FocusOptions) => {
+		if (suppressNextInputFocusScroll) {
+			originalInputFocus?.call(target, { preventScroll: true })
+			return
+		}
+
+		originalInputFocus?.call(target, options)
+	}) as HTMLInputElement['focus']
 }
 
 function teardownInputFocusScrollSuppression() {
 	inputFocusScrollSuppressionTarget?.removeEventListener('pointerdown', openPickerWithoutInputFocus)
+	if (inputFocusScrollSuppressionTarget && originalInputFocus) {
+		inputFocusScrollSuppressionTarget.focus = originalInputFocus
+	}
 	inputFocusScrollSuppressionTarget = null
+	originalInputFocus = null
+	suppressNextInputFocusScroll = false
 }
 
 function syncInputFocusScrollSuppression() {
@@ -971,6 +1002,7 @@ function syncInputFocusScrollSuppression() {
 
 	teardownInputFocusScrollSuppression()
 	target.addEventListener('pointerdown', openPickerWithoutInputFocus)
+	patchInputFocusScrollSuppression(target)
 	inputFocusScrollSuppressionTarget = target
 }
 
@@ -1092,6 +1124,11 @@ onMounted(async () => {
 		onReady: (_selectedDates, _dateStr, instance) => {
 			syncCalendarView(instance)
 
+			instance.calendarContainer.addEventListener(
+				'pointerdown',
+				suppressInputFocusScrollForCalendarPointer,
+				true,
+			)
 			instance.calendarContainer.addEventListener('pointerdown', startRangeDrag, true)
 			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
@@ -1196,6 +1233,12 @@ onMounted(async () => {
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
 			cancelRangeEndpointMovePreview()
+			if (suppressNextInputFocusScroll) {
+				const focusTarget = instance.altInput ?? inputRef.value
+				focusTarget?.blur()
+				suppressNextInputFocusScroll = false
+			}
+
 			if (hasCompleteModelRange()) {
 				syncPickerFromModel()
 				return
