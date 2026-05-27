@@ -252,12 +252,25 @@ async fn fetch_project_downloads_facets(
 fn normalize_download_source_facets(
     user_agents: &[String],
 ) -> Vec<DownloadSource> {
-    user_agents
+    let mut sources = user_agents
         .iter()
         .filter_map(|user_agent| normalize_download_source(user_agent))
         .collect::<HashSet<_>>()
         .into_iter()
-        .collect()
+        .collect::<Vec<_>>();
+    sources.sort_by(|a, b| download_source_sort_key(a).cmp(download_source_sort_key(b)));
+    sources
+}
+
+fn download_source_sort_key(source: &DownloadSource) -> &str {
+    match source {
+        DownloadSource::Named(name) => name,
+        DownloadSource::Website => "website",
+        DownloadSource::ModrinthApp => "modrinth_app",
+        DownloadSource::ModrinthHosting => "modrinth_hosting",
+        DownloadSource::ModrinthMaven => "modrinth_maven",
+        DownloadSource::Other => "other",
+    }
 }
 
 async fn fetch_project_playtime_facets(
