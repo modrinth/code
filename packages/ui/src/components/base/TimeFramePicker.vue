@@ -56,6 +56,7 @@
 								show-today
 								wrapper-class="w-full"
 								calendar-class="!border-none"
+								close-on-select
 							/>
 						</div>
 						<div class="flex flex-col gap-1">
@@ -73,6 +74,7 @@
 								show-today
 								wrapper-class="w-full"
 								calendar-class="!border-none"
+								close-on-select
 							/>
 						</div>
 					</div>
