@@ -370,9 +370,51 @@ async fn persist_attribution_results(
         }
     }
 
+    let existing_flame_groups = sqlx::query!(
+        r#"
+        select id as "id: DBAttributionGroupId", flame_project
+        from project_attribution_groups
+        where project_id = $1 and flame_project is not null
+        "#,
+        project_id as DBProjectId,
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_err("fetching existing flame attribution groups")?;
+
+    let mut existing_flame_group_ids = HashMap::new();
+    for group in existing_flame_groups {
+        if let Some(flame_project) = group.flame_project.and_then(|fp| {
+            serde_json::from_value::<AttributionFlameProject>(fp).ok()
+        }) {
+            existing_flame_group_ids.insert(flame_project.id, group.id);
+        }
+    }
+
     for (file, external_license_id, status, link, flame_project) in
         external_license_files
     {
+        if let Some(group_id) = flame_project
+            .as_ref()
+            .and_then(|fp| existing_flame_group_ids.get(&fp.id))
+        {
+            sqlx::query!(
+                "
+                insert into project_attribution_files (group_id, name, sha1, moderation_external_license_id)
+                values ($1, $2, $3, $4)
+                ",
+                *group_id as DBAttributionGroupId,
+                &file.path,
+                &file.sha1.as_bytes().to_vec() as &[u8],
+                external_license_id,
+            )
+            .execute(&mut *txn)
+            .await
+            .wrap_err("inserting external license attribution file into existing flame group")?;
+
+            continue;
+        }
+
         let attribution = default_external_license_attribution(status, link);
         let flame_project =
             flame_project.and_then(|fp| serde_json::to_value(fp).ok());
@@ -406,33 +448,11 @@ async fn persist_attribution_results(
         .wrap_err("inserting external license attribution file")?;
     }
 
-    let existing_flame_groups = sqlx::query!(
-        r#"
-        select id as "id: DBAttributionGroupId", flame_project
-        from project_attribution_groups
-        where project_id = $1 and flame_project is not null
-        "#,
-        project_id as DBProjectId,
-    )
-    .fetch_all(&mut *txn)
-    .await
-    .wrap_err("fetching existing flame attribution groups")?;
-
     for (flame_project_id, (files, resolution)) in &flame_groups {
-        let existing = existing_flame_groups.iter().find(|g| {
-            g.flame_project
-                .as_ref()
-                .and_then(|fp| {
-                    serde_json::from_value::<AttributionFlameProject>(
-                        fp.clone(),
-                    )
-                    .ok()
-                })
-                .is_some_and(|fp| fp.id == *flame_project_id)
-        });
-
-        let group_id = if let Some(group) = existing {
-            group.id
+        let group_id = if let Some(group_id) =
+            existing_flame_group_ids.get(flame_project_id)
+        {
+            *group_id
         } else {
             let fp = resolution
                 .and_then(|r| {
@@ -457,6 +477,7 @@ async fn persist_attribution_results(
             .execute(&mut *txn)
             .await
             .wrap_err("inserting attribution group")?;
+            existing_flame_group_ids.insert(*flame_project_id, id);
             id
         };
 
