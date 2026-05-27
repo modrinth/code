@@ -174,10 +174,17 @@ pub async fn tiltify_webhook(
         .insert(&mut transaction)
         .await
         .wrap_internal_err("inserting donation")?;
+
     transaction
         .commit()
         .await
         .wrap_internal_err("committing transaction")?;
+
+    if let Some(user_id) = donation.user_id {
+        DBUser::clear_caches(&[(user_id, username)], &redis)
+            .await
+            .wrap_internal_err("clearing user caches")?;
+    }
 
     Ok(())
 }

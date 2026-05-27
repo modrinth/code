@@ -5,3 +5,5 @@ create table campaign_donations (
     amount_usd numeric(96, 48),
     user_id bigint references users(id)
 );
+create index campaign_donations_user_amount_donated_at_idx
+on campaign_donations (user_id, amount_usd, donated_at);
