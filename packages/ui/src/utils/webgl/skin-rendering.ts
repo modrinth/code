@@ -257,7 +257,10 @@ export async function setupSkinModel(
 	model: THREE.Object3D
 	bodyNode: THREE.Object3D | null
 }> {
-	const [gltf, texture] = await Promise.all([loadModel(modelUrl), loadTexture(textureUrl, config)])
+	const [gltf, texture] = await Promise.all([
+		loadModel(modelUrl),
+		loadTexture(textureUrl, config),
+	])
 
 	const model = gltf.scene.clone()
 	applyTexture(model, texture)

@@ -4,7 +4,7 @@ import {
 	createTransparentTexture,
 	disposeCaches,
 	setupSkinModel,
-} from '@modrinth/utils'
+} from '@modrinth/ui'
 import * as THREE from 'three'
 import { reactive } from 'vue'
 

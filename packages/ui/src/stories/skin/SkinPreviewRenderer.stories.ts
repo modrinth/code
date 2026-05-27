@@ -74,6 +74,64 @@ export const RepeatInteract: Story = {
 	}),
 }
 
+export const AnimationControls: Story = {
+	render: (args) => ({
+		components: { SkinPreviewRenderer },
+		setup() {
+			type SkinPreviewRendererExpose = {
+				getAvailableAnimations: () => string[]
+				getCurrentAnimation: () => string
+				playAnimation: (name: string) => boolean
+				stopAnimations: () => void
+			}
+
+			const preview = ref<SkinPreviewRendererExpose | null>(null)
+			const availableAnimations = ref<string[]>([])
+			const currentAnimation = ref('')
+
+			function refreshAnimations() {
+				availableAnimations.value = preview.value?.getAvailableAnimations() ?? []
+				currentAnimation.value = preview.value?.getCurrentAnimation() ?? ''
+			}
+
+			function playAnimation(name: string) {
+				preview.value?.playAnimation(name)
+				currentAnimation.value = name
+			}
+
+			return {
+				args,
+				availableAnimations,
+				currentAnimation,
+				playAnimation,
+				preview,
+				refreshAnimations,
+			}
+		},
+		template: /* html */ `
+			<div class="flex items-start gap-6">
+				<div class="h-[80vh] min-h-[32rem] max-h-[48rem] w-[22rem]">
+					<SkinPreviewRenderer ref="preview" v-bind="args" />
+				</div>
+				<div class="flex max-w-[18rem] flex-col gap-2">
+					<button class="rounded-lg border-0 bg-surface-4 px-4 py-2 text-primary" @click="refreshAnimations">
+						Refresh animations
+					</button>
+					<div class="text-sm text-secondary">Current: {{ currentAnimation || 'none' }}</div>
+					<button
+						v-for="name in availableAnimations"
+						:key="name"
+						class="rounded-lg border-0 bg-surface-4 px-4 py-2 text-left text-primary"
+						@click="playAnimation(name)"
+					>
+						{{ name }}
+					</button>
+				</div>
+			</div>
+		`,
+	}),
+}
+
 export const ResponsiveFit: Story = {
 	args: {
 		lockFit: false,
