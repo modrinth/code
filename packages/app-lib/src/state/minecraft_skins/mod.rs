@@ -131,8 +131,8 @@ impl CustomMinecraftSkin {
         minecraft_user_id: Uuid,
         db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<impl Stream<Item = Self>> {
-        // Limit the first-load IPC payload. Full skin textures are returned inline,
-        // so very large libraries can otherwise block the skins page while serializing.
+        // Limit ourselves to 2048 skins, so that memory usage even when storing base64
+        // PNG data of a 64x64 texture with random pixels stays around ~150 MiB
         Self::get_many(minecraft_user_id, 0, 2048, db).await
     }
 
