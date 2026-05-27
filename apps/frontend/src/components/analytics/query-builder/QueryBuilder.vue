@@ -838,7 +838,7 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 
 function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
 	if (breakdown === 'project') {
-		return 'Projects'
+		return 'Project'
 	}
 
 	return breakdownOptions.value.find((option) => option.value === breakdown)?.label ?? breakdown
