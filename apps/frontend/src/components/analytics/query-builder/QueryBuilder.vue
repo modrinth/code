@@ -21,7 +21,7 @@
 				@close="handleProjectSelectClose"
 			>
 				<template #input-content="{ isOpen, openDirection }">
-					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-2 pr-1">
+					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-1.5 pr-1">
 						<img
 							v-if="selectedProjectIconUrl"
 							:src="selectedProjectIconUrl"
@@ -70,7 +70,7 @@
 					<div>
 						<button
 							type="button"
-							class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
+							class="flex w-full cursor-pointer items-center gap-1.5 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
 							:aria-selected="isAllProjectsOptionSelected"
 							:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 							role="option"
@@ -136,12 +136,11 @@
 				fit-content
 				checkbox-position="right"
 				placeholder="None"
-				clearable
 				@open="handleBreakdownSelectOpen"
 				@close="handleBreakdownSelectClose"
 			>
 				<template #input-content="{ isOpen, openDirection }">
-					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-2 pr-1">
+					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-1.5 pr-1">
 						<BlocksIcon class="size-5 shrink-0 text-primary" />
 						<span
 							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary"
@@ -149,26 +148,12 @@
 						>
 							{{ mobileSelectedBreakdownLabel }}
 						</span>
-						<div class="flex shrink-0 items-center gap-1.5">
-							<template v-if="canClearSelectedBreakdowns">
-								<button
-									type="button"
-									class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-									aria-label="Clear breakdowns"
-									@click.stop="clearSelectedBreakdowns"
-								>
-									<XIcon class="size-4 text-primary" />
-								</button>
-								<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-							</template>
-
-							<ChevronLeftIcon
-								class="size-5 shrink-0 text-primary transition-transform duration-150"
-								:class="
-									isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
-								"
-							/>
-						</div>
+						<ChevronLeftIcon
+							class="size-5 shrink-0 text-primary transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+						/>
 					</div>
 				</template>
 			</MultiSelect>
@@ -206,7 +191,7 @@
 						@close="handleProjectSelectClose"
 					>
 						<template #input-content="{ isOpen, openDirection }">
-							<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
+							<div class="flex min-h-7 min-w-0 flex-1 items-center gap-1.5 pr-1">
 								<div class="flex items-center gap-0.5">
 									<img
 										v-if="selectedProjectIconUrl"
@@ -225,30 +210,12 @@
 										{{ selectedProjectLabel }}
 									</span>
 								</div>
-								<div class="flex shrink-0 items-center gap-1.5">
-									<template v-if="canClearDraftSelectedProjects">
-										<button
-											type="button"
-											class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-											aria-label="Clear projects"
-											@click.stop="clearDraftSelectedProjects"
-										>
-											<XIcon class="size-4 text-primary" />
-										</button>
-										<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-									</template>
-
-									<ChevronLeftIcon
-										class="size-5 shrink-0 text-primary transition-transform duration-150"
-										:class="
-											isOpen
-												? openDirection === 'down'
-													? 'rotate-90'
-													: '-rotate-90'
-												: '-rotate-90'
-										"
-									/>
-								</div>
+								<ChevronLeftIcon
+									class="size-5 shrink-0 text-primary transition-transform duration-150"
+									:class="
+										isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+									"
+								/>
 							</div>
 						</template>
 						<template #option="{ item, selected }">
@@ -366,42 +333,27 @@
 									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 									checkbox-position="right"
 									placeholder="None"
-									clearable
 									@open="handleBreakdownSelectOpen"
 									@close="handleBreakdownSelectClose"
 								>
 									<template #input-content="{ isOpen, openDirection }">
-										<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
+										<div class="flex min-h-7 min-w-0 flex-1 items-center gap-1.5 pr-1">
 											<span
 												class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary"
 												:title="selectedBreakdownLabel"
 											>
 												{{ selectedBreakdownLabel }}
 											</span>
-											<div class="flex shrink-0 items-center gap-1.5">
-												<template v-if="canClearSelectedBreakdowns">
-													<button
-														type="button"
-														class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-														aria-label="Clear breakdowns"
-														@click.stop="clearSelectedBreakdowns"
-													>
-														<XIcon class="size-4 text-primary" />
-													</button>
-													<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-												</template>
-
-												<ChevronLeftIcon
-													class="size-5 shrink-0 text-primary transition-transform duration-150"
-													:class="
-														isOpen
-															? openDirection === 'down'
-																? 'rotate-90'
-																: '-rotate-90'
+											<ChevronLeftIcon
+												class="size-5 shrink-0 text-primary transition-transform duration-150"
+												:class="
+													isOpen
+														? openDirection === 'down'
+															? 'rotate-90'
 															: '-rotate-90'
-													"
-												/>
-											</div>
+														: '-rotate-90'
+												"
+											/>
 										</div>
 									</template>
 								</MultiSelect>
@@ -426,7 +378,6 @@ import {
 	ClockIcon,
 	FolderOpenIcon,
 	LayersIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -621,9 +572,6 @@ const areAllProjectsSelected = computed(() => {
 	return isSameProjectSelection(draftSelectedProjectIds.value, allProjectIds.value)
 })
 const isAllProjectsOptionSelected = computed(() => draftSelectedProjectIds.value.length === 0)
-const canClearDraftSelectedProjects = computed(() => {
-	return !isAllProjectsOptionSelected.value && !areAllProjectsSelected.value
-})
 
 const selectedProjectLabel = computed(() => {
 	if (!hasProjectOptions.value) {
@@ -685,14 +633,6 @@ function commitDraftSelectedProjects(
 	draftSelectedProjectIds.value = [...nextProjectIds]
 	if (!isSameProjectSelection(selectedProjectIds.value, nextProjectIds)) {
 		selectedProjectIds.value = nextProjectIds
-	}
-}
-
-function clearDraftSelectedProjects() {
-	clearProjectDownloadsThreshold()
-	draftSelectedProjectIds.value = []
-	if (!isProjectSelectOpen.value) {
-		handleProjectSelectClose()
 	}
 }
 
@@ -873,7 +813,6 @@ const mobileSelectedBreakdownLabel = computed(() => {
 
 	return `Breakdown by ${selectedBreakdownLabel.value.toLowerCase()}`
 })
-const canClearSelectedBreakdowns = computed(() => selectedBreakdownValue.value.length > 0)
 const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[]>(
 	() => {
 		const selectedBreakdownSet = new Set(selectedBreakdownValue.value)
@@ -899,13 +838,6 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 
 function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
 	return breakdownOptions.value.find((option) => option.value === breakdown)?.label ?? breakdown
-}
-
-function clearSelectedBreakdowns() {
-	selectedBreakdownValue.value = []
-	if (!isBreakdownSelectOpen.value) {
-		commitDraftSelectedBreakdowns()
-	}
 }
 
 function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
