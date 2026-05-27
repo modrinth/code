@@ -517,6 +517,9 @@ const selectedProjects = computed(() =>
 			doesProjectStatusMatchFilters(project.status, selectedFilters.value),
 	),
 )
+const selectedProjectNameById = computed(
+	() => new Map(selectedProjects.value.map((project) => [project.id, project.name])),
+)
 const selectedProjectEventIdSet = computed(
 	() => new Set(selectedProjects.value.map((project) => project.id)),
 )
@@ -524,7 +527,7 @@ const localProjectChartEvents = computed<AnalyticsChartEvent[]>(() =>
 	projectEvents.value
 		.filter((event) => selectedProjectEventIdSet.value.has(event.project_id))
 		.map((event) => ({
-			title: getProjectEventTitle(event),
+			title: getProjectEventDisplayTitle(event),
 			starts: event.timestamp,
 			ends: event.timestamp,
 			subtitle: formatProjectEventDate(event.timestamp),
@@ -551,12 +554,22 @@ function formatProjectStatusLabel(status: Labrinth.Projects.v2.ProjectStatus) {
 
 function getProjectEventTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
 	if (event.kind === 'version_uploaded') {
-		return event.version_name.trim() || event.version_number.trim() || 'Version uploaded'
+		return event.version_number.trim() || 'Version uploaded'
 	}
 
 	const statusFrom = formatProjectStatusLabel(event.status_from)
 	const statusTo = formatProjectStatusLabel(event.status_to)
 	return `Status changed from ${statusFrom} to ${statusTo}`
+}
+
+function getProjectEventDisplayTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
+	const title = getProjectEventTitle(event)
+	if (selectedProjects.value.length <= 1) {
+		return title
+	}
+
+	const projectName = selectedProjectNameById.value.get(event.project_id)
+	return projectName ? `${projectName}: ${title}` : title
 }
 
 function formatProjectEventDate(timestamp: string) {

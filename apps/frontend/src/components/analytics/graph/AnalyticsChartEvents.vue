@@ -75,7 +75,7 @@
 							See announcement
 							<ExternalIcon class="size-3.5" aria-hidden="true" />
 						</a>
-						<div class="mt-2.5 text-xs font-semibold text-primary">
+						<div class="mt-1 text-xs font-semibold text-primary">
 							{{ event.subtitle ?? formatEventRange(event) }}
 						</div>
 					</div>

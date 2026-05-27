@@ -30,7 +30,9 @@ import {
 	buildDefaultAnalyticsQueryBuilderState,
 	getAnalyticsBreakdownPresetsForProjectSelection,
 	getDefaultAnalyticsBreakdownPresets,
+	getDefaultAnalyticsGraphProjectEventsVisibility,
 	hasAnalyticsBreakdownQuery,
+	hasAnalyticsGraphProjectEventsVisibilityQuery,
 	hasAnalyticsProjectSelectionQuery,
 	hasAnalyticsQueryBuilderRouteChange,
 	isAnalyticsGraphStateDefault,
@@ -1321,7 +1323,10 @@ export function createAnalyticsDashboardContext(
 	const route = useRoute()
 	const router = useRouter()
 	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
-	const initialGraphState = readAnalyticsGraphState(route.query)
+	const initialGraphState = readAnalyticsGraphState(
+		route.query,
+		initialQueryState.selectedProjectIds,
+	)
 
 	const activeStat = ref<AnalyticsDashboardStat>(initialGraphState.activeStat)
 	const activeGraphViewMode = ref<AnalyticsGraphViewMode>(initialGraphState.activeGraphViewMode)
@@ -1727,6 +1732,9 @@ export function createAnalyticsDashboardContext(
 		hasAnalyticsProjectSelectionQuery(route.query),
 	)
 	const hasExplicitBreakdownQuery = computed(() => hasAnalyticsBreakdownQuery(route.query))
+	const hasExplicitProjectEventsVisibilityQuery = computed(() =>
+		hasAnalyticsGraphProjectEventsVisibilityQuery(route.query),
+	)
 	const isAnalyticsQueryBuilderDefault = computed(() => {
 		const isQueryBuilderDefault = isAnalyticsQueryBuilderStateDefault(
 			{
@@ -1743,18 +1751,21 @@ export function createAnalyticsDashboardContext(
 			},
 			availableProjectIds.value,
 		)
-		const isGraphDefault = isAnalyticsGraphStateDefault({
-			activeStat: activeStat.value,
-			activeGraphViewMode: activeGraphViewMode.value,
-			isRatioMode: isRatioMode.value,
-			showChartEvents: showChartEvents.value,
-			showProjectEvents: showProjectEvents.value,
-			showPreviousPeriod: showPreviousPeriod.value,
-			hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
-			selectedGraphDatasetIds: hasExplicitGraphDatasetSelection.value
-				? selectedGraphDatasetIds.value
-				: null,
-		})
+		const isGraphDefault = isAnalyticsGraphStateDefault(
+			{
+				activeStat: activeStat.value,
+				activeGraphViewMode: activeGraphViewMode.value,
+				isRatioMode: isRatioMode.value,
+				showChartEvents: showChartEvents.value,
+				showProjectEvents: showProjectEvents.value,
+				showPreviousPeriod: showPreviousPeriod.value,
+				hiddenGraphDatasetIds: hiddenGraphDatasetIds.value,
+				selectedGraphDatasetIds: hasExplicitGraphDatasetSelection.value
+					? selectedGraphDatasetIds.value
+					: null,
+			},
+			selectedProjectIds.value,
+		)
 
 		return isQueryBuilderDefault && isGraphDefault
 	})
@@ -1988,14 +1999,30 @@ export function createAnalyticsDashboardContext(
 	)
 
 	watch(
+		[selectedProjectIds, hasExplicitProjectEventsVisibilityQuery],
+		([nextSelectedProjectIds, nextHasExplicitProjectEventsVisibilityQuery]) => {
+			const defaultProjectEventsVisibility =
+				getDefaultAnalyticsGraphProjectEventsVisibility(nextSelectedProjectIds)
+
+			if (
+				!nextHasExplicitProjectEventsVisibilityQuery &&
+				showProjectEvents.value !== defaultProjectEventsVisibility
+			) {
+				showProjectEvents.value = defaultProjectEventsVisibility
+			}
+		},
+		{ deep: true, immediate: true },
+	)
+
+	watch(
 		() => route.query,
 		(nextQuery) => {
 			const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
-			const nextGraphState = readAnalyticsGraphState(nextQuery)
 			const availableProjectIdSet = new Set(availableProjectIds.value)
 			const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
 				availableProjectIdSet.has(projectId),
 			)
+			const nextGraphState = readAnalyticsGraphState(nextQuery, nextSelectedProjectIds)
 			const nextSelectedBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
 				nextQueryState.selectedBreakdowns,
 				nextSelectedProjectIds,
@@ -2448,7 +2475,10 @@ export function createAnalyticsDashboardContext(
 			if (nextAnalyticsData === undefined) {
 				return
 			}
-			const splitTimeSlices = splitAnalyticsTimeSlices(nextAnalyticsData.metrics, fetchRequest.value)
+			const splitTimeSlices = splitAnalyticsTimeSlices(
+				nextAnalyticsData.metrics,
+				fetchRequest.value,
+			)
 			timeSlices.value = splitTimeSlices.currentTimeSlices
 			previousTimeSlices.value = splitTimeSlices.previousTimeSlices
 			projectEvents.value = getAnalyticsProjectEventsInTimeRange(
@@ -2659,7 +2689,7 @@ export function createAnalyticsDashboardContext(
 		}
 
 		const defaultQueryState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds.value)
-		const defaultGraphState = buildDefaultAnalyticsGraphState()
+		const defaultGraphState = buildDefaultAnalyticsGraphState(defaultQueryState.selectedProjectIds)
 
 		selectedProjectIds.value = defaultQueryState.selectedProjectIds
 		selectedTimeframeMode.value = defaultQueryState.selectedTimeframeMode

@@ -95,7 +95,6 @@ export const DEFAULT_ANALYTICS_DASHBOARD_STAT: AnalyticsDashboardStat = 'views'
 export const DEFAULT_ANALYTICS_GRAPH_VIEW_MODE: AnalyticsGraphViewMode = 'line'
 export const DEFAULT_ANALYTICS_GRAPH_RATIO_MODE = false
 export const DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY = true
-export const DEFAULT_ANALYTICS_GRAPH_PROJECT_EVENTS_VISIBILITY = true
 export const DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY = false
 export const MAX_ANALYTICS_BREAKDOWN_PRESETS = 2
 
@@ -382,8 +381,10 @@ function parseEnabledQueryValue(
 
 function parseVisibleQueryValue(
 	value: LocationQueryValue | LocationQueryValue[] | undefined,
+	fallbackValue: boolean,
 ): boolean {
 	const rawValue = Array.isArray(value) ? value[0] : value
+	if (rawValue === undefined) return fallbackValue
 	return rawValue !== '0'
 }
 
@@ -447,13 +448,21 @@ function isTimeframeRangeEndBeforeStart(
 	return endValue < startValue
 }
 
-export function buildDefaultAnalyticsGraphState(): AnalyticsGraphState {
+export function getDefaultAnalyticsGraphProjectEventsVisibility(
+	selectedProjectIds: readonly string[] = [],
+): boolean {
+	return selectedProjectIds.length <= 1
+}
+
+export function buildDefaultAnalyticsGraphState(
+	selectedProjectIds: readonly string[] = [],
+): AnalyticsGraphState {
 	return {
 		activeStat: DEFAULT_ANALYTICS_DASHBOARD_STAT,
 		activeGraphViewMode: DEFAULT_ANALYTICS_GRAPH_VIEW_MODE,
 		isRatioMode: DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
 		showChartEvents: DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
-		showProjectEvents: DEFAULT_ANALYTICS_GRAPH_PROJECT_EVENTS_VISIBILITY,
+		showProjectEvents: getDefaultAnalyticsGraphProjectEventsVisibility(selectedProjectIds),
 		showPreviousPeriod: DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 		hiddenGraphDatasetIds: [],
 		selectedGraphDatasetIds: null,
@@ -555,8 +564,11 @@ export function isAnalyticsQueryBuilderStateDefault(
 	)
 }
 
-export function isAnalyticsGraphStateDefault(state: AnalyticsGraphState): boolean {
-	const defaultState = buildDefaultAnalyticsGraphState()
+export function isAnalyticsGraphStateDefault(
+	state: AnalyticsGraphState,
+	selectedProjectIds: readonly string[] = [],
+): boolean {
+	const defaultState = buildDefaultAnalyticsGraphState(selectedProjectIds)
 
 	return (
 		state.activeStat === defaultState.activeStat &&
@@ -577,6 +589,11 @@ function serializeListQueryValue(values: string[]): string | undefined {
 
 function serializeExplicitListQueryValue(values: string[]): string {
 	return values.join(',')
+}
+
+function serializeVisibleQueryValue(value: boolean, defaultValue: boolean): string | undefined {
+	if (value === defaultValue) return undefined
+	return value ? '1' : '0'
 }
 
 function normalizeQueryValue(
@@ -650,8 +667,11 @@ function areAllProjectsSelected(selectedProjectIds: string[], allProjectIds: str
 	return selectedProjectIds.every((projectId) => allProjectIdSet.has(projectId))
 }
 
-export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphState {
-	const defaultState = buildDefaultAnalyticsGraphState()
+export function readAnalyticsGraphState(
+	query: LocationQuery,
+	selectedProjectIds: readonly string[] = [],
+): AnalyticsGraphState {
+	const defaultState = buildDefaultAnalyticsGraphState(selectedProjectIds)
 
 	return {
 		activeStat: parsePresetQueryValue(
@@ -665,8 +685,14 @@ export function readAnalyticsGraphState(query: LocationQuery): AnalyticsGraphSta
 			defaultState.activeGraphViewMode,
 		),
 		isRatioMode: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_RATIO_MODE]),
-		showChartEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_EVENTS_VISIBILITY]),
-		showProjectEvents: parseVisibleQueryValue(query[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY]),
+		showChartEvents: parseVisibleQueryValue(
+			query[QUERY_KEY_GRAPH_EVENTS_VISIBILITY],
+			defaultState.showChartEvents,
+		),
+		showProjectEvents: parseVisibleQueryValue(
+			query[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY],
+			defaultState.showProjectEvents,
+		),
 		showPreviousPeriod: parseEnabledQueryValue(query[QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY]),
 		hiddenGraphDatasetIds: parseListQueryValue(query[QUERY_KEY_GRAPH_HIDDEN_SERIES]),
 		selectedGraphDatasetIds:
@@ -803,6 +829,10 @@ export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean
 	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).length > 0
 }
 
+export function hasAnalyticsGraphProjectEventsVisibilityQuery(query: LocationQuery): boolean {
+	return query[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY] !== undefined
+}
+
 export function hasAnalyticsTableSortQuery(query: LocationQuery): boolean {
 	return (
 		query[QUERY_KEY_TABLE_SORT] !== undefined || query[QUERY_KEY_TABLE_SORT_DIRECTION] !== undefined
@@ -863,6 +893,8 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	nextRouteQuery[QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE] = undefined
 
 	if (graphState) {
+		const defaultGraphState = buildDefaultAnalyticsGraphState(state.selectedProjectIds)
+
 		nextRouteQuery[QUERY_KEY_STAT] =
 			graphState.activeStat !== DEFAULT_ANALYTICS_DASHBOARD_STAT ? graphState.activeStat : undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_VIEW_MODE] =
@@ -870,10 +902,14 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 				? graphState.activeGraphViewMode
 				: undefined
 		nextRouteQuery[QUERY_KEY_GRAPH_RATIO_MODE] = graphState.isRatioMode ? '1' : undefined
-		nextRouteQuery[QUERY_KEY_GRAPH_EVENTS_VISIBILITY] = graphState.showChartEvents ? undefined : '0'
-		nextRouteQuery[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY] = graphState.showProjectEvents
-			? undefined
-			: '0'
+		nextRouteQuery[QUERY_KEY_GRAPH_EVENTS_VISIBILITY] = serializeVisibleQueryValue(
+			graphState.showChartEvents,
+			defaultGraphState.showChartEvents,
+		)
+		nextRouteQuery[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY] = serializeVisibleQueryValue(
+			graphState.showProjectEvents,
+			defaultGraphState.showProjectEvents,
+		)
 		nextRouteQuery[QUERY_KEY_GRAPH_PREVIOUS_PERIOD_VISIBILITY] = graphState.showPreviousPeriod
 			? '1'
 			: undefined
