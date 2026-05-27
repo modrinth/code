@@ -2,7 +2,7 @@
 import { DropdownIcon, EditIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import { Accordion, ButtonStyled, SkinButton, SkinLikeTextButton } from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
 import type { Skin } from '@/helpers/skins.ts'
@@ -66,7 +66,11 @@ const scrollTop = ref(0)
 const viewportHeight = ref(0)
 const containerOffset = ref(0)
 const openSectionKeys = ref<Set<string>>(new Set())
+const hasSettledInitialLayout = ref(false)
 const knownSectionKeys = new Set<string>()
+let enableLayoutTransitionsFrame: number | null = null
+let isEnableLayoutTransitionsScheduled = false
+let isUnmounted = false
 
 const { width: listWidth } = useElementSize(listContainer)
 const { width: windowWidth } = useWindowSize()
@@ -197,6 +201,46 @@ watch(listContainer, (element, _previousElement, onCleanup) => {
 	})
 })
 
+watch(
+	listWidth,
+	(width) => {
+		if (
+			typeof window === 'undefined' ||
+			width <= 0 ||
+			hasSettledInitialLayout.value ||
+			isEnableLayoutTransitionsScheduled
+		) {
+			return
+		}
+
+		isEnableLayoutTransitionsScheduled = true
+		void nextTick(() => {
+			if (isUnmounted) return
+
+			enableLayoutTransitionsFrame = window.requestAnimationFrame(() => {
+				if (isUnmounted) return
+
+				enableLayoutTransitionsFrame = window.requestAnimationFrame(() => {
+					if (isUnmounted) return
+
+					hasSettledInitialLayout.value = true
+					enableLayoutTransitionsFrame = null
+					isEnableLayoutTransitionsScheduled = false
+				})
+			})
+		})
+	},
+	{ immediate: true },
+)
+
+onUnmounted(() => {
+	isUnmounted = true
+
+	if (enableLayoutTransitionsFrame !== null) {
+		window.cancelAnimationFrame(enableLayoutTransitionsFrame)
+	}
+})
+
 function defaultSkinSectionKey(title: string) {
 	return `default-skins-${title}`
 }
@@ -316,8 +360,13 @@ defineExpose({ getAddSkinButtonElement })
 		<div
 			v-for="{ section, top, index } in visibleSections"
 			:key="section.key"
-			class="absolute inset-x-0 transition-transform duration-300 ease-in-out will-change-transform motion-reduce:transition-none"
-			:class="index === 0 ? 'pt-1' : 'pt-6'"
+			class="absolute inset-x-0"
+			:class="[
+				index === 0 ? 'pt-1' : 'pt-6',
+				hasSettledInitialLayout
+					? 'transition-transform duration-300 ease-in-out will-change-transform motion-reduce:transition-none'
+					: '',
+			]"
 			:style="{ transform: `translateY(${top}px)` }"
 		>
 			<Accordion

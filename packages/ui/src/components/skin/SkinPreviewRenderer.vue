@@ -27,7 +27,7 @@
 		</div>
 		<div
 			v-if="nametag"
-			class="absolute left-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-gray nametag-bg transition-all duration-200"
+			class="absolute left-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-gray nametag-bg"
 			:style="nametagStyle"
 		>
 			{{ nametagText }}
@@ -476,6 +476,7 @@ function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.Animatio
 	}
 
 	mixer.value = new THREE.AnimationMixer(loadedScene)
+	clock.start()
 	actions.value = {}
 
 	clips.forEach((clip) => {
@@ -488,7 +489,7 @@ function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.Animatio
 
 	if (baseAnimation.value && actions.value[baseAnimation.value]) {
 		actions.value[baseAnimation.value].setLoop(THREE.LoopRepeat, Infinity)
-		playAnimation(baseAnimation.value)
+		playAnimation(baseAnimation.value, true)
 		setupRandomAnimationLoop()
 	} else {
 		console.warn(`Base animation "${baseAnimation.value}" not found`)
@@ -496,12 +497,12 @@ function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.Animatio
 		const firstAnimationName = Object.keys(actions.value)[0]
 		if (firstAnimationName) {
 			actions.value[firstAnimationName].setLoop(THREE.LoopRepeat, Infinity)
-			playAnimation(firstAnimationName)
+			playAnimation(firstAnimationName, true)
 		}
 	}
 }
 
-function playAnimation(name: string) {
+function playAnimation(name: string, immediate = false) {
 	if (!mixer.value || !actions.value[name]) {
 		console.warn(`Animation "${name}" not found!`)
 		return false
@@ -547,8 +548,16 @@ function playAnimation(name: string) {
 		addAnimationFinishedListener(onFinished)
 	}
 
-	action.fadeIn(transitionDuration)
+	if (immediate) {
+		action.setEffectiveWeight(1)
+	} else {
+		action.fadeIn(transitionDuration)
+	}
 	action.play()
+
+	if (immediate) {
+		mixer.value.update(0)
+	}
 
 	currentAnimation.value = name
 	return true
