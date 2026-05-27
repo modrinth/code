@@ -7,8 +7,7 @@ use crate::{minecraft_skins::SkinSource, state::MinecraftSkinVariant};
 use super::super::super::Skin;
 
 const DEFAULT_SKINS_SECTION: &str = "Default skins";
-const MINECON_EARTH_2017_SKIN_PACK_SECTION: &str =
-    "MINECON Earth 2017 Skin Pack";
+const MINECON_EARTH_2017_SKIN_PACK_SECTION: &str = "MINECON Earth 2017";
 const BUILDERS_AND_BIOMES_SKIN_PACK_SECTION: &str = "Builders & Biomes";
 const STRIDING_HERO_SKIN_PACK_SECTION: &str = "Striding Hero";
 const THE_GARDEN_AWAKENS_SKIN_PACK_SECTION: &str = "The Garden Awakens";

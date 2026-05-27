@@ -118,7 +118,7 @@ export function useSkinPreviewFit({
 		const preset = FRAMING_PRESETS[currentFraming.value].padding
 
 		return {
-			top: Math.max(preset.top, nametag.value ? (hasNametagBadge.value ? 0.28 : 0.2) : 0),
+			top: Math.max(preset.top, hasNametagBadge.value ? 0.28 : nametag.value ? 0.2 : 0),
 			right: preset.right,
 			bottom: Math.max(preset.bottom, hasSubtitle.value ? 0.28 : preset.bottom),
 			left: preset.left,

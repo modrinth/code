@@ -27,7 +27,6 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_default_user, login as login_flow, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
-import { get as getSettings } from '@/helpers/settings.ts'
 import type { Cape, Skin, SkinTextureUrl } from '@/helpers/skins.ts'
 import {
 	equip_skin,
@@ -41,6 +40,7 @@ import {
 	remove_custom_skin,
 } from '@/helpers/skins.ts'
 import { handleSevereError } from '@/store/error'
+import { useTheming } from '@/store/state'
 
 type UnlistenFn = () => void
 type VirtualSkinSectionListExpose = {
@@ -54,7 +54,7 @@ const skinSectionList = useTemplateRef<VirtualSkinSectionListExpose>('skinSectio
 const notifications = injectNotificationManager()
 const { addNotification, handleError } = notifications
 
-const settings = ref(await getSettings())
+const themeStore = useTheming()
 const skins = ref<Skin[]>([])
 const capes = ref<Cape[]>([])
 
@@ -113,9 +113,7 @@ const skinTexture = computedAsync(async () => {
 })
 const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
-const skinNametag = computed(() =>
-	settings.value.hide_nametag_skins_page ? undefined : username.value,
-)
+const skinNametag = computed(() => (themeStore.hideNametagSkinsPage ? undefined : username.value))
 const hasPendingSkinChange = computed(
 	() => !skinsMatch(selectedSkin.value, originalSelectedSkin.value),
 )
