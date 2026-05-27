@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import {
 	CheckIcon,
+	DropdownIcon,
 	EditIcon,
 	ExcitedRinthbot,
+	EyeIcon,
 	LogInIcon,
 	PlusIcon,
+	RotateCounterClockwiseIcon,
 	SpinnerIcon,
 	TrashIcon,
-	UndoIcon,
 } from '@modrinth/assets'
 import {
+	Accordion,
 	ButtonStyled,
 	ConfirmModal,
 	injectNotificationManager,
@@ -18,13 +21,13 @@ import {
 	SkinPreviewRenderer,
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
+import { getCurrentWebview, type DragDropEvent } from '@tauri-apps/api/webview'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
-import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_default_user, login as login_flow, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
@@ -37,16 +40,24 @@ import {
 	filterSavedSkins,
 	get_available_capes,
 	get_available_skins,
+	get_dragged_skin_data,
 	get_normalized_skin_texture,
 	normalize_skin_texture,
 	remove_custom_skin,
 } from '@/helpers/skins.ts'
 import { handleSevereError } from '@/store/error'
+
+type UnlistenFn = () => void
+type SkinLikeTextButtonExpose = {
+	getRootElement: () => HTMLElement | null | undefined
+}
+
 const editSkinModal = useTemplateRef('editSkinModal')
-const uploadSkinModal = useTemplateRef('uploadSkinModal')
+const addSkinButton = useTemplateRef<SkinLikeTextButtonExpose>('addSkinButton')
+const addSkinFileInput = useTemplateRef<HTMLInputElement>('addSkinFileInput')
 
 const notifications = injectNotificationManager()
-const { handleError } = notifications
+const { addNotification, handleError } = notifications
 
 const settings = ref(await getSettings())
 const skins = ref<Skin[]>([])
@@ -71,6 +82,22 @@ const savedSkins = computed(() => {
 	}
 })
 const defaultSkins = computed(() => filterDefaultSkins(skins.value))
+const defaultSkinSections = computed(() => {
+	const sections = new Map<string, Skin[]>()
+
+	for (const skin of defaultSkins.value) {
+		const sectionTitle = skin.section ?? 'Default skins'
+		const sectionSkins = sections.get(sectionTitle)
+
+		if (sectionSkins) {
+			sectionSkins.push(skin)
+		} else {
+			sections.set(sectionTitle, [skin])
+		}
+	}
+
+	return Array.from(sections, ([title, skins]) => ({ title, skins }))
+})
 
 const currentCape = computed(() => {
 	if (selectedSkin.value?.cape_id) {
@@ -99,6 +126,11 @@ const hasPendingSkinChange = computed(
 )
 
 let userCheckInterval: number | null = null
+let unlistenAddSkinDragDrop: UnlistenFn | null = null
+let isUnmounted = false
+
+const isDraggingSkinFile = ref(false)
+const isAddSkinButtonDragActive = ref(false)
 
 const deleteSkinModal = ref()
 const skinToDelete = ref<Skin | null>(null)
@@ -228,28 +260,154 @@ async function login() {
 	accountsCard.value.setLoginDisabled(false)
 }
 
-function openUploadSkinModal(e: MouseEvent) {
-	uploadSkinModal.value?.show(e)
+function openAddSkinFileBrowser() {
+	addSkinFileInput.value?.click()
 }
 
-function onSkinFileUploaded(buffer: ArrayBuffer) {
+async function onAddSkinFileInputChange(e: Event) {
+	const files = (e.target as HTMLInputElement).files
+	const file = files?.[0]
+
+	if (!file) {
+		return
+	}
+
+	await processSkinFileBuffer(await file.arrayBuffer())
+
+	if (addSkinFileInput.value) {
+		addSkinFileInput.value.value = ''
+	}
+}
+
+function isSkinImagePath(path: string) {
+	return path.toLowerCase().endsWith('.png')
+}
+
+function isSkinFileDrag(event: DragEvent) {
+	const items = Array.from(event.dataTransfer?.items ?? [])
+	const files = Array.from(event.dataTransfer?.files ?? [])
+
+	return (
+		items.some((item) => item.kind === 'file' && item.type === 'image/png') ||
+		files.some((file) => file.type === 'image/png' || isSkinImagePath(file.name))
+	)
+}
+
+function isPositionOverAddSkinButton(position: { x: number; y: number }) {
+	const element = addSkinButton.value?.getRootElement()
+
+	if (!element) {
+		return false
+	}
+
+	const { x, y } = position
+	const rect = element.getBoundingClientRect()
+
+	return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+}
+
+async function handleAddSkinNativeDragDrop(event: { payload: DragDropEvent }) {
+	const payload = event.payload
+
+	if (payload.type === 'leave') {
+		isDraggingSkinFile.value = false
+		isAddSkinButtonDragActive.value = false
+		return
+	}
+
+	if (payload.type === 'enter') {
+		isDraggingSkinFile.value = payload.paths.some(isSkinImagePath)
+	}
+
+	if (payload.type === 'enter' || payload.type === 'over') {
+		isAddSkinButtonDragActive.value =
+			isDraggingSkinFile.value && isPositionOverAddSkinButton(payload.position)
+		return
+	}
+
+	const hasSkinPath = payload.paths.some(isSkinImagePath)
+	const shouldUpload =
+		(isDraggingSkinFile.value || hasSkinPath) && isPositionOverAddSkinButton(payload.position)
+
+	isDraggingSkinFile.value = false
+	isAddSkinButtonDragActive.value = false
+
+	if (!shouldUpload) {
+		return
+	}
+
+	const skinPath = payload.paths.find(isSkinImagePath)
+
+	if (!skinPath) {
+		return
+	}
+
+	try {
+		const data = await get_dragged_skin_data(skinPath)
+		await processSkinFileBuffer(data)
+	} catch (error) {
+		addNotification({
+			title: 'Error processing file',
+			text: error instanceof Error ? error.message : 'Failed to read the dropped file.',
+			type: 'error',
+		})
+	}
+}
+
+function onAddSkinDragOver(event: DragEvent) {
+	if (!isSkinFileDrag(event)) {
+		return
+	}
+
+	isAddSkinButtonDragActive.value = true
+}
+
+function onAddSkinDragLeave() {
+	isAddSkinButtonDragActive.value = false
+}
+
+async function onAddSkinDrop(event: DragEvent) {
+	isAddSkinButtonDragActive.value = false
+
+	const file = Array.from(event.dataTransfer?.files ?? []).find(
+		(file) => file.type === 'image/png' || isSkinImagePath(file.name),
+	)
+
+	if (!file) {
+		return
+	}
+
+	await processSkinFileBuffer(await file.arrayBuffer())
+}
+
+async function setupAddSkinDragDropListener() {
+	try {
+		const unlisten = await getCurrentWebview().onDragDropEvent(handleAddSkinNativeDragDrop)
+
+		if (isUnmounted) {
+			unlisten()
+			return
+		}
+
+		unlistenAddSkinDragDrop = unlisten
+	} catch (error) {
+		handleError(error as Error)
+	}
+}
+
+async function processSkinFileBuffer(buffer: Uint8Array | ArrayBuffer) {
 	const fakeEvent = new MouseEvent('click')
 	const originalSkinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(buffer)
-	normalize_skin_texture(originalSkinTexUrl).then((skinTextureNormalized: Uint8Array) => {
+	try {
+		const skinTextureNormalized = await normalize_skin_texture(originalSkinTexUrl)
 		const skinTexUrl: SkinTextureUrl = {
 			original: originalSkinTexUrl,
 			normalized: `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized),
 		}
-		if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
-			editSkinModal.value.restoreWithNewTexture(skinTexUrl)
-		} else {
-			editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
-		}
-	})
-}
-
-function onUploadCanceled() {
-	editSkinModal.value?.restoreModal()
+		editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
+	} catch (error) {
+		handleError(error as Error)
+	}
 }
 
 watch(
@@ -259,11 +417,19 @@ watch(
 
 onMounted(() => {
 	userCheckInterval = window.setInterval(checkUserChanges, 250)
+	void setupAddSkinDragDropListener()
 })
 
 onUnmounted(() => {
+	isUnmounted = true
+
 	if (userCheckInterval !== null) {
 		window.clearInterval(userCheckInterval)
+	}
+
+	if (unlistenAddSkinDragDrop) {
+		unlistenAddSkinDragDrop()
+		unlistenAddSkinDragDrop = null
 	}
 })
 
@@ -292,12 +458,13 @@ await loadSkins()
 		:capes="capes"
 		@saved="onSkinSaved"
 		@deleted="() => loadSkins()"
-		@open-upload-modal="openUploadSkinModal"
 	/>
-	<UploadSkinModal
-		ref="uploadSkinModal"
-		@uploaded="onSkinFileUploaded"
-		@canceled="onUploadCanceled"
+	<input
+		ref="addSkinFileInput"
+		type="file"
+		accept="image/png"
+		class="hidden"
+		@change="onAddSkinFileInputChange"
 	/>
 	<ConfirmModal
 		ref="deleteSkinModal"
@@ -307,65 +474,105 @@ await loadSkins()
 		@proceed="deleteSkin"
 	/>
 
-	<div v-if="currentUser" class="p-4 skin-layout">
-		<div class="preview-panel">
+	<div v-if="currentUser" class="skin-layout box-border min-h-full p-4">
+		<div class="sticky top-6 self-start p-2 pt-0">
 			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
 				Skins
-				<span class="text-sm font-bold px-2 bg-brand-highlight text-brand rounded-full">Beta</span>
 			</h1>
-			<div class="preview-container">
+			<div class="ml-5 flex h-[80vh] items-center justify-center max-[700px]:h-[50vh]">
 				<SkinPreviewRenderer
 					:cape-src="capeTexture"
 					:texture-src="skinTexture || ''"
 					:variant="skinVariant"
 					:nametag="skinNametag"
 					:initial-rotation="Math.PI / 8"
+					:lock-fit="false"
 				>
-					<template #subtitle>
-						<div v-if="hasPendingSkinChange" class="flex gap-2">
-							<ButtonStyled>
-								<button :disabled="isApplyingSkin" @click="resetSelectedSkin">
-									<UndoIcon />
-									Reset
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand">
-								<button :disabled="isApplyingSkin" @click="applySelectedSkin">
-									<SpinnerIcon v-if="isApplyingSkin" class="animate-spin" />
-									<CheckIcon v-else />
-									Apply
-								</button>
-							</ButtonStyled>
+					<template v-if="hasPendingSkinChange" #nametag-badge>
+						<div
+							class="flex items-center justify-center gap-1.5 rounded-full border border-solid border-brand-blue bg-bg-blue px-3 py-1 text-base font-semibold leading-6 text-brand-blue"
+						>
+							<EyeIcon class="size-5 shrink-0" />
+							Previewing
 						</div>
-						<ButtonStyled v-else>
+					</template>
+					<template #subtitle>
+						<div
+							v-if="hasPendingSkinChange"
+							class="flex max-w-[calc(100vw-2rem)] flex-wrap items-center justify-center gap-2 px-2"
+						>
 							<button
-								:disabled="!selectedSkin"
-								@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
+								class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 text-contrast shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
+								:disabled="isApplyingSkin"
+								@click="resetSelectedSkin"
 							>
-								<EditIcon />
-								Edit skin
+								<RotateCounterClockwiseIcon />
+								Reset
 							</button>
-						</ButtonStyled>
+							<button
+								class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-brand px-4 py-2.5 text-base font-semibold leading-5 text-[rgba(0,0,0,0.9)] shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
+								:disabled="isApplyingSkin"
+								@click="applySelectedSkin"
+							>
+								<SpinnerIcon v-if="isApplyingSkin" class="animate-spin" />
+								<CheckIcon v-else />
+								Apply
+							</button>
+						</div>
+						<button
+							v-else
+							class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 text-contrast shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
+							:disabled="!selectedSkin"
+							@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
+						>
+							<EditIcon />
+							Edit skin
+						</button>
 					</template>
 				</SkinPreviewRenderer>
 			</div>
 		</div>
 
-		<div class="skins-container">
-			<section class="flex flex-col gap-2 mt-1">
-				<h2 class="text-lg font-bold m-0 text-primary">Saved skins</h2>
+		<div class="pt-2">
+			<Accordion
+				class="mt-1"
+				button-class="group flex w-full items-center gap-[6px] bg-transparent m-0 p-0 border-none cursor-pointer text-left"
+				content-class="pt-2"
+				open-by-default
+			>
+				<template #title>Saved skins</template>
+				<template #button="{ open }">
+					<DropdownIcon
+						class="size-6 shrink-0 text-primary transition-transform duration-300"
+						:class="{ 'rotate-180': open }"
+					/>
+					<span class="min-w-0 text-xl font-semibold leading-7 text-primary">
+						Saved skins
+					</span>
+				</template>
 				<div class="skin-card-grid">
-					<SkinLikeTextButton class="skin-card" @click="openUploadSkinModal">
+					<SkinLikeTextButton
+						ref="addSkinButton"
+						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
+						dropzone
+						:drag-active="isAddSkinButtonDragActive"
+						@click="openAddSkinFileBrowser"
+						@dragenter="onAddSkinDragOver"
+						@dragover="onAddSkinDragOver"
+						@dragleave="onAddSkinDragLeave"
+						@drop="onAddSkinDrop"
+					>
 						<template #icon>
 							<PlusIcon class="size-8" />
 						</template>
-						<span>Add a skin</span>
+						Add skin
+						<template #subtitle>Drag and drop</template>
 					</SkinLikeTextButton>
 
 					<SkinButton
 						v-for="skin in savedSkins"
 						:key="skinKey(skin, 'saved-skin')"
-						class="skin-card"
+						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
 						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
 						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 						:selected="isSkinSelected(skin)"
@@ -394,15 +601,33 @@ await loadSkins()
 						</template>
 					</SkinButton>
 				</div>
-			</section>
+			</Accordion>
 
-			<section class="flex flex-col gap-2 mt-6">
-				<h2 class="text-lg font-bold m-0 text-primary">Default skins</h2>
+			<Accordion
+				v-for="section in defaultSkinSections"
+				:key="section.title"
+				class="mt-6"
+				button-class="group flex w-full items-center gap-[6px] bg-transparent m-0 p-0 border-none cursor-pointer text-left"
+				content-class="pt-2"
+				open-by-default
+			>
+				<template #title>
+					{{ section.title }}
+				</template>
+				<template #button="{ open }">
+					<DropdownIcon
+						class="size-6 shrink-0 text-primary transition-transform duration-300"
+						:class="{ 'rotate-180': open }"
+					/>
+					<span class="min-w-0 text-xl font-semibold leading-7 text-primary">
+						{{ section.title }}
+					</span>
+				</template>
 				<div class="skin-card-grid">
 					<SkinButton
-						v-for="skin in defaultSkins"
-						:key="skinKey(skin, 'default-skin')"
-						class="skin-card"
+						v-for="skin in section.skins"
+						:key="skinKey(skin, section.title)"
+						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
 						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
 						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 						:selected="isSkinSelected(skin)"
@@ -410,13 +635,13 @@ await loadSkins()
 						@select="changeSkin(skin)"
 					/>
 				</div>
-			</section>
+			</Accordion>
 		</div>
 	</div>
 
-	<div v-else class="flex items-center justify-center min-h-[50vh] pt-[25%]">
+	<div v-else class="box-border flex min-h-full items-center justify-center pt-[25%]">
 		<div
-			class="bg-bg-raised card-shadow rounded-lg p-7 flex flex-col gap-5 shadow-md relative max-w-xl w-full mx-auto"
+			class="relative mx-auto flex w-full max-w-xl flex-col gap-5 rounded-lg bg-bg-raised p-7 shadow-lg"
 		>
 			<img
 				:src="ExcitedRinthbot"
@@ -455,9 +680,6 @@ await loadSkins()
 </template>
 
 <style lang="scss" scoped>
-$skin-card-width: 155px;
-$skin-card-gap: 4px;
-
 .skin-layout {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr);
@@ -468,34 +690,10 @@ $skin-card-gap: 4px;
 	}
 }
 
-.preview-panel {
-	top: 1.5rem;
-	position: sticky;
-	align-self: start;
-	padding: 0.5rem;
-	padding-top: 0;
-}
-
-.preview-container {
-	height: 80vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-left: calc((2.5rem / 2));
-
-	@media (max-width: 700px) {
-		height: 50vh;
-	}
-}
-
-.skins-container {
-	padding-top: 0.5rem;
-}
-
 .skin-card-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: $skin-card-gap;
+	gap: 0.75rem;
 	width: 100%;
 
 	@media (min-width: 1300px) {
@@ -509,13 +707,5 @@ $skin-card-gap: 4px;
 	@media (min-width: 2050px) {
 		grid-template-columns: repeat(6, 1fr);
 	}
-}
-
-.skin-card {
-	aspect-ratio: 0.95;
-	border-radius: 10px;
-	box-sizing: border-box;
-	width: 100%;
-	min-width: 0;
 }
 </style>

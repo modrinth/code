@@ -14,6 +14,7 @@ export type SkinSource = 'default' | 'custom_external' | 'custom'
 export interface Skin {
 	texture_key: string
 	name?: string
+	section?: string
 	variant: SkinModel
 	cape_id?: string
 	texture: string

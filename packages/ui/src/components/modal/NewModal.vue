@@ -83,6 +83,7 @@
 						</Transition>
 
 						<div
+							data-modal-content
 							ref="scrollContainer"
 							:class="[
 								'flex-1 min-h-0',
@@ -112,7 +113,9 @@
 
 					<div
 						v-else
+						data-modal-content
 						:class="[
+							'min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6',
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"

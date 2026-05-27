@@ -22,6 +22,8 @@
 //! stores saved custom skins. A saved skin is the same saved skin when its
 //! `texture_key` matches; changing its model variant or cape updates that saved
 //! skin instead of creating another row.
+//! A bundled default skin with no cape is redundant, so it is removed from the
+//! saved-skin database and represented by the default skin list instead.
 //!
 //! `cape_id = Some(_)` means a skin should apply that specific cape.
 //! `cape_id = None` means the skin should have no cape.
@@ -81,6 +83,9 @@ pub struct Skin {
     pub texture_key: Arc<str>,
     /// The name of the skin, if available.
     pub name: Option<Arc<str>>,
+    /// The section this skin should be grouped under, if available.
+    #[serde(default)]
+    pub section: Option<Arc<str>>,
     /// The variant of the skin model.
     pub variant: MinecraftSkinVariant,
     /// The UUID of the cape that this skin uses, if any.
@@ -147,7 +152,7 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
 
 /// Gets the skins for the selected Minecraft profile.
 /// Returns saved custom skins, bundled default skins, and the active Mojang skin
-/// if it is not already represented by texture key and model variant.
+/// if it is not already represented by texture key, model variant, and cape.
 /// Exactly one returned skin is marked as equipped.
 #[tracing::instrument]
 pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
@@ -177,12 +182,15 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         .await
     {
         let is_equipped = !found_equipped_skin
-            && custom_skin.texture_key == *current_skin_texture_key;
+            && custom_skin.texture_key == *current_skin_texture_key
+            && custom_skin.variant == current_skin.variant
+            && custom_skin.cape_id == current_cape_id;
 
         found_equipped_skin |= is_equipped;
 
         available_skins.push(Skin {
             name: None,
+            section: None,
             variant: if is_equipped {
                 current_skin.variant
             } else {
@@ -206,13 +214,15 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
 
     for default_skin in assets::DEFAULT_SKINS.iter() {
         let is_equipped = !found_equipped_skin
-            && default_skin.texture_key == current_skin_texture_key;
+            && default_skin.texture_key == current_skin_texture_key
+            && default_skin.variant == current_skin.variant;
 
         found_equipped_skin |= is_equipped;
 
         available_skins.push(Skin {
             texture_key: Arc::clone(&default_skin.texture_key),
             name: default_skin.name.as_ref().cloned(),
+            section: default_skin.section.as_ref().cloned(),
             variant: default_skin.variant,
             cape_id: is_equipped.then_some(current_cape_id).flatten(),
             texture: Arc::clone(&default_skin.texture),
@@ -226,6 +236,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         available_skins.push(Skin {
             texture_key: current_skin_texture_key,
             name: current_skin.name.as_deref().map(Arc::from),
+            section: None,
             variant: current_skin.variant,
             cape_id: current_cape_id,
             texture: Arc::clone(&current_skin.url),
@@ -285,21 +296,39 @@ pub async fn add_and_equip_custom_skin(
             })?,
     };
 
-    if let Err(error) = CustomMinecraftSkin::add(
-        profile.id,
-        &profile.current_skin()?.texture_key(),
-        &texture_blob,
-        variant,
-        cape_id,
-        &state.pool,
-    )
-    .await
+    let equipped_skin = profile.current_skin()?;
+    let equipped_skin_texture_key = equipped_skin.texture_key();
+    let equipped_skin_variant = equipped_skin.variant;
+
+    let persistence_result = if cape_id.is_none()
+        && is_bundled_skin(&equipped_skin_texture_key, equipped_skin_variant)
     {
+        CustomMinecraftSkin {
+            texture_key: equipped_skin_texture_key.to_string(),
+            variant: equipped_skin_variant,
+            cape_id: None,
+        }
+        .remove(profile.id, &state.pool)
+        .await
+    } else {
+        CustomMinecraftSkin::add(
+            profile.id,
+            &equipped_skin_texture_key,
+            &texture_blob,
+            variant,
+            cape_id,
+            &state.pool,
+        )
+        .await
+    };
+
+    if let Err(error) = persistence_result {
         refresh_profile_cache(&selected_credentials).await;
         return Err(error);
     }
 
-    if let Err(error) = sync_cape(&selected_credentials, &profile, cape_id).await
+    if let Err(error) =
+        sync_cape(&selected_credentials, &profile, cape_id).await
     {
         refresh_profile_cache(&selected_credentials).await;
         return Err(error);
@@ -336,7 +365,8 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     )
     .await?;
 
-    if let Err(error) = sync_cape(&selected_credentials, &profile, skin.cape_id).await
+    if let Err(error) =
+        sync_cape(&selected_credentials, &profile, skin.cape_id).await
     {
         refresh_profile_cache(&selected_credentials).await;
         return Err(error);
@@ -399,8 +429,7 @@ pub async fn unequip_skin() -> crate::Result<()> {
     mojang_api::MinecraftSkinOperation::unequip_any(&selected_credentials)
         .await?;
 
-    if let Err(error) = sync_cape(&selected_credentials, &profile, None).await
-    {
+    if let Err(error) = sync_cape(&selected_credentials, &profile, None).await {
         refresh_profile_cache(&selected_credentials).await;
         return Err(error);
     }
@@ -520,6 +549,13 @@ fn is_bundled_skin_texture(texture_key: &str) -> bool {
     assets::DEFAULT_SKINS
         .iter()
         .any(|default_skin| default_skin.texture_key.as_ref() == texture_key)
+}
+
+fn is_bundled_skin(texture_key: &str, variant: MinecraftSkinVariant) -> bool {
+    assets::DEFAULT_SKINS.iter().any(|default_skin| {
+        default_skin.texture_key.as_ref() == texture_key
+            && default_skin.variant == variant
+    })
 }
 
 /// Sets the equipped cape to the skin's associated cape, or no cape.

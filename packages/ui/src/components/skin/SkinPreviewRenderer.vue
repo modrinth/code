@@ -1,24 +1,43 @@
 <template>
 	<!-- eslint-disable vue/no-undef-components -->
-	<div ref="skinPreviewContainer" class="relative w-full h-full cursor-grab" @click="onCanvasClick">
+	<div
+		ref="skinPreviewContainer"
+		class="relative w-full h-full overflow-hidden cursor-grab"
+		@click="onCanvasClick"
+	>
 		<div
-			class="absolute bottom-[18%] left-0 right-0 flex flex-col justify-center items-center mb-2 pointer-events-none z-10 gap-2"
+			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
+			:class="previewControlsPositionClass"
 		>
-			<span class="text-primary text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+			<span
+				class="flex items-center justify-center gap-1.5 text-base font-medium leading-6 text-primary"
+			>
+				<ArrowLeftRightIcon class="size-5 shrink-0" />
 				Drag to rotate
 			</span>
 		</div>
 		<div
-			class="absolute bottom-[10%] left-0 right-0 flex justify-center items-center pointer-events-auto z-10"
+			v-if="$slots.subtitle"
+			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
+			:class="subtitlePositionClass"
 		>
-			<slot name="subtitle" />
+			<div class="pointer-events-auto">
+				<slot name="subtitle" />
+			</div>
 		</div>
 		<div
-			v-if="nametag"
-			class="absolute top-[18%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-gray nametag-bg transition-all duration-200"
-			:style="{ fontSize: nametagFontSize }"
+			v-if="nametag || $slots['nametag-badge']"
+			class="absolute left-1/2 z-10 flex flex-col items-center gap-2 pointer-events-none transition-all duration-200"
+			:style="nametagContainerStyle"
 		>
-			{{ nametagText }}
+			<slot name="nametag-badge" />
+			<div
+				v-if="nametag"
+				class="px-3 py-1 rounded-md font-minecraft text-gray nametag-bg"
+				:style="nametagStyle"
+			>
+				{{ nametagText }}
+			</div>
 		</div>
 
 		<TresCanvas
@@ -38,28 +57,14 @@
 			@pointerleave="onPointerUp"
 		>
 			<Suspense>
-				<Group>
-					<Group
-						:rotation="[0, modelRotation, 0]"
-						:position="[0, -0.05 * scale, 1.95]"
-						:scale="[0.8 * scale, 0.8 * scale, 0.8 * scale]"
-					>
+				<Group
+					:rotation="[0, modelRotation, 0]"
+					:position="modelGroupPosition"
+					:scale="modelGroupScale"
+				>
+					<Group :position="modelOffset">
 						<primitive v-if="scene" :object="scene" />
 					</Group>
-
-					<!-- <TresMesh
-            :position="[0, -0.095 * scale, 2]"
-            :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.4 * 0.75 * scale, 0.4 * 0.75 * scale, 0.4 * 0.75 * scale]"
-          >
-            <TresCircleGeometry :args="[1, 128]" />
-            <TresMeshBasicMaterial
-              color="#000000"
-              :opacity="0.5"
-              transparent
-              :depth-write="false"
-            />
-          </TresMesh> -->
 				</Group>
 			</Suspense>
 
@@ -71,9 +76,9 @@
 
 			<Suspense>
 				<TresMesh
-					:position="[0, -0.1 * scale, 2]"
+					:position="spotlightPosition"
 					:rotation="[-Math.PI / 2, 0, 0]"
-					:scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
+					:scale="spotlightScale"
 				>
 					<TresCircleGeometry :args="[1, 128]" />
 					<TresShaderMaterial v-bind="radialSpotlightShader" />
@@ -82,9 +87,9 @@
 
 			<TresPerspectiveCamera
 				:make-default.camel="true"
-				:fov="fov"
-				:position="[0, 1.5, -3.25]"
-				:look-at="target"
+				:fov="cameraConfig.fov"
+				:position="cameraConfig.position"
+				:look-at="cameraConfig.target"
 			/>
 
 			<TresAmbientLight :intensity="2" />
@@ -93,7 +98,7 @@
 
 		<div
 			v-if="!isReady"
-			class="w-full h-full flex items-center justify-center transition-opacity duration-500"
+			class="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
 			:class="{ 'opacity-100': !isReady, 'opacity-0': isReady }"
 		>
 			<div class="text-primary">Loading...</div>
@@ -102,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
+import { ArrowLeftRightIcon, ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 import {
 	applyCapeTexture,
 	applyTexture,
@@ -113,14 +118,17 @@ import { useGLTF } from '@tresjs/cientos'
 import { TresCanvas, useRenderLoop, useTexture } from '@tresjs/core'
 import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'
 import * as THREE from 'three'
+import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import {
 	computed,
 	markRaw,
 	onBeforeMount,
+	onMounted,
 	onUnmounted,
 	ref,
 	shallowRef,
 	toRefs,
+	useSlots,
 	useTemplateRef,
 	watch,
 } from 'vue'
@@ -134,24 +142,51 @@ interface AnimationConfig {
 	transitionDuration?: number
 }
 
+type SkinPreviewFraming = 'page' | 'modal'
+
+interface FitPadding {
+	top: number
+	right: number
+	bottom: number
+	left: number
+}
+
+interface FitLock {
+	containerSize: {
+		width: number
+		height: number
+	}
+	modelCenter: [number, number, number]
+	modelSize: [number, number, number]
+}
+
 const props = withDefaults(
 	defineProps<{
 		textureSrc: string
 		capeSrc?: string
 		variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
 		nametag?: string
+		fit?: boolean
+		lockFit?: boolean
+		framing?: SkinPreviewFraming
+		fitZoom?: number
+		fitPadding?: Partial<FitPadding>
+		/** @deprecated Manual framing fallback. */
 		scale?: number
+		/** @deprecated Manual framing fallback, or auto-fit FOV override when fit=true. */
 		fov?: number
 		initialRotation?: number
 		animationConfig?: AnimationConfig
 	}>(),
 	{
 		variant: 'CLASSIC',
-		scale: 1,
-		fov: 40,
 		capeSrc: undefined,
 		initialRotation: 15.75,
 		nametag: undefined,
+		fit: undefined,
+		lockFit: true,
+		framing: 'page',
+		fitZoom: 1,
 		animationConfig: () => ({
 			baseAnimation: 'idle',
 			randomAnimations: ['idle_sub_1', 'idle_sub_2', 'idle_sub_3'],
@@ -162,7 +197,22 @@ const props = withDefaults(
 )
 
 const skinPreviewContainer = useTemplateRef<HTMLElement>('skinPreviewContainer')
+const slots = useSlots()
 const nametagText = computed(() => props.nametag)
+
+const fitEnabled = computed(() => {
+	if (props.fit !== undefined) return props.fit
+	return props.scale === undefined && props.fov === undefined
+})
+const currentFraming = computed<SkinPreviewFraming>(() => props.framing ?? 'page')
+const legacyScale = computed(() => props.scale ?? 1)
+const legacyFov = computed(() => props.fov ?? 40)
+const previewControlsPositionClass = computed(() =>
+	currentFraming.value === 'modal' ? 'bottom-[calc(6%)]' : 'bottom-[calc(15%+64px)]',
+)
+const subtitlePositionClass = computed(() =>
+	currentFraming.value === 'modal' ? 'bottom-[6%]' : 'bottom-[calc(15%)]',
+)
 
 const { fontSize: nametagFontSize } = useDynamicFontSize({
 	containerElement: skinPreviewContainer,
@@ -174,6 +224,28 @@ const { fontSize: nametagFontSize } = useDynamicFontSize({
 	fontFamily: 'inherit',
 })
 
+const containerSize = ref({ width: 1, height: 1 })
+let resizeObserver: ResizeObserver | undefined
+
+onMounted(() => {
+	const el = skinPreviewContainer.value
+	if (!el) return
+
+	resizeObserver = new ResizeObserver(([entry]) => {
+		const { width, height } = entry.contentRect
+		containerSize.value = {
+			width: Math.max(width, 1),
+			height: Math.max(height, 1),
+		}
+
+		if (props.lockFit) {
+			lockFitState()
+		}
+	})
+
+	resizeObserver.observe(el)
+})
+
 const selectedModelSrc = computed(() =>
 	props.variant === 'SLIM' ? SlimPlayerModel : ClassicPlayerModel,
 )
@@ -183,10 +255,29 @@ const lastCapeSrc = ref<string | undefined>(undefined)
 const texture = shallowRef<THREE.Texture | null>(null)
 const capeTexture = shallowRef<THREE.Texture | null>(null)
 const transparentTexture = createTransparentTexture()
+const modelCenter = ref<[number, number, number]>([0, 1, 0])
+const modelSize = ref<[number, number, number]>([1, 2, 1])
 
 const isModelLoaded = ref(false)
 const isTextureLoaded = ref(false)
-const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value)
+const fitLock = ref<FitLock | null>(null)
+const hasUsableFitSize = computed(
+	() => containerSize.value.width > 1 && containerSize.value.height > 1,
+)
+const hasResolvedFit = computed(
+	() => !fitEnabled.value || (props.lockFit ? fitLock.value !== null : hasUsableFitSize.value),
+)
+const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value && hasResolvedFit.value)
+
+const fitContainerSize = computed(() =>
+	props.lockFit ? (fitLock.value?.containerSize ?? containerSize.value) : containerSize.value,
+)
+const fitModelCenter = computed(() =>
+	props.lockFit ? (fitLock.value?.modelCenter ?? modelCenter.value) : modelCenter.value,
+)
+const fitModelSize = computed(() =>
+	props.lockFit ? (fitLock.value?.modelSize ?? modelSize.value) : modelSize.value,
+)
 
 const mixer = ref<THREE.AnimationMixer | null>(null)
 const actions = ref<Record<string, THREE.AnimationAction>>({})
@@ -242,6 +333,145 @@ const radialSpotlightShader = computed(() => ({
 	depthWrite: false,
 	depthTest: false,
 }))
+
+const FRAMING_PRESETS = {
+	page: {
+		fov: 35,
+		zoom: 0.96,
+		padding: { top: 0.2, right: 0.14, bottom: 0.3, left: 0.14 },
+	},
+	modal: {
+		fov: 35,
+		zoom: 1,
+		padding: { top: 0.1, right: 0.1, bottom: 0.18, left: 0.1 },
+	},
+} satisfies Record<SkinPreviewFraming, { fov: number; zoom: number; padding: FitPadding }>
+
+const resolvedFitPadding = computed<FitPadding>(() => {
+	const preset = FRAMING_PRESETS[currentFraming.value].padding
+
+	return {
+		top: Math.max(preset.top, props.nametag ? 0.2 : 0),
+		right: preset.right,
+		bottom: Math.max(preset.bottom, slots.subtitle ? 0.28 : preset.bottom),
+		left: preset.left,
+		...(props.fitPadding ?? {}),
+	}
+})
+
+const modelOffset = computed<[number, number, number]>(() => {
+	if (!fitEnabled.value) return [0, 0, 0]
+
+	const [x, y, z] = fitModelCenter.value
+	return [-x, -y, -z]
+})
+
+const modelGroupPosition = computed<[number, number, number]>(() => {
+	if (fitEnabled.value) return [0, 0, 0]
+	return [0, -0.05 * legacyScale.value, 1.95]
+})
+
+const modelGroupScale = computed<[number, number, number]>(() => {
+	if (fitEnabled.value) return [1, 1, 1]
+
+	const scale = 0.8 * legacyScale.value
+	return [scale, scale, scale]
+})
+
+const fittedCamera = computed(() => {
+	const width = Math.max(fitContainerSize.value.width, 1)
+	const height = Math.max(fitContainerSize.value.height, 1)
+	const aspect = width / height
+	const preset = FRAMING_PRESETS[currentFraming.value]
+	const padding = resolvedFitPadding.value
+
+	const usableWidth = Math.max(width * (1 - padding.left - padding.right), 1)
+	const usableHeight = Math.max(height * (1 - padding.top - padding.bottom), 1)
+
+	const [sizeX, sizeY, sizeZ] = fitModelSize.value
+	const halfWidth = Math.sqrt((sizeX / 2) ** 2 + (sizeZ / 2) ** 2)
+	const halfHeight = sizeY / 2
+
+	const fov = props.fov ?? preset.fov
+	const verticalFov = THREE.MathUtils.degToRad(fov)
+	const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * aspect)
+
+	const paddedHalfWidth = halfWidth * (width / usableWidth)
+	const paddedHalfHeight = halfHeight * (height / usableHeight)
+	const zoom = Math.max((props.fitZoom ?? 1) * preset.zoom, 0.01)
+
+	const distance =
+		Math.max(
+			paddedHalfHeight / Math.tan(verticalFov / 2),
+			paddedHalfWidth / Math.tan(horizontalFov / 2),
+		) / zoom
+
+	const visibleHalfHeight = distance * Math.tan(verticalFov / 2)
+	const targetY = -(padding.bottom - padding.top) * visibleHalfHeight
+
+	return {
+		fov,
+		position: [0, targetY, -distance] as [number, number, number],
+		target: [0, targetY, 0] as [number, number, number],
+	}
+})
+
+const cameraConfig = computed(() => {
+	if (fitEnabled.value) return fittedCamera.value
+
+	return {
+		fov: legacyFov.value,
+		position: [0, 1.5, -3.25] as [number, number, number],
+		target: modelCenter.value,
+	}
+})
+
+const nametagTop = computed(() => {
+	if (!fitEnabled.value) return '18%'
+
+	const [, sizeY] = fitModelSize.value
+	const { fov, position, target } = cameraConfig.value
+	const distance = Math.max(Math.abs(position[2] - target[2]), 0.001)
+	const verticalFov = THREE.MathUtils.degToRad(fov)
+	const modelTopY = sizeY / 2
+	const projectedY = (modelTopY - target[1]) / distance / Math.max(Math.tan(verticalFov / 2), 0.001)
+	const topPercent = THREE.MathUtils.clamp(((1 - projectedY) / 2) * 100, 8, 40)
+
+	return `${topPercent - 2}%`
+})
+
+const nametagContainerStyle = computed(() => ({
+	top: nametagTop.value,
+	transform: fitEnabled.value ? 'translate(-50%, calc(-100% - 0.75rem))' : 'translateX(-50%)',
+}))
+
+const nametagStyle = computed(() => ({
+	fontSize: nametagFontSize.value,
+}))
+
+const spotlightY = computed(() => {
+	if (!fitEnabled.value) return -0.1 * legacyScale.value
+
+	const [, sizeY] = fitModelSize.value
+	return -sizeY / 2 - 0.02
+})
+
+const spotlightPosition = computed<[number, number, number]>(() => [
+	0,
+	spotlightY.value,
+	fitEnabled.value ? 0 : 2,
+])
+
+const spotlightScale = computed<[number, number, number]>(() => {
+	if (!fitEnabled.value) {
+		const scale = 0.75 * legacyScale.value
+		return [scale, scale, scale]
+	}
+
+	const [sizeX, , sizeZ] = fitModelSize.value
+	const radius = Math.max(sizeX, sizeZ, 1) * 0.8
+	return [radius, radius, radius]
+})
 
 const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
 
@@ -439,24 +669,90 @@ onLoop(() => {
 	}
 })
 
+const SKIN_LAYER_DEPTH_OFFSET: Record<string, number> = {
+	Body_Layer: -4,
+	Left_Leg_Layer: -8,
+	Right_Leg_Layer: -8,
+	Left_Arm_Layer: -12,
+	Right_Arm_Layer: -12,
+	Hat_Layer: -16,
+}
+
+function configureSkinPreviewMesh(mesh: THREE.Mesh) {
+	const isSkinLayer = mesh.name.endsWith('_Layer')
+	const layerDepthOffset = SKIN_LAYER_DEPTH_OFFSET[mesh.name] ?? 0
+	mesh.renderOrder = isSkinLayer ? Math.abs(layerDepthOffset) : 0
+
+	const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+	materials.forEach((material) => {
+		if (!(material instanceof THREE.MeshStandardMaterial) || material.name === 'cape') return
+
+		material.transparent = false
+		material.alphaTest = 0.1
+		material.depthTest = true
+		material.depthWrite = true
+		material.polygonOffset = isSkinLayer
+		material.polygonOffsetFactor = layerDepthOffset
+		material.polygonOffsetUnits = layerDepthOffset
+		material.needsUpdate = true
+	})
+}
+
+function cloneSceneForRenderer(source: THREE.Object3D) {
+	const cloned = cloneSkeleton(source)
+
+	cloned.traverse((object) => {
+		const mesh = object as THREE.Mesh
+		if (!mesh.isMesh || !mesh.material) return
+
+		mesh.material = Array.isArray(mesh.material)
+			? mesh.material.map((material) => material.clone())
+			: mesh.material.clone()
+
+		configureSkinPreviewMesh(mesh)
+	})
+
+	return markRaw(cloned)
+}
+
+function cloneModelTuple(tuple: [number, number, number]): [number, number, number] {
+	return [tuple[0], tuple[1], tuple[2]]
+}
+
+function lockFitState() {
+	if (!fitEnabled.value || !props.lockFit || fitLock.value || !isModelLoaded.value) return
+
+	const { width, height } = containerSize.value
+	if (width <= 1 || height <= 1) return
+
+	fitLock.value = {
+		containerSize: { width, height },
+		modelCenter: cloneModelTuple(modelCenter.value),
+		modelSize: cloneModelTuple(modelSize.value),
+	}
+}
+
 async function loadModel(src: string) {
 	try {
 		isModelLoaded.value = false
+		fitLock.value = null
 		const { scene: loadedScene, animations } = await useGLTF(src)
-		scene.value = markRaw(loadedScene)
+		const clonedScene = cloneSceneForRenderer(loadedScene)
+		scene.value = clonedScene
 
 		if (texture.value) {
-			applyTexture(scene.value, texture.value)
+			applyTexture(clonedScene, texture.value)
 		}
 
-		applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
+		applyCapeTexture(clonedScene, capeTexture.value, transparentTexture)
 
 		if (animations && animations.length > 0) {
-			initializeAnimations(loadedScene, animations)
+			initializeAnimations(clonedScene, animations)
 		}
 
 		updateModelInfo()
 		isModelLoaded.value = true
+		lockFitState()
 	} catch (error) {
 		console.error('Failed to load model:', error)
 		isModelLoaded.value = false
@@ -499,23 +795,52 @@ async function loadAndApplyCapeTexture(src: string | undefined) {
 	}
 }
 
-const centre = ref<[number, number, number]>([0, 1, 0])
-const modelHeight = ref(1.4)
+function getVisibleMeshBox(root: THREE.Object3D): THREE.Box3 | null {
+	root.updateWorldMatrix(true, true)
 
-function updateModelInfo() {
-	if (!scene.value) return
-	try {
-		const bbox = new THREE.Box3().setFromObject(scene.value)
-		const mid = new THREE.Vector3()
-		bbox.getCenter(mid)
-		centre.value = [mid.x, mid.y, mid.z]
-		modelHeight.value = bbox.max.y - bbox.min.y
-	} catch (error) {
-		console.error('Failed to update model info:', error)
-	}
+	const result = new THREE.Box3()
+	const meshBox = new THREE.Box3()
+	let found = false
+
+	root.traverse((object) => {
+		const mesh = object as THREE.Mesh
+		if (!mesh.isMesh || !mesh.geometry || mesh.visible === false) return
+
+		const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+		if (materials.length && materials.every((material) => material.visible === false)) return
+
+		if (!mesh.geometry.boundingBox) {
+			mesh.geometry.computeBoundingBox()
+		}
+
+		if (!mesh.geometry.boundingBox) return
+
+		meshBox.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrixWorld)
+		result.union(meshBox)
+		found = true
+	})
+
+	return found && !result.isEmpty() ? result.clone() : null
 }
 
-const target = computed(() => centre.value)
+function updateModelInfo() {
+	const box = scene.value ? getVisibleMeshBox(scene.value) : null
+
+	if (!box) {
+		modelCenter.value = [0, 1, 0]
+		modelSize.value = [1, 2, 1]
+		return
+	}
+
+	const center = new THREE.Vector3()
+	const size = new THREE.Vector3()
+
+	box.getCenter(center)
+	box.getSize(size)
+
+	modelCenter.value = [center.x, center.y, center.z]
+	modelSize.value = [Math.max(size.x, 0.001), Math.max(size.y, 0.001), Math.max(size.z, 0.001)]
+}
 
 const modelRotation = ref(props.initialRotation + Math.PI)
 const isDragging = ref(false)
@@ -553,6 +878,13 @@ function onCanvasClick() {
 }
 
 watch(selectedModelSrc, (src) => loadModel(src))
+watch(
+	() => props.lockFit,
+	() => {
+		fitLock.value = null
+		lockFitState()
+	},
+)
 watch(
 	() => props.textureSrc,
 	async (newSrc) => {
@@ -604,6 +936,8 @@ onBeforeMount(async () => {
 })
 
 onUnmounted(() => {
+	resizeObserver?.disconnect()
+
 	if (randomAnimationTimer.value) {
 		clearTimeout(randomAnimationTimer.value)
 	}

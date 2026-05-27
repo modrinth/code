@@ -6,6 +6,17 @@ use crate::{minecraft_skins::SkinSource, state::MinecraftSkinVariant};
 
 use super::super::super::Skin;
 
+const DEFAULT_SKINS_SECTION: &str = "Default skins";
+const MINECON_EARTH_2017_SKIN_PACK_SECTION: &str =
+    "MINECON Earth 2017 Skin Pack";
+const BUILDERS_AND_BIOMES_SKIN_PACK_SECTION: &str = "Builders & Biomes";
+const STRIDING_HERO_SKIN_PACK_SECTION: &str = "Striding Hero";
+const THE_GARDEN_AWAKENS_SKIN_PACK_SECTION: &str = "The Garden Awakens";
+const CHASE_THE_SKIES_SKIN_PACK_SECTION: &str = "Chase the Skies";
+const THE_COPPER_AGE_SKIN_PACK_SECTION: &str = "The Copper Age";
+const MOUNTS_OF_MAYHEM_SKIN_PACK_SECTION: &str = "Mounts of Mayhem";
+const TINY_TAKEOVER_SKIN_PACK_SECTION: &str = "Tiny Takeover";
+
 /// A list of default Minecraft skins to make available to the user, created by Mojang.
 pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     //
@@ -16,6 +27,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     vec![Skin {
         texture_key: Arc::from("46acd06e8483b176e8ea39fc12fe105eb3a2a4970f5100057e9d84d4b60bdfa7"),
         name: Some(Arc::from("Alex")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -27,6 +39,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("1abc803022d8300ab7578b189294cce39622d9a404cdc00d3feacfdf45be6981"),
         name: Some(Arc::from("Alex")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -38,6 +51,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("6ac6ca262d67bcfb3dbc924ba8215a18195497c780058a5749de674217721892"),
         name: Some(Arc::from("Ari")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -49,6 +63,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("4c05ab9e07b3505dc3ec11370c3bdce5570ad2fb2b562e9b9dd9cf271f81aa44"),
         name: Some(Arc::from("Ari")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -60,6 +75,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("fece7017b1bb13926d1158864b283b8b930271f80a90482f174cca6a17e88236"),
         name: Some(Arc::from("Efe")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -71,6 +87,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("daf3d88ccb38f11f74814e92053d92f7728ddb1a7955652a60e30cb27ae6659f"),
         name: Some(Arc::from("Efe")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -82,6 +99,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("226c617fde5b1ba569aa08bd2cb6fd84c93337532a872b3eb7bf66bdd5b395f8"),
         name: Some(Arc::from("Kai")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -93,6 +111,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("e5cdc3243b2153ab28a159861be643a4fc1e3c17d291cdd3e57a7f370ad676f3"),
         name: Some(Arc::from("Kai")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -104,6 +123,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("7cb3ba52ddd5cc82c0b050c3f920f87da36add80165846f479079663805433db"),
         name: Some(Arc::from("Makena")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -115,6 +135,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("dc0fcfaf2aa040a83dc0de4e56058d1bbb2ea40157501f3e7d15dc245e493095"),
         name: Some(Arc::from("Makena")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -126,6 +147,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("6c160fbd16adbc4bff2409e70180d911002aebcfa811eb6ec3d1040761aea6dd"),
         name: Some(Arc::from("Noor")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -137,6 +159,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("90e75cd429ba6331cd210b9bd19399527ee3bab467b5a9f61cb8a27b177f6789"),
         name: Some(Arc::from("Noor")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -148,6 +171,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("d5c4ee5ce20aed9e33e866c66caa37178606234b3721084bf01d13320fb2eb3f"),
         name: Some(Arc::from("Steve")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -159,6 +183,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("31f477eb1a7beee631c2ca64d06f8f68fa93a3386d04452ab27f43acdf1b60cb"),
         name: Some(Arc::from("Steve")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -170,6 +195,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("b66bc80f002b10371e2fa23de6f230dd5e2f3affc2e15786f65bc9be4c6eb71a"),
         name: Some(Arc::from("Sunny")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -181,6 +207,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("a3bd16079f764cd541e072e888fe43885e711f98658323db0f9a6045da91ee7a"),
         name: Some(Arc::from("Sunny")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -192,6 +219,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("eee522611005acf256dbd152e992c60c0bb7978cb0f3127807700e478ad97664"),
         name: Some(Arc::from("Zuri")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -203,6 +231,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("f5dddb41dcafef616e959c2817808e0be741c89ffbfed39134a13e75b811863d"),
         name: Some(Arc::from("Zuri")),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -220,6 +249,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("6c25523e7dabfcaf0dbe32d90fd0c001d5d57ac66206a0595defe9be5947ff08"),
         name: Some(Arc::from("Globe Alex")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -231,6 +261,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("66206c8f51d13d2d31c54696a58a3e8bcd1e5e7db9888d331d0753129324e4f1"),
         name: Some(Arc::from("Party Alex")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Slim,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -242,6 +273,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("6acf91326bd116ce889e461ddb57e92ace07a8367dbd2d191075078fccc3c727"),
         name: Some(Arc::from("Cardboard Cosplayer")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -253,6 +285,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("b9f7facdca2bf4772fa168e1c3cf7b020124eb1fc82118307d426da1b88c32c5"),
         name: Some(Arc::from("Creeper Cosplayer")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -264,6 +297,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("b7393199a84eb9e932efa8dda6829423875eb65af76cb82912ade62f93996b9c"),
         name: Some(Arc::from("Creeper Piñata Cosplayer")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -275,6 +309,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("7cbe449d9d37c111a07a902e322d3869d98790c48f1fa16a24bcbe2d8d73808b"),
         name: Some(Arc::from("Sheep Cosplayer")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -286,6 +321,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("b182ad5783a343be3e202ac35902270a8d31042fdfd48b849fc99a55a1b60a91"),
         name: Some(Arc::from("Cake Steve")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -297,6 +333,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("c05e396bbf744082122f77b7277af390d11d2d4e93dd2f8c67942ca9626db24d"),
         name: Some(Arc::from("Party Steve")),
+        section: Some(Arc::from(MINECON_EARTH_2017_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -311,6 +348,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("2007b66a99ae905c81f339e2a0a4bf4b99e9454a485d5164e3e1051c3036ad70"),
         name: Some(Arc::from("Barn Builder")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -322,6 +360,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("59f2872323bf515aa8d84c00931fbf8170b2cec5138961527c09ffcd06ca4ab2"),
         name: Some(Arc::from("Bee-Friender")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -333,6 +372,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("7cd85127cbc710a1c9a53c6bb3474f59995c222b9d8c57b293993cc2d8a225aa"),
         name: Some(Arc::from("Bee-Friender (Alternate)")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -344,6 +384,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("5e4e09eccbce11e701c51bb64b102d688a6ac4018c725dd2b780210aee101b31"),
         name: Some(Arc::from("Buff Butcher")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -355,6 +396,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("d66ed86ce96a1b63c30f1baac762f638717930866474ac4fce697cdbd0bd6fbb"),
         name: Some(Arc::from("Buff Butcher (Alternate)")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -366,6 +408,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("b9e9d1b51b4be289b9525d4decd798cb7912e920bac8846a2df70e9ff4f0b1d8"),
         name: Some(Arc::from("Homestead Healer")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -377,6 +420,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("83e283ab33558baa2cd0184d2e85f090c795a797bdbcb2cc47230c27f23fe9b1"),
         name: Some(Arc::from("Pig Whisperer")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -388,6 +432,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("e1fc44f1d69fd2864df7b80618a38af4170d4800f2df4fbde81c17b74b2a818b"),
         name: Some(Arc::from("Pig Whisperer (Alternate)")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -399,6 +444,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("25dc6421d47cad8e2bdf93f56fae9ab06fcfe218c8645c1775ae2e4563c065ad"),
         name: Some(Arc::from("Ranch Ranger")),
+        section: Some(Arc::from(BUILDERS_AND_BIOMES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -413,6 +459,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("721c05483a435d4362047ccb62e075ef5f001aa63a7e0e2afe03e60759bab91d"),
         name: Some(Arc::from("Snowfeather")),
+        section: Some(Arc::from(STRIDING_HERO_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -424,6 +471,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("b914cf5106aaa82409fdd9213fbdb1479b4d65aecc5d5e22b1f25e5744c4c4f7"),
         name: Some(Arc::from("Stray")),
+        section: Some(Arc::from(STRIDING_HERO_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -435,6 +483,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("5eb077c54ecfc7e760c36add887b68859d7a3160d331580ff859f7353d959151"),
         name: Some(Arc::from("Strider")),
+        section: Some(Arc::from(STRIDING_HERO_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -446,6 +495,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("b271a744ef479018927575952621b110b9c11f62730a95729af7e8591cf8dbf6"),
         name: Some(Arc::from("Villager 1")),
+        section: Some(Arc::from(STRIDING_HERO_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -457,6 +507,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("748923629fed7c6ec9462016b4480fa3cff8c16e82ee6fe26d4b707f4de10060"),
         name: Some(Arc::from("Villager 2")),
+        section: Some(Arc::from(STRIDING_HERO_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -468,6 +519,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("3d996abc69ea70a20442855e429bf44b45111f9818d0f8c46272e12d12bec218"),
         name: Some(Arc::from("Wither Skeleton")),
+        section: Some(Arc::from(STRIDING_HERO_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -482,6 +534,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("6f8fc677cdcd4c6eed67d90c08d23162abc3a3a85357c7636fdf80d874aa857f"),
         name: Some(Arc::from("Pale Lumberjack")),
+        section: Some(Arc::from(THE_GARDEN_AWAKENS_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -493,6 +546,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("9a0af2b1fd9659480d43132db95cd7d459d1a66480fe42150e132d03b9731573"),
         name: Some(Arc::from("Creaking")),
+        section: Some(Arc::from(THE_GARDEN_AWAKENS_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -507,6 +561,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("8409954698b6c7741460fdd85d6ec6a5e0a9ad04ade7e2c72c913f02936a607d"),
         name: Some(Arc::from("Ghast Pilot")),
+        section: Some(Arc::from(CHASE_THE_SKIES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -518,6 +573,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("e12d98dab548e92cad7ac80f92d8fefbb9ca7a1af94aa4f428daf6ef723aa8e0"),
         name: Some(Arc::from("Ghast Swimmer")),
+        section: Some(Arc::from(CHASE_THE_SKIES_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -533,6 +589,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("33aef79a4ca986a2971057d35046e71dce326b645353e6f92d56e1c4bb3b0073"),
         name: Some(Arc::from("Copper Chemist")),
+        section: Some(Arc::from(THE_COPPER_AGE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -544,6 +601,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("514b10ff7bc50dd01b5438632815b9e27cfe54064d1a28ef6014f3309d278b38"),
         name: Some(Arc::from("Copper Welder")),
+        section: Some(Arc::from(THE_COPPER_AGE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
@@ -558,10 +616,49 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("e0bae80c765f9ef3c3050dd72ea4d4bc53ae00e39c8a376a886d419abdc5dd84"),
         name: Some(Arc::from("Zombie Horse Onesie")),
+        section: Some(Arc::from(MOUNTS_OF_MAYHEM_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
             "data:image/png;base64,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"
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    // Tiny Takeover skin pack
+    Skin {
+        texture_key: Arc::from("890044fb07cbca79bb9ffec4d2f15cdd1053e4b554e9a02469e9d0b271f3fdfa"),
+        name: Some(Arc::from("Baby Bee")),
+        section: Some(Arc::from(TINY_TAKEOVER_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,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"
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    Skin {
+        texture_key: Arc::from("8d0484011053097a9809f14c0301166981369b3a660150afea1e753ae7e54685"),
+        name: Some(Arc::from("Baby Axolotl")),
+        section: Some(Arc::from(TINY_TAKEOVER_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,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"
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    // Dandelion Onesie skin pack
+    Skin {
+        texture_key: Arc::from("b240795e214270b5b864cea3cbbcbac2fae60abed5de10229a7567510713355b"),
+        name: Some(Arc::from("Dandelion Onesie")),
+        section: Some(Arc::from(TINY_TAKEOVER_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,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"
         ).unwrap()),
         source: SkinSource::Default,
         is_equipped: false,

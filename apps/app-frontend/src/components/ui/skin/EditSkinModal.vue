@@ -1,6 +1,5 @@
 <template>
-	<UploadSkinModal ref="uploadModal" />
-	<ModalWrapper ref="modal" @on-hide="resetState">
+	<NewModal ref="modal" :on-hide="handleModalHide">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">
 				{{ mode === 'edit' ? 'Editing skin' : 'Adding a skin' }}
@@ -13,8 +12,7 @@
 					:variant="variant"
 					:texture-src="previewSkin || ''"
 					:cape-src="selectedCapeTexture"
-					:scale="1.4"
-					:fov="40"
+					framing="modal"
 					:initial-rotation="Math.PI / 8"
 					class="h-full w-full"
 				/>
@@ -24,8 +22,17 @@
 				<section v-if="mode === 'edit' && canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">Texture</h2>
 					<ButtonStyled>
-						<button @click="openUploadSkinModal"><UploadIcon /> Replace texture</button>
+						<button @click="openTextureFileBrowser" class="!shadow-none">
+							<UploadIcon /> Replace texture
+						</button>
 					</ButtonStyled>
+					<input
+						ref="textureFileInput"
+						type="file"
+						accept="image/png"
+						class="hidden"
+						@change="onTextureFileInputChange"
+					/>
 				</section>
 
 				<section v-if="canEditTextureAndModel">
@@ -56,7 +63,8 @@
 
 						<div
 							ref="capeListRef"
-							class="grid max-h-[334px] grid-cols-[repeat(4,max-content)] auto-rows-max gap-2 overflow-y-auto pr-1"
+							class="grid grid-cols-[repeat(4,max-content)] auto-rows-max gap-2 overflow-y-auto pr-1"
+							:style="{ maxHeight: capeListMaxHeight }"
 							@scroll="checkCapeScrollState"
 						>
 							<CapeLikeTextButton
@@ -69,6 +77,14 @@
 							</CapeLikeTextButton>
 
 							<CapeButton
+								v-for="cape in sortedCapes"
+								:id="cape.id"
+								:key="cape.id"
+								:texture="cape.texture"
+								:name="cape.name || 'Cape'"
+								:selected="selectedCape?.id === cape.id"
+								@select="selectCape(cape)"
+							/><CapeButton
 								v-for="cape in sortedCapes"
 								:id="cape.id"
 								:key="cape.id"
@@ -97,20 +113,22 @@
 			</div>
 		</div>
 
-		<div class="flex gap-2">
-			<ButtonStyled color="brand">
-				<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
-					<SpinnerIcon v-if="isSaving" class="animate-spin" />
-					<CheckIcon v-else-if="mode === 'new'" />
-					<SaveIcon v-else />
-					{{ mode === 'new' ? 'Add skin' : 'Save skin' }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled type="outlined">
-				<button :disabled="isSaving" @click="hide"><XIcon />Cancel</button>
-			</ButtonStyled>
-		</div>
-	</ModalWrapper>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button :disabled="isSaving" @click="hide"><XIcon />Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
+						<SpinnerIcon v-if="isSaving" class="animate-spin" />
+						<CheckIcon v-else-if="mode === 'new'" />
+						<SaveIcon v-else />
+						{{ mode === 'new' ? 'Add skin' : 'Save skin' }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
@@ -120,19 +138,20 @@ import {
 	CapeButton,
 	CapeLikeTextButton,
 	injectNotificationManager,
+	NewModal,
 	RadioButtons,
 	SkinPreviewRenderer,
 	useScrollIndicator,
 } from '@modrinth/ui'
+import { arrayBufferToBase64 } from '@modrinth/utils'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
 import {
 	add_and_equip_custom_skin,
 	type Cape,
 	determineModelType,
 	get_normalized_skin_texture,
+	normalize_skin_texture,
 	remove_custom_skin,
 	type Skin,
 	type SkinModel,
@@ -140,13 +159,16 @@ import {
 	unequip_skin,
 } from '@/helpers/skins.ts'
 
+const CAPE_LIST_MAX_HEIGHT = 334
+
 const { handleError } = injectNotificationManager()
 
 const modal = useTemplateRef('modal')
+const textureFileInput = useTemplateRef<HTMLInputElement>('textureFileInput')
 const capeListRef = ref<HTMLElement | null>(null)
+const capeListMaxHeight = ref(`${CAPE_LIST_MAX_HEIGHT}px`)
 const mode = ref<'new' | 'edit'>('new')
 const currentSkin = ref<Skin | null>(null)
-const shouldRestoreModal = ref(false)
 const isSaving = ref(false)
 
 const uploadedTextureUrl = ref<SkinTextureUrl | null>(null)
@@ -164,6 +186,39 @@ const {
 	checkScrollState: checkCapeScrollState,
 	forceCheck: forceCapeScrollCheck,
 } = useScrollIndicator(capeListRef)
+
+let capeListLayoutFrame: number | null = null
+function updateCapeListLayout() {
+	const capeList = capeListRef.value
+	const modalContent = capeList?.closest('[data-modal-content]') as HTMLElement | null
+
+	if (!capeList || !modalContent) {
+		capeListMaxHeight.value = `${CAPE_LIST_MAX_HEIGHT}px`
+		forceCapeScrollCheck()
+		return
+	}
+
+	const availableHeight =
+		modalContent.getBoundingClientRect().bottom - capeList.getBoundingClientRect().top
+
+	capeListMaxHeight.value = `${Math.min(
+		CAPE_LIST_MAX_HEIGHT,
+		Math.max(0, Math.floor(availableHeight)),
+	)}px`
+
+	nextTick(() => forceCapeScrollCheck())
+}
+
+function refreshCapeListLayout() {
+	if (capeListLayoutFrame !== null) {
+		cancelAnimationFrame(capeListLayoutFrame)
+	}
+
+	capeListLayoutFrame = requestAnimationFrame(() => {
+		capeListLayoutFrame = null
+		updateCapeListLayout()
+	})
+}
 
 const sortedCapes = computed(() => {
 	return [...(props.capes || [])].sort((a, b) => {
@@ -217,8 +272,11 @@ function resetState() {
 	previewSkin.value = ''
 	variant.value = 'CLASSIC'
 	selectedCape.value = undefined
-	shouldRestoreModal.value = false
 	isSaving.value = false
+}
+
+function handleModalHide() {
+	setTimeout(() => resetState(), 250)
 }
 
 async function show(e: MouseEvent, skin?: Skin) {
@@ -235,7 +293,7 @@ async function show(e: MouseEvent, skin?: Skin) {
 	await loadPreviewSkin()
 
 	modal.value?.show(e)
-	nextTick(() => forceCapeScrollCheck())
+	nextTick(() => refreshCapeListLayout())
 }
 
 async function showNew(e: MouseEvent, skinTextureUrl: SkinTextureUrl) {
@@ -248,45 +306,50 @@ async function showNew(e: MouseEvent, skinTextureUrl: SkinTextureUrl) {
 	await loadPreviewSkin()
 
 	modal.value?.show(e)
-	nextTick(() => forceCapeScrollCheck())
+	nextTick(() => refreshCapeListLayout())
 }
 
-async function restoreWithNewTexture(skinTextureUrl: SkinTextureUrl) {
+async function setUploadedTexture(skinTextureUrl: SkinTextureUrl) {
 	uploadedTextureUrl.value = skinTextureUrl
 	await loadPreviewSkin()
-
-	if (shouldRestoreModal.value) {
-		setTimeout(() => {
-			modal.value?.show()
-			nextTick(() => forceCapeScrollCheck())
-			shouldRestoreModal.value = false
-		}, 0)
-	}
+	nextTick(() => refreshCapeListLayout())
 }
 
 function hide() {
 	modal.value?.hide()
-	setTimeout(() => resetState(), 250)
 }
 
 function selectCape(cape: Cape | undefined) {
 	selectedCape.value = cape
 }
 
-function openUploadSkinModal(e: MouseEvent) {
-	shouldRestoreModal.value = true
-	modal.value?.hide()
-	emit('open-upload-modal', e)
+function openTextureFileBrowser() {
+	textureFileInput.value?.click()
 }
 
-function restoreModal() {
-	if (shouldRestoreModal.value) {
-		setTimeout(() => {
-			const fakeEvent = new MouseEvent('click')
-			modal.value?.show(fakeEvent)
-			nextTick(() => forceCapeScrollCheck())
-			shouldRestoreModal.value = false
-		}, 500)
+async function onTextureFileInputChange(e: Event) {
+	const files = (e.target as HTMLInputElement).files
+	const file = files?.[0]
+
+	if (!file) {
+		return
+	}
+
+	try {
+		const originalSkinTexUrl = `data:image/png;base64,${arrayBufferToBase64(
+			await file.arrayBuffer(),
+		)}`
+		const skinTextureNormalized = await normalize_skin_texture(originalSkinTexUrl)
+		await setUploadedTexture({
+			original: originalSkinTexUrl,
+			normalized: `data:image/png;base64,${arrayBufferToBase64(skinTextureNormalized)}`,
+		})
+	} catch (error) {
+		handleError(error)
+	} finally {
+		if (textureFileInput.value) {
+			textureFileInput.value.value = ''
+		}
 	}
 }
 
@@ -327,28 +390,53 @@ async function save() {
 
 watch([uploadedTextureUrl, currentSkin], async () => {
 	await loadPreviewSkin()
+	refreshCapeListLayout()
 })
 
 watch(
 	() => props.capes,
 	() => {
-		nextTick(() => forceCapeScrollCheck())
+		nextTick(() => refreshCapeListLayout())
 	},
 	{ immediate: true },
+)
+
+watch(
+	capeListRef,
+	(capeList, _, onCleanup) => {
+		if (!capeList) return
+
+		const modalContent = capeList.closest('[data-modal-content]')
+		const resizeObserver = new ResizeObserver(() => refreshCapeListLayout())
+
+		if (modalContent instanceof HTMLElement) {
+			resizeObserver.observe(modalContent)
+		}
+
+		window.addEventListener('resize', refreshCapeListLayout, { passive: true })
+		refreshCapeListLayout()
+
+		onCleanup(() => {
+			resizeObserver.disconnect()
+			window.removeEventListener('resize', refreshCapeListLayout)
+
+			if (capeListLayoutFrame !== null) {
+				cancelAnimationFrame(capeListLayoutFrame)
+				capeListLayoutFrame = null
+			}
+		})
+	},
+	{ flush: 'post' },
 )
 
 const emit = defineEmits<{
 	(event: 'saved'): void
 	(event: 'deleted', skin: Skin): void
-	(event: 'open-upload-modal', mouseEvent: MouseEvent): void
 }>()
 
 defineExpose({
 	show,
 	showNew,
-	restoreWithNewTexture,
 	hide,
-	shouldRestoreModal,
-	restoreModal,
 })
 </script>
