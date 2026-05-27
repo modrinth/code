@@ -361,6 +361,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     );
     let mut found_equipped_skin = false;
     let mut available_skins = Vec::new();
+    let mut custom_skins = Vec::new();
     let mut saved_default_skins = Vec::new();
 
     for mut custom_skin in CustomMinecraftSkin::get_all(profile.id, &state.pool)
@@ -426,7 +427,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
             None => custom_skin.texture_blob(&state.pool).await?,
         };
 
-        available_skins.push(Skin {
+        custom_skins.push(Skin {
             name: None,
             section: None,
             variant: custom_skin.variant,
@@ -443,6 +444,9 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
             texture_key: custom_skin.texture_key.into(),
         });
     }
+
+    custom_skins.sort_by(|a, b| a.texture.as_str().cmp(b.texture.as_str()));
+    available_skins.extend(custom_skins);
 
     for default_skin in assets::DEFAULT_SKINS.iter() {
         let is_equipped = !found_equipped_skin
@@ -676,9 +680,17 @@ async fn equip_skin_now(
 
     preserve_current_profile_skin(&state, &profile).await?;
 
+    let texture_blob = png_util::url_to_data_stream(&skin.texture)
+        .await?
+        .try_fold(Vec::new(), |mut texture, chunk| async move {
+            texture.extend_from_slice(&chunk);
+            Ok(texture)
+        })
+        .await?;
+
     let profile = mojang_api::MinecraftSkinOperation::equip(
         selected_credentials,
-        png_util::url_to_data_stream(&skin.texture).await?,
+        stream::iter([Ok::<_, String>(Bytes::from(texture_blob.clone()))]),
         skin.variant,
     )
     .await?;
@@ -694,10 +706,65 @@ async fn equip_skin_now(
     };
 
     if let Err(error) =
+        persist_equipped_skin(&state, &profile, skin, &texture_blob).await
+    {
+        refresh_profile_cache(selected_credentials).await;
+        return Err(error);
+    }
+
+    if let Err(error) =
         sync_cape(selected_credentials, &profile, skin.cape_id).await
     {
         refresh_profile_cache(selected_credentials).await;
         return Err(error);
+    }
+
+    Ok(())
+}
+
+async fn persist_equipped_skin(
+    state: &State,
+    profile: &MinecraftProfile,
+    skin: &Skin,
+    texture_blob: &[u8],
+) -> crate::Result<()> {
+    let equipped_skin = profile.current_skin()?;
+    let equipped_skin_texture_key = equipped_skin.texture_key();
+    let equipped_skin_variant = equipped_skin.variant;
+    let texture_key_changed =
+        skin.texture_key.as_ref() != equipped_skin_texture_key.as_ref();
+
+    if skin.cape_id.is_none()
+        && is_bundled_skin(&equipped_skin_texture_key, equipped_skin_variant)
+    {
+        CustomMinecraftSkin {
+            texture_key: equipped_skin_texture_key.to_string(),
+            variant: equipped_skin_variant,
+            cape_id: None,
+        }
+        .remove(profile.id, &state.pool)
+        .await?;
+    } else if texture_key_changed || !matches!(&skin.source, SkinSource::Custom)
+    {
+        CustomMinecraftSkin::add(
+            profile.id,
+            &equipped_skin_texture_key,
+            texture_blob,
+            equipped_skin_variant,
+            skin.cape_id,
+            &state.pool,
+        )
+        .await?;
+    }
+
+    if texture_key_changed {
+        CustomMinecraftSkin {
+            texture_key: skin.texture_key.to_string(),
+            variant: skin.variant,
+            cape_id: skin.cape_id,
+        }
+        .remove(profile.id, &state.pool)
+        .await?;
     }
 
     Ok(())
