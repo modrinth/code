@@ -67,13 +67,11 @@ pub async fn create(
     Ok(HttpResponse::Accepted().finish())
 }
 
-/// Directly sends emails to users and inserts notifications when emails are
-/// delivered successfully.
+/// Inserts notifications for all users and tries to send emails immediately.
 ///
 /// Responds with the user IDs that could not be emailed:
-/// - `200` if every recipient was delivered (empty list)
-/// - `207` if some recipients failed (list of failed IDs)
-/// - `500` if no recipient was delivered
+/// - `200` if every recipient was emailed (empty list)
+/// - `207` if some recipients could not be emailed (list of failed IDs)
 #[post(
     "external_notifications/direct-email",
     guard = "external_notification_key_guard"
@@ -99,57 +97,40 @@ pub async fn create_direct_email(
         ));
     }
 
-    let mut results: Vec<Result<DBUserId, DBUserId>> =
-        Vec::with_capacity(user_ids.len());
-
-    for user_id in &user_ids {
-        let user = DBUser::get_id(*user_id, &mut txn, &redis).await?.ok_or(
-            ApiError::Internal(eyre!(
-                "user `{}` disappeared while sending notification email",
-                user_id.0
-            )),
-        )?;
-
-        let delivered =
-            match user.email.and_then(|email| email.parse::<Mailbox>().ok()) {
-                Some(mailbox) => {
-                    email_queue
-                        .send_one(&mut txn, body.clone(), *user_id, mailbox)
-                        .await?
-                        == NotificationDeliveryStatus::Delivered
-                }
-                None => false,
-            };
-
-        results.push(if delivered {
-            Ok(*user_id)
-        } else {
-            Err(*user_id)
-        });
-    }
-
-    let delivered = results
-        .iter()
-        .filter_map(|result| result.as_ref().ok().copied())
-        .collect::<Vec<_>>();
-
-    if delivered.is_empty() {
-        return Err(ApiError::Internal(eyre!(
-            "failed to deliver notification email to any of {} recipients",
-            user_ids.len(),
-        )));
-    }
-
-    NotificationBuilder { body }
-        .insert_many_without_delivery(delivered, &mut txn, &redis)
+    NotificationBuilder { body: body.clone() }
+        .insert_many_without_delivery(user_ids.clone(), &mut txn, &redis)
         .await?;
 
     txn.commit().await?;
 
-    let failed = results
-        .into_iter()
-        .filter_map(|result| result.err().map(|id| UserId(id.0 as u64)))
-        .collect::<Vec<_>>();
+    let mut email_txn = pool.begin().await?;
+
+    let mut failed = Vec::new();
+    for user_id in &user_ids {
+        let Some(user) =
+            DBUser::get_id(*user_id, &mut email_txn, &redis).await?
+        else {
+            failed.push(UserId(user_id.0 as u64));
+            continue;
+        };
+
+        let delivered = match user
+            .email
+            .and_then(|email| email.parse::<Mailbox>().ok())
+        {
+            Some(mailbox) => {
+                email_queue
+                    .send_one(&mut email_txn, body.clone(), *user_id, mailbox)
+                    .await?
+                    == NotificationDeliveryStatus::Delivered
+            }
+            None => false,
+        };
+
+        if !delivered {
+            failed.push(UserId(user_id.0 as u64));
+        }
+    }
 
     let status = if failed.is_empty() {
         StatusCode::OK
