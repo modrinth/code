@@ -1,6 +1,7 @@
 use actix_web::{post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
+use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use tracing::warn;
@@ -8,10 +9,15 @@ use uuid::Uuid;
 
 use crate::{
     database::{
-        PgPool,
-        models::{DBUser, generate_campaign_donation_id},
+        PgPool, PgTransaction,
+        models::{
+            DBCampaignDonationId, DBUser, DBUserId,
+            generate_campaign_donation_id,
+        },
         redis::RedisPool,
     },
+    models::payouts::TremendousForexResponse,
+    queue::payouts::PayoutsQueue,
     routes::ApiError,
     util::error::Context,
 };
@@ -54,11 +60,45 @@ pub struct TiltifyMeta {
     pub subscription_source_type: String,
 }
 
+pub struct CampaignDonation {
+    pub id: DBCampaignDonationId,
+    pub raw_data: serde_json::Value,
+    pub donated_at: DateTime<Utc>,
+    pub amount_usd: Option<Decimal>,
+    pub user_id: Option<DBUserId>,
+}
+
+impl CampaignDonation {
+    pub async fn insert(
+        &self,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<(), ApiError> {
+        let user_id = self.user_id.map(|id| id.0);
+        sqlx::query!(
+            "
+            insert into campaign_donations (id, raw_data, donated_at, amount_usd, user_id)
+            values ($1, $2, $3, $4, $5)
+            ",
+            self.id.0,
+            self.raw_data,
+            self.donated_at,
+            self.amount_usd,
+            user_id,
+        )
+        .execute(transaction)
+        .await
+        .wrap_internal_err("inserting campaign donation")?;
+
+        Ok(())
+    }
+}
+
 #[utoipa::path]
 #[post("/webhook")]
 pub async fn tiltify_webhook(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    payouts_queue: web::Data<PayoutsQueue>,
     web::Json(raw_payload): web::Json<serde_json::Value>,
 ) -> Result<(), ApiError> {
     // deserialize the JSON in the request handler, not in the params,
@@ -74,47 +114,90 @@ pub async fn tiltify_webhook(
         })?;
 
     // no matter what, we need to insert this donation record into the db
-    let mut transaction = pool.begin().await?;
+    // so we'll make one upfront
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("beginning transaction")?;
     let id = generate_campaign_donation_id(&mut transaction).await?;
-    sqlx::query!(
-        "
-        insert into campaign_donations (id, raw_data, donated_at, user_id)
-        values ($1, $2, $3, $4)
-        ",
-        id.0,
-        raw_payload,
-        payload.meta.generated_at,
-        None::<i64>,
-    )
-    .execute(&**pool)
-    .await
-    .wrap_internal_err("inserting campaign donation")?;
 
+    let mut donation = CampaignDonation {
+        id,
+        raw_data: raw_payload,
+        donated_at: payload.meta.generated_at,
+        amount_usd: None,
+        user_id: None,
+    };
+
+    let result = async {
+        // then we can attempt user lookups
+        let username = &payload.data.user.username;
+        let user = DBUser::get(username, &**pool, &redis)
+            .await
+            .wrap_err("fetching user from database")?
+            .wrap_err_with(|| {
+                eyre!("got donation for user '{username}' which does not exist")
+            })?;
+
+        donation.user_id = Some(user.id);
+        eyre::Ok(())
+    }
+    .await;
+
+    if let Err(err) = result {
+        warn!("Failed to resolve donation to Modrinth user: {err:?}");
+    }
+
+    let result = async {
+        // and insert value amount
+        let amount_usd =
+            amount_raised_usd(&payload.data.amount_raised, &payouts_queue)
+                .await
+                .wrap_err("failed to get donation amount")?;
+
+        donation.amount_usd = Some(amount_usd);
+        eyre::Ok(())
+    }
+    .await;
+
+    if let Err(err) = result {
+        warn!("Failed to resolve donation amount: {err:?}");
+    }
+
+    donation
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err("inserting donation")?;
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing donation transaction")?;
-
-    // then we can attempt user lookups
-    let username = &payload.data.user.username;
-    let user = DBUser::get(username, &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching user from database")?;
-
-    if let Some(user) = user {
-        sqlx::query!(
-            "
-            update campaign_donations set user_id = $1 where id = $2
-            ",
-            user.id.0,
-            id.0,
-        )
-        .execute(&**pool)
-        .await
-        .wrap_internal_err("updating campaign donation user")?;
-    } else {
-        warn!("Got donation for user '{username}' which does not exist");
-    }
+        .wrap_internal_err("committing transaction")?;
 
     Ok(())
+}
+
+async fn amount_raised_usd(
+    amount: &AmountRaised,
+    payouts_queue: &PayoutsQueue,
+) -> Result<Decimal, ApiError> {
+    let currency = amount.currency.to_uppercase();
+
+    if currency == "USD" {
+        return Ok(amount.value);
+    }
+
+    let forex: TremendousForexResponse = payouts_queue
+        .make_tremendous_request(Method::GET, "forex", None::<()>)
+        .await
+        .wrap_internal_err("failed to fetch Tremendous forex data")?;
+
+    let usd_to_currency = forex
+        .forex
+        .get(&currency)
+        .copied()
+        .wrap_internal_err_with(|| {
+            eyre!("no Tremendous forex rate for '{currency}'")
+        })?;
+
+    Ok(amount.value / usd_to_currency)
 }
