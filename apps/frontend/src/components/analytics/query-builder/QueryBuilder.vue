@@ -780,7 +780,6 @@ const groupByPresetOptions: Array<{
 	{ value: 'year', label: 'Year' },
 ]
 
-const selectedProjectCount = computed(() => selectedProjectIds.value.length)
 const selectedBreakdownLabel = computed(() => {
 	if (selectedBreakdownValue.value.length === 0) {
 		return 'None'
@@ -821,7 +820,6 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 		const hasReachedBreakdownLimit =
 			selectedBreakdownValue.value.length >= MAX_ANALYTICS_BREAKDOWN_PRESETS
 		const options: MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[] = [
-			...(selectedProjectCount.value > 1 ? [{ value: 'project' as const, label: 'Projects' }] : []),
 			{ value: 'country', label: 'Country' },
 			{ value: 'monetization', label: 'Monetization' },
 			{ value: 'user_agent', label: 'Download source' },
@@ -839,6 +837,10 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 )
 
 function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
+	if (breakdown === 'project') {
+		return 'Projects'
+	}
+
 	return breakdownOptions.value.find((option) => option.value === breakdown)?.label ?? breakdown
 }
 

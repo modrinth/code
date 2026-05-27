@@ -505,10 +505,7 @@ export function getAnalyticsBreakdownPresetsForProjectSelection(
 	const normalizedBreakdowns: AnalyticsSelectedBreakdowns = []
 
 	for (const breakdown of breakdowns) {
-		if (breakdown === 'none') {
-			continue
-		}
-		if (breakdown === 'project' && selectedProjectIds.length <= 1) {
+		if (breakdown === 'none' || breakdown === 'project') {
 			continue
 		}
 		if (!normalizedBreakdowns.includes(breakdown)) {
