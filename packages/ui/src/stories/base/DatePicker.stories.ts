@@ -312,6 +312,27 @@ export const OpenCalendar: Story = {
 	}),
 }
 
+export const CloseOnSelect: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-06-15')
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-[300px]"
+					close-on-select
+					default-view-date="2026-06-01"
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const ForceAbove: Story = {
 	render: () => ({
 		components: { DatePicker },

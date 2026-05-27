@@ -136,6 +136,7 @@ const props = withDefaults(
 		showIcon?: boolean
 		showToday?: boolean
 		calendarOnly?: boolean
+		closeOnSelect?: boolean
 		/**
 		 * Controls where the calendar opens relative to the input. Use `above`
 		 * to force the calendar to open above the input.
@@ -165,6 +166,7 @@ const props = withDefaults(
 		showIcon: true,
 		showToday: false,
 		calendarOnly: false,
+		closeOnSelect: false,
 		position: 'auto',
 		preserveDay: false,
 		viewDateAlignment: 'left',
@@ -1000,6 +1002,7 @@ watch(
 		props.altFormat,
 		props.time24hr,
 		props.calendarOnly,
+		props.closeOnSelect,
 		props.position,
 	],
 	() => {
@@ -1233,7 +1236,7 @@ function flatpickrOptions(): Options {
 		altInputClass: props.calendarOnly ? undefined : inputClasses.value.filter(Boolean).join(' '),
 		altFormat: resolvedAltFormat.value,
 		appendTo: ensureCalendarPortal(),
-		closeOnSelect: false,
+		closeOnSelect: props.closeOnSelect,
 		dateFormat: resolvedDateFormat.value,
 		disableMobile: true,
 		enableTime: props.enableTime,
