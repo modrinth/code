@@ -1,223 +1,416 @@
 <template>
-	<div class="flex flex-col gap-3 pl-1">
-		<div v-if="showProjectRow" class="flex items-start gap-2">
-			<div class="my-1.5 flex w-32 items-center gap-2 text-primary">
-				<FolderOpenIcon class="size-5" />
-				<span class="text-base font-medium">Project:</span>
-			</div>
-			<div class="w-fit">
-				<MultiSelect
-					v-model="draftSelectedProjectIds"
-					:options="projectSelectOptions"
-					:disabled="!hasProjectOptions"
-					:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-					dropdown-min-width="360px"
-					placeholder="Select projects"
-					:no-options-message="noProjectsMessage"
-					:searchable="projectOptions.length > 6"
-					:max-tag-rows="1"
-					checkbox-position="right"
-					show-selection-actions
-					@open="handleProjectSelectOpen"
-					@close="handleProjectSelectClose"
-				>
-					<template #input-content="{ isOpen, openDirection }">
-						<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
-							<div class="flex items-center gap-0.5">
+	<div class="pl-1">
+		<div class="flex flex-wrap items-center gap-2 md:hidden">
+			<MultiSelect
+				v-if="showProjectRow"
+				v-model="draftSelectedProjectIds"
+				class="min-w-0 max-w-full"
+				:options="projectSelectOptions"
+				:disabled="!hasProjectOptions"
+				:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+				dropdown-min-width="360px"
+				placeholder="Select projects"
+				:no-options-message="noProjectsMessage"
+				:searchable="projectOptions.length > 6"
+				:max-tag-rows="1"
+				:trigger-class="analyticsQueryChipTriggerClass"
+				fit-content
+				checkbox-position="right"
+				show-selection-actions
+				@open="handleProjectSelectOpen"
+				@close="handleProjectSelectClose"
+			>
+				<template #input-content="{ isOpen, openDirection }">
+					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-2 pr-1">
+						<img
+							v-if="selectedProjectIconUrl"
+							:src="selectedProjectIconUrl"
+							:alt="`${selectedProjectLabel} Icon`"
+							class="size-5 shrink-0 rounded object-cover"
+							loading="lazy"
+							decoding="async"
+						/>
+						<LayersIcon v-else class="size-5 shrink-0 text-primary" />
+						<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary">
+							{{ selectedProjectLabel }}
+						</span>
+						<ChevronLeftIcon
+							class="size-5 shrink-0 text-primary transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+						/>
+					</div>
+				</template>
+				<template #option="{ item, selected }">
+					<div class="flex min-w-0 flex-1 items-center gap-2">
+						<img
+							v-if="getProjectIconUrl(item.value)"
+							:src="getProjectIconUrl(item.value)"
+							:alt="`${item.label} Icon`"
+							class="h-5 w-5 shrink-0 rounded object-cover"
+							loading="lazy"
+							decoding="async"
+						/>
+						<BoxIcon
+							v-else
+							class="h-5 w-5 shrink-0 text-primary"
+							:class="selected ? 'text-contrast' : 'text-primary'"
+						/>
+						<span
+							v-tooltip="item.label"
+							class="min-w-0 truncate font-semibold leading-tight"
+							:class="selected ? 'text-contrast' : 'text-primary'"
+						>
+							{{ item.label }}
+						</span>
+					</div>
+				</template>
+				<template v-if="hasProjectOptions" #top>
+					<div>
+						<button
+							type="button"
+							class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
+							:aria-selected="isAllProjectsOptionSelected"
+							:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+							role="option"
+							@click="selectAllProjectsMode"
+							@keydown.enter.stop
+							@keydown.space.stop
+						>
+							<LayersIcon
+								class="h-5 w-5 shrink-0 text-primary"
+								:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+							/>
+							<span class="min-w-0 flex-1 font-semibold leading-tight"> All projects </span>
+							<span class="flex shrink-0 items-center justify-center text-brand">
+								<CheckIcon v-if="isAllProjectsOptionSelected" aria-hidden="true" class="size-5" />
+							</span>
+						</button>
+					</div>
+				</template>
+				<template v-if="hasProjectOptions" #bottom>
+					<DownloadsThresholdInput
+						class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+						label="Projects above"
+						input-aria-label="Project downloads threshold"
+						:threshold="projectDownloadsThreshold"
+						input-width-class="w-20"
+						@update:threshold="setProjectDownloadsThreshold"
+						@submit="runProjectDownloadsThresholdQuery"
+					/>
+				</template>
+			</MultiSelect>
+
+			<TimeFramePicker
+				class="!w-auto min-w-0 max-w-full"
+				:trigger-class="analyticsQueryChipTriggerClass"
+			>
+				<template #prefix>
+					<CalendarIcon class="size-5 shrink-0 text-primary" />
+				</template>
+			</TimeFramePicker>
+
+			<Combobox
+				v-model="selectedGroupBy"
+				class="!w-auto min-w-0 max-w-full"
+				:options="groupByOptions"
+				:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+				:display-value="selectedGroupByLabel"
+				:trigger-class="analyticsQueryChipTriggerClass"
+			>
+				<template #prefix>
+					<ClockIcon class="size-5 shrink-0 text-primary" />
+				</template>
+			</Combobox>
+
+			<MultiSelect
+				v-model="selectedBreakdownValue"
+				class="min-w-0 max-w-full"
+				:options="breakdownOptions"
+				:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+				:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+				:trigger-class="analyticsQueryChipTriggerClass"
+				fit-content
+				checkbox-position="right"
+				placeholder="None"
+				clearable
+				@open="handleBreakdownSelectOpen"
+				@close="handleBreakdownSelectClose"
+			>
+				<template #input-content="{ isOpen, openDirection }">
+					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-2 pr-1">
+						<BlocksIcon class="size-5 shrink-0 text-primary" />
+						<span
+							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary"
+							:title="mobileSelectedBreakdownLabel"
+						>
+							{{ mobileSelectedBreakdownLabel }}
+						</span>
+						<div class="flex shrink-0 items-center gap-1.5">
+							<template v-if="canClearSelectedBreakdowns">
+								<button
+									type="button"
+									class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+									aria-label="Clear breakdowns"
+									@click.stop="clearSelectedBreakdowns"
+								>
+									<XIcon class="size-4 text-primary" />
+								</button>
+								<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+							</template>
+
+							<ChevronLeftIcon
+								class="size-5 shrink-0 text-primary transition-transform duration-150"
+								:class="
+									isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+								"
+							/>
+						</div>
+					</div>
+				</template>
+			</MultiSelect>
+
+			<QueryBuilderFilter
+				add-label="Add filter"
+				:show-label="false"
+				show-preview-filter-icon
+				:show-clear-action="false"
+				:preview-trigger-class="analyticsQueryFilterChipTriggerClass"
+				:add-button-class="analyticsQueryAddFilterButtonClass"
+			/>
+		</div>
+
+		<div class="hidden flex-col gap-3 md:flex">
+			<div v-if="showProjectRow" class="flex items-start gap-2">
+				<div class="my-1.5 flex w-32 items-center gap-2 text-primary">
+					<FolderOpenIcon class="size-5" />
+					<span class="text-base font-medium">Project:</span>
+				</div>
+				<div class="w-fit">
+					<MultiSelect
+						v-model="draftSelectedProjectIds"
+						:options="projectSelectOptions"
+						:disabled="!hasProjectOptions"
+						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+						dropdown-min-width="360px"
+						placeholder="Select projects"
+						:no-options-message="noProjectsMessage"
+						:searchable="projectOptions.length > 6"
+						:max-tag-rows="1"
+						checkbox-position="right"
+						show-selection-actions
+						@open="handleProjectSelectOpen"
+						@close="handleProjectSelectClose"
+					>
+						<template #input-content="{ isOpen, openDirection }">
+							<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
+								<div class="flex items-center gap-0.5">
+									<img
+										v-if="selectedProjectIconUrl"
+										:src="selectedProjectIconUrl"
+										:alt="`${selectedProjectLabel} Icon`"
+										class="size-6 shrink-0 rounded object-cover"
+										loading="lazy"
+										decoding="async"
+									/>
+									<LayersIcon
+										v-else-if="isAllProjectsOptionSelected || areAllProjectsSelected"
+										class="size-6 shrink-0 text-primary"
+									/>
+									<BoxIcon v-else class="size-6 shrink-0 text-primary" />
+									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary">
+										{{ selectedProjectLabel }}
+									</span>
+								</div>
+								<div class="flex shrink-0 items-center gap-1.5">
+									<template v-if="canClearDraftSelectedProjects">
+										<button
+											type="button"
+											class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+											aria-label="Clear projects"
+											@click.stop="clearDraftSelectedProjects"
+										>
+											<XIcon class="size-4 text-primary" />
+										</button>
+										<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+									</template>
+
+									<ChevronLeftIcon
+										class="size-5 shrink-0 text-primary transition-transform duration-150"
+										:class="
+											isOpen
+												? openDirection === 'down'
+													? 'rotate-90'
+													: '-rotate-90'
+												: '-rotate-90'
+										"
+									/>
+								</div>
+							</div>
+						</template>
+						<template #option="{ item, selected }">
+							<div class="flex min-w-0 flex-1 items-center gap-2">
 								<img
-									v-if="selectedProjectIconUrl"
-									:src="selectedProjectIconUrl"
-									:alt="`${selectedProjectLabel} Icon`"
-									class="size-6 shrink-0 rounded object-cover"
+									v-if="getProjectIconUrl(item.value)"
+									:src="getProjectIconUrl(item.value)"
+									:alt="`${item.label} Icon`"
+									class="h-5 w-5 shrink-0 rounded object-cover"
 									loading="lazy"
 									decoding="async"
 								/>
-								<LayersIcon
-									v-else-if="isAllProjectsOptionSelected || areAllProjectsSelected"
-									class="size-6 shrink-0 text-primary"
-								/>
-								<BoxIcon v-else class="size-6 shrink-0 text-primary" />
-								<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary">
-									{{ selectedProjectLabel }}
-								</span>
-							</div>
-							<div class="flex shrink-0 items-center gap-1.5">
-								<template v-if="canClearDraftSelectedProjects">
-									<button
-										type="button"
-										class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-										aria-label="Clear projects"
-										@click.stop="clearDraftSelectedProjects"
-									>
-										<XIcon class="size-4 text-primary" />
-									</button>
-									<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-								</template>
-
-								<ChevronLeftIcon
-									class="size-5 shrink-0 text-primary transition-transform duration-150"
-									:class="
-										isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
-									"
-								/>
-							</div>
-						</div>
-					</template>
-					<template #option="{ item, selected }">
-						<div class="flex min-w-0 flex-1 items-center gap-2">
-							<img
-								v-if="getProjectIconUrl(item.value)"
-								:src="getProjectIconUrl(item.value)"
-								:alt="`${item.label} Icon`"
-								class="h-5 w-5 shrink-0 rounded object-cover"
-								loading="lazy"
-								decoding="async"
-							/>
-							<BoxIcon
-								v-else
-								class="h-5 w-5 shrink-0 text-primary"
-								:class="selected ? 'text-contrast' : 'text-primary'"
-							/>
-							<span
-								v-tooltip="item.label"
-								class="min-w-0 truncate font-semibold leading-tight"
-								:class="selected ? 'text-contrast' : 'text-primary'"
-							>
-								{{ item.label }}
-							</span>
-						</div>
-					</template>
-					<template v-if="hasProjectOptions" #top>
-						<div>
-							<button
-								type="button"
-								class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
-								:aria-selected="isAllProjectsOptionSelected"
-								:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
-								role="option"
-								@click="selectAllProjectsMode"
-								@keydown.enter.stop
-								@keydown.space.stop
-							>
-								<LayersIcon
+								<BoxIcon
+									v-else
 									class="h-5 w-5 shrink-0 text-primary"
-									:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+									:class="selected ? 'text-contrast' : 'text-primary'"
 								/>
-								<span class="min-w-0 flex-1 font-semibold leading-tight"> All projects </span>
-								<span class="flex shrink-0 items-center justify-center text-brand">
-									<CheckIcon v-if="isAllProjectsOptionSelected" aria-hidden="true" class="size-5" />
+								<span
+									v-tooltip="item.label"
+									class="min-w-0 truncate font-semibold leading-tight"
+									:class="selected ? 'text-contrast' : 'text-primary'"
+								>
+									{{ item.label }}
 								</span>
-							</button>
-						</div>
-					</template>
-					<template v-if="hasProjectOptions" #bottom>
-						<DownloadsThresholdInput
-							class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
-							label="Projects above"
-							input-aria-label="Project downloads threshold"
-							:threshold="projectDownloadsThreshold"
-							input-width-class="w-20"
-							@update:threshold="setProjectDownloadsThreshold"
-							@submit="runProjectDownloadsThresholdQuery"
+							</div>
+						</template>
+						<template v-if="hasProjectOptions" #top>
+							<div>
+								<button
+									type="button"
+									class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
+									:aria-selected="isAllProjectsOptionSelected"
+									:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+									role="option"
+									@click="selectAllProjectsMode"
+									@keydown.enter.stop
+									@keydown.space.stop
+								>
+									<LayersIcon
+										class="h-5 w-5 shrink-0 text-primary"
+										:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+									/>
+									<span class="min-w-0 flex-1 font-semibold leading-tight"> All projects </span>
+									<span class="flex shrink-0 items-center justify-center text-brand">
+										<CheckIcon
+											v-if="isAllProjectsOptionSelected"
+											aria-hidden="true"
+											class="size-5"
+										/>
+									</span>
+								</button>
+							</div>
+						</template>
+						<template v-if="hasProjectOptions" #bottom>
+							<DownloadsThresholdInput
+								class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
+								label="Projects above"
+								input-aria-label="Project downloads threshold"
+								:threshold="projectDownloadsThreshold"
+								input-width-class="w-20"
+								@update:threshold="setProjectDownloadsThreshold"
+								@submit="runProjectDownloadsThresholdQuery"
+							/>
+						</template>
+					</MultiSelect>
+				</div>
+			</div>
+
+			<div class="flex flex-wrap items-center gap-2">
+				<div class="flex items-center gap-2">
+					<div class="flex w-32 items-center gap-2 text-primary">
+						<CalendarIcon class="size-5" />
+						<span class="text-base font-medium">Timeframe:</span>
+					</div>
+					<div>
+						<TimeFramePicker />
+					</div>
+				</div>
+				<div class="flex items-center gap-2">
+					<span class="text-base font-medium text-primary">Grouped by</span>
+					<div>
+						<Combobox
+							v-model="selectedGroupBy"
+							:options="groupByOptions"
+							:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+							:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 						/>
-					</template>
-				</MultiSelect>
+					</div>
+				</div>
+				<ButtonStyled v-if="!isTimeframeAndGroupByDefault" type="transparent">
+					<button
+						type="button"
+						:disabled="isTimeframeAndGroupByDefault"
+						@click="resetTimeframeAndGroupBy"
+					>
+						Reset
+					</button>
+				</ButtonStyled>
 			</div>
-		</div>
 
-		<div class="flex flex-wrap items-center gap-2">
-			<div class="flex items-center gap-2">
-				<div class="flex w-32 items-center gap-2 text-primary">
-					<CalendarIcon class="size-5" />
-					<span class="text-base font-medium">Timeframe:</span>
-				</div>
-				<div>
-					<TimeFramePicker />
-				</div>
-			</div>
-			<div class="flex items-center gap-2">
-				<span class="text-base font-medium text-primary">Grouped by</span>
-				<div>
-					<Combobox
-						v-model="selectedGroupBy"
-						:options="groupByOptions"
-						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-						:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-					/>
-				</div>
-			</div>
-			<ButtonStyled v-if="!isTimeframeAndGroupByDefault" type="transparent">
-				<button
-					type="button"
-					:disabled="isTimeframeAndGroupByDefault"
-					@click="resetTimeframeAndGroupBy"
-				>
-					Reset
-				</button>
-			</ButtonStyled>
-		</div>
+			<div class="flex flex-wrap items-start gap-2">
+				<div class="flex items-center gap-2">
+					<div class="flex w-32 items-center gap-2 text-primary">
+						<BlocksIcon class="size-5" />
+						<span class="text-base font-medium">Breakdown:</span>
+					</div>
+					<div class="flex flex-col gap-2">
+						<div class="flex flex-wrap items-center gap-2">
+							<div>
+								<MultiSelect
+									v-model="selectedBreakdownValue"
+									:options="breakdownOptions"
+									:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
+									:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+									checkbox-position="right"
+									placeholder="None"
+									clearable
+									@open="handleBreakdownSelectOpen"
+									@close="handleBreakdownSelectClose"
+								>
+									<template #input-content="{ isOpen, openDirection }">
+										<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
+											<span
+												class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary"
+												:title="selectedBreakdownLabel"
+											>
+												{{ selectedBreakdownLabel }}
+											</span>
+											<div class="flex shrink-0 items-center gap-1.5">
+												<template v-if="canClearSelectedBreakdowns">
+													<button
+														type="button"
+														class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+														aria-label="Clear breakdowns"
+														@click.stop="clearSelectedBreakdowns"
+													>
+														<XIcon class="size-4 text-primary" />
+													</button>
+													<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
+												</template>
 
-		<div class="flex flex-wrap items-start gap-2">
-			<div class="flex items-center gap-2">
-				<div class="flex w-32 items-center gap-2 text-primary">
-					<BlocksIcon class="size-5" />
-					<span class="text-base font-medium">Breakdown:</span>
-				</div>
-				<div class="flex flex-col gap-2">
-					<div class="flex flex-wrap items-center gap-2">
-						<div>
-							<MultiSelect
-								v-model="selectedBreakdownValue"
-								:options="breakdownOptions"
-								:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-								:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-								:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-								checkbox-position="right"
-								placeholder="None"
-								clearable
-								@open="handleBreakdownSelectOpen"
-								@close="handleBreakdownSelectClose"
-							>
-								<template #input-content="{ isOpen, openDirection }">
-									<div class="flex min-h-7 min-w-0 flex-1 items-center gap-2 pr-1">
-										<span
-											class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary"
-											:title="selectedBreakdownLabel"
-										>
-											{{ selectedBreakdownLabel }}
-										</span>
-										<div class="flex shrink-0 items-center gap-1.5">
-											<template v-if="canClearSelectedBreakdowns">
-												<button
-													type="button"
-													class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
-													aria-label="Clear breakdowns"
-													@click.stop="clearSelectedBreakdowns"
-												>
-													<XIcon class="size-4 text-primary" />
-												</button>
-												<div class="h-5 w-[1px] shrink-0 bg-surface-5"></div>
-											</template>
-
-											<ChevronLeftIcon
-												class="size-5 shrink-0 text-primary transition-transform duration-150"
-												:class="
-													isOpen
-														? openDirection === 'down'
-															? 'rotate-90'
+												<ChevronLeftIcon
+													class="size-5 shrink-0 text-primary transition-transform duration-150"
+													:class="
+														isOpen
+															? openDirection === 'down'
+																? 'rotate-90'
+																: '-rotate-90'
 															: '-rotate-90'
-														: '-rotate-90'
-												"
-											/>
+													"
+												/>
+											</div>
 										</div>
-									</div>
-								</template>
-							</MultiSelect>
+									</template>
+								</MultiSelect>
+							</div>
 						</div>
 					</div>
 				</div>
+				<QueryBuilderFilter />
 			</div>
-			<QueryBuilderFilter />
 		</div>
 	</div>
 </template>
@@ -230,6 +423,7 @@ import {
 	CalendarIcon,
 	CheckIcon,
 	ChevronLeftIcon,
+	ClockIcon,
 	FolderOpenIcon,
 	LayersIcon,
 	XIcon,
@@ -275,6 +469,12 @@ import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '17rem'
+const analyticsQueryChipTriggerClass =
+	'h-10 min-w-0 max-w-full border border-solid border-surface-5 bg-surface-4 px-4 py-1.5 text-base font-semibold text-primary'
+const analyticsQueryFilterChipTriggerClass =
+	'h-10 min-w-0 max-w-full border border-solid border-surface-5 bg-surface-4 px-4 py-1.5 text-base font-semibold text-primary transition-all hover:brightness-110 active:brightness-110'
+const analyticsQueryAddFilterButtonClass =
+	'!h-10 max-w-full !rounded-xl !border-dashed !border-surface-5 !bg-transparent !px-4 !py-1.5 text-base'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
 const {
@@ -647,6 +847,31 @@ const selectedBreakdownLabel = computed(() => {
 	return selectedBreakdownValue.value
 		.map((breakdown) => getBreakdownOptionLabel(breakdown))
 		.join(' + ')
+})
+const selectedGroupByLabel = computed(() => {
+	switch (selectedGroupBy.value) {
+		case '1h':
+			return 'Group by hour'
+		case '6h':
+			return 'Group by 6 hours'
+		case 'day':
+			return 'Group by date'
+		case 'week':
+			return 'Group by week'
+		case 'month':
+			return 'Group by month'
+		case 'year':
+			return 'Group by year'
+		default:
+			return 'Group by date'
+	}
+})
+const mobileSelectedBreakdownLabel = computed(() => {
+	if (selectedBreakdownValue.value.length === 0) {
+		return 'No breakdown'
+	}
+
+	return `Breakdown by ${selectedBreakdownLabel.value.toLowerCase()}`
 })
 const canClearSelectedBreakdowns = computed(() => selectedBreakdownValue.value.length > 0)
 const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[]>(

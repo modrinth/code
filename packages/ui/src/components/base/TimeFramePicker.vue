@@ -4,6 +4,7 @@
 		:options="timeframeDropdownOptions"
 		:display-value="selectedTimeframeLabel"
 		:max-height="maxHeight"
+		:trigger-class="triggerClass"
 		:dropdown-min-width="timeframeDropdownMinWidth"
 		:outside-click-ignore="timeframeDropdownOutsideClickIgnore"
 		:dropdown-class="
@@ -16,6 +17,9 @@
 		@close="handleTimeframeSelectClose"
 		@select="handleTimeframePresetSelect"
 	>
+		<template #prefix>
+			<slot name="prefix"></slot>
+		</template>
 		<template #dropdown-footer>
 			<template v-if="activeTimeframePanel === 'custom_range'">
 				<div
@@ -386,6 +390,7 @@ const props = withDefaults(
 		maxDate?: string
 		nowTimestamp?: number
 		maxHeight?: number
+		triggerClass?: string
 		dropdownMinWidth?: string | number
 		customRangeDropdownMinWidth?: string | number
 	}>(),

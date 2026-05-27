@@ -2,8 +2,13 @@
 	<DropdownFilterBar
 		v-model="selectedFilterValue"
 		:categories="filterCategories"
-		:show-clear="canClearSelectedBreakdown"
+		:show-clear="showClearAction && canClearSelectedBreakdown"
+		:show-label="showLabel"
+		:show-preview-filter-icon="showPreviewFilterIcon"
+		:preview-trigger-class="previewTriggerClass"
+		:add-button-class="addButtonClass"
 		clear-label="Reset"
+		:add-label="addLabel"
 		checkbox-position="right"
 		@clear="clearFilterBar"
 	>
@@ -210,6 +215,23 @@ type ProjectVersionProjectOptionMetadata = {
 	iconUrl?: string
 }
 
+withDefaults(
+	defineProps<{
+		addLabel?: string
+		showLabel?: boolean
+		showPreviewFilterIcon?: boolean
+		previewTriggerClass?: string
+		addButtonClass?: string
+		showClearAction?: boolean
+	}>(),
+	{
+		addLabel: 'Add',
+		showLabel: true,
+		showPreviewFilterIcon: false,
+		showClearAction: true,
+	},
+)
+
 const {
 	hasProjectContext,
 	projects,
@@ -412,7 +434,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 		},
 		{
 			key: 'user_agent',
-			label: 'Download Source',
+			label: 'Download source',
 			searchable: downloadSourceFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search download sources...',
 			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
@@ -436,7 +458,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 		},
 		{
 			key: 'game_version',
-			label: 'Game Version',
+			label: 'Game version',
 			searchable: true,
 			searchPlaceholder: 'Search versions...',
 			submenuClass: 'w-fit',
@@ -444,7 +466,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 		},
 		{
 			key: 'loader_type',
-			label: 'Loader Type',
+			label: 'Loader',
 			options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
 		},
 	)

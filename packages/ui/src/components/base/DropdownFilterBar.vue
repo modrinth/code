@@ -1,5 +1,6 @@
 <template>
 	<span
+		v-if="showLabel"
 		class="flex h-10 items-center text-nowrap text-base font-medium text-primary"
 		:aria-label="useFilterIcon ? label : undefined"
 	>
@@ -10,6 +11,7 @@
 	<MultiSelect
 		v-for="preview in appliedFilterPreviews"
 		:key="preview.key"
+		class="min-w-0 max-w-full"
 		:model-value="getPreviewSelectedValues(preview.key)"
 		:options="preview.options"
 		:max-height="500"
@@ -18,7 +20,7 @@
 		:fit-content="true"
 		:searchable="preview.category.searchable"
 		:search-placeholder="preview.category.searchPlaceholder"
-		:trigger-class="previewTriggerClass"
+		:trigger-class="effectivePreviewTriggerClass"
 		:dropdown-width="getPreviewDropdownWidth(preview.category)"
 		:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
 		:checkbox-position="checkboxPosition"
@@ -37,7 +39,12 @@
 			></slot>
 		</template>
 		<template #input-content="{ isOpen, openDirection }">
-			<div class="flex min-h-8 max-w-80 items-center gap-2">
+			<div class="flex min-h-8 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
+				<FilterIcon
+					v-if="showPreviewFilterIcon"
+					class="size-5 shrink-0 text-primary"
+					aria-hidden="true"
+				/>
 				<span class="min-w-0 flex-1 truncate">
 					<span class="font-medium">{{ preview.label }}:</span>
 					<span class="ml-1 font-semibold text-contrast">{{ preview.summary }}</span>
@@ -79,11 +86,12 @@
 		</template>
 	</MultiSelect>
 
-	<div class="flex h-10 items-center gap-2">
+	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
 		<ButtonStyled type="outlined">
 			<button
 				ref="addMenuTrigger"
 				type="button"
+				:class="addButtonClass"
 				:aria-expanded="isAddMenuOpen"
 				aria-haspopup="menu"
 				@click="handleAddMenuTriggerClick"
@@ -421,7 +429,11 @@ const props = withDefaults(
 		addLabel?: string
 		clearLabel?: string
 		showClear?: boolean
+		showLabel?: boolean
 		useFilterIcon?: boolean
+		showPreviewFilterIcon?: boolean
+		previewTriggerClass?: string
+		addButtonClass?: string
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
@@ -431,7 +443,9 @@ const props = withDefaults(
 		addLabel: 'Add',
 		clearLabel: 'Clear',
 		showClear: false,
+		showLabel: true,
 		useFilterIcon: false,
+		showPreviewFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',
 		emptySearchLabel: 'No options found.',
 		checkboxPosition: 'left',
@@ -599,22 +613,32 @@ const addMenuOutsideClickTarget = computed(() => menuContainer.value ?? submenu.
 const addMenuOutsideClickIgnore = computed(() => [addMenuTrigger, menuContainer, submenu])
 
 const appliedFilterPreviews = computed(() =>
-	filterCategories.value
-		.map((category) => ({
-			key: category.key,
-			label: category.label,
-			summary: getCategorySelectionSummary(category),
-			count: getCategorySelectionCount(category.key),
-			category,
-			options: getVisiblePreviewOptions(category),
-		}))
-		.filter((preview) => preview.count > 0),
+	Object.entries(props.modelValue)
+		.map(([categoryKey, selectedValues]) => {
+			const category = filterCategoriesByKey.value.get(categoryKey)
+			if (!category || selectedValues.length === 0) {
+				return undefined
+			}
+
+			return {
+				key: category.key,
+				label: category.label,
+				summary: getCategorySelectionSummary(category),
+				count: selectedValues.length,
+				category,
+				options: getVisiblePreviewOptions(category),
+			}
+		})
+		.filter((preview): preview is NonNullable<typeof preview> => preview !== undefined),
 )
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
-const previewTriggerClass =
+const DEFAULT_PREVIEW_TRIGGER_CLASS =
 	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-4 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
+const effectivePreviewTriggerClass = computed(
+	() => props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS,
+)
 
 function cloneSelectedFilters(filters: DropdownFilterBarValue): DropdownFilterBarValue {
 	return Object.fromEntries(
@@ -723,10 +747,7 @@ function setSelectedValues(
 		return
 	}
 
-	const nextFilters = {
-		...cloneSelectedFilters(currentFilters),
-		[categoryKey]: normalizedValues,
-	}
+	const nextFilters = getNextSelectedFilters(currentFilters, categoryKey, normalizedValues)
 
 	if (source === 'draft') {
 		draftSelectedFilters.value = nextFilters
@@ -947,6 +968,22 @@ function getCategorySelectionCount(
 	source: 'committed' | 'draft' = 'committed',
 ): number {
 	return getSelectedValues(categoryKey, source).length
+}
+
+function getNextSelectedFilters(
+	currentFilters: DropdownFilterBarValue,
+	categoryKey: string,
+	selectedValues: string[],
+): DropdownFilterBarValue {
+	const nextFilters = cloneSelectedFilters(currentFilters)
+	const shouldAppendCategory = (currentFilters[categoryKey] ?? []).length === 0
+
+	if (shouldAppendCategory) {
+		delete nextFilters[categoryKey]
+	}
+
+	nextFilters[categoryKey] = selectedValues
+	return nextFilters
 }
 
 function getCategorySelectionSummary(category: DropdownFilterBarCategory): string {
@@ -1220,11 +1257,7 @@ function getViewportRect(): ViewportRect {
 	}
 }
 
-function getAddMenuPosition({
-	triggerRect,
-	dropdownRect,
-	viewport,
-}: MenuPositionOptions) {
+function getAddMenuPosition({ triggerRect, dropdownRect, viewport }: MenuPositionOptions) {
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
 	const triggerTop = triggerRect.top + viewport.offsetTop
 	const triggerBottom = triggerRect.bottom + viewport.offsetTop
@@ -1272,10 +1305,7 @@ function getSubmenuPosition({
 		openDirection === 'right'
 			? buttonRight + DROPDOWN_GAP
 			: buttonLeft - submenuWidth - DROPDOWN_GAP
-	const maxLeft = Math.max(
-		minLeft,
-		viewportRight - submenuWidth - DROPDOWN_VIEWPORT_MARGIN,
-	)
+	const maxLeft = Math.max(minLeft, viewportRight - submenuWidth - DROPDOWN_VIEWPORT_MARGIN)
 	const left = Math.min(Math.max(minLeft, preferredLeft), maxLeft)
 	const minTop = viewportTop + DROPDOWN_VIEWPORT_MARGIN
 	const top = Math.min(

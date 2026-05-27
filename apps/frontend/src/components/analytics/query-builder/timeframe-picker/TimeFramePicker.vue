@@ -8,12 +8,17 @@
 		v-model:custom-end-date="selectedCustomTimeframeEndDate"
 		:min-date="ANALYTICS_START_DATE_INPUT_VALUE"
 		:now-timestamp="queryRefreshTimestamp"
+		:trigger-class="triggerClass"
 		@open="handleTimeframeOpen"
 		@commit="handleTimeframeCommit"
 		@apply="handleTimeframeApply"
 		@draft-change="handleTimeframeDraftChange"
 		@preset-select="handleTimeframePresetSelect"
-	/>
+	>
+		<template #prefix>
+			<slot name="prefix"></slot>
+		</template>
+	</BaseTimeFramePicker>
 </template>
 
 <script setup lang="ts">
@@ -49,6 +54,10 @@ const {
 	queryRefreshTimestamp,
 	refreshAnalyticsQuery,
 } = injectAnalyticsDashboardContext()
+
+defineProps<{
+	triggerClass?: string
+}>()
 
 const draftSelectedGroupBy = ref(selectedGroupBy.value)
 
