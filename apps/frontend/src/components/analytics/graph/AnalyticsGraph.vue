@@ -29,15 +29,15 @@
 	>
 		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
 			<div
-				class="flex w-full flex-col items-start gap-3 rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
+				class="flex w-full flex-col items-start justify-between gap-3 rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4 sm:flex-row sm:items-center"
 			>
-				<div class="flex min-w-0 flex-col gap-0.5">
+				<div class="flex flex-col gap-0.5">
 					<div class="text-xl font-semibold text-contrast">
 						{{ graphTitle }}
 					</div>
 					<div
 						v-if="showTableSelectionSubheading"
-						class="m-0 flex flex-wrap items-center gap-2 text-sm text-secondary"
+						class="m-0 flex w-max flex-wrap items-center gap-2 text-sm text-secondary"
 					>
 						<span>{{ tableSelectionSubheading }}</span>
 
@@ -60,19 +60,17 @@
 					</div>
 				</div>
 
-				<div class="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:justify-end">
+				<div class="flex w-full flex-wrap-reverse items-center justify-end gap-3">
 					<div v-if="canUseRatioMode" class="inline-flex items-center gap-2">
 						<label for="ratio-mode-toggle" class="cursor-pointer text-sm text-secondary"
 							>Ratio</label
 						>
-						<Toggle
-							id="ratio-mode-toggle"
-							v-model="isRatioMode"
-							:small="!isMobileLayout"
-						/>
+						<Toggle id="ratio-mode-toggle" v-model="isRatioMode" :small="!isMobileLayout" />
 					</div>
 					<div v-if="canShowPreviousPeriodToggle" class="inline-flex items-center gap-2">
-						<label for="previous-period-toggle" class="cursor-pointer text-sm text-secondary"
+						<label
+							for="previous-period-toggle"
+							class="cursor-pointer text-sm font-medium text-secondary"
 							>Prev. period</label
 						>
 						<Toggle
@@ -81,24 +79,64 @@
 							:small="!isMobileLayout"
 						/>
 					</div>
-					<div v-if="hasChartEvents" class="inline-flex items-center gap-2">
-						<label for="events-toggle" class="cursor-pointer text-sm text-secondary">Events</label>
-						<Toggle
-							id="events-toggle"
-							v-model="showChartEvents"
-							:small="!isMobileLayout"
-						/>
-					</div>
-					<div v-if="hasProjectEvents" class="inline-flex items-center gap-2">
-						<label for="project-events-toggle" class="cursor-pointer text-sm text-secondary">
-							Project events
-						</label>
-						<Toggle
-							id="project-events-toggle"
-							v-model="showProjectEvents"
-							:small="!isMobileLayout"
-						/>
-					</div>
+					<Menu
+						v-if="hasTimelineEventSettings"
+						theme="analytics-events-menu"
+						placement="bottom-end"
+						:shown="isEventsMenuOpen"
+						:triggers="[]"
+						:popper-triggers="[]"
+						:aria-id="eventsMenuId"
+						no-auto-focus
+						@update:shown="isEventsMenuOpen = $event"
+					>
+						<button
+							ref="eventsMenuTrigger"
+							type="button"
+							:aria-expanded="isEventsMenuOpen"
+							:aria-controls="eventsMenuId"
+							class="font-base btn-dropdown-animation inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-sm font-medium text-secondary transition-all hover:text-contrast focus-visible:text-contrast"
+							@click="toggleEventsMenu"
+						>
+							<span>Events</span>
+							<DropdownIcon class="size-5" aria-hidden="true" />
+						</button>
+						<template #popper>
+							<div
+								ref="eventsMenuPanel"
+								role="dialog"
+								aria-label="Event display settings"
+								class="flex min-w-48 flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 text-sm shadow-2xl"
+							>
+								<div v-if="hasChartEvents" class="inline-flex items-center justify-between gap-4">
+									<label
+										:for="modrinthEventsToggleId"
+										class="cursor-pointer whitespace-nowrap text-sm text-primary"
+									>
+										Modrinth events
+									</label>
+									<Toggle
+										:id="modrinthEventsToggleId"
+										v-model="showChartEvents"
+										:small="!isMobileLayout"
+									/>
+								</div>
+								<div v-if="hasProjectEvents" class="inline-flex items-center justify-between gap-4">
+									<label
+										:for="projectEventsToggleId"
+										class="cursor-pointer whitespace-nowrap text-sm text-primary"
+									>
+										Project events
+									</label>
+									<Toggle
+										:id="projectEventsToggleId"
+										v-model="showProjectEvents"
+										:small="!isMobileLayout"
+									/>
+								</div>
+							</div>
+						</template>
+					</Menu>
 					<Tabs
 						:value="activeGraphViewMode"
 						:tabs="viewModeTabs"
@@ -330,7 +368,13 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon, InfoIcon } from '@modrinth/assets'
+import {
+	ChartAreaIcon,
+	ChartColumnBigIcon,
+	ChartSplineIcon,
+	DropdownIcon,
+	InfoIcon,
+} from '@modrinth/assets'
 import {
 	ButtonStyled,
 	injectModrinthClient,
@@ -342,7 +386,7 @@ import {
 	useScrollIndicator,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
-import { Dropdown } from 'floating-vue'
+import { Dropdown, Menu } from 'floating-vue'
 
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
@@ -489,6 +533,7 @@ const localProjectChartEvents = computed<AnalyticsChartEvent[]>(() =>
 		})),
 )
 const hasProjectEvents = computed(() => localProjectChartEvents.value.length > 0)
+const hasTimelineEventSettings = computed(() => hasChartEvents.value || hasProjectEvents.value)
 const visibleProjectChartEvents = computed(() =>
 	showProjectEvents.value ? localProjectChartEvents.value : [],
 )
@@ -497,15 +542,11 @@ const visibleTimelineEvents = computed(() => [
 	...visibleProjectChartEvents.value,
 ])
 const hasVisibleTimelineEvents = computed(
-	() =>
-		visibleModrinthChartEvents.value.length > 0 ||
-		visibleProjectChartEvents.value.length > 0,
+	() => visibleModrinthChartEvents.value.length > 0 || visibleProjectChartEvents.value.length > 0,
 )
 
 function formatProjectStatusLabel(status: Labrinth.Projects.v2.ProjectStatus) {
-	return status
-		.replace(/[_-]/g, ' ')
-		.replace(/\b\w/g, (character) => character.toUpperCase())
+	return status.replace(/[_-]/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase())
 }
 
 function getProjectEventTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
@@ -844,6 +885,8 @@ const selectableChartDatasets = computed(() => {
 
 const chartContainer = ref<HTMLElement | null>(null)
 const legendContainer = ref<HTMLElement | null>(null)
+const eventsMenuTrigger = ref<HTMLElement | null>(null)
+const eventsMenuPanel = ref<HTMLElement | null>(null)
 const chartTooltip = ref<InstanceType<typeof AnalyticsChartTooltip> | null>(null)
 const showAllSelectedGraphDatasetsModal = ref<InstanceType<typeof NewModal> | null>(null)
 const chartGeometry = ref<AnalyticsChartGeometryPayload | null>(null)
@@ -872,6 +915,7 @@ onMounted(() => {
 	window.addEventListener('keyup', updateShiftKeyState)
 	window.addEventListener('blur', clearShiftKeyState)
 	document.addEventListener('click', onDocumentClick, true)
+	document.addEventListener('pointerdown', onEventsMenuDocumentPointerDown, true)
 })
 
 onBeforeUnmount(() => {
@@ -881,6 +925,7 @@ onBeforeUnmount(() => {
 	window.removeEventListener('keyup', updateShiftKeyState)
 	window.removeEventListener('blur', clearShiftKeyState)
 	document.removeEventListener('click', onDocumentClick, true)
+	document.removeEventListener('pointerdown', onEventsMenuDocumentPointerDown, true)
 	if (clearIgnoredChartClickTimeout) {
 		clearTimeout(clearIgnoredChartClickTimeout)
 		clearIgnoredChartClickTimeout = null
@@ -906,6 +951,10 @@ const ignoreNextChartClick = ref(false)
 const hoveredLegendEntryId = ref<string | null>(null)
 const isLegendExpanded = ref(false)
 const isShiftKeyPressed = ref(false)
+const isEventsMenuOpen = ref(false)
+const eventsMenuId = useId()
+const modrinthEventsToggleId = useId()
+const projectEventsToggleId = useId()
 const monetizationPopoverId = useId()
 const promotedCollapsedLegendEntryIds = ref<string[]>([])
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
@@ -982,6 +1031,17 @@ function onDocumentClick(event: MouseEvent) {
 	if (!isHoverPinned.value) return
 	if (event.target instanceof Node && chartContainer.value?.contains(event.target)) return
 	unpinHoverState()
+}
+
+function toggleEventsMenu() {
+	isEventsMenuOpen.value = !isEventsMenuOpen.value
+}
+
+function onEventsMenuDocumentPointerDown(event: PointerEvent) {
+	if (!isEventsMenuOpen.value || !(event.target instanceof Node)) return
+	if (eventsMenuTrigger.value?.contains(event.target)) return
+	if (eventsMenuPanel.value?.contains(event.target)) return
+	isEventsMenuOpen.value = false
 }
 
 function onChartHover(payload: HoverState) {
@@ -1582,6 +1642,18 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 }
 
 .v-popper--theme-analytics-monetization-popover .v-popper__arrow-container {
+	display: none;
+}
+
+.v-popper--theme-analytics-events-menu .v-popper__inner {
+	overflow: visible !important;
+	background: transparent !important;
+	padding: 0 !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+.v-popper--theme-analytics-events-menu .v-popper__arrow-container {
 	display: none;
 }
 </style>
