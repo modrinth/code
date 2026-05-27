@@ -143,39 +143,6 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000
 const ONE_HOUR_MS = 60 * 60 * 1000
 const ONE_MINUTE_MS = 60 * 1000
 
-function getDayPeriod(date: Date, options: Intl.DateTimeFormatOptions): string | null {
-	return (
-		new Intl.DateTimeFormat(undefined, options)
-			.formatToParts(date)
-			.find((part) => part.type === 'dayPeriod')?.value ?? null
-	)
-}
-
-function formatDateWithoutDayPeriod(date: Date, options: Intl.DateTimeFormatOptions): string {
-	const parts = new Intl.DateTimeFormat(undefined, options).formatToParts(date)
-	const dayPeriodIndex = parts.findIndex((part) => part.type === 'dayPeriod')
-	if (dayPeriodIndex === -1) return parts.map((part) => part.value).join('')
-
-	const previousPart = parts[dayPeriodIndex - 1]
-	const nextPart = parts[dayPeriodIndex + 1]
-
-	parts.splice(dayPeriodIndex, 1)
-
-	if (previousPart?.type === 'literal') {
-		parts[dayPeriodIndex - 1] = {
-			...previousPart,
-			value: previousPart.value.replace(/\s+$/, ''),
-		}
-	} else if (nextPart?.type === 'literal') {
-		parts[dayPeriodIndex] = {
-			...nextPart,
-			value: nextPart.value.replace(/^\s+/, ''),
-		}
-	}
-
-	return parts.map((part) => part.value).join('')
-}
-
 function formatRangeLabel(
 	start: Date,
 	end: Date,
@@ -188,10 +155,9 @@ function formatRangeLabel(
 		chartStart !== null && chartEnd !== null && chartStart.getFullYear() !== chartEnd.getFullYear()
 	const showTrailingYear = !yearsDiffer && chartYearsDiffer
 	const monthsDiffer = yearsDiffer || start.getMonth() !== end.getMonth()
-	const daysDiffer = monthsDiffer || start.getDate() !== end.getDate()
 
 	const timeOptions: Intl.DateTimeFormatOptions = includeTime
-		? { hour: 'numeric', minute: '2-digit' }
+		? { hour: 'numeric', minute: '2-digit', hour12: true }
 		: {}
 
 	const startOptions: Intl.DateTimeFormatOptions = {
@@ -201,23 +167,27 @@ function formatRangeLabel(
 		...timeOptions,
 	}
 
+	if (includeTime) {
+		const startLabel = new Intl.DateTimeFormat(undefined, startOptions).format(start)
+		const endLabel = new Intl.DateTimeFormat(undefined, timeOptions).format(end)
+		const range = `${startLabel}–${endLabel}`
+
+		if (!showTrailingYear) return range
+
+		const yearLabel = new Intl.DateTimeFormat(undefined, { year: 'numeric' }).format(end)
+		return `${range}, ${yearLabel}`
+	}
+
 	let endOptions: Intl.DateTimeFormatOptions
-	if (!daysDiffer && includeTime) {
-		endOptions = { ...timeOptions }
-	} else if (yearsDiffer) {
-		endOptions = { month: 'short', day: 'numeric', year: 'numeric', ...timeOptions }
-	} else if (monthsDiffer || includeTime) {
-		endOptions = { month: 'short', day: 'numeric', ...timeOptions }
+	if (yearsDiffer) {
+		endOptions = { month: 'short', day: 'numeric', year: 'numeric' }
+	} else if (monthsDiffer) {
+		endOptions = { month: 'short', day: 'numeric' }
 	} else {
 		endOptions = { day: 'numeric' }
 	}
 
-	const startDayPeriod = includeTime ? getDayPeriod(start, timeOptions) : null
-	const endDayPeriod = includeTime ? getDayPeriod(end, timeOptions) : null
-	const showEndDayPeriodOnly = startDayPeriod !== null && startDayPeriod === endDayPeriod
-	const startLabel = showEndDayPeriodOnly
-		? formatDateWithoutDayPeriod(start, startOptions)
-		: new Intl.DateTimeFormat(undefined, startOptions).format(start)
+	const startLabel = new Intl.DateTimeFormat(undefined, startOptions).format(start)
 	const endLabel = new Intl.DateTimeFormat(undefined, endOptions).format(end)
 	const range = `${startLabel}–${endLabel}`
 
