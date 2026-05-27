@@ -31,8 +31,8 @@ import {
 } from 'chart.js'
 
 import {
-	injectAnalyticsDashboardContext,
 	type AnalyticsDashboardStat,
+	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
 import { type ChartDataset, DEFAULT_X_AXIS_TICK_LIMIT, formatAxisValue } from './utils'

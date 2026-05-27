@@ -976,11 +976,6 @@ function getNextSelectedFilters(
 	selectedValues: string[],
 ): DropdownFilterBarValue {
 	const nextFilters = cloneSelectedFilters(currentFilters)
-	const shouldAppendCategory = (currentFilters[categoryKey] ?? []).length === 0
-
-	if (shouldAppendCategory) {
-		delete nextFilters[categoryKey]
-	}
 
 	nextFilters[categoryKey] = selectedValues
 	return nextFilters

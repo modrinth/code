@@ -284,10 +284,7 @@ export namespace Labrinth {
 					AffiliateCodeConversionsField,
 					AffiliateCodeConversionsFilters
 				>
-				affiliate_code_revenue?: Metrics<
-					AffiliateCodeRevenueField,
-					AffiliateCodeRevenueFilters
-				>
+				affiliate_code_revenue?: Metrics<AffiliateCodeRevenueField, AffiliateCodeRevenueFilters>
 			}
 
 			export type Metrics<BucketBy, FilterBy> = {
