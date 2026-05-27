@@ -11,6 +11,32 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-27T22:30:20+00:00`,
+		product: 'app',
+		version: '0.14.0',
+		body: `## Changed
+- Renamed the Skins page to Skin selector and removed its beta label.
+- Redesigned the Skin selector with a sticky preview, larger skin cards, and collapsible skin pack sections.
+- Moved PNG skin uploads from a separate modal to the Add skin card in Saved skins.
+- Changed cape selection so each saved skin controls its own cape instead of using a separate default cape.
+- Moved cape selection into the Edit skin modal, with a \`None\` option for saving skins without capes.
+- Updated skin previews for more consistent framing across the Skin selector, skin editor, and skin cards.
+- Skin and cape changes made outside Modrinth App are now reflected when the Skin selector refreshes or on app launch safely.
+- Images from \`user-images.githubusercontent.com\` will no longer be proxied.
+
+## Fixed
+- Fixed duplicate saved skin cards appearing when the same texture was saved with different arm or cape settings.
+- Fixed skins equipped outside Modrinth App disappearing from the Skin selector after switching to another skin.
+- Fixed skin selection hanging when a skin texture download stopped responding.
+- Fixed the hide nametag setting not updating the Skin selector preview until the page refreshed.`,
+	},
+	{
+		date: `2026-05-27T22:30:20+00:00`,
+		product: 'web',
+		body: `## Changed
+- Images from \`user-images.githubusercontent.com\` will no longer be proxied.`,
+	},
+	{
 		date: `2026-05-24T17:46:23+00:00`,
 		product: 'web',
 		body: `## Changed
