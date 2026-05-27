@@ -122,10 +122,18 @@ type PositionedEvent = AnalyticsChartEvent & {
 type EventGroup = {
 	id: string
 	x: number
+	xSum: number
 	markerOffsetX: number
 	markerIcon: AnalyticsChartEventMarkerIcon
 	groupKey: string
 	events: PositionedEvent[]
+}
+
+type CollisionClusterLayout = {
+	groups: EventGroup[]
+	markerWidths: number[]
+	left: number
+	right: number
 }
 
 const props = defineProps<{
@@ -211,6 +219,8 @@ const visibleEvents = computed<PositionedEvent[]>(() => {
 	const endMs = chartEndMs.value
 	if (!geometry || startMs === null || endMs === null || endMs <= startMs) return []
 
+	const bucketXByDate = getBucketXByDate(geometry, startMs, endMs)
+
 	return props.events
 		.filter((event) => doesEventMatchActiveStat(event))
 		.map((event) => {
@@ -220,8 +230,22 @@ const visibleEvents = computed<PositionedEvent[]>(() => {
 			if (eventEndMs < eventStartMs) return null
 			if (eventEndMs < startMs || eventStartMs > endMs) return null
 
-			const x = getDateBucketX(event.starts, eventStartMs, geometry, startMs, endMs)
-			const endX = getDateBucketX(event.ends, eventEndMs, geometry, startMs, endMs)
+			const x = getDateBucketX(
+				event.starts,
+				eventStartMs,
+				geometry,
+				startMs,
+				endMs,
+				bucketXByDate,
+			)
+			const endX = getDateBucketX(
+				event.ends,
+				eventEndMs,
+				geometry,
+				startMs,
+				endMs,
+				bucketXByDate,
+			)
 			if (x === null || endX === null) return null
 
 			return {
@@ -286,16 +310,15 @@ function mergeNearbyEventGroupsOnce(groups: EventGroup[]) {
 	let didMerge = false
 
 	for (const group of groups) {
-		const nextGroup = cloneEventGroup(group)
-		const previousGroup = previousGroupsByKey.get(nextGroup.groupKey)
-		if (previousGroup && shouldMergeEventGroups(previousGroup, nextGroup)) {
-			mergeEventGroup(previousGroup, nextGroup)
+		const previousGroup = previousGroupsByKey.get(group.groupKey)
+		if (previousGroup && shouldMergeEventGroups(previousGroup, group)) {
+			mergeEventGroup(previousGroup, group)
 			didMerge = true
 			continue
 		}
 
-		mergedGroups.push(nextGroup)
-		previousGroupsByKey.set(nextGroup.groupKey, nextGroup)
+		mergedGroups.push(group)
+		previousGroupsByKey.set(group.groupKey, group)
 	}
 
 	return {
@@ -425,17 +448,11 @@ function createEventGroup(event: PositionedEvent): EventGroup {
 	return {
 		id: getEventKey(event),
 		x: event.x,
+		xSum: event.x,
 		markerOffsetX: 0,
 		markerIcon: event.markerIcon,
 		groupKey: event.groupKey,
 		events: [event],
-	}
-}
-
-function cloneEventGroup(group: EventGroup): EventGroup {
-	return {
-		...group,
-		events: [...group.events],
 	}
 }
 
@@ -447,9 +464,45 @@ function shouldMergeEventGroups(left: EventGroup, right: EventGroup) {
 }
 
 function mergeEventGroup(target: EventGroup, source: EventGroup) {
-	target.events.push(...source.events)
-	target.events.sort((left, right) => left.x - right.x || left.startMs - right.startMs)
-	target.x = target.events.reduce((sum, event) => sum + event.x, 0) / target.events.length
+	target.events = mergeSortedGroupEvents(target.events, source.events)
+	target.xSum += source.xSum
+	target.x = target.xSum / target.events.length
+}
+
+// Both event arrays are already sorted, so this does the merge step from merge sort.
+function mergeSortedGroupEvents(leftEvents: PositionedEvent[], rightEvents: PositionedEvent[]) {
+	const mergedEvents: PositionedEvent[] = []
+	let leftIndex = 0
+	let rightIndex = 0
+
+	while (leftIndex < leftEvents.length && rightIndex < rightEvents.length) {
+		const left = leftEvents[leftIndex]
+		const right = rightEvents[rightIndex]
+		if (compareGroupEvents(left, right) <= 0) {
+			mergedEvents.push(left)
+			leftIndex++
+			continue
+		}
+
+		mergedEvents.push(right)
+		rightIndex++
+	}
+
+	while (leftIndex < leftEvents.length) {
+		mergedEvents.push(leftEvents[leftIndex])
+		leftIndex++
+	}
+
+	while (rightIndex < rightEvents.length) {
+		mergedEvents.push(rightEvents[rightIndex])
+		rightIndex++
+	}
+
+	return mergedEvents
+}
+
+function compareGroupEvents(left: PositionedEvent, right: PositionedEvent) {
+	return left.x - right.x || left.startMs - right.startMs
 }
 
 function getGroupMarkerGap(left: EventGroup, right: EventGroup) {
@@ -499,45 +552,45 @@ function getMarkerIconOrder(markerIcon: AnalyticsChartEventMarkerIcon) {
 }
 
 function getStableCollisionClusterLayouts(clusters: EventGroup[][]) {
-	let nextClusters = clusters
-	let didMerge = true
+	let layouts = clusters.map(getCollisionClusterLayout).sort(compareCollisionClusterLayouts)
 
-	while (didMerge) {
-		const mergedClusters: EventGroup[][] = []
-		const layouts = nextClusters.map(getCollisionClusterLayout).sort(compareCollisionClusterLayouts)
-		didMerge = false
+	while (true) {
+		const mergedLayouts: CollisionClusterLayout[] = []
+		let didMerge = false
 
 		for (const layout of layouts) {
-			const previousCluster = mergedClusters[mergedClusters.length - 1]
-			if (!previousCluster) {
-				mergedClusters.push([...layout.groups])
+			const previousLayout = mergedLayouts[mergedLayouts.length - 1]
+			if (!previousLayout) {
+				mergedLayouts.push(layout)
 				continue
 			}
 
-			const previousLayout = getCollisionClusterLayout(previousCluster)
 			if (layout.left - previousLayout.right <= GROUP_MARKER_GAP_PX) {
-				previousCluster.push(...layout.groups)
+				mergedLayouts[mergedLayouts.length - 1] = getCollisionClusterLayout([
+					...previousLayout.groups,
+					...layout.groups,
+				])
 				didMerge = true
 				continue
 			}
 
-			mergedClusters.push([...layout.groups])
+			mergedLayouts.push(layout)
 		}
 
-		nextClusters = mergedClusters
-	}
+		if (!didMerge) return mergedLayouts
 
-	return nextClusters.map(getCollisionClusterLayout).sort(compareCollisionClusterLayouts)
+		layouts = mergedLayouts.sort(compareCollisionClusterLayouts)
+	}
 }
 
 function compareCollisionClusterLayouts(
-	left: ReturnType<typeof getCollisionClusterLayout>,
-	right: ReturnType<typeof getCollisionClusterLayout>,
+	left: CollisionClusterLayout,
+	right: CollisionClusterLayout,
 ) {
 	return left.left - right.left || left.right - right.right
 }
 
-function getCollisionClusterLayout(groups: EventGroup[]) {
+function getCollisionClusterLayout(groups: EventGroup[]): CollisionClusterLayout {
 	const sortedGroups = [...groups].sort(
 		(left, right) =>
 			getMarkerIconOrder(left.markerIcon) - getMarkerIconOrder(right.markerIcon) ||
@@ -577,12 +630,39 @@ function getClampedMarkerCenterX(group: EventGroup) {
 	return clamp(group.x + group.markerOffsetX, minX, maxX)
 }
 
+function getBucketXByDate(
+	geometry: AnalyticsChartGeometryPayload,
+	startMs: number,
+	endMs: number,
+) {
+	if (isTimeRelevantForGroupBy(props.groupBy)) return null
+
+	const xPositions = geometry.xPositions
+	const bucketMs = xPositions.length > 0 ? (endMs - startMs) / xPositions.length : 0
+	if (bucketMs <= 0) return null
+
+	const bucketXByDate = new Map<string, number>()
+	for (let index = 0; index < xPositions.length; index++) {
+		const x = xPositions[index]
+		if (!Number.isFinite(x)) continue
+
+		const bucketDate = getBucketDateForEventSnap(index, bucketMs, startMs)
+		const dateValue = getDateInputValue(bucketDate)
+		if (!bucketXByDate.has(dateValue)) {
+			bucketXByDate.set(dateValue, x)
+		}
+	}
+
+	return bucketXByDate
+}
+
 function getDateBucketX(
 	value: string,
 	fallbackMs: number,
 	geometry: AnalyticsChartGeometryPayload,
 	startMs: number,
 	endMs: number,
+	bucketXByDate: Map<string, number> | null,
 ) {
 	if (isTimeRelevantForGroupBy(props.groupBy)) {
 		const clampedMs = Math.max(startMs, Math.min(endMs, fallbackMs))
@@ -590,19 +670,9 @@ function getDateBucketX(
 	}
 
 	const dateInputValue = getEventDateInputValue(value)
-	const xPositions = geometry.xPositions
-	const bucketMs = xPositions.length > 0 ? (endMs - startMs) / xPositions.length : 0
-	if (!dateInputValue || bucketMs <= 0) {
-		const clampedMs = Math.max(startMs, Math.min(endMs, fallbackMs))
-		return getTimeAxisX(clampedMs, geometry, startMs, endMs)
-	}
-
-	for (let index = 0; index < xPositions.length; index++) {
-		const bucketDate = getBucketDateForEventSnap(index, bucketMs, startMs)
-		if (getDateInputValue(bucketDate) === dateInputValue) {
-			const x = xPositions[index]
-			return Number.isFinite(x) ? x : null
-		}
+	if (dateInputValue && bucketXByDate) {
+		const x = bucketXByDate.get(dateInputValue)
+		if (x !== undefined) return x
 	}
 
 	const clampedMs = Math.max(startMs, Math.min(endMs, fallbackMs))
