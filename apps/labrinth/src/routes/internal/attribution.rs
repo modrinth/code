@@ -81,7 +81,7 @@ struct ModerationExternalLicenseResponse {
 }
 
 #[utoipa::path]
-#[get("{project_id}")]
+#[get("/{project_id}")]
 async fn list(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -298,7 +298,7 @@ struct UpdateGroupBody {
 }
 
 #[utoipa::path]
-#[patch("group/{group_id}")]
+#[patch("/group/{group_id}")]
 async fn update_group(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -368,7 +368,7 @@ struct AssignBody {
 }
 
 #[utoipa::path]
-#[post("assign")]
+#[post("/assign")]
 async fn assign(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -386,9 +386,13 @@ async fn assign(
     .await?
     .1;
 
-    let sha1_bytes = hex_to_bytes(&body.sha1).ok_or_else(|| {
-        ApiError::InvalidInput("invalid sha1 hex string".to_string())
-    })?;
+    let sha1 = body.sha1.trim().to_lowercase();
+    if hex_to_bytes(&sha1).is_none() {
+        return Err(ApiError::InvalidInput(
+            "invalid sha1 hex string".to_string(),
+        ));
+    }
+    let sha1_bytes = sha1.as_bytes().to_vec();
     let project_id: DBProjectId = body.project_id.into();
 
     let source_group_id = sqlx::query_scalar!(
@@ -467,7 +471,7 @@ struct SplitBody {
 }
 
 #[utoipa::path]
-#[post("split")]
+#[post("/split")]
 async fn split(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -485,9 +489,13 @@ async fn split(
     .await?
     .1;
 
-    let sha1_bytes = hex_to_bytes(&body.sha1).ok_or_else(|| {
-        ApiError::InvalidInput("invalid sha1 hex string".to_string())
-    })?;
+    let sha1 = body.sha1.trim().to_lowercase();
+    if hex_to_bytes(&sha1).is_none() {
+        return Err(ApiError::InvalidInput(
+            "invalid sha1 hex string".to_string(),
+        ));
+    }
+    let sha1_bytes = sha1.as_bytes().to_vec();
     let project_id: DBProjectId = body.project_id.into();
 
     let existing = sqlx::query!(
