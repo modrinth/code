@@ -116,6 +116,7 @@ const EMPTY_DATA_Y_AXIS_STEP = 2
 const Y_AXIS_WIDTH = 44
 const SECONDS_PER_HOUR = 60 * 60
 const DIMMED_SERIES_OPACITY = 0.5
+const DIMMED_SERIES_COLOR = 'var(--color-text-tertiary)'
 const BAR_BACKGROUND_OPACITY = 0.85
 const AREA_BACKGROUND_OPACITY = 0.3
 const SERIES_OPACITY_TRANSITION_MS = 150
@@ -376,11 +377,13 @@ function resolveCssColor(color: string): string {
 	return resolvedColor || color
 }
 
-function getTargetDatasetOpacity(index: number) {
+function isDatasetDimmed(index: number) {
 	const dataset = props.datasets[index]
 	return props.highlightedDatasetId !== null && dataset?.projectId !== props.highlightedDatasetId
-		? DIMMED_SERIES_OPACITY
-		: 1
+}
+
+function getTargetDatasetOpacity(index: number) {
+	return isDatasetDimmed(index) ? DIMMED_SERIES_OPACITY : 1
 }
 
 function getDatasetOpacity(index: number) {
@@ -389,9 +392,13 @@ function getDatasetOpacity(index: number) {
 
 function getDatasetColors(dataset: ChartDataset, index: number) {
 	const opacity = getDatasetOpacity(index)
+	const baseBorderColor = isDatasetDimmed(index) ? DIMMED_SERIES_COLOR : dataset.borderColor
+	const baseBackgroundColor = isDatasetDimmed(index)
+		? DIMMED_SERIES_COLOR
+		: dataset.backgroundColor
 	return {
-		borderColor: withAlpha(resolveCssColor(dataset.borderColor), opacity),
-		backgroundColor: resolveCssColor(dataset.backgroundColor),
+		borderColor: withAlpha(resolveCssColor(baseBorderColor), opacity),
+		backgroundColor: resolveCssColor(baseBackgroundColor),
 		opacity,
 	}
 }
