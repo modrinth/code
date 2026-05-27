@@ -60,6 +60,20 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+export const RepeatInteract: Story = {
+	render: (args) => ({
+		components: { SkinPreviewRenderer },
+		setup() {
+			return { args }
+		},
+		template: /* html */ `
+			<div class="h-[80vh] min-h-[32rem] max-h-[48rem] w-[22rem]">
+				<SkinPreviewRenderer v-bind="args" />
+			</div>
+		`,
+	}),
+}
+
 export const ResponsiveFit: Story = {
 	args: {
 		lockFit: false,

@@ -51,9 +51,9 @@
 		>
 			<Suspense>
 				<Group
-					:rotation="[0, modelRotation, 0]"
-					:position="modelGroupPosition"
-					:scale="modelGroupScale"
+					:rotation="animatedModelGroupRotation"
+					:position="animatedModelGroupPosition"
+					:scale="animatedModelGroupScale"
 				>
 					<Group :position="modelOffset">
 						<primitive v-if="scene" :object="scene" />
@@ -83,10 +83,7 @@
 			<TresDirectionalLight :position="[-3, 4, -2]" :intensity="1.2" />
 		</TresCanvas>
 
-		<div
-			v-if="showLoading"
-			class="absolute inset-0 flex items-center justify-center"
-		>
+		<div v-if="showLoading" class="absolute inset-0 flex items-center justify-center">
 			<div class="text-primary">Loading...</div>
 		</div>
 	</div>
@@ -286,8 +283,28 @@ const currentAnimation = ref<string>('')
 const randomAnimationTimer = ref<number | null>(null)
 const lastRandomAnimation = ref<string>('')
 const animationFinishedListeners: AnimationFinishedListener[] = []
+
+const INTERACT_ANIMATION_NAME = 'interact'
+// TODO: apply fix in future to model-level
+const INTERACT_VISIBLE_DURATION_SECONDS = 0.5
+const CLICK_IMPULSE_MAX_ENERGY = 5
+const CLICK_IMPULSE_ENERGY_PER_CLICK = 1
+const CLICK_IMPULSE_DECAY_PER_SECOND = 6
+const CLICK_IMPULSE_BASE_SPEED = 18
+const CLICK_IMPULSE_SPEED_BOOST = 7
+const CLICK_IMPULSE_OFFSET_X = 0.035
+const CLICK_IMPULSE_ROTATION_Z = 0.055
+const CLICK_IMPULSE_SCALE_X = 0.018
+const CLICK_IMPULSE_SCALE_Y = 0.025
 let modelLoadVersion = 0
 let isUnmounted = false
+
+const clickImpulseEnergy = ref(0)
+const clickImpulsePhase = ref(0)
+const clickImpulseOffsetX = ref(0)
+const clickImpulseRotationZ = ref(0)
+const clickImpulseScaleX = ref(1)
+const clickImpulseScaleY = ref(1)
 
 const radialSpotlightShader = computed(() => ({
 	uniforms: {
@@ -379,6 +396,22 @@ const modelGroupScale = computed<[number, number, number]>(() => {
 
 	const scale = 0.8 * legacyScale.value
 	return [scale, scale, scale]
+})
+
+const animatedModelGroupRotation = computed<[number, number, number]>(() => [
+	0,
+	modelRotation.value,
+	clickImpulseRotationZ.value,
+])
+
+const animatedModelGroupPosition = computed<[number, number, number]>(() => {
+	const [x, y, z] = modelGroupPosition.value
+	return [x + clickImpulseOffsetX.value, y, z]
+})
+
+const animatedModelGroupScale = computed<[number, number, number]>(() => {
+	const [x, y, z] = modelGroupScale.value
+	return [x * clickImpulseScaleX.value, y * clickImpulseScaleY.value, z]
 })
 
 const fittedCamera = computed(() => {
@@ -486,6 +519,10 @@ function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.Animatio
 	actions.value = {}
 
 	clips.forEach((clip) => {
+		if (clip.name === INTERACT_ANIMATION_NAME) {
+			clip.duration = INTERACT_VISIBLE_DURATION_SECONDS
+		}
+
 		const action = mixer.value!.clipAction(clip)
 
 		action.setLoop(THREE.LoopOnce, 1)
@@ -626,6 +663,7 @@ function playRandomAnimation(name: string) {
 	action.reset()
 	action.setLoop(THREE.LoopOnce, 1)
 	action.clampWhenFinished = true
+	action.setEffectiveTimeScale(1)
 	action.fadeIn(transitionDuration)
 	action.play()
 
@@ -638,6 +676,7 @@ function playRandomAnimation(name: string) {
 				action.fadeOut(transitionDuration)
 				const baseAction = actions.value[baseAnimation.value]
 				baseAction.reset()
+				baseAction.setEffectiveTimeScale(1)
 				baseAction.fadeIn(transitionDuration)
 				baseAction.play()
 				currentAnimation.value = baseAnimation.value
@@ -649,6 +688,38 @@ function playRandomAnimation(name: string) {
 	}
 
 	addAnimationFinishedListener(onFinished)
+	randomAnimationFinishedListeners.set(action, onFinished)
+}
+
+function addClickImpulse() {
+	clickImpulseEnergy.value = Math.min(
+		CLICK_IMPULSE_MAX_ENERGY,
+		clickImpulseEnergy.value + CLICK_IMPULSE_ENERGY_PER_CLICK,
+	)
+}
+
+function updateClickImpulse(delta: number) {
+	const energy = Math.max(0, clickImpulseEnergy.value - CLICK_IMPULSE_DECAY_PER_SECOND * delta)
+	clickImpulseEnergy.value = energy
+
+	if (energy <= 0) {
+		clickImpulseOffsetX.value = 0
+		clickImpulseRotationZ.value = 0
+		clickImpulseScaleX.value = 1
+		clickImpulseScaleY.value = 1
+		return
+	}
+
+	const intensity = energy / CLICK_IMPULSE_MAX_ENERGY
+	clickImpulsePhase.value += delta * (CLICK_IMPULSE_BASE_SPEED + energy * CLICK_IMPULSE_SPEED_BOOST)
+
+	const shake = Math.sin(clickImpulsePhase.value) * intensity
+	const squash = Math.abs(Math.sin(clickImpulsePhase.value * 1.7)) * intensity
+
+	clickImpulseOffsetX.value = shake * CLICK_IMPULSE_OFFSET_X
+	clickImpulseRotationZ.value = shake * CLICK_IMPULSE_ROTATION_Z
+	clickImpulseScaleX.value = 1 + squash * CLICK_IMPULSE_SCALE_X
+	clickImpulseScaleY.value = 1 - squash * CLICK_IMPULSE_SCALE_Y
 }
 
 function stopAnimations() {
@@ -766,9 +837,13 @@ defineExpose({
 
 const { onLoop } = useRenderLoop()
 onLoop(() => {
+	const delta = clock.getDelta()
+
 	if (mixer.value) {
-		mixer.value.update(clock.getDelta())
+		mixer.value.update(delta)
 	}
+
+	updateClickImpulse(delta)
 })
 
 const SKIN_LAYER_DEPTH_OFFSET: Record<string, number> = {
@@ -983,8 +1058,10 @@ function onPointerUp(event: PointerEvent) {
 
 function onCanvasClick() {
 	if (!hasDragged.value) {
-		if (actions.value['interact']) {
-			playRandomAnimation('interact')
+		addClickImpulse()
+
+		if (actions.value[INTERACT_ANIMATION_NAME]) {
+			playRandomAnimation(INTERACT_ANIMATION_NAME)
 		}
 	}
 
