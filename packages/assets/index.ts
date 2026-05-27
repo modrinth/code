@@ -64,11 +64,12 @@ import _YouTubeIcon from './external/youtube.svg?component'
 import _YouTubeGaming from './external/youtubegaming.svg?component'
 import _YouTubeShortsIcon from './external/youtubeshorts.svg?component'
 // Tag icon helpers - import maps from generated-icons
+import _PrideBG from './branding/illustrations/pride-bg.png?url'
 import type { IconComponent } from './generated-icons'
 import { categoryIconMap, loaderIconMap } from './generated-icons'
 import _DoneIllustration from './illustrations/done.svg?component'
-import _EmptyIllustration from './illustrations/empty.svg?component'
 import _EmptyInboxIllustration from './illustrations/empty-inbox.svg?component'
+import _EmptyIllustration from './illustrations/empty.svg?component'
 import _ErrorIllustration from './illustrations/error.svg?component'
 import _NoConnectionIllustration from './illustrations/no-connection.svg?component'
 import _NoCreditCardIllustration from './illustrations/no-credit-card.svg?component'
@@ -133,6 +134,7 @@ export const PolygonIcon = _PolygonIcon
 export const USDCColorIcon = _USDCColorIcon
 export const VisaIcon = _VisaIcon
 export const MinecraftServerIcon = _MinecraftServerIcon
+export const PrideBG = _PrideBG
 
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'

@@ -29,7 +29,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	projectTypesPrimaryNav: false,
 	enableMedalPromotion: true,
 	hidePlusPromoInUserMenu: false,
-	projectBackground: false,
+	projectSearchBackground: false,
 	searchBackground: false,
 	advancedDebugInfo: false,
 	FilesRefreshButton: false,

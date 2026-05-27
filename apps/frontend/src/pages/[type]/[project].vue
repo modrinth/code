@@ -1,7 +1,10 @@
 <template>
 	<template v-if="project && projectV3Loaded">
-		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
-			<ProjectBackgroundGradient :project="project" />
+		<Teleport
+			v-if="flags.projectSearchBackground && !isSettings"
+			to="#absolute-background-teleport"
+		>
+			<div class="search-background" :style="{ '--search-background-image': `url(${PrideBG})` }"></div>
 		</Teleport>
 		<template v-if="isSettings">
 			<div v-if="canAccessSettings" class="normal-page no-sidebar">
@@ -1059,6 +1062,7 @@ import {
 	MoreVerticalIcon,
 	PlayIcon,
 	PlusIcon,
+	PrideBG,
 	ReportIcon,
 	ScaleIcon,
 	ScanEyeIcon,
@@ -1086,7 +1090,6 @@ import {
 	OverflowMenu,
 	PopoutMenu,
 	PROJECT_DEP_MARKER_QUERY,
-	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
 	ProjectHeader,
 	ProjectSidebarCompatibility,
@@ -2819,6 +2822,17 @@ provideProjectPageContext({
 
 .normal-page__info:empty {
 	display: none;
+}
+
+.search-background {
+	width: 100%;
+	height: 20rem;
+	background-image: var(--search-background-image);
+	background-size: cover;
+	background-position: 50% 25%;
+	pointer-events: none;
+	mask-image: linear-gradient(to bottom, black, transparent);
+	opacity: 0.25;
 }
 
 :deep(.accordion-with-bg) {
