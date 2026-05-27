@@ -129,9 +129,7 @@ pub async fn all_projects(
     let mut organizations = HashMap::new();
     let mut visible_organization_ids = Vec::new();
     for data in organizations_data {
-        if !is_visible_organization(&data, &user, &pool, &redis)
-            .await?
-        {
+        if !is_visible_organization(&data, &user, &pool, &redis).await? {
             continue;
         }
 
