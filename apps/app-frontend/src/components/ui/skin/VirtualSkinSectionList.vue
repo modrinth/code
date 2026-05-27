@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { DropdownIcon, EditIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
-import { Accordion, ButtonStyled, SkinButton, SkinLikeTextButton } from '@modrinth/ui'
+import {
+	Accordion,
+	ButtonStyled,
+	SkinButton,
+	SkinLikeTextButton,
+	useScrollViewport,
+} from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
@@ -60,11 +66,7 @@ const emit = defineEmits<{
 }>()
 
 const addSkinButton = useTemplateRef<SkinLikeTextButtonExpose>('addSkinButton')
-const listContainer = ref<HTMLElement | null>(null)
-const scrollContainer = ref<HTMLElement | Window | null>(null)
-const scrollTop = ref(0)
-const viewportHeight = ref(0)
-const containerOffset = ref(0)
+const { listContainer, relativeScrollTop, scrollContainer, viewportHeight } = useScrollViewport()
 const openSectionKeys = ref<Set<string>>(new Set())
 const hasSettledInitialLayout = ref(false)
 const knownSectionKeys = new Set<string>()
@@ -142,11 +144,8 @@ const visibleSections = computed<VirtualSkinSection[]>(() => {
 		return sectionLayouts.value.slice(0, 4)
 	}
 
-	const viewportStart = Math.max(0, scrollTop.value - containerOffset.value - SKIN_SECTION_OVERSCAN)
-	const viewportEnd =
-		Math.max(0, scrollTop.value - containerOffset.value) +
-		viewportHeight.value +
-		SKIN_SECTION_OVERSCAN
+	const viewportStart = Math.max(0, relativeScrollTop.value - SKIN_SECTION_OVERSCAN)
+	const viewportEnd = relativeScrollTop.value + viewportHeight.value + SKIN_SECTION_OVERSCAN
 
 	return sectionLayouts.value
 		.filter((layout) => layout.top + layout.height >= viewportStart && layout.top <= viewportEnd)
@@ -177,29 +176,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-watch(listContainer, (element, _previousElement, onCleanup) => {
-	if (!element || typeof window === 'undefined') return
-
-	const container = findScrollableAncestor(element)
-	scrollContainer.value = container
-	syncScrollState()
-
-	container.addEventListener('scroll', handleScroll, { passive: true })
-	window.addEventListener('resize', handleResize, { passive: true })
-
-	let resizeObserver: ResizeObserver | undefined
-	if (!(container instanceof Window)) {
-		resizeObserver = new ResizeObserver(syncScrollState)
-		resizeObserver.observe(container)
-	}
-
-	onCleanup(() => {
-		container.removeEventListener('scroll', handleScroll)
-		window.removeEventListener('resize', handleResize)
-		resizeObserver?.disconnect()
-	})
-})
 
 watch(
 	listWidth,
@@ -277,71 +253,6 @@ function getSectionHeightEstimate(section: SkinSection, index: number) {
 	const gridHeight = rowCount * cardHeight.value + Math.max(0, rowCount - 1) * SKIN_GRID_GAP
 
 	return spacing + SKIN_SECTION_HEADER_HEIGHT + SKIN_SECTION_CONTENT_SPACING + gridHeight
-}
-
-function findScrollableAncestor(element: HTMLElement): HTMLElement | Window {
-	let current: HTMLElement | null = element.parentElement
-
-	while (current) {
-		const { overflowY } = getComputedStyle(current)
-
-		if (overflowY === 'auto' || overflowY === 'scroll') {
-			return current
-		}
-
-		current = current.parentElement
-	}
-
-	return window
-}
-
-function getScrollTop(container: HTMLElement | Window) {
-	return container instanceof Window ? window.scrollY : container.scrollTop
-}
-
-function getViewportHeight(container: HTMLElement | Window) {
-	return container instanceof Window ? window.innerHeight : container.clientHeight
-}
-
-function updateContainerOffset() {
-	const container = scrollContainer.value
-	const listElement = listContainer.value
-
-	if (!container || !listElement) {
-		return
-	}
-
-	if (container instanceof Window) {
-		containerOffset.value = listElement.getBoundingClientRect().top + window.scrollY
-		return
-	}
-
-	const listRect = listElement.getBoundingClientRect()
-	const containerRect = container.getBoundingClientRect()
-	containerOffset.value = listRect.top - containerRect.top + container.scrollTop
-}
-
-function syncScrollState() {
-	if (!scrollContainer.value) {
-		return
-	}
-
-	scrollTop.value = getScrollTop(scrollContainer.value)
-	viewportHeight.value = getViewportHeight(scrollContainer.value)
-	updateContainerOffset()
-}
-
-function handleScroll() {
-	if (!scrollContainer.value) {
-		return
-	}
-
-	scrollTop.value = getScrollTop(scrollContainer.value)
-	updateContainerOffset()
-}
-
-function handleResize() {
-	syncScrollState()
 }
 
 function getAddSkinButtonElement() {
