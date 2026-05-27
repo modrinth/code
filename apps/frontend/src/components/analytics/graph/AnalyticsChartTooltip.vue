@@ -2,7 +2,7 @@
 	<div
 		v-show="visible"
 		ref="tooltipElement"
-		class="analytics-chart-tooltip absolute left-0 top-0 z-10 flex max-h-[360px] min-w-[14rem] flex-col overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
+		class="analytics-chart-tooltip absolute left-0 top-0 z-10 flex max-h-[360px] flex-col overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
 		:class="pinned ? '' : 'pointer-events-none'"
 		:style="positionStyle"
 		@click.stop
@@ -10,7 +10,7 @@
 		<div
 			class="mb-1.5 flex shrink-0 items-center justify-between gap-2 border-0 border-b border-solid border-surface-5 px-3 pb-1.5 font-medium text-contrast"
 		>
-			<span>
+			<span class="min-w-0 truncate">
 				{{ rangeLabel }}
 				<span v-if="durationLabel" class="text-xs font-normal text-secondary">
 					({{ durationLabel }})
@@ -34,11 +34,11 @@
 			<div
 				v-for="entry in entries"
 				:key="entry.projectId"
-				class="flex w-full items-center justify-between gap-4 text-primary"
+				class="flex w-full min-w-0 items-center justify-between gap-4 text-primary"
 			>
 				<button
 					type="button"
-					class="inline-flex items-center gap-1.5 border-0 bg-transparent p-0 text-left focus-visible:!outline-none"
+					class="inline-flex min-w-0 items-center gap-1.5 border-0 bg-transparent p-0 text-left focus-visible:!outline-none"
 					:class="
 						entry.toggleDisabled && !shiftKeyPressed
 							? 'cursor-default'
@@ -59,6 +59,7 @@
 								? 'h-0 w-2 rounded-none border-0 border-t-2 border-dashed bg-transparent'
 								: 'size-2 rounded-full'
 						"
+						class="shrink-0"
 						:style="
 							entry.isPreviousPeriod
 								? { borderColor: entry.color }
@@ -67,6 +68,7 @@
 					/>
 					<span
 						v-tooltip="entry.projectName ?? ''"
+						class="min-w-0 truncate"
 						:class="{
 							'line-through': entry.hidden,
 							capitalize: capitalizeLabels,
@@ -77,6 +79,7 @@
 				</button>
 				<span
 					:class="[
+						'shrink-0',
 						entry.isPreviousPeriod ? 'font-medium text-secondary' : 'font-semibold',
 						entry.hidden ? 'text-primary line-through opacity-70' : 'text-contrast',
 					]"
@@ -254,9 +257,16 @@ const viewportWidth = ref(0)
 
 const CURSOR_OFFSET = 12
 const EDGE_PADDING = 8
+const TOOLTIP_MAX_WIDTH = 26 * 16
 const WHEEL_DELTA_LINE = 1
 const WHEEL_DELTA_PAGE = 2
 const WHEEL_LINE_HEIGHT = 16
+
+function getTooltipFallbackWidth() {
+	const availableWidth = (viewportWidth.value || props.containerWidth) - EDGE_PADDING * 2
+	if (availableWidth <= 0) return TOOLTIP_MAX_WIDTH
+	return Math.min(TOOLTIP_MAX_WIDTH, availableWidth)
+}
 
 function updateTooltipMeasurements() {
 	nextTick(() => {
@@ -324,16 +334,20 @@ defineExpose({
 })
 
 const positionStyle = computed(() => {
+	const tooltipMaxWidth = getTooltipFallbackWidth()
+	const tooltipWidthForPosition = tooltipWidth.value || tooltipMaxWidth
 	const desiredLeft = props.x + CURSOR_OFFSET
 	const viewportRight = viewportWidth.value || tooltipOffsetParentLeft.value + props.containerWidth
-	const desiredViewportRight = tooltipOffsetParentLeft.value + desiredLeft + tooltipWidth.value
+	const desiredViewportRight = tooltipOffsetParentLeft.value + desiredLeft + tooltipWidthForPosition
 	const shouldPlaceLeft =
 		props.x <= props.containerWidth / 4 || desiredViewportRight > viewportRight - EDGE_PADDING
-	const candidateLeft = shouldPlaceLeft ? props.x - tooltipWidth.value - CURSOR_OFFSET : desiredLeft
+	const candidateLeft = shouldPlaceLeft
+		? props.x - tooltipWidthForPosition - CURSOR_OFFSET
+		: desiredLeft
 	const minLeft = EDGE_PADDING - tooltipOffsetParentLeft.value
 	const maxLeft = Math.max(
 		minLeft,
-		viewportRight - tooltipOffsetParentLeft.value - tooltipWidth.value - EDGE_PADDING,
+		viewportRight - tooltipOffsetParentLeft.value - tooltipWidthForPosition - EDGE_PADDING,
 	)
 	const clampedLeft = Math.min(maxLeft, Math.max(minLeft, candidateLeft))
 
@@ -342,6 +356,7 @@ const positionStyle = computed(() => {
 	const clampedTop = Math.min(maxTop, Math.max(EDGE_PADDING, desiredTop))
 
 	return {
+		'--analytics-chart-tooltip-max-width': `${tooltipMaxWidth}px`,
 		transform: `translate3d(${clampedLeft}px, ${clampedTop}px, 0)`,
 	}
 })
@@ -349,6 +364,8 @@ const positionStyle = computed(() => {
 
 <style scoped>
 .analytics-chart-tooltip {
+	min-width: min(14rem, var(--analytics-chart-tooltip-max-width, calc(100vw - 1rem)));
+	max-width: var(--analytics-chart-tooltip-max-width, min(26rem, calc(100vw - 1rem)));
 	transition: transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
 	will-change: transform;
 }
