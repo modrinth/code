@@ -39,7 +39,7 @@ const compactNumberFormatter = computed(
 	() =>
 		new Intl.NumberFormat(undefined, {
 			notation: 'compact',
-			maximumSignificantDigits: 3,
+			maximumSignificantDigits: 2,
 		}),
 )
 
