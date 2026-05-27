@@ -139,7 +139,7 @@
 						>
 							<button
 								type="button"
-								class="flex h-8 w-8 cursor-pointer items-center justify-center border-0 border-r border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
+								class="flex h-8 w-8 touch-manipulation cursor-pointer items-center justify-center border-0 border-r border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
 								:aria-label="formatMessage(messages.decreaseAmount)"
 								@click.stop="decrementAmount"
 							>
@@ -150,7 +150,7 @@
 								type="number"
 								min="1"
 								step="1"
-								class="h-8 w-12 border-0 bg-transparent px-1 text-center text-sm font-semibold text-primary outline-none ring-0 focus:outline-none focus-visible:shadow-none"
+								class="h-8 w-12 touch-manipulation border-0 bg-transparent px-1 text-center text-sm font-semibold text-primary outline-none ring-0 focus:outline-none focus-visible:shadow-none"
 								:aria-label="formatMessage(messages.timeframeAmount)"
 								@focus="activateLastTimeframe"
 								@input="handleAmountInput"
@@ -159,7 +159,7 @@
 							/>
 							<button
 								type="button"
-								class="flex h-8 w-8 cursor-pointer items-center justify-center border-0 border-l border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
+								class="flex h-8 w-8 touch-manipulation cursor-pointer items-center justify-center border-0 border-l border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
 								:aria-label="formatMessage(messages.increaseAmount)"
 								@click.stop="incrementAmount"
 							>
@@ -168,7 +168,7 @@
 						</div>
 						<select
 							v-model="draftSelectedLastTimeframeUnit"
-							class="h-8 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
+							class="h-8 touch-manipulation rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
 							:aria-label="formatMessage(messages.timeframeUnit)"
 							@change="handleLastTimeframeUnitChange"
 						>

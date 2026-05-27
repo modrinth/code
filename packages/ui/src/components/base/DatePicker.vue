@@ -35,7 +35,7 @@
 		<button
 			v-if="hasClearButton"
 			type="button"
-			class="absolute right-0.5 z-[1] cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
+			class="absolute right-0.5 z-[1] touch-manipulation cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
 			aria-label="Clear date"
 			@click.stop="clearValue"
 		>
@@ -193,6 +193,7 @@ const suppressNextRangeClick = ref(false)
 let rangeClickSuppressionTimeout: number | null = null
 let monthSelectSyncFrame: number | null = null
 let calendarPortal: HTMLElement | null = null
+let inputFocusScrollSuppressionTarget: HTMLInputElement | null = null
 const calendarBaseClass = 'modrinth-date-picker-calendar'
 const calendarStateClasses = [
 	'calendar-only',
@@ -945,6 +946,34 @@ function syncTimeInputTypes(instance: Instance) {
 	}
 }
 
+function openPickerWithoutInputFocus(event: PointerEvent) {
+	if (!props.readonly || props.disabled || props.calendarOnly) return
+	if (event.button !== 0) return
+	if (event.pointerType === 'mouse') return
+
+	event.preventDefault()
+	picker.value?.open()
+}
+
+function teardownInputFocusScrollSuppression() {
+	inputFocusScrollSuppressionTarget?.removeEventListener('pointerdown', openPickerWithoutInputFocus)
+	inputFocusScrollSuppressionTarget = null
+}
+
+function syncInputFocusScrollSuppression() {
+	const target = picker.value?.altInput ?? inputRef.value ?? null
+	if (!target || !props.readonly || props.disabled || props.calendarOnly) {
+		teardownInputFocusScrollSuppression()
+		return
+	}
+
+	if (inputFocusScrollSuppressionTarget === target) return
+
+	teardownInputFocusScrollSuppression()
+	target.addEventListener('pointerdown', openPickerWithoutInputFocus)
+	inputFocusScrollSuppressionTarget = target
+}
+
 const resolvedDateFormat = computed(
 	() => props.dateFormat ?? (props.enableTime ? 'Y-m-d H:i' : 'Y-m-d'),
 )
@@ -976,7 +1005,7 @@ const hasClearButton = computed(
 const inputClasses = computed(() => [
 	props.calendarOnly
 		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
-		: 'w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
+		: 'w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
 	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
 	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
 	!props.calendarOnly
@@ -1140,6 +1169,7 @@ onMounted(async () => {
 			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
 			syncMultiMonthSelects(instance)
+			syncInputFocusScrollSuppression()
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -1213,6 +1243,7 @@ onMounted(async () => {
 	}
 
 	syncAltInputState()
+	syncInputFocusScrollSuppression()
 	syncPickerFromModel()
 	syncHeaderControlState(picker.value)
 	syncRangeEndpointMoveState(picker.value)
@@ -1225,6 +1256,7 @@ onBeforeUnmount(() => {
 	document.removeEventListener('pointermove', updateRangeDrag, true)
 	document.removeEventListener('pointerup', stopRangeDrag, true)
 	document.removeEventListener('pointercancel', stopRangeDrag, true)
+	teardownInputFocusScrollSuppression()
 	picker.value?.destroy()
 	destroyCalendarPortal()
 })
@@ -1288,10 +1320,14 @@ function syncPickerFromModel() {
 }
 
 function syncAltInputState() {
-	if (!picker.value?.altInput) return
+	if (!picker.value?.altInput) {
+		syncInputFocusScrollSuppression()
+		return
+	}
 
 	picker.value.altInput.disabled = props.disabled
 	picker.value.altInput.readOnly = props.readonly
+	syncInputFocusScrollSuppression()
 }
 
 function clearValue() {
@@ -1318,7 +1354,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {
-	@apply mt-2 rounded-2xl border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
+	@apply mt-2 touch-manipulation rounded-2xl border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
 	box-sizing: content-box;
 }
 
@@ -1379,7 +1415,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year),
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-10;
+	@apply touch-manipulation rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-10;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
@@ -1437,7 +1473,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-prev-month),
 .modrinth-date-picker :deep(.flatpickr-next-month) {
-	@apply top-2.5 mx-3.5 flex h-10 w-10 items-center justify-center rounded-full p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
+	@apply top-2.5 mx-3.5 flex h-10 w-10 touch-manipulation items-center justify-center rounded-full p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
 }
 
 .modrinth-date-picker :deep(.flatpickr-prev-month.flatpickr-disabled),
@@ -1462,7 +1498,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply relative z-0 m-0 max-w-none rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
+	@apply relative z-0 m-0 max-w-none touch-manipulation rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
 }
 .modrinth-date-picker
 	:deep(
@@ -1657,7 +1693,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-time input),
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-am-pm) {
-	@apply h-full rounded-xl bg-transparent px-2 text-center font-semibold text-primary hover:bg-surface-5 focus:bg-surface-5;
+	@apply h-full touch-manipulation rounded-xl bg-transparent px-2 text-center font-semibold text-primary hover:bg-surface-5 focus:bg-surface-5;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-time-separator) {
