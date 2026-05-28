@@ -9,7 +9,7 @@
 			v-for="group in eventGroups"
 			:key="`${group.id}:guide`"
 			aria-hidden="true"
-			class="absolute left-0 z-0 border-0 border-l border-dashed transition-all"
+			class="absolute left-0 border-0 border-l border-dashed transition-all"
 			:class="
 				activeGroup?.id === group.id
 					? isModrinthEventGroup(group)
@@ -25,7 +25,7 @@
 			<div
 				v-if="rangeHighlight"
 				aria-hidden="true"
-				class="pointer-events-none absolute left-0 z-10 rounded-sm border border-l-0 border-dashed border-blue bg-highlight-blue opacity-40"
+				class="pointer-events-none absolute left-0 rounded-sm border border-l-0 border-dashed border-blue bg-highlight-blue opacity-40"
 				:style="rangeHighlight"
 			/>
 		</Transition>
@@ -34,7 +34,7 @@
 			v-for="group in eventGroups"
 			:key="group.id"
 			type="button"
-			class="pointer-events-auto absolute left-0 top-0 z-20 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 transition-colors focus-visible:border-brand focus-visible:text-contrast"
+			class="pointer-events-auto absolute left-0 top-0 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 transition-colors focus-visible:border-brand focus-visible:text-contrast"
 			:class="
 				activeGroup?.id === group.id
 					? isModrinthEventGroup(group)
@@ -68,7 +68,7 @@
 			<div
 				v-if="activeGroup"
 				ref="tooltipElement"
-				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] flex max-h-[340px] w-[12rem] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-3 text-sm shadow-xl"
+				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 flex max-h-[340px] w-[12rem] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-3 text-sm shadow-xl"
 				:style="tooltipStyle"
 				@mouseenter="onTooltipMouseEnter"
 				@mouseleave="onTooltipMouseLeave"
@@ -87,7 +87,7 @@
 					>
 						<div
 							v-if="showTooltipTopFade"
-							class="pointer-events-none absolute left-0 right-0 top-0 z-10 -mt-1 h-6 bg-gradient-to-b from-bg-raised to-transparent"
+							class="pointer-events-none absolute left-0 right-0 top-0 -mt-1 h-6 bg-gradient-to-b from-bg-raised to-transparent"
 						/>
 					</Transition>
 
@@ -144,7 +144,7 @@
 					>
 						<div
 							v-if="showTooltipBottomFade"
-							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 -mb-1 h-8 bg-gradient-to-t from-bg-raised to-transparent"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 -mb-1 h-8 bg-gradient-to-t from-bg-raised to-transparent"
 						/>
 					</Transition>
 				</div>

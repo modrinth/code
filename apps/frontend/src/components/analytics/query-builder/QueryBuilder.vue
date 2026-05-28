@@ -340,7 +340,7 @@
 									<template #input-content="{ isOpen, openDirection }">
 										<div class="flex min-h-7 min-w-0 flex-1 items-center gap-1.5 pr-1">
 											<span
-												class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary"
+												class="min-w-0 flex-1 truncate font-semibold text-primary"
 												:title="selectedBreakdownLabel"
 											>
 												{{ selectedBreakdownLabel }}
@@ -424,7 +424,7 @@ import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '17rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
-const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !min-w-24'
+const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
 const {

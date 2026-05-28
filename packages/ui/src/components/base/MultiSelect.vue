@@ -4,7 +4,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative flex items-center overflow-hidden rounded-xl bg-surface-4 px-3 py-1 text-left transition-all duration-200"
+			class="relative flex items-center overflow-hidden rounded-xl bg-surface-4 px-4 py-1 text-left transition-all duration-200"
 			:class="[
 				fitContent ? 'w-auto max-w-full' : 'w-full',
 				triggerClass,
@@ -340,7 +340,7 @@
 					<template v-else>
 						<div
 							v-if="shouldShowSelectionActions"
-							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-3 py-2.5 text-sm"
+							class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-4 py-2.5 text-sm"
 						>
 							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
 							<button
