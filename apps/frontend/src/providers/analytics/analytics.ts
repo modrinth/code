@@ -1857,12 +1857,26 @@ export function createAnalyticsDashboardContext(
 		}
 	}
 
+	function syncProjectEventsVisibilityForProjectSelection(nextSelectedProjectIds: string[]) {
+		const defaultProjectEventsVisibility =
+			getDefaultAnalyticsGraphProjectEventsVisibility(nextSelectedProjectIds)
+
+		if (
+			!hasExplicitProjectEventsVisibilityQuery.value &&
+			showProjectEvents.value !== defaultProjectEventsVisibility
+		) {
+			replaceNextAnalyticsRouteNavigation()
+			showProjectEvents.value = defaultProjectEventsVisibility
+		}
+	}
+
 	watch(
 		[projects, areProjectsLoaded],
 		([nextProjects, nextAreProjectsLoaded]) => {
 			if (nextProjects.length === 0) {
 				if (nextAreProjectsLoaded) {
 					syncSelectedBreakdownsForProjectSelection([])
+					syncProjectEventsVisibilityForProjectSelection([])
 				}
 				if (nextAreProjectsLoaded && selectedProjectIds.value.length > 0) {
 					replaceNextAnalyticsRouteNavigation()
@@ -1875,6 +1889,7 @@ export function createAnalyticsDashboardContext(
 			if (!hasExplicitProjectSelectionQuery.value) {
 				const nextSelectedProjectIds = nextProjects.map((project) => project.id)
 				syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds)
+				syncProjectEventsVisibilityForProjectSelection(nextSelectedProjectIds)
 				if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
 					replaceNextAnalyticsRouteNavigation()
 					selectedProjectIds.value = nextSelectedProjectIds
@@ -1887,6 +1902,7 @@ export function createAnalyticsDashboardContext(
 				retainedSelection.length > 0 ? retainedSelection : nextProjects.map((project) => project.id)
 
 			syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds)
+			syncProjectEventsVisibilityForProjectSelection(nextSelectedProjectIds)
 			if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
 				replaceNextAnalyticsRouteNavigation()
 				selectedProjectIds.value = nextSelectedProjectIds
@@ -1905,16 +1921,8 @@ export function createAnalyticsDashboardContext(
 
 	watch(
 		[selectedProjectIds, hasExplicitProjectEventsVisibilityQuery],
-		([nextSelectedProjectIds, nextHasExplicitProjectEventsVisibilityQuery]) => {
-			const defaultProjectEventsVisibility =
-				getDefaultAnalyticsGraphProjectEventsVisibility(nextSelectedProjectIds)
-
-			if (
-				!nextHasExplicitProjectEventsVisibilityQuery &&
-				showProjectEvents.value !== defaultProjectEventsVisibility
-			) {
-				showProjectEvents.value = defaultProjectEventsVisibility
-			}
+		([nextSelectedProjectIds]) => {
+			syncProjectEventsVisibilityForProjectSelection(nextSelectedProjectIds)
 		},
 		{ deep: true, immediate: true },
 	)
