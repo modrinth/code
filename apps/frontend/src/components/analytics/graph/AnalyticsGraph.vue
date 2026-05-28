@@ -292,8 +292,11 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="isDataLoading" class="absolute inset-0 z-[19] overflow-hidden rounded-xl">
+		<div class="absolute inset-0 z-[20] overflow-hidden rounded-xl">
 			<AnalyticsLoadingBar :loading="isDataLoading" />
+		</div>
+
+		<div v-if="isDataLoading" class="absolute inset-0 z-[19] overflow-hidden rounded-xl">
 			<div class="absolute inset-0 bg-surface-3 opacity-50" />
 			<div class="absolute inset-0 backdrop-blur-[3px]" />
 			<div class="absolute inset-0 flex items-center justify-center">
