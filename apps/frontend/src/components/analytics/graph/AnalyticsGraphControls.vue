@@ -172,10 +172,14 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-	(e: 'update:ratioMode', value: boolean): void
-	(e: 'update:showChartEvents', value: boolean): void
-	(e: 'update:showProjectEvents', value: boolean): void
-	(e: 'update:showPreviousPeriod', value: boolean): void
+	(
+		e:
+			| 'update:ratioMode'
+			| 'update:showChartEvents'
+			| 'update:showProjectEvents'
+			| 'update:showPreviousPeriod',
+		value: boolean,
+	): void
 }>()
 
 const isControlsMenuOpen = ref(false)

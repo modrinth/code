@@ -443,6 +443,7 @@ const {
 	selectedFilters,
 	activeStat,
 	projectStatusById,
+	projectDownloadsById,
 	queryResetToken,
 	refreshAnalyticsQuery,
 	setFetchRequest,
@@ -719,7 +720,7 @@ function applyProjectDownloadsThreshold(threshold: number | null) {
 	}
 
 	const projectIds = projects.value
-		.filter((project) => project.downloads >= threshold)
+		.filter((project) => (projectDownloadsById.value.get(project.id) ?? 0) >= threshold)
 		.map((project) => project.id)
 
 	projectDownloadsThresholdProjectIds.value = projectIds
