@@ -56,7 +56,7 @@
 					<div v-if="canShowPreviousPeriod" class="flex min-h-7 items-center justify-between gap-3">
 						<label
 							:for="previousPeriodToggleId"
-							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-2.5 font-semibold leading-tight text-primary"
+							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-1.5 font-semibold leading-tight text-primary"
 						>
 							<HistoryIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
 							<span class="min-w-0 truncate">Previous period</span>
@@ -70,7 +70,7 @@
 					<div v-if="canUseRatioMode" class="flex min-h-7 items-center justify-between gap-3">
 						<label
 							:for="ratioModeToggleId"
-							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-2.5 font-semibold leading-tight text-primary"
+							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-1.5 font-semibold leading-tight text-primary"
 						>
 							<span
 								class="inline-flex size-4 shrink-0 items-center justify-center text-sm font-semibold leading-none text-secondary"
@@ -95,12 +95,8 @@
 					>
 						<label
 							:for="projectEventsToggleId"
-							class="flex min-h-7 min-w-0 grow items-center gap-2.5 font-semibold leading-tight"
-							:class="
-								hasProjectEvents
-									? 'cursor-pointer text-primary'
-									: 'cursor-not-allowed text-secondary'
-							"
+							class="flex min-h-7 min-w-0 grow items-center gap-1.5 font-semibold leading-tight text-primary"
+							:class="hasProjectEvents ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'"
 						>
 							<TagCategoryFlagIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
 							<span class="min-w-0 truncate">Project events</span>
@@ -119,10 +115,8 @@
 					>
 						<label
 							:for="modrinthEventsToggleId"
-							class="flex min-h-7 min-w-0 grow items-center gap-2.5 font-semibold leading-tight"
-							:class="
-								hasChartEvents ? 'cursor-pointer text-primary' : 'cursor-not-allowed text-secondary'
-							"
+							class="flex min-h-7 min-w-0 grow items-center gap-1.5 font-semibold leading-tight text-primary"
+							:class="hasChartEvents ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'"
 						>
 							<InfoIcon
 								class="size-4 shrink-0"
