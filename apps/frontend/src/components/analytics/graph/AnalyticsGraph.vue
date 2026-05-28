@@ -389,6 +389,7 @@ const {
 	displayedTimeSlices: timeSlices,
 	displayedPreviousTimeSlices: previousTimeSlices,
 	displayedProjectEvents: projectEvents,
+	hasCompletedAnalyticsLoading,
 	displayedSelectedGroupBy: selectedGroupBy,
 	displayedSelectedBreakdowns: selectedBreakdowns,
 	displayedSelectedFilters: selectedFilters,
@@ -403,6 +404,7 @@ const isDataLoading = computed(() => isLoading.value)
 const { data: analyticsEvents } = useQuery({
 	queryKey: analyticsEventsQueryKey,
 	queryFn: () => client.labrinth.analytics_v3.getEvents(),
+	enabled: computed(() => hasCompletedAnalyticsLoading.value),
 	placeholderData: [],
 	refetchOnMount: 'always',
 	retry: false,

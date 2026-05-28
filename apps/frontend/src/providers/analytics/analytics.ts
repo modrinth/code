@@ -10,7 +10,6 @@ import {
 	type ProjectStatusFilterValue,
 	sanitizeAnalyticsSelectedFilters,
 } from '~/components/analytics/query-builder/query-filter/queryFilter'
-import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
 
 import type { OrganizationContext } from '../organization-context'
 import {
@@ -66,7 +65,7 @@ const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group 
 const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000
 const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
-const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 20
+const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 2000
 const ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS = 300
 const ANALYTICS_MOBILE_LAYOUT_QUERY = '(pointer: coarse), (max-width: 800px)'
 
@@ -87,6 +86,11 @@ type AnalyticsDashboardProjectSource = ProjectTypeMetadata & {
 	icon_url?: string | null
 	downloads?: number | null
 	status?: string | null
+}
+
+type AnalyticsProjectVersionSource = {
+	id: string
+	versions?: readonly string[] | null
 }
 
 export interface AnalyticsDashboardProject {
@@ -215,6 +219,7 @@ export interface AnalyticsDashboardContextValue {
 	displayedPreviousTimeSlices: Ref<Labrinth.Analytics.v3.TimeSlice[]>
 	projectEvents: Ref<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>
 	displayedProjectEvents: Ref<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>
+	hasCompletedAnalyticsLoading: Ref<boolean>
 	isLoading: ComputedRef<boolean>
 	isRefetching: ComputedRef<boolean>
 	activeStat: Ref<AnalyticsDashboardStat>
@@ -771,9 +776,7 @@ function getUniqueAnalyticsDashboardProjects(
 	return analyticsProjects
 }
 
-function getProjectOrganizationId(
-	project: AnalyticsDashboardProjectSource,
-): string | undefined {
+function getProjectOrganizationId(project: AnalyticsDashboardProjectSource): string | undefined {
 	return typeof project.organization === 'string' && project.organization.trim().length > 0
 		? project.organization
 		: undefined
@@ -857,16 +860,6 @@ function getProjectVersionFilterOptionSummary(
 	}
 }
 
-async function fetchAnalyticsVersionMetadata(
-	projectIds: string[],
-	getProjects: (ids: string[]) => Promise<Labrinth.Projects.v3.Project[]>,
-	getVersions: (ids: string[]) => Promise<Labrinth.Versions.v3.Version[]>,
-): Promise<AnalyticsVersionMetadata[]> {
-	const projects = await fetchSegmentedWith(projectIds, getProjects)
-	const versionIds = sortStringValues([...new Set(projects.flatMap((project) => project.versions))])
-	return fetchAnalyticsVersionMetadataByIds(versionIds, getVersions)
-}
-
 async function fetchAnalyticsVersionMetadataByIds(
 	versionIds: string[],
 	getVersions: (ids: string[]) => Promise<Labrinth.Versions.v3.Version[]>,
@@ -880,6 +873,29 @@ async function fetchAnalyticsVersionMetadataByIds(
 	}
 
 	return metadata
+}
+
+function getAnalyticsVersionIdsFromProjects(
+	projects: readonly AnalyticsProjectVersionSource[],
+	projectIds: readonly string[],
+): string[] {
+	const selectedProjectIds = new Set(projectIds)
+	const versionIds = new Set<string>()
+
+	for (const project of projects) {
+		if (!selectedProjectIds.has(project.id)) {
+			continue
+		}
+
+		for (const versionId of project.versions ?? []) {
+			const normalizedVersionId = versionId.trim()
+			if (normalizedVersionId.length > 0) {
+				versionIds.add(normalizedVersionId)
+			}
+		}
+	}
+
+	return sortStringValues([...versionIds])
 }
 
 function retainAvailableSelectedFilterValues(
@@ -1347,6 +1363,8 @@ export function createAnalyticsDashboardContext(
 	const queryRefreshTimestamp = ref(Date.now())
 	const queryResetToken = ref(0)
 	const fetchRequest = ref<Labrinth.Analytics.v3.FetchRequest | null>(null)
+	const hasInitializedAnalyticsFetchRequest = ref(false)
+	const hasCompletedAnalyticsLoading = ref(false)
 	let revenueHourlyGroupByBeforeOverride: AnalyticsGroupByPreset | null = null
 	let nextAnalyticsRouteNavigationMode: AnalyticsQueryBuilderRouteNavigationMode = 'replace'
 	let mobileLayoutMedia: MediaQueryList | null = null
@@ -1425,7 +1443,7 @@ export function createAnalyticsDashboardContext(
 				throw error
 			}
 		},
-		enabled: shouldFetchEffectiveUser,
+		enabled: computed(() => shouldFetchEffectiveUser.value && hasCompletedAnalyticsLoading.value),
 		placeholderData: null,
 	})
 	const effectiveUsername = computed(() => {
@@ -1442,12 +1460,7 @@ export function createAnalyticsDashboardContext(
 	})
 
 	const { data: dashboardAllProjects, isFetched: hasFetchedDashboardAllProjects } = useQuery({
-		queryKey: computed(() => [
-			'analytics',
-			'dashboard',
-			effectiveUserId.value,
-			'all-projects',
-		]),
+		queryKey: computed(() => ['analytics', 'dashboard', effectiveUserId.value, 'all-projects']),
 		queryFn: async (): Promise<Labrinth.Users.v3.AllProjectsResponse> => {
 			try {
 				const user = effectiveUserId.value
@@ -1586,6 +1599,31 @@ export function createAnalyticsDashboardContext(
 		return PROJECT_STATUS_FILTER_VALUES.filter((status) => presentStatuses.has(status))
 	})
 	const sortedSelectedProjectIds = computed(() => sortStringValues(selectedProjectIds.value))
+	const filterOptionProjectSources = computed<AnalyticsProjectVersionSource[] | null>(() => {
+		if (hasProjectContext.value && options.projectPageContext) {
+			const project =
+				options.projectPageContext.projectV3.value ?? options.projectPageContext.projectV2.value
+			return project ? [project] : []
+		}
+
+		if (hasOrganizationContext.value) {
+			return options.organizationContext?.projects.value ?? null
+		}
+
+		if (shouldFetchDashboardAllProjects.value) {
+			return dashboardAllProjects.value?.projects ?? null
+		}
+
+		return []
+	})
+	const filterOptionVersionIds = computed(() => {
+		const projects = filterOptionProjectSources.value
+		if (!projects) {
+			return []
+		}
+
+		return getAnalyticsVersionIdsFromProjects(projects, sortedSelectedProjectIds.value)
+	})
 	const hasExplicitProjectSelectionQuery = computed(() =>
 		hasAnalyticsProjectSelectionQuery(route.query),
 	)
@@ -2116,6 +2154,30 @@ export function createAnalyticsDashboardContext(
 			!currentTimeSlicePending.value &&
 			!currentFetching.value,
 	)
+	watch(
+		[
+			hasInitializedAnalyticsFetchRequest,
+			areProjectsLoaded,
+			analyticsTimeSlicesFetchRequest,
+			hasCompletedCurrentTimeSliceFetch,
+		],
+		([
+			hasInitializedFetchRequest,
+			nextAreProjectsLoaded,
+			nextFetchRequest,
+			hasCompletedFetch,
+		]) => {
+			if (!hasInitializedFetchRequest || !nextAreProjectsLoaded) {
+				hasCompletedAnalyticsLoading.value = false
+				return
+			}
+
+			hasCompletedAnalyticsLoading.value = isAnalyticsFetchRequestReady(nextFetchRequest)
+				? hasCompletedFetch
+				: true
+		},
+		{ deep: true, immediate: true },
+	)
 	const revenueDailyPrefetchRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(() => {
 		if (!isRevenueHourlyGroupBy(selectedGroupBy.value)) {
 			return null
@@ -2222,7 +2284,11 @@ export function createAnalyticsDashboardContext(
 
 			return client.labrinth.analytics_v3.fetchFacets(nextRequest)
 		},
-		enabled: computed(() => isAnalyticsFetchRequestReady(analyticsFacetsRequest.value)),
+		enabled: computed(
+			() =>
+				hasCompletedAnalyticsLoading.value &&
+				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
+		),
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})
 
@@ -2234,15 +2300,17 @@ export function createAnalyticsDashboardContext(
 				analyticsQueryUserId.value,
 				'filter-options',
 				'versions',
-				sortedSelectedProjectIds.value,
+				filterOptionVersionIds.value,
 			]),
 			queryFn: () =>
-				fetchAnalyticsVersionMetadata(
-					sortedSelectedProjectIds.value,
-					(ids) => client.labrinth.projects_v3.getMultiple(ids),
+				fetchAnalyticsVersionMetadataByIds(
+					filterOptionVersionIds.value,
 					(ids) => client.labrinth.versions_v3.getVersions(ids),
 				),
-			enabled: computed(() => sortedSelectedProjectIds.value.length > 0),
+			enabled: computed(
+				() =>
+					filterOptionProjectSources.value !== null && sortedSelectedProjectIds.value.length > 0,
+			),
 			placeholderData: [],
 			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 		})
@@ -2574,6 +2642,8 @@ export function createAnalyticsDashboardContext(
 	}
 
 	function setFetchRequest(nextFetchRequest: Labrinth.Analytics.v3.FetchRequest) {
+		hasInitializedAnalyticsFetchRequest.value = true
+
 		if (areAnalyticsFetchRequestsEqual(fetchRequest.value, nextFetchRequest)) {
 			return
 		}
@@ -2649,6 +2719,7 @@ export function createAnalyticsDashboardContext(
 		displayedPreviousTimeSlices,
 		projectEvents,
 		displayedProjectEvents,
+		hasCompletedAnalyticsLoading,
 		isLoading,
 		isRefetching,
 		activeStat,
