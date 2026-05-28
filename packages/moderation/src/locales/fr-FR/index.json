@@ -12,7 +12,7 @@
     "defaultMessage": "Ajouter une icône"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Ajoutez l'adresse IP et le port que les joueurs de Java Edition pourront utiliser pour rejoindre votre serveur."
+    "defaultMessage": "Ajoutez l'adresse IP et le port que les joueurs Java Edition pourront utiliser pour rejoindre votre serveur."
   },
   "nags.add-java-address.title": {
     "defaultMessage": "Ajouter une adresse Java"

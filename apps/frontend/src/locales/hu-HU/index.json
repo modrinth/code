@@ -1826,9 +1826,6 @@
   "layout.banner.build-fail.title": {
     "message": "Hiba történt az API állapotának generálása közben a fordítás során."
   },
-  "layout.banner.preview.description": {
-    "message": "Ha a hivatalos Modrinth weboldalt szeretnéd elérni, látogass el a {url} oldalra. Ezt az előzetes verziót a Modrinth munkatársai tesztelési célokra használják. A <branch-link>{owner}/{branch</branch-link> @ {commit} használatával készült."
-  },
   "layout.banner.preview.title": {
     "message": "Ez a Modrinth weboldal előzetes verziója."
   },

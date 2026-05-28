@@ -380,6 +380,7 @@ import _TrendingUpIcon from './icons/trending-up.svg?component'
 import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
+import _UnfoldHorizontalIcon from './icons/unfold-horizontal.svg?component'
 import _UnknownIcon from './icons/unknown.svg?component'
 import _UnknownDonationIcon from './icons/unknown-donation.svg?component'
 import _UnlinkIcon from './icons/unlink.svg?component'
@@ -779,6 +780,7 @@ export const TrendingUpIcon = _TrendingUpIcon
 export const TriangleAlertIcon = _TriangleAlertIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon
+export const UnfoldHorizontalIcon = _UnfoldHorizontalIcon
 export const UnknownIcon = _UnknownIcon
 export const UnknownDonationIcon = _UnknownDonationIcon
 export const UnlinkIcon = _UnlinkIcon

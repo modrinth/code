@@ -332,6 +332,138 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "app.skins.add-button": {
+    "message": "Add skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Drag and drop"
+  },
+  "app.skins.apply-button": {
+    "message": "Apply"
+  },
+  "app.skins.delete-button": {
+    "message": "Delete skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "This will permanently delete the selected skin. This action cannot be undone."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Are you sure you want to delete this skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Failed to read the dropped file."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Error processing file"
+  },
+  "app.skins.edit-button": {
+    "message": "Edit skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Add skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Adding a skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Arm style"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Slim"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Wide"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Cape"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Cape"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Editing skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Make an edit to the skin first!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "No cape"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "None"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Replace texture"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Save skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Saving..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Texture"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Upload a skin first!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Edit skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Previewing"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "You're changing your skin too frequently. Mojang's servers have temporarily blocked further requests. Please wait a moment before trying again."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Slow down!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Default skins"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Saved skins"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Sign In"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Please sign into your Minecraft account to use the skin management features of the Modrinth app."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Excited Modrinth Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Please sign in"
+  },
+  "app.skins.title": {
+    "message": "Skin selector"
+  },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App."
   },
