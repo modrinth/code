@@ -55,7 +55,6 @@
 								:max-date="customRangeMaxDate"
 								show-today
 								wrapper-class="w-full"
-								calendar-class="!border-none"
 								close-on-select
 							/>
 						</div>
@@ -73,7 +72,6 @@
 								:max-date="customRangeMaxDate"
 								show-today
 								wrapper-class="w-full"
-								calendar-class="!border-none"
 								close-on-select
 							/>
 						</div>

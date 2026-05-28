@@ -163,7 +163,6 @@
 				:show-label="false"
 				show-preview-filter-icon
 				:show-clear-action="false"
-				:preview-trigger-class="analyticsQueryFilterChipTriggerClass"
 				:add-button-class="analyticsQueryAddFilterButtonClass"
 			/>
 		</div>
@@ -203,9 +202,9 @@
 									/>
 									<LayersIcon
 										v-else-if="isAllProjectsOptionSelected || areAllProjectsSelected"
-										class="size-6 shrink-0 text-primary"
+										class="size-5 shrink-0 text-primary"
 									/>
-									<BoxIcon v-else class="size-6 shrink-0 text-primary" />
+									<BoxIcon v-else class="size-5 shrink-0 text-primary" />
 									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary">
 										{{ selectedProjectLabel }}
 									</span>
@@ -422,12 +421,8 @@ import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '17rem'
-const analyticsQueryChipTriggerClass =
-	'h-10 min-w-0 max-w-full border border-solid border-surface-5 bg-surface-4 px-4 py-1.5 text-base font-semibold text-primary'
-const analyticsQueryFilterChipTriggerClass =
-	'h-10 min-w-0 max-w-full border border-solid border-surface-5 bg-surface-4 px-4 py-1.5 text-base font-semibold text-primary transition-all hover:brightness-110 active:brightness-110'
-const analyticsQueryAddFilterButtonClass =
-	'!h-10 max-w-full !rounded-xl !border-dashed !border-surface-5 !bg-transparent !px-4 !py-1.5 text-base'
+const analyticsQueryChipTriggerClass = 'h-10 '
+const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !min-w-24'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
 const {

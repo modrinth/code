@@ -640,7 +640,7 @@ const appliedFilterPreviews = computed(() =>
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
 const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
 const DEFAULT_PREVIEW_TRIGGER_CLASS =
-	'h-10 max-w-[16rem] border border-solid border-surface-5 bg-surface-4 px-4 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
+	'h-10 max-w-[16rem] bg-surface-4 px-4 py-1.5 transition-all bg-surface-4 hover:brightness-110 active:brightness-110'
 const effectivePreviewTriggerClass = computed(
 	() => props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS,
 )
