@@ -16,12 +16,12 @@ const label = defineMessage({
 </script>
 <template>
 	<a
-		class="text-link flex items-center outline-offset-[4px] rounded-sm"
+		class="text-link flex items-center outline-offset-[4px] rounded-sm truncate"
 		target="_blank"
 		rel="noopener"
 		:href="href"
 	>
-		{{ formatMessage(label) }}
+		<span class="truncate">{{ formatMessage(label) }}</span>
 		<ExternalIcon class="size-3 shrink-0 mb-2 ml-1" />
 	</a>
 </template>

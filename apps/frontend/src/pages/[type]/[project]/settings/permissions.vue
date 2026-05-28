@@ -4,8 +4,10 @@ import {
 	ArrowDown10Icon,
 	ArrowDownWideNarrowIcon,
 	ClockArrowDownIcon,
+	FoldVerticalIcon,
 	RightArrowIcon,
 	SearchIcon,
+	UnfoldVerticalIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
@@ -26,23 +28,24 @@ import {
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const auth = await useAuth()
+const flags = useFeatureFlags()
 
 const isModerator = computed(() => {
-	return isStaff(auth.value?.user)
+	return isStaff(auth.value?.user) && !flags.value.showModeratorProjectMemberUi
 })
 
 const { formatMessage } = useVIntl()
-const flags = useFeatureFlags()
 const { projectV2: project } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 
-type SortType = 'status' | 'most_files' | 'recently_edited'
+type SortType = 'status' | 'most_files' | 'recently_edited' | 'rejected'
 
 const searchQuery = ref('')
 const currentSortType = ref<SortType>('status')
+const cardCollapsedById = ref<Record<string, boolean>>({})
 
 const {
 	data: attributionData,
@@ -53,35 +56,49 @@ const {
 	queryFn: () => labrinth.attribution_internal.listProjectAttribution(project.value.id),
 })
 
-const sortTypes = computed<ComboboxOption<SortType>[]>(() => [
-	{
-		value: 'status',
-		label: formatMessage(
-			defineMessage({
-				id: 'project.settings.permissions.sort.status',
-				defaultMessage: 'Status',
-			}),
-		),
-	},
-	{
-		value: 'most_files',
-		label: formatMessage(
-			defineMessage({
-				id: 'project.settings.permissions.sort.most-files',
-				defaultMessage: 'Most files',
-			}),
-		),
-	},
-	{
-		value: 'recently_edited',
-		label: formatMessage(
-			defineMessage({
-				id: 'project.settings.permissions.sort.recently-edited',
-				defaultMessage: 'Recently edited',
-			}),
-		),
-	},
-])
+const sortRejectedLabel = defineMessage({
+	id: 'project.settings.permissions.sort.rejected',
+	defaultMessage: 'Rejected',
+})
+
+const sortTypes = computed<ComboboxOption<SortType>[]>(() => {
+	const options: ComboboxOption<SortType>[] = [
+		{
+			value: 'status',
+			label: formatMessage(
+				defineMessage({
+					id: 'project.settings.permissions.sort.status',
+					defaultMessage: 'Status',
+				}),
+			),
+		},
+		{
+			value: 'most_files',
+			label: formatMessage(
+				defineMessage({
+					id: 'project.settings.permissions.sort.most-files',
+					defaultMessage: 'Most files',
+				}),
+			),
+		},
+		{
+			value: 'recently_edited',
+			label: formatMessage(
+				defineMessage({
+					id: 'project.settings.permissions.sort.recently-edited',
+					defaultMessage: 'Recently edited',
+				}),
+			),
+		},
+	]
+	if (hasMixedModerationStatus.value) {
+		options.push({
+			value: 'rejected',
+			label: formatMessage(sortRejectedLabel),
+		})
+	}
+	return options
+})
 
 const currentSortLabel = computed(() => {
 	return sortTypes.value.find((option) => option.value === currentSortType.value)?.label ?? ''
@@ -94,6 +111,44 @@ function isAttributed(group: Labrinth.Attribution.Internal.AttributionGroup): bo
 function isNoPermission(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
 	return group.attribution?.kind === 'no_permission'
 }
+
+function isModerationRejected(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	const kind = group.attribution?.moderation_status?.kind
+	return kind === 'bad_proof' || kind === 'not_allowed'
+}
+
+function rejectedSortRank(group: Labrinth.Attribution.Internal.AttributionGroup): number {
+	if (isModerationRejected(group)) {
+		return 0
+	}
+	if (group.attribution?.moderation_status?.kind === 'approved') {
+		return 1
+	}
+	return 2
+}
+
+const hasMixedModerationStatus = computed(() => {
+	const groups = attributionData.value ?? []
+	let hasRejected = false
+	let hasNonRejected = false
+	for (const group of groups) {
+		if (isModerationRejected(group)) {
+			hasRejected = true
+		} else {
+			hasNonRejected = true
+		}
+		if (hasRejected && hasNonRejected) {
+			return true
+		}
+	}
+	return false
+})
+
+watch(hasMixedModerationStatus, (mixed) => {
+	if (!mixed && currentSortType.value === 'rejected') {
+		currentSortType.value = 'status'
+	}
+})
 
 function statusSortRank(group: Labrinth.Attribution.Internal.AttributionGroup): number {
 	if (isNoPermission(group)) {
@@ -151,6 +206,9 @@ const filteredGroups = computed(() => {
 			const ac = a.files?.length ?? 0
 			const bc = b.files?.length ?? 0
 			return bc - ac
+		}
+		if (sortMode === 'rejected') {
+			return rejectedSortRank(a) - rejectedSortRank(b)
 		}
 		const at = attributedTimestamp(a)
 		const bt = attributedTimestamp(b)
@@ -238,7 +296,50 @@ const messages = defineMessages({
 		id: 'project.settings.permissions.no-results',
 		defaultMessage: 'No external files match your search.',
 	},
+	collapseAll: {
+		id: 'project.settings.permissions.collapse-all',
+		defaultMessage: 'Collapse all',
+	},
+	expandAll: {
+		id: 'project.settings.permissions.expand-all',
+		defaultMessage: 'Expand all',
+	},
 })
+
+function defaultCardCollapsed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	return (
+		(!isModerator.value && !!group.attribution) || group?.attribution?.kind === 'globally_allowed'
+	)
+}
+
+function getCardCollapsed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	return cardCollapsedById.value[group.id] ?? defaultCardCollapsed(group)
+}
+
+function setCardCollapsed(groupId: string, collapsed: boolean) {
+	cardCollapsedById.value = { ...cardCollapsedById.value, [groupId]: collapsed }
+}
+
+const allCardsCollapsed = computed(() => {
+	const groups = filteredGroups.value
+	if (groups.length === 0) {
+		return true
+	}
+	return groups.every((group) => getCardCollapsed(group))
+})
+
+const expandCollapseAllLabel = computed(() =>
+	formatMessage(allCardsCollapsed.value ? messages.expandAll : messages.collapseAll),
+)
+
+function toggleAllCardsCollapsed() {
+	const collapsed = !allCardsCollapsed.value
+	const next = { ...cardCollapsedById.value }
+	for (const group of filteredGroups.value) {
+		next[group.id] = collapsed
+	}
+	cardCollapsedById.value = next
+}
 
 function dismissInfoBanner() {
 	flags.value.dismissedExternalProjectsInfo = true
@@ -247,7 +348,7 @@ function dismissInfoBanner() {
 </script>
 <template>
 	<Admonition
-		v-if="!flags.dismissedExternalProjectsInfo"
+		v-if="!flags.dismissedExternalProjectsInfo && !isModerator"
 		type="info"
 		class="mb-4"
 		:header="formatMessage(messages.infoBannerTitle)"
@@ -277,34 +378,36 @@ function dismissInfoBanner() {
 		</div>
 	</template>
 	<template v-else-if="totalGroups > 0">
-		<Admonition
-			v-if="stats.pending === 0 && stats.noPermission === 0"
-			type="success"
-			class="mb-4"
-			:header="formatMessage(messages.completedTitle)"
-			:body="formatMessage(messages.completedDescription)"
-		/>
-		<Admonition
-			v-else-if="stats.noPermission > 0"
-			type="critical"
-			class="mb-4"
-			:header="formatMessage(messages.failTitle)"
-			:body="formatMessage(messages.failDescription)"
-		/>
-		<Admonition
-			v-else-if="stats.pending > 0"
-			type="warning"
-			class="mb-4"
-			:header="formatMessage(messages.attentionNeededTitle)"
-			:body="
-				formatMessage(
-					projectIsApproved
-						? messages.attentionNeededDescriptionApproved
-						: messages.attentionNeededDescriptionDraft,
-				)
-			"
-		/>
-		<div class="grid grid-cols-[1fr_auto] gap-2">
+		<template v-if="!isModerator">
+			<Admonition
+				v-if="stats.pending === 0 && stats.noPermission === 0"
+				type="success"
+				class="mb-4"
+				:header="formatMessage(messages.completedTitle)"
+				:body="formatMessage(messages.completedDescription)"
+			/>
+			<Admonition
+				v-else-if="stats.noPermission > 0"
+				type="critical"
+				class="mb-4"
+				:header="formatMessage(messages.failTitle)"
+				:body="formatMessage(messages.failDescription)"
+			/>
+			<Admonition
+				v-else-if="stats.pending > 0"
+				type="warning"
+				class="mb-4"
+				:header="formatMessage(messages.attentionNeededTitle)"
+				:body="
+					formatMessage(
+						projectIsApproved
+							? messages.attentionNeededDescriptionApproved
+							: messages.attentionNeededDescriptionDraft,
+					)
+				"
+			/>
+		</template>
+		<div class="grid grid-cols-[1fr_auto_auto] gap-2">
 			<StyledInput
 				v-model="searchQuery"
 				type="text"
@@ -339,20 +442,36 @@ function dismissInfoBanner() {
 								v-else-if="currentSortType === 'recently_edited'"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
+							<ArrowDownWideNarrowIcon
+								v-else-if="currentSortType === 'rejected'"
+								class="size-5 flex-shrink-0 text-secondary"
+							/>
 							<span class="truncate text-contrast">{{ currentSortLabel }}</span>
 						</span>
 					</template>
 				</Combobox>
 			</div>
+			<ButtonStyled>
+				<button type="button" class="!h-[40px]" @click="toggleAllCardsCollapsed">
+					<UnfoldVerticalIcon
+						v-if="allCardsCollapsed"
+						class="size-5 flex-shrink-0 text-secondary"
+					/>
+					<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+					{{ expandCollapseAllLabel }}
+				</button>
+			</ButtonStyled>
 		</div>
 		<div class="mt-4 flex flex-col gap-3">
 			<TransitionGroup name="list">
 				<ExternalProjectPermissionsCard
 					v-for="group in filteredGroups"
 					:key="group.id"
+					:collapsed="getCardCollapsed(group)"
 					:project-id="project.id"
 					:group="group"
 					:is-moderator="isModerator"
+					@update:collapsed="setCardCollapsed(group.id, $event)"
 				/>
 				<EmptyState
 					v-if="filteredGroups.length === 0"

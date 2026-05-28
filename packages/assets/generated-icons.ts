@@ -100,6 +100,7 @@ import _FilePlusIcon from './icons/file-plus.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
+import _FoldVerticalIcon from './icons/fold-vertical.svg?component'
 import _FolderIcon from './icons/folder.svg?component'
 import _FolderArchiveIcon from './icons/folder-archive.svg?component'
 import _FolderCogIcon from './icons/folder-cog.svg?component'
@@ -377,6 +378,7 @@ import _TrashExclamationIcon from './icons/trash-exclamation.svg?component'
 import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
+import _UnfoldVerticalIcon from './icons/unfold-vertical.svg?component'
 import _UnknownIcon from './icons/unknown.svg?component'
 import _UnknownDonationIcon from './icons/unknown-donation.svg?component'
 import _UnlinkIcon from './icons/unlink.svg?component'
@@ -496,6 +498,7 @@ export const FilePlusIcon = _FilePlusIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
 export const FilterXIcon = _FilterXIcon
+export const FoldVerticalIcon = _FoldVerticalIcon
 export const FolderIcon = _FolderIcon
 export const FolderArchiveIcon = _FolderArchiveIcon
 export const FolderCogIcon = _FolderCogIcon
@@ -773,6 +776,7 @@ export const TrashExclamationIcon = _TrashExclamationIcon
 export const TriangleAlertIcon = _TriangleAlertIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon
+export const UnfoldVerticalIcon = _UnfoldVerticalIcon
 export const UnknownIcon = _UnknownIcon
 export const UnknownDonationIcon = _UnknownDonationIcon
 export const UnlinkIcon = _UnlinkIcon

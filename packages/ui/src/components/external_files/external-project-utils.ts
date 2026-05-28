@@ -20,6 +20,8 @@ export type ProjectPermissionField =
 	| 'notes'
 	| 'image_urls'
 
+export type AttributionProofRequirement = 'explanation_or_images' | 'images' | null
+
 export const PERMISSION_REASONS = {
 	license: {
 		label: defineMessage({
@@ -30,11 +32,17 @@ export const PERMISSION_REASONS = {
 			id: 'external-files.permissions-card.reason.license.description',
 			defaultMessage: 'The license of this work permits you to redistribute it in your modpack.',
 		}),
+		notesLabel: defineMessage({
+			id: 'external-files.permissions-card.explanation-label',
+			defaultMessage: 'Explanation',
+		}),
+		notesDescription: null,
+		notesShowsOptional: true,
 		proofImagesDescription: defineMessage({
 			id: 'external-files.permissions-card.reason.license.proof-images-description',
 			defaultMessage: 'Upload supporting documentation related to this license.',
 		}),
-		proofImagesOptional: true,
+		proofRequirement: null,
 		fields: ['license_id', 'custom_license', 'link_to_work', 'notes', 'image_urls'] as const,
 	},
 	my_project: {
@@ -46,11 +54,20 @@ export const PERMISSION_REASONS = {
 			id: 'external-files.permissions-card.reason.my-project.description',
 			defaultMessage: 'Original work created by you.',
 		}),
+		notesLabel: defineMessage({
+			id: 'external-files.permissions-card.explanation-label',
+			defaultMessage: 'Explanation',
+		}),
+		notesDescription: defineMessage({
+			id: 'external-files.permissions-card.explanation-description',
+			defaultMessage: 'A short explanation or proof images are required.',
+		}),
+		notesShowsOptional: false,
 		proofImagesDescription: defineMessage({
 			id: 'external-files.permissions-card.reason.my-project.proof-images-description',
 			defaultMessage: 'Upload files that help verify you created this work.',
 		}),
-		proofImagesOptional: true,
+		proofRequirement: 'explanation_or_images',
 		fields: ['license_id', 'custom_license', 'notes', 'image_urls'] as const,
 	},
 	special_permissions: {
@@ -63,12 +80,11 @@ export const PERMISSION_REASONS = {
 			defaultMessage:
 				'You have obtained special permission to redistribute this work in your modpack.',
 		}),
-		proofImagesDescription: defineMessage({
-			id: 'external-files.permissions-card.reason.proof-description',
-			defaultMessage:
-				'Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack.',
-		}),
-		proofImagesOptional: false,
+		notesLabel: null,
+		notesDescription: null,
+		notesShowsOptional: true,
+		proofImagesDescription: null,
+		proofRequirement: 'images',
 		fields: ['link_to_work', 'notes', 'image_urls'] as const,
 	},
 	no_permission: {
@@ -80,8 +96,11 @@ export const PERMISSION_REASONS = {
 			id: 'external-files.permissions-card.reason.no-permission.description',
 			defaultMessage: "You don't have permission to use this work.",
 		}),
+		notesLabel: null,
+		notesDescription: null,
+		notesShowsOptional: true,
 		proofImagesDescription: null,
-		proofImagesOptional: null,
+		proofRequirement: null,
 		fields: ['notes'] as const,
 	},
 	globally_allowed: {
@@ -94,8 +113,11 @@ export const PERMISSION_REASONS = {
 			defaultMessage:
 				"We've seen this file before and have prepared an attribution for you. If something seems wrong, please contact Modrinth Support via the Help Center",
 		}),
+		notesLabel: null,
+		notesDescription: null,
+		notesShowsOptional: false,
 		proofImagesDescription: null,
-		proofImagesOptional: null,
+		proofRequirement: null,
 		fields: ['link_to_work'] as const,
 	},
 } satisfies Record<
@@ -103,11 +125,53 @@ export const PERMISSION_REASONS = {
 	{
 		label: MessageDescriptor
 		description: MessageDescriptor
+		notesLabel: MessageDescriptor | null
+		notesDescription: MessageDescriptor | null
+		notesShowsOptional: boolean
 		proofImagesDescription: MessageDescriptor | null
-		proofImagesOptional: boolean | null
+		proofRequirement: AttributionProofRequirement
 		fields: ProjectPermissionField[]
 	}
 >
+
+export function isAttributionProofValid(
+	requirement: AttributionProofRequirement,
+	notes: string,
+	imageUrls: readonly string[],
+): boolean {
+	switch (requirement) {
+		case 'explanation_or_images':
+			return notes.trim().length > 0 || imageUrls.length > 0
+		case 'images':
+			return imageUrls.length > 0
+		default:
+			return true
+	}
+}
+
+export function attributionProofValidationError(
+	requirement: AttributionProofRequirement,
+	notes: string,
+	imageUrls: readonly string[],
+): MessageDescriptor | null {
+	if (isAttributionProofValid(requirement, notes, imageUrls)) {
+		return null
+	}
+	switch (requirement) {
+		case 'explanation_or_images':
+			return defineMessage({
+				id: 'external-files.permissions-card.error.explanation-or-images-required',
+				defaultMessage: 'Please provide an explanation or upload at least one proof image.',
+			})
+		case 'images':
+			return defineMessage({
+				id: 'external-files.permissions-card.error.proof-images-required',
+				defaultMessage: 'Please upload at least one proof image.',
+			})
+		default:
+			return null
+	}
+}
 
 export function isHttpUrl(raw: string): boolean {
 	const s = raw.trim()
@@ -273,23 +337,23 @@ export const MODERATION_DB_BADGE: Record<
 > = {
 	no: {
 		color: 'var(--color-red)',
-		label: 'Likely not licensed',
+		label: 'Restrictive license',
 	},
 	'permanent-no': {
 		color: 'var(--color-purple)',
-		label: 'May violate rules',
+		label: 'Prohibited content',
 	},
 	yes: {
 		color: 'var(--color-green)',
-		label: 'Allowed',
+		label: 'Permissive license',
 	},
 	'with-attribution': {
 		color: 'var(--color-green)',
-		label: 'Allowed',
+		label: 'Permissive license',
 	},
 	'with-attribution-and-source': {
 		color: 'var(--color-green)',
-		label: 'Allowed',
+		label: 'Permissive license',
 	},
 	unidentified: {
 		label: 'Unidentified',

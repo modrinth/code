@@ -2780,9 +2780,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Show member UI"
-  },
   "project.moderation.thread.private-description": {
     "message": "This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project."
   },
@@ -2861,6 +2858,9 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Unknown external content"
   },
+  "project.settings.permissions.collapse-all": {
+    "message": "Collapse all"
+  },
   "project.settings.permissions.completed.description": {
     "message": "All external content has permission information and attributions have been provided."
   },
@@ -2872,6 +2872,9 @@
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "You're all set!"
+  },
+  "project.settings.permissions.expand-all": {
+    "message": "Expand all"
   },
   "project.settings.permissions.fail.description": {
     "message": "You may not have permission to redistribute some of the external content in your project. In order to publish on Modrinth, please remove this content or provide proof that you do have permission to use it."
@@ -2899,6 +2902,9 @@
   },
   "project.settings.permissions.sort.recently-edited": {
     "message": "Recently edited"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Rejected"
   },
   "project.settings.permissions.sort.status": {
     "message": "Status"

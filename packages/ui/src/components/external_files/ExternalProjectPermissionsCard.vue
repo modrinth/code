@@ -13,10 +13,13 @@ import {
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { attributionQuickReplies, type QuickReply } from '@modrinth/moderation'
+import { renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
-import { ButtonStyled, Collapsible } from '#ui/components'
+import { ButtonStyled, Collapsible, OverflowMenu } from '#ui/components'
+import type { OverflowMenuOption } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
 
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
@@ -51,6 +54,15 @@ const props = withDefaults(
 		isModerator: false,
 	},
 )
+
+const collapsedModel = defineModel<boolean>('collapsed')
+
+const collapsed = computed({
+	get: () => collapsedModel.value ?? (!props.isModerator && !!props.group.attribution),
+	set: (value) => {
+		collapsedModel.value = value
+	},
+})
 
 const emit = defineEmits<{
 	(e: 'updated'): void
@@ -117,27 +129,15 @@ const messages = defineMessages({
 		id: 'external-files.permissions-card.add-files-to-group',
 		defaultMessage: 'Add files...',
 	},
-	reviewExplanationPlaceholder: {
-		id: 'external-files.permissions-card.review-explanation-placeholder',
-		defaultMessage: 'Explanation of review',
-	},
-	moderationApproved: {
-		id: 'external-files.permissions-card.moderation.approved',
-		defaultMessage: 'Seems legit',
-	},
-	moderationBadProof: {
-		id: 'external-files.permissions-card.moderation.bad-proof',
-		defaultMessage: 'Insufficient proof',
-	},
-	moderationNotAllowed: {
-		id: 'external-files.permissions-card.moderation.not-allowed',
-		defaultMessage: 'Breaks rules',
-	},
 })
 
-const collapsed = ref(!!props.group.attribution)
-const editing = ref(false)
+type EditingMode = 'attribution' | 'moderation_review'
+
+const editingMode = ref<EditingMode | null>(null)
 const editorResumeKey = ref(0)
+
+const isEditingAttribution = computed(() => editingMode.value === 'attribution')
+const isEditingModerationReview = computed(() => editingMode.value === 'moderation_review')
 
 const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionResolution | null>(
 	() => parseInitialAttribution(props.group.attribution),
@@ -227,14 +227,24 @@ const splitFileMutation = useMutation({
 	},
 })
 
-function startEditing() {
-	editing.value = true
+function startEditingAttribution() {
+	editingMode.value = 'attribution'
 	collapsed.value = false
 	editorResumeKey.value += 1
 }
 
-function stopEditingAfterSaveOrCancel() {
-	editing.value = false
+function startEditingModerationReview() {
+	syncReviewReasonInput()
+	editingMode.value = 'moderation_review'
+}
+
+function stopEditing() {
+	editingMode.value = null
+}
+
+function cancelModerationReviewEditing() {
+	syncReviewReasonInput()
+	stopEditing()
 }
 
 function handleEditorUpdated() {
@@ -292,17 +302,39 @@ const moderationStatusKind = computed(
 )
 
 const moderationStatusIndicator = computed(() => {
-	if (!props.isModerator || !moderationStatusKind.value) {
+	if (!moderationStatusKind.value) {
 		return null
 	}
 	switch (moderationStatusKind.value) {
 		case 'approved':
-			return { icon: CheckCircleIcon, class: 'text-green size-5 shrink-0' }
+			return {
+				icon: CheckCircleIcon,
+				class: 'text-green',
+				name: defineMessage({
+					id: 'external-files.permissions-card.attribution.moderation-status.passed',
+					defaultMessage: 'Passed',
+				}),
+			}
 		case 'bad_proof':
-			return { icon: XCircleIcon, class: 'text-red size-5 shrink-0' }
+			return {
+				icon: XCircleIcon,
+				class: 'text-red',
+				name: defineMessage({
+					id: 'external-files.permissions-card.attribution.moderation-status.rejected-proof',
+					defaultMessage: 'Proof rejected',
+				}),
+			}
 		case 'not_allowed':
-			return { icon: ReportIcon, class: 'text-red size-5 shrink-0' }
+			return {
+				icon: ReportIcon,
+				class: 'text-red',
+				name: defineMessage({
+					id: 'external-files.permissions-card.attribution.moderation-status.content-not-allowed',
+					defaultMessage: 'Content not allowed',
+				}),
+			}
 	}
+	return null
 })
 
 const reviewReasonInput = ref('')
@@ -316,7 +348,9 @@ syncReviewReasonInput()
 watch(
 	() => props.group.attribution?.moderation_status,
 	() => {
-		syncReviewReasonInput()
+		if (!isEditingModerationReview.value) {
+			syncReviewReasonInput()
+		}
 	},
 	{ deep: true },
 )
@@ -347,6 +381,7 @@ const setModerationStatusMutation = useMutation({
 	},
 	onSuccess: async () => {
 		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.projectId] })
+		stopEditing()
 		emit('updated')
 	},
 	onError: (error: Error) => {
@@ -368,6 +403,31 @@ function handleSetModerationStatus(
 ) {
 	setModerationStatusMutation.mutate(kind)
 }
+
+async function handleQuickReply(reply: QuickReply) {
+	const message =
+		typeof reply.message === 'function' ? await reply.message(undefined) : reply.message
+	reviewReasonInput.value = message
+}
+
+const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
+	const replies = attributionQuickReplies
+
+	if (!replies) return []
+
+	return replies
+		.filter((reply) => {
+			if (reply.shouldShow === undefined) return true
+			return reply.shouldShow(undefined)
+		})
+		.map(
+			(reply) =>
+				({
+					id: reply.label,
+					action: () => handleQuickReply(reply),
+				}) as OverflowMenuOption,
+		)
+})
 </script>
 
 <template>
@@ -388,12 +448,14 @@ function handleSetModerationStatus(
 					:class="{ 'rotate-180': !collapsed }"
 				/>
 				<span class="flex flex-col items-start min-w-0 group-active:scale-[0.98]">
-					<span class="flex items-center gap-2 min-w-0">
+					<span class="flex items-center gap-2 min-w-0 flex-wrap">
 						<span class="text-contrast truncate font-semibold">{{ title }}</span>
 						<component
 							:is="moderationStatusIndicator.icon"
 							v-if="moderationStatusIndicator"
+							v-tooltip="formatMessage(moderationStatusIndicator.name)"
 							:class="moderationStatusIndicator.class"
+							class="size-5 shrink-0"
 							aria-hidden="true"
 						/>
 						<AttributionStatusTag :variant="attributionStatusVariant" />
@@ -424,12 +486,14 @@ function handleSetModerationStatus(
 						:key="file.sha1"
 						class="pl-3 rounded-xl grid grid-cols-[auto_1fr_auto] gap-2 items-start border-[1px] border-solid border-surface-5 bg-surface-2"
 						:style="{
-							'border-color': file.moderation_external_license
-								? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
-								: undefined,
-							color: file.moderation_external_license
-								? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
-								: undefined,
+							'border-color':
+								isModerator && file.moderation_external_license
+									? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
+									: undefined,
+							color:
+								isModerator && file.moderation_external_license
+									? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
+									: undefined,
 						}"
 					>
 						<FileIcon class="size-4 shrink-0 mt-2.5" />
@@ -442,7 +506,6 @@ function handleSetModerationStatus(
 							<ButtonStyled v-if="group.files.length > 1" circular size="small">
 								<button
 									v-tooltip="formatMessage(messages.splitFile)"
-									type="button"
 									class="m-1"
 									:disabled="splitFileMutation.isPending.value"
 									@click="handleSplitFile(file.sha1)"
@@ -458,7 +521,7 @@ function handleSetModerationStatus(
 					</span>
 					<div>
 						<ButtonStyled>
-							<button type="button" @click="handleAddFilesToGroup($event)">
+							<button @click="handleAddFilesToGroup($event)">
 								<PlusIcon class="size-4 shrink-0" /> {{ formatMessage(messages.addFilesToGroup) }}
 							</button>
 						</ButtonStyled>
@@ -492,7 +555,7 @@ function handleSetModerationStatus(
 				</template>
 
 				<AttributionDisplay
-					v-if="!editing && initialAttribution"
+					v-if="!isEditingAttribution && initialAttribution"
 					:attribution="initialAttribution"
 					:attributed-at="group.attributed_at"
 					:attributor-href="attributorLink"
@@ -501,81 +564,177 @@ function handleSetModerationStatus(
 				>
 					<template v-if="group.attribution?.kind !== 'globally_allowed'" #actions>
 						<ButtonStyled>
-							<button @click="startEditing">
+							<button @click="startEditingAttribution">
 								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
 							</button>
 						</ButtonStyled>
 					</template>
-					<template v-if="isModerator" #footer>
-						<StyledInput
-							v-model="reviewReasonInput"
-							multiline
-							:placeholder="formatMessage(messages.reviewExplanationPlaceholder)"
-						/>
-						<div class="flex items-center gap-2 flex-wrap mt-3">
-							<ButtonStyled color="green" color-fill="text">
-								<button
-									type="button"
-									:disabled="setModerationStatusMutation.isPending.value"
-									@click="handleSetModerationStatus('approved')"
+					<template
+						v-if="
+							(isModerator || group.attribution.moderation_status) &&
+							group.attribution.kind !== 'globally_allowed'
+						"
+						#footer
+					>
+						<div class="flex gap-4 flex-wrap">
+							<div>
+								<p
+									class="font-semibold m-0 flex items-center gap-2 mb-3"
+									:class="isModerator ? 'text-orange' : moderationStatusIndicator?.class"
 								>
-									<SpinnerIcon
-										v-if="
-											setModerationStatusMutation.isPending.value &&
-											pendingModerationStatusKind === 'approved'
+									<template v-if="isModerator">
+										<ScaleIcon class="size-5 shrink-0" />
+										Review attribution
+									</template>
+									<template v-else-if="moderationStatusIndicator">
+										<component
+											:is="moderationStatusIndicator.icon"
+											class="size-5 shrink-0"
+											aria-hidden="true"
+										/>
+										{{ formatMessage(moderationStatusIndicator.name) }}
+									</template>
+								</p>
+								<template v-if="isModerator">
+									<template
+										v-if="group.attribution.moderation_status && !isEditingModerationReview"
+									>
+										<div class="grid grid-cols-[auto_1fr] gap-y-3 gap-x-4">
+											<div>Status:</div>
+											<div
+												class="flex items-center gap-1"
+												:class="moderationStatusIndicator ? moderationStatusIndicator.class : ''"
+											>
+												<template v-if="moderationStatusIndicator">
+													<component
+														:is="moderationStatusIndicator.icon"
+														class="size-4 shrink-0"
+														aria-hidden="true"
+													/>
+													{{ formatMessage(moderationStatusIndicator.name) }}
+												</template>
+											</div>
+											<div class="leading-[1.5]">Reason:</div>
+											<div>
+												<div
+													class="markdown-body"
+													v-html="renderString(group.attribution.moderation_status.reason || 'N/A')"
+												/>
+											</div>
+										</div>
+									</template>
+									<template v-else>
+										<StyledInput
+											v-model="reviewReasonInput"
+											multiline
+											placeholder="Explanation of review (optional)"
+										/>
+										<div class="flex items-center gap-2 flex-wrap mt-3">
+											<ButtonStyled v-if="visibleQuickReplies.length > 0">
+												<OverflowMenu :options="visibleQuickReplies">
+													Reply presets
+													<ChevronDownIcon />
+												</OverflowMenu>
+											</ButtonStyled>
+											<ButtonStyled color="green" color-fill="text">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="handleSetModerationStatus('approved')"
+												>
+													<SpinnerIcon
+														v-if="
+															setModerationStatusMutation.isPending.value &&
+															pendingModerationStatusKind === 'approved'
+														"
+														class="size-4 shrink-0 animate-spin"
+													/>
+													<CheckCircleIcon v-else />
+													Approve
+												</button>
+											</ButtonStyled>
+											<ButtonStyled color="red" color-fill="text">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="handleSetModerationStatus('bad_proof')"
+												>
+													<SpinnerIcon
+														v-if="
+															setModerationStatusMutation.isPending.value &&
+															pendingModerationStatusKind === 'bad_proof'
+														"
+														class="size-4 shrink-0 animate-spin"
+													/>
+													<XCircleIcon v-else />
+													Reject: Insufficient proof
+												</button>
+											</ButtonStyled>
+											<ButtonStyled color="red" color-fill="text">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="handleSetModerationStatus('not_allowed')"
+												>
+													<SpinnerIcon
+														v-if="
+															setModerationStatusMutation.isPending.value &&
+															pendingModerationStatusKind === 'not_allowed'
+														"
+														class="size-4 shrink-0 animate-spin"
+													/>
+													<ReportIcon v-else />
+													Reject: Not allowed
+												</button>
+											</ButtonStyled>
+											<ButtonStyled v-if="isEditingModerationReview" type="outlined">
+												<button
+													:disabled="setModerationStatusMutation.isPending.value"
+													@click="cancelModerationReviewEditing"
+												>
+													<XIcon />
+													{{ formatMessage(commonMessages.cancelButton) }}
+												</button>
+											</ButtonStyled>
+										</div>
+										<div class="flex items-center gap-2 flex-wrap mt-3">
+											<ButtonStyled>
+												<button @click="handleAddToGlobalDatabase">
+													<ScaleIcon /> Add files to database...
+												</button>
+											</ButtonStyled>
+											<ButtonStyled>
+												<button @click="handleAddToExistingEntry">
+													<ScaleIcon /> Add to existing entry...
+												</button>
+											</ButtonStyled>
+										</div>
+									</template>
+								</template>
+								<div v-else class="grid grid-cols-[auto_1fr] gap-y-3 gap-x-4">
+									<div class="leading-[1.5]">
+										{{ formatMessage(messages.moderationReasonLabel) }}
+									</div>
+									<div
+										class="markdown-body"
+										v-html="
+											renderString(
+												group.attribution.moderation_status.reason || 'No reason provided',
+											)
 										"
-										class="size-4 shrink-0 animate-spin"
 									/>
-									<CheckCircleIcon v-else />
-									{{ formatMessage(messages.moderationApproved) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="red" color-fill="text">
-								<button
-									type="button"
-									:disabled="setModerationStatusMutation.isPending.value"
-									@click="handleSetModerationStatus('bad_proof')"
-								>
-									<SpinnerIcon
-										v-if="
-											setModerationStatusMutation.isPending.value &&
-											pendingModerationStatusKind === 'bad_proof'
-										"
-										class="size-4 shrink-0 animate-spin"
-									/>
-									<XCircleIcon v-else />
-									{{ formatMessage(messages.moderationBadProof) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="red" color-fill="text">
-								<button
-									type="button"
-									:disabled="setModerationStatusMutation.isPending.value"
-									@click="handleSetModerationStatus('not_allowed')"
-								>
-									<SpinnerIcon
-										v-if="
-											setModerationStatusMutation.isPending.value &&
-											pendingModerationStatusKind === 'not_allowed'
-										"
-										class="size-4 shrink-0 animate-spin"
-									/>
-									<ReportIcon v-else />
-									{{ formatMessage(messages.moderationNotAllowed) }}
-								</button>
-							</ButtonStyled>
-						</div>
-						<div class="flex items-center gap-2 flex-wrap mt-3">
-							<ButtonStyled>
-								<button type="button" @click="handleAddToGlobalDatabase">
-									<ScaleIcon /> Add files to database...
-								</button>
-							</ButtonStyled>
-							<ButtonStyled>
-								<button type="button" @click="handleAddToExistingEntry">
-									<ScaleIcon /> Add to existing entry...
-								</button>
-							</ButtonStyled>
+								</div>
+							</div>
+							<div
+								v-if="
+									isModerator && !isEditingModerationReview && group.attribution.moderation_status
+								"
+								class="ml-auto"
+							>
+								<ButtonStyled color="orange">
+									<button @click="startEditingModerationReview">
+										<ScaleIcon />
+										{{ formatMessage(commonMessages.editButton) }}
+									</button>
+								</ButtonStyled>
+							</div>
 						</div>
 					</template>
 				</AttributionDisplay>
@@ -591,8 +750,8 @@ function handleSetModerationStatus(
 						:flame-project-url="group.flame_project?.url"
 						:resume-key="editorResumeKey"
 						@updated="handleEditorUpdated"
-						@saved="stopEditingAfterSaveOrCancel"
-						@cancel="stopEditingAfterSaveOrCancel"
+						@saved="stopEditing"
+						@cancel="stopEditing"
 					/>
 				</div>
 			</div>

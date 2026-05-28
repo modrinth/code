@@ -848,8 +848,20 @@
   "external-files.permissions-card.add-files-to-group": {
     "defaultMessage": "Add files..."
   },
+  "external-files.permissions-card.all-rights-reserved": {
+    "defaultMessage": "All Rights Reserved/No license"
+  },
   "external-files.permissions-card.assign-files-error.title": {
     "defaultMessage": "Could not add files"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "Content not allowed"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Passed"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Proof rejected"
   },
   "external-files.permissions-card.badge.attributed": {
     "defaultMessage": "Attributed"
@@ -867,7 +879,10 @@
     "defaultMessage": "Other"
   },
   "external-files.permissions-card.error.custom-license-required": {
-    "defaultMessage": "Please describe the custom license."
+    "defaultMessage": "Please include a link to your license. If you have none, you should likely select 'All Rights Reserved/No license'"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Please provide an explanation or upload at least one proof image."
   },
   "external-files.permissions-card.error.license-required": {
     "defaultMessage": "Please select a license."
@@ -880,6 +895,15 @@
   },
   "external-files.permissions-card.error.proof-image-invalid-type": {
     "defaultMessage": "Please upload a PNG, JPEG, GIF, WebP, or BMP image."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Please upload at least one proof image."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "A short explanation or proof images are required."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Explanation"
   },
   "external-files.permissions-card.fallback-group-title": {
     "defaultMessage": "Attribution group {id}"
@@ -917,17 +941,11 @@
   "external-files.permissions-card.link-to-work-url-placeholder": {
     "defaultMessage": "link-to-work"
   },
-  "external-files.permissions-card.moderation.approved": {
-    "defaultMessage": "Seems legit"
-  },
-  "external-files.permissions-card.moderation.bad-proof": {
-    "defaultMessage": "Insufficient proof"
-  },
   "external-files.permissions-card.moderation.error.title": {
     "defaultMessage": "Could not save moderation review"
   },
-  "external-files.permissions-card.moderation.not-allowed": {
-    "defaultMessage": "Breaks rules"
+  "external-files.permissions-card.modrinth-link-to-work": {
+    "defaultMessage": "This appears to be a Modrinth link. If this content is available on Modrinth, your pack was likely exported incorrectly. If you downloaded it from another site, try downloading the Modrinth version instead; sometimes they are not identical files."
   },
   "external-files.permissions-card.not-used-in-versions": {
     "defaultMessage": "These files are not currently used by any version."
@@ -992,17 +1010,11 @@
   "external-files.permissions-card.reason.no-permission.description": {
     "defaultMessage": "You don't have permission to use this work."
   },
-  "external-files.permissions-card.reason.proof-description": {
-    "defaultMessage": "Include screenshots of messages, emails, or replies from the copyright owner showing that they granted you permission to redistribute their work in your modpack."
-  },
   "external-files.permissions-card.reason.special-permission": {
     "defaultMessage": "Special permission"
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
-  },
-  "external-files.permissions-card.review-explanation-placeholder": {
-    "defaultMessage": "Explanation of review"
   },
   "external-files.permissions-card.save": {
     "defaultMessage": "Save attribution"

@@ -136,7 +136,7 @@
 				</ButtonStyled>
 			</div>
 			<div v-else class="input-group mt-2">
-				<ButtonStyled v-if="primaryFile?.url && !currentMember" color="brand">
+				<ButtonStyled v-if="primaryFile?.url" color="brand">
 					<a
 						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
 						:href="decoratedPrimaryFileUrl"
@@ -159,36 +159,44 @@
 						Report
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-if="currentMember">
-					<button @click="handleOpenEditVersionModal(version.id, project.id, 'metadata')">
-						<BoxIcon aria-hidden="true" />
-						Edit metadata
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="currentMember">
-					<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-details')">
-						<InfoIcon aria-hidden="true" />
-						Edit details
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="currentMember">
-					<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-files')">
-						<FileIcon aria-hidden="true" />
-						Edit files
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button
-						v-if="
-							currentMember &&
-							version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
-						"
-						@click="modal_package_mod?.show()"
-					>
-						<BoxIcon aria-hidden="true" />
-						Package as mod
-					</button>
-				</ButtonStyled>
+
+				<template v-if="currentMember">
+					<ButtonStyled v-if="version.files_missing_attribution?.length > 0" color="orange">
+						<nuxt-link :to="`/project/${project.id}/settings/permissions`">
+							Resolve missing permissions
+							<RightArrowIcon aria-hidden="true" />
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="handleOpenEditVersionModal(version.id, project.id, 'metadata')">
+							<BoxIcon aria-hidden="true" />
+							Edit metadata
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-details')">
+							<InfoIcon aria-hidden="true" />
+							Edit details
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-files')">
+							<FileIcon aria-hidden="true" />
+							Edit files
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button
+							v-if="
+								version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
+							"
+							@click="modal_package_mod?.show()"
+						>
+							<BoxIcon aria-hidden="true" />
+							Package as mod
+						</button>
+					</ButtonStyled>
+				</template>
 			</div>
 		</div>
 		<div class="version-page__changelog universal-card">

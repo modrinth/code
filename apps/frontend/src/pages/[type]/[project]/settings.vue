@@ -17,6 +17,7 @@ import {
 	commonMessages,
 	commonProjectSettingsMessages,
 	injectProjectPageContext,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
@@ -142,6 +143,16 @@ watch(route, () => {
 	const scrollY = scroll.y.value
 	setTimeout(() => window.scrollTo(0, scrollY), 10)
 })
+
+const moderatorSeeUserUi = computed<boolean>({
+	get() {
+		return flags.value.showModeratorProjectMemberUi
+	},
+	set(value: boolean) {
+		flags.value.showModeratorProjectMemberUi = value
+		saveFeatureFlags()
+	},
+})
 </script>
 
 <template>
@@ -165,6 +176,10 @@ watch(route, () => {
 		<div class="grid gap-4 lg:grid-cols-[1fr_3fr]">
 			<div>
 				<NavStack :items="navItems" />
+				<div v-if="isStaff(currentMember?.user)" class="mt-4 flex items-center gap-2">
+					<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
+					<label for="moderator-see-user-ui-toggle"> Show member UI </label>
+				</div>
 			</div>
 			<div class="min-w-0">
 				<NuxtPage />

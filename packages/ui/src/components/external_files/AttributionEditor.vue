@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, SaveIcon, SpinnerIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	InfoIcon,
+	IssuesIcon,
+	SaveIcon,
+	SpinnerIcon,
+	TrashIcon,
+	UploadIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { builtinLicenses } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import {
-	Admonition,
-	ButtonStyled,
-	Chips,
-	Combobox,
-	type ComboboxOption,
-	StyledInput,
-} from '#ui/components'
+import { ButtonStyled, Chips, Combobox, type ComboboxOption, StyledInput } from '#ui/components'
 import { FileInput } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
 
@@ -20,6 +22,7 @@ import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import {
 	attributionLinkToWork,
+	attributionProofValidationError,
 	CUSTOM_LICENSE_VALUE,
 	isHttpUrl,
 	parseAttributionLicense,
@@ -134,6 +137,14 @@ const messages = defineMessages({
 		id: 'external-files.permissions-card.proof-image-remove',
 		defaultMessage: 'Remove image',
 	},
+	modrinthLinkToWork: {
+		id: 'external-files.permissions-card.modrinth-link-to-work',
+		defaultMessage: `This appears to be a Modrinth link. If this content is available on Modrinth, your pack was likely exported incorrectly. If you downloaded it from another site, try downloading the Modrinth version instead; sometimes they are not identical files.`,
+	},
+	arrLabel: {
+		id: 'external-files.permissions-card.all-rights-reserved',
+		defaultMessage: `All Rights Reserved/No license`,
+	},
 })
 
 const MAX_PROOF_IMAGE_BYTES = 1_048_576
@@ -210,18 +221,48 @@ watch(
 	},
 )
 
+watch(selectedKind, () => {
+	inputError.value = null
+})
+
 const permissionReasonFields = computed<ProjectPermissionField[]>(() => {
 	return PERMISSION_REASONS[selectedKind.value]?.fields ?? []
+})
+
+const selectedPermissionReason = computed(() => PERMISSION_REASONS[selectedKind.value])
+
+const notesAfterProofImages = computed(() => selectedKind.value === 'special_permissions')
+
+const notesInputRows = computed(() => (notesAfterProofImages.value ? 2 : 3))
+
+const proofImagesShowOptional = computed(
+	() => selectedPermissionReason.value.proofRequirement === null,
+)
+
+const attributionFieldSections = computed(() => {
+	const fields = permissionReasonFields.value
+	const sections: Array<'notes' | 'image_urls'> = []
+	if (fields.includes('notes') && !notesAfterProofImages.value) {
+		sections.push('notes')
+	}
+	if (fields.includes('image_urls')) {
+		sections.push('image_urls')
+	}
+	if (fields.includes('notes') && notesAfterProofImages.value) {
+		sections.push('notes')
+	}
+	return sections
 })
 
 const isCustomLicense = computed(() => licenseIdInput.value === CUSTOM_LICENSE_VALUE)
 
 const licenseOptions = computed<ComboboxOption<string>[]>(() => [
 	...builtinLicenses
-		.filter((license) => license.short !== '' && license.short !== 'All-Rights-Reserved')
+		.filter((license) => license.short !== '')
 		.map((license) => ({
 			value: license.short,
-			label: license.short,
+			label:
+				license.short === 'All-Rights-Reserved' ? formatMessage(messages.arrLabel) : license.short,
 		})),
 	{
 		value: CUSTOM_LICENSE_VALUE,
@@ -245,7 +286,7 @@ function buildAttributionLicense(): Labrinth.Attribution.Internal.AttributionLic
 		inputError.value = formatMessage(
 			defineMessage({
 				id: 'external-files.permissions-card.error.custom-license-required',
-				defaultMessage: 'Please describe the custom license.',
+				defaultMessage: `Please include a link to your license. If you have none, you should likely select 'All Rights Reserved/No license'`,
 			}),
 		)
 		return null
@@ -257,6 +298,15 @@ function buildEditedData(): Labrinth.Attribution.Internal.AttributionResolution 
 	inputError.value = null
 	const notes = notesInput.value.trim()
 	const image_urls = [...proofImageUrls.value]
+	const proofError = attributionProofValidationError(
+		selectedPermissionReason.value.proofRequirement,
+		notes,
+		image_urls,
+	)
+	if (proofError) {
+		inputError.value = formatMessage(proofError)
+		return null
+	}
 	switch (selectedKind.value) {
 		case 'license': {
 			const license = buildAttributionLicense()
@@ -416,6 +466,15 @@ function cancelEditing() {
 				class="max-w-[40rem]"
 				:placeholder="`https://example.com/${formatMessage(messages.linkToWorkUrlPlaceholder)}`"
 			/>
+			<span
+				v-if="
+					linkInput.startsWith('https://modrinth.com/') ||
+					linkInput.startsWith('https://www.modrinth.com/')
+				"
+				class="flex text-orange gap-2 font-medium mt-2"
+			>
+				<IssuesIcon class="shrink-0 mt-0.5" /> {{ formatMessage(messages.modrinthLinkToWork) }}
+			</span>
 		</div>
 		<div v-if="permissionReasonFields.includes('license_id')" class="flex flex-col gap-2">
 			<span class="text-contrast font-semibold mt-1">
@@ -443,87 +502,108 @@ function cancelEditing() {
 				:placeholder="`https://example.com/${formatMessage(messages.linkToLicenseUrlPlaceholder)}`"
 			/>
 		</div>
-		<div v-if="permissionReasonFields.includes('notes')" class="flex flex-col gap-2">
-			<span class="text-contrast font-semibold mt-1">
-				{{ formatMessage(messages.notesLabel) }}
-				<span class="font-normal text-primary">{{ formatMessage(messages.optional) }}</span>
-			</span>
-			<StyledInput
-				v-model="notesInput"
-				type="text"
-				resize="both"
-				multiline
-				class="max-w-[40rem]"
-				:placeholder="formatMessage(messages.notesPlaceholder)"
-			/>
-		</div>
-		<div v-if="permissionReasonFields.includes('image_urls')" class="flex flex-col gap-2">
-			<div class="flex flex-col gap-2 mt-1">
-				<div class="flex flex-col gap-1 mt-1">
-					<span class="text-contrast font-semibold">
-						{{ formatMessage(messages.proofImagesLabel) }}
-						<span
-							v-if="!!PERMISSION_REASONS[selectedKind].proofImagesOptional"
-							class="font-normal text-primary"
-							>{{ formatMessage(messages.optional) }}</span
-						>
-					</span>
-					<span v-if="PERMISSION_REASONS[selectedKind].proofImagesDescription">{{
-						formatMessage(PERMISSION_REASONS[selectedKind].proofImagesDescription!)
-					}}</span>
+		<div class="flex flex-col gap-3">
+			<template v-for="section in attributionFieldSections" :key="section">
+				<div v-if="section === 'notes'" class="flex flex-col gap-2">
+					<div class="flex flex-col gap-1 mt-1">
+						<span class="text-contrast font-semibold">
+							{{ formatMessage(selectedPermissionReason.notesLabel ?? messages.notesLabel) }}
+							<span
+								v-if="selectedPermissionReason.notesShowsOptional"
+								class="font-normal text-primary"
+								>{{ formatMessage(messages.optional) }}</span
+							>
+						</span>
+						<span v-if="selectedPermissionReason.notesDescription">{{
+							formatMessage(selectedPermissionReason.notesDescription)
+						}}</span>
+					</div>
+					<StyledInput
+						v-model="notesInput"
+						type="text"
+						resize="both"
+						multiline
+						:rows="notesInputRows"
+						class="max-w-[40rem]"
+						:placeholder="formatMessage(messages.notesPlaceholder)"
+					/>
 				</div>
-				<div v-if="proofImageUrls.length > 0" class="grid grid-cols-2 gap-4">
-					<div
-						v-for="(src, idx) in proofImageUrls"
-						:key="`${src}-${idx}`"
-						class="relative rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
-					>
-						<img
-							:src="src"
-							:alt="formatMessage(messages.proofImageThumbnailAlt, { n: idx + 1 })"
-							class="flex w-full object-contain bg-surface-3"
-						/>
-						<div class="absolute top-2 right-2">
-							<ButtonStyled circular>
-								<button
-									v-tooltip="formatMessage(messages.proofImageRemove)"
-									type="button"
-									@click="removeProofImage(idx)"
-								>
-									<TrashIcon />
-								</button>
-							</ButtonStyled>
+				<div v-else-if="section === 'image_urls'" class="flex flex-col gap-2">
+					<div class="flex flex-col gap-2 mt-1">
+						<div class="flex flex-col gap-1 mt-1">
+							<span class="text-contrast font-semibold">
+								{{ formatMessage(messages.proofImagesLabel) }}
+								<span v-if="proofImagesShowOptional" class="font-normal text-primary">{{
+									formatMessage(messages.optional)
+								}}</span>
+							</span>
+							<span v-if="selectedPermissionReason.proofImagesDescription">{{
+								formatMessage(selectedPermissionReason.proofImagesDescription)
+							}}</span>
 						</div>
+						<div v-if="proofImageUrls.length > 0" class="grid grid-cols-2 gap-4">
+							<div
+								v-for="(src, idx) in proofImageUrls"
+								:key="`${src}-${idx}`"
+								class="relative rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
+							>
+								<img
+									:src="src"
+									:alt="formatMessage(messages.proofImageThumbnailAlt, { n: idx + 1 })"
+									class="flex w-full object-contain bg-surface-3"
+								/>
+								<div class="absolute top-2 right-2">
+									<ButtonStyled circular>
+										<button
+											v-tooltip="formatMessage(messages.proofImageRemove)"
+											type="button"
+											@click="removeProofImage(idx)"
+										>
+											<TrashIcon />
+										</button>
+									</ButtonStyled>
+								</div>
+							</div>
+						</div>
+						<div class="grid grid-cols-2 gap-4">
+							<FileInput
+								accept="image/png,image/jpeg,image/gif,image/webp,image/bmp"
+								:prompt="formatMessage(messages.proofImagesUploadPrompt)"
+								long-style
+								should-always-reset
+								:max-size="MAX_PROOF_IMAGE_BYTES"
+								:disabled="uploadProofImageMutation.isPending.value || saveMutation.isPending.value"
+								class="!bg-surface-3"
+								@change="handleProofImagesSelected"
+							>
+								<UploadIcon class="size-5 shrink-0" />
+							</FileInput>
+						</div>
+						<p v-if="uploadProofImageMutation.isError.value" class="text-red text-sm m-0">
+							{{ String(uploadProofImageMutation.error.value) }}
+						</p>
 					</div>
 				</div>
-				<div class="grid grid-cols-2 gap-4 mt-2">
-					<FileInput
-						accept="image/png,image/jpeg,image/gif,image/webp,image/bmp"
-						:prompt="formatMessage(messages.proofImagesUploadPrompt)"
-						long-style
-						should-always-reset
-						:max-size="MAX_PROOF_IMAGE_BYTES"
-						:disabled="uploadProofImageMutation.isPending.value || saveMutation.isPending.value"
-						class="!bg-surface-3"
-						@change="handleProofImagesSelected"
-					>
-						<UploadIcon class="size-5 shrink-0" />
-					</FileInput>
-				</div>
-				<p v-if="uploadProofImageMutation.isError.value" class="text-red text-sm m-0">
-					{{ String(uploadProofImageMutation.error.value) }}
-				</p>
+			</template>
+		</div>
+		<div
+			v-if="selectedKind === 'my_project' || selectedKind === 'special_permissions'"
+			class="grid grid-cols-[auto_1fr] gap-2"
+		>
+			<div class="flex flex-col items-center">
+				<InfoIcon class="size-5 text-blue" />
+				<div class="w-[2px] flex-grow bg-blue mt-[-1px]"></div>
+			</div>
+			<div class="flex flex-col gap-2">
+				<span class="font-medium leading-[1.25] text-blue">{{
+					formatMessage(messages.proofWarningTitle)
+				}}</span>
+				<span class="text-contrast">{{ formatMessage(messages.proofWarningBody) }}</span>
 			</div>
 		</div>
-		<Admonition
-			v-if="selectedKind === 'special_permissions'"
-			type="warning"
-			:header="formatMessage(messages.proofWarningTitle)"
-			:body="formatMessage(messages.proofWarningBody)"
-		/>
 
-		<p v-if="inputError" class="text-red text-sm m-0">{{ inputError }}</p>
-		<p v-else-if="saveMutation.isError.value" class="text-red text-sm m-0">
+		<p v-if="inputError" class="text-red m-0">{{ inputError }}</p>
+		<p v-else-if="saveMutation.isError.value" class="text-red m-0">
 			{{ String(saveMutation.error.value) }}
 		</p>
 

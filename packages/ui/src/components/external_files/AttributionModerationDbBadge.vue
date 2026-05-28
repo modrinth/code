@@ -29,9 +29,14 @@ const moderationStatuses = computed<{
 	primary: Labrinth.ExternalProjects.Internal.ExternalLicenseStatus
 	others?: Labrinth.ExternalProjects.Internal.ExternalLicenseStatus[]
 }>(() => {
-	const statuses = (props.files ?? [])
-		.map((file) => file.moderation_external_license?.status)
-		.filter((x) => x !== undefined)
+	const statuses = (props.files ?? []).map((file) => {
+		const status = file.moderation_external_license?.status
+		if (!status) {
+			return 'unidentified'
+		} else {
+			return status
+		}
+	})
 	const sorted = sortByIndex(MODERATION_STATUS_PRIORITY, [...new Set(statuses)])
 	const primary = sorted[0] ?? 'unidentified'
 	return {
@@ -51,10 +56,15 @@ const otherStatusesTooltip = computed(() => {
 
 <template>
 	<TagItem
-		v-tooltip="otherStatusesTooltip"
+		v-tooltip="`Other statuses: ${otherStatusesTooltip}`"
 		:style="{ color: MODERATION_DB_BADGE[moderationStatuses.primary]?.color }"
 	>
 		<ScaleIcon class="size-4 shrink-0" />
 		{{ statusLabel(moderationStatuses.primary) }}
+		<span class="text-primary">
+			{{
+				moderationStatuses.others?.length > 0 ? `+ ${moderationStatuses.others?.length} more` : ''
+			}}
+		</span>
 	</TagItem>
 </template>
