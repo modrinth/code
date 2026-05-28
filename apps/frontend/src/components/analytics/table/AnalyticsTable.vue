@@ -20,7 +20,7 @@
 				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 					<div class="text-xl font-semibold text-contrast">Breakdown</div>
 
-					<div class="flex w-full flex-wrap items-center gap-3 md:w-auto">
+					<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
 						<StyledInput
 							v-model="searchQuery"
 							:icon="SearchIcon"
@@ -139,8 +139,8 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 import {
-	type AnalyticsTableSortColumn as TableColumnKey,
 	type AnalyticsTableSortDirection as SortDirection,
+	type AnalyticsTableSortColumn as TableColumnKey,
 	areStringArraysEqual,
 	buildAnalyticsTableSortRouteQuery,
 	hasAnalyticsTableSortQuery,
