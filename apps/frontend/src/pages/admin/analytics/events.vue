@@ -170,7 +170,14 @@
 				</template>
 
 				<template #cell-date="{ row }">
-					<span class="font-medium text-primary">{{ formatEventDateRange(row) }}</span>
+					<div
+						v-if="isEventDateRange(row)"
+						class="flex flex-col gap-0.5 text-sm font-medium leading-5 text-primary"
+					>
+						<span>{{ formatEventDateRangeStart(row) }} -</span>
+						<span>{{ formatEventDateRangeEnd(row) }}</span>
+					</div>
+					<span v-else class="font-medium text-primary">{{ formatEventDateRange(row) }}</span>
 				</template>
 
 				<template #cell-metrics="{ row }">
@@ -612,6 +619,18 @@ function formatEventDateRange(event: Labrinth.Analytics.v3.AnalyticsEvent): stri
 	}
 
 	return `${formatLongDateTime(startDate)} - ${formatLongDateTime(endDate)}`
+}
+
+function isEventDateRange(event: Labrinth.Analytics.v3.AnalyticsEvent): boolean {
+	return new Date(event.starts).getTime() !== new Date(event.ends).getTime()
+}
+
+function formatEventDateRangeStart(event: Labrinth.Analytics.v3.AnalyticsEvent): string {
+	return formatLongDateTime(new Date(event.starts))
+}
+
+function formatEventDateRangeEnd(event: Labrinth.Analytics.v3.AnalyticsEvent): string {
+	return formatLongDateTime(new Date(event.ends))
 }
 
 function getEventFormDateRange(): [string, string] | null {
