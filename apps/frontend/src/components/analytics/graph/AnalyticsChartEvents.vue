@@ -1,5 +1,10 @@
 <template>
-	<div v-if="canRender" ref="chartElement" class="pointer-events-none absolute inset-0">
+	<div
+		v-if="canRender"
+		ref="chartElement"
+		class="pointer-events-none absolute left-0 top-0"
+		:style="chartLayerStyle"
+	>
 		<div
 			v-for="group in eventGroups"
 			:key="`${group.id}:guide`"
@@ -63,7 +68,7 @@
 			<div
 				v-if="activeGroup"
 				ref="tooltipElement"
-				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] flex max-h-[330px] w-[12rem] overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-3 text-sm shadow-xl"
+				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] flex max-h-[340px] w-[12rem] flex-col overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-3 text-sm shadow-xl"
 				:style="tooltipStyle"
 				@mouseenter="onTooltipMouseEnter"
 				@mouseleave="onTooltipMouseLeave"
@@ -71,7 +76,7 @@
 				@focusout="onTooltipMouseLeave"
 				@click.stop
 			>
-				<div class="relative min-h-0 flex-1">
+				<div class="relative flex min-h-0 flex-1 flex-col">
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
@@ -88,7 +93,7 @@
 
 					<div
 						ref="tooltipScrollElement"
-						class="max-h-[330px] overflow-y-auto overscroll-contain py-2"
+						class="overflow-y-auto overscroll-contain py-2"
 						@scroll="checkTooltipScrollState"
 					>
 						<div class="flex flex-col gap-2.5">
@@ -209,8 +214,6 @@ const props = defineProps<{
 	chartStart: Date | null
 	chartEnd: Date | null
 	geometry: AnalyticsChartGeometryPayload | null
-	containerWidth: number
-	containerHeight: number
 	markerIcon?: AnalyticsChartEventMarkerIcon
 	markerOffsetY?: number
 }>()
@@ -274,13 +277,17 @@ const {
 
 const chartStartMs = computed(() => props.chartStart?.getTime() ?? null)
 const chartEndMs = computed(() => props.chartEnd?.getTime() ?? null)
-const containerWidth = computed(() => props.containerWidth || props.geometry?.width || 0)
-const containerHeight = computed(() => props.containerHeight || props.geometry?.height || 0)
+const chartWidth = computed(() => props.geometry?.width ?? 0)
+const chartHeight = computed(() => props.geometry?.height ?? 0)
+const chartLayerStyle = computed(() => ({
+	width: `${chartWidth.value}px`,
+	height: `${chartHeight.value}px`,
+}))
 const canRender = computed(
 	() =>
 		props.geometry !== null &&
-		containerWidth.value > 0 &&
-		containerHeight.value > 0 &&
+		chartWidth.value > 0 &&
+		chartHeight.value > 0 &&
 		chartStartMs.value !== null &&
 		chartEndMs.value !== null &&
 		chartEndMs.value > chartStartMs.value &&
@@ -433,18 +440,12 @@ const markerTop = computed(() => {
 	if (!geometry) return 0
 	const preferredTop = geometry.top - MARKER_HEIGHT_PX
 	const availableHeight =
-		containerHeight.value -
-		MARKER_HEIGHT_PX -
-		EDGE_PADDING_PX -
-		Math.max(props.markerOffsetY ?? 0, 0)
+		chartHeight.value - MARKER_HEIGHT_PX - EDGE_PADDING_PX - Math.max(props.markerOffsetY ?? 0, 0)
 	const maxTop = Math.max(EDGE_PADDING_PX, availableHeight)
 	return clamp(preferredTop, EDGE_PADDING_PX, maxTop)
 })
 const markerOffsetTop = computed(() => {
-	const maxTop = Math.max(
-		EDGE_PADDING_PX,
-		containerHeight.value - MARKER_HEIGHT_PX - EDGE_PADDING_PX,
-	)
+	const maxTop = Math.max(EDGE_PADDING_PX, chartHeight.value - MARKER_HEIGHT_PX - EDGE_PADDING_PX)
 	return clamp(markerTop.value + (props.markerOffsetY ?? 0), EDGE_PADDING_PX, maxTop)
 })
 
@@ -452,22 +453,21 @@ const tooltipStyle = computed(() => {
 	const group = activeGroup.value
 	if (!group) return {}
 
-	const maxTooltipWidth = Math.max(0, containerWidth.value - EDGE_PADDING_PX * 2)
-	const maxTooltipHeight = Math.max(0, containerHeight.value - EDGE_PADDING_PX * 2)
+	const maxTooltipWidth = Math.max(0, chartWidth.value - EDGE_PADDING_PX * 2)
 	const resolvedTooltipWidth = Math.min(tooltipWidth.value, maxTooltipWidth)
-	const resolvedTooltipHeight = Math.min(tooltipHeight.value, maxTooltipHeight)
+	const resolvedTooltipHeight = tooltipHeight.value
 	const markerX = getClampedMarkerCenterX(group)
 	const markerViewportLeft = chartRect.left + markerX
 	const markerViewportTop = chartRect.top + MARKER_TOP_OFFSET_PX + markerOffsetTop.value
 	const desiredLeft = markerViewportLeft - resolvedTooltipWidth / 2
 	const maxLeft = Math.max(
 		chartRect.left + EDGE_PADDING_PX,
-		chartRect.left + containerWidth.value - resolvedTooltipWidth - EDGE_PADDING_PX,
+		chartRect.left + chartWidth.value - resolvedTooltipWidth - EDGE_PADDING_PX,
 	)
 	const left = clamp(desiredLeft, chartRect.left + EDGE_PADDING_PX, maxLeft)
 
 	const desiredTop = markerViewportTop - resolvedTooltipHeight - TOOLTIP_OFFSET_PX
-	const viewportHeight = typeof window === 'undefined' ? containerHeight.value : window.innerHeight
+	const viewportHeight = typeof window === 'undefined' ? resolvedTooltipHeight : window.innerHeight
 	const maxTop = Math.max(EDGE_PADDING_PX, viewportHeight - resolvedTooltipHeight - EDGE_PADDING_PX)
 	const top = clamp(desiredTop, EDGE_PADDING_PX, maxTop)
 
@@ -670,7 +670,7 @@ function getCollisionClusterLayout(groups: EventGroup[]): CollisionClusterLayout
 	const originalRight = Math.max(...groups.map(getGroupRightEdge))
 	const center = (originalLeft + originalRight) / 2
 	const preferredLeft = center - totalWidth / 2
-	const maxLeft = Math.max(EDGE_PADDING_PX, containerWidth.value - totalWidth - EDGE_PADDING_PX)
+	const maxLeft = Math.max(EDGE_PADDING_PX, chartWidth.value - totalWidth - EDGE_PADDING_PX)
 	const left = clamp(preferredLeft, EDGE_PADDING_PX, maxLeft)
 	return {
 		groups: sortedGroups,
@@ -691,7 +691,7 @@ function getEstimatedMarkerWidth(group: EventGroup) {
 function getClampedMarkerCenterX(group: EventGroup) {
 	const markerWidth = getEstimatedMarkerWidth(group)
 	const minX = markerWidth / 2 + EDGE_PADDING_PX
-	const maxX = Math.max(minX, containerWidth.value - markerWidth / 2 - EDGE_PADDING_PX)
+	const maxX = Math.max(minX, chartWidth.value - markerWidth / 2 - EDGE_PADDING_PX)
 	return clamp(group.x + group.markerOffsetX, minX, maxX)
 }
 
@@ -920,7 +920,7 @@ function formatEventRange(event: AnalyticsChartEvent) {
 }
 
 watch(
-	() => [activeGroup.value, props.containerWidth, props.containerHeight],
+	() => [activeGroup.value, chartWidth.value, chartHeight.value],
 	() => {
 		nextTick(() => {
 			updateChartRect()

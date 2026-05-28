@@ -252,8 +252,6 @@
 							:chart-start="chartRangeBounds?.start ?? null"
 							:chart-end="chartRangeBounds?.end ?? null"
 							:geometry="chartGeometry"
-							:container-width="containerSize.width"
-							:container-height="containerSize.height"
 						/>
 						<div
 							v-if="showHoverGuide"
