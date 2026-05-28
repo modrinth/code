@@ -295,14 +295,22 @@ export const SearchableCategories: Story = {
 		template: /* html */ `
 			<div class="flex flex-wrap items-center gap-2">
 				<DropdownFilterBar v-model="selected" :categories="categories">
-					<template #option-right="{ category, option }">
-						<span
-							v-if="getVersionProject(category.key, option.value)"
-							v-tooltip="getVersionProject(category.key, option.value)"
-							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
-						>
-							<BoxIcon class="size-6" />
-						</span>
+					<template #option="{ category, option, selected }">
+						<div class="flex min-w-0 flex-1 items-center gap-2">
+							<span
+								v-if="getVersionProject(category.key, option.value)"
+								v-tooltip="getVersionProject(category.key, option.value)"
+								class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+							>
+								<BoxIcon class="size-6" />
+							</span>
+							<span
+								class="min-w-0 truncate font-semibold leading-tight"
+								:class="selected ? 'text-contrast' : 'text-primary'"
+							>
+								{{ option.label }}
+							</span>
+						</div>
 					</template>
 				</DropdownFilterBar>
 			</div>
@@ -406,14 +414,22 @@ export const VirtualizedPreview: Story = {
 		template: /* html */ `
 			<div class="flex flex-wrap items-center gap-2">
 				<DropdownFilterBar v-model="selected" :categories="categories">
-					<template #option-right="{ category, option }">
-						<span
-							v-if="getVersionProject(category.key, option.value)"
-							v-tooltip="getVersionProject(category.key, option.value)"
-							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
-						>
-							<BoxIcon class="size-6" />
-						</span>
+					<template #option="{ category, option, selected }">
+						<div class="flex min-w-0 flex-1 items-center gap-2">
+							<span
+								v-if="getVersionProject(category.key, option.value)"
+								v-tooltip="getVersionProject(category.key, option.value)"
+								class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+							>
+								<BoxIcon class="size-6" />
+							</span>
+							<span
+								class="min-w-0 truncate font-semibold leading-tight"
+								:class="selected ? 'text-contrast' : 'text-primary'"
+							>
+								{{ option.label }}
+							</span>
+						</div>
 					</template>
 				</DropdownFilterBar>
 			</div>
@@ -464,14 +480,22 @@ export const VirtualizedSubmenu: Story = {
 		template: /* html */ `
 			<div class="flex flex-wrap items-center gap-2">
 				<DropdownFilterBar v-model="selected" :categories="categories">
-					<template #option-right="{ category, option }">
-						<span
-							v-if="getVersionProject(category.key, option.value)"
-							v-tooltip="getVersionProject(category.key, option.value)"
-							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
-						>
-							<BoxIcon class="size-6" />
-						</span>
+					<template #option="{ category, option, selected }">
+						<div class="flex min-w-0 flex-1 items-center gap-2">
+							<span
+								v-if="getVersionProject(category.key, option.value)"
+								v-tooltip="getVersionProject(category.key, option.value)"
+								class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+							>
+								<BoxIcon class="size-6" />
+							</span>
+							<span
+								class="min-w-0 truncate font-semibold leading-tight"
+								:class="selected ? 'text-contrast' : 'text-primary'"
+							>
+								{{ option.label }}
+							</span>
+						</div>
 					</template>
 				</DropdownFilterBar>
 			</div>
@@ -494,7 +518,7 @@ export const VirtualizedSubmenu: Story = {
 		docs: {
 			description: {
 				story:
-					'Covers the add-menu submenu with flush rows, square hover states, and OverlayScrollbars.',
+					'Covers the add-menu submenu with a large unselected category, custom option content, flush rows, square hover states, and OverlayScrollbars.',
 			},
 		},
 	},

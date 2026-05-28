@@ -100,7 +100,130 @@ export type FilterOption = {
 	searchTerms?: string[]
 }
 
+export type ProjectVersionFilterOption = FilterOption
+
+export type ProjectVersionFilterOptionProjectMetadata = {
+	name: string
+	iconUrl?: string
+}
+
 type AnalyticsBreakdownInput = AnalyticsBreakdownPreset | readonly AnalyticsBreakdownPreset[]
+
+function getOptionalDateTimestamp(date: string | undefined): number | undefined {
+	if (!date) {
+		return undefined
+	}
+
+	const timestamp = new Date(date).getTime()
+	return Number.isFinite(timestamp) ? timestamp : undefined
+}
+
+export function getProjectVersionFilterOptionsCacheKey(
+	versionIds: string[],
+	versionNumbersById: Map<string, string>,
+	versionPublishedDatesById: Map<string, string>,
+	versionProjectNamesById: Map<string, string>,
+): string {
+	return versionIds
+		.map(
+			(versionId) =>
+				`${versionId}\x1f${versionNumbersById.get(versionId) ?? ''}\x1f${
+					versionPublishedDatesById.get(versionId) ?? ''
+				}\x1f${versionProjectNamesById.get(versionId) ?? ''}`,
+		)
+		.join('\x1e')
+}
+
+export function getProjectVersionFilterOptionProjectMetadataCacheKey(
+	versionIds: string[],
+	versionProjectNamesById: Map<string, string>,
+	versionProjectIconUrlsById: Map<string, string>,
+): string {
+	return versionIds
+		.map(
+			(versionId) =>
+				`${versionId}\x1f${versionProjectNamesById.get(versionId) ?? ''}\x1f${
+					versionProjectIconUrlsById.get(versionId) ?? ''
+				}`,
+		)
+		.join('\x1e')
+}
+
+export function getProjectVersionFilterOptionMetadataIds(
+	versionIds: string[],
+	selectedVersionIds: string[],
+): string[] {
+	const knownVersionIds = new Set(versionIds)
+	const metadataIds = [...versionIds]
+
+	for (const versionId of selectedVersionIds) {
+		if (!knownVersionIds.has(versionId)) {
+			metadataIds.push(versionId)
+			knownVersionIds.add(versionId)
+		}
+	}
+
+	return metadataIds
+}
+
+export function buildProjectVersionFilterOptions(
+	versionIds: string[],
+	versionNumbersById: Map<string, string>,
+	versionPublishedDatesById: Map<string, string>,
+	versionProjectNamesById: Map<string, string>,
+): ProjectVersionFilterOption[] {
+	return versionIds
+		.map((versionId) => {
+			const projectName = versionProjectNamesById.get(versionId)
+			return {
+				option: {
+					value: versionId,
+					label: versionNumbersById.get(versionId) ?? versionId,
+					searchTerms: projectName ? [versionId, projectName] : [versionId],
+				},
+				publishedTimestamp: getOptionalDateTimestamp(versionPublishedDatesById.get(versionId)),
+			}
+		})
+		.sort((left, right) => {
+			if (left.publishedTimestamp !== undefined && right.publishedTimestamp !== undefined) {
+				return right.publishedTimestamp - left.publishedTimestamp
+			}
+			if (left.publishedTimestamp !== undefined) {
+				return -1
+			}
+			if (right.publishedTimestamp !== undefined) {
+				return 1
+			}
+
+			return left.option.label.localeCompare(right.option.label)
+		})
+		.map(({ option }) => option)
+}
+
+export function buildProjectVersionFilterOptionProjectMetadataById(
+	versionIds: string[],
+	versionProjectNamesById: Map<string, string>,
+	versionProjectIconUrlsById: Map<string, string>,
+): Map<string, ProjectVersionFilterOptionProjectMetadata[]> {
+	const metadataById = new Map<string, ProjectVersionFilterOptionProjectMetadata[]>()
+
+	for (const versionId of versionIds) {
+		const projectName = versionProjectNamesById.get(versionId)
+		if (!projectName) {
+			continue
+		}
+
+		const metadata: ProjectVersionFilterOptionProjectMetadata = { name: projectName }
+		const iconUrl = versionProjectIconUrlsById.get(versionId)
+		if (iconUrl) {
+			metadata.iconUrl = iconUrl
+		}
+
+		metadataById.set(versionId, [metadata])
+	}
+
+	return metadataById
+}
 
 function intersectAnalyticsStats(
 	left: readonly AnalyticsDashboardStat[],
@@ -290,6 +413,10 @@ export function getOptionsWithSelectedValues(
 	selectedValues: string[],
 	getMissingSelectedOptionLabel: (value: string) => string = (value) => value,
 ): FilterOption[] {
+	if (selectedValues.length === 0) {
+		return options
+	}
+
 	const knownValues = new Set(options.map((option) => option.value))
 	const missingSelectedOptions = selectedValues
 		.filter((value) => !knownValues.has(value))
@@ -298,7 +425,7 @@ export function getOptionsWithSelectedValues(
 			label: getMissingSelectedOptionLabel(value),
 		}))
 
-	return [...options, ...missingSelectedOptions]
+	return missingSelectedOptions.length === 0 ? options : [...options, ...missingSelectedOptions]
 }
 
 export function normalizeSelectedValues(

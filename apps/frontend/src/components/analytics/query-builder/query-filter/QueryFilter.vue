@@ -13,7 +13,7 @@
 		@clear="clearFilterBar"
 	>
 		<template #search-actions="{ category, setSelectedValues }">
-			<div v-if="category.key === 'game_version'" class="mr-2 flex w-[150px] justify-end">
+			<div v-if="category.key === 'game_version'" class="mr-2 flex min-w-[150px] justify-end">
 				<Chips
 					:model-value="gameVersionType"
 					:items="gameVersionTypeOptions"
@@ -26,23 +26,31 @@
 			</div>
 		</template>
 
-		<template #option-right="{ category, option }">
-			<template v-if="category.key === 'version_id'">
+		<template #option="{ category, option, selected }">
+			<div class="flex min-w-0 flex-1 items-center gap-2">
+				<template v-if="category.key === 'version_id'">
+					<span
+						v-for="metadata in getProjectVersionOptionProjectMetadata(option.value)"
+						:key="`${option.value}-${metadata.name}`"
+						v-tooltip="metadata.name"
+						class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+					>
+						<img
+							v-if="metadata.iconUrl"
+							:src="metadata.iconUrl"
+							:alt="`${metadata.name} Icon`"
+							class="h-6 w-6 rounded object-cover"
+						/>
+						<BoxIcon v-else class="h-full w-full" />
+					</span>
+				</template>
 				<span
-					v-for="metadata in projectVersionOptionProjectMetadataById.get(option.value) ?? []"
-					:key="`${option.value}-${metadata.name}`"
-					v-tooltip="metadata.name"
-					class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+					class="min-w-0 truncate font-semibold leading-tight"
+					:class="selected ? 'text-contrast' : 'text-primary'"
 				>
-					<img
-						v-if="metadata.iconUrl"
-						:src="metadata.iconUrl"
-						:alt="`${metadata.name} Icon`"
-						class="h-6 w-6 rounded object-cover"
-					/>
-					<BoxIcon v-else class="h-full w-full" />
+					{{ option.label }}
 				</span>
-			</template>
+			</div>
 		</template>
 
 		<template #category-footer="{ category, setSelectedValues, closeMenu }">
@@ -199,21 +207,24 @@ import { getDownloadSourceLabel } from '../../breakdown'
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
 	areSelectedFiltersEqual,
+	buildProjectVersionFilterOptionProjectMetadataById,
+	buildProjectVersionFilterOptions,
 	cloneSelectedFilters,
 	FILTER_VALUE_CATEGORIES,
 	getOptionsWithSelectedValues,
+	getProjectVersionFilterOptionMetadataIds,
+	getProjectVersionFilterOptionProjectMetadataCacheKey,
+	getProjectVersionFilterOptionsCacheKey,
 	getVisibleAnalyticsFilterCategoriesForState,
 	normalizeSelectedValues as normalizeSelectedFilterValues,
+	type ProjectVersionFilterOption,
+	type ProjectVersionFilterOptionProjectMetadata,
 } from './queryFilter'
 
 type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'project'>
 type SetDropdownFilterValues = (values: string[]) => void
 type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => void
 type CloseDownloadsThresholdMenu = (event?: Event) => void
-type ProjectVersionProjectOptionMetadata = {
-	name: string
-	iconUrl?: string
-}
 
 withDefaults(
 	defineProps<{
@@ -246,10 +257,12 @@ const {
 	selectedFilters,
 	queryResetToken,
 	refreshAnalyticsQuery,
+	hasCompletedAnalyticsLoading,
+	versionNumbersById,
+	versionPublishedDatesById,
+	versionProjectNamesById,
+	versionProjectIconUrlsById,
 	getVersionDisplayName,
-	getVersionPublishedDate,
-	getVersionProjectName,
-	getVersionProjectIconUrl,
 } = injectAnalyticsDashboardContext()
 const formattedCountries = useFormattedCountries()
 const generatedState = useGeneratedState()
@@ -281,34 +294,6 @@ const effectiveSelectedProjectCount = computed(
 		).length,
 )
 const showProjectVersionProjectIcons = computed(() => effectiveSelectedProjectCount.value > 1)
-const projectVersionOptionProjectMetadataById = computed(() => {
-	const metadataById = new Map<string, ProjectVersionProjectOptionMetadata[]>()
-
-	if (!showProjectVersionProjectIcons.value) {
-		return metadataById
-	}
-
-	const versionIds = new Set([
-		...filterOptions.value.versionIds,
-		...selectedFilters.value.version_id,
-	])
-	for (const versionId of versionIds) {
-		const projectName = getVersionProjectName(versionId)
-		if (!projectName) {
-			continue
-		}
-
-		const metadata: ProjectVersionProjectOptionMetadata = { name: projectName }
-		const iconUrl = getVersionProjectIconUrl(versionId)
-		if (iconUrl) {
-			metadata.iconUrl = iconUrl
-		}
-
-		metadataById.set(versionId, [metadata])
-	}
-
-	return metadataById
-})
 const defaultSelectedBreakdown = computed(() =>
 	getDefaultAnalyticsBreakdownPresets(selectedProjectIds.value),
 )
@@ -318,10 +303,16 @@ const canClearSelectedBreakdown = computed(
 const analyticsFilterOptionsEmptyLabel = computed(() =>
 	isAnalyticsFilterOptionsLoading.value ? 'Loading...' : undefined,
 )
+const projectVersionFilterOptions = shallowRef<ProjectVersionFilterOption[]>([])
+const projectVersionFilterOptionProjectMetadataById = shallowRef(
+	new Map<string, ProjectVersionFilterOptionProjectMetadata[]>(),
+)
 const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 	cloneSelectedFilters(selectedFilters.value),
 )
 let selectedFiltersCommitRequestId = 0
+let projectVersionFilterOptionsCacheKey = ''
+let projectVersionFilterOptionProjectMetadataCacheKey = ''
 
 const selectedFilterValue = computed<Record<string, string[]>>({
 	get: () => getSelectedFilterBarValue(),
@@ -368,6 +359,97 @@ watch(
 		clearDownloadsThresholdsForChangedFilters(previousFilters, nextFilters)
 	},
 	{ deep: true },
+)
+
+watch(
+	[
+		hasCompletedAnalyticsLoading,
+		filterOptions,
+		versionNumbersById,
+		versionPublishedDatesById,
+		versionProjectNamesById,
+	],
+	([
+		hasCompletedLoading,
+		nextFilterOptions,
+		nextVersionNumbersById,
+		nextVersionPublishedDatesById,
+		nextVersionProjectNamesById,
+	]) => {
+		if (!hasCompletedLoading) {
+			projectVersionFilterOptionsCacheKey = ''
+			if (projectVersionFilterOptions.value.length > 0) {
+				projectVersionFilterOptions.value = []
+			}
+			return
+		}
+
+		const nextCacheKey = getProjectVersionFilterOptionsCacheKey(
+			nextFilterOptions.versionIds,
+			nextVersionNumbersById,
+			nextVersionPublishedDatesById,
+			nextVersionProjectNamesById,
+		)
+		if (nextCacheKey === projectVersionFilterOptionsCacheKey) {
+			return
+		}
+
+		projectVersionFilterOptionsCacheKey = nextCacheKey
+		projectVersionFilterOptions.value = buildProjectVersionFilterOptions(
+			nextFilterOptions.versionIds,
+			nextVersionNumbersById,
+			nextVersionPublishedDatesById,
+			nextVersionProjectNamesById,
+		)
+	},
+	{ immediate: true },
+)
+
+watch(
+	[
+		hasCompletedAnalyticsLoading,
+		filterOptions,
+		selectedFilters,
+		versionProjectNamesById,
+		versionProjectIconUrlsById,
+	],
+	([
+		hasCompletedLoading,
+		nextFilterOptions,
+		nextSelectedFilters,
+		nextVersionProjectNamesById,
+		nextVersionProjectIconUrlsById,
+	]) => {
+		if (!hasCompletedLoading) {
+			projectVersionFilterOptionProjectMetadataCacheKey = ''
+			if (projectVersionFilterOptionProjectMetadataById.value.size > 0) {
+				projectVersionFilterOptionProjectMetadataById.value = new Map()
+			}
+			return
+		}
+
+		const metadataIds = getProjectVersionFilterOptionMetadataIds(
+			nextFilterOptions.versionIds,
+			nextSelectedFilters.version_id,
+		)
+		const nextCacheKey = getProjectVersionFilterOptionProjectMetadataCacheKey(
+			metadataIds,
+			nextVersionProjectNamesById,
+			nextVersionProjectIconUrlsById,
+		)
+		if (nextCacheKey === projectVersionFilterOptionProjectMetadataCacheKey) {
+			return
+		}
+
+		projectVersionFilterOptionProjectMetadataCacheKey = nextCacheKey
+		projectVersionFilterOptionProjectMetadataById.value =
+			buildProjectVersionFilterOptionProjectMetadataById(
+				metadataIds,
+				nextVersionProjectNamesById,
+				nextVersionProjectIconUrlsById,
+			)
+	},
+	{ immediate: true },
 )
 
 async function scheduleSelectedFiltersCommit() {
@@ -451,10 +533,10 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 		{
 			key: 'version_id',
 			label: 'Project version',
-			searchable: versionFilterOptions.value.length > 6,
+			searchable: projectVersionFilterOptions.value.length > 6,
 			searchPlaceholder: 'Search project versions...',
 			submenuClass: 'w-fit',
-			options: withSelectedOptions('version_id', versionFilterOptions.value),
+			options: withSelectedOptions('version_id', projectVersionFilterOptions.value),
 		},
 		{
 			key: 'game_version',
@@ -528,27 +610,6 @@ const downloadReasonFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	})),
 )
 
-const versionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
-	filterOptions.value.versionIds
-		.map((versionId) => {
-			const projectName = projectVersionOptionProjectMetadataById.value.get(versionId)?.[0]?.name
-
-			return {
-				value: versionId,
-				label: getVersionDisplayName(versionId),
-				searchTerms: projectName ? [versionId, projectName] : [versionId],
-			}
-		})
-		.sort((left, right) =>
-			compareOptionalDateStringsDescending(
-				getVersionPublishedDate(left.value),
-				getVersionPublishedDate(right.value),
-				left.label,
-				right.label,
-			),
-		),
-)
-
 const gameVersionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.gameVersions
 		.filter((gameVersion) => {
@@ -617,6 +678,14 @@ function getMissingSelectedOptionLabel(
 		return getLoaderTypeFilterOptionLabel
 	}
 	return undefined
+}
+
+function getProjectVersionOptionProjectMetadata(versionId: string) {
+	if (!showProjectVersionProjectIcons.value) {
+		return []
+	}
+
+	return projectVersionFilterOptionProjectMetadataById.value.get(versionId) ?? []
 }
 
 function getCountryFilterOptionLabel(countryCode: string): string {
@@ -730,7 +799,7 @@ function applyProjectVersionDownloadsThreshold(setSelectedValues: SetDropdownFil
 		return
 	}
 
-	const selectedValues = versionFilterOptions.value
+	const selectedValues = projectVersionFilterOptions.value
 		.filter((version) => {
 			return (projectVersionDownloadsById.value.get(version.value) ?? 0) >= threshold
 		})

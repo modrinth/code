@@ -75,7 +75,16 @@
 				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
 			></slot>
 		</template>
-		<template v-if="$slots['option-right']" #option-right="{ item, selected, index }">
+		<template v-if="$slots.option" #option="{ item, selected, index }">
+			<slot
+				name="option"
+				:category="preview.category"
+				:option="item"
+				:selected="selected"
+				:index="index"
+			></slot>
+		</template>
+		<template v-else-if="$slots['option-right']" #option-right="{ item, selected, index }">
 			<slot
 				name="option-right"
 				:category="preview.category"
@@ -271,18 +280,28 @@
 									<CheckIcon v-if="option.selected" aria-hidden="true" stroke-width="3" />
 								</span>
 								<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
-									<span
-										class="min-w-0 truncate font-semibold leading-tight"
-										:class="option.selected ? 'text-contrast' : 'text-primary'"
-									>
-										{{ option.label }}
-									</span>
 									<slot
-										name="option-right"
+										v-if="$slots.option"
+										name="option"
 										:category="activeCategory"
 										:option="option"
 										:selected="option.selected"
+										:index="index"
 									></slot>
+									<template v-else>
+										<span
+											class="min-w-0 truncate font-semibold leading-tight"
+											:class="option.selected ? 'text-contrast' : 'text-primary'"
+										>
+											{{ option.label }}
+										</span>
+										<slot
+											name="option-right"
+											:category="activeCategory"
+											:option="option"
+											:selected="option.selected"
+										></slot>
+									</template>
 								</div>
 								<span
 									v-if="checkboxPosition === 'right'"
@@ -690,6 +709,10 @@ function getOptionsWithSelectedValues(
 	options: DropdownFilterBarOption[],
 	selectedValues: string[],
 ): DropdownFilterBarOption[] {
+	if (selectedValues.length === 0) {
+		return options
+	}
+
 	const knownValues = new Set(options.map((option) => option.value))
 	const missingSelectedOptions = selectedValues
 		.filter((value) => !knownValues.has(value))
@@ -698,7 +721,7 @@ function getOptionsWithSelectedValues(
 			label: value,
 		}))
 
-	return [...options, ...missingSelectedOptions]
+	return missingSelectedOptions.length === 0 ? options : [...options, ...missingSelectedOptions]
 }
 
 function getCategorySyntheticValueSet(category: DropdownFilterBarCategory): Set<string> {
