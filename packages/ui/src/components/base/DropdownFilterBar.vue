@@ -211,18 +211,23 @@
 			</div>
 
 			<div
-				v-if="activeCategorySelectionCount > 0"
 				class="flex items-center justify-between gap-3 border-0 border-b border-solid border-b-surface-5 px-4 py-2.5 text-sm"
 			>
 				<span class="font-semibold text-secondary">{{ activeCategorySelectionLabel }}</span>
 				<button
 					type="button"
-					class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:bg-transparent hover:text-contrast"
+					class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors"
+					:class="
+						hasActiveCategorySelection
+							? 'hover:bg-transparent hover:text-contrast'
+							: 'cursor-not-allowed opacity-50'
+					"
+					:disabled="!hasActiveCategorySelection"
 					@click="clearActiveCategorySelection"
 					@keydown.enter.stop
 					@keydown.space.stop
 				>
-					Deselect all
+					Clear
 				</button>
 			</div>
 			<div
@@ -530,11 +535,12 @@ const activeCategory = computed(() =>
 const activeCategorySelectionCount = computed(() => {
 	return activeCategory.value ? getCategorySelectionCount(activeCategory.value.key, 'draft') : 0
 })
-const activeCategorySelectionLabel = computed(() =>
-	activeCategorySelectionCount.value === 1
+const hasActiveCategorySelection = computed(() => activeCategorySelectionCount.value > 0)
+const activeCategorySelectionLabel = computed(() => {
+	return activeCategorySelectionCount.value === 1
 		? '1 selected'
-		: `${activeCategorySelectionCount.value} selected`,
-)
+		: `${activeCategorySelectionCount.value} selected`
+})
 const activeCategorySelectedValues = computed(() =>
 	activeCategory.value ? getSelectedValues(activeCategory.value.key, 'draft') : [],
 )

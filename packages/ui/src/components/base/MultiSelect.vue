@@ -201,7 +201,13 @@
 							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
 							<button
 								type="button"
-								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
+								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all"
+								:class="
+									hasSelectedOptions
+										? 'hover:bg-transparent hover:text-contrast'
+										: 'cursor-not-allowed opacity-50'
+								"
+								:disabled="!hasSelectedOptions"
 								@click="clearAll"
 								@keydown.enter.stop
 								@keydown.space.stop
@@ -339,7 +345,13 @@
 							<span class="font-semibold text-secondary">{{ selectionActionsLabel }}</span>
 							<button
 								type="button"
-								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
+								class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all"
+								:class="
+									hasSelectedOptions
+										? 'hover:bg-transparent hover:text-contrast'
+										: 'cursor-not-allowed opacity-50'
+								"
+								:disabled="!hasSelectedOptions"
 								@click="clearAll"
 								@keydown.enter.stop
 								@keydown.space.stop
@@ -657,9 +669,8 @@ const shouldShowSelectAll = computed(
 	() => props.includeSelectAllOption && enabledSelectableOptions.value.length > 1,
 )
 const selectedOptionCount = computed(() => selectedOptions.value.length)
-const shouldShowSelectionActions = computed(
-	() => props.showSelectionActions && selectedOptionCount.value > 0,
-)
+const hasSelectedOptions = computed(() => selectedOptionCount.value > 0)
+const shouldShowSelectionActions = computed(() => props.showSelectionActions)
 const selectionActionsLabel = computed(() => {
 	return selectedOptionCount.value === 1 ? '1 selected' : `${selectedOptionCount.value} selected`
 })
