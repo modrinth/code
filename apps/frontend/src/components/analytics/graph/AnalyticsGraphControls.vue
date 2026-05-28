@@ -33,7 +33,7 @@
 				ref="controlsMenuPanel"
 				role="dialog"
 				aria-label="Analytics graph controls"
-				class="mt-1 flex w-[228px] max-w-[calc(100vw_-_2rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-5 bg-surface-3 text-sm shadow-2xl"
+				class="mt-1 flex w-[228px] max-w-[calc(100vw_-_2rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-4 bg-surface-3 text-sm shadow-2xl"
 			>
 				<div class="flex items-center justify-between gap-3 px-3 py-2.5 text-xs font-medium">
 					<span class="font-semibold text-primary">{{ activeControlCountLabel }}</span>
@@ -50,7 +50,7 @@
 
 				<div
 					v-if="hasDisplayControls"
-					class="flex flex-col gap-1 border-0 border-t border-solid border-surface-5 px-3 py-2.5"
+					class="flex flex-col gap-1 border-0 border-t border-solid border-surface-4 px-3 py-2.5"
 				>
 					<div class="mb-0.5 text-xs font-semibold text-secondary">Display</div>
 					<div v-if="canShowPreviousPeriod" class="flex min-h-7 items-center justify-between gap-3">
@@ -85,7 +85,7 @@
 				</div>
 
 				<div
-					class="flex flex-col gap-1 border-0 border-t border-solid border-surface-5 px-3 py-2.5"
+					class="flex flex-col gap-1 border-0 border-t border-solid border-surface-4 px-3 py-2.5"
 				>
 					<div class="mb-0.5 text-xs font-semibold text-secondary">Annotations</div>
 					<div
