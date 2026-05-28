@@ -292,7 +292,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="absolute inset-0 z-[20] overflow-hidden rounded-xl">
+		<div class="pointer-events-none absolute inset-0 z-[20] overflow-hidden rounded-xl">
 			<AnalyticsLoadingBar :loading="isDataLoading" />
 		</div>
 
