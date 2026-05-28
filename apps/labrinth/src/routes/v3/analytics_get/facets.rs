@@ -1,9 +1,9 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use actix_web::{HttpRequest, post, web};
 use serde::Serialize;
 
-use super::{DownloadSource, GetRequest, normalize_download_source};
+use super::{DownloadSource, GetRequest, TimeRange, normalize_download_source};
 use crate::{
     auth::get_user_from_headers,
     database::{
@@ -34,45 +34,54 @@ pub struct AnalyticsFacets {
 
 #[derive(Debug, Default, Serialize, utoipa::ToSchema)]
 pub struct ProjectViewsFacets {
-    pub domain: Vec<String>,
-    pub site_path: Vec<String>,
-    pub monetized: Vec<bool>,
-    pub country: Vec<String>,
+    pub domain: Vec<FacetValue<String>>,
+    pub site_path: Vec<FacetValue<String>>,
+    pub monetized: Vec<FacetValue<bool>>,
+    pub country: Vec<FacetValue<String>>,
 }
 
 #[derive(Debug, Default, Serialize, utoipa::ToSchema)]
 pub struct ProjectDownloadsFacets {
-    pub domain: Vec<String>,
-    pub user_agent: Vec<DownloadSource>,
-    pub version_id: Vec<VersionId>,
-    pub monetized: Vec<bool>,
-    pub country: Vec<String>,
-    pub reason: Vec<DownloadReason>,
-    pub game_version: Vec<String>,
-    pub loader: Vec<String>,
+    pub domain: Vec<FacetValue<String>>,
+    pub user_agent: Vec<FacetValue<DownloadSource>>,
+    pub version_id: Vec<FacetValue<VersionId>>,
+    pub monetized: Vec<FacetValue<bool>>,
+    pub country: Vec<FacetValue<String>>,
+    pub reason: Vec<FacetValue<DownloadReason>>,
+    pub game_version: Vec<FacetValue<String>>,
+    pub loader: Vec<FacetValue<String>>,
 }
 
 #[derive(Debug, Default, Serialize, utoipa::ToSchema)]
 pub struct ProjectPlaytimeFacets {
-    pub version_id: Vec<VersionId>,
-    pub loader: Vec<String>,
-    pub game_version: Vec<String>,
-    pub country: Vec<String>,
+    pub version_id: Vec<FacetValue<VersionId>>,
+    pub loader: Vec<FacetValue<String>>,
+    pub game_version: Vec<FacetValue<String>>,
+    pub country: Vec<FacetValue<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, utoipa::ToSchema)]
+pub struct FacetValue<T> {
+    pub value: T,
+    pub count: u64,
 }
 
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct StringFacetRow {
     value: String,
+    count: u64,
 }
 
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct VersionFacetRow {
     value: DBVersionId,
+    count: u64,
 }
 
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct BoolFacetRow {
     value: bool,
+    count: u64,
 }
 
 #[utoipa::path(
@@ -117,17 +126,20 @@ pub async fn fetch_facets(
             project_views: fetch_project_views_facets(
                 &clickhouse,
                 &project_ids,
+                &req.time_range,
             )
             .await?,
             project_downloads: fetch_project_downloads_facets(
                 &clickhouse,
                 &project_ids,
+                &req.time_range,
             )
             .await?,
             project_playtime: fetch_project_playtime_facets(
                 &clickhouse,
                 &project_ids,
                 &parent_version_ids,
+                &req.time_range,
             )
             .await?,
         },
@@ -158,108 +170,133 @@ async fn fetch_project_version_ids(
 async fn fetch_project_views_facets(
     clickhouse: &clickhouse::Client,
     project_ids: &[DBProjectId],
+    time_range: &TimeRange,
 ) -> Result<ProjectViewsFacets, ApiError> {
     Ok(ProjectViewsFacets {
         domain: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT domain AS value FROM views WHERE project_id IN {project_ids: Array(UInt64)} AND domain != '' ORDER BY value",
+            "SELECT domain AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND domain != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
         .await?,
         site_path: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT site_path AS value FROM views WHERE project_id IN {project_ids: Array(UInt64)} AND site_path != '' ORDER BY value",
+            "SELECT site_path AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND site_path != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
         .await?,
         monetized: fetch_bool_facet(
             clickhouse,
-            "SELECT DISTINCT monetized AS value FROM views WHERE project_id IN {project_ids: Array(UInt64)} ORDER BY value",
+            "SELECT monetized AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
         .await?,
         country: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT country AS value FROM views WHERE project_id IN {project_ids: Array(UInt64)} AND country != '' ORDER BY value",
+            "SELECT country AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND country != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
-        .await?,
-    })
+		.await?,
+	})
 }
 
 async fn fetch_project_downloads_facets(
     clickhouse: &clickhouse::Client,
     project_ids: &[DBProjectId],
+    time_range: &TimeRange,
 ) -> Result<ProjectDownloadsFacets, ApiError> {
     let user_agents = fetch_string_facet(
         clickhouse,
-        "SELECT DISTINCT user_agent AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} AND user_agent != ''",
+        "SELECT user_agent AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND user_agent != '' GROUP BY value",
         project_ids,
+        time_range,
     )
-    .await?;
+	.await?;
     let user_agent = normalize_download_source_facets(&user_agents);
 
     Ok(ProjectDownloadsFacets {
         domain: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT domain AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} AND domain != '' ORDER BY value",
+            "SELECT domain AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND domain != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
-        .await?,
-        user_agent,
+		.await?,
+		user_agent,
         version_id: fetch_version_facet(
             clickhouse,
-            "SELECT DISTINCT version_id AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} AND version_id != 0 ORDER BY value",
+            "SELECT version_id AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND version_id != 0 GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
-        .await?,
+		.await?,
         monetized: fetch_bool_facet(
             clickhouse,
-            "SELECT DISTINCT user_id != 0 AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} ORDER BY value",
+            "SELECT user_id != 0 AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
-        .await?,
+		.await?,
         country: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT country AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} AND country != '' ORDER BY value",
+            "SELECT country AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND country != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
-        .await?,
+		.await?,
         reason: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT reason AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} AND reason != '' ORDER BY value",
+            "SELECT reason AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND reason != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
         .await?
         .into_iter()
-        .filter_map(|reason| reason.parse().ok())
+        .filter_map(|reason| {
+            reason.value.parse().ok().map(|value| FacetValue {
+                value,
+                count: reason.count,
+            })
+        })
         .collect(),
         game_version: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT game_version AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} AND game_version != '' ORDER BY value",
+            "SELECT game_version AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND game_version != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
-        .await?,
+		.await?,
         loader: fetch_string_facet(
             clickhouse,
-            "SELECT DISTINCT loader AS value FROM downloads WHERE project_id IN {project_ids: Array(UInt64)} AND loader != '' ORDER BY value",
+            "SELECT loader AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND loader != '' GROUP BY value ORDER BY value",
             project_ids,
+            time_range,
         )
-        .await?,
-    })
+		.await?,
+	})
 }
 
 fn normalize_download_source_facets(
-    user_agents: &[String],
-) -> Vec<DownloadSource> {
-    let mut sources = user_agents
-        .iter()
-        .filter_map(|user_agent| normalize_download_source(user_agent))
-        .collect::<HashSet<_>>()
+    user_agents: &[FacetValue<String>],
+) -> Vec<FacetValue<DownloadSource>> {
+    let mut counts = HashMap::<DownloadSource, u64>::new();
+    for user_agent in user_agents {
+        if let Some(source) = normalize_download_source(&user_agent.value) {
+            *counts.entry(source).or_default() += user_agent.count;
+        }
+    }
+
+    let mut sources = counts
         .into_iter()
+        .map(|(value, count)| FacetValue { value, count })
         .collect::<Vec<_>>();
     sources.sort_by(|a, b| {
-        download_source_sort_key(a).cmp(download_source_sort_key(b))
+        download_source_sort_key(&a.value)
+            .cmp(download_source_sort_key(&b.value))
     });
     sources
 }
@@ -279,12 +316,14 @@ async fn fetch_project_playtime_facets(
     clickhouse: &clickhouse::Client,
     project_ids: &[DBProjectId],
     parent_version_ids: &[DBVersionId],
+    time_range: &TimeRange,
 ) -> Result<ProjectPlaytimeFacets, ApiError> {
     Ok(ProjectPlaytimeFacets {
         version_id: fetch_playtime_version_facet(
             clickhouse,
             project_ids,
             parent_version_ids,
+            time_range,
         )
         .await?,
         loader: fetch_playtime_string_facet(
@@ -292,6 +331,7 @@ async fn fetch_project_playtime_facets(
             "loader",
             project_ids,
             parent_version_ids,
+            time_range,
         )
         .await?,
         game_version: fetch_playtime_string_facet(
@@ -299,6 +339,7 @@ async fn fetch_project_playtime_facets(
             "game_version",
             project_ids,
             parent_version_ids,
+            time_range,
         )
         .await?,
         country: fetch_playtime_string_facet(
@@ -306,6 +347,7 @@ async fn fetch_project_playtime_facets(
             "country",
             project_ids,
             parent_version_ids,
+            time_range,
         )
         .await?,
     })
@@ -315,14 +357,20 @@ async fn fetch_string_facet(
     clickhouse: &clickhouse::Client,
     query: &str,
     project_ids: &[DBProjectId],
-) -> Result<Vec<String>, ApiError> {
+    time_range: &TimeRange,
+) -> Result<Vec<FacetValue<String>>, ApiError> {
     let mut rows = clickhouse
         .query(query)
+        .param("time_range_start", time_range.start.timestamp())
+        .param("time_range_end", time_range.end.timestamp())
         .param("project_ids", project_ids)
         .fetch::<StringFacetRow>()?;
     let mut values = Vec::new();
     while let Some(row) = rows.next().await? {
-        values.push(row.value);
+        values.push(FacetValue {
+            value: row.value,
+            count: row.count,
+        });
     }
     Ok(values)
 }
@@ -331,14 +379,20 @@ async fn fetch_version_facet(
     clickhouse: &clickhouse::Client,
     query: &str,
     project_ids: &[DBProjectId],
-) -> Result<Vec<VersionId>, ApiError> {
+    time_range: &TimeRange,
+) -> Result<Vec<FacetValue<VersionId>>, ApiError> {
     let mut rows = clickhouse
         .query(query)
+        .param("time_range_start", time_range.start.timestamp())
+        .param("time_range_end", time_range.end.timestamp())
         .param("project_ids", project_ids)
         .fetch::<VersionFacetRow>()?;
     let mut values = Vec::new();
     while let Some(row) = rows.next().await? {
-        values.push(row.value.into());
+        values.push(FacetValue {
+            value: row.value.into(),
+            count: row.count,
+        });
     }
     Ok(values)
 }
@@ -347,14 +401,20 @@ async fn fetch_bool_facet(
     clickhouse: &clickhouse::Client,
     query: &str,
     project_ids: &[DBProjectId],
-) -> Result<Vec<bool>, ApiError> {
+    time_range: &TimeRange,
+) -> Result<Vec<FacetValue<bool>>, ApiError> {
     let mut rows = clickhouse
         .query(query)
+        .param("time_range_start", time_range.start.timestamp())
+        .param("time_range_end", time_range.end.timestamp())
         .param("project_ids", project_ids)
         .fetch::<BoolFacetRow>()?;
     let mut values = Vec::new();
     while let Some(row) = rows.next().await? {
-        values.push(row.value);
+        values.push(FacetValue {
+            value: row.value,
+            count: row.count,
+        });
     }
     Ok(values)
 }
@@ -364,22 +424,30 @@ async fn fetch_playtime_string_facet(
     column: &str,
     project_ids: &[DBProjectId],
     parent_version_ids: &[DBVersionId],
-) -> Result<Vec<String>, ApiError> {
+    time_range: &TimeRange,
+) -> Result<Vec<FacetValue<String>>, ApiError> {
     let query = format!(
-        "SELECT DISTINCT {column} AS value
-        FROM playtime
-        WHERE (project_id IN {{project_ids: Array(UInt64)}} OR parent IN {{parent_version_ids: Array(UInt64)}})
-            AND {column} != ''
-        ORDER BY value"
+		"SELECT {column} AS value, COUNT(*) AS count
+		FROM playtime
+		WHERE recorded BETWEEN {{time_range_start: Int64}} AND {{time_range_end: Int64}}
+			AND (project_id IN {{project_ids: Array(UInt64)}} OR parent IN {{parent_version_ids: Array(UInt64)}})
+			AND {column} != ''
+        GROUP BY value
+		ORDER BY value"
     );
     let mut rows = clickhouse
         .query(&query)
+        .param("time_range_start", time_range.start.timestamp())
+        .param("time_range_end", time_range.end.timestamp())
         .param("project_ids", project_ids)
         .param("parent_version_ids", parent_version_ids)
         .fetch::<StringFacetRow>()?;
     let mut values = Vec::new();
     while let Some(row) = rows.next().await? {
-        values.push(row.value);
+        values.push(FacetValue {
+            value: row.value,
+            count: row.count,
+        });
     }
     Ok(values)
 }
@@ -388,21 +456,29 @@ async fn fetch_playtime_version_facet(
     clickhouse: &clickhouse::Client,
     project_ids: &[DBProjectId],
     parent_version_ids: &[DBVersionId],
-) -> Result<Vec<VersionId>, ApiError> {
+    time_range: &TimeRange,
+) -> Result<Vec<FacetValue<VersionId>>, ApiError> {
     let mut rows = clickhouse
-        .query(
-            "SELECT DISTINCT version_id AS value
-            FROM playtime
-            WHERE (project_id IN {project_ids: Array(UInt64)} OR parent IN {parent_version_ids: Array(UInt64)})
-                AND version_id != 0
-            ORDER BY value",
+		.query(
+			"SELECT version_id AS value, COUNT(*) AS count
+			FROM playtime
+			WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64}
+				AND (project_id IN {project_ids: Array(UInt64)} OR parent IN {parent_version_ids: Array(UInt64)})
+				AND version_id != 0
+            GROUP BY value
+			ORDER BY value",
         )
-        .param("project_ids", project_ids)
-        .param("parent_version_ids", parent_version_ids)
+		.param("time_range_start", time_range.start.timestamp())
+		.param("time_range_end", time_range.end.timestamp())
+		.param("project_ids", project_ids)
+		.param("parent_version_ids", parent_version_ids)
         .fetch::<VersionFacetRow>()?;
     let mut values = Vec::new();
     while let Some(row) = rows.next().await? {
-        values.push(row.value.into());
+        values.push(FacetValue {
+            value: row.value.into(),
+            count: row.count,
+        });
     }
     Ok(values)
 }
@@ -414,19 +490,43 @@ mod tests {
     #[test]
     fn user_agent_facets_use_normalized_sources() {
         let user_agents = vec![
-            "MultiMC/5.0".to_string(),
-            "MultiMC/6.0".to_string(),
-            "PrismLauncher/6.1".to_string(),
-            "curl/8.7.1".to_string(),
-            "Mozilla/5.0 AppleWebKit/537.36".to_string(),
+            FacetValue {
+                value: "MultiMC/5.0".to_string(),
+                count: 2,
+            },
+            FacetValue {
+                value: "MultiMC/6.0".to_string(),
+                count: 3,
+            },
+            FacetValue {
+                value: "PrismLauncher/6.1".to_string(),
+                count: 5,
+            },
+            FacetValue {
+                value: "curl/8.7.1".to_string(),
+                count: 7,
+            },
+            FacetValue {
+                value: "Mozilla/5.0 AppleWebKit/537.36".to_string(),
+                count: 11,
+            },
         ];
 
         assert_eq!(
             normalize_download_source_facets(&user_agents),
             vec![
-                DownloadSource::Named("MultiMC".into()),
-                DownloadSource::Named("Prism Launcher".into()),
-                DownloadSource::Website,
+                FacetValue {
+                    value: DownloadSource::Named("MultiMC".into()),
+                    count: 5,
+                },
+                FacetValue {
+                    value: DownloadSource::Named("Prism Launcher".into()),
+                    count: 5,
+                },
+                FacetValue {
+                    value: DownloadSource::Website,
+                    count: 11,
+                },
             ],
         );
     }
