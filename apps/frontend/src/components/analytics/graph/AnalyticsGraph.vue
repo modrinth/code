@@ -25,11 +25,13 @@
 	</NewModal>
 
 	<section
+		ref="graphSection"
 		class="relative flex flex-col rounded-2xl border border-solid border-surface-5 bg-surface-3"
+		:style="graphSectionStyle"
 	>
 		<div class="flex w-full flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
 			<div
-				class="flex w-full flex-col items-start justify-between gap-3 rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4 sm:flex-row sm:items-center"
+				class="flex min-h-[84px] w-full flex-col items-start justify-between gap-3 rounded-t-2xl border-0 border-b border-solid border-surface-5 bg-surface-3 p-4 sm:flex-row sm:items-center"
 			>
 				<div class="flex flex-col gap-0.5">
 					<div class="w-max text-xl font-semibold text-contrast">
@@ -946,6 +948,7 @@ const selectableChartDatasets = computed(() => {
 })
 
 const chartContainer = ref<HTMLElement | null>(null)
+const graphSection = ref<HTMLElement | null>(null)
 const legendContainer = ref<HTMLElement | null>(null)
 const eventsMenuTrigger = ref<HTMLElement | null>(null)
 const eventsMenuPanel = ref<HTMLElement | null>(null)
@@ -953,6 +956,12 @@ const chartTooltip = ref<InstanceType<typeof AnalyticsChartTooltip> | null>(null
 const showAllSelectedGraphDatasetsModal = ref<InstanceType<typeof NewModal> | null>(null)
 const chartGeometry = ref<AnalyticsChartGeometryPayload | null>(null)
 const containerSize = reactive({ width: 0, height: 0 })
+const rememberedGraphSectionHeight = ref(0)
+const graphSectionStyle = computed(() =>
+	showEmptyChartState.value && rememberedGraphSectionHeight.value > 0
+		? { height: `${rememberedGraphSectionHeight.value}px` }
+		: undefined,
+)
 const {
 	showTopFade: showLegendTopFade,
 	showBottomFade: showLegendBottomFade,
@@ -960,9 +969,18 @@ const {
 	forceCheck: forceCheckLegendScrollState,
 } = useScrollIndicator(legendContainer)
 let resizeObserver: ResizeObserver | null = null
+let graphSectionResizeObserver: ResizeObserver | null = null
 let clearIgnoredChartClickTimeout: ReturnType<typeof setTimeout> | null = null
 
 onMounted(() => {
+	if (graphSection.value && typeof ResizeObserver !== 'undefined') {
+		graphSectionResizeObserver = new ResizeObserver(() => {
+			if (showEmptyChartState.value) return
+			rememberGraphSectionHeight()
+		})
+		graphSectionResizeObserver.observe(graphSection.value)
+	}
+
 	if (chartContainer.value && typeof ResizeObserver !== 'undefined') {
 		resizeObserver = new ResizeObserver((entries) => {
 			const entry = entries[0]
@@ -981,6 +999,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+	graphSectionResizeObserver?.disconnect()
+	graphSectionResizeObserver = null
 	resizeObserver?.disconnect()
 	resizeObserver = null
 	window.removeEventListener('keydown', updateShiftKeyState)
@@ -1344,6 +1364,23 @@ function hidePreviousPeriodEntriesForHiddenCurrentEntries() {
 		hiddenGraphDatasetIds.value = nextHiddenDatasetIdList
 	}
 }
+
+function rememberGraphSectionHeight() {
+	if (!graphSection.value) return
+
+	const height = graphSection.value.getBoundingClientRect().height
+	if (height > 0) {
+		rememberedGraphSectionHeight.value = height
+	}
+}
+
+watch(showEmptyChartState, (showEmpty) => {
+	if (showEmpty) {
+		rememberGraphSectionHeight()
+	} else {
+		nextTick(rememberGraphSectionHeight)
+	}
+})
 
 watch(
 	displayedLegendEntries,
