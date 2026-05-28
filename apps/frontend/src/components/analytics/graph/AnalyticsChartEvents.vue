@@ -4,15 +4,23 @@
 			v-for="group in eventGroups"
 			:key="`${group.id}:guide`"
 			aria-hidden="true"
-			class="absolute left-0 z-0 border-0 border-l border-dashed opacity-40"
-			:class="activeGroup?.id === group.id ? 'border-contrast' : 'border-secondary'"
+			class="absolute left-0 z-0 border-0 border-l border-dashed transition-all"
+			:class="
+				activeGroup?.id === group.id
+					? isModrinthEventGroup(group)
+						? 'border-blue opacity-80'
+						: 'border-contrast opacity-60'
+					: isModrinthEventGroup(group)
+						? 'border-blue opacity-50'
+						: 'border-secondary opacity-40'
+			"
 			:style="getGuideStyle(group)"
 		/>
 		<Transition name="analytics-event-range-highlight-fade">
 			<div
 				v-if="rangeHighlight"
 				aria-hidden="true"
-				class="pointer-events-none absolute left-0 z-10 rounded-sm border border-l-0 border-dashed border-secondary bg-highlight-blue opacity-40"
+				class="pointer-events-none absolute left-0 z-10 rounded-sm border border-l-0 border-dashed border-blue bg-highlight-blue opacity-40"
 				:style="rangeHighlight"
 			/>
 		</Transition>
@@ -22,7 +30,13 @@
 			:key="group.id"
 			type="button"
 			class="pointer-events-auto absolute left-0 top-0 z-20 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 transition-colors focus-visible:border-brand focus-visible:text-contrast"
-			:class="activeGroup?.id === group.id ? 'border-brand text-contrast' : 'text-secondary'"
+			:class="
+				activeGroup?.id === group.id
+					? isModrinthEventGroup(group)
+						? 'border-blue text-contrast'
+						: 'border-brand text-contrast'
+					: 'text-secondary'
+			"
 			:style="getMarkerStyle(group)"
 			:aria-label="getGroupAriaLabel(group)"
 			@pointerdown.stop="handleGroupPointerDown(group.id)"
@@ -38,7 +52,7 @@
 				class="relative top-px size-5"
 				aria-hidden="true"
 			/>
-			<InfoIcon v-else class="size-5" aria-hidden="true" />
+			<InfoIcon v-else class="size-5 text-blue" aria-hidden="true" />
 			<span v-if="group.events.length > 1" class="text-xs font-semibold leading-none">
 				{{ group.events.length }}
 			</span>
@@ -49,7 +63,7 @@
 			<div
 				v-if="activeGroup"
 				ref="tooltipElement"
-				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] max-h-[330px] w-[12rem] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-xl"
+				class="analytics-event-tooltip pointer-events-auto fixed left-0 top-0 z-[100] flex max-h-[330px] w-[12rem] overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-3 text-sm shadow-xl"
 				:style="tooltipStyle"
 				@mouseenter="onTooltipMouseEnter"
 				@mouseleave="onTooltipMouseLeave"
@@ -57,29 +71,77 @@
 				@focusout="onTooltipMouseLeave"
 				@click.stop
 			>
-				<div class="flex flex-col gap-2.5">
-					<div
-						v-for="event in activeGroup.events"
-						:key="getEventKey(event)"
-						class="border-0 border-b border-solid border-surface-5 px-3 pb-2.5 last:border-b-0 last:pb-0"
+				<div class="relative min-h-0 flex-1">
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-6"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-6"
+						leave-to-class="opacity-0 max-h-0"
 					>
-						<div class="font-semibold leading-snug text-contrast">
-							{{ event.title }}
-						</div>
-						<a
-							v-if="event.announcement_url"
-							:href="event.announcement_url"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-primary underline !transition-all hover:text-contrast"
-						>
-							See announcement
-							<ExternalIcon class="size-3.5" aria-hidden="true" />
-						</a>
-						<div class="mt-1 text-xs font-semibold text-primary">
-							{{ event.subtitle ?? formatEventRange(event) }}
+						<div
+							v-if="showTooltipTopFade"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 -mt-1 h-6 bg-gradient-to-b from-bg-raised to-transparent"
+						/>
+					</Transition>
+
+					<div
+						ref="tooltipScrollElement"
+						class="max-h-[330px] overflow-y-auto overscroll-contain py-2"
+						@scroll="checkTooltipScrollState"
+					>
+						<div class="flex flex-col gap-2.5">
+							<div
+								v-for="event in activeGroup.events"
+								:key="getEventKey(event)"
+								class="border-0 border-b border-solid border-surface-5 px-3 pb-2.5 last:border-b-0 last:pb-0"
+							>
+								<div
+									:class="
+										event.projectName
+											? 'font-medium leading-snug text-primary'
+											: 'font-medium leading-snug text-contrast'
+									"
+								>
+									<template v-if="event.projectName">
+										<span class="text-contrast">{{ event.projectName }}: </span>
+										<span>{{ event.title }}</span>
+									</template>
+									<template v-else>
+										{{ event.title }}
+									</template>
+								</div>
+								<a
+									v-if="event.announcement_url"
+									:href="event.announcement_url"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-primary underline !transition-all hover:text-contrast"
+								>
+									See announcement
+									<ExternalIcon class="size-3.5" aria-hidden="true" />
+								</a>
+								<div class="mt-1 text-xs font-medium text-primary">
+									{{ event.subtitle ?? formatEventRange(event) }}
+								</div>
+							</div>
 						</div>
 					</div>
+
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-8"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-8"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showTooltipBottomFade"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 -mb-1 h-8 bg-gradient-to-t from-bg-raised to-transparent"
+						/>
+					</Transition>
 				</div>
 			</div>
 		</Transition>
@@ -89,6 +151,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ExternalIcon, InfoIcon, TagCategoryFlagIcon } from '@modrinth/assets'
+import { useScrollIndicator } from '@modrinth/ui'
 
 import type {
 	AnalyticsDashboardStat,
@@ -104,6 +167,8 @@ export type AnalyticsChartEvent = {
 	title: string
 	starts: string
 	ends: string
+	projectId?: string
+	projectName?: string
 	subtitle?: string
 	announcement_url?: string | null
 	for_metric_kind?: Labrinth.Analytics.v3.AnalyticsEventMetricKind[] | null
@@ -189,6 +254,7 @@ const hoveredGroupId = ref<string | null>(null)
 const isTooltipHovered = ref(false)
 const chartElement = ref<HTMLDivElement | null>(null)
 const tooltipElement = ref<HTMLDivElement | null>(null)
+const tooltipScrollElement = ref<HTMLDivElement | null>(null)
 const tooltipWidth = ref(0)
 const tooltipHeight = ref(0)
 const chartRect = reactive({
@@ -199,6 +265,12 @@ let closeTimeout: ReturnType<typeof setTimeout> | null = null
 let openTimeout: ReturnType<typeof setTimeout> | null = null
 let pointerDownGroupId: string | null = null
 let wasPointerDownGroupActive = false
+const {
+	showTopFade: showTooltipTopFade,
+	showBottomFade: showTooltipBottomFade,
+	checkScrollState: checkTooltipScrollState,
+	forceCheck: forceCheckTooltipScrollState,
+} = useScrollIndicator(tooltipScrollElement)
 
 const chartStartMs = computed(() => props.chartStart?.getTime() ?? null)
 const chartEndMs = computed(() => props.chartEnd?.getTime() ?? null)
@@ -422,7 +494,7 @@ function doesEventMatchActiveStat(event: AnalyticsChartEvent) {
 function getEventKey(event: AnalyticsChartEvent) {
 	return `${event.title}:${event.starts}:${event.ends}:${event.announcement_url ?? ''}:${
 		event.for_metric_kind?.join(',') ?? ''
-	}:${event.subtitle ?? ''}`
+	}:${event.subtitle ?? ''}:${event.projectId ?? ''}:${event.projectName ?? ''}`
 }
 
 function getEventMarkerIcon(event: AnalyticsChartEvent): AnalyticsChartEventMarkerIcon {
@@ -431,6 +503,10 @@ function getEventMarkerIcon(event: AnalyticsChartEvent): AnalyticsChartEventMark
 
 function getEventGroupKey(event: AnalyticsChartEvent): string {
 	return event.groupKey ?? getEventMarkerIcon(event)
+}
+
+function isModrinthEventGroup(group: EventGroup) {
+	return group.groupKey === 'modrinth'
 }
 
 function createEventGroup(event: PositionedEvent): EventGroup {
@@ -851,6 +927,7 @@ watch(
 			if (!tooltipElement.value) return
 			tooltipWidth.value = tooltipElement.value.offsetWidth
 			tooltipHeight.value = tooltipElement.value.offsetHeight
+			forceCheckTooltipScrollState()
 		})
 	},
 	{ deep: true, immediate: true },

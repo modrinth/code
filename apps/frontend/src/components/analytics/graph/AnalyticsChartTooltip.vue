@@ -2,21 +2,27 @@
 	<div
 		v-show="visible"
 		ref="tooltipElement"
-		class="analytics-chart-tooltip absolute left-0 top-0 z-10 flex max-h-[360px] flex-col overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
+		class="analytics-chart-tooltip absolute left-0 top-0 z-10 flex max-h-[356px] flex-col overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 text-sm shadow-lg"
 		:class="pinned ? '' : 'pointer-events-none'"
 		:style="positionStyle"
 		@wheel.stop
 		@click.stop
 	>
 		<div
-			class="mb-1.5 flex shrink-0 items-center justify-between gap-2 border-0 border-b border-solid border-surface-5 px-3 pb-1.5 font-medium text-contrast"
+			class="mb-1.5 flex shrink-0 items-start justify-between gap-2 border-0 border-b border-solid border-surface-5 px-3 pb-1.5 font-medium text-contrast"
 		>
-			<span class="min-w-0 truncate">
-				{{ rangeLabel }}
-				<span v-if="durationLabel" class="text-xs font-normal text-secondary">
-					({{ durationLabel }})
+			<div class="flex min-w-0 flex-col gap-0.5">
+				<span class="min-w-0 truncate">
+					{{ rangeLabel }}
+					<span v-if="durationLabel" class="text-xs font-normal text-secondary">
+						({{ durationLabel }})
+					</span>
 				</span>
-			</span>
+				<span v-if="previousRangeLabel" class="min-w-0 truncate text-xs text-primary">
+					<span class="font-medium">{{ previousRangeLabel }}</span>
+					<span class="font-normal text-secondary"> (prev.)</span>
+				</span>
+			</div>
 			<PinIcon
 				v-if="pinned"
 				v-tooltip="'Chart tooltip pinned'"
@@ -24,9 +30,24 @@
 				aria-label="Pinned"
 			/>
 		</div>
+		<Transition
+			enter-active-class="transition-all duration-200 ease-out"
+			enter-from-class="opacity-0 max-h-0"
+			enter-to-class="opacity-100 max-h-6"
+			leave-active-class="transition-all duration-200 ease-in"
+			leave-from-class="opacity-100 max-h-6"
+			leave-to-class="opacity-0 max-h-0"
+		>
+			<div
+				v-if="showEntriesTopFade"
+				class="analytics-chart-tooltip-entries-fade-top pointer-events-none absolute left-0 right-0 z-10 -mt-1 h-6 bg-gradient-to-b from-surface-3 to-transparent"
+			/>
+		</Transition>
+
 		<div
 			ref="entriesElement"
 			class="analytics-chart-tooltip-entries flex min-h-0 flex-col gap-1 overflow-y-auto overscroll-contain px-3"
+			@scroll="checkEntriesScrollState"
 			@touchstart="onEntriesTouchStart"
 			@touchmove="onEntriesTouchMove"
 			@touchend="clearEntriesTouchScroll"
@@ -93,11 +114,26 @@
 				</span>
 			</div>
 		</div>
+
+		<Transition
+			enter-active-class="transition-all duration-200 ease-out"
+			enter-from-class="opacity-0 max-h-0"
+			enter-to-class="opacity-100 max-h-6"
+			leave-active-class="transition-all duration-200 ease-in"
+			leave-from-class="opacity-100 max-h-6"
+			leave-to-class="opacity-0 max-h-0"
+		>
+			<div
+				v-if="showEntriesBottomFade"
+				class="analytics-chart-tooltip-entries-fade-bottom pointer-events-none absolute left-0 right-0 z-10 -mb-1 h-6 bg-gradient-to-t from-surface-3 to-transparent"
+			/>
+		</Transition>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { PinIcon } from '@modrinth/assets'
+import { useScrollIndicator } from '@modrinth/ui'
 
 export type AnalyticsChartTooltipEntry = {
 	projectId: string
@@ -116,6 +152,8 @@ const props = defineProps<{
 	y: number
 	start: Date | null
 	end: Date | null
+	previousStart: Date | null
+	previousEnd: Date | null
 	chartStart: Date | null
 	chartEnd: Date | null
 	formattedTotal: string
@@ -153,7 +191,9 @@ function formatRangeLabel(
 	const yearsDiffer = start.getFullYear() !== end.getFullYear()
 	const chartYearsDiffer =
 		chartStart !== null && chartEnd !== null && chartStart.getFullYear() !== chartEnd.getFullYear()
-	const showTrailingYear = !yearsDiffer && chartYearsDiffer
+	const rangeYearDiffersFromChart =
+		chartStart !== null && start.getFullYear() !== chartStart.getFullYear()
+	const showTrailingYear = !yearsDiffer && (chartYearsDiffer || rangeYearDiffersFromChart)
 	const monthsDiffer = yearsDiffer || start.getMonth() !== end.getMonth()
 
 	const timeOptions: Intl.DateTimeFormatOptions = includeTime
@@ -222,11 +262,24 @@ const rangeLabel = computed(() =>
 const durationLabel = computed(() =>
 	props.start && props.end ? formatDurationLabel(props.start, props.end) : '',
 )
+const previousRangeLabel = computed(() =>
+	props.previousStart && props.previousEnd
+		? formatRangeLabel(props.previousStart, props.previousEnd, props.chartStart, props.chartEnd)
+		: '',
+)
 
 const tooltipElement = ref<HTMLDivElement | null>(null)
 const entriesElement = ref<HTMLDivElement | null>(null)
+const {
+	showTopFade: showEntriesTopFade,
+	showBottomFade: showEntriesBottomFade,
+	checkScrollState: checkEntriesScrollState,
+	forceCheck: forceCheckEntriesScrollState,
+} = useScrollIndicator(entriesElement)
 const tooltipWidth = ref(0)
 const tooltipHeight = ref(0)
+const entriesTopOffset = ref(0)
+const entriesBottomOffset = ref(0)
 const tooltipOffsetParentLeft = ref(0)
 const viewportWidth = ref(0)
 let entriesTouchStartY = 0
@@ -253,11 +306,21 @@ function updateTooltipMeasurements() {
 		tooltipWidth.value = element.offsetWidth
 		tooltipHeight.value = element.offsetHeight
 
+		const entries = entriesElement.value
+		if (entries) {
+			entriesTopOffset.value = entries.offsetTop
+			entriesBottomOffset.value = Math.max(
+				0,
+				element.offsetHeight - entries.offsetTop - entries.offsetHeight,
+			)
+		}
+
 		const offsetParent =
 			element.offsetParent instanceof HTMLElement ? element.offsetParent : element.parentElement
 		tooltipOffsetParentLeft.value = offsetParent?.getBoundingClientRect().left ?? 0
 		viewportWidth.value =
 			document.documentElement.clientWidth || window.innerWidth || props.containerWidth
+		forceCheckEntriesScrollState()
 	})
 }
 
@@ -267,6 +330,7 @@ watch(
 		props.entries,
 		rangeLabel.value,
 		durationLabel.value,
+		previousRangeLabel.value,
 		props.pinned,
 		props.containerWidth,
 		props.containerHeight,
@@ -369,6 +433,8 @@ const positionStyle = computed(() => {
 
 	return {
 		'--analytics-chart-tooltip-max-width': `${tooltipMaxWidth}px`,
+		'--analytics-chart-tooltip-entries-top': `${entriesTopOffset.value}px`,
+		'--analytics-chart-tooltip-entries-bottom': `${entriesBottomOffset.value}px`,
 		transform: `translate3d(${clampedLeft}px, ${clampedTop}px, 0)`,
 	}
 })
@@ -386,6 +452,14 @@ const positionStyle = computed(() => {
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior: contain;
 	touch-action: pan-y;
+}
+
+.analytics-chart-tooltip-entries-fade-top {
+	top: var(--analytics-chart-tooltip-entries-top, 0rem);
+}
+
+.analytics-chart-tooltip-entries-fade-bottom {
+	bottom: var(--analytics-chart-tooltip-entries-bottom, 0rem);
 }
 
 @media (pointer: coarse) {

@@ -503,9 +503,13 @@ export function getAnalyticsBreakdownPresetsForProjectSelection(
 	selectedProjectIds: readonly string[],
 ): AnalyticsSelectedBreakdowns {
 	const normalizedBreakdowns: AnalyticsSelectedBreakdowns = []
+	const canBreakDownByProject = selectedProjectIds.length > 1
 
 	for (const breakdown of breakdowns) {
-		if (breakdown === 'none' || breakdown === 'project') {
+		if (breakdown === 'none') {
+			continue
+		}
+		if (breakdown === 'project' && !canBreakDownByProject) {
 			continue
 		}
 		if (!normalizedBreakdowns.includes(breakdown)) {
@@ -514,10 +518,6 @@ export function getAnalyticsBreakdownPresetsForProjectSelection(
 		if (normalizedBreakdowns.length >= MAX_ANALYTICS_BREAKDOWN_PRESETS) {
 			break
 		}
-	}
-
-	if (normalizedBreakdowns.length === 0 && selectedProjectIds.length > 1) {
-		return ['project']
 	}
 
 	return normalizedBreakdowns

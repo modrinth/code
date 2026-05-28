@@ -335,6 +335,8 @@
 							:y="hoverState.y"
 							:start="hoverBucketRange?.start ?? null"
 							:end="hoverBucketRange?.end ?? null"
+							:previous-start="previousHoverBucketRange?.start ?? null"
+							:previous-end="previousHoverBucketRange?.end ?? null"
 							:chart-start="chartRangeBounds?.start ?? null"
 							:chart-end="chartRangeBounds?.end ?? null"
 							:formatted-total="hoverFormattedTotal"
@@ -401,6 +403,7 @@ import {
 } from '~/providers/analytics/analytics'
 
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
+import { COMBINED_BREAKDOWN_DATASET_ID_PREFIX } from '../breakdown'
 import {
 	ensureMinimumTimeRange,
 	getDefaultAnalyticsGroupByForDurationMinutes,
@@ -489,6 +492,7 @@ const GRAPH_RENDER_DATASET_LIMIT = 250
 const PREVIOUS_PERIOD_DATASET_ID_PREFIX = 'previous-period:'
 const PREVIOUS_PERIOD_BORDER_DASH = [6, 4]
 const PROJECT_VERSION_UPLOAD_DEDUPE_WINDOW_MS = 24 * 60 * 60 * 1000
+const ALL_PROJECTS_DATASET_ID = 'all'
 const PROJECT_EVENT_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'short',
 	day: 'numeric',
@@ -498,6 +502,23 @@ const MONETIZATION_LEGEND_ENTRY_ORDER = new Map([
 	['breakdown:monetized', 0],
 	['breakdown:unmonetized', 1],
 ])
+const visibleProjectStatusChangeEventStatuses = [
+	'approved',
+	'unlisted',
+	'private',
+] as const satisfies readonly Labrinth.Projects.v2.ProjectStatus[]
+
+type VisibleProjectStatusChangeEventStatus =
+	(typeof visibleProjectStatusChangeEventStatuses)[number]
+
+const visibleProjectStatusChangeEventStatusSet = new Set<Labrinth.Projects.v2.ProjectStatus>(
+	visibleProjectStatusChangeEventStatuses,
+)
+const projectStatusEventCopy: Record<VisibleProjectStatusChangeEventStatus, string> = {
+	approved: 'Project approved',
+	unlisted: 'Project unlisted',
+	private: 'Project set to private',
+}
 
 const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])
 const hasChartEvents = computed(() => localAnalyticsChartEvents.value.length > 0)
@@ -528,11 +549,16 @@ const selectedProjectEventIdSet = computed(
 )
 const localProjectChartEvents = computed<AnalyticsChartEvent[]>(() =>
 	dedupeProjectVersionUploadEvents(
-		projectEvents.value.filter((event) => selectedProjectEventIdSet.value.has(event.project_id)),
+		projectEvents.value.filter(
+			(event) =>
+				selectedProjectEventIdSet.value.has(event.project_id) && shouldShowProjectEvent(event),
+		),
 	).map((event) => ({
-		title: getProjectEventDisplayTitle(event),
+		title: getProjectEventTitle(event),
 		starts: event.timestamp,
 		ends: event.timestamp,
+		projectId: event.project_id,
+		projectName: selectedProjectNameById.value.get(event.project_id),
 		subtitle: formatProjectEventDate(event.timestamp),
 		markerIcon: 'flag' as const,
 		groupKey: 'project',
@@ -541,7 +567,9 @@ const localProjectChartEvents = computed<AnalyticsChartEvent[]>(() =>
 const hasProjectEvents = computed(() => localProjectChartEvents.value.length > 0)
 const hasTimelineEventSettings = computed(() => hasChartEvents.value || hasProjectEvents.value)
 const visibleProjectChartEvents = computed(() =>
-	showProjectEvents.value ? localProjectChartEvents.value : [],
+	showProjectEvents.value
+		? localProjectChartEvents.value.filter(isProjectChartEventVisibleForLegend)
+		: [],
 )
 const visibleTimelineEvents = computed(() => [
 	...visibleModrinthChartEvents.value,
@@ -551,29 +579,31 @@ const hasVisibleTimelineEvents = computed(
 	() => visibleModrinthChartEvents.value.length > 0 || visibleProjectChartEvents.value.length > 0,
 )
 
-function formatProjectStatusLabel(status: Labrinth.Projects.v2.ProjectStatus) {
-	return status.replace(/[_-]/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase())
-}
-
 function getProjectEventTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
 	if (event.kind === 'version_uploaded') {
 		const versionNumber = event.version_number.trim()
 		return versionNumber ? `${versionNumber} released` : 'Version uploaded'
 	}
 
-	const statusFrom = formatProjectStatusLabel(event.status_from)
-	const statusTo = formatProjectStatusLabel(event.status_to)
-	return `Status changed from ${statusFrom} to ${statusTo}`
-}
-
-function getProjectEventDisplayTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
-	const title = getProjectEventTitle(event)
-	if (selectedProjects.value.length <= 1) {
-		return title
+	if (isVisibleProjectStatusChangeEventStatus(event.status_to)) {
+		return projectStatusEventCopy[event.status_to]
 	}
 
-	const projectName = selectedProjectNameById.value.get(event.project_id)
-	return projectName ? `${projectName}: ${title}` : title
+	return 'Project status changed'
+}
+
+function shouldShowProjectEvent(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
+	if (event.kind !== 'status_changed') {
+		return true
+	}
+
+	return isVisibleProjectStatusChangeEventStatus(event.status_to)
+}
+
+function isVisibleProjectStatusChangeEventStatus(
+	status: Labrinth.Projects.v2.ProjectStatus,
+): status is VisibleProjectStatusChangeEventStatus {
+	return visibleProjectStatusChangeEventStatusSet.has(status)
 }
 
 function dedupeProjectVersionUploadEvents(events: Labrinth.Analytics.v3.ProjectAnalyticsEvent[]) {
@@ -1269,6 +1299,85 @@ const currentLegendEntries = computed<LegendEntry[]>(() =>
 		.sort(compareLegendEntries),
 )
 
+const visibleProjectEventIdSet = computed(() => {
+	if (!selectedBreakdowns.value.includes('project')) {
+		return selectedProjectEventIdSet.value
+	}
+
+	const visibleProjectIds = new Set<string>()
+	const projectIdsWithLegendEntries = new Set<string>()
+
+	for (const legendEntry of currentLegendEntries.value) {
+		const projectId = getLegendEntryProjectId(legendEntry)
+		if (!projectId) {
+			continue
+		}
+
+		projectIdsWithLegendEntries.add(projectId)
+		if (!legendEntry.hidden) {
+			visibleProjectIds.add(projectId)
+		}
+	}
+
+	if (isGraphDatasetSelectionActive.value) {
+		return visibleProjectIds
+	}
+
+	if (projectIdsWithLegendEntries.size === 0) {
+		return selectedProjectEventIdSet.value
+	}
+
+	const eventProjectIds = new Set<string>()
+	for (const projectId of selectedProjectEventIdSet.value) {
+		if (!projectIdsWithLegendEntries.has(projectId) || visibleProjectIds.has(projectId)) {
+			eventProjectIds.add(projectId)
+		}
+	}
+
+	return eventProjectIds
+})
+
+function isProjectChartEventVisibleForLegend(event: AnalyticsChartEvent) {
+	return !event.projectId || visibleProjectEventIdSet.value.has(event.projectId)
+}
+
+function getLegendEntryProjectId(legendEntry: LegendEntry) {
+	const projectBreakdownIndex = selectedBreakdowns.value.findIndex(
+		(breakdown) => breakdown === 'project',
+	)
+
+	if (projectBreakdownIndex === -1) {
+		if (selectedProjects.value.length === 1 && legendEntry.id === ALL_PROJECTS_DATASET_ID) {
+			return selectedProjects.value[0]?.id ?? null
+		}
+
+		return null
+	}
+
+	if (selectedBreakdowns.value.length === 1) {
+		return selectedProjectIdSet.value.has(legendEntry.id) ? legendEntry.id : null
+	}
+
+	if (!legendEntry.id.startsWith(COMBINED_BREAKDOWN_DATASET_ID_PREFIX)) {
+		return null
+	}
+
+	const values = legendEntry.id
+		.slice(COMBINED_BREAKDOWN_DATASET_ID_PREFIX.length)
+		.split('+')
+		.map(decodeBreakdownDatasetValue)
+	const projectId = values[projectBreakdownIndex]
+	return projectId && selectedProjectIdSet.value.has(projectId) ? projectId : null
+}
+
+function decodeBreakdownDatasetValue(value: string) {
+	try {
+		return decodeURIComponent(value)
+	} catch {
+		return value
+	}
+}
+
 const legendEntries = computed<LegendEntry[]>(() => {
 	if (!shouldShowPreviousPeriod.value) {
 		return currentLegendEntries.value
@@ -1673,6 +1782,22 @@ const hoverBucketRange = computed(() => {
 	const nextFetchRequest = fetchRequest.value
 	if (!nextFetchRequest || hoverState.sliceIndex === null) return null
 	return getSliceBucketRange(nextFetchRequest.time_range, sliceCount.value, hoverState.sliceIndex)
+})
+
+const previousHoverBucketRange = computed(() => {
+	if (!shouldShowPreviousPeriod.value) return null
+
+	const bucketRange = hoverBucketRange.value
+	const rangeBounds = chartRangeBounds.value
+	if (!bucketRange || !rangeBounds) return null
+
+	const periodMs = rangeBounds.end.getTime() - rangeBounds.start.getTime()
+	if (!Number.isFinite(periodMs) || periodMs <= 0) return null
+
+	return {
+		start: new Date(bucketRange.start.getTime() - periodMs),
+		end: new Date(bucketRange.end.getTime() - periodMs),
+	}
 })
 
 const chartRangeBounds = computed(() => {

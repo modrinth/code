@@ -136,6 +136,7 @@
 				fit-content
 				checkbox-position="right"
 				placeholder="None"
+				show-selection-actions
 				@open="handleBreakdownSelectOpen"
 				@close="handleBreakdownSelectClose"
 			>
@@ -332,6 +333,7 @@
 									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 									checkbox-position="right"
 									placeholder="None"
+									show-selection-actions
 									@open="handleBreakdownSelectOpen"
 									@close="handleBreakdownSelectClose"
 								>
@@ -791,7 +793,7 @@ const selectedGroupByLabel = computed(() => {
 		case '6h':
 			return 'Group by 6 hours'
 		case 'day':
-			return 'Group by date'
+			return 'Group by day'
 		case 'week':
 			return 'Group by week'
 		case 'month':
@@ -799,7 +801,7 @@ const selectedGroupByLabel = computed(() => {
 		case 'year':
 			return 'Group by year'
 		default:
-			return 'Group by date'
+			return 'Group by day'
 	}
 })
 const mobileSelectedBreakdownLabel = computed(() => {
@@ -814,7 +816,13 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 		const selectedBreakdownSet = new Set(selectedBreakdownValue.value)
 		const hasReachedBreakdownLimit =
 			selectedBreakdownValue.value.length >= MAX_ANALYTICS_BREAKDOWN_PRESETS
-		const options: MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[] = [
+		const options: MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[] = []
+
+		if (selectedProjectIds.value.length > 1) {
+			options.push({ value: 'project', label: 'Project' })
+		}
+
+		options.push(
 			{ value: 'country', label: 'Country' },
 			{ value: 'monetization', label: 'Monetization' },
 			{ value: 'user_agent', label: 'Download source' },
@@ -822,7 +830,7 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 			{ value: 'version_id', label: 'Project version' },
 			{ value: 'loader', label: 'Loader' },
 			{ value: 'game_version', label: 'Game version' },
-		]
+		)
 
 		return options.map((option) => ({
 			...option,
