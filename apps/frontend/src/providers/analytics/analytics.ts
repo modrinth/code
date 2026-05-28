@@ -1836,10 +1836,34 @@ export function createAnalyticsDashboardContext(
 		{ deep: true, immediate: true },
 	)
 
+	function syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds: string[]) {
+		const validBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
+			selectedBreakdowns.value,
+			nextSelectedProjectIds,
+		)
+		if (!areStringArraysEqual(selectedBreakdowns.value, validBreakdowns)) {
+			replaceNextAnalyticsRouteNavigation()
+			selectedBreakdowns.value = validBreakdowns
+			return
+		}
+
+		const defaultBreakdowns = getDefaultAnalyticsBreakdownPresets(nextSelectedProjectIds)
+		if (
+			!hasExplicitBreakdownQuery.value &&
+			!areStringArraysEqual(selectedBreakdowns.value, defaultBreakdowns)
+		) {
+			replaceNextAnalyticsRouteNavigation()
+			selectedBreakdowns.value = defaultBreakdowns
+		}
+	}
+
 	watch(
 		[projects, areProjectsLoaded],
 		([nextProjects, nextAreProjectsLoaded]) => {
 			if (nextProjects.length === 0) {
+				if (nextAreProjectsLoaded) {
+					syncSelectedBreakdownsForProjectSelection([])
+				}
 				if (nextAreProjectsLoaded && selectedProjectIds.value.length > 0) {
 					replaceNextAnalyticsRouteNavigation()
 					selectedProjectIds.value = []
@@ -1850,6 +1874,7 @@ export function createAnalyticsDashboardContext(
 			const availableProjectIds = new Set(nextProjects.map((project) => project.id))
 			if (!hasExplicitProjectSelectionQuery.value) {
 				const nextSelectedProjectIds = nextProjects.map((project) => project.id)
+				syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds)
 				if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
 					replaceNextAnalyticsRouteNavigation()
 					selectedProjectIds.value = nextSelectedProjectIds
@@ -1861,6 +1886,7 @@ export function createAnalyticsDashboardContext(
 			const nextSelectedProjectIds =
 				retainedSelection.length > 0 ? retainedSelection : nextProjects.map((project) => project.id)
 
+			syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds)
 			if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
 				replaceNextAnalyticsRouteNavigation()
 				selectedProjectIds.value = nextSelectedProjectIds
@@ -1871,25 +1897,8 @@ export function createAnalyticsDashboardContext(
 
 	watch(
 		[selectedProjectIds, hasExplicitBreakdownQuery],
-		([nextSelectedProjectIds, nextHasExplicitBreakdownQuery]) => {
-			const validBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
-				selectedBreakdowns.value,
-				nextSelectedProjectIds,
-			)
-			if (!areStringArraysEqual(selectedBreakdowns.value, validBreakdowns)) {
-				replaceNextAnalyticsRouteNavigation()
-				selectedBreakdowns.value = validBreakdowns
-				return
-			}
-
-			const defaultBreakdowns = getDefaultAnalyticsBreakdownPresets(nextSelectedProjectIds)
-			if (
-				!nextHasExplicitBreakdownQuery &&
-				!areStringArraysEqual(selectedBreakdowns.value, defaultBreakdowns)
-			) {
-				replaceNextAnalyticsRouteNavigation()
-				selectedBreakdowns.value = defaultBreakdowns
-			}
+		([nextSelectedProjectIds]) => {
+			syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds)
 		},
 		{ deep: true, immediate: true },
 	)
