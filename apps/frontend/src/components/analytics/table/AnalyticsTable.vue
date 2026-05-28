@@ -135,10 +135,8 @@ import type { LocationQuery } from 'vue-router'
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
-	doesAnalyticsPointMatchNormalizedFilters,
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
-	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 import {
 	type AnalyticsTableSortColumn as TableColumnKey,
@@ -388,7 +386,6 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 	const nextSelectedBreakdowns = selectedBreakdowns.value
 	const nextSelectedProjectIds = selectedProjectIdSet.value
 	const nextRelevantStats = relevantStats.value
-	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters.value)
 
 	if (!nextFetchRequest || nextSelectedProjectIds.size === 0) {
 		return []
@@ -524,10 +521,6 @@ function buildTableRows(mode: TableMode): AnalyticsTableRow[] {
 			}
 
 			if (!nextSelectedProjectIds.has(point.source_project)) {
-				continue
-			}
-
-			if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) {
 				continue
 			}
 

@@ -1,14 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { formatLoaderLabel } from '@modrinth/ui'
 
-import {
-	type AnalyticsBreakdownPreset,
-	type AnalyticsDashboardProject,
-	type AnalyticsDashboardStat,
-	type AnalyticsGroupByPreset,
-	type AnalyticsSelectedFilters,
-	doesAnalyticsPointMatchNormalizedFilters,
-	normalizeAnalyticsSelectedFilters,
+import type {
+	AnalyticsBreakdownPreset,
+	AnalyticsDashboardProject,
+	AnalyticsDashboardStat,
+	AnalyticsGroupByPreset,
 } from '~/providers/analytics/analytics'
 
 import {
@@ -282,7 +279,6 @@ export function buildChartDatasets(
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
-	selectedFilters: AnalyticsSelectedFilters,
 	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
 	getVersionProjectName?: (versionId: string) => string | undefined,
 	sliceCount: number = timeSlices.length,
@@ -293,7 +289,6 @@ export function buildChartDatasets(
 	}
 
 	const dataLength = Math.max(sliceCount, timeSlices.length)
-	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
 	const projectNamesById = new Map(selectedProjects.map((project) => [project.id, project.name]))
 
@@ -321,7 +316,6 @@ export function buildChartDatasets(
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
-				if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
 				const breakdownValues = getAnalyticsBreakdownValues(point, normalizedBreakdowns)
 				if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
@@ -391,7 +385,6 @@ export function buildChartDatasets(
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
-				if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
 				if (point.metric_kind === 'downloads') {
 					downloadTotal += getMetricValue(point, 'downloads')
@@ -441,7 +434,6 @@ export function buildChartDatasets(
 	timeSlices.forEach((slice, sliceIndex) => {
 		for (const point of slice) {
 			if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
-			if (!doesAnalyticsPointMatchNormalizedFilters(point, normalizedFilters)) continue
 
 			const breakdownValues = getAnalyticsBreakdownValues(point, normalizedBreakdowns)
 			if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {

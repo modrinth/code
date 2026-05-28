@@ -833,7 +833,6 @@ const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset
 	const nextSelectedProjects = selectedProjects.value
 	const nextPalette = legendPalette.value
 	const nextSelectedBreakdowns = selectedBreakdowns.value
-	const nextSelectedFilters = selectedFilters.value
 	const nextGetVersionProjectName = showProjectVersionNames.value
 		? getVersionProjectName
 		: undefined
@@ -846,7 +845,6 @@ const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset
 			stat,
 			nextPalette,
 			nextSelectedBreakdowns,
-			nextSelectedFilters,
 			getVersionDisplayName,
 			nextGetVersionProjectName,
 			nextSliceCount,
@@ -861,7 +859,6 @@ const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, Char
 	const nextSelectedProjects = selectedProjects.value
 	const nextPalette = legendPalette.value
 	const nextSelectedBreakdowns = selectedBreakdowns.value
-	const nextSelectedFilters = selectedFilters.value
 	const nextGetVersionProjectName = showProjectVersionNames.value
 		? getVersionProjectName
 		: undefined
@@ -874,7 +871,6 @@ const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, Char
 			stat,
 			nextPalette,
 			nextSelectedBreakdowns,
-			nextSelectedFilters,
 			getVersionDisplayName,
 			nextGetVersionProjectName,
 			nextSliceCount,

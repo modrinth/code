@@ -679,7 +679,6 @@ function computeTotals(
 	if (filteredProjectIds.size === 0) {
 		return totals
 	}
-	const normalizedFilters = normalizeAnalyticsSelectedFilters(filters)
 
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
@@ -688,10 +687,6 @@ function computeTotals(
 			}
 
 			if (!filteredProjectIds.has(dataPoint.source_project)) {
-				continue
-			}
-
-			if (!doesAnalyticsPointMatchNormalizedFilters(dataPoint, normalizedFilters)) {
 				continue
 			}
 
