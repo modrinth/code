@@ -12,6 +12,7 @@ use crate::{
 use super::super::{
     ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
     condense_country, none_if_empty, none_if_zero_version_id,
+    normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -79,6 +80,7 @@ pub struct ProjectPlaytime {
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct PlaytimeRow {
     bucket: u64,
+    source_project_id: DBProjectId,
     project_id: DBProjectId,
     parent_version_id: DBVersionId,
     version_id: DBVersionId,
@@ -103,6 +105,7 @@ const PLAYTIME: &str = {
     formatcp!(
         "SELECT
             bucket,
+            source_project_id,
             if({USE_PROJECT_ID}, source_project_id, 0) AS project_id,
             parent_version_id,
             version_id,
@@ -122,7 +125,8 @@ const PLAYTIME: &str = {
                 seconds
             FROM playtime
             WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                recorded >= {TIME_RANGE_START}
+                AND recorded < {TIME_RANGE_END}
                 AND playtime.project_id IN {PROJECT_IDS}
                 AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
                 AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})
@@ -142,14 +146,15 @@ const PLAYTIME: &str = {
                 seconds
             FROM playtime
             WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                recorded >= {TIME_RANGE_START}
+                AND recorded < {TIME_RANGE_END}
                 AND parent IN {PARENT_VERSION_IDS}
                 AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
                 AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})
                 AND (empty({FILTER_GAME_VERSION}) OR playtime.game_version IN {FILTER_GAME_VERSION})
                 AND (empty({FILTER_COUNTRY}) OR playtime.country IN {FILTER_COUNTRY})
         )
-        GROUP BY bucket, project_id, parent_version_id, version_id, loader, game_version, country"
+        GROUP BY bucket, source_project_id, project_id, parent_version_id, version_id, loader, game_version, country"
     )
 };
 
@@ -228,11 +233,25 @@ pub(crate) async fn fetch(
             } else {
                 row.project_id
             };
+        let source_project_id = if row.source_project_id.0 == 0 {
+            parent_version_projects
+                .get(&row.parent_version_id)
+                .copied()
+                .unwrap_or(row.source_project_id)
+        } else {
+            row.source_project_id
+        };
         let key = PlaytimeBucket {
             bucket: row.bucket,
             project_id,
             version_id: uses_column("use_version_id").then_some(row.version_id),
-            loader: uses_column("use_loader").then(|| row.loader.clone()),
+            loader: uses_column("use_loader").then(|| {
+                normalize_loader_for_project(
+                    row.loader.clone(),
+                    source_project_id,
+                    cx.project_loaders,
+                )
+            }),
             game_version: uses_column("use_game_version")
                 .then(|| row.game_version.clone()),
             country: uses_column("use_country").then(|| row.country.clone()),
