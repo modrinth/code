@@ -24,13 +24,14 @@ pub use affiliate_code_revenue::{
     AffiliateCodeRevenue, AffiliateCodeRevenueField,
     AffiliateCodeRevenueFilters,
 };
+#[cfg(test)]
+pub(crate) use project_downloads::normalize_download_source;
 pub use project_downloads::{
     DownloadSource, ProjectDownloads, ProjectDownloadsField,
     ProjectDownloadsFilters,
 };
 pub(crate) use project_downloads::{
     all_download_sources, fetch as fetch_project_downloads,
-    normalize_download_source,
 };
 pub(crate) use project_playtime::fetch as fetch_project_playtime;
 pub use project_playtime::{

@@ -1,8 +1,7 @@
-mod dynamic;
 mod fixed;
 
 use actix_web::{HttpRequest, post, web};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use super::DownloadSource;
 use crate::models::{
@@ -33,42 +32,30 @@ pub struct AnalyticsFacets {
 
 #[derive(Debug, Default, Serialize, utoipa::ToSchema)]
 pub struct ProjectViewsFacets {
-    pub domain: Vec<FacetValue<String>>,
-    pub site_path: Vec<FacetValue<String>>,
-    pub monetized: Vec<FacetValue<bool>>,
-    pub country: Vec<FacetValue<String>>,
+    pub domain: Vec<String>,
+    pub site_path: Vec<String>,
+    pub monetized: Vec<bool>,
+    pub country: Vec<String>,
 }
 
 #[derive(Debug, Default, Serialize, utoipa::ToSchema)]
 pub struct ProjectDownloadsFacets {
-    pub domain: Vec<FacetValue<String>>,
-    pub user_agent: Vec<FacetValue<DownloadSource>>,
-    pub version_id: Vec<FacetValue<VersionId>>,
-    pub monetized: Vec<FacetValue<bool>>,
-    pub country: Vec<FacetValue<String>>,
-    pub reason: Vec<FacetValue<DownloadReason>>,
-    pub game_version: Vec<FacetValue<String>>,
-    pub loader: Vec<FacetValue<String>>,
+    pub domain: Vec<String>,
+    pub user_agent: Vec<DownloadSource>,
+    pub version_id: Vec<VersionId>,
+    pub monetized: Vec<bool>,
+    pub country: Vec<String>,
+    pub reason: Vec<DownloadReason>,
+    pub game_version: Vec<String>,
+    pub loader: Vec<String>,
 }
 
 #[derive(Debug, Default, Serialize, utoipa::ToSchema)]
 pub struct ProjectPlaytimeFacets {
-    pub version_id: Vec<FacetValue<VersionId>>,
-    pub loader: Vec<FacetValue<String>>,
-    pub game_version: Vec<FacetValue<String>>,
-    pub country: Vec<FacetValue<String>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, utoipa::ToSchema)]
-pub struct FacetValue<T> {
-    pub value: T,
-    pub count: u64,
-}
-
-#[derive(Debug, Deserialize)]
-struct FacetsQuery {
-    #[serde(default)]
-    detailed: bool,
+    pub version_id: Vec<VersionId>,
+    pub loader: Vec<String>,
+    pub game_version: Vec<String>,
+    pub country: Vec<String>,
 }
 
 #[utoipa::path(
@@ -77,14 +64,12 @@ struct FacetsQuery {
 #[post("/facets")]
 pub async fn fetch_facets(
     http_req: HttpRequest,
-    query: web::Query<FacetsQuery>,
-    req: web::Json<super::GetRequest>,
+    _req: web::Json<super::GetRequest>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    clickhouse: web::Data<clickhouse::Client>,
 ) -> Result<web::Json<FacetsResponse>, ApiError> {
-    let (_, user) = get_user_from_headers(
+    get_user_from_headers(
         &http_req,
         &**pool,
         &redis,
@@ -93,12 +78,7 @@ pub async fn fetch_facets(
     )
     .await?;
 
-    let facets = if query.detailed {
-        dynamic::fetch(req.into_inner(), &user, &pool, &redis, &clickhouse)
-            .await?
-    } else {
-        fixed::fetch(&req, &user, &pool, &redis).await?
-    };
+    let facets = fixed::fetch(&pool, &redis).await?;
 
     Ok(web::Json(FacetsResponse { facets }))
 }
