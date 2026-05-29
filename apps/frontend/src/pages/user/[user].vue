@@ -729,7 +729,7 @@ const messages = defineMessages({
 	officialAccountBio: {
 		id: 'profile.official-account.bio',
 		defaultMessage:
-			'The official user account of Modrinth. Get support at {support-link} or via email at {email}',
+			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
 	},
 })
 

@@ -124,9 +124,6 @@ const selectedCountText = computed(() => {
 
 const bulkProgressMessage = computed(() => {
 	if (!props.bulkOperation) return ''
-	const contentType = props.contentTypeLabel
-		? `${props.contentTypeLabel}${props.bulkTotal === 1 ? '' : 's'}`
-		: 'items'
 	const messageMap = {
 		enable: props.bulkWaiting ? messages.bulkEnablingWaiting : messages.bulkEnabling,
 		disable: props.bulkWaiting ? messages.bulkDisablingWaiting : messages.bulkDisabling,
