@@ -13,15 +13,12 @@
 		@clear="clearFilterBar"
 	>
 		<template #search-actions="{ category, setSelectedValues }">
-			<div v-if="category.key === 'game_version'" class="mr-2 flex min-w-[150px] justify-end">
-				<Chips
-					:model-value="gameVersionType"
-					:items="gameVersionTypeOptions"
-					:never-empty="true"
+			<div v-if="category.key === 'game_version'" class="mr-2 flex min-w-[124px] justify-end">
+				<Tabs
+					:value="gameVersionType"
+					:tabs="gameVersionTypeTabs"
 					aria-label="Game version type"
-					size="small"
-					hide-checkmark-icon
-					@update:model-value="(type) => setGameVersionType(type, setSelectedValues)"
+					@update:value="(type) => setGameVersionType(type, setSelectedValues)"
 				/>
 			</div>
 		</template>
@@ -184,19 +181,21 @@
 <script setup lang="ts">
 import { BoxIcon } from '@modrinth/assets'
 import {
-	Chips,
 	DropdownFilterBar,
+	Tabs,
 	type DropdownFilterBarCategory,
 	type DropdownFilterBarOption,
+	type TabsTab,
+	type TabsValue,
 } from '@modrinth/ui'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useGeneratedState } from '~/composables/generated'
 import {
-	type AnalyticsQueryFilterCategory,
-	type AnalyticsSelectedFilters,
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
+	type AnalyticsQueryFilterCategory,
+	type AnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 import {
 	areStringArraysEqual,
@@ -222,6 +221,7 @@ import {
 } from './queryFilter'
 
 type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'project'>
+type GameVersionType = 'release' | 'all'
 type SetDropdownFilterValues = (values: string[]) => void
 type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => void
 type CloseDownloadsThresholdMenu = (event?: Event) => void
@@ -267,11 +267,14 @@ const {
 const formattedCountries = useFormattedCountries()
 const generatedState = useGeneratedState()
 
-const gameVersionType = ref<'release' | 'all'>('release')
+const gameVersionType = ref<GameVersionType>('release')
 const countryDownloadsThreshold = ref<number | null>(null)
 const projectVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionDownloadsThreshold = ref<number | null>(null)
-const gameVersionTypeOptions: Array<'release' | 'all'> = ['release', 'all']
+const gameVersionTypeTabs: TabsTab[] = [
+	{ value: 'release', label: 'Release' },
+	{ value: 'all', label: 'All' },
+]
 const filterValueCategoryKeys = new Set<string>(FILTER_VALUE_CATEGORIES)
 const downloadsThresholdFilterCategories = ['country', 'version_id', 'game_version'] as const
 type DownloadsThresholdFilterCategory = (typeof downloadsThresholdFilterCategories)[number]
@@ -543,7 +546,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: 'Game version',
 			searchable: true,
 			searchPlaceholder: 'Search versions...',
-			submenuClass: 'w-fit',
+			submenuClass: 'w-fit max-w-[340px]',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 		},
 		{
@@ -930,15 +933,16 @@ async function runDownloadsThresholdQuery(
 	await refreshAnalyticsQuery()
 }
 
-function setGameVersionType(
-	type: 'release' | 'all' | null | undefined,
-	setSelectedValues: SetDropdownFilterValues,
-) {
-	if (type === null || type === undefined) {
+function setGameVersionType(type: TabsValue, setSelectedValues: SetDropdownFilterValues) {
+	if (!isGameVersionType(type)) {
 		return
 	}
 
 	gameVersionType.value = type
 	applyGameVersionDownloadsThreshold(setSelectedValues)
+}
+
+function isGameVersionType(type: TabsValue): type is GameVersionType {
+	return type === 'release' || type === 'all'
 }
 </script>

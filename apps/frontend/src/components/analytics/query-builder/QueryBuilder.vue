@@ -422,7 +422,7 @@ import {
 import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
-const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '17rem'
+const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
 const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
@@ -442,6 +442,7 @@ const {
 	selectedBreakdowns,
 	selectedFilters,
 	activeStat,
+	showPreviousPeriod,
 	projectStatusById,
 	projectDownloadsById,
 	queryResetToken,
@@ -632,6 +633,9 @@ function commitDraftSelectedProjects(
 
 	draftSelectedProjectIds.value = [...nextProjectIds]
 	if (!isSameProjectSelection(selectedProjectIds.value, nextProjectIds)) {
+		if (isSameProjectSelection(nextProjectIds, allProjectIds.value)) {
+			showPreviousPeriod.value = false
+		}
 		selectedProjectIds.value = nextProjectIds
 	}
 }
@@ -674,6 +678,7 @@ function handleBreakdownSelectClose() {
 function commitDraftSelectedBreakdowns() {
 	const nextBreakdowns = [...draftSelectedBreakdowns.value]
 	if (!areSelectedBreakdownsEqual(selectedBreakdowns.value, nextBreakdowns)) {
+		showPreviousPeriod.value = false
 		selectedBreakdowns.value = nextBreakdowns
 	}
 }
