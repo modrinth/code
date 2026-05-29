@@ -61,11 +61,14 @@ pub struct TiltifyMeta {
     pub subscription_source_type: String,
 }
 
-#[derive(Debug, Serialize, utoipa::ToSchema)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct CampaignInfo {
     pub total_donations_usd: Decimal,
     pub target_usd: Decimal,
 }
+
+const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info";
+const CAMPAIGN_INFO_CACHE_TTL_SECONDS: i64 = 15 * 60;
 
 #[derive(Debug, Deserialize)]
 struct TiltifyCampaignResponse {
@@ -225,17 +228,33 @@ pub async fn tiltify_webhook(
 #[get("/pride-26")]
 pub async fn pride_26(
     http: web::Data<HttpClient>,
+    redis: web::Data<RedisPool>,
     tiltify: web::Data<TiltifyClient>,
 ) -> Result<web::Json<CampaignInfo>, ApiError> {
+    let campaign_id = &ENV.TILTIFY_PRIDE_26_CAMPAIGN_ID;
+    let mut redis_connection = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to redis")?;
+
+    if let Some(cached) = redis_connection
+        .get(CAMPAIGN_INFO_CACHE_NAMESPACE, campaign_id)
+        .await
+        .wrap_internal_err("getting cached campaign info")?
+    {
+        let campaign_info = serde_json::from_str::<CampaignInfo>(&cached)
+            .wrap_internal_err("parsing cached campaign info")?;
+        return Ok(web::Json(campaign_info));
+    }
+
     let access_token = tiltify
         .access_token()
         .await
         .wrap_internal_err("fetching Tiltify access token")?;
     let url = format!(
         "https://v5api.tiltify.com/api/public/team_campaigns/{}",
-        ENV.TILTIFY_PRIDE_26_CAMPAIGN_ID
+        campaign_id
     );
-    info!("at = {access_token}");
     let response = http
         .get(url)
         .bearer_auth(access_token)
@@ -262,10 +281,22 @@ pub async fn pride_26(
         )));
     }
 
-    Ok(web::Json(CampaignInfo {
+    let campaign_info = CampaignInfo {
         total_donations_usd: response.data.total_amount_raised.value,
         target_usd: response.data.goal.value,
-    }))
+    };
+
+    redis_connection
+        .set_serialized_to_json(
+            CAMPAIGN_INFO_CACHE_NAMESPACE,
+            campaign_id,
+            &campaign_info,
+            Some(CAMPAIGN_INFO_CACHE_TTL_SECONDS),
+        )
+        .await
+        .wrap_internal_err("caching campaign info")?;
+
+    Ok(web::Json(campaign_info))
 }
 
 async fn amount_raised_usd(
