@@ -1,11 +1,11 @@
 {
 	"articles": [
 		{
-			"title": "Project Analytics 2.0",
-			"summary": "New query builder, breakdowns, filtering, and richer project data.",
-			"thumbnail": "https://modrinth.com/news/default.webp",
+			"title": "Project Analytics are good now",
+			"summary": "Get deeper insights into how people are using your projects with breakdowns, filtering, and more!",
+			"thumbnail": "https://modrinth.com/news/article/analytics-overhaul/thumbnail.webp",
 			"date": "2026-05-29T11:00:00.000Z",
-			"link": "https://modrinth.com/news/article/project-analytics-2.0"
+			"link": "https://modrinth.com/news/article/analytics-overhaul"
 		},
 		{
 			"title": "Modrinth Hosting in the App",

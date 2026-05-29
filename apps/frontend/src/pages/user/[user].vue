@@ -142,9 +142,9 @@
 						{{
 							user.bio
 								? user.bio
-								: projects.length === 0
-									? formatMessage(messages.bioFallbackUser)
-									: formatMessage(messages.bioFallbackCreator)
+								: projects?.length > 0
+									? formatMessage(messages.bioFallbackCreator)
+									: formatMessage(messages.bioFallbackUser)
 						}}
 					</template>
 					<template #stats>
