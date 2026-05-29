@@ -789,9 +789,7 @@ function applyCountryDownloadsThreshold(setSelectedValues: SetDropdownFilterValu
 
 	const selectedValues = countryFilterOptions.value
 		.filter((country) => {
-			return (
-				(countryDownloadsByCode.value.get(country.value.trim().toUpperCase()) ?? 0) > threshold
-			)
+			return (countryDownloadsByCode.value.get(country.value.trim().toUpperCase()) ?? 0) > threshold
 		})
 		.map((country) => country.value)
 
