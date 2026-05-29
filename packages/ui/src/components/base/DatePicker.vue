@@ -198,6 +198,7 @@ let inputFocusScrollSuppressionTarget: HTMLInputElement | null = null
 let originalInputFocus: HTMLInputElement['focus'] | null = null
 let suppressNextInputFocusScroll = false
 const calendarBaseClass = 'modrinth-date-picker-calendar'
+const twoCalendarClass = 'has-two-calendars'
 const calendarStateClasses = [
 	'calendar-only',
 	'show-today',
@@ -314,6 +315,7 @@ function syncCalendarClasses(instance?: Instance) {
 	if (!container) return
 
 	container.classList.add(calendarBaseClass)
+	container.classList.toggle(twoCalendarClass, resolvedShowMonths.value === 2)
 
 	for (const cls of appliedCalendarClasses) {
 		container.classList.remove(cls)
@@ -1509,6 +1511,27 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-calendar.multiMonth .dayContainer + .dayContainer) {
 	box-shadow: none;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars) {
+	width: calc(615.75px + 0.75rem) !important;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-months),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-weekdays),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-days) {
+	@apply gap-3;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-rContainer),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-weekdays),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-days) {
+	width: calc(615.75px + 0.75rem) !important;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-month),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-weekdaycontainer) {
+	@apply max-w-[307.875px] min-w-[307.875px] flex-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar::before),

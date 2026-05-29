@@ -238,7 +238,7 @@ type LastTimeframeValue = {
 
 const TIMEFRAME_DROPDOWN_MAX_HEIGHT = 500
 const TIMEFRAME_DROPDOWN_MIN_WIDTH = '20rem'
-const CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = '40.5rem'
+const CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = '41.25rem'
 const MOBILE_CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = 'min(calc(100vw - 1rem), 20rem)'
 const MOBILE_CUSTOM_RANGE_PICKER_QUERY = '(pointer: coarse), (max-width: 800px)'
 const DATE_PICKER_PORTAL_SELECTOR = '.modrinth-date-picker-portal'
