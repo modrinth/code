@@ -108,11 +108,11 @@
 
 				<div
 					ref="legendContainer"
-					class="flex max-h-[160px] flex-wrap items-center gap-y-1 overflow-y-auto px-3"
+					class="flex max-h-[130px] flex-wrap items-center gap-y-1 overflow-y-auto px-3"
 					@scroll="checkLegendScrollState"
 				>
 					<div
-						v-for="legendEntry in displayedLegendEntries"
+						v-for="legendEntry in legendEntries"
 						:key="legendEntry.id"
 						class="inline-flex items-center"
 					>
@@ -180,15 +180,6 @@
 							</template>
 						</Dropdown>
 					</div>
-					<button
-						v-if="canToggleLegendExpansion"
-						type="button"
-						class="font-base ml-1 text-sm text-secondary underline !transition-all hover:text-contrast"
-						:aria-expanded="isLegendExpanded"
-						@click="toggleLegendExpansion"
-					>
-						{{ isLegendExpanded ? 'Show less' : 'Show more' }}
-					</button>
 				</div>
 
 				<Transition
@@ -1035,14 +1026,9 @@ const hoverState = reactive<HoverState>({
 const isHoverPinned = ref(false)
 const ignoreNextChartClick = ref(false)
 const hoveredLegendEntryId = ref<string | null>(null)
-const isLegendExpanded = ref(false)
 const isShiftKeyPressed = ref(false)
 const monetizationPopoverId = useId()
-const promotedCollapsedLegendEntryIds = ref<string[]>([])
 const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
-const promotedCollapsedLegendEntryIdSet = computed(
-	() => new Set(promotedCollapsedLegendEntryIds.value),
-)
 const previousChartDatasetByOriginalId = computed(() => {
 	const datasets = new Map<string, ChartDataset>()
 	for (const dataset of previousChartDatasets.value) {
@@ -1050,8 +1036,6 @@ const previousChartDatasetByOriginalId = computed(() => {
 	}
 	return datasets
 })
-
-const LEGEND_MAX_ITEMS = 8
 
 type LegendEntry = {
 	id: string
@@ -1364,37 +1348,6 @@ const hiddenCurrentLegendEntryIdsKey = computed(() =>
 	hiddenCurrentLegendEntryIds.value.join('\u0000'),
 )
 
-const canToggleLegendExpansion = computed(() => legendEntries.value.length > LEGEND_MAX_ITEMS)
-
-const displayedLegendEntries = computed<LegendEntry[]>(() => {
-	if (!isLegendExpanded.value && canToggleLegendExpansion.value) {
-		return legendEntries.value.filter(
-			(entry, index) =>
-				index < LEGEND_MAX_ITEMS || promotedCollapsedLegendEntryIdSet.value.has(entry.id),
-		)
-	}
-	return legendEntries.value
-})
-
-const collapsedLegendEntryIds = computed(() => {
-	if (isLegendExpanded.value || !canToggleLegendExpansion.value) return new Set<string>()
-	return new Set(
-		legendEntries.value
-			.slice(LEGEND_MAX_ITEMS)
-			.filter((entry) => !promotedCollapsedLegendEntryIdSet.value.has(entry.id))
-			.map((entry) => entry.id),
-	)
-})
-
-function toggleLegendExpansion() {
-	isLegendExpanded.value = !isLegendExpanded.value
-}
-
-function promoteCollapsedLegendEntry(datasetId: string) {
-	if (promotedCollapsedLegendEntryIdSet.value.has(datasetId)) return
-	promotedCollapsedLegendEntryIds.value = [...promotedCollapsedLegendEntryIds.value, datasetId]
-}
-
 function openShowAllSelectedGraphDatasetsModal(event: MouseEvent) {
 	showAllSelectedGraphDatasetsModal.value?.show(event)
 }
@@ -1451,7 +1404,7 @@ watch(showEmptyChartState, (showEmpty) => {
 })
 
 watch(
-	displayedLegendEntries,
+	legendEntries,
 	() => {
 		nextTick(() => {
 			forceCheckLegendScrollState()
@@ -1459,12 +1412,6 @@ watch(
 	},
 	{ immediate: true, flush: 'post' },
 )
-
-watch(canToggleLegendExpansion, (canToggle) => {
-	if (!canToggle) {
-		isLegendExpanded.value = false
-	}
-})
 
 watch(canUseRatioMode, (canUse) => {
 	if (!canUse) {
@@ -1659,10 +1606,6 @@ function onLegendEntryClick(event: MouseEvent, datasetId: string) {
 function onTooltipEntryClick(datasetId: string, shiftKey: boolean) {
 	if (!chartDatasetById.value.has(datasetId)) return
 
-	if (collapsedLegendEntryIds.value.has(datasetId)) {
-		promoteCollapsedLegendEntry(datasetId)
-	}
-
 	if (shiftKey) {
 		soloLegendEntry(datasetId)
 		clearLegendHoverState()
@@ -1720,18 +1663,6 @@ watch(
 
 		if (!areStringArraysEqual(hiddenGraphDatasetIds.value, nextHiddenDatasetIds)) {
 			hiddenGraphDatasetIds.value = nextHiddenDatasetIds
-		}
-
-		const nextPromotedCollapsedLegendEntryIds = promotedCollapsedLegendEntryIds.value.filter(
-			(datasetId) => availableDatasetIds.has(datasetId),
-		)
-		if (
-			!areStringArraysEqual(
-				promotedCollapsedLegendEntryIds.value,
-				nextPromotedCollapsedLegendEntryIds,
-			)
-		) {
-			promotedCollapsedLegendEntryIds.value = nextPromotedCollapsedLegendEntryIds
 		}
 	},
 	{ immediate: true },
