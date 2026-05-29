@@ -96,7 +96,7 @@ export function useAnalyticsChartDatasets(
 		}
 
 		return hasAvailableProjects.value
-			? formatMessage(analyticsMessages.selectAtLeastOneProject)
+			? formatMessage(analyticsMessages.noDataAvailable)
 			: formatMessage(analyticsMessages.noProjectsAvailableForAnalytics)
 	})
 	const legendPalette = computed(() =>

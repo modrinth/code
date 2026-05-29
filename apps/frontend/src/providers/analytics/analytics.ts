@@ -1,5 +1,10 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { createContext, injectModrinthClient, type ProjectPageContext } from '@modrinth/ui'
+import {
+	createContext,
+	injectModrinthClient,
+	injectNotificationManager,
+	type ProjectPageContext,
+} from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
@@ -127,6 +132,26 @@ const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
 const ANALYTICS_MOBILE_LAYOUT_QUERY = '(pointer: coarse), (max-width: 800px)'
 
+function getAnalyticsFetchErrorMessage(error: unknown): string {
+	if (error && typeof error === 'object') {
+		const dataDescription = (error as { data?: { description?: unknown } }).data?.description
+		if (typeof dataDescription === 'string' && dataDescription.length > 0) {
+			return dataDescription
+		}
+
+		const message = (error as { message?: unknown }).message
+		if (typeof message === 'string' && message.length > 0) {
+			return message
+		}
+	}
+
+	if (typeof error === 'string' && error.length > 0) {
+		return error
+	}
+
+	return 'Please try refreshing the page or changing your query.'
+}
+
 export interface AnalyticsDashboardContextValue {
 	hasProjectContext: ComputedRef<boolean>
 	projectGroups: ComputedRef<AnalyticsDashboardProjectGroup[]>
@@ -221,6 +246,7 @@ export function createAnalyticsDashboardContext(
 	options: CreateAnalyticsDashboardContextOptions,
 ): AnalyticsDashboardContextValue {
 	const client = injectModrinthClient()
+	const { addNotification } = injectNotificationManager()
 	const queryClient = useQueryClient()
 	const route = useRoute()
 	const initialQueryState = readAnalyticsQueryBuilderState(route.query, [])
@@ -851,6 +877,7 @@ export function createAnalyticsDashboardContext(
 		data: currentAnalyticsData,
 		isPending: currentTimeSlicePending,
 		isFetching: currentFetching,
+		error: currentAnalyticsError,
 		refetch: refetchCurrentTimeSlices,
 	} = useQuery({
 		queryKey: computed(() =>
@@ -875,6 +902,17 @@ export function createAnalyticsDashboardContext(
 		},
 		enabled: computed(() => isAnalyticsFetchRequestReady(analyticsTimeSlicesFetchRequest.value)),
 		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
+	})
+	watch(currentAnalyticsError, (error) => {
+		if (!error) {
+			return
+		}
+
+		addNotification({
+			title: 'Analytics failed to load',
+			text: getAnalyticsFetchErrorMessage(error),
+			type: 'error',
+		})
 	})
 	const isCurrentTimeSliceLoading = computed(
 		() =>
