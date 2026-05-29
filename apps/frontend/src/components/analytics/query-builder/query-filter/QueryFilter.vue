@@ -7,8 +7,8 @@
 		:show-preview-filter-icon="showPreviewFilterIcon"
 		:preview-trigger-class="previewTriggerClass"
 		:add-button-class="addButtonClass"
-		clear-label="Reset"
-		:add-label="addLabel"
+		:clear-label="formatMessage(analyticsMessages.resetButton)"
+		:add-label="resolvedAddLabel"
 		checkbox-position="right"
 		@clear="clearFilterBar"
 	>
@@ -17,7 +17,7 @@
 				<Tabs
 					:value="gameVersionType"
 					:tabs="gameVersionTypeTabs"
-					aria-label="Game version type"
+					:aria-label="formatMessage(analyticsMessages.gameVersionTypeAria)"
 					@update:value="(type) => setGameVersionType(type, setSelectedValues)"
 				/>
 			</div>
@@ -35,7 +35,7 @@
 						<img
 							v-if="metadata.iconUrl"
 							:src="metadata.iconUrl"
-							:alt="`${metadata.name} Icon`"
+							:alt="formatMessage(analyticsMessages.projectIconAlt, { name: metadata.name })"
 							class="h-6 w-6 rounded object-cover"
 						/>
 						<BoxIcon v-else class="h-full w-full" />
@@ -54,8 +54,8 @@
 			<DownloadsThresholdInput
 				v-if="category.key === 'country'"
 				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
-				label="Countries above"
-				input-aria-label="Country downloads threshold"
+				:label="formatMessage(analyticsMessages.countriesAbove)"
+				:input-aria-label="formatMessage(analyticsMessages.countryDownloadsThresholdAria)"
 				:threshold="countryDownloadsThreshold"
 				input-width-class="w-16"
 				@update:threshold="
@@ -74,8 +74,8 @@
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'version_id'"
 				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
-				label="Project versions above"
-				input-aria-label="Project version downloads threshold"
+				:label="formatMessage(analyticsMessages.projectVersionsAbove)"
+				:input-aria-label="formatMessage(analyticsMessages.projectVersionDownloadsThresholdAria)"
 				:threshold="projectVersionDownloadsThreshold"
 				input-width-class="w-16"
 				@update:threshold="
@@ -94,8 +94,8 @@
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'game_version'"
 				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
-				label="Game Versions above"
-				input-aria-label="Game version downloads threshold"
+				:label="formatMessage(analyticsMessages.gameVersionsAbove)"
+				:input-aria-label="formatMessage(analyticsMessages.gameVersionDownloadsThresholdAria)"
 				:threshold="gameVersionDownloadsThreshold"
 				input-width-class="w-16"
 				@update:threshold="
@@ -117,8 +117,8 @@
 			<DownloadsThresholdInput
 				v-if="category.key === 'country'"
 				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
-				label="Countries above"
-				input-aria-label="Country downloads threshold"
+				:label="formatMessage(analyticsMessages.countriesAbove)"
+				:input-aria-label="formatMessage(analyticsMessages.countryDownloadsThresholdAria)"
 				:threshold="countryDownloadsThreshold"
 				input-width-class="w-16"
 				@update:threshold="
@@ -137,8 +137,8 @@
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'version_id'"
 				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
-				label="Project versions above"
-				input-aria-label="Project version downloads threshold"
+				:label="formatMessage(analyticsMessages.projectVersionsAbove)"
+				:input-aria-label="formatMessage(analyticsMessages.projectVersionDownloadsThresholdAria)"
 				:threshold="projectVersionDownloadsThreshold"
 				input-width-class="w-16"
 				@update:threshold="
@@ -157,8 +157,8 @@
 			<DownloadsThresholdInput
 				v-else-if="category.key === 'game_version'"
 				class="border-0 border-t border-solid border-surface-5 px-3 py-2.5"
-				label="Game Versions above"
-				input-aria-label="Game version downloads threshold"
+				:label="formatMessage(analyticsMessages.gameVersionsAbove)"
+				:input-aria-label="formatMessage(analyticsMessages.gameVersionDownloadsThresholdAria)"
 				:threshold="gameVersionDownloadsThreshold"
 				input-width-class="w-16"
 				@update:threshold="
@@ -187,6 +187,7 @@ import {
 	Tabs,
 	type TabsTab,
 	type TabsValue,
+	useVIntl,
 } from '@modrinth/ui'
 
 import { useFormattedCountries } from '@/composables/country.ts'
@@ -202,6 +203,14 @@ import {
 	getDefaultAnalyticsBreakdownPresets,
 } from '~/providers/analytics/query-builder-url'
 
+import {
+	analyticsBreakdownMessages,
+	analyticsMessages,
+	analyticsMonetizationMessages,
+	formatAnalyticsDownloadReasonLabel,
+	formatAnalyticsLoaderLabel,
+	formatAnalyticsProjectStatusLabel,
+} from '../../analytics-messages'
 import { getDownloadSourceLabel } from '../../breakdown'
 import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
 import {
@@ -226,7 +235,7 @@ type SetDropdownFilterValues = (values: string[]) => void
 type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => void
 type CloseDownloadsThresholdMenu = (event?: Event) => void
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		addLabel?: string
 		showLabel?: boolean
@@ -236,13 +245,13 @@ withDefaults(
 		showClearAction?: boolean
 	}>(),
 	{
-		addLabel: 'Add',
 		showLabel: true,
 		showPreviewFilterIcon: false,
 		showClearAction: true,
 	},
 )
 
+const { formatMessage } = useVIntl()
 const {
 	hasProjectContext,
 	projects,
@@ -271,10 +280,13 @@ const gameVersionType = ref<GameVersionType>('release')
 const countryDownloadsThreshold = ref<number | null>(null)
 const projectVersionDownloadsThreshold = ref<number | null>(null)
 const gameVersionDownloadsThreshold = ref<number | null>(null)
-const gameVersionTypeTabs: TabsTab[] = [
-	{ value: 'release', label: 'Release' },
-	{ value: 'all', label: 'All' },
-]
+const gameVersionTypeTabs = computed<TabsTab[]>(() => [
+	{ value: 'release', label: formatMessage(analyticsMessages.releaseTab) },
+	{ value: 'all', label: formatMessage(analyticsMessages.allTab) },
+])
+const resolvedAddLabel = computed(
+	() => props.addLabel ?? formatMessage(analyticsMessages.addButton),
+)
 const filterValueCategoryKeys = new Set<string>(FILTER_VALUE_CATEGORIES)
 const downloadsThresholdFilterCategories = ['country', 'version_id', 'game_version'] as const
 type DownloadsThresholdFilterCategory = (typeof downloadsThresholdFilterCategories)[number]
@@ -304,7 +316,9 @@ const canClearSelectedBreakdown = computed(
 	() => !areStringArraysEqual(selectedBreakdowns.value, defaultSelectedBreakdown.value),
 )
 const analyticsFilterOptionsEmptyLabel = computed(() =>
-	isAnalyticsFilterOptionsLoading.value ? 'Loading...' : undefined,
+	isAnalyticsFilterOptionsLoading.value
+		? formatMessage(analyticsMessages.loadingOptions)
+		: undefined,
 )
 const projectVersionFilterOptions = shallowRef<ProjectVersionFilterOption[]>([])
 const projectVersionFilterOptionProjectMetadataById = shallowRef(
@@ -493,7 +507,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	if (!hasProjectContext.value) {
 		categories.push({
 			key: 'project_status',
-			label: 'Project status',
+			label: formatMessage(analyticsBreakdownMessages.projectStatus),
 			options: withSelectedOptions('project_status', projectStatusFilterOptions.value),
 		})
 	}
@@ -501,9 +515,9 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	categories.push(
 		{
 			key: 'country',
-			label: 'Country',
+			label: formatMessage(analyticsBreakdownMessages.country),
 			searchable: countryFilterOptions.value.length > 6,
-			searchPlaceholder: 'Search countries...',
+			searchPlaceholder: formatMessage(analyticsMessages.searchCountriesPlaceholder),
 			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
 			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('country', countryFilterOptions.value),
@@ -511,47 +525,47 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 		},
 		{
 			key: 'monetization',
-			label: 'Monetization',
+			label: formatMessage(analyticsBreakdownMessages.monetization),
 			options: withSelectedOptions('monetization', [
-				{ value: 'monetized', label: 'Monetized' },
-				{ value: 'unmonetized', label: 'Unmonetized' },
+				{ value: 'monetized', label: formatMessage(analyticsMonetizationMessages.monetized) },
+				{ value: 'unmonetized', label: formatMessage(analyticsMonetizationMessages.unmonetized) },
 			]),
 		},
 		{
 			key: 'user_agent',
-			label: 'Download source',
+			label: formatMessage(analyticsBreakdownMessages.userAgent),
 			searchable: downloadSourceFilterOptions.value.length > 6,
-			searchPlaceholder: 'Search download sources...',
+			searchPlaceholder: formatMessage(analyticsMessages.searchDownloadSourcesPlaceholder),
 			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
 			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('user_agent', downloadSourceFilterOptions.value),
 		},
 		{
 			key: 'download_reason',
-			label: 'Download reason',
+			label: formatMessage(analyticsBreakdownMessages.downloadReason),
 			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
 			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('download_reason', downloadReasonFilterOptions.value),
 		},
 		{
 			key: 'version_id',
-			label: 'Project version',
+			label: formatMessage(analyticsBreakdownMessages.versionId),
 			searchable: projectVersionFilterOptions.value.length > 6,
-			searchPlaceholder: 'Search project versions...',
+			searchPlaceholder: formatMessage(analyticsMessages.searchProjectVersionsPlaceholder),
 			submenuClass: 'w-fit',
 			options: withSelectedOptions('version_id', projectVersionFilterOptions.value),
 		},
 		{
 			key: 'game_version',
-			label: 'Game version',
+			label: formatMessage(analyticsBreakdownMessages.gameVersion),
 			searchable: true,
-			searchPlaceholder: 'Search versions...',
+			searchPlaceholder: formatMessage(analyticsMessages.searchVersionsPlaceholder),
 			submenuClass: 'w-fit max-w-[340px]',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 		},
 		{
 			key: 'loader_type',
-			label: 'Loader',
+			label: formatMessage(analyticsBreakdownMessages.loader),
 			options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
 		},
 	)
@@ -601,7 +615,7 @@ const downloadSourceFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.downloadSources
 		.map((downloadSource) => ({
 			value: downloadSource,
-			label: getDownloadSourceLabel(downloadSource),
+			label: getDownloadSourceLabel(downloadSource, formatMessage),
 		}))
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
@@ -675,7 +689,7 @@ function getMissingSelectedOptionLabel(
 		return getDownloadReasonFilterOptionLabel
 	}
 	if (categoryKey === 'user_agent') {
-		return getDownloadSourceLabel
+		return (value) => getDownloadSourceLabel(value, formatMessage)
 	}
 	if (categoryKey === 'loader_type') {
 		return getLoaderTypeFilterOptionLabel
@@ -694,43 +708,22 @@ function getProjectVersionOptionProjectMetadata(versionId: string) {
 function getCountryFilterOptionLabel(countryCode: string): string {
 	const normalizedCode = countryCode.trim().toUpperCase()
 	if (normalizedCode === 'XX') {
-		return 'Other'
+		return formatMessage(analyticsMessages.other)
 	}
 
 	return countryLabelsByCode.value.get(normalizedCode) ?? countryCode
 }
 
 function getProjectStatusFilterOptionLabel(status: string): string {
-	const normalizedStatus = status.trim()
-	if (normalizedStatus.length === 0) {
-		return status
-	}
-
-	return `${normalizedStatus.charAt(0).toUpperCase()}${normalizedStatus.slice(1)}`
+	return formatAnalyticsProjectStatusLabel(status, formatMessage)
 }
 
 function getLoaderTypeFilterOptionLabel(loaderType: string): string {
-	const normalizedLoaderType = loaderType.trim()
-	if (normalizedLoaderType.length === 0) {
-		return loaderType
-	}
-
-	return `${normalizedLoaderType.charAt(0).toUpperCase()}${normalizedLoaderType.slice(1)}`
+	return formatAnalyticsLoaderLabel(loaderType, formatMessage)
 }
 
 function getDownloadReasonFilterOptionLabel(reason: string): string {
-	switch (reason) {
-		case 'standalone':
-			return 'Standalone'
-		case 'dependency':
-			return 'Dependency'
-		case 'modpack':
-			return 'Modpack'
-		case 'update':
-			return 'Update'
-		default:
-			return reason
-	}
+	return formatAnalyticsDownloadReasonLabel(reason, formatMessage)
 }
 
 function getDateTimestamp(date: string | undefined): number | undefined {

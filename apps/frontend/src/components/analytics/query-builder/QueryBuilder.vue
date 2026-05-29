@@ -9,7 +9,7 @@
 				:disabled="!hasProjectOptions"
 				:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 				dropdown-min-width="360px"
-				placeholder="Select projects"
+				:placeholder="formatMessage(analyticsMessages.selectProjects)"
 				:no-options-message="noProjectsMessage"
 				:searchable="projectOptions.length > 6"
 				:max-tag-rows="1"
@@ -25,7 +25,7 @@
 						<img
 							v-if="selectedProjectIconUrl"
 							:src="selectedProjectIconUrl"
-							:alt="`${selectedProjectLabel} Icon`"
+							:alt="formatMessage(analyticsMessages.projectIconAlt, { name: selectedProjectLabel })"
 							class="size-5 shrink-0 rounded object-cover"
 							loading="lazy"
 							decoding="async"
@@ -47,7 +47,7 @@
 						<img
 							v-if="getProjectIconUrl(item.value)"
 							:src="getProjectIconUrl(item.value)"
-							:alt="`${item.label} Icon`"
+							:alt="formatMessage(analyticsMessages.projectIconAlt, { name: item.label })"
 							class="h-5 w-5 shrink-0 rounded object-cover"
 							loading="lazy"
 							decoding="async"
@@ -82,7 +82,9 @@
 								class="h-5 w-5 shrink-0 text-primary"
 								:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 							/>
-							<span class="min-w-0 flex-1 font-semibold leading-tight"> All projects </span>
+							<span class="min-w-0 flex-1 font-semibold leading-tight">
+								{{ formatMessage(analyticsMessages.allProjects) }}
+							</span>
 							<span class="flex shrink-0 items-center justify-center text-brand">
 								<CheckIcon v-if="isAllProjectsOptionSelected" aria-hidden="true" class="size-5" />
 							</span>
@@ -92,8 +94,8 @@
 				<template v-if="hasProjectOptions" #bottom>
 					<DownloadsThresholdInput
 						class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
-						label="Projects above"
-						input-aria-label="Project downloads threshold"
+						:label="formatMessage(analyticsMessages.projectsAbove)"
+						:input-aria-label="formatMessage(analyticsMessages.projectDownloadsThresholdAria)"
 						:threshold="projectDownloadsThreshold"
 						input-width-class="w-20"
 						@update:threshold="setProjectDownloadsThreshold"
@@ -135,7 +137,7 @@
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
 				checkbox-position="right"
-				placeholder="None"
+				:placeholder="formatMessage(analyticsMessages.none)"
 				show-selection-actions
 				@open="handleBreakdownSelectOpen"
 				@close="handleBreakdownSelectClose"
@@ -160,7 +162,7 @@
 			</MultiSelect>
 
 			<QueryBuilderFilter
-				add-label="Add filter"
+				:add-label="formatMessage(analyticsMessages.addFilterButton)"
 				:show-label="false"
 				show-preview-filter-icon
 				:show-clear-action="false"
@@ -172,7 +174,9 @@
 			<div v-if="showProjectRow" class="flex items-start gap-2">
 				<div class="my-1.5 flex w-32 items-center gap-2 text-primary">
 					<FolderOpenIcon class="size-5" />
-					<span class="text-base font-medium">Project:</span>
+					<span class="text-base font-medium">{{
+						formatMessage(analyticsMessages.projectLabel)
+					}}</span>
 				</div>
 				<div class="w-fit">
 					<MultiSelect
@@ -181,7 +185,7 @@
 						:disabled="!hasProjectOptions"
 						:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 						dropdown-min-width="360px"
-						placeholder="Select projects"
+						:placeholder="formatMessage(analyticsMessages.selectProjects)"
 						:no-options-message="noProjectsMessage"
 						:searchable="projectOptions.length > 6"
 						:max-tag-rows="1"
@@ -196,7 +200,11 @@
 									<img
 										v-if="selectedProjectIconUrl"
 										:src="selectedProjectIconUrl"
-										:alt="`${selectedProjectLabel} Icon`"
+										:alt="
+											formatMessage(analyticsMessages.projectIconAlt, {
+												name: selectedProjectLabel,
+											})
+										"
 										class="size-6 shrink-0 rounded object-cover"
 										loading="lazy"
 										decoding="async"
@@ -223,7 +231,7 @@
 								<img
 									v-if="getProjectIconUrl(item.value)"
 									:src="getProjectIconUrl(item.value)"
-									:alt="`${item.label} Icon`"
+									:alt="formatMessage(analyticsMessages.projectIconAlt, { name: item.label })"
 									class="h-5 w-5 shrink-0 rounded object-cover"
 									loading="lazy"
 									decoding="async"
@@ -258,7 +266,9 @@
 										class="h-5 w-5 shrink-0 text-primary"
 										:class="isAllProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 									/>
-									<span class="min-w-0 flex-1 font-semibold leading-tight"> All projects </span>
+									<span class="min-w-0 flex-1 font-semibold leading-tight">
+										{{ formatMessage(analyticsMessages.allProjects) }}
+									</span>
 									<span class="flex shrink-0 items-center justify-center text-brand">
 										<CheckIcon
 											v-if="isAllProjectsOptionSelected"
@@ -272,8 +282,8 @@
 						<template v-if="hasProjectOptions" #bottom>
 							<DownloadsThresholdInput
 								class="border-0 border-t border-solid border-surface-5 px-6 py-2.5"
-								label="Projects above"
-								input-aria-label="Project downloads threshold"
+								:label="formatMessage(analyticsMessages.projectsAbove)"
+								:input-aria-label="formatMessage(analyticsMessages.projectDownloadsThresholdAria)"
 								:threshold="projectDownloadsThreshold"
 								input-width-class="w-20"
 								@update:threshold="setProjectDownloadsThreshold"
@@ -288,14 +298,18 @@
 				<div class="flex items-center gap-2">
 					<div class="flex w-32 items-center gap-2 text-primary">
 						<CalendarIcon class="size-5" />
-						<span class="text-base font-medium">Timeframe:</span>
+						<span class="text-base font-medium">
+							{{ formatMessage(analyticsMessages.timeframeLabel) }}
+						</span>
 					</div>
 					<div>
 						<TimeFramePicker />
 					</div>
 				</div>
 				<div class="flex items-center gap-2">
-					<span class="text-base font-medium text-primary">Grouped by</span>
+					<span class="text-base font-medium text-primary">
+						{{ formatMessage(analyticsMessages.groupedByLabel) }}
+					</span>
 					<div>
 						<Combobox
 							v-model="selectedGroupBy"
@@ -311,7 +325,7 @@
 						:disabled="isTimeframeAndGroupByDefault"
 						@click="resetTimeframeAndGroupBy"
 					>
-						Reset
+						{{ formatMessage(analyticsMessages.resetButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -320,7 +334,9 @@
 				<div class="flex items-center gap-2">
 					<div class="flex w-32 items-center gap-2 text-primary">
 						<BlocksIcon class="size-5" />
-						<span class="text-base font-medium">Breakdown:</span>
+						<span class="text-base font-medium">
+							{{ formatMessage(analyticsMessages.breakdownLabel) }}
+						</span>
 					</div>
 					<div class="flex flex-col gap-2">
 						<div class="flex flex-wrap items-center gap-2">
@@ -332,7 +348,7 @@
 									:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 									checkbox-position="right"
-									placeholder="None"
+									:placeholder="formatMessage(analyticsMessages.none)"
 									show-selection-actions
 									@open="handleBreakdownSelectOpen"
 									@close="handleBreakdownSelectClose"
@@ -387,6 +403,7 @@ import {
 	MultiSelect,
 	type MultiSelectItem,
 	type MultiSelectOption,
+	useVIntl,
 } from '@modrinth/ui'
 
 import {
@@ -406,6 +423,12 @@ import {
 	MAX_ANALYTICS_BREAKDOWN_PRESETS,
 } from '~/providers/analytics/query-builder-url'
 
+import {
+	analyticsMessages,
+	formatAnalyticsBreakdownLabel,
+	formatAnalyticsGroupByLabel,
+	formatAnalyticsGroupBySelectedLabel,
+} from '../analytics-messages'
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
 	getAnalyticsStatsForBreakdown,
@@ -450,6 +473,7 @@ const {
 	setFetchRequest,
 } = injectAnalyticsDashboardContext()
 const route = useRoute()
+const { formatMessage } = useVIntl()
 const { selectedTimeRange, selectedTimeframeDurationMinutes } = useSelectedAnalyticsTimeRange()
 const defaultQueryState = buildDefaultAnalyticsQueryBuilderState([])
 
@@ -512,7 +536,9 @@ const projectSelectOptions = computed<MultiSelectItem<string>[]>(() => {
 const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
 const hasProjectOptions = computed(() => projectOptions.value.length > 0)
 const noProjectsMessage = computed(() =>
-	hasProjectContext.value ? 'No data available for analytics' : 'No projects available',
+	hasProjectContext.value
+		? formatMessage(analyticsMessages.noDataAvailableForAnalytics)
+		: formatMessage(analyticsMessages.noProjectsAvailable),
 )
 const isProjectSelectOpen = ref(false)
 const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
@@ -580,17 +606,19 @@ const selectedProjectLabel = computed(() => {
 	}
 
 	if (isAllProjectsOptionSelected.value || areAllProjectsSelected.value) {
-		return 'All projects'
+		return formatMessage(analyticsMessages.allProjects)
 	}
 
 	if (draftSelectedProjectIds.value.length === 1) {
 		const selectedProject = projectOptions.value.find(
 			(project) => project.value === draftSelectedProjectIds.value[0],
 		)
-		return selectedProject?.label ?? '1 project'
+		return selectedProject?.label ?? formatMessage(analyticsMessages.projectCount, { count: 1 })
 	}
 
-	return `${draftSelectedProjectIds.value.length} projects`
+	return formatMessage(analyticsMessages.projectCount, {
+		count: draftSelectedProjectIds.value.length,
+	})
 })
 
 const selectedProjectIconUrl = computed(() => {
@@ -773,19 +801,18 @@ async function runProjectDownloadsThresholdQuery(event: KeyboardEvent) {
 
 const groupByPresetOptions: Array<{
 	value: AnalyticsGroupByPreset
-	label: string
 }> = [
-	{ value: '1h', label: '1h' },
-	{ value: '6h', label: '6h' },
-	{ value: 'day', label: 'Day' },
-	{ value: 'week', label: 'Week' },
-	{ value: 'month', label: 'Month' },
-	{ value: 'year', label: 'Year' },
+	{ value: '1h' },
+	{ value: '6h' },
+	{ value: 'day' },
+	{ value: 'week' },
+	{ value: 'month' },
+	{ value: 'year' },
 ]
 
 const selectedBreakdownLabel = computed(() => {
 	if (selectedBreakdownValue.value.length === 0) {
-		return 'None'
+		return formatMessage(analyticsMessages.none)
 	}
 
 	return selectedBreakdownValue.value
@@ -793,29 +820,16 @@ const selectedBreakdownLabel = computed(() => {
 		.join(' + ')
 })
 const selectedGroupByLabel = computed(() => {
-	switch (selectedGroupBy.value) {
-		case '1h':
-			return 'Group by hour'
-		case '6h':
-			return 'Group by 6 hours'
-		case 'day':
-			return 'Group by day'
-		case 'week':
-			return 'Group by week'
-		case 'month':
-			return 'Group by month'
-		case 'year':
-			return 'Group by year'
-		default:
-			return 'Group by day'
-	}
+	return formatAnalyticsGroupBySelectedLabel(selectedGroupBy.value, formatMessage)
 })
 const mobileSelectedBreakdownLabel = computed(() => {
 	if (selectedBreakdownValue.value.length === 0) {
-		return 'No breakdown'
+		return formatMessage(analyticsMessages.noBreakdown)
 	}
 
-	return `Breakdown by ${selectedBreakdownLabel.value.toLowerCase()}`
+	return formatMessage(analyticsMessages.breakdownBy, {
+		breakdown: selectedBreakdownLabel.value,
+	})
 })
 const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[]>(
 	() => {
@@ -825,17 +839,41 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 		const options: MultiSelectOption<Exclude<AnalyticsBreakdownPreset, 'none'>>[] = []
 
 		if (selectedProjectIds.value.length > 1) {
-			options.push({ value: 'project', label: 'Project' })
+			options.push({
+				value: 'project',
+				label: formatAnalyticsBreakdownLabel('project', formatMessage),
+			})
 		}
 
 		options.push(
-			{ value: 'country', label: 'Country' },
-			{ value: 'monetization', label: 'Monetization' },
-			{ value: 'user_agent', label: 'Download source' },
-			{ value: 'download_reason', label: 'Download reason' },
-			{ value: 'version_id', label: 'Project version' },
-			{ value: 'loader', label: 'Loader' },
-			{ value: 'game_version', label: 'Game version' },
+			{
+				value: 'country',
+				label: formatAnalyticsBreakdownLabel('country', formatMessage),
+			},
+			{
+				value: 'monetization',
+				label: formatAnalyticsBreakdownLabel('monetization', formatMessage),
+			},
+			{
+				value: 'user_agent',
+				label: formatAnalyticsBreakdownLabel('user_agent', formatMessage),
+			},
+			{
+				value: 'download_reason',
+				label: formatAnalyticsBreakdownLabel('download_reason', formatMessage),
+			},
+			{
+				value: 'version_id',
+				label: formatAnalyticsBreakdownLabel('version_id', formatMessage),
+			},
+			{
+				value: 'loader',
+				label: formatAnalyticsBreakdownLabel('loader', formatMessage),
+			},
+			{
+				value: 'game_version',
+				label: formatAnalyticsBreakdownLabel('game_version', formatMessage),
+			},
 		)
 
 		return options.map((option) => ({
@@ -846,11 +884,10 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 )
 
 function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
-	if (breakdown === 'project') {
-		return 'Project'
-	}
-
-	return breakdownOptions.value.find((option) => option.value === breakdown)?.label ?? breakdown
+	return (
+		breakdownOptions.value.find((option) => option.value === breakdown)?.label ??
+		formatAnalyticsBreakdownLabel(breakdown, formatMessage)
+	)
 }
 
 function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
@@ -874,7 +911,7 @@ const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => 
 		const isRevenueDailyFallback = activeStat.value === 'revenue' && option.value === 'day'
 		return {
 			value: option.value,
-			label: option.label,
+			label: formatAnalyticsGroupByLabel(option.value, formatMessage),
 			disabled:
 				isRevenueHourlyGroupByOption || (!isRevenueDailyFallback && (isTooCoarse || isTooFine)),
 		}

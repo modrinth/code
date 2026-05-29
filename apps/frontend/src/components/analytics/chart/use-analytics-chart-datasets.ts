@@ -1,3 +1,4 @@
+import { useVIntl } from '@modrinth/ui'
 import { computed, type ComputedRef, ref, watch } from 'vue'
 
 import { useTheme } from '~/composables/nuxt-accessors'
@@ -9,11 +10,17 @@ import type {
 } from '~/providers/analytics/analytics'
 
 import {
+	analyticsChartMessages,
+	analyticsMessages,
+	formatAnalyticsGraphTitle,
+	type FormatMessage,
+	getAnalyticsBreakdownItemType,
+} from '../analytics-messages'
+import {
 	ANALYTICS_DASHBOARD_STATS,
 	DARK_LEGEND_PALETTE,
 	GRAPH_RENDER_DATASET_LIMIT,
 	LIGHT_LEGEND_PALETTE,
-	TITLE_BY_ANALYTICS_STAT,
 	TOP_GRAPH_DATASET_LIMIT,
 } from './analytics-chart-constants'
 import {
@@ -53,6 +60,7 @@ export function useAnalyticsChartDatasets(
 	hasAvailableProjects: ComputedRef<boolean>,
 ) {
 	const theme = useTheme()
+	const { formatMessage } = useVIntl()
 	const showAllSelectedGraphDatasets = ref(false)
 
 	const chartRangeBounds = computed(() => {
@@ -80,51 +88,29 @@ export function useAnalyticsChartDatasets(
 	)
 	const emptyChartMessage = computed(() => {
 		if (isTableGraphSelectionEmpty.value) {
-			return 'Select items from table below to visualize your data.'
+			return formatMessage(analyticsChartMessages.selectTableItemsEmpty)
 		}
 
 		if (context.hasProjectContext.value) {
-			return 'No data available for analytics'
+			return formatMessage(analyticsMessages.noDataAvailableForAnalytics)
 		}
 
 		return hasAvailableProjects.value
-			? 'Select at least one project to view data'
-			: 'No projects available for analytics'
+			? formatMessage(analyticsMessages.selectAtLeastOneProject)
+			: formatMessage(analyticsMessages.noProjectsAvailableForAnalytics)
 	})
 	const legendPalette = computed(() =>
 		isDarkTheme(theme.active) ? DARK_LEGEND_PALETTE : LIGHT_LEGEND_PALETTE,
 	)
-	const graphTitle = computed(() => TITLE_BY_ANALYTICS_STAT[context.activeStat.value])
+	const graphTitle = computed(() =>
+		formatAnalyticsGraphTitle(context.activeStat.value, formatMessage),
+	)
 	const showTableSelectionSubheading = computed(
 		() => context.isGraphDatasetSelectionActive.value && tableProjectCount.value > 0,
 	)
-	const tableBreakdownItemLabel = computed(() => {
-		const isSingular = tableProjectCount.value === 1
-		if (context.displayedSelectedBreakdowns.value.length !== 1) {
-			return isSingular ? 'item' : 'items'
-		}
-
-		switch (context.displayedSelectedBreakdowns.value[0]) {
-			case 'project':
-				return isSingular ? 'project' : 'projects'
-			case 'country':
-				return isSingular ? 'country' : 'countries'
-			case 'monetization':
-				return isSingular ? 'monetization value' : 'monetization values'
-			case 'user_agent':
-				return isSingular ? 'download source' : 'download sources'
-			case 'download_reason':
-				return isSingular ? 'download reason' : 'download reasons'
-			case 'version_id':
-				return isSingular ? 'project version' : 'project versions'
-			case 'loader':
-				return isSingular ? 'loader' : 'loaders'
-			case 'game_version':
-				return isSingular ? 'game version' : 'game versions'
-			default:
-				return isSingular ? 'item' : 'items'
-		}
-	})
+	const tableBreakdownItemType = computed(() =>
+		getAnalyticsBreakdownItemType(context.displayedSelectedBreakdowns.value),
+	)
 	const shouldCapitalizeDatasetLabels = computed(() =>
 		shouldCapitalizeBreakdownLabel(context.displayedSelectedBreakdowns.value),
 	)
@@ -176,6 +162,7 @@ export function useAnalyticsChartDatasets(
 			context.displayedSelectedBreakdowns.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
+			formatMessage,
 			sliceCount.value,
 		),
 	)
@@ -187,6 +174,7 @@ export function useAnalyticsChartDatasets(
 			context.displayedSelectedBreakdowns.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
+			formatMessage,
 			sliceCount.value,
 		),
 	)
@@ -237,21 +225,30 @@ export function useAnalyticsChartDatasets(
 	)
 	const tableSelectionSubheading = computed(() => {
 		if (isGraphRenderDatasetLimitActive.value) {
-			return `Showing ${GRAPH_RENDER_DATASET_LIMIT} ${tableBreakdownItemLabel.value} from table`
+			return formatMessage(analyticsChartMessages.tableSelectionLimited, {
+				limit: GRAPH_RENDER_DATASET_LIMIT,
+				itemType: tableBreakdownItemType.value,
+			})
 		}
 
 		if (isShowingAllTableItems.value) {
-			return `Showing all ${tableBreakdownItemLabel.value} from table`
+			return formatMessage(analyticsChartMessages.tableSelectionAll, {
+				count: tableProjectCount.value,
+				itemType: tableBreakdownItemType.value,
+			})
 		}
 
 		if (isShowingTopTableItems.value) {
-			if (tableProjectCount.value === 1) {
-				return `Showing top ${tableBreakdownItemLabel.value} from table`
-			}
-			return `Showing top ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
+			return formatMessage(analyticsChartMessages.tableSelectionTop, {
+				count: tableProjectCount.value,
+				itemType: tableBreakdownItemType.value,
+			})
 		}
 
-		return `Showing ${tableProjectCount.value} ${tableBreakdownItemLabel.value} from table`
+		return formatMessage(analyticsChartMessages.tableSelectionCount, {
+			count: tableProjectCount.value,
+			itemType: tableBreakdownItemType.value,
+		})
 	})
 	const shouldUseDefaultGraphDatasetSelection = computed(
 		() =>
@@ -280,7 +277,9 @@ export function useAnalyticsChartDatasets(
 	)
 	const showGraphRenderLimitButton = computed(() => isGraphRenderDatasetOverLimit.value)
 	const graphRenderLimitButtonLabel = computed(() =>
-		showAllSelectedGraphDatasets.value ? 'Show limited' : 'Show all',
+		showAllSelectedGraphDatasets.value
+			? formatMessage(analyticsChartMessages.showLimited)
+			: formatMessage(analyticsChartMessages.showAll),
 	)
 	const showTopGraphDatasetsButton = computed(
 		() =>
@@ -322,7 +321,6 @@ export function useAnalyticsChartDatasets(
 		legendPalette,
 		graphTitle,
 		showTableSelectionSubheading,
-		tableBreakdownItemLabel,
 		shouldCapitalizeDatasetLabels,
 		chartType,
 		canShowPreviousPeriodToggle,
@@ -365,6 +363,7 @@ function buildDatasetsByStat(
 	selectedBreakdowns: Parameters<typeof buildChartDatasets>[4],
 	getVersionDisplayName: Parameters<typeof buildChartDatasets>[5],
 	getVersionProjectName: Parameters<typeof buildChartDatasets>[6],
+	formatMessage: FormatMessage,
 	sliceCount: number,
 ) {
 	const datasetsByStat = {} as Record<AnalyticsDashboardStat, ChartDataset[]>
@@ -377,6 +376,7 @@ function buildDatasetsByStat(
 			selectedBreakdowns,
 			getVersionDisplayName,
 			getVersionProjectName,
+			formatMessage,
 			sliceCount,
 		)
 	}

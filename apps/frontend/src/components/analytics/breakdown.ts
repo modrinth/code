@@ -2,14 +2,17 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import type { AnalyticsBreakdownPreset } from '~/providers/analytics/analytics'
 
-export const ALL_BREAKDOWN_VALUE = 'All'
-export const UNKNOWN_BREAKDOWN_VALUE = 'Unknown'
+import { formatAnalyticsDownloadSourceLabel, type FormatMessage } from './analytics-messages'
+
+export const ALL_BREAKDOWN_VALUE = '__all__'
+export const UNKNOWN_BREAKDOWN_VALUE = '__unknown__'
 export const COMBINED_BREAKDOWN_LABEL_SEPARATOR = ' + '
 export const COMBINED_BREAKDOWN_DATASET_ID_PREFIX = 'breakdowns:'
 
 export function getAnalyticsBreakdownValue(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
 	selectedBreakdown: AnalyticsBreakdownPreset,
+	formatMessage: FormatMessage,
 ): string {
 	switch (selectedBreakdown) {
 		case 'none':
@@ -24,10 +27,14 @@ export function getAnalyticsBreakdownValue(
 			}
 			return ALL_BREAKDOWN_VALUE
 		}
-		case 'user_agent':
-			return getDownloadSourceLabel(
-				normalizeBreakdownValue('user_agent' in point ? point.user_agent : undefined),
+		case 'user_agent': {
+			const downloadSource = normalizeBreakdownValue(
+				'user_agent' in point ? point.user_agent : undefined,
 			)
+			return downloadSource === ALL_BREAKDOWN_VALUE
+				? ALL_BREAKDOWN_VALUE
+				: getDownloadSourceLabel(downloadSource, formatMessage)
+		}
 		case 'download_reason':
 			return normalizeBreakdownValue(
 				'reason' in point ? point.reason : undefined,
@@ -53,10 +60,11 @@ export function getAnalyticsBreakdownValue(
 export function getAnalyticsBreakdownValues(
 	point: Labrinth.Analytics.v3.ProjectAnalytics,
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	formatMessage: FormatMessage,
 ): string[] {
 	return selectedBreakdowns
 		.filter((breakdown) => breakdown !== 'none')
-		.map((breakdown) => getAnalyticsBreakdownValue(point, breakdown))
+		.map((breakdown) => getAnalyticsBreakdownValue(point, breakdown, formatMessage))
 }
 
 export function getAnalyticsBreakdownKey(values: readonly string[]): string {
@@ -81,24 +89,8 @@ export function getAnalyticsBreakdownDatasetId(
 	return `${COMBINED_BREAKDOWN_DATASET_ID_PREFIX}${getAnalyticsBreakdownKey(values)}`
 }
 
-export function getDownloadSourceLabel(value: string): string {
-	const normalized = value.trim()
-	const normalizedLowercase = normalized.toLowerCase()
-	if (normalizedLowercase === 'website') {
-		return 'Modrinth Website'
-	}
-	if (normalizedLowercase === 'modrinth_app') {
-		return 'Modrinth App'
-	}
-	if (!normalized.includes('_')) {
-		return normalized
-	}
-
-	return normalizedLowercase
-		.split('_')
-		.filter((part) => part.length > 0)
-		.map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
-		.join(' ')
+export function getDownloadSourceLabel(value: string, formatMessage: FormatMessage): string {
+	return formatAnalyticsDownloadSourceLabel(value, formatMessage)
 }
 
 function normalizeBreakdownValue(

@@ -1,15 +1,19 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { TableColumn } from '@modrinth/ui'
 
+import { analyticsTableMessages, type FormatMessage } from '../analytics-messages'
 import { isAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
 import type { AnalyticsTableColumnKey, AnalyticsTableRow } from './analytics-table-types'
 
 export function buildAnalyticsTableCsvContent(
 	rows: AnalyticsTableRow[],
 	visibleColumns: TableColumn<AnalyticsTableColumnKey>[],
+	formatMessage: FormatMessage,
 ): string {
 	const header = visibleColumns
-		.map((column) => escapeAnalyticsTableCsvField(getAnalyticsTableCsvHeaderLabel(column)))
+		.map((column) =>
+			escapeAnalyticsTableCsvField(getAnalyticsTableCsvHeaderLabel(column, formatMessage)),
+		)
 		.join(',')
 
 	const csvRows = rows.map((row) =>
@@ -44,11 +48,13 @@ export function downloadAnalyticsTableCsv(filename: string, csvContent: string) 
 export function getAnalyticsTableCsvFilename(
 	breakdownColumnLabel: string,
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+	formatMessage: FormatMessage,
 ): string {
 	return `${sanitizeAnalyticsTableCsvFilename(
-		`Modrinth Analytics ${breakdownColumnLabel} Breakdown - ${getAnalyticsTableCsvFilenameDateRange(
-			fetchRequest,
-		)}`,
+		formatMessage(analyticsTableMessages.csvFilename, {
+			breakdown: breakdownColumnLabel,
+			dateRange: getAnalyticsTableCsvFilenameDateRange(fetchRequest, formatMessage),
+		}),
 	)}.csv`
 }
 
@@ -76,9 +82,12 @@ function getAnalyticsTableCsvCellValue(
 	}
 }
 
-function getAnalyticsTableCsvHeaderLabel(column: TableColumn<AnalyticsTableColumnKey>): string {
+function getAnalyticsTableCsvHeaderLabel(
+	column: TableColumn<AnalyticsTableColumnKey>,
+	formatMessage: FormatMessage,
+): string {
 	if (column.key === 'playtime') {
-		return 'Playtime (seconds)'
+		return formatMessage(analyticsTableMessages.playtimeSecondsHeader)
 	}
 
 	return column.label ?? column.key
@@ -107,21 +116,27 @@ function formatAnalyticsTableCsvFilenameDate(date: Date): string {
 
 function getAnalyticsTableCsvFilenameDateRange(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+	formatMessage: FormatMessage,
 ): string {
 	const timeRange = fetchRequest?.time_range
 	if (!timeRange) {
-		return 'Selected Range'
+		return formatMessage(analyticsTableMessages.csvSelectedRange)
 	}
 
 	const start = new Date(timeRange.start)
 	const end = new Date(timeRange.end)
 	if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-		return 'Selected Range'
+		return formatMessage(analyticsTableMessages.csvSelectedRange)
 	}
 
 	const startLabel = formatAnalyticsTableCsvFilenameDate(start)
 	const endLabel = formatAnalyticsTableCsvFilenameDate(end)
-	return startLabel === endLabel ? startLabel : `${startLabel} to ${endLabel}`
+	return startLabel === endLabel
+		? startLabel
+		: formatMessage(analyticsTableMessages.csvDateRange, {
+				start: startLabel,
+				end: endLabel,
+			})
 }
 
 function sanitizeAnalyticsTableCsvFilename(value: string): string {

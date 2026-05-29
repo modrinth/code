@@ -1,3 +1,4 @@
+import { useVIntl } from '@modrinth/ui'
 import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
 
 import type {
@@ -5,6 +6,7 @@ import type {
 	AnalyticsDashboardProject,
 } from '~/providers/analytics/analytics'
 
+import { analyticsChartMessages } from '../../analytics-messages'
 import { COMBINED_BREAKDOWN_DATASET_ID_PREFIX } from '../../breakdown'
 import {
 	ALL_PROJECTS_DATASET_ID,
@@ -46,6 +48,7 @@ export function useAnalyticsChartLegend({
 	selectedProjectIdSet: ComputedRef<Set<string>>
 	selectedProjectEventIdSet: ComputedRef<Set<string>>
 }) {
+	const { formatMessage } = useVIntl()
 	const hoveredLegendEntryId = ref<string | null>(null)
 	const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
 	const previousChartDatasetByOriginalId = computed(() => {
@@ -113,7 +116,7 @@ export function useAnalyticsChartLegend({
 			const previousDataset = previousChartDatasetByOriginalId.value.get(entry.id)
 			const previousEntry: AnalyticsChartLegendEntry = {
 				id: getPreviousPeriodDatasetId(entry.id),
-				name: `${entry.name} (Prev.)`,
+				name: formatMessage(analyticsChartMessages.previousPeriodSuffix, { name: entry.name }),
 				projectName: entry.projectName,
 				color: entry.color,
 				totalValue: previousDataset ? getChartDatasetTotal(previousDataset) : 0,
@@ -146,7 +149,9 @@ export function useAnalyticsChartLegend({
 			)
 			datasets.set(getPreviousPeriodDatasetId(dataset.projectId), {
 				projectId: getPreviousPeriodDatasetId(dataset.projectId),
-				label: `${dataset.label} (Prev.)`,
+				label: formatMessage(analyticsChartMessages.previousPeriodSuffix, {
+					name: dataset.label,
+				}),
 				projectName: dataset.projectName,
 				data: previousData,
 				borderColor: dataset.borderColor,

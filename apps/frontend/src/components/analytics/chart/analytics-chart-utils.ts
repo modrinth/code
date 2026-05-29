@@ -1,5 +1,4 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { formatLoaderLabel } from '@modrinth/ui'
 
 import type {
 	AnalyticsBreakdownPreset,
@@ -9,11 +8,21 @@ import type {
 } from '~/providers/analytics/analytics'
 
 import {
+	analyticsChartMessages,
+	analyticsMessages,
+	analyticsStatCardMessages,
+	formatAnalyticsDownloadReasonLabel,
+	formatAnalyticsLoaderLabel,
+	formatAnalyticsMonetizationLabel,
+	type FormatMessage,
+} from '../analytics-messages'
+import {
 	ALL_BREAKDOWN_VALUE,
 	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	UNKNOWN_BREAKDOWN_VALUE,
 } from '../breakdown'
 import { PREVIOUS_PERIOD_DATASET_ID_PREFIX } from './analytics-chart-constants'
 
@@ -75,19 +84,7 @@ const LOADER_CHART_COLORS: Record<string, string> = {
 
 const REGION_CODE_PATTERN = /^[a-z]{2}$/i
 const OTHER_COUNTRY_CODE = 'XX'
-const UNKNOWN_BREAKDOWN_LABEL = 'Unknown'
 const ALL_PROJECTS_DATASET_ID = 'all'
-const ALL_PROJECTS_DATASET_LABEL = 'All projects'
-const MONETIZATION_BREAKDOWN_LABELS: Record<string, string> = {
-	monetized: 'Monetized',
-	unmonetized: 'Unmonetized',
-}
-const DOWNLOAD_REASON_BREAKDOWN_LABELS: Record<string, string> = {
-	standalone: 'Standalone',
-	dependency: 'Dependency',
-	modpack: 'Modpack',
-	update: 'Update',
-}
 const MONETIZATION_CHART_COLOR_INDEX: Record<string, number> = {
 	monetized: 0,
 	unmonetized: 1,
@@ -109,10 +106,10 @@ function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
 	}
 }
 
-function formatCountryCode(countryCode: string): string {
+function formatCountryCode(countryCode: string, formatMessage: FormatMessage): string {
 	const normalized = countryCode.trim().toUpperCase()
 	if (normalized === OTHER_COUNTRY_CODE) {
-		return UNKNOWN_BREAKDOWN_LABEL
+		return formatMessage(analyticsMessages.unknown)
 	}
 
 	if (!REGION_CODE_PATTERN.test(normalized)) {
@@ -138,28 +135,33 @@ function formatCountryCode(countryCode: string): string {
 export function formatBreakdownLabel(
 	breakdownValue: string,
 	selectedBreakdown: AnalyticsBreakdownPreset,
-	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
+	getVersionDisplayName: ((versionId: string) => string) | undefined,
+	formatMessage: FormatMessage,
 ): string {
 	const normalizedValue = breakdownValue.trim()
 	const normalizedLowercaseValue = normalizedValue.toLowerCase()
 
-	if (normalizedLowercaseValue === 'other') {
-		return UNKNOWN_BREAKDOWN_LABEL
+	if (
+		normalizedValue === UNKNOWN_BREAKDOWN_VALUE ||
+		normalizedLowercaseValue === 'other' ||
+		normalizedLowercaseValue === 'unknown'
+	) {
+		return formatMessage(analyticsMessages.unknown)
 	}
 	if (selectedBreakdown === 'country') {
-		return formatCountryCode(breakdownValue)
+		return formatCountryCode(breakdownValue, formatMessage)
 	}
 	if (selectedBreakdown === 'monetization') {
-		return MONETIZATION_BREAKDOWN_LABELS[normalizedLowercaseValue] ?? breakdownValue
+		return formatAnalyticsMonetizationLabel(normalizedLowercaseValue, formatMessage)
 	}
 	if (selectedBreakdown === 'download_reason') {
-		return DOWNLOAD_REASON_BREAKDOWN_LABELS[normalizedLowercaseValue] ?? breakdownValue
+		return formatAnalyticsDownloadReasonLabel(normalizedLowercaseValue, formatMessage)
 	}
 	if (selectedBreakdown === 'version_id') {
-		return getVersionDisplayName(breakdownValue)
+		return getVersionDisplayName?.(breakdownValue) ?? breakdownValue
 	}
 	if (selectedBreakdown === 'loader') {
-		return formatLoaderLabel(normalizedValue)
+		return formatAnalyticsLoaderLabel(normalizedValue, formatMessage)
 	}
 
 	return breakdownValue
@@ -168,23 +170,34 @@ export function formatBreakdownLabel(
 export function formatBreakdownLabels(
 	breakdownValues: readonly string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
-	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
+	getVersionDisplayName: ((versionId: string) => string) | undefined,
+	formatMessage: FormatMessage,
 ): string {
 	return collapseRepeatedUnknownBreakdownLabels(
 		selectedBreakdowns
 			.filter((breakdown) => breakdown !== 'none')
 			.map((breakdown, index) =>
-				formatBreakdownLabel(breakdownValues[index] ?? '', breakdown, getVersionDisplayName),
+				formatBreakdownLabel(
+					breakdownValues[index] ?? '',
+					breakdown,
+					getVersionDisplayName,
+					formatMessage,
+				),
 			),
+		formatMessage,
 	).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 }
 
-function collapseRepeatedUnknownBreakdownLabels(labels: string[]): string[] {
+function collapseRepeatedUnknownBreakdownLabels(
+	labels: string[],
+	formatMessage: FormatMessage,
+): string[] {
 	let hasUnknownLabel = false
 	const collapsedLabels: string[] = []
+	const unknownBreakdownLabel = formatMessage(analyticsMessages.unknown)
 
 	for (const label of labels) {
-		if (label === UNKNOWN_BREAKDOWN_LABEL) {
+		if (label === unknownBreakdownLabel) {
 			if (hasUnknownLabel) {
 				continue
 			}
@@ -304,8 +317,9 @@ export function buildChartDatasets(
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
-	getVersionDisplayName: (versionId: string) => string = (versionId) => versionId,
-	getVersionProjectName?: (versionId: string) => string | undefined,
+	getVersionDisplayName: ((versionId: string) => string) | undefined,
+	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
+	formatMessage: FormatMessage,
 	sliceCount: number = timeSlices.length,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
@@ -325,8 +339,9 @@ export function buildChartDatasets(
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
 				}
 
-				return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName)
+				return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName, formatMessage)
 			}),
+			formatMessage,
 		).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 	}
 
@@ -342,7 +357,11 @@ export function buildChartDatasets(
 			for (const point of slice) {
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
 
-				const breakdownValues = getAnalyticsBreakdownValues(point, normalizedBreakdowns)
+				const breakdownValues = getAnalyticsBreakdownValues(
+					point,
+					normalizedBreakdowns,
+					formatMessage,
+				)
 				if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
 					continue
 				}
@@ -426,7 +445,7 @@ export function buildChartDatasets(
 				[
 					{
 						key: ALL_PROJECTS_DATASET_ID,
-						label: ALL_PROJECTS_DATASET_LABEL,
+						label: formatMessage(analyticsMessages.allProjects),
 						total: downloadTotal,
 					},
 				],
@@ -437,7 +456,7 @@ export function buildChartDatasets(
 		return [
 			{
 				projectId: ALL_PROJECTS_DATASET_ID,
-				label: selectedProject?.name ?? ALL_PROJECTS_DATASET_LABEL,
+				label: selectedProject?.name ?? formatMessage(analyticsMessages.allProjects),
 				data,
 				borderColor: color,
 				backgroundColor: color,
@@ -460,7 +479,11 @@ export function buildChartDatasets(
 		for (const point of slice) {
 			if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
 
-			const breakdownValues = getAnalyticsBreakdownValues(point, normalizedBreakdowns)
+			const breakdownValues = getAnalyticsBreakdownValues(
+				point,
+				normalizedBreakdowns,
+				formatMessage,
+			)
 			if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
 				continue
 			}
@@ -718,15 +741,20 @@ export function formatMetricValue(
 	value: number,
 	activeStat: AnalyticsDashboardStat,
 	formatNumber: (value: number) => string,
+	formatMessage: FormatMessage,
 ): string {
 	switch (activeStat) {
 		case 'revenue': {
 			const amount = Math.round(value * 100) / 100
-			return `$${formatNumber(amount)}`
+			return formatMessage(analyticsStatCardMessages.revenueValue, {
+				value: formatNumber(amount),
+			})
 		}
 		case 'playtime': {
 			const hours = value / 3600
-			return `${hours.toFixed(1)} hrs`
+			return formatMessage(analyticsStatCardMessages.playtimeHours, {
+				hours: hours.toFixed(1),
+			})
 		}
 		case 'views':
 		case 'downloads':
@@ -791,21 +819,32 @@ export function formatAxisValue(
 	value: number,
 	activeStat: AnalyticsDashboardStat,
 	formatCompact: (value: number) => string,
+	formatMessage: FormatMessage,
 	axisValues: readonly number[] = [value],
 ): string {
 	switch (activeStat) {
 		case 'revenue': {
 			const amount = Math.round(value * 100) / 100
 			const axisAmounts = axisValues.map((axisValue) => Math.round(axisValue * 100) / 100)
-			return `$${formatCompactAxisNumber(amount, axisAmounts) ?? formatCompact(amount)}`
+			return formatMessage(analyticsStatCardMessages.revenueValue, {
+				value: formatCompactAxisNumber(amount, axisAmounts) ?? formatCompact(amount),
+			})
 		}
 		case 'playtime': {
 			const hours = value / 3600
 			const axisHours = axisValues.map((axisValue) => axisValue / 3600)
 			const formattedHours = formatCompactAxisNumber(hours, axisHours)
-			if (formattedHours) return formattedHours
-			if (Math.abs(hours) < 10) return formatSmallAxisNumber(hours)
-			return `${formatCompact(Math.round(hours))} h`
+			if (formattedHours) {
+				return formatMessage(analyticsChartMessages.playtimeAxisHours, { hours: formattedHours })
+			}
+			if (Math.abs(hours) < 10) {
+				return formatMessage(analyticsChartMessages.playtimeAxisHours, {
+					hours: formatSmallAxisNumber(hours),
+				})
+			}
+			return formatMessage(analyticsChartMessages.playtimeAxisHours, {
+				hours: formatCompact(Math.round(hours)),
+			})
 		}
 		case 'views':
 		case 'downloads':

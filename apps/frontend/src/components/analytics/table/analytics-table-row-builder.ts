@@ -5,6 +5,7 @@ import type {
 	AnalyticsDashboardStat,
 } from '~/providers/analytics/analytics'
 
+import type { FormatMessage } from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
 	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
@@ -40,6 +41,7 @@ type BuildAnalyticsTableRowsOptions = {
 	getVersionProjectName: (versionId: string) => string | undefined
 	showTimeInBucketLabel: boolean
 	showYearInBucketLabel: boolean
+	formatMessage: FormatMessage
 }
 
 export function buildAnalyticsTableRows({
@@ -54,6 +56,7 @@ export function buildAnalyticsTableRows({
 	getVersionProjectName,
 	showTimeInBucketLabel,
 	showYearInBucketLabel,
+	formatMessage,
 }: BuildAnalyticsTableRowsOptions): AnalyticsTableRow[] {
 	if (!fetchRequest || selectedProjectIds.size === 0) {
 		return []
@@ -79,6 +82,7 @@ export function buildAnalyticsTableRows({
 				breakdown,
 				projectNamesById,
 				getVersionDisplayName,
+				formatMessage,
 			)
 			breakdownDisplayValues.set(key, displayValue)
 		}
@@ -200,7 +204,7 @@ export function buildAnalyticsTableRows({
 			const breakdownValues =
 				selectedBreakdowns.length === 0
 					? []
-					: getAnalyticsBreakdownValues(point, selectedBreakdowns)
+					: getAnalyticsBreakdownValues(point, selectedBreakdowns, formatMessage)
 			if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
 				continue
 			}
@@ -273,9 +277,10 @@ function formatAnalyticsTableBreakdownDisplayValue(
 	breakdown: AnalyticsTableBreakdownPreset,
 	projectNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: (versionId: string) => string,
+	formatMessage: FormatMessage,
 ): string {
 	if (breakdown === 'project') {
 		return projectNamesById.get(value) ?? value
 	}
-	return formatBreakdownLabel(value, breakdown, getVersionDisplayName)
+	return formatBreakdownLabel(value, breakdown, getVersionDisplayName, formatMessage)
 }

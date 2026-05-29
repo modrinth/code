@@ -14,12 +14,18 @@
 			type="button"
 			:aria-expanded="isControlsMenuOpen"
 			:aria-controls="controlsMenuId"
-			:aria-label="`Analytics graph controls, ${activeControlCountLabel}`"
+			:aria-label="
+				formatMessage(analyticsChartMessages.controlsAria, {
+					activeCount: activeControlCountLabel,
+				})
+			"
 			class="btn-dropdown-animation inline-flex min-h-5 cursor-pointer items-center justify-between gap-2 rounded-xl border-0 bg-surface-4 px-3 py-2 text-left text-sm font-semibold text-button-text shadow-none transition-all duration-200 hover:brightness-[115%] focus-visible:brightness-[115%] active:brightness-[115%]"
 			@click="toggleControlsMenu"
 		>
 			<Settings2Icon class="size-4 text-secondary" aria-hidden="true" />
-			<span class="leading-tight text-primary">Controls</span>
+			<span class="leading-tight text-primary">
+				{{ formatMessage(analyticsChartMessages.controlsButton) }}
+			</span>
 			<span
 				v-if="activeControlCount > 0"
 				class="inline-flex min-w-5 items-center justify-center rounded-full bg-highlight-green px-1.5 text-xs font-semibold leading-5 text-green"
@@ -32,7 +38,7 @@
 			<div
 				ref="controlsMenuPanel"
 				role="dialog"
-				aria-label="Analytics graph controls"
+				:aria-label="formatMessage(analyticsChartMessages.controlsDialogAria)"
 				class="mt-1 flex w-[228px] max-w-[calc(100vw_-_2rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-4 bg-surface-3 text-sm shadow-2xl"
 			>
 				<div class="flex items-center justify-between gap-3 px-3 py-2.5 text-xs font-medium">
@@ -44,7 +50,7 @@
 						:class="isResetDisabled ? '' : 'hover:text-contrast focus-visible:text-contrast'"
 						@click="resetControls"
 					>
-						Reset
+						{{ formatMessage(analyticsMessages.resetButton) }}
 					</button>
 				</div>
 
@@ -52,14 +58,18 @@
 					v-if="hasDisplayControls"
 					class="flex flex-col gap-1 border-0 border-t border-solid border-surface-4 px-3 py-2.5"
 				>
-					<div class="mb-0.5 text-xs font-semibold text-secondary">Display</div>
+					<div class="mb-0.5 text-xs font-semibold text-secondary">
+						{{ formatMessage(analyticsChartMessages.displayControls) }}
+					</div>
 					<div v-if="canShowPreviousPeriod" class="flex min-h-7 items-center justify-between">
 						<label
 							:for="previousPeriodToggleId"
 							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-1.5 pr-3 font-semibold leading-tight text-primary"
 						>
 							<HistoryIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
-							<span class="min-w-0 truncate">Previous period</span>
+							<span class="min-w-0 truncate">
+								{{ formatMessage(analyticsChartMessages.previousPeriod) }}
+							</span>
 						</label>
 						<Toggle
 							:id="previousPeriodToggleId"
@@ -78,7 +88,9 @@
 							>
 								%
 							</span>
-							<span class="min-w-0 truncate">Ratio</span>
+							<span class="min-w-0 truncate">
+								{{ formatMessage(analyticsChartMessages.ratio) }}
+							</span>
 						</label>
 						<Toggle :id="ratioModeToggleId" v-model="ratioModeModel" :small="smallToggles" />
 					</div>
@@ -87,7 +99,9 @@
 				<div
 					class="flex flex-col gap-1 border-0 border-t border-solid border-surface-4 px-3 py-2.5"
 				>
-					<div class="mb-0.5 text-xs font-semibold text-secondary">Annotations</div>
+					<div class="mb-0.5 text-xs font-semibold text-secondary">
+						{{ formatMessage(analyticsChartMessages.annotations) }}
+					</div>
 					<div
 						v-tooltip="projectEventsDisabledTooltip"
 						class="justify3 flex min-h-7 items-center"
@@ -99,7 +113,9 @@
 							:class="hasProjectEvents ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'"
 						>
 							<TagCategoryFlagIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
-							<span class="min-w-0 truncate">Project events</span>
+							<span class="min-w-0 truncate">
+								{{ formatMessage(analyticsChartMessages.projectEvents) }}
+							</span>
 						</label>
 						<Toggle
 							:id="projectEventsToggleId"
@@ -119,7 +135,9 @@
 							:class="hasChartEvents ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'"
 						>
 							<InfoIcon class="size-4 shrink-0 text-blue" aria-hidden="true" />
-							<span class="min-w-0 truncate">Modrinth events</span>
+							<span class="min-w-0 truncate">
+								{{ formatMessage(analyticsChartMessages.modrinthEvents) }}
+							</span>
 						</label>
 						<Toggle
 							:id="modrinthEventsToggleId"
@@ -142,8 +160,10 @@ import {
 	Settings2Icon,
 	TagCategoryFlagIcon,
 } from '@modrinth/assets'
-import { Toggle } from '@modrinth/ui'
+import { Toggle, useVIntl } from '@modrinth/ui'
 import { Menu } from 'floating-vue'
+
+import { analyticsChartMessages, analyticsMessages } from '../../analytics-messages'
 
 const props = defineProps<{
 	ratioMode: boolean
@@ -180,6 +200,7 @@ const ratioModeToggleId = useId()
 const previousPeriodToggleId = useId()
 const modrinthEventsToggleId = useId()
 const projectEventsToggleId = useId()
+const { formatMessage } = useVIntl()
 
 const ratioModeModel = computed({
 	get: () => props.ratioMode,
@@ -208,10 +229,10 @@ const showPreviousPeriodModel = computed({
 
 const hasDisplayControls = computed(() => props.canShowPreviousPeriod || props.canUseRatioMode)
 const projectEventsDisabledTooltip = computed(() =>
-	props.hasProjectEvents ? undefined : 'No project events in graph.',
+	props.hasProjectEvents ? undefined : formatMessage(analyticsChartMessages.noProjectEvents),
 )
 const modrinthEventsDisabledTooltip = computed(() =>
-	props.hasChartEvents ? undefined : 'No Modrinth events in graph.',
+	props.hasChartEvents ? undefined : formatMessage(analyticsChartMessages.noModrinthEvents),
 )
 const activeControlCount = computed(() => {
 	let count = 0
@@ -221,7 +242,9 @@ const activeControlCount = computed(() => {
 	if (props.hasChartEvents && props.showChartEvents) count += 1
 	return count
 })
-const activeControlCountLabel = computed(() => `${activeControlCount.value} active`)
+const activeControlCountLabel = computed(() =>
+	formatMessage(analyticsChartMessages.activeControlCount, { count: activeControlCount.value }),
+)
 const isResetDisabled = computed(
 	() =>
 		props.showPreviousPeriod === props.defaultShowPreviousPeriod &&

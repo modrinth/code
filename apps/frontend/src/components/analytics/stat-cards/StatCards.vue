@@ -15,13 +15,14 @@
 </template>
 
 <script setup lang="ts">
-import { useFormatNumber } from '@modrinth/ui'
+import { useFormatNumber, useVIntl } from '@modrinth/ui'
 
 import {
 	type AnalyticsDashboardStat,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
+import { analyticsStatCardMessages, formatAnalyticsStatLabel } from '../analytics-messages'
 import StatCard from './StatCard.vue'
 
 const {
@@ -34,6 +35,7 @@ const {
 	isAnalyticsDashboardStatRelevant,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
+const { formatMessage } = useVIntl()
 
 const compactNumberFormatter = computed(
 	() =>
@@ -79,7 +81,7 @@ const statCards = computed<
 >(() => [
 	{
 		key: 'views',
-		label: 'Views',
+		label: formatAnalyticsStatLabel('views', formatMessage),
 		statLabel: formatStatNumber(currentTotals.value.views),
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.views),
 		icon: 'eye',
@@ -87,7 +89,7 @@ const statCards = computed<
 	},
 	{
 		key: 'downloads',
-		label: 'Downloads',
+		label: formatAnalyticsStatLabel('downloads', formatMessage),
 		statLabel: formatStatNumber(currentTotals.value.downloads),
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.downloads),
 		icon: 'download',
@@ -95,16 +97,20 @@ const statCards = computed<
 	},
 	{
 		key: 'revenue',
-		label: 'Revenue',
-		statLabel: `$${formatStatNumber(currentTotals.value.revenue)}`,
+		label: formatAnalyticsStatLabel('revenue', formatMessage),
+		statLabel: formatMessage(analyticsStatCardMessages.revenueValue, {
+			value: formatStatNumber(currentTotals.value.revenue),
+		}),
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.revenue),
 		icon: 'dollar',
 		disabled: !isAnalyticsDashboardStatRelevant('revenue', selectedBreakdowns.value),
 	},
 	{
 		key: 'playtime',
-		label: 'Playtime',
-		statLabel: `${formatStatNumber(currentTotals.value.playtime / 3600)} hrs`,
+		label: formatAnalyticsStatLabel('playtime', formatMessage),
+		statLabel: formatMessage(analyticsStatCardMessages.playtimeHours, {
+			hours: formatStatNumber(currentTotals.value.playtime / 3600),
+		}),
 		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.playtime),
 		icon: 'clock',
 		disabled: !isAnalyticsDashboardStatRelevant('playtime', selectedBreakdowns.value),

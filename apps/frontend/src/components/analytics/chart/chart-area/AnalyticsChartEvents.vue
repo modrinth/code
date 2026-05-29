@@ -112,8 +112,16 @@
 									"
 								>
 									<template v-if="event.projectName">
-										<span class="text-contrast">{{ event.projectName }}: </span>
-										<span>{{ event.title }}</span>
+										<IntlFormatted
+											:message-id="analyticsChartMessages.projectEventTitle"
+											:values="{ projectName: event.projectName ?? '', title: event.title }"
+										>
+											<template #project="{ children }">
+												<span class="text-contrast">
+													<component :is="() => children" />
+												</span>
+											</template>
+										</IntlFormatted>
 									</template>
 									<template v-else>
 										{{ event.title }}
@@ -126,7 +134,7 @@
 									rel="noopener noreferrer"
 									class="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-primary underline !transition-all hover:text-contrast"
 								>
-									See announcement
+									{{ formatMessage(analyticsChartMessages.seeAnnouncement) }}
 									<ExternalIcon class="size-3.5" aria-hidden="true" />
 								</a>
 								<div class="mt-1 text-xs font-medium text-primary">
@@ -158,13 +166,14 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ExternalIcon, InfoIcon, TagCategoryFlagIcon } from '@modrinth/assets'
-import { useScrollIndicator } from '@modrinth/ui'
+import { IntlFormatted, useScrollIndicator, useVIntl } from '@modrinth/ui'
 
 import type {
 	AnalyticsDashboardStat,
 	AnalyticsGroupByPreset,
 } from '~/providers/analytics/analytics'
 
+import { analyticsChartMessages } from '../../analytics-messages'
 import { isTimeRelevantForGroupBy } from '../analytics-chart-utils'
 import type { AnalyticsChartGeometryPayload } from '../AnalyticsChart.client.vue'
 
@@ -227,6 +236,7 @@ const props = defineProps<{
 	markerOffsetY?: number
 }>()
 
+const { formatMessage } = useVIntl()
 const GROUP_DISTANCE_PX = 32
 const GROUP_MARKER_GAP_PX = 6
 const MARKER_ICON_WIDTH_PX = 20
@@ -913,7 +923,9 @@ function getGroupAriaLabel(group: EventGroup) {
 		return group.events[0].title
 	}
 
-	return `${group.events.length} analytics events`
+	return formatMessage(analyticsChartMessages.analyticsEventsCount, {
+		count: group.events.length,
+	})
 }
 
 function clearCloseTimeout() {

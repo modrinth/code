@@ -74,16 +74,15 @@
 				>
 					<InfoIcon
 						class="-ml-1 mt-px inline-flex size-4 items-center justify-center rounded-full border-0 bg-transparent p-0 text-secondary transition-all hover:text-contrast focus-visible:text-contrast"
-						aria-label="View monetized analytics details"
+						:aria-label="formatMessage(analyticsChartMessages.viewMonetizedAnalyticsDetails)"
 					/>
 					<template #popper>
 						<div
 							role="dialog"
-							aria-label="Monetized analytics details"
+							:aria-label="formatMessage(analyticsChartMessages.monetizedAnalyticsDetails)"
 							class="font-base w-[292px] rounded-xl border border-solid border-surface-5 bg-surface-3 p-3 text-sm leading-snug shadow-2xl"
 						>
-							Only views and downloads made through Modrinth count toward monetization, and
-							downloads require users to be logged in.
+							{{ formatMessage(analyticsChartMessages.monetizedAnalyticsDetailsDescription) }}
 						</div>
 					</template>
 				</Dropdown>
@@ -108,9 +107,10 @@
 
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
-import { useScrollIndicator } from '@modrinth/ui'
+import { useScrollIndicator, useVIntl } from '@modrinth/ui'
 import { Dropdown } from 'floating-vue'
 
+import { analyticsChartMessages } from '../../analytics-messages'
 import type { AnalyticsChartLegendEntry } from '../analytics-chart-types'
 
 const props = defineProps<{
@@ -128,6 +128,7 @@ const emit = defineEmits<{
 const monetizationPopoverId = useId()
 const legendContainer = ref<HTMLElement | null>(null)
 const isShiftKeyPressed = ref(false)
+const { formatMessage } = useVIntl()
 const {
 	showTopFade: showLegendTopFade,
 	showBottomFade: showLegendBottomFade,

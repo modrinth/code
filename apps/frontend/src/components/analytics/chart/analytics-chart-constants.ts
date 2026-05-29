@@ -2,13 +2,6 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 
-export const TITLE_BY_ANALYTICS_STAT: Record<AnalyticsDashboardStat, string> = {
-	views: 'Views Over Time',
-	downloads: 'Downloads Over Time',
-	revenue: 'Revenue Over Time',
-	playtime: 'Playtime Over Time',
-}
-
 export const ANALYTICS_DASHBOARD_STATS: readonly AnalyticsDashboardStat[] = [
 	'views',
 	'downloads',
@@ -45,12 +38,6 @@ export type VisibleProjectStatusChangeEventStatus =
 
 export const VISIBLE_PROJECT_STATUS_CHANGE_EVENT_STATUS_SET =
 	new Set<Labrinth.Projects.v2.ProjectStatus>(VISIBLE_PROJECT_STATUS_CHANGE_EVENT_STATUSES)
-
-export const PROJECT_STATUS_EVENT_COPY: Record<VisibleProjectStatusChangeEventStatus, string> = {
-	approved: 'Project approved',
-	unlisted: 'Project unlisted',
-	private: 'Project set to private',
-}
 
 export const LIGHT_LEGEND_PALETTE = [
 	'hsl(152, 100%, 34%)',

@@ -14,11 +14,15 @@
 			@blur="formatInput"
 			@keydown.enter.prevent.stop="submitInput"
 		/>
-		<span class="shrink-0 text-sm font-semibold text-primary">{{ props.suffix }}</span>
+		<span class="shrink-0 text-sm font-semibold text-primary">{{ suffixLabel }}</span>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { useVIntl } from '@modrinth/ui'
+
+import { analyticsMessages } from '../analytics-messages'
+
 const props = withDefaults(
 	defineProps<{
 		label: string
@@ -28,16 +32,17 @@ const props = withDefaults(
 		inputWidthClass?: string
 	}>(),
 	{
-		suffix: 'downloads',
 		inputWidthClass: 'w-20',
 	},
 )
 
+const { formatMessage } = useVIntl()
 const emit = defineEmits<{
 	'update:threshold': [threshold: number | null]
 	submit: [event: KeyboardEvent]
 }>()
 
+const suffixLabel = computed(() => props.suffix ?? formatMessage(analyticsMessages.downloadsSuffix))
 const inputValue = ref('')
 let isSyncingThreshold = false
 let hasPendingEmittedThreshold = false

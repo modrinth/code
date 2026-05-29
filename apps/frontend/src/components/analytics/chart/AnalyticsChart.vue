@@ -90,7 +90,7 @@
 				<div
 					class="relative bottom-6 inline-flex items-center gap-2 text-lg font-semibold text-primary"
 				>
-					<span>Fetching results...</span>
+					<span>{{ formatMessage(analyticsMessages.fetchingResults) }}</span>
 				</div>
 			</div>
 		</div>
@@ -98,10 +98,13 @@
 </template>
 
 <script setup lang="ts">
+import { useVIntl } from '@modrinth/ui'
+
 import type { AnalyticsGroupByPreset } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 import { getDefaultAnalyticsGraphProjectEventsVisibility } from '~/providers/analytics/query-builder-url'
 
+import { analyticsMessages } from '../analytics-messages'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import AnalyticsChartPlot from './chart-area/AnalyticsChartPlot.vue'
 import { useAnalyticsChartEvents } from './chart-area/use-analytics-chart-events'
@@ -114,6 +117,7 @@ import { useAnalyticsChartDatasets } from './use-analytics-chart-datasets'
 import { useAnalyticsChartProjects } from './use-analytics-chart-projects'
 
 const dashboardContext = injectAnalyticsDashboardContext()
+const { formatMessage } = useVIntl()
 const {
 	activeStat,
 	activeGraphViewMode,

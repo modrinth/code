@@ -20,14 +20,16 @@
 				</span>
 				<span v-if="previousRangeLabel" class="min-w-0 truncate text-xs text-primary">
 					<span class="font-medium">{{ previousRangeLabel }}</span>
-					<span class="font-normal text-secondary"> (prev.)</span>
+					<span class="font-normal text-secondary">
+						{{ formatMessage(analyticsChartMessages.previousPeriodShort) }}
+					</span>
 				</span>
 			</div>
 			<PinIcon
 				v-if="pinned"
-				v-tooltip="'Chart tooltip pinned'"
+				v-tooltip="formatMessage(analyticsChartMessages.tooltipPinned)"
 				class="pointer-events-none size-4 shrink-0 font-normal text-contrast"
-				aria-label="Pinned"
+				:aria-label="formatMessage(analyticsChartMessages.pinned)"
 			/>
 		</div>
 		<Transition
@@ -54,7 +56,9 @@
 			@touchcancel="clearEntriesTouchScroll"
 		>
 			<div v-if="!ratioMode" class="flex shrink-0 items-center justify-between gap-4">
-				<span class="font-medium text-primary">Total</span>
+				<span class="font-medium text-primary">
+					{{ formatMessage(analyticsChartMessages.total) }}
+				</span>
 				<span class="font-semibold text-contrast">{{ formattedTotal }}</span>
 			</div>
 			<div
@@ -72,7 +76,7 @@
 								? 'cursor-pointer text-secondary opacity-70'
 								: 'cursor-pointer text-primary transition-all hover:brightness-125'
 					"
-					:aria-label="`${entry.hidden ? 'Show' : 'Hide'} ${entry.name} in graph`"
+					:aria-label="getEntryAriaLabel(entry)"
 					@mouseenter="emit('entry-hover', entry.projectId)"
 					@mouseleave="emit('entry-hover-clear', entry.projectId)"
 					@focus="emit('entry-hover', entry.projectId)"
@@ -133,7 +137,9 @@
 
 <script setup lang="ts">
 import { PinIcon } from '@modrinth/assets'
-import { useScrollIndicator } from '@modrinth/ui'
+import { useScrollIndicator, useVIntl } from '@modrinth/ui'
+
+import { analyticsChartMessages } from '../../analytics-messages'
 
 export type AnalyticsChartTooltipEntry = {
 	projectId: string
@@ -172,9 +178,20 @@ const emit = defineEmits<{
 	'entry-hover-clear': [projectId: string]
 }>()
 
+const { formatMessage } = useVIntl()
+
 function onEntryClick(event: MouseEvent, entry: AnalyticsChartTooltipEntry) {
 	if (entry.toggleDisabled && !event.shiftKey) return
 	emit('entry-click', entry.projectId, event.shiftKey)
+}
+
+function getEntryAriaLabel(entry: AnalyticsChartTooltipEntry) {
+	return formatMessage(
+		entry.hidden
+			? analyticsChartMessages.showEntryInGraph
+			: analyticsChartMessages.hideEntryInGraph,
+		{ name: entry.name },
+	)
 }
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
@@ -243,14 +260,14 @@ function formatDurationLabel(start: Date, end: Date): string {
 
 	if (durationMs >= ONE_DAY_MS) {
 		const days = Math.round(durationMs / ONE_DAY_MS)
-		return `${days} ${days === 1 ? 'day' : 'days'}`
+		return formatMessage(analyticsChartMessages.durationDays, { count: days })
 	}
 	if (durationMs >= ONE_HOUR_MS) {
 		const hours = Math.round(durationMs / ONE_HOUR_MS)
-		return `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+		return formatMessage(analyticsChartMessages.durationHours, { count: hours })
 	}
 	const minutes = Math.max(1, Math.round(durationMs / ONE_MINUTE_MS))
-	return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`
+	return formatMessage(analyticsChartMessages.durationMinutes, { count: minutes })
 }
 
 const rangeLabel = computed(() =>

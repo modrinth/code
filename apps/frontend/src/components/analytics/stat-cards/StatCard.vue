@@ -1,6 +1,6 @@
 <template>
 	<button
-		v-tooltip="disabled ? 'Stat unavailable for current qeury' : ''"
+		v-tooltip="disabled ? formatMessage(analyticsStatCardMessages.unavailableTooltip) : ''"
 		type="button"
 		class="flex h-full appearance-none flex-col gap-2.5 rounded-2xl border border-solid p-5 px-4 text-left transition-colors sm:gap-4"
 		:class="{
@@ -48,7 +48,9 @@
 			</div>
 
 			<template v-if="disabled">
-				<span class="inline-flex items-center gap-1 text-xs text-secondary">N/A</span>
+				<span class="inline-flex items-center gap-1 text-xs text-secondary">
+					{{ formatMessage(analyticsStatCardMessages.unavailableLabel) }}
+				</span>
 			</template>
 			<template v-else>
 				<div v-if="vsPrevPeriodPercent" class="flex items-center gap-1 text-sm">
@@ -76,7 +78,7 @@
 							'text-primary': !disabled,
 						}"
 					>
-						vs prev. period
+						{{ formatMessage(analyticsStatCardMessages.previousPeriodComparison) }}
 					</span>
 					<span
 						class="visible mt-px text-xs sm:hidden"
@@ -85,7 +87,7 @@
 							'text-primary': !disabled,
 						}"
 					>
-						vs prev.
+						{{ formatMessage(analyticsStatCardMessages.previousPeriodComparisonShort) }}
 					</span>
 				</div>
 			</template>
@@ -105,6 +107,9 @@ import {
 	TrendingDownIcon,
 	TrendingUpIcon,
 } from '@modrinth/assets'
+import { useVIntl } from '@modrinth/ui'
+
+import { analyticsStatCardMessages } from '../analytics-messages'
 
 const props = defineProps<{
 	label: string
@@ -119,6 +124,7 @@ const emit = defineEmits<{
 	(event: 'click'): void
 }>()
 
+const { formatMessage } = useVIntl()
 const statCardIconMap: Record<string, IconComponent> = {
 	clock: ClockIcon,
 	timer: TimerIcon,

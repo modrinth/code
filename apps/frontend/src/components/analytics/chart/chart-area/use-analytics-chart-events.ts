@@ -1,13 +1,13 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { injectModrinthClient } from '@modrinth/ui'
+import { injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, type ComputedRef } from 'vue'
 
 import type { AnalyticsDashboardContextValue } from '~/providers/analytics/analytics'
 
+import { analyticsProjectEventMessages, type FormatMessage } from '../../analytics-messages'
 import {
 	PROJECT_EVENT_DATE_FORMATTER,
-	PROJECT_STATUS_EVENT_COPY,
 	PROJECT_VERSION_UPLOAD_DEDUPE_WINDOW_MS,
 	VISIBLE_PROJECT_STATUS_CHANGE_EVENT_STATUS_SET,
 	type VisibleProjectStatusChangeEventStatus,
@@ -32,6 +32,7 @@ export function useAnalyticsChartEvents(
 	visibleProjectEventIdSet: ComputedRef<Set<string>>,
 ) {
 	const client = injectModrinthClient()
+	const { formatMessage } = useVIntl()
 	const { data: analyticsEvents } = useQuery({
 		queryKey: analyticsEventsQueryKey,
 		queryFn: () => client.labrinth.analytics_v3.getEvents(),
@@ -62,7 +63,7 @@ export function useAnalyticsChartEvents(
 					selectedProjectEventIdSet.value.has(event.project_id) && shouldShowProjectEvent(event),
 			),
 		).map((event) => ({
-			title: getProjectEventTitle(event),
+			title: getProjectEventTitle(event, formatMessage),
 			starts: event.timestamp,
 			ends: event.timestamp,
 			projectId: event.project_id,
@@ -127,17 +128,36 @@ export function useAnalyticsChartEvents(
 	}
 }
 
-function getProjectEventTitle(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {
+function getProjectEventTitle(
+	event: Labrinth.Analytics.v3.ProjectAnalyticsEvent,
+	formatMessage: FormatMessage,
+) {
 	if (event.kind === 'version_uploaded') {
 		const versionNumber = event.version_number.trim()
-		return versionNumber ? `${versionNumber} released` : 'Version uploaded'
+		return versionNumber
+			? formatMessage(analyticsProjectEventMessages.versionReleased, { version: versionNumber })
+			: formatMessage(analyticsProjectEventMessages.versionUploaded)
 	}
 
 	if (isVisibleProjectStatusChangeEventStatus(event.status_to)) {
-		return PROJECT_STATUS_EVENT_COPY[event.status_to]
+		return getProjectStatusEventTitle(event.status_to, formatMessage)
 	}
 
-	return 'Project status changed'
+	return formatMessage(analyticsProjectEventMessages.projectStatusChanged)
+}
+
+function getProjectStatusEventTitle(
+	status: VisibleProjectStatusChangeEventStatus,
+	formatMessage: FormatMessage,
+) {
+	switch (status) {
+		case 'approved':
+			return formatMessage(analyticsProjectEventMessages.projectApproved)
+		case 'unlisted':
+			return formatMessage(analyticsProjectEventMessages.projectUnlisted)
+		case 'private':
+			return formatMessage(analyticsProjectEventMessages.projectPrivate)
+	}
 }
 
 function shouldShowProjectEvent(event: Labrinth.Analytics.v3.ProjectAnalyticsEvent) {

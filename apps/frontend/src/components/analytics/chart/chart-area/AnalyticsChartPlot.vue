@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { useFormatNumber } from '@modrinth/ui'
+import { useFormatNumber, useVIntl } from '@modrinth/ui'
 
 import type {
 	AnalyticsDashboardStat,
@@ -133,6 +133,7 @@ const emit = defineEmits<{
 }>()
 
 const formatNumber = useFormatNumber()
+const { formatMessage } = useVIntl()
 const {
 	chartContainer,
 	chartTooltip,
@@ -180,7 +181,7 @@ const hoverFormattedTotal = computed(() => {
 	if (props.isRatioMode) {
 		return hoverTotalValue.value > 0 ? '100%' : '0%'
 	}
-	return formatMetricValue(hoverTotalValue.value, props.activeStat, formatNumber)
+	return formatMetricValue(hoverTotalValue.value, props.activeStat, formatNumber, formatMessage)
 })
 
 const hoverEntries = computed(() => {
@@ -199,7 +200,7 @@ const hoverEntries = computed(() => {
 			color: legendEntry.color,
 			formattedValue: props.isRatioMode
 				? `${ratioValue.toFixed(1)}%`
-				: formatMetricValue(value, props.activeStat, formatNumber),
+				: formatMetricValue(value, props.activeStat, formatNumber, formatMessage),
 			hidden: legendEntry.hidden,
 			toggleDisabled: !legendEntry.hidden && isLegendEntryToggleDisabled(legendEntry),
 			isPreviousPeriod: legendEntry.isPreviousPeriod,

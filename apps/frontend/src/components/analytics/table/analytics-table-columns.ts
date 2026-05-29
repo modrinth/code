@@ -6,6 +6,12 @@ import type {
 	AnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
+import {
+	analyticsGroupByMessages,
+	formatAnalyticsBreakdownLabel,
+	formatAnalyticsStatLabel,
+	type FormatMessage,
+} from '../analytics-messages'
 import type {
 	AnalyticsTableBreakdownColumnKey,
 	AnalyticsTableBreakdownPreset,
@@ -18,35 +24,18 @@ type BuildAnalyticsTableColumnsOptions = {
 	selectedFilters: AnalyticsSelectedFilters
 	showBreakdownColumn: boolean
 	showProjectVersionProjectColumn: boolean
+	formatMessage: FormatMessage
 	getRelevantAnalyticsDashboardStats: (
 		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters?: AnalyticsSelectedFilters,
 	) => readonly AnalyticsDashboardStat[]
 }
 
-export function getAnalyticsTableBreakdownColumnLabel(breakdown: AnalyticsBreakdownPreset): string {
-	switch (breakdown) {
-		case 'none':
-			return 'Project'
-		case 'project':
-			return 'Project'
-		case 'country':
-			return 'Country'
-		case 'monetization':
-			return 'Monetization'
-		case 'user_agent':
-			return 'Download source'
-		case 'download_reason':
-			return 'Download reason'
-		case 'version_id':
-			return 'Project version'
-		case 'loader':
-			return 'Loader'
-		case 'game_version':
-			return 'Game version'
-		default:
-			return 'Breakdown'
-	}
+export function getAnalyticsTableBreakdownColumnLabel(
+	breakdown: AnalyticsBreakdownPreset,
+	formatMessage: FormatMessage,
+): string {
+	return formatAnalyticsBreakdownLabel(breakdown, formatMessage)
 }
 
 export function buildAnalyticsTableColumns({
@@ -55,6 +44,7 @@ export function buildAnalyticsTableColumns({
 	selectedFilters,
 	showBreakdownColumn,
 	showProjectVersionProjectColumn,
+	formatMessage,
 	getRelevantAnalyticsDashboardStats,
 }: BuildAnalyticsTableColumnsOptions): TableColumn<AnalyticsTableColumnKey>[] {
 	const nextColumns: TableColumn<AnalyticsTableColumnKey>[] = []
@@ -63,7 +53,7 @@ export function buildAnalyticsTableColumns({
 	if (includeDate) {
 		nextColumns.push({
 			key: 'date',
-			label: 'Date',
+			label: formatMessage(analyticsGroupByMessages.date),
 			enableSorting: true,
 			defaultSortDirection: 'desc',
 			width: stats.length > 2 ? '20%' : '',
@@ -74,7 +64,7 @@ export function buildAnalyticsTableColumns({
 		for (const breakdown of selectedBreakdowns) {
 			nextColumns.push({
 				key: getAnalyticsTableBreakdownColumnKey(breakdown),
-				label: getAnalyticsTableBreakdownColumnLabel(breakdown),
+				label: getAnalyticsTableBreakdownColumnLabel(breakdown, formatMessage),
 				enableSorting: true,
 			})
 		}
@@ -83,13 +73,13 @@ export function buildAnalyticsTableColumns({
 	if (showProjectVersionProjectColumn) {
 		nextColumns.push({
 			key: 'project',
-			label: 'Project',
+			label: formatAnalyticsBreakdownLabel('project', formatMessage),
 			enableSorting: true,
 		})
 	}
 
 	for (const stat of stats) {
-		const column = getAnalyticsTableMetricColumn(stat)
+		const column = getAnalyticsTableMetricColumn(stat, formatMessage)
 		if (column) {
 			nextColumns.push(column)
 		}
@@ -100,12 +90,13 @@ export function buildAnalyticsTableColumns({
 
 export function getAnalyticsTableMetricColumn(
 	stat: AnalyticsDashboardStat,
+	formatMessage: FormatMessage,
 ): TableColumn<AnalyticsTableColumnKey> | null {
 	switch (stat) {
 		case 'views':
 			return {
 				key: 'views',
-				label: 'Views',
+				label: formatAnalyticsStatLabel('views', formatMessage),
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',
@@ -113,7 +104,7 @@ export function getAnalyticsTableMetricColumn(
 		case 'downloads':
 			return {
 				key: 'downloads',
-				label: 'Downloads',
+				label: formatAnalyticsStatLabel('downloads', formatMessage),
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',
@@ -121,7 +112,7 @@ export function getAnalyticsTableMetricColumn(
 		case 'revenue':
 			return {
 				key: 'revenue',
-				label: 'Revenue',
+				label: formatAnalyticsStatLabel('revenue', formatMessage),
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',
@@ -129,7 +120,7 @@ export function getAnalyticsTableMetricColumn(
 		case 'playtime':
 			return {
 				key: 'playtime',
-				label: 'Playtime',
+				label: formatAnalyticsStatLabel('playtime', formatMessage),
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',

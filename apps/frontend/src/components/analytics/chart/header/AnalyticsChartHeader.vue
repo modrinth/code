@@ -27,7 +27,7 @@
 						class="font-base border-0 bg-transparent p-0 text-sm underline transition-all hover:brightness-125"
 						@click="emit('show-top-graph-datasets')"
 					>
-						Show top 8
+						{{ formatMessage(analyticsChartMessages.showTopEight) }}
 					</button>
 				</div>
 			</div>
@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
-import { Tabs, type TabsTab } from '@modrinth/ui'
+import { Tabs, type TabsTab, useVIntl } from '@modrinth/ui'
 
 import type { AnalyticsGraphViewMode } from '~/providers/analytics/analytics'
 import {
@@ -69,6 +69,7 @@ import {
 	DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
 } from '~/providers/analytics/query-builder-url'
 
+import { analyticsChartMessages } from '../../analytics-messages'
 import AnalyticsChartControls from './AnalyticsChartControls.vue'
 
 const activeGraphViewMode = defineModel<AnalyticsGraphViewMode>('activeGraphViewMode', {
@@ -95,14 +96,27 @@ const props = defineProps<{
 	isMobileLayout: boolean
 }>()
 
+const { formatMessage } = useVIntl()
 const emit = defineEmits<{
 	'toggle-graph-render-limit': [event: MouseEvent]
 	'show-top-graph-datasets': []
 }>()
 
 const viewModeTabs = computed<TabsTab[]>(() => [
-	{ value: 'line', label: props.isMobileLayout ? '' : 'Line', icon: ChartSplineIcon },
-	{ value: 'area', label: props.isMobileLayout ? '' : 'Area', icon: ChartAreaIcon },
-	{ value: 'bar', label: props.isMobileLayout ? '' : 'Bar', icon: ChartColumnBigIcon },
+	{
+		value: 'line',
+		label: props.isMobileLayout ? '' : formatMessage(analyticsChartMessages.lineView),
+		icon: ChartSplineIcon,
+	},
+	{
+		value: 'area',
+		label: props.isMobileLayout ? '' : formatMessage(analyticsChartMessages.areaView),
+		icon: ChartAreaIcon,
+	},
+	{
+		value: 'bar',
+		label: props.isMobileLayout ? '' : formatMessage(analyticsChartMessages.barView),
+		icon: ChartColumnBigIcon,
+	},
 ])
 </script>

@@ -18,13 +18,15 @@
 		>
 			<template #header>
 				<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-					<div class="text-xl font-semibold text-contrast">Breakdown</div>
+					<div class="text-xl font-semibold text-contrast">
+						{{ formatMessage(analyticsBreakdownMessages.breakdown) }}
+					</div>
 
 					<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
 						<StyledInput
 							v-model="searchQuery"
 							:icon="SearchIcon"
-							placeholder="Search..."
+							:placeholder="formatMessage(analyticsTableMessages.searchPlaceholder)"
 							clearable
 							wrapper-class="w-full sm:w-64"
 							@focusin="selectSearchInputText"
@@ -36,10 +38,14 @@
 								:disabled="isDataLoading || filteredRows.length === 0"
 							>
 								<DownloadIcon />
-								Export CSV
+								{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
 								<DropdownIcon />
-								<template #cumulative-csv> Cumulative </template>
-								<template #grouped-csv> Grouped by {{ groupByLabel.toLowerCase() }} </template>
+								<template #cumulative-csv>
+									{{ formatMessage(analyticsTableMessages.cumulativeCsv) }}
+								</template>
+								<template #grouped-csv>
+									{{ formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel }) }}
+								</template>
 							</OverflowMenu>
 						</ButtonStyled>
 					</div>
@@ -101,7 +107,13 @@
 			class="mt-3 flex flex-wrap items-center justify-between gap-3 px-1 text-sm text-secondary"
 		>
 			<span>
-				Showing {{ visibleRowStart }} to {{ visibleRowEnd }} of {{ filteredRows.length }}
+				{{
+					formatMessage(analyticsTableMessages.paginationSummary, {
+						start: visibleRowStart,
+						end: visibleRowEnd,
+						total: filteredRows.length,
+					})
+				}}
 			</span>
 			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
 		</div>
@@ -110,7 +122,7 @@
 			<div class="absolute inset-0 backdrop-blur-[4px]" />
 			<div class="absolute inset-0 flex h-full max-h-[500px] items-center justify-center pt-10">
 				<div class="inline-flex items-center gap-2 text-lg font-semibold text-primary opacity-100">
-					<span>Fetching results...</span>
+					<span>{{ formatMessage(analyticsMessages.fetchingResults) }}</span>
 				</div>
 			</div>
 		</div>
@@ -127,6 +139,7 @@ import {
 	StyledInput,
 	Table,
 	useFormatNumber,
+	useVIntl,
 } from '@modrinth/ui'
 import type { LocationQuery } from 'vue-router'
 
@@ -140,6 +153,11 @@ import {
 	readAnalyticsTableSortState,
 } from '~/providers/analytics/query-builder-url'
 
+import {
+	analyticsBreakdownMessages,
+	analyticsMessages,
+	analyticsTableMessages,
+} from '../analytics-messages'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
 	isTimeRelevantForGroupBy,
@@ -208,6 +226,7 @@ const {
 	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
+const { formatMessage } = useVIntl()
 const isDataLoading = computed(() => isLoading.value)
 const route = useRoute()
 const router = useRouter()
@@ -269,7 +288,9 @@ const displayedIncludeDateColumn = computed(() =>
 			? false
 			: displayedTableMode.value === 'date_breakdown',
 )
-const groupByLabel = computed(() => getAnalyticsTableGroupByLabel(selectedGroupBy.value))
+const groupByLabel = computed(() =>
+	getAnalyticsTableGroupByLabel(selectedGroupBy.value, formatMessage),
+)
 const csvExportOptions = computed<OverflowMenuOption[]>(() => {
 	if (showGraphDatasetSelection.value) {
 		return [
@@ -302,20 +323,22 @@ const analyticsPointCount = computed(() =>
 )
 const emptyTableMessage = computed(() => {
 	if (trimmedSearchQuery.value && sortedRows.value.length > 0) {
-		return 'No matching analytics rows'
+		return formatMessage(analyticsTableMessages.noMatchingRows)
 	}
 
 	if (hasProjectContext.value) {
-		return 'No data available for analytics'
+		return formatMessage(analyticsMessages.noDataAvailableForAnalytics)
 	}
 
-	return hasAvailableProjects.value ? 'No data available' : 'No projects available for analytics'
+	return hasAvailableProjects.value
+		? formatMessage(analyticsMessages.noDataAvailable)
+		: formatMessage(analyticsMessages.noProjectsAvailableForAnalytics)
 })
 
 const breakdownColumnLabel = computed(() =>
 	selectedBreakdowns.value.length === 1
-		? getAnalyticsTableBreakdownColumnLabel(selectedBreakdowns.value[0])
-		: 'Breakdown',
+		? getAnalyticsTableBreakdownColumnLabel(selectedBreakdowns.value[0], formatMessage)
+		: formatMessage(analyticsBreakdownMessages.breakdown),
 )
 const relevantStats = computed(
 	() =>
@@ -343,6 +366,7 @@ function buildTableRows(mode: AnalyticsTableMode) {
 		getVersionProjectName,
 		showTimeInBucketLabel: showTimeInBucketLabel.value,
 		showYearInBucketLabel: showYearInBucketLabel.value,
+		formatMessage,
 	})
 }
 
@@ -356,6 +380,7 @@ function buildColumns(includeDate: boolean) {
 		selectedFilters: selectedFilters.value,
 		showBreakdownColumn: showBreakdownColumn.value,
 		showProjectVersionProjectColumn: showProjectVersionProjectColumn.value,
+		formatMessage,
 		getRelevantAnalyticsDashboardStats,
 	})
 }
@@ -502,15 +527,15 @@ function formatInteger(value: number): string {
 }
 
 function formatRevenue(value: number): string {
-	return formatAnalyticsTableRevenue(revenueFormatter.value, value)
+	return formatAnalyticsTableRevenue(revenueFormatter.value, value, formatMessage)
 }
 
 function formatCompactPlaytime(value: number): string {
-	return formatAnalyticsTableCompactPlaytime(value)
+	return formatAnalyticsTableCompactPlaytime(value, formatMessage)
 }
 
 function formatFullPlaytime(value: number): string {
-	return formatAnalyticsTableFullPlaytime(formatNumber, value)
+	return formatAnalyticsTableFullPlaytime(value, formatMessage)
 }
 
 function applyRouteOrDefaultSort(nextColumns = activeColumns.value) {
@@ -610,7 +635,7 @@ function getCsvColumns(mode: AnalyticsTableMode) {
 }
 
 function getCsvFilename(): string {
-	return getAnalyticsTableCsvFilename(breakdownColumnLabel.value, fetchRequest.value)
+	return getAnalyticsTableCsvFilename(breakdownColumnLabel.value, fetchRequest.value, formatMessage)
 }
 
 function downloadCsv(mode: AnalyticsTableMode) {
@@ -624,7 +649,7 @@ function downloadCsv(mode: AnalyticsTableMode) {
 	}
 
 	const visibleColumns = getCsvColumns(mode)
-	const csvContent = buildAnalyticsTableCsvContent(csvRows, visibleColumns)
+	const csvContent = buildAnalyticsTableCsvContent(csvRows, visibleColumns, formatMessage)
 	downloadAnalyticsTableCsv(getCsvFilename(), csvContent)
 }
 </script>

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { useCompactNumber } from '@modrinth/ui'
+import { useCompactNumber, useVIntl } from '@modrinth/ui'
 import {
 	BarController,
 	BarElement,
@@ -99,6 +99,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 let chartInstance: Chart | null = null
 
 const { formatCompactNumber } = useCompactNumber()
+const { formatMessage } = useVIntl()
 
 type ExternalTooltipHandler = NonNullable<
 	NonNullable<NonNullable<ChartConfiguration['options']>['plugins']>['tooltip']
@@ -664,7 +665,13 @@ function buildConfig(): ChartConfiguration {
 							const tickValues = ticks
 								.map((tick) => tick.value)
 								.filter((value) => Number.isFinite(value))
-							return formatAxisValue(numeric, props.activeStat, formatCompactNumber, tickValues)
+							return formatAxisValue(
+								numeric,
+								props.activeStat,
+								formatCompactNumber,
+								formatMessage,
+								tickValues,
+							)
 						},
 					},
 				},
