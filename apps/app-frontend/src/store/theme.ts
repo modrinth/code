@@ -22,6 +22,7 @@ export type ColorTheme = (typeof THEME_OPTIONS)[number]
 export type ThemeStore = {
 	selectedTheme: ColorTheme
 	advancedRendering: boolean
+	hideNametagSkinsPage: boolean
 	toggleSidebar: boolean
 
 	devMode: boolean
@@ -31,6 +32,7 @@ export type ThemeStore = {
 export const DEFAULT_THEME_STORE: ThemeStore = {
 	selectedTheme: 'dark',
 	advancedRendering: true,
+	hideNametagSkinsPage: false,
 	toggleSidebar: false,
 
 	devMode: false,

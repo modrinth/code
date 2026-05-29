@@ -2450,6 +2450,12 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Download {username}'s projects on Modrinth"
   },
+  "profile.official-account": {
+    "message": "Official Modrinth account"
+  },
+  "profile.official-account.bio": {
+    "message": "The official user account of Modrinth. Get support at {support-link} or via email at {email}"
+  },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
   },

@@ -1880,9 +1880,6 @@
   "layout.banner.build-fail.title": {
     "message": "Błąd podczas generowania stanu z API przy kompilacji."
   },
-  "layout.banner.preview.description": {
-    "message": "Jeśli chciałeś/aś wejść na oficjalną stronę Modrinth, odwiedź {url}. To wydanie poglądowe jest używane przez administrację Modrinth do testów. Zostało utworzone z <branch-link>{owner}/{branch}</branch-link> @ {commit}."
-  },
   "layout.banner.preview.title": {
     "message": "To jest wydanie poglądowe strony Modrinth."
   },

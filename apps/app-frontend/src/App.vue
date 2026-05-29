@@ -335,6 +335,7 @@ async function setupApp() {
 		locale,
 		telemetry,
 		collapsed_navigation,
+		hide_nametag_skins_page,
 		advanced_rendering,
 		onboarded,
 		default_page,
@@ -365,6 +366,7 @@ async function setupApp() {
 	themeStore.setThemeState(theme)
 	themeStore.collapsedNavigation = collapsed_navigation
 	themeStore.advancedRendering = advanced_rendering
+	themeStore.hideNametagSkinsPage = hide_nametag_skins_page
 	themeStore.toggleSidebar = toggle_sidebar
 	themeStore.devMode = developer_mode
 	themeStore.featureFlags = feature_flags
@@ -1232,7 +1234,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<CompassIcon />
 			</NavButton>
-			<NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
+			<NavButton v-tooltip.right="'Skin selector'" to="/skins">
 				<ChangeSkinIcon />
 			</NavButton>
 			<NavButton

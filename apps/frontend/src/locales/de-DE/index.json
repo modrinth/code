@@ -1811,9 +1811,6 @@
   "layout.banner.build-fail.title": {
     "message": "Fehler beim Generieren des Status aus der API beim Erstellen."
   },
-  "layout.banner.preview.description": {
-    "message": "Falls du die offizielle Modrinth-Website aufrufen wolltest, besuche {url}. Diese Vorschauversion wird von Modrinth-Mitarbeitern zu Testzwecken genutzt. Sie wurde unter Verwendung von <branch-link>{owner}/{branch}</branch-link> @ {commit} erstellt."
-  },
   "layout.banner.preview.title": {
     "message": "Dies ist eine Vorschauversion der Modrinth-Website."
   },
