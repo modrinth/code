@@ -5,14 +5,14 @@ import { computed, type ComputedRef } from 'vue'
 
 import type { AnalyticsDashboardContextValue } from '~/providers/analytics/analytics'
 
-import { analyticsProjectEventMessages, type FormatMessage } from '../../analytics-messages'
+import { analyticsProjectEventMessages, type FormatMessage } from '../../analytics-messages.ts'
 import {
 	PROJECT_EVENT_DATE_FORMATTER,
 	PROJECT_VERSION_UPLOAD_DEDUPE_WINDOW_MS,
 	VISIBLE_PROJECT_STATUS_CHANGE_EVENT_STATUS_SET,
 	type VisibleProjectStatusChangeEventStatus,
-} from '../analytics-chart-constants'
-import type { AnalyticsChartRangeBounds } from '../analytics-chart-types'
+} from '../analytics-chart-constants.ts'
+import type { AnalyticsChartRangeBounds } from '../analytics-chart-types.ts'
 import type { AnalyticsChartEvent } from './AnalyticsChartEvents.vue'
 
 const analyticsEventsQueryKey = ['analytics-events'] as const

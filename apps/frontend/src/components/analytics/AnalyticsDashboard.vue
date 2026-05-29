@@ -45,8 +45,8 @@ import {
 } from '~/providers/analytics/analytics'
 import { injectOrganizationContext } from '~/providers/organization-context'
 
+import AnalyticsChart from './analytics-chart/AnalyticsChart.vue'
 import { analyticsMessages } from './analytics-messages'
-import AnalyticsChart from './chart/AnalyticsChart.vue'
 import QueryBuilder from './query-builder/QueryBuilder.vue'
 import StatCards from './stat-cards/StatCards.vue'
 import AnalyticsTable from './table/AnalyticsTable.vue'

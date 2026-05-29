@@ -154,15 +154,15 @@ import {
 } from '~/providers/analytics/query-builder-url'
 
 import {
+	isTimeRelevantForGroupBy,
+	isYearRelevantForTimeRange,
+} from '../analytics-chart/analytics-chart-utils.ts'
+import {
 	analyticsBreakdownMessages,
 	analyticsMessages,
 	analyticsTableMessages,
 } from '../analytics-messages'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
-import {
-	isTimeRelevantForGroupBy,
-	isYearRelevantForTimeRange,
-} from '../chart/analytics-chart-utils'
 import {
 	buildAnalyticsTableColumns,
 	getAnalyticsTableBreakdownColumnLabel,

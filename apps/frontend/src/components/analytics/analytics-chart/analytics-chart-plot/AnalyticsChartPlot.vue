@@ -89,13 +89,16 @@ import type {
 	AnalyticsGroupByPreset,
 } from '~/providers/analytics/analytics'
 
-import type { AnalyticsChartLegendEntry, AnalyticsChartRangeBounds } from '../analytics-chart-types'
-import type { ChartDataset } from '../analytics-chart-utils'
-import { formatMetricValue } from '../analytics-chart-utils'
+import type {
+	AnalyticsChartLegendEntry,
+	AnalyticsChartRangeBounds,
+} from '../analytics-chart-types.ts'
+import type { ChartDataset } from '../analytics-chart-utils.ts'
+import { formatMetricValue } from '../analytics-chart-utils.ts'
 import AnalyticsChartClient from '../AnalyticsChart.client.vue'
 import AnalyticsChartEvents, { type AnalyticsChartEvent } from './AnalyticsChartEvents.vue'
 import AnalyticsChartTooltip from './AnalyticsChartTooltip.vue'
-import { useAnalyticsChartInteractions } from './use-analytics-chart-interactions'
+import { useAnalyticsChartInteractions } from './use-analytics-chart-interactions.ts'
 
 const props = defineProps<{
 	chartType: 'line' | 'bar'

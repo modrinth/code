@@ -173,8 +173,8 @@ import type {
 	AnalyticsGroupByPreset,
 } from '~/providers/analytics/analytics'
 
-import { analyticsChartMessages } from '../../analytics-messages'
-import { isTimeRelevantForGroupBy } from '../analytics-chart-utils'
+import { analyticsChartMessages } from '../../analytics-messages.ts'
+import { isTimeRelevantForGroupBy } from '../analytics-chart-utils.ts'
 import type { AnalyticsChartGeometryPayload } from '../AnalyticsChart.client.vue'
 
 type AnalyticsChartEventMarkerIcon = 'info' | 'flag'

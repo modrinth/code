@@ -69,7 +69,7 @@ import {
 	DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
 } from '~/providers/analytics/query-builder-url'
 
-import { analyticsChartMessages } from '../../analytics-messages'
+import { analyticsChartMessages } from '../../analytics-messages.ts'
 import AnalyticsChartControls from './AnalyticsChartControls.vue'
 
 const activeGraphViewMode = defineModel<AnalyticsGraphViewMode>('activeGraphViewMode', {

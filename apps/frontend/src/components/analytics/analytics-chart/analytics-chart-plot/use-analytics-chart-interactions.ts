@@ -6,10 +6,13 @@ import type { AnalyticsGroupByPreset } from '~/providers/analytics/analytics'
 import {
 	ensureMinimumTimeRange,
 	getDefaultAnalyticsGroupByForDurationMinutes,
-} from '../../query-builder/timeframe-picker/timeframe'
-import type { AnalyticsChartHoverState, AnalyticsChartRangeBounds } from '../analytics-chart-types'
-import type { ChartDataset } from '../analytics-chart-utils'
-import { getSliceBucketRange } from '../analytics-chart-utils'
+} from '../../query-builder/timeframe-picker/timeframe.ts'
+import type {
+	AnalyticsChartHoverState,
+	AnalyticsChartRangeBounds,
+} from '../analytics-chart-types.ts'
+import type { ChartDataset } from '../analytics-chart-utils.ts'
+import { getSliceBucketRange } from '../analytics-chart-utils.ts'
 import type {
 	AnalyticsChartGeometryPayload,
 	AnalyticsChartRangeSelectPayload,

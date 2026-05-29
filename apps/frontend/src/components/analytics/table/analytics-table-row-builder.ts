@@ -5,6 +5,12 @@ import type {
 	AnalyticsDashboardStat,
 } from '~/providers/analytics/analytics'
 
+import {
+	formatBreakdownLabel,
+	formatBucketEndLabel,
+	getSliceBucketRange,
+	getSliceCount,
+} from '../analytics-chart/analytics-chart-utils'
 import type { FormatMessage } from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
@@ -13,12 +19,6 @@ import {
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
 } from '../breakdown'
-import {
-	formatBreakdownLabel,
-	formatBucketEndLabel,
-	getSliceBucketRange,
-	getSliceCount,
-} from '../chart/analytics-chart-utils'
 import { getAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
 import type {
 	AnalyticsTableBreakdownDisplayValues,

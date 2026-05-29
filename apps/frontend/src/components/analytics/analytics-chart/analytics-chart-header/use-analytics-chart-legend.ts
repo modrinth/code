@@ -6,22 +6,22 @@ import type {
 	AnalyticsDashboardProject,
 } from '~/providers/analytics/analytics'
 
-import { analyticsChartMessages } from '../../analytics-messages'
-import { COMBINED_BREAKDOWN_DATASET_ID_PREFIX } from '../../breakdown'
+import { analyticsChartMessages } from '../../analytics-messages.ts'
+import { COMBINED_BREAKDOWN_DATASET_ID_PREFIX } from '../../breakdown.ts'
 import {
 	ALL_PROJECTS_DATASET_ID,
 	MONETIZATION_LEGEND_ENTRY_ORDER,
 	PREVIOUS_PERIOD_BORDER_DASH,
-} from '../analytics-chart-constants'
-import type { AnalyticsChartLegendEntry } from '../analytics-chart-types'
+} from '../analytics-chart-constants.ts'
+import type { AnalyticsChartLegendEntry } from '../analytics-chart-types.ts'
 import {
 	areStringArraysEqual,
 	type ChartDataset,
 	decodeBreakdownDatasetValue,
 	getChartDatasetTotal,
 	getPreviousPeriodDatasetId,
-} from '../analytics-chart-utils'
-import type { AnalyticsChartEvent } from '../chart-area/AnalyticsChartEvents.vue'
+} from '../analytics-chart-utils.ts'
+import type { AnalyticsChartEvent } from '../analytics-chart-plot/AnalyticsChartEvents.vue'
 
 export function useAnalyticsChartLegend({
 	selectableChartDatasets,
