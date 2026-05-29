@@ -191,11 +191,16 @@ function getAnalyticsFacetDownloadsByValue<T>(
 			continue
 		}
 
-		const downloads = Number.isFinite(facet.downloads) ? facet.downloads : 0
+		const downloads = getAnalyticsFacetDownloadCount(facet)
 		downloadsByValue.set(key, (downloadsByValue.get(key) ?? 0) + downloads)
 	}
 
 	return downloadsByValue
+}
+
+function getAnalyticsFacetDownloadCount<T>(facet: Labrinth.Analytics.v3.AnalyticsFacet<T>): number {
+	const count = (facet as { count?: number }).count ?? facet.downloads
+	return Number.isFinite(count) ? count : 0
 }
 
 export function getAnalyticsFacetsFilterOptionSummary(
