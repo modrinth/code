@@ -138,6 +138,19 @@
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>
+							<div
+								v-if="$slots['search-actions']"
+								class="flex shrink-0 items-center"
+								@keydown="handleSearchActionsKeydown"
+							>
+								<slot
+									name="search-actions"
+									:model-value="modelValue"
+									:selected-options="selectedOptions"
+									:clear-all="clearAll"
+									:is-open="isOpen"
+								></slot>
+							</div>
 						</div>
 
 						<div
@@ -1228,6 +1241,12 @@ function handleSearchKeydown(event: KeyboardEvent) {
 		} else {
 			focusNextOption()
 		}
+	}
+}
+
+function handleSearchActionsKeydown(event: KeyboardEvent) {
+	if (event.key !== 'Escape') {
+		event.stopPropagation()
 	}
 }
 

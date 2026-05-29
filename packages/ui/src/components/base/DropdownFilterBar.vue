@@ -38,6 +38,15 @@
 				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
 			></slot>
 		</template>
+		<template v-if="$slots['search-actions']" #search-actions>
+			<slot
+				name="search-actions"
+				:category="preview.category"
+				:selected-values="getPreviewSelectedValues(preview.key)"
+				:set-selected-values="(values) => setPreviewSelectedValues(preview.key, values)"
+				:close-menu="(event) => closePreviewFilterMenu(preview.key, event)"
+			></slot>
+		</template>
 		<template #input-content="{ isOpen, openDirection }">
 			<div class="flex min-h-8 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
 				<FilterIcon

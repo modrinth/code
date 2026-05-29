@@ -599,6 +599,14 @@ export const CustomControls: Story = {
 		},
 		categories: searchableCategories,
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers category search actions and footer controls in both add-menu and applied-filter preview dropdowns.',
+			},
+		},
+	},
 }
 
 export const EmptyCategory: Story = {
