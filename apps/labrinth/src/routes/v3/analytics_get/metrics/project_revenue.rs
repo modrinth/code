@@ -57,7 +57,8 @@ pub(crate) async fn fetch(
             -- for affiliate code revenue, see `affiliate_code_revenue`
             payouts_values.mod_id IS NOT NULL
             AND payouts_values.mod_id = ANY($4)
-            AND created BETWEEN $1 AND $2
+            AND created >= $1
+            AND created < $2
         GROUP BY bucket, mod_id",
     )
     .bind(req.time_range.start)

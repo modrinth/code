@@ -175,28 +175,28 @@ async fn fetch_project_views_facets(
     Ok(ProjectViewsFacets {
         domain: fetch_string_facet(
             clickhouse,
-            "SELECT domain AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND domain != '' GROUP BY value ORDER BY value",
+            "SELECT domain AS value, COUNT(*) AS count FROM views WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND domain != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
         .await?,
         site_path: fetch_string_facet(
             clickhouse,
-            "SELECT site_path AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND site_path != '' GROUP BY value ORDER BY value",
+            "SELECT site_path AS value, COUNT(*) AS count FROM views WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND site_path != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
         .await?,
         monetized: fetch_bool_facet(
             clickhouse,
-            "SELECT monetized AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} GROUP BY value ORDER BY value",
+            "SELECT monetized AS value, COUNT(*) AS count FROM views WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
         .await?,
         country: fetch_string_facet(
             clickhouse,
-            "SELECT country AS value, COUNT(*) AS count FROM views WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND country != '' GROUP BY value ORDER BY value",
+            "SELECT country AS value, COUNT(*) AS count FROM views WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND country != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
@@ -211,7 +211,7 @@ async fn fetch_project_downloads_facets(
 ) -> Result<ProjectDownloadsFacets, ApiError> {
     let user_agents = fetch_string_facet(
         clickhouse,
-        "SELECT user_agent AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND user_agent != '' GROUP BY value",
+        "SELECT user_agent AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND user_agent != '' GROUP BY value",
         project_ids,
         time_range,
     )
@@ -221,7 +221,7 @@ async fn fetch_project_downloads_facets(
     Ok(ProjectDownloadsFacets {
         domain: fetch_string_facet(
             clickhouse,
-            "SELECT domain AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND domain != '' GROUP BY value ORDER BY value",
+            "SELECT domain AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND domain != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
@@ -229,28 +229,28 @@ async fn fetch_project_downloads_facets(
 		user_agent,
         version_id: fetch_version_facet(
             clickhouse,
-            "SELECT version_id AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND version_id != 0 GROUP BY value ORDER BY value",
+            "SELECT version_id AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND version_id != 0 GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
 		.await?,
         monetized: fetch_bool_facet(
             clickhouse,
-            "SELECT user_id != 0 AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} GROUP BY value ORDER BY value",
+            "SELECT user_id != 0 AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
 		.await?,
         country: fetch_string_facet(
             clickhouse,
-            "SELECT country AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND country != '' GROUP BY value ORDER BY value",
+            "SELECT country AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND country != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
 		.await?,
         reason: fetch_string_facet(
             clickhouse,
-            "SELECT reason AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND reason != '' GROUP BY value ORDER BY value",
+            "SELECT reason AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND reason != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
@@ -265,14 +265,14 @@ async fn fetch_project_downloads_facets(
         .collect(),
         game_version: fetch_string_facet(
             clickhouse,
-            "SELECT game_version AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND game_version != '' GROUP BY value ORDER BY value",
+            "SELECT game_version AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND game_version != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
 		.await?,
         loader: fetch_string_facet(
             clickhouse,
-            "SELECT loader AS value, COUNT(*) AS count FROM downloads WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND loader != '' GROUP BY value ORDER BY value",
+            "SELECT loader AS value, COUNT(*) AS count FROM downloads WHERE recorded >= {time_range_start: Int64} AND recorded < {time_range_end: Int64} AND project_id IN {project_ids: Array(UInt64)} AND loader != '' GROUP BY value ORDER BY value",
             project_ids,
             time_range,
         )
@@ -429,7 +429,8 @@ async fn fetch_playtime_string_facet(
     let query = format!(
 		"SELECT {column} AS value, COUNT(*) AS count
 		FROM playtime
-		WHERE recorded BETWEEN {{time_range_start: Int64}} AND {{time_range_end: Int64}}
+		WHERE recorded >= {{time_range_start: Int64}}
+			AND recorded < {{time_range_end: Int64}}
 			AND (project_id IN {{project_ids: Array(UInt64)}} OR parent IN {{parent_version_ids: Array(UInt64)}})
 			AND {column} != ''
         GROUP BY value
@@ -462,7 +463,8 @@ async fn fetch_playtime_version_facet(
 		.query(
 			"SELECT version_id AS value, COUNT(*) AS count
 			FROM playtime
-			WHERE recorded BETWEEN {time_range_start: Int64} AND {time_range_end: Int64}
+			WHERE recorded >= {time_range_start: Int64}
+				AND recorded < {time_range_end: Int64}
 				AND (project_id IN {project_ids: Array(UInt64)} OR parent IN {parent_version_ids: Array(UInt64)})
 				AND version_id != 0
             GROUP BY value

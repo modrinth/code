@@ -122,7 +122,8 @@ const PLAYTIME: &str = {
                 seconds
             FROM playtime
             WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                recorded >= {TIME_RANGE_START}
+                AND recorded < {TIME_RANGE_END}
                 AND playtime.project_id IN {PROJECT_IDS}
                 AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
                 AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})
@@ -142,7 +143,8 @@ const PLAYTIME: &str = {
                 seconds
             FROM playtime
             WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                recorded >= {TIME_RANGE_START}
+                AND recorded < {TIME_RANGE_END}
                 AND parent IN {PARENT_VERSION_IDS}
                 AND (empty({FILTER_VERSION_ID}) OR playtime.version_id IN {FILTER_VERSION_ID})
                 AND (empty({FILTER_LOADER}) OR playtime.loader IN {FILTER_LOADER})

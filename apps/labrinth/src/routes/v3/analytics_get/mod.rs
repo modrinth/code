@@ -277,7 +277,7 @@ pub async fn fetch_analytics(
         .filter(|version| {
             visible_version_ids.contains(&version.inner.id)
                 && version.inner.date_published >= req.time_range.start
-                && version.inner.date_published <= req.time_range.end
+                && version.inner.date_published < req.time_range.end
         })
         .map(|version| ProjectAnalyticsEvent {
             project_id: version.inner.project_id.into(),
@@ -423,7 +423,8 @@ async fn fetch_project_status_change_events(
         WHERE
             t.mod_id = ANY($1)
             AND tm.body->>'type' = 'status_change'
-            AND tm.created BETWEEN $2 AND $3
+            AND tm.created >= $2
+            AND tm.created < $3
         "#,
         &project_id_values,
         time_range.start,
@@ -600,6 +601,9 @@ pub(crate) fn add_to_time_slice(
     bucket: usize,
     data: AnalyticsData,
 ) -> Result<(), ApiError> {
+    // Bucketed analytics queries must filter time ranges as `[start, end)`.
+    // `widthBucket` returns `num_time_slices + 1` for values at or after
+    // `end`, which is outside the response slice array.
     // row.recorded <  time_range_start => bucket = 0
     // row.recorded >= time_range_end   => bucket = num_time_slices
     //   (note: this is out of range of `time_slices`!)
