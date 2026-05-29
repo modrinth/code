@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-29T20:01:16+00:00`,
+		product: 'web',
+		body: `## Changed
+- Completely overhauled project analytics. See our [blog post](https://modrinth.com/news/article/analytics-overhaul/) to learn about it!
+
+## Fixed
+- Fixed i18n bug in the resubmit project modal.`,
+	},
+	{
 		date: `2026-05-29T01:44:44+00:00`,
 		product: 'web',
 		body: `## Fixed
