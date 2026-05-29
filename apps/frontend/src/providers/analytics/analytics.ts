@@ -2178,12 +2178,7 @@ export function createAnalyticsDashboardContext(
 			analyticsTimeSlicesFetchRequest,
 			hasCompletedCurrentTimeSliceFetch,
 		],
-		([
-			hasInitializedFetchRequest,
-			nextAreProjectsLoaded,
-			nextFetchRequest,
-			hasCompletedFetch,
-		]) => {
+		([hasInitializedFetchRequest, nextAreProjectsLoaded, nextFetchRequest, hasCompletedFetch]) => {
 			if (!hasInitializedFetchRequest || !nextAreProjectsLoaded) {
 				hasCompletedAnalyticsLoading.value = false
 				return
@@ -2320,9 +2315,8 @@ export function createAnalyticsDashboardContext(
 				filterOptionVersionIds.value,
 			]),
 			queryFn: () =>
-				fetchAnalyticsVersionMetadataByIds(
-					filterOptionVersionIds.value,
-					(ids) => client.labrinth.versions_v3.getVersions(ids),
+				fetchAnalyticsVersionMetadataByIds(filterOptionVersionIds.value, (ids) =>
+					client.labrinth.versions_v3.getVersions(ids),
 				),
 			enabled: computed(
 				() =>

@@ -182,9 +182,9 @@
 import { BoxIcon } from '@modrinth/assets'
 import {
 	DropdownFilterBar,
-	Tabs,
 	type DropdownFilterBarCategory,
 	type DropdownFilterBarOption,
+	Tabs,
 	type TabsTab,
 	type TabsValue,
 } from '@modrinth/ui'
@@ -192,10 +192,10 @@ import {
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useGeneratedState } from '~/composables/generated'
 import {
-	doesProjectStatusMatchFilters,
-	injectAnalyticsDashboardContext,
 	type AnalyticsQueryFilterCategory,
 	type AnalyticsSelectedFilters,
+	doesProjectStatusMatchFilters,
+	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 import {
 	areStringArraysEqual,

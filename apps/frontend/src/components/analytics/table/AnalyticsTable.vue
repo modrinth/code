@@ -139,8 +139,8 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 import {
-	type AnalyticsTableSortDirection as SortDirection,
 	type AnalyticsTableSortColumn as TableColumnKey,
+	type AnalyticsTableSortDirection as SortDirection,
 	areStringArraysEqual,
 	buildAnalyticsTableSortRouteQuery,
 	hasAnalyticsTableSortQuery,

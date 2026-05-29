@@ -471,8 +471,7 @@ export const ScrollRepositioning: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					'Covers fixed dropdown repositioning while the page scrolls with the menu open.',
+				story: 'Covers fixed dropdown repositioning while the page scrolls with the menu open.',
 			},
 		},
 	},
