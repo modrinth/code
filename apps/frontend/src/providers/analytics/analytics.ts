@@ -233,6 +233,8 @@ export interface AnalyticsDashboardContextValue {
 	hasExplicitGraphDatasetSelection: Ref<boolean>
 	isGraphDatasetSelectionActive: Ref<boolean>
 	selectedGraphDatasetIds: Ref<string[]>
+	defaultGraphDatasetIds: Ref<string[]>
+	topGraphDatasetIds: Ref<string[]>
 	currentTotals: ComputedRef<AnalyticsDashboardTotals>
 	previousTotals: ComputedRef<AnalyticsDashboardTotals>
 	percentChanges: ComputedRef<AnalyticsDashboardPercentChanges>
@@ -1344,6 +1346,8 @@ export function createAnalyticsDashboardContext(
 	const hasExplicitGraphDatasetSelection = ref(initialGraphState.selectedGraphDatasetIds !== null)
 	const isGraphDatasetSelectionActive = ref(false)
 	const selectedGraphDatasetIds = ref<string[]>(initialGraphState.selectedGraphDatasetIds ?? [])
+	const defaultGraphDatasetIds = ref<string[]>([])
+	const topGraphDatasetIds = ref<string[]>([])
 	const selectedProjectIds = ref<string[]>(initialQueryState.selectedProjectIds)
 	const selectedTimeframeMode = ref<AnalyticsTimeframeMode>(initialQueryState.selectedTimeframeMode)
 	const selectedTimeframe = ref<AnalyticsTimeframePreset>(initialQueryState.selectedTimeframe)
@@ -2744,6 +2748,8 @@ export function createAnalyticsDashboardContext(
 		hasExplicitGraphDatasetSelection,
 		isGraphDatasetSelectionActive,
 		selectedGraphDatasetIds,
+		defaultGraphDatasetIds,
+		topGraphDatasetIds,
 		currentTotals,
 		previousTotals,
 		percentChanges,

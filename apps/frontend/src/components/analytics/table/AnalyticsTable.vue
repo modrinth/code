@@ -198,6 +198,8 @@ type DisplayedRowsCache = {
 const {
 	hasProjectContext,
 	projects,
+	selectedProjectIds: currentSelectedProjectIds,
+	selectedBreakdowns: currentSelectedBreakdowns,
 	displayedSelectedProjectIds: selectedProjectIds,
 	displayedSelectedGroupBy: selectedGroupBy,
 	displayedSelectedBreakdowns: selectedBreakdowns,
@@ -208,6 +210,8 @@ const {
 	hasExplicitGraphDatasetSelection,
 	isGraphDatasetSelectionActive,
 	selectedGraphDatasetIds,
+	defaultGraphDatasetIds,
+	topGraphDatasetIds,
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	versionNumbersById,
@@ -243,7 +247,6 @@ const modeBuildRequestIds: Record<TableMode, number> = {
 	date_breakdown: 0,
 	breakdown_only: 0,
 }
-const selectDefaultGraphDatasetsWhenSelectionEmpties = ref(false)
 let tableCacheGeneration = 0
 let displayedSortedRowsGeneration = 0
 const displayedTableMode = ref<TableMode>('breakdown_only')
@@ -635,13 +638,23 @@ const selectableGraphDatasetIds = computed(() => getSelectableGraphDatasetIds(so
 const filteredSelectableGraphDatasetIds = computed(() =>
 	getSelectableGraphDatasetIds(filteredRows.value),
 )
+const sortedMetricGraphDatasetIds = computed(() => getMetricSortedGraphDatasetIds(sortedRows.value))
+const defaultSelectedGraphDatasetIds = computed(() => {
+	const sortedMetricIds = sortedMetricGraphDatasetIds.value
+	const defaultIds = sortedMetricIds.length > 0 ? sortedMetricIds : selectableGraphDatasetIds.value
+	return defaultIds.slice(0, GRAPH_DATASET_SELECTION_LIMIT)
+})
 const tableSelectedGraphDatasetIds = computed<unknown[]>({
 	get: () => selectedGraphDatasetIds.value,
 	set: (ids) => {
-		selectedGraphDatasetIds.value = ids.filter((id): id is string => typeof id === 'string')
-		if (showGraphDatasetSelection.value) {
-			hasExplicitGraphDatasetSelection.value = true
+		const nextGraphDatasetIds = ids.filter((id): id is string => typeof id === 'string')
+		if (showGraphDatasetSelection.value && isDefaultGraphDatasetSelection(nextGraphDatasetIds)) {
+			setSelectedGraphDatasetIds(defaultSelectedGraphDatasetIds.value, false)
+			return
 		}
+
+		selectedGraphDatasetIds.value = nextGraphDatasetIds
+		hasExplicitGraphDatasetSelection.value = showGraphDatasetSelection.value
 	},
 })
 
@@ -654,9 +667,6 @@ watch(
 	showGraphDatasetSelection,
 	(nextShowSelection) => {
 		isGraphDatasetSelectionActive.value = nextShowSelection
-		if (!nextShowSelection) {
-			setSelectedGraphDatasetIds([], false)
-		}
 	},
 	{ immediate: true },
 )
@@ -672,70 +682,71 @@ watch(activeStat, () => {
 	applyActiveStatSort()
 })
 
-watch(selectedBreakdowns, () => {
+function resetGraphDatasetSelection() {
 	setSelectedGraphDatasetIds([], false)
-})
+}
+
+function isDefaultGraphDatasetSelection(ids: string[]) {
+	const defaultIds = defaultSelectedGraphDatasetIds.value
+	if (defaultIds.length === 0 || ids.length !== defaultIds.length) {
+		return false
+	}
+
+	const selectedIdSet = new Set(ids)
+	return defaultIds.every((id) => selectedIdSet.has(id))
+}
 
 watch(
-	[selectedProjectIds, selectedFilters],
-	() => {
-		selectDefaultGraphDatasetsWhenSelectionEmpties.value = true
+	currentSelectedBreakdowns,
+	(nextBreakdowns, previousBreakdowns) => {
+		if (areStringArraysEqual(nextBreakdowns, previousBreakdowns ?? [])) {
+			return
+		}
+
+		resetGraphDatasetSelection()
 	},
 	{ deep: true },
 )
 
 watch(
-	[selectableGraphDatasetIds, showGraphDatasetSelection, hasExplicitGraphDatasetSelection],
-	(
-		[nextSelectableGraphDatasetIds, nextShowGraphDatasetSelection, nextHasExplicitSelection],
-		previousValues,
-	) => {
-		if (!nextShowGraphDatasetSelection) {
-			selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
+	currentSelectedProjectIds,
+	(nextProjectIds, previousProjectIds) => {
+		if (areStringArraysEqual(nextProjectIds, previousProjectIds ?? [])) {
 			return
 		}
 
-		const previousSelectableGraphDatasetIds = previousValues?.[0] ?? []
-		const didSelectableGraphDatasetsChange = !areStringArraysEqual(
-			previousSelectableGraphDatasetIds,
-			nextSelectableGraphDatasetIds,
-		)
-		const nextSelectableGraphDatasetIdSet = new Set(nextSelectableGraphDatasetIds)
-		const nextSelectedGraphDatasetIds = selectedGraphDatasetIds.value.filter((datasetId) =>
-			nextSelectableGraphDatasetIdSet.has(datasetId),
-		)
+		resetGraphDatasetSelection()
+	},
+	{ deep: true },
+)
+
+watch(
+	[defaultSelectedGraphDatasetIds, sortedMetricGraphDatasetIds, showGraphDatasetSelection],
+	([nextDefaultGraphDatasetIds, nextTopGraphDatasetIds, nextShowGraphDatasetSelection]) => {
+		defaultGraphDatasetIds.value = nextShowGraphDatasetSelection
+			? [...nextDefaultGraphDatasetIds]
+			: []
+		topGraphDatasetIds.value = nextShowGraphDatasetSelection ? [...nextTopGraphDatasetIds] : []
+	},
+	{ immediate: true },
+)
+
+watch(
+	[defaultSelectedGraphDatasetIds, showGraphDatasetSelection, hasExplicitGraphDatasetSelection],
+	([nextDefaultGraphDatasetIds, nextShowGraphDatasetSelection, nextHasExplicitSelection]) => {
+		if (!nextShowGraphDatasetSelection) {
+			return
+		}
 
 		if (nextHasExplicitSelection) {
-			if (
-				selectDefaultGraphDatasetsWhenSelectionEmpties.value &&
-				didSelectableGraphDatasetsChange &&
-				nextSelectedGraphDatasetIds.length === 0 &&
-				nextSelectableGraphDatasetIds.length > 0
-			) {
-				selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
-				setSelectedGraphDatasetIds(
-					getDefaultSelectedGraphDatasetIds(nextSelectableGraphDatasetIds),
-					false,
-				)
-				return
-			}
-
-			if (didSelectableGraphDatasetsChange) {
-				selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
-			}
-
-			if (!areStringArraysEqual(selectedGraphDatasetIds.value, nextSelectedGraphDatasetIds)) {
-				setSelectedGraphDatasetIds(nextSelectedGraphDatasetIds, true)
+			if (isDefaultGraphDatasetSelection(selectedGraphDatasetIds.value)) {
+				setSelectedGraphDatasetIds(nextDefaultGraphDatasetIds, false)
 			}
 			return
 		}
 
-		selectDefaultGraphDatasetsWhenSelectionEmpties.value = false
-		const defaultSelectedGraphDatasetIds = getDefaultSelectedGraphDatasetIds(
-			nextSelectableGraphDatasetIds,
-		)
-		if (!areStringArraysEqual(selectedGraphDatasetIds.value, defaultSelectedGraphDatasetIds)) {
-			setSelectedGraphDatasetIds(defaultSelectedGraphDatasetIds, false)
+		if (!areStringArraysEqual(selectedGraphDatasetIds.value, nextDefaultGraphDatasetIds)) {
+			setSelectedGraphDatasetIds(nextDefaultGraphDatasetIds, false)
 		}
 	},
 	{ immediate: true },
@@ -1276,14 +1287,52 @@ function getGraphDatasetId(
 	return getAnalyticsBreakdownDatasetId(breakdownValues, selectedBreakdowns)
 }
 
-function getDefaultSelectedGraphDatasetIds(ids: string[]): string[] {
-	return ids.length > GRAPH_DATASET_SELECTION_LIMIT
-		? ids.slice(0, GRAPH_DATASET_SELECTION_LIMIT)
-		: ids
-}
-
 function getSelectableGraphDatasetIds(rows: AnalyticsTableRow[]): string[] {
 	return Array.from(new Set(rows.map((row) => row.graphDatasetId)))
+}
+
+function getMetricSortedGraphDatasetIds(rows: AnalyticsTableRow[]): string[] {
+	const metricColumn = getMetricSortColumn(sortColumn.value)
+	if (!metricColumn) {
+		return []
+	}
+
+	const totalsByGraphDatasetId = new Map<string, number>()
+	const labelsByGraphDatasetId = new Map<string, string>()
+	for (const row of rows) {
+		totalsByGraphDatasetId.set(
+			row.graphDatasetId,
+			(totalsByGraphDatasetId.get(row.graphDatasetId) ?? 0) + row[metricColumn],
+		)
+		if (!labelsByGraphDatasetId.has(row.graphDatasetId)) {
+			labelsByGraphDatasetId.set(row.graphDatasetId, row.breakdownDisplay)
+		}
+	}
+
+	return Array.from(totalsByGraphDatasetId.keys()).sort((left, right) => {
+		const totalDifference =
+			(totalsByGraphDatasetId.get(right) ?? 0) - (totalsByGraphDatasetId.get(left) ?? 0)
+		return (
+			totalDifference ||
+			sortCollator.compare(
+				labelsByGraphDatasetId.get(left) ?? left,
+				labelsByGraphDatasetId.get(right) ?? right,
+			) ||
+			left.localeCompare(right)
+		)
+	})
+}
+
+function getMetricSortColumn(column: TableColumnKey | undefined): AnalyticsDashboardStat | null {
+	switch (column) {
+		case 'views':
+		case 'downloads':
+		case 'revenue':
+		case 'playtime':
+			return column
+		default:
+			return null
+	}
 }
 
 function getGroupByLabel(groupBy: string): string {

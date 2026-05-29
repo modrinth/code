@@ -368,6 +368,8 @@ const {
 	hasExplicitGraphDatasetSelection,
 	isGraphDatasetSelectionActive,
 	selectedGraphDatasetIds,
+	defaultGraphDatasetIds,
+	topGraphDatasetIds: tableTopGraphDatasetIds,
 	selectedProjectIds: currentSelectedProjectIds,
 	hasPreviousPeriodComparison,
 	hasProjectContext,
@@ -744,8 +746,13 @@ const sortedChartDatasetIds = computed(() =>
 		})
 		.map((dataset) => dataset.projectId),
 )
-const topGraphDatasetIds = computed(() =>
+const chartTopGraphDatasetIds = computed(() =>
 	sortedChartDatasetIds.value.slice(0, TOP_GRAPH_DATASET_LIMIT),
+)
+const fallbackDefaultGraphDatasetIds = computed(() =>
+	defaultGraphDatasetIds.value.length > 0
+		? defaultGraphDatasetIds.value
+		: chartTopGraphDatasetIds.value,
 )
 const isShowingAllTableItems = computed(() => {
 	if (selectedGraphDatasetIds.value.length !== sortedChartDatasetIds.value.length) return false
@@ -753,13 +760,16 @@ const isShowingAllTableItems = computed(() => {
 	return sortedChartDatasetIds.value.every((datasetId) => selectedDatasetIds.has(datasetId))
 })
 const isShowingTopGraphDatasets = computed(() => {
-	if (selectedGraphDatasetIds.value.length !== topGraphDatasetIds.value.length) return false
+	if (selectedGraphDatasetIds.value.length !== fallbackDefaultGraphDatasetIds.value.length)
+		return false
 	const selectedDatasetIds = new Set(selectedGraphDatasetIds.value)
-	return topGraphDatasetIds.value.every((datasetId) => selectedDatasetIds.has(datasetId))
+	return fallbackDefaultGraphDatasetIds.value.every((datasetId) =>
+		selectedDatasetIds.has(datasetId),
+	)
 })
 const isShowingTopTableItems = computed(() => {
 	const topDatasetIds = new Set(
-		sortedChartDatasetIds.value.slice(0, selectedGraphDatasetIds.value.length),
+		tableTopGraphDatasetIds.value.slice(0, selectedGraphDatasetIds.value.length),
 	)
 	return selectedGraphDatasetIds.value.every((datasetId) => topDatasetIds.has(datasetId))
 })
@@ -891,7 +901,7 @@ const shouldUseDefaultGraphDatasetSelection = computed(
 )
 const selectedGraphDatasetIdSet = computed(() => {
 	if (shouldUseDefaultGraphDatasetSelection.value) {
-		return new Set(topGraphDatasetIds.value)
+		return new Set(fallbackDefaultGraphDatasetIds.value)
 	}
 
 	return new Set(selectedGraphDatasetIds.value)
@@ -927,7 +937,7 @@ const graphRenderLimitButtonLabel = computed(() =>
 const showTopGraphDatasetsButton = computed(
 	() =>
 		isGraphDatasetSelectionActive.value &&
-		topGraphDatasetIds.value.length > 0 &&
+		tableTopGraphDatasetIds.value.length > 0 &&
 		!isShowingTopGraphDatasets.value,
 )
 const isGraphRenderDatasetLimitActive = computed(
