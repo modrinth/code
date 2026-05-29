@@ -225,8 +225,12 @@ pub async fn get_linked_modpack_info(
     };
 
     // Check for updates
-    let (has_update, update_version_id, update_version) =
-        check_modpack_update(&linked_data.version_id, &version, all_versions);
+    let (has_update, update_version_id, update_version) = check_modpack_update(
+        &linked_data.version_id,
+        &version,
+        all_versions,
+        profile.show_prerelease_updates,
+    );
 
     Ok(Some(LinkedModpackInfo {
         project,
@@ -244,6 +248,7 @@ fn check_modpack_update(
     installed_version_id: &str,
     installed_version: &Version,
     all_versions: Option<Vec<Version>>,
+    show_prerelease_updates: bool,
 ) -> (bool, Option<String>, Option<Version>) {
     let Some(versions) = all_versions else {
         return (false, None, None);
@@ -254,6 +259,7 @@ fn check_modpack_update(
         .filter(|v| {
             v.id != installed_version_id
                 && v.date_published > installed_version.date_published
+                && (show_prerelease_updates || v.version_type == "release")
         })
         .collect();
 

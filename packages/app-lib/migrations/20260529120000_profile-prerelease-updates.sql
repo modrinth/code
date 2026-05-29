@@ -1,0 +1,2 @@
+ALTER TABLE profiles
+ADD COLUMN show_prerelease_updates INTEGER NOT NULL DEFAULT FALSE;

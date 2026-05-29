@@ -22,6 +22,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import PaperChannelBadge from '#ui/components/base/PaperChannelBadge.vue'
+import Toggle from '#ui/components/base/Toggle.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -290,6 +291,15 @@ const messages = defineMessages({
 		id: 'installation-settings.reinstalling-modpack',
 		defaultMessage: 'Reinstalling modpack',
 	},
+	showPrereleaseUpdatesTitle: {
+		id: 'installation-settings.show-prerelease-updates.title',
+		defaultMessage: 'Show beta and alpha updates',
+	},
+	showPrereleaseUpdatesDescription: {
+		id: 'installation-settings.show-prerelease-updates.description',
+		defaultMessage:
+			'Shows prerelease project versions as available updates for this instance.',
+	},
 	unlinkButton: {
 		id: 'installation-settings.unlink',
 		defaultMessage: 'Unlink',
@@ -344,6 +354,26 @@ const messages = defineMessages({
 						></span>
 					</div>
 				</div>
+			</div>
+
+			<div
+				v-if="ctx.showPrereleaseUpdates && ctx.setShowPrereleaseUpdates"
+				class="flex items-center gap-4 justify-between"
+			>
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.showPrereleaseUpdatesTitle) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.showPrereleaseUpdatesDescription) }}
+					</p>
+				</div>
+				<Toggle
+					id="show-prerelease-updates"
+					:model-value="ctx.showPrereleaseUpdates.value"
+					:disabled="ctx.isBusy.value"
+					@update:model-value="ctx.setShowPrereleaseUpdates"
+				/>
 			</div>
 
 			<!-- LINKED -->

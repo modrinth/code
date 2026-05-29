@@ -2,7 +2,8 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash, cache_file_hash,
+    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash,
+    FileUpdateChannelPolicy, cache_file_hash,
 };
 use crate::util;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
@@ -39,6 +40,7 @@ pub struct Profile {
     pub groups: Vec<String>,
 
     pub linked_data: Option<LinkedData>,
+    pub show_prerelease_updates: bool,
 
     pub created: DateTime<Utc>,
     pub modified: DateTime<Utc>,
@@ -295,6 +297,7 @@ struct ProfileQueryResult {
     linked_project_id: Option<String>,
     linked_version_id: Option<String>,
     locked: Option<i64>,
+    show_prerelease_updates: i64,
     created: i64,
     modified: i64,
     last_played: Option<i64>,
@@ -344,6 +347,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
             } else {
                 None
             },
+            show_prerelease_updates: x.show_prerelease_updates == 1,
             created: Utc
                 .timestamp_opt(x.created, 0)
                 .single()
@@ -394,7 +398,7 @@ macro_rules! select_profiles_with_predicate {
                 path, install_stage, launcher_feature_version, name, icon_path,
                 game_version, protocol_version, mod_loader, mod_loader_version,
                 json(groups) as "groups!: serde_json::Value",
-                linked_project_id, linked_version_id, locked,
+                linked_project_id, linked_version_id, locked, show_prerelease_updates,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
                 override_java_path,
@@ -514,7 +518,7 @@ impl Profile {
                 path, install_stage, name, icon_path,
                 game_version, mod_loader, mod_loader_version,
                 groups,
-                linked_project_id, linked_version_id, locked,
+                linked_project_id, linked_version_id, locked, show_prerelease_updates,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
@@ -526,13 +530,13 @@ impl Profile {
                 $1, $2, $3, $4,
                 $5, $6, $7,
                 jsonb($8),
-                $9, $10, $11,
-                $12, $13, $14,
-                $15, $16,
-                $17, jsonb($18), jsonb($19),
-                $20, $21, $22, $23,
-                $24, $25, $26,
-                $27, $28
+                $9, $10, $11, $12,
+                $13, $14, $15,
+                $16, $17,
+                $18, jsonb($19), jsonb($20),
+                $21, $22, $23, $24,
+                $25, $26, $27,
+                $28, $29
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -548,28 +552,29 @@ impl Profile {
                 linked_project_id = $9,
                 linked_version_id = $10,
                 locked = $11,
+                show_prerelease_updates = $12,
 
-                created = $12,
-                modified = $13,
-                last_played = $14,
+                created = $13,
+                modified = $14,
+                last_played = $15,
 
-                submitted_time_played = $15,
-                recent_time_played = $16,
+                submitted_time_played = $16,
+                recent_time_played = $17,
 
-                override_java_path = $17,
-                override_extra_launch_args = jsonb($18),
-                override_custom_env_vars = jsonb($19),
-                override_mc_memory_max = $20,
-                override_mc_force_fullscreen = $21,
-                override_mc_game_resolution_x = $22,
-                override_mc_game_resolution_y = $23,
+                override_java_path = $18,
+                override_extra_launch_args = jsonb($19),
+                override_custom_env_vars = jsonb($20),
+                override_mc_memory_max = $21,
+                override_mc_force_fullscreen = $22,
+                override_mc_game_resolution_x = $23,
+                override_mc_game_resolution_y = $24,
 
-                override_hook_pre_launch = $24,
-                override_hook_wrapper = $25,
-                override_hook_post_exit = $26,
+                override_hook_pre_launch = $25,
+                override_hook_wrapper = $26,
+                override_hook_post_exit = $27,
 
-                protocol_version = $27,
-                launcher_feature_version = $28
+                protocol_version = $28,
+                launcher_feature_version = $29
             ",
             self.path,
             install_stage,
@@ -582,6 +587,7 @@ impl Profile {
             linked_data_project_id,
             linked_data_version_id,
             linked_data_locked,
+            self.show_prerelease_updates,
             created,
             modified,
             last_played,
@@ -1211,8 +1217,14 @@ impl Profile {
     }
 
     fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
+        let channel_policy = if profile.show_prerelease_updates {
+            FileUpdateChannelPolicy::All
+        } else {
+            FileUpdateChannelPolicy::ReleaseOnly
+        };
+
         format!(
-            "{}-{}-{}",
+            "{}-{}-{}-{}",
             file.hash,
             file.project_type
                 .filter(|x| *x != ProjectType::Mod)
@@ -1220,6 +1232,7 @@ impl Profile {
                     || profile.loader.as_str().to_string(),
                     |x| x.get_loaders().join("+")
                 ),
+            channel_policy.key(),
             profile.game_version
         )
     }

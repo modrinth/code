@@ -273,6 +273,10 @@ provideInstallationSettings({
 	isServer: false,
 	isApp: true,
 	showModpackVersionActions: !isMinecraftServer.value,
+	showPrereleaseUpdates: computed(() => instance.value.show_prerelease_updates),
+	setShowPrereleaseUpdates: async (value: boolean) => {
+		await edit(instance.value.path, { show_prerelease_updates: value }).catch(handleError)
+	},
 	repairing,
 	reinstalling,
 })

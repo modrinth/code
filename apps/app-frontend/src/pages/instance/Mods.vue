@@ -1194,6 +1194,15 @@ watch(
 	},
 )
 
+watch(
+	() => props.instance?.show_prerelease_updates,
+	async (newValue, oldValue) => {
+		if (newValue !== oldValue) {
+			await initProjects('must_revalidate')
+		}
+	},
+)
+
 onUnmounted(() => {
 	isUnmounted = true
 	removeBeforeEach()

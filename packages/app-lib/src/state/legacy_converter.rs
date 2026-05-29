@@ -5,9 +5,9 @@ use crate::state;
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
-    DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion, LinkedData,
-    MemorySettings, ModrinthCredentials, Profile, ProfileInstallStage,
-    TeamMember, Theme, VersionFile, WindowSize,
+    DeviceTokenPair, FileType, FileUpdateChannelPolicy, Hooks,
+    LauncherFeatureVersion, LinkedData, MemorySettings, ModrinthCredentials,
+    Profile, ProfileInstallStage, TeamMember, Theme, VersionFile, WindowSize,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
@@ -248,6 +248,10 @@ where
                                     loaders: vec![
                                         mod_loader.as_str().to_string(),
                                     ],
+                                    channel_policy:
+                                        FileUpdateChannelPolicy::All
+                                            .key()
+                                            .to_string(),
                                     update_version_id: update_version
                                         .id
                                         .clone(),
@@ -333,6 +337,7 @@ where
 
                         None
                     }),
+                    show_prerelease_updates: false,
                     created: profile.metadata.date_created,
                     modified: profile.metadata.date_modified,
                     last_played: profile.metadata.last_played,

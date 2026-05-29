@@ -14,6 +14,7 @@ export type GameInstance = {
 	groups: string[]
 
 	linked_data?: LinkedData
+	show_prerelease_updates: boolean
 
 	created: Date
 	modified: Date
