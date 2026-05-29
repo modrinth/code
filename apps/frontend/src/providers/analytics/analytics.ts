@@ -9,7 +9,7 @@ import {
 	PROJECT_STATUS_FILTER_VALUES,
 	type ProjectStatusFilterValue,
 	sanitizeAnalyticsSelectedFilters,
-} from '~/components/analytics/query-builder/query-filter/queryFilter'
+} from '~/components/analytics/query-builder/query-filter/query-filter'
 
 import type { OrganizationContext } from '../organization-context'
 import {

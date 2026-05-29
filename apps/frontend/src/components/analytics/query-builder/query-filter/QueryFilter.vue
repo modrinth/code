@@ -218,7 +218,7 @@ import {
 	normalizeSelectedValues as normalizeSelectedFilterValues,
 	type ProjectVersionFilterOption,
 	type ProjectVersionFilterOptionProjectMetadata,
-} from './queryFilter'
+} from './query-filter.ts'
 
 type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'project'>
 type GameVersionType = 'release' | 'all'
