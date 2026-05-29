@@ -20,6 +20,7 @@ type UseAnalyticsTableGraphSelectionOptions = {
 	isGraphDatasetSelectionActive: Ref<boolean>
 	defaultGraphDatasetIds: Ref<string[]>
 	topGraphDatasetIds: Ref<string[]>
+	queryResetToken: Ref<number>
 	currentSelectedBreakdowns: Ref<AnalyticsSelectedBreakdowns>
 	currentSelectedProjectIds: Ref<string[]>
 	activeStat: Ref<AnalyticsDashboardStat>
@@ -39,6 +40,7 @@ export function useAnalyticsTableGraphSelection({
 	isGraphDatasetSelectionActive,
 	defaultGraphDatasetIds,
 	topGraphDatasetIds,
+	queryResetToken,
 	currentSelectedBreakdowns,
 	currentSelectedProjectIds,
 	activeStat,
@@ -99,8 +101,8 @@ export function useAnalyticsTableGraphSelection({
 	}
 
 	watch(
-		showGraphDatasetSelection,
-		(nextShowSelection) => {
+		[showGraphDatasetSelection, queryResetToken],
+		([nextShowSelection]) => {
 			isGraphDatasetSelectionActive.value = nextShowSelection
 		},
 		{ immediate: true },
@@ -153,7 +155,12 @@ export function useAnalyticsTableGraphSelection({
 	)
 
 	watch(
-		[defaultSelectedGraphDatasetIds, showGraphDatasetSelection, hasExplicitGraphDatasetSelection],
+		[
+			defaultSelectedGraphDatasetIds,
+			showGraphDatasetSelection,
+			hasExplicitGraphDatasetSelection,
+			queryResetToken,
+		],
 		([nextDefaultGraphDatasetIds, nextShowGraphDatasetSelection, nextHasExplicitSelection]) => {
 			if (!nextShowGraphDatasetSelection) {
 				return
