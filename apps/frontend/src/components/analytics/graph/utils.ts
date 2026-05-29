@@ -720,26 +720,79 @@ function formatSmallAxisNumber(value: number): string {
 	return formattedValue.replace(/\.?0+$/, '')
 }
 
+const COMPACT_AXIS_UNITS = [
+	{ threshold: 1_000_000, divisor: 1_000_000, suffix: 'M' },
+	{ threshold: 1_000, divisor: 1_000, suffix: 'K' },
+] as const
+const MAX_COMPACT_AXIS_DIGITS = 3
+
+function getCompactAxisUnit(values: readonly number[]) {
+	let maxAbsoluteValue = 0
+	for (const value of values) {
+		if (Number.isFinite(value)) {
+			maxAbsoluteValue = Math.max(maxAbsoluteValue, Math.abs(value))
+		}
+	}
+
+	return COMPACT_AXIS_UNITS.find((unit) => maxAbsoluteValue >= unit.threshold) ?? null
+}
+
+function formatCompactAxisNumber(value: number, axisValues: readonly number[]): string | null {
+	const unit = getCompactAxisUnit(axisValues)
+	if (!unit) return null
+
+	return `${formatCompactAxisValue(value / unit.divisor)}${unit.suffix}`
+}
+
+function formatCompactAxisValue(value: number): string {
+	const absoluteValue = Math.abs(value)
+	if (absoluteValue === 0) return '0'
+
+	const integerDigitCount = absoluteValue < 1 ? 1 : Math.floor(absoluteValue).toString().length
+	const fractionDigitCount = Math.max(0, MAX_COMPACT_AXIS_DIGITS - integerDigitCount)
+	const roundedValue = Number(value.toFixed(fractionDigitCount))
+	const roundedIntegerDigitCount =
+		Math.abs(roundedValue) < 1 ? 1 : Math.floor(Math.abs(roundedValue)).toString().length
+
+	if (roundedIntegerDigitCount > MAX_COMPACT_AXIS_DIGITS) {
+		const truncatedValue = Math.sign(value) * (10 ** MAX_COMPACT_AXIS_DIGITS - 1)
+		return String(truncatedValue)
+	}
+
+	return roundedValue.toFixed(fractionDigitCount).replace(/\.?0+$/, '')
+}
+
 export function formatAxisValue(
 	value: number,
 	activeStat: AnalyticsDashboardStat,
 	formatCompact: (value: number) => string,
+	axisValues: readonly number[] = [value],
 ): string {
 	switch (activeStat) {
-		case 'revenue':
-			return `$${formatCompact(Math.round(value * 100) / 100)}`
+		case 'revenue': {
+			const amount = Math.round(value * 100) / 100
+			const axisAmounts = axisValues.map((axisValue) => Math.round(axisValue * 100) / 100)
+			return `$${formatCompactAxisNumber(amount, axisAmounts) ?? formatCompact(amount)}`
+		}
 		case 'playtime': {
 			const hours = value / 3600
-			const formattedHours =
-				Math.abs(hours) < 10 ? formatSmallAxisNumber(hours) : formatCompact(Math.round(hours))
-			return formattedHours
+			const axisHours = axisValues.map((axisValue) => axisValue / 3600)
+			const formattedHours = formatCompactAxisNumber(hours, axisHours)
+			if (formattedHours) return formattedHours
+			if (Math.abs(hours) < 10) return formatSmallAxisNumber(hours)
+			return `${formatCompact(Math.round(hours))} h`
 		}
 		case 'views':
 		case 'downloads':
-		default:
+		default: {
+			const roundedValue = Math.round(value)
+			const roundedAxisValues = axisValues.map((axisValue) => Math.round(axisValue))
+			const formattedValue = formatCompactAxisNumber(roundedValue, roundedAxisValues)
+			if (formattedValue) return formattedValue
 			if (Math.abs(value) < 10) {
 				return formatSmallAxisNumber(value)
 			}
-			return formatCompact(Math.round(value))
+			return formatCompact(roundedValue)
+		}
 	}
 }

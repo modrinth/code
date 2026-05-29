@@ -107,7 +107,7 @@ const PINNED_DRAG_THRESHOLD_PX = 6
 const RANGE_SELECT_THRESHOLD_PX = 8
 const EMPTY_DATA_Y_AXIS_MAX = 10
 const EMPTY_DATA_Y_AXIS_STEP = 2
-const Y_AXIS_WIDTH = 44
+const Y_AXIS_WIDTH = 56
 const SECONDS_PER_HOUR = 60 * 60
 const DIMMED_SERIES_OPACITY = 0.5
 const DIMMED_SERIES_COLOR = 'var(--color-text-tertiary)'
@@ -652,12 +652,15 @@ function buildConfig(): ChartConfiguration {
 							: hasData
 								? {}
 								: { stepSize: getEmptyDataYAxisStepSize() }),
-						callback: (tickValue) => {
+						callback: (tickValue, _index, ticks) => {
 							const numeric =
 								typeof tickValue === 'number' ? tickValue : Number.parseFloat(String(tickValue))
 							if (!Number.isFinite(numeric)) return String(tickValue)
 							if (props.ratioMode) return `${numeric}%`
-							return formatAxisValue(numeric, props.activeStat, formatCompactNumber)
+							const tickValues = ticks
+								.map((tick) => tick.value)
+								.filter((value) => Number.isFinite(value))
+							return formatAxisValue(numeric, props.activeStat, formatCompactNumber, tickValues)
 						},
 					},
 				},

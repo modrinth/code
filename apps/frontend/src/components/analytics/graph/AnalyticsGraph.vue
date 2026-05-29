@@ -199,7 +199,7 @@
 
 			<div
 				ref="chartContainer"
-				class="relative h-[460px] select-none"
+				class="relative -ml-4 h-[460px] select-none"
 				@click="onChartClick"
 				@wheel.capture="onChartWheel"
 			>
