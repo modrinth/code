@@ -645,7 +645,7 @@
     "message": "Memória alocada"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/caminho/para/java"
+    "message": "/caminho/ao/java"
   },
   "instance.settings.tabs.window": {
     "message": "Janela"

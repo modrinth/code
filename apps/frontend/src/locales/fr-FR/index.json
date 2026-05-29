@@ -105,7 +105,7 @@
     "message": "Moniteur d'activité"
   },
   "app-marketing.features.performance.cpu-percent": {
-    "message": "Pourcentage du processeur"
+    "message": "% Processeur"
   },
   "app-marketing.features.performance.description": {
     "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de mémoire vive !"
@@ -126,7 +126,7 @@
     "message": "∞ * ∞ Mo"
   },
   "app-marketing.features.performance.less-than-150mb": {
-    "message": "moins de 150 Mo"
+    "message": "< 150 Mo"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -165,7 +165,7 @@
     "message": "Partagez des modpacks"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Un launcher comme"
+    "message": "Contrairement à tous les autres launchers"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
@@ -174,7 +174,7 @@
     "message": "Intégration au site Web"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "vous n'en avez jamais vu"
+    "message": "vous avez utilisé avant"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Capture d'écran de Modrinth App avec une instance Cobblemon ouverte sur la page « Contenu »."
@@ -1881,7 +1881,7 @@
     "message": "Erreur lors de la génération de l’état à partir de l’API pendant la construction."
   },
   "layout.banner.preview.description": {
-    "message": "Si vous voulez accéder au site officiel de Modrinth, visitez {url}. Cet aperçu\nde déploiement est utilisée par le staff de Modrinth pour des raisons d'essai.\nIl a été construit en utilisant <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Si vous souhaitez accéder au site web officiel de Modrinth, rendez-vous sûr {url}. Cette version anticipée est utilisée par l'équipe de Modrinth à des fins de test. Elle a été créée avec {ref}."
   },
   "layout.banner.preview.title": {
     "message": "Ceci est un déploiement de prévisualisation du site Modrinth."

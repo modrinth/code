@@ -1880,9 +1880,6 @@
   "layout.banner.build-fail.title": {
     "message": "构建期间从 API 生成状态时发生错误。"
   },
-  "layout.banner.preview.description": {
-    "message": "如果你是想前往 Modrinth 的官方网站，请前往 {url}。这个预览部署版本仅供 Modrinth 工作人员测试使用。它是基于 <branch-link>{owner}/{branch}</branch-link> @ {commit} 构建而成。"
-  },
   "layout.banner.preview.title": {
     "message": "这是 Modrinth 网站的预览部署版本。"
   },

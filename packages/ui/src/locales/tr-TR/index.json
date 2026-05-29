@@ -356,6 +356,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} güncellendi"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Devre dışı"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Etkin"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Güncellemeler"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Uyarı"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Yedekleniyor..."
   },
@@ -632,14 +644,26 @@
   "creation-flow.modal.final-config.world-type.label": {
     "defaultMessage": "Dünya türü"
   },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "Büyük Biyomlar"
+  },
   "creation-flow.modal.final-config.world-type.placeholder": {
     "defaultMessage": "Dünya türü seçin"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "Tek Biyom"
   },
   "creation-flow.modal.final-config.world-type.superflat": {
     "defaultMessage": "Dümdüz"
   },
   "creation-flow.modal.import-instance.action.add": {
     "defaultMessage": "Ekle"
+  },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "Modpacklere göz atın"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "Mod paketini dışa aktar"
   },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Yüklemek istediğiniz mod paketini zaten biliyor musunuz?"
@@ -656,11 +680,59 @@
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Bir yükleyici ve sürüm seçerek başlayın."
   },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "Özel Kurulum"
+  },
   "creation-flow.modal.setup-type.option.import-instance.description": {
     "defaultMessage": "Prism, CurseForge veya benzeri bir platformdan bir oturum/profil içe aktarın."
   },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "Kurulumu Dışa aktar"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Modpack İndir"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "Mod yada plugin olmayan classic Minecraft."
+  },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
     "defaultMessage": "Vanilla Minecraft"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "Yükleme Şeklini seçin"
+  },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "Yükleme Şeklini seçin"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "Dünya Türünü Seçin"
+  },
+  "creation-flow.title.choose-modpack": {
+    "defaultMessage": "Modpack seçin"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "Kurulum oluştur"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "Dünya Oluştur"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "Kurulum aktar"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "Sunucuyu Yeniden Başlat"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "Sunucu kurun"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "Hayır"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Kalıcı olarak hayır"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Evet"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Özeti ayıkla"
@@ -1130,6 +1202,9 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "İçeriği güncelleme başarısız"
   },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "İçerik yüklenemedi"
+  },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Mod paketinin içeriği yüklenemedi"
   },
@@ -1156,6 +1231,9 @@
   },
   "hosting.loader.failed-to-load-versions": {
     "defaultMessage": "Sürümler yüklenemedi"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Modpack yeniden yüklenemedi"
   },
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Sunucu tamir edilemedi"
@@ -1576,6 +1654,12 @@
   },
   "label.game-version": {
     "defaultMessage": "Oyun sürümü"
+  },
+  "label.hide-installed-content": {
+    "defaultMessage": "Zaten Yüklenmiş İçerikleri gizle"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Seçilmiş İçerikleri Gizle"
   },
   "label.installation-info": {
     "defaultMessage": "Kurulum bilgisi"
