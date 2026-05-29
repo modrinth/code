@@ -209,6 +209,13 @@ type CollisionClusterLayout = {
 	right: number
 }
 
+type CollisionClusterPlacement = {
+	group: EventGroup
+	markerWidth: number
+	markerX: number
+	index: number
+}
+
 const props = defineProps<{
 	events: AnalyticsChartEvent[]
 	activeStat: AnalyticsDashboardStat
@@ -336,7 +343,9 @@ const visibleEvents = computed<PositionedEvent[]>(() => {
 })
 
 const eventGroups = computed<EventGroup[]>(() => {
-	const groups = mergeNearbyEventGroups(buildInitialEventGroups(visibleEvents.value))
+	const groups = mergeProjectGroupsForModrinthEventDistance(
+		mergeNearbyEventGroups(buildInitialEventGroups(visibleEvents.value)),
+	)
 	const resolvedGroups = groups.map((group) => ({
 		...group,
 		id: `${group.groupKey}:${group.events.map(getEventKey).join('|')}`,
@@ -398,6 +407,78 @@ function mergeNearbyEventGroupsOnce(groups: EventGroup[]) {
 		groups: mergedGroups,
 		didMerge,
 	}
+}
+
+function mergeProjectGroupsForModrinthEventDistance(groups: EventGroup[]): EventGroup[] {
+	let nextGroups = groups
+
+	while (true) {
+		const result = mergeProjectGroupsForModrinthEventDistanceOnce(nextGroups)
+		if (!result.didMerge) return nextGroups
+
+		nextGroups = mergeNearbyEventGroups(result.groups).sort(compareEventGroupsByTarget)
+	}
+}
+
+function mergeProjectGroupsForModrinthEventDistanceOnce(groups: EventGroup[]) {
+	const clusterLayouts = getCollisionClusterLayouts(groups)
+
+	for (const layout of clusterLayouts) {
+		const projectGroupsToMerge = getProjectGroupsToMergeForModrinthEventDistance(layout)
+		if (projectGroupsToMerge.length <= 1) continue
+
+		return {
+			groups: mergeEventGroupsInList(groups, projectGroupsToMerge),
+			didMerge: true,
+		}
+	}
+
+	return {
+		groups,
+		didMerge: false,
+	}
+}
+
+function getProjectGroupsToMergeForModrinthEventDistance(layout: CollisionClusterLayout) {
+	const placements = getCollisionClusterPlacements(layout)
+	const projectPlacements = placements.filter((placement) => isProjectEventGroup(placement.group))
+	if (projectPlacements.length <= 1) return []
+
+	const distanceLimit = Math.max(...projectPlacements.map((placement) => placement.markerWidth / 2))
+	const overLimitPlacement = getMostDisplacedModrinthPlacement(placements, distanceLimit)
+	if (!overLimitPlacement) return []
+
+	const displacedModrinthPlacement = overLimitPlacement
+	const offset = displacedModrinthPlacement.markerX - displacedModrinthPlacement.group.x
+	const projectPlacementsOnOffsetSide = projectPlacements.filter((placement) =>
+		offset > 0
+			? placement.index < displacedModrinthPlacement.index
+			: placement.index > displacedModrinthPlacement.index,
+	)
+	const placementsToMerge =
+		projectPlacementsOnOffsetSide.length > 1 ? projectPlacementsOnOffsetSide : projectPlacements
+
+	return placementsToMerge.map((placement) => placement.group)
+}
+
+function getMostDisplacedModrinthPlacement(
+	placements: CollisionClusterPlacement[],
+	distanceLimit: number,
+) {
+	let largestOverage = 0
+	let overLimitPlacement: CollisionClusterPlacement | null = null
+
+	for (const placement of placements) {
+		if (!isModrinthEventGroup(placement.group)) continue
+
+		const overage = Math.abs(placement.markerX - placement.group.x) - distanceLimit
+		if (overage <= largestOverage) continue
+
+		largestOverage = overage
+		overLimitPlacement = placement
+	}
+
+	return overLimitPlacement
 }
 
 const activeGroup = computed(
@@ -514,6 +595,10 @@ function isModrinthEventGroup(group: EventGroup) {
 	return group.groupKey === 'modrinth'
 }
 
+function isProjectEventGroup(group: EventGroup) {
+	return group.groupKey === 'project'
+}
+
 function createEventGroup(event: PositionedEvent): EventGroup {
 	return {
 		id: getEventKey(event),
@@ -537,6 +622,20 @@ function mergeEventGroup(target: EventGroup, source: EventGroup) {
 	target.events = mergeSortedGroupEvents(target.events, source.events)
 	target.xSum += source.xSum
 	target.x = target.xSum / target.events.length
+}
+
+function mergeEventGroupsInList(groups: EventGroup[], groupsToMerge: EventGroup[]) {
+	const targetGroup = groupsToMerge[0]
+	if (!targetGroup) return groups
+
+	const groupsToMergeSet = new Set(groupsToMerge)
+	for (const sourceGroup of groupsToMerge.slice(1)) {
+		mergeEventGroup(targetGroup, sourceGroup)
+	}
+
+	return groups
+		.filter((group) => !groupsToMergeSet.has(group) || group === targetGroup)
+		.sort(compareEventGroupsByTarget)
 }
 
 // Both event arrays are already sorted, so this does the merge step from merge sort.
@@ -575,6 +674,14 @@ function compareGroupEvents(left: PositionedEvent, right: PositionedEvent) {
 	return left.x - right.x || left.startMs - right.startMs
 }
 
+function compareEventGroupsByTarget(left: EventGroup, right: EventGroup) {
+	return (
+		left.x - right.x ||
+		getMarkerIconOrder(left.markerIcon) - getMarkerIconOrder(right.markerIcon) ||
+		left.groupKey.localeCompare(right.groupKey)
+	)
+}
+
 function getGroupMarkerGap(left: EventGroup, right: EventGroup) {
 	return getGroupLeftEdge(right) - getGroupRightEdge(left)
 }
@@ -592,23 +699,13 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function applyCollisionOffsets(groups: EventGroup[]): EventGroup[] {
-	const sortedGroups = [...groups].sort(
-		(left, right) =>
-			left.x - right.x ||
-			getMarkerIconOrder(left.markerIcon) - getMarkerIconOrder(right.markerIcon) ||
-			left.groupKey.localeCompare(right.groupKey),
-	)
 	const offsetByGroupId = new Map<string, number>()
-	const clusterLayouts = getStableCollisionClusterLayouts(sortedGroups.map((group) => [group]))
+	const clusterLayouts = getCollisionClusterLayouts(groups)
 
 	for (const layout of clusterLayouts) {
-		let cursor = layout.left
-		layout.groups.forEach((group, index) => {
-			const markerWidth = layout.markerWidths[index]
-			const targetX = cursor + markerWidth / 2
-			offsetByGroupId.set(group.id, targetX - group.x)
-			cursor += markerWidth + GROUP_MARKER_GAP_PX
-		})
+		for (const placement of getCollisionClusterPlacements(layout)) {
+			offsetByGroupId.set(placement.group.id, placement.markerX - placement.group.x)
+		}
 	}
 
 	return groups.map((group) => ({
@@ -660,13 +757,12 @@ function compareCollisionClusterLayouts(
 	return left.left - right.left || left.right - right.right
 }
 
+function getCollisionClusterLayouts(groups: EventGroup[]) {
+	return getStableCollisionClusterLayouts(groups.map((group) => [group]))
+}
+
 function getCollisionClusterLayout(groups: EventGroup[]): CollisionClusterLayout {
-	const sortedGroups = [...groups].sort(
-		(left, right) =>
-			getMarkerIconOrder(left.markerIcon) - getMarkerIconOrder(right.markerIcon) ||
-			left.x - right.x ||
-			left.groupKey.localeCompare(right.groupKey),
-	)
+	const sortedGroups = [...groups].sort(compareEventGroupsByTarget)
 	const markerWidths = sortedGroups.map(getEstimatedMarkerWidth)
 	const totalWidth =
 		markerWidths.reduce((sum, width) => sum + width, 0) +
@@ -683,6 +779,27 @@ function getCollisionClusterLayout(groups: EventGroup[]): CollisionClusterLayout
 		left,
 		right: left + totalWidth,
 	}
+}
+
+function getCollisionClusterPlacements(
+	layout: CollisionClusterLayout,
+): CollisionClusterPlacement[] {
+	const placements: CollisionClusterPlacement[] = []
+	let cursor = layout.left
+
+	layout.groups.forEach((group, index) => {
+		const markerWidth = layout.markerWidths[index]
+		const markerX = cursor + markerWidth / 2
+		placements.push({
+			group,
+			markerWidth,
+			markerX,
+			index,
+		})
+		cursor += markerWidth + GROUP_MARKER_GAP_PX
+	})
+
+	return placements
 }
 
 function getEstimatedMarkerWidth(group: EventGroup) {
