@@ -35,7 +35,11 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
-import { type ChartDataset, DEFAULT_X_AXIS_TICK_LIMIT, formatAxisValue } from './utils'
+import {
+	type ChartDataset,
+	DEFAULT_X_AXIS_TICK_LIMIT,
+	formatAxisValue,
+} from './analytics-chart-utils'
 
 Chart.register(
 	LineController,

@@ -15,6 +15,7 @@ import {
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
 } from '../breakdown'
+import { PREVIOUS_PERIOD_DATASET_ID_PREFIX } from './analytics-chart-constants'
 
 export type ChartDataset = {
 	projectId: string
@@ -24,6 +25,30 @@ export type ChartDataset = {
 	borderColor: string
 	backgroundColor: string
 	borderDash?: number[]
+}
+
+export function getChartDatasetTotal(dataset: ChartDataset) {
+	return dataset.data.reduce((sum, value) => sum + value, 0)
+}
+
+export function getPreviousPeriodDatasetId(datasetId: string) {
+	return `${PREVIOUS_PERIOD_DATASET_ID_PREFIX}${datasetId}`
+}
+
+export function decodeBreakdownDatasetValue(value: string) {
+	try {
+		return decodeURIComponent(value)
+	} catch {
+		return value
+	}
+}
+
+export function areStringArraysEqual(left: string[], right: string[]) {
+	if (left.length !== right.length) return false
+	for (let index = 0; index < left.length; index += 1) {
+		if (left[index] !== right[index]) return false
+	}
+	return true
 }
 
 const LOADER_CHART_COLORS: Record<string, string> = {

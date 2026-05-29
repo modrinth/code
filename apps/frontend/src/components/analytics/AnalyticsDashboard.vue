@@ -28,7 +28,7 @@
 			<QueryBuilder />
 		</div>
 		<StatCards />
-		<AnalyticsGraph />
+		<AnalyticsChart />
 		<AnalyticsTable />
 	</div>
 </template>
@@ -43,7 +43,7 @@ import {
 } from '~/providers/analytics/analytics'
 import { injectOrganizationContext } from '~/providers/organization-context'
 
-import AnalyticsGraph from './graph/AnalyticsGraph.vue'
+import AnalyticsChart from './chart/AnalyticsChart.vue'
 import QueryBuilder from './query-builder/QueryBuilder.vue'
 import StatCards from './stat-cards/StatCards.vue'
 import AnalyticsTable from './table/AnalyticsTable.vue'

@@ -165,8 +165,8 @@ import type {
 	AnalyticsGroupByPreset,
 } from '~/providers/analytics/analytics'
 
-import type { AnalyticsChartGeometryPayload } from './AnalyticsChart.client.vue'
-import { isTimeRelevantForGroupBy } from './utils'
+import { isTimeRelevantForGroupBy } from '../analytics-chart-utils'
+import type { AnalyticsChartGeometryPayload } from '../AnalyticsChart.client.vue'
 
 type AnalyticsChartEventMarkerIcon = 'info' | 'flag'
 
