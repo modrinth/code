@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Project Analytics 2.0",
+			"summary": "New query builder, breakdowns, filtering, and richer project data.",
+			"thumbnail": "https://modrinth.com/news/default.webp",
+			"date": "2026-05-29T11:00:00.000Z",
+			"link": "https://modrinth.com/news/article/project-analytics-2.0"
+		},
+		{
 			"title": "Modrinth Hosting in the App",
 			"summary": "Buy, setup, and manage your server all in the Modrinth App.",
 			"thumbnail": "https://modrinth.com/news/article/modrinth-hosting-in-app/thumbnail.webp",
