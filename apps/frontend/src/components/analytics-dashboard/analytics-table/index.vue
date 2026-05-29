@@ -144,14 +144,14 @@ import {
 import type { LocationQuery } from 'vue-router'
 
 import {
-	doesProjectStatusMatchFilters,
-	injectAnalyticsDashboardContext,
-} from '~/providers/analytics/analytics'
-import {
 	hasAnalyticsTableSortQuery,
 	hasAnalyticsTableSortRouteChange,
 	readAnalyticsTableSortState,
 } from '~/components/analytics-dashboard/analytics-route-query'
+import {
+	doesProjectStatusMatchFilters,
+	injectAnalyticsDashboardContext,
+} from '~/providers/analytics/analytics'
 
 import {
 	isTimeRelevantForGroupBy,

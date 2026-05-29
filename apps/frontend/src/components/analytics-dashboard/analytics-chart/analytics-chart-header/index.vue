@@ -62,12 +62,12 @@
 import { ChartAreaIcon, ChartColumnBigIcon, ChartSplineIcon } from '@modrinth/assets'
 import { Tabs, type TabsTab, useVIntl } from '@modrinth/ui'
 
-import type { AnalyticsGraphViewMode } from '~/providers/analytics/analytics'
 import {
 	DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
 	DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 	DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
 } from '~/components/analytics-dashboard/analytics-route-query'
+import type { AnalyticsGraphViewMode } from '~/providers/analytics/analytics'
 
 import { analyticsChartMessages } from '../../analytics-messages.ts'
 import AnalyticsChartControls from './AnalyticsChartControls.vue'

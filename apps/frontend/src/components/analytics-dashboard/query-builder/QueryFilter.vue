@@ -191,6 +191,10 @@ import {
 } from '@modrinth/ui'
 
 import { useFormattedCountries } from '@/composables/country.ts'
+import {
+	areStringArraysEqual,
+	getDefaultAnalyticsBreakdownPresets,
+} from '~/components/analytics-dashboard/analytics-route-query'
 import { useGeneratedState } from '~/composables/generated'
 import {
 	type AnalyticsQueryFilterCategory,
@@ -198,10 +202,6 @@ import {
 	doesProjectStatusMatchFilters,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
-import {
-	areStringArraysEqual,
-	getDefaultAnalyticsBreakdownPresets,
-} from '~/components/analytics-dashboard/analytics-route-query'
 
 import {
 	analyticsBreakdownMessages,

@@ -407,6 +407,11 @@ import {
 } from '@modrinth/ui'
 
 import {
+	buildDefaultAnalyticsQueryBuilderState,
+	getAnalyticsBreakdownPresetsForProjectSelection,
+	MAX_ANALYTICS_BREAKDOWN_PRESETS,
+} from '~/components/analytics-dashboard/analytics-route-query'
+import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardProject,
 	type AnalyticsDashboardStat,
@@ -417,11 +422,6 @@ import {
 	getProjectIdsMatchingStatusFilter,
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
-import {
-	buildDefaultAnalyticsQueryBuilderState,
-	getAnalyticsBreakdownPresetsForProjectSelection,
-	MAX_ANALYTICS_BREAKDOWN_PRESETS,
-} from '~/components/analytics-dashboard/analytics-route-query'
 
 import {
 	analyticsMessages,
