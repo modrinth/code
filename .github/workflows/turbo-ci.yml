@@ -204,4 +204,5 @@ jobs:
       - name: Verify intl:extract has been run
         run: |
           pnpm turbo run intl:extract --force
-          git diff --exit-code --color */*/src/locales/en-US/index.json
+          pnpm scripts i18n-icu-contract prune-local --check
+          git diff --exit-code --color */*/src/locales/*/index.json

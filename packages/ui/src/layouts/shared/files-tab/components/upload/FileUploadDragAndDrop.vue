@@ -18,7 +18,7 @@
 				<p class="mt-2 text-xl">
 					{{
 						formatMessage(messages.dropToUpload, {
-							type: type ? type.toLocaleLowerCase() : undefined,
+							type: formatFileItemType(formatMessage, type?.toLocaleLowerCase(), true),
 						})
 					}}
 				</p>
@@ -32,6 +32,7 @@ import { UploadIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { formatFileItemType } from '#ui/utils/common-messages'
 
 const { formatMessage } = useVIntl()
 
@@ -47,7 +48,7 @@ defineProps<{
 const messages = defineMessages({
 	dropToUpload: {
 		id: 'files.upload.drag-and-drop.drop-to-upload',
-		defaultMessage: 'Drop {type, select, undefined {files} other {{type}s}} here to upload',
+		defaultMessage: 'Drop {type} here to upload',
 	},
 })
 

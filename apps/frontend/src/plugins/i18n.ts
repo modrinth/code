@@ -35,6 +35,25 @@ function findLocaleLoader(modules: LocaleModules, code: string) {
 	return undefined
 }
 
+function formatIcuMessage(msg: string, locale: string, values: Record<string, unknown>) {
+	const cacheKey = `${locale}:${msg}`
+	let formatter = formatterCache.get(cacheKey)
+
+	try {
+		if (!formatter) {
+			formatter = new IntlMessageFormat(msg, locale)
+			formatterCache.set(cacheKey, formatter)
+		}
+		const result = formatter.format(values)
+		if (import.meta.dev && typeof result !== 'string') {
+			debug('formatIcuMessage: format returned non-string', typeof result)
+		}
+		return result as string
+	} catch {
+		return null
+	}
+}
+
 async function loadLocale(code: string): Promise<void> {
 	if (messageCache.has(code)) {
 		debug('loadLocale: already cached', code)
@@ -148,21 +167,15 @@ export default defineNuxtPlugin({
 
 			if (!values || Object.keys(values).length === 0) return msg
 
-			const cacheKey = `${currentLocale}:${msg}`
-			let formatter = formatterCache.get(cacheKey)
-			if (!formatter) {
-				formatter = new IntlMessageFormat(msg, currentLocale)
-				formatterCache.set(cacheKey, formatter)
+			const formatted = formatIcuMessage(msg, currentLocale, values)
+			if (formatted !== null) return formatted
+
+			const fallbackMsg = fallbackMessages?.[key]
+			if (fallbackMsg && fallbackMsg !== msg) {
+				return formatIcuMessage(fallbackMsg, DEFAULT_LOCALE, values) ?? fallbackMsg
 			}
-			try {
-				const result = formatter.format(values) as string
-				if (import.meta.dev && typeof result !== 'string') {
-					debug('t: format returned non-string', key, typeof result)
-				}
-				return result
-			} catch {
-				return msg
-			}
+
+			return msg
 		}
 
 		async function setLocale(newLocale: string): Promise<void> {

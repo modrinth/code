@@ -14,9 +14,8 @@ if (!scriptName) {
 
 const scriptPath = join(__dirname, `${scriptName}.ts`)
 
-const child = spawn('pnpx', ['tsx', scriptPath, ...args], {
+const child = spawn('pnpm', ['exec', 'tsx', scriptPath, ...args], {
 	stdio: 'inherit',
-	shell: true,
 })
 
 child.on('exit', (code) => {

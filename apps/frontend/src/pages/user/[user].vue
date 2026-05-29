@@ -412,9 +412,9 @@
 							<div class="stats">
 								<BoxIcon />
 								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${
-										(collection.projects?.length || 0) !== 1 ? 's' : ''
-									}`
+									formatMessage(messages.collectionProjectsCount, {
+										count: collection.projects?.length || 0,
+									})
 								}}
 							</div>
 							<div class="stats">
@@ -590,6 +590,10 @@ const messages = defineMessages({
 	profileDownloadsLabel: {
 		id: 'profile.label.downloads',
 		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
+	},
+	collectionProjectsCount: {
+		id: 'profile.collection.projects-count',
+		defaultMessage: '{count, plural, one {# project} other {# projects}}',
 	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',

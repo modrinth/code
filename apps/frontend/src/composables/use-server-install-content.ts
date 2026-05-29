@@ -61,7 +61,7 @@ export interface UseServerInstallContentOptions {
 const messages = defineMessages({
 	unsupportedContentType: {
 		id: 'discover.install.error.unsupported-content-type',
-		defaultMessage: 'This content type cannot be installed to a server from browse.',
+		defaultMessage: 'This content type cannot be installed to a server from Discover.',
 	},
 	noServerWorld: {
 		id: 'discover.install.error.no-server-world',
