@@ -24,7 +24,7 @@ export function useCompactNumber() {
 	const { locale } = injectI18n()
 
 	function formatCompactNumber(value: number | bigint): string {
-		if (value < 1000) {
+		if (value < 10_000) {
 			const standardFormatter = getStandardFormatter(locale.value)
 			return standardFormatter.format(value)
 		}
