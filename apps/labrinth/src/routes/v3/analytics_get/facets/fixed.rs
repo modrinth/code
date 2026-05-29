@@ -1,18 +1,16 @@
 use super::super::all_download_sources;
 use super::{
-    AnalyticsFacets, FacetValue, ProjectDownloadsFacets, ProjectPlaytimeFacets,
+    AnalyticsFacets, ProjectDownloadsFacets, ProjectPlaytimeFacets,
     ProjectViewsFacets,
 };
 use crate::{
     database::{PgPool, redis::RedisPool},
-    models::{users::User, v3::analytics::DownloadReason},
+    models::v3::analytics::DownloadReason,
     routes::ApiError,
     util::tags::valid_download_tags,
 };
 
 pub async fn fetch(
-    _req: &super::super::GetRequest,
-    _user: &User,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<AnalyticsFacets, ApiError> {
@@ -23,8 +21,8 @@ pub async fn fetch(
         tags.game_versions.iter().cloned().collect::<Vec<_>>();
     game_versions.sort();
 
-    let loader_facets = string_facets(loaders);
-    let game_version_facets = string_facets(game_versions);
+    let loader_facets = loaders;
+    let game_version_facets = game_versions;
     let country_facets = country_facets();
 
     Ok(AnalyticsFacets {
@@ -53,20 +51,11 @@ pub async fn fetch(
     })
 }
 
-fn bool_facets() -> Vec<FacetValue<bool>> {
-    vec![
-        FacetValue {
-            value: false,
-            count: 0,
-        },
-        FacetValue {
-            value: true,
-            count: 0,
-        },
-    ]
+fn bool_facets() -> Vec<bool> {
+    vec![false, true]
 }
 
-fn download_reason_facets() -> Vec<FacetValue<DownloadReason>> {
+fn download_reason_facets() -> Vec<DownloadReason> {
     [
         DownloadReason::Standalone,
         DownloadReason::Dependency,
@@ -74,32 +63,19 @@ fn download_reason_facets() -> Vec<FacetValue<DownloadReason>> {
         DownloadReason::Update,
     ]
     .into_iter()
-    .map(|value| FacetValue { value, count: 0 })
     .collect()
 }
 
-fn download_source_facets() -> Vec<FacetValue<super::super::DownloadSource>> {
+fn download_source_facets() -> Vec<super::super::DownloadSource> {
     all_download_sources()
-        .into_iter()
-        .map(|value| FacetValue { value, count: 0 })
-        .collect()
 }
 
-fn country_facets() -> Vec<FacetValue<String>> {
+fn country_facets() -> Vec<String> {
     let mut countries = rust_iso3166::ALL_ALPHA2
         .iter()
         .map(|country| country.to_string())
         .collect::<Vec<_>>();
     countries.push("XX".to_string());
     countries.sort();
-    string_facets(countries)
-}
-
-fn string_facets(
-    values: impl IntoIterator<Item = String>,
-) -> Vec<FacetValue<String>> {
-    values
-        .into_iter()
-        .map(|value| FacetValue { value, count: 0 })
-        .collect()
+    countries
 }

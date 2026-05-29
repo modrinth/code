@@ -48,6 +48,7 @@ use crate::{
     routes::ApiError,
 };
 
+#[cfg(test)]
 pub(crate) use metrics::normalize_download_source;
 pub use metrics::*;
 
