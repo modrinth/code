@@ -46,7 +46,7 @@
 
 		<div
 			ref="entriesElement"
-			class="analytics-chart-tooltip-entries flex min-h-0 flex-col gap-1 overflow-y-auto overscroll-contain px-3"
+			class="analytics-chart-tooltip-entries flex min-h-0 flex-col overflow-y-auto overscroll-contain px-3"
 			@scroll="checkEntriesScrollState"
 			@touchstart="onEntriesTouchStart"
 			@touchmove="onEntriesTouchMove"
@@ -64,7 +64,7 @@
 			>
 				<button
 					type="button"
-					class="inline-flex min-w-0 items-center gap-1.5 border-0 bg-transparent p-0 text-left focus-visible:!outline-none"
+					class="inline-flex min-w-0 items-center gap-1.5 border-0 bg-transparent p-0 py-0.5 text-left focus-visible:!outline-none"
 					:class="
 						entry.toggleDisabled && !shiftKeyPressed
 							? 'cursor-default'
