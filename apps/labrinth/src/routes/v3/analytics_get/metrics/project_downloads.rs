@@ -19,8 +19,8 @@ use crate::{
 
 use super::super::{
     ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
-    condense_country, none_if_empty, none_if_zero_version_id,
-    normalize_loader_for_project,
+    none_if_empty, none_if_zero_version_id, normalize_loader_for_project,
+    passes_country_privacy_floor,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -358,6 +358,13 @@ pub(crate) async fn fetch(
     }
 
     for (key, downloads) in buckets {
+        if !passes_country_privacy_floor(
+            key.country.is_some() || !metrics.filter_by.country.is_empty(),
+            downloads,
+        ) {
+            continue;
+        }
+
         add_to_time_slice(
             cx.time_slices,
             key.bucket as usize,
@@ -370,9 +377,7 @@ pub(crate) async fn fetch(
                         .version_id
                         .and_then(none_if_zero_version_id),
                     monetized: key.monetized,
-                    country: key
-                        .country
-                        .map(|country| condense_country(country, downloads)),
+                    country: key.country,
                     reason: key.reason,
                     game_version: key.game_version.and_then(none_if_empty),
                     loader: key.loader.and_then(none_if_empty),

@@ -5,7 +5,7 @@ use crate::{database::models::DBProjectId, routes::ApiError};
 
 use super::super::{
     ClickhouseFilterParam, ClickhouseQueryParams, QueryClickhouseContext,
-    condense_country, none_if_empty, query_clickhouse,
+    none_if_empty, passes_country_privacy_floor, query_clickhouse,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -150,14 +150,14 @@ pub(crate) async fn fetch(
             ),
             ClickhouseFilterParam::String(&metrics.filter_by.country),
         ],
-        |_| true,
+        |row| {
+            passes_country_privacy_floor(
+                uses(F::Country) || !metrics.filter_by.country.is_empty(),
+                row.views,
+            )
+        },
         |row| row.bucket,
         |row| {
-            let country = if uses(F::Country) {
-                Some(condense_country(row.country, row.views))
-            } else {
-                None
-            };
             AnalyticsData::Project(ProjectAnalytics {
                 source_project: row.project_id.into(),
                 metrics: ProjectMetrics::Views(ProjectViews {
@@ -168,7 +168,7 @@ pub(crate) async fn fetch(
                         1 => Some(true),
                         _ => None,
                     },
-                    country,
+                    country: uses(F::Country).then_some(row.country),
                     views: row.views,
                 }),
             })

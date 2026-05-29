@@ -114,6 +114,7 @@ pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
 /// [`TimeRange::resolution`].
 pub const MAX_TIME_SLICES: usize = 1024;
 pub(crate) const UNKNOWN_LOADER: &str = "unknown";
+pub(crate) const COUNTRY_PRIVACY_FLOOR: u64 = 50;
 
 // response
 
@@ -403,13 +404,11 @@ pub(crate) fn none_if_zero_version_id(v: DBVersionId) -> Option<VersionId> {
     if v.0 == 0 { None } else { Some(v.into()) }
 }
 
-pub(crate) fn condense_country(country: String, count: u64) -> String {
-    // Every country under '50' (view or downloads) should be condensed into 'XX'
-    if count < 50 {
-        "XX".to_string()
-    } else {
-        country
-    }
+pub(crate) fn passes_country_privacy_floor(
+    country_is_constrained: bool,
+    count: u64,
+) -> bool {
+    !country_is_constrained || count >= COUNTRY_PRIVACY_FLOOR
 }
 
 pub(crate) fn project_loader_map(
@@ -792,6 +791,13 @@ mod tests {
             serde_json::to_value(DownloadSource::Other).unwrap(),
             json!("other")
         );
+    }
+
+    #[test]
+    fn country_privacy_floor_suppresses_small_constrained_buckets() {
+        assert!(passes_country_privacy_floor(false, 1));
+        assert!(!passes_country_privacy_floor(true, 49));
+        assert!(passes_country_privacy_floor(true, 50));
     }
 
     #[test]
