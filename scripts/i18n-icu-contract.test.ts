@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { contractFromMessage, contractsEqual } from './i18n-icu-contract'
+import { contractFromMessage, contractsEqual, sourceContractChanged } from './i18n-icu-contract'
 
 test('same plain text contract is equal', () => {
 	assert.equal(
@@ -54,5 +54,28 @@ test('select branch changes contract', () => {
 			contractFromMessage('{type, select, plugin {plugin} other {project}}', 'b'),
 		),
 		false,
+	)
+})
+
+test('invalid previous source message is treated as changed', () => {
+	assert.equal(
+		sourceContractChanged(
+			'Get support at {support-link}',
+			'Get support at <support-link></support-link>',
+			'previous',
+			'current',
+		),
+		true,
+	)
+})
+
+test('invalid current source message is rejected', () => {
+	assert.throws(() =>
+		sourceContractChanged(
+			'Get support at <support-link></support-link>',
+			'Get support at {support-link}',
+			'previous',
+			'current',
+		),
 	)
 })
