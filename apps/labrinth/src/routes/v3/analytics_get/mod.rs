@@ -517,11 +517,11 @@ pub(crate) struct ClickhouseQueryParams {
 }
 
 pub(crate) enum ClickhouseFilterParam<'a> {
-    String(&'static str, &'a [String]),
+    String(&'a [String]),
     Bool(&'static str, &'a [bool]),
-    VersionId(&'static str, &'a [VersionId]),
-    AffiliateCodeId(&'static str, &'a [AffiliateCodeId]),
-    DownloadReason(&'static str, &'a [DownloadReason]),
+    VersionId(&'a [VersionId]),
+    AffiliateCodeId(&'a [AffiliateCodeId]),
+    DownloadReason(&'a [DownloadReason]),
 }
 
 impl ClickhouseFilterParam<'_> {
@@ -530,7 +530,7 @@ impl ClickhouseFilterParam<'_> {
         query: clickhouse::query::Query,
     ) -> clickhouse::query::Query {
         match self {
-            Self::String(name, values) => query.param(name, values),
+            Self::String(values) => query.bind(values),
             Self::Bool(name, values) => {
                 let value = match values {
                     [false] => 0,
@@ -539,24 +539,24 @@ impl ClickhouseFilterParam<'_> {
                 };
                 query.param(name, value)
             }
-            Self::VersionId(name, values) => {
+            Self::VersionId(values) => {
                 let values = values
                     .iter()
                     .map(|id| DBVersionId::from(*id))
                     .collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
-            Self::AffiliateCodeId(name, values) => {
+            Self::AffiliateCodeId(values) => {
                 let values = values
                     .iter()
                     .map(|id| DBAffiliateCodeId::from(*id))
                     .collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
-            Self::DownloadReason(name, values) => {
+            Self::DownloadReason(values) => {
                 let values =
                     values.iter().map(ToString::to_string).collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
         }
     }
@@ -613,13 +613,13 @@ where
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len());
     if params.project_ids {
-        query = query.param("project_ids", cx.project_ids);
+        query = query.bind(cx.project_ids);
     }
     if params.parent_version_ids {
-        query = query.param("parent_version_ids", cx.parent_version_ids);
+        query = query.bind(cx.parent_version_ids);
     }
     if params.affiliate_code_ids {
-        query = query.param("affiliate_code_ids", cx.affiliate_code_ids);
+        query = query.bind(cx.affiliate_code_ids);
     }
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)

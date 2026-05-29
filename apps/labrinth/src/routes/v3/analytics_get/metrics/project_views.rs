@@ -12,7 +12,7 @@ use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 const TIME_RANGE_START: &str = "{time_range_start: UInt64}";
 const TIME_RANGE_END: &str = "{time_range_end: UInt64}";
 const TIME_SLICES: &str = "{time_slices: UInt64}";
-const PROJECT_IDS: &str = "{project_ids: Array(UInt64)}";
+const PROJECT_IDS: &str = "project_ids";
 
 /// Fields for [`super::ReturnMetrics::project_views`].
 #[derive(
@@ -87,13 +87,18 @@ const VIEWS: &str = {
     const USE_SITE_PATH: &str = "{use_site_path: Bool}";
     const USE_MONETIZED: &str = "{use_monetized: Bool}";
     const USE_COUNTRY: &str = "{use_country: Bool}";
-    const FILTER_DOMAIN: &str = "{filter_domain: Array(String)}";
-    const FILTER_SITE_PATH: &str = "{filter_site_path: Array(String)}";
+    const FILTER_DOMAIN: &str = "filter_domain";
+    const FILTER_SITE_PATH: &str = "filter_site_path";
     const FILTER_MONETIZED: &str = "{filter_monetized: UInt8}";
-    const FILTER_COUNTRY: &str = "{filter_country: Array(String)}";
+    const FILTER_COUNTRY: &str = "filter_country";
 
     formatcp!(
-        "SELECT
+        "WITH
+            ? AS {PROJECT_IDS},
+            ? AS {FILTER_DOMAIN},
+            ? AS {FILTER_SITE_PATH},
+            ? AS {FILTER_COUNTRY}
+        SELECT
             widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
             if({USE_PROJECT_ID}, project_id, 0) AS project_id,
             if({USE_DOMAIN}, domain, '') AS domain,
@@ -137,22 +142,13 @@ pub(crate) async fn fetch(
             ("use_country", uses(F::Country)),
         ],
         vec![
-            ClickhouseFilterParam::String(
-                "filter_domain",
-                &metrics.filter_by.domain,
-            ),
-            ClickhouseFilterParam::String(
-                "filter_site_path",
-                &metrics.filter_by.site_path,
-            ),
+            ClickhouseFilterParam::String(&metrics.filter_by.domain),
+            ClickhouseFilterParam::String(&metrics.filter_by.site_path),
             ClickhouseFilterParam::Bool(
                 "filter_monetized",
                 &metrics.filter_by.monetized,
             ),
-            ClickhouseFilterParam::String(
-                "filter_country",
-                &metrics.filter_by.country,
-            ),
+            ClickhouseFilterParam::String(&metrics.filter_by.country),
         ],
         |_| true,
         |row| row.bucket,
