@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
 use eyre::eyre;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
 use tokio::sync::Mutex;
 
@@ -72,7 +72,7 @@ impl TiltifyClient {
                 "grant_type": "client_credentials",
                 "client_id": &ENV.TILTIFY_CLIENT_ID,
                 "client_secret": &ENV.TILTIFY_CLIENT_SECRET,
-                "scope": "private",
+                "scope": "public",
             }))
             .send()
             .await?;

@@ -232,7 +232,7 @@ pub async fn pride_26(
         .await
         .wrap_internal_err("fetching Tiltify access token")?;
     let url = format!(
-        "https://v5api.tiltify.com/api/cause/team_campaigns/{}",
+        "https://v5api.tiltify.com/api/public/team_campaigns/{}",
         ENV.TILTIFY_PRIDE_26_CAMPAIGN_ID
     );
     info!("at = {access_token}");
@@ -241,34 +241,31 @@ pub async fn pride_26(
         .bearer_auth(access_token)
         .send()
         .await
-        .wrap_internal_err("fetching campaign from Tiltify")?;
+        .wrap_internal_err("fetching campaign from Tiltify")?
+        .error_for_status()
+        .wrap_internal_err("fetching campaign from Tiltify")?
+        .json::<TiltifyCampaignResponse>()
+        .await
+        .wrap_internal_err("parsing Tiltify response")?;
 
-    info!("{:?}", response.text().await);
-    panic!();
-    // .error_for_status()
-    // .wrap_internal_err("fetching campaign from Tiltify")?
-    // .json::<TiltifyCampaignResponse>()
-    // .await
-    // .wrap_internal_err("parsing Tiltify response")?;
+    let raised_currency = &response.data.total_amount_raised.currency;
+    if raised_currency != "USD" {
+        return Err(ApiError::Internal(eyre!(
+            "total amount raised is in {raised_currency}, must be USD"
+        )));
+    }
 
-    // let raised_currency = &response.data.total_amount_raised.currency;
-    // if raised_currency != "USD" {
-    //     return Err(ApiError::Internal(eyre!(
-    //         "total amount raised is in {raised_currency}, must be USD"
-    //     )));
-    // }
+    let goal_currency = &response.data.goal.currency;
+    if goal_currency != "USD" {
+        return Err(ApiError::Internal(eyre!(
+            "goal amount is in {goal_currency}, must be USD"
+        )));
+    }
 
-    // let goal_currency = &response.data.goal.currency;
-    // if goal_currency != "USD" {
-    //     return Err(ApiError::Internal(eyre!(
-    //         "goal amount is in {goal_currency}, must be USD"
-    //     )));
-    // }
-
-    // Ok(web::Json(CampaignInfo {
-    //     total_donations_usd: response.data.total_amount_raised.value,
-    //     target_usd: response.data.goal.value,
-    // }))
+    Ok(web::Json(CampaignInfo {
+        total_donations_usd: response.data.total_amount_raised.value,
+        target_usd: response.data.goal.value,
+    }))
 }
 
 async fn amount_raised_usd(
