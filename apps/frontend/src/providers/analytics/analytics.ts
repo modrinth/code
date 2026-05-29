@@ -43,6 +43,7 @@ import {
 	getAnalyticsProjectEventsInTimeRange,
 	getAnalyticsTimeframeDurationMs,
 	getPercentChange,
+	getProjectDownloadsByIdFromTimeSlices,
 	isAnalyticsFetchRequestReady,
 	isRevenueHourlyGroupBy,
 	REVENUE_MIN_TIMEFRAME_MS,
@@ -1245,9 +1246,12 @@ export function createAnalyticsDashboardContext(
 		}
 		return versionProjectIconUrls
 	})
-	const projectDownloadsById = computed(
-		() => analyticsFacetsFilterOptionSummary.value.projectDownloadsById,
-	)
+	const projectDownloadsById = computed(() => {
+		const facetProjectDownloadsById = analyticsFacetsFilterOptionSummary.value.projectDownloadsById
+		return facetProjectDownloadsById.size > 0
+			? facetProjectDownloadsById
+			: getProjectDownloadsByIdFromTimeSlices(timeSlices.value)
+	})
 	const projectVersionDownloadsById = computed(
 		() => analyticsFacetsFilterOptionSummary.value.projectVersionDownloadsById,
 	)

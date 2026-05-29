@@ -476,6 +476,27 @@ export function computeTotals(
 	return totals
 }
 
+export function getProjectDownloadsByIdFromTimeSlices(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+): Map<string, number> {
+	const projectDownloadsById = new Map<string, number>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!isProjectAnalyticsPoint(dataPoint) || dataPoint.metric_kind !== 'downloads') {
+				continue
+			}
+
+			projectDownloadsById.set(
+				dataPoint.source_project,
+				(projectDownloadsById.get(dataPoint.source_project) ?? 0) + dataPoint.downloads,
+			)
+		}
+	}
+
+	return projectDownloadsById
+}
+
 export function cloneAnalyticsFetchRequest(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 ): Labrinth.Analytics.v3.FetchRequest | null {
