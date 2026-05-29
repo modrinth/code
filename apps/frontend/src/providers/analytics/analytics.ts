@@ -42,7 +42,11 @@ import {
 	fetchAnalyticsTimeSlices,
 	getAnalyticsProjectEventsInTimeRange,
 	getAnalyticsTimeframeDurationMs,
+	getCountryDownloadsByCodeFromTimeSlices,
+	getGameVersionDownloadsByVersionFromTimeSlices,
 	getPercentChange,
+	getProjectDownloadsByIdFromTimeSlices,
+	getProjectVersionDownloadsByIdFromTimeSlices,
 	isAnalyticsFetchRequestReady,
 	isRevenueHourlyGroupBy,
 	REVENUE_MIN_TIMEFRAME_MS,
@@ -1017,6 +1021,35 @@ export function createAnalyticsDashboardContext(
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})
 
+	const { data: analyticsDownloadCountTimeSlices } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			analyticsQueryUserId.value,
+			'filter-options',
+			'download-counts-fallback',
+			analyticsFacetsRequest.value,
+			queryRefreshTimestamp.value,
+		]),
+		queryFn: () => {
+			const nextRequest = analyticsFacetsRequest.value
+			if (!isAnalyticsFetchRequestReady(nextRequest)) {
+				return []
+			}
+
+			return fetchAnalyticsTimeSlices(nextRequest, (request) =>
+				client.labrinth.analytics_v3.fetch(request),
+			)
+		},
+		enabled: computed(
+			() =>
+				hasFetchedAnalyticsFilterOptions.value &&
+				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
+		),
+		placeholderData: [],
+		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+	})
+
 	const { data: filterOptionProjectVersions, isFetched: hasFetchedFilterOptionProjectVersions } =
 		useQuery({
 			queryKey: computed(() => [
@@ -1245,17 +1278,21 @@ export function createAnalyticsDashboardContext(
 		}
 		return versionProjectIconUrls
 	})
-	const projectDownloadsById = computed(
-		() => analyticsFacetsFilterOptionSummary.value.projectDownloadsById,
+	const downloadCountTimeSlices = computed(() => {
+		const countTimeSlices = analyticsDownloadCountTimeSlices.value ?? []
+		return countTimeSlices.length > 0 ? countTimeSlices : timeSlices.value
+	})
+	const projectDownloadsById = computed(() =>
+		getProjectDownloadsByIdFromTimeSlices(downloadCountTimeSlices.value),
 	)
-	const projectVersionDownloadsById = computed(
-		() => analyticsFacetsFilterOptionSummary.value.projectVersionDownloadsById,
+	const projectVersionDownloadsById = computed(() =>
+		getProjectVersionDownloadsByIdFromTimeSlices(downloadCountTimeSlices.value),
 	)
-	const countryDownloadsByCode = computed(
-		() => analyticsFacetsFilterOptionSummary.value.countryDownloadsByCode,
+	const countryDownloadsByCode = computed(() =>
+		getCountryDownloadsByCodeFromTimeSlices(downloadCountTimeSlices.value),
 	)
-	const gameVersionDownloadsByVersion = computed(
-		() => analyticsFacetsFilterOptionSummary.value.gameVersionDownloadsByVersion,
+	const gameVersionDownloadsByVersion = computed(() =>
+		getGameVersionDownloadsByVersionFromTimeSlices(downloadCountTimeSlices.value),
 	)
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))

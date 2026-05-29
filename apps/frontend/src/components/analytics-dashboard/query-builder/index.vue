@@ -753,7 +753,7 @@ function applyProjectDownloadsThreshold(threshold: number | null) {
 	}
 
 	const projectIds = projects.value
-		.filter((project) => (projectDownloadsById.value.get(project.id) ?? 0) >= threshold)
+		.filter((project) => (projectDownloadsById.value.get(project.id) ?? 0) > threshold)
 		.map((project) => project.id)
 
 	projectDownloadsThresholdProjectIds.value = projectIds

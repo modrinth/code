@@ -232,7 +232,13 @@ import {
 type AnalyticsFilterValueCategory = Exclude<AnalyticsQueryFilterCategory, 'project'>
 type GameVersionType = 'release' | 'all'
 type SetDropdownFilterValues = (values: string[]) => void
-type ApplyDownloadsThreshold = (setSelectedValues: SetDropdownFilterValues) => void
+type DownloadsThresholdSelection = {
+	categoryKey: DownloadsThresholdFilterCategory
+	selectedValues: string[]
+}
+type ApplyDownloadsThreshold = (
+	setSelectedValues: SetDropdownFilterValues,
+) => DownloadsThresholdSelection | null
 type CloseDownloadsThresholdMenu = (event?: Event) => void
 
 const props = withDefaults(
@@ -763,48 +769,46 @@ function compareOptionalDateStringsDescending(
 function applyGameVersionDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
 	const threshold = gameVersionDownloadsThreshold.value
 	if (threshold === null) {
-		return
+		return null
 	}
 
 	const selectedValues = gameVersionFilterOptions.value
 		.filter((gameVersion) => {
-			return (gameVersionDownloadsByVersion.value.get(gameVersion.value) ?? 0) >= threshold
+			return (gameVersionDownloadsByVersion.value.get(gameVersion.value) ?? 0) > threshold
 		})
 		.map((gameVersion) => gameVersion.value)
 
-	setDownloadsThresholdSelectedValues('game_version', selectedValues, setSelectedValues)
+	return setDownloadsThresholdSelectedValues('game_version', selectedValues, setSelectedValues)
 }
 
 function applyCountryDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
 	const threshold = countryDownloadsThreshold.value
 	if (threshold === null) {
-		return
+		return null
 	}
 
 	const selectedValues = countryFilterOptions.value
 		.filter((country) => {
-			return (
-				(countryDownloadsByCode.value.get(country.value.trim().toUpperCase()) ?? 0) >= threshold
-			)
+			return (countryDownloadsByCode.value.get(country.value.trim().toUpperCase()) ?? 0) > threshold
 		})
 		.map((country) => country.value)
 
-	setDownloadsThresholdSelectedValues('country', selectedValues, setSelectedValues)
+	return setDownloadsThresholdSelectedValues('country', selectedValues, setSelectedValues)
 }
 
 function applyProjectVersionDownloadsThreshold(setSelectedValues: SetDropdownFilterValues) {
 	const threshold = projectVersionDownloadsThreshold.value
 	if (threshold === null) {
-		return
+		return null
 	}
 
 	const selectedValues = projectVersionFilterOptions.value
 		.filter((version) => {
-			return (projectVersionDownloadsById.value.get(version.value) ?? 0) >= threshold
+			return (projectVersionDownloadsById.value.get(version.value) ?? 0) > threshold
 		})
 		.map((version) => version.value)
 
-	setDownloadsThresholdSelectedValues('version_id', selectedValues, setSelectedValues)
+	return setDownloadsThresholdSelectedValues('version_id', selectedValues, setSelectedValues)
 }
 
 function setCountryDownloadsThreshold(
@@ -876,12 +880,18 @@ function setDownloadsThresholdSelectedValues(
 	categoryKey: DownloadsThresholdFilterCategory,
 	selectedValues: string[],
 	setSelectedValues: SetDropdownFilterValues,
-) {
+): DownloadsThresholdSelection {
+	const normalizedSelectedValues = normalizeSelectedFilterValues(categoryKey, selectedValues, [])
 	downloadsThresholdSelections.value = {
 		...downloadsThresholdSelections.value,
-		[categoryKey]: normalizeSelectedFilterValues(categoryKey, selectedValues, []),
+		[categoryKey]: normalizedSelectedValues,
 	}
 	setSelectedValues(selectedValues)
+
+	return {
+		categoryKey,
+		selectedValues: normalizedSelectedValues,
+	}
 }
 
 function clearDownloadsThreshold(categoryKey: DownloadsThresholdFilterCategory) {
@@ -923,8 +933,13 @@ async function runDownloadsThresholdQuery(
 	closeMenu: CloseDownloadsThresholdMenu,
 	event?: KeyboardEvent,
 ) {
-	applyDownloadsThreshold(setSelectedValues)
+	const selection = applyDownloadsThreshold(setSelectedValues)
 	closeMenu(event)
+	if (selection) {
+		const nextFilters = cloneSelectedFilters(draftSelectedFilters.value)
+		nextFilters[selection.categoryKey] = selection.selectedValues
+		draftSelectedFilters.value = nextFilters
+	}
 	await scheduleSelectedFiltersCommit()
 	await refreshAnalyticsQuery()
 }

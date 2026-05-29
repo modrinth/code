@@ -174,28 +174,8 @@ function getEmptyAnalyticsFacetsFilterOptionSummary(): AnalyticsFacetsFilterOpti
 	}
 }
 
-function getAnalyticsFacetValues<T>(
-	facets: Labrinth.Analytics.v3.AnalyticsFacet<T>[] | null | undefined,
-): T[] {
-	return facets?.map((facet) => facet.value) ?? []
-}
-
-function getAnalyticsFacetDownloadsByValue<T>(
-	facets: Labrinth.Analytics.v3.AnalyticsFacet<T>[] | null | undefined,
-	getKey: (value: T) => string,
-): Map<string, number> {
-	const downloadsByValue = new Map<string, number>()
-	for (const facet of facets ?? []) {
-		const key = getKey(facet.value)
-		if (key.length === 0) {
-			continue
-		}
-
-		const downloads = Number.isFinite(facet.downloads) ? facet.downloads : 0
-		downloadsByValue.set(key, (downloadsByValue.get(key) ?? 0) + downloads)
-	}
-
-	return downloadsByValue
+function getAnalyticsFacetValues<T>(facets: T[] | null | undefined): T[] {
+	return facets ? [...facets] : []
 }
 
 export function getAnalyticsFacetsFilterOptionSummary(
@@ -205,15 +185,18 @@ export function getAnalyticsFacetsFilterOptionSummary(
 		return getEmptyAnalyticsFacetsFilterOptionSummary()
 	}
 
-	const downloadCountries = getAnalyticsFacetValues(facets.project_downloads.country)
-	const downloadGameVersions = getAnalyticsFacetValues(facets.project_downloads.game_version)
-	const downloadLoaders = getAnalyticsFacetValues(facets.project_downloads.loader)
-	const downloadVersionIds = getAnalyticsFacetValues(facets.project_downloads.version_id)
-	const viewCountries = getAnalyticsFacetValues(facets.project_views.country)
-	const playtimeCountries = getAnalyticsFacetValues(facets.project_playtime.country)
-	const playtimeGameVersions = getAnalyticsFacetValues(facets.project_playtime.game_version)
-	const playtimeLoaders = getAnalyticsFacetValues(facets.project_playtime.loader)
-	const playtimeVersionIds = getAnalyticsFacetValues(facets.project_playtime.version_id)
+	const projectDownloadFacets = facets.project_downloads
+	const projectViewFacets = facets.project_views
+	const projectPlaytimeFacets = facets.project_playtime
+	const downloadCountries = getAnalyticsFacetValues(projectDownloadFacets?.country)
+	const downloadGameVersions = getAnalyticsFacetValues(projectDownloadFacets?.game_version)
+	const downloadLoaders = getAnalyticsFacetValues(projectDownloadFacets?.loader)
+	const downloadVersionIds = getAnalyticsFacetValues(projectDownloadFacets?.version_id)
+	const viewCountries = getAnalyticsFacetValues(projectViewFacets?.country)
+	const playtimeCountries = getAnalyticsFacetValues(projectPlaytimeFacets?.country)
+	const playtimeGameVersions = getAnalyticsFacetValues(projectPlaytimeFacets?.game_version)
+	const playtimeLoaders = getAnalyticsFacetValues(projectPlaytimeFacets?.loader)
+	const playtimeVersionIds = getAnalyticsFacetValues(projectPlaytimeFacets?.version_id)
 	const countries = new Set([...viewCountries, ...downloadCountries, ...playtimeCountries])
 	const gameVersions = new Set([...downloadGameVersions, ...playtimeGameVersions])
 	const loaderTypes = new Set<string>()
@@ -230,8 +213,8 @@ export function getAnalyticsFacetsFilterOptionSummary(
 				.map((country) => country.trim().toUpperCase())
 				.filter((country) => country.length > 0),
 		),
-		downloadSources: sortStringValues(getAnalyticsFacetValues(facets.project_downloads.user_agent)),
-		downloadReasons: sortStringValues(getAnalyticsFacetValues(facets.project_downloads.reason)),
+		downloadSources: sortStringValues(getAnalyticsFacetValues(projectDownloadFacets?.user_agent)),
+		downloadReasons: sortStringValues(getAnalyticsFacetValues(projectDownloadFacets?.reason)),
 		gameVersions: sortStringValues(
 			[...gameVersions]
 				.map((gameVersion) => gameVersion.trim())
@@ -239,22 +222,10 @@ export function getAnalyticsFacetsFilterOptionSummary(
 		),
 		loaderTypes: sortStringValues([...loaderTypes]),
 		versionIds: sortStringValues([...new Set([...downloadVersionIds, ...playtimeVersionIds])]),
-		projectDownloadsById: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.project_id,
-			(projectId) => projectId.trim(),
-		),
-		projectVersionDownloadsById: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.version_id,
-			(versionId) => versionId.trim(),
-		),
-		gameVersionDownloadsByVersion: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.game_version,
-			(gameVersion) => gameVersion.trim(),
-		),
-		countryDownloadsByCode: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.country,
-			(country) => country.trim().toUpperCase(),
-		),
+		projectDownloadsById: new Map(),
+		projectVersionDownloadsById: new Map(),
+		gameVersionDownloadsByVersion: new Map(),
+		countryDownloadsByCode: new Map(),
 	}
 }
 

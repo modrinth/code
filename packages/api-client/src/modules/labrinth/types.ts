@@ -375,41 +375,36 @@ export namespace Labrinth {
 				facets: AnalyticsFacets
 			}
 
-			export type AnalyticsFacet<T> = {
-				value: T
-				downloads: number
-			}
-
 			export type AnalyticsFacets = {
-				project_views: ProjectViewsFacets
-				project_downloads: ProjectDownloadsFacets
-				project_playtime: ProjectPlaytimeFacets
+				project_views?: Partial<ProjectViewsFacets>
+				project_downloads?: Partial<ProjectDownloadsFacets>
+				project_playtime?: Partial<ProjectPlaytimeFacets>
 			}
 
 			export type ProjectViewsFacets = {
-				domain: AnalyticsFacet<string>[]
-				site_path: AnalyticsFacet<string>[]
-				monetized: AnalyticsFacet<boolean>[]
-				country: AnalyticsFacet<string>[]
+				domain: string[]
+				site_path: string[]
+				monetized: boolean[]
+				country: string[]
 			}
 
 			export type ProjectDownloadsFacets = {
-				project_id: AnalyticsFacet<string>[]
-				domain: AnalyticsFacet<string>[]
-				user_agent: AnalyticsFacet<string>[]
-				version_id: AnalyticsFacet<string>[]
-				monetized: AnalyticsFacet<boolean>[]
-				country: AnalyticsFacet<string>[]
-				reason: AnalyticsFacet<DownloadReason>[]
-				game_version: AnalyticsFacet<string>[]
-				loader: AnalyticsFacet<string>[]
+				project_id: string[]
+				domain: string[]
+				user_agent: string[]
+				version_id: string[]
+				monetized: boolean[]
+				country: string[]
+				reason: DownloadReason[]
+				game_version: string[]
+				loader: string[]
 			}
 
 			export type ProjectPlaytimeFacets = {
-				version_id: AnalyticsFacet<string>[]
-				loader: AnalyticsFacet<string>[]
-				game_version: AnalyticsFacet<string>[]
-				country: AnalyticsFacet<string>[]
+				version_id: string[]
+				loader: string[]
+				game_version: string[]
+				country: string[]
 			}
 
 			export type TimeSlice = AnalyticsData[]
