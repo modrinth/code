@@ -118,11 +118,7 @@
 							class="flex min-h-7 min-w-0 grow items-center gap-1.5 font-semibold leading-tight text-primary"
 							:class="hasChartEvents ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'"
 						>
-							<InfoIcon
-								class="size-4 shrink-0"
-								:class="hasChartEvents ? 'text-blue' : 'text-secondary'"
-								aria-hidden="true"
-							/>
+							<InfoIcon class="size-4 shrink-0 text-blue" aria-hidden="true" />
 							<span class="min-w-0 truncate">Modrinth events</span>
 						</label>
 						<Toggle

@@ -102,11 +102,7 @@ type ExternalTooltipHandler = NonNullable<
 type ExternalTooltipContext = Parameters<Exclude<ExternalTooltipHandler, undefined>>[0]
 type ChartEvents = NonNullable<NonNullable<ChartConfiguration['options']>['events']>
 
-const chartInteractionEvents: ChartEvents = [
-	'mousemove',
-	'mouseout',
-	'click',
-]
+const chartInteractionEvents: ChartEvents = ['mousemove', 'mouseout', 'click']
 const PINNED_DRAG_THRESHOLD_PX = 6
 const RANGE_SELECT_THRESHOLD_PX = 8
 const EMPTY_DATA_Y_AXIS_MAX = 10
@@ -393,9 +389,7 @@ function getDatasetOpacity(index: number) {
 function getDatasetColors(dataset: ChartDataset, index: number) {
 	const opacity = getDatasetOpacity(index)
 	const baseBorderColor = isDatasetDimmed(index) ? DIMMED_SERIES_COLOR : dataset.borderColor
-	const baseBackgroundColor = isDatasetDimmed(index)
-		? DIMMED_SERIES_COLOR
-		: dataset.backgroundColor
+	const baseBackgroundColor = isDatasetDimmed(index) ? DIMMED_SERIES_COLOR : dataset.backgroundColor
 	return {
 		borderColor: withAlpha(resolveCssColor(baseBorderColor), opacity),
 		backgroundColor: resolveCssColor(baseBackgroundColor),

@@ -728,8 +728,12 @@ export function formatAxisValue(
 	switch (activeStat) {
 		case 'revenue':
 			return `$${formatCompact(Math.round(value * 100) / 100)}`
-		case 'playtime':
-			return `${(value / 3600).toFixed(1)}h`
+		case 'playtime': {
+			const hours = value / 3600
+			const formattedHours =
+				Math.abs(hours) < 10 ? formatSmallAxisNumber(hours) : formatCompact(Math.round(hours))
+			return formattedHours
+		}
 		case 'views':
 		case 'downloads':
 		default:
