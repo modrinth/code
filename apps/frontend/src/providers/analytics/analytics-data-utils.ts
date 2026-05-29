@@ -369,8 +369,10 @@ export function getAnalyticsTimeframeDurationMs({
 				yearStart.setHours(0, 0, 0, 0)
 				return now.getTime() - yearStart.getTime()
 			}
-			case 'all_time':
-				return REVENUE_MIN_TIMEFRAME_MS
+			case 'all_time': {
+				const allTimeDurationMs = nowTimestamp - ANALYTICS_START_TIME
+				return Math.max(0, allTimeDurationMs)
+			}
 		}
 	}
 
