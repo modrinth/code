@@ -1390,7 +1390,11 @@ const { cycle: changeTheme } = useTheme()
 
 		&-mobile {
 			.account-container {
+				opacity: 0;
 				padding-bottom: 0;
+				pointer-events: none;
+				transition: opacity 0.15s ease-in-out;
+				visibility: hidden;
 
 				.account-button {
 					padding: var(--spacing-card-md);
@@ -1413,6 +1417,12 @@ const { cycle: changeTheme } = useTheme()
 			&.expanded {
 				transform: translateY(0);
 				box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
+
+				.account-container {
+					opacity: 1;
+					pointer-events: auto;
+					visibility: visible;
+				}
 			}
 		}
 	}

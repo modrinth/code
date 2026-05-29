@@ -2,7 +2,11 @@
 	<NewModal ref="modal" fade="danger" :header="formatMessage(messages.header)" max-width="500px">
 		<Admonition type="critical" class="md:min-w-[400px]">
 			<template #header>{{ formatMessage(messages.deletingName, { name: item?.name }) }}</template>
-			{{ formatMessage(messages.deleteWarning, { type: item?.type }) }}
+			{{
+				formatMessage(
+					item?.type === 'directory' ? messages.deleteFolderWarning : messages.deleteFileWarning,
+				)
+			}}
 		</Admonition>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
@@ -46,10 +50,14 @@ const messages = defineMessages({
 		id: 'files.delete-modal.deleting-name',
 		defaultMessage: 'Deleting "{name}"',
 	},
-	deleteWarning: {
-		id: 'files.delete-modal.warning',
+	deleteFileWarning: {
+		id: 'files.delete-modal.warning.file',
+		defaultMessage: 'This file will be permanently deleted. This action cannot be undone.',
+	},
+	deleteFolderWarning: {
+		id: 'files.delete-modal.warning.folder',
 		defaultMessage:
-			'{type, select, directory {This folder and all its contents will be permanently deleted. This action cannot be undone.} other {This file will be permanently deleted. This action cannot be undone.}}',
+			'This folder and all its contents will be permanently deleted. This action cannot be undone.',
 	},
 })
 

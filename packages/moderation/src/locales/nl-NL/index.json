@@ -65,9 +65,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Bezoek de galerij pagina"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Je {type, select,mod {mod}plugin {plugin}other {project}} gebruikt een licentie die vereist dat de source code beschikbaar is. Gelieve de source code link of source bestanden for elke extra versie te verstrekken, of overweeg een andere licentie te gebruiken."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
@@ -158,9 +155,6 @@
   "nags.select-language.title": {
     "defaultMessage": "Selecteer een taal"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Selecteer de licentie waaronder je {type, select,mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is gedistibrueerd."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Selecteer een licentie"
   },
@@ -218,14 +212,8 @@
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecteer relevante tags"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": ""
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": ""
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"
@@ -249,4 +237,3 @@
     "defaultMessage": "Bezoek linkjes instellingen"
   }
 }
-

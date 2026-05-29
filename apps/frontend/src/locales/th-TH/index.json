@@ -302,9 +302,6 @@
   "auth.welcome.description": {
     "message": "ตอนนี้คุณได้เป็นส่วนหนึ่งของคอมมูนิตี้สุดเจ๋งของเหล่าครีเอเตอร์และนักสำรวจ ที่กำลังสร้างสรรค์ ดาวน์โหลด และอัปเดตม็อดสุดยอดอยู่เสมอ"
   },
-  "auth.welcome.label.tos": {
-    "message": "การสร้างบัญชี <tems-link> ข้อกำหนด </sems-link> และ <Privacy-Policy-Link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ modrinth"
-  },
   "auth.welcome.long-title": {
     "message": "ยินดีต้อนรับเข้าสู่ modrinth!"
   },
@@ -580,9 +577,6 @@
   },
   "landing.notifications.heading": {
     "message": "การแจ้งเตือน"
-  },
-  "landing.notifications.received-time": {
-    "message": ""
   },
   "settings.applications.button.upload-icon": {
     "message": "อัปโหลดไอคอน"

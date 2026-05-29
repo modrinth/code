@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Details zum Abonnement konnten nicht geladen werden."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 Tage"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/Monat"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/Quartal"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/Jahr"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Deine nächste Abrechnung erfolgt am <charge-date>{date}</charge-date>."
   },
@@ -103,9 +91,6 @@
   },
   "browse.offline": {
     "defaultMessage": "Du bist aktuell Offline. Verbinde dich mit dem Internet um Modrinth zu durchstöbern!"
-  },
-  "browse.search.placeholder": {
-    "defaultMessage": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} server {Server} other {Projekte}}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Ausgewählte Projekte"
@@ -347,12 +332,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Löschwarnung"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Lösche {count} {itemType}{count, plural, one {} other {s}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Lösche {itemType}{count, plural, one {} other {s}}"
-  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Downgraden} other {Aktualiseren}} kann zu Kompatibilitätsproblemen führen. Mods oder Inhalte, die du zusätzlich zum Modpack hinzugefügt hast, bleiben erhalten, sind jedoch eventuell nicht mit der neuen Version kompatibel."
   },
@@ -419,9 +398,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Halte Umschalt während dem klicken um die Bestätigung zu überspringen."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Wir empfehlen das erstellen einer Sicherung, bevor du weitermachst, so dass du deine {type, select, server {Welt} other {Instanz}} wiederherstellen kannst, sollte was kaputt gehen."
-  },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Die Inhalte deines Modpacks können jetzt hier gefunden werden!"
   },
@@ -463,9 +439,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Bitte warten"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "Durchsuche {count} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Dateinamen"
@@ -529,9 +502,6 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Aktualisiere {contentType}..."
-  },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} ausgewählt"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} ausgewählt"
@@ -839,17 +809,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} überschrieben"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Überschreibt"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Dateien werden überschrieben"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "{type, select, directory {Ordner} other {Datei}} erstellen"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "{type, select, directory {einen Ordner} other {eine Datei}} erstellen"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "z. B. mein-ordner"
@@ -862,9 +823,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Datei löschen"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Dieser Ordner und sein gesamter Inhalt werden dauerhaft gelöscht.} other {Diese Datei wird dauerhaft gelöscht.}} Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Inhalt der Datei konnte nicht geladen werden."
@@ -992,9 +950,6 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "z. B. /mein-ordner"
   },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Ordner} other {Datei}} verschieben"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Zurück zum Start"
   },
@@ -1114,9 +1069,6 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} übrig"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Ziehe {type, select, undefined {Dateien} other {{type}s}} zum Hochladen hierher"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Name darf nur alphanumerische Zeichen, Bindestriche, Unterstriche oder Leerzeichen enthalten."
@@ -1490,17 +1442,11 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Das ändern von Loadern ist zerstörerisch"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Verlinktes {projectType, select, server {Server Projekt} other {Modpack}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}version"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Du musst deinen Server zurücksetzen um den Loader zu wechseln."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Das neu installieren des Modpacks setzt die {type, select, server {Serverinhalte} other {Inhalte der Instanz}} auf ihren Originalzustand zurück, und entfernt von dir hinzugefügte Inhalte."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Modpack neu installieren"
@@ -1532,9 +1478,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "Trennen"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Entkoppeln trennt {type, select, server {diesen Server} other {diese Instanz}} vom {projectType, select, server {Server} other {Modpack}} Projekt, welches dir erlaubt, die Loader und Minecraftversion zu ändern. Du erhälst jedich keine zukünftigen Aktualisierungen."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "Wird überprüft..."
   },
@@ -1549,12 +1492,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Modpack neu installieren"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Das reparieren installiert den Loader und die Abhängigkeiten von Minecraft neu ohne deine Inhalte zu löschen. Dies könnte Probleme mit dem starten {type, select, server {deines Servers} other {des Launchers auf grund von Launcher-relevanten Problemen}} lösen."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "{type, select, server {Server} other {Instanz}} reparieren"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparieren"
@@ -3461,9 +3398,6 @@
   "servers.listing.notice.moderated": {
     "defaultMessage": "Dein Server wurde aufgrund einer Moderationsmassnahme deaktiviert. "
   },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "Dein Server wird am <date>{formattedDate}</date> auf den {planSize} Plan {verb}. "
-  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Bitte warte, während wir deinen Server einrichten. Dies kann bis zu 10 Minuten dauern."
   },
@@ -3568,9 +3502,6 @@
   },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Erfolg"
-  },
-  "servers.manage.search-placeholder": {
-    "defaultMessage": "Durchsuche {count} Server..."
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
@@ -4320,4 +4251,3 @@
     "defaultMessage": "Alle ausblenden"
   }
 }
-

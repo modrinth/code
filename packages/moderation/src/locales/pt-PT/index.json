@@ -53,9 +53,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Vê a página da galeria"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "O teu {type, select, mod {mod} plugin {plugin} other {projeto}} usa uma licença que requer que o código-fonte esteja disponível. Por favor, fornece um link para o código-fonte ou um ficheiro de fonte para cada versão adicional, ou considera usar uma licença diferente."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornece o código-fonte"
   },
@@ -122,9 +119,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleciona a resolução correta"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Seleciona a licença em que o teu {type, select, mod {mod} modpack {modpack} resourcepack {pacote de recursos} shader {shader} plugin {plugin} datapack {pacote de dados} other {projeto}} é distribuído sob."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Seleciona uma licença"
   },
@@ -182,9 +176,6 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleciona etiquetas precisas"
   },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "É necessária pelo menos uma iagem para mostrar o conteúdo do teu {type, select, resourcepack {pacote de recursor, excepto para audio ou pacotes de localização. Caso isto descreva o teu pacote, por favor seleciona a etiqueta apropriada} shader {shader} other {projeto}}."
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Adiciona uma imagem à galeria"
   },
@@ -207,4 +198,3 @@
     "defaultMessage": "Vê as definições de links"
   }
 }
-

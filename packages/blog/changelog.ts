@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-29T01:44:44+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Account sign in buttons were showing in mobile navbar on iOs when hidden`,
+	},
+	{
 		date: `2026-05-27T22:30:20+00:00`,
 		product: 'app',
 		version: '0.14.0',

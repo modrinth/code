@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Zoek servers"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "{name} Zal **permanent verwijderd** worden en kan niet hersteld worden."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Weet je zeker dat je deze wereld definitief wilt verwijderen?"
   },
@@ -256,9 +253,6 @@
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Ben je zeker dat je {name} wil verwijderen?"
-  },
-  "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Zoek werelden"
   },
   "app.instance.worlds.this-server": {
     "message": "deze server"

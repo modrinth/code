@@ -122,11 +122,22 @@
 			<div class="normal-page__header py-4">
 				<ContentPageHeader>
 					<template #icon>
-						<Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
+						<Avatar
+							:src="user.avatar_url"
+							:alt="user.username"
+							:size="isModrinthUser ? '64px' : '96px'"
+							circle
+						/>
 					</template>
 					<template #title>
 						<span class="flex items-center gap-2">
 							{{ user.username }}
+							<BadgeCheckIcon
+								v-if="isModrinthUser"
+								v-tooltip="formatMessage(messages.officialAccount)"
+								class="size-5 text-brand"
+								fill="var(--color-brand-highlight)"
+							/>
 							<TagItem
 								v-if="isAdminViewing && isAffiliate"
 								:style="{
@@ -138,7 +149,31 @@
 							</TagItem>
 						</span>
 					</template>
-					<template #summary>
+					<template v-if="isModrinthUser" #summary>
+						<IntlFormatted :message-id="messages.officialAccountBio">
+							<template #support-link>
+								<a
+									href="https://support.modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									https://support.modrinth.com
+								</a>
+							</template>
+							<template #email>
+								<a
+									href="mailto:support@modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									support@modrinth.com
+								</a>
+							</template>
+						</IntlFormatted>
+					</template>
+					<template v-else #summary>
 						{{
 							user.bio
 								? user.bio
@@ -147,7 +182,7 @@
 									: formatMessage(messages.bioFallbackCreator)
 						}}
 					</template>
-					<template #stats>
+					<template v-if="!isModrinthUser" #stats>
 						<div
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
@@ -352,6 +387,7 @@
 				<div
 					v-if="!route.params.projectType || route.params.projectType === 'collections'"
 					class="collections-grid"
+					:class="{ 'mt-3': projects?.length > 0 }"
 				>
 					<nuxt-link
 						v-for="collection in sortedCollections"
@@ -376,9 +412,9 @@
 							<div class="stats">
 								<BoxIcon />
 								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${
-										(collection.projects?.length || 0) !== 1 ? 's' : ''
-									}`
+									formatMessage(messages.collectionProjectsCount, {
+										count: collection.projects?.length || 0,
+									})
 								}}
 							</div>
 							<div class="stats">
@@ -466,6 +502,7 @@
 <script setup>
 import {
 	AffiliateIcon,
+	BadgeCheckIcon,
 	BoxIcon,
 	CalendarIcon,
 	CheckIcon,
@@ -553,6 +590,10 @@ const messages = defineMessages({
 	profileDownloadsLabel: {
 		id: 'profile.label.downloads',
 		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
+	},
+	collectionProjectsCount: {
+		id: 'profile.collection.projects-count',
+		defaultMessage: '{count, plural, one {# project} other {# projects}}',
 	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',
@@ -681,6 +722,15 @@ const messages = defineMessages({
 		id: 'profile.error.not-found',
 		defaultMessage: 'User not found',
 	},
+	officialAccount: {
+		id: 'profile.official-account',
+		defaultMessage: 'Official Modrinth account',
+	},
+	officialAccountBio: {
+		id: 'profile.official-account.bio',
+		defaultMessage:
+			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
+	},
 })
 
 const client = injectModrinthClient()
@@ -749,6 +799,8 @@ onServerPrefetch(async () => {
 const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
 )
+
+const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
 
 const sortedCollections = computed(() => {
 	const list = collections.value
@@ -951,7 +1003,6 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
-	margin-top: var(--gap-md);
 
 	.collection-item {
 		display: flex;

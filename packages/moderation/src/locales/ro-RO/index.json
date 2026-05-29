@@ -65,9 +65,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Vizitează pagina galeriei"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "{type, select, mod {mod-ul} plugin {plugin-ul} other {proiectul}} dumneavoastră folosește o licență care necesită codul sursă să fie disponibil. Vă rugăm să introdueți link-ul codului sursă sau fișierul sursă pentru fiecare versiune adițională, sau luați în considerare folosirea unei licențe diferite."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oferă codul sursă"
   },
@@ -134,9 +131,6 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Examinați feedback-ul"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Ați selectat {count, plural, one {# tag de resoluție} other {# tag-uri de resoluție}}. Pachete de resursă ar trebui tipic să aibă numai un tag de resoluție care să se potrivească cu resoluția primară."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selectează rezoluția corectă"
   },
@@ -157,9 +151,6 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Selectați o limbă"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Selectați licența sub care este distribuit {type, select, mod {mod} modpack {modpack} resourcepack {resourcepack} shader {shader} plugin {plugin} datapack {datapack} other {project}} dumneavoastră."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selectează o licență"
@@ -224,9 +215,6 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Selectează etichete exacte"
   },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Este necesară cel puțin o imagine din galerie pentru a prezenta conținutul dvs{type, select,resourcepack {pachet de resurse, cu excepția pachetelor audio sau de localizare. Dacă acest lucru descrie pachetul dvs., vă rugăm să selectați eticheta corespunzătoare}shader {shader} other {proiect}}."
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Încarcă o imagine în galerie"
   },
@@ -249,4 +237,3 @@
     "defaultMessage": "Vizitează setările link-urilor"
   }
 }
-

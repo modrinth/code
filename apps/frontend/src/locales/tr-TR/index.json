@@ -512,9 +512,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
   },
-  "create.collection.collection-info": {
-    "message": "Yeni koleksiyonunuz herkese açık olarak {count, plural, =0 {projesiz hâlde} other {# proje ile}} oluşturulacaktır."
-  },
   "create.collection.create-collection": {
     "message": "Koleksiyon oluştur"
   },
@@ -1352,15 +1349,6 @@
   "discover.install.heading.reset-modpack": {
     "message": "Sıfırlama sonrası yüklenecek mod paketi seçiliyor"
   },
-  "discover.seo.description": {
-    "message": "Modrinth üzerinde anında ve doğru arama sonuçlarıyla binlerce Minecraft {projectType, select, mod {mod} modpack {modpack} resourcepack {kaynak paketi} shader {shader} plugin {eklenti} datapack {veri paketi} other {proje}} arasında arama yap ve göz at. Filtrelerimiz en iyi Minecraft {projectType, select, mod {modları} modpack {mod paketlerini} resourcepack {kaynak paketlerini} shader {shaderları} plugin {eklentileri} datapack {veri paketlerini} other {projeleri}} hızlıca bulmana yardımcı olur."
-  },
-  "discover.seo.title": {
-    "message": "Ara {projectType, select, mod {modları} modpack {mod paketleri} resourcepack {kaynak paketleri} shader {shaderlar} plugin {eklentiler} datapack {veri paketleri} other {projeler}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Ara {projectType, select, mod {modları} modpack {mod paketleri} resourcepack {kaynak paketleri} shader {shaderlar} plugin {eklentiler} datapack {veri paketleri} other {projeler}} | {query}"
-  },
   "error.collection.404.list_item.1": {
     "message": "Koleksiyonun URL'ini yanlış yazmış olabilirsin."
   },
@@ -1795,9 +1783,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Oyuncular İçin"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "{count}'un üzerinde içerik keşfedin"
   },
   "landing.subheading": {
     "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
@@ -2789,23 +2774,11 @@
   "report.already-reported": {
     "message": "Zaten {title} ögesini bildirdiniz"
   },
-  "report.already-reported-description": {
-    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} için zaten açık bir raporunuz bulunuyor. Eklemek istediğiniz yeni bilgiler varsa mevcut raporunuza detay ekleyebilirsiniz."
-  },
-  "report.back-to-item": {
-    "message": "{item, select, project {projeye} version {sürüme} user {kullanıcıya} other {içeriğe}} geri dön"
-  },
   "report.body.description": {
     "message": "Eğer mümkünse ve alakalıysa bağlantılar ve görseller ekleyin. Boş ve yetersiz raporlar kapatılacak ve yok sayılacak."
   },
   "report.body.title": {
     "message": "Lütfen raporunuzla ilgili ekstra bağlam sağlayın"
-  },
-  "report.checking": {
-    "message": "{item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} kontrol ediliyor..."
-  },
-  "report.could-not-find": {
-    "message": "{item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} bulunamadı"
   },
   "report.for.violation": {
     "message": "Modrinth <rules-link>Kuralları</rules-link> veya <terms-link>Kullanım Koşulları</terms-link> İhlali"
@@ -2846,14 +2819,8 @@
   "report.please-report": {
     "message": "Lütfen bildirin:"
   },
-  "report.question.content-id": {
-    "message": "{item, select, project {projenin} version {sürümün} user {kullanıcının} other {içeriğin}} kimliği nedir?"
-  },
   "report.question.content-type": {
     "message": "Ne tür bir içerik bildiriyorsunuz?"
-  },
-  "report.question.report-reason": {
-    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} Modrinth kurallarından hangisini ihlal ediyor?"
   },
   "report.report-content": {
     "message": "Moderatörlere içerik bildir"
@@ -3521,20 +3488,11 @@
   "settings.billing.expires": {
     "message": "Son kullanma tarihi {date}"
   },
-  "settings.billing.interval.monthly": {
-    "message": "ay"
-  },
   "settings.billing.interval.quarter": {
     "message": "çeyrek"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "çeyreklik"
-  },
   "settings.billing.interval.year": {
     "message": "yıl"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "yıllık"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Modrinth App ve modrinth.com'da reklamsız gezinme"
@@ -3605,9 +3563,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} Paylaşımlı CPU ( {bursts} CPU’ya kadar ani yükselme)"
   },
@@ -3674,17 +3629,8 @@
   "settings.billing.subscription.title": {
     "message": "Abonelikler"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "{interval} planına geçiliyor"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "{interval} planına geç"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Aylık faturalandırma size yıllık ek olarak {amount} maliyet çıkaracaktır"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "{date} tarihinde {interval} ödemeye geçer"
   },
   "settings.billing.update-method": {
     "message": "Güncelleme metodu"

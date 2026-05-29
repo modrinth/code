@@ -49,7 +49,13 @@
 			<span class="font-semibold text-contrast">
 				{{ formatMessage(messages.instanceType) }}
 			</span>
-			<Chips v-model="tab" :items="tabs" :format-label="formatTabLabel" :never-empty="true" />
+			<Chips
+				v-model="tab"
+				:items="tabs"
+				:format-label="formatTabLabel"
+				:never-empty="true"
+				:capitalize="false"
+			/>
 		</div>
 
 		<div class="h-px bg-divider" />
