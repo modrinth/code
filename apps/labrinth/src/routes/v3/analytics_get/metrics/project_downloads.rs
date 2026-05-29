@@ -416,6 +416,30 @@ impl DownloadSourcePattern {
     }
 }
 
+pub(crate) fn all_download_sources() -> Vec<DownloadSource> {
+    let mut sources = DOWNLOAD_SOURCE_PATTERNS
+        .iter()
+        .map(|(_, source)| source.into_source())
+        .collect::<Vec<_>>();
+    sources.push(DownloadSource::Other);
+    sources.sort_by(|a, b| {
+        download_source_sort_key(a).cmp(download_source_sort_key(b))
+    });
+    sources.dedup();
+    sources
+}
+
+fn download_source_sort_key(source: &DownloadSource) -> &str {
+    match source {
+        DownloadSource::Named(name) => name,
+        DownloadSource::Website => "website",
+        DownloadSource::ModrinthApp => "modrinth_app",
+        DownloadSource::ModrinthHosting => "modrinth_hosting",
+        DownloadSource::ModrinthMaven => "modrinth_maven",
+        DownloadSource::Other => "other",
+    }
+}
+
 static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
     LazyLock::new(|| {
         use DownloadSourcePattern as P;

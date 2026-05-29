@@ -29,7 +29,8 @@ pub use project_downloads::{
     ProjectDownloadsFilters,
 };
 pub(crate) use project_downloads::{
-    fetch as fetch_project_downloads, normalize_download_source,
+    all_download_sources, fetch as fetch_project_downloads,
+    normalize_download_source,
 };
 pub(crate) use project_playtime::fetch as fetch_project_playtime;
 pub use project_playtime::{
