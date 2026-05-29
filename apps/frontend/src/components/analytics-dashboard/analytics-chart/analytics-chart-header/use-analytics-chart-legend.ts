@@ -13,6 +13,7 @@ import {
 	MONETIZATION_LEGEND_ENTRY_ORDER,
 	PREVIOUS_PERIOD_BORDER_DASH,
 } from '../analytics-chart-constants.ts'
+import type { AnalyticsChartEvent } from '../analytics-chart-plot/AnalyticsChartEvents.vue'
 import type { AnalyticsChartLegendEntry } from '../analytics-chart-types.ts'
 import {
 	areStringArraysEqual,
@@ -21,7 +22,6 @@ import {
 	getChartDatasetTotal,
 	getPreviousPeriodDatasetId,
 } from '../analytics-chart-utils.ts'
-import type { AnalyticsChartEvent } from '../analytics-chart-plot/AnalyticsChartEvents.vue'
 
 export function useAnalyticsChartLegend({
 	selectableChartDatasets,
