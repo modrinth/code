@@ -3,12 +3,12 @@ import {
 	type ProjectStatusFilterValue,
 } from '~/components/analytics-dashboard/query-builder/query-filter'
 
-import type { AnalyticsSelectedFilters } from './query-builder-url'
 import type {
 	AnalyticsDashboardProject,
 	AnalyticsDashboardProjectSource,
 	ProjectTypeMetadata,
-} from './types'
+} from './analytics-types'
+import type { AnalyticsSelectedFilters } from './query-builder-url'
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 

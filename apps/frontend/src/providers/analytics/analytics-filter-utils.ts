@@ -1,6 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { AnalyticsSelectedFilters } from './query-builder-url'
 import type {
 	AnalyticsDashboardFilterOptions,
 	AnalyticsFacetsFilterOptionSummary,
@@ -8,7 +7,8 @@ import type {
 	AnalyticsVersionMetadata,
 	NormalizedAnalyticsSelectedFilters,
 	ProjectVersionFilterOptionSummary,
-} from './types'
+} from './analytics-types'
+import type { AnalyticsSelectedFilters } from './query-builder-url'
 
 export function sortStringValues(values: string[]): string[] {
 	return [...values].sort((left, right) => left.localeCompare(right))

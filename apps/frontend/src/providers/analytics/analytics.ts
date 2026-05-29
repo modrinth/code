@@ -49,6 +49,15 @@ import {
 	toAnalyticsDashboardProject,
 	UNKNOWN_ORGANIZATION_NAME,
 } from './analytics-project-utils'
+import type {
+	AnalyticsDashboardFilterOptions,
+	AnalyticsDashboardPercentChanges,
+	AnalyticsDashboardProject,
+	AnalyticsDashboardProjectGroup,
+	AnalyticsDashboardTotals,
+	AnalyticsProjectVersionSource,
+	AnalyticsVersionMetadata,
+} from './analytics-types'
 import {
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
@@ -74,15 +83,6 @@ import {
 	readAnalyticsGraphState,
 	readAnalyticsQueryBuilderState,
 } from './query-builder-url'
-import type {
-	AnalyticsDashboardFilterOptions,
-	AnalyticsDashboardPercentChanges,
-	AnalyticsDashboardProject,
-	AnalyticsDashboardProjectGroup,
-	AnalyticsDashboardTotals,
-	AnalyticsProjectVersionSource,
-	AnalyticsVersionMetadata,
-} from './types'
 import { useAnalyticsRouteSync } from './use-analytics-route-sync'
 
 export { ANALYTICS_START_DATE_INPUT_VALUE } from './analytics-data-utils'
@@ -96,6 +96,14 @@ export {
 	getProjectIdsMatchingStatusFilter,
 } from './analytics-project-utils'
 export type {
+	AnalyticsDashboardFilterOptions,
+	AnalyticsDashboardPercentChanges,
+	AnalyticsDashboardProject,
+	AnalyticsDashboardProjectGroup,
+	AnalyticsDashboardTotals,
+	NormalizedAnalyticsSelectedFilters,
+} from './analytics-types'
+export type {
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardStat,
 	AnalyticsGraphState,
@@ -108,14 +116,6 @@ export type {
 	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
 } from './query-builder-url'
-export type {
-	AnalyticsDashboardFilterOptions,
-	AnalyticsDashboardPercentChanges,
-	AnalyticsDashboardProject,
-	AnalyticsDashboardProjectGroup,
-	AnalyticsDashboardTotals,
-	NormalizedAnalyticsSelectedFilters,
-} from './types'
 
 const REVENUE_GROUP_BY_FALLBACK: AnalyticsGroupByPreset = 'day'
 const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000

@@ -4,18 +4,18 @@ import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/
 
 import { getProjectIdsMatchingStatusFilter } from './analytics-project-utils'
 import type {
+	AnalyticsDashboardTotals,
+	AnalyticsFetchData,
+	AnalyticsProjectFetchRequest,
+	AnalyticsTimeSliceSplit,
+} from './analytics-types'
+import type {
 	AnalyticsGroupByPreset,
 	AnalyticsLastTimeframeUnit,
 	AnalyticsSelectedFilters,
 	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
 } from './query-builder-url'
-import type {
-	AnalyticsDashboardTotals,
-	AnalyticsFetchData,
-	AnalyticsProjectFetchRequest,
-	AnalyticsTimeSliceSplit,
-} from './types'
 
 const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
 export const ANALYTICS_START_DATE_INPUT_VALUE = ANALYTICS_START_TIMESTAMP.slice(0, 10)
