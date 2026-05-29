@@ -80,6 +80,7 @@ pub struct ProjectPlaytime {
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct PlaytimeRow {
     bucket: u64,
+    source_project_id: DBProjectId,
     project_id: DBProjectId,
     parent_version_id: DBVersionId,
     version_id: DBVersionId,
@@ -104,6 +105,7 @@ const PLAYTIME: &str = {
     formatcp!(
         "SELECT
             bucket,
+            source_project_id,
             if({USE_PROJECT_ID}, source_project_id, 0) AS project_id,
             parent_version_id,
             version_id,
@@ -152,7 +154,7 @@ const PLAYTIME: &str = {
                 AND (empty({FILTER_GAME_VERSION}) OR playtime.game_version IN {FILTER_GAME_VERSION})
                 AND (empty({FILTER_COUNTRY}) OR playtime.country IN {FILTER_COUNTRY})
         )
-        GROUP BY bucket, project_id, parent_version_id, version_id, loader, game_version, country"
+        GROUP BY bucket, source_project_id, project_id, parent_version_id, version_id, loader, game_version, country"
     )
 };
 
@@ -231,13 +233,13 @@ pub(crate) async fn fetch(
             } else {
                 row.project_id
             };
-        let source_project_id = if row.project_id.0 == 0 {
+        let source_project_id = if row.source_project_id.0 == 0 {
             parent_version_projects
                 .get(&row.parent_version_id)
                 .copied()
-                .unwrap_or(row.project_id)
+                .unwrap_or(row.source_project_id)
         } else {
-            row.project_id
+            row.source_project_id
         };
         let key = PlaytimeBucket {
             bucket: row.bucket,

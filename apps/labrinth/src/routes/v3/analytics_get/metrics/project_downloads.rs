@@ -204,8 +204,8 @@ const DOWNLOADS: &str = {
     formatcp!(
         "SELECT
             widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-            project_id AS source_project_id,
-            if({USE_PROJECT_ID}, project_id, 0) AS project_id,
+            downloads.project_id AS source_project_id,
+            if({USE_PROJECT_ID}, downloads.project_id, 0) AS project_id,
             if({USE_DOMAIN}, domain, '') AS domain,
             if({USE_USER_AGENT}, user_agent, '') AS user_agent,
             if({USE_VERSION_ID}, version_id, 0) AS version_id,
@@ -230,7 +230,7 @@ const DOWNLOADS: &str = {
             AND (empty({FILTER_REASON}) OR downloads.reason IN {FILTER_REASON})
             AND (empty({FILTER_GAME_VERSION}) OR downloads.game_version IN {FILTER_GAME_VERSION})
             AND (empty({FILTER_LOADER}) OR downloads.loader IN {FILTER_LOADER})
-        GROUP BY bucket, project_id, domain, user_agent, version_id, monetized, country, reason, game_version, loader"
+        GROUP BY bucket, source_project_id, project_id, domain, user_agent, version_id, monetized, country, reason, game_version, loader"
     )
 };
 
