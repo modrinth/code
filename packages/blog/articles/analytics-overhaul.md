@@ -1,7 +1,7 @@
 ---
 title: Project Analytics are good now
 summary: Get deeper insights into how people are using your projects with breakdowns, filtering, and more!
-date: 2026-05-29T04:00:00-07:00
+date: 2026-05-29T13:00:00-07:00
 authors: ['AJfd8YH6', '6EjnV9Uf', 'xSQqYYIN']
 ---
 
