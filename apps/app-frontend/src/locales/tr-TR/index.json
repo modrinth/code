@@ -368,9 +368,6 @@
   "friends.action.add-friend": {
     "message": "Bir arkadaş ekle"
   },
-  "friends.action.view-friend-requests": {
-    "message": "{count} arkadaşlık isteği"
-  },
   "friends.add-friend.submit": {
     "message": "Arkadaşlık isteği gönder"
   },

@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Переглянути сервери"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "«{name}» буде **назавжди видалено** й у вас не буде можливости відновлення."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Ви впевнені, що хочете назавжди видалити цей світ?"
   },
@@ -248,12 +245,6 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Сервера або світи не додано"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "«{name}» буде видалено з вашого списку, включно в грі, і без можливости відновлення."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "«{name}» ({address}) буде видалено з вашого списку, включно в грі, і без можливости відновлення."
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "Ви впевнені, що хочете видалити «{name}»?"
   },
@@ -271,9 +262,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установити"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Потрібна збірка"
@@ -394,9 +382,6 @@
   },
   "friends.action.add-friend": {
     "message": "Додати друга"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} запит{count, plural, one { у} few {и в} many {ів у} other {у в}} друзі"
   },
   "friends.add-friend.submit": {
     "message": "Надіслати запит у друзі"

@@ -1331,9 +1331,6 @@
   "project-member-header.invitation-title": {
     "message": "Invitație de a te alătura proiectului"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Ai fost invitat să devii membru al acestui proiect cu rolul de '{role}''."
-  },
   "project-member-header.success-decline": {
     "message": "Ai refuzat invitația în echipă"
   },

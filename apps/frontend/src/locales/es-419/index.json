@@ -1361,15 +1361,6 @@
   "discover.install.heading.reset-modpack": {
     "message": "Seleccionando modpack para instalar antes del reinicio"
   },
-  "discover.seo.description": {
-    "message": "Busca y navega miles de {projectType, select, mod {mods} modpack {modpacks}  resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {proyectos}} para Minecraft en Modrinth con resultados de busqueda instantáneos y precisos. Nuestros filtradores te ayudarán a encontrar rápidamente los mejores {projectType, select, mod {mods} modpack {modpacks}  resourcepack {packs de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} para Minecraft."
-  },
-  "discover.seo.title": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks} resourcepack {paquetes de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {modpacks}  resourcepack {paquetes de recursos} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
-  },
   "error.collection.404.list_item.1": {
     "message": "Puede que hayas escrito mal la URL de la colección."
   },
@@ -2918,23 +2909,11 @@
   "report.already-reported": {
     "message": "Ya has reportado {title}"
   },
-  "report.already-reported-description": {
-    "message": "Ya tienes un reporte abierto para {item, select, project {este proyecto} version {esta versión} user {este usuario} other {este contenido}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
-  },
-  "report.back-to-item": {
-    "message": "Volver {item, select, project {al proyecto} version {a la versión} user {al usuario} other {al contenido}}"
-  },
   "report.body.description": {
     "message": "Incluye enlaces e imágenes si es posible y relevante. Los reportes vacíos o insuficientes serán cerrados e ignorados."
   },
   "report.body.title": {
     "message": "Por favor, proporciona contexto adicional acerca de tu reporte"
-  },
-  "report.checking": {
-    "message": "Revisando {item, select, project {proyecto} version {version} user {usuario} other {contenido}}..."
-  },
-  "report.could-not-find": {
-    "message": "No se pudo encontrar {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}"
   },
   "report.for.violation": {
     "message": "Infracción de las <rules-link>Reglas</rules-link> o <terms-link>Términos de Uso</terms-link> de Modrinth"
@@ -2975,14 +2954,8 @@
   "report.please-report": {
     "message": "Por favor, informa:"
   },
-  "report.question.content-id": {
-    "message": "¿Cual es la ID de {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
-  },
   "report.question.content-type": {
     "message": "¿Qué tipo de contenido estás reportando?"
-  },
-  "report.question.report-reason": {
-    "message": "¿Que regla de Mondrinth esta quebrantando {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
   },
   "report.report-content": {
     "message": "Reportar contenido a moderadores"
@@ -3662,20 +3635,11 @@
   "settings.billing.interval.month": {
     "message": "mes"
   },
-  "settings.billing.interval.monthly": {
-    "message": "mensual"
-  },
   "settings.billing.interval.quarter": {
     "message": "trimestre"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "trimestralmente"
-  },
   "settings.billing.interval.year": {
     "message": "año"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "anual"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Navegación sin anuncios en modrinth.com y en la Modrinth App"
@@ -3761,9 +3725,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPUs compartidas (Picos de hasta {bursts} CPUs)"
   },
@@ -3830,17 +3791,8 @@
   "settings.billing.subscription.title": {
     "message": "Suscripciones"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Cambiando a {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Cambiar a {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "La facturación mensual te costará {amount} adicionales por año"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Se cambia a facturación {interval} el {date}"
   },
   "settings.billing.update-method": {
     "message": "Actualizar método"

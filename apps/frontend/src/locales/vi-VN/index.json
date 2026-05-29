@@ -485,9 +485,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
   },
-  "create.collection.collection-info": {
-    "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
-  },
   "create.collection.create-collection": {
     "message": "Tạo bộ sưu tập"
   },
@@ -2168,9 +2165,6 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Tải xuống các dự án của {username} trên Modrinth"
   },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> người theo dõi dự án}}"
-  },
   "profile.user-id": {
     "message": "ID người dùng: {id}"
   },
@@ -2498,12 +2492,6 @@
   "project.settings.visit-dashboard": {
     "message": "Truy cập bảng điều khiển dự án"
   },
-  "project.stats.downloads-label": {
-    "message": "lượt tải"
-  },
-  "project.stats.followers-label": {
-    "message": "người theo dõi"
-  },
   "project.status.archived.message": {
     "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
   },
@@ -2513,23 +2501,11 @@
   "report.already-reported": {
     "message": "Bạn đã báo cáo {title}"
   },
-  "report.already-reported-description": {
-    "message": "Bạn đã có một báo cáo đang mở cho {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}} này. Bạn có thể bổ sung chi tiết vào báo cáo của mình nếu có thêm thông tin."
-  },
-  "report.back-to-item": {
-    "message": "Quay lại {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}}"
-  },
   "report.body.description": {
     "message": "Hãy kèm theo liên kết và hình ảnh nếu có và phù hợp. Các báo cáo trống hoặc không đầy đủ sẽ bị đóng và bỏ qua."
   },
   "report.body.title": {
     "message": "Vui lòng cung cấp thêm ngữ cảnh cho báo cáo của bạn"
-  },
-  "report.checking": {
-    "message": "Đang kiểm tra {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}}..."
-  },
-  "report.could-not-find": {
-    "message": "Không tìm thấy {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}}"
   },
   "report.for.violation": {
     "message": "Vi phạm <rules-link>Quy định</rules-link> hoặc <terms-link>Điều khoản sử dụng</terms-link> của Modrinth"
@@ -2570,14 +2546,8 @@
   "report.please-report": {
     "message": "Vui lòng báo cáo:"
   },
-  "report.question.content-id": {
-    "message": "ID của {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}} này là gì?"
-  },
   "report.question.content-type": {
     "message": "Bạn đang báo cáo loại nội dung nào?"
-  },
-  "report.question.report-reason": {
-    "message": "{item, select, project {Dự án} version {Phiên bản} user {Người dùng} other {Nội dung}} này đang vi phạm quy định nào của Modrinth?"
   },
   "report.report-content": {
     "message": "Báo cáo nội dung cho kiểm duyệt viên"
@@ -3251,14 +3221,8 @@
   "settings.billing.interval.month": {
     "message": "tháng"
   },
-  "settings.billing.interval.monthly": {
-    "message": "hằng tháng"
-  },
   "settings.billing.interval.year": {
     "message": "năm"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "hằng năm"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Duyệt web không quảng cáo trên modrinth.com và app Modrinth"
@@ -3344,9 +3308,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPU dùng chung (Tăng tốc tối đa {bursts} CPU)"
   },
@@ -3410,17 +3371,8 @@
   "settings.billing.subscription.title": {
     "message": "Gói đăng ký"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Đang chuyển sang {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Chuyển sang {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Thanh toán hàng tháng sẽ tốn thêm {amount} mỗi năm"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Chuyển sang thanh toán theo {interval} vào ngày {date}"
   },
   "settings.billing.update-method": {
     "message": "Cập nhật phương thức"

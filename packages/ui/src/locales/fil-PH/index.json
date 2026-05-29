@@ -50,18 +50,6 @@
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Error"
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 araw"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/buwan"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/tatlong buwan"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/taon"
-  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Plan"
   },
@@ -572,9 +560,6 @@
   "installation-settings.incompatible-content.loader-change-body": {
     "defaultMessage": "Sa pagpapalit ng loader, ang lahat ng na-install na kontento ay mapapatay. Sa halip, inimumungkahi namin na i-reset ang iyong server."
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Naka-link na {projectType, select, server {server project} other {modpack}}"
-  },
   "installation-settings.removed-incompatible": {
     "defaultMessage": "Tinanggal (di-magkatugma)"
   },
@@ -586,9 +571,6 @@
   },
   "installation-settings.unlink": {
     "defaultMessage": "Mag-unlink"
-  },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Sa pag-a-unlink ay habambuhay na madidiskonekta ang {type, select, server {server na} other {instansiyang}} ito sa proyektong {projectType, select, server {server} other {modpack}}, na mahahayaan kang makapagpalit ng loader at ng bersiyon ng Minecraft, ngunit hindi ka na makatatanggap ng mga susunod na update."
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Ayusin"
@@ -2595,4 +2577,3 @@
     "defaultMessage": "Mayroon kang hindi na-save na pagbabago."
   }
 }
-

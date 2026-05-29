@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Não foi possível carregar os detalhes da assinatura."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 dias"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/mês"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/trimestre"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/ano"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Sua próxima cobrança será em <charge-date>{date}</charge-date>."
   },
@@ -103,9 +91,6 @@
   },
   "browse.offline": {
     "defaultMessage": "Você está offline. Conecte a internet para navegar no Modrinth!"
-  },
-  "browse.search.placeholder": {
-    "defaultMessage": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods} resourcepack {pacotes de recursos} shader {sombreadores} plugin {plugins} datapack {pacotes de dados} server {servidores} other {projetos}}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Selecione projetos"
@@ -347,12 +332,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Aviso de exclusão"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Excluir {count} {itemType}{count, plural, one {} other {s}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Excluir {itemType}{count, plural, one {} other {s}}"
-  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {O retrocesso de versão} other {A atualização}} pode causar problemas de compatibilidade. Mods ou conteúdo que você adicionou além do pacote de mods serão mantidos, mas podem não ser compatíveis com a nova versão."
   },
@@ -431,9 +410,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Segure Shift ao clicar para pular a confirmação."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Recomendamos criar uma cópia de segurança antes de prosseguir, assim você poderá restaurar {type, select, server {seu mundo} other {sua instância}} caso algo dê errado."
-  },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "O conteúdo do seu pacote de mods agora pode ser encontrado aqui!"
   },
@@ -475,9 +451,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Por favor, aguarde"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "Buscar {count} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nomes dos arquivos"
@@ -541,9 +514,6 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Atualizando {contentType}..."
-  },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} selecionado(s)"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selecionado(s)"
@@ -851,17 +821,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} sobrescrito"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Sobrescrito"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Os arquivos serão sobrescritos"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "Criar {type, select, directory {pasta} other {arquivo}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Criar {type, select, directory {uma pasta} other {um arquivo}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "ex.: minha-pasta"
@@ -874,9 +835,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Excluir arquivo"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Esta pasta e todo o seu conteúdo serão excluídos permanentemente. Esta ação não pode ser desfeita.} other {Este arquivo será excluído permanentemente. Esta ação não pode ser desfeita.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Não foi possível carregar o conteúdo do arquivo."
@@ -1004,9 +962,6 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "ex.: /minha-pasta"
   },
-  "files.move-modal.header": {
-    "defaultMessage": "Mover {type, select, directory {pasta} other {arquivo}}"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Voltar para a página inicial"
   },
@@ -1073,9 +1028,6 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Novo nome"
   },
-  "files.row.item-count": {
-    "defaultMessage": "{count, plural, =0 {Nenhum item} one {# item} other {# itens}}"
-  },
   "files.table-header.created": {
     "defaultMessage": "Criado"
   },
@@ -1126,9 +1078,6 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} restantes"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Solte {type, select, undefined {arquivos} other {{type}s}} aqui para enviar"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "O nome deve conter apenas caracteres alfanuméricos, hífens, sublinhados ou espaços."
@@ -1502,17 +1451,11 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Alterar carregadores é destrutivo"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Vinculado ao {projectType, select, server {projeto de servidor} other {pacote de mods}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "Versão do {loader}"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Você precisará redefinir seu servidor para trocar o carregador."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Reinstalar o pacote de mods redefine o conteúdo {type, select, server {do servidor} other {da instancia}} para seu estado original, removendo quaisquer mods ou conteúdo que você tenha adicionado."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Reinstalar pacote de mods"
@@ -1544,9 +1487,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "Desvincular"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Desvincular desconecta permanentemente {type, select, server {este servidor} other {esta instância}} do {projectType, select, server {projeto de servidor} other {pacote de mods}}, permitindo que você altere o carregador e a versão do Minecraft, mas você não receberá atualizações futuras."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "Verificando..."
   },
@@ -1561,12 +1501,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstalar pacote de mods"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Reparar reinstala o carregador e as dependências do Minecraft sem excluir seu conteúdo. Isso pode resolver problemas se seu {type, select, server {servidor não estiver iniciando corretamente} other {jogo não estiver iniciando devido a erros relacionados ao launcher}}."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "Reparar {type, select, server {servidor} other {instância}}"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparar"
@@ -1585,9 +1519,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
-  },
-  "instances.content-install.compatible-count": {
-    "defaultMessage": "{count, plural, =0 {Nenhuma instância compatível} one {{count} instância compatível} other {{count} instâncias compatíveis}} "
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Instância existente"
@@ -2594,9 +2525,6 @@
   "project.about.tags.title": {
     "defaultMessage": "Etiquetas"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count, plural, =0 {Nenhum download} one {{count} download} other {{count} downloads}}"
-  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Necessário tanto no cliente quanto no servidor."
   },
@@ -2662,21 +2590,6 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente desconhecido"
-  },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, plural, =0 {Nenhum seguidor} one {{count} seguidor} other {{count} seguidores}}"
-  },
-  "project.online-player-count": {
-    "defaultMessage": "{count, plural, =0 {Ninguém online} other {{count} online}}"
-  },
-  "project.online-player-count.tooltip": {
-    "defaultMessage": "{count, plural, =0 {Nenhum jogador} one {{count} jogador} other {{count} jogadores}} online"
-  },
-  "project.recent-plays": {
-    "defaultMessage": "{countPlural, plural, =0 {Nenhuma entrada recente} one {{count} entrada recente} other {{count} entradas recentes}}"
-  },
-  "project.recent-plays.tooltip": {
-    "defaultMessage": "{countPlural, plural, =0 {Nenhuma entrada recente} one {{count} entrada recente} other {{count} entradas recentes}} do Modrinth nas últimas 2 semanas"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Este projeto utiliza um pacote de mods personalizado"
@@ -3464,17 +3377,11 @@
   "servers.listing.new-label": {
     "defaultMessage": "Novo"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Seus arquivos serão mantidos por mais {daysRemaining, plural, one {{daysRemaining} dia} other {{daysRemaining} dias}}. Entre em contato com o suporte para baixar os arquivos antes que sejam excluídos. "
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Seus arquivos serão preservados por 30 dias após o cancelamento."
   },
   "servers.listing.notice.moderated": {
     "defaultMessage": "Seu servidor foi suspenso por ação da moderação. "
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "Seu servidor {verb} para o plano {planSize} em <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Aguarde enquanto configuramos seu servidor. Isso pode levar até 10 minutos."
@@ -4331,11 +4238,7 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Sair da página?"
   },
-  "ui.stacked-admonitions.alert-count": {
-    "defaultMessage": "{count, plural, =0 {Nenhum alerta} one {# alerta} other {# alertas}}"
-  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Dispensar tudo"
   }
 }
-

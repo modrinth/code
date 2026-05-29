@@ -266,9 +266,6 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Anna koodi..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-Link> Unohditko salasanasi? </forgot-password-Link> • <create-account-link>Luo tili</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Kirjaudu sisään käyttäen"
   },

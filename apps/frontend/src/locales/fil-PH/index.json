@@ -881,9 +881,6 @@
   "dashboard.notifications.link.view-history": {
     "message": "Tingnan ang kasaysayan ng notipikasyon"
   },
-  "dashboard.notifications.link.view-more": {
-    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
-  },
   "dashboard.organizations.button.create": {
     "message": "Lumikha ng organisasyon"
   },
@@ -2480,23 +2477,11 @@
   "report.already-reported": {
     "message": "Nasumbong mo na ang {title}"
   },
-  "report.already-reported-description": {
-    "message": "Ikaw ay mayroon nang bukas na sumbong para sa {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito. Ikaw ay maaaring magdagdag ng detalye sa iyong sumbong kapag mayroong impormasyong kang maisasama pa."
-  },
-  "report.back-to-item": {
-    "message": "Bumalik sa {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
-  },
   "report.body.description": {
     "message": "Maglagay ng mga link at imahe kung makakaya at matumpak. Ang mga sumbong na kumulang o walang laman ay agarang sininasara at binabalewala."
   },
   "report.body.title": {
     "message": "Mangyaring magbigay ng karagdagang konteksto ukol sa iyong sumbong"
-  },
-  "report.checking": {
-    "message": "Tinitignan ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}..."
-  },
-  "report.could-not-find": {
-    "message": "Hindi mahanap ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
   },
   "report.for.violation": {
     "message": "Paglabag sa <rules-link>Mga Patakaran</rules-link> o <terms-link>Mga Tuntunin sa Paggamit</terms-link> ng Modrinth"
@@ -2537,14 +2522,8 @@
   "report.please-report": {
     "message": "Pakisumbong:"
   },
-  "report.question.content-id": {
-    "message": "Ano ang ID ng {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}?"
-  },
   "report.question.content-type": {
     "message": "Anong uri ng kontento ang iyong isusumbong?"
-  },
-  "report.question.report-reason": {
-    "message": "Aling sa mga tuntunin ng Modrinth ang nilabag ng {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito?"
   },
   "report.report-content": {
     "message": "Isumbong ang kontento sa mga moderator"
@@ -3032,20 +3011,11 @@
   "settings.billing.interval.month": {
     "message": "buwan"
   },
-  "settings.billing.interval.monthly": {
-    "message": "buwanan"
-  },
   "settings.billing.interval.quarter": {
     "message": "tatlong buwan"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "taluhang-buwan"
-  },
   "settings.billing.interval.year": {
     "message": "taon"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "taunan"
   },
   "settings.billing.midas.benefits.title": {
     "message": "Mga pakinabang"
@@ -3091,9 +3061,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Mga paraan ng pagbabayad"
-  },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
   },
   "settings.billing.pyro.resubscribe.error.text": {
     "message": "Isang error ang naganap habang pagre-resubscribe sa iyong Modrinth server."

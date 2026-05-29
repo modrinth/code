@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Procházet servery"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "\"{name}\" bude **navždy smazáno** a nebude způsob, jak to obnovit."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Opravdu si jsi jistý, že chceš navždy smazat tenhle svět?"
   },
@@ -247,9 +244,6 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Žádné servery nebo světy nebyly přidány"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "„{name}“ bude odstraněn z tvého seznamu, včetně hry, a nebude žádný způsob, jak ho obnovit."
   },
   "app.instance.worlds.remove-server-description-with-address": {
     "message": "'{name}' ({address}) bude odstraněn z vašeho seznamu, a to i ve hře, a nebude možné jej obnovit."
@@ -442,9 +436,6 @@
   },
   "friends.heading.pending": {
     "message": "Čeká na vyřízení"
-  },
-  "friends.no-friends-match": {
-    "message": "Žádní přátelé neodpovídají '{query}''"
   },
   "friends.search-friends-placeholder": {
     "message": "Hledat přátele..."
