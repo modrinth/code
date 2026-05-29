@@ -562,8 +562,8 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: formatMessage(analyticsBreakdownMessages.gameVersion),
 			searchable: true,
 			searchPlaceholder: formatMessage(analyticsMessages.searchVersionsPlaceholder),
-			submenuClass: 'w-fit max-w-[340px]',
-			previewDropdownWidth: '340px',
+			submenuClass: 'w-fit max-w-[338px]',
+			previewDropdownWidth: '338px',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 		},
 		{
