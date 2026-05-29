@@ -1212,8 +1212,7 @@ function onChartWheel(event: WheelEvent) {
 
 function isAnalyticsEventTooltipTrigger(target: EventTarget | null) {
 	return (
-		target instanceof Element &&
-		target.closest('[data-analytics-event-tooltip-trigger]') !== null
+		target instanceof Element && target.closest('[data-analytics-event-tooltip-trigger]') !== null
 	)
 }
 
@@ -1727,8 +1726,7 @@ const hoverEntries = computed<AnalyticsChartTooltipEntry[]>(() => {
 	return legendEntries.value.map((legendEntry) => {
 		const dataset = chartDatasetById.value.get(legendEntry.id)
 		const value = dataset?.data[sliceIndex] ?? 0
-		const ratioValue =
-			legendEntry.hidden || totalValue === 0 ? 0 : (value / totalValue) * 100
+		const ratioValue = legendEntry.hidden || totalValue === 0 ? 0 : (value / totalValue) * 100
 		return {
 			projectId: legendEntry.id,
 			name: legendEntry.name,
