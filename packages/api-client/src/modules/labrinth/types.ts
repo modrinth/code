@@ -238,6 +238,267 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Analytics {
+		export namespace v3 {
+			export type AnalyticsEventId = number
+			export type AnalyticsEventMetricKind = 'views' | 'revenue' | 'downloads' | 'playtime'
+
+			export type AnalyticsEvent = {
+				announcement_url: string | null
+				for_metric_kind: AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				id: AnalyticsEventId
+				starts: string
+			}
+
+			export type AnalyticsEventUpsert = {
+				announcement_url: string | null
+				for_metric_kind: AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				starts: string
+			}
+
+			export type FetchRequest = {
+				time_range: TimeRange
+				return_metrics: ReturnMetrics
+				project_ids?: string[]
+			}
+
+			export type TimeRange = {
+				start: string
+				end: string
+				resolution: TimeRangeResolution
+			}
+
+			export type TimeRangeResolution = { slices: number } | { minutes: number }
+
+			export type ReturnMetrics = {
+				project_views?: Metrics<ProjectViewsField, ProjectViewsFilters>
+				project_downloads?: Metrics<ProjectDownloadsField, ProjectDownloadsFilters>
+				project_playtime?: Metrics<ProjectPlaytimeField, ProjectPlaytimeFilters>
+				project_revenue?: Metrics<ProjectRevenueField, ProjectRevenueFilters>
+				affiliate_code_clicks?: Metrics<AffiliateCodeClicksField, AffiliateCodeClicksFilters>
+				affiliate_code_conversions?: Metrics<
+					AffiliateCodeConversionsField,
+					AffiliateCodeConversionsFilters
+				>
+				affiliate_code_revenue?: Metrics<AffiliateCodeRevenueField, AffiliateCodeRevenueFilters>
+			}
+
+			export type Metrics<BucketBy, FilterBy> = {
+				bucket_by?: BucketBy[]
+				filter_by?: FilterBy
+			}
+
+			export type ProjectViewsField =
+				| 'project_id'
+				| 'domain'
+				| 'site_path'
+				| 'monetized'
+				| 'country'
+
+			export type ProjectDownloadsField =
+				| 'project_id'
+				| 'version_id'
+				| 'user_agent'
+				| 'domain'
+				| 'country'
+				| 'monetized'
+				| 'reason'
+				| 'game_version'
+				| 'loader'
+
+			export type ProjectPlaytimeField =
+				| 'project_id'
+				| 'version_id'
+				| 'loader'
+				| 'game_version'
+				| 'country'
+
+			export type ProjectRevenueField = 'project_id'
+
+			export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
+
+			export type AffiliateCodeClicksField = 'affiliate_code_id'
+
+			export type AffiliateCodeConversionsField = 'affiliate_code_id'
+
+			export type AffiliateCodeRevenueField = 'affiliate_code_id'
+
+			export type ProjectViewsFilters = {
+				domain?: string[]
+				site_path?: string[]
+				monetized?: boolean[]
+				country?: string[]
+			}
+
+			export type ProjectDownloadsFilters = {
+				version_id?: string[]
+				domain?: string[]
+				user_agent?: string[]
+				monetized?: boolean[]
+				country?: string[]
+				reason?: DownloadReason[]
+				game_version?: string[]
+				loader?: string[]
+			}
+
+			export type ProjectPlaytimeFilters = {
+				version_id?: string[]
+				loader?: string[]
+				game_version?: string[]
+				country?: string[]
+			}
+
+			export type ProjectRevenueFilters = Record<string, never>
+
+			export type AffiliateCodeClicksFilters = {
+				affiliate_code_id?: string[]
+			}
+
+			export type AffiliateCodeConversionsFilters = {
+				affiliate_code_id?: string[]
+			}
+
+			export type AffiliateCodeRevenueFilters = {
+				affiliate_code_id?: string[]
+			}
+
+			export type FetchResponse = {
+				metrics: TimeSlice[]
+				project_events: ProjectAnalyticsEvent[]
+			}
+
+			export type FacetsResponse = {
+				facets: AnalyticsFacets
+			}
+
+			export type AnalyticsFacet<T> = {
+				value: T
+				downloads: number
+			}
+
+			export type AnalyticsFacets = {
+				project_views: ProjectViewsFacets
+				project_downloads: ProjectDownloadsFacets
+				project_playtime: ProjectPlaytimeFacets
+			}
+
+			export type ProjectViewsFacets = {
+				domain: AnalyticsFacet<string>[]
+				site_path: AnalyticsFacet<string>[]
+				monetized: AnalyticsFacet<boolean>[]
+				country: AnalyticsFacet<string>[]
+			}
+
+			export type ProjectDownloadsFacets = {
+				project_id: AnalyticsFacet<string>[]
+				domain: AnalyticsFacet<string>[]
+				user_agent: AnalyticsFacet<string>[]
+				version_id: AnalyticsFacet<string>[]
+				monetized: AnalyticsFacet<boolean>[]
+				country: AnalyticsFacet<string>[]
+				reason: AnalyticsFacet<DownloadReason>[]
+				game_version: AnalyticsFacet<string>[]
+				loader: AnalyticsFacet<string>[]
+			}
+
+			export type ProjectPlaytimeFacets = {
+				version_id: AnalyticsFacet<string>[]
+				loader: AnalyticsFacet<string>[]
+				game_version: AnalyticsFacet<string>[]
+				country: AnalyticsFacet<string>[]
+			}
+
+			export type TimeSlice = AnalyticsData[]
+
+			export type ProjectAnalyticsEvent = {
+				project_id: string
+				timestamp: string
+			} & ProjectAnalyticsEventKind
+
+			export type ProjectAnalyticsEventKind =
+				| {
+						kind: 'version_uploaded'
+						version_id: string
+						version_name: string
+						version_number: string
+				  }
+				| {
+						kind: 'status_changed'
+						status_from: Projects.v2.ProjectStatus
+						status_to: Projects.v2.ProjectStatus
+				  }
+
+			export type AnalyticsData = ProjectAnalytics | AffiliateCodeAnalytics
+
+			export type ProjectAnalytics = {
+				source_project: string
+			} & ProjectMetrics
+
+			export type ProjectMetrics =
+				| ({ metric_kind: 'views' } & ProjectViews)
+				| ({ metric_kind: 'downloads' } & ProjectDownloads)
+				| ({ metric_kind: 'playtime' } & ProjectPlaytime)
+				| ({ metric_kind: 'revenue' } & ProjectRevenue)
+
+			export type ProjectViews = {
+				domain?: string
+				site_path?: string
+				monetized?: boolean
+				country?: string
+				views: number
+			}
+
+			export type ProjectDownloads = {
+				user_agent?: string
+				domain?: string
+				version_id?: string
+				country?: string
+				monetized?: boolean
+				reason?: DownloadReason
+				game_version?: string
+				loader?: string
+				downloads: number
+			}
+
+			export type ProjectPlaytime = {
+				version_id?: string
+				loader?: string
+				game_version?: string
+				country?: string
+				seconds: number
+			}
+
+			export type ProjectRevenue = {
+				revenue: string
+			}
+
+			export type AffiliateCodeAnalytics = {
+				source_affiliate_code: string
+			} & AffiliateCodeMetrics
+
+			export type AffiliateCodeMetrics =
+				| ({ metric_kind: 'clicks' } & AffiliateCodeClicks)
+				| ({ metric_kind: 'conversions' } & AffiliateCodeConversions)
+				| ({ metric_kind: 'revenue' } & AffiliateCodeRevenue)
+
+			export type AffiliateCodeClicks = {
+				clicks: number
+			}
+
+			export type AffiliateCodeConversions = {
+				conversions: number
+			}
+
+			export type AffiliateCodeRevenue = {
+				revenue: string
+			}
+		}
+	}
+
 	export namespace Auth {
 		export namespace Internal {
 			export type SubscriptionStatus = {
@@ -1059,6 +1320,11 @@ export namespace Labrinth {
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
 				github_id?: number
+			}
+
+			export type AllProjectsResponse = {
+				projects: Projects.v3.Project[]
+				organizations: Record<string, Organizations.v3.Organization>
 			}
 		}
 	}

@@ -60,10 +60,20 @@ export function useScrollViewport(options: ScrollViewportOptions = {}) {
 	}
 
 	function syncScrollState() {
-		if (!scrollContainer.value) return
-		scrollTop.value = getScrollTop(scrollContainer.value)
-		viewportHeight.value = getViewportHeight(scrollContainer.value)
+		const listEl = listContainer.value
+		if (!listEl) return
+
+		const container = findScrollableAncestor(listEl)
+		scrollContainer.value = container
+		scrollTop.value = getScrollTop(container)
+		viewportHeight.value = getViewportHeight(container)
 		updateContainerOffset()
+	}
+
+	function resetScrollState() {
+		scrollTop.value = 0
+		viewportHeight.value = 0
+		containerOffset.value = 0
 	}
 
 	function handleScroll() {
@@ -109,6 +119,7 @@ export function useScrollViewport(options: ScrollViewportOptions = {}) {
 	})
 
 	return {
+		resetScrollState,
 		containerOffset,
 		listContainer,
 		relativeScrollTop,
@@ -130,10 +141,16 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		nearEndThreshold = 0.2,
 	} = options
 
-	const { listContainer, relativeScrollTop, scrollContainer, syncScrollState, viewportHeight } =
-		useScrollViewport({
-			onScroll: checkNearEnd,
-		})
+	const {
+		listContainer,
+		relativeScrollTop,
+		resetScrollState,
+		scrollContainer,
+		syncScrollState,
+		viewportHeight,
+	} = useScrollViewport({
+		onScroll: checkNearEnd,
+	})
 
 	const totalHeight = computed(() => items.value.length * itemHeight)
 
@@ -191,5 +208,7 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		visibleRange,
 		visibleTop,
 		visibleItems,
+		resetScrollState,
+		syncScrollState,
 	}
 }
