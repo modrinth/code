@@ -791,6 +791,8 @@ function getCompactAxisUnit(values: readonly number[]) {
 }
 
 function formatCompactAxisNumber(value: number, axisValues: readonly number[]): string | null {
+	if (Math.abs(value) === 0) return '0'
+
 	const unit = getCompactAxisUnit(axisValues)
 	if (!unit) return null
 
@@ -831,19 +833,17 @@ export function formatAxisValue(
 			})
 		}
 		case 'playtime': {
-			const hours = value / 3600
-			const axisHours = axisValues.map((axisValue) => axisValue / 3600)
-			const formattedHours = formatCompactAxisNumber(hours, axisHours)
+			const formattedHours = formatCompactAxisNumber(value, axisValues)
 			if (formattedHours) {
 				return formatMessage(analyticsChartMessages.playtimeAxisHours, { hours: formattedHours })
 			}
-			if (Math.abs(hours) < 10) {
+			if (Math.abs(value) < 10) {
 				return formatMessage(analyticsChartMessages.playtimeAxisHours, {
-					hours: formatSmallAxisNumber(hours),
+					hours: formatSmallAxisNumber(value),
 				})
 			}
 			return formatMessage(analyticsChartMessages.playtimeAxisHours, {
-				hours: formatCompact(Math.round(hours)),
+				hours: formatCompact(Math.round(value)),
 			})
 		}
 		case 'views':

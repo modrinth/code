@@ -402,12 +402,20 @@ function getDatasetColors(dataset: ChartDataset, index: number) {
 	}
 }
 
+function getChartDataValue(value: number) {
+	if (props.activeStat === 'playtime' && !props.ratioMode) {
+		return value / SECONDS_PER_HOUR
+	}
+
+	return value
+}
+
 function buildDatasets() {
 	return props.datasets.map((dataset, index) => {
 		const colors = getDatasetColors(dataset, index)
 		const common = {
 			label: dataset.label,
-			data: dataset.data,
+			data: dataset.data.map(getChartDataValue),
 			borderColor: colors.borderColor,
 			borderDash: dataset.borderDash,
 			borderWidth: 2,
@@ -572,15 +580,11 @@ function hasMetricData() {
 }
 
 function getEmptyDataYAxisMax() {
-	return props.activeStat === 'playtime'
-		? EMPTY_DATA_Y_AXIS_MAX * SECONDS_PER_HOUR
-		: EMPTY_DATA_Y_AXIS_MAX
+	return EMPTY_DATA_Y_AXIS_MAX
 }
 
 function getEmptyDataYAxisStepSize() {
-	return props.activeStat === 'playtime'
-		? EMPTY_DATA_Y_AXIS_STEP * SECONDS_PER_HOUR
-		: EMPTY_DATA_Y_AXIS_STEP
+	return EMPTY_DATA_Y_AXIS_STEP
 }
 
 function buildConfig(): ChartConfiguration {
