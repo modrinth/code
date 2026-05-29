@@ -60,7 +60,6 @@ import {
 	getAnalyticsVersionIdsFromProjects,
 	getProjectVersionFilterOptionSummary,
 	sanitizeAnalyticsSelectedFiltersForAvailableOptions,
-	shouldFetchAnalyticsDownloadCountFallback,
 	sortStringValues,
 } from './analytics-filter-utils'
 import {
@@ -1022,10 +1021,7 @@ export function createAnalyticsDashboardContext(
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})
 
-	const shouldFetchDownloadCountFallback = computed(() =>
-		shouldFetchAnalyticsDownloadCountFallback(analyticsFacetsData.value?.facets),
-	)
-	const { data: analyticsDownloadCountFallbackTimeSlices } = useQuery({
+	const { data: analyticsDownloadCountTimeSlices } = useQuery({
 		queryKey: computed(() => [
 			'analytics',
 			'dashboard',
@@ -1048,7 +1044,6 @@ export function createAnalyticsDashboardContext(
 		enabled: computed(
 			() =>
 				hasFetchedAnalyticsFilterOptions.value &&
-				shouldFetchDownloadCountFallback.value &&
 				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
 		),
 		placeholderData: [],
@@ -1283,58 +1278,22 @@ export function createAnalyticsDashboardContext(
 		}
 		return versionProjectIconUrls
 	})
-	const downloadCountFallbackTimeSlices = computed(() => {
-		const fallbackTimeSlices = analyticsDownloadCountFallbackTimeSlices.value ?? []
-		return fallbackTimeSlices.length > 0 ? fallbackTimeSlices : timeSlices.value
+	const downloadCountTimeSlices = computed(() => {
+		const countTimeSlices = analyticsDownloadCountTimeSlices.value ?? []
+		return countTimeSlices.length > 0 ? countTimeSlices : timeSlices.value
 	})
-	const fallbackProjectDownloadsById = computed(() =>
-		getProjectDownloadsByIdFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	const projectDownloadsById = computed(() =>
+		getProjectDownloadsByIdFromTimeSlices(downloadCountTimeSlices.value),
 	)
-	const fallbackProjectVersionDownloadsById = computed(() =>
-		getProjectVersionDownloadsByIdFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	const projectVersionDownloadsById = computed(() =>
+		getProjectVersionDownloadsByIdFromTimeSlices(downloadCountTimeSlices.value),
 	)
-	const fallbackCountryDownloadsByCode = computed(() =>
-		getCountryDownloadsByCodeFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	const countryDownloadsByCode = computed(() =>
+		getCountryDownloadsByCodeFromTimeSlices(downloadCountTimeSlices.value),
 	)
-	const fallbackGameVersionDownloadsByVersion = computed(() =>
-		getGameVersionDownloadsByVersionFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	const gameVersionDownloadsByVersion = computed(() =>
+		getGameVersionDownloadsByVersionFromTimeSlices(downloadCountTimeSlices.value),
 	)
-	function getDownloadCountMap(
-		facetDownloadsByValue: Map<string, number>,
-		fallbackDownloadsByValue: Map<string, number>,
-	): Map<string, number> {
-		if (shouldFetchDownloadCountFallback.value && fallbackDownloadsByValue.size > 0) {
-			return fallbackDownloadsByValue
-		}
-
-		return facetDownloadsByValue.size > 0 ? facetDownloadsByValue : fallbackDownloadsByValue
-	}
-
-	const projectDownloadsById = computed(() => {
-		const facetProjectDownloadsById = analyticsFacetsFilterOptionSummary.value.projectDownloadsById
-		return getDownloadCountMap(facetProjectDownloadsById, fallbackProjectDownloadsById.value)
-	})
-	const projectVersionDownloadsById = computed(() => {
-		const facetProjectVersionDownloadsById =
-			analyticsFacetsFilterOptionSummary.value.projectVersionDownloadsById
-		return getDownloadCountMap(
-			facetProjectVersionDownloadsById,
-			fallbackProjectVersionDownloadsById.value,
-		)
-	})
-	const countryDownloadsByCode = computed(() => {
-		const facetCountryDownloadsByCode =
-			analyticsFacetsFilterOptionSummary.value.countryDownloadsByCode
-		return getDownloadCountMap(facetCountryDownloadsByCode, fallbackCountryDownloadsByCode.value)
-	})
-	const gameVersionDownloadsByVersion = computed(() => {
-		const facetGameVersionDownloadsByVersion =
-			analyticsFacetsFilterOptionSummary.value.gameVersionDownloadsByVersion
-		return getDownloadCountMap(
-			facetGameVersionDownloadsByVersion,
-			fallbackGameVersionDownloadsByVersion.value,
-		)
-	})
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))

@@ -377,7 +377,6 @@ export namespace Labrinth {
 
 			export type AnalyticsFacet<T> = {
 				value: T
-				downloads: number
 			}
 
 			export type AnalyticsFacets = {

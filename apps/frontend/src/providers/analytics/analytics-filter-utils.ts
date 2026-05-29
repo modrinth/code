@@ -180,54 +180,6 @@ function getAnalyticsFacetValues<T>(
 	return facets?.map((facet) => facet.value) ?? []
 }
 
-function getAnalyticsFacetDownloadsByValue<T>(
-	facets: Labrinth.Analytics.v3.AnalyticsFacet<T>[] | null | undefined,
-	getKey: (value: T) => string,
-): Map<string, number> {
-	const downloadsByValue = new Map<string, number>()
-	for (const facet of facets ?? []) {
-		const key = getKey(facet.value)
-		if (key.length === 0) {
-			continue
-		}
-
-		const downloads = getAnalyticsFacetDownloadCount(facet)
-		if (downloads === null) {
-			continue
-		}
-
-		downloadsByValue.set(key, (downloadsByValue.get(key) ?? 0) + downloads)
-	}
-
-	return downloadsByValue
-}
-
-function getAnalyticsFacetDownloadCount<T>(
-	facet: Labrinth.Analytics.v3.AnalyticsFacet<T>,
-): number | null {
-	const count = (facet as { count?: number }).count ?? facet.downloads
-	return Number.isFinite(count) ? count : null
-}
-
-function doesAnalyticsFacetHaveDownloadCount<T>(
-	facet: Labrinth.Analytics.v3.AnalyticsFacet<T>,
-): boolean {
-	return !!getAnalyticsFacetDownloadCount(facet)
-}
-
-export function shouldFetchAnalyticsDownloadCountFallback(
-	facets: Labrinth.Analytics.v3.AnalyticsFacets | null | undefined,
-): boolean {
-	if (!facets) {
-		return false
-	}
-
-	const projectDownloadFacets = Object.values(facets.project_downloads)
-	const downloadFacets =
-		projectDownloadFacets.flat() as Labrinth.Analytics.v3.AnalyticsFacet<unknown>[]
-	return downloadFacets.some((facet) => !doesAnalyticsFacetHaveDownloadCount(facet))
-}
-
 export function getAnalyticsFacetsFilterOptionSummary(
 	facets: Labrinth.Analytics.v3.AnalyticsFacets | null | undefined,
 ): AnalyticsFacetsFilterOptionSummary {
@@ -269,22 +221,10 @@ export function getAnalyticsFacetsFilterOptionSummary(
 		),
 		loaderTypes: sortStringValues([...loaderTypes]),
 		versionIds: sortStringValues([...new Set([...downloadVersionIds, ...playtimeVersionIds])]),
-		projectDownloadsById: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.project_id,
-			(projectId) => projectId.trim(),
-		),
-		projectVersionDownloadsById: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.version_id,
-			(versionId) => versionId.trim(),
-		),
-		gameVersionDownloadsByVersion: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.game_version,
-			(gameVersion) => gameVersion.trim(),
-		),
-		countryDownloadsByCode: getAnalyticsFacetDownloadsByValue(
-			facets.project_downloads.country,
-			(country) => country.trim().toUpperCase(),
-		),
+		projectDownloadsById: new Map(),
+		projectVersionDownloadsById: new Map(),
+		gameVersionDownloadsByVersion: new Map(),
+		countryDownloadsByCode: new Map(),
 	}
 }
 
