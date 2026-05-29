@@ -522,6 +522,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			options: withSelectedOptions('country', countryFilterOptions.value),
 			submenuClass: 'w-fit',
+			previewDropdownWidth: 'fit-content',
 		},
 		{
 			key: 'monetization',
@@ -553,6 +554,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			searchable: projectVersionFilterOptions.value.length > 6,
 			searchPlaceholder: formatMessage(analyticsMessages.searchProjectVersionsPlaceholder),
 			submenuClass: 'w-fit',
+			previewDropdownWidth: 'fit-content',
 			options: withSelectedOptions('version_id', projectVersionFilterOptions.value),
 		},
 		{
@@ -561,6 +563,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			searchable: true,
 			searchPlaceholder: formatMessage(analyticsMessages.searchVersionsPlaceholder),
 			submenuClass: 'w-fit max-w-[340px]',
+			previewDropdownWidth: '340px',
 			options: withSelectedOptions('game_version', gameVersionFilterOptions.value),
 		},
 		{
