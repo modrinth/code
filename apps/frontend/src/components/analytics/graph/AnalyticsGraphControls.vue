@@ -53,10 +53,10 @@
 					class="flex flex-col gap-1 border-0 border-t border-solid border-surface-4 px-3 py-2.5"
 				>
 					<div class="mb-0.5 text-xs font-semibold text-secondary">Display</div>
-					<div v-if="canShowPreviousPeriod" class="flex min-h-7 items-center justify-between gap-3">
+					<div v-if="canShowPreviousPeriod" class="flex min-h-7 items-center justify-between">
 						<label
 							:for="previousPeriodToggleId"
-							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-1.5 font-semibold leading-tight text-primary"
+							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-1.5 pr-3 font-semibold leading-tight text-primary"
 						>
 							<HistoryIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
 							<span class="min-w-0 truncate">Previous period</span>
@@ -67,10 +67,10 @@
 							:small="smallToggles"
 						/>
 					</div>
-					<div v-if="canUseRatioMode" class="flex min-h-7 items-center justify-between gap-3">
+					<div v-if="canUseRatioMode" class="flex min-h-7 items-center justify-between">
 						<label
 							:for="ratioModeToggleId"
-							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-1.5 font-semibold leading-tight text-primary"
+							class="flex min-h-7 min-w-0 grow cursor-pointer items-center gap-1.5 pr-3 font-semibold leading-tight text-primary"
 						>
 							<span
 								class="inline-flex size-4 shrink-0 items-center justify-center text-sm font-semibold leading-none text-secondary"
@@ -90,12 +90,12 @@
 					<div class="mb-0.5 text-xs font-semibold text-secondary">Annotations</div>
 					<div
 						v-tooltip="projectEventsDisabledTooltip"
-						class="flex min-h-7 items-center justify-between gap-3"
+						class="justify3 flex min-h-7 items-center"
 						:aria-disabled="!hasProjectEvents"
 					>
 						<label
 							:for="projectEventsToggleId"
-							class="flex min-h-7 min-w-0 grow items-center gap-1.5 font-semibold leading-tight text-primary"
+							class="flex min-h-7 min-w-0 grow items-center gap-1.5 pr-3 font-semibold leading-tight text-primary"
 							:class="hasProjectEvents ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'"
 						>
 							<TagCategoryFlagIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
@@ -110,12 +110,12 @@
 					</div>
 					<div
 						v-tooltip="modrinthEventsDisabledTooltip"
-						class="flex min-h-7 items-center justify-between gap-3"
+						class="justify3 flex min-h-7 items-center"
 						:aria-disabled="!hasChartEvents"
 					>
 						<label
 							:for="modrinthEventsToggleId"
-							class="flex min-h-7 min-w-0 grow items-center gap-1.5 font-semibold leading-tight text-primary"
+							class="flex min-h-7 min-w-0 grow items-center gap-1.5 pr-3 font-semibold leading-tight text-primary"
 							:class="hasChartEvents ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'"
 						>
 							<InfoIcon class="size-4 shrink-0 text-blue" aria-hidden="true" />
