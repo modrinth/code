@@ -34,6 +34,7 @@
 			v-for="group in eventGroups"
 			:key="group.id"
 			type="button"
+			data-analytics-event-tooltip-trigger
 			class="pointer-events-auto absolute left-0 top-0 inline-flex h-5 min-w-5 cursor-default items-center justify-center gap-1 rounded-full bg-surface-3 px-1 transition-colors focus-visible:border-brand focus-visible:text-contrast"
 			:class="
 				activeGroup?.id === group.id
@@ -50,6 +51,7 @@
 			@mouseleave="scheduleHoverClose"
 			@focus="showHoveredGroup(group.id)"
 			@blur="scheduleHoverClose"
+			@wheel="handleGroupWheel($event, group.id)"
 			@keydown.escape.stop="clearActiveGroup"
 		>
 			<TagCategoryFlagIcon
@@ -230,6 +232,9 @@ const TOOLTIP_OFFSET_PX = 8
 const EDGE_PADDING_PX = 8
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 120
+const WHEEL_DELTA_LINE = 1
+const WHEEL_DELTA_PAGE = 2
+const WHEEL_LINE_HEIGHT = 16
 const EVENT_RANGE_DATE_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'long',
 	day: 'numeric',
@@ -826,6 +831,39 @@ function handleGroupClick(groupId: string) {
 
 	pointerDownGroupId = null
 	wasPointerDownGroupActive = false
+}
+
+function handleGroupWheel(event: WheelEvent, groupId: string) {
+	event.preventDefault()
+	event.stopPropagation()
+
+	if (hoveredGroupId.value !== groupId) {
+		showHoveredGroup(groupId)
+		nextTick(() => scrollTooltipByWheel(event))
+		return
+	}
+
+	scrollTooltipByWheel(event)
+}
+
+function getNormalizedWheelDeltaY(event: WheelEvent, element: HTMLElement) {
+	if (event.deltaMode === WHEEL_DELTA_PAGE) return event.deltaY * element.clientHeight
+	if (event.deltaMode === WHEEL_DELTA_LINE) return event.deltaY * WHEEL_LINE_HEIGHT
+	return event.deltaY
+}
+
+function scrollTooltipByWheel(event: WheelEvent) {
+	const element = tooltipScrollElement.value
+	if (!element) return
+
+	const maxScrollTop = Math.max(0, element.scrollHeight - element.clientHeight)
+	if (maxScrollTop <= 0) return
+
+	const deltaY = getNormalizedWheelDeltaY(event, element)
+	if (deltaY === 0) return
+
+	element.scrollTop = clamp(element.scrollTop + deltaY, 0, maxScrollTop)
+	checkTooltipScrollState()
 }
 
 function scheduleHoveredGroupOpen(groupId: string) {
