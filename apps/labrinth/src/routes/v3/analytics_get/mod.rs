@@ -11,7 +11,10 @@ mod facets;
 mod metrics;
 mod old;
 
-use std::{collections::HashMap, num::NonZeroU64};
+use std::{
+    collections::{HashMap, HashSet},
+    num::NonZeroU64,
+};
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
@@ -26,6 +29,7 @@ use crate::{
     },
     database::{
         self, DBProject,
+        models::version_item::VersionQueryResult,
         models::{
             DBAffiliateCode, DBAffiliateCodeId, DBProjectId, DBUser, DBVersion,
             DBVersionId,
@@ -108,6 +112,7 @@ pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
 /// Maximum number of [`TimeSlice`]s in a [`GetResponse`], controlled by
 /// [`TimeRange::resolution`].
 pub const MAX_TIME_SLICES: usize = 1024;
+pub(crate) const UNKNOWN_LOADER: &str = "unknown";
 
 // response
 
@@ -305,6 +310,7 @@ pub async fn fetch_analytics(
             .into_iter()
             .map(|code| code.id)
             .collect::<Vec<_>>();
+    let project_loaders = project_loader_map(&parent_version_data);
 
     let mut query_clickhouse_cx = QueryClickhouseContext {
         clickhouse: &clickhouse,
@@ -313,6 +319,7 @@ pub async fn fetch_analytics(
         project_ids: &project_ids,
         parent_version_ids: &parent_version_ids,
         affiliate_code_ids: &affiliate_code_ids,
+        project_loaders: &project_loaders,
     };
 
     if let Some(metrics) = &req.return_metrics.project_views {
@@ -404,6 +411,41 @@ pub(crate) fn condense_country(country: String, count: u64) -> String {
     }
 }
 
+pub(crate) fn project_loader_map(
+    versions: &[VersionQueryResult],
+) -> HashMap<DBProjectId, HashSet<String>> {
+    let mut loaders = HashMap::<DBProjectId, HashSet<String>>::new();
+
+    for version in versions {
+        loaders
+            .entry(version.inner.project_id)
+            .or_default()
+            .extend(version.loaders.iter().cloned());
+    }
+
+    loaders
+}
+
+pub(crate) fn normalize_loader_for_project(
+    loader: String,
+    project_id: DBProjectId,
+    project_loaders: &HashMap<DBProjectId, HashSet<String>>,
+) -> String {
+    if loader.is_empty() {
+        return loader;
+    }
+
+    let loader_is_valid = project_loaders
+        .get(&project_id)
+        .is_some_and(|loaders| loaders.contains(&loader));
+
+    if loader_is_valid {
+        loader
+    } else {
+        UNKNOWN_LOADER.to_string()
+    }
+}
+
 async fn fetch_project_status_change_events(
     project_ids: &[DBProjectId],
     time_range: &TimeRange,
@@ -463,6 +505,7 @@ pub(crate) struct QueryClickhouseContext<'a> {
     pub(crate) project_ids: &'a [DBProjectId],
     pub(crate) parent_version_ids: &'a [DBVersionId],
     pub(crate) affiliate_code_ids: &'a [DBAffiliateCodeId],
+    pub(crate) project_loaders: &'a HashMap<DBProjectId, HashSet<String>>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]

@@ -20,6 +20,7 @@ use crate::{
 use super::super::{
     ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
     condense_country, none_if_empty, none_if_zero_version_id,
+    normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -169,6 +170,7 @@ impl<'de> Deserialize<'de> for DownloadSource {
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct DownloadRow {
     bucket: u64,
+    source_project_id: DBProjectId,
     project_id: DBProjectId,
     domain: String,
     user_agent: String,
@@ -202,6 +204,7 @@ const DOWNLOADS: &str = {
     formatcp!(
         "SELECT
             widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+            project_id AS source_project_id,
             if({USE_PROJECT_ID}, project_id, 0) AS project_id,
             if({USE_DOMAIN}, domain, '') AS domain,
             if({USE_USER_AGENT}, user_agent, '') AS user_agent,
@@ -352,7 +355,13 @@ pub(crate) async fn fetch(
             },
             game_version: uses_column("use_game_version")
                 .then(|| row.game_version.clone()),
-            loader: uses_column("use_loader").then(|| row.loader.clone()),
+            loader: uses_column("use_loader").then(|| {
+                normalize_loader_for_project(
+                    row.loader.clone(),
+                    row.source_project_id,
+                    cx.project_loaders,
+                )
+            }),
         };
 
         *buckets.entry(key).or_default() += row.downloads;

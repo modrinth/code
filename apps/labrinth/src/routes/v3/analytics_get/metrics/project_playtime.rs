@@ -12,6 +12,7 @@ use crate::{
 use super::super::{
     ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
     condense_country, none_if_empty, none_if_zero_version_id,
+    normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -230,11 +231,25 @@ pub(crate) async fn fetch(
             } else {
                 row.project_id
             };
+        let source_project_id = if row.project_id.0 == 0 {
+            parent_version_projects
+                .get(&row.parent_version_id)
+                .copied()
+                .unwrap_or(row.project_id)
+        } else {
+            row.project_id
+        };
         let key = PlaytimeBucket {
             bucket: row.bucket,
             project_id,
             version_id: uses_column("use_version_id").then_some(row.version_id),
-            loader: uses_column("use_loader").then(|| row.loader.clone()),
+            loader: uses_column("use_loader").then(|| {
+                normalize_loader_for_project(
+                    row.loader.clone(),
+                    source_project_id,
+                    cx.project_loaders,
+                )
+            }),
             game_version: uses_column("use_game_version")
                 .then(|| row.game_version.clone()),
             country: uses_column("use_country").then(|| row.country.clone()),
