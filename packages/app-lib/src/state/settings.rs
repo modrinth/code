@@ -61,6 +61,7 @@ pub enum FeatureFlag {
     ServersInApp,
     ServerProjectQa,
     I18nDebug,
+    ShowInstancePlayTime,
 }
 
 impl Settings {
