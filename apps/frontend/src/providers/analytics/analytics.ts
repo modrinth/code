@@ -4,6 +4,22 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 
 import {
+	areSelectedFiltersEqual,
+	areStringArraysEqual,
+	buildDefaultAnalyticsGraphState,
+	buildDefaultAnalyticsQueryBuilderState,
+	getAnalyticsBreakdownPresetsForProjectSelection,
+	getDefaultAnalyticsBreakdownPresets,
+	getDefaultAnalyticsGraphProjectEventsVisibility,
+	hasAnalyticsBreakdownQuery,
+	hasAnalyticsGraphProjectEventsVisibilityQuery,
+	hasAnalyticsProjectSelectionQuery,
+	isAnalyticsGraphStateDefault,
+	isAnalyticsQueryBuilderStateDefault,
+	readAnalyticsGraphState,
+	readAnalyticsQueryBuilderState,
+} from '~/components/analytics-dashboard/analytics-route-query'
+import {
 	getEnabledAnalyticsStatsForState,
 	PROJECT_STATUS_FILTER_VALUES,
 	type ProjectStatusFilterValue,
@@ -68,22 +84,6 @@ import type {
 	AnalyticsTimeframePreset,
 	AnalyticsVersionMetadata,
 } from './analytics-types'
-import {
-	areSelectedFiltersEqual,
-	areStringArraysEqual,
-	buildDefaultAnalyticsGraphState,
-	buildDefaultAnalyticsQueryBuilderState,
-	getAnalyticsBreakdownPresetsForProjectSelection,
-	getDefaultAnalyticsBreakdownPresets,
-	getDefaultAnalyticsGraphProjectEventsVisibility,
-	hasAnalyticsBreakdownQuery,
-	hasAnalyticsGraphProjectEventsVisibilityQuery,
-	hasAnalyticsProjectSelectionQuery,
-	isAnalyticsGraphStateDefault,
-	isAnalyticsQueryBuilderStateDefault,
-	readAnalyticsGraphState,
-	readAnalyticsQueryBuilderState,
-} from './query-builder-url'
 
 export { ANALYTICS_START_DATE_INPUT_VALUE } from './analytics-data-utils'
 export {

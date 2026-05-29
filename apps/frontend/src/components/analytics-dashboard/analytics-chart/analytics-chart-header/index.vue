@@ -67,7 +67,7 @@ import {
 	DEFAULT_ANALYTICS_GRAPH_EVENTS_VISIBILITY,
 	DEFAULT_ANALYTICS_GRAPH_PREVIOUS_PERIOD_VISIBILITY,
 	DEFAULT_ANALYTICS_GRAPH_RATIO_MODE,
-} from '~/providers/analytics/query-builder-url'
+} from '~/components/analytics-dashboard/analytics-route-query'
 
 import { analyticsChartMessages } from '../../analytics-messages.ts'
 import AnalyticsChartControls from './AnalyticsChartControls.vue'

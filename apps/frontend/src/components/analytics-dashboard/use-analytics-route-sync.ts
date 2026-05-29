@@ -1,6 +1,15 @@
 import type { Ref } from 'vue'
 import type { LocationQuery } from 'vue-router'
 
+import {
+	areSelectedFiltersEqual,
+	areStringArraysEqual,
+	buildAnalyticsQueryBuilderRouteQuery,
+	getAnalyticsBreakdownPresetsForProjectSelection,
+	hasAnalyticsQueryBuilderRouteChange,
+	readAnalyticsGraphState,
+	readAnalyticsQueryBuilderState,
+} from '~/components/analytics-dashboard/analytics-route-query'
 import type {
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardStat,
@@ -12,15 +21,6 @@ import type {
 	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
 } from '~/providers/analytics/analytics-types'
-import {
-	areSelectedFiltersEqual,
-	areStringArraysEqual,
-	buildAnalyticsQueryBuilderRouteQuery,
-	getAnalyticsBreakdownPresetsForProjectSelection,
-	hasAnalyticsQueryBuilderRouteChange,
-	readAnalyticsGraphState,
-	readAnalyticsQueryBuilderState,
-} from '~/providers/analytics/query-builder-url'
 
 export type AnalyticsQueryBuilderRouteNavigationMode = 'push' | 'replace'
 

@@ -151,7 +151,7 @@ import {
 	hasAnalyticsTableSortQuery,
 	hasAnalyticsTableSortRouteChange,
 	readAnalyticsTableSortState,
-} from '~/providers/analytics/query-builder-url'
+} from '~/components/analytics-dashboard/analytics-route-query'
 
 import {
 	isTimeRelevantForGroupBy,

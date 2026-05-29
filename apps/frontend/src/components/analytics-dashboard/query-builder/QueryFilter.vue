@@ -201,7 +201,7 @@ import {
 import {
 	areStringArraysEqual,
 	getDefaultAnalyticsBreakdownPresets,
-} from '~/providers/analytics/query-builder-url'
+} from '~/components/analytics-dashboard/analytics-route-query'
 
 import {
 	analyticsBreakdownMessages,

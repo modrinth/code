@@ -1,11 +1,11 @@
 import type { TableColumn } from '@modrinth/ui'
 import type { LocationQuery } from 'vue-router'
 
-import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 import {
 	buildAnalyticsTableSortRouteQuery,
 	readAnalyticsTableSortState,
-} from '~/providers/analytics/query-builder-url'
+} from '~/components/analytics-dashboard/analytics-route-query'
+import type { AnalyticsDashboardStat } from '~/providers/analytics/analytics'
 
 import { isAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
 import {

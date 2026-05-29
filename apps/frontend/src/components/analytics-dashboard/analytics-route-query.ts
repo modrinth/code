@@ -17,7 +17,7 @@ import type {
 	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
 	MutableRouteQuery,
-} from './analytics-types'
+} from '~/providers/analytics/analytics-types'
 
 export const DEFAULT_TIMEFRAME_PRESET: AnalyticsTimeframePreset = 'last_30_days'
 export const DEFAULT_TIMEFRAME_MODE: AnalyticsTimeframeMode = 'preset'

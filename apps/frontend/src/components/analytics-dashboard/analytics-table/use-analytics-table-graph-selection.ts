@@ -1,11 +1,11 @@
 import type { ComputedRef, Ref, WritableComputedRef } from 'vue'
 import { computed, watch } from 'vue'
 
+import { areStringArraysEqual } from '~/components/analytics-dashboard/analytics-route-query'
 import type {
 	AnalyticsDashboardStat,
 	AnalyticsSelectedBreakdowns,
 } from '~/providers/analytics/analytics'
-import { areStringArraysEqual } from '~/providers/analytics/query-builder-url'
 
 import { getAnalyticsTableMetricSortedGraphDatasetIds } from './analytics-table-sorting'
 import type { AnalyticsTableColumnKey, AnalyticsTableRow } from './analytics-table-types'

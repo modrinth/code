@@ -102,7 +102,7 @@ import { useVIntl } from '@modrinth/ui'
 
 import type { AnalyticsGroupByPreset } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
-import { getDefaultAnalyticsGraphProjectEventsVisibility } from '~/providers/analytics/query-builder-url'
+import { getDefaultAnalyticsGraphProjectEventsVisibility } from '~/components/analytics-dashboard/analytics-route-query'
 
 import { analyticsMessages } from '../analytics-messages.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'

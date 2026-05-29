@@ -421,7 +421,7 @@ import {
 	buildDefaultAnalyticsQueryBuilderState,
 	getAnalyticsBreakdownPresetsForProjectSelection,
 	MAX_ANALYTICS_BREAKDOWN_PRESETS,
-} from '~/providers/analytics/query-builder-url'
+} from '~/components/analytics-dashboard/analytics-route-query'
 
 import {
 	analyticsMessages,
