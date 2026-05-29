@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import AnalyticsDashboard from '~/components/analytics/AnalyticsDashboard.vue'
+import AnalyticsDashboard from '~/components/analytics-dashboard/index.vue'
 </script>

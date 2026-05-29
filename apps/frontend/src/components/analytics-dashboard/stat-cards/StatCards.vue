@@ -22,7 +22,7 @@ import {
 	injectAnalyticsDashboardContext,
 } from '~/providers/analytics/analytics'
 
-import { analyticsStatCardMessages, formatAnalyticsStatLabel } from '../analytics-messages'
+import { analyticsStatCardMessages, formatAnalyticsStatLabel } from '../analytics-messages.ts'
 import StatCard from './StatCard.vue'
 
 const {

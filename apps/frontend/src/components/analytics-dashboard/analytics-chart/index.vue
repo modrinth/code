@@ -106,11 +106,11 @@ import { getDefaultAnalyticsGraphProjectEventsVisibility } from '~/providers/ana
 
 import { analyticsMessages } from '../analytics-messages.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
-import AnalyticsChartHeader from './analytics-chart-header/AnalyticsChartHeader.vue'
 import AnalyticsChartLegend from './analytics-chart-header/AnalyticsChartLegend.vue'
 import AnalyticsChartRenderLimitModal from './analytics-chart-header/AnalyticsChartRenderLimitModal.vue'
+import AnalyticsChartHeader from './analytics-chart-header/index.vue'
 import { useAnalyticsChartLegend } from './analytics-chart-header/use-analytics-chart-legend.ts'
-import AnalyticsChartPlot from './analytics-chart-plot/AnalyticsChartPlot.vue'
+import AnalyticsChartPlot from './analytics-chart-plot/index.vue'
 import { useAnalyticsChartEvents } from './analytics-chart-plot/use-analytics-chart-events.ts'
 import { useAnalyticsChartLayout } from './analytics-chart-plot/use-analytics-chart-layout.ts'
 import { useAnalyticsChartDatasets } from './use-analytics-chart-datasets.ts'

@@ -5,7 +5,7 @@
 <script setup>
 import { commonProjectSettingsMessages, useVIntl } from '@modrinth/ui'
 
-import AnalyticsDashboard from '~/components/analytics/AnalyticsDashboard.vue'
+import AnalyticsDashboard from '~/components/analytics-dashboard/index.vue'
 
 const { formatMessage } = useVIntl()
 

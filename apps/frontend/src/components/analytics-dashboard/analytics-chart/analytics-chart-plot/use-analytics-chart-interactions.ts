@@ -6,7 +6,7 @@ import type { AnalyticsGroupByPreset } from '~/providers/analytics/analytics'
 import {
 	ensureMinimumTimeRange,
 	getDefaultAnalyticsGroupByForDurationMinutes,
-} from '../../query-builder/timeframe-picker/timeframe.ts'
+} from '../../query-builder/timeframe.ts'
 import type {
 	AnalyticsChartHoverState,
 	AnalyticsChartRangeBounds,

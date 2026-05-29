@@ -428,21 +428,21 @@ import {
 	formatAnalyticsBreakdownLabel,
 	formatAnalyticsGroupByLabel,
 	formatAnalyticsGroupBySelectedLabel,
-} from '../analytics-messages'
+} from '../analytics-messages.ts'
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
 	getAnalyticsStatsForBreakdown,
 	getAnalyticsStatsForFilterCategory,
 	getEnabledAnalyticsStatsForState,
-} from './query-filter/query-filter.ts'
-import QueryBuilderFilter from './query-filter/QueryFilter.vue'
+} from './query-filter.ts'
+import QueryBuilderFilter from './QueryFilter.vue'
 import {
 	ensureMinimumTimeRange,
 	getAnalyticsGroupByPresetMinutes,
 	MAX_ANALYTICS_TIME_SLICES,
 	useSelectedAnalyticsTimeRange,
-} from './timeframe-picker/timeframe'
-import TimeFramePicker from './timeframe-picker/TimeFramePicker.vue'
+} from './timeframe.ts'
+import TimeFramePicker from './TimeframePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
 const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'

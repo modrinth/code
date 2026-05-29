@@ -45,10 +45,10 @@ import {
 } from '~/providers/analytics/analytics'
 import { injectOrganizationContext } from '~/providers/organization-context'
 
-import AnalyticsChart from './analytics-chart/AnalyticsChart.vue'
-import { analyticsMessages } from './analytics-messages'
-import AnalyticsTable from './analytics-table/AnalyticsTable.vue'
-import QueryBuilder from './query-builder/QueryBuilder.vue'
+import AnalyticsChart from './analytics-chart/index.vue'
+import { analyticsMessages } from './analytics-messages.ts'
+import AnalyticsTable from './analytics-table/index.vue'
+import QueryBuilder from './query-builder/index.vue'
 import StatCards from './stat-cards/StatCards.vue'
 
 const auth = await useAuth()

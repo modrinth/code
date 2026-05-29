@@ -210,9 +210,9 @@ import {
 	formatAnalyticsDownloadReasonLabel,
 	formatAnalyticsLoaderLabel,
 	formatAnalyticsProjectStatusLabel,
-} from '../../analytics-messages'
-import { getDownloadSourceLabel } from '../../breakdown'
-import DownloadsThresholdInput from '../DownloadsThresholdInput.vue'
+} from '../analytics-messages.ts'
+import { getDownloadSourceLabel } from '../breakdown.ts'
+import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
 	areSelectedFiltersEqual,
 	buildProjectVersionFilterOptionProjectMetadataById,
