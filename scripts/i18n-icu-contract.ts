@@ -99,6 +99,22 @@ export function contractsEqual(a: Contract, b: Contract) {
 	return JSON.stringify(a) === JSON.stringify(b)
 }
 
+export function sourceContractChanged(
+	previousText: string,
+	currentText: string,
+	previousLabel: string,
+	currentLabel: string,
+) {
+	const after = contractFromMessage(currentText, currentLabel)
+
+	try {
+		const before = contractFromMessage(previousText, previousLabel)
+		return !contractsEqual(before, after)
+	} catch {
+		return true
+	}
+}
+
 async function readJson(file: string): Promise<MessageFile> {
 	return JSON.parse(await readFile(file, 'utf8')) as MessageFile
 }
@@ -250,10 +266,14 @@ async function changedSourceIds(baseRef: string, scope?: string) {
 				const currentText = textOf(currentEntry)
 				if (previousText === undefined || currentText === undefined) continue
 
-				const before = contractFromMessage(previousText, `${baseRef}:${sourceFile}:${key}`)
-				const after = contractFromMessage(currentText, `${sourceFile}:${key}`)
-
-				if (!contractsEqual(before, after)) {
+				if (
+					sourceContractChanged(
+						previousText,
+						currentText,
+						`${baseRef}:${sourceFile}:${key}`,
+						`${sourceFile}:${key}`,
+					)
+				) {
 					const ids = changed.get(destPath) ?? new Set<string>()
 					ids.add(key)
 					changed.set(destPath, ids)
