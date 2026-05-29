@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-29T23:08:28+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed revenue not showing in 'All time' queries`,
+	},
+	{
 		date: `2026-05-29T22:06:30+00:00`,
 		product: 'web',
 		body: `## Fixed
