@@ -4,6 +4,7 @@ use eyre::eyre;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use tracing::{info, warn};
 use uuid::Uuid;
 
@@ -65,6 +66,7 @@ pub struct TiltifyMeta {
 pub struct CampaignInfo {
     pub total_donations_usd: Decimal,
     pub target_usd: Decimal,
+    pub num_donators: usize,
 }
 
 const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info";
@@ -79,6 +81,22 @@ struct TiltifyCampaignResponse {
 struct TiltifyCampaign {
     goal: AmountRaised,
     total_amount_raised: AmountRaised,
+}
+
+#[derive(Debug, Deserialize)]
+struct TiltifyDonationResponse {
+    data: Vec<TiltifyDonation>,
+    metadata: TiltifyPaginationMetadata,
+}
+
+#[derive(Debug, Deserialize)]
+struct TiltifyDonation {
+    donor_name: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct TiltifyPaginationMetadata {
+    after: Option<String>,
 }
 
 pub struct CampaignDonation {
@@ -257,7 +275,7 @@ pub async fn pride_26(
     );
     let response = http
         .get(url)
-        .bearer_auth(access_token)
+        .bearer_auth(&access_token)
         .send()
         .await
         .wrap_internal_err("fetching campaign from Tiltify")?
@@ -284,6 +302,7 @@ pub async fn pride_26(
     let campaign_info = CampaignInfo {
         total_donations_usd: response.data.total_amount_raised.value,
         target_usd: response.data.goal.value,
+        num_donators: num_donators(&http, &access_token, campaign_id).await?,
     };
 
     redis_connection
@@ -297,6 +316,54 @@ pub async fn pride_26(
         .wrap_internal_err("caching campaign info")?;
 
     Ok(web::Json(campaign_info))
+}
+
+async fn num_donators(
+    http: &HttpClient,
+    access_token: &str,
+    campaign_id: &str,
+) -> Result<usize, ApiError> {
+    let mut after = None;
+    let mut donors = HashSet::new();
+
+    loop {
+        let url = format!(
+            "https://v5api.tiltify.com/api/public/team_campaigns/{campaign_id}/donations"
+        );
+        let mut request = http
+            .get(url)
+            .bearer_auth(access_token)
+            .query(&[("limit", "100")]);
+
+        if let Some(after) = &after {
+            request = request.query(&[("after", after)]);
+        }
+
+        let response = request
+            .send()
+            .await
+            .wrap_internal_err("fetching donations from Tiltify")?
+            .error_for_status()
+            .wrap_internal_err("fetching donations from Tiltify")?
+            .json::<TiltifyDonationResponse>()
+            .await
+            .wrap_internal_err("parsing Tiltify donations response")?;
+
+        donors.extend(
+            response
+                .data
+                .into_iter()
+                .map(|donation| donation.donor_name)
+                .filter(|donor_name| donor_name != "Anonymous"),
+        );
+
+        match response.metadata.after {
+            Some(next_after) => after = Some(next_after),
+            None => break,
+        }
+    }
+
+    Ok(donors.len())
 }
 
 async fn amount_raised_usd(
