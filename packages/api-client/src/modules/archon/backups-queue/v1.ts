@@ -37,10 +37,30 @@ export class ArchonBackupsQueueV1Module extends AbstractModule {
 		)
 	}
 
+	/** POST /v1/servers/:server_id/worlds/:world_id/backups-queue/history/create/:operation_id/cancel */
+	public async cancelCreate(serverId: string, worldId: string, operationId: number): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/backups-queue/history/create/${operationId}/cancel`,
+			{ api: 'archon', version: 1, method: 'POST' },
+		)
+	}
+
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups-queue/history/restore/:operation_id/ack */
 	public async ackRestore(serverId: string, worldId: string, operationId: number): Promise<void> {
 		await this.client.request<void>(
 			`/servers/${serverId}/worlds/${worldId}/backups-queue/history/restore/${operationId}/ack`,
+			{ api: 'archon', version: 1, method: 'POST' },
+		)
+	}
+
+	/** POST /v1/servers/:server_id/worlds/:world_id/backups-queue/history/restore/:operation_id/cancel */
+	public async cancelRestore(
+		serverId: string,
+		worldId: string,
+		operationId: number,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/backups-queue/history/restore/${operationId}/cancel`,
 			{ api: 'archon', version: 1, method: 'POST' },
 		)
 	}
