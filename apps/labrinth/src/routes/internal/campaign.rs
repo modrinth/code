@@ -270,8 +270,7 @@ pub async fn pride_26(
         .await
         .wrap_internal_err("fetching Tiltify access token")?;
     let url = format!(
-        "https://v5api.tiltify.com/api/public/team_campaigns/{}",
-        campaign_id
+        "https://v5api.tiltify.com/api/public/team_campaigns/{campaign_id}",
     );
     let response = http
         .get(url)
