@@ -53,10 +53,20 @@ type VirtualSkinSectionListExpose = {
 }
 
 const PENDING_SKIN_REFRESH_DELAY_MS = 11_000
+const DEFAULT_SKIN_SECTION_SORT_ORDER = ['Modrinth Pride', 'Default skins']
 const messages = defineMessages({
 	skinSelectorTitle: {
 		id: 'app.skins.title',
 		defaultMessage: 'Skin selector',
+	},
+	modrinthPrideSection: {
+		id: 'app.skins.section.modrinth-pride',
+		defaultMessage: 'Modrinth Pride',
+	},
+	modrinthPrideTooltip: {
+		id: 'app.skins.section.modrinth-pride.tooltip',
+		defaultMessage:
+			'You received these skins for donating to a Modrinth Pride fundraiser during Pride Month.',
 	},
 	defaultSkinsSection: {
 		id: 'app.skins.section.default-skins',
@@ -185,17 +195,25 @@ const defaultSkinSections = computed(() => {
 	const sections = new Map<string, Skin[]>()
 
 	for (const skin of defaultSkins.value) {
-		const sectionTitle = getDefaultSkinSectionTitle(skin.section)
-		const sectionSkins = sections.get(sectionTitle)
+		const section = skin.section ?? 'Default skins'
+		const sectionSkins = sections.get(section)
 
 		if (sectionSkins) {
 			sectionSkins.push(skin)
 		} else {
-			sections.set(sectionTitle, [skin])
+			sections.set(section, [skin])
 		}
 	}
 
-	return Array.from(sections, ([title, skins]) => ({ title, skins }))
+	return Array.from(sections, ([section, skins]) => ({
+		section,
+		title: getDefaultSkinSectionTitle(section),
+		infoTooltip: getDefaultSkinSectionInfoTooltip(section),
+		skins,
+	})).sort(
+		(a, b) =>
+			getDefaultSkinSectionSortIndex(a.section) - getDefaultSkinSectionSortIndex(b.section),
+	)
 })
 
 const currentCape = computed(() => {
@@ -303,6 +321,8 @@ function isMinecraftSkinRateLimitError(error: unknown) {
 
 function getDefaultSkinSectionTitle(section?: string) {
 	switch (section) {
+		case 'Modrinth Pride':
+			return formatMessage(messages.modrinthPrideSection)
 		case 'MINECON Earth 2017':
 			return formatMessage(messages.mineconEarth2017Section)
 		case 'Builders & Biomes':
@@ -324,6 +344,20 @@ function getDefaultSkinSectionTitle(section?: string) {
 		default:
 			return section ?? formatMessage(messages.defaultSkinsSection)
 	}
+}
+
+function getDefaultSkinSectionInfoTooltip(section: string) {
+	switch (section) {
+		case 'Modrinth Pride':
+			return formatMessage(messages.modrinthPrideTooltip)
+		default:
+			return undefined
+	}
+}
+
+function getDefaultSkinSectionSortIndex(section: string) {
+	const index = DEFAULT_SKIN_SECTION_SORT_ORDER.indexOf(section)
+	return index === -1 ? DEFAULT_SKIN_SECTION_SORT_ORDER.length : index
 }
 
 function changeSkin(newSkin: Skin) {
