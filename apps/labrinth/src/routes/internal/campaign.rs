@@ -1,4 +1,4 @@
-use actix_web::{post, web};
+use actix_web::{get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use reqwest::Method;
@@ -16,14 +16,15 @@ use crate::{
         },
         redis::RedisPool,
     },
+    env::ENV,
     models::payouts::TremendousForexResponse,
     queue::payouts::PayoutsQueue,
     routes::ApiError,
-    util::error::Context,
+    util::{error::Context, http::HttpClient, tiltify::TiltifyClient},
 };
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(tiltify_webhook);
+    cfg.service(tiltify_webhook).service(pride_26);
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
@@ -58,6 +59,23 @@ pub struct TiltifyMeta {
     pub id: Uuid,
     pub subscription_source_id: Uuid,
     pub subscription_source_type: String,
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct CampaignInfo {
+    pub total_donations_usd: Decimal,
+    pub target_usd: Decimal,
+}
+
+#[derive(Debug, Deserialize)]
+struct TiltifyCampaignResponse {
+    data: TiltifyCampaign,
+}
+
+#[derive(Debug, Deserialize)]
+struct TiltifyCampaign {
+    goal: AmountRaised,
+    total_amount_raised: AmountRaised,
 }
 
 pub struct CampaignDonation {
@@ -201,6 +219,56 @@ pub async fn tiltify_webhook(
     }
 
     Ok(())
+}
+
+#[utoipa::path]
+#[get("/pride-26")]
+pub async fn pride_26(
+    http: web::Data<HttpClient>,
+    tiltify: web::Data<TiltifyClient>,
+) -> Result<web::Json<CampaignInfo>, ApiError> {
+    let access_token = tiltify
+        .access_token()
+        .await
+        .wrap_internal_err("fetching Tiltify access token")?;
+    let url = format!(
+        "https://v5api.tiltify.com/api/cause/team_campaigns/{}",
+        ENV.TILTIFY_PRIDE_26_CAMPAIGN_ID
+    );
+    info!("at = {access_token}");
+    let response = http
+        .get(url)
+        .bearer_auth(access_token)
+        .send()
+        .await
+        .wrap_internal_err("fetching campaign from Tiltify")?;
+
+    info!("{:?}", response.text().await);
+    panic!();
+    // .error_for_status()
+    // .wrap_internal_err("fetching campaign from Tiltify")?
+    // .json::<TiltifyCampaignResponse>()
+    // .await
+    // .wrap_internal_err("parsing Tiltify response")?;
+
+    // let raised_currency = &response.data.total_amount_raised.currency;
+    // if raised_currency != "USD" {
+    //     return Err(ApiError::Internal(eyre!(
+    //         "total amount raised is in {raised_currency}, must be USD"
+    //     )));
+    // }
+
+    // let goal_currency = &response.data.goal.currency;
+    // if goal_currency != "USD" {
+    //     return Err(ApiError::Internal(eyre!(
+    //         "goal amount is in {goal_currency}, must be USD"
+    //     )));
+    // }
+
+    // Ok(web::Json(CampaignInfo {
+    //     total_donations_usd: response.data.total_amount_raised.value,
+    //     target_usd: response.data.goal.value,
+    // }))
 }
 
 async fn amount_raised_usd(
