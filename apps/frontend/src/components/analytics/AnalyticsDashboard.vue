@@ -47,9 +47,9 @@ import { injectOrganizationContext } from '~/providers/organization-context'
 
 import AnalyticsChart from './analytics-chart/AnalyticsChart.vue'
 import { analyticsMessages } from './analytics-messages'
+import AnalyticsTable from './analytics-table/AnalyticsTable.vue'
 import QueryBuilder from './query-builder/QueryBuilder.vue'
 import StatCards from './stat-cards/StatCards.vue'
-import AnalyticsTable from './table/AnalyticsTable.vue'
 
 const auth = await useAuth()
 const { formatMessage } = useVIntl()

@@ -161,44 +161,44 @@ import {
 	analyticsBreakdownMessages,
 	analyticsMessages,
 	analyticsTableMessages,
-} from '../analytics-messages'
+} from '../analytics-messages.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
 	buildAnalyticsTableColumns,
 	getAnalyticsTableBreakdownColumnLabel,
-} from './analytics-table-columns'
+} from './analytics-table-columns.ts'
 import {
 	buildAnalyticsTableCsvContent,
 	downloadAnalyticsTableCsv,
 	getAnalyticsTableCsvFilename,
-} from './analytics-table-csv-export'
+} from './analytics-table-csv-export.ts'
 import {
 	formatAnalyticsTableCompactPlaytime,
 	formatAnalyticsTableFullPlaytime,
 	formatAnalyticsTableInteger,
 	formatAnalyticsTableRevenue,
 	getAnalyticsTableGroupByLabel,
-} from './analytics-table-formatting'
-import { buildAnalyticsTableRows } from './analytics-table-row-builder'
+} from './analytics-table-formatting.ts'
+import { buildAnalyticsTableRows } from './analytics-table-row-builder.ts'
 import {
 	filterAnalyticsTableRowsBySearch,
 	getAnalyticsTableSearchableColumns,
-} from './analytics-table-search-filtering'
+} from './analytics-table-search-filtering.ts'
 import {
 	areAnalyticsTableSortStatesEqual,
 	buildSyncedAnalyticsTableSortRouteQuery,
 	getRouteAnalyticsTableSortState,
 	toAnalyticsTableSortState,
-} from './analytics-table-sort-route'
-import { sortAnalyticsTableRows } from './analytics-table-sorting'
+} from './analytics-table-sort-route.ts'
+import { sortAnalyticsTableRows } from './analytics-table-sorting.ts'
 import type {
 	AnalyticsTableColumnKey,
 	AnalyticsTableMode,
 	AnalyticsTableSortDirectionValue,
-} from './analytics-table-types'
-import { useAnalyticsTableGraphSelection } from './use-analytics-table-graph-selection'
-import { useAnalyticsTablePagination } from './use-analytics-table-pagination'
-import { useAnalyticsTableRowCache } from './use-analytics-table-row-cache'
+} from './analytics-table-types.ts'
+import { useAnalyticsTableGraphSelection } from './use-analytics-table-graph-selection.ts'
+import { useAnalyticsTablePagination } from './use-analytics-table-pagination.ts'
+import { useAnalyticsTableRowCache } from './use-analytics-table-row-cache.ts'
 
 const {
 	hasProjectContext,
