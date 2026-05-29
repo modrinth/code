@@ -1,8 +1,8 @@
-import type { AnalyticsBreakdownPreset } from '~/providers/analytics/analytics'
 import type {
+	AnalyticsBreakdownPreset,
 	AnalyticsTableSortColumn,
 	AnalyticsTableSortDirection,
-} from '~/providers/analytics/query-builder-url'
+} from '~/providers/analytics/analytics'
 
 export type AnalyticsTableMode = 'date_breakdown' | 'breakdown_only'
 export type AnalyticsTableBreakdownPreset = Exclude<AnalyticsBreakdownPreset, 'none'>

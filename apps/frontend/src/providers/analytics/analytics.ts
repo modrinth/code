@@ -9,6 +9,7 @@ import {
 	type ProjectStatusFilterValue,
 	sanitizeAnalyticsSelectedFilters,
 } from '~/components/analytics-dashboard/query-builder/query-filter'
+import { useAnalyticsRouteSync } from '~/components/analytics-dashboard/use-analytics-route-sync'
 
 import type { OrganizationContext } from '../organization-context'
 import {
@@ -50,24 +51,24 @@ import {
 	UNKNOWN_ORGANIZATION_NAME,
 } from './analytics-project-utils'
 import type {
+	AnalyticsBreakdownPreset,
 	AnalyticsDashboardFilterOptions,
 	AnalyticsDashboardPercentChanges,
 	AnalyticsDashboardProject,
 	AnalyticsDashboardProjectGroup,
+	AnalyticsDashboardStat,
 	AnalyticsDashboardTotals,
+	AnalyticsGraphViewMode,
+	AnalyticsGroupByPreset,
+	AnalyticsLastTimeframeUnit,
 	AnalyticsProjectVersionSource,
+	AnalyticsSelectedBreakdowns,
+	AnalyticsSelectedFilters,
+	AnalyticsTimeframeMode,
+	AnalyticsTimeframePreset,
 	AnalyticsVersionMetadata,
 } from './analytics-types'
 import {
-	type AnalyticsBreakdownPreset,
-	type AnalyticsDashboardStat,
-	type AnalyticsGraphViewMode,
-	type AnalyticsGroupByPreset,
-	type AnalyticsLastTimeframeUnit,
-	type AnalyticsSelectedBreakdowns,
-	type AnalyticsSelectedFilters,
-	type AnalyticsTimeframeMode,
-	type AnalyticsTimeframePreset,
 	areSelectedFiltersEqual,
 	areStringArraysEqual,
 	buildDefaultAnalyticsGraphState,
@@ -83,7 +84,6 @@ import {
 	readAnalyticsGraphState,
 	readAnalyticsQueryBuilderState,
 } from './query-builder-url'
-import { useAnalyticsRouteSync } from './use-analytics-route-sync'
 
 export { ANALYTICS_START_DATE_INPUT_VALUE } from './analytics-data-utils'
 export {
@@ -96,16 +96,13 @@ export {
 	getProjectIdsMatchingStatusFilter,
 } from './analytics-project-utils'
 export type {
+	AnalyticsBreakdownPreset,
 	AnalyticsDashboardFilterOptions,
 	AnalyticsDashboardPercentChanges,
 	AnalyticsDashboardProject,
 	AnalyticsDashboardProjectGroup,
-	AnalyticsDashboardTotals,
-	NormalizedAnalyticsSelectedFilters,
-} from './analytics-types'
-export type {
-	AnalyticsBreakdownPreset,
 	AnalyticsDashboardStat,
+	AnalyticsDashboardTotals,
 	AnalyticsGraphState,
 	AnalyticsGraphViewMode,
 	AnalyticsGroupByPreset,
@@ -113,9 +110,12 @@ export type {
 	AnalyticsQueryFilterCategory,
 	AnalyticsSelectedBreakdowns,
 	AnalyticsSelectedFilters,
+	AnalyticsTableSortColumn,
+	AnalyticsTableSortDirection,
 	AnalyticsTimeframeMode,
 	AnalyticsTimeframePreset,
-} from './query-builder-url'
+	NormalizedAnalyticsSelectedFilters,
+} from './analytics-types'
 
 const REVENUE_GROUP_BY_FALLBACK: AnalyticsGroupByPreset = 'day'
 const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000

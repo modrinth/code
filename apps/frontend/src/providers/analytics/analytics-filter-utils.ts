@@ -4,11 +4,11 @@ import type {
 	AnalyticsDashboardFilterOptions,
 	AnalyticsFacetsFilterOptionSummary,
 	AnalyticsProjectVersionSource,
+	AnalyticsSelectedFilters,
 	AnalyticsVersionMetadata,
 	NormalizedAnalyticsSelectedFilters,
 	ProjectVersionFilterOptionSummary,
 } from './analytics-types'
-import type { AnalyticsSelectedFilters } from './query-builder-url'
 
 export function sortStringValues(values: string[]): string[] {
 	return [...values].sort((left, right) => left.localeCompare(right))

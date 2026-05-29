@@ -6,9 +6,9 @@ import {
 import type {
 	AnalyticsDashboardProject,
 	AnalyticsDashboardProjectSource,
+	AnalyticsSelectedFilters,
 	ProjectTypeMetadata,
 } from './analytics-types'
-import type { AnalyticsSelectedFilters } from './query-builder-url'
 
 const MINECRAFT_JAVA_SERVER_PROJECT_TYPE = 'minecraft_java_server'
 

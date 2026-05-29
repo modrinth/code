@@ -1,6 +1,95 @@
 import type { Labrinth } from '@modrinth/api-client'
+import type { LocationQueryValueRaw } from 'vue-router'
 
 import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter'
+
+export type AnalyticsQueryFilterCategory =
+	| 'project'
+	| 'project_status'
+	| 'country'
+	| 'monetization'
+	| 'user_agent'
+	| 'download_reason'
+	| 'version_id'
+	| 'game_version'
+	| 'loader_type'
+
+export type AnalyticsTimeframePreset =
+	| 'today'
+	| 'yesterday'
+	| 'last_7_days'
+	| 'last_14_days'
+	| 'last_30_days'
+	| 'last_90_days'
+	| 'last_180_days'
+	| 'year_to_date'
+	| 'all_time'
+
+export type AnalyticsTimeframeMode = 'preset' | 'last' | 'custom_range' | 'custom_datetime_range'
+export type AnalyticsLastTimeframeUnit = 'hours' | 'days' | 'weeks' | 'months'
+
+export type AnalyticsGroupByPreset = '1h' | '6h' | 'day' | 'week' | 'month' | 'year'
+
+export type AnalyticsBreakdownPreset =
+	| 'none'
+	| 'project'
+	| 'country'
+	| 'monetization'
+	| 'user_agent'
+	| 'download_reason'
+	| 'version_id'
+	| 'loader'
+	| 'game_version'
+
+export type AnalyticsSelectedBreakdowns = Exclude<AnalyticsBreakdownPreset, 'none'>[]
+export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
+export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
+export type AnalyticsTableSortColumn =
+	| 'date'
+	| 'project'
+	| 'breakdown'
+	| `breakdown_${Exclude<AnalyticsBreakdownPreset, 'none'>}`
+	| 'views'
+	| 'downloads'
+	| 'revenue'
+	| 'playtime'
+export type AnalyticsTableSortDirection = 'asc' | 'desc'
+
+export type AnalyticsSelectedFilters = Record<AnalyticsQueryFilterCategory, string[]>
+
+export type AnalyticsQueryBuilderState = {
+	selectedProjectIds: string[]
+	selectedTimeframeMode: AnalyticsTimeframeMode
+	selectedTimeframe: AnalyticsTimeframePreset
+	selectedLastTimeframeAmount: number
+	selectedLastTimeframeUnit: AnalyticsLastTimeframeUnit
+	selectedCustomTimeframeStartDate: string
+	selectedCustomTimeframeEndDate: string
+	selectedGroupBy: AnalyticsGroupByPreset
+	selectedBreakdowns: AnalyticsSelectedBreakdowns
+	selectedFilters: AnalyticsSelectedFilters
+}
+
+export type AnalyticsGraphState = {
+	activeStat: AnalyticsDashboardStat
+	activeGraphViewMode: AnalyticsGraphViewMode
+	isRatioMode: boolean
+	showChartEvents: boolean
+	showProjectEvents: boolean
+	showPreviousPeriod: boolean
+	hiddenGraphDatasetIds: string[]
+	selectedGraphDatasetIds: string[] | null
+}
+
+export type AnalyticsTableSortState = {
+	sortColumn: AnalyticsTableSortColumn | undefined
+	sortDirection: AnalyticsTableSortDirection
+}
+
+export type MutableRouteQuery = Record<
+	string,
+	LocationQueryValueRaw | LocationQueryValueRaw[] | undefined
+>
 
 export type ProjectTypeMetadata = {
 	project_type?: string | null
