@@ -21,7 +21,7 @@ const ANALYTICS_START_TIME = new Date(ANALYTICS_START_TIMESTAMP).getTime()
 export const REVENUE_MIN_TIMEFRAME_MS = 1 * 24 * 60 * 60 * 1000 // need at least 1 day in timeframe range to show revenue
 const ANALYTICS_DAY_MS = 24 * 60 * 60 * 1000
 const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group by" for timeframe ranges
-const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 2000
+const ANALYTICS_PROJECT_IDS_FETCH_BATCH_SIZE = 40
 const ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS = 300
 
 function isProjectAnalyticsPoint(
