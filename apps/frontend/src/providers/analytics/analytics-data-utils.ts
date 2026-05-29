@@ -497,6 +497,64 @@ export function getProjectDownloadsByIdFromTimeSlices(
 	return projectDownloadsById
 }
 
+function getDownloadFieldCountsFromTimeSlices(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+	getKey: (
+		dataPoint: Extract<Labrinth.Analytics.v3.ProjectMetrics, { metric_kind: 'downloads' }>,
+	) => string | null | undefined,
+): Map<string, number> {
+	const downloadsByValue = new Map<string, number>()
+
+	for (const timeSlice of timeSlices) {
+		for (const dataPoint of timeSlice) {
+			if (!isProjectAnalyticsPoint(dataPoint) || dataPoint.metric_kind !== 'downloads') {
+				continue
+			}
+
+			const key = getKey(dataPoint)?.trim()
+			if (!key) {
+				continue
+			}
+
+			downloadsByValue.set(key, (downloadsByValue.get(key) ?? 0) + dataPoint.downloads)
+		}
+	}
+
+	return downloadsByValue
+}
+
+export function getProjectVersionDownloadsByIdFromTimeSlices(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+): Map<string, number> {
+	return getDownloadFieldCountsFromTimeSlices(timeSlices, (dataPoint) => dataPoint.version_id)
+}
+
+export function getGameVersionDownloadsByVersionFromTimeSlices(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+): Map<string, number> {
+	return getDownloadFieldCountsFromTimeSlices(timeSlices, (dataPoint) => dataPoint.game_version)
+}
+
+export function getCountryDownloadsByCodeFromTimeSlices(
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
+): Map<string, number> {
+	const countryDownloadsByCode = new Map<string, number>()
+	const downloadsByCountry = getDownloadFieldCountsFromTimeSlices(
+		timeSlices,
+		(dataPoint) => dataPoint.country,
+	)
+
+	for (const [country, downloads] of downloadsByCountry.entries()) {
+		const countryCode = country.toUpperCase()
+		countryDownloadsByCode.set(
+			countryCode,
+			(countryDownloadsByCode.get(countryCode) ?? 0) + downloads,
+		)
+	}
+
+	return countryDownloadsByCode
+}
+
 export function cloneAnalyticsFetchRequest(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 ): Labrinth.Analytics.v3.FetchRequest | null {

@@ -192,15 +192,40 @@ function getAnalyticsFacetDownloadsByValue<T>(
 		}
 
 		const downloads = getAnalyticsFacetDownloadCount(facet)
+		if (downloads === null) {
+			continue
+		}
+
 		downloadsByValue.set(key, (downloadsByValue.get(key) ?? 0) + downloads)
 	}
 
 	return downloadsByValue
 }
 
-function getAnalyticsFacetDownloadCount<T>(facet: Labrinth.Analytics.v3.AnalyticsFacet<T>): number {
+function getAnalyticsFacetDownloadCount<T>(
+	facet: Labrinth.Analytics.v3.AnalyticsFacet<T>,
+): number | null {
 	const count = (facet as { count?: number }).count ?? facet.downloads
-	return Number.isFinite(count) ? count : 0
+	return Number.isFinite(count) ? count : null
+}
+
+function doesAnalyticsFacetHaveDownloadCount<T>(
+	facet: Labrinth.Analytics.v3.AnalyticsFacet<T>,
+): boolean {
+	return !!getAnalyticsFacetDownloadCount(facet)
+}
+
+export function shouldFetchAnalyticsDownloadCountFallback(
+	facets: Labrinth.Analytics.v3.AnalyticsFacets | null | undefined,
+): boolean {
+	if (!facets) {
+		return false
+	}
+
+	const projectDownloadFacets = Object.values(facets.project_downloads)
+	const downloadFacets =
+		projectDownloadFacets.flat() as Labrinth.Analytics.v3.AnalyticsFacet<unknown>[]
+	return downloadFacets.some((facet) => !doesAnalyticsFacetHaveDownloadCount(facet))
 }
 
 export function getAnalyticsFacetsFilterOptionSummary(

@@ -42,8 +42,11 @@ import {
 	fetchAnalyticsTimeSlices,
 	getAnalyticsProjectEventsInTimeRange,
 	getAnalyticsTimeframeDurationMs,
+	getCountryDownloadsByCodeFromTimeSlices,
+	getGameVersionDownloadsByVersionFromTimeSlices,
 	getPercentChange,
 	getProjectDownloadsByIdFromTimeSlices,
+	getProjectVersionDownloadsByIdFromTimeSlices,
 	isAnalyticsFetchRequestReady,
 	isRevenueHourlyGroupBy,
 	REVENUE_MIN_TIMEFRAME_MS,
@@ -57,6 +60,7 @@ import {
 	getAnalyticsVersionIdsFromProjects,
 	getProjectVersionFilterOptionSummary,
 	sanitizeAnalyticsSelectedFiltersForAvailableOptions,
+	shouldFetchAnalyticsDownloadCountFallback,
 	sortStringValues,
 } from './analytics-filter-utils'
 import {
@@ -1018,6 +1022,39 @@ export function createAnalyticsDashboardContext(
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 	})
 
+	const shouldFetchDownloadCountFallback = computed(() =>
+		shouldFetchAnalyticsDownloadCountFallback(analyticsFacetsData.value?.facets),
+	)
+	const { data: analyticsDownloadCountFallbackTimeSlices } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			analyticsQueryUserId.value,
+			'filter-options',
+			'download-counts-fallback',
+			analyticsFacetsRequest.value,
+			queryRefreshTimestamp.value,
+		]),
+		queryFn: () => {
+			const nextRequest = analyticsFacetsRequest.value
+			if (!isAnalyticsFetchRequestReady(nextRequest)) {
+				return []
+			}
+
+			return fetchAnalyticsTimeSlices(nextRequest, (request) =>
+				client.labrinth.analytics_v3.fetch(request),
+			)
+		},
+		enabled: computed(
+			() =>
+				hasFetchedAnalyticsFilterOptions.value &&
+				shouldFetchDownloadCountFallback.value &&
+				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
+		),
+		placeholderData: [],
+		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+	})
+
 	const { data: filterOptionProjectVersions, isFetched: hasFetchedFilterOptionProjectVersions } =
 		useQuery({
 			queryKey: computed(() => [
@@ -1246,21 +1283,58 @@ export function createAnalyticsDashboardContext(
 		}
 		return versionProjectIconUrls
 	})
+	const downloadCountFallbackTimeSlices = computed(() => {
+		const fallbackTimeSlices = analyticsDownloadCountFallbackTimeSlices.value ?? []
+		return fallbackTimeSlices.length > 0 ? fallbackTimeSlices : timeSlices.value
+	})
+	const fallbackProjectDownloadsById = computed(() =>
+		getProjectDownloadsByIdFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	)
+	const fallbackProjectVersionDownloadsById = computed(() =>
+		getProjectVersionDownloadsByIdFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	)
+	const fallbackCountryDownloadsByCode = computed(() =>
+		getCountryDownloadsByCodeFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	)
+	const fallbackGameVersionDownloadsByVersion = computed(() =>
+		getGameVersionDownloadsByVersionFromTimeSlices(downloadCountFallbackTimeSlices.value),
+	)
+	function getDownloadCountMap(
+		facetDownloadsByValue: Map<string, number>,
+		fallbackDownloadsByValue: Map<string, number>,
+	): Map<string, number> {
+		if (shouldFetchDownloadCountFallback.value && fallbackDownloadsByValue.size > 0) {
+			return fallbackDownloadsByValue
+		}
+
+		return facetDownloadsByValue.size > 0 ? facetDownloadsByValue : fallbackDownloadsByValue
+	}
+
 	const projectDownloadsById = computed(() => {
 		const facetProjectDownloadsById = analyticsFacetsFilterOptionSummary.value.projectDownloadsById
-		return facetProjectDownloadsById.size > 0
-			? facetProjectDownloadsById
-			: getProjectDownloadsByIdFromTimeSlices(timeSlices.value)
+		return getDownloadCountMap(facetProjectDownloadsById, fallbackProjectDownloadsById.value)
 	})
-	const projectVersionDownloadsById = computed(
-		() => analyticsFacetsFilterOptionSummary.value.projectVersionDownloadsById,
-	)
-	const countryDownloadsByCode = computed(
-		() => analyticsFacetsFilterOptionSummary.value.countryDownloadsByCode,
-	)
-	const gameVersionDownloadsByVersion = computed(
-		() => analyticsFacetsFilterOptionSummary.value.gameVersionDownloadsByVersion,
-	)
+	const projectVersionDownloadsById = computed(() => {
+		const facetProjectVersionDownloadsById =
+			analyticsFacetsFilterOptionSummary.value.projectVersionDownloadsById
+		return getDownloadCountMap(
+			facetProjectVersionDownloadsById,
+			fallbackProjectVersionDownloadsById.value,
+		)
+	})
+	const countryDownloadsByCode = computed(() => {
+		const facetCountryDownloadsByCode =
+			analyticsFacetsFilterOptionSummary.value.countryDownloadsByCode
+		return getDownloadCountMap(facetCountryDownloadsByCode, fallbackCountryDownloadsByCode.value)
+	})
+	const gameVersionDownloadsByVersion = computed(() => {
+		const facetGameVersionDownloadsByVersion =
+			analyticsFacetsFilterOptionSummary.value.gameVersionDownloadsByVersion
+		return getDownloadCountMap(
+			facetGameVersionDownloadsByVersion,
+			fallbackGameVersionDownloadsByVersion.value,
+		)
+	})
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
 	const availableProjectIdSet = computed(() => new Set(availableProjectIds.value))
