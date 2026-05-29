@@ -29,9 +29,6 @@
   "nags.add-links.title": {
     "defaultMessage": "Lägg till externa länkar"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Du har valt alla {totalAvailableTags} taggar. Detta motverkar syftet med taggar, som ska hjälpa användare att hitta projekten de letar efter. Vänligen välj bara taggar som är relevanta till ditt projekt."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Välj korrekta taggar"
   },
@@ -64,9 +61,6 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Besök gallerisida"
-  },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ditt {type, select, mod {mod} plugin {plugin} other {projekt}} använder en licens som kräver att källkoden är tillgänglig. Var god tillförse en källkodslänk eller källkodsfil för varje egen version, eller fundera på att använda en annan licens."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Tillförse källkod"
@@ -158,9 +152,6 @@
   "nags.select-language.title": {
     "defaultMessage": "Välj språk"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Välj vilken licens {type, select, mod {din mod} modpack {ditt modpaket} resourcepack {ditt resurspaket} shader {din shader} plugin {ditt plugin} datapack {ditt datapaket} other {ditt projekt}} distribueras under."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Välj en licens"
   },
@@ -224,9 +215,6 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Välj korrekta taggar"
   },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Åt minstone en galleribild krävs för att visa innehållet i {type, select, resourcepack {ditt resurspaket, utom för ljud eller localiseringspaket. Om detta beskriver ditt paket, var god välj den lämpliga taggen} shader {din shader} other {ditt projekt}}."
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ladda upp en galleribild"
   },
@@ -249,4 +237,3 @@
     "defaultMessage": "Besök länkinställningar"
   }
 }
-

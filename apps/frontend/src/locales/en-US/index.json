@@ -123,7 +123,7 @@
     "message": "∞ MB"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -1067,6 +1067,9 @@
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord invite"
   },
+  "dashboard.projects.links.header.edit": {
+    "message": "Edit links"
+  },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "A place for users to report bugs, issues, and concerns about your project."
   },
@@ -1092,7 +1095,7 @@
     "message": "Source code"
   },
   "dashboard.projects.links.wiki-page.description": {
-    "message": "A page containing information, documentation, and help for the project."
+    "message": "A page containing information, documentation, and help for the project"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Wiki page"
@@ -1356,19 +1359,19 @@
     "message": "No server world is available for install."
   },
   "discover.install.error.unsupported-content-type": {
-    "message": "This content type cannot be installed to a server from browse."
+    "message": "This content type cannot be installed to a server from Discover."
   },
   "discover.install.heading.reset-modpack": {
     "message": "Selecting modpack to install after reset"
   },
   "discover.seo.description": {
-    "message": "Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
+    "message": "Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}."
   },
   "discover.seo.title": {
-    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
+    "message": "Search {projectType}"
   },
   "discover.seo.title-with-query": {
-    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
+    "message": "Search {projectType} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
@@ -2357,6 +2360,9 @@
   "muralpay.warning.wallet-address": {
     "message": "Double-check your wallet address. Funds sent to an incorrect address cannot be recovered."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "Changes will be applied to {count, plural, one {# project} other {# projects}}."
+  },
   "profile.bio.fallback.creator": {
     "message": "A Modrinth creator."
   },
@@ -2380,6 +2386,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Set as affiliate"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, one {# project} other {# projects}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Auth providers"
@@ -2454,7 +2463,7 @@
     "message": "Official Modrinth account"
   },
   "profile.official-account.bio": {
-    "message": "The official user account of Modrinth. Get support at {support-link} or via email at {email}"
+    "message": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
@@ -2904,10 +2913,10 @@
     "message": "Visit projects dashboard"
   },
   "project.stats.downloads-label": {
-    "message": "download{count, plural, one {} other {s}}"
+    "message": "{count, plural, one {download} other {downloads}}"
   },
   "project.stats.followers-label": {
-    "message": "follower{count, plural, one {} other {s}}"
+    "message": "{count, plural, one {follower} other {followers}}"
   },
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."
@@ -2928,10 +2937,10 @@
     "message": "You've already reported {title}"
   },
   "report.already-reported-description": {
-    "message": "You have an open report for this {item, select, project {project} version {version} user {user} other {content}} already. You can add more details to your report if you have more information to add."
+    "message": "You have an open report for this {item} already. You can add more details to your report if you have more information to add."
   },
   "report.back-to-item": {
-    "message": "Back to {item, select, project {project} version {version} user {user} other {content}}"
+    "message": "Back to {item}"
   },
   "report.body.description": {
     "message": "Include links and images if possible and relevant. Empty or insufficient reports will be closed and ignored."
@@ -2940,10 +2949,10 @@
     "message": "Please provide additional context about your report"
   },
   "report.checking": {
-    "message": "Checking {item, select, project {project} version {version} user {user} other {content}}..."
+    "message": "Checking {item}..."
   },
   "report.could-not-find": {
-    "message": "Could not find {item, select, project {project} version {version} user {user} other {content}}"
+    "message": "Could not find {item}"
   },
   "report.for.violation": {
     "message": "Violation of Modrinth <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>"
@@ -2985,13 +2994,13 @@
     "message": "Please report:"
   },
   "report.question.content-id": {
-    "message": "What is the ID of the {item, select, project {project} version {version} user {user} other {content}}?"
+    "message": "What is the ID of the {item}?"
   },
   "report.question.content-type": {
     "message": "What type of content are you reporting?"
   },
   "report.question.report-reason": {
-    "message": "Which of Modrinth's rules is this {item, select, project {project} version {version} user {user} other {content}} violating?"
+    "message": "Which of Modrinth's rules is this {item} violating?"
   },
   "report.report-content": {
     "message": "Report content to moderators"
@@ -3105,25 +3114,25 @@
     "message": "Write organizations"
   },
   "scopes.patCreate.description": {
-    "message": "Create personal API tokens"
+    "message": "Create personal access tokens"
   },
   "scopes.patCreate.label": {
     "message": "Create PATs"
   },
   "scopes.patDelete.description": {
-    "message": "Delete your personal API tokens"
+    "message": "Delete your personal access tokens"
   },
   "scopes.patDelete.label": {
     "message": "Delete PATs"
   },
   "scopes.patRead.description": {
-    "message": "View created API tokens"
+    "message": "View created personal access tokens"
   },
   "scopes.patRead.label": {
     "message": "Read PATs"
   },
   "scopes.patWrite.description": {
-    "message": "Edit personal API tokens"
+    "message": "Edit personal access tokens"
   },
   "scopes.patWrite.label": {
     "message": "Write PATs"
@@ -3332,6 +3341,9 @@
   "servers.plan.small.description": {
     "message": "Perfect for 1–5 friends with a few light mods."
   },
+  "servers.purchase.step.plan.billed": {
+    "message": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Complete setup"
   },
@@ -3493,6 +3505,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Add an additional layer of security to your account during login."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Remove 2FA"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Setup 2FA"
   },
   "settings.account.security.two-factor.title": {
     "message": "Two-factor authentication"
@@ -3671,20 +3689,11 @@
   "settings.billing.interval.month": {
     "message": "month"
   },
-  "settings.billing.interval.monthly": {
-    "message": "monthly"
-  },
   "settings.billing.interval.quarter": {
     "message": "quarter"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "quarterly"
-  },
   "settings.billing.interval.year": {
     "message": "year"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "yearly"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Ad-free browsing on modrinth.com and Modrinth App"
@@ -3770,9 +3779,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} Shared CPUs (Bursts up to {bursts} CPUs)"
   },
@@ -3840,16 +3846,16 @@
     "message": "Subscriptions"
   },
   "settings.billing.switch.switching-to-interval": {
-    "message": "Switching to {interval}"
+    "message": "Switching to {interval, select, monthly {monthly} yearly {yearly} other {{interval}}}"
   },
   "settings.billing.switch.to-interval": {
-    "message": "Switch to {interval}"
+    "message": "Switch to {interval, select, monthly {monthly} yearly {yearly} other {{interval}}}"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Monthly billing will cost you an additional {amount} per year"
   },
   "settings.billing.switches-to-billing-on": {
-    "message": "Switches to {interval} billing on {date}"
+    "message": "Switches to {interval, select, monthly {monthly} yearly {yearly} other {{interval}}} billing on {date}"
   },
   "settings.billing.update-method": {
     "message": "Update method"

@@ -1,7 +1,11 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header, { count, itemType })"
+		:header="
+			formatMessage(messages.header, {
+				itemType: formatContentTypeSentence(formatMessage, itemType, count),
+			})
+		"
 		:fade="variant === 'server' ? 'warning' : 'danger'"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
@@ -31,7 +35,12 @@
 				<ButtonStyled :color="variant === 'server' ? 'orange' : 'red'">
 					<button :disabled="buttonsDisabled" @click="confirm">
 						<TrashIcon />
-						{{ formatMessage(messages.deleteButton, { count, itemType }) }}
+						{{
+							formatMessage(messages.deleteButton, {
+								count,
+								itemType: formatContentTypeSentence(formatMessage, itemType, count),
+							})
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -47,7 +56,7 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
@@ -56,7 +65,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	header: {
 		id: 'content.confirm-deletion.header',
-		defaultMessage: 'Delete {itemType}{count, plural, one {} other {s}}',
+		defaultMessage: 'Delete {itemType}',
 	},
 	admonitionHeader: {
 		id: 'content.confirm-deletion.admonition-header',
@@ -69,7 +78,7 @@ const messages = defineMessages({
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
-		defaultMessage: 'Delete {count} {itemType}{count, plural, one {} other {s}}',
+		defaultMessage: 'Delete {count, number} {itemType}',
 	},
 })
 

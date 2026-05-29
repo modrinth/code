@@ -65,9 +65,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Bisitahin ang pahina ng galeriya"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ang iyong {type, select, mod {mod} plugin {plugin} other {proyekto}} ay gumagamit ng lisensiya na nangangailangang available ang source code. Mangyaring ibahagi ang source code link o ang sources file sa bawat karagdagang bersiyon, o pag-isipang gumamit ng ibang lisensiya."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Magbigay ng source code"
   },
@@ -158,9 +155,6 @@
   "nags.select-language.title": {
     "defaultMessage": "Piliin ang wika"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Pilian mo ng lisensiya ang iyong {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} na magiging batayan sa pamamahagi."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Pumili ng lisensiya"
   },
@@ -224,9 +218,6 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Piliin ang pinakatumpak na mga tag"
   },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Nangangailangan ng isa o higit pang gallery image upang ma-showcase ang kontento ng iyong {type, select, resourcepack {resource pack, malabian sa audio o localization packs. Kung nilalarawan nito ang iyong pack, mangyaring piliin ang makawawastong tag} shader {shader} other {project}}."
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Mag-upload ng imaheng panggaleriya"
   },
@@ -249,4 +240,3 @@
     "defaultMessage": "Bisitahin ang mga setting sa mga link"
   }
 }
-

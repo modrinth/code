@@ -245,9 +245,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "Pasang"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# mod}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Paket mod yang diperlukan"
   },
@@ -361,9 +358,6 @@
   },
   "friends.action.add-friend": {
     "message": "Tambah teman"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, other {permintaan}} teman"
   },
   "friends.add-friend.submit": {
     "message": "Kirim permintaan teman"

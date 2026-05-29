@@ -1361,15 +1361,6 @@
   "discover.install.heading.reset-modpack": {
     "message": "Sélectionner un modpack à insaller après la réinitialisation"
   },
-  "discover.seo.description": {
-    "message": "Recherchez et parcourez des milliers de {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}} Minecraft sur Modrinth avec des résultars fidèles et rapides. Nos filtres vous aident à trouver les meilleurs {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}}."
-  },
-  "discover.seo.title": {
-    "message": "Rechercher des {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {packs de ressources} shader {shaders} plugin {plugins} datapack {packs de données} other {projets}} | {query}"
-  },
   "error.collection.404.list_item.1": {
     "message": "Vous avez peut-être mal tapé l'URL de la collection."
   },
@@ -2468,9 +2459,6 @@
   "project-member-header.invitation-title": {
     "message": "Invitation à rejoindre un projet"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Vous avez été invité à être membre de ce projet sous le rôle de '{role}''."
-  },
   "project-member-header.success-decline": {
     "message": "Vous avez refusé l’invitation à rejoindre l’équipe."
   },
@@ -2921,23 +2909,11 @@
   "report.already-reported": {
     "message": "Vous avez déjà signalé {title}"
   },
-  "report.already-reported-description": {
-    "message": "Vous avez déjà un rapport ouvert pour {item, select, project {ce projet} version {cette version} user {cet utilisateur} other {ce contenu}}. Vous pouvez ajouter plus de détails à votre rapport si vous avez plus d'information à ajouter."
-  },
-  "report.back-to-item": {
-    "message": "Retour vers {item, select, project {le projet} version {la version} user {l'utilisateur} other {le contenu}}"
-  },
   "report.body.description": {
     "message": "Incluez des liens et des images si possible et pertinentes. Les signalements vides ou insuffisants seront fermés et ignorés."
   },
   "report.body.title": {
     "message": "Veuillez fournir des informations supplémentaires concernant votre signalement."
-  },
-  "report.checking": {
-    "message": "Vérification {item, select, project {du projet} version {de la version} user {de l'utilisateur} other {du contenu}}..."
-  },
-  "report.could-not-find": {
-    "message": "Impossible de trouver {item, select, project {la projet} version {la version} user {l'utilisateur} other {le contenu}}"
   },
   "report.for.violation": {
     "message": "Violation des <rules-link>Règles</rules-link> ou des <terms-link>Conditions d’utilisation</terms-link> de Modrinth"
@@ -2978,14 +2954,8 @@
   "report.please-report": {
     "message": "Veuillez signaler :"
   },
-  "report.question.content-id": {
-    "message": "Quel est l'ID {item, select, project {du projet} version {de la version} user {de l'utilisateur} other {du contenu}} ?"
-  },
   "report.question.content-type": {
     "message": "Quel type de contenu signalez-vous ?"
-  },
-  "report.question.report-reason": {
-    "message": "Quelle règle de Modrinth {item, select, project {ce projet enfreint-il} version {cette version enfreint-elle} user {cet utilisateur enfreint-il} other {ce contenu enfreint-il}} ?"
   },
   "report.report-content": {
     "message": "Signaler le contenu aux modérateurs"
@@ -3665,20 +3635,11 @@
   "settings.billing.interval.month": {
     "message": "mois"
   },
-  "settings.billing.interval.monthly": {
-    "message": "mensuel"
-  },
   "settings.billing.interval.quarter": {
     "message": "trimestre"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "trimestriel"
-  },
   "settings.billing.interval.year": {
     "message": "an"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "annuel"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Navigation sans publicité sur modrinth.com et Modrinth App"
@@ -3764,9 +3725,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} processeurs partagés (pics jusqu’à {bursts} processeurs)"
   },
@@ -3833,17 +3791,8 @@
   "settings.billing.subscription.title": {
     "message": "Abonnements"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Passage à {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Passer à {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "La facturation mensuelle vous coûtera un supplément de {amount} par an"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Passe à une facturation {interval} le {date}"
   },
   "settings.billing.update-method": {
     "message": "Mettre à jour le moyen de paiement"

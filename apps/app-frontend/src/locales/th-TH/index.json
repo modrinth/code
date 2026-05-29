@@ -260,9 +260,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "ติดตั้ง"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# ม็อด}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "มอดแพ็กที่จำเป็น"
   },
@@ -373,9 +370,6 @@
   },
   "friends.action.add-friend": {
     "message": "เพิ่มเพื่อน"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "คำขอเป็นเพื่อน {count} {count, plural, other {คน}}"
   },
   "friends.add-friend.submit": {
     "message": "ส่งคำขอเป็นเพื่อน"

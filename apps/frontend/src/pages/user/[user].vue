@@ -412,9 +412,9 @@
 							<div class="stats">
 								<BoxIcon />
 								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${
-										(collection.projects?.length || 0) !== 1 ? 's' : ''
-									}`
+									formatMessage(messages.collectionProjectsCount, {
+										count: collection.projects?.length || 0,
+									})
 								}}
 							</div>
 							<div class="stats">
@@ -591,6 +591,10 @@ const messages = defineMessages({
 		id: 'profile.label.downloads',
 		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
 	},
+	collectionProjectsCount: {
+		id: 'profile.collection.projects-count',
+		defaultMessage: '{count, plural, one {# project} other {# projects}}',
+	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',
 		defaultMessage: 'Joined',
@@ -725,7 +729,7 @@ const messages = defineMessages({
 	officialAccountBio: {
 		id: 'profile.official-account.bio',
 		defaultMessage:
-			'The official user account of Modrinth. Get support at {support-link} or via email at {email}',
+			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
 	},
 })
 

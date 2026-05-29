@@ -65,17 +65,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Failed to load subscription details."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 days"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/month"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/quarter"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/year"
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 days} monthly {/month} quarterly {/quarter} yearly {/year} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Your next charge will be on <charge-date>{date}</charge-date>."
@@ -105,7 +96,7 @@
     "defaultMessage": "You are currently offline. Connect to the internet to browse Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} server {servers} other {projects}}..."
+    "defaultMessage": "Search {projectType}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Selected projects"
@@ -323,6 +314,12 @@
   "collections.label.private": {
     "defaultMessage": "Private"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "content"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {item} other {items}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Select {project}"
   },
@@ -348,10 +345,10 @@
     "defaultMessage": "Deletion warning"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Delete {count} {itemType}{count, plural, one {} other {s}}"
+    "defaultMessage": "Delete {count, number} {itemType}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Delete {itemType}{count, plural, one {} other {s}}"
+    "defaultMessage": "Delete {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Downgrading} other {Updating}} may cause compatibility issues. Mods or content you added on top of the modpack will be kept, but may not be compatible with the new version."
@@ -428,11 +425,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Create backup"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instance"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Hold Shift while clicking to skip confirmation."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {instance}} if anything breaks."
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type} if anything breaks."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "world"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Your modpack's content can now be found here!"
@@ -477,7 +480,7 @@
     "defaultMessage": "Please wait"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Search {count} {contentType}..."
+    "defaultMessage": "Search {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "File names"
@@ -543,7 +546,7 @@
     "defaultMessage": "Updating {contentType}..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} selected"
+    "defaultMessage": "{count, number} {contentType} selected"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
@@ -842,6 +845,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Overwrite"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Will overwrite <file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Over 100 files will be overwritten if you proceed with extraction; here are some of them."
   },
@@ -851,17 +857,14 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} overwritten"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Overwritten"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Files will be overwritten"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "Create {type, select, directory {folder} other {file}}"
+    "defaultMessage": "Create {type}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "Create a {type, select, directory {folder} other {file}}"
+    "defaultMessage": "Create a {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "e.g. my-folder"
@@ -875,8 +878,11 @@
   "files.delete-modal.header": {
     "defaultMessage": "Delete file"
   },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {This folder and all its contents will be permanently deleted. This action cannot be undone.} other {This file will be permanently deleted. This action cannot be undone.}}"
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "This file will be permanently deleted. This action cannot be undone."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "This folder and all its contents will be permanently deleted. This action cannot be undone."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Could not load file contents."
@@ -965,6 +971,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Zoom out"
   },
+  "files.item-type.file": {
+    "defaultMessage": "file"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "files"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "folder"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "folders"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "File operations are disabled while the operation is in progress."
   },
@@ -1005,7 +1023,7 @@
     "defaultMessage": "e.g. /my-folder"
   },
   "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
+    "defaultMessage": "Move {type}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Back to home"
@@ -1128,7 +1146,7 @@
     "defaultMessage": " - {count} left"
   },
   "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Drop {type, select, undefined {files} other {{type}s}} here to upload"
+    "defaultMessage": "Drop {type} here to upload"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Name must contain only alphanumeric characters, dashes, underscores, or spaces."
@@ -1503,7 +1521,13 @@
     "defaultMessage": "Changing loaders is destructive"
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "Linked {projectType, select, server {server project} other {modpack}}"
+    "defaultMessage": "Linked {projectType}"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "modpack"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "server project"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} version"
@@ -1512,7 +1536,7 @@
     "defaultMessage": "You will need to reset your server to switch loader."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added."
+    "defaultMessage": "Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Re-install modpack"
@@ -1541,11 +1565,23 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Search game version..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "instance"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "instance's"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "server"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "server's"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Unlink"
   },
   "installation-settings.unlink.description": {
-    "defaultMessage": "Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
+    "defaultMessage": "Unlinking permanently disconnects this {type} from the {projectType} project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Verifying..."
@@ -1562,14 +1598,23 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstall modpack"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your {type, select, server {server is not starting correctly} other {game is not launching due to launcher-related errors}}."
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your game is not launching due to launcher-related errors."
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly."
   },
   "instance.confirm-repair.header": {
-    "defaultMessage": "Repair {type, select, server {server} other {instance}}"
+    "defaultMessage": "Repair {type}"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "instance"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Repair"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "server"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
@@ -2352,7 +2397,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -3110,6 +3155,18 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
   },
+  "report.item-type.content": {
+    "defaultMessage": "content"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "project"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "user"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "version"
+  },
   "s.bg": {
     "defaultMessage": "Background task running"
   },
@@ -3426,7 +3483,7 @@
     "defaultMessage": "No servers yet"
   },
   "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Pick your favourite mods and we handle the rest."
+    "defaultMessage": "Pick your favorite mods and we handle the rest."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "One-click mod installs"
@@ -3465,16 +3522,16 @@
     "defaultMessage": "New"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining>. Contact support to download the files before they are deleted. "
+    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days}}</days-remaining>. Contact support to download the files before they are deleted."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Your files will be preserved for 30 days after cancellation."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Your server has been suspended by moderation action. "
+    "defaultMessage": "Your server has been suspended by moderation action."
   },
   "servers.listing.notice.pending-change": {
-    "defaultMessage": "Your server will {verb} to the {planSize} Plan on <date>{formattedDate}</date>. "
+    "defaultMessage": "Your server will {verb, select, downgrade {downgrade} other {upgrade}} to the {planSize} Plan on <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Please wait while we set up your server. This can take up to 10 minutes."
@@ -3483,7 +3540,7 @@
     "defaultMessage": "Your subscription was cancelled."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Your subscription was cancelled on <date>{formattedDate}</date>. "
+    "defaultMessage": "Your subscription was cancelled on <date>{formattedDate}</date>."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Your subscription was cancelled due to payment failure."
@@ -3664,6 +3721,9 @@
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Payment method"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Available in North America, Europe, and Southeast Asia."

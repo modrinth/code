@@ -1,11 +1,15 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header, { type: server ? 'server' : 'instance' })"
+		:header="
+			formatMessage(messages.header, {
+				type: formatMessage(server ? messages.serverLabel : messages.instanceLabel),
+			})
+		"
 		max-width="500px"
 	>
 		<span class="text-primary">
-			{{ formatMessage(messages.body, { type: server ? 'server' : 'instance' }) }}
+			{{ formatMessage(server ? messages.serverBody : messages.instanceBody) }}
 		</span>
 
 		<template #actions>
@@ -45,16 +49,29 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	header: {
 		id: 'instance.confirm-repair.header',
-		defaultMessage: 'Repair {type, select, server {server} other {instance}}',
+		defaultMessage: 'Repair {type}',
 	},
-	body: {
-		id: 'instance.confirm-repair.body',
+	instanceBody: {
+		id: 'instance.confirm-repair.body.instance',
 		defaultMessage:
-			'Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your {type, select, server {server is not starting correctly} other {game is not launching due to launcher-related errors}}.',
+			'Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your game is not launching due to launcher-related errors.',
+	},
+	serverBody: {
+		id: 'instance.confirm-repair.body.server',
+		defaultMessage:
+			'Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly.',
 	},
 	repairButton: {
 		id: 'instance.confirm-repair.repair-button',
 		defaultMessage: 'Repair',
+	},
+	instanceLabel: {
+		id: 'instance.confirm-repair.instance-label',
+		defaultMessage: 'instance',
+	},
+	serverLabel: {
+		id: 'instance.confirm-repair.server-label',
+		defaultMessage: 'server',
 	},
 })
 
