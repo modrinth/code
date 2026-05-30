@@ -36,20 +36,15 @@ struct TiltifyWebhook {
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 struct TiltifyData {
-    amount_raised: AmountRaised,
-    user: TiltifyUser,
+    amount: AmountRaised,
+    donor_name: String,
+    completed_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 struct AmountRaised {
     currency: String,
     value: Decimal,
-}
-
-#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-struct TiltifyUser {
-    id: Uuid,
-    username: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
@@ -168,14 +163,14 @@ pub async fn tiltify_webhook(
         id,
         tiltify_event_id: payload.meta.id,
         raw_data: raw_payload,
-        donated_at: payload.meta.generated_at,
+        donated_at: payload.data.completed_at,
         amount_usd: None,
         user_id: None,
     };
 
     let username = async {
         // then we can attempt user lookups
-        let username = payload.data.user.username;
+        let username = payload.data.donor_name.clone();
         let user = DBUser::get(&username, &**pool, &redis)
             .await
             .wrap_err("fetching user from database")?
@@ -195,7 +190,7 @@ pub async fn tiltify_webhook(
     let amount_usd = async {
         // and insert value amount
         let amount_usd =
-            amount_raised_usd(&payload.data.amount_raised, &payouts_queue)
+            amount_raised_usd(&payload.data.amount, &payouts_queue)
                 .await
                 .wrap_err("failed to get donation amount")?;
 
