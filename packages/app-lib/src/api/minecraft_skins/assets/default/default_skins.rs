@@ -8,6 +8,7 @@ use super::super::super::Skin;
 
 const MODRINTH_PRIDE_SKIN_PACK_SECTION: &str = "Modrinth Pride";
 const DEFAULT_SKINS_SECTION: &str = "Default skins";
+const MODRINTH_SKIN_PACK_SECTION: &str = "Modrinth";
 const MINECON_EARTH_2017_SKIN_PACK_SECTION: &str = "MINECON Earth 2017";
 const BUILDERS_AND_BIOMES_SKIN_PACK_SECTION: &str = "Builders & Biomes";
 const STRIDING_HERO_SKIN_PACK_SECTION: &str = "Striding Hero";
@@ -26,7 +27,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     //
     vec![Skin {
         texture_key: Arc::from("local-cb3974d16e88a6bd1fe91b0bd58aa5a89abc01f66aed0efc732b84091a523fc9"),
-        name: Some(Arc::from("Asexual")),
+        name: Some(Arc::from("Mr. Pack - Asexual")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
@@ -38,7 +39,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     },
     Skin {
         texture_key: Arc::from("local-017ef388aa15a32c47af5b6230c0969085c30e2a884e8853fb449bcdcb60d6f4"),
-        name: Some(Arc::from("Bisexual")),
+        name: Some(Arc::from("Mr. Pack - Bisexual")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
@@ -50,7 +51,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     },
     Skin {
         texture_key: Arc::from("local-6721474dc24f7ebfac096c3df0bbc0ff7bd3d7d63e8bce13754b0db9acab3805"),
-        name: Some(Arc::from("Genderfluid")),
+        name: Some(Arc::from("Mr. Pack - Genderfluid")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
@@ -62,7 +63,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     },
     Skin {
         texture_key: Arc::from("local-7f01d162a7dedfd0e1bf1a03533ca9eecd8105dd1008e3297ff9d9d8b1582b8c"),
-        name: Some(Arc::from("Intersex")),
+        name: Some(Arc::from("Mr. Pack - Intersex")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
@@ -74,7 +75,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     },
     Skin {
         texture_key: Arc::from("local-9417023c7f4674feff1592df3cab3bea791a2dd2bc453eb03033859fbf9483f9"),
-        name: Some(Arc::from("Lesbian")),
+        name: Some(Arc::from("Mr. Pack - Lesbian")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
@@ -86,7 +87,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     },
     Skin {
         texture_key: Arc::from("local-88b4e9d37f25f947c12dfc5c354af30601016cf852e90681633c92b750e43761"),
-        name: Some(Arc::from("MLM")),
+        name: Some(Arc::from("Mr. Pack - MLM")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
@@ -98,12 +99,24 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     },
     Skin {
         texture_key: Arc::from("local-8fcc36625f7b7ce18362ab5eaec276653f26af331f4ec38d00a610c93da69640"),
-        name: Some(Arc::from("Nonbinary")),
+        name: Some(Arc::from("Mr. Pack - Nonbinary")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(
             "data:image/png;base64,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"
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    Skin {
+        texture_key: Arc::from("local-7cc8f7620b66002be6e531ac0f90f050eca831d7827a66c01cf6256b0a4f936e"),
+        name: Some(Arc::from("Mr. Pack - Pride")),
+        section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,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"
         ).unwrap()),
         source: SkinSource::Default,
         is_equipped: false,
@@ -332,6 +345,18 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
         cape_id: None,
         texture: Arc::from(Url::try_from(
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAE10lEQVR4Xu2asYsUSRjFvePSEzY5DkTB5TwVAxUWTMYVjeQwGcwuMdzkNtxMPC5YQwMVQTDRwEhDweP+ATExFe5v8fp4DW95++vqmS12bae1Hzyquvqb2nqvvurpqdpjx5bg+A/fNes/rTUn1n5sVHfp+m+XT7e8s3l+H93O/kaHFF4ywkLThGxjf6MDxavMrEixJbK/0SFFc/aZASWyv9Eh17uM4DKgYJL9jQ4UTxMomGR/o0Ou/Qsnf+48Cyz0q/4W8KzbAGYAxacJ7G/lYCFc2/mg4zLgvYzJstTGz3I8gyPFse5Ss7l981Jz7/aVlqqrjcJK5mRfabY/w/EMjhxs0qJTOOn7NiONoNAsM47jGRw50Idbt1phBxFfMkHX6iOFUzxN4XgGhwepB1afeOH6qe/3rlUXHEcT1FdpKXC5rIQBOXiLTgOcFSXqXhrgz6aJNCNNWIlvCX9d+auLgpI7s3MtfZ2xZn4FlvpkLMczOPjmRmZmJCl2GR3Lz3A8Xxxvn+40yfX19X1kPPHnmY3m7wdPOoLVpnvu9/6dm/vodvZHvP/1RvPvxVstVddk7P5+reWj7fnSzy8FDdjY2NgTrzrjiTQgZ58G9JH9ESn+xbnZXjYeWUY9v7vVJI/agI9vH+/RorON/RE24LNlQMmAJOMJG5DPCNWPyoDSEjhUBmgAEqryw+vdlh6Mr0sxptJQwkQP7N3LV50nvgzwfcfrs6Lulah7//xytWUKt3gvg+zPsSb1dpDrj+LSgL4Y/ZEcgAcqE0SL8aA1QBqQwtxm4RbkuvtxnPviGPw56u2gJIwZkCawrj+Ug2aK5uBNx5dik2qnEck+A/w3VFJvB33iF5mQpAE5myksM2DRDFMoBdaSejtIAyhe9/gsyHjVPRMpgEJoiE0oCc8Ykc+SJN818qFrUm8HFEXBfeJNi0kTSsIzG3IJMDbFq07RfBtNIzLGJfV20CdM1JN/mQEWQzIbeL/EUnwKTeGlV3K2H8gAfu/X0sYkuZRySdWSgnmdWcC4QQz4Y/NsL/969qYl22tIwUm9/dkAU22DGkByBknGLyNFW3hJfJpgI6i3g3zPF2ezWTOfz9tSdDt/FZopSnU+I5I0wde8n9cWnVmgd36nvVOfpWIOZICFpti+6xJLgnLNqz3fKRhPk8iSAf7hY8Fqc2nxB86ACRMmTJgwYcLKQrtK/3361Etuo3knSvdUsr8JEybsB3+z15L9jQ75y6vvF1neYxv7Gx04o7VkfxMmfOPw88HkDhLjCW6Re3NjNBscNKD2eF1b4WmCT329I8T4lQM3NWsN4IHK6DKgZEDN/xdwCax8BijNc4OTm6B+b+jbBFXK+yDT6c8s4HGZqWuOZ3DkercBFMmYJE9zfSRmE1I4S8VxPIODwlRnBqQJrJcMyFnO2c9zQ5ccz+DgrKYBfSYkaUAtuR/A/YIk9wqOZL8gDeBrMk0oZQvP9nm+v4iK5XgGB0Wl4EXiTQuh8DwRYnuWHM/g6BNG9sXRAB6DUTzvczzVYLrWkt/7tbS4NCBZaktSTzVyhkozljOXpesUVMucYZHn+4sMUCz1VIMzWksKqiUNsAmLjMj/D6CewXHY/y/I9M9ngc/3Swbk0TjHMzgO+/8FEuSz/RTPDEjm/wdwPLX4H8bzDGXhwa6jAAAAAElFTkSuQmCC"
+        ).unwrap()),
+        source: SkinSource::Default,
+        is_equipped: false,
+    },
+    Skin {
+        texture_key: Arc::from("local-8776f8b6615e2051b3da182b8208ae8700254d3cc49eac36aef85f7577c85e4a"),
+        name: Some(Arc::from("Mr. Pack")),
+        section: Some(Arc::from(MODRINTH_SKIN_PACK_SECTION)),
+        variant: MinecraftSkinVariant::Classic,
+        cape_id: None,
+        texture: Arc::from(Url::try_from(
+            "data:image/png;base64,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"
         ).unwrap()),
         source: SkinSource::Default,
         is_equipped: false,

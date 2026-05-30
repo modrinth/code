@@ -1,6 +1,17 @@
 import type { ISO3166 } from '../iso3166/types'
+import type { RawDecimal } from '../../utils/types'
 
 export namespace Labrinth {
+	export namespace Campaign {
+		export namespace Internal {
+			export type CampaignInfo = {
+				total_donations_usd: RawDecimal
+				target_usd: RawDecimal
+				num_donators: number
+			}
+		}
+	}
+
 	export namespace Billing {
 		export namespace Internal {
 			export type PriceDuration = 'five-days' | 'monthly' | 'quarterly' | 'yearly'
@@ -1011,12 +1022,17 @@ export namespace Labrinth {
 				venmo_handle?: string
 				balance: number
 			}
+
+			export type UserCampaigns = {
+				pride_26: string | null
+			}
 		}
 
 		export namespace v2 {
 			export type Role = Common.Role
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
+			export type UserCampaigns = Common.UserCampaigns
 
 			export type User = {
 				id: string
@@ -1027,6 +1043,7 @@ export namespace Labrinth {
 				created: string
 				role: Role
 				badges: number
+				campaigns?: UserCampaigns
 				auth_providers?: AuthProvider[]
 				email?: string
 				email_verified?: boolean
@@ -1041,6 +1058,7 @@ export namespace Labrinth {
 			export type Role = Common.Role
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
+			export type UserCampaigns = Common.UserCampaigns
 
 			export type User = {
 				id: string
@@ -1050,6 +1068,7 @@ export namespace Labrinth {
 				created: string
 				role: Role
 				badges: number
+				campaigns: UserCampaigns
 				auth_providers?: AuthProvider[]
 				email?: string
 				email_verified?: boolean

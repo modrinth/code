@@ -13,11 +13,14 @@ import {
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
+	injectAuth,
+	injectModrinthClient,
 	injectNotificationManager,
 	SkinPreviewRenderer,
 	useVIntl,
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { type DragDropEvent, getCurrentWebview } from '@tauri-apps/api/webview'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
@@ -53,7 +56,7 @@ type VirtualSkinSectionListExpose = {
 }
 
 const PENDING_SKIN_REFRESH_DELAY_MS = 11_000
-const DEFAULT_SKIN_SECTION_SORT_ORDER = ['Modrinth Pride', 'Default skins']
+const DEFAULT_SKIN_SECTION_SORT_ORDER = ['Modrinth Pride', 'Default skins', 'Modrinth']
 const messages = defineMessages({
 	skinSelectorTitle: {
 		id: 'app.skins.title',
@@ -67,6 +70,10 @@ const messages = defineMessages({
 		id: 'app.skins.section.modrinth-pride.tooltip',
 		defaultMessage:
 			'You received these skins for donating to a Modrinth Pride fundraiser during Pride Month.',
+	},
+	modrinthSection: {
+		id: 'app.skins.section.modrinth',
+		defaultMessage: 'Modrinth',
 	},
 	defaultSkinsSection: {
 		id: 'app.skins.section.default-skins',
@@ -167,6 +174,8 @@ const skinSectionList = useTemplateRef<VirtualSkinSectionListExpose>('skinSectio
 const { formatMessage } = useVIntl()
 const notifications = injectNotificationManager()
 const { addNotification, handleError } = notifications
+const auth = injectAuth()
+const client = injectModrinthClient()
 
 const themeStore = useTheming()
 const skins = ref<Skin[]>([])
@@ -190,7 +199,33 @@ const savedSkins = computed(() => {
 		return []
 	}
 })
-const defaultSkins = computed(() => filterDefaultSkins(skins.value))
+const { data: modrinthUser } = useQuery({
+	queryKey: computed(() => ['authenticated-user', 'campaigns', auth.user.value?.id]),
+	queryFn: () => client.labrinth.users_v3.getAuthenticated(),
+	enabled: () => !!auth.session_token.value,
+	retry: false,
+})
+const hasModrinthPrideCampaign = computed(
+	() =>
+		!!auth.session_token.value &&
+		(hasActivePrideCampaign(modrinthUser.value?.campaigns?.pride_26) ||
+			hasActivePrideCampaign(auth.user.value?.campaigns?.pride_26)),
+)
+const defaultSkins = computed(() =>
+	filterDefaultSkins(skins.value).filter(
+		(skin) => skin.section !== 'Modrinth Pride' || hasModrinthPrideCampaign.value,
+	),
+)
+
+function hasActivePrideCampaign(prideDate?: string | null) {
+	if (!prideDate) return false
+
+	const expires = new Date(prideDate)
+	if (Number.isNaN(expires.getTime())) return false
+
+	expires.setUTCMonth(expires.getUTCMonth() + 1)
+	return expires.getTime() > Date.now()
+}
 const defaultSkinSections = computed(() => {
 	const sections = new Map<string, Skin[]>()
 
@@ -211,8 +246,7 @@ const defaultSkinSections = computed(() => {
 		infoTooltip: getDefaultSkinSectionInfoTooltip(section),
 		skins,
 	})).sort(
-		(a, b) =>
-			getDefaultSkinSectionSortIndex(a.section) - getDefaultSkinSectionSortIndex(b.section),
+		(a, b) => getDefaultSkinSectionSortIndex(a.section) - getDefaultSkinSectionSortIndex(b.section),
 	)
 })
 
@@ -323,6 +357,8 @@ function getDefaultSkinSectionTitle(section?: string) {
 	switch (section) {
 		case 'Modrinth Pride':
 			return formatMessage(messages.modrinthPrideSection)
+		case 'Modrinth':
+			return formatMessage(messages.modrinthSection)
 		case 'MINECON Earth 2017':
 			return formatMessage(messages.mineconEarth2017Section)
 		case 'Builders & Biomes':

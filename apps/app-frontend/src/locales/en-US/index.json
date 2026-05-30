@@ -431,6 +431,9 @@
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
   "app.skins.section.modrinth-pride": {
     "message": "Modrinth Pride"
   },
