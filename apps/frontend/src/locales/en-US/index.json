@@ -8,6 +8,474 @@
   "admin.billing.error.not-found": {
     "message": "User not found"
   },
+  "analytics.action.add": {
+    "message": "Add"
+  },
+  "analytics.action.cancel": {
+    "message": "Cancel"
+  },
+  "analytics.action.refresh": {
+    "message": "Refresh"
+  },
+  "analytics.action.reset": {
+    "message": "Reset"
+  },
+  "analytics.breakdown.country": {
+    "message": "Country"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Download reason"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Download source"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Game version"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Breakdown"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Loader"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetization"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "No breakdown"
+  },
+  "analytics.breakdown.project": {
+    "message": "Project"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Project status"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Project version"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Breakdown by {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Show all"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Show limited"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Show top 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} active"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Annotations"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Analytics graph controls, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Controls"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Analytics graph controls"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Display"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth events"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "No Modrinth events in graph."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "No project events in graph."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Previous period"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Project events"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Ratio"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Select items from table below to visualize your data."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# analytics event} other {# analytics events}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "See announcement"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "View monetized analytics details"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Only views and downloads made through Modrinth count toward monetization, and downloads require users to be logged in."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Monetized analytics details"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Prev.)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "Showing all selected lines from table may degrade page performance."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Show all {count} lines in graph?"
+  },
+  "analytics.chart.table-selection.all": {
+    "message": "Showing all {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Showing {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "Showing {limit} {itemType, select, project {{limit, plural, one {project} other {projects}}} country {{limit, plural, one {country} other {countries}}} monetization {{limit, plural, one {monetization value} other {monetization values}}} downloadSource {{limit, plural, one {download source} other {download sources}}} downloadReason {{limit, plural, one {download reason} other {download reasons}}} projectVersion {{limit, plural, one {project version} other {project versions}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {game version} other {game versions}}} other {{limit, plural, one {item} other {items}}}} from table"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Showing top {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# day} other {# days}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# hour} other {# hours}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# minute} other {# minutes}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Hide {name} in graph"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Chart tooltip pinned"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Pinned"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(prev.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Show {name} in graph"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Total"
+  },
+  "analytics.chart.view.area": {
+    "message": "Area"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Bar"
+  },
+  "analytics.chart.view.line": {
+    "message": "Line"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Dependency"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modpack"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Standalone"
+  },
+  "analytics.download-reason.update": {
+    "message": "Update"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth Website"
+  },
+  "analytics.downloads.suffix": {
+    "message": "downloads"
+  },
+  "analytics.empty.no-data": {
+    "message": "No data available"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "No data available for analytics"
+  },
+  "analytics.empty.no-projects": {
+    "message": "No projects available"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "No projects available for analytics"
+  },
+  "analytics.empty.select-project": {
+    "message": "Select at least one project to view data"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Game version type"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "All"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Release"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Search countries..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Search download sources..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Search project versions..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Search versions..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Downloads Over Time"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Playtime Over Time"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Revenue Over Time"
+  },
+  "analytics.graph.title.views": {
+    "message": "Views Over Time"
+  },
+  "analytics.group-by.1h": {
+    "message": "1h"
+  },
+  "analytics.group-by.6h": {
+    "message": "6h"
+  },
+  "analytics.group-by.date": {
+    "message": "Date"
+  },
+  "analytics.group-by.day": {
+    "message": "Day"
+  },
+  "analytics.group-by.month": {
+    "message": "Month"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Group by day"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Group by hour"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Group by month"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Group by 6 hours"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Group by week"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Group by year"
+  },
+  "analytics.group-by.week": {
+    "message": "Week"
+  },
+  "analytics.group-by.year": {
+    "message": "Year"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Fetching results..."
+  },
+  "analytics.options.loading": {
+    "message": "Loading..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Project approved"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Project set to private"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Project status changed"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Project unlisted"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} released"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Version uploaded"
+  },
+  "analytics.project-status.approved": {
+    "message": "Approved"
+  },
+  "analytics.project-status.archived": {
+    "message": "Archived"
+  },
+  "analytics.project-status.draft": {
+    "message": "Draft"
+  },
+  "analytics.project-status.other": {
+    "message": "Other"
+  },
+  "analytics.project-status.private": {
+    "message": "Private"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Rejected"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Unlisted"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Withheld"
+  },
+  "analytics.project.all": {
+    "message": "All projects"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# project} other {# projects}}"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name} Icon"
+  },
+  "analytics.project.select": {
+    "message": "Select projects"
+  },
+  "analytics.query.filter.add": {
+    "message": "Add filter"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Breakdown:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Grouped by"
+  },
+  "analytics.query.label.project": {
+    "message": "Project:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Timeframe:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Downloads"
+  },
+  "analytics.stat.playtime": {
+    "message": "Playtime"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} hrs"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "vs prev. period"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "vs prev."
+  },
+  "analytics.stat.revenue": {
+    "message": "Revenue"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "Stat unavailable for current query"
+  },
+  "analytics.stat.views": {
+    "message": "Views"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start} to {end}"
+  },
+  "analytics.table.csv.filename": {
+    "message": "Modrinth Analytics {breakdown} Breakdown - {dateRange}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Playtime (seconds)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "Selected Range"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# day} other {# days}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# hour} other {# hours}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# minute} other {# minutes}}"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "No matching analytics rows"
+  },
+  "analytics.table.export-csv": {
+    "message": "Export CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Cumulative"
+  },
+  "analytics.table.export.grouped": {
+    "message": "Grouped by {groupBy}"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "Showing {start} to {end} of {total}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Search..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Countries above"
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "Country downloads threshold"
+  },
+  "analytics.threshold.game-version-downloads-aria": {
+    "message": "Game version downloads threshold"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Game versions above"
+  },
+  "analytics.threshold.project-downloads-aria": {
+    "message": "Project downloads threshold"
+  },
+  "analytics.threshold.project-version-downloads-aria": {
+    "message": "Project version downloads threshold"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Project versions above"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Projects above"
+  },
+  "analytics.title": {
+    "message": "Analytics"
+  },
+  "analytics.value.monetized": {
+    "message": "Monetized"
+  },
+  "analytics.value.none": {
+    "message": "None"
+  },
+  "analytics.value.other": {
+    "message": "Other"
+  },
+  "analytics.value.unknown": {
+    "message": "Unknown"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Unmonetized"
+  },
   "app-marketing.download.description": {
     "message": "Our desktop app is available across all platforms, choose your desired version."
   },

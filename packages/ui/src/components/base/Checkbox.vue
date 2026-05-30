@@ -35,7 +35,7 @@ import { CheckIcon, MinusIcon } from '@modrinth/assets'
 import type { HTMLAttributes } from 'vue'
 
 const emit = defineEmits<{
-	'update:modelValue': [boolean]
+	'update:modelValue': [modelValue: boolean, event?: MouseEvent]
 }>()
 
 const props = withDefaults(
@@ -59,9 +59,9 @@ const props = withDefaults(
 	},
 )
 
-function toggle() {
+function toggle(event: MouseEvent) {
 	if (!props.disabled) {
-		emit('update:modelValue', !props.modelValue)
+		emit('update:modelValue', !props.modelValue, event)
 	}
 }
 </script>

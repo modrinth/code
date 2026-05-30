@@ -103,7 +103,8 @@ const VIEWS: &str = {
             COUNT(*) AS views
         FROM views
         WHERE
-            recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+            recorded >= {TIME_RANGE_START}
+            AND recorded < {TIME_RANGE_END}
             -- make sure that the REAL project id is included,
             -- not the possibly-zero one,
             -- by using `views.project_id` instead of `project_id`
