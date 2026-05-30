@@ -45,8 +45,8 @@ export const regionOverrides = {
 	},
 	'au-syd': {
 		name: defineMessage({
-			id: 'servers.region.oceania',
-			defaultMessage: 'Oceania',
+			id: 'servers.region.australia',
+			defaultMessage: 'Australia',
 		}),
 		flag: 'https://flagcdn.com/au.svg',
 	},

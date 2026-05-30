@@ -3773,6 +3773,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Review"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Australia"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Central Europe"
   },
@@ -3790,9 +3793,6 @@
   },
   "servers.region.north-america-west": {
     "defaultMessage": "Western North America"
-  },
-  "servers.region.oceania": {
-    "defaultMessage": "Oceania"
   },
   "servers.region.prompt": {
     "defaultMessage": "Where would you like your server to be located?"
