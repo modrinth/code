@@ -143,9 +143,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "กำลังอัปเดต {contentType}..."
   },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} เลือกแล้ว"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} เลือกแล้ว"
   },
@@ -654,4 +651,3 @@
     "defaultMessage": "โปรไฟล์สาธารณะ"
   }
 }
-

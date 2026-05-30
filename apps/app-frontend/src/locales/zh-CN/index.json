@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "浏览服务器"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "“{name}”将被**永久删除**，并且无法恢复。"
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "你确定要永久删除这个世界吗？"
   },
@@ -248,12 +245,6 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未添加服务器或世界"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "将从你的列表中删除“{name}”，包括游戏内，并且无法恢复。"
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "将从你的列表中删除“{name}”（{address}），包括游戏内，并且无法恢复。"
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "你确定要删除 {name} 吗？"
   },
@@ -271,9 +262,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "安装"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} 个模组"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "需求整合包"
@@ -394,9 +382,6 @@
   },
   "friends.action.add-friend": {
     "message": "添加好友"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} 个好友请求"
   },
   "friends.add-friend.submit": {
     "message": "发送好友请求"

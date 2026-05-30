@@ -2258,9 +2258,6 @@
   "report.already-reported": {
     "message": "Du har redan rapporterat {title}"
   },
-  "report.already-reported-description": {
-    "message": "Du har redan en öppen rapport för {item, select, project {detta projekt} version {denna version} user {denna användare} other {detta innehåll}}. Du kan lägga till mer detaljer till din rapport om du har mer information att lägga till."
-  },
   "report.body.title": {
     "message": "Vänligen ge oss mer kontext om din rapport"
   },
@@ -2783,20 +2780,11 @@
   "settings.billing.interval.month": {
     "message": "månad"
   },
-  "settings.billing.interval.monthly": {
-    "message": "månatligen"
-  },
   "settings.billing.interval.quarter": {
     "message": "kvartal"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "kvartalsvis"
-  },
   "settings.billing.interval.year": {
     "message": "år"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "årligen"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Annonsfritt surfande på modrinth.com och Modrinth App"
@@ -2882,9 +2870,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Server ID: {id}"
   },
@@ -2921,17 +2906,8 @@
   "settings.billing.subscription.title": {
     "message": "Prenumerationer"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Ändrar till {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Ändra till {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Månatlig betalning kommer kosta dig ytterligare {amount} per år"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Ändrar till {interval} betalning på {date}"
   },
   "settings.billing.update-method": {
     "message": "Uppdatera metod"

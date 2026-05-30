@@ -272,9 +272,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} mod"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Szükséges modcsomag"
   },
@@ -394,9 +391,6 @@
   },
   "friends.action.add-friend": {
     "message": "Barát hozzáadása"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} barát {count, plural, other {kérelem}}"
   },
   "friends.add-friend.submit": {
     "message": "Barátkérelem elküldése"

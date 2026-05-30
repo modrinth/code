@@ -272,9 +272,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "Instalar"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pacote de mods necessário"
   },
@@ -394,9 +391,6 @@
   },
   "friends.action.add-friend": {
     "message": "Adicionar um amigo"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count, plural, =0 {Nenhuma solicitação de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
   },
   "friends.add-friend.submit": {
     "message": "Enviar amizade"

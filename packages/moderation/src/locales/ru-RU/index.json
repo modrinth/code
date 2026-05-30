@@ -29,14 +29,8 @@
   "nags.add-links.title": {
     "defaultMessage": "Добавьте внешние ссылки"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} other {# тегов}}. Не достигается их цель помогать искать релевантные проекты. Оставьте только относящиеся к проекту теги."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Оставьте ключевые теги"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Описание содержит {length, plural, one {# читаемый символ} few {# читаемых символа} other {# читаемых символов}}. Для ясного и информативного описания рекомендуется не менее {minChars, plural, one {# символа} other {# символов}}."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Расширьте описание"
@@ -64,9 +58,6 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Перейти в галерею"
-  },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Лицензия {type, select, mod {мода} plugin {плагина} other {проекта}} обязывает публиковать исходный код. Укажите ссылку на исходный код или файл с исходным кодом для каждой версии или выберите другую лицензию."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Укажите исходный код"
@@ -101,9 +92,6 @@
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Не сокращайте ссылки"
   },
-  "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# заголовок} few {# заголовка} other {# заголовков}} в описании слишком {count, plural, one {длинный} other {длинные}}. Заголовки должны быть краткими названиями разделов, а не предложениями."
-  },
   "nags.long-headers.title": {
     "defaultMessage": "Сократите заголовки"
   },
@@ -134,9 +122,6 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Посмотрите замечания"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}} разрешения: {tags}. Рекомендуется оставить один тег с основным разрешением."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
   },
@@ -157,9 +142,6 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Укажите язык"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Выберите, по какой лицензии распространяется {type, select, mod {мод} modpack {сборка} resourcepack {набор ресурсов} shader {шейдер} plugin {плагин} datapack {набор данных} other {проект}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Укажите лицензию"
@@ -200,9 +182,6 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Упростите сводку"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "В сводке {length, plural, one {# символ} few {# символа} other {# символов}}. Для понятной и интересной сводки рекомендуется не менее {minChars, plural, one {# символа} few {# символов} other {# символов}}."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Расширьте сводку"
   },
@@ -212,20 +191,11 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Упростите название"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}}. Оставьте не более {maxTagCount}, чтобы повысить релевантность сервера в поиске."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Оставьте ключевые теги"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}}. Оставьте не более {maxTagCount}, чтобы повысить релевантность проекта в поиске."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Оставьте ключевые теги"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "В галерее требуется хотя бы одно изображение, в котором показано содержимое {type, select, resourcepack {набора ресурсов. Если он содержит только звуки или переводы, укажите это в тегах} shader {шейдера} other {проекта}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Добавьте изображения"
@@ -249,4 +219,3 @@
     "defaultMessage": "Настроить ссылки"
   }
 }
-

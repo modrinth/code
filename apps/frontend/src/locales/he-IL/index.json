@@ -1034,9 +1034,6 @@
   "error.generic.default.list_item.1": {
     "message": "בדוק אם Modrinth אינו זמין ב<status-link>דף הסטטוס</status-link> שלנו."
   },
-  "error.generic.default.list_item.2": {
-    "message": "אם זה ממשיך לקרות, אנא ידע/י את צוות Modrinth דרך <discord-server>שרת הדיסקורד</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "נסו שוב בעוד מספר דקות."
   },
@@ -2243,23 +2240,11 @@
   "report.already-reported": {
     "message": "כבר דיווחת {title}"
   },
-  "report.already-reported-description": {
-    "message": "כבר קיים דיווח פתוח עבור ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}} הזה. אפשר להוסיף פרטים נוספים לדיווח אם יש לך מידע נוסף לשתף."
-  },
-  "report.back-to-item": {
-    "message": "חזרה ל{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}"
-  },
   "report.body.description": {
     "message": "מומלץ להוסיף קישורים ותמונות אם הם רלוונטיים. דיווחים ריקים או חסרים ייסגרו ללא טיפול."
   },
   "report.body.title": {
     "message": "נשמח לקבל פרטים נוספים על הדיווח שלך"
-  },
-  "report.checking": {
-    "message": "בודק את ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}..."
-  },
-  "report.could-not-find": {
-    "message": "לא נמצא {item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}"
   },
   "report.for.violation": {
     "message": "הפרה של <rules-link>חוקי Modrinth</rules-link> או <terms-link>תנאי השימוש</terms-link>"
@@ -2300,14 +2285,8 @@
   "report.please-report": {
     "message": "נא לדווח על:"
   },
-  "report.question.content-id": {
-    "message": "מהו ה-ID של ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}?"
-  },
   "report.question.content-type": {
     "message": "מהו סוג התוכן שברצונך לדווח עליו?"
-  },
-  "report.question.report-reason": {
-    "message": "על איזה מחוקי Modrinth עובר ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}} הזה?"
   },
   "report.report-content": {
     "message": "דיווח על תוכן למנהלים"

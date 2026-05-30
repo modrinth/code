@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NewModal ref="editLinksModal" :header="formatMessage(messages.editLinksButton)">
+		<NewModal ref="editLinksModal" :header="formatMessage(messages.editLinksHeader)">
 			<div class="universal-modal links-modal !p-0">
 				<p>{{ formatMessage(messages.editLinksDescription) }}</p>
 				<section class="links">
@@ -360,6 +360,10 @@ const messages = defineMessages({
 		id: 'dashboard.projects.links.button.edit',
 		defaultMessage: 'Edit links',
 	},
+	editLinksHeader: {
+		id: 'dashboard.projects.links.header.edit',
+		defaultMessage: 'Edit links',
+	},
 	editLinksDescription: {
 		id: 'dashboard.projects.links.description',
 		defaultMessage:
@@ -387,7 +391,7 @@ const messages = defineMessages({
 	},
 	wikiPageDescription: {
 		id: 'dashboard.projects.links.wiki-page.description',
-		defaultMessage: 'A page containing information, documentation, and help for the project.',
+		defaultMessage: 'A page containing information, documentation, and help for the project',
 	},
 	discordInviteLabel: {
 		id: 'dashboard.projects.links.discord-invite.label',

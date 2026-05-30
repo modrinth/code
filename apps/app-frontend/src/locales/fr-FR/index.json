@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Parcourir des serveurs"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "« {name} » sera supprimé **pour toujours**, et il sera impossible de le récupérer."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Êtes-vous sûr·e de vouloir supprimer ce monde pour toujours ?"
   },
@@ -247,12 +244,6 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Aucun serveur ou monde ajoutés"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "« {name} » sera retiré de votre liste, y compris en jeu, et il sera impossible de le récupérer."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "« {name} » ({address}) sera retiré de votre liste, y compris en jeu, et il sera impossible de le récupérer."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Êtes-vous sûr·e de vouloir retirer {name} ?"
@@ -388,9 +379,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Hors ligne"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count, plural, =0 {Personne en ligne} one {# est en ligne} other {# sont en ligne}}"
   },
   "friends.action.add-friend": {
     "message": "Ajouter un ami"

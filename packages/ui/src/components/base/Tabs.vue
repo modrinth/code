@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="tabs.length > 0"
-		class="inline-flex w-fit items-center overflow-x-auto rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm gap-1"
+		class="inline-flex w-fit items-center overflow-x-auto rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm gap-1 h-[38px]"
 		role="tablist"
 	>
 		<button
@@ -9,7 +9,7 @@
 			:key="tab.value"
 			ref="tabButtons"
 			type="button"
-			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg border border-solid px-2.5 py-1 text-sm font-medium outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow"
+			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg border border-solid px-2.5 h-full text-sm font-medium outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow"
 			:class="
 				tab.value === value
 					? 'border-green bg-highlight-green text-green'
@@ -27,7 +27,7 @@
 				class="size-5 shrink-0"
 				:class="tab.value === value ? 'text-green' : 'text-secondary'"
 			/>
-			<span class="text-nowrap">{{ tab.label }}</span>
+			<span v-if="tab.label" class="text-nowrap">{{ tab.label }}</span>
 		</button>
 	</div>
 </template>

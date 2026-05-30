@@ -32,6 +32,17 @@ export const Default: Story = {
 	},
 }
 
+export const WithSelectedOption: Story = {
+	args: {
+		modelValue: '2',
+		options: [
+			{ value: '1', label: 'Option 1' },
+			{ value: '2', label: 'Option 2' },
+			{ value: '3', label: 'Option 3' },
+		],
+	},
+}
+
 export const Searchable: Story = {
 	args: {
 		options: [
@@ -64,28 +75,59 @@ export const SearchableEmpty: Story = {
 	},
 }
 
+export const DropdownMinWidth: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [
+				{ value: 'fabric', label: 'Fabric', subLabel: 'Lightweight modding toolchain' },
+				{ value: 'forge', label: 'Forge', subLabel: 'The original Minecraft modding API' },
+				{ value: 'neoforge', label: 'NeoForge', subLabel: 'Community-driven Forge fork' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 11rem;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					:dropdown-min-width="320"
+					placeholder="Loader"
+				/>
+			</div>
+		`,
+	}),
+}
+
+export const DropdownClass: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [
+				{ value: 'fabric', label: 'Fabric' },
+				{ value: 'forge', label: 'Forge' },
+				{ value: 'neoforge', label: 'NeoForge' },
+			],
+		}),
+		template: /*html*/ `
+			<div style="width: 14rem;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					dropdown-class="!border-brand"
+					placeholder="Loader"
+				/>
+			</div>
+		`,
+	}),
+}
+
 export const Disabled: Story = {
 	args: {
 		options: [{ value: '1', label: 'Option 1' }],
 		triggerText: 'Disabled',
 		disabled: true,
-	},
-}
-
-export const WithSubLabels: Story = {
-	args: {
-		options: [
-			{ value: 'download', label: 'Download', icon: DownloadIcon },
-			{ value: 'share', label: 'Share', icon: ShareIcon },
-			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
-			{ type: 'divider' },
-			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
-			{ value: 'profile', label: 'Profile', icon: UserIcon },
-			{ type: 'divider' },
-			{ value: 'delete', label: 'Delete', icon: TrashIcon, disabled: true },
-		],
-		placeholder: 'Select an action',
-		listbox: false,
 	},
 }
 
@@ -105,7 +147,24 @@ export const SearchableWithIcons: Story = {
 	},
 }
 
-export const WithSelectedOption: Story = {
+export const WithDividers: Story = {
+	args: {
+		options: [
+			{ value: 'download', label: 'Download', icon: DownloadIcon },
+			{ value: 'share', label: 'Share', icon: ShareIcon },
+			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
+			{ type: 'divider' },
+			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
+			{ value: 'profile', label: 'Profile', icon: UserIcon },
+			{ type: 'divider' },
+			{ value: 'delete', label: 'Delete', icon: TrashIcon, disabled: true },
+		],
+		placeholder: 'Select an action',
+		listbox: false,
+	},
+}
+
+export const WithSubLabel: Story = {
 	args: {
 		modelValue: '2',
 		options: [
@@ -113,6 +172,18 @@ export const WithSelectedOption: Story = {
 			{ value: '2', label: 'Forge', subLabel: 'The original Minecraft modding API' },
 			{ value: '3', label: 'NeoForge', subLabel: 'Community-driven Forge fork' },
 			{ value: '4', label: 'Quilt', subLabel: 'The mod-loader that cares' },
+		],
+	},
+}
+
+export const MixedSubLabels: Story = {
+	args: {
+		options: [
+			{ value: '1', label: 'Minecraft', subLabel: 'The base game' },
+			{ value: '2', label: 'Fabric' },
+			{ value: '3', label: 'Forge', subLabel: 'Supports most mods' },
+			{ value: '4', label: 'NeoForge' },
+			{ value: '5', label: 'Quilt', subLabel: 'Fabric-compatible' },
 		],
 	},
 }
@@ -129,20 +200,6 @@ export const SearchableNoFilter: Story = {
 		searchable: true,
 		searchPlaceholder: 'Search actions...',
 		disableSearchFilter: true,
-	},
-}
-
-export const SearchableModpacks: Story = {
-	args: {
-		options: [
-			{ value: 'download', label: 'Download', icon: DownloadIcon },
-			{ value: 'share', label: 'Share', icon: ShareIcon },
-			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
-			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
-		],
-		searchable: true,
-		searchPlaceholder: 'Search modpacks...',
-		noOptionsMessage: 'No modpacks found',
 	},
 }
 
@@ -194,15 +251,48 @@ export const WithDropdownFooter: StoryObj = {
 	}),
 }
 
-export const MixedSubLabels: Story = {
-	args: {
-		options: [
-			{ value: '1', label: 'Minecraft', subLabel: 'The base game' },
-			{ value: '2', label: 'Fabric' },
-			{ value: '3', label: 'Forge', subLabel: 'Supports most mods' },
-			{ value: '4', label: 'NeoForge' },
-			{ value: '5', label: 'Quilt', subLabel: 'Fabric-compatible' },
-		],
+export const DropdownFooterOnly: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: [],
+		}),
+		template: /*html*/ `
+			<div style="width: 240px;">
+				<Combobox
+					v-model="selected"
+					:options="options"
+					display-value="Custom range"
+					dropdown-min-width="320"
+				>
+					<template #dropdown-footer>
+						<div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; color: var(--color-text-primary);">
+							<div style="font-size: 0.875rem; font-weight: 700;">Dropdown footer content</div>
+							<div style="font-size: 0.8125rem; color: var(--color-text-secondary);">
+								This dropdown has no options and stays open because its footer slot is content.
+							</div>
+							<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+								<button type="button" style="height: 2rem; border: 1px solid var(--color-surface-5); border-radius: 0.5rem; background: var(--color-surface-3); color: var(--color-text-primary); font-weight: 600;">
+									Cancel
+								</button>
+								<button type="button" style="height: 2rem; border: 0; border-radius: 0.5rem; background: var(--color-brand); color: var(--color-bg); font-weight: 700;">
+									Apply
+								</button>
+							</div>
+						</div>
+					</template>
+				</Combobox>
+			</div>
+		`,
+	}),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers dropdowns whose only rendered content is the footer slot, such as the analytics custom date range picker.',
+			},
+		},
 	},
 }
 
@@ -257,4 +347,57 @@ export const SearchableWithOptionAndSelectionAffix: StoryObj = {
 			</Combobox>
 		`,
 	}),
+}
+
+export const ManyOptionsOverflow: Story = {
+	args: {
+		options: Array.from({ length: 40 }, (_, index) => ({
+			value: `${index + 1}`,
+			label: `Option ${index + 1}`,
+		})),
+		placeholder: 'Select an option',
+		maxHeight: 380,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers long option lists where the dropdown content should scroll within its max height.',
+			},
+		},
+	},
+}
+
+export const ScrollRepositioning: StoryObj = {
+	render: () => ({
+		components: { Combobox },
+		data: () => ({
+			selected: undefined,
+			options: Array.from({ length: 16 }, (_, index) => ({
+				value: `loader-${index + 1}`,
+				label: `Loader ${index + 1}`,
+			})),
+		}),
+		template: /*html*/ `
+			<div style="min-height: 150vh; padding-top: 45vh;">
+				<div style="width: min(100%, 22rem);">
+					<Combobox
+						v-model="selected"
+						:options="options"
+						searchable
+						placeholder="Select loader"
+						search-placeholder="Search loaders..."
+					/>
+				</div>
+			</div>
+		`,
+	}),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Covers fixed dropdown repositioning while the page scrolls with a searchable input open.',
+			},
+		},
+	},
 }

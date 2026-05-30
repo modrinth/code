@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Esplora i server"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "\"{name}\" verrà **eliminato permanentemente** e non ci sarà modo di recuperarlo."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Vuoi davvero eliminare questo mondo per sempre?"
   },
@@ -248,12 +245,6 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nessun server o mondo aggiunto"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "\"{name}\" sarà rimosso dalla tua lista, inclusa quella nel gioco, e non ci sarà modo di recuperarlo."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "\"{name}\" ({address}) sarà rimosso dalla tua lista, inclusa quella nel gioco, e non ci sarà modo di recuperarlo."
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "Vuoi davvero rimuovere {name}?"
   },
@@ -271,9 +262,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Installa"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} mod"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pacchetto di mod richiesto"

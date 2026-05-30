@@ -239,6 +239,7 @@ impl TempUser {
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
+                campaign_pride_26: None,
                 allow_friend_requests: true,
                 is_subscribed_to_newsletter: false,
             }
@@ -1573,6 +1574,7 @@ pub async fn create_account_with_password(
         created: Utc::now(),
         role: Role::Developer.to_string(),
         badges: Badges::default(),
+        campaign_pride_26: None,
         allow_friend_requests: true,
         is_subscribed_to_newsletter: new_account
             .sign_up_newsletter

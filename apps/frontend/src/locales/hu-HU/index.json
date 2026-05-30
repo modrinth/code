@@ -491,9 +491,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "A kiegészítő fájlok olyan kiegészítő forrásokhoz tartoznak, mint például a forráskód, nem pedig alternatív verziókhoz vagy változatokhoz."
   },
-  "create.collection.collection-info": {
-    "message": "Az új gyűjteményed nyilvános gyűjteményként jön létre {count, plural, =0 {projektek nélkül} other {# projekttel}}."
-  },
   "create.collection.create-collection": {
     "message": "Gyűjtemény létrehozása"
   },
@@ -653,9 +650,6 @@
   "dashboard.affiliate-links.search": {
     "message": "Társulati linkek keresése..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "{count} projektből"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Összes letöltés"
   },
@@ -676,9 +670,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Próbáld meg módosítani a szűrőket vagy a keresési kifejezéseket."
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} projekt"
   },
   "dashboard.collections.label.search-input": {
     "message": "Keresd meg a gyűjteményeidet"
@@ -962,17 +953,11 @@
   "dashboard.notifications.link.view-history": {
     "message": "Értesítési előzmények megtekintése"
   },
-  "dashboard.notifications.link.view-more": {
-    "message": "További {extraNotifs} értesítés megtekintése"
-  },
   "dashboard.organizations.button.create": {
     "message": "Szervezet létrehozása"
   },
   "dashboard.organizations.empty.cta": {
     "message": "Hozz létre egy szervezetet!"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} tag"
   },
   "dashboard.organizations.title": {
     "message": "Szervezetek"
@@ -1015,9 +1000,6 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "Linkek szerkesztése"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "A változtatások <strong>{count}</strong> projektre vonatkoznak."
   },
   "dashboard.projects.links.discord-invite.description": {
     "message": "Meghívólink a Discord szerveredre."
@@ -1309,15 +1291,6 @@
   },
   "discover.install.error.unsupported-content-type": {
     "message": "Ez a tartalomtípus nem telepíthető a szerverre a „” menüpontból."
-  },
-  "discover.seo.description": {
-    "message": "Keress és böngéssz több ezer Minecraft-{projectType, select, mod {mod} modpack {modcsomag} resourcepack {forráscsomag} shader {shader} plugin {bővítmény} datapack {adatcsomag} other {projekt}} között a Modrinthon gyors és pontos keresési találatokkal. Szűrőink segítenek gyorsan megtalálni a legjobb Minecraft-{projectType, select, mod {modokat} modpack {modcsomagokat} resourcepack {forráscsomagokat} shader {shadereket} plugin {bővítményeket} datapack {adatcsomagokat} other {projekteket}}."
-  },
-  "discover.seo.title": {
-    "message": "{projectType, select, mod {Modok} modpack {Modcsomagok} resourcepack {Forráscsomagok} shader {Shaderek} plugin {Bővítmények} datapack {Adatcsomagok} other {Projektek}} keresése"
-  },
-  "discover.seo.title-with-query": {
-    "message": "{projectType, select, mod {Modok} modpack {Modcsomagok} resourcepack {Forráscsomagok} shader {Shaderek} plugin {Bővítmények} datapack {Adatcsomagok} other {Projektek}} keresése | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
@@ -2360,9 +2333,6 @@
   "profile.label.collection": {
     "message": "Gyűjtemény"
   },
-  "profile.label.downloads": {
-    "message": "{count} letöltés"
-  },
   "profile.label.joined": {
     "message": "Csatlakozott"
   },
@@ -2381,9 +2351,6 @@
   "profile.label.organizations": {
     "message": "Szervezetek"
   },
-  "profile.label.projects": {
-    "message": "{count} projekt"
-  },
   "profile.label.saving": {
     "message": "Mentés..."
   },
@@ -2392,9 +2359,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Töltsd le {username} projektjeit a Modrinthon"
-  },
-  "profile.stats.projects-followers": {
-    "message": "<stat>{count}</stat> projektkövető"
   },
   "profile.user-id": {
     "message": "Felhasználói azonosító: {id}"
@@ -2753,20 +2717,11 @@
   "project.settings.permissions.learn-more": {
     "message": "További információ"
   },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Keresés {count} külső projekt között..."
-  },
   "project.settings.title": {
     "message": "Beállítások"
   },
   "project.settings.visit-dashboard": {
     "message": "Projektek irányítópult megnyitása"
-  },
-  "project.stats.downloads-label": {
-    "message": "letöltés"
-  },
-  "project.stats.followers-label": {
-    "message": "követő"
   },
   "project.status.archived.message": {
     "message": "A(z) {title} archiválásra került. A(z) {title} nem kap további frissítéseket, kivéve, ha a fejlesztő úgy dönt, hogy visszavonja a projekt archiválását."
@@ -2786,23 +2741,11 @@
   "report.already-reported": {
     "message": "Már feljelentetted ezt: {title}"
   },
-  "report.already-reported-description": {
-    "message": "Már létezik egy nyitott jelentésed ehhez a {item, select, project {projekthez} version {verzióhoz} user {felhasználóhoz} other {tartalomhoz}}. További részletekkel egészítheted ki a jelentésed, ha van további információ, amit hozzá szeretnél adni."
-  },
-  "report.back-to-item": {
-    "message": "Vissza a {item, select, project {projekthez} version {verzióhoz} user {felhasználóhoz} other {tartalomhoz}}"
-  },
   "report.body.description": {
     "message": "Ha lehetséges és releváns, csatolj linkeket és képeket. Az üres vagy hiányos jelentéseket lezárjuk és figyelmen kívül hagyjuk."
   },
   "report.body.title": {
     "message": "Adj meg további kontextust a jelentéseddel kapcsolatban"
-  },
-  "report.checking": {
-    "message": "{item, select, project {Projekt} version {Verzió} user {Felhasználó} other {Tartalom}} ellenőrzése..."
-  },
-  "report.could-not-find": {
-    "message": "{item, select, project {Projekt} version {Verzió} user {Felhasználó} other {Tartalom}} nem található"
   },
   "report.for.violation": {
     "message": "A Modrinth <rules-link>Szabályzat</rules-link> vagy <terms-link>Felhasználási feltételek</terms-link> megsértése"
@@ -2843,14 +2786,8 @@
   "report.please-report": {
     "message": "Kérjük, az alábbiakat jelentsd:"
   },
-  "report.question.content-id": {
-    "message": "Mi a {item, select, project {projekt} version {verzió} user {felhasználó} other {tartalom}} azonosítója?"
-  },
   "report.question.content-type": {
     "message": "Milyen típusú tartalmat jelentesz?"
-  },
-  "report.question.report-reason": {
-    "message": "A Modrinth melyik szabályát szegi meg ez a {item, select, project {projekt} version {verzió} user {felhasználó} other {tartalom}}?"
   },
   "report.report-content": {
     "message": "Tartalom jelentése a moderátoroknak"
@@ -3530,20 +3467,11 @@
   "settings.billing.interval.month": {
     "message": "hónap"
   },
-  "settings.billing.interval.monthly": {
-    "message": "havi"
-  },
   "settings.billing.interval.quarter": {
     "message": "negyedév"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "negyedéves"
-  },
   "settings.billing.interval.year": {
     "message": "év"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "éves"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Reklámmentes böngészés a modrinth.com-on és a Modrinth App-ban"
@@ -3629,9 +3557,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} Megosztott CPU-k (maximum {bursts} CPU-ig terjedő löketek)"
   },
@@ -3698,17 +3623,8 @@
   "settings.billing.subscription.title": {
     "message": "Előfizetések"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Váltás {interval} számlázásra"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Váltás {interval} számlázásra "
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "A havi számlázás évente további {amount} költséggel jár"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "{interval} számlázásra vált {date} napon"
   },
   "settings.billing.update-method": {
     "message": "Fizetési mód változtatása"

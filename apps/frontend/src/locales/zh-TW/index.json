@@ -410,9 +410,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補充檔案是用於提供原始碼等支援性資源，而非用於替代版本或變體。"
   },
-  "create.collection.collection-info": {
-    "message": "你的新收藏將建立為公開收藏，{count, plural,=0 {不包含任何專案}other {包含 # 個專案}}。"
-  },
   "create.collection.create-collection": {
     "message": "建立收藏"
   },
@@ -575,9 +572,6 @@
   "dashboard.affiliate-links.search": {
     "message": "搜尋聯盟連結..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "來自 {count} 個專案"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "總下載量"
   },
@@ -598,9 +592,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "試試調整篩選器或搜尋字詞。"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} 個專案"
   },
   "dashboard.collections.label.search-input": {
     "message": "搜尋收藏"
@@ -880,9 +871,6 @@
   },
   "dashboard.notifications.link.view-history": {
     "message": "查看通知紀錄"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "查看另外 {extraNotifs} 則通知"
   },
   "dashboard.organizations.button.create": {
     "message": "建立組織"
@@ -2261,9 +2249,6 @@
   "profile.label.collection": {
     "message": "收藏"
   },
-  "profile.label.downloads": {
-    "message": "下載次數：{count}"
-  },
   "profile.label.joined": {
     "message": "加入時間"
   },
@@ -2282,9 +2267,6 @@
   "profile.label.organizations": {
     "message": "組織"
   },
-  "profile.label.projects": {
-    "message": "{count} 個專案"
-  },
   "profile.label.saving": {
     "message": "儲存中..."
   },
@@ -2293,9 +2275,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — 前往 Modrinth 下載 {username} 的專案"
-  },
-  "profile.stats.projects-followers": {
-    "message": "<stat>{count}</stat> 位專案追蹤者"
   },
   "profile.user-id": {
     "message": "使用者 ID：{id}"
@@ -2654,20 +2633,11 @@
   "project.settings.permissions.learn-more": {
     "message": "了解更多"
   },
-  "project.settings.permissions.search-placeholder": {
-    "message": "搜尋 {count} 個外部專案..."
-  },
   "project.settings.title": {
     "message": "設定"
   },
   "project.settings.visit-dashboard": {
     "message": "前往專案資訊主頁"
-  },
-  "project.stats.downloads-label": {
-    "message": "次下載"
-  },
-  "project.stats.followers-label": {
-    "message": "位追蹤者"
   },
   "project.status.archived.message": {
     "message": "{title} 已封存。{title} 將不會再收到任何後續更新，除非作者決定解除封存該專案。"
@@ -2687,23 +2657,11 @@
   "report.already-reported": {
     "message": "你已檢舉 {title}"
   },
-  "report.already-reported-description": {
-    "message": "你已經針對這個{item, select, project {專案} version {版本} user {使用者} other {內容}}提交過檢舉報告。如果你有更多資訊，可以為該報告補充詳細說明。"
-  },
-  "report.back-to-item": {
-    "message": "返回{item, select, project {專案} version {版本} user {使用者} other {內容}}"
-  },
   "report.body.description": {
     "message": "若可行且相關，請一併附上連結與圖片。空白或資訊不足的檢舉將會被關閉且不予處理。"
   },
   "report.body.title": {
     "message": "請提供檢舉的更多背景資訊"
-  },
-  "report.checking": {
-    "message": "正在檢查{item, select, project {專案} version {版本} user {使用者} other {內容}}..."
-  },
-  "report.could-not-find": {
-    "message": "找不到{item, select, project {專案} version {版本} user {使用者} other {內容}}"
   },
   "report.for.violation": {
     "message": "違反 Modrinth《<rules-link>內容規範</rules-link>》或《<terms-link>使用條款</terms-link>》"
@@ -2744,14 +2702,8 @@
   "report.please-report": {
     "message": "請檢舉："
   },
-  "report.question.content-id": {
-    "message": "該{item, select, project {專案} version {版本} user {使用者} other {內容}}的 ID 是什麼？"
-  },
   "report.question.content-type": {
     "message": "你要檢舉什麼類型的內容？"
-  },
-  "report.question.report-reason": {
-    "message": "這個{item, select, project {專案} version {版本} user {使用者} other {內容}}違反了 Modrinth 的哪項規範？"
   },
   "report.report-content": {
     "message": "向管理員檢舉內容"
@@ -3431,20 +3383,11 @@
   "settings.billing.interval.month": {
     "message": "月"
   },
-  "settings.billing.interval.monthly": {
-    "message": "每月"
-  },
   "settings.billing.interval.quarter": {
     "message": "季"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "每季"
-  },
   "settings.billing.interval.year": {
     "message": "年"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "每年"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "在 modrinth.com 與 Modrinth App 上享受無廣告的瀏覽體驗"
@@ -3530,9 +3473,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} 個共用 CPU（最高可爆發至 {bursts} 個 CPU）"
   },
@@ -3599,17 +3539,8 @@
   "settings.billing.subscription.title": {
     "message": "訂閱"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "正在切換至{interval}計費"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "切換至{interval}計費"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "每月帳單將額外收取 {amount}／年"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "於 {date} 轉換為 {interval} 付款週期"
   },
   "settings.billing.update-method": {
     "message": "更新方式"

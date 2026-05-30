@@ -1,4 +1,4 @@
-import { defineMessages } from '../composables/i18n'
+import { defineMessages, type MessageDescriptor } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
 	acceptButton: {
@@ -787,6 +787,8 @@ export function normalizeProjectType(type: string): string {
 	return PROJECT_TYPE_ALIASES[type] ?? type
 }
 
+type FormatMessage = (descriptor: MessageDescriptor, values?: Record<string, unknown>) => string
+
 export const commonProjectTypeCategoryMessages = defineMessages({
 	datapack: {
 		id: 'project-type.datapack.category',
@@ -891,6 +893,120 @@ export const commonProjectTypeSentenceMessages = defineMessages({
 		defaultMessage: '{count, plural, one {project} other {projects}}',
 	},
 })
+
+type ProjectTypeMessageKey = keyof typeof commonProjectTypeSentenceMessages
+
+function getProjectTypeMessageKey(type: string | undefined): ProjectTypeMessageKey {
+	const normalized = normalizeProjectType(type ?? 'project')
+	return normalized in commonProjectTypeSentenceMessages
+		? (normalized as ProjectTypeMessageKey)
+		: 'project'
+}
+
+export function getProjectTypeCategoryMessage(type: string | undefined): MessageDescriptor {
+	return commonProjectTypeCategoryMessages[getProjectTypeMessageKey(type)]
+}
+
+export function getProjectTypeTitleMessage(type: string | undefined): MessageDescriptor {
+	return commonProjectTypeTitleMessages[getProjectTypeMessageKey(type)]
+}
+
+export function getProjectTypeSentenceMessage(type: string | undefined): MessageDescriptor {
+	return commonProjectTypeSentenceMessages[getProjectTypeMessageKey(type)]
+}
+
+export function formatProjectTypeSentence(
+	formatMessage: FormatMessage,
+	type: string | undefined,
+	count = 1,
+): string {
+	return formatMessage(getProjectTypeSentenceMessage(type), { count })
+}
+
+export const contentItemTypeMessages = defineMessages({
+	item: {
+		id: 'content-type.item.lowercase',
+		defaultMessage: '{count, plural, one {item} other {items}}',
+	},
+	content: {
+		id: 'content-type.content.lowercase',
+		defaultMessage: 'content',
+	},
+})
+
+export function formatContentTypeSentence(
+	formatMessage: FormatMessage,
+	type: string | undefined,
+	count = 1,
+	fallback: keyof typeof contentItemTypeMessages = 'item',
+): string {
+	if (type) {
+		return formatProjectTypeSentence(formatMessage, type, count)
+	}
+
+	return formatMessage(contentItemTypeMessages[fallback], { count })
+}
+
+export const reportItemTypeMessages = defineMessages({
+	project: {
+		id: 'report.item-type.project',
+		defaultMessage: 'project',
+	},
+	version: {
+		id: 'report.item-type.version',
+		defaultMessage: 'version',
+	},
+	user: {
+		id: 'report.item-type.user',
+		defaultMessage: 'user',
+	},
+	content: {
+		id: 'report.item-type.content',
+		defaultMessage: 'content',
+	},
+})
+
+export function formatReportItemType(
+	formatMessage: FormatMessage,
+	type: string | undefined,
+): string {
+	const key =
+		type && type in reportItemTypeMessages
+			? (type as keyof typeof reportItemTypeMessages)
+			: 'content'
+	return formatMessage(reportItemTypeMessages[key])
+}
+
+export const fileItemTypeMessages = defineMessages({
+	file: {
+		id: 'files.item-type.file',
+		defaultMessage: 'file',
+	},
+	files: {
+		id: 'files.item-type.files',
+		defaultMessage: 'files',
+	},
+	folder: {
+		id: 'files.item-type.folder',
+		defaultMessage: 'folder',
+	},
+	folders: {
+		id: 'files.item-type.folders',
+		defaultMessage: 'folders',
+	},
+})
+
+export function formatFileItemType(
+	formatMessage: FormatMessage,
+	type: string | undefined,
+	plural = false,
+): string {
+	if (type === 'directory') {
+		return formatMessage(plural ? fileItemTypeMessages.folders : fileItemTypeMessages.folder)
+	}
+
+	return formatMessage(plural ? fileItemTypeMessages.files : fileItemTypeMessages.file)
+}
 
 export const commonSettingsMessages = defineMessages({
 	account: {
@@ -1083,7 +1199,7 @@ export const paymentMethodMessages = defineMessages({
 	},
 	mastercard: {
 		id: 'payment-method.mastercard',
-		defaultMessage: 'MasterCard',
+		defaultMessage: 'Mastercard',
 	},
 	paypal: {
 		id: 'payment-method.paypal',

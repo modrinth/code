@@ -686,9 +686,6 @@
   "dashboard.affiliate-links.search": {
     "message": "Cerca tra i link affiliati..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "da {count, plural, one {# progetto} other {# progetti}}"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Download totali"
   },
@@ -995,9 +992,6 @@
   "dashboard.notifications.link.view-history": {
     "message": "Mostra cronologia notifiche"
   },
-  "dashboard.notifications.link.view-more": {
-    "message": "Mostra {extraNotifs, plural, one {un'altra notifica} other {altre # notifiche}}"
-  },
   "dashboard.organizations.button.create": {
     "message": "Crea organizzazione"
   },
@@ -1006,9 +1000,6 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Impossibile ottenere le organizzazioni"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count, plural, one {# membro} other {# membri}}"
   },
   "dashboard.organizations.title": {
     "message": "Organizzazioni"
@@ -1045,9 +1036,6 @@
   },
   "dashboard.projects.head-title": {
     "message": "Progetti"
-  },
-  "dashboard.projects.links.and-more": {
-    "message": "e {count, plural, one {un altro ancora} other {altri #}}..."
   },
   "dashboard.projects.links.button.clear-link": {
     "message": "Rimuovi link"
@@ -1360,15 +1348,6 @@
   },
   "discover.install.heading.reset-modpack": {
     "message": "Pacchetti da installare dopo il ripristino"
-  },
-  "discover.seo.description": {
-    "message": "Cerca e esplora tra migliaia di {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} presenti su Modrinth attraverso ricerche rapide e accurate. I nostri filtri ti aiuteranno a trovare quello che fa al caso tuo."
-  },
-  "discover.seo.title": {
-    "message": "Trova {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Trova {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} other {progetti}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Forse c'è un errore di battitura nell'URL della raccolta."
@@ -2417,9 +2396,6 @@
   "profile.label.collection": {
     "message": "Raccolta"
   },
-  "profile.label.downloads": {
-    "message": "{count} download"
-  },
   "profile.label.joined": {
     "message": "Iscrizione"
   },
@@ -2449,9 +2425,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "<stat>{count, plural, =0 {Nessun} other {{count}}}</stat> follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"
@@ -2888,20 +2861,11 @@
   "project.settings.permissions.learn-more": {
     "message": "Scopri di più"
   },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Cerca tra {count, plural, one {# progetto esterno} other {# progetti esterni}}..."
-  },
   "project.settings.title": {
     "message": "Impostazioni"
   },
   "project.settings.visit-dashboard": {
     "message": "Visita bacheca del progetto"
-  },
-  "project.stats.downloads-label": {
-    "message": "download"
-  },
-  "project.stats.followers-label": {
-    "message": "follower"
   },
   "project.status.archived.message": {
     "message": "{title} è stato archiviato. {title} non riceverà più aggiornamenti a meno che l'autore decida di rimuoverlo dall'archivio."
@@ -2921,23 +2885,11 @@
   "report.already-reported": {
     "message": "Hai già segnalato {title}"
   },
-  "report.already-reported-description": {
-    "message": "Hai già una segnalazione aperta per quest{item, select, project {o progetto} version {a versione} user {'utente} other {o contenuto}}. Puoi aggiungere più dettagli se hai informazioni da aggiungere."
-  },
-  "report.back-to-item": {
-    "message": "Torna al{item, select, project { progetto} version {la versione} user {l'utente} other { contenuto}}"
-  },
   "report.body.description": {
     "message": "Includi link e immagini se possibile e pertinente. Segnalazioni vuote o carenti saranno chiuse e ignorate."
   },
   "report.body.title": {
     "message": "Si prega di fornire contesto aggiuntivo alla segnalazione"
-  },
-  "report.checking": {
-    "message": "Controllando {item, select, project {il progetto} version {la versione} user {l'utente} other {il contenuto}}..."
-  },
-  "report.could-not-find": {
-    "message": "Impossibile trovare {item, select, project {il progetto} version {la versione} user {l'utente} other {il contenuto}}"
   },
   "report.for.violation": {
     "message": "Violazione delle <rules-link>regole</rules-link> o dei <terms-link>termini d'uso</terms-link> di Modrinth"
@@ -2978,14 +2930,8 @@
   "report.please-report": {
     "message": "Si prega di segnalare:"
   },
-  "report.question.content-id": {
-    "message": "Qual è l'ID del{item, select, project { progetto} version {la versione} user {l'utente} other { contenuto}}?"
-  },
   "report.question.content-type": {
     "message": "Che tipo di contenuto stai segnalando?"
-  },
-  "report.question.report-reason": {
-    "message": "Quali regole di Modrinth sta violando quest{item, select, project {o progetto} version {a versione} user {'utente} other {o contenuto}}?"
   },
   "report.report-content": {
     "message": "Segnala contenuto ai moderatori"
@@ -3665,20 +3611,11 @@
   "settings.billing.interval.month": {
     "message": "mese"
   },
-  "settings.billing.interval.monthly": {
-    "message": "mensile"
-  },
   "settings.billing.interval.quarter": {
     "message": "trimestre"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "trimestrale"
-  },
   "settings.billing.interval.year": {
     "message": "anno"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "annuale"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Niente pubblicità su modrinth.com e nella Modrinth App"
@@ -3764,9 +3701,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPU condivise (Supercarica fino a {bursts} CPU)"
   },
@@ -3833,17 +3767,8 @@
   "settings.billing.subscription.title": {
     "message": "Abbonamenti"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Passando al piano {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Passa al piano {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Il piano mensile costerà {amount} in più all'anno"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Passerà al piano {interval} il {date}"
   },
   "settings.billing.update-method": {
     "message": "Aggiorna metodo"

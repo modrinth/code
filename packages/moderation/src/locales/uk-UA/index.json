@@ -65,9 +65,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Відвідайте сторінку галереї"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ваш {type, select, mod {мод} plugin {плаґін} other {проєкт}} використовує ліцензію, яка вимагає наявности вихідного коду. Будь ласка, надайте посилання на вихідний код або файл з вихідними кодами для кожної додаткової версії або використовуйте іншу ліцензію."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
   },
@@ -101,9 +98,6 @@
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Не використовуйте вкорочувачі посилань"
   },
-  "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# заголовок} few {# заголовки} other {# заголовків}} у вашому описі {count, plural, one {є задовгим} other {є задовгими}}. Заголовки мають бути стислими та виступати в ролі назв розділів, а не повних речень."
-  },
   "nags.long-headers.title": {
     "defaultMessage": "Скоротіть заголовки"
   },
@@ -134,9 +128,6 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Перегляньте зворотний зв’язок"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Ви вибрали {count, plural,  one {# теґ роздільности}  few{# теґи роздільности} many{# теґів роздільности} other{теґів родільности}} ({tags}). Пакети ресурсів зазвичай повинні мати лише один теґ роздільности, що вказує на їхню роздільність."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Виберіть правильну роздільність"
   },
@@ -157,9 +148,6 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Виберіть мову"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Виберіть ліцезію під якою поширюється {type, select, mod {ваш мод} modpack {ваша збірка} resourcepack {ваш пакет ресурсів} shader {ваш шейдер} plugin {ваш плаґін} datapack {ваш пакет даних} other {ваш проєкт}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Виберіть ліцензію"
@@ -212,20 +200,11 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Скоротіть назву"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Вами вибрано {tagCount, plural, one {# теґ} few {# теґи} other {# теґів}}. Будь ласка, зменште їх кількість до {maxTagCount}, щоб переконатися, що ваш сервер видно в доречних результатах пошуку."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Виберіть відповідні теґи"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Ви вибрали {tagCount, plural, one {# теґ} few {# теґи} other {# теґів}}. Зменште кількість до {maxTagCount} або менше, щоб ваш проєкт показувався у відповідних результатах пошуку."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Виберіть відповідні теґи"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Хоча б одне зображення необхідне для демонстрації вмісту вашого {type, select, resourcepack {пакета ресурсів, за винятком звукових або локалізаційних пакетів. Якщо це описує ваш пакет, виберіть відповідний теґ} shader {шейдера} other {проєкту}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Завантажте зображення до галереї"
@@ -249,4 +228,3 @@
     "defaultMessage": "Відвідайте налаштування посилань"
   }
 }
-

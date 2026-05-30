@@ -32,13 +32,22 @@
 			:aria-hidden="calendarOnly ? 'true' : undefined"
 			type="text"
 		/>
+		<button
+			v-if="hasClearButton"
+			type="button"
+			class="absolute right-0.5 z-[1] touch-manipulation cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
+			aria-label="Clear date"
+			@click.stop="clearValue"
+		>
+			<XIcon class="h-5 w-5" aria-hidden="true" />
+		</button>
 	</div>
 </template>
 
 <script setup lang="ts">
 import 'flatpickr/dist/flatpickr.css'
 
-import { CalendarIcon } from '@modrinth/assets'
+import { CalendarIcon, XIcon } from '@modrinth/assets'
 import chevronLeftIcon from '@modrinth/assets/icons/chevron-left.svg?raw'
 import chevronRightIcon from '@modrinth/assets/icons/chevron-right.svg?raw'
 import flatpickr from 'flatpickr'
@@ -127,6 +136,7 @@ const props = withDefaults(
 		showIcon?: boolean
 		showToday?: boolean
 		calendarOnly?: boolean
+		closeOnSelect?: boolean
 		/**
 		 * Controls where the calendar opens relative to the input. Use `above`
 		 * to force the calendar to open above the input.
@@ -146,7 +156,7 @@ const props = withDefaults(
 	}>(),
 	{
 		disabled: false,
-		readonly: false,
+		readonly: true,
 		enableTime: false,
 		mode: 'single',
 		showMonths: 1,
@@ -156,6 +166,7 @@ const props = withDefaults(
 		showIcon: true,
 		showToday: false,
 		calendarOnly: false,
+		closeOnSelect: false,
 		position: 'auto',
 		preserveDay: false,
 		viewDateAlignment: 'left',
@@ -176,13 +187,18 @@ const intendedViewMonth = ref<CalendarViewMonth | null>(null)
 const preserveViewOnNextModelSync = ref(false)
 const intendedDay = ref<number | null>(null)
 const isPreservingDay = ref(false)
+const timeInputDigits = ref(new WeakMap<HTMLInputElement, string>())
 const rangeDragState = ref<RangeDragState | null>(null)
 const rangeEndpointMoveState = ref<RangeEndpointMoveState | null>(null)
 const suppressNextRangeClick = ref(false)
 let rangeClickSuppressionTimeout: number | null = null
 let monthSelectSyncFrame: number | null = null
 let calendarPortal: HTMLElement | null = null
+let inputFocusScrollSuppressionTarget: HTMLInputElement | null = null
+let originalInputFocus: HTMLInputElement['focus'] | null = null
+let suppressNextInputFocusScroll = false
 const calendarBaseClass = 'modrinth-date-picker-calendar'
+const twoCalendarClass = 'has-two-calendars'
 const calendarStateClasses = [
 	'calendar-only',
 	'show-today',
@@ -299,6 +315,7 @@ function syncCalendarClasses(instance?: Instance) {
 	if (!container) return
 
 	container.classList.add(calendarBaseClass)
+	container.classList.toggle(twoCalendarClass, resolvedShowMonths.value === 2)
 
 	for (const cls of appliedCalendarClasses) {
 		container.classList.remove(cls)
@@ -868,7 +885,7 @@ function getTimeInputDigits(value: string) {
 
 function sanitizeTimeInputValue(input: HTMLInputElement) {
 	const nextValue = getTimeInputDigits(input.value)
-	if (input.value === nextValue) return
+	if (input.value === nextValue) return nextValue
 
 	const cursorPosition = input.selectionStart ?? nextValue.length
 	const removedBeforeCursor =
@@ -878,6 +895,7 @@ function sanitizeTimeInputValue(input: HTMLInputElement) {
 
 	input.value = nextValue
 	input.setSelectionRange(nextCursorPosition, nextCursorPosition)
+	return nextValue
 }
 
 function normalizeTimeInputValue(input: HTMLInputElement) {
@@ -917,14 +935,81 @@ function preventNonNumericTimeKeydown(event: KeyboardEvent) {
 	if (event.key.length === 1 && /\D/.test(event.key)) event.preventDefault()
 }
 
-function sanitizeNumericTimeInput(event: Event) {
-	if (isTimeInput(event.target)) sanitizeTimeInputValue(event.target)
+function getTimeInputs(instance: Instance) {
+	return [instance.hourElement, instance.minuteElement, instance.secondElement].filter(
+		(input): input is HTMLInputElement => Boolean(input),
+	)
+}
+
+function getTimeInputDraft(input: HTMLInputElement) {
+	return document.activeElement === input
+		? (timeInputDigits.value.get(input) ?? getTimeInputDigits(input.value))
+		: getTimeInputDigits(input.value)
+}
+
+function getNormalizedTimeInputDraft(input: HTMLInputElement) {
+	const draft = getTimeInputDraft(input)
+	if (!draft) return null
+	if (draft.length === 2) return draft
+
+	const minValue = Number.parseInt(input.min, 10)
+	const maxValue = Number.parseInt(input.max, 10)
+	let nextValue = Number.parseInt(draft, 10)
+
+	if (Number.isFinite(minValue)) nextValue = Math.max(nextValue, minValue)
+	if (Number.isFinite(maxValue)) nextValue = Math.min(nextValue, maxValue)
+
+	return String(nextValue).padStart(2, '0')
+}
+
+function prepareTimeInputValuesForCommit(instance: Instance) {
+	for (const input of getTimeInputs(instance)) {
+		const nextValue = getNormalizedTimeInputDraft(input)
+		if (nextValue === null) return false
+
+		input.value = nextValue
+	}
+
+	return true
+}
+
+function syncTimeInputDrafts(instance: Instance) {
+	for (const input of getTimeInputs(instance)) {
+		timeInputDigits.value.set(input, getTimeInputDigits(input.value))
+	}
+}
+
+function commitTimeInputForInput(event: Event) {
+	if (!isTimeInput(event.target)) return
+
+	const instance = picker.value
+	if (!instance) return
+
+	const previousValue = instance.input.value
+	const nextDigits = sanitizeTimeInputValue(event.target)
+	timeInputDigits.value.set(event.target, nextDigits)
+	if (!prepareTimeInputValuesForCommit(instance)) return
+
+	event.target.dispatchEvent(new Event('increment', { bubbles: true }))
+	if (nextDigits.length === 1 && document.activeElement === event.target) {
+		event.target.value = nextDigits
+		event.target.setSelectionRange(nextDigits.length, nextDigits.length)
+	}
+	syncTimeInputDrafts(instance)
+	if (instance.input.value === previousValue) return
+
+	const nextValue =
+		props.mode === 'single'
+			? instance.input.value || null
+			: instance.selectedDates.map((date) => instance.formatDate(date, resolvedDateFormat.value))
+	model.value = nextValue
+	emit('change', nextValue)
 }
 
 function syncTimeInputTypes(instance: Instance) {
-	const timeInputs = [instance.hourElement, instance.minuteElement, instance.secondElement].filter(
-		(input): input is HTMLInputElement => Boolean(input),
-	)
+	const timeInputs = getTimeInputs(instance)
+	const activeTimeInput = timeInputs.find((input) => document.activeElement === input)
+	const activeDraft = activeTimeInput ? timeInputDigits.value.get(activeTimeInput) : undefined
 
 	for (const input of timeInputs) {
 		input.type = 'text'
@@ -932,6 +1017,71 @@ function syncTimeInputTypes(instance: Instance) {
 		input.pattern = '[0-9]*'
 		normalizeTimeInputValue(input)
 	}
+
+	if (activeTimeInput && activeDraft !== undefined && activeDraft.length < 2) {
+		activeTimeInput.value = activeDraft
+		activeTimeInput.setSelectionRange(activeDraft.length, activeDraft.length)
+	}
+
+	syncTimeInputDrafts(instance)
+}
+
+function openPickerWithoutInputFocus(event: PointerEvent) {
+	if (!props.readonly || props.disabled || props.calendarOnly) return
+	if (event.button !== 0) return
+	if (event.pointerType === 'mouse') return
+
+	event.preventDefault()
+	suppressNextInputFocusScroll = true
+	picker.value?.open()
+}
+
+function suppressInputFocusScrollForCalendarPointer(event: PointerEvent) {
+	if (!props.readonly || props.disabled || props.calendarOnly || !props.closeOnSelect) return
+	if (event.button !== 0) return
+	if (event.pointerType === 'mouse') return
+
+	const dayElem = getRangeDayElement(event.target)
+	if (!dayElem || !isSelectableDay(dayElem)) return
+
+	suppressNextInputFocusScroll = true
+}
+
+function patchInputFocusScrollSuppression(target: HTMLInputElement) {
+	originalInputFocus = target.focus
+	target.focus = ((options?: FocusOptions) => {
+		if (suppressNextInputFocusScroll) {
+			originalInputFocus?.call(target, { preventScroll: true })
+			return
+		}
+
+		originalInputFocus?.call(target, options)
+	}) as HTMLInputElement['focus']
+}
+
+function teardownInputFocusScrollSuppression() {
+	inputFocusScrollSuppressionTarget?.removeEventListener('pointerdown', openPickerWithoutInputFocus)
+	if (inputFocusScrollSuppressionTarget && originalInputFocus) {
+		inputFocusScrollSuppressionTarget.focus = originalInputFocus
+	}
+	inputFocusScrollSuppressionTarget = null
+	originalInputFocus = null
+	suppressNextInputFocusScroll = false
+}
+
+function syncInputFocusScrollSuppression() {
+	const target = picker.value?.altInput ?? inputRef.value ?? null
+	if (!target || !props.readonly || props.disabled || props.calendarOnly) {
+		teardownInputFocusScrollSuppression()
+		return
+	}
+
+	if (inputFocusScrollSuppressionTarget === target) return
+
+	teardownInputFocusScrollSuppression()
+	target.addEventListener('pointerdown', openPickerWithoutInputFocus)
+	patchInputFocusScrollSuppression(target)
+	inputFocusScrollSuppressionTarget = target
 }
 
 const resolvedDateFormat = computed(
@@ -944,19 +1094,6 @@ const resolvedShowMonths = computed(() =>
 	Number.isFinite(props.showMonths) ? Math.max(1, Math.floor(props.showMonths)) : 1,
 )
 
-const inputClasses = computed(() => [
-	props.calendarOnly
-		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
-		: 'w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
-	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
-	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
-	!props.calendarOnly
-		? 'pr-3 h-9 py-2 text-base outline-none bg-surface-4 border-none rounded-xl'
-		: '',
-	props.disabled && !props.calendarOnly ? 'cursor-not-allowed' : '',
-	props.inputClass,
-])
-
 const selectedDates = computed(() => {
 	const value = model.value
 	if (Array.isArray(value)) {
@@ -965,6 +1102,28 @@ const selectedDates = computed(() => {
 
 	return value ? [value] : []
 })
+
+const hasClearButton = computed(
+	() =>
+		!props.calendarOnly &&
+		props.clearable &&
+		!props.disabled &&
+		!props.readonly &&
+		selectedDates.value.length > 0,
+)
+
+const inputClasses = computed(() => [
+	props.calendarOnly
+		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
+		: 'w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow !outline-0',
+	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
+	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
+	!props.calendarOnly
+		? `${hasClearButton.value ? 'pr-10' : 'pr-3'} h-9 py-2 text-base outline-none bg-surface-4 border-none rounded-xl`
+		: '',
+	props.disabled && !props.calendarOnly ? 'cursor-not-allowed' : '',
+	props.inputClass,
+])
 
 watch(
 	() => [
@@ -982,6 +1141,7 @@ watch(
 		props.altFormat,
 		props.time24hr,
 		props.calendarOnly,
+		props.closeOnSelect,
 		props.position,
 	],
 	() => {
@@ -1042,6 +1202,11 @@ onMounted(async () => {
 		onReady: (_selectedDates, _dateStr, instance) => {
 			syncCalendarView(instance)
 
+			instance.calendarContainer.addEventListener(
+				'pointerdown',
+				suppressInputFocusScrollForCalendarPointer,
+				true,
+			)
 			instance.calendarContainer.addEventListener('pointerdown', startRangeDrag, true)
 			instance.calendarContainer.addEventListener('mousedown', stopRangeEndpointMouseEvent, true)
 			instance.calendarContainer.addEventListener('mouseup', stopRangeEndpointMouseEvent, true)
@@ -1061,7 +1226,7 @@ onMounted(async () => {
 			)
 			instance.calendarContainer.addEventListener('beforeinput', preventNonNumericTimeInput, true)
 			instance.calendarContainer.addEventListener('keydown', preventNonNumericTimeKeydown, true)
-			instance.calendarContainer.addEventListener('input', sanitizeNumericTimeInput, true)
+			instance.calendarContainer.addEventListener('input', commitTimeInputForInput, true)
 
 			instance.calendarContainer.addEventListener('mousedown', (event) => {
 				if (props.mode !== 'range') return
@@ -1119,6 +1284,7 @@ onMounted(async () => {
 			syncCalendarStateClasses(instance)
 			syncRangeEndpointMoveState(instance)
 			syncMultiMonthSelects(instance)
+			syncInputFocusScrollSuppression()
 		},
 		onChange: (_selectedDates, dateStr, instance) => {
 			if (isSyncingFromModel.value) return
@@ -1145,6 +1311,12 @@ onMounted(async () => {
 		},
 		onClose: (_selectedDates, dateStr, instance) => {
 			cancelRangeEndpointMovePreview()
+			if (suppressNextInputFocusScroll) {
+				const focusTarget = instance.altInput ?? inputRef.value
+				focusTarget?.blur()
+				suppressNextInputFocusScroll = false
+			}
+
 			if (hasCompleteModelRange()) {
 				syncPickerFromModel()
 				return
@@ -1192,6 +1364,7 @@ onMounted(async () => {
 	}
 
 	syncAltInputState()
+	syncInputFocusScrollSuppression()
 	syncPickerFromModel()
 	syncHeaderControlState(picker.value)
 	syncRangeEndpointMoveState(picker.value)
@@ -1204,6 +1377,7 @@ onBeforeUnmount(() => {
 	document.removeEventListener('pointermove', updateRangeDrag, true)
 	document.removeEventListener('pointerup', stopRangeDrag, true)
 	document.removeEventListener('pointercancel', stopRangeDrag, true)
+	teardownInputFocusScrollSuppression()
 	picker.value?.destroy()
 	destroyCalendarPortal()
 })
@@ -1215,7 +1389,7 @@ function flatpickrOptions(): Options {
 		altInputClass: props.calendarOnly ? undefined : inputClasses.value.filter(Boolean).join(' '),
 		altFormat: resolvedAltFormat.value,
 		appendTo: ensureCalendarPortal(),
-		closeOnSelect: false,
+		closeOnSelect: props.closeOnSelect,
 		dateFormat: resolvedDateFormat.value,
 		disableMobile: true,
 		enableTime: props.enableTime,
@@ -1267,25 +1441,31 @@ function syncPickerFromModel() {
 }
 
 function syncAltInputState() {
-	if (!picker.value?.altInput) return
+	if (!picker.value?.altInput) {
+		syncInputFocusScrollSuppression()
+		return
+	}
 
 	picker.value.altInput.disabled = props.disabled
 	picker.value.altInput.readOnly = props.readonly
+	syncInputFocusScrollSuppression()
+}
+
+function clearValue() {
+	const nextValue = props.mode === 'single' ? null : []
+	model.value = nextValue
+	picker.value?.clear(false)
+	setRangeEndpointMoveState(null)
+	syncMissingRangeEndState()
+	emit('clear')
+	emit('change', nextValue)
 }
 
 defineExpose({
 	focus: () => picker.value?.altInput?.focus() ?? inputRef.value?.focus(),
 	open: () => picker.value?.open(),
 	close: () => picker.value?.close(),
-	clear: () => {
-		const nextValue = props.mode === 'single' ? null : []
-		model.value = nextValue
-		picker.value?.clear(false)
-		setRangeEndpointMoveState(null)
-		syncMissingRangeEndState()
-		emit('clear')
-		emit('change', nextValue)
-	},
+	clear: clearValue,
 })
 </script>
 
@@ -1295,7 +1475,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {
-	@apply mt-2 rounded-2xl border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
+	@apply mt-2 touch-manipulation rounded-2xl border border-solid border-surface-5 bg-surface-3 shadow-none p-3 text-primary select-none;
 	box-sizing: content-box;
 }
 
@@ -1333,6 +1513,27 @@ defineExpose({
 	box-shadow: none;
 }
 
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars) {
+	width: calc(615.75px + 0.75rem) !important;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-months),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-weekdays),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-days) {
+	@apply gap-3;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-rContainer),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-weekdays),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-days) {
+	width: calc(615.75px + 0.75rem) !important;
+}
+
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-month),
+.modrinth-date-picker :deep(.flatpickr-calendar.has-two-calendars .flatpickr-weekdaycontainer) {
+	@apply max-w-[307.875px] min-w-[307.875px] flex-none;
+}
+
 .modrinth-date-picker :deep(.flatpickr-calendar::before),
 .modrinth-date-picker :deep(.flatpickr-calendar::after) {
 	display: none;
@@ -1356,7 +1557,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year),
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
-	@apply rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-10;
+	@apply touch-manipulation rounded-xl bg-surface-4 py-1 font-semibold text-contrast hover:bg-surface-5 min-h-10;
 }
 
 .modrinth-date-picker :deep(.flatpickr-current-month .flatpickr-monthDropdown-months) {
@@ -1414,7 +1615,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-prev-month),
 .modrinth-date-picker :deep(.flatpickr-next-month) {
-	@apply top-2.5 mx-3.5 flex h-10 w-10 items-center justify-center rounded-full p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
+	@apply top-2.5 mx-3.5 flex h-10 w-10 touch-manipulation items-center justify-center rounded-full p-0 text-secondary hover:bg-surface-4 hover:text-contrast;
 }
 
 .modrinth-date-picker :deep(.flatpickr-prev-month.flatpickr-disabled),
@@ -1439,7 +1640,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-day) {
-	@apply relative z-0 m-0 max-w-none rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
+	@apply relative z-0 m-0 max-w-none touch-manipulation rounded-full border border-solid border-transparent text-primary hover:bg-surface-4 hover:text-contrast font-semibold aspect-square h-auto;
 }
 .modrinth-date-picker
 	:deep(
@@ -1625,7 +1826,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-time) {
-	@apply mt-2 flex h-11 max-h-none items-center  gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 leading-none;
+	@apply mt-2 flex h-11 max-h-none items-center  gap-2 border-0 border-t border-solid border-surface-5 px-1 pt-2 overflow-visible leading-none;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .numInputWrapper) {
@@ -1634,7 +1835,7 @@ defineExpose({
 
 .modrinth-date-picker :deep(.flatpickr-time input),
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-am-pm) {
-	@apply h-full rounded-xl bg-transparent px-2 text-center font-semibold text-primary hover:bg-surface-5 focus:bg-surface-5;
+	@apply h-full touch-manipulation rounded-xl bg-transparent px-2 text-center font-semibold text-primary hover:bg-surface-5 focus:bg-surface-5;
 }
 
 .modrinth-date-picker :deep(.flatpickr-time .flatpickr-time-separator) {

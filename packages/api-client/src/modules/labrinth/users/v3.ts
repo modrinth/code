@@ -17,4 +17,25 @@ export class LabrinthUsersV3Module extends AbstractModule {
 			method: 'GET',
 		})
 	}
+
+	/**
+	 * Get all projects the authenticated user can access directly or through
+	 * their organizations.
+	 *
+	 * @param idOrUsername - User ID or username. Must be the authenticated user.
+	 *
+	 * GET /v3/user/{id}/all-projects
+	 */
+	public async getAllProjects(
+		idOrUsername: string,
+	): Promise<Labrinth.Users.v3.AllProjectsResponse> {
+		return this.client.request<Labrinth.Users.v3.AllProjectsResponse>(
+			`/user/${encodeURIComponent(idOrUsername)}/all-projects`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
 }

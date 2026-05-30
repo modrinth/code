@@ -20,6 +20,7 @@ use crate::{
 use super::super::{
     ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
     condense_country, none_if_empty, none_if_zero_version_id,
+    normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -169,6 +170,7 @@ impl<'de> Deserialize<'de> for DownloadSource {
 #[derive(Debug, clickhouse::Row, serde::Deserialize)]
 struct DownloadRow {
     bucket: u64,
+    source_project_id: DBProjectId,
     project_id: DBProjectId,
     domain: String,
     user_agent: String,
@@ -202,7 +204,8 @@ const DOWNLOADS: &str = {
     formatcp!(
         "SELECT
             widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-            if({USE_PROJECT_ID}, project_id, 0) AS project_id,
+            downloads.project_id AS source_project_id,
+            if({USE_PROJECT_ID}, downloads.project_id, 0) AS project_id,
             if({USE_DOMAIN}, domain, '') AS domain,
             if({USE_USER_AGENT}, user_agent, '') AS user_agent,
             if({USE_VERSION_ID}, version_id, 0) AS version_id,
@@ -214,7 +217,8 @@ const DOWNLOADS: &str = {
             COUNT(*) AS downloads
         FROM downloads
         WHERE
-            recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+            recorded >= {TIME_RANGE_START}
+            AND recorded < {TIME_RANGE_END}
             -- make sure that the REAL project id is included,
             -- not the possibly-zero one,
             -- by using `downloads.project_id` instead of `project_id`
@@ -226,7 +230,7 @@ const DOWNLOADS: &str = {
             AND (empty({FILTER_REASON}) OR downloads.reason IN {FILTER_REASON})
             AND (empty({FILTER_GAME_VERSION}) OR downloads.game_version IN {FILTER_GAME_VERSION})
             AND (empty({FILTER_LOADER}) OR downloads.loader IN {FILTER_LOADER})
-        GROUP BY bucket, project_id, domain, user_agent, version_id, monetized, country, reason, game_version, loader"
+        GROUP BY bucket, source_project_id, project_id, domain, user_agent, version_id, monetized, country, reason, game_version, loader"
     )
 };
 
@@ -351,7 +355,13 @@ pub(crate) async fn fetch(
             },
             game_version: uses_column("use_game_version")
                 .then(|| row.game_version.clone()),
-            loader: uses_column("use_loader").then(|| row.loader.clone()),
+            loader: uses_column("use_loader").then(|| {
+                normalize_loader_for_project(
+                    row.loader.clone(),
+                    row.source_project_id,
+                    cx.project_loaders,
+                )
+            }),
         };
 
         *buckets.entry(key).or_default() += row.downloads;
@@ -403,6 +413,30 @@ impl DownloadSourcePattern {
             Self::ModrinthHosting => DownloadSource::ModrinthHosting,
             Self::ModrinthMaven => DownloadSource::ModrinthMaven,
         }
+    }
+}
+
+pub(crate) fn all_download_sources() -> Vec<DownloadSource> {
+    let mut sources = DOWNLOAD_SOURCE_PATTERNS
+        .iter()
+        .map(|(_, source)| source.into_source())
+        .collect::<Vec<_>>();
+    sources.push(DownloadSource::Other);
+    sources.sort_by(|a, b| {
+        download_source_sort_key(a).cmp(download_source_sort_key(b))
+    });
+    sources.dedup();
+    sources
+}
+
+fn download_source_sort_key(source: &DownloadSource) -> &str {
+    match source {
+        DownloadSource::Named(name) => name,
+        DownloadSource::Website => "website",
+        DownloadSource::ModrinthApp => "modrinth_app",
+        DownloadSource::ModrinthHosting => "modrinth_hosting",
+        DownloadSource::ModrinthMaven => "modrinth_maven",
+        DownloadSource::Other => "other",
     }
 }
 

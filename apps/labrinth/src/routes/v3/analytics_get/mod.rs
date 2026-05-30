@@ -11,7 +11,10 @@ mod facets;
 mod metrics;
 mod old;
 
-use std::{collections::HashMap, num::NonZeroU64};
+use std::{
+    collections::{HashMap, HashSet},
+    num::NonZeroU64,
+};
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
@@ -26,6 +29,7 @@ use crate::{
     },
     database::{
         self, DBProject,
+        models::version_item::VersionQueryResult,
         models::{
             DBAffiliateCode, DBAffiliateCodeId, DBProjectId, DBUser, DBVersion,
             DBVersionId,
@@ -44,6 +48,7 @@ use crate::{
     routes::ApiError,
 };
 
+#[cfg(test)]
 pub(crate) use metrics::normalize_download_source;
 pub use metrics::*;
 
@@ -108,6 +113,7 @@ pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
 /// Maximum number of [`TimeSlice`]s in a [`GetResponse`], controlled by
 /// [`TimeRange::resolution`].
 pub const MAX_TIME_SLICES: usize = 1024;
+pub(crate) const UNKNOWN_LOADER: &str = "unknown";
 
 // response
 
@@ -277,7 +283,7 @@ pub async fn fetch_analytics(
         .filter(|version| {
             visible_version_ids.contains(&version.inner.id)
                 && version.inner.date_published >= req.time_range.start
-                && version.inner.date_published <= req.time_range.end
+                && version.inner.date_published < req.time_range.end
         })
         .map(|version| ProjectAnalyticsEvent {
             project_id: version.inner.project_id.into(),
@@ -305,6 +311,7 @@ pub async fn fetch_analytics(
             .into_iter()
             .map(|code| code.id)
             .collect::<Vec<_>>();
+    let project_loaders = project_loader_map(&parent_version_data);
 
     let mut query_clickhouse_cx = QueryClickhouseContext {
         clickhouse: &clickhouse,
@@ -313,6 +320,7 @@ pub async fn fetch_analytics(
         project_ids: &project_ids,
         parent_version_ids: &parent_version_ids,
         affiliate_code_ids: &affiliate_code_ids,
+        project_loaders: &project_loaders,
     };
 
     if let Some(metrics) = &req.return_metrics.project_views {
@@ -404,6 +412,41 @@ pub(crate) fn condense_country(country: String, count: u64) -> String {
     }
 }
 
+pub(crate) fn project_loader_map(
+    versions: &[VersionQueryResult],
+) -> HashMap<DBProjectId, HashSet<String>> {
+    let mut loaders = HashMap::<DBProjectId, HashSet<String>>::new();
+
+    for version in versions {
+        loaders
+            .entry(version.inner.project_id)
+            .or_default()
+            .extend(version.loaders.iter().cloned());
+    }
+
+    loaders
+}
+
+pub(crate) fn normalize_loader_for_project(
+    loader: String,
+    project_id: DBProjectId,
+    project_loaders: &HashMap<DBProjectId, HashSet<String>>,
+) -> String {
+    if loader.is_empty() {
+        return loader;
+    }
+
+    let loader_is_valid = project_loaders
+        .get(&project_id)
+        .is_some_and(|loaders| loaders.contains(&loader));
+
+    if loader_is_valid {
+        loader
+    } else {
+        UNKNOWN_LOADER.to_string()
+    }
+}
+
 async fn fetch_project_status_change_events(
     project_ids: &[DBProjectId],
     time_range: &TimeRange,
@@ -423,7 +466,8 @@ async fn fetch_project_status_change_events(
         WHERE
             t.mod_id = ANY($1)
             AND tm.body->>'type' = 'status_change'
-            AND tm.created BETWEEN $2 AND $3
+            AND tm.created >= $2
+            AND tm.created < $3
         "#,
         &project_id_values,
         time_range.start,
@@ -462,6 +506,7 @@ pub(crate) struct QueryClickhouseContext<'a> {
     pub(crate) project_ids: &'a [DBProjectId],
     pub(crate) parent_version_ids: &'a [DBVersionId],
     pub(crate) affiliate_code_ids: &'a [DBAffiliateCodeId],
+    pub(crate) project_loaders: &'a HashMap<DBProjectId, HashSet<String>>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -600,6 +645,9 @@ pub(crate) fn add_to_time_slice(
     bucket: usize,
     data: AnalyticsData,
 ) -> Result<(), ApiError> {
+    // Bucketed analytics queries must filter time ranges as `[start, end)`.
+    // `widthBucket` returns `num_time_slices + 1` for values at or after
+    // `end`, which is outside the response slice array.
     // row.recorded <  time_range_start => bucket = 0
     // row.recorded >= time_range_end   => bucket = num_time_slices
     //   (note: this is out of range of `time_slices`!)

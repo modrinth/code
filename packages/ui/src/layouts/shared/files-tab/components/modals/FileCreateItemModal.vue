@@ -1,5 +1,13 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header, { type })" max-width="500px">
+	<NewModal
+		ref="modal"
+		:header="
+			formatMessage(messages.header, {
+				type: formatFileItemType(formatMessage, type),
+			})
+		"
+		max-width="500px"
+	>
 		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
 			<label class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{
@@ -29,7 +37,11 @@
 				<ButtonStyled color="brand">
 					<button :disabled="!!error && submitted" @click="handleSubmit">
 						<PlusIcon class="h-5 w-5" />
-						{{ formatMessage(messages.createButton, { type }) }}
+						{{
+							formatMessage(messages.createButton, {
+								type: formatFileItemType(formatMessage, type),
+							})
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -45,7 +57,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatFileItemType } from '#ui/utils/common-messages'
 
 import { fileValidationMessages } from './file-validation-messages'
 
@@ -54,7 +66,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	header: {
 		id: 'files.create-modal.header',
-		defaultMessage: 'Create a {type, select, directory {folder} other {file}}',
+		defaultMessage: 'Create a {type}',
 	},
 	placeholderFile: {
 		id: 'files.create-modal.placeholder-file',
@@ -66,7 +78,7 @@ const messages = defineMessages({
 	},
 	createButton: {
 		id: 'files.create-modal.create-button',
-		defaultMessage: 'Create {type, select, directory {folder} other {file}}',
+		defaultMessage: 'Create {type}',
 	},
 })
 

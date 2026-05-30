@@ -1,7 +1,11 @@
 <template>
 	<div class="flex flex-col gap-3">
 		<span class="text-primary">
-			{{ formatMessage(messages.warningBody, { type: backup.isServer ? 'server' : 'instance' }) }}
+			{{
+				formatMessage(messages.warningBody, {
+					type: formatMessage(backup.isServer ? messages.worldLabel : messages.instanceLabel),
+				})
+			}}
 		</span>
 
 		<div v-if="backup.available" class="flex items-center gap-2">
@@ -88,7 +92,15 @@ const messages = defineMessages({
 	warningBody: {
 		id: 'content.inline-backup.warning-body',
 		defaultMessage:
-			'We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {instance}} if anything breaks.',
+			'We recommend creating a backup before proceeding so you can restore your {type} if anything breaks.',
+	},
+	worldLabel: {
+		id: 'content.inline-backup.world-label',
+		defaultMessage: 'world',
+	},
+	instanceLabel: {
+		id: 'content.inline-backup.instance-label',
+		defaultMessage: 'instance',
 	},
 	createBackup: {
 		id: 'content.inline-backup.create-backup',

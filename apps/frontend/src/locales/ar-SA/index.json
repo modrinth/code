@@ -410,9 +410,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "الملفات التكميلية تستخدم لدعم الموارد مثل كود المصدر، وليس للإصدارات أو الأنواع البديلة."
   },
-  "create.collection.collection-info": {
-    "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
-  },
   "create.collection.create-collection": {
     "message": "إنشاء مجموعة"
   },
@@ -901,9 +898,6 @@
   },
   "dashboard.revenue.stats.withdrawn": {
     "message": "تم سحبه "
-  },
-  "dashboard.revenue.tos": {
-    "message": "بتحميل المشاريع إلى مودرينث وسحب الأموال من حسابك، فإنك توافق على <terms-link> المكافآت. تعرّف على المزيد حول </info-link> برنامج المكافآت. "
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "قم بالتنزيل كملف CSV "

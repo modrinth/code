@@ -254,9 +254,6 @@
   "friends.action.add-friend": {
     "message": "הוספת חבר"
   },
-  "friends.action.view-friend-requests": {
-    "message": "{count, plural, one {בקשת חברות אחת} other {# בקשות חברות}}"
-  },
   "friends.add-friend.submit": {
     "message": "שליחת בקשת חברות"
   },
