@@ -620,6 +620,12 @@ const updateToPlayModal = ref()
 
 const modrinthLoginFlowWaitModal = ref()
 
+watch(incompatibilityWarningModal, (modal) => {
+	if (modal) {
+		setContentIncompatibilityWarningModal(modal)
+	}
+})
+
 setupAuthProvider(credentials, async (_redirectPath) => {
 	await signIn()
 })

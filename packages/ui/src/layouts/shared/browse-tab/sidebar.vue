@@ -43,7 +43,14 @@ const buttonClass = computed(() => {
 const contentClass = computed(() => (isApp.value ? 'mt-2 mb-3' : 'mb-4 mx-3'))
 const innerPanelClass = computed(() => (isApp.value ? 'ml-2 mr-3' : 'p-1'))
 
+function hasProvidedFilter(filterId: string): boolean {
+	return (ctx.providedFilters?.value ?? []).some((filter) => filter.type === filterId)
+}
+
 function getFilterOpenByDefault(filterId: string): boolean {
+	if (hasProvidedFilter(filterId)) {
+		return true
+	}
 	if (ctx.isServerType.value) {
 		return ![
 			'server_category_minecraft_server_meta',

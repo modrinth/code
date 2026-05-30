@@ -49,7 +49,7 @@ interface IncompatibilityWarningModalRef {
 		versions: Labrinth.Versions.v2.Version[],
 		version: Labrinth.Versions.v2.Version,
 		callback: (versionId?: string) => void,
-	) => void
+	) => void | Promise<void>
 }
 
 const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
@@ -410,14 +410,34 @@ export function createContentInstall(opts: {
 	async function handleInstallToInstance(instance: ContentInstallInstance) {
 		const profile = profileMap[instance.id]
 		const storeInstance = instances.value.find((i) => i.id === instance.id)
-		if (storeInstance) storeInstance.installing = true
+		if (!currentProject || !profile) {
+			opts.handleError('No project or instance found')
+			return
+		}
 
 		const version = findPreferredVersion(currentVersions, currentProject, profile)
 		if (!version) {
-			if (storeInstance) storeInstance.installing = false
-			opts.handleError('No compatible version found')
+			if (currentVersions.length > 0 && incompatibilityWarningModalRef) {
+				const onIncompatibleInstall = (versionId?: string) => {
+					if (versionId && storeInstance) {
+						storeInstance.installed = true
+					}
+					currentCallback(versionId)
+				}
+				await incompatibilityWarningModalRef.show(
+					profile,
+					currentProject,
+					currentVersions,
+					currentVersions[0],
+					onIncompatibleInstall,
+				)
+			} else {
+				opts.handleError('No version found')
+			}
 			return
 		}
+
+		if (storeInstance) storeInstance.installing = true
 
 		const installedProjectIds: string[] = []
 		if (currentProject) {
@@ -614,7 +634,7 @@ export function createContentInstall(opts: {
 					removeInstallingItems(instancePath, installedProjectIds)
 				}
 			} else {
-				incompatibilityWarningModalRef?.show(instance, project, projectVersions, version, callback)
+				await incompatibilityWarningModalRef?.show(instance, project, projectVersions, version, callback)
 			}
 		} else {
 			let versions = (

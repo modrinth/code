@@ -98,14 +98,10 @@
 					v-for="inst in filteredInstances"
 					:key="inst.id"
 					class="flex items-center justify-between px-6 py-1.5"
-					:class="
-						!inst.compatible ? 'opacity-40' : inst.installed ? 'opacity-60' : 'hover:bg-surface-3'
-					"
+					:class="inst.installed ? 'opacity-60' : 'hover:bg-surface-3'"
 				>
 					<button
-						v-tooltip="
-							!inst.compatible ? 'This instance is not compatible with this project' : undefined
-						"
+						v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
 						class="flex min-w-0 cursor-pointer items-center gap-2.5 overflow-hidden border-0 bg-transparent p-0 text-left"
 						@click="emit('navigate', inst)"
 					>
@@ -114,14 +110,23 @@
 							inst.name
 						}}</span>
 					</button>
-					<ButtonStyled v-if="inst.installed" :disabled="true">
-						<button>
+					<ButtonStyled v-if="inst.installed">
+						<button disabled>
 							<CheckIcon />
 							{{ formatMessage(messages.installedBadge) }}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else-if="inst.compatible" :disabled="inst.installing">
-						<button @click="emit('install', inst)">
+					<ButtonStyled
+						v-else
+						:type="inst.compatible ? 'standard' : 'outlined'"
+						:color="inst.compatible ? 'standard' : 'orange'"
+					>
+						<button
+							:disabled="inst.installing"
+							v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
+							@click="emit('install', inst)"
+						>
+							<TriangleAlertIcon v-if="!inst.compatible" />
 							{{
 								inst.installing
 									? formatMessage(commonMessages.installingLabel)
@@ -247,6 +252,7 @@ import {
 	EyeIcon,
 	EyeOffIcon,
 	SearchIcon,
+	TriangleAlertIcon,
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -295,6 +301,10 @@ const messages = defineMessages({
 	installButton: {
 		id: 'instances.content-install.install-button',
 		defaultMessage: 'Install',
+	},
+	incompatibleTooltip: {
+		id: 'instances.content-install.incompatible-tooltip',
+		defaultMessage: 'This instance is not compatible with this project',
 	},
 	selectIcon: {
 		id: 'instances.content-install.select-icon',
