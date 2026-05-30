@@ -1269,20 +1269,18 @@ components:
             badges:
               type: integer
               format: bitfield
-              example: 511
+              example: 63
               description: |
                 Any badges applicable to this user. These are currently unused and undisplayed, and as such are subject to change
 
-                In order from first to ninth bit, the current bits are:
-                - MIDAS
+                In order from first to seventh bit, the current bits are:
+                - (unused)
                 - EARLY_MODPACK_ADOPTER
                 - EARLY_RESPACK_ADOPTER
                 - EARLY_PLUGIN_ADOPTER
                 - ALPHA_TESTER
                 - CONTRIBUTOR
                 - TRANSLATOR
-                - AFFILIATE
-                - PRIDE_2026
             auth_providers:
               type: array
               items:
