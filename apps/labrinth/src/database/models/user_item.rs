@@ -186,7 +186,7 @@ impl DBUser {
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations
                             WHERE campaign_donations.user_id = users.id
-                                AND campaign_donations.amount_usd > 5
+                                AND campaign_donations.amount_usd >= 5
                         ) AS campaign_pride_26,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,

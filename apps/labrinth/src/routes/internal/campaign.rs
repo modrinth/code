@@ -18,7 +18,7 @@ use crate::{
         redis::RedisPool,
     },
     env::ENV,
-    models::payouts::TremendousForexResponse,
+    models::{payouts::TremendousForexResponse, users::Badges},
     queue::payouts::PayoutsQueue,
     routes::ApiError,
     util::{error::Context, http::HttpClient, tiltify::TiltifyClient},
@@ -179,7 +179,7 @@ pub async fn tiltify_webhook(
             })?;
 
         donation.user_id = Some(user.id);
-        eyre::Ok(username)
+        eyre::Ok((username, user.badges))
     }
     .await
     .inspect_err(|err| {
@@ -203,7 +203,10 @@ pub async fn tiltify_webhook(
 
     info!(
         "Resolved donation from {} for US${}",
-        username.as_deref().unwrap_or("<unknown>"),
+        username
+            .as_ref()
+            .map(|(username, _)| username.as_str())
+            .unwrap_or("<unknown>"),
         amount_usd
             .map(|a| a.to_string())
             .unwrap_or_else(|| "<unknown>".to_string())
@@ -223,15 +226,38 @@ pub async fn tiltify_webhook(
         return Ok(());
     }
 
+    if let (Some(user_id), Some((_, badges)), Some(amount_usd)) =
+        (donation.user_id, username.as_ref(), donation.amount_usd)
+        && amount_usd >= Decimal::ONE
+    {
+        let badges = *badges | Badges::PRIDE_2026;
+
+        sqlx::query!(
+            "
+            UPDATE users
+            SET badges = $1
+            WHERE (id = $2)
+            ",
+            badges.bits() as i64,
+            user_id.0,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err("updating user campaign badge")?;
+    }
+
     transaction
         .commit()
         .await
         .wrap_internal_err("committing transaction")?;
 
     if let Some(user_id) = donation.user_id {
-        DBUser::clear_caches(&[(user_id, username)], &redis)
-            .await
-            .wrap_internal_err("clearing user caches")?;
+        DBUser::clear_caches(
+            &[(user_id, username.map(|(username, _)| username))],
+            &redis,
+        )
+        .await
+        .wrap_internal_err("clearing user caches")?;
     }
 
     Ok(())

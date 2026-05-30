@@ -1,0 +1,173 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                                AND campaign_donations.amount_usd >= 5\n                        ) AS campaign_pride_26,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "raw_avatar_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "bio",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "role",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "badges",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "campaign_pride_26",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "github_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "discord_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "gitlab_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "google_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "steam_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 15,
+        "name": "microsoft_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "email_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 17,
+        "name": "password",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 18,
+        "name": "totp_secret",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 19,
+        "name": "paypal_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 20,
+        "name": "paypal_country",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 21,
+        "name": "paypal_email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 22,
+        "name": "venmo_handle",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 23,
+        "name": "stripe_customer_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 24,
+        "name": "allow_friend_requests",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 25,
+        "name": "is_subscribed_to_newsletter",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      null,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "5ed1f07dfcb5590ac98594ac38a9d7894f83410fdd5d7061aa80885701f9f8dd"
+}
