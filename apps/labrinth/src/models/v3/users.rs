@@ -56,6 +56,7 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: Role,
     pub badges: Badges,
+    pub campaigns: UserCampaigns,
 
     pub auth_providers: Option<Vec<AuthProvider>>,
     pub email: Option<String>,
@@ -70,6 +71,11 @@ pub struct User {
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct UserCampaigns {
+    pub pride_26: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -94,6 +100,9 @@ impl From<DBUser> for User {
             created: data.created,
             role: Role::from_string(&data.role),
             badges: data.badges,
+            campaigns: UserCampaigns {
+                pride_26: data.campaign_pride_26,
+            },
             payout_data: None,
             auth_providers: None,
             has_password: None,
@@ -142,6 +151,9 @@ impl User {
             created: db_user.created,
             role: Role::from_string(&db_user.role),
             badges: db_user.badges,
+            campaigns: UserCampaigns {
+                pride_26: db_user.campaign_pride_26,
+            },
             auth_providers: Some(auth_providers),
             has_password: Some(db_user.password.is_some()),
             has_totp: Some(db_user.totp_secret.is_some()),
