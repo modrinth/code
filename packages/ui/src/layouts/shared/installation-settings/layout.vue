@@ -297,8 +297,7 @@ const messages = defineMessages({
 	},
 	showPrereleaseUpdatesDescription: {
 		id: 'installation-settings.show-prerelease-updates.description',
-		defaultMessage:
-			'Shows prerelease project versions as available updates for this instance.',
+		defaultMessage: 'Shows prerelease project versions as available updates for this instance.',
 	},
 	unlinkButton: {
 		id: 'installation-settings.unlink',
@@ -354,26 +353,6 @@ const messages = defineMessages({
 						></span>
 					</div>
 				</div>
-			</div>
-
-			<div
-				v-if="ctx.showPrereleaseUpdates && ctx.setShowPrereleaseUpdates"
-				class="flex items-center gap-4 justify-between"
-			>
-				<div class="flex flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.showPrereleaseUpdatesTitle) }}
-					</h2>
-					<p class="m-0">
-						{{ formatMessage(messages.showPrereleaseUpdatesDescription) }}
-					</p>
-				</div>
-				<Toggle
-					id="show-prerelease-updates"
-					:model-value="ctx.showPrereleaseUpdates.value"
-					:disabled="ctx.isBusy.value"
-					@update:model-value="ctx.setShowPrereleaseUpdates"
-				/>
 			</div>
 
 			<!-- LINKED -->
@@ -793,6 +772,26 @@ const messages = defineMessages({
 			</template>
 
 			<slot name="extra" />
+
+			<div
+				v-if="ctx.showPrereleaseUpdates && ctx.setShowPrereleaseUpdates"
+				class="flex items-center gap-4 justify-between"
+			>
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.showPrereleaseUpdatesTitle) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.showPrereleaseUpdatesDescription) }}
+					</p>
+				</div>
+				<Toggle
+					id="show-prerelease-updates"
+					:model-value="ctx.showPrereleaseUpdates.value"
+					:disabled="ctx.isBusy.value"
+					@update:model-value="ctx.setShowPrereleaseUpdates"
+				/>
+			</div>
 		</template>
 	</div>
 

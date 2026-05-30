@@ -1565,6 +1565,12 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Search game version..."
   },
+  "installation-settings.show-prerelease-updates.description": {
+    "defaultMessage": "Shows prerelease project versions as available updates for this instance."
+  },
+  "installation-settings.show-prerelease-updates.title": {
+    "defaultMessage": "Show beta and alpha updates"
+  },
   "installation-settings.type.instance": {
     "defaultMessage": "instance"
   },

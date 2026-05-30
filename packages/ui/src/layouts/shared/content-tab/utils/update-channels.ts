@@ -19,10 +19,7 @@ export function newestEligibleUpdate(
 
 	return (
 		[...versions]
-			.sort(
-				(a, b) =>
-					new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-			)
+			.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime())
 			.find((version) => {
 				if (version.id === currentVersionId) return false
 				if (!allowsUpdateChannel(version, policy)) return false
