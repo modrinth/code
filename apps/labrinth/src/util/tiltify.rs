@@ -5,7 +5,10 @@ use serde::Deserialize;
 use serde_json::json;
 use tokio::sync::Mutex;
 
-use crate::{env::ENV, util::http::HttpClient};
+use crate::{
+    env::ENV,
+    util::{error::Context, http::HttpClient},
+};
 
 #[derive(Debug)]
 pub struct TiltifyClient {
@@ -75,15 +78,14 @@ impl TiltifyClient {
                 "scope": "public",
             }))
             .send()
-            .await?;
-        let status = response.status();
-        let response_text = response.text().await?;
+            .await
+            .wrap_err("fetching OAuth token")?
+            .error_for_status()
+            .wrap_err("fetching OAuth token")?
+            .json::<TiltifyTokenResponse>()
+            .await
+            .wrap_err("parsing OAuth token response")?;
 
-        if !status.is_success() {
-            return Err(eyre!("Tiltify OAuth error: {response_text}"));
-        }
-
-        serde_json::from_str::<TiltifyTokenResponse>(&response_text)
-            .map_err(Into::into)
+        Ok(response)
     }
 }
