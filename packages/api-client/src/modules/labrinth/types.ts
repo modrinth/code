@@ -1,5 +1,5 @@
-import type { ISO3166 } from '../iso3166/types'
 import type { RawDecimal } from '../../utils/types'
+import type { ISO3166 } from '../iso3166/types'
 
 export namespace Labrinth {
 	export namespace Campaign {

@@ -26,6 +26,7 @@ import { article as new_environments } from "./new_environments";
 import { article as new_site_beta } from "./new_site_beta";
 import { article as plugins_resource_packs } from "./plugins_resource_packs";
 import { article as pride_campaign_2025 } from "./pride_campaign_2025";
+import { article as pride_campaign_2026 } from "./pride_campaign_2026";
 import { article as redesign } from "./redesign";
 import { article as russian_censorship } from "./russian_censorship";
 import { article as skins_now_in_modrinth_app } from "./skins_now_in_modrinth_app";
@@ -65,6 +66,7 @@ export const articles = [
   new_site_beta,
   plugins_resource_packs,
   pride_campaign_2025,
+  pride_campaign_2026,
   redesign,
   russian_censorship,
   skins_now_in_modrinth_app,
