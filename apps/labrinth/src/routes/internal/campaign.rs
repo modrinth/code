@@ -29,44 +29,44 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct TiltifyWebhook {
-    pub data: TiltifyData,
-    pub meta: TiltifyMeta,
+struct TiltifyWebhook {
+    data: TiltifyData,
+    meta: TiltifyMeta,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct TiltifyData {
-    pub amount_raised: AmountRaised,
-    pub user: TiltifyUser,
+struct TiltifyData {
+    amount_raised: AmountRaised,
+    user: TiltifyUser,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct AmountRaised {
-    pub currency: String,
-    pub value: Decimal,
+struct AmountRaised {
+    currency: String,
+    value: Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct TiltifyUser {
-    pub id: Uuid,
-    pub username: String,
+struct TiltifyUser {
+    id: Uuid,
+    username: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct TiltifyMeta {
-    pub attempted_at: DateTime<Utc>,
-    pub event_type: String,
-    pub generated_at: DateTime<Utc>,
-    pub id: Uuid,
-    pub subscription_source_id: Uuid,
-    pub subscription_source_type: String,
+struct TiltifyMeta {
+    attempted_at: DateTime<Utc>,
+    event_type: String,
+    generated_at: DateTime<Utc>,
+    id: Uuid,
+    subscription_source_id: Uuid,
+    subscription_source_type: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct CampaignInfo {
-    pub total_donations_usd: Decimal,
-    pub target_usd: Decimal,
-    pub num_donators: usize,
+    total_donations_usd: Decimal,
+    target_usd: Decimal,
+    num_donators: usize,
 }
 
 const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info";
@@ -99,17 +99,17 @@ struct TiltifyPaginationMetadata {
     after: Option<String>,
 }
 
-pub struct CampaignDonation {
-    pub id: DBCampaignDonationId,
-    pub tiltify_event_id: Uuid,
-    pub raw_data: serde_json::Value,
-    pub donated_at: DateTime<Utc>,
-    pub amount_usd: Option<Decimal>,
-    pub user_id: Option<DBUserId>,
+struct CampaignDonation {
+    id: DBCampaignDonationId,
+    tiltify_event_id: Uuid,
+    raw_data: serde_json::Value,
+    donated_at: DateTime<Utc>,
+    amount_usd: Option<Decimal>,
+    user_id: Option<DBUserId>,
 }
 
 impl CampaignDonation {
-    pub async fn insert(
+    async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<bool, ApiError> {
