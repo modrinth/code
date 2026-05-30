@@ -385,7 +385,7 @@ pub struct EditProfile {
         with = "serde_with::rust::double_option"
     )]
     pub linked_data: Option<Option<LinkedData>>,
-    pub show_prerelease_updates: Option<bool>,
+    pub preferred_update_channel: Option<ReleaseChannel>,
 
     #[serde(
         default,
@@ -450,10 +450,10 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
         if let Some(linked_data) = edit_profile.linked_data.clone() {
             prof.linked_data = linked_data;
         }
-        if let Some(show_prerelease_updates) =
-            edit_profile.show_prerelease_updates
+        if let Some(preferred_update_channel) =
+            edit_profile.preferred_update_channel
         {
-            prof.show_prerelease_updates = show_prerelease_updates;
+            prof.preferred_update_channel = preferred_update_channel;
         }
         if let Some(groups) = edit_profile.groups.clone() {
             prof.groups = groups;

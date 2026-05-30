@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                path, install_stage, launcher_feature_version, name, icon_path,\n                game_version, protocol_version, mod_loader, mod_loader_version,\n                json(groups) as \"groups!: serde_json::Value\",\n                linked_project_id, linked_version_id, locked, show_prerelease_updates,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path,\n                json(override_extra_launch_args) as \"override_extra_launch_args!: serde_json::Value\", json(override_custom_env_vars) as \"override_custom_env_vars!: serde_json::Value\",\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit\n            FROM profiles\n            WHERE path IN (SELECT value FROM json_each($1))",
+  "query": "\n            SELECT\n                path, install_stage, launcher_feature_version, name, icon_path,\n                game_version, protocol_version, mod_loader, mod_loader_version,\n                json(groups) as \"groups!: serde_json::Value\",\n                linked_project_id, linked_version_id, locked, preferred_update_channel,\n                created, modified, last_played,\n                submitted_time_played, recent_time_played,\n                override_java_path,\n                json(override_extra_launch_args) as \"override_extra_launch_args!: serde_json::Value\", json(override_custom_env_vars) as \"override_custom_env_vars!: serde_json::Value\",\n                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,\n                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit\n            FROM profiles\n            WHERE path IN (SELECT value FROM json_each($1))",
   "describe": {
     "columns": [
       {
@@ -69,9 +69,9 @@
         "type_info": "Integer"
       },
       {
-        "name": "show_prerelease_updates",
+        "name": "preferred_update_channel",
         "ordinal": 13,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
         "name": "created",
@@ -184,5 +184,5 @@
       true
     ]
   },
-  "hash": "cf15ce2acd08c53a7415c73daa6b0b2f10b52eeb4b074a3da2b1961cb2861155"
+  "hash": "de1887a95766303d16ddcad7fe7f34e0a64101ead329bcc88e55e31b32578a97"
 }

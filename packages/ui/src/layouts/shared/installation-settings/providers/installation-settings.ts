@@ -57,9 +57,6 @@ export interface InstallationSettingsContext {
 	/** When false, hides change-version and reinstall buttons in linked state (default: true) */
 	showModpackVersionActions?: boolean | ComputedRef<boolean>
 
-	showPrereleaseUpdates?: Ref<boolean> | ComputedRef<boolean>
-	setShowPrereleaseUpdates?: (value: boolean) => Promise<void>
-
 	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
 	isLocalFile?: boolean | ComputedRef<boolean>
 

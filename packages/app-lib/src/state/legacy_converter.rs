@@ -5,8 +5,8 @@ use crate::state;
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
-    DeviceTokenPair, FileType, FileUpdateChannelPolicy, Hooks,
-    LauncherFeatureVersion, LinkedData, MemorySettings, ModrinthCredentials,
+    DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion, LinkedData,
+    MemorySettings, ModrinthCredentials, ReleaseChannel,
     Profile, ProfileInstallStage, TeamMember, Theme, VersionFile, WindowSize,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
@@ -248,10 +248,9 @@ where
                                     loaders: vec![
                                         mod_loader.as_str().to_string(),
                                     ],
-                                    channel_policy:
-                                        FileUpdateChannelPolicy::All
-                                            .key()
-                                            .to_string(),
+                                    channel_policy: ReleaseChannel::Alpha
+                                        .key()
+                                        .to_string(),
                                     update_version_id: update_version
                                         .id
                                         .clone(),
@@ -337,7 +336,7 @@ where
 
                         None
                     }),
-                    show_prerelease_updates: false,
+                    preferred_update_channel: ReleaseChannel::Release,
                     created: profile.metadata.date_created,
                     modified: profile.metadata.date_modified,
                     last_played: profile.metadata.last_played,

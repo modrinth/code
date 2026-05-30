@@ -14,7 +14,7 @@ export type GameInstance = {
 	groups: string[]
 
 	linked_data?: LinkedData
-	show_prerelease_updates: boolean
+	preferred_update_channel: ReleaseChannel
 
 	created: Date
 	modified: Date
@@ -46,6 +46,8 @@ type LinkedData = {
 
 	locked: boolean
 }
+
+type ReleaseChannel = 'release' | 'beta' | 'alpha'
 
 export type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 

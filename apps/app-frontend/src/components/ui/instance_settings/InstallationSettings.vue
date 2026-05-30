@@ -273,13 +273,6 @@ provideInstallationSettings({
 	isServer: false,
 	isApp: true,
 	showModpackVersionActions: !isMinecraftServer.value,
-	showPrereleaseUpdates: computed(() => instance.value.show_prerelease_updates),
-	setShowPrereleaseUpdates: async (value: boolean) => {
-		const profilePath = instance.value.path
-		await edit(profilePath, { show_prerelease_updates: value })
-			.then(() => queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', profilePath] }))
-			.catch(handleError)
-	},
 	repairing,
 	reinstalling,
 })

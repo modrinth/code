@@ -1,2 +1,2 @@
 ALTER TABLE profiles
-ADD COLUMN show_prerelease_updates INTEGER NOT NULL DEFAULT FALSE;
+ADD COLUMN preferred_update_channel TEXT NOT NULL DEFAULT 'release';

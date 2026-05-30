@@ -2,8 +2,8 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash,
-    FileUpdateChannelPolicy, cache_file_hash,
+    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash, ReleaseChannel,
+    cache_file_hash,
 };
 use crate::util;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
@@ -40,7 +40,7 @@ pub struct Profile {
     pub groups: Vec<String>,
 
     pub linked_data: Option<LinkedData>,
-    pub show_prerelease_updates: bool,
+    pub preferred_update_channel: ReleaseChannel,
 
     pub created: DateTime<Utc>,
     pub modified: DateTime<Utc>,
@@ -297,7 +297,7 @@ struct ProfileQueryResult {
     linked_project_id: Option<String>,
     linked_version_id: Option<String>,
     locked: Option<i64>,
-    show_prerelease_updates: i64,
+    preferred_update_channel: String,
     created: i64,
     modified: i64,
     last_played: Option<i64>,
@@ -347,7 +347,9 @@ impl TryFrom<ProfileQueryResult> for Profile {
             } else {
                 None
             },
-            show_prerelease_updates: x.show_prerelease_updates == 1,
+            preferred_update_channel: ReleaseChannel::from_key(
+                &x.preferred_update_channel,
+            ),
             created: Utc
                 .timestamp_opt(x.created, 0)
                 .single()
@@ -398,7 +400,7 @@ macro_rules! select_profiles_with_predicate {
                 path, install_stage, launcher_feature_version, name, icon_path,
                 game_version, protocol_version, mod_loader, mod_loader_version,
                 json(groups) as "groups!: serde_json::Value",
-                linked_project_id, linked_version_id, locked, show_prerelease_updates,
+                linked_project_id, linked_version_id, locked, preferred_update_channel,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
                 override_java_path,
@@ -496,6 +498,7 @@ impl Profile {
         let linked_data_version_id =
             self.linked_data.as_ref().map(|x| x.version_id.clone());
         let linked_data_locked = self.linked_data.as_ref().map(|x| x.locked);
+        let preferred_update_channel = self.preferred_update_channel.key();
 
         let created = self.created.timestamp();
         let modified = self.modified.timestamp();
@@ -518,7 +521,7 @@ impl Profile {
                 path, install_stage, name, icon_path,
                 game_version, mod_loader, mod_loader_version,
                 groups,
-                linked_project_id, linked_version_id, locked, show_prerelease_updates,
+                linked_project_id, linked_version_id, locked, preferred_update_channel,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
@@ -552,7 +555,7 @@ impl Profile {
                 linked_project_id = $9,
                 linked_version_id = $10,
                 locked = $11,
-                show_prerelease_updates = $12,
+                preferred_update_channel = $12,
 
                 created = $13,
                 modified = $14,
@@ -587,7 +590,7 @@ impl Profile {
             linked_data_project_id,
             linked_data_version_id,
             linked_data_locked,
-            self.show_prerelease_updates,
+            preferred_update_channel,
             created,
             modified,
             last_played,
@@ -752,7 +755,13 @@ impl Profile {
             .filter_map(|file| {
                 all.iter()
                     .find(|prof| file.path.contains(&prof.path))
-                    .map(|profile| Self::get_cache_key(file, profile))
+                    .map(|profile| {
+                        Self::get_cache_key(
+                            file,
+                            profile,
+                            profile.preferred_update_channel,
+                        )
+                    })
             })
             .collect::<Vec<_>>();
 
@@ -1023,10 +1032,26 @@ impl Profile {
                     })
                     .collect::<Vec<_>>();
 
+                let installed_channels = Self::get_installed_update_channels(
+                    &file_info_by_hash,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
+
                 let file_updates = file_hashes
                     .iter()
                     .filter(|x| file_info_by_hash.contains_key(&x.hash))
-                    .map(|x| Self::get_cache_key(x, self))
+                    .map(|x| {
+                        Self::get_cache_key(
+                            x,
+                            self,
+                            self.effective_update_channel(
+                                installed_channels.get(&x.hash).copied(),
+                            ),
+                        )
+                    })
                     .collect::<Vec<_>>();
 
                 let file_updates_ref =
@@ -1041,34 +1066,52 @@ impl Profile {
 
                 (file_hashes, file_info_by_hash, file_updates)
             } else {
-                let file_updates = file_hashes
-                    .iter()
-                    .map(|x| Self::get_cache_key(x, self))
-                    .collect::<Vec<_>>();
-
                 let file_hashes_ref =
                     file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
-                let file_updates_ref =
-                    file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
-                let (file_info, file_updates) = tokio::try_join!(
-                    CachedEntry::get_file_many(
-                        &file_hashes_ref,
-                        cache_behaviour,
-                        pool,
-                        fetch_semaphore,
-                    ),
-                    CachedEntry::get_file_update_many(
-                        &file_updates_ref,
-                        cache_behaviour,
-                        pool,
-                        fetch_semaphore,
-                    )
-                )?;
+                let file_info = CachedEntry::get_file_many(
+                    &file_hashes_ref,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
 
                 let file_info_by_hash: HashMap<String, CachedFile> = file_info
                     .into_iter()
                     .map(|f| (f.hash.clone(), f))
                     .collect();
+
+                let installed_channels = Self::get_installed_update_channels(
+                    &file_info_by_hash,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
+
+                let file_updates = file_hashes
+                    .iter()
+                    .filter(|x| file_info_by_hash.contains_key(&x.hash))
+                    .map(|x| {
+                        Self::get_cache_key(
+                            x,
+                            self,
+                            self.effective_update_channel(
+                                installed_channels.get(&x.hash).copied(),
+                            ),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+
+                let file_updates_ref =
+                    file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+                let file_updates = CachedEntry::get_file_update_many(
+                    &file_updates_ref,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
 
                 (file_hashes, file_info_by_hash, file_updates)
             };
@@ -1126,6 +1169,60 @@ impl Profile {
         }
 
         Ok(files)
+    }
+
+    async fn get_installed_update_channels(
+        file_info_by_hash: &HashMap<String, CachedFile>,
+        cache_behaviour: Option<CacheBehaviour>,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<HashMap<String, ReleaseChannel>> {
+        let version_ids = file_info_by_hash
+            .values()
+            .map(|file| file.version_id.as_str())
+            .collect::<HashSet<_>>();
+
+        if version_ids.is_empty() {
+            return Ok(HashMap::new());
+        }
+
+        let version_ids_ref =
+            version_ids.iter().copied().collect::<Vec<_>>();
+        let versions = CachedEntry::get_version_many(
+            &version_ids_ref,
+            cache_behaviour,
+            pool,
+            fetch_semaphore,
+        )
+        .await?;
+        let channels_by_version_id = versions
+            .into_iter()
+            .map(|version| {
+                (
+                    version.id,
+                    ReleaseChannel::from_version_type(&version.version_type),
+                )
+            })
+            .collect::<HashMap<_, _>>();
+
+        Ok(file_info_by_hash
+            .iter()
+            .filter_map(|(hash, file)| {
+                channels_by_version_id
+                    .get(&file.version_id)
+                    .copied()
+                    .map(|channel| (hash.clone(), channel))
+            })
+            .collect())
+    }
+
+    fn effective_update_channel(
+        &self,
+        installed_channel: Option<ReleaseChannel>,
+    ) -> ReleaseChannel {
+        installed_channel.map_or(self.preferred_update_channel, |channel| {
+            self.preferred_update_channel.least_stable(channel)
+        })
     }
 
     pub async fn get_installed_project_ids(
@@ -1216,13 +1313,11 @@ impl Profile {
         Ok((keys, file_hashes))
     }
 
-    fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
-        let channel_policy = if profile.show_prerelease_updates {
-            FileUpdateChannelPolicy::All
-        } else {
-            FileUpdateChannelPolicy::ReleaseOnly
-        };
-
+    fn get_cache_key(
+        file: &CachedFileHash,
+        profile: &Profile,
+        channel: ReleaseChannel,
+    ) -> String {
         format!(
             "{}-{}-{}-{}",
             file.hash,
@@ -1232,7 +1327,7 @@ impl Profile {
                     || profile.loader.as_str().to_string(),
                     |x| x.get_loaders().join("+")
                 ),
-            channel_policy.key(),
+            channel.key(),
             profile.game_version
         )
     }

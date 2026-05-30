@@ -1195,7 +1195,7 @@ watch(
 )
 
 watch(
-	() => props.instance?.show_prerelease_updates,
+	() => props.instance?.preferred_update_channel,
 	async (newValue, oldValue) => {
 		if (newValue !== oldValue) {
 			await initProjects('must_revalidate')

@@ -19,7 +19,7 @@
 
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::profiles::{Profile, ProfileFile, ProjectType};
-use crate::state::{CacheBehaviour, CachedEntry};
+use crate::state::{CacheBehaviour, CachedEntry, ReleaseChannel};
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
 };
@@ -229,7 +229,7 @@ pub async fn get_linked_modpack_info(
         &linked_data.version_id,
         &version,
         all_versions,
-        profile.show_prerelease_updates,
+        profile.preferred_update_channel,
     );
 
     Ok(Some(LinkedModpackInfo {
@@ -248,26 +248,42 @@ fn check_modpack_update(
     installed_version_id: &str,
     installed_version: &Version,
     all_versions: Option<Vec<Version>>,
-    show_prerelease_updates: bool,
+    preferred_update_channel: ReleaseChannel,
 ) -> (bool, Option<String>, Option<Version>) {
     let Some(versions) = all_versions else {
         return (false, None, None);
     };
 
-    let mut newer_versions: Vec<&Version> = versions
-        .iter()
-        .filter(|v| {
-            v.id != installed_version_id
-                && v.date_published > installed_version.date_published
-                && (show_prerelease_updates || v.version_type == "release")
-        })
-        .collect();
+    let installed_channel =
+        ReleaseChannel::from_version_type(&installed_version.version_type);
+    let effective_channel =
+        preferred_update_channel.least_stable(installed_channel);
 
-    // Sort by date_published descending (newest first)
-    newer_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+    for version_types in effective_channel.version_type_fallbacks() {
+        if !versions
+            .iter()
+            .any(|v| version_types.contains(&v.version_type.as_str()))
+        {
+            continue;
+        }
 
-    if let Some(newest) = newer_versions.first() {
-        return (true, Some(newest.id.clone()), Some((*newest).clone()));
+        let mut newer_versions: Vec<&Version> = versions
+            .iter()
+            .filter(|v| {
+                v.id != installed_version_id
+                    && v.date_published > installed_version.date_published
+                    && version_types.contains(&v.version_type.as_str())
+            })
+            .collect();
+
+        // Sort by date_published descending (newest first)
+        newer_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+
+        if let Some(newest) = newer_versions.first() {
+            return (true, Some(newest.id.clone()), Some((*newest).clone()));
+        }
+
+        return (false, None, None);
     }
 
     (false, None, None)
