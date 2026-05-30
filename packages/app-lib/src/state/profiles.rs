@@ -753,15 +753,15 @@ impl Profile {
         let file_updates = file_hashes
             .iter()
             .filter_map(|file| {
-                all.iter()
-                    .find(|prof| file.path.contains(&prof.path))
-                    .map(|profile| {
+                all.iter().find(|prof| file.path.contains(&prof.path)).map(
+                    |profile| {
                         Self::get_cache_key(
                             file,
                             profile,
                             profile.preferred_update_channel,
                         )
-                    })
+                    },
+                )
             })
             .collect::<Vec<_>>();
 
@@ -1186,8 +1186,7 @@ impl Profile {
             return Ok(HashMap::new());
         }
 
-        let version_ids_ref =
-            version_ids.iter().copied().collect::<Vec<_>>();
+        let version_ids_ref = version_ids.iter().copied().collect::<Vec<_>>();
         let versions = CachedEntry::get_version_many(
             &version_ids_ref,
             cache_behaviour,

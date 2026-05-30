@@ -57,7 +57,9 @@ export function newestEligibleUpdate(
 	const effectivePolicy = effectiveUpdateChannel(policy, currentVersionType)
 
 	for (const versionTypes of channelFallbacks(effectivePolicy)) {
-		if (!versions.some((version) => versionTypes.includes(normalizeChannel(version.version_type)))) {
+		if (
+			!versions.some((version) => versionTypes.includes(normalizeChannel(version.version_type)))
+		) {
 			continue
 		}
 

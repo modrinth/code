@@ -6,8 +6,8 @@ use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
     DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion, LinkedData,
-    MemorySettings, ModrinthCredentials, ReleaseChannel,
-    Profile, ProfileInstallStage, TeamMember, Theme, VersionFile, WindowSize,
+    MemorySettings, ModrinthCredentials, Profile, ProfileInstallStage,
+    ReleaseChannel, TeamMember, Theme, VersionFile, WindowSize,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};

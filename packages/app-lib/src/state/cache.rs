@@ -1534,8 +1534,10 @@ impl CachedEntry {
                     let key = string.splitn(4, '-').collect::<Vec<_>>();
 
                     let parsed_key = if key.len() == 4
-                        && matches!(key[2], "release" | "beta" | "alpha" | "all")
-                    {
+                        && matches!(
+                            key[2],
+                            "release" | "beta" | "alpha" | "all"
+                        ) {
                         Some((key[0], key[1], key[2], key[3]))
                     } else {
                         let key = string.splitn(3, '-').collect::<Vec<_>>();
