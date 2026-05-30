@@ -34,7 +34,7 @@ This year, we will also be providing rewards as a small thank you to everyone wh
 
 Everyone who donates will receive a special Pride 2026 profile badge on Modrinth.
 
-<img width="204px" height="204px" class="mx-auto mb-4" src="./pride-badge.webp" />
+<img width="204px" height="204px" class="mx-auto mb-4" src="/news/article/pride-campaign-2026/pride-badge.webp" />
 
 Supporters with this badge will also unlock a special Pride section in the Skin selector in the Modrinth App featuring the incredibly cute Mr. Pack in Pride-themed, exclusive Modrinth skins:
 
