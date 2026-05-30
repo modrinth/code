@@ -971,6 +971,7 @@ impl CachedEntry {
             && (cache_behaviour == CacheBehaviour::StaleWhileRevalidate
                 || cache_behaviour
                     == CacheBehaviour::StaleWhileRevalidateSkipOffline)
+            && crate::state::State::initialized()
         {
             tokio::task::spawn(async move {
                 // TODO: if possible- find a way to do this without invoking state get
