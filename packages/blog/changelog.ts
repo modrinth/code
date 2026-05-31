@@ -11,6 +11,35 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'app',
+		version: '0.14.2',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'web',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15+00:00`,
+		product: 'app',
+		version: '0.14.2',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
 		date: `2026-05-31T16:45:15+00:00`,
 		product: 'app',
 		version: '0.14.1',
