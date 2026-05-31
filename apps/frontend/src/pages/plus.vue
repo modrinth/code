@@ -38,11 +38,7 @@
 				{{ calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly) }}% with
 				annual billing!
 			</p>
-			<ButtonStyled
-				v-if="auth.user && hasActiveMidas(auth.user)"
-				color="purple"
-				size="large"
-			>
+			<ButtonStyled v-if="auth.user && hasActiveMidas(auth.user)" color="purple" size="large">
 				<nuxt-link to="/settings/billing">
 					<SettingsIcon aria-hidden="true" />
 					Manage subscription

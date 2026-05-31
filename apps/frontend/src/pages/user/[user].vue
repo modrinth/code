@@ -548,8 +548,8 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
-import { hasActiveMidas, hasPride26Badge } from '~/utils/user-membership.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
+import { hasActiveMidas, hasPride26Badge } from '~/utils/user-membership.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
