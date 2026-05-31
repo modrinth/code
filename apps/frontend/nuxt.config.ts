@@ -104,6 +104,9 @@ export default defineNuxtConfig({
 							params: {
 								overrides: {
 									removeViewBox: false,
+									cleanupIds: {
+										minify: false,
+									},
 								},
 							},
 						},
