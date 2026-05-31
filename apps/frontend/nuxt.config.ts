@@ -75,10 +75,10 @@ export default defineNuxtConfig({
 		},
 		ssr: {
 			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
-			noExternal: ['v-tooltip'],
-			optimizeDeps: {
-				include: ['vue-router'],
-			},
+			noExternal: ['floating-vue', '@floating-ui/core', '@floating-ui/dom'],
+		},
+		optimizeDeps: {
+			include: ['vue-router', 'floating-vue', '@floating-ui/dom'],
 		},
 		define: {
 			global: {},

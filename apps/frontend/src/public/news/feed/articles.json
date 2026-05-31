@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Pride 2026 Fundraiser: Matching up to $5,000",
+			"summary": "Celebrating our community and working together to make a difference.",
+			"thumbnail": "https://modrinth.com/news/article/pride-campaign-2026/thumbnail.webp",
+			"date": "2026-06-01T16:00:00.000Z",
+			"link": "https://modrinth.com/news/article/pride-campaign-2026"
+		},
+		{
 			"title": "Project Analytics are good now",
 			"summary": "Get deeper insights into how people are using your projects with breakdowns, filtering, and more!",
 			"thumbnail": "https://modrinth.com/news/article/analytics-overhaul/thumbnail.webp",

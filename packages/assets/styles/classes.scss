@@ -700,10 +700,10 @@ a:not(.no-click-animation),
 
 .v-popper--theme-tooltip {
 	.v-popper__inner {
-		background: var(--surface-3) !important;
-		color: var(--color-contrast) !important;
+		background: var(--color-tooltip-bg) !important;
+		color: var(--color-tooltip-text) !important;
 		padding: 0.625rem 0.75rem !important;
-		border-radius: 12px !important;
+		border-radius: var(--radius-sm) !important;
 		filter: drop-shadow(2px 2px 0.4rem rgba(0, 0, 0, 0.5));
 		font-size: 0.9rem;
 		font-weight: 500;
@@ -730,7 +730,6 @@ a:not(.no-click-animation),
 		color: var(--color-tooltip-text) !important;
 		padding: 0.75rem 1rem !important;
 		border-radius: 0.75rem !important;
-		filter: drop-shadow(5px 5px 0.8rem rgba(0, 0, 0, 0.35));
 		font-size: 0.9rem;
 		font-weight: bold;
 		line-height: 1;

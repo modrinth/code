@@ -7,6 +7,18 @@ export class LabrinthUsersV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Get the authenticated user.
+	 * GET /v3/user
+	 */
+	public async getAuthenticated(): Promise<Labrinth.Users.v3.User> {
+		return this.client.request<Labrinth.Users.v3.User>('/user', {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
+		})
+	}
+
+	/**
 	 * Get a user by ID or username
 	 *
 	 * @param idOrUsername - The user's ID or username
