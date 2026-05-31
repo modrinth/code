@@ -18,7 +18,7 @@ That's why this Pride Month, Modrinth will be running a fundraiser supporting [*
 
 Rainbow Railroad works with LGBTQIA+ people who are facing danger, helping to connect them with support, resources, and pathways to safe countries. Through their **Solidarity in Pride 2026** campaign, they're raising funds to help at-risk LGBTQIA+ people access safety when staying in place is no longer an option.
 
-<a href="https://tiltify.com/+modrinth/modrinth-pride-2026" class="!text-2xl font-semibold">You can support the fundraiser here.</a>
+<a href="https://modrinth.com/pride?from=blog-2026" class="!text-2xl font-semibold">You can support the fundraiser here.</a>
 
 **When donating, please enter your _Modrinth username_ as the _Tiltify display name_ so we can apply any eligible rewards to your account!**
 
