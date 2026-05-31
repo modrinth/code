@@ -75,7 +75,7 @@ pub struct User {
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UserCampaigns {
-    pub pride_26: Option<DateTime<Utc>>,
+    pub pride_26: Option<Pride26CampaignDonation>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -87,7 +87,8 @@ pub struct UserPayoutData {
     pub balance: Decimal,
 }
 
-use crate::database::models::user_item::DBUser;
+use crate::database::models::user_item::{DBUser, Pride26CampaignDonation};
+
 impl From<DBUser> for User {
     fn from(data: DBUser) -> Self {
         Self {
