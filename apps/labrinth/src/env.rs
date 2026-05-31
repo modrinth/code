@@ -295,6 +295,9 @@ vars! {
     DELPHI_SLACK_WEBHOOK: String = "";
 
     TREMENDOUS_CAMPAIGN_ID: String = "none";
+    TILTIFY_CLIENT_ID: String = "";
+    TILTIFY_CLIENT_SECRET: String = "";
+    TILTIFY_PRIDE_26_CAMPAIGN_ID: String = "";
 
     // server pinging
     SERVER_PING_MAX_CONCURRENT: usize = 16usize;
