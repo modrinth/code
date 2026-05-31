@@ -8,7 +8,6 @@ use super::super::super::Skin;
 
 const MODRINTH_PRIDE_SKIN_PACK_SECTION: &str = "Modrinth Pride";
 const DEFAULT_SKINS_SECTION: &str = "Default skins";
-const MODRINTH_SKIN_PACK_SECTION: &str = "Modrinth";
 const MINECON_EARTH_2017_SKIN_PACK_SECTION: &str = "MINECON Earth 2017";
 const BUILDERS_AND_BIOMES_SKIN_PACK_SECTION: &str = "Builders & Biomes";
 const STRIDING_HERO_SKIN_PACK_SECTION: &str = "Striding Hero";
