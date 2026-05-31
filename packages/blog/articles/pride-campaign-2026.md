@@ -1,10 +1,12 @@
 ---
-title: 'Pride 2026 Fundraiser: Matching up to $5,000'
+title: 'Pride 2026 Fundraiser: Matching up to $10,000'
 short_title: Pride 2026 Fundraiser
 summary: Celebrating our community and working together to make a difference.
 short_summary: Celebrating our community and working together to make a difference.
 date: 2026-06-01T12:00:00-04:00
 ---
+
+**Update: Within a few hours of lauching the fundraiser, we already hit our initial goal of $5,000. We've now raised it to $10,000, and are continuing to match donations to the new $10k goal!**
 
 ## Happy Pride Month!
 
@@ -24,7 +26,7 @@ Rainbow Railroad works with LGBTQIA+ people who are facing danger, helping to co
 
 We want to maximize the impact our community can make.
 
-To help achieve this, Modrinth is matching all donations 1:1, up to $5,000! We will apply matched donations at the end of the event.
+To help achieve this, Modrinth is matching all donations 1:1, up to $10,000! We will apply matched donations at the end of the event.
 
 ## Donor Rewards
 
