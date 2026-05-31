@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { ExternalIcon } from '@modrinth/assets'
 import { Tooltip } from 'floating-vue'
 import { type Component, useId } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '#ui/composables/i18n.ts'
-import { ExternalIcon } from '@modrinth/assets'
+
 import AutoLink from '../base/AutoLink.vue'
 
 const { formatMessage } = useVIntl()
