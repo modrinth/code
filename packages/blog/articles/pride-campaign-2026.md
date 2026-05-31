@@ -24,7 +24,7 @@ Rainbow Railroad works with LGBTQIA+ people who are facing danger, helping to co
 
 We want to maximize the impact our community can make.
 
-To help achieve this, we've committed to matching all donations 1:1 until our fundraising goal of $5,000 has been met.
+To help achieve this, Modrinth is matching all donations 1:1, up to $5,000! We will apply matched donations at the end of the event.
 
 ## Donor Rewards
 

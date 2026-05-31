@@ -137,7 +137,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.alpha.about.1',
-				defaultMessage: `This user has been around since Modrinth Alpha, which ended in November 2020`,
+				defaultMessage: `This user has been around since Modrinth Alpha, which ended in November 2020.`,
 			}),
 		],
 		criteria: [
@@ -372,7 +372,7 @@ const BADGES = [
 		about: [
 			defineMessage({
 				id: 'user.profile.badge.hosting-alpha.about.1',
-				defaultMessage: `This user participated in a closed alpha test of Modrinth Hosting before we launched Modrinth Hosting Beta in November 2024`,
+				defaultMessage: `This user participated in a closed alpha test of Modrinth Hosting before we launched Modrinth Hosting Beta in November 2024.`,
 			}),
 		],
 		criteria: [], // TODO: Add badge on backend for Hosting Alpha Tester
