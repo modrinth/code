@@ -3,9 +3,13 @@ import { CalendarIcon, UsersIcon, XIcon } from '@modrinth/assets'
 import { injectModrinthClient, ProgressBar } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const DISMISSED_STORAGE_KEY = 'pride-fundraiser-2026-dismissed'
+
+const props = defineProps<{
+	hasPride26Badge?: boolean
+}>()
 
 const client = injectModrinthClient()
 const dismissed = ref(localStorage.getItem(DISMISSED_STORAGE_KEY) === 'true')
@@ -13,11 +17,14 @@ const dismissed = ref(localStorage.getItem(DISMISSED_STORAGE_KEY) === 'true')
 const { data: campaignInfo } = useQuery({
 	queryKey: ['campaign', 'pride-26'],
 	queryFn: () => client.labrinth.campaign_internal.getPride26(),
-	enabled: () => !dismissed.value,
+	enabled: () => !dismissed.value && !props.hasPride26Badge,
 	staleTime: 15 * 60 * 1000,
 	refetchInterval: 15 * 60 * 1000,
 	retry: false,
 })
+const shouldShowBanner = computed(
+	() => !dismissed.value && !props.hasPride26Badge && Number(campaignInfo.value?.target_usd) > 0,
+)
 
 async function openPrideFundraiser() {
 	await openUrl('https://modrinth.com/pride')
@@ -45,7 +52,7 @@ function daysLeft() {
 </script>
 
 <template>
-	<div v-if="!dismissed && campaignInfo && Number(campaignInfo.target_usd) > 0">
+	<div v-if="shouldShowBanner && campaignInfo">
 		<section
 			role="link"
 			tabindex="0"

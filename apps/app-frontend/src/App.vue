@@ -102,6 +102,7 @@ import { list } from '@/helpers/profile.js'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
+import { hasActivePride26Midas, hasMidasBadge, hasPride26Badge } from '@/helpers/user-campaigns.ts'
 import {
 	areUpdatesEnabled,
 	enqueueUpdateForInstallation,
@@ -687,13 +688,14 @@ async function logOut() {
 	await fetchCredentials()
 }
 
-const MIDAS_BITFLAG = 1 << 0
+const hasPride26BadgeReward = computed(() =>
+	hasPride26Badge(authenticatedModrinthUser.value?.campaigns?.pride_26),
+)
 const hasPlus = computed(
 	() =>
 		!!credentials.value?.user &&
-		((credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG ||
-			hasActivePrideCampaign(authenticatedModrinthUser.value?.campaigns?.pride_26) ||
-			hasActivePrideCampaign(credentials.value.user.campaigns?.pride_26)),
+		(hasMidasBadge(credentials.value.user) ||
+			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
 )
 
 const showAd = computed(
@@ -724,16 +726,6 @@ async function fetchIntercomToken() {
 		throw new Error(`Failed to fetch Intercom token: ${response.status}`)
 	}
 	return await response.json()
-}
-
-function hasActivePrideCampaign(prideDate) {
-	if (!prideDate) return false
-
-	const expires = new Date(prideDate)
-	if (Number.isNaN(expires.getTime())) return false
-
-	expires.setUTCMonth(expires.getUTCMonth() + 1)
-	return expires.getTime() > Date.now()
 }
 
 watch(showAd, () => {
@@ -1503,6 +1495,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<PrideFundraiserBanner
 						v-if="prideFundraiserEnabled"
+						:has-pride-26-badge="hasPride26BadgeReward"
 						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
 					/>
 					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">

@@ -1278,7 +1278,6 @@ export namespace Labrinth {
 				venmo_handle?: string
 				balance: number
 			}
-
 		}
 
 		export namespace v2 {

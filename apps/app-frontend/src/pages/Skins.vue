@@ -47,6 +47,7 @@ import {
 	normalize_skin_texture,
 	remove_custom_skin,
 } from '@/helpers/skins.ts'
+import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/state'
 
@@ -206,26 +207,13 @@ const { data: modrinthUser } = useQuery({
 	retry: false,
 })
 const hasModrinthPrideCampaign = computed(
-	() =>
-		!!auth.session_token.value &&
-		(hasActivePrideCampaign(modrinthUser.value?.campaigns?.pride_26) ||
-			hasActivePrideCampaign(auth.user.value?.campaigns?.pride_26)),
+	() => !!auth.session_token.value && hasPride26Badge(modrinthUser.value?.campaigns?.pride_26),
 )
 const defaultSkins = computed(() =>
 	filterDefaultSkins(skins.value).filter(
 		(skin) => skin.section !== 'Modrinth Pride' || hasModrinthPrideCampaign.value,
 	),
 )
-
-function hasActivePrideCampaign(prideDate?: string | null) {
-	if (!prideDate) return false
-
-	const expires = new Date(prideDate)
-	if (Number.isNaN(expires.getTime())) return false
-
-	expires.setUTCMonth(expires.getUTCMonth() + 1)
-	return expires.getTime() > Date.now()
-}
 const defaultSkinSections = computed(() => {
 	const sections = new Map<string, Skin[]>()
 
