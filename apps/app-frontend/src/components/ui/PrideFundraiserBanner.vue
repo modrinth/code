@@ -56,7 +56,7 @@ function daysLeft() {
 		<section
 			role="link"
 			tabindex="0"
-			class="flex w-full cursor-pointer flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-button-bg p-3 text-primary transition-colors hover:border-surface-6 hover:bg-button-bg-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+			class="flex w-full cursor-pointer flex-col gap-3 rounded-xl border border-solid border-surface-5 bg-button-bg p-3 text-primary transition-[border-color,filter] hover:border-surface-6 hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 			aria-label="Open Pride fundraiser"
 			@click="openPrideFundraiser"
 			@keydown.enter="openPrideFundraiser"

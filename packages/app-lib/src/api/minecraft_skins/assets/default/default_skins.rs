@@ -123,7 +123,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     },
     Skin {
         texture_key: Arc::from("local-2674d92834203a9fc2b3c435fc8c89fb68de8c62eac674b885c1fe7868ab04b6"),
-        name: Some(Arc::from("Transgender")),
+        name: Some(Arc::from("Mr. Pack - Transgender")),
         section: Some(Arc::from(MODRINTH_PRIDE_SKIN_PACK_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
@@ -352,7 +352,7 @@ pub static DEFAULT_SKINS: LazyLock<Vec<Skin>> = LazyLock::new(|| {
     Skin {
         texture_key: Arc::from("local-8776f8b6615e2051b3da182b8208ae8700254d3cc49eac36aef85f7577c85e4a"),
         name: Some(Arc::from("Mr. Pack")),
-        section: Some(Arc::from(MODRINTH_SKIN_PACK_SECTION)),
+        section: Some(Arc::from(DEFAULT_SKINS_SECTION)),
         variant: MinecraftSkinVariant::Classic,
         cape_id: None,
         texture: Arc::from(Url::try_from(

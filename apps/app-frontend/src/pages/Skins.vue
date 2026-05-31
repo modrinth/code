@@ -57,7 +57,7 @@ type VirtualSkinSectionListExpose = {
 }
 
 const PENDING_SKIN_REFRESH_DELAY_MS = 11_000
-const DEFAULT_SKIN_SECTION_SORT_ORDER = ['Modrinth Pride', 'Default skins', 'Modrinth']
+const DEFAULT_SKIN_SECTION_SORT_ORDER = ['Default skins', 'Modrinth Pride']
 const messages = defineMessages({
 	skinSelectorTitle: {
 		id: 'app.skins.title',
