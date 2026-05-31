@@ -1036,6 +1036,7 @@ export namespace Labrinth {
 				icon_url: string | null
 				color: number | null
 				members: Projects.v3.TeamMember[]
+				moderation_notes?: Users.Common.ModerationNote | null
 			}
 
 			export type CreateOrganizationRequest = {
@@ -1260,7 +1261,7 @@ export namespace Labrinth {
 	}
 
 	export namespace Users {
-		namespace Common {
+		export namespace Common {
 			export type Role = 'developer' | 'moderator' | 'admin'
 
 			export type AuthProvider =
@@ -1277,6 +1278,15 @@ export namespace Labrinth {
 				paypal_country?: string
 				venmo_handle?: string
 				balance: number
+			}
+
+			export type ModerationNote = {
+				notes: string
+				last_modified: string
+				created_at: string
+				last_author: string
+				user_rating: number
+				version: number
 			}
 		}
 
@@ -1336,7 +1346,7 @@ export namespace Labrinth {
 				payout_data?: UserPayoutData
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
-				campaigns: UserCampaigns
+				moderation_notes?: Common.ModerationNote | null
 				github_id?: number
 			}
 
