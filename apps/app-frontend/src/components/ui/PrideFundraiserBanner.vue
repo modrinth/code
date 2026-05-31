@@ -17,13 +17,13 @@ const dismissed = ref(localStorage.getItem(DISMISSED_STORAGE_KEY) === 'true')
 const { data: campaignInfo } = useQuery({
 	queryKey: ['campaign', 'pride-26'],
 	queryFn: () => client.labrinth.campaign_internal.getPride26(),
-	enabled: () => !dismissed.value && !props.hasPride26Badge,
+	enabled: () => !dismissed.value,
 	staleTime: 15 * 60 * 1000,
 	refetchInterval: 15 * 60 * 1000,
 	retry: false,
 })
 const shouldShowBanner = computed(
-	() => !dismissed.value && !props.hasPride26Badge && Number(campaignInfo.value?.target_usd) > 0,
+	() => !dismissed.value && Number(campaignInfo.value?.target_usd) > 0,
 )
 
 async function openPrideFundraiser() {
