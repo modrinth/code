@@ -495,12 +495,13 @@ a:not(.no-click-animation),
 
 // CARDS
 .base-card {
-	padding: var(--gap-xl);
+	padding: 1rem;
 	position: relative;
 	min-height: var(--font-size-2xl);
 
-	background-color: var(--color-raised-bg);
+	background-color: var(--surface-3);
 	border-radius: var(--radius-lg);
+	border: 1px solid var(--surface-4);
 
 	margin-bottom: var(--gap-md);
 	outline: 2px solid transparent;
@@ -526,19 +527,6 @@ a:not(.no-click-animation),
 			text-decoration: underline;
 		}
 	}
-
-	// TODO: Add back later
-	//&.warning {
-	//  border-left: 0.5rem solid var(--color-warning-banner-side);
-	//  background-color: var(--color-warning-banner-bg);
-	//  color: var(--color-warning-banner-text);
-	//}
-	//
-	//&.information {
-	//  border-left: 0.5rem solid var(--color-info-banner-side);
-	//  background-color: var(--color-info-banner-bg);
-	//  color: var(--color-info-banner-text);
-	//}
 }
 
 .card {
@@ -654,20 +642,20 @@ a:not(.no-click-animation),
 .v-popper--theme-dropdown,
 .v-popper--theme-dropdown.v-popper--theme-ribbit-popout {
 	.v-popper__inner {
-		border: 1px solid var(--color-divider) !important;
+		border: 1px solid var(--surface-5) !important;
 		padding: var(--gap-sm) !important;
 		width: fit-content !important;
-		border-radius: var(--radius-md) !important;
-		background-color: var(--color-raised-bg) !important;
-		box-shadow: var(--shadow-floating) !important;
+		border-radius: 12px !important;
+		background-color: var(--surface-3) !important;
+		box-shadow: 3px 3px 0.8rem rgba(0, 0, 0, 0.3) !important;
 	}
 
 	.v-popper__arrow-outer {
-		border-color: var(--color-divider) !important;
+		border-color: var(--surface-5) !important;
 	}
 
 	.v-popper__arrow-inner {
-		border-color: var(--color-raised-bg) !important;
+		border-color: var(--surface-3) !important;
 	}
 }
 
@@ -711,21 +699,25 @@ a:not(.no-click-animation),
 }
 
 .v-popper--theme-tooltip {
-	pointer-events: none;
-
 	.v-popper__inner {
 		background: var(--color-tooltip-bg) !important;
 		color: var(--color-tooltip-text) !important;
-		padding: 0.5rem 0.5rem !important;
+		padding: 0.625rem 0.75rem !important;
 		border-radius: var(--radius-sm) !important;
+		filter: drop-shadow(2px 2px 0.4rem rgba(0, 0, 0, 0.5));
 		font-size: 0.9rem;
-		font-weight: bold;
+		font-weight: 500;
 		line-height: 1;
+		border: 1px solid var(--surface-5);
 	}
 
-	.v-popper__arrow-outer,
+	.v-popper__arrow-outer {
+		border-color: var(--surface-5) !important;
+	}
+
 	.v-popper__arrow-inner {
-		border-color: var(--color-tooltip-bg);
+		visibility: visible;
+		border-color: var(--surface-3) !important;
 	}
 }
 

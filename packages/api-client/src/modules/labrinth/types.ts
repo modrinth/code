@@ -1279,16 +1279,12 @@ export namespace Labrinth {
 				balance: number
 			}
 
-			export type UserCampaigns = {
-				pride_26: string | null
-			}
 		}
 
 		export namespace v2 {
 			export type Role = Common.Role
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
-			export type UserCampaigns = Common.UserCampaigns
 
 			export type User = {
 				id: string
@@ -1299,7 +1295,6 @@ export namespace Labrinth {
 				created: string
 				role: Role
 				badges: number
-				campaigns?: UserCampaigns
 				auth_providers?: AuthProvider[]
 				email?: string
 				email_verified?: boolean
@@ -1314,7 +1309,16 @@ export namespace Labrinth {
 			export type Role = Common.Role
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
-			export type UserCampaigns = Common.UserCampaigns
+
+			export type Pride26CampaignDonation = {
+				last_donated_at: string
+				has_badge: boolean
+				has_midas: boolean
+			}
+
+			export type UserCampaigns = {
+				pride_26: Pride26CampaignDonation | null
+			}
 
 			export type User = {
 				id: string
@@ -1333,6 +1337,7 @@ export namespace Labrinth {
 				payout_data?: UserPayoutData
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
+				campaigns: UserCampaigns
 				github_id?: number
 			}
 

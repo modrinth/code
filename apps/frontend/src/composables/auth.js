@@ -75,6 +75,7 @@ export const initAuth = async (oldToken = null) => {
 			auth.user = await useBaseFetch(
 				'user',
 				{
+					apiVersion: 3,
 					headers: {
 						Authorization: auth.token,
 					},
@@ -105,6 +106,7 @@ export const initAuth = async (oldToken = null) => {
 				auth.user = await useBaseFetch(
 					'user',
 					{
+						apiVersion: 3,
 						headers: {
 							Authorization: auth.token,
 						},
