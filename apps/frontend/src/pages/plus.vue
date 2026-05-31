@@ -39,7 +39,7 @@
 				annual billing!
 			</p>
 			<ButtonStyled
-				v-if="auth.user && isPermission(auth.user.badges, 1 << 0)"
+				v-if="auth.user && hasActiveMidas(auth.user)"
 				color="purple"
 				size="large"
 			>
@@ -95,8 +95,8 @@ import {
 import { calculateSavings, getCurrency } from '@modrinth/utils'
 
 import { useBaseFetch } from '@/composables/fetch.js'
-import { isPermission } from '@/utils/permissions.ts'
 import { products } from '~/generated/state.json'
+import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const { addNotification } = injectNotificationManager()
 const formatPrice = useFormatPrice()

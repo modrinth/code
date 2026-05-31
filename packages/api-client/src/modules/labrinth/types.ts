@@ -1298,6 +1298,16 @@ export namespace Labrinth {
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
 
+			export type Pride26CampaignDonation = {
+				last_donated_at: string
+				has_badge: boolean
+				has_midas: boolean
+			}
+
+			export type UserCampaigns = {
+				pride_26: Pride26CampaignDonation | null
+			}
+
 			export type User = {
 				id: string
 				username: string
@@ -1314,6 +1324,7 @@ export namespace Labrinth {
 				payout_data?: UserPayoutData
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
+				campaigns: UserCampaigns
 				github_id?: number
 			}
 

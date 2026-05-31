@@ -60,6 +60,12 @@ type BadgeCriterion =
 			bitflag: number
 	  }
 	| {
+			type: 'midas'
+	  }
+	| {
+			type: 'pride'
+	  }
+	| {
 			type: 'role'
 			role: Labrinth.Users.v3.Role
 	  }
@@ -188,6 +194,9 @@ const BADGES = [
 				type: 'badge',
 				bitflag: BadgeBitflag.MIDAS,
 			},
+			{
+				type: 'midas',
+			},
 		],
 		link: {
 			href: 'https://modrinth.com/plus',
@@ -211,8 +220,7 @@ const BADGES = [
 		],
 		criteria: [
 			{
-				type: 'badge',
-				bitflag: BadgeBitflag.PRIDE,
+				type: 'pride',
 			},
 		],
 		link: {
@@ -405,6 +413,8 @@ const DOWNLOAD_BADGES = [
 const props = defineProps<{
 	role: Labrinth.Users.v2.Role
 	badges: number
+	hasMidas?: boolean
+	hasPride?: boolean
 	downloads: number
 	joinDate: Date
 	earliestProjectByType: Record<EarlyAdopterProjectTypes, Date>
@@ -436,6 +446,12 @@ function passesCriterion(criterion: BadgeCriterion) {
 		}
 		case 'badge': {
 			return props.badges & criterion.bitflag
+		}
+		case 'midas': {
+			return props.hasMidas === true
+		}
+		case 'pride': {
+			return props.hasPride === true
 		}
 		case 'join_date': {
 			return props.joinDate < criterion.cutoff

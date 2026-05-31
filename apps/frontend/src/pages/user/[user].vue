@@ -484,6 +484,8 @@
 					:join-date="joinDate"
 					:role="user.role"
 					:badges="user.badges"
+					:has-midas="hasActiveMidas(user)"
+					:has-pride="hasPride26Badge(user)"
 					:earliest-project-by-type="earliestProjectByType"
 					class="mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 pt-3"
 				/>
@@ -546,6 +548,7 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
+import { hasActiveMidas, hasPride26Badge } from '~/utils/user-membership.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
@@ -730,7 +733,7 @@ const {
 	suspense: userSuspense,
 } = useQuery({
 	queryKey: computed(() => ['user', userId]),
-	queryFn: () => client.labrinth.users_v2.get(userId),
+	queryFn: () => client.labrinth.users_v3.get(userId),
 })
 
 watch(
