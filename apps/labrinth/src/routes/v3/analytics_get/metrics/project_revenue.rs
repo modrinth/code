@@ -40,6 +40,7 @@ pub(crate) async fn fetch(
     req: &super::super::GetRequest,
     num_time_slices: usize,
     project_id_values: &[i64],
+    user_id: i64,
 ) -> Result<(), ApiError> {
     let mut rows = sqlx::query(
         "SELECT
@@ -49,22 +50,25 @@ pub(crate) async fn fetch(
                 EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 $3::integer
             ) AS bucket,
-            mod_id,
-            SUM(amount) amount_sum
-        FROM payouts_values
+            pv.mod_id,
+            SUM(pv.amount * (tm.payouts_split / 100.0)) amount_sum
+        FROM payouts_values pv
+        JOIN mods m ON m.id = pv.mod_id
+        JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $5
         WHERE
             -- only project revenue is counted here
             -- for affiliate code revenue, see `affiliate_code_revenue`
-            payouts_values.mod_id IS NOT NULL
-            AND payouts_values.mod_id = ANY($4)
-            AND created >= $1
-            AND created < $2
-        GROUP BY bucket, mod_id",
+            pv.mod_id IS NOT NULL
+            AND pv.mod_id = ANY($4)
+            AND pv.created >= $1
+            AND pv.created < $2
+        GROUP BY bucket, pv.mod_id",
     )
     .bind(req.time_range.start)
     .bind(req.time_range.end)
     .bind(num_time_slices as i64)
     .bind(project_id_values)
+    .bind(user_id)
     .fetch(pool);
     while let Some(row) = rows.next().await.transpose()? {
         let bucket = row

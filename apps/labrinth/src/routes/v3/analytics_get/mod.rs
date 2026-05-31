@@ -357,6 +357,7 @@ pub async fn fetch_analytics(
             &req,
             num_time_slices,
             &project_id_values,
+            user_id.0,
         )
         .await?;
     }
