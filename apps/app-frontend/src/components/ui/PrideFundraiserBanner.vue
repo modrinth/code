@@ -7,10 +7,6 @@ import { computed, ref } from 'vue'
 
 const DISMISSED_STORAGE_KEY = 'pride-fundraiser-2026-dismissed'
 
-const props = defineProps<{
-	hasPride26Badge?: boolean
-}>()
-
 const client = injectModrinthClient()
 const dismissed = ref(localStorage.getItem(DISMISSED_STORAGE_KEY) === 'true')
 

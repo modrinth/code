@@ -102,7 +102,7 @@ import { list } from '@/helpers/profile.js'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { hasActivePride26Midas, hasMidasBadge, hasPride26Badge } from '@/helpers/user-campaigns.ts'
+import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
 import {
 	areUpdatesEnabled,
 	enqueueUpdateForInstallation,
@@ -688,9 +688,6 @@ async function logOut() {
 	await fetchCredentials()
 }
 
-const hasPride26BadgeReward = computed(() =>
-	hasPride26Badge(authenticatedModrinthUser.value?.campaigns?.pride_26),
-)
 const hasPlus = computed(
 	() =>
 		!!credentials.value?.user &&
@@ -1495,7 +1492,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<PrideFundraiserBanner
 						v-if="prideFundraiserEnabled"
-						:has-pride-26-badge="hasPride26BadgeReward"
 						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
 					/>
 					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
