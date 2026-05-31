@@ -286,9 +286,8 @@ fn verify_tiltify_webhook_signature(
     mac.update(timestamp.as_bytes());
     mac.update(b".");
     mac.update(body.as_bytes());
-    mac.verify_slice(&signature).map_err(|_| {
-        ApiError::InvalidInput("invalid Tiltify webhook signature".into())
-    })?;
+    mac.verify_slice(&signature)
+        .wrap_request_err("invalid Tiltify webhook signature")?;
 
     Ok(())
 }
