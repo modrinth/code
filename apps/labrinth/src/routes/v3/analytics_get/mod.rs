@@ -116,6 +116,7 @@ pub const MAX_TIME_SLICES: usize = 1024;
 pub(crate) const UNKNOWN_LOADER: &str = "unknown";
 pub(crate) const UNKNOWN_COUNTRY: &str = "XX";
 pub(crate) const COUNTRY_PRIVACY_FLOOR: u64 = 50;
+pub(crate) const COUNTRY_PLAYTIME_PRIVACY_FLOOR_SECONDS: u64 = 4 * 60 * 60;
 
 // response
 
@@ -409,8 +410,9 @@ pub(crate) fn apply_country_privacy(
     country: &mut Option<String>,
     country_filter_applied: bool,
     count: u64,
+    floor: u64,
 ) -> bool {
-    if count >= COUNTRY_PRIVACY_FLOOR {
+    if count >= floor {
         return true;
     }
 
@@ -804,19 +806,39 @@ mod tests {
     #[test]
     fn country_privacy_floor_suppresses_small_constrained_buckets() {
         let mut country = None;
-        assert!(apply_country_privacy(&mut country, false, 1));
+        assert!(apply_country_privacy(
+            &mut country,
+            false,
+            1,
+            COUNTRY_PRIVACY_FLOOR
+        ));
         assert_eq!(country, None);
 
         let mut country = Some("US".into());
-        assert!(apply_country_privacy(&mut country, false, 49));
+        assert!(apply_country_privacy(
+            &mut country,
+            false,
+            49,
+            COUNTRY_PRIVACY_FLOOR
+        ));
         assert_eq!(country, Some("XX".into()));
 
         let mut country = Some("US".into());
-        assert!(!apply_country_privacy(&mut country, true, 49));
+        assert!(!apply_country_privacy(
+            &mut country,
+            true,
+            49,
+            COUNTRY_PRIVACY_FLOOR
+        ));
         assert_eq!(country, Some("US".into()));
 
         let mut country = Some("US".into());
-        assert!(apply_country_privacy(&mut country, true, 50));
+        assert!(apply_country_privacy(
+            &mut country,
+            true,
+            50,
+            COUNTRY_PRIVACY_FLOOR
+        ));
         assert_eq!(country, Some("US".into()));
     }
 

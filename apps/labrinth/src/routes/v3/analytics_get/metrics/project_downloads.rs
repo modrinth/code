@@ -18,9 +18,9 @@ use crate::{
 };
 
 use super::super::{
-    ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
-    apply_country_privacy, none_if_empty, none_if_zero_version_id,
-    normalize_loader_for_project,
+    COUNTRY_PRIVACY_FLOOR, ClickhouseFilterParam, QueryClickhouseContext,
+    add_to_time_slice, apply_country_privacy, none_if_empty,
+    none_if_zero_version_id, normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -363,6 +363,7 @@ pub(crate) async fn fetch(
             &mut key.country,
             !metrics.filter_by.country.is_empty(),
             downloads,
+            COUNTRY_PRIVACY_FLOOR,
         ) {
             continue;
         }

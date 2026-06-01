@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use crate::{database::models::DBProjectId, routes::ApiError};
 
 use super::super::{
-    ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
-    apply_country_privacy, none_if_empty,
+    COUNTRY_PRIVACY_FLOOR, ClickhouseFilterParam, QueryClickhouseContext,
+    add_to_time_slice, apply_country_privacy, none_if_empty,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -207,6 +207,7 @@ pub(crate) async fn fetch(
             &mut key.country,
             !metrics.filter_by.country.is_empty(),
             views,
+            COUNTRY_PRIVACY_FLOOR,
         ) {
             continue;
         }
