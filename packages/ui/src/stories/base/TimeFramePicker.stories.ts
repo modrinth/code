@@ -33,7 +33,6 @@ function renderPicker(
 		customStartDate?: string
 		customEndDate?: string
 	} = {},
-	triggerClass?: string,
 ) {
 	return () => ({
 		components: { TimeFramePicker },
@@ -52,7 +51,6 @@ function renderPicker(
 				lastUnit,
 				mode,
 				preset,
-				triggerClass,
 			}
 		},
 		template: /* html */ `
@@ -63,7 +61,6 @@ function renderPicker(
 				v-model:last-unit="lastUnit"
 				v-model:custom-start-date="customStartDate"
 				v-model:custom-end-date="customEndDate"
-				:trigger-class="triggerClass"
 				min-date="2023-01-01"
 			/>
 		`,
@@ -88,11 +85,12 @@ export const CustomRange: Story = {
 		customStartDate: '2026-04-23',
 		customEndDate: '2026-05-22',
 	}),
-}
-
-export const CompactTrigger: Story = {
-	render: renderPicker(
-		{},
-		'!h-10 !min-h-10 !rounded-[14px] !bg-surface-4 !py-2.5 !text-base shadow-[0px_1px_1px_rgba(0,0,0,0.3),0px_1px_1.5px_rgba(0,0,0,0.15)]',
-	),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'On mobile and narrow viewports, the custom range panel uses separate one-month start and end date pickers whose portaled calendars should not close the timeframe dropdown when selecting dates.',
+			},
+		},
+	},
 }

@@ -66,7 +66,7 @@
     "defaultMessage": "Bisitahin ang pahina ng galeriya"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ang iyong {type, select, mod {mod} plugin {plugin} other {proyekto}} ay gumagamit ng lisensiya na nangangailangang available ang source code. Mangyaring ibahagi ang source code link o ang sources file sa bawat karagdagang bersiyon, o pag-isipang gumamit ng ibang lisensiya."
+    "defaultMessage": "Ang iyong {type} ay gumagamit ng lisensiya na nangangailangang may-magagamit na source code. Mangyaring magbigay ng source code link o ng source file sa bawat laragdagang bersiyon, o isiping gumamit ng ibang lisensiya."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Magbigay ng source code"
@@ -75,7 +75,7 @@
     "defaultMessage": "Ang ilan sa iyong link palabas ay magkatulad. Bawat link ay dapat isahan lamang malagay at sa wastong uri ng link."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Mga Magkatulad na Link"
+    "defaultMessage": "Ipaglinis ang mga magkaparehong link"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Ang iyong Paglalarawan ay dapat maglalaman ng simpleng teksto o image alt-text, panatilihing accessible sa mga gumamagamit ng screen reader o mahihina ang koneksiyon sa internet."
@@ -159,7 +159,7 @@
     "defaultMessage": "Piliin ang wika"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Pilian mo ng lisensiya ang iyong {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} na magiging batayan sa pamamahagi."
+    "defaultMessage": "Piliin ang lisensiya na ma-distribute ang iyong {type}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Pumili ng lisensiya"
@@ -225,7 +225,10 @@
     "defaultMessage": "Piliin ang pinakatumpak na mga tag"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Nangangailangan ng isa o higit pang gallery image upang ma-showcase ang kontento ng iyong {type, select, resourcepack {resource pack, malabian sa audio o localization packs. Kung nilalarawan nito ang iyong pack, mangyaring piliin ang makawawastong tag} shader {shader} other {project}}."
+    "defaultMessage": "Mangangailangan ng hindi kukulang sa isang imaheng panggaleriya na pang-showcase ng kontento ng iyong {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resource pack, maliban sa audio o mga pack ng pagsasalon. Kung napaglarawan nito ang iyong pack, mangyaring piliin ang nakawawastong tag"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Mag-upload ng imaheng panggaleriya"

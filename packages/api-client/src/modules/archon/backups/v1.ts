@@ -66,7 +66,8 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	}
 
 	/**
-	 * @deprecated Use `client.archon.backups_queue_v1.delete` instead.
+	 * @deprecated Use `client.archon.backups_queue_v1.delete` for backup deletion, or
+	 * `client.archon.backups_queue_v1.cancelCreate` / `cancelRestore` for active operations.
 	 */
 	/** DELETE /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
 	public async delete(serverId: string, worldId: string, backupId: string): Promise<void> {

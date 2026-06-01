@@ -1,4 +1,16 @@
 {
+  "app.action-bar.downloads": {
+    "message": "הורדות"
+  },
+  "app.action-bar.offline": {
+    "message": "לא מקוון"
+  },
+  "app.action-bar.stop-instance": {
+    "message": ""
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "מאפשר עיבוד מתקדם כגון אפקטים טשטוש העלולים לגרום לבעיות ביצועים ללא עיבוד מואץ לחומרה."
+  },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
   },
@@ -253,9 +265,6 @@
   },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count, plural, one {בקשת חברות אחת} other {# בקשות חברות}}"
   },
   "friends.add-friend.submit": {
     "message": "שליחת בקשת חברות"

@@ -5,7 +5,7 @@
 		role="switch"
 		:aria-checked="modelValue"
 		:disabled="disabled"
-		class="group inline-flex shrink-0 items-center rounded-full m-0 p-1 transition-all duration-200 cursor-pointer border-none"
+		class="group inline-flex shrink-0 touch-manipulation items-center rounded-full m-0 p-1 transition-all duration-200 cursor-pointer border-none"
 		:class="[
 			small ? 'h-5 !w-[40px]' : 'h-6 !w-[48px]',
 			modelValue ? 'bg-brand' : 'bg-button-bg',

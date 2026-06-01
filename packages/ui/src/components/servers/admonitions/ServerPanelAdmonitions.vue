@@ -317,7 +317,21 @@ async function onBackupCancel(item: BackupAdmonitionEntry) {
 	if (cancellingIds.has(item.key)) return
 	cancellingIds.add(item.key)
 	try {
-		await client.archon.backups_v1.delete(ctx.serverId, ctx.worldId.value!, item.backupId)
+		if (item.operationId == null) {
+			await client.archon.backups_v1.delete(ctx.serverId, ctx.worldId.value!, item.backupId)
+		} else if (item.type === 'create') {
+			await client.archon.backups_queue_v1.cancelCreate(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
+		} else {
+			await client.archon.backups_queue_v1.cancelRestore(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
+		}
 		await invalidate()
 	} catch (err) {
 		cancellingIds.delete(item.key)

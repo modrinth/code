@@ -8,6 +8,120 @@
   "admin.billing.error.not-found": {
     "message": "Pengguna tidak ditemukan"
   },
+  "analytics.action.add": {
+    "message": "Tambah"
+  },
+  "analytics.action.cancel": {
+    "message": "Batal"
+  },
+  "analytics.action.refresh": {
+    "message": "Segarkan"
+  },
+  "analytics.action.reset": {
+    "message": "Atur Ulang"
+  },
+  "analytics.breakdown.country": {
+    "message": "Negara"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Alasan pengunduhan"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Sumber pengdunduhan"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Versi permainan"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Uraian"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Pemuat"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetisasi"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Tanpa uraian"
+  },
+  "analytics.breakdown.project": {
+    "message": "Proyek"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Status proyek"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Versi proyek"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Uraikan berdasarkan {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Tampilkan semua"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Tampilkan secara terbatas"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Tampilkan 8 teratas"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} j"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktif"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Anotasi"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Kendali grafik analisis, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Kendali"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Kendali grafik analisis"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Tampilan"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Acara Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Tidak ada acara Modrinth di grafik."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Tidak ada acara proyek di grafik."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Periode sebelumnya"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Acara proyek"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Perbandingan"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Pilih benda dari tabel di bawah ini untuk memvisualisasi data Anda."
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Lihat pengumuman"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Sblm.)"
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Tampilkan semua ({count}) garis di grafik?"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Sembunyikan {name} di grafik"
+  },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
   },
@@ -121,9 +235,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -410,9 +521,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Berkas tambahan hanya untuk sumber pendukung seperti kode sumber, bukan untuk versi atau varian lain."
   },
-  "create.collection.collection-info": {
-    "message": "Koleksi baru Anda akan dibuat sebagai koleksi publik dengan {count, plural, =0 {0 proyek} other {# proyek}}."
-  },
   "create.collection.create-collection": {
     "message": "Buat koleksi"
   },
@@ -586,9 +694,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Coba sesuaikan kata kunci pencarian atau penyaringan Anda."
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} {countPlural, plural, other {proyek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi Anda"
@@ -907,6 +1012,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Tarik"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Laporan aktif"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analisis"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Kreator"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Panel tampilan"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Pemberitahuan"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisasi"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Gambaran"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Proyek"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Pendapatan"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Rekening"
@@ -2024,9 +2156,6 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {pengunduhan}}"
-  },
   "profile.label.joined": {
     "message": "Telah bergabung"
   },
@@ -2045,9 +2174,6 @@
   "profile.label.organizations": {
     "message": "Organisasi"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {proyek}}"
-  },
   "profile.label.saving": {
     "message": "Menyimpan..."
   },
@@ -2056,9 +2182,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Unduh proyek milik {username} di Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> pengikut proyek}}"
   },
   "profile.user-id": {
     "message": "Pengenal Pengguna: {id}"
@@ -2387,12 +2510,6 @@
   "project.settings.visit-dashboard": {
     "message": "Kunjungi dasbor proyek"
   },
-  "project.stats.downloads-label": {
-    "message": "unduhan{count, plural, other {}}"
-  },
-  "project.stats.followers-label": {
-    "message": "pengikut{count, plural, other {}}"
-  },
   "project.status.archived.message": {
     "message": "{title} telah diarsip. {title} tidak akan menerima pembaruan di masa mendatang kecuali pembuat memutuskan untuk membuka arsip proyek ini."
   },
@@ -2402,23 +2519,11 @@
   "report.already-reported": {
     "message": "Anda sudah melaporkan {title}"
   },
-  "report.already-reported-description": {
-    "message": "Anda memiliki laporan terbuka untuk {item, select, project {proyek} version {versi} user {pengguna} other {konten}} ini. Anda dapat menambah informasi tambahan ke laporan ini bila diperlukan."
-  },
-  "report.back-to-item": {
-    "message": "Kembali ke {item, select, project {proyek} version {versi} user {pengguna} other {konten}}"
-  },
   "report.body.description": {
     "message": "Sertakan tautan dan gambar bila memungkinkan dan relevan. Laporan yang kosong atau tidak mencukupi akan ditutup dan diabaikan."
   },
   "report.body.title": {
     "message": "Mohon berikan konteks tambahan tentang laporan Anda"
-  },
-  "report.checking": {
-    "message": "Memeriksa {item, select, project {proyek} version {versi} user {pengguna} other {konten}}..."
-  },
-  "report.could-not-find": {
-    "message": "Tidak dapat menemukan {item, select, project {proyek} version {versi} user {pengguna} other {konten}}"
   },
   "report.for.violation": {
     "message": "Pelanggaran <rules-link>Peraturan</rules-link> Modrinth atau <terms-link>Ketentuan Penggunaan</terms-link>"
@@ -2459,14 +2564,8 @@
   "report.please-report": {
     "message": "Mohon laporkan:"
   },
-  "report.question.content-id": {
-    "message": "Apa pengenal (ID) dari {item, select, project {proyek} version {versi} user {pengguna} other {konten}} ini?"
-  },
   "report.question.content-type": {
     "message": "Konten jenis apa yang ingin Anda laporkan?"
-  },
-  "report.question.report-reason": {
-    "message": "Peraturan Modrinth manakah yang dilanggar oleh {item, select, project {proyek} version {versi} user {pengguna} other {konten}} ini?"
   },
   "report.report-content": {
     "message": "Laporkan konten ke moderator"
@@ -2579,26 +2678,14 @@
   "scopes.organizationWrite.label": {
     "message": "Tulis organisasi"
   },
-  "scopes.patCreate.description": {
-    "message": "Membuat token API pribadi"
-  },
   "scopes.patCreate.label": {
     "message": "Buat token API pribadi"
-  },
-  "scopes.patDelete.description": {
-    "message": "Menghapus token API pribadi Anda"
   },
   "scopes.patDelete.label": {
     "message": "Hapus token API pribadi"
   },
-  "scopes.patRead.description": {
-    "message": "Melihat token API yang telah dibuat"
-  },
   "scopes.patRead.label": {
     "message": "Baca token API pribadi"
-  },
-  "scopes.patWrite.description": {
-    "message": "Mengubah token API pribadi"
   },
   "scopes.patWrite.label": {
     "message": "Tulis token API pribadi"
@@ -3226,6 +3313,15 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Platform tidak dikenal"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Akun"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Pengembang"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Tampilan"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Berita terkini dari Modrinth"

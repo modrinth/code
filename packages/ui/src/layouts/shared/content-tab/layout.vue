@@ -26,7 +26,7 @@ import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
 import ContentModpackCard from './components/ContentModpackCard.vue'
@@ -73,7 +73,7 @@ const messages = defineMessages({
 	},
 	searchPlaceholder: {
 		id: 'content.page-layout.search-placeholder',
-		defaultMessage: 'Search {count} {contentType}...',
+		defaultMessage: 'Search {count, number} {contentType}...',
 	},
 	browseContent: {
 		id: 'content.page-layout.browse-content',
@@ -566,7 +566,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								:placeholder="
 									formatMessage(messages.searchPlaceholder, {
 										count: tableItems.length,
-										contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
+										contentType: formatContentTypeSentence(
+											formatMessage,
+											ctx.contentTypeLabel.value,
+											tableItems.length,
+										),
 									})
 								"
 							/>
@@ -725,7 +729,12 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							ctx.modpack.value
 								? formatMessage(messages.emptyModpackHint)
 								: formatMessage(messages.emptyHint, {
-										contentType: `${ctx.contentTypeLabel.value}s`,
+										contentType: formatContentTypeSentence(
+											formatMessage,
+											ctx.contentTypeLabel.value,
+											2,
+											'content',
+										),
 									})
 						}}
 					</template>

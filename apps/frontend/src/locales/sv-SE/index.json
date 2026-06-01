@@ -8,6 +8,102 @@
   "admin.billing.error.not-found": {
     "message": "Användaren hittades inte"
   },
+  "analytics.action.add": {
+    "message": "Lägg till"
+  },
+  "analytics.action.cancel": {
+    "message": "Avbryt"
+  },
+  "analytics.action.reset": {
+    "message": "Återställ"
+  },
+  "analytics.breakdown.country": {
+    "message": "Land"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Nedladdningskälla"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Spelversion"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Laddare"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Intäkter"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projekt"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Projektstatus"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Projektversion"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Visa alla"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktiva"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Kontroller"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Beroende"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modpaket"
+  },
+  "analytics.download-reason.update": {
+    "message": "Uppdatera"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth hemsida"
+  },
+  "analytics.downloads.suffix": {
+    "message": "nedladdningar"
+  },
+  "analytics.empty.no-data": {
+    "message": "Ingen data tillgänglig"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Alla"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Sök länder..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Sök versioner..."
+  },
+  "analytics.group-by.1h": {
+    "message": "1h"
+  },
+  "analytics.group-by.6h": {
+    "message": "6h"
+  },
+  "analytics.group-by.date": {
+    "message": "Datum"
+  },
+  "analytics.group-by.day": {
+    "message": "Dag"
+  },
+  "analytics.group-by.month": {
+    "message": "Månad"
+  },
+  "analytics.group-by.week": {
+    "message": "Vecka"
+  },
+  "analytics.group-by.year": {
+    "message": "År"
+  },
   "app-marketing.download.description": {
     "message": "Vår skrivbordsapplikation är tillgänglig för alla plattformar, välj din önskade version."
   },
@@ -121,9 +217,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -2249,17 +2342,11 @@
   "project.settings.title": {
     "message": "Inställningar"
   },
-  "project.stats.downloads-label": {
-    "message": "nedladdning{count, plural, one {} other {ar}}"
-  },
   "project.versions.title": {
     "message": "Versioner"
   },
   "report.already-reported": {
     "message": "Du har redan rapporterat {title}"
-  },
-  "report.already-reported-description": {
-    "message": "Du har redan en öppen rapport för {item, select, project {detta projekt} version {denna version} user {denna användare} other {detta innehåll}}. Du kan lägga till mer detaljer till din rapport om du har mer information att lägga till."
   },
   "report.body.title": {
     "message": "Vänligen ge oss mer kontext om din rapport"
@@ -2384,26 +2471,14 @@
   "scopes.organizationWrite.label": {
     "message": "Skriv organisationer"
   },
-  "scopes.patCreate.description": {
-    "message": "Skapa personlig API-token"
-  },
   "scopes.patCreate.label": {
     "message": "Skapa PAT:s"
-  },
-  "scopes.patDelete.description": {
-    "message": "Ta bort din personliga API-token"
   },
   "scopes.patDelete.label": {
     "message": "Radera PAT:s"
   },
-  "scopes.patRead.description": {
-    "message": "Visa skapade API-tokens"
-  },
   "scopes.patRead.label": {
     "message": "Läs PAT:s"
-  },
-  "scopes.patWrite.description": {
-    "message": "Redigera personliga API-tokens"
   },
   "scopes.patWrite.label": {
     "message": "Skriva PATs"
@@ -2783,20 +2858,11 @@
   "settings.billing.interval.month": {
     "message": "månad"
   },
-  "settings.billing.interval.monthly": {
-    "message": "månatligen"
-  },
   "settings.billing.interval.quarter": {
     "message": "kvartal"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "kvartalsvis"
-  },
   "settings.billing.interval.year": {
     "message": "år"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "årligen"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Annonsfritt surfande på modrinth.com och Modrinth App"
@@ -2882,9 +2948,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Server ID: {id}"
   },
@@ -2921,17 +2984,8 @@
   "settings.billing.subscription.title": {
     "message": "Prenumerationer"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Ändrar till {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Ändra till {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Månatlig betalning kommer kosta dig ytterligare {amount} per år"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Ändrar till {interval} betalning på {date}"
   },
   "settings.billing.update-method": {
     "message": "Uppdatera metod"

@@ -122,11 +122,22 @@
 			<div class="normal-page__header py-4">
 				<ContentPageHeader>
 					<template #icon>
-						<Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
+						<Avatar
+							:src="user.avatar_url"
+							:alt="user.username"
+							:size="isModrinthUser ? '64px' : '96px'"
+							circle
+						/>
 					</template>
 					<template #title>
 						<span class="flex items-center gap-2">
 							{{ user.username }}
+							<BadgeCheckIcon
+								v-if="isModrinthUser"
+								v-tooltip="formatMessage(messages.officialAccount)"
+								class="size-5 text-brand"
+								fill="var(--color-brand-highlight)"
+							/>
 							<TagItem
 								v-if="isAdminViewing && isAffiliate"
 								:style="{
@@ -138,16 +149,40 @@
 							</TagItem>
 						</span>
 					</template>
-					<template #summary>
+					<template v-if="isModrinthUser" #summary>
+						<IntlFormatted :message-id="messages.officialAccountBio">
+							<template #support-link>
+								<a
+									href="https://support.modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									https://support.modrinth.com
+								</a>
+							</template>
+							<template #email>
+								<a
+									href="mailto:support@modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									support@modrinth.com
+								</a>
+							</template>
+						</IntlFormatted>
+					</template>
+					<template v-else #summary>
 						{{
 							user.bio
 								? user.bio
-								: projects.length === 0
-									? formatMessage(messages.bioFallbackUser)
-									: formatMessage(messages.bioFallbackCreator)
+								: projects?.length > 0
+									? formatMessage(messages.bioFallbackCreator)
+									: formatMessage(messages.bioFallbackUser)
 						}}
 					</template>
-					<template #stats>
+					<template v-if="!isModrinthUser" #stats>
 						<div
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
@@ -352,6 +387,7 @@
 				<div
 					v-if="!route.params.projectType || route.params.projectType === 'collections'"
 					class="collections-grid"
+					:class="{ 'mt-3': projects?.length > 0 }"
 				>
 					<nuxt-link
 						v-for="collection in sortedCollections"
@@ -376,9 +412,9 @@
 							<div class="stats">
 								<BoxIcon />
 								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${
-										(collection.projects?.length || 0) !== 1 ? 's' : ''
-									}`
+									formatMessage(messages.collectionProjectsCount, {
+										count: collection.projects?.length || 0,
+									})
 								}}
 							</div>
 							<div class="stats">
@@ -424,8 +460,11 @@
 				</div>
 			</div>
 			<div class="normal-page__sidebar">
-				<div v-if="organizations?.length > 0" class="card flex-card">
-					<h2 class="text-lg text-contrast">
+				<div
+					v-if="organizations?.length > 0"
+					class="mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 pt-3"
+				>
+					<h2 class="m-0 mb-2 text-lg text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
 					<div class="flex flex-wrap gap-2">
@@ -440,24 +479,16 @@
 						</nuxt-link>
 					</div>
 				</div>
-				<div v-if="badges.length > 0" class="card flex-card">
-					<h2 class="text-lg text-contrast">
-						{{ formatMessage(messages.profileBadges) }}
-					</h2>
-					<div class="flex flex-wrap gap-2">
-						<div v-for="badge in badges" :key="badge">
-							<StaffBadge v-if="badge === 'staff'" class="h-14 w-14" />
-							<ModBadge v-else-if="badge === 'mod'" class="h-14 w-14" />
-							<nuxt-link v-else-if="badge === 'plus'" to="/plus">
-								<PlusBadge class="h-14 w-14" />
-							</nuxt-link>
-							<TenMClubBadge v-else-if="badge === '10m-club'" class="h-14 w-14" />
-							<EarlyAdopterBadge v-else-if="badge === 'early-adopter'" class="h-14 w-14" />
-							<AlphaTesterBadge v-else-if="badge === 'alpha-tester'" class="h-14 w-14" />
-							<BetaTesterBadge v-else-if="badge === 'beta-tester'" class="h-14 w-14" />
-						</div>
-					</div>
-				</div>
+				<UserBadges
+					:downloads="sumDownloads"
+					:join-date="joinDate"
+					:role="user.role"
+					:badges="user.badges"
+					:has-midas="hasActiveMidas(user)"
+					:has-pride="hasPride26Badge(user)"
+					:earliest-project-by-type="earliestProjectByType"
+					class="mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 pt-3"
+				/>
 				<AdPlaceholder v-if="!auth.user" />
 			</div>
 		</div>
@@ -466,6 +497,7 @@
 <script setup>
 import {
 	AffiliateIcon,
+	BadgeCheckIcon,
 	BoxIcon,
 	CalendarIcon,
 	CheckIcon,
@@ -503,6 +535,7 @@ import {
 	useCompactNumber,
 	useFormatDateTime,
 	useFormatNumber,
+	UserBadges,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -510,19 +543,13 @@ import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onServerPrefetch } from 'vue'
 
-import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
-import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'
-import BetaTesterBadge from '~/assets/images/badges/beta-tester.svg?component'
-import EarlyAdopterBadge from '~/assets/images/badges/early-adopter.svg?component'
-import ModBadge from '~/assets/images/badges/mod.svg?component'
-import PlusBadge from '~/assets/images/badges/plus.svg?component'
-import StaffBadge from '~/assets/images/badges/staff.svg?component'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { reportUser } from '~/utils/report-helpers.ts'
+import { hasActiveMidas, hasPride26Badge } from '~/utils/user-membership.ts'
 
 const data = useNuxtApp()
 const route = useNativeRoute()
@@ -553,6 +580,10 @@ const messages = defineMessages({
 	profileDownloadsLabel: {
 		id: 'profile.label.downloads',
 		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
+	},
+	collectionProjectsCount: {
+		id: 'profile.collection.projects-count',
+		defaultMessage: '{count, plural, one {# project} other {# projects}}',
 	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',
@@ -681,6 +712,15 @@ const messages = defineMessages({
 		id: 'profile.error.not-found',
 		defaultMessage: 'User not found',
 	},
+	officialAccount: {
+		id: 'profile.official-account',
+		defaultMessage: 'Official Modrinth account',
+	},
+	officialAccountBio: {
+		id: 'profile.official-account.bio',
+		defaultMessage:
+			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
+	},
 })
 
 const client = injectModrinthClient()
@@ -693,7 +733,7 @@ const {
 	suspense: userSuspense,
 } = useQuery({
 	queryKey: computed(() => ['user', userId]),
-	queryFn: () => client.labrinth.users_v2.get(userId),
+	queryFn: () => client.labrinth.users_v3.get(userId),
 })
 
 watch(
@@ -749,6 +789,8 @@ onServerPrefetch(async () => {
 const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
 )
+
+const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
 
 const sortedCollections = computed(() => {
 	const list = collections.value
@@ -807,56 +849,20 @@ const sumDownloads = computed(() => {
 })
 
 const joinDate = computed(() => new Date(user.value.created))
-const MODRINTH_BETA_END_DATE = new Date('2022-02-27T08:00:00.000Z')
-const MODRINTH_ALPHA_END_DATE = new Date('2020-11-30T08:00:00.000Z')
-
-const badges = computed(() => {
-	const badges = []
-
-	if (user.value.role === 'admin') {
-		badges.push('staff')
-	}
-
-	if (user.value.role === 'moderator') {
-		badges.push('mod')
-	}
-
-	if (isPermission(user.value.badges, 1 << 0)) {
-		badges.push('plus')
-	}
-
-	if (sumDownloads.value > 10000000) {
-		badges.push('10m-club')
-	}
-
-	if (
-		isPermission(user.value.badges, 1 << 1) ||
-		isPermission(user.value.badges, 1 << 2) ||
-		isPermission(user.value.badges, 1 << 3)
-	) {
-		badges.push('early-adopter')
-	}
-
-	if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_ALPHA_END_DATE) {
-		badges.push('alpha-tester')
-	} else if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_BETA_END_DATE) {
-		badges.push('beta-tester')
-	}
-
-	if (isPermission(user.value.badges, 1 << 5)) {
-		badges.push('contributor')
-	}
-
-	if (isPermission(user.value.badges, 1 << 6)) {
-		badges.push('translator')
-	}
-
-	return badges
-})
 
 async function copyId() {
 	await navigator.clipboard.writeText(user.value.id)
 }
+
+const earliestProjectByType = computed(() => {
+	const obj = {}
+
+	for (const project of projects.value ?? []) {
+		obj[project.project_type] = new Date(project.published)
+	}
+
+	return obj
+})
 
 async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
@@ -951,7 +957,6 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
-	margin-top: var(--gap-md);
 
 	.collection-item {
 		display: flex;
@@ -961,7 +966,6 @@ export default defineNuxtComponent({
 	}
 
 	.description {
-		// Grow to take up remaining space
 		flex-grow: 1;
 
 		color: var(--color-text);
