@@ -71,9 +71,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado"
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Enlaces idénticos"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Tu Descripción debe contener suficiente texto sin formato o texto alternativo para imágenes, de modo que sea accesible para quienes utilizan lectores de pantalla o tienen conexiones lentas a Internet."
   },
@@ -240,3 +237,4 @@
     "defaultMessage": "Visitar la configuración de enlaces"
   }
 }
+

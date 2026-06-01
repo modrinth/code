@@ -32,14 +32,16 @@
 								{{ instance.loader }} {{ instance.game_version }}
 							</div>
 
-							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+							<template v-if="showInstancePlayTime">
+								<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
 
-							<div class="flex items-center gap-2 font-medium">
-								<template v-if="timePlayed > 0">
-									{{ timePlayedHumanized }}
-								</template>
-								<template v-else> Never played </template>
-							</div>
+								<div class="flex items-center gap-2 font-medium">
+									<template v-if="timePlayed > 0">
+										{{ timePlayedHumanized }}
+									</template>
+									<template v-else> Never played </template>
+								</div>
+							</template>
 						</template>
 
 						<template v-else>
@@ -326,7 +328,7 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useBreadcrumbs } from '@/store/state'
+import { useBreadcrumbs, useTheming } from '@/store/state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -338,6 +340,8 @@ const route = useRoute()
 
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
+const themeStore = useTheming()
+const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_instance_play_time'))
 const contentSubpageRouteNames = new Set(['Mods', 'ModsFilter'])
 
 const offline = ref(!navigator.onLine)

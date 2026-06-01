@@ -84,6 +84,7 @@ export function useInstallationForm(
 	})
 
 	async function save() {
+		if (ctx.isBusy.value) return
 		isSaving.value = true
 		try {
 			const platformChanged = selectedPlatform.value !== ctx.currentPlatform.value
@@ -156,6 +157,7 @@ export function useInstallationForm(
 	}
 
 	async function confirmLoaderChange() {
+		if (ctx.isBusy.value) return
 		try {
 			if (ctx.disableAllContent) {
 				await ctx.disableAllContent()
@@ -169,6 +171,7 @@ export function useInstallationForm(
 	}
 
 	async function confirmAutoFix() {
+		if (ctx.isBusy.value) return
 		try {
 			if (ctx.previewSave) {
 				isVerifying.value = true
@@ -210,6 +213,7 @@ export function useInstallationForm(
 	}
 
 	async function confirmDisableConflicts() {
+		if (ctx.isBusy.value) return
 		try {
 			if (ctx.disableIncompatibleContent) {
 				await ctx.disableIncompatibleContent(selectedGameVersion.value)
@@ -239,6 +243,7 @@ export function useInstallationForm(
 	}
 
 	async function confirmSave() {
+		if (ctx.isBusy.value) return
 		pendingPreview.value = null
 		try {
 			await performSave()
@@ -280,6 +285,7 @@ export function useInstallationForm(
 	const loadingChangelog = ref(false)
 
 	async function handleChangeModpackVersion() {
+		if (ctx.isBusy.value) return
 		updatingModpack.value = true
 		loadingChangelog.value = false
 
@@ -350,6 +356,7 @@ export function useInstallationForm(
 	}
 
 	async function handleUpdaterConfirm(version: Labrinth.Versions.v2.Version) {
+		if (ctx.isBusy.value) return
 		try {
 			await ctx.onModpackVersionConfirm(version)
 		} finally {

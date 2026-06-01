@@ -1,4 +1,5 @@
 export { default as ServerOnboardingPanelPage } from './hosting/manage/[id]/onboarding.vue'
+export { default as ServersManageAccessPage } from './hosting/manage/access.vue'
 export { default as ServersManageBackupsPage } from './hosting/manage/backups.vue'
 export { default as ServersManageContentPage } from './hosting/manage/content.vue'
 export { default as ServersManageFilesPage } from './hosting/manage/files.vue'

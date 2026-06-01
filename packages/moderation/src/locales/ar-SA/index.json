@@ -68,9 +68,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "بعض روابطك الإضافية تبدو متطابقة. كل رابط يجب أن يكون فريدا بنوع رابط مناسب."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "روابط متطابقة"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "وصفك يجب أن يحتوي على نص عادي أو نص بديل للصورة، لتكون متاحة لمستخدمي قارئ الشاشة أو من لا توجد عنده اتصال إنترنت جيد."
   },

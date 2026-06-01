@@ -14,10 +14,13 @@ export interface ConsoleManagerContext {
 	sendCommand?: (cmd: string) => void
 	showCommandInput?: boolean | Ref<boolean> | ComputedRef<boolean>
 	disableCommandInput?: boolean | Ref<boolean> | ComputedRef<boolean>
+	disableCommandInputTooltip?: string | Ref<string | undefined> | ComputedRef<string | undefined>
 
 	loading?: Ref<boolean> | ComputedRef<boolean>
 
 	onClear?: () => void
+	clearDisabled?: Ref<boolean> | ComputedRef<boolean>
+	clearDisabledTooltip?: string | Ref<string | undefined> | ComputedRef<string | undefined>
 	onDelete?: () => Promise<void>
 	deleteDisabled?: Ref<boolean> | ComputedRef<boolean>
 	deleteDisabledTooltip?: string

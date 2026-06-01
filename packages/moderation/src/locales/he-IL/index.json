@@ -71,9 +71,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "חלק מהקישורים החיצוניים שלך נראים זהים. יש להזין כל קישור פעם אחת בלבד ועם סוג הקישור המתאים."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "קישורים זהים"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "התיאור שלך צריך להכיל מספיק טקסט פשוט או טקסט חלופי לתמונה, כדי שיישאר נגיש למשתמשים עם הקראות מסך או חיבורי אינטרנט איטיים."
   },

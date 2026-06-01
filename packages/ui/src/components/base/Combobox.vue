@@ -73,7 +73,7 @@
 					<slot name="selected">{{ triggerText }}</slot>
 				</span>
 			</div>
-			<div class="flex items-center gap-1">
+			<div class="flex shrink-0 items-center gap-1">
 				<slot name="suffix"></slot>
 				<ChevronLeftIcon
 					v-if="showChevron"
@@ -97,6 +97,7 @@
 					:class="[
 						props.dropdownClass,
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
+						props.dropdownClass,
 					]"
 					:style="dropdownStyle"
 					:role="listbox ? 'listbox' : 'menu'"
@@ -174,7 +175,7 @@
 						</div>
 					</div>
 
-					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
+					<div v-else-if="searchQuery" class="p-4 text-center text-sm text-secondary">
 						{{ noOptionsMessage }}
 					</div>
 
@@ -276,6 +277,9 @@ const props = withDefaults(
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
+		dropdownClass?: string
+		dropdownMinWidth?: string
+		minSearchLengthToOpen?: number
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
 		/** Select the searchable input text when the field receives focus */
@@ -293,6 +297,7 @@ const props = withDefaults(
 		showIconInSelected: false,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		noOptionsMessage: 'No results found',
+		minSearchLengthToOpen: 0,
 		syncWithSelection: true,
 		selectSearchTextOnFocus: false,
 		showSearchIcon: false,
@@ -376,6 +381,10 @@ const triggerText = computed(() => {
 	if (selectedOption.value) return selectedOption.value.label
 	return props.placeholder
 })
+
+const hasMinimumSearchLength = computed(
+	() => !props.searchable || searchQuery.value.trim().length >= props.minSearchLengthToOpen,
+)
 
 const optionsWithKeys = computed(() => {
 	return props.options.map((opt, index) => ({
@@ -583,7 +592,8 @@ function destroyOptionsOverlayScrollbars() {
 }
 
 async function openDropdown() {
-	if (props.disabled || isOpen.value || !hasDropdownContent.value) return
+	if (props.disabled || isOpen.value || !hasMinimumSearchLength.value || !hasDropdownContent.value)
+		return
 
 	isOpen.value = true
 	emit('open')
@@ -782,6 +792,10 @@ function handleSearchKeydown(event: KeyboardEvent) {
 function handleSearchInput() {
 	userHasTyped.value = true
 	emit('searchInput', searchQuery.value)
+	if (!hasMinimumSearchLength.value) {
+		closeDropdown()
+		return
+	}
 	if (!isOpen.value) {
 		openDropdown()
 	}
@@ -906,10 +920,16 @@ watch(hasDropdownContent, (value) => {
 	}
 })
 
+watch(hasMinimumSearchLength, (canOpen) => {
+	if (!canOpen) {
+		closeDropdown()
+	}
+})
+
 watch(
 	[() => props.modelValue, () => props.options],
 	([val]) => {
-		if (props.searchable && props.syncWithSelection && !isOpen.value) {
+		if (props.searchable && props.syncWithSelection && !isOpen.value && !userHasTyped.value) {
 			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
 			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
 		}

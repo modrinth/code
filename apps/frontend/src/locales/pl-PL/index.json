@@ -8,6 +8,135 @@
   "admin.billing.error.not-found": {
     "message": "Nie znaleziono użytkownika"
   },
+  "analytics.action.add": {
+    "message": "Dodaj"
+  },
+  "analytics.action.cancel": {
+    "message": "Anuluj"
+  },
+  "analytics.action.refresh": {
+    "message": "Odśwież"
+  },
+  "analytics.action.reset": {
+    "message": "Zresetuj"
+  },
+  "analytics.breakdown.country": {
+    "message": "Kraj"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Wersja gry"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Status projektu"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Wersja projektu"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Pokaż wszystko"
+  },
+  "analytics.download-reason.update": {
+    "message": "Zaktualizuj"
+  },
+  "analytics.download-source.app": {
+    "message": "Aplikacja Modrinth"
+  },
+  "analytics.download-source.website": {
+    "message": "Strona Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "pobrane"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Wszystko"
+  },
+  "analytics.group-by.1h": {
+    "message": "1 godz"
+  },
+  "analytics.group-by.6h": {
+    "message": "6 godz"
+  },
+  "analytics.group-by.date": {
+    "message": "Data"
+  },
+  "analytics.group-by.day": {
+    "message": "Dzień"
+  },
+  "analytics.group-by.month": {
+    "message": "Miesiąc"
+  },
+  "analytics.options.loading": {
+    "message": "Ładowanie..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projekt zaakceptowany"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Projekt ustawiony jako prywatny"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Status projektu zmieniony"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projekt ustawiony jako niewymieniony"
+  },
+  "analytics.project-event.version-released": {
+    "message": "Wydano {version}"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Wersja przesłana"
+  },
+  "analytics.project-status.approved": {
+    "message": "Zatwierdzony"
+  },
+  "analytics.project-status.archived": {
+    "message": "Zarchiwizowany"
+  },
+  "analytics.project-status.draft": {
+    "message": "Wersja robocza"
+  },
+  "analytics.project-status.other": {
+    "message": "Inne"
+  },
+  "analytics.project-status.private": {
+    "message": "Prywatny"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Odrzucony"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Niepubliczny"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Wstrzymany"
+  },
+  "analytics.project.all": {
+    "message": "Wszystkie projekty"
+  },
+  "analytics.project.icon-alt": {
+    "message": "Ikona {name}"
+  },
+  "analytics.project.select": {
+    "message": "Wybierz projekty"
+  },
+  "analytics.query.filter.add": {
+    "message": "Dodaj filtr"
+  },
+  "analytics.query.label.project": {
+    "message": "Projekt:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Zakres czasowy:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Ilość pobrań"
+  },
+  "analytics.stat.revenue": {
+    "message": "Przychód"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Wyszukaj..."
+  },
   "app-marketing.download.description": {
     "message": "Nasza aplikacja desktopowa jest dostępna na wszystkie platformy, wybierz preferowaną wersję."
   },
@@ -121,9 +250,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -1082,9 +1208,6 @@
   "dashboard.projects.links.source-code.label": {
     "message": "Kod źródłowy"
   },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Strona zawierające informację, dokumentację i pomoc projektu."
-  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Strona wiki"
   },
@@ -1343,11 +1466,11 @@
   "discover.install.error.no-server-world": {
     "message": "Brak świata serwera do zainstalowania."
   },
-  "discover.install.error.unsupported-content-type": {
-    "message": "Ten rodzaj zawartości nie może być zainstalowany na serwerze z przeglądania."
-  },
   "discover.install.heading.reset-modpack": {
     "message": "Wybieranie paczki modów do zainstalowania po zresetowaniu"
+  },
+  "discover.seo.title": {
+    "message": "Wyszukaj {projectType}"
   },
   "error.collection.404.list_item.1": {
     "message": "Mogłeś źle napisać URL kolekcji."
@@ -1858,6 +1981,9 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Błąd podczas generowania stanu z API przy kompilacji."
+  },
+  "layout.banner.preview.description": {
+    "message": "Jeśli chciałeś/aś wejść na oficjalną stronę Modrinth, odwiedź {url}. To wydanie poglądowe jest używane przez administrację Modrinth do testów. Zostało utworzone z {ref}."
   },
   "layout.banner.preview.title": {
     "message": "To jest wydanie poglądowe strony Modrinth."
@@ -2420,6 +2546,9 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Pobieraj projekty {username} na Modrinth"
   },
+  "profile.official-account": {
+    "message": "Oficjalne konto Modrinth-a"
+  },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> obserwujący projekt} other {<stat>{count}</stat> obserwujących projekt}}"
   },
@@ -2882,6 +3011,9 @@
   "report.already-reported": {
     "message": "Zgłosiłeś już {title}"
   },
+  "report.already-reported-description": {
+    "message": "Masz już otwarte zgłoszenie dotyczące tego {item}. Jeśli masz więcej informacji, możesz dodać je do zgłoszenia."
+  },
   "report.body.description": {
     "message": "Jeśli to możliwe i istotne, prosimy o dołączenie linków i zdjęć. Puste lub niekompletne zgłoszenia zostaną zamknięte i zignorowane."
   },
@@ -2929,6 +3061,9 @@
   },
   "report.question.content-type": {
     "message": "Jakiego rodzaju treści zgłaszasz?"
+  },
+  "report.question.report-reason": {
+    "message": "Które z zasad Modrinth narusza {item}?"
   },
   "report.report-content": {
     "message": "Zgłoś treści do moderacji"
@@ -3041,26 +3176,14 @@
   "scopes.organizationWrite.label": {
     "message": "Napisz organizacje"
   },
-  "scopes.patCreate.description": {
-    "message": "Utwórz osobiste tokeny API"
-  },
   "scopes.patCreate.label": {
     "message": "Tworzenie PATów"
-  },
-  "scopes.patDelete.description": {
-    "message": "Usuń swoje osobiste tokeny API"
   },
   "scopes.patDelete.label": {
     "message": "Usuwanie PATów"
   },
-  "scopes.patRead.description": {
-    "message": "Wyświetl utworzone tokeny API"
-  },
   "scopes.patRead.label": {
     "message": "Odczytywanie PATów"
-  },
-  "scopes.patWrite.description": {
-    "message": "Edytuj osobiste tokeny API"
   },
   "scopes.patWrite.label": {
     "message": "Napisz PAT"

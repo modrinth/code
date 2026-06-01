@@ -65,9 +65,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Bazı dış bağlantılarınız aynı. Her bağlantı sadece bir kere doğru bağlantı türüyle girilmelidir."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Aynı linkler"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Açıklaman yeterli düz yazı veya resim açıklamalı içermeli ki ekran okuyucu veya patates internet kullananlar için erişilebilir olsun."
   },

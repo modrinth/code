@@ -68,9 +68,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Některé z vašich externích odkazů se zdají být duplicitní. Každý odkaz by měl být zadán pouze jednou a s příslušným typem odkazu."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Stejné odkazy"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Popis by měl obsahovat dostatečné množství prostého textu nebo popisků u obrázku, aby byl přístupný i těm, kteří používají čtečky obrazovky nebo mají pomalé připojení k internetu."
   },

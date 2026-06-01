@@ -216,7 +216,10 @@
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button
-						:disabled="!selectedVersion || selectedVersion.id === currentVersionId"
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="
+							props.actionDisabled || !selectedVersion || selectedVersion.id === currentVersionId
+						"
 						@click="handleUpdate"
 					>
 						<DownloadIcon />
@@ -393,6 +396,8 @@ const props = withDefaults(
 		loading?: boolean
 		/** Whether changelog is being loaded for the selected version */
 		loadingChangelog?: boolean
+		actionDisabled?: boolean
+		actionDisabledTooltip?: string
 	}>(),
 	{
 		projectType: undefined,
@@ -401,6 +406,8 @@ const props = withDefaults(
 		header: undefined,
 		loading: false,
 		loadingChangelog: false,
+		actionDisabled: false,
+		actionDisabledTooltip: undefined,
 	},
 )
 
@@ -614,6 +621,7 @@ function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 }
 
 function handleUpdate(event: MouseEvent) {
+	if (props.actionDisabled) return
 	if (selectedVersion.value) {
 		const changesGameVersion = versionChangesGameVersion(
 			selectedVersion.value,

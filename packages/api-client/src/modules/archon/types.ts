@@ -1,6 +1,287 @@
 import type { Labrinth } from '../labrinth/types'
 
 export namespace Archon {
+	export namespace Nodes {
+		export namespace Internal {
+			export type Node = {
+				id: string
+				hostname: string
+				region: string
+				created_at: string | null
+				locked: boolean
+			}
+
+			export type Server = {
+				id: string
+				available: boolean
+			}
+
+			export type NodeFull = Node & {
+				servers: Server[]
+			}
+
+			export type Overview = {
+				node_hostnames: string[]
+				regions: Region[]
+				total_servers_active: number
+			}
+
+			export type Region = {
+				display_name: string
+				country_code: string
+				key: string
+				server_count: number
+				node_count: number
+			}
+
+			export type RegionWithStatistics = {
+				region: Region
+				active_servers: string[]
+			}
+		}
+	}
+
+	export namespace Notices {
+		export namespace v0 {
+			export type Notice = {
+				id: number
+				dismissable: boolean
+				title: string | null
+				message: string
+				level: string
+				announced: string
+			}
+
+			export type ListedNotice = {
+				id: number
+				dismissable: boolean
+				message: string
+				title: string | null
+				level: string
+				announce_at: string
+				expires: string | null
+				assigned: Assignment[]
+				dismissed_by: Dismisser[]
+			}
+
+			export type Dismisser = {
+				server: string
+				dismissed_on: string
+			}
+
+			export type Assignment = {
+				kind: string
+				id: string
+				name: string
+			}
+
+			export type AssignmentTarget = { server: string } | { node: string }
+
+			export type Announce = {
+				message: string
+				title?: string | null
+				level: string
+				dismissable: boolean
+				announce_at: string
+				expires?: string | null
+			}
+
+			export type AnnouncePatch = {
+				message?: string
+				title?: string | null
+				level?: string
+				dismissable?: boolean
+				announce_at?: string
+				expires?: string | null
+			}
+
+			export type PostNoticeResponseBody = {
+				id: number
+			}
+		}
+	}
+
+	export namespace Actions {
+		export namespace v1 {
+			export type SortOrder = 'asc' | 'desc'
+
+			export type ActionName =
+				| 'server_created'
+				| 'changed_server_name'
+				| 'changed_server_subdomain'
+				| 'server_reallocated'
+				| 'server_plan_changed'
+				| 'user_invited'
+				| 'user_invite_revoked'
+				| 'user_permission_modified'
+				| 'user_removed'
+				| 'addon_added'
+				| 'addon_uploaded'
+				| 'addon_disabled'
+				| 'addon_enabled'
+				| 'addon_deleted'
+				| 'addon_updated'
+				| 'modpack_changed'
+				| 'modpack_unlinked'
+				| 'server_repaired'
+				| 'server_reset'
+				| 'server_started'
+				| 'server_stopped'
+				| 'server_restarted'
+				| 'server_killed'
+				| 'port_allocation_added'
+				| 'port_allocation_removed'
+				| 'loader_version_edited'
+				| 'game_version_edited'
+				| 'server_properties_modified'
+				| 'file_uploaded'
+				| 'file_deleted'
+				| 'file_renamed'
+				| 'file_edited'
+				| 'sftp_login'
+				| 'console_command_executed'
+				| 'console_cleared'
+				| 'backup_created'
+				| 'backup_renamed'
+				| 'backup_restored'
+				| 'backup_deleted'
+				| 'startup_command_modified'
+				| 'java_runtime_modified'
+				| 'java_version_modified'
+
+			export type Action = {
+				action: ActionName | string
+				metadata?: unknown
+			}
+
+			export type UserPermissionsActionMetadata = {
+				user_id: string
+				permissions?: ServerUsers.v1.UserScope | null
+			}
+
+			export type ActionUser =
+				| {
+						type: 'user'
+						user_id: string
+				  }
+				| {
+						type: 'support'
+						user_id?: string | null
+				  }
+
+			export type ActionEntry = {
+				actor: ActionUser
+				action: Action
+				server_id: string
+				world_id?: string | null
+				timestamp: string
+			}
+
+			export type UserResp = {
+				username: string
+				avatar_url?: string | null
+			}
+
+			export type AddonResp = {
+				title: string
+				slug?: string | null
+				icon_url?: string | null
+				version?: string | null
+			}
+
+			export type VersionResp = {
+				name: string
+				version_number?: string | null
+			}
+
+			export type ActionLogResponse = {
+				next_offset?: number | null
+				data: ActionEntry[]
+				users: Record<string, UserResp>
+				addons: Record<string, AddonResp>
+				versions: Record<string, VersionResp>
+			}
+
+			export type ActionLogFilter = {
+				users?: string[]
+				worlds?: Array<string | null>
+				actions?: ActionName[]
+			}
+
+			export type ListActionLogOptions = {
+				filter?: ActionLogFilter
+				limit?: number
+				offset?: number
+				order?: SortOrder
+				min_datetime?: string
+				max_datetime?: string
+			}
+		}
+	}
+
+	export namespace Transfers {
+		export namespace Internal {
+			export type ProvisionOptions = {
+				region?: string | null
+				node_tags: string[]
+			}
+
+			export type ScheduleServerTransfersRequest = {
+				server_ids: string[]
+				scheduled_at?: string | null
+				target_region?: string | null
+				node_tags?: string[]
+				reason?: string | null
+			}
+
+			export type ScheduleNodeTransfersRequest = {
+				node_hostnames: string[]
+				scheduled_at?: string | null
+				target_region?: string | null
+				node_tags?: string[]
+				reason?: string | null
+				cordon_nodes?: boolean
+				tag_nodes?: string | null
+			}
+
+			export type ScheduleTransfersResponse = {
+				batch_id: number
+				scheduled_count: number
+			}
+
+			export type CancelTransfersRequest = {
+				batch_ids: number[]
+			}
+
+			export type CancelTransfersResponse = {
+				cancelled_count: number
+			}
+
+			export type TransferLogBatchEntry = {
+				id: number
+				created_by: string
+				created_at: string
+				reason?: string | null
+				scheduled_at: string
+				cancelled: boolean
+				log_count: number
+				provision_options: ProvisionOptions
+			}
+
+			export type TransferHistoryQuery = {
+				page?: number
+				page_size?: number
+			}
+
+			export type TransferHistoryResponse = {
+				batches: TransferLogBatchEntry[]
+				total: number
+				page: number
+				page_size: number
+			}
+		}
+	}
+
 	export namespace Content {
 		export namespace v1 {
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
@@ -222,11 +503,58 @@ export namespace Archon {
 		}
 	}
 
+	export namespace ServerUsers {
+		export namespace v1 {
+			export type ServerUserRole = 'Owner' | 'Editor' | 'Viewer' | 'Unknown'
+
+			export type AssignableServerUserRole = Exclude<ServerUserRole, 'Owner' | 'Unknown'>
+
+			export const UserScope = {
+				NONE: '',
+				SERVER_ADMIN: 'SERVER_ADMIN',
+				BASE_READ: 'BASE_READ',
+				POWER_ACTIONS: 'POWER_ACTIONS',
+				FILES_WRITE: 'FILES_WRITE',
+				SETUP: 'SETUP',
+				BACKUPS: 'BACKUPS',
+				ADVANCED: 'ADVANCED',
+				RESET_SERVER: 'RESET_SERVER',
+				MANAGE_USERS: 'MANAGE_USERS',
+				SUPPORT_AGENT: 'SUPPORT_AGENT',
+				INFRA_MANAGER: 'INFRA_MANAGER',
+				INFRA_MANAGER_READ: 'INFRA_MANAGER_READ',
+				INFRA_SERVERS_XFER: 'INFRA_SERVERS_XFER',
+			} as const
+
+			export type UserScope = string | number
+
+			export type UserResp = {
+				id: string
+				username: string
+				avatar_url?: string | null
+			}
+
+			export type ServerUser = {
+				user: UserResp
+				added_on?: string | null
+				permissions: UserScope
+			}
+
+			export type AddServerUserRequest = {
+				server_id?: string | null
+				user_id: string
+				added_on?: string | null
+				role: ServerUserRole
+			}
+		}
+	}
+
 	export namespace Servers {
 		export namespace v0 {
 			export type ServerGetResponse = {
 				servers: Server[]
 				pagination: Pagination
+				users: Record<string, ServerOwner>
 			}
 
 			export type Pagination = {
@@ -234,6 +562,12 @@ export namespace Archon {
 				page_size: number
 				total_pages: number
 				total_items: number
+			}
+
+			export type ServerOwner = {
+				id: string
+				username: string
+				avatar_url?: string | null
 			}
 
 			export type Status = 'installing' | 'broken' | 'available' | 'suspended'
@@ -281,12 +615,15 @@ export namespace Archon {
 				node: NodeInfo | null
 				flows: Flows
 				is_medal: boolean
+				current_user_permissions: UserScope
 
 				medal_expires?: string
 			}
 
+			export type UserScope = number
+
 			export type Net = {
-				ip: string
+				ip: string | null
 				port: number
 				domain: string
 			}
@@ -422,9 +759,9 @@ export namespace Archon {
 				modloader: string
 				modloader_version: string
 				game_version: string
-				java_version: number
-				invocation: string
-				original_invocation: string
+				java_version: number | null
+				invocation: string | null
+				original_invocation: string | null
 			}
 
 			export type Region = {
@@ -552,6 +889,106 @@ export namespace Archon {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
 			}
+		}
+	}
+
+	export namespace Sync {
+		export namespace v1 {
+			export type SyncCategory = 'backup' | 'users' | 'server' | 'protocol' | 'world'
+			export type SyncIntent = 'all' | SyncCategory | SyncCategory[]
+			export type BackupOperationStatus = 'completed' | 'cancelled' | 'failed' | 'timed-out'
+			export type ServerNetworkPort = { port: number; name: string }
+
+			export type ProtocolResetEvent = { type: 'protocol.reset' }
+			export type ProtocolInvalidEvent = { type: 'protocol.invalid' }
+			export type ProtocolErrorEvent = { type: 'protocol.error'; error: string }
+
+			export type BackupNewEvent = { type: 'backup.new'; id: string }
+			export type BackupPatchEvent = {
+				type: 'backup.patch'
+				world_id: string
+				backup_id: string
+				name: string
+			}
+			export type BackupDeleteEvent = {
+				type: 'backup.delete'
+				world_id: string
+				backup_id: string
+			}
+			export type BackupOperationStartEvent = {
+				type:
+					| 'backup.operation.create.init'
+					| 'backup.operation.create.start'
+					| 'backup.operation.restore.init'
+					| 'backup.operation.restore.start'
+				world_id: string
+				backup_id: string
+				operation_id: number
+			}
+			export type BackupOperationDoneEvent = {
+				type: 'backup.operation.create.done' | 'backup.operation.restore.done'
+				world_id: string
+				backup_id: string
+				operation_id: number
+				status: BackupOperationStatus
+			}
+
+			export type ServerPatchEvent = {
+				type: 'server.patch'
+				name: string
+				subdomain: string
+			}
+			export type ServerNetworkPatchEvent = {
+				type: 'server.network.patch'
+				ports: ServerNetworkPort[]
+			}
+			export type ServerTransferEvent = {
+				type: 'server.transfer.start' | 'server.transfer.done'
+				target_node: string
+			}
+
+			export type UsersPatchEvent = { type: 'users.patch' }
+
+			export type WorldPatchEvent = {
+				type: 'world.patch'
+				world_id: string
+				name: string
+			}
+			export type WorldStartupPatchEvent = {
+				type: 'world.startup.patch'
+				world_id: string
+				java_version: number | null
+				invocation: string | null
+				original_invocation: string | null
+			}
+			export type WorldContentAddonPatchEvent = {
+				type: 'world.content.addon.patch'
+				world_id: string
+				specs: Archon.Content.v1.Addon[]
+			}
+			export type WorldContentBaseUpdateEvent = {
+				type: 'world.content.base.update'
+				world_id: string
+				spec: Archon.Content.v1.Addons
+			}
+
+			export type SyncEvent =
+				| ProtocolResetEvent
+				| ProtocolInvalidEvent
+				| ProtocolErrorEvent
+				| BackupNewEvent
+				| BackupPatchEvent
+				| BackupDeleteEvent
+				| BackupOperationStartEvent
+				| BackupOperationDoneEvent
+				| ServerPatchEvent
+				| ServerNetworkPatchEvent
+				| ServerTransferEvent
+				| UsersPatchEvent
+				| WorldPatchEvent
+				| WorldStartupPatchEvent
+				| WorldContentAddonPatchEvent
+				| WorldContentBaseUpdateEvent
 		}
 	}
 

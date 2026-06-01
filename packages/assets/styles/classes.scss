@@ -639,8 +639,8 @@ a:not(.no-click-animation),
 
 // TOOLTIPS
 
-.v-popper--theme-dropdown,
-.v-popper--theme-dropdown.v-popper--theme-ribbit-popout {
+.v-popper__popper.v-popper--theme-dropdown,
+.v-popper__popper.v-popper--theme-dropdown.v-popper--theme-ribbit-popout {
 	.v-popper__inner {
 		border: 1px solid var(--surface-5) !important;
 		padding: var(--gap-sm) !important;
@@ -698,7 +698,13 @@ a:not(.no-click-animation),
 	//transform: scale(.9);
 }
 
-.v-popper--theme-tooltip {
+.v-popper__popper.v-popper--theme-tooltip {
+	pointer-events: none;
+
+	&.v-popper--interactive {
+		pointer-events: auto;
+	}
+
 	.v-popper__inner {
 		background: var(--color-tooltip-bg) !important;
 		color: var(--color-tooltip-text) !important;
@@ -721,7 +727,7 @@ a:not(.no-click-animation),
 	}
 }
 
-.v-popper--theme-dismissable-prompt {
+.v-popper__popper.v-popper--theme-dismissable-prompt {
 	z-index: 10;
 
 	.v-popper__inner {

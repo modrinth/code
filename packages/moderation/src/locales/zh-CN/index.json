@@ -65,9 +65,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "链接重复"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
   },

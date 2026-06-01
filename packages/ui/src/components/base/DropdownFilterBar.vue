@@ -109,7 +109,7 @@
 			<button
 				ref="addMenuTrigger"
 				type="button"
-				:class="addButtonClass"
+				:class="addButtonClass ?? '!border'"
 				:aria-expanded="isAddMenuOpen"
 				aria-haspopup="menu"
 				@click="handleAddMenuTriggerClick"
@@ -464,6 +464,7 @@ const props = withDefaults(
 		showClear?: boolean
 		showLabel?: boolean
 		useFilterIcon?: boolean
+		applyImmediately?: boolean
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
 		addButtonClass?: string
@@ -478,6 +479,7 @@ const props = withDefaults(
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
+		applyImmediately: false,
 		showPreviewFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',
 		emptySearchLabel: 'No options found.',
@@ -797,6 +799,9 @@ function setSelectedValues(
 		if (isAddMenuOpen.value && activeCategoryKey.value === categoryKey) {
 			scheduleSubmenuPositionUpdate()
 		}
+		if (props.applyImmediately) {
+			emit('update:modelValue', nextFilters)
+		}
 	} else {
 		emit('update:modelValue', nextFilters)
 	}
@@ -1076,9 +1081,13 @@ function getPreviewSelectedValues(categoryKey: string): string[] {
 }
 
 function setPreviewSelectedValues(categoryKey: string, values: string[]) {
+	const normalizedValues = normalizeSelectedValues(values)
 	previewSelectedValueDrafts.value = {
 		...previewSelectedValueDrafts.value,
-		[categoryKey]: normalizeSelectedValues(values),
+		[categoryKey]: normalizedValues,
+	}
+	if (props.applyImmediately) {
+		setSelectedValues(categoryKey, normalizedValues)
 	}
 }
 

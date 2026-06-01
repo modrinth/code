@@ -1,5 +1,16 @@
 export { AbstractModrinthClient } from './core/abstract-client'
 export { AbstractFeature, type FeatureConfig } from './core/abstract-feature'
+export {
+	AbstractSyncClient,
+	type SyncConnection,
+	type SyncConnectOptions,
+	type SyncEventHandler,
+	type SyncEventOfType,
+	type SyncEventType,
+	type SyncStatus,
+	type SyncStatusHandler,
+	type SyncStatusState,
+} from './core/abstract-sync'
 export { AbstractUploadClient } from './core/abstract-upload-client'
 export {
 	AbstractWebSocketClient,
@@ -25,10 +36,18 @@ export * from './modules/types'
 export { GenericModrinthClient } from './platform/generic'
 export type { NuxtClientConfig } from './platform/nuxt'
 export { NuxtCircuitBreakerStorage, NuxtModrinthClient } from './platform/nuxt'
+export { GenericSyncClient } from './platform/sync-generic'
 export type { TauriClientConfig } from './platform/tauri'
 export { TauriModrinthClient } from './platform/tauri'
 export { XHRUploadClient } from './platform/xhr-upload-client'
 export { clearNodeAuthState, nodeAuthState, setNodeAuthState } from './state/node-auth'
 export * from './types'
 export { withJWTRetry } from './utils/jwt-retry'
+export {
+	type ParsedSseEvent,
+	type ParsedSseItem,
+	type ParsedSseRetry,
+	parseSyncEventData,
+	SseParser,
+} from './utils/sse'
 export type { Override, RawDecimal } from './utils/types'

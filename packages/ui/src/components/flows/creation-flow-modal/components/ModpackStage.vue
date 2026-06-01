@@ -5,8 +5,10 @@
 		}}</span>
 		<Combobox
 			v-model="ctx.modpackSearchProjectId.value"
+			v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
 			:options="ctx.modpackSearchOptions.value"
 			searchable
+			:disabled="ctx.finishDisabled.value"
 			:search-placeholder="formatMessage(messages.searchModpackPlaceholder)"
 			:no-options-message="
 				searchLoading
@@ -29,13 +31,23 @@
 		</div>
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
-				<button class="flex-1" @click="triggerFileInput">
+				<button
+					v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
+					class="flex-1"
+					:disabled="ctx.finishDisabled.value"
+					@click="triggerFileInput"
+				>
 					<ImportIcon />
 					{{ formatMessage(messages.importModpack) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
-				<button class="flex-1" @click="ctx.browseModpacks()">
+				<button
+					v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
+					class="flex-1"
+					:disabled="ctx.finishDisabled.value"
+					@click="ctx.browseModpacks()"
+				>
 					<CompassIcon />
 					{{ formatMessage(messages.browseModpacks) }}
 				</button>
@@ -87,6 +99,8 @@ const messages = defineMessages({
 })
 
 function proceedWithModpack() {
+	if (ctx.finishDisabled.value) return
+
 	debug('proceedWithModpack:', {
 		flowType: ctx.flowType,
 		modpackSelection: ctx.modpackSelection.value,
@@ -196,6 +210,8 @@ watch(
 )
 
 async function triggerFileInput() {
+	if (ctx.finishDisabled.value) return
+
 	const picked = await filePicker.pickModpackFile()
 	if (picked) {
 		ctx.modpackFile.value = picked.file

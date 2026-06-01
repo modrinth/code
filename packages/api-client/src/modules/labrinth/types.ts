@@ -1493,6 +1493,17 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Friends {
+		export namespace v3 {
+			export type UserFriend = {
+				id: string
+				friend_id: string
+				accepted: boolean
+				created: string
+			}
+		}
+	}
+
 	export namespace ServerPing {
 		export namespace Internal {
 			export type MinecraftJavaPingRequest = {

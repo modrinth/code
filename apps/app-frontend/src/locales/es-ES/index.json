@@ -332,6 +332,15 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
   },
+  "app.skins.add-button": {
+    "message": "Añadir skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Arrastrar y soltar"
+  },
+  "app.skins.apply-button": {
+    "message": "Aplicar"
+  },
   "app.update-popup.body": {
     "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
   },

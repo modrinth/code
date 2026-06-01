@@ -12,7 +12,7 @@
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				:backup-name="backupTip ? `Before unlink (${backupTip})` : 'Before unlink'"
+				:backup-name="props.backupTip ? `Before unlink (${props.backupTip})` : 'Before unlink'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -26,9 +26,13 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button :disabled="buttonsDisabled" @click="confirm">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="confirm"
+					>
 						<UnlinkIcon />
-						{{ formatMessage(messages.unlinkButton) }}
+						{{ formatMessage(props.server ? messages.header : messages.unlinkButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -48,9 +52,11 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
-defineProps<{
+const props = defineProps<{
 	server?: boolean
 	backupTip?: string
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string
 }>()
 
 const { formatMessage } = useVIntl()
@@ -88,6 +94,7 @@ function show() {
 }
 
 function confirm() {
+	if (props.actionDisabled) return
 	modal.value?.hide()
 	emit('unlink')
 }

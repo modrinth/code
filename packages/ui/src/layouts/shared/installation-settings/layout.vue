@@ -106,6 +106,14 @@ const disabledPlatforms = computed(() => {
 	if (!ctx.lockPlatform || ctx.currentPlatform.value === 'vanilla') return []
 	return ctx.availablePlatforms.filter((p) => p !== ctx.currentPlatform.value)
 })
+const platformDisabledItems = computed(() =>
+	ctx.isBusy.value ? ctx.availablePlatforms : disabledPlatforms.value,
+)
+const platformDisabledTooltip = computed(() =>
+	ctx.isBusy.value
+		? (ctx.busyMessage?.value ?? undefined)
+		: formatMessage(messages.platformLockTooltip),
+)
 
 const showModpackVersionActions = computed(() => {
 	const val = ctx.showModpackVersionActions
@@ -120,6 +128,7 @@ const isLocalFile = computed(() => {
 })
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
+	if (ctx.isBusy.value) return
 	pendingUpdateVersion.value = version
 
 	const currentVersionId = ctx.updaterModalProps.value.currentVersionId
@@ -140,6 +149,7 @@ function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event
 }
 
 function handleModpackUpdateConfirm() {
+	if (ctx.isBusy.value) return
 	const version = pendingUpdateVersion.value
 	if (version) {
 		contentUpdaterModal.value?.hide()
@@ -155,16 +165,19 @@ function handleModpackUpdateCancel() {
 }
 
 function handleRepair() {
+	if (ctx.isBusy.value) return
 	form.cancelEditing()
 	ctx.repair()
 }
 
 function handleReinstall() {
+	if (ctx.isBusy.value) return
 	form.cancelEditing()
 	ctx.reinstallModpack()
 }
 
 function handleUnlink() {
+	if (ctx.isBusy.value) return
 	form.cancelEditing()
 	ctx.unlinkModpack()
 }
@@ -174,6 +187,7 @@ const emit = defineEmits<{
 }>()
 
 function handleIncompatibleResetServer() {
+	if (ctx.isBusy.value) return
 	form.cancelPreview()
 	form.cancelEditing()
 	emit('reset-server')
@@ -413,6 +427,7 @@ const messages = defineMessages({
 					<div class="flex flex-wrap gap-2">
 						<ButtonStyled v-if="showModpackVersionActions">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="form.handleChangeModpackVersion()"
@@ -438,6 +453,7 @@ const messages = defineMessages({
 					<div>
 						<ButtonStyled color="orange">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="(e: MouseEvent) => (e.shiftKey ? handleUnlink() : unlinkModal?.show())"
@@ -473,6 +489,7 @@ const messages = defineMessages({
 					<div>
 						<ButtonStyled color="red">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="
@@ -512,6 +529,7 @@ const messages = defineMessages({
 					<div>
 						<ButtonStyled>
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="repairModal?.show()"
@@ -555,8 +573,8 @@ const messages = defineMessages({
 								:items="ctx.availablePlatforms"
 								:format-label="formatLoaderLabel"
 								:capitalize="false"
-								:disabled-items="disabledPlatforms"
-								:disabled-tooltip="formatMessage(messages.platformLockTooltip)"
+								:disabled-items="platformDisabledItems"
+								:disabled-tooltip="platformDisabledTooltip"
 								:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
 							/>
 						</div>
@@ -567,6 +585,7 @@ const messages = defineMessages({
 							</span>
 							<Combobox
 								v-model="form.selectedGameVersion.value"
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								:options="form.gameVersionOptions.value"
 								searchable
 								sync-with-selection
@@ -577,11 +596,14 @@ const messages = defineMessages({
 									formatMessage(commonMessages.selectVersionPlaceholder)
 								"
 								:aria-label="formatMessage(messages.selectGameVersionAriaLabel)"
+								:disabled="ctx.isBusy.value"
 								@option-hover="ctx.onGameVersionHover?.($event)"
 							>
 								<template v-if="form.hasSnapshots.value" #dropdown-footer>
 									<button
+										v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+										:disabled="ctx.isBusy.value"
 										@mousedown.prevent
 										@click="form.showSnapshots.value = !form.showSnapshots.value"
 									>
@@ -610,6 +632,7 @@ const messages = defineMessages({
 							</span>
 							<Combobox
 								v-model="form.selectedLoaderVersion.value"
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								searchable
 								sync-with-selection
 								:placeholder="
@@ -627,6 +650,7 @@ const messages = defineMessages({
 										loader: form.formattedLoaderName.value,
 									})
 								"
+								:disabled="ctx.isBusy.value"
 							>
 								<template
 									v-if="form.selectedPlatform.value === 'paper'"
@@ -659,8 +683,14 @@ const messages = defineMessages({
 						<div class="flex flex-wrap gap-2">
 							<ButtonStyled color="brand">
 								<button
+									v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 									class="!shadow-none"
-									:disabled="!form.isValid.value || !form.hasChanges.value || form.isSaving.value"
+									:disabled="
+										!form.isValid.value ||
+										!form.hasChanges.value ||
+										form.isSaving.value ||
+										ctx.isBusy.value
+									"
 									@click="form.save()"
 								>
 									<SpinnerIcon v-if="form.isSaving.value" class="animate-spin" />
@@ -702,6 +732,7 @@ const messages = defineMessages({
 					<div class="flex flex-wrap gap-2">
 						<ButtonStyled color="orange">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="form.isEditing.value = true"
@@ -736,6 +767,7 @@ const messages = defineMessages({
 					<div>
 						<ButtonStyled>
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="repairModal?.show()"

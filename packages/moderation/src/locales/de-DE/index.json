@@ -72,7 +72,7 @@
     "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem entsprechenden Linktyp eingegeben werden."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Identische Links"
+    "defaultMessage": "Doppelte Links löschen"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Deine Beschreibung sollte ausreichend Klartext oder Alt-Text für Bilder enthalten, damit sie für Nutzer mit Bildschirmleseprogrammen oder langsamer Internetverbindung zugänglich bleibt."
@@ -240,3 +240,4 @@
     "defaultMessage": "Linkeinstellungen ansehen"
   }
 }
+

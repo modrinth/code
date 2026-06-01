@@ -8,6 +8,51 @@
   "admin.billing.error.not-found": {
     "message": "找不到使用者"
   },
+  "analytics.action.add": {
+    "message": "新增"
+  },
+  "analytics.action.cancel": {
+    "message": "取消"
+  },
+  "analytics.action.refresh": {
+    "message": "重新整理"
+  },
+  "analytics.action.reset": {
+    "message": "重設"
+  },
+  "analytics.breakdown.country": {
+    "message": "國家或地區"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "來源"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "版本"
+  },
+  "analytics.breakdown.loader": {
+    "message": "平臺"
+  },
+  "analytics.breakdown.project": {
+    "message": "專案"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "狀態"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "版本"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "顯示全部"
+  },
+  "analytics.chart.controls.button": {
+    "message": "控制"
+  },
+  "analytics.chart.controls.display": {
+    "message": "顯示"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth 事件"
+  },
   "app-marketing.download.description": {
     "message": "我們的桌面應用程式可在所有平臺上使用，請選擇你所需的版本。"
   },
@@ -920,6 +965,9 @@
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord 邀請"
   },
+  "dashboard.projects.links.header.edit": {
+    "message": "編輯連結"
+  },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "供使用者回報關於你專案的錯誤、問題與疑慮之處。"
   },
@@ -945,7 +993,7 @@
     "message": "原始碼"
   },
   "dashboard.projects.links.wiki-page.description": {
-    "message": "包含專案資訊、文件及說明的頁面。"
+    "message": "包含專案資訊、文件及說明的頁面"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Wiki 頁面"
@@ -1209,7 +1257,7 @@
     "message": "沒有可安裝的伺服器世界。"
   },
   "discover.install.error.unsupported-content-type": {
-    "message": "無法從瀏覽頁面將這類內容類型安裝至伺服器。"
+    "message": "無法從「探索」頁面將這類內容類型安裝至伺服器。"
   },
   "discover.install.heading.reset-modpack": {
     "message": "在重設後選擇要安裝的模組包"
@@ -2817,25 +2865,25 @@
     "message": "寫入組織"
   },
   "scopes.patCreate.description": {
-    "message": "建立個人 API 權杖"
+    "message": "建立個人存取權杖"
   },
   "scopes.patCreate.label": {
     "message": "建立個人存取權杖"
   },
   "scopes.patDelete.description": {
-    "message": "刪除你的個人 API 權杖"
+    "message": "刪除你的個人存取權杖"
   },
   "scopes.patDelete.label": {
     "message": "刪除個人存取權杖"
   },
   "scopes.patRead.description": {
-    "message": "檢視已建立的 API 權杖"
+    "message": "檢視建立的個人存取權杖"
   },
   "scopes.patRead.label": {
     "message": "讀取個人存取權杖"
   },
   "scopes.patWrite.description": {
-    "message": "編輯個人 API 權杖"
+    "message": "編輯個人存取權杖"
   },
   "scopes.patWrite.label": {
     "message": "寫入個人存取權杖"
@@ -3205,6 +3253,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "為你的帳號登入程序增加額外的安全防護。"
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "移除 2FA"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "設定 2FA"
   },
   "settings.account.security.two-factor.title": {
     "message": "雙重驗證"

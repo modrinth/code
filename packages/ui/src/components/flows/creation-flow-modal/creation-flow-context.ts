@@ -186,6 +186,8 @@ export interface CreationFlowContextValue {
 
 	// Loading state (set when finish() is called, cleared on reset)
 	loading: Ref<boolean>
+	finishDisabled: ComputedRef<boolean>
+	finishDisabledTooltip: ComputedRef<string | undefined>
 
 	// Backup state (set by InlineBackupCreator in reset-server flow)
 	isBackingUp: Ref<boolean>
@@ -232,6 +234,8 @@ export interface CreationFlowOptions {
 	searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest?: LoaderManifestResolver
+	finishDisabled?: ComputedRef<boolean>
+	finishDisabledTooltip?: ComputedRef<string | undefined>
 }
 
 export function createCreationFlowContext(
@@ -257,6 +261,8 @@ export function createCreationFlowContext(
 	const searchModpacks = options.searchModpacks!
 	const getProjectVersions = options.getProjectVersions!
 	const getLoaderManifest = options.getLoaderManifest ?? null
+	const finishDisabled = options.finishDisabled ?? computed(() => false)
+	const finishDisabledTooltip = options.finishDisabledTooltip ?? computed(() => undefined)
 
 	const setupType = ref<SetupType | null>(null)
 	const isImportMode = ref(false)
@@ -502,6 +508,8 @@ export function createCreationFlowContext(
 	}
 
 	function finish() {
+		if (finishDisabled.value) return
+
 		debug('finish() called, state:', {
 			setupType: setupType.value,
 			selectedLoader: selectedLoader.value,
@@ -585,6 +593,8 @@ export function createCreationFlowContext(
 		importSearchQuery,
 		hardReset,
 		loading,
+		finishDisabled,
+		finishDisabledTooltip,
 		isBackingUp,
 		cancelBackup,
 		modal,
