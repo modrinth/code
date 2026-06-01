@@ -375,10 +375,11 @@ const BACKUP_HIGHLIGHT_DURATION_MS = 5_000
 
 defineEmits(['onDownload'])
 
-const { backups, invalidate, hasActiveCreate, hasActiveRestore, query } = useServerBackupsQueue(
-	computed(() => serverId),
-	worldId,
-)
+const { backups, invalidate, activeOperationByBackupId, hasActiveCreate, hasActiveRestore, query } =
+	useServerBackupsQueue(
+		computed(() => serverId),
+		worldId,
+	)
 
 const error = computed(() => {
 	const err = query.error.value
@@ -414,17 +415,37 @@ const deleteQueueMutation = useMutation({
 	},
 })
 
-/** In-progress / incomplete backups: legacy cancel + delete path. */
-const deleteLegacyMutation = useMutation({
-	mutationFn: (backupId: string) =>
-		client.archon.backups_v1.delete(serverId, worldId.value!, backupId),
+const cancelOperationMutation = useMutation({
+	mutationFn: async (backup: Archon.BackupsQueue.v1.BackupQueueBackup) => {
+		const activeOperation = activeOperationByBackupId.value.get(backup.id)
+		const historyOperation = backup.history.find(
+			(op) => (op.state === 'pending' || op.state === 'ongoing') && op.operation_id != null,
+		)
+		const operation = activeOperation?.operation_id != null ? activeOperation : historyOperation
+
+		if (operation?.operation_id == null) {
+			await client.archon.backups_v1.delete(serverId, worldId.value!, backup.id)
+		} else if (operation.operation_type === 'create') {
+			await client.archon.backups_queue_v1.cancelCreate(
+				serverId,
+				worldId.value!,
+				operation.operation_id,
+			)
+		} else {
+			await client.archon.backups_queue_v1.cancelRestore(
+				serverId,
+				worldId.value!,
+				operation.operation_id,
+			)
+		}
+	},
 	onSuccess: async () => {
 		await invalidate()
 		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	},
 })
 
-/** Bulk delete via queue API — handles both completed and in-progress backups (cancels the latter). */
+/** Bulk delete selected backups via queue API. */
 const deleteManyMutation = useMutation({
 	mutationFn: (backupIds: string[]) =>
 		client.archon.backups_queue_v1.deleteMany(serverId, worldId.value!, backupIds),
@@ -676,18 +697,20 @@ function deleteBackup(backup?: Archon.BackupsQueue.v1.BackupQueueBackup) {
 		return
 	}
 
-	const mutation = useQueueDeleteFor(backup) ? deleteQueueMutation : deleteLegacyMutation
+	const onError = (err: unknown) => {
+		const message = err instanceof Error ? err.message : String(err)
+		addNotification({
+			type: 'error',
+			title: 'Error deleting backup',
+			text: message,
+		})
+	}
 
-	mutation.mutate(backup.id, {
-		onError: (err) => {
-			const message = err instanceof Error ? err.message : String(err)
-			addNotification({
-				type: 'error',
-				title: 'Error deleting backup',
-				text: message,
-			})
-		},
-	})
+	if (useQueueDeleteFor(backup)) {
+		deleteQueueMutation.mutate(backup.id, { onError })
+	} else {
+		cancelOperationMutation.mutate(backup, { onError })
+	}
 }
 </script>
 

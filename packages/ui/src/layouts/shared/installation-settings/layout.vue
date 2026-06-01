@@ -200,7 +200,7 @@ defineExpose({
 const messages = defineMessages({
 	linkedInstanceTitle: {
 		id: 'installation-settings.linked-instance.title',
-		defaultMessage: 'Linked {projectType, select, server {server project} other {modpack}}',
+		defaultMessage: 'Linked {projectType}',
 	},
 	reinstallModpackTitle: {
 		id: 'installation-settings.reinstall-modpack.title',
@@ -209,7 +209,7 @@ const messages = defineMessages({
 	reinstallModpackDescription: {
 		id: 'installation-settings.reinstall-modpack.description',
 		defaultMessage:
-			"Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added.",
+			'Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added.',
 	},
 	editInstallationTitle: {
 		id: 'installation-settings.edit-installation.title',
@@ -218,7 +218,7 @@ const messages = defineMessages({
 	unlinkDescription: {
 		id: 'installation-settings.unlink.description',
 		defaultMessage:
-			"Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
+			"Unlinking permanently disconnects this {type} from the {projectType} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
 	},
 	repairInstanceTitle: {
 		id: 'installation-settings.repair.instance-title',
@@ -242,6 +242,30 @@ const messages = defineMessages({
 		id: 'installation-settings.edit.warning-instance',
 		defaultMessage:
 			"We don't recommend editing your installation settings after installing content. If you want to edit them, be cautious as it may cause issues.",
+	},
+	serverProjectLabel: {
+		id: 'installation-settings.linked.server-project',
+		defaultMessage: 'server project',
+	},
+	modpackLabel: {
+		id: 'installation-settings.linked.modpack',
+		defaultMessage: 'modpack',
+	},
+	serverLabel: {
+		id: 'installation-settings.type.server',
+		defaultMessage: 'server',
+	},
+	instanceLabel: {
+		id: 'installation-settings.type.instance',
+		defaultMessage: 'instance',
+	},
+	serverPossessiveLabel: {
+		id: 'installation-settings.type.server-possessive',
+		defaultMessage: "server's",
+	},
+	instancePossessiveLabel: {
+		id: 'installation-settings.type.instance-possessive',
+		defaultMessage: "instance's",
 	},
 	editWarningServer: {
 		id: 'installation-settings.edit.warning-server',
@@ -420,7 +444,9 @@ const messages = defineMessages({
 					<span class="text-lg font-semibold text-contrast">
 						{{
 							formatMessage(messages.linkedInstanceTitle, {
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
+								projectType: formatMessage(
+									showModpackVersionActions ? messages.modpackLabel : messages.serverProjectLabel,
+								),
 							})
 						}}
 					</span>
@@ -446,8 +472,10 @@ const messages = defineMessages({
 					<span class="text-primary">
 						{{
 							formatMessage(messages.unlinkDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
+								type: formatMessage(ctx.isServer ? messages.serverLabel : messages.instanceLabel),
+								projectType: formatMessage(
+									showModpackVersionActions ? messages.modpackLabel : messages.serverLabel,
+								),
 							})
 						}}
 					</span>
@@ -481,7 +509,9 @@ const messages = defineMessages({
 					<span class="text-primary">
 						{{
 							formatMessage(messages.reinstallModpackDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
+								type: formatMessage(
+									ctx.isServer ? messages.serverPossessiveLabel : messages.instancePossessiveLabel,
+								),
 							})
 						}}
 					</span>

@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Falha ao carregar detalhes da assinatura"
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 dias"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/mês"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/trimestre"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/year"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "A sua próxima cobrança será em <charge-date>{date}</charge-date>."
   },
@@ -299,12 +287,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Aviso de eliminação"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Eliminar {count} {itemType}{count, plural, one {} other {s}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Eliminar {itemType}{count, plural, one {} other {s}}"
-  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Reverter} other {Atualizar}} pode causar incompatibilidades. Mods ou conteúdo que tu adicionar ao modpack será mantido, mas pode não ser compatível com a nova versão."
   },
@@ -371,9 +353,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Pressiona Shift enquanto clicas para saltar a confirmação."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Recomendamos a criação de um backup antes de proceder para que você possa restaurar {type, select, server {seu mundo} other {sua instância}} se alguma coisa quebrar."
-  },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "O conteúdo do teu modpack agora pode ser encontrado aqui!"
   },
@@ -415,9 +394,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Aguarde"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "Procurar {count} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nomes dos ficheiros"
@@ -482,9 +458,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "A atualizar {contentType}..."
   },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "Selecionou {count} {contentType}"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selecionado"
   },
@@ -503,17 +476,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} a substituir"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Conflito"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Os ficheiros serão substituídos"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "Criar {type, select, directory {pasta} other {arquivo}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Criar {type, select, directory {uma pasta} other {um arquivo}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "ex.: meu-diretorio"
@@ -526,9 +490,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Eliminar ficheiro"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Este diretório e todo o seu conteúdo serão permanentemente apagados. Esta ação não pode ser desfeita.} other {Esse ficheiro será permanentemente apagado. Esta ação não pode ser desfeita.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Não foi possível carregar o conteúdo do ficheiro"
@@ -580,9 +541,6 @@
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "ex.: /minha-pasta"
-  },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Mover pasta} other {Mover ficheiro}}"
   },
   "files.navbar.new-folder": {
     "defaultMessage": "Nova pasta"
@@ -1231,9 +1189,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"

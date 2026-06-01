@@ -14,7 +14,7 @@
 				<p class="m-0">
 					<IntlFormatted
 						:message-id="messages.resubmitModalDescription"
-						:message-values="{ projectTitle: project.title }"
+						:values="{ projectTitle: project.title }"
 					>
 						<template #project-title="{ children }">
 							<span class="font-semibold text-contrast">

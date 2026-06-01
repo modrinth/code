@@ -244,7 +244,7 @@ const messages = defineMessages({
 					</TagItem>
 					<div
 						v-if="world.type === 'singleplayer'"
-						class="text-sm text-secondary flex items-center gap-1 font-semibold"
+						class="text-sm text-secondary flex items-center gap-1 font-semibold flex-nowrap whitespace-nowrap"
 					>
 						<UserIcon
 							aria-hidden="true"

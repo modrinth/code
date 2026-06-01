@@ -321,7 +321,7 @@ const messages = defineMessages({
 	},
 	subscriptionCancelledOnDate: {
 		id: 'servers.listing.notice.subscription-cancelled-on-date',
-		defaultMessage: 'Your subscription was cancelled on <date>{formattedDate}</date>. ',
+		defaultMessage: 'Your subscription was cancelled on <date>{formattedDate}</date>.',
 	},
 	subscriptionCancelledPaymentFailed: {
 		id: 'servers.listing.notice.subscription-cancelled-payment-failed',
@@ -335,7 +335,7 @@ const messages = defineMessages({
 	filesKeptForDownload: {
 		id: 'servers.listing.notice.files-kept-for-download',
 		defaultMessage:
-			'Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining>. Contact support to download the files before they are deleted. ',
+			'Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days}}</days-remaining>. Contact support to download the files before they are deleted.',
 	},
 	subscriptionSetToCancel: {
 		id: 'servers.listing.notice.subscription-set-to-cancel',
@@ -351,7 +351,7 @@ const messages = defineMessages({
 	},
 	moderatedNotice: {
 		id: 'servers.listing.notice.moderated',
-		defaultMessage: 'Your server has been suspended by moderation action. ',
+		defaultMessage: 'Your server has been suspended by moderation action.',
 	},
 	suspendedNotice: {
 		id: 'servers.listing.notice.suspended',
@@ -389,7 +389,7 @@ const messages = defineMessages({
 	pendingChangeNotice: {
 		id: 'servers.listing.notice.pending-change',
 		defaultMessage:
-			'Your server will {verb} to the {planSize} Plan on <date>{formattedDate}</date>. ',
+			'Your server will {verb, select, downgrade {downgrade} other {upgrade}} to the {planSize} Plan on <date>{formattedDate}</date>.',
 	},
 })
 

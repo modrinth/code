@@ -66,7 +66,7 @@
     "defaultMessage": "Visit gallery page"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Your {type, select, mod {mod} plugin {plugin} other {project}} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
+    "defaultMessage": "Your {type} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Provide source code"
@@ -75,7 +75,7 @@
     "defaultMessage": "Some of your external links appear to be identical. Each link should be entered only once and with the appropriate link type."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Identical Links"
+    "defaultMessage": "Clean up identical links"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Your Description should contain sufficient plain text or image alt-text, keeping it accessible to those using screen readers or with slow internet connections."
@@ -159,7 +159,7 @@
     "defaultMessage": "Select a language"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Select the license your {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is distributed under."
+    "defaultMessage": "Select the license your {type} is distributed under."
   },
   "nags.select-license.title": {
     "defaultMessage": "Select a license"
@@ -225,7 +225,10 @@
     "defaultMessage": "Select accurate tags"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "At least one gallery image is required to showcase the content of your {type, select, resourcepack {resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag} shader {shader} other {project}}."
+    "defaultMessage": "At least one gallery image is required to showcase the content of your {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload a gallery image"

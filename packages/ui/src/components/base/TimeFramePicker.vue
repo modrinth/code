@@ -6,6 +6,7 @@
 		:max-height="maxHeight"
 		:trigger-class="triggerClass"
 		:dropdown-min-width="timeframeDropdownMinWidth"
+		:outside-click-ignore="timeframeDropdownOutsideClickIgnore"
 		:dropdown-class="
 			activeTimeframePanel === 'custom_range'
 				? 'bg-transparent border-0 -mt-1 pb-2 shadow-none'
@@ -16,12 +17,16 @@
 		@close="handleTimeframeSelectClose"
 		@select="handleTimeframePresetSelect"
 	>
+		<template #prefix>
+			<slot name="prefix"></slot>
+		</template>
 		<template #dropdown-footer>
 			<template v-if="activeTimeframePanel === 'custom_range'">
 				<div
 					class="flex flex-col gap-0 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-0 pt-1"
 				>
 					<DatePicker
+						v-if="!isMobileCustomRangePicker"
 						v-model="pickerRange"
 						mode="range"
 						:show-months="2"
@@ -35,8 +40,47 @@
 						wrapper-class="w-full"
 						calendar-class="!border-none"
 					/>
-					<div class="flex items-center justify-between p-4 pt-1">
-						<div class="text-base">
+					<div v-else class="grid grid-cols-1 gap-3 p-3">
+						<div class="flex flex-col gap-1">
+							<span class="px-1 text-sm font-semibold text-secondary">
+								{{ formatMessage(messages.startDate) }}
+							</span>
+							<DatePicker
+								v-model="mobileStartDate"
+								mode="single"
+								:show-months="1"
+								:clearable="false"
+								:default-view-date="mobileStartDefaultViewDate"
+								:min-date="minDate"
+								:max-date="customRangeMaxDate"
+								show-today
+								wrapper-class="w-full"
+								close-on-select
+							/>
+						</div>
+						<div class="flex flex-col gap-1">
+							<span class="px-1 text-sm font-semibold text-secondary">
+								{{ formatMessage(messages.endDate) }}
+							</span>
+							<DatePicker
+								v-model="mobileEndDate"
+								mode="single"
+								:show-months="1"
+								:clearable="false"
+								:default-view-date="mobileEndDefaultViewDate"
+								:min-date="minDate"
+								:max-date="customRangeMaxDate"
+								show-today
+								wrapper-class="w-full"
+								close-on-select
+							/>
+						</div>
+					</div>
+					<div
+						class="flex items-center gap-3 p-4 pt-1"
+						:class="isMobileCustomRangePicker ? 'justify-end' : 'justify-between'"
+					>
+						<div v-if="!isMobileCustomRangePicker" class="text-base">
 							<template v-if="formattedRange">
 								<div class="flex items-center gap-1.5">
 									<span class="font-normal text-primary">{{ rangeLabel }}:</span>
@@ -93,7 +137,7 @@
 						>
 							<button
 								type="button"
-								class="flex h-8 w-8 cursor-pointer items-center justify-center border-0 border-r border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
+								class="flex h-8 w-8 touch-manipulation cursor-pointer items-center justify-center border-0 border-r border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
 								:aria-label="formatMessage(messages.decreaseAmount)"
 								@click.stop="decrementAmount"
 							>
@@ -104,7 +148,7 @@
 								type="number"
 								min="1"
 								step="1"
-								class="h-8 w-12 border-0 bg-transparent px-1 text-center text-sm font-semibold text-primary outline-none ring-0 focus:outline-none focus-visible:shadow-none"
+								class="h-8 w-12 touch-manipulation border-0 bg-transparent px-1 text-center text-sm font-semibold text-primary outline-none ring-0 focus:outline-none focus-visible:shadow-none max-sm:text-base"
 								:aria-label="formatMessage(messages.timeframeAmount)"
 								@focus="activateLastTimeframe"
 								@input="handleAmountInput"
@@ -113,7 +157,7 @@
 							/>
 							<button
 								type="button"
-								class="flex h-8 w-8 cursor-pointer items-center justify-center border-0 border-l border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
+								class="flex h-8 w-8 touch-manipulation cursor-pointer items-center justify-center border-0 border-l border-solid border-surface-5 bg-transparent p-0 text-secondary transition-colors hover:text-contrast"
 								:aria-label="formatMessage(messages.increaseAmount)"
 								@click.stop="incrementAmount"
 							>
@@ -122,7 +166,7 @@
 						</div>
 						<select
 							v-model="draftSelectedLastTimeframeUnit"
-							class="h-8 rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
+							class="h-8 touch-manipulation rounded-lg border border-solid border-surface-5 bg-surface-3 px-2 text-sm font-semibold text-primary outline-none transition-[box-shadow,color] focus:text-contrast focus:ring-4 focus:ring-brand-shadow"
 							:aria-label="formatMessage(messages.timeframeUnit)"
 							@change="handleLastTimeframeUnitChange"
 						>
@@ -150,7 +194,7 @@
 
 <script setup lang="ts">
 import { MinusIcon, PlusIcon } from '@modrinth/assets'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import ButtonStyled from './ButtonStyled.vue'
@@ -194,7 +238,10 @@ type LastTimeframeValue = {
 
 const TIMEFRAME_DROPDOWN_MAX_HEIGHT = 500
 const TIMEFRAME_DROPDOWN_MIN_WIDTH = '20rem'
-const CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = '40.5rem'
+const CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = '41.25rem'
+const MOBILE_CUSTOM_RANGE_DROPDOWN_MIN_WIDTH = 'min(calc(100vw - 1rem), 20rem)'
+const MOBILE_CUSTOM_RANGE_PICKER_QUERY = '(pointer: coarse), (max-width: 800px)'
+const DATE_PICKER_PORTAL_SELECTOR = '.modrinth-date-picker-portal'
 
 const DEFAULT_LAST_TIMEFRAME_VALUE_BY_PRESET: Partial<Record<TimeFramePreset, LastTimeframeValue>> =
 	{
@@ -297,6 +344,14 @@ const messages = defineMessages({
 		id: 'time-frame-picker.selected-range',
 		defaultMessage: 'Selected',
 	},
+	startDate: {
+		id: 'time-frame-picker.start-date',
+		defaultMessage: 'Start date',
+	},
+	endDate: {
+		id: 'time-frame-picker.end-date',
+		defaultMessage: 'End date',
+	},
 	selectTimeframe: {
 		id: 'time-frame-picker.select-timeframe',
 		defaultMessage: 'Select timeframe',
@@ -368,6 +423,10 @@ const draftSelectedCustomTimeframeStartDate = ref(customStartDate.value)
 const draftSelectedCustomTimeframeEndDate = ref(customEndDate.value)
 const amountInput = ref(String(lastAmount.value))
 const pickerRange = ref<DatePickerValue[]>([customStartDate.value, customEndDate.value])
+const mobileStartDate = ref<DatePickerValue>(customStartDate.value)
+const mobileEndDate = ref<DatePickerValue>(customEndDate.value)
+const isMobileCustomRangePicker = ref(false)
+let mobileCustomRangePickerMedia: MediaQueryList | null = null
 
 const timeframeOptions = computed<ComboboxOption<TimeFramePreset>[]>(
 	() =>
@@ -400,8 +459,15 @@ const timeframeDropdownOptions = computed<ComboboxOption<TimeFramePreset>[]>(() 
 )
 const timeframeDropdownMinWidth = computed(() =>
 	activeTimeframePanel.value === 'custom_range'
-		? props.customRangeDropdownMinWidth
+		? isMobileCustomRangePicker.value
+			? MOBILE_CUSTOM_RANGE_DROPDOWN_MIN_WIDTH
+			: props.customRangeDropdownMinWidth
 		: props.dropdownMinWidth,
+)
+const timeframeDropdownOutsideClickIgnore = computed(() =>
+	activeTimeframePanel.value === 'custom_range' && isMobileCustomRangePicker.value
+		? [DATE_PICKER_PORTAL_SELECTOR]
+		: [],
 )
 const highlightedTimeframePreset = computed<TimeFramePreset | undefined>(() =>
 	draftSelectedTimeframeMode.value === 'preset' ? draftSelectedTimeframe.value : undefined,
@@ -421,6 +487,12 @@ const selectedTimeframeLabel = computed(() => {
 })
 const todayInputValue = computed(() => getDateInputValue(new Date()))
 const customRangeMaxDate = computed(() => props.maxDate ?? todayInputValue.value)
+const mobileStartDefaultViewDate = computed(
+	() => draftSelectedCustomTimeframeStartDate.value || todayInputValue.value,
+)
+const mobileEndDefaultViewDate = computed(
+	() => draftSelectedCustomTimeframeEndDate.value || todayInputValue.value,
+)
 const selectedDraftDates = computed(() =>
 	pickerRange.value
 		.map(getDatePickerValueString)
@@ -492,6 +564,25 @@ function getDraftSelection(): TimeFramePickerSelection {
 
 function emitDraftChange() {
 	emit('draft-change', getDraftSelection())
+}
+
+function syncMobileCustomRangePickerState() {
+	isMobileCustomRangePicker.value = mobileCustomRangePickerMedia?.matches ?? false
+}
+
+function setupMobileCustomRangePickerMedia() {
+	if (typeof window === 'undefined') {
+		return
+	}
+
+	mobileCustomRangePickerMedia = window.matchMedia(MOBILE_CUSTOM_RANGE_PICKER_QUERY)
+	syncMobileCustomRangePickerState()
+	mobileCustomRangePickerMedia.addEventListener('change', syncMobileCustomRangePickerState)
+}
+
+function teardownMobileCustomRangePickerMedia() {
+	mobileCustomRangePickerMedia?.removeEventListener('change', syncMobileCustomRangePickerState)
+	mobileCustomRangePickerMedia = null
 }
 
 function getDateInputValue(date: Date): string {
@@ -803,6 +894,16 @@ async function handleCustomRangeApply(event: MouseEvent) {
 		return
 	}
 
+	const orderedRange = getOrderedRange([
+		draftSelectedCustomTimeframeStartDate.value,
+		draftSelectedCustomTimeframeEndDate.value,
+	])
+	if (orderedRange) {
+		const [nextStartDate, nextEndDate] = orderedRange
+		draftSelectedCustomTimeframeStartDate.value = nextStartDate
+		draftSelectedCustomTimeframeEndDate.value = nextEndDate
+	}
+
 	draftSelectedTimeframeMode.value = 'custom_range'
 	await applyTimeframeDraft(event)
 }
@@ -905,10 +1006,19 @@ function clearRange() {
 	draftSelectedCustomTimeframeStartDate.value = ''
 	draftSelectedCustomTimeframeEndDate.value = ''
 	pickerRange.value = []
+	mobileStartDate.value = ''
+	mobileEndDate.value = ''
 	emitDraftChange()
 }
 
 function syncPickerRangeFromDraft() {
+	if (mobileStartDate.value !== draftSelectedCustomTimeframeStartDate.value) {
+		mobileStartDate.value = draftSelectedCustomTimeframeStartDate.value
+	}
+	if (mobileEndDate.value !== draftSelectedCustomTimeframeEndDate.value) {
+		mobileEndDate.value = draftSelectedCustomTimeframeEndDate.value
+	}
+
 	if (
 		pickerRange.value.length === 2 &&
 		pickerRange.value[0] === draftSelectedCustomTimeframeStartDate.value &&
@@ -936,7 +1046,33 @@ watch(
 	syncPickerRangeFromDraft,
 )
 
+watch(mobileStartDate, (nextDate) => {
+	const nextStartDate = getDatePickerValueString(nextDate)
+	if (!nextStartDate || nextStartDate === draftSelectedCustomTimeframeStartDate.value) {
+		return
+	}
+
+	draftSelectedCustomTimeframeStartDate.value = nextStartDate
+	draftSelectedTimeframeMode.value = 'custom_range'
+	emitDraftChange()
+})
+
+watch(mobileEndDate, (nextDate) => {
+	const nextEndDate = getDatePickerValueString(nextDate)
+	if (!nextEndDate || nextEndDate === draftSelectedCustomTimeframeEndDate.value) {
+		return
+	}
+
+	draftSelectedCustomTimeframeEndDate.value = nextEndDate
+	draftSelectedTimeframeMode.value = 'custom_range'
+	emitDraftChange()
+})
+
 watch(pickerRange, (nextRange) => {
+	if (isMobileCustomRangePicker.value) {
+		return
+	}
+
 	const orderedRange = getOrderedRange(nextRange)
 	if (!orderedRange) {
 		return
@@ -947,4 +1083,8 @@ watch(pickerRange, (nextRange) => {
 	draftSelectedCustomTimeframeEndDate.value = nextEndDate
 	emitDraftChange()
 })
+
+onMounted(setupMobileCustomRangePickerMedia)
+
+onBeforeUnmount(teardownMobileCustomRangePickerMedia)
 </script>

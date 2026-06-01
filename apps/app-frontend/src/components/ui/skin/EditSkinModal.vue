@@ -1,149 +1,242 @@
 <template>
-	<UploadSkinModal ref="uploadModal" />
-	<ModalWrapper ref="modal" @on-hide="resetState">
+	<NewModal ref="modal" :on-hide="handleModalHide">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">
-				{{ mode === 'edit' ? 'Editing skin' : 'Adding a skin' }}
+				{{ formatMessage(mode === 'edit' ? messages.editSkinTitle : messages.addSkinTitle) }}
 			</span>
 		</template>
 
 		<div class="flex flex-col md:flex-row gap-6">
-			<div class="max-h-[25rem] w-[16rem] min-w-[16rem] overflow-hidden relative">
-				<div class="absolute top-[-4rem] left-0 h-[32rem] w-[16rem] flex-shrink-0">
-					<SkinPreviewRenderer
-						:variant="variant"
-						:texture-src="previewSkin || ''"
-						:cape-src="selectedCapeTexture"
-						:scale="1.4"
-						:fov="50"
-						:initial-rotation="Math.PI / 8"
-						class="h-full w-full"
-					/>
-				</div>
+			<div class="h-[25rem] w-[16rem] min-w-[16rem] flex-shrink-0 md:self-center">
+				<SkinPreviewRenderer
+					:variant="variant"
+					:texture-src="previewSkin || ''"
+					:cape-src="selectedCapeTexture"
+					framing="modal"
+					:initial-rotation="Math.PI / 8"
+					class="h-full w-full"
+				/>
 			</div>
 
 			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
-				<section>
-					<h2 class="text-base font-semibold mb-2">Texture</h2>
+				<section v-if="mode === 'edit' && canEditTextureAndModel">
+					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.textureSection) }}</h2>
 					<ButtonStyled>
-						<button @click="openUploadSkinModal"><UploadIcon /> Replace texture</button>
+						<button class="!shadow-none" @click="openTextureFileBrowser">
+							<UploadIcon /> {{ formatMessage(messages.replaceTextureButton) }}
+						</button>
 					</ButtonStyled>
+					<input
+						ref="textureFileInput"
+						type="file"
+						accept="image/png"
+						class="hidden"
+						@change="onTextureFileInputChange"
+					/>
 				</section>
 
-				<section>
-					<h2 class="text-base font-semibold mb-2">Arm style</h2>
+				<section v-if="canEditTextureAndModel">
+					<h2 class="text-base font-semibold mb-2">
+						{{ formatMessage(messages.armStyleSection) }}
+					</h2>
 					<RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']">
 						<template #default="{ item }">
-							{{ item === 'CLASSIC' ? 'Wide' : 'Slim' }}
+							{{
+								formatMessage(item === 'CLASSIC' ? messages.wideArmStyle : messages.slimArmStyle)
+							}}
 						</template>
 					</RadioButtons>
 				</section>
 
 				<section>
-					<h2 class="text-base font-semibold mb-2">Cape</h2>
-					<div class="flex gap-2">
-						<CapeButton
-							v-if="defaultCape"
-							:id="defaultCape.id"
-							:texture="defaultCape.texture"
-							:name="undefined"
-							:selected="!selectedCape"
-							faded
-							@select="selectCape(undefined)"
+					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.capeSection) }}</h2>
+					<div class="relative w-fit max-w-full">
+						<Transition
+							enter-active-class="transition-all duration-200 ease-out"
+							enter-from-class="opacity-0 max-h-0"
+							enter-to-class="opacity-100 max-h-6"
+							leave-active-class="transition-all duration-200 ease-in"
+							leave-from-class="opacity-100 max-h-6"
+							leave-to-class="opacity-0 max-h-0"
 						>
-							<span>Use default cape</span>
-						</CapeButton>
-						<CapeLikeTextButton v-else :highlighted="!selectedCape" @click="selectCape(undefined)">
-							<span>Use default cape</span>
-						</CapeLikeTextButton>
+							<div
+								v-if="showCapeTopFade"
+								class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-6 bg-gradient-to-b from-bg-raised to-transparent"
+							/>
+						</Transition>
 
-						<CapeButton
-							v-for="cape in visibleCapeList"
-							:id="cape.id"
-							:key="cape.id"
-							:texture="cape.texture"
-							:name="cape.name || 'Cape'"
-							:selected="selectedCape?.id === cape.id"
-							@select="selectCape(cape)"
-						/>
-
-						<CapeLikeTextButton
-							v-if="(capes?.length ?? 0) > 2"
-							tooltip="View more capes"
-							@mouseup="openSelectCapeModal"
+						<div
+							ref="capeListRef"
+							class="grid grid-cols-[repeat(4,max-content)] auto-rows-max gap-2 overflow-y-auto pr-1"
+							:style="{ maxHeight: capeListMaxHeight }"
+							@scroll="checkCapeScrollState"
 						>
-							<template #icon><ChevronRightIcon /></template>
-							<span>More</span>
-						</CapeLikeTextButton>
+							<CapeLikeTextButton
+								:tooltip="formatMessage(messages.noCapeTooltip)"
+								:highlighted="!selectedCape"
+								@click="selectCape(undefined)"
+							>
+								<template #icon><XIcon /></template>
+								<span>{{ formatMessage(messages.noneCapeOption) }}</span>
+							</CapeLikeTextButton>
+
+							<CapeButton
+								v-for="cape in sortedCapes"
+								:id="cape.id"
+								:key="cape.id"
+								:texture="cape.texture"
+								:name="cape.name || formatMessage(messages.capeFallbackName)"
+								:selected="selectedCape?.id === cape.id"
+								@select="selectCape(cape)"
+							/>
+						</div>
+
+						<Transition
+							enter-active-class="transition-all duration-200 ease-out"
+							enter-from-class="opacity-0 max-h-0"
+							enter-to-class="opacity-100 max-h-6"
+							leave-active-class="transition-all duration-200 ease-in"
+							leave-from-class="opacity-100 max-h-6"
+							leave-to-class="opacity-0 max-h-0"
+						>
+							<div
+								v-if="showCapeBottomFade"
+								class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-6 bg-gradient-to-t from-bg-raised to-transparent"
+							/>
+						</Transition>
 					</div>
 				</section>
 			</div>
 		</div>
 
-		<div class="flex gap-2 mt-12">
-			<ButtonStyled color="brand">
-				<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
-					<SpinnerIcon v-if="isSaving" class="animate-spin" />
-					<CheckIcon v-else-if="mode === 'new'" />
-					<SaveIcon v-else />
-					{{ mode === 'new' ? 'Add skin' : 'Save skin' }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled type="outlined">
-				<button :disabled="isSaving" @click="hide"><XIcon />Cancel</button>
-			</ButtonStyled>
-		</div>
-	</ModalWrapper>
-
-	<SelectCapeModal
-		ref="selectCapeModal"
-		:capes="capes || []"
-		@select="handleCapeSelected"
-		@cancel="handleCapeCancel"
-	/>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button :disabled="isSaving" @click="hide">
+						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
+						<SpinnerIcon v-if="isSaving" class="animate-spin" />
+						<CheckIcon v-else-if="mode === 'new'" />
+						<SaveIcon v-else />
+						{{ formatMessage(mode === 'new' ? messages.addSkinButton : messages.saveSkinButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
-import {
-	CheckIcon,
-	ChevronRightIcon,
-	SaveIcon,
-	SpinnerIcon,
-	UploadIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { CheckIcon, SaveIcon, SpinnerIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	CapeButton,
 	CapeLikeTextButton,
+	commonMessages,
+	defineMessages,
 	injectNotificationManager,
+	NewModal,
 	RadioButtons,
 	SkinPreviewRenderer,
+	useScrollIndicator,
+	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { arrayBufferToBase64 } from '@modrinth/utils'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
-import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
 import {
 	add_and_equip_custom_skin,
 	type Cape,
 	determineModelType,
+	equip_skin,
 	get_normalized_skin_texture,
-	remove_custom_skin,
+	normalize_skin_texture,
+	save_custom_skin,
 	type Skin,
 	type SkinModel,
 	type SkinTextureUrl,
-	unequip_skin,
 } from '@/helpers/skins.ts'
 
+const CAPE_LIST_MAX_HEIGHT = 334
+const messages = defineMessages({
+	editSkinTitle: {
+		id: 'app.skins.modal.edit-title',
+		defaultMessage: 'Editing skin',
+	},
+	addSkinTitle: {
+		id: 'app.skins.modal.add-title',
+		defaultMessage: 'Adding a skin',
+	},
+	textureSection: {
+		id: 'app.skins.modal.texture-section',
+		defaultMessage: 'Texture',
+	},
+	replaceTextureButton: {
+		id: 'app.skins.modal.replace-texture-button',
+		defaultMessage: 'Replace texture',
+	},
+	armStyleSection: {
+		id: 'app.skins.modal.arm-style-section',
+		defaultMessage: 'Arm style',
+	},
+	wideArmStyle: {
+		id: 'app.skins.modal.arm-style-wide',
+		defaultMessage: 'Wide',
+	},
+	slimArmStyle: {
+		id: 'app.skins.modal.arm-style-slim',
+		defaultMessage: 'Slim',
+	},
+	capeSection: {
+		id: 'app.skins.modal.cape-section',
+		defaultMessage: 'Cape',
+	},
+	noCapeTooltip: {
+		id: 'app.skins.modal.no-cape-tooltip',
+		defaultMessage: 'No cape',
+	},
+	noneCapeOption: {
+		id: 'app.skins.modal.none-cape-option',
+		defaultMessage: 'None',
+	},
+	capeFallbackName: {
+		id: 'app.skins.modal.cape-fallback-name',
+		defaultMessage: 'Cape',
+	},
+	savingTooltip: {
+		id: 'app.skins.modal.saving-tooltip',
+		defaultMessage: 'Saving...',
+	},
+	uploadSkinFirstTooltip: {
+		id: 'app.skins.modal.upload-skin-first-tooltip',
+		defaultMessage: 'Upload a skin first!',
+	},
+	makeEditFirstTooltip: {
+		id: 'app.skins.modal.make-edit-first-tooltip',
+		defaultMessage: 'Make an edit to the skin first!',
+	},
+	addSkinButton: {
+		id: 'app.skins.modal.add-skin-button',
+		defaultMessage: 'Add skin',
+	},
+	saveSkinButton: {
+		id: 'app.skins.modal.save-skin-button',
+		defaultMessage: 'Save skin',
+	},
+})
+
+const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 
 const modal = useTemplateRef('modal')
-const selectCapeModal = useTemplateRef('selectCapeModal')
+const textureFileInput = useTemplateRef<HTMLInputElement>('textureFileInput')
+const capeListRef = ref<HTMLElement | null>(null)
+const capeListMaxHeight = ref(`${CAPE_LIST_MAX_HEIGHT}px`)
 const mode = ref<'new' | 'edit'>('new')
 const currentSkin = ref<Skin | null>(null)
-const shouldRestoreModal = ref(false)
 const isSaving = ref(false)
 
 const uploadedTextureUrl = ref<SkinTextureUrl | null>(null)
@@ -151,10 +244,49 @@ const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
-const props = defineProps<{ capes?: Cape[]; defaultCape?: Cape }>()
+const props = defineProps<{ capes?: Cape[] }>()
 
 const selectedCapeTexture = computed(() => selectedCape.value?.texture)
-const visibleCapeList = ref<Cape[]>([])
+const canEditTextureAndModel = computed(() => currentSkin.value?.source !== 'default')
+const {
+	showTopFade: showCapeTopFade,
+	showBottomFade: showCapeBottomFade,
+	checkScrollState: checkCapeScrollState,
+	forceCheck: forceCapeScrollCheck,
+} = useScrollIndicator(capeListRef)
+
+let capeListLayoutFrame: number | null = null
+function updateCapeListLayout() {
+	const capeList = capeListRef.value
+	const modalContent = capeList?.closest('[data-modal-content]') as HTMLElement | null
+
+	if (!capeList || !modalContent) {
+		capeListMaxHeight.value = `${CAPE_LIST_MAX_HEIGHT}px`
+		forceCapeScrollCheck()
+		return
+	}
+
+	const availableHeight =
+		modalContent.getBoundingClientRect().bottom - capeList.getBoundingClientRect().top
+
+	capeListMaxHeight.value = `${Math.min(
+		CAPE_LIST_MAX_HEIGHT,
+		Math.max(0, Math.floor(availableHeight)),
+	)}px`
+
+	nextTick(() => forceCapeScrollCheck())
+}
+
+function refreshCapeListLayout() {
+	if (capeListLayoutFrame !== null) {
+		cancelAnimationFrame(capeListLayoutFrame)
+	}
+
+	capeListLayoutFrame = requestAnimationFrame(() => {
+		capeListLayoutFrame = null
+		updateCapeListLayout()
+	})
+}
 
 const sortedCapes = computed(() => {
 	return [...(props.capes || [])].sort((a, b) => {
@@ -163,32 +295,6 @@ const sortedCapes = computed(() => {
 		return nameA.localeCompare(nameB)
 	})
 })
-
-function initVisibleCapeList() {
-	if (!props.capes || props.capes.length === 0) {
-		visibleCapeList.value = []
-		return
-	}
-
-	if (visibleCapeList.value.length === 0) {
-		if (selectedCape.value) {
-			const otherCape = getSortedCapeExcluding(selectedCape.value.id)
-			visibleCapeList.value = otherCape ? [selectedCape.value, otherCape] : [selectedCape.value]
-		} else {
-			visibleCapeList.value = getSortedCapes(2)
-		}
-	}
-}
-
-function getSortedCapes(count: number): Cape[] {
-	if (!sortedCapes.value || sortedCapes.value.length === 0) return []
-	return sortedCapes.value.slice(0, count)
-}
-
-function getSortedCapeExcluding(excludeId: string): Cape | undefined {
-	if (!sortedCapes.value || sortedCapes.value.length <= 1) return undefined
-	return sortedCapes.value.find((cape) => cape.id !== excludeId)
-}
 
 async function loadPreviewSkin() {
 	if (uploadedTextureUrl.value) {
@@ -221,9 +327,13 @@ const disableSave = computed(
 )
 
 const saveTooltip = computed(() => {
-	if (isSaving.value) return 'Saving...'
-	if (mode.value === 'new' && !uploadedTextureUrl.value) return 'Upload a skin first!'
-	if (mode.value === 'edit' && !hasEdits.value) return 'Make an edit to the skin first!'
+	if (isSaving.value) return formatMessage(messages.savingTooltip)
+	if (mode.value === 'new' && !uploadedTextureUrl.value) {
+		return formatMessage(messages.uploadSkinFirstTooltip)
+	}
+	if (mode.value === 'edit' && !hasEdits.value) {
+		return formatMessage(messages.makeEditFirstTooltip)
+	}
 	return undefined
 })
 
@@ -234,9 +344,11 @@ function resetState() {
 	previewSkin.value = ''
 	variant.value = 'CLASSIC'
 	selectedCape.value = undefined
-	visibleCapeList.value = []
-	shouldRestoreModal.value = false
 	isSaving.value = false
+}
+
+function handleModalHide() {
+	setTimeout(() => resetState(), 250)
 }
 
 async function show(e: MouseEvent, skin?: Skin) {
@@ -249,12 +361,11 @@ async function show(e: MouseEvent, skin?: Skin) {
 		variant.value = 'CLASSIC'
 		selectedCape.value = undefined
 	}
-	visibleCapeList.value = []
-	initVisibleCapeList()
 
 	await loadPreviewSkin()
 
 	modal.value?.show(e)
+	nextTick(() => refreshCapeListLayout())
 }
 
 async function showNew(e: MouseEvent, skinTextureUrl: SkinTextureUrl) {
@@ -263,98 +374,54 @@ async function showNew(e: MouseEvent, skinTextureUrl: SkinTextureUrl) {
 	uploadedTextureUrl.value = skinTextureUrl
 	variant.value = await determineModelType(skinTextureUrl.original)
 	selectedCape.value = undefined
-	visibleCapeList.value = []
-	initVisibleCapeList()
 
 	await loadPreviewSkin()
 
 	modal.value?.show(e)
+	nextTick(() => refreshCapeListLayout())
 }
 
-async function restoreWithNewTexture(skinTextureUrl: SkinTextureUrl) {
+async function setUploadedTexture(skinTextureUrl: SkinTextureUrl) {
 	uploadedTextureUrl.value = skinTextureUrl
 	await loadPreviewSkin()
-
-	if (shouldRestoreModal.value) {
-		setTimeout(() => {
-			modal.value?.show()
-			shouldRestoreModal.value = false
-		}, 0)
-	}
+	nextTick(() => refreshCapeListLayout())
 }
 
 function hide() {
 	modal.value?.hide()
-	setTimeout(() => resetState(), 250)
 }
 
 function selectCape(cape: Cape | undefined) {
-	if (cape && selectedCape.value?.id !== cape.id) {
-		const isInVisibleList = visibleCapeList.value.some((c) => c.id === cape.id)
-		if (!isInVisibleList && visibleCapeList.value.length > 0) {
-			visibleCapeList.value.splice(0, 1, cape)
-
-			if (visibleCapeList.value.length > 1 && visibleCapeList.value[1].id === cape.id) {
-				const otherCape = getSortedCapeExcluding(cape.id)
-				if (otherCape) {
-					visibleCapeList.value.splice(1, 1, otherCape)
-				}
-			}
-		}
-	}
 	selectedCape.value = cape
 }
 
-function handleCapeSelected(cape: Cape | undefined) {
-	selectCape(cape)
+function openTextureFileBrowser() {
+	textureFileInput.value?.click()
+}
 
-	if (shouldRestoreModal.value) {
-		setTimeout(() => {
-			modal.value?.show()
-			shouldRestoreModal.value = false
-		}, 0)
+async function onTextureFileInputChange(e: Event) {
+	const files = (e.target as HTMLInputElement).files
+	const file = files?.[0]
+
+	if (!file) {
+		return
 	}
-}
 
-function handleCapeCancel() {
-	if (shouldRestoreModal.value) {
-		setTimeout(() => {
-			modal.value?.show()
-			shouldRestoreModal.value = false
-		}, 0)
-	}
-}
-
-function openSelectCapeModal(e: MouseEvent) {
-	if (!selectCapeModal.value) return
-
-	shouldRestoreModal.value = true
-	modal.value?.hide()
-
-	setTimeout(() => {
-		selectCapeModal.value?.show(
-			e,
-			currentSkin.value?.texture_key,
-			selectedCape.value,
-			previewSkin.value,
-			variant.value,
-		)
-	}, 0)
-}
-
-function openUploadSkinModal(e: MouseEvent) {
-	shouldRestoreModal.value = true
-	modal.value?.hide()
-	emit('open-upload-modal', e)
-}
-
-function restoreModal() {
-	if (shouldRestoreModal.value) {
-		setTimeout(() => {
-			const fakeEvent = new MouseEvent('click')
-			modal.value?.show(fakeEvent)
-			shouldRestoreModal.value = false
-		}, 500)
+	try {
+		const originalSkinTexUrl = `data:image/png;base64,${arrayBufferToBase64(
+			await file.arrayBuffer(),
+		)}`
+		const skinTextureNormalized = await normalize_skin_texture(originalSkinTexUrl)
+		await setUploadedTexture({
+			original: originalSkinTexUrl,
+			normalized: `data:image/png;base64,${arrayBufferToBase64(skinTextureNormalized)}`,
+		})
+	} catch (error) {
+		handleError(error)
+	} finally {
+		if (textureFileInput.value) {
+			textureFileInput.value.value = ''
+		}
 	}
 }
 
@@ -370,17 +437,32 @@ async function save() {
 			textureUrl = currentSkin.value!.texture
 		}
 
-		await unequip_skin()
-
 		const bytes: Uint8Array = new Uint8Array(await (await fetch(textureUrl)).arrayBuffer())
 
 		if (mode.value === 'new') {
-			await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
-			emit('saved')
+			const addedSkin = await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
+			emit('saved', {
+				applied: true,
+				skin: addedSkin,
+			})
 		} else {
-			await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
-			await remove_custom_skin(currentSkin.value!)
-			emit('saved')
+			const updatedSkin = await save_custom_skin(
+				currentSkin.value!,
+				bytes,
+				variant.value,
+				selectedCape.value,
+				!!uploadedTextureUrl.value && textureUrl !== currentSkin.value?.texture,
+			)
+
+			if (currentSkin.value?.is_equipped) {
+				await equip_skin(updatedSkin)
+			}
+
+			emit('saved', {
+				applied: !!currentSkin.value?.is_equipped,
+				skin: updatedSkin,
+				previousSkin: currentSkin.value!,
+			})
 		}
 
 		hide()
@@ -393,28 +475,53 @@ async function save() {
 
 watch([uploadedTextureUrl, currentSkin], async () => {
 	await loadPreviewSkin()
+	refreshCapeListLayout()
 })
 
 watch(
 	() => props.capes,
 	() => {
-		initVisibleCapeList()
+		nextTick(() => refreshCapeListLayout())
 	},
 	{ immediate: true },
 )
 
+watch(
+	capeListRef,
+	(capeList, _, onCleanup) => {
+		if (!capeList) return
+
+		const modalContent = capeList.closest('[data-modal-content]')
+		const resizeObserver = new ResizeObserver(() => refreshCapeListLayout())
+
+		if (modalContent instanceof HTMLElement) {
+			resizeObserver.observe(modalContent)
+		}
+
+		window.addEventListener('resize', refreshCapeListLayout, { passive: true })
+		refreshCapeListLayout()
+
+		onCleanup(() => {
+			resizeObserver.disconnect()
+			window.removeEventListener('resize', refreshCapeListLayout)
+
+			if (capeListLayoutFrame !== null) {
+				cancelAnimationFrame(capeListLayoutFrame)
+				capeListLayoutFrame = null
+			}
+		})
+	},
+	{ flush: 'post' },
+)
+
 const emit = defineEmits<{
-	(event: 'saved'): void
+	(event: 'saved', options: { applied: boolean; skin?: Skin; previousSkin?: Skin }): void
 	(event: 'deleted', skin: Skin): void
-	(event: 'open-upload-modal', mouseEvent: MouseEvent): void
 }>()
 
 defineExpose({
 	show,
 	showNew,
-	restoreWithNewTexture,
 	hide,
-	shouldRestoreModal,
-	restoreModal,
 })
 </script>

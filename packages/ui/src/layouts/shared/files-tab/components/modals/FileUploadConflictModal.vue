@@ -28,7 +28,7 @@
 				<div
 					v-for="(file, index) in files"
 					:key="file"
-					class="grid grid-cols-[auto_auto_1fr] items-center min-h-10 h-10 gap-2"
+					class="grid grid-cols-[auto_minmax(0,1fr)] items-center min-h-10 h-10 gap-2"
 				>
 					<div class="flex flex-col items-center justify-between">
 						<div class="w-[1px] h-2"></div>
@@ -38,14 +38,17 @@
 							class="w-[1px] h-2 relative top-1"
 						></div>
 					</div>
-					<span class="text-sm shrink-0 whitespace-nowrap">{{
-						formatMessage(messages.overwrittenLabel)
-					}}</span>
-					<span
-						v-tooltip="file"
-						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
-					>
-						{{ file }}
+					<span class="flex min-w-0 text-sm whitespace-nowrap overflow-hidden">
+						<IntlFormatted :message-id="messages.overwriteFileLabel" :values="{ path: file }">
+							<template #file-path="{ children }">
+								<span
+									v-tooltip="file"
+									class="min-w-0 text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
+								>
+									<component :is="() => children" />
+								</span>
+							</template>
+						</IntlFormatted>
 					</span>
 				</div>
 			</div>
@@ -76,6 +79,7 @@ import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -105,9 +109,9 @@ const messages = defineMessages({
 		id: 'files.conflict-modal.overwritten-count',
 		defaultMessage: '{count} overwritten',
 	},
-	overwrittenLabel: {
-		id: 'files.conflict-modal.overwritten-label',
-		defaultMessage: 'Overwritten',
+	overwriteFileLabel: {
+		id: 'files.conflict-modal.overwrite-file-label',
+		defaultMessage: 'Will overwrite <file-path>{path}</file-path>',
 	},
 	overwriteButton: {
 		id: 'files.conflict-modal.overwrite-button',
