@@ -65,6 +65,9 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Não foi possível carregar os detalhes da assinatura."
   },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 dias} monthly {/mes} quarterly {/trimestre} yearly {/ano} other {{interval}}}"
+  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Sua próxima cobrança será em <charge-date>{date}</charge-date>."
   },
@@ -91,6 +94,9 @@
   },
   "browse.offline": {
     "defaultMessage": "Você está offline. Conecte a internet para navegar no Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Buscar {projectType}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Selecione projetos"
@@ -308,6 +314,9 @@
   "collections.label.private": {
     "defaultMessage": "Privado"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "conteúdo"
+  },
   "content.card.select-project": {
     "defaultMessage": "Selecionar {project}"
   },
@@ -331,6 +340,12 @@
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Aviso de exclusão"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Excluir {count, number} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Excluir {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {O retrocesso de versão} other {A atualização}} pode causar problemas de compatibilidade. Mods ou conteúdo que você adicionou além do pacote de mods serão mantidos, mas podem não ser compatíveis com a nova versão."
@@ -407,8 +422,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instância"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Segure Shift ao clicar para pular a confirmação."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Recomendamos criar uma cópia de segurança antes de prosseguir, assim você poderá restaurar seu {type} caso algo dê errado."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "O conteúdo do seu pacote de mods agora pode ser encontrado aqui!"
@@ -451,6 +475,9 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Por favor, aguarde"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Buscar {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nomes dos arquivos"
@@ -514,6 +541,9 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Atualizando {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} selecionado(s)"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selecionado(s)"
@@ -812,6 +842,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Sobrescrever"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Vai sobrescrever <file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Mais de 100 arquivos serão sobrescritos se você prosseguir com a extração; aqui estão alguns deles."
   },
@@ -824,6 +857,12 @@
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Os arquivos serão sobrescritos"
   },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Criar {type}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Criar um {type}"
+  },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "ex.: minha-pasta"
   },
@@ -835,6 +874,12 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Excluir arquivo"
+  },
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "Este arquivo será excluído permanentemente. Esta ação não pode ser desfeita."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "Esta pasta e todo seu conteúdo será excluído permanentemente. Esta ação não pode ser desfeita."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Não foi possível carregar o conteúdo do arquivo."
@@ -923,6 +968,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Diminuir zoom"
   },
+  "files.item-type.file": {
+    "defaultMessage": "arquivo"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "arquivos"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "pasta"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "pastas"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "As operações de arquivo estão desativadas enquanto a operação está em andamento."
   },
@@ -961,6 +1018,9 @@
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "ex.: /minha-pasta"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "Mover {type}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Voltar para a página inicial"
@@ -1078,6 +1138,9 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} restantes"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Arraste {type} aqui para adicionar"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "O nome deve conter apenas caracteres alfanuméricos, hífens, sublinhados ou espaços."
@@ -1451,11 +1514,23 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Alterar carregadores é destrutivo"
   },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Vinculado a {projectType}"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "pacote de mods"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "projeto de servidor"
+  },
   "installation-settings.loader-version": {
     "defaultMessage": "Versão do {loader}"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Você precisará redefinir seu servidor para trocar o carregador."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Reinstalar o pacote de mods redefine o conteúdo do {type} para seu estado original, removendo quaisquer mods ou conteúdo que você tenha adicionado."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Reinstalar pacote de mods"
@@ -1484,8 +1559,23 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Buscar versão do jogo..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "instância"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "instância"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "servidor"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "servidor"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Desvincular"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Desvincular desconecta permanentemente este {type} do {projectType}, permitindo que você altere o carregador e a versão do Minecraft, mas você não receberá atualizações futuras."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Verificando..."
@@ -1502,8 +1592,23 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstalar pacote de mods"
   },
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "Reparar reinstala o carregador e as dependências do Minecraft sem excluir seu conteúdo. Isso pode resolver problemas se seu jogo não estiver iniciando devido a erros relacionados ao launcher."
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "Reparar reinstala o carregador e as dependências do Minecraft sem excluir seu conteúdo. Isso pode resolver problemas caso seu servidor não esteja iniciando corretamente."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Reparar {type}"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "instância"
+  },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparar"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "servidor"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modo Aventura"
@@ -1629,7 +1734,7 @@
     "defaultMessage": "Selecione a versão para ver seu registro de alteração"
   },
   "instances.updater-modal.show-incompatible": {
-    "defaultMessage": "Ver incompatibilidade"
+    "defaultMessage": "Exibir incompatíveis"
   },
   "instances.updater-modal.switch-to": {
     "defaultMessage": "Trocar para {version}"
@@ -2283,7 +2388,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2308,6 +2413,9 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.label.badges": {
+    "defaultMessage": "Emblemas"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Publicado {date}"
@@ -3023,6 +3131,18 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Não listado pela equipe"
   },
+  "report.item-type.content": {
+    "defaultMessage": "conteúdo"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "projeto"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "usuário"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "versão"
+  },
   "s.bg": {
     "defaultMessage": "Tarefa em segundo plano em execução\t"
   },
@@ -3291,7 +3411,7 @@
     "defaultMessage": "Um erro inesperado ocorreu durante a instalação"
   },
   "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Esta versão do Minecraft ou do carregador ainda não é suportada pela Modrinth Hosting."
+    "defaultMessage": "Esta versão do Minecraft ou do carregador ainda não é suportada pelo Modrinth Hosting."
   },
   "servers.installing-banner.phase.installing-addons": {
     "defaultMessage": "Instalando complementos..."
@@ -3324,7 +3444,7 @@
     "defaultMessage": "Já possui um servidor?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Saiba mais sobre a Modrinth Hosting"
+    "defaultMessage": "Saiba mais sobre o Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -3377,11 +3497,17 @@
   "servers.listing.new-label": {
     "defaultMessage": "Novo"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Seus arquivos serão mantidos por <days-remaining>mais {daysRemaining} {daysRemaining, plural, one {dia} other {dias}}</days-remaining>. Entre em contato com o suporte para baixar os arquivos antes que sejam excluídos."
+  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Seus arquivos serão preservados por 30 dias após o cancelamento."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Seu servidor foi suspenso por ação da moderação. "
+    "defaultMessage": "Seu servidor foi suspenso por ação da moderação."
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Seu servidor irá {verb, select, downgrade {rebaixar} other {atualizar}} para o plano {planSize} em <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Aguarde enquanto configuramos seu servidor. Isso pode levar até 10 minutos."
@@ -3390,7 +3516,7 @@
     "defaultMessage": "Sua assinatura foi cancelada."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Sua assinatura foi cancelada em <date>{formattedDate}</date>. "
+    "defaultMessage": "Sua assinatura foi cancelada em <date>{formattedDate}</date>."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Sua assinatura foi cancelada devido a falha no pagamento."
@@ -3405,7 +3531,7 @@
     "defaultMessage": "Sua assinatura será cancelada em <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Seu servidor foi suspenso. Entre em contato com o Suporte da Modrinth para obter mais informações."
+    "defaultMessage": "Seu servidor foi suspenso. Entre em contato com o Suporte do Modrinth para obter mais informações."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "O hardware do seu servidor está sendo atualizado e estará online novamente em breve."
@@ -3432,7 +3558,7 @@
     "defaultMessage": "Envio em andamento"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Contate o suporte da Modrinth"
+    "defaultMessage": "Contate o suporte do Modrinth"
   },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Nossos sistemas alertam automaticamente nossa equipe quando há algum problema. Já estamos trabalhando para restabelecê-los."
@@ -3447,7 +3573,7 @@
     "defaultMessage": "Se você adquiriu recentemente um servidor Modrinth Hosting, ele está atualmente em uma fila e aparecerá aqui assim que estiver pronto. <warning>Não tente adquirir um novo servidor.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Caso necessite de suporte personalizado em relação ao status do seu servidor, entre em contato com o Suporte da Modrinth."
+    "defaultMessage": "Caso necessite de suporte personalizado em relação ao status do seu servidor, entre em contato com o Suporte do Modrinth."
   },
   "servers.manage.error.title": {
     "defaultMessage": "Não foi possível carregar os servidores"
@@ -3513,10 +3639,10 @@
     "defaultMessage": "Seu período de teste do servidor Medal terminou e seu servidor foi suspenso. Faça uma atualização para continuar usando o servidor."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Seu servidor foi suspenso. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte da Modrinth para obter mais informações."
+    "defaultMessage": "Seu servidor foi suspenso. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte do Modrinth para obter mais informações."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Seu servidor foi suspenso: {reason}. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte da Modrinth para obter mais informações."
+    "defaultMessage": "Seu servidor foi suspenso: {reason}. Por favor, atualize suas informações de pagamento ou entre em contato com o Suporte do Modrinth para obter mais informações."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "O hardware do seu servidor está sendo atualizado e estará online novamente em breve."
@@ -3572,6 +3698,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Método de pagamento"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "cobrado {interval, select, monthly {mensalmente} quarterly {trimestralmente} yearly {anualmente} other {{interval}}}"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Disponível na América do Norte, Europa e Sudeste Asiático."
   },
@@ -3620,6 +3749,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Revisar"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Austrália"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Europa Central"
   },
@@ -3642,7 +3774,7 @@
     "defaultMessage": "Onde deseja que seu servidor esteja localizado?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Região não listada? <link>Deixe-nos saber onde gostaria de ver o próximo Modrinth Hosting!</link>"
+    "defaultMessage": "Sua região não está listada? <link>Informe-nos onde você gostaria de ver o Modrinth Hosting em seguida!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"
@@ -4220,6 +4352,93 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Aplicar"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Limpar"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Intervalo fixo personalizado..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Diminuir o período"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "Nenhum intervalo de datas selecionado."
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "Data final"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Aumentar o período"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select, hours {{amount, plural, one {Na última hora} other {Nas últimas {amount} horas}}} days {{amount, plural, one {No último dia} other {Nos últimos # dias}}} weeks {{amount, plural, one {Na última semana} other {Nas últimas # semanas}}} months {{amount, plural, one {No último mês} other {Nos últimos # meses}}} other {Nos últimos dias}}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "No último"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Todo o período"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Últimos 14 dias"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Últimos 180 dias"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Últimos 30 dias"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Últimos 7 dias"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Últimos 90 dias"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Hoje"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "Acumulado no ano"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Ontem"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Selecione o período"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Selecionado"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Selecionando"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "Data inicial"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Quantidade de períodos"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Unidade do período"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "dias"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "horas"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "meses"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "semanas"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Você tem alterações não salvas."
   },
@@ -4240,5 +4459,101 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Dispensar tudo"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Este usuário está presente desde a versão alfa do Modrinth, que terminou em novembro de 2020."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Testador Alfa"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Este usuário está presente desde a versão beta do Modrinth, que terminou em fevereiro de 2022."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Clique aqui para ler sobre o lançamento do Modrinth Beta."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Testador Beta"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Os projetos deste usuário alcançaram coletivamente {download_sum} downloads."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} Downloads"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de pacotes de dados no Modrinth antes de seu lançamento em janeiro de 2023."
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "Adotante inicial dos pacotes de dados"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de pacote de mods no Modrinth antes de os lançarmos em maio de 2022."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "Adotante inicial dos pacotes de mods"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de plugins no Modrinth antes de os lançarmos em agosto de 2022."
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "Adotante inicial dos plugins"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de pacote de recursos no Modrinth antes de os lançarmos em agosto de 2022."
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "Adotante inicial dos pacotes de recursos"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de servidores no Modrinth antes de os lançarmos em março de 2026."
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "Adotante inicial dos servidores"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "Este usuário nos ajudou a testar projetos de sombreadores no Modrinth antes de seu lançamento em janeiro de 2023."
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "Adotante inicial dos sombreadores"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "Este usuário participou de um teste alfa fechado do Modrinth Hosting antes do lançamento da versão beta do Modrinth Hosting em novembro de 2024."
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "Testador Alfa do Modrinth Hosting"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "Este usuário trabalha para o Modrinth como Moderador de Conteúdo."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Os moderadores de conteúdo do Modrinth revisam projetos, lidam com denúncias e ajudam a manter o Modrinth seguro."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "Moderador de Conteúdo"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Este usuário está indo além para apoiar o Modrinth e os criadores da plataforma."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Clique aqui para saber mais sobre como se tornar membro."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Membro Modrinth+"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Este usuário participou de pelo menos uma das campanhas de arrecadação do Modrinth para a comunidade LGBTQIA+."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "Clique aqui para conhecer nossa mais recente campanha de arrecadação de fundos para o Orgulho LGBTQIA+."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Apoiador da campanha de arrecadação do Orgulho LGBTQIA+"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Este usuário trabalha para o Modrinth."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Equipe do Modrinth"
   }
 }

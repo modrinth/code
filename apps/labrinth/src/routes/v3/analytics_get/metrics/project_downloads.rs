@@ -18,16 +18,16 @@ use crate::{
 };
 
 use super::super::{
-    ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
-    condense_country, none_if_empty, none_if_zero_version_id,
-    normalize_loader_for_project,
+    COUNTRY_PRIVACY_FLOOR, ClickhouseFilterParam, QueryClickhouseContext,
+    add_to_time_slice, apply_country_privacy, none_if_empty,
+    none_if_zero_version_id, normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
 const TIME_RANGE_START: &str = "{time_range_start: UInt64}";
 const TIME_RANGE_END: &str = "{time_range_end: UInt64}";
 const TIME_SLICES: &str = "{time_slices: UInt64}";
-const PROJECT_IDS: &str = "{project_ids: Array(UInt64)}";
+const PROJECT_IDS: &str = "project_ids";
 
 /// Fields for [`super::ReturnMetrics::project_downloads`].
 #[derive(
@@ -193,16 +193,24 @@ const DOWNLOADS: &str = {
     const USE_REASON: &str = "{use_reason: Bool}";
     const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
     const USE_LOADER: &str = "{use_loader: Bool}";
-    const FILTER_DOMAIN: &str = "{filter_domain: Array(String)}";
-    const FILTER_VERSION_ID: &str = "{filter_version_id: Array(UInt64)}";
+    const FILTER_DOMAIN: &str = "filter_domain";
+    const FILTER_VERSION_ID: &str = "filter_version_id";
     const FILTER_MONETIZED: &str = "{filter_monetized: UInt8}";
-    const FILTER_COUNTRY: &str = "{filter_country: Array(String)}";
-    const FILTER_REASON: &str = "{filter_reason: Array(String)}";
-    const FILTER_GAME_VERSION: &str = "{filter_game_version: Array(String)}";
-    const FILTER_LOADER: &str = "{filter_loader: Array(String)}";
+    const FILTER_COUNTRY: &str = "filter_country";
+    const FILTER_REASON: &str = "filter_reason";
+    const FILTER_GAME_VERSION: &str = "filter_game_version";
+    const FILTER_LOADER: &str = "filter_loader";
 
     formatcp!(
-        "SELECT
+        "WITH
+            ? AS {PROJECT_IDS},
+            ? AS {FILTER_DOMAIN},
+            ? AS {FILTER_VERSION_ID},
+            ? AS {FILTER_COUNTRY},
+            ? AS {FILTER_REASON},
+            ? AS {FILTER_GAME_VERSION},
+            ? AS {FILTER_LOADER}
+        SELECT
             widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
             downloads.project_id AS source_project_id,
             if({USE_PROJECT_ID}, downloads.project_id, 0) AS project_id,
@@ -275,39 +283,21 @@ pub(crate) async fn fetch(
         .param("time_range_start", cx.req.time_range.start.timestamp())
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len())
-        .param("project_ids", cx.project_ids);
+        .bind(cx.project_ids);
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
     }
     for filter_param in [
-        ClickhouseFilterParam::String(
-            "filter_domain",
-            &metrics.filter_by.domain,
-        ),
-        ClickhouseFilterParam::VersionId(
-            "filter_version_id",
-            &metrics.filter_by.version_id,
-        ),
+        ClickhouseFilterParam::String(&metrics.filter_by.domain),
+        ClickhouseFilterParam::VersionId(&metrics.filter_by.version_id),
         ClickhouseFilterParam::Bool(
             "filter_monetized",
             &metrics.filter_by.monetized,
         ),
-        ClickhouseFilterParam::String(
-            "filter_country",
-            &metrics.filter_by.country,
-        ),
-        ClickhouseFilterParam::DownloadReason(
-            "filter_reason",
-            &metrics.filter_by.reason,
-        ),
-        ClickhouseFilterParam::String(
-            "filter_game_version",
-            &metrics.filter_by.game_version,
-        ),
-        ClickhouseFilterParam::String(
-            "filter_loader",
-            &metrics.filter_by.loader,
-        ),
+        ClickhouseFilterParam::String(&metrics.filter_by.country),
+        ClickhouseFilterParam::DownloadReason(&metrics.filter_by.reason),
+        ClickhouseFilterParam::String(&metrics.filter_by.game_version),
+        ClickhouseFilterParam::String(&metrics.filter_by.loader),
     ] {
         query = filter_param.bind(query);
     }
@@ -367,7 +357,20 @@ pub(crate) async fn fetch(
         *buckets.entry(key).or_default() += row.downloads;
     }
 
-    for (key, downloads) in buckets {
+    let mut output_buckets = HashMap::<DownloadBucket, u64>::new();
+    for (mut key, downloads) in buckets {
+        if !apply_country_privacy(
+            &mut key.country,
+            !metrics.filter_by.country.is_empty(),
+            downloads,
+            COUNTRY_PRIVACY_FLOOR,
+        ) {
+            continue;
+        }
+        *output_buckets.entry(key).or_default() += downloads;
+    }
+
+    for (key, downloads) in output_buckets {
         add_to_time_slice(
             cx.time_slices,
             key.bucket as usize,
@@ -380,9 +383,7 @@ pub(crate) async fn fetch(
                         .version_id
                         .and_then(none_if_zero_version_id),
                     monetized: key.monetized,
-                    country: key
-                        .country
-                        .map(|country| condense_country(country, downloads)),
+                    country: key.country,
                     reason: key.reason,
                     game_version: key.game_version.and_then(none_if_empty),
                     loader: key.loader.and_then(none_if_empty),

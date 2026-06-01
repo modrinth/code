@@ -8,6 +8,54 @@
   "admin.billing.error.not-found": {
     "message": "Không tìm thấy người dùng"
   },
+  "analytics.action.add": {
+    "message": "Tạo"
+  },
+  "analytics.action.cancel": {
+    "message": "Hủy"
+  },
+  "analytics.action.refresh": {
+    "message": "Làm mới"
+  },
+  "analytics.action.reset": {
+    "message": "Dặt lại"
+  },
+  "analytics.breakdown.country": {
+    "message": "Quốc gia"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Lý do tải"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Nguồn tải"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Phiên bản game"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Loader"
+  },
+  "analytics.breakdown.project": {
+    "message": "Dự án"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Trạng thái dự án"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Phiên bản dự án"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Hiện thị tất cả"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Hiển thị 8 hạng đầu"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Hiển thị"
+  },
   "app-marketing.download.description": {
     "message": "Ứng dụng máy tính của chúng tôi có sẵn trên mọi nền tảng, hãy chọn phiên bản bạn muốn."
   },
@@ -121,9 +169,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -2660,26 +2705,14 @@
   "scopes.organizationWrite.label": {
     "message": "Ghi tổ chức"
   },
-  "scopes.patCreate.description": {
-    "message": "Tạo token API cá nhân"
-  },
   "scopes.patCreate.label": {
     "message": "Tạo PAT"
-  },
-  "scopes.patDelete.description": {
-    "message": "Xoá token API cá nhân của bạn"
   },
   "scopes.patDelete.label": {
     "message": "Xoá PAT"
   },
-  "scopes.patRead.description": {
-    "message": "Xem token API đã tạo"
-  },
   "scopes.patRead.label": {
     "message": "Đọc PAT"
-  },
-  "scopes.patWrite.description": {
-    "message": "Chỉnh sửa token API cá nhân"
   },
   "scopes.patWrite.label": {
     "message": "Ghi PAT"

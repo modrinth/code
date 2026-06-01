@@ -2024,9 +2024,6 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -3047,9 +3044,6 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "No se han encontrado servidores todavía"
   },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Elige tus mods favoritos y nosotros nos encargamos del resto."
-  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Instala mod en un clic"
   },
@@ -3086,23 +3080,14 @@
   "servers.listing.new-label": {
     "defaultMessage": "Nuevo"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Tus archivos se mantrendran por <days-remaining>{daysRemaining} {daysRemaining, plural, one {día} other {días} }más</days-remaining>. Contacta con el soporta para descargarlos antes de que sean eliminados. "
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Tus archivos se preservarán por 30 días tras la cancelación."
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "Tu servidor ha sido suspendido por acciones de moderación."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Por favor espere mientras preparamos tu servidor. Esto puede tomar hasta 10 minutos."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Tu suscripción ha sido cancelada."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Tu suscripción fue cancelada el <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Tu suscripción fue cancelada debido a un error en el pago."

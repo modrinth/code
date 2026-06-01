@@ -326,6 +326,69 @@
   "app.settings.tabs.resource-management": {
     "message": "Zarządzanie zasobami"
   },
+  "app.skins.add-button": {
+    "message": "Dodaj skina"
+  },
+  "app.skins.apply-button": {
+    "message": "Zastosuj"
+  },
+  "app.skins.delete-button": {
+    "message": "Usuń skina"
+  },
+  "app.skins.edit-button": {
+    "message": "Edytuj skina"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Dodaj skina"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Dodawanie skina"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Peleryna"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Pelerynki"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Edytuj skina"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Brak peleryny"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Nic"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Zapisz skina"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Zapisywanie..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Tekstura"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Edytuj skina"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Zwolnij!"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Domyślne skiny"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Zaloguj Się"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Proszę zaloguj się"
+  },
+  "app.skins.title": {
+    "message": "Wybierz skina"
+  },
   "app.update-popup.body": {
     "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
   },
@@ -602,6 +665,24 @@
   "instance.settings.tabs.java": {
     "message": "Java i pamięć"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Zmienne środowiskowe"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Niestandardowe argumenty Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Niestandardowa instalacja Javy"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Niestandardowa alokacja pamięci"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Zmienne środowiskowe..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Argumenty Javy..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Zmienne środowiskowe"
   },
@@ -616,6 +697,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Przypisana pamięć"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "Okno"

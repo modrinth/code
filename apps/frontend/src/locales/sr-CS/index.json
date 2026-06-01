@@ -740,26 +740,14 @@
   "scopes.organizationWrite.label": {
     "message": "Uređivanje organizacija"
   },
-  "scopes.patCreate.description": {
-    "message": "Omogućava kreiranje ličnih API tokena"
-  },
   "scopes.patCreate.label": {
     "message": "Kreiranje PAT-ova"
-  },
-  "scopes.patDelete.description": {
-    "message": "Omogućava brisanje vaših ličnih API tokena"
   },
   "scopes.patDelete.label": {
     "message": "Brisanje PAT-ova"
   },
-  "scopes.patRead.description": {
-    "message": "Omogućava pregled kreiranih API tokena"
-  },
   "scopes.patRead.label": {
     "message": "Čitanje PAT-ova"
-  },
-  "scopes.patWrite.description": {
-    "message": "Omogućava izmenu ličnih API tokena"
   },
   "scopes.patWrite.label": {
     "message": "Uređivanje PAT-ova"

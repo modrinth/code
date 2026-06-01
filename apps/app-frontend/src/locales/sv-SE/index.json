@@ -56,6 +56,18 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
   },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimera programstartare"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Använd systemets fönsterram (omstart av app krävs)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Inbyggda fönsterdekorationer"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Välj ett alternativ"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
   },
@@ -86,6 +98,9 @@
   "app.browse.server.installing": {
     "message": "Installerar"
   },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."
   },
@@ -94,6 +109,9 @@
   },
   "app.export-modal.header": {
     "message": "Exportera modpaket"
+  },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Inkludera \"{file}\"?"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Modpaketets namn"
@@ -253,6 +271,60 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resurshantering"
+  },
+  "app.skins.add-button": {
+    "message": "Lägg till utseende"
+  },
+  "app.skins.delete-button": {
+    "message": "Ta bort utseende"
+  },
+  "app.skins.edit-button": {
+    "message": "Redigera utseende"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Lägg till utseende"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Lägga till ett utseende"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Arm stil"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Smal"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Bred"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Mantel"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Mantel"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Redigerar utseende"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Gör en ändring på utseendet först!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Ingen mantel"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Ingen"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Byt ut textur"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Spara utseende"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Sparar..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textur"
   },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} är redo att laddas ner! Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
@@ -620,6 +692,24 @@
   "instance.worlds.world_in_use": {
     "message": "Värld används"
   },
+  "minecraft-account.add-account": {
+    "message": "Lägg till konto"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft konto"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Inte inloggad"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Ta bort konto"
+  },
+  "minecraft-account.select-account": {
+    "message": "Välj konto"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Logga in till Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Tillhandahållet av instansen"
   },
@@ -643,5 +733,8 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader tillhandahålls av servern"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Installera ändå"
   }
 }

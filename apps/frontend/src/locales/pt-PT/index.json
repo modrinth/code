@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -2441,12 +2438,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visitar o painel de projetos"
   },
-  "project.stats.downloads-label": {
-    "message": "transferência{count, plural,one { } other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "seguidor{count, plural, one {} other {es}}"
-  },
   "project.status.archived.message": {
     "message": "{title} foi arquivado. {title} não receberá mais atualizações, a menos que o autor decida desarquivar o projeto."
   },
@@ -2615,26 +2606,14 @@
   "scopes.organizationWrite.label": {
     "message": "Editar organizações"
   },
-  "scopes.patCreate.description": {
-    "message": "Criar tokens de API pessoais"
-  },
   "scopes.patCreate.label": {
     "message": "Criar TAPs"
-  },
-  "scopes.patDelete.description": {
-    "message": "Apaga os teu tokens de API pessoais"
   },
   "scopes.patDelete.label": {
     "message": "Apagar TAPs"
   },
-  "scopes.patRead.description": {
-    "message": "Ver tokens API criados"
-  },
   "scopes.patRead.label": {
     "message": "Ler TAPs"
-  },
-  "scopes.patWrite.description": {
-    "message": "Criar tokens de API pessoais"
   },
   "scopes.patWrite.label": {
     "message": "Editar TAPs"

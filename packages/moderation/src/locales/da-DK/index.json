@@ -71,9 +71,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Nogle af dine eksterne links ser ud til at være identiske. Hvert link skal kun indtastes en gang og med den korrekte linktype."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Identiske Links"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Din Beskrivelse burde indeholde tilstrækkelig almindelig tekst eller billedtekst, så den er tilgængelig for personer som bruger skærmlæsere eller med langsom internet forbindelse."
   },
@@ -87,3 +84,4 @@
     "defaultMessage": "Besøg beskrivelse indstillinger"
   }
 }
+
