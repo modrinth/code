@@ -65,6 +65,9 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Impossible de charger les détails de l'abonnement."
   },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {tous les 5 jours} monthly {par mois} quarterly {par trimestre} yearly {par an} other {{interval}}}"
+  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Votre prochain paiement sera le <charge-date>{date}</charge-date>."
   },
@@ -91,6 +94,9 @@
   },
   "browse.offline": {
     "defaultMessage": "Vous êtes actuellement hors ligne. Connectez-vous à Internet pour rechercher sur Modrinth !"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Rechercher {projectType}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Projets sélectionnés"
@@ -308,6 +314,12 @@
   "collections.label.private": {
     "defaultMessage": "Privé"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "contenu"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural,one {objet} other {objets}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Sélectionner {project}"
   },
@@ -331,6 +343,12 @@
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Avertissement suppression"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Supprimer {count, number} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Supprimer {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Rétrograder} other {Mettre à jour}} peut causer des erreurs de compatibilité. Les mods ou le contenu ajouté par-dessus le modpack seront gardés, mais il est possible qu'ils ne soient pas compatibles avec la nouvelle version."
@@ -407,8 +425,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Sauvegarder"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instance"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Appuyer sur Maj en cliquant pour passer la confirmation."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Nous vous recommandons de créer une sauvegarde avant de continuer afin de pouvoir restaurer votre {type} en cas de problème."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "monde"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Le contenu de votre modpack peut maintenant être retrouvé ici !"
@@ -451,6 +478,9 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Veuillez patienter"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Rechercher {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Noms des fichers"
@@ -514,6 +544,9 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Mise à jour de {contentType} en cours..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} sélectionné"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Créer une instance"
@@ -809,6 +842,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Écraser"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Écrasera <file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Plus de 100 fichiers seront écrasés si vous procédez à l'extraction ; en voici quelques-uns."
   },
@@ -817,6 +853,12 @@
   },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Les fichiers seront écrasés"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Créer {type}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Crée un {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "ex. mon-dossier"
@@ -829,6 +871,12 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Supprimer le fichier"
+  },
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "Ce fichier sera définitivement supprimé. Cette action est irréversible."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "Ce dossier et tout son contenu seront définitivement supprimés. Cette action est irréversible."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Impossible de charger le contenu du fichier"
@@ -917,6 +965,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Dézoomer"
   },
+  "files.item-type.file": {
+    "defaultMessage": "fichier"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "fichiers"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "dossier"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "dossiers"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "Les opérations de fichier sont désactivées pendant que l'opération est en cours."
   },
@@ -952,6 +1012,9 @@
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "ex. /mon-dossier"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "Déplacer {type}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Retour vers l'accueil"
@@ -1072,6 +1135,9 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} restants"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Déposez {type} ici pour téléverser"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Le nom ne doit contenir que des caractères alphanumériques, des tirets, des tirets bas, ou des espaces."
@@ -1445,6 +1511,15 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Changer de loader est destructif"
   },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "{projectType} associés"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "modpack"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "projet serveur"
+  },
   "installation-settings.loader-version": {
     "defaultMessage": "Version de {loader}"
   },
@@ -1478,6 +1553,18 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Recherchez une version du jeu..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "instance"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "de l'instance"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "serveur"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "du serveur"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Dissocier"
   },
@@ -1496,8 +1583,17 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Réinstaller le modpack"
   },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Réparer {type}"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "l'instance"
+  },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Réparer"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "le serveur"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Mode aventure"
@@ -2280,7 +2376,7 @@
     "defaultMessage": "JBC"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2305,6 +2401,9 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.label.badges": {
+    "defaultMessage": "Badges"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Publié {date}"
@@ -3038,6 +3137,18 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Désactivé par les modérateurs"
   },
+  "report.item-type.content": {
+    "defaultMessage": "contenu"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "projet"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "utilisateur"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "version"
+  },
   "s.bg": {
     "defaultMessage": "Tâche d'arrière-plan en exécution"
   },
@@ -3354,7 +3465,7 @@
     "defaultMessage": "Aucun serveur pour le moment"
   },
   "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Choisissez vos mods préférés et on se charge du reste."
+    "defaultMessage": "Choisissez vos mods préférés et nous nous occupons du reste."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Installez des mods en un clic"
@@ -3393,22 +3504,16 @@
     "defaultMessage": "Nouveau"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Vos fichiers seront conservés pour <days-remaining>{daysRemaining} {daysRemaining, plural,one {jour}other {jours}} de plus</days-remaining>. Contactez l'assistance pour télécharger les fichiers avant qu'ils ne soient supprimés. "
+    "defaultMessage": "Vos fichiers seront conservés pendant encore <days-remaining>{daysRemaining} jour{daysRemaining, plural, one {} other {s}}</days-remaining>. Contactez le support pour les télécharger avant leur suppression."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Vos fichiers seront préservés pour 30 jours après l'annulation."
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "Votre serveur a été suspendu par action de modération. "
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Veuillez patienter pendant que nous mettons en place votre serveur. Cela peut prendre jusqu'à 10 minutes."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Votre abonnement a été annulé."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Votre abonnement a été annulé le <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Votre abonnement a été annulé à cause d'une erreur de paiement."
@@ -3637,6 +3742,9 @@
   },
   "servers.purchase.step.review.title": {
     "defaultMessage": "Évaluer"
+  },
+  "servers.region.australia": {
+    "defaultMessage": "Australie"
   },
   "servers.region.central-europe": {
     "defaultMessage": "Europe centrale"
@@ -4237,6 +4345,15 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
+  },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Appliquer"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Annuler"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Effacer"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Vous avez des modifications non enregistrées."

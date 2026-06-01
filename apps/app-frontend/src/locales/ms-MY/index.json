@@ -299,6 +299,9 @@
   "app.project.install-button.already-installed": {
     "message": "Projek ini sudah dipasang"
   },
+  "app.project.install-context.back-to-browse": {
+    "message": "Kembali menemukan"
+  },
   "app.project.install-context.install-content-to-instance": {
     "message": "Pasang kandungan ke dalam pemasangan"
   },
@@ -602,6 +605,21 @@
   "instance.settings.tabs.java": {
     "message": "Java dan ingatan"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Pembolehubah persekitaran tersuai"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumen Java tersuai"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Pemasangan Java tersuai"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Peruntukan ingatan tersuai"
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Masukkan argumen Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Pembolehubah persekitaran"
   },
@@ -616,6 +634,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Ingatan yang diperuntukkan"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/laluan/ke/java"
   },
   "instance.settings.tabs.window": {
     "message": "Tetingkap"
