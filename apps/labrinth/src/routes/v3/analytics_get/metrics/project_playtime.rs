@@ -11,8 +11,8 @@ use crate::{
 
 use super::super::{
     ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
-    none_if_empty, none_if_zero_version_id, normalize_loader_for_project,
-    passes_country_privacy_floor,
+    apply_country_privacy, none_if_empty, none_if_zero_version_id,
+    normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -255,14 +255,19 @@ pub(crate) async fn fetch(
         *buckets.entry(key).or_default() += row.seconds;
     }
 
-    for (key, seconds) in buckets {
-        if !passes_country_privacy_floor(
-            key.country.is_some() || !metrics.filter_by.country.is_empty(),
+    let mut output_buckets = HashMap::<PlaytimeBucket, u64>::new();
+    for (mut key, seconds) in buckets {
+        if !apply_country_privacy(
+            &mut key.country,
+            !metrics.filter_by.country.is_empty(),
             seconds,
         ) {
             continue;
         }
+        *output_buckets.entry(key).or_default() += seconds;
+    }
 
+    for (key, seconds) in output_buckets {
         add_to_time_slice(
             cx.time_slices,
             key.bucket as usize,

@@ -114,6 +114,7 @@ pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
 /// [`TimeRange::resolution`].
 pub const MAX_TIME_SLICES: usize = 1024;
 pub(crate) const UNKNOWN_LOADER: &str = "unknown";
+pub(crate) const UNKNOWN_COUNTRY: &str = "XX";
 pub(crate) const COUNTRY_PRIVACY_FLOOR: u64 = 50;
 
 // response
@@ -404,11 +405,24 @@ pub(crate) fn none_if_zero_version_id(v: DBVersionId) -> Option<VersionId> {
     if v.0 == 0 { None } else { Some(v.into()) }
 }
 
-pub(crate) fn passes_country_privacy_floor(
-    country_is_constrained: bool,
+pub(crate) fn apply_country_privacy(
+    country: &mut Option<String>,
+    country_filter_applied: bool,
     count: u64,
 ) -> bool {
-    !country_is_constrained || count >= COUNTRY_PRIVACY_FLOOR
+    if count >= COUNTRY_PRIVACY_FLOOR {
+        return true;
+    }
+
+    if country_filter_applied {
+        return false;
+    }
+
+    if country.is_some() {
+        *country = Some(UNKNOWN_COUNTRY.to_string());
+    }
+
+    true
 }
 
 pub(crate) fn project_loader_map(
@@ -562,12 +576,6 @@ impl ClickhouseFilterParam<'_> {
 }
 
 impl ClickhouseQueryParams {
-    pub(crate) const PROJECT_IDS: Self = Self {
-        project_ids: true,
-        parent_version_ids: false,
-        affiliate_code_ids: false,
-    };
-
     pub(crate) const fn empty() -> Self {
         Self {
             project_ids: false,
@@ -795,9 +803,21 @@ mod tests {
 
     #[test]
     fn country_privacy_floor_suppresses_small_constrained_buckets() {
-        assert!(passes_country_privacy_floor(false, 1));
-        assert!(!passes_country_privacy_floor(true, 49));
-        assert!(passes_country_privacy_floor(true, 50));
+        let mut country = None;
+        assert!(apply_country_privacy(&mut country, false, 1));
+        assert_eq!(country, None);
+
+        let mut country = Some("US".into());
+        assert!(apply_country_privacy(&mut country, false, 49));
+        assert_eq!(country, Some("XX".into()));
+
+        let mut country = Some("US".into());
+        assert!(!apply_country_privacy(&mut country, true, 49));
+        assert_eq!(country, Some("US".into()));
+
+        let mut country = Some("US".into());
+        assert!(apply_country_privacy(&mut country, true, 50));
+        assert_eq!(country, Some("US".into()));
     }
 
     #[test]

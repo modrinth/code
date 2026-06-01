@@ -1,11 +1,13 @@
+use std::collections::HashMap;
+
 use const_format::formatcp;
 use serde::{Deserialize, Serialize};
 
 use crate::{database::models::DBProjectId, routes::ApiError};
 
 use super::super::{
-    ClickhouseFilterParam, ClickhouseQueryParams, QueryClickhouseContext,
-    none_if_empty, passes_country_privacy_floor, query_clickhouse,
+    ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
+    apply_country_privacy, none_if_empty,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -81,6 +83,16 @@ struct ViewRow {
     views: u64,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct ViewBucket {
+    bucket: u64,
+    project_id: DBProjectId,
+    domain: Option<String>,
+    site_path: Option<String>,
+    monetized: Option<bool>,
+    country: Option<String>,
+}
+
 const VIEWS: &str = {
     const USE_PROJECT_ID: &str = "{use_project_id: Bool}";
     const USE_DOMAIN: &str = "{use_domain: Bool}";
@@ -129,50 +141,94 @@ pub(crate) async fn fetch(
 ) -> Result<(), ApiError> {
     use ProjectViewsField as F;
     let uses = |field| metrics.bucket_by.contains(&field);
+    let use_columns = &[
+        ("use_project_id", uses(F::ProjectId)),
+        ("use_domain", uses(F::Domain)),
+        ("use_site_path", uses(F::SitePath)),
+        ("use_monetized", uses(F::Monetized)),
+        ("use_country", uses(F::Country)),
+    ];
+    let uses_column = |name| {
+        use_columns
+            .iter()
+            .any(|(column_name, used)| *column_name == name && *used)
+    };
 
-    query_clickhouse::<ViewRow>(
-        cx,
-        VIEWS,
-        ClickhouseQueryParams::PROJECT_IDS,
-        &[
-            ("use_project_id", uses(F::ProjectId)),
-            ("use_domain", uses(F::Domain)),
-            ("use_site_path", uses(F::SitePath)),
-            ("use_monetized", uses(F::Monetized)),
-            ("use_country", uses(F::Country)),
-        ],
-        vec![
-            ClickhouseFilterParam::String(&metrics.filter_by.domain),
-            ClickhouseFilterParam::String(&metrics.filter_by.site_path),
-            ClickhouseFilterParam::Bool(
-                "filter_monetized",
-                &metrics.filter_by.monetized,
-            ),
-            ClickhouseFilterParam::String(&metrics.filter_by.country),
-        ],
-        |row| {
-            passes_country_privacy_floor(
-                uses(F::Country) || !metrics.filter_by.country.is_empty(),
-                row.views,
-            )
-        },
-        |row| row.bucket,
-        |row| {
+    let mut query = cx
+        .clickhouse
+        .query(VIEWS)
+        .param("time_range_start", cx.req.time_range.start.timestamp())
+        .param("time_range_end", cx.req.time_range.end.timestamp())
+        .param("time_slices", cx.time_slices.len())
+        .bind(cx.project_ids);
+    for (param_name, used) in use_columns {
+        query = query.param(param_name, used)
+    }
+    for filter_param in [
+        ClickhouseFilterParam::String(&metrics.filter_by.domain),
+        ClickhouseFilterParam::String(&metrics.filter_by.site_path),
+        ClickhouseFilterParam::Bool(
+            "filter_monetized",
+            &metrics.filter_by.monetized,
+        ),
+        ClickhouseFilterParam::String(&metrics.filter_by.country),
+    ] {
+        query = filter_param.bind(query);
+    }
+
+    let mut cursor = query.fetch::<ViewRow>()?;
+    let mut buckets = HashMap::<ViewBucket, u64>::new();
+
+    while let Some(row) = cursor.next().await? {
+        let key = ViewBucket {
+            bucket: row.bucket,
+            project_id: row.project_id,
+            domain: uses_column("use_domain").then(|| row.domain.clone()),
+            site_path: uses_column("use_site_path")
+                .then(|| row.site_path.clone()),
+            monetized: if uses_column("use_monetized") {
+                match row.monetized {
+                    0 => Some(false),
+                    1 => Some(true),
+                    _ => None,
+                }
+            } else {
+                None
+            },
+            country: uses_column("use_country").then(|| row.country.clone()),
+        };
+
+        *buckets.entry(key).or_default() += row.views;
+    }
+
+    let mut output_buckets = HashMap::<ViewBucket, u64>::new();
+    for (mut key, views) in buckets {
+        if !apply_country_privacy(
+            &mut key.country,
+            !metrics.filter_by.country.is_empty(),
+            views,
+        ) {
+            continue;
+        }
+        *output_buckets.entry(key).or_default() += views;
+    }
+
+    for (key, views) in output_buckets {
+        add_to_time_slice(
+            cx.time_slices,
+            key.bucket as usize,
             AnalyticsData::Project(ProjectAnalytics {
-                source_project: row.project_id.into(),
+                source_project: key.project_id.into(),
                 metrics: ProjectMetrics::Views(ProjectViews {
-                    domain: none_if_empty(row.domain),
-                    site_path: none_if_empty(row.site_path),
-                    monetized: match row.monetized {
-                        0 => Some(false),
-                        1 => Some(true),
-                        _ => None,
-                    },
-                    country: uses(F::Country).then_some(row.country),
-                    views: row.views,
+                    domain: key.domain.and_then(none_if_empty),
+                    site_path: key.site_path.and_then(none_if_empty),
+                    monetized: key.monetized,
+                    country: key.country,
+                    views,
                 }),
-            })
-        },
-    )
-    .await
+            }),
+        )?;
+    }
+
+    Ok(())
 }

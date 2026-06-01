@@ -19,8 +19,8 @@ use crate::{
 
 use super::super::{
     ClickhouseFilterParam, QueryClickhouseContext, add_to_time_slice,
-    none_if_empty, none_if_zero_version_id, normalize_loader_for_project,
-    passes_country_privacy_floor,
+    apply_country_privacy, none_if_empty, none_if_zero_version_id,
+    normalize_loader_for_project,
 };
 use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
@@ -357,14 +357,19 @@ pub(crate) async fn fetch(
         *buckets.entry(key).or_default() += row.downloads;
     }
 
-    for (key, downloads) in buckets {
-        if !passes_country_privacy_floor(
-            key.country.is_some() || !metrics.filter_by.country.is_empty(),
+    let mut output_buckets = HashMap::<DownloadBucket, u64>::new();
+    for (mut key, downloads) in buckets {
+        if !apply_country_privacy(
+            &mut key.country,
+            !metrics.filter_by.country.is_empty(),
             downloads,
         ) {
             continue;
         }
+        *output_buckets.entry(key).or_default() += downloads;
+    }
 
+    for (key, downloads) in output_buckets {
         add_to_time_slice(
             cx.time_slices,
             key.bucket as usize,
