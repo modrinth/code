@@ -199,4 +199,19 @@ export const md = (options = {}) => {
 	return md
 }
 
-export const renderString = (string: string) => configuredXss.process(md().render(string))
+// WKWebView (macOS) loads the app from a custom `tauri://localhost` scheme and
+// will not attach a Referer to cross-origin subframes, which makes YouTube embeds
+// fail with "Video player configuration error" (Error 153). Forcing
+// `referrerpolicy="unsafe-url"` asks the engine to send the fullest referrer it
+// can, which YouTube accepts. Applied after sanitization so it only touches
+// iframes the allow-list already validated.
+export const injectEmbedReferrerPolicy = (html: string) =>
+	html.replace(/<iframe\b(?![^>]*\breferrerpolicy=)([^>]*?)>/gi, (match, attrs) => {
+		if (!/\bsrc=["'][^"']*youtube(-nocookie)?\.com\/embed\//i.test(attrs)) {
+			return match
+		}
+		return `<iframe referrerpolicy="unsafe-url"${attrs}>`
+	})
+
+export const renderString = (string: string) =>
+	injectEmbedReferrerPolicy(configuredXss.process(md().render(string)))

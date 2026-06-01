@@ -17,7 +17,7 @@ import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import mcfunction from 'highlightjs-mcfunction'
 
-import { configuredXss, md } from '../parse'
+import { configuredXss, injectEmbedReferrerPolicy, md } from '../parse'
 import skript from './skript'
 
 /* REGISTRATION */
@@ -58,20 +58,22 @@ hljs.registerAliases(['html', 'htm', 'xhtml', 'mcui', 'fxml'], { languageName: '
 export { hljs }
 
 export const renderHighlightedString = (string) =>
-	configuredXss.process(
-		md({
-			highlight(str, lang) {
-				if (lang && hljs.getLanguage(lang)) {
-					try {
-						return hljs.highlight(str, { language: lang }).value
-					} catch {
-						/* empty */
+	injectEmbedReferrerPolicy(
+		configuredXss.process(
+			md({
+				highlight(str, lang) {
+					if (lang && hljs.getLanguage(lang)) {
+						try {
+							return hljs.highlight(str, { language: lang }).value
+						} catch {
+							/* empty */
+						}
 					}
-				}
 
-				return ''
-			},
-		}).render(string),
+					return ''
+				},
+			}).render(string),
+		),
 	)
 
 export const highlightCodeLines = (code: string, language: string): string[] => {
