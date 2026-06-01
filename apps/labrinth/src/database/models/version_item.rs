@@ -778,7 +778,7 @@ impl DBVersion {
 
                 let dependencies : DashMap<DBVersionId, Vec<DependencyQueryResult>> = sqlx::query!(
                     "
-                    SELECT DISTINCT dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type
+                    SELECT DISTINCT d.id as dependency_id, dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type
                     FROM dependencies d
                     WHERE dependent_id = ANY($1)
                     ",
@@ -786,10 +786,12 @@ impl DBVersion {
                 ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<_,Vec<DependencyQueryResult>>, m| {
                         let dependency = DependencyQueryResult {
+                            id: m.dependency_id,
                             project_id: m.dependency_project_id.map(DBProjectId),
                             version_id: m.dependency_version_id.map(DBVersionId),
                             file_name: m.file_name,
                             dependency_type: m.dependency_type,
+                            attribution: None,
                         };
 
                         acc.entry(DBVersionId(m.version_id))
@@ -1039,10 +1041,12 @@ pub struct VersionQueryResult {
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct DependencyQueryResult {
+    pub id: i32,
     pub project_id: Option<DBProjectId>,
     pub version_id: Option<DBVersionId>,
     pub file_name: Option<String>,
     pub dependency_type: String,
+    pub attribution: Option<crate::models::projects::DependencyAttribution>,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]

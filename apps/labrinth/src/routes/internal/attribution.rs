@@ -13,7 +13,7 @@ use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     AttributionModerationStatusKind, AttributionResolution,
-    AttributionResolutionKind,
+    AttributionResolutionKind, FlameProject,
 };
 use crate::models::users::User;
 use crate::queue::moderation::ApprovalType;
@@ -25,14 +25,6 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(update_group)
         .service(assign)
         .service(split);
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FlameProject {
-    pub id: u32,
-    pub title: String,
-    pub url: String,
-    pub icon_url: String,
 }
 
 #[derive(Serialize)]
@@ -129,12 +121,14 @@ async fn list(
 			from project_attribution_files paf
 			left join override_file_sources ofs on ofs.sha1 = paf.sha1
 			left join files f on f.id = ofs.file_id
-			left join attribution_enforced_versions aev on aev.id = f.version_id
+			left join versions v on v.id = f.version_id and v.mod_id = $2
+			left join attribution_enforced_versions aev on aev.id = v.id
 			where paf.group_id = ANY($1)
 			group by paf.group_id, paf.name, paf.sha1, paf.moderation_external_license_id
 			",
         )
         .bind(&group_ids)
+        .bind(project_id as DBProjectId)
         .fetch_all(pool.as_ref())
         .await?
     };
@@ -271,6 +265,15 @@ async fn list(
                 },
             })
             .collect();
+        let group_version_ids = group_files
+            .iter()
+            .flat_map(|file| file.versions.iter().copied())
+            .collect::<std::collections::HashSet<_>>();
+        let group_versions = version_infos
+            .iter()
+            .filter(|version| group_version_ids.contains(&version.id))
+            .cloned()
+            .collect();
 
         result.push(AttributionGroupResponse {
             id: group.id.into(),
@@ -285,7 +288,7 @@ async fn list(
                 .attributed_by
                 .map(|id| ariadne::ids::UserId(id as u64)),
             files: group_files,
-            versions: version_infos.clone(),
+            versions: group_versions,
         });
     }
 

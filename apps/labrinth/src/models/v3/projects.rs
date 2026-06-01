@@ -667,13 +667,25 @@ pub enum OverrideSource {
 #[derive(
     Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
 )]
+pub struct FlameProject {
+    pub id: u32,
+    pub title: String,
+    pub url: String,
+    pub icon_url: String,
+}
+
+#[derive(
+    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(untagged)]
 pub enum AttributionLicense {
     Spdx(String),
     Custom { name: String },
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[derive(
+    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum AttributionResolutionKind {
     License {
@@ -835,7 +847,7 @@ impl From<VersionQueryResult> for Version {
                     dependency_type: DependencyType::from_string(
                         d.dependency_type.as_str(),
                     ),
-                    attribution: None,
+                    attribution: d.attribution,
                 })
                 .collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),
@@ -988,11 +1000,9 @@ pub struct Dependency {
 )]
 pub struct DependencyAttribution {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub link: Option<Url>,
+    pub flame_project: Option<FlameProject>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon_url: Option<Url>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub license: Option<AttributionLicense>,
+    pub resolution: Option<AttributionResolutionKind>,
 }
 
 #[derive(

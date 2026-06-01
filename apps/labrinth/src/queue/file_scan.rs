@@ -20,12 +20,12 @@ use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::FileId;
 use crate::models::projects::{
-    AttributionResolution, AttributionResolutionKind,
+    AttributionResolution, AttributionResolutionKind, DependencyAttribution,
+    FlameProject,
 };
 use crate::queue::moderation::{
-    ApprovalType, FingerprintResponse, FlameProject, FlameResponse,
+    ApprovalType, FingerprintResponse, FlameResponse,
 };
-use crate::routes::internal::attribution::FlameProject as AttributionFlameProject;
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 
@@ -232,9 +232,9 @@ pub enum OverrideResolution {
         id: i64,
         status: ApprovalType,
         link: Option<String>,
-        flame_project: Option<AttributionFlameProject>,
+        flame_project: Option<FlameProject>,
     },
-    Flame(AttributionFlameProject),
+    Flame(FlameProject),
     Unknown,
 }
 
@@ -329,7 +329,7 @@ async fn persist_attribution_results(
         i64,
         ApprovalType,
         Option<String>,
-        Option<AttributionFlameProject>,
+        Option<FlameProject>,
     )> = Vec::new();
     let mut unknown_files: Vec<&OverrideFile> = Vec::new();
 
@@ -384,9 +384,10 @@ async fn persist_attribution_results(
 
     let mut existing_flame_group_ids = HashMap::new();
     for group in existing_flame_groups {
-        if let Some(flame_project) = group.flame_project.and_then(|fp| {
-            serde_json::from_value::<AttributionFlameProject>(fp).ok()
-        }) {
+        if let Some(flame_project) = group
+            .flame_project
+            .and_then(|fp| serde_json::from_value::<FlameProject>(fp).ok())
+        {
             existing_flame_group_ids.insert(flame_project.id, group.id);
         }
     }
@@ -746,8 +747,12 @@ async fn resolve_overrides(
                 .await
                 .ok()
                 .and_then(|t| {
-                    serde_json::from_str::<FlameResponse<Vec<FlameProject>>>(&t)
-                        .ok()
+                    serde_json::from_str::<
+                        FlameResponse<
+                            Vec<crate::queue::moderation::FlameProjectResponse>,
+                        >,
+                    >(&t)
+                    .ok()
                 })
                 .map(|x| x.data)
                 .unwrap_or_default(),
@@ -768,7 +773,7 @@ async fn resolve_overrides(
                 let idx = remaining.remove(remaining_pos);
                 let project =
                     flame_projects.iter().find(|p| p.id == *flame_project_id);
-                let flame_project = AttributionFlameProject {
+                let flame_project = FlameProject {
                     id: *flame_project_id,
                     title: project.map(|p| p.name.clone()).unwrap_or_else(
                         || format!("Flame project {flame_project_id}"),
@@ -874,7 +879,7 @@ pub async fn get_files_missing_attribution<'a, E>(
 ) -> Result<
     std::collections::HashMap<
         DBVersionId,
-        Vec<(DBFileId, Option<AttributionFlameProject>)>,
+        Vec<(DBFileId, Option<FlameProject>)>,
     >,
 >
 where
@@ -924,15 +929,13 @@ where
 }
 
 pub struct DependencyAttributionData {
-    pub link: Option<String>,
-    pub icon_url: Option<String>,
-    pub license: Option<serde_json::Value>,
+    pub attribution: DependencyAttribution,
 }
 
 pub async fn get_dependency_attributions<'a, E>(
     exec: E,
     version_ids: &[DBVersionId],
-) -> Result<HashMap<(DBVersionId, String), DependencyAttributionData>>
+) -> Result<HashMap<i32, DependencyAttributionData>>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres>,
 {
@@ -945,8 +948,7 @@ where
     let rows = sqlx::query!(
         r#"
         select
-            d.dependent_id as "version_id: DBVersionId",
-            d.dependency_file_name as "file_name!",
+            d.id as "dependency_id!",
             pag.attribution,
             pag.flame_project,
             pag.project_id as "project_id: DBProjectId"
@@ -974,49 +976,22 @@ where
 
     let mut result = HashMap::new();
     for row in rows {
-        let file_name = row.file_name;
-
         let attribution: Option<AttributionResolution> =
             row.attribution.and_then(|v| serde_json::from_value(v).ok());
 
-        let flame_project: Option<AttributionFlameProject> = row
+        let flame_project: Option<FlameProject> = row
             .flame_project
             .and_then(|v| serde_json::from_value(v).ok());
 
-        let link = attribution
-            .as_ref()
-            .and_then(|a| match &a.kind {
-                AttributionResolutionKind::License { link_to_work, .. } => {
-                    Some(link_to_work.to_string())
-                }
-                AttributionResolutionKind::GloballyAllowed { link_to_work } => {
-                    Some(link_to_work.to_string())
-                }
-                AttributionResolutionKind::SpecialPermissions {
-                    link_to_work,
-                } => Some(link_to_work.to_string()),
-                _ => None,
-            })
-            .or(flame_project.as_ref().map(|fp| fp.url.clone()));
-
-        let icon_url = flame_project.as_ref().map(|fp| fp.icon_url.clone());
-
-        let license = attribution
-            .as_ref()
-            .and_then(|a| match &a.kind {
-                AttributionResolutionKind::License { license, .. } => {
-                    Some(serde_json::to_value(license).ok())
-                }
-                _ => None,
-            })
-            .flatten();
+        let resolution = attribution.map(|a| a.kind);
 
         result.insert(
-            (row.version_id, file_name),
+            row.dependency_id,
             DependencyAttributionData {
-                link,
-                icon_url,
-                license,
+                attribution: DependencyAttribution {
+                    flame_project,
+                    resolution,
+                },
             },
         );
     }

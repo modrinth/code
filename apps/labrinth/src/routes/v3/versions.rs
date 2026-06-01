@@ -25,9 +25,7 @@ use crate::models::projects::{
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
-use crate::queue::file_scan::{
-    get_dependency_attributions, get_files_missing_attribution,
-};
+use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
 use crate::search::SearchBackend;
@@ -113,11 +111,16 @@ pub async fn version_project_get_helper(
                 || x.inner.version_number == id.1
         });
 
-        if let Some(version) = version
+        if let Some(mut version) = version
             && is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await?
         {
             let version_id = version.inner.id;
+            enrich_dependency_attributions(
+                std::slice::from_mut(&mut version),
+                &**pool,
+            )
+            .await;
             let mut v = models::projects::Version::from(version);
             let missing = get_files_missing_attribution(&**pool, &[version_id])
                 .await
@@ -142,11 +145,6 @@ pub async fn version_project_get_helper(
                          .collect()
                  })
                  .unwrap_or_default();
-
-            let dep_attr = get_dependency_attributions(&**pool, &[version_id])
-                .await
-                .unwrap_or_default();
-            enrich_dependency_attributions(&mut v, &dep_attr);
 
             return Ok(HttpResponse::Ok().json(v));
         }
@@ -238,10 +236,15 @@ pub async fn version_get_helper(
     .map(|x| x.1)
     .ok();
 
-    if let Some(data) = version_data
+    if let Some(mut data) = version_data
         && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
     {
         let version_id = data.inner.id;
+        enrich_dependency_attributions(
+            std::slice::from_mut(&mut data),
+            &**pool,
+        )
+        .await;
         let mut version = models::projects::Version::from(data);
         let missing = get_files_missing_attribution(&**pool, &[version_id])
             .await
@@ -268,11 +271,6 @@ pub async fn version_get_helper(
                     .collect()
             })
             .unwrap_or_default();
-
-        let dep_attr = get_dependency_attributions(&**pool, &[version_id])
-            .await
-            .unwrap_or_default();
-        enrich_dependency_attributions(&mut version, &dep_attr);
 
         return Ok(web::Json(version));
     }
