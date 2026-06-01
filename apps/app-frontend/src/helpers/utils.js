@@ -43,6 +43,14 @@ export async function highlightInFolder(path) {
 	return await invoke('plugin:utils|highlight_in_folder', { path })
 }
 
+export async function openVideoOverlay(videoId) {
+	return await invoke('plugin:utils|open_video_overlay', { videoId })
+}
+
+export async function closeVideoOverlay() {
+	return await invoke('plugin:utils|close_video_overlay')
+}
+
 export async function showLauncherLogsFolder() {
 	return await invoke('plugin:utils|show_launcher_logs_folder', {})
 }
