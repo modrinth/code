@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use tauri::Runtime;
+use tauri::webview::{NewWindowResponse, WebviewBuilder};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime, WebviewUrl};
 use tauri_plugin_opener::OpenerExt;
 use theseus::{
     handler,
@@ -20,6 +21,8 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             should_disable_mouseover,
             highlight_in_folder,
             open_path,
+            open_video_overlay,
+            close_video_overlay,
             show_launcher_logs_folder,
             progress_bars_list,
             get_opening_command
@@ -107,6 +110,117 @@ pub async fn open_path<R: Runtime>(app: tauri::AppHandle<R>, path: PathBuf) {
     })
     .await
     .ok();
+}
+
+const VIDEO_WEBVIEW_LABEL: &str = "video-overlay";
+
+fn is_valid_video_id(video_id: &str) -> bool {
+    !video_id.is_empty()
+        && video_id.len() <= 16
+        && video_id
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+}
+
+/// Computes the centered video rect (16:9) within the main window, leaving a
+/// margin so the surrounding backdrop and the close button stay visible.
+fn video_overlay_rect(
+    window_size: PhysicalSize<u32>,
+) -> (PhysicalPosition<i32>, PhysicalSize<u32>) {
+    let win_w = window_size.width as f32;
+    let win_h = window_size.height as f32;
+
+    // Use at most 80% of each dimension, keeping a 16:9 aspect ratio.
+    let max_w = win_w * 0.8;
+    let max_h = win_h * 0.8;
+    let mut width = max_w;
+    let mut height = width * 9.0 / 16.0;
+    if height > max_h {
+        height = max_h;
+        width = height * 16.0 / 9.0;
+    }
+
+    let x = ((win_w - width) / 2.0).max(0.0);
+    let y = ((win_h - height) / 2.0).max(0.0);
+
+    (
+        PhysicalPosition::new(x as i32, y as i32),
+        PhysicalSize::new(width as u32, height as u32),
+    )
+}
+
+/// Opens a YouTube video as an in-app overlay webview centered over the main
+/// window.
+///
+/// Inline YouTube `/embed` iframes fail with "Video player configuration error"
+/// (Error 153) inside the app, because the main webview loads from a custom
+/// `tauri://localhost` scheme and macOS WKWebView refuses to attach a `Referer`
+/// to the cross-origin subframe. Loading the standard `watch?v=` page in a
+/// separate child webview gives YouTube a real origin, so playback works. The
+/// frontend draws a dimmed backdrop and close button behind/around it.
+#[tauri::command]
+pub async fn open_video_overlay<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    video_id: String,
+) -> Result<()> {
+    if !is_valid_video_id(&video_id) {
+        tracing::error!(
+            "Refusing to open invalid YouTube video id: {video_id}"
+        );
+        return Ok(());
+    }
+
+    let Some(window) = app.get_window("main") else {
+        return Ok(());
+    };
+
+    let url: Url = format!("https://www.youtube.com/watch?v={video_id}")
+        .parse()
+        .map_err(|_| {
+            TheseusSerializableError::Theseus(
+                theseus::ErrorKind::OtherError(
+                    "Failed to parse video URL".to_string(),
+                )
+                .as_error(),
+            )
+        })?;
+
+    let (position, size) = video_overlay_rect(window.inner_size()?);
+
+    if let Some(webview) = app.webviews().get(VIDEO_WEBVIEW_LABEL) {
+        webview.navigate(url)?;
+        webview.set_size(size)?;
+        webview.set_position(position)?;
+        webview.show().ok();
+    } else {
+        window.add_child(
+            WebviewBuilder::new(VIDEO_WEBVIEW_LABEL, WebviewUrl::External(url))
+                .initialization_script_for_all_frames(include_str!(
+                    "youtube-theater.js"
+                ))
+                .zoom_hotkeys_enabled(false)
+                .on_new_window(|_, _| NewWindowResponse::Deny),
+            position,
+            size,
+        )?;
+    }
+
+    Ok(())
+}
+
+/// Hides the in-app video overlay webview (moved offscreen and hidden).
+#[tauri::command]
+pub async fn close_video_overlay<R: Runtime>(app: tauri::AppHandle<R>) {
+    if let Some(webview) = app.webviews().get(VIDEO_WEBVIEW_LABEL) {
+        // Navigate away first so audio stops, then hide offscreen.
+        if let Ok(url) = "about:blank".parse() {
+            let _ = webview.navigate(url);
+        }
+        webview
+            .set_position(PhysicalPosition::new(-10000, -10000))
+            .ok();
+        webview.hide().ok();
+    }
 }
 
 #[tauri::command]
