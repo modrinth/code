@@ -13,11 +13,14 @@ import {
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
+	injectAuth,
+	injectModrinthClient,
 	injectNotificationManager,
 	SkinPreviewRenderer,
 	useVIntl,
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { type DragDropEvent, getCurrentWebview } from '@tauri-apps/api/webview'
 import { computedAsync } from '@vueuse/core'
 import type { Ref } from 'vue'
@@ -44,6 +47,7 @@ import {
 	normalize_skin_texture,
 	remove_custom_skin,
 } from '@/helpers/skins.ts'
+import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/state'
 
@@ -53,10 +57,24 @@ type VirtualSkinSectionListExpose = {
 }
 
 const PENDING_SKIN_REFRESH_DELAY_MS = 11_000
+const DEFAULT_SKIN_SECTION_SORT_ORDER = ['Default skins', 'Modrinth Pride']
 const messages = defineMessages({
 	skinSelectorTitle: {
 		id: 'app.skins.title',
 		defaultMessage: 'Skin selector',
+	},
+	modrinthPrideSection: {
+		id: 'app.skins.section.modrinth-pride',
+		defaultMessage: 'Modrinth Pride',
+	},
+	modrinthPrideTooltip: {
+		id: 'app.skins.section.modrinth-pride.tooltip',
+		defaultMessage:
+			'You received these skins for donating to a Modrinth Pride fundraiser during Pride Month.',
+	},
+	modrinthSection: {
+		id: 'app.skins.section.modrinth',
+		defaultMessage: 'Modrinth',
 	},
 	defaultSkinsSection: {
 		id: 'app.skins.section.default-skins',
@@ -157,6 +175,8 @@ const skinSectionList = useTemplateRef<VirtualSkinSectionListExpose>('skinSectio
 const { formatMessage } = useVIntl()
 const notifications = injectNotificationManager()
 const { addNotification, handleError } = notifications
+const auth = injectAuth()
+const client = injectModrinthClient()
 
 const themeStore = useTheming()
 const skins = ref<Skin[]>([])
@@ -180,22 +200,42 @@ const savedSkins = computed(() => {
 		return []
 	}
 })
-const defaultSkins = computed(() => filterDefaultSkins(skins.value))
+const { data: modrinthUser } = useQuery({
+	queryKey: computed(() => ['authenticated-user', 'campaigns', auth.user.value?.id]),
+	queryFn: () => client.labrinth.users_v3.getAuthenticated(),
+	enabled: () => !!auth.session_token.value,
+	retry: false,
+})
+const hasModrinthPrideCampaign = computed(
+	() => !!auth.session_token.value && hasPride26Badge(modrinthUser.value?.campaigns?.pride_26),
+)
+const defaultSkins = computed(() =>
+	filterDefaultSkins(skins.value).filter(
+		(skin) => skin.section !== 'Modrinth Pride' || hasModrinthPrideCampaign.value,
+	),
+)
 const defaultSkinSections = computed(() => {
 	const sections = new Map<string, Skin[]>()
 
 	for (const skin of defaultSkins.value) {
-		const sectionTitle = getDefaultSkinSectionTitle(skin.section)
-		const sectionSkins = sections.get(sectionTitle)
+		const section = skin.section ?? 'Default skins'
+		const sectionSkins = sections.get(section)
 
 		if (sectionSkins) {
 			sectionSkins.push(skin)
 		} else {
-			sections.set(sectionTitle, [skin])
+			sections.set(section, [skin])
 		}
 	}
 
-	return Array.from(sections, ([title, skins]) => ({ title, skins }))
+	return Array.from(sections, ([section, skins]) => ({
+		section,
+		title: getDefaultSkinSectionTitle(section),
+		infoTooltip: getDefaultSkinSectionInfoTooltip(section),
+		skins,
+	})).sort(
+		(a, b) => getDefaultSkinSectionSortIndex(a.section) - getDefaultSkinSectionSortIndex(b.section),
+	)
 })
 
 const currentCape = computed(() => {
@@ -303,6 +343,10 @@ function isMinecraftSkinRateLimitError(error: unknown) {
 
 function getDefaultSkinSectionTitle(section?: string) {
 	switch (section) {
+		case 'Modrinth Pride':
+			return formatMessage(messages.modrinthPrideSection)
+		case 'Modrinth':
+			return formatMessage(messages.modrinthSection)
 		case 'MINECON Earth 2017':
 			return formatMessage(messages.mineconEarth2017Section)
 		case 'Builders & Biomes':
@@ -324,6 +368,20 @@ function getDefaultSkinSectionTitle(section?: string) {
 		default:
 			return section ?? formatMessage(messages.defaultSkinsSection)
 	}
+}
+
+function getDefaultSkinSectionInfoTooltip(section: string) {
+	switch (section) {
+		case 'Modrinth Pride':
+			return formatMessage(messages.modrinthPrideTooltip)
+		default:
+			return undefined
+	}
+}
+
+function getDefaultSkinSectionSortIndex(section: string) {
+	const index = DEFAULT_SKIN_SECTION_SORT_ORDER.indexOf(section)
+	return index === -1 ? DEFAULT_SKIN_SECTION_SORT_ORDER.length : index
 }
 
 function changeSkin(newSkin: Skin) {

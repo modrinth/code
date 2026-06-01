@@ -3,7 +3,7 @@
 		<AutoLink
 			:to="currentAd.link"
 			:aria-label="currentAd.description"
-			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit] bg-bg-raised"
+			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit] border border-solid border-surface-4 bg-surface-3"
 		>
 			<img
 				:src="currentAd.light"
@@ -19,7 +19,7 @@
 			/>
 		</AutoLink>
 		<div
-			class="absolute top-0 flex items-center justify-center overflow-hidden rounded-2xl bg-bg-raised"
+			class="absolute top-0 flex items-center justify-center overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-3"
 		>
 			<div id="modrinth-rail-1" />
 		</div>

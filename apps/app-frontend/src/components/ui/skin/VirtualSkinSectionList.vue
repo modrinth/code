@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DropdownIcon, EditIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import { DropdownIcon, EditIcon, PlusIcon, TrashIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	ButtonStyled,
@@ -11,6 +11,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
+import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
@@ -24,6 +25,7 @@ type AddSkinButtonRef = SkinLikeTextButtonExpose | SkinLikeTextButtonExpose[]
 
 interface DefaultSkinSection {
 	title: string
+	infoTooltip?: string
 	skins: Skin[]
 }
 
@@ -31,6 +33,7 @@ interface SkinSection {
 	key: string
 	title: string
 	kind: SkinSectionKind
+	infoTooltip?: string
 	skins: Skin[]
 }
 
@@ -145,6 +148,7 @@ const sections = computed<SkinSection[]>(() => [
 		key: defaultSkinSectionKey(section.title),
 		title: section.title,
 		kind: 'default' as const,
+		infoTooltip: section.infoTooltip,
 		skins: section.skins,
 	})),
 ])
@@ -330,6 +334,24 @@ defineExpose({ getAddSkinButtonElement })
 					<span class="min-w-0 text-xl font-semibold leading-7 text-primary">
 						{{ section.title }}
 					</span>
+					<Tooltip
+						v-if="section.infoTooltip"
+						theme="dismissable-prompt"
+						placement="top"
+						:triggers="['hover', 'focus']"
+					>
+						<span
+							class="inline-flex size-6 shrink-0 items-center justify-center text-secondary transition-colors group-hover:text-primary"
+							@click.stop
+						>
+							<UnknownIcon class="size-5" />
+						</span>
+						<template #popper>
+							<p class="m-0 max-w-96 text-wrap text-sm font-medium leading-tight">
+								{{ section.infoTooltip }}
+							</p>
+						</template>
+					</Tooltip>
 				</template>
 
 				<div

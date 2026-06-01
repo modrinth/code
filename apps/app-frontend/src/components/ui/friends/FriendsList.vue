@@ -393,7 +393,6 @@ const messages = defineMessages({
 			<FriendsSection
 				v-if="pendingFriends.length > 0"
 				:is-searching="!!search"
-				open-by-default
 				:friends="pendingFriends"
 				:heading="formatMessage(messages.pending)"
 				:remove-friend="removeFriend"
