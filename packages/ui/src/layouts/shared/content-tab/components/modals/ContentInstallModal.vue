@@ -304,7 +304,8 @@ const messages = defineMessages({
 	},
 	incompatibleTooltip: {
 		id: 'instances.content-install.incompatible-tooltip',
-		defaultMessage: 'This instance is not compatible with this project',
+		defaultMessage:
+			'This instance uses a different loader or game version than this project supports.',
 	},
 	selectIcon: {
 		id: 'instances.content-install.select-icon',
@@ -462,7 +463,7 @@ function removeIcon() {
 function resetState() {
 	tab.value = props.defaultTab ?? 'existing'
 	searchFilter.value = ''
-	hideUninstallable.value = true
+	hideUninstallable.value = false
 	instanceName.value = `New instance (${props.instances.length + 1})`
 	iconPath.value = null
 	iconPreviewUrl.value = null
@@ -481,7 +482,6 @@ function resetState() {
 }
 
 function handleHide() {
-	resetState()
 	emit('cancel')
 }
 

@@ -3,7 +3,7 @@
 		ref="modal"
 		:header="
 			formatMessage(messages.header, {
-				itemType: formatContentTypeSentence(formatMessage, itemType, count),
+				itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
 			})
 		"
 		:fade="variant === 'server' ? 'warning' : 'danger'"
@@ -37,8 +37,8 @@
 						<TrashIcon />
 						{{
 							formatMessage(messages.deleteButton, {
-								count,
-								itemType: formatContentTypeSentence(formatMessage, itemType, count),
+								count: visibleCount,
+								itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
 							})
 						}}
 					</button>
@@ -82,7 +82,7 @@ const messages = defineMessages({
 	},
 })
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
@@ -102,8 +102,12 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
+const visibleCount = ref(props.count)
+const visibleItemType = ref(props.itemType)
 
 function show() {
+	visibleCount.value = props.count
+	visibleItemType.value = props.itemType
 	modal.value?.show()
 }
 

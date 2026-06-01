@@ -3,19 +3,13 @@
 		ref="modal"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
+		:on-hide="handleModalHide"
 		no-padding
 	>
 		<template #title>
 			<Avatar v-if="projectIconUrl" :src="projectIconUrl" size="3rem" :tint-by="projectName" />
 			<span class="text-lg font-extrabold text-contrast">{{
-				header ??
-				formatMessage(
-					isModpack
-						? messages.switchModpackVersionHeader
-						: switchMode
-							? messages.switchVersionHeader
-							: messages.updateVersionHeader,
-				)
+				header ?? defaultHeader
 			}}</span>
 		</template>
 		<div
@@ -99,7 +93,7 @@
 				</div>
 
 				<div
-					v-if="!isModpack"
+					v-if="!isModpack && !incompatibilityWarningMode"
 					class="absolute bottom-0 left-0 right-0 pointer-events-none flex flex-col items-center justify-end bg-gradient-to-b from-transparent to-bg-raised to-70% pb-3 h-24"
 				>
 					<div class="pointer-events-auto">
@@ -204,7 +198,14 @@
 			>
 				<TriangleAlertIcon class="size-6 shrink-0" />
 				<span>{{
-					formatMessage(isApp ? messages.updateWarningApp : messages.updateWarningWeb)
+					warning ??
+					formatMessage(
+						incompatibilityWarningMode
+							? messages.incompatibilityWarning
+							: isApp
+								? messages.updateWarningApp
+								: messages.updateWarningWeb,
+					)
 				}}</span>
 			</div>
 			<div class="flex flex-row gap-2 shrink-0 ml-auto">
@@ -214,23 +215,32 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="brand">
+				<ButtonStyled :color="incompatibilityWarningMode ? 'orange' : 'brand'">
 					<button
-						:disabled="!selectedVersion || selectedVersion.id === currentVersionId"
+						:disabled="
+							actionLoading ||
+							!selectedVersion ||
+							(!incompatibilityWarningMode && selectedVersion.id === currentVersionId)
+						"
 						@click="handleUpdate"
 					>
-						<DownloadIcon />
+						<SpinnerIcon v-if="actionLoading" class="size-5 animate-spin" />
+						<DownloadIcon v-else />
 						{{
-							formatMessage(
-								isDowngrade
-									? messages.downgradeToVersion
-									: switchMode
-										? messages.switchToVersion
-										: messages.updateToVersion,
-								{
-									version: selectedVersion?.version_number ?? '...',
-								},
-							)
+							actionLoading
+								? formatMessage(commonMessages.installingLabel)
+								: incompatibilityWarningMode
+									? formatMessage(messages.installAnywayButton)
+									: formatMessage(
+											isDowngrade
+												? messages.downgradeToVersion
+												: switchMode
+													? messages.switchToVersion
+													: messages.updateToVersion,
+											{
+												version: selectedVersion?.version_number ?? '...',
+											},
+										)
 						}}
 					</button>
 				</ButtonStyled>
@@ -267,7 +277,12 @@ import {
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
+import {
+	capitalizeString,
+	formatVersionsForDisplay,
+	renderHighlightedString,
+	type GameVersionTag,
+} from '@modrinth/utils'
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -279,6 +294,7 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectTags } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 import {
 	versionChangesGameVersion,
@@ -287,11 +303,16 @@ import {
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentUpdaterModal')
+const tags = injectTags(null)
 
 const messages = defineMessages({
 	updateVersionHeader: {
 		id: 'instances.updater-modal.header',
 		defaultMessage: 'Update version',
+	},
+	incompatibilityWarningHeader: {
+		id: 'instances.updater-modal.incompatibility-warning-header',
+		defaultMessage: 'Choose version',
 	},
 	switchModpackVersionHeader: {
 		id: 'instances.updater-modal.header-modpack',
@@ -329,6 +350,11 @@ const messages = defineMessages({
 	updateWarningWeb: {
 		id: 'instances.updater-modal.warning-web',
 		defaultMessage: 'Updating can break your world. Review version changelogs and back up first.',
+	},
+	incompatibilityWarning: {
+		id: 'instances.updater-modal.incompatibility-warning',
+		defaultMessage:
+			'This version is not marked as compatible with this instance. Dependencies will not be installed automatically.',
 	},
 	downgradeToVersion: {
 		id: 'instances.updater-modal.downgrade-to',
@@ -375,6 +401,10 @@ const messages = defineMessages({
 		id: 'instances.updater-modal.incompatible-update.proceed',
 		defaultMessage: 'Update anyway',
 	},
+	installAnywayButton: {
+		id: 'instances.updater-modal.install-anyway',
+		defaultMessage: 'Install anyway',
+	},
 })
 
 const props = withDefaults(
@@ -389,6 +419,9 @@ const props = withDefaults(
 		projectIconUrl?: string
 		projectName?: string
 		header?: string
+		mode?: 'version' | 'incompatibility-warning'
+		warning?: string
+		actionLoading?: boolean
 		/** Whether versions are currently being loaded */
 		loading?: boolean
 		/** Whether changelog is being loaded for the selected version */
@@ -399,12 +432,29 @@ const props = withDefaults(
 		projectIconUrl: undefined,
 		projectName: undefined,
 		header: undefined,
+		mode: 'version',
+		warning: undefined,
+		actionLoading: false,
 		loading: false,
 		loadingChangelog: false,
 	},
 )
 
 const isModpack = computed(() => props.projectType === 'modpack')
+const incompatibilityWarningMode = computed(() => props.mode === 'incompatibility-warning')
+const defaultHeader = computed(() => {
+	if (incompatibilityWarningMode.value) {
+		return formatMessage(messages.incompatibilityWarningHeader)
+	}
+
+	return formatMessage(
+		isModpack.value
+			? messages.switchModpackVersionHeader
+			: switchMode.value
+				? messages.switchVersionHeader
+				: messages.updateVersionHeader,
+	)
+})
 
 const emit = defineEmits<{
 	update: [version: Labrinth.Versions.v2.Version, event: MouseEvent]
@@ -424,6 +474,7 @@ const pendingIncompatibleUpdate = ref<{
 	version: Labrinth.Versions.v2.Version
 	event: MouseEvent
 } | null>(null)
+const suppressCancelOnHide = ref(false)
 // Store the initial version ID to select when versions become available
 const pendingInitialVersionId = ref<string | undefined>(undefined)
 
@@ -501,12 +552,18 @@ const filteredVersions = computed(() => {
 	if (searchQuery.value) {
 		const query = searchQuery.value.toLowerCase()
 		versions = versions.filter(
-			(v) => v.name.toLowerCase().includes(query) || v.version_number.toLowerCase().includes(query),
+			(v) =>
+				v.name.toLowerCase().includes(query) ||
+				v.version_number.toLowerCase().includes(query) ||
+				(incompatibilityWarningMode.value &&
+					[...v.loaders, ...v.game_versions].some((value) =>
+						value.toLowerCase().includes(query),
+					)),
 		)
 	}
 
 	const beforeFilterCount = versions.length
-	if (!isModpack.value && hideIncompatibleState.value) {
+	if (!incompatibilityWarningMode.value && !isModpack.value && hideIncompatibleState.value) {
 		versions = versions.filter(
 			(version) =>
 				version.id === props.currentVersionId ||
@@ -528,6 +585,7 @@ const filteredVersions = computed(() => {
 })
 
 function shouldShowBadge(version: Labrinth.Versions.v2.Version): boolean {
+	if (incompatibilityWarningMode.value) return false
 	return version.id === props.currentVersionId || shouldShowIncompatibleBadge(version)
 }
 
@@ -587,8 +645,20 @@ function formatLongDate(dateString: string): string {
 
 function formatLoaderGameVersion(version: Labrinth.Versions.v2.Version): string {
 	const loader = capitalizeString(version.loaders[0] || '')
-	const gameVersion = version.game_versions[0] || ''
-	return `${loader} ${gameVersion}`
+	const gameVersions = formatGameVersions(version)
+	return [loader, gameVersions].filter(Boolean).join(' ')
+}
+
+function formatGameVersions(version: Labrinth.Versions.v2.Version): string {
+	if (!incompatibilityWarningMode.value) {
+		return version.game_versions[0] || ''
+	}
+
+	const gameVersions = tags?.gameVersions.value?.length
+		? formatVersionsForDisplay(version.game_versions, tags.gameVersions.value as GameVersionTag[])
+		: version.game_versions
+
+	return gameVersions.join(', ')
 }
 
 let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
@@ -615,6 +685,11 @@ function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 
 function handleUpdate(event: MouseEvent) {
 	if (selectedVersion.value) {
+		if (incompatibilityWarningMode.value) {
+			emitUpdate(selectedVersion.value, event, { hide: false })
+			return
+		}
+
 		const changesGameVersion = versionChangesGameVersion(
 			selectedVersion.value,
 			props.currentGameVersion,
@@ -679,9 +754,18 @@ function handleCancel() {
 	hide()
 }
 
+function handleModalHide() {
+	if (suppressCancelOnHide.value) {
+		suppressCancelOnHide.value = false
+		return
+	}
+
+	emit('cancel')
+}
+
 function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 	searchQuery.value = ''
-	hideIncompatibleState.value = !isModpack.value
+	hideIncompatibleState.value = incompatibilityWarningMode.value ? false : !isModpack.value
 	pendingIncompatibleUpdate.value = null
 	switchMode.value = options?.switchMode ?? false
 
@@ -724,6 +808,7 @@ function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 }
 
 function hide() {
+	suppressCancelOnHide.value = true
 	modal.value?.hide()
 }
 
