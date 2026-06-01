@@ -16,7 +16,7 @@ export const configuredXss = new FilterXSS({
 		h6: ['id'],
 		kbd: ['id'],
 		input: ['checked', 'disabled', 'type'],
-		iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
+		iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end', 'referrerpolicy'],
 		img: [...(whiteList.img || []), 'usemap', 'style', 'align'],
 		map: ['name'],
 		area: [...(whiteList.a || []), 'coords'],
@@ -38,10 +38,18 @@ export const configuredXss = new FilterXSS({
 	onIgnoreTagAttr: (tag, name, value) => {
 		// Allow iframes from acceptable sources
 		if (tag === 'iframe' && name === 'src') {
-			const allowedSources = [
+			const allowedSources: {
+				url: RegExp
+				allowedParameters: RegExp[]
+				forcedParameters?: Record<string, string>
+			}[] = [
 				{
 					url: /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}/,
 					allowedParameters: [/start=\d+/, /end=\d+/],
+					// Force a valid web origin so embeds work inside the Tauri webview,
+					// whose document origin (tauri://localhost) YouTube otherwise rejects
+					// with "Video player configuration error" (Error 153).
+					forcedParameters: { origin: 'https://modrinth.com' },
 				},
 				{
 					url: /^https?:\/\/(www\.)?discord\.com\/widget/,
@@ -63,6 +71,12 @@ export const configuredXss = new FilterXSS({
 							newSearchParams.delete(key)
 						}
 					})
+
+					if (source.forcedParameters) {
+						for (const [key, paramValue] of Object.entries(source.forcedParameters)) {
+							newSearchParams.set(key, paramValue)
+						}
+					}
 
 					url.search = newSearchParams.toString()
 					return `${name}="${escapeAttrValue(url.toString())}"`
