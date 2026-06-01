@@ -711,19 +711,19 @@
     "message": "Alpha"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Stable release, beta, and alpha versions will be shown as available updates."
+    "message": "Release, beta, and alpha versions will be shown as available updates."
   },
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "Stable release and beta versions will be shown as available updates."
+    "message": "Release and beta versions will be shown as available updates."
   },
   "instance.settings.tabs.general.update-channel.release": {
     "message": "Release"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Only stable release versions will be shown as available updates."
+    "message": "Only release versions will be shown as available updates."
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Select update channel"

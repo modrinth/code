@@ -237,15 +237,15 @@ const messages = defineMessages({
 	},
 	updateChannelReleaseDescription: {
 		id: 'instance.settings.tabs.general.update-channel.release.description',
-		defaultMessage: 'Only stable release versions will be shown as available updates.',
+		defaultMessage: 'Only release versions will be shown as available updates.',
 	},
 	updateChannelBetaDescription: {
 		id: 'instance.settings.tabs.general.update-channel.beta.description',
-		defaultMessage: 'Stable release and beta versions will be shown as available updates.',
+		defaultMessage: 'Release and beta versions will be shown as available updates.',
 	},
 	updateChannelAlphaDescription: {
 		id: 'instance.settings.tabs.general.update-channel.alpha.description',
-		defaultMessage: 'Stable release, beta, and alpha versions will be shown as available updates.',
+		defaultMessage: 'Release, beta, and alpha versions will be shown as available updates.',
 	},
 	updateChannelRelease: {
 		id: 'instance.settings.tabs.general.update-channel.release',
