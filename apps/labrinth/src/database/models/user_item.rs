@@ -11,6 +11,7 @@ use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
@@ -48,10 +49,19 @@ pub struct DBUser {
     pub created: DateTime<Utc>,
     pub role: String,
     pub badges: Badges,
+    #[serde(default)]
+    pub campaign_pride_26: Option<Pride26CampaignDonation>,
 
     pub allow_friend_requests: bool,
 
     pub is_subscribed_to_newsletter: bool,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug, utoipa::ToSchema)]
+pub struct Pride26CampaignDonation {
+    pub last_donated_at: DateTime<Utc>,
+    pub has_badge: bool,
+    pub has_midas: bool,
 }
 
 impl DBUser {
@@ -180,6 +190,16 @@ impl DBUser {
                     SELECT id, email,
                         avatar_url, raw_avatar_url, username, bio,
                         created, role, badges,
+                        (
+                            SELECT MAX(campaign_donations.donated_at)
+                            FROM campaign_donations
+                            WHERE campaign_donations.user_id = users.id
+                        ) AS campaign_pride_26_last_donated_at,
+                        (
+                            SELECT SUM(campaign_donations.amount_usd)
+                            FROM campaign_donations
+                            WHERE campaign_donations.user_id = users.id
+                        ) AS campaign_pride_26_total_amount_donated_usd,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
                         venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
@@ -208,6 +228,21 @@ impl DBUser {
                             created: u.created,
                             role: u.role,
                             badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
+                            campaign_pride_26: u
+                                .campaign_pride_26_last_donated_at
+                                .zip(u.campaign_pride_26_total_amount_donated_usd)
+                                .map(
+                                    |(
+                                        last_donated_at,
+                                        total_amount_donated_usd,
+                                    )| Pride26CampaignDonation {
+                                        last_donated_at,
+                                        has_badge: total_amount_donated_usd
+                                            >= Decimal::ONE,
+                                        has_midas: total_amount_donated_usd
+                                            >= Decimal::from(5),
+                                    },
+                                ),
                             password: u.password,
                             paypal_id: u.paypal_id,
                             paypal_country: u.paypal_country,
