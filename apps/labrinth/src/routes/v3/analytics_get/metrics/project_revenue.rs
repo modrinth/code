@@ -45,21 +45,20 @@ pub(crate) async fn fetch(
     let mut rows = sqlx::query(
         "SELECT
             WIDTH_BUCKET(
-                EXTRACT(EPOCH FROM created)::bigint,
+                EXTRACT(EPOCH FROM pv.created)::bigint,
                 EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 $3::integer
             ) AS bucket,
             pv.mod_id,
-            SUM(pv.amount * (tm.payouts_split / 100.0)) amount_sum
+            SUM(pv.amount) amount_sum
         FROM payouts_values pv
-        JOIN mods m ON m.id = pv.mod_id
-        JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $5
         WHERE
             -- only project revenue is counted here
             -- for affiliate code revenue, see `affiliate_code_revenue`
             pv.mod_id IS NOT NULL
             AND pv.mod_id = ANY($4)
+            AND pv.user_id = $5
             AND pv.created >= $1
             AND pv.created < $2
         GROUP BY bucket, pv.mod_id",
