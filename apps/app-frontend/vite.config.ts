@@ -58,6 +58,9 @@ export default defineConfig({
 						params: {
 							overrides: {
 								removeViewBox: false,
+								cleanupIds: {
+									minify: false,
+								},
 							},
 						},
 					},

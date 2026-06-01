@@ -16,6 +16,7 @@ type CrowdinListResponse<T> = {
 	data: Array<{ data: T }>
 	pagination: { offset: number; limit: number }
 }
+type CrowdinSourceString = { id: number; identifier: string; fileId: number; branchId: number }
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const DEFAULT_LOCALE = 'en-US'
@@ -338,19 +339,30 @@ export async function clearCrowdinChangedTranslations(options: {
 			offset,
 		}) as Promise<CrowdinListResponse<{ id: number; path: string }>>,
 	)
-	const fileByPath = new Map(files.map((file) => [normalizeCrowdinPath(file.path), file]))
+	const branchPathPrefix = normalizeCrowdinPath(options.crowdinBranch)
+	const fileByPath = new Map<string, { id: number; path: string }>()
+	for (const file of files) {
+		const filePath = normalizeCrowdinPath(file.path)
+		fileByPath.set(filePath, file)
+
+		if (filePath.startsWith(`${branchPathPrefix}/`)) {
+			fileByPath.set(normalizeCrowdinPath(filePath.slice(branchPathPrefix.length)), file)
+		}
+	}
+	let sourceStrings: CrowdinSourceString[] | undefined
 
 	for (const [destPath, keys] of changed) {
 		const file = fileByPath.get(destPath)
 		if (!file) throw new Error(`Crowdin file not found: ${destPath}`)
 
-		const strings = await listAll((limit, offset) =>
+		sourceStrings ??= await listAll((limit, offset) =>
 			client.sourceStringsApi.listProjectStrings(projectId, {
-				branchId: branch.id,
-				fileId: file.id,
 				limit,
 				offset,
-			}) as Promise<CrowdinListResponse<{ id: number; identifier: string }>>,
+			}) as Promise<CrowdinListResponse<CrowdinSourceString>>,
+		)
+		const strings = sourceStrings.filter(
+			(sourceString) => sourceString.branchId === branch.id && sourceString.fileId === file.id,
 		)
 		const stringByIdentifier = new Map(strings.map((sourceString) => [sourceString.identifier, sourceString]))
 
