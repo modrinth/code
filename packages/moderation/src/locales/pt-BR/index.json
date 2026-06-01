@@ -65,6 +65,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Visitar página da galeria"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Seu {type} utiliza uma licença que exige um código-fonte para ser disponibilizado. Forneça um link do código-fonte ou seus arquivos de origem para cada versão adicional, ou considere utilizar outra licença."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Forneça o código-fonte"
   },
@@ -72,7 +75,7 @@
     "defaultMessage": "Alguns dos seus links externos parecem ser idênticos. Cada link deve ser inserido apenas uma vez e com o tipo de link apropriado."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Links idênticos"
+    "defaultMessage": "Limpar links idênticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Sua descrição deve conter texto simples ou uma imagem com texto alternativo, mantendo-a acessível para aqueles que usam leitores de tela ou têm conexões de rede lentas."
@@ -155,6 +158,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Selecionar um idioma"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Selecione a licença sob a qual seu {type} é distribuído."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Selecione uma licença"
   },
@@ -214,6 +220,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecione etiquetas específicas"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Pelo menos uma imagem de galeria é necessária para mostrar o conteúdo do seu {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pacote de recursos, exceto pacotes de áudio ou localização. Se esta descrição se aplica ao seu pacote, selecione a etiqueta apropriada"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Envie uma imagem para a galeria"

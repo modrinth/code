@@ -71,9 +71,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Unele dintre linkurile dvs. externe par a fi identice. Fiecare link trebuie introdus o singură dată și cu tipul de link corespunzător."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Legături identice"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Descrierea ta ar trebui să conțină suficient text simplu sau text alternativ pentru imagini, pentru a o face accesibilă persoanelor care folosesc cititoare de ecran sau care au o conexiune lentă la internet."
   },

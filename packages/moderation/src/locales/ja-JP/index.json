@@ -65,9 +65,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "まったく同じ外部リンクが複数あるようです。各リンクは適切なリンク形式で一度だけ入力してください。"
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "リンクの重複"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "視覚障害のある方やインターネット回線速度の遅い方への配慮のため、十分で分かりやすい説明または画像の代替テキストが必要です。"
   },

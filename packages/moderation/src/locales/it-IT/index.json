@@ -66,7 +66,7 @@
     "defaultMessage": "Alcuni dei tuoi link esterni sembrano essere identici. I link dovrebbero essere inseriti solo una volta e con il tipo appropriato."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Link identici"
+    "defaultMessage": "Ripulisci link identici"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "La tua descrizione dovrebbe contenere abbastanza contenuto scritto e descrizioni testuali alternative alle immagini, cosicché sia accessibile a chi usi lettori dello schermo o abbia connessioni a Internet lente."
@@ -199,6 +199,9 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pacchetto di risorse, eccetto per audio e localizzazioni. Se ciò descrive il pacchetto, seleziona il tag appropriato"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Carica un'immagine"

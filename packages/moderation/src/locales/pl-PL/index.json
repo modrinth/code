@@ -71,9 +71,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Niektóre z Twoich linków zewnętrznych są identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Takie same linki"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Twój opis powinien zawierać wystarczająco zwykłego tekstu lub tekstu alternatywnego obrazów, aby był przystępny dla osób korzystających z czytników ekranu lub mających wolne połączenie z internetem."
   },

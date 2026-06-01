@@ -8,6 +8,33 @@
   "admin.billing.error.not-found": {
     "message": "Користувача не знайдено"
   },
+  "analytics.action.add": {
+    "message": "Додати"
+  },
+  "analytics.action.cancel": {
+    "message": "Скасувати"
+  },
+  "analytics.action.reset": {
+    "message": "Скинути"
+  },
+  "analytics.breakdown.country": {
+    "message": "Країна"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Версія гри"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Завантажувач"
+  },
+  "analytics.breakdown.project": {
+    "message": "Проєкт"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Стан проєкту"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Версія проєкту"
+  },
   "app-marketing.download.description": {
     "message": "Наш застосунок доступний на всіх платформах, виберіть бажану вами версію."
   },
@@ -121,9 +148,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ МБ"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ МБ"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 МБ"
@@ -1076,9 +1100,6 @@
   "dashboard.projects.links.source-code.label": {
     "message": "Вихідний код"
   },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Сторінка, що містить інформацію, документацію та допомогу для проєкту."
-  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Сторінка вікі"
   },
@@ -1339,9 +1360,6 @@
   },
   "discover.install.error.no-server-world": {
     "message": "Жоден світ сервера недоступний для встановлення."
-  },
-  "discover.install.error.unsupported-content-type": {
-    "message": "Цей тип умісту не можна встановити на сервер із перегляду."
   },
   "discover.install.heading.reset-modpack": {
     "message": "Вибір збірки для встановлення після скидання"
@@ -2685,7 +2703,7 @@
     "message": "Ваш проєкт опубліковано та доступний для виявлення на Modrinth."
   },
   "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Ваш проєкт є приватним, тобто доступ до нього можливий лише за прямим посиланням і його неможливо знайти на Modrinth."
+    "message": "Ваш проєкт приватний. Доступ до нього можна отримати лише за прямим посиланням. Його неможливо знайти на Modrinth."
   },
   "project.moderation.admonition.approved.body.visibility-message": {
     "message": "Ви можете змінити видимість свого проєкту в <visibility-settings-link>параметрах видимости</visibility-settings-link> проєкту."
@@ -3035,26 +3053,14 @@
   "scopes.organizationWrite.label": {
     "message": "Редагувати організації"
   },
-  "scopes.patCreate.description": {
-    "message": "Створювати особисті API-токени"
-  },
   "scopes.patCreate.label": {
     "message": "Створювати токени доступу"
-  },
-  "scopes.patDelete.description": {
-    "message": "Видаляти ваші особисті API-токени"
   },
   "scopes.patDelete.label": {
     "message": "Видаляти токени доступу"
   },
-  "scopes.patRead.description": {
-    "message": "Переглядати створені API-токени"
-  },
   "scopes.patRead.label": {
     "message": "Дивитися токени доступу"
-  },
-  "scopes.patWrite.description": {
-    "message": "Змінювати особисті API-токени"
   },
   "scopes.patWrite.label": {
     "message": "Редагувати токени доступу"
@@ -3720,13 +3726,13 @@
     "message": "Запит на поновлення підписки надіслано"
   },
   "settings.billing.pyro.resubscribe.success.text": {
-    "message": "Підписка на сервер успішно поновлена"
+    "message": "Передплата на сервер успішно поновлена"
   },
   "settings.billing.pyro.status.failed": {
     "message": "Не вдалося оплатити підписку. Будь ласка, оновіть ваш спосіб оплати й спробуйте підписатися повторно."
   },
   "settings.billing.pyro.status.processing": {
-    "message": "Ваш платіж обробляється. Сервер буде активовано після успішної оплати."
+    "message": "Ваш платіж обробляється. Сервер увімкнеться після успішної оплати."
   },
   "settings.billing.pyro.storage": {
     "message": "SSD на {gb} ГБ"
@@ -3735,10 +3741,10 @@
     "message": "{gb} ГБ підкачування"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Керування вашими підписками на Modrinth Servers."
+    "message": "Керування вашими передплатами на Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Підписка на Сервери Modrinth"
+    "message": "Передплата на сервери Modrinth"
   },
   "settings.billing.renews": {
     "message": "Поновлення {date}"
@@ -3753,7 +3759,7 @@
     "message": "Підписатися"
   },
   "settings.billing.subscription.description": {
-    "message": "Керування вашими підписками Modrinth."
+    "message": "Керування вашими передплатами Modrinth."
   },
   "settings.billing.subscription.title": {
     "message": "Підписки"

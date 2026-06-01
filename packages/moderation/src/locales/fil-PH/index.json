@@ -65,6 +65,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Bisitahin ang pahina ng galeriya"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ang iyong {type} ay gumagamit ng lisensiya na nangangailangang may-magagamit na source code. Mangyaring magbigay ng source code link o ng source file sa bawat laragdagang bersiyon, o isiping gumamit ng ibang lisensiya."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Magbigay ng source code"
   },
@@ -72,7 +75,7 @@
     "defaultMessage": "Ang ilan sa iyong link palabas ay magkatulad. Bawat link ay dapat isahan lamang malagay at sa wastong uri ng link."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Mga Magkatulad na Link"
+    "defaultMessage": "Ipaglinis ang mga magkaparehong link"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Ang iyong Paglalarawan ay dapat maglalaman ng simpleng teksto o image alt-text, panatilihing accessible sa mga gumamagamit ng screen reader o mahihina ang koneksiyon sa internet."
@@ -155,6 +158,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Piliin ang wika"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Piliin ang lisensiya na ma-distribute ang iyong {type}."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Pumili ng lisensiya"
   },
@@ -218,6 +224,12 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Piliin ang pinakatumpak na mga tag"
   },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Mangangailangan ng hindi kukulang sa isang imaheng panggaleriya na pang-showcase ng kontento ng iyong {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resource pack, maliban sa audio o mga pack ng pagsasalon. Kung napaglarawan nito ang iyong pack, mangyaring piliin ang nakawawastong tag"
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Mag-upload ng imaheng panggaleriya"
   },
@@ -240,3 +252,4 @@
     "defaultMessage": "Bisitahin ang mga setting sa mga link"
   }
 }
+
