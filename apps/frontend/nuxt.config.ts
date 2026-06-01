@@ -224,6 +224,7 @@ export default defineNuxtConfig({
 				globalThis.INTERCOM_APP_ID ||
 				'ykeritl9',
 			production: isProduction(),
+			cookieSecure: isProduction(),
 			buildEnv: process.env.BUILD_ENV,
 			preview: process.env.PREVIEW === 'true',
 			featureFlagOverrides: getFeatureFlagOverrides(),
