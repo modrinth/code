@@ -206,9 +206,6 @@
   "app.instance.mods.project-was-added": {
     "message": "«{name}» добавлен"
   },
-  "app.instance.mods.projects-were-added": {
-    "message": "{count, plural, one {Добавлен # проект} few {Добавлено # проекта} other {Добавлено # проектов}}"
-  },
   "app.instance.mods.share-text": {
     "message": "Что в моей сборке:"
   },
@@ -223,9 +220,6 @@
   },
   "app.instance.worlds.browse-servers": {
     "message": "Найти серверы"
-  },
-  "app.instance.worlds.delete-world-description": {
-    "message": "«{name}» будет **удалён навсегда**. Его невозможно восстановить."
   },
   "app.instance.worlds.delete-world-title": {
     "message": "Вы действительно хотите удалить этот мир?"
@@ -248,17 +242,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Нет серверов и миров"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "«{name}» будет удалён из списка — в том числе в игре. Его невозможно восстановить."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "«{name}» ({address}) будет удалён из списка — в том числе в игре. Его невозможно восстановить."
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "Вы действительно хотите удалить {name}?"
-  },
-  "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Поиск по {count, plural, one {# миру} other {# мирам}}..."
   },
   "app.instance.worlds.this-server": {
     "message": "этот сервер"
@@ -271,9 +256,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Необходимая сборка"
@@ -395,9 +377,6 @@
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
   },
-  "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
-  },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"
   },
@@ -490,9 +469,6 @@
   },
   "instance.edit-world.title": {
     "message": "Настройка мира"
-  },
-  "instance.files.adding-files": {
-    "message": "Добавление файлов ({completed, number}/⁠{total, number})"
   },
   "instance.files.save-as": {
     "message": "Сохранить как..."

@@ -1,7 +1,8 @@
 use super::DatabaseError;
 use crate::database::PgTransaction;
 use crate::models::ids::{
-    AffiliateCodeId, AnalyticsEventId, AttributionGroupId, ChargeId,
+    AffiliateCodeId, AnalyticsEventId, AttributionGroupId, CampaignDonationId,
+    ChargeId,
     CollectionId, FileId, ImageId, NotificationId, OAuthAccessTokenId,
     OAuthClientAuthorizationId, OAuthClientId, OAuthRedirectUriId,
     OrganizationId, PatId, PayoutId, ProductId, ProductPriceId, ProjectId,
@@ -163,6 +164,10 @@ macro_rules! id_type {
 db_id_interface!(
     ChargeId,
     generator: generate_charge_id @ "charges",
+);
+db_id_interface!(
+    CampaignDonationId,
+    generator: generate_campaign_donation_id @ "campaign_donations",
 );
 db_id_interface!(
     CollectionId,

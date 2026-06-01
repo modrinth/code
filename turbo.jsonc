@@ -101,8 +101,12 @@
 			"cache": false
 		},
 		"intl:extract": {},
+		"intl:prune-local": {
+			"cache": false,
+			"dependsOn": ["intl:extract"]
+		},
 		"prepr": {
-			"dependsOn": ["^prepr", "fix", "intl:extract"]
+			"dependsOn": ["^prepr", "fix", "intl:extract", "intl:prune-local"]
 		}
 	}
 }

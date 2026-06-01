@@ -71,7 +71,8 @@ pub(crate) async fn fetch(
         WHERE
             user_id = $4
             AND payouts_values.affiliate_code_source IS NOT NULL
-            AND created BETWEEN $1 AND $2
+            AND created >= $1
+            AND created < $2
             AND (cardinality($6::bigint[]) = 0 OR affiliate_code_source = ANY($6))
         GROUP BY bucket, affiliate_code_source",
     )

@@ -395,9 +395,6 @@
   "friends.action.add-friend": {
     "message": "친구 추가"
   },
-  "friends.action.view-friend-requests": {
-    "message": "{count}건의 친구 요청"
-  },
   "friends.add-friend.submit": {
     "message": "친구 요청 보내기"
   },

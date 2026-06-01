@@ -75,7 +75,8 @@ pub(crate) async fn fetch(
         INNER JOIN charges c ON c.subscription_id = us.id
         WHERE
             ac.affiliate = $4
-            AND usa.created_at BETWEEN $1 AND $2
+            AND usa.created_at >= $1
+            AND usa.created_at < $2
             AND c.status = 'succeeded'
             AND (cardinality($6::bigint[]) = 0 OR affiliate_code = ANY($6))
         GROUP BY bucket, affiliate_code",

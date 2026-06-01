@@ -65,9 +65,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Visitar página da galeria"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Seu {type, select, mod {mod} plugin {plugin} other {projeto}} usa uma licença que necessita que o código fonte esteja disponível. Por favor, providencie o link do código fonte ou o arquivo de origem para cada versão adicional, ou considere usar uma licença diferente."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Forneça o código-fonte"
   },
@@ -158,9 +155,6 @@
   "nags.select-language.title": {
     "defaultMessage": "Selecionar um idioma"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Selecione a licença em que seu {type, select, mod {mod} modpack {pacote de mods} resourcepack {pacote de recurso} shader {sombreador} plugin {plugin} datapack {pacote de dados} other {projeto}} está distribuido."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Selecione uma licença"
   },
@@ -212,9 +206,6 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpe o nome"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Você selecionou {tagCount, plural,=0 {nenhuma tag} one {# tag} other {# tags}}. Por favor reduza para {maxTagCount} ou menos para garantir que seu servidor apareça nos resultados de pesquisa relevantes."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecione etiquetas específicas"
   },
@@ -223,9 +214,6 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecione etiquetas específicas"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Pelo menos uma imagem da galeria é requerida para mostrar o conteúdo do seu {type, select, resourcepack {pacote de recursos, com exceção do áudio e pacotes de localização. Se isto descreve seu pacote, por favor selecione a etiqueta apropriada} shader {sombreador} other {projeto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Envie uma imagem para a galeria"
@@ -249,4 +237,3 @@
     "defaultMessage": "Visitar página de links"
   }
 }
-

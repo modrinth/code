@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Не вдалося завантажити деталей підписки."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 днів"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/місяць"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/квартал"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/рік"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Ваше наступне списання буде <charge-date>{date}</charge-date>."
   },
@@ -104,20 +92,8 @@
   "browse.offline": {
     "defaultMessage": "Ви наразі не в мережі. Під'єднайтеся до Інтернету, аби шукати на Modrinth!"
   },
-  "browse.search.placeholder": {
-    "defaultMessage": "Шукати {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} server {сервери} other {проєкти}}..."
-  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Обрані проєкти"
-  },
-  "browse.selected-projects-floating-bar.install": {
-    "defaultMessage": "Установити {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
-  },
-  "browse.selected-projects-floating-bar.selected-count": {
-    "defaultMessage": "Обрано {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
-  },
-  "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "Ви обрали {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}} для встановлення. Установіть їх зараз або поверніться, не встановивши."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Обрані проєкти ще не встановлено"
@@ -326,9 +302,6 @@
   "content.card.select-project": {
     "defaultMessage": "Обрати {project}"
   },
-  "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Ви впевнені, що хочете оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}} до їхньої останньої сумісної версії? Рекомендується оновлювати вміст по одному."
-  },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Попередження щодо оновлення"
   },
@@ -338,17 +311,11 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Щоб пропустити це підтвердження в майбутньому, утримуйте клавішу Shift, натискаючи «Оновити все»."
   },
-  "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
-  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Видалення моду може назавжди вплинути на ваш світ й спричинити втрату вмісту або несподівані проблеми при його повторному завантаженні."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Попередження щодо видалення"
-  },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Видалити {count} {itemType}"
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Видалення {itemType}"
@@ -431,9 +398,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Утримуйте клавішу Shift під час натискання, щоб пропустити підтвердження."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Ми рекомендуємо створити резервну копію перш ніж продовжувати, щоб ви могли відновити свій {type, select, server {світ} other {профіль}}, якщо щось піде не так."
-  },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Уміст вашої збірки тепер можна знайти тут!"
   },
@@ -451,9 +415,6 @@
   },
   "content.page-layout.busy-description": {
     "defaultMessage": "Будь ласка, дочекайтеся завершення операції, перш ніж редагувати вміст."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Знайдіть або вивантажте {contentType, select, mod {мод} mods {моди} plugin {плаґін} plugins {плаґіни} datapack {пакет даних} datapacks {пакети даних} project {проєкт} projects {проєкти} other {вміст}}, щоб розпочати"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Додайте додатковий уміст до цієї збірки"
@@ -475,9 +436,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Будь ласка, зачекайте"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "Пошук серед {count} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} проєкт {проєкту} проєктs {проєктів} other {елементів умісту}}…"
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Назви файлів"
@@ -518,33 +476,6 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Увесь вибраний уміст уже ввімкнено"
   },
-  "content.selection-bar.bulk.deleting": {
-    "defaultMessage": "Видалення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "Видалення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.disabling": {
-    "defaultMessage": "Вимкнення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.disabling-waiting": {
-    "defaultMessage": "Вимкнення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.enabling": {
-    "defaultMessage": "Увімкнення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.enabling-waiting": {
-    "defaultMessage": "Увімкнення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.updating": {
-    "defaultMessage": "Оновлення {progress}/{total} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "Оновлення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
-  },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "Вибрано {count} {contentType, select, mod {мод} mods {{count, plural, few {моди} other {модів}}} plugin {плаґін} plugins {{count, plural, few {плаґіни} other {плаґінів}}} datapack {пакет даних} datapacks {{count, plural, few {пакети даних} other {пакетів даних}}} проєкт {проєкт} проєктs {{count, plural, few {проєкти} other {проєктів}}} other {{count, plural, one {елемент умісту} few {елементи вмісту} other {елементів умісту}}}}"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Вибрано {count, number}"
   },
@@ -559,9 +490,6 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "Імпорт"
-  },
-  "creation-flow.button.import-instances": {
-    "defaultMessage": "Імпорт {count, plural, one {# профілю} few {# профілів} many {# профілів} other {# профілів}}"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Налаштування сервера"
@@ -851,17 +779,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} перезаписано"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Перезаписано"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Файли будуть перезаписані"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "Створити {type, select, directory {теку} other {файл}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Створити {type, select, directory {теку} other {файл}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "як-от my-folder"
@@ -874,9 +793,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Видалити файл"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Цю теку та весь її вміст буде назавжди видалено. Цю дію неможливо скасувати.} other {Цей файл буде назавжди видалено. Цю дію неможливо скасувати.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Не вдалося завантажити вміст теки."
@@ -1004,9 +920,6 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "як-от /my-folder"
   },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Перемістити теку} other {Перемістити файл}}"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "На головну"
   },
@@ -1073,9 +986,6 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Нова назва"
   },
-  "files.row.item-count": {
-    "defaultMessage": "{count, plural, one {# елемент} few {# елементи} other {# елементів}}"
-  },
   "files.table-header.created": {
     "defaultMessage": "Створено"
   },
@@ -1126,9 +1036,6 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " — залишилося {count}"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Перемістіть сюди файли, щоб вивантажити їх"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Назва може містити лише літери, цифри, тире, нижні підкреслення або пробіли."
@@ -1276,9 +1183,6 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Уведіть регіон"
-  },
-  "format.bytes.0": {
-    "defaultMessage": "{count, plural, one {# байт} few {# байти} many {# байтів} other {# байтів}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} КіБ"
@@ -1502,17 +1406,11 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Змінення завантажувача деструктивне"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "{projectType, select, server {Пов’заний проєкт сервера} other {Пов’зана збірка}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "Версія {loader}"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Щоб змінювати завантажувач потрібно скинути сервер."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Перевстановлення зібрки скине вміст {type, select, server {сервера} other {профіля}} до початкового стану, видаливши всі моди та вміст, які ви додавали."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Перевстановити збірку"
@@ -1544,9 +1442,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "Відв’язати"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Відв’яжіть {type, select, server {сервер} other {профіль}} від проєкту {projectType, select, server {сервера} other {збірки}}. Це дозволить змінити завантажувач і версію Minecraft, але ви не будете отримувати майбутні оновлення."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "Перевірка…"
   },
@@ -1561,12 +1456,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Перевстановити збірку"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Лагодження перевстановить завантажувач та залежності Minecraft без видалення вашого вмісту. Це може розв’язати проблеми, якщо {type, select, server {ваш сервер не запускається належним чином} other {ваша гра не запускається через помилки запускача}}."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "Полагодити {type, select, server {сервер} other {профіль}}"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Полагодити"
@@ -1585,9 +1474,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Невідомий режим"
-  },
-  "instances.content-install.compatible-count": {
-    "defaultMessage": "{count} {count, plural, one {сумісний профіль} few {сумісні профілі} other {сумісних профілів}}"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Наявний профіль"
@@ -2399,77 +2285,29 @@
   "project-type.all": {
     "defaultMessage": "Усі"
   },
-  "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, one {Пакет даних} few {Пакети даних} many {Пакетів даних} other {Пакетів даних}}"
-  },
   "project-type.datapack.category": {
     "defaultMessage": "Пакети даних"
-  },
-  "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, one {пакет даних} few {пакети даних} many {пакетів даних} other {пакетів даних}}"
-  },
-  "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, one {Мод} few {Мода} many {Модів} other {Модів}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Моди"
   },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, one {мод} few {мода} many {модів} other {модів}}"
-  },
-  "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, one {Збірка} few {Збірки} other {Збірок}}"
-  },
   "project-type.modpack.category": {
     "defaultMessage": "Збірки"
-  },
-  "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, one {збірка} few {збірки} other {збірок}}"
-  },
-  "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural, one {Плаґін} few {Плаґіни} many {Плаґінів} other {Плаґінів}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Плаґіни"
   },
-  "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural, one {плаґін} few {плаґіни} many {плаґінів} other {плаґінів}}"
-  },
-  "project-type.project.capital": {
-    "defaultMessage": "{count, plural, one {Проєкт} few {Проєкти} other {Проєктів}}"
-  },
   "project-type.project.category": {
     "defaultMessage": "Проєкти"
-  },
-  "project-type.project.lowercase": {
-    "defaultMessage": "{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
-  },
-  "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Пакет ресурсів} few {Пакети ресурсів} many {Пакетів ресурсів} other {Пакетів ресурсів}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Пакети ресурсів"
   },
-  "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, one {пакет ресурсів} few {пакети ресурсів} many {пакетів ресурсів} other {пакетів ресурсів}}"
-  },
-  "project-type.server.capital": {
-    "defaultMessage": "{count, plural, one {Сервер} few {Сервери} many {Серверів} other {Серверів}}"
-  },
   "project-type.server.category": {
     "defaultMessage": "Сервери"
   },
-  "project-type.server.lowercase": {
-    "defaultMessage": "{count, plural, one {сервер} few {сервери} many {серверів} other {серверів}}"
-  },
-  "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, one {Шейдер} few {Шейдери} other {Шейдерів}}"
-  },
   "project-type.shader.category": {
     "defaultMessage": "Шейдери"
-  },
-  "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, one {шейдер} few {шейдери} other {шейдерів}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Підтримувані середовища"
@@ -2594,9 +2432,6 @@
   "project.about.tags.title": {
     "defaultMessage": "Теґи"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count, number} {count, plural, one {завантаження} few {завантаження} other {завантажень}}"
-  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Необхідно й на клієнті й на сервері."
   },
@@ -2663,17 +2498,8 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Невідоме середовище"
   },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} {count, plural, one {відстежує} few {відстежують} other {відстежують}}"
-  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} у мережі"
-  },
-  "project.online-player-count.tooltip": {
-    "defaultMessage": "{count} {countPlural, plural, one {гравець} few {гравці} many {гравців} other {гравців}} у мережі"
-  },
-  "project.recent-plays": {
-    "defaultMessage": "{count} {countPlural, plural, one {нещодавно грав} few {нещодавно грали} many {нещодавно грали} other {нещодавно грали}}"
   },
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, one {нещодавно грав} other {нещодавно грали}} з Modrinth за останні 2 тижні"
@@ -3281,26 +3107,11 @@
   "servers.backups.bulk-bar.aria-label": {
     "defaultMessage": "{count, plural, one {Групові дії для однієї вибраної резервної копії} other {Групові дії для # вибраних резервних копій}}"
   },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Видалення {total, plural, one {# резервоної копії} few {# резервних копій} many {# резервних копій} other {# резервних копій}}…"
-  },
-  "servers.backups.bulk-bar.selected-count": {
-    "defaultMessage": "{count, plural, one {# резервну копію вибрано} few {# резевні копії вибрано} many {# резевних копій вибрано} other {# резевних копій вибрано}}"
-  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Після видалення {count, plural, one {цієї резервної копії} other {цих резервних копій}} не можна буде відновитися. Видалення остаточне."
   },
   "servers.backups.delete-modal.admonition-header": {
     "defaultMessage": "Попередження видалення"
-  },
-  "servers.backups.delete-modal.backups-label": {
-    "defaultMessage": "{count, plural, one {Резервна копія} few {Резервні копії ({count})} many {Резервні копії ({count})} other {Резервні копії ({count})}}"
-  },
-  "servers.backups.delete-modal.confirm": {
-    "defaultMessage": "Видалити {count, plural, one {резервну копію} few {# резервні копії} many {# резервних копій} other {# резервних копій}}"
-  },
-  "servers.backups.delete-modal.header": {
-    "defaultMessage": "Видалення {count, plural, one {резервної копії} few {резервних копій} many {# резервних копій} other {# резервних копій}}"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Створення вашої першої резервної копії"
@@ -3464,17 +3275,11 @@
   "servers.listing.new-label": {
     "defaultMessage": "Новий"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Ваші файли зберігатимуться ще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дні} many {днів} other {днів} }</days-remaining>. Зверніться до служби підтримки, щоб завантажити файли, перш ніж їх буде видалено. "
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Ваші файли зберігатимуться протягом 30 днів після скасування."
   },
   "servers.listing.notice.moderated": {
     "defaultMessage": "Ваш сервер призупинено модерацією. "
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "Ваш сервер буде {verb} до {planSize} плану <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Зачекайте, поки ми налаштуємо ваш сервер. Це може тривати до 10 хвилин."
@@ -3581,9 +3386,6 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Успіх"
   },
-  "servers.manage.search-placeholder": {
-    "defaultMessage": "Пошук {count} {count, plural, one {сервера} few {серверів} many {серверів} other {серверів}}…"
-  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3595,9 +3397,6 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Налаштування вашого сервера переміщено"
-  },
-  "servers.medal-listing.countdown.remaining": {
-    "defaultMessage": "Залишилося <days-count>{days}</days-count> {days, plural, one {день} few {дні} other {днів}} <hours-count>{hours}</hours-count> {hours, plural, one {година} few {години} other {годин}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {хвилина} few {хвилини} other {хвилин}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {секунда} few {секунди} other {секунд}}…"
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Новий сервер"
@@ -3862,9 +3661,6 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Пошук мови…"
-  },
-  "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "За вашим запитом {matches, plural,=0 {не знайдено жодної мови} one {знайдено # мову} few{знайдено # мови} other {знайдено # мов}}."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "За вашим запитом не знайдено жодної мови."
@@ -4331,11 +4127,7 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Покинути сторінку?"
   },
-  "ui.stacked-admonitions.alert-count": {
-    "defaultMessage": "{count, plural, one {# оповіщення} few {# оповіщення} many {# оповіщень} other {# оповіщень}}"
-  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Відхилити все"
   }
 }
-

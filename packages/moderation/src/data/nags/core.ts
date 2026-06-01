@@ -1,4 +1,4 @@
-import { defineMessage, useVIntl } from '@modrinth/ui'
+import { defineMessage, formatProjectTypeSentence, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -106,10 +106,19 @@ export const coreNags: Nag[] = [
 				defineMessage({
 					id: 'nags.upload-gallery-image.description',
 					defaultMessage:
-						'At least one gallery image is required to showcase the content of your {type, select, resourcepack {resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag} shader {shader} other {project}}.',
+						'At least one gallery image is required to showcase the content of your {type}.',
 				}),
 				{
-					type: context.project.project_type,
+					type:
+						context.project.project_type === 'resourcepack'
+							? formatMessage(
+									defineMessage({
+										id: 'nags.upload-gallery-image.resourcepack-type',
+										defaultMessage:
+											'resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag',
+									}),
+								)
+							: formatProjectTypeSentence(formatMessage, context.project.project_type),
 				},
 			)
 		},
@@ -174,11 +183,10 @@ export const coreNags: Nag[] = [
 			return formatMessage(
 				defineMessage({
 					id: 'nags.select-license.description',
-					defaultMessage:
-						'Select the license your {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is distributed under.',
+					defaultMessage: 'Select the license your {type} is distributed under.',
 				}),
 				{
-					type: context.project.project_type,
+					type: formatProjectTypeSentence(formatMessage, context.project.project_type),
 				},
 			)
 		},

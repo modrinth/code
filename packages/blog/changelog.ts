@@ -11,6 +11,86 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'app',
+		version: '0.14.2',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'web',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15+00:00`,
+		product: 'app',
+		version: '0.14.1',
+		body: `## Added
+- Pride Fundraiser 2026 banner in the Modrinth App sidebar with donation progress, supporter count, days remaining, and a donation link.
+- Modrinth Pride Fundraiser supporters can now access exclusive Mr. Pack Pride skins in the Modrinth App Skin selector.
+- Mr. Pack is now available as a default skin in the Modrinth App Skin selector.
+
+## Changed
+- Updated tooltips from pure black backgrounds to a style consistent with other popovers.
+- Floating tooltips and pop-ups now have stronger shadows.
+- Updated cards across Modrinth with consistent subtle borders.`,
+	},
+	{
+		date: `2026-05-31T16:45:15+00:00`,
+		product: 'web',
+		body: `## Added
+- Download count badges for 1 million, 10 million, 25 million, 50 million, 100 million, 250 million, and 500 million downloads.
+- Early adopter badges for users who helped test new project types before they launched.
+- Pride Fundraiser Supporter badge.
+
+## Changed
+- Redesigned user badges.
+- Content Moderators now also have the Modrinth Team badge.
+- Users with the Alpha Tester badge now also have the Beta Tester badge.
+- Updated cards across Modrinth with consistent subtle borders.
+- Updated tooltips from pure black backgrounds to a style consistent with other popovers.
+- Floating tooltips and pop-ups now have stronger shadows.
+
+## Fixed
+- Fixed card padding shifting after pages finished loading.`,
+	},
+	{
+		date: `2026-05-29T23:08:28+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed revenue not showing in 'All time' queries`,
+	},
+	{
+		date: `2026-05-29T22:06:30+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed lack of error notification when analytics errors.
+- Fixed failing to fetch analytics for an obscene amount of projects.`,
+	},
+	{
+		date: `2026-05-29T20:01:16+00:00`,
+		product: 'web',
+		body: `## Changed
+- Completely overhauled project analytics. See our [blog post](https://modrinth.com/news/article/analytics-overhaul/) to learn about it!
+
+## Fixed
+- Fixed i18n bug in the resubmit project modal.`,
+	},
+	{
+		date: `2026-05-29T01:44:44+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Account sign in buttons were showing in mobile navbar on iOs when hidden`,
+	},
+	{
 		date: `2026-05-27T22:30:20+00:00`,
 		product: 'app',
 		version: '0.14.0',

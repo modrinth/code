@@ -254,9 +254,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "インストール"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {#個のMod}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "必須のModパック"
   },
@@ -367,9 +364,6 @@
   },
   "friends.action.add-friend": {
     "message": "フレンドを追加"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count}件の友達リクエスト"
   },
   "friends.add-friend.submit": {
     "message": "フレンド申請を送信"

@@ -482,9 +482,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
   },
-  "create.collection.collection-info": {
-    "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
-  },
   "create.collection.create-collection": {
     "message": "Cipta koleksi"
   },
@@ -644,9 +641,6 @@
   "dashboard.affiliate-links.search": {
     "message": "Cari pautan afiliasi..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "daripada {count} {count, plural, other {projek}}"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Jumlah muat turun"
   },
@@ -667,9 +661,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Cuba laraskan penapis atau istilah carian anda."
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi anda"
@@ -950,9 +941,6 @@
   "dashboard.notifications.link.view-history": {
     "message": "Lihat sejarah pemberitahuan"
   },
-  "dashboard.notifications.link.view-more": {
-    "message": "Lihat {extraNotifs} lagi {extraNotifs, plural, other {pemberitahuan}}"
-  },
   "dashboard.organizations.button.create": {
     "message": "Cipta organisasi"
   },
@@ -961,9 +949,6 @@
   },
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "Perubahan akan diterapkan kepada <strong>{count}</strong> {count, plural, other {projek}}."
   },
   "dashboard.projects.links.description": {
     "message": "Sebarang pautan yang anda nyatakan di bawah akan ditulis ganti pada setiap projek yang dipilih. Sebarang pautan yang anda biarkan kosong akan diabaikan. Anda boleh memadamkan pautan daripada semua projek yang dipilih menggunakan butang tong sampah."
@@ -1225,15 +1210,6 @@
   },
   "discover.install.cancel-reset": {
     "message": "Batalkan penetapan semula"
-  },
-  "discover.seo.description": {
-    "message": "Cari dan layari beribu-ribu {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} Minecraft di Modrinth dengan hasil carian yang segera dan tepat. Penapis kami akan membantu anda mencari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} yang terbaik."
-  },
-  "discover.seo.title": {
-    "message": "Cari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Cari {projectType, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Anda mungkin tersalah taip URL koleksi."
@@ -2261,9 +2237,6 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {muat turun}}"
-  },
   "profile.label.joined": {
     "message": "Telah menyertai"
   },
@@ -2282,9 +2255,6 @@
   "profile.label.organizations": {
     "message": "Organisasi"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {projek}}"
-  },
   "profile.label.saving": {
     "message": "Sedang menyimpan..."
   },
@@ -2293,9 +2263,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Muat turun projek milik {username} di Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> pengikut projek}}"
   },
   "profile.user-id": {
     "message": "ID Pengguna: {id}"
@@ -2732,20 +2699,11 @@
   "project.settings.permissions.learn-more": {
     "message": "Ketahui lebih lanjut"
   },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Cari {count} {count, plural, other {projek luaran}}..."
-  },
   "project.settings.title": {
     "message": "Tetapan"
   },
   "project.settings.visit-dashboard": {
     "message": "Kunjungi papan pemuka projek"
-  },
-  "project.stats.downloads-label": {
-    "message": "muat turun{count, plural, other {}}"
-  },
-  "project.stats.followers-label": {
-    "message": "pengikut{count, plural, other {}}"
   },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
@@ -2753,35 +2711,17 @@
   "project.versions.title": {
     "message": "Versi"
   },
-  "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, other {Versi ini}} kini ditahan dan tidak disenaraikan secara umum. Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula fail tertentu yang disertakan dalam {count, plural, other {versi}} pek mod ini."
-  },
   "project.versions.withheld-versions-warning.resolve-button": {
     "message": "Selesaikan"
   },
-  "project.versions.withheld-versions-warning.title": {
-    "message": "{count, plural, other {Versi}} telah ditahan kerana kandungan terbenam yang tidak diketahui"
-  },
   "report.already-reported": {
     "message": "Anda telah melaporkan {title}"
-  },
-  "report.already-reported-description": {
-    "message": "Anda sudah mempunyai laporan terbuka untuk {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} ini. Anda boleh menambah lebih banyak butiran pada laporan anda jika anda mempunyai lebih banyak maklumat untuk ditambahkan."
-  },
-  "report.back-to-item": {
-    "message": "Kembali ke {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}"
   },
   "report.body.description": {
     "message": "Sertakan pautan dan gambar jika boleh dan adalah berkaitan. Laporan kosong atau tidak mencukupi akan ditutup dan diabaikan."
   },
   "report.body.title": {
     "message": "Sila berikan konteks tambahan tentang laporan anda"
-  },
-  "report.checking": {
-    "message": "Sedang menyemak {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}..."
-  },
-  "report.could-not-find": {
-    "message": "Tidak dapat mencari {item, select, project {projek} version {versi} user {pengguna} other {kandungan}}"
   },
   "report.for.violation": {
     "message": "Pelanggaran <rules-link>Peraturan</rules-link> atau <terms-link>Terma Penggunaan</terms-link> Modrinth"
@@ -2822,14 +2762,8 @@
   "report.please-report": {
     "message": "Tolong laporkan:"
   },
-  "report.question.content-id": {
-    "message": "Apakah ID {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} itu?"
-  },
   "report.question.content-type": {
     "message": "Apakah jenis kandungan yang anda hendak laporkan?"
-  },
-  "report.question.report-reason": {
-    "message": "Peraturan Modrinth manakah yang dilanggar oleh {item, select, project {projek} version {versi} user {pengguna} other {kandungan}} ini?"
   },
   "report.report-content": {
     "message": "Laporkan kandungan kepada penyederhana"
@@ -3509,20 +3443,11 @@
   "settings.billing.interval.month": {
     "message": "bulan"
   },
-  "settings.billing.interval.monthly": {
-    "message": "bulanan"
-  },
   "settings.billing.interval.quarter": {
     "message": "3 bulan"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "setiap tiga bulan"
-  },
   "settings.billing.interval.year": {
     "message": "tahun"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "tahunan"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Pelayaran bebas iklan di modrinth.com dan Modrinth App"
@@ -3608,9 +3533,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPU Kongsi (Boleh memecut sehingga {bursts} CPU)"
   },
@@ -3677,17 +3599,8 @@
   "settings.billing.subscription.title": {
     "message": "Langganan"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Bertukar ke {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Tukar ke {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Bil bulanan akan dikenakan bayaran tambahan sebanyak {amount} setahun"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Akan beralih kepada pengebilan {interval} pada {date}"
   },
   "settings.billing.update-method": {
     "message": "Kaedah kemas kini"

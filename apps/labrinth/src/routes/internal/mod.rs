@@ -2,6 +2,7 @@ pub mod admin;
 pub mod affiliate;
 pub mod attribution;
 pub mod billing;
+pub mod campaign;
 pub mod delphi;
 pub mod external_notifications;
 pub mod flows;
@@ -85,6 +86,11 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/affiliate")
             .wrap(default_cors())
             .configure(affiliate::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/campaign")
+            .wrap(default_cors())
+            .configure(campaign::config),
     )
     .service(
         utoipa_actix_web::scope("/_internal/search-management")

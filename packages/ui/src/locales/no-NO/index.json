@@ -212,12 +212,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Slettingsadvarsel"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Slett {count} {itemType}{count, plural, one {} other {s}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Slett {itemType}{count, plural, one {} other {s}}"
-  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Nedgrader} other {Oppdatering}} advarsel"
   },
@@ -277,9 +271,6 @@
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Hold inne Skift mens du klikker for å hoppe over bekreftelse."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Vi anbefaler at du lager ei sikkerhetskopiering før du fortsetter, sånn at du kan få tilbake {type, select, server {verden} other {instansen}}-en din viss noe går i stykker."
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Modpakkeinnholdet ditt kan nå bli funnet her!"
@@ -464,17 +455,11 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Vi anbefaler ikke at du endrer installeringsinstillingene dine etter installering av innhold. Viss du må endre dem, gjør omstart av serveren din."
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Kopla til {projectType, select, server {serverprosjekt} other {modpakke}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}-versjon"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Du kommer til å måtte starte serveren din på nytt att for å bytte loader."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Re-installering av modpakka tilbakestiller {type, select, server {serverens} other {instanser}}-innholdet til den opprinnelige tilstanden, fjerner modsa/innholda du har lagt til."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Re-installer modpakke"
@@ -506,9 +491,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "Kople fra"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Frakopling kommer til å permanent frakople denne {type, select, server {server} other {instansen}} fra {projectType, select, server {server} other {modpakke}}-prosjektet, som gjør at du kan endre loader-en og Minecraft-versjonen, men du kommer ikke til å få framtidige oppdateringer."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "Bekrefter..."
   },
@@ -523,12 +505,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstaller modpakke"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Reparering installerer loader-en og Minecraft-avhengigheter på nytt att, uten å slette innholdet ditt. Dette kan fikse problem viss {type, select, server {serveren din ikke starter opp riktig} other {spillet ikke starter opp grunna problem relatert til launcher-en}}."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "Reparer {type, select, server {server} other {instanse}}"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparer"
@@ -2163,4 +2139,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

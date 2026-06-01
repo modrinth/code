@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "無法載入訂閱詳細資訊。"
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "／5 天"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "／月"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "／季"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "／年"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "下一次扣款日期為 <charge-date>{date}</charge-date>。"
   },
@@ -106,12 +94,6 @@
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "已選取專案"
-  },
-  "browse.selected-projects-floating-bar.install": {
-    "defaultMessage": "安裝 {count} 個專案"
-  },
-  "browse.selected-projects-floating-bar.selected-count": {
-    "defaultMessage": "已選取 {count} 個專案"
   },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "捨棄"
@@ -314,9 +296,6 @@
   "content.card.select-project": {
     "defaultMessage": "選取「{project}」"
   },
-  "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "確定要將這 {count} 個專案更新至最新的相容版本嗎？建議你逐一進行更新。"
-  },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "更新警告"
   },
@@ -326,17 +305,11 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "按住 Shift 鍵並點選「全部更新」，即可在日後跳過這項確認步驟。"
   },
-  "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "更新 {count} 個專案"
-  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "刪除模組可能會對你的世界造成永久性影響，並在重新載入時導致內容遺失或發生非預期的問題。"
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "刪除警告"
-  },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "刪除 {count} 個{itemType}"
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "刪除{itemType}"
@@ -407,9 +380,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "按住 Shift 鍵並點選以跳過確認。"
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "我們建議在繼續操作前先建立備份，以便在發生問題時還原你的{type, select, server {世界} other {實例}}。"
-  },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "你模組包的內容現在可以在這裡找到了！"
   },
@@ -451,9 +421,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "請稍候"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "搜尋 {count} 個{contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "檔案名稱"
@@ -518,9 +485,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "正在上傳{contentType}..."
   },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "已選取 {count} 個{contentType}"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "已選取 {count, number} 個項目"
   },
@@ -535,9 +499,6 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "匯入"
-  },
-  "creation-flow.button.import-instances": {
-    "defaultMessage": "匯入 {count} 個實例"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "設定伺服器"
@@ -827,17 +788,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "將覆寫 {count} 個檔案"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "將覆寫"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "檔案將被覆寫"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "建立{type, select, directory {資料夾} other {檔案}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "建立{type, select, directory {資料夾} other {檔案}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "例如：my-folder"
@@ -850,9 +802,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "刪除檔案"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {這個資料夾及其所有內容將被永久刪除。此動作無法復原。} other {這個檔案將被永久刪除。此動作無法復原。}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "無法載入檔案內容。"
@@ -980,9 +929,6 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "例如：/my-folder"
   },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {移動資料夾} other {移動檔案}}"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "回到首頁"
   },
@@ -1102,9 +1048,6 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": "剩餘 {count} 個"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "將 {type, select, undefined {檔案} other {{type}}} 拖曳到這裡以上傳"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "名稱只能包含英數字、破折號、底線或空格"
@@ -1252,9 +1195,6 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "輸入縣市／省／州"
-  },
-  "format.bytes.0": {
-    "defaultMessage": "{count} 位元組"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1475,17 +1415,11 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "變更載入器具有破壞性"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "已連結的{projectType, select, server {伺服器專案} other {模組包}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} 版本"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "你需要重設伺服器才能切換載入器。"
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "重新安裝模組包會將{type, select, server {伺服器} other {實例}}內容重設為原始狀態，你新增的所有模組或內容都將被移除。"
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "重新安裝模組包"
@@ -1517,9 +1451,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "取消連結"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "取消連結將永久切斷此{type, select, server {伺服器} other {實例}}與{projectType, select, server {伺服器} other {模組包}}專案的連結。這讓你可以更改載入器與 Minecraft 版本，但你將無法收到未來的更新。"
-  },
   "installation-settings.verifying": {
     "defaultMessage": "驗證中..."
   },
@@ -1534,12 +1465,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "重新安裝模組包"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "修復實例會在保留遊戲內容的情況下，重新安裝載入器與 Minecraft 的必要元件。這或許能修復你{type, select, server {伺服器無法正常啟動的問題} other {的遊戲因啟動器出錯而打不開的問題}}。"
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "修復{type, select, server {伺服器} other {實例}}"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "修復"
@@ -1558,9 +1483,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "未知的遊戲模式"
-  },
-  "instances.content-install.compatible-count": {
-    "defaultMessage": "{count} 個相容實例"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "已有實例"
@@ -1618,9 +1540,6 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "沒有專案符合你的搜尋字詞。"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜尋 {count, number} 個專案"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
@@ -2219,44 +2138,17 @@
   "project-type.all": {
     "defaultMessage": "全部"
   },
-  "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, other {資料包}}"
-  },
   "project-type.datapack.category": {
     "defaultMessage": "資料包"
-  },
-  "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, other {資料包}}"
-  },
-  "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, other {模組}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "模組"
   },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, other {模組}}"
-  },
-  "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, other {模組包}}"
-  },
   "project-type.modpack.category": {
     "defaultMessage": "模組包"
   },
-  "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, other {模組包}}"
-  },
-  "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural, other {插件}}"
-  },
   "project-type.plugin.category": {
     "defaultMessage": "插件"
-  },
-  "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural, other {插件}}"
-  },
-  "project-type.project.capital": {
-    "defaultMessage": "專案"
   },
   "project-type.project.category": {
     "defaultMessage": "專案"
@@ -2264,14 +2156,8 @@
   "project-type.project.lowercase": {
     "defaultMessage": "個 {count, plural, one {專案} other {專案}}"
   },
-  "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, other {資源包}}"
-  },
   "project-type.resourcepack.category": {
     "defaultMessage": "資源包"
-  },
-  "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, other {資源包}}"
   },
   "project-type.server.capital": {
     "defaultMessage": "{count, plural, one {伺服器} other {伺服器}}"
@@ -2282,14 +2168,8 @@
   "project-type.server.lowercase": {
     "defaultMessage": "個 {count, plural, one {伺服器} other {伺服器}}"
   },
-  "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, other {光影包}}"
-  },
   "project-type.shader.category": {
     "defaultMessage": "光影包"
-  },
-  "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, other {光影包}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "支援環境"
@@ -2414,9 +2294,6 @@
   "project.about.tags.title": {
     "defaultMessage": "標籤"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count, number} 次下載"
-  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "用戶端與伺服器皆需安裝。"
   },
@@ -2483,20 +2360,8 @@
   "project.environment.unknown.title": {
     "defaultMessage": "未知的執行環境"
   },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} 位追蹤者"
-  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 人在線上"
-  },
-  "project.online-player-count.tooltip": {
-    "defaultMessage": "{count} 位玩家在線上"
-  },
-  "project.recent-plays": {
-    "defaultMessage": "{count} 次近期遊玩"
-  },
-  "project.recent-plays.tooltip": {
-    "defaultMessage": "過去 2 週內來自 Modrinth 的 {count} 次最近遊玩次數"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "這個專案使用了自訂模組包"
@@ -3098,15 +2963,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "從備份還原"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "對 {count} 個選取的備份執行批次動作"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "正在刪除 {total} 個備份..."
-  },
-  "servers.backups.bulk-bar.selected-count": {
-    "defaultMessage": "已選取 {count} 個備份"
-  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "一旦刪除，{count, plural, one {這個備份} other {這些備份}}將無法還原。刪除後即永久消失。"
   },
@@ -3118,9 +2974,6 @@
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "刪除{count, plural, one {備份} other {# 個備份}}"
-  },
-  "servers.backups.delete-modal.header": {
-    "defaultMessage": "刪除備份"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "建立你的第一個備份"
@@ -3263,17 +3116,11 @@
   "servers.listing.new-label": {
     "defaultMessage": "新伺服器"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "你的檔案還會保留 <days-remaining>{daysRemaining} 天</days-remaining>。請在檔案被刪除前聯絡支援團隊以進行下載。"
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "取消服務後，你的檔案將保留 30 天。"
   },
   "servers.listing.notice.moderated": {
     "defaultMessage": "由於違反管理規範，你的伺服器已遭停權。"
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "你的伺服器將於 {formattedDate} {verb}為 {planSize} 方案。"
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "我們正在為你設定伺服器，請稍候。這可能需要長達 10 分鐘。"
@@ -3380,9 +3227,6 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "成功"
   },
-  "servers.manage.search-placeholder": {
-    "defaultMessage": "搜尋 {count} {count, plural, other {個伺服器}}..."
-  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3394,9 +3238,6 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "你的伺服器設定已移動位置"
-  },
-  "servers.medal-listing.countdown.remaining": {
-    "defaultMessage": "剩餘 <days-count>{days}</days-count> 天 <hours-count>{hours}</hours-count> 小時 <minutes-count>{minutes}</minutes-count> 分鐘 <seconds-count>{seconds}</seconds-count> 秒..."
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "新伺服器"
@@ -3652,9 +3493,6 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "搜尋語言..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural, =0 {未搜尋到相關語言} other {有 # 個語言符合搜尋字詞}}"
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "沒有語言符合你的搜尋字詞。"
@@ -4121,11 +3959,7 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "離開頁面？"
   },
-  "ui.stacked-admonitions.alert-count": {
-    "defaultMessage": "{count} 個警示"
-  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "忽略全部"
   }
 }
-

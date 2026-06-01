@@ -434,20 +434,8 @@
   "create.collection.title": {
     "message": "Criar uma coleção"
   },
-  "create.limit-alert.approaching-limit": {
-    "message": "A alcançar o limite de {typePlural} ({current}/{max})"
-  },
-  "create.limit-alert.approaching-limit-description": {
-    "message": "Estás prestes a atingir o limite de {typePlural}, por favor contacta o suporte se precisas de mais do que {max} {typePlural}."
-  },
   "create.limit-alert.contact-support": {
     "message": "Contacta o suporte"
-  },
-  "create.limit-alert.limit-reached": {
-    "message": "limite de {typePlural} atingido"
-  },
-  "create.limit-alert.limit-reached-description": {
-    "message": "Atingiste o teu limite de {typePlural} de {max}. Por favor contacta o suporte para aumentar o teu limite."
   },
   "create.limit-alert.type-collection": {
     "message": "coleção"
@@ -2468,23 +2456,11 @@
   "report.already-reported": {
     "message": "Já denunciaste {title}"
   },
-  "report.already-reported-description": {
-    "message": "Já tens uma denúnia aberta para est{item, select,project {e projeto} version {a versão} user {e utilizador} other {e conteúdo}}. Podes adicionar mais detalhes à tua denúncia se tiveres mais informações."
-  },
-  "report.back-to-item": {
-    "message": "Voltar para {item, select,project {projeto} version {versão} user {utilizador} other {conteúdo}}"
-  },
   "report.body.description": {
     "message": "Inclui links e imagens se possível e relevante. Denúncias vazias ou insuficientes vão ser fechadas e ignoradas."
   },
   "report.body.title": {
     "message": "Por favor fornece contexto adicional sobre a tua denúncia"
-  },
-  "report.checking": {
-    "message": "Verificando {item, select,project {projeto} version {versão} user {utilizador} other {conteúdo}}..."
-  },
-  "report.could-not-find": {
-    "message": "Não foi possível encontrar {item, select,project {o projeto} version {a versão} user {o utilizador} other {o conteúdo}}"
   },
   "report.for.violation": {
     "message": "Violação das <rules-link>Regras</rules-link> ou <terms-link>Termos de Uso</terms-link> do Modrinth"
@@ -2525,14 +2501,8 @@
   "report.please-report": {
     "message": "Por favor denuncia:"
   },
-  "report.question.content-id": {
-    "message": "Qual é o ID d{item, select,project {o projeto} version {a versão} user {o utilizador} other {o conteúdo}}?"
-  },
   "report.question.content-type": {
     "message": "Que tipo de conteúdo estás a denunciar?"
-  },
-  "report.question.report-reason": {
-    "message": "Qual das regras do Modrinth est{item, select,project {e projeto} version {a versão} user {e utilizador} other {e conteúdo}} está a violar?"
   },
   "report.report-content": {
     "message": "Denunciar conteúdo aos moderadores"
@@ -3209,14 +3179,8 @@
   "settings.billing.interval.month": {
     "message": "mês"
   },
-  "settings.billing.interval.monthly": {
-    "message": "mensal"
-  },
   "settings.billing.interval.year": {
     "message": "ano"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "anual"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Navegação sem anúncios em modrinth.com e Modrinth App"
@@ -3302,9 +3266,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPUs partilhadas (Reforço até {bursts} CPUs)"
   },
@@ -3364,12 +3325,6 @@
   },
   "settings.billing.subscription.title": {
     "message": "Subscrições"
-  },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Alterando para {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Alterar para {interval}"
   },
   "settings.billing.update-method": {
     "message": "Atualizar método"

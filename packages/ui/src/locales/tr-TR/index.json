@@ -59,18 +59,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Abonelik detayları yüklenemedi."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 gün"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/ay"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/çeyrek"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/yıl"
-  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Plan"
   },
@@ -299,17 +287,11 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Gelecekte bu onayı atlamak için \"Hepsini güncelle\" seçeneğine tıklarken Shift tuşuna basılı tutun."
   },
-  "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "{count} projeyi güncelle"
-  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Mod kaldırmak dünyanızı kalıcı şekilde etkileyebilir ve eksik içerik ve beklenmedik sorunlar yaşayabilirsiniz."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Kaldırma uyarısı"
-  },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "{count} {itemType} kaldır"
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} kaldır"
@@ -389,9 +371,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Doğrulamayı atlamak için tıklarken Shift basılı tutun."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Herhangi bir şey bozulursa {type, select, server {dünyanızı} other {kurulumunuzu}} kurtarmak için devam etmeden önce yedek oluşturmanızı tavsiye ediyoruz."
-  },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Mod paketinizin içeriği artık burada bulunabilir!"
   },
@@ -433,9 +412,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Lütfen bekleyin"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "{count} {contentType} arasında arayın..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Dosya adları"
@@ -499,9 +475,6 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType} güncelleniyor..."
-  },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} seçildi"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} seçildi"
@@ -749,17 +722,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} tanesinin üzerine yazıldı"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Üzerine yazıldı"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Dosyaların üzerine yazılacak"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "{type, select, directory {klasör} other {dosya}} oluştur"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Bir {type, select, directory {klasör} other {dosya}} oluştur"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "örneğin: klasörüm"
@@ -772,9 +736,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Dosyayı sil"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Bu klasör ve içindeki tüm içerikler kalıcı olarak silinecektir. Bu işlem geri alınamaz.} other {Bu dosya kalıcı olarak silinecektir. Bu işlem geri alınamaz.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Dosya içeriği yüklenemedi."
@@ -902,9 +863,6 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "Örn. /klasorum"
   },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Klasörü taşı} other {Dosyayı taşı}}"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Ana sayfaya dön"
   },
@@ -1015,9 +973,6 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": "- {count} kaldı"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Yüklemek için {type, select, undefined {dosyaları} other {{type}ları}} buraya bırakın"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Ad yalnızca alfanümerik karakterler, tireler, alt çizgiler veya boşluklar içerebilir."
@@ -1367,17 +1322,11 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Yükleyici değiştirmek tehlikelidir"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Bağlı {projectType, select, server {sunucu} other {mod paketi}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} sürümü"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Yükleyici değiştirmek için sunucunuzu sıfırlamalısınız."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Mod paketini tekrardan kurmak {type, select, server {sunucuyu} other {kurulumu}} orijinal hâline geri döndürür. Bu işlem sonradan eklediğiniz tüm içeriği siler."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Mod paketini yeniden kur"
@@ -1409,9 +1358,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "Bağlantıyı kopar"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Bağlantıyı kalıcı olarak kesmek, bu {type, select, server {sunucunun} other {örneğin}} {projectType, select, server {sunucu} other {mod paketi}} projesiyle olan ilişkisini tamamen koparır; bu sayede yükleyiciyi ve Minecraft sürümünü değiştirebilirsiniz ancak gelecekteki güncellemeleri alamazsınız."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "Doğrulanıyor..."
   },
@@ -1426,12 +1372,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Mod paketini yeniden kur"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Tamir etmek yükleyiciyi ve Minecraft'ın çalışması için gereken dosyaları, sizin içeriğinizi silmeden tekrar yükler. Bu, {type, select, server {sunucunuz doğru başlamıyor ise} other {oyununuz yükleyici bazlı hatalardan dolayı başlamıyor ise}} sorunları çözebilir."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "{type, select, server {Sunucuyu} other {Kurulumu}} tamir et"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Tamir et"
@@ -1450,9 +1390,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
-  },
-  "instances.content-install.compatible-count": {
-    "defaultMessage": "{count} uyumlu kurulum"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Var olan kurulum"
@@ -2009,9 +1946,6 @@
   "payment-method.amex": {
     "defaultMessage": "American Express"
   },
-  "payment-method.card_display": {
-    "defaultMessage": ""
-  },
   "payment-method.cashapp": {
     "defaultMessage": "Cash App"
   },
@@ -2087,41 +2021,17 @@
   "project-type.all": {
     "defaultMessage": "Tümü"
   },
-  "project-type.datapack.capital": {
-    "defaultMessage": "Veri Paketi"
-  },
   "project-type.datapack.category": {
     "defaultMessage": "Veri Paketleri"
-  },
-  "project-type.datapack.lowercase": {
-    "defaultMessage": "veri paketi"
-  },
-  "project-type.mod.capital": {
-    "defaultMessage": "Mod"
   },
   "project-type.mod.category": {
     "defaultMessage": "Modlar"
   },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "mod"
-  },
-  "project-type.modpack.capital": {
-    "defaultMessage": "Mod Paketi"
-  },
   "project-type.modpack.category": {
     "defaultMessage": "Mod Paketleri"
   },
-  "project-type.modpack.lowercase": {
-    "defaultMessage": "mod paketi"
-  },
-  "project-type.plugin.capital": {
-    "defaultMessage": "Plugin"
-  },
   "project-type.plugin.category": {
     "defaultMessage": "Pluginler"
-  },
-  "project-type.plugin.lowercase": {
-    "defaultMessage": "plugin"
   },
   "project-type.project.capital": {
     "defaultMessage": "{count, plural,one {Proje} other {Projeler}}"
@@ -2129,29 +2039,11 @@
   "project-type.project.category": {
     "defaultMessage": "Projeler"
   },
-  "project-type.project.lowercase": {
-    "defaultMessage": "proje"
-  },
-  "project-type.resourcepack.capital": {
-    "defaultMessage": "Kaynak Paketi"
-  },
   "project-type.resourcepack.category": {
     "defaultMessage": "Kaynak Paketleri"
   },
-  "project-type.resourcepack.lowercase": {
-    "defaultMessage": "kaynak paketi"
-  },
-  "project-type.server.capital": {
-    "defaultMessage": "Sunucu"
-  },
   "project-type.server.category": {
     "defaultMessage": "Sunucular"
-  },
-  "project-type.server.lowercase": {
-    "defaultMessage": "sunucu"
-  },
-  "project-type.shader.capital": {
-    "defaultMessage": "Shader"
   },
   "project-type.shader.category": {
     "defaultMessage": "Shaderlar"
@@ -2282,9 +2174,6 @@
   "project.about.tags.title": {
     "defaultMessage": "Etiketler"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count, number} indirme"
-  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Hem istemci hem de sunucu tarafında gereklidir."
   },
@@ -2351,20 +2240,8 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Bilinmeyen ortam"
   },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} takipçi"
-  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} çevrim içi"
-  },
-  "project.online-player-count.tooltip": {
-    "defaultMessage": "{count} çevrim içi oyuncu"
-  },
-  "project.recent-plays": {
-    "defaultMessage": "{count} oynama"
-  },
-  "project.recent-plays.tooltip": {
-    "defaultMessage": "Modrinth'den son 2 haftada {count} oynama"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Bu proje özel bir mod paketi kullanmaktadır"
@@ -3624,4 +3501,3 @@
     "defaultMessage": "Sayfadan ayrılsın mı?"
   }
 }
-

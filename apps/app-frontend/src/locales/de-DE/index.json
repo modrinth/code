@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Server durchsuchen"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "„{name}“ wird **endgültig gelöscht**, und es gibt keine Möglichkeit, sie wiederherzustellen."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Möchtest du diese Welt wirklich endgültig löschen?"
   },
@@ -247,12 +244,6 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Keine Server oder Welten hinzugefügt"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "„{name}“ wird aus deiner Liste entfernt, auch im Spiel, und es gibt keine Möglichkeit, ihn wiederherzustellen."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "„{name}“ ({address}) wird aus deiner Liste entfernt, inklusive im Spiel, und es gibt keine Möglichkeit, ihn wiederherzustellen."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Möchtest du {name} wirklich entfernen?"

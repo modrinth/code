@@ -710,9 +710,6 @@
   "dashboard.collections.empty.no-match-hint": {
     "message": "Tente ajustar seus filtros ou termos de busca."
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, =0 {Nenhum projeto} one {{count} projeto} other {{count} projetos}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Buscar suas coleções"
   },
@@ -1360,15 +1357,6 @@
   },
   "discover.install.heading.reset-modpack": {
     "message": "Selecionando o pacote de mods para instalar após a redefinição"
-  },
-  "discover.seo.description": {
-    "message": "Busque e explore milhares de {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}} de Minecraft no Modrinth com resultados de busca instantâneos e precisos. Nossos filtros ajudam você a encontrar rapidamente os melhores {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}} de Minecraft."
-  },
-  "discover.seo.title": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Buscar {projectType, select, mod {mods} modpack {pacotes de mods (modpacks)} resourcepack {pacotes de recursos (resourcepacks)} shader {sombreadores (shaders)} plugin {plugins} datapack {pacotes de dados (datapacks)} other {projetos}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Você pode ter digitado incorretamente o URL da coleção."
@@ -2417,9 +2405,6 @@
   "profile.label.collection": {
     "message": "Coleção"
   },
-  "profile.label.downloads": {
-    "message": "{count, plural, =0 {Nenhum download} one {{count} download} other {{count} downloads}}"
-  },
   "profile.label.joined": {
     "message": "Entrou"
   },
@@ -2438,9 +2423,6 @@
   "profile.label.organizations": {
     "message": "Organizações"
   },
-  "profile.label.projects": {
-    "message": "{count, plural, =0 {Nenhum projeto} one {{count} projeto} other {{count} projetos}}"
-  },
   "profile.label.saving": {
     "message": "Salvando..."
   },
@@ -2449,9 +2431,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — Baixe os projetos de {username} no Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, =0 {{count} seguidores} one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
   },
   "profile.user-id": {
     "message": "ID do usuário: {id}"
@@ -2921,23 +2900,11 @@
   "report.already-reported": {
     "message": "Você já denunciou este {title}"
   },
-  "report.already-reported-description": {
-    "message": "Você já tem uma denúncia aberta para {item, select, project {este projeto} version {esta versão} user {este usuário} other {este conteúdo}}. Se tiver mais informações, você pode adicionar mais detalhes ao seu relatório."
-  },
-  "report.back-to-item": {
-    "message": "Voltar para {item, select, project {o projeto} version {a versão} user {o usuário} other {o conteúdo}}"
-  },
   "report.body.description": {
     "message": "Se possível, inclua links e imagens relevantes. Denúncias vazias ou insuficientes serão fechadas e ignoradas."
   },
   "report.body.title": {
     "message": "Forneça mais contexto sobre seu relatório"
-  },
-  "report.checking": {
-    "message": "Checando {item, select, project {projeto} version {versão} user {usuário} other {conteúdo}}..."
-  },
-  "report.could-not-find": {
-    "message": "Não foi possível encontrar {item, select, project {o projeto} version {a versão} user {o usuário} other {o conteúdo}}"
   },
   "report.for.violation": {
     "message": "Violação das <rules-link>regras </rules-link> ou <terms-link>termos de uso</terms-link> do Modrinth"
@@ -2978,14 +2945,8 @@
   "report.please-report": {
     "message": "Denuncie apenas:"
   },
-  "report.question.content-id": {
-    "message": "Qual é o ID {item, select, project {do projeto} version {da versão} user {do usuário} other {do conteúdo}}?"
-  },
   "report.question.content-type": {
     "message": "Que tipo de conteúdo você está denunciando?"
-  },
-  "report.question.report-reason": {
-    "message": "Qual das regras do Modrinth {item, select, project {este projeto} version {esta versão} user {este usuário} other {este conteúdo}} está violando?"
   },
   "report.report-content": {
     "message": "Denunciar conteúdo aos moderadores"
@@ -3665,20 +3626,11 @@
   "settings.billing.interval.month": {
     "message": "mês"
   },
-  "settings.billing.interval.monthly": {
-    "message": "mensal"
-  },
   "settings.billing.interval.quarter": {
     "message": "trimestre"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "trimestral"
-  },
   "settings.billing.interval.year": {
     "message": "ano"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "anual"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Navegação sem anúncios em modrinth.com e no Modrinth App"
@@ -3764,9 +3716,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPUs compartilhadas (picos de até {bursts} CPUs)"
   },
@@ -3833,17 +3782,8 @@
   "settings.billing.subscription.title": {
     "message": "Assinaturas"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Trocando para {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Trocar para {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "A cobrança mensal terá um custo adicional de {amount} por ano"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Muda para cobrança {interval} em {date}"
   },
   "settings.billing.update-method": {
     "message": "Atualizar método"

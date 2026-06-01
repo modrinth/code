@@ -65,9 +65,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Odwiedź stronę galerii"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Twój {type, select, mod {mod} plugin {plugin} other {projekt}} używa licencji, która wymaga publikacji kodu źródłowego. Podaj link do kodu źródłowego, plik z źródłami dla każdej podanej wersji lub rozważ użycie innej licencji."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Podaj kod źródłowy"
   },
@@ -101,9 +98,6 @@
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Nie używaj skracaczy linków"
   },
-  "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# nagłówek} few {# nagłówki} other {# nagłówków}} w twoim opisie {count, plural, one {jest za długi} few {są za długie} other {jest za długich}}. Nagłówki powinny być zwięzłe i pełnić funkcję tytułów sekcji, a nie pełnych zdań."
-  },
   "nags.long-headers.title": {
     "defaultMessage": "Skróć nagłówki"
   },
@@ -134,9 +128,6 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Przejrzyj informacje zwrotne"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Wybrano {count, plural, one {# tag rozdzielczości} few {# tagi rozdzielczości} other {# tagów rozdzielczości}} ({tags}). Paczki zasobów zwykle powinny mieć tylko jeden tag rozdzielczości opisujący ich główną rozdzielczość."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"
   },
@@ -157,9 +148,6 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Wybierz język"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Wybierz licencję, pod którą {type, select, mod {udostępniony jest Twój mod} modpack {udostępniona jest Twoja paczka modów} resourcepack {udostępniona jest Twoja paczka zasobów} shader {udostępnione są Twoje shadery} plugin {udostępniony jest Twój plugin} datapack {udostępniona jest Twoja paczka danych} other {udostępniony jest Twój projekt}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Wybierz licencję"
@@ -212,20 +200,11 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Oczyść nazwę"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój serwer był łatwiejszy do znalezienia."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój projekt był łatwiejszy do znalezienia."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Przynajmniej jeden obrazek w galerii jest wymagany, by pokazać zawartość {type, select, resourcepack {Twojej paczki zasobów, z wyjątkiem paczek zawierających tylko dźwięki lub tłumaczenia. Jeżeli opisuje to Twoją paczkę, wybierz odpowiedni tag} shader {Twojego shadera} other {Twojego projektu}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Prześlij obraz do galerii"
@@ -249,4 +228,3 @@
     "defaultMessage": "Odwiedź ustawienia linków"
   }
 }
-

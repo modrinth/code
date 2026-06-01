@@ -62,7 +62,8 @@ const AFFILIATE_CODE_CLICKS: &str = {
             COUNT(*) AS clicks
         FROM affiliate_code_clicks
         WHERE
-            recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+            recorded >= {TIME_RANGE_START}
+            AND recorded < {TIME_RANGE_END}
             -- make sure that the REAL affiliate code id is included,
             -- not the possibly-zero one,
             -- by using `affiliate_code_clicks.affiliate_code_id` instead of `project_id`

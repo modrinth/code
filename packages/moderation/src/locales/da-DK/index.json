@@ -65,9 +65,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Besøg galleri side"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Dit {type, select, mod {mod} plugin {plugin} other {projekt}} bruger en licens hvilke kræver kilde kode for at tilgængelig. Venligst et link til kilde kode eller kilde filer for hver ekstra version, eller tænk over at bruge en anden licens."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Angiv kilde kode"
   },
@@ -83,9 +80,6 @@
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licens-URL'en er ugyldig."
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Vælg den licens {type, select, mod {dit mod} modpack {din modpack} resourcepack {din ressourcepakke} shader {din shader} plugin {dit plugin} datapack {din datapakke} other {dit projekt}} distribueres under."
-  },
   "nags.server.title": {
     "defaultMessage": "Besøg server indstillinger"
   },
@@ -93,4 +87,3 @@
     "defaultMessage": "Besøg beskrivelse indstillinger"
   }
 }
-
