@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
   "describe": {
     "columns": [
       {
@@ -50,81 +50,91 @@
       },
       {
         "ordinal": 9,
+        "name": "campaign_pride_26_last_donated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "campaign_pride_26_total_amount_donated_usd",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 11,
         "name": "github_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 10,
+        "ordinal": 12,
         "name": "discord_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 11,
+        "ordinal": 13,
         "name": "gitlab_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 12,
+        "ordinal": 14,
         "name": "google_id",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 13,
+        "ordinal": 15,
         "name": "steam_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 14,
+        "ordinal": 16,
         "name": "microsoft_id",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 15,
+        "ordinal": 17,
         "name": "email_verified",
         "type_info": "Bool"
       },
       {
-        "ordinal": 16,
+        "ordinal": 18,
         "name": "password",
         "type_info": "Text"
       },
       {
-        "ordinal": 17,
+        "ordinal": 19,
         "name": "totp_secret",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 18,
+        "ordinal": 20,
         "name": "paypal_id",
         "type_info": "Text"
       },
       {
-        "ordinal": 19,
+        "ordinal": 21,
         "name": "paypal_country",
         "type_info": "Text"
       },
       {
-        "ordinal": 20,
+        "ordinal": 22,
         "name": "paypal_email",
         "type_info": "Text"
       },
       {
-        "ordinal": 21,
+        "ordinal": 23,
         "name": "venmo_handle",
         "type_info": "Text"
       },
       {
-        "ordinal": 22,
+        "ordinal": 24,
         "name": "stripe_customer_id",
         "type_info": "Text"
       },
       {
-        "ordinal": 23,
+        "ordinal": 25,
         "name": "allow_friend_requests",
         "type_info": "Bool"
       },
       {
-        "ordinal": 24,
+        "ordinal": 26,
         "name": "is_subscribed_to_newsletter",
         "type_info": "Bool"
       }
@@ -145,6 +155,8 @@
       false,
       false,
       false,
+      null,
+      null,
       true,
       true,
       true,
@@ -163,5 +175,5 @@
       false
     ]
   },
-  "hash": "5fcdeeeb820ada62e10feb0beefa29b0535241bbb6d74143925e16cf8cd720c4"
+  "hash": "e6c22fe10d603206c8466da630b30d0d4848455f5cddbf9202d9cdbfa1f306b5"
 }

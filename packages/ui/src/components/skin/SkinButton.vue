@@ -49,14 +49,14 @@ watch(
 <template>
 	<div
 		v-tooltip="tooltip ?? undefined"
-		class="skin-button group relative flex items-end justify-center overflow-hidden border border-solid transition-[border-color,box-shadow] duration-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand"
+		class="skin-button group relative flex items-end justify-center overflow-hidden border border-solid transition-[border-color,box-shadow] duration-200"
 		:class="[
 			selected ? 'skin-button--selected' : '',
 			{ 'skin-button--with-actions': $slots['overlay-buttons'] },
 		]"
 	>
 		<button
-			class="absolute inset-0 z-10 cursor-pointer border-none bg-transparent p-0"
+			class="absolute inset-0 z-10 cursor-pointer border-none bg-transparent p-0 focus-visible:outline-none"
 			:aria-label="tooltip ? `Select ${tooltip}` : 'Select skin'"
 			:aria-pressed="selected"
 			@click="emit('select')"
@@ -149,6 +149,11 @@ watch(
 	pointer-events: none;
 	content: '';
 	background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(37, 39, 45, 0.2) 100%);
+}
+
+.skin-button:has(:focus-visible) {
+	outline: 2px solid var(--color-brand);
+	outline-offset: 2px;
 }
 
 .skin-button:hover,
