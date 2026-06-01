@@ -525,11 +525,7 @@ export function createContentInstall(opts: {
 
 		incompatibilityWarningInstalling.value = true
 		try {
-			await add_project_from_version(
-				incompatibilityWarningInstance.path,
-				version.id,
-				'standalone',
-			)
+			await add_project_from_version(incompatibilityWarningInstance.path, version.id, 'standalone')
 		} catch (err) {
 			opts.handleError(err)
 			incompatibilityWarningInstalling.value = false

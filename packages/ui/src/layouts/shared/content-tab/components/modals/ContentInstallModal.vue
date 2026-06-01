@@ -122,8 +122,8 @@
 						:color="inst.compatible ? 'standard' : 'orange'"
 					>
 						<button
-							:disabled="inst.installing"
 							v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
+							:disabled="inst.installing"
 							@click="emit('install', inst)"
 						>
 							<TriangleAlertIcon v-if="!inst.compatible" />

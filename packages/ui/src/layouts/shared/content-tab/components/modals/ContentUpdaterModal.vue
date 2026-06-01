@@ -8,9 +8,7 @@
 	>
 		<template #title>
 			<Avatar v-if="projectIconUrl" :src="projectIconUrl" size="3rem" :tint-by="projectName" />
-			<span class="text-lg font-extrabold text-contrast">{{
-				header ?? defaultHeader
-			}}</span>
+			<span class="text-lg font-extrabold text-contrast">{{ header ?? defaultHeader }}</span>
 		</template>
 		<div
 			class="flex h-[min(550px,calc(95vh-10rem))] border-solid border-transparent border-[1px] border-b-surface-4"
@@ -280,8 +278,8 @@ import {
 import {
 	capitalizeString,
 	formatVersionsForDisplay,
-	renderHighlightedString,
 	type GameVersionTag,
+	renderHighlightedString,
 } from '@modrinth/utils'
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
@@ -556,9 +554,7 @@ const filteredVersions = computed(() => {
 				v.name.toLowerCase().includes(query) ||
 				v.version_number.toLowerCase().includes(query) ||
 				(incompatibilityWarningMode.value &&
-					[...v.loaders, ...v.game_versions].some((value) =>
-						value.toLowerCase().includes(query),
-					)),
+					[...v.loaders, ...v.game_versions].some((value) => value.toLowerCase().includes(query))),
 		)
 	}
 
