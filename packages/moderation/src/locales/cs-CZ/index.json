@@ -35,9 +35,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Vyberte vhodné tagy"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
-  },
   "nags.description-too-short.title": {
     "defaultMessage": "Rozšířit popisek"
   },
@@ -65,17 +62,11 @@
   "nags.gallery.title": {
     "defaultMessage": "Navštivte stránku galerie"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": ""
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Poskytnutí zdrojového kódu"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Některé z vašich externích odkazů se zdají být duplicitní. Každý odkaz by měl být zadán pouze jednou a s příslušným typem odkazu."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Stejné odkazy"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Popis by měl obsahovat dostatečné množství prostého textu nebo popisků u obrázku, aby byl přístupný i těm, kteří používají čtečky obrazovky nebo mají pomalé připojení k internetu."
@@ -158,9 +149,6 @@
   "nags.select-language.title": {
     "defaultMessage": "Vyberte jazyk"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Vyberte licenci, pod kterou je distribuován váš {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {doplněk} datapack {datapack} other {projekt}}."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Vybrat licenci"
   },
@@ -200,9 +188,6 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Vyjasněte si shrnutí"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Rozšířte shrnutí"
   },
@@ -223,9 +208,6 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Vyberte odpovídající tagy"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Alespoň jeden obraz s galerie je potřeba na zobrazení obsahu vašeho {type, select, resourcepack {balíčků textur, kromě zvukových a lokalizačních balíčků. Jistly tohle váš balíček popisuje, tak zvolte ten vhodný tag} shader {shader} other {project}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Nahrání obrázku do galerie"
@@ -249,4 +231,3 @@
     "defaultMessage": "Navštívit nastavení odkazů"
   }
 }
-

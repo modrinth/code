@@ -1,18 +1,18 @@
 /*
   Cards and body styling
 */
+// CARDS
 .base-card {
-	padding: var(--spacing-card-lg);
+	padding: 1rem;
 	position: relative;
+	min-height: var(--font-size-2xl);
 
-	background-color: var(--color-raised-bg);
-	border-radius: var(--size-rounded-card);
+	background-color: var(--surface-3);
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--surface-4);
 
-	margin-bottom: var(--spacing-card-md);
+	margin-bottom: var(--gap-md);
 	outline: 2px solid transparent;
-	outline-offset: -2px;
-
-	box-shadow: var(--shadow-card);
 
 	.card__overlay {
 		position: absolute;
@@ -23,6 +23,17 @@
 		align-items: flex-end;
 		grid-gap: 0.5rem;
 		z-index: 2;
+	}
+
+	&:where(&.warning, &.information) {
+		padding: 1.5rem;
+		line-height: 1.5;
+		min-height: 0;
+
+		a {
+			color: var(--color-blue);
+			text-decoration: underline;
+		}
 	}
 
 	&.moderation-card {

@@ -1,4 +1,7 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+};
 
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::database::PgPool;
@@ -10,12 +13,14 @@ use crate::{
         get_user_from_headers,
     },
     database::{
-        models::{DBModerationNote, DBUser},
+        models::{DBModerationNote, DBOrganization, DBProjectId, DBUser},
         redis::RedisPool,
     },
     file_hosting::{FileHost, FileHostPublicity},
     models::{
+        ids::OrganizationId,
         notifications::Notification,
+        organizations::Organization,
         pats::Scopes,
         projects::Project,
         users::{Badges, Role},
@@ -38,6 +43,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
     cfg.service(
         web::scope("user")
+            .route("{user_id}/all-projects", web::get().to(all_projects))
             .route("{user_id}/projects", web::get().to(projects_list))
             .route("{id}/notes", web::patch().to(user_notes_edit))
             .route("{id}", web::get().to(user_get))
@@ -53,9 +59,144 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+#[derive(Serialize)]
+pub struct AllProjectsResponse {
+    pub projects: Vec<Project>,
+    pub organizations: HashMap<OrganizationId, Organization>,
+}
+
 #[derive(Deserialize)]
 pub struct UserEmailQuery {
     pub email: String,
+}
+
+pub async fn all_projects(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<AllProjectsResponse>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+    let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await?
+        .ok_or(ApiError::NotFound)?;
+
+    let user_project_ids =
+        DBUser::get_projects(target_user.id, &**pool, &redis).await?;
+    let organization_ids =
+        DBUser::get_organizations(target_user.id, &**pool).await?;
+    let organizations_data =
+        DBOrganization::get_many_ids(&organization_ids, &**pool, &redis)
+            .await?;
+
+    let team_ids = organizations_data
+        .iter()
+        .map(|organization| organization.team_id)
+        .collect::<Vec<_>>();
+    let teams_data =
+        crate::database::models::DBTeamMember::get_from_team_full_many(
+            &team_ids, &**pool, &redis,
+        )
+        .await?;
+    let users = DBUser::get_many_ids(
+        &teams_data
+            .iter()
+            .map(|member| member.user_id)
+            .collect::<Vec<_>>(),
+        &**pool,
+        &redis,
+    )
+    .await?;
+
+    let mut team_groups = HashMap::new();
+    for member in teams_data {
+        team_groups
+            .entry(member.team_id)
+            .or_insert(vec![])
+            .push(member);
+    }
+
+    let mut organizations = HashMap::new();
+    let mut visible_organization_ids = Vec::new();
+    for data in organizations_data {
+        if !is_visible_organization(&data, &user, &pool, &redis).await? {
+            continue;
+        }
+
+        visible_organization_ids.push(data.id);
+        let members_data = team_groups.remove(&data.team_id).unwrap_or(vec![]);
+        let logged_in = user
+            .as_ref()
+            .and_then(|user| {
+                members_data
+                    .iter()
+                    .find(|x| x.user_id == user.id.into() && x.accepted)
+            })
+            .is_some();
+        let team_members = members_data
+            .into_iter()
+            .filter(|x| logged_in || x.accepted || target_user.id == x.user_id)
+            .filter_map(|data| {
+                users.iter().find(|x| x.id == data.user_id).map(|member| {
+                    crate::models::teams::TeamMember::from(
+                        data,
+                        member.clone(),
+                        !logged_in,
+                    )
+                })
+            })
+            .collect();
+
+        organizations.insert(
+            OrganizationId::from(data.id),
+            Organization::from(data, team_members),
+        );
+    }
+
+    let organization_id_values = visible_organization_ids
+        .iter()
+        .map(|id| id.0)
+        .collect::<Vec<_>>();
+    let organization_project_ids = sqlx::query!(
+        "
+        SELECT m.id
+        FROM mods m
+        WHERE m.organization_id = ANY($1)
+        ",
+        &organization_id_values,
+    )
+    .fetch_all(&**pool)
+    .await?
+    .into_iter()
+    .map(|row| DBProjectId(row.id))
+    .collect::<Vec<_>>();
+
+    let project_ids = user_project_ids
+        .into_iter()
+        .chain(organization_project_ids)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    let projects_data =
+        crate::database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
+            .await?;
+    let projects =
+        filter_visible_projects(projects_data, &user, &pool, true).await?;
+
+    Ok(web::Json(AllProjectsResponse {
+        projects,
+        organizations,
+    }))
 }
 
 pub async fn admin_user_email(

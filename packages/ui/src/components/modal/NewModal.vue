@@ -84,6 +84,7 @@
 
 						<div
 							ref="scrollContainer"
+							data-modal-content
 							:class="[
 								'flex-1 min-h-0',
 								props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
@@ -112,7 +113,9 @@
 
 					<div
 						v-else
+						data-modal-content
 						:class="[
+							'min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6',
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"

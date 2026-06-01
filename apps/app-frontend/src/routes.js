@@ -86,10 +86,10 @@ export default new createRouter({
 		},
 		{
 			path: '/skins',
-			name: 'Skins',
+			name: 'Skin selector',
 			component: Pages.Skins,
 			meta: {
-				breadcrumb: [{ name: 'Skins' }],
+				breadcrumb: [{ name: 'Skin selector' }],
 			},
 		},
 		{

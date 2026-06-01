@@ -29,9 +29,6 @@
   "nags.add-links.title": {
     "defaultMessage": "외부 링크 추가"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "사용 가능한 모든 {totalAvailableTags, plural, other {#개의 태그}}를 선택하셨습니다. 이는 사용자가 관련 프로젝트를 찾는 데 도움을 주기 위한 태그의 목적에 어긋납니다. 프로젝트와 관련된 태그만 선택해 주세요."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "올바른 태그를 선택해 주세요"
   },
@@ -65,17 +62,11 @@
   "nags.gallery.title": {
     "defaultMessage": "갤러리 페이지 보기"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "이 {type, select, mod {모드는} plugin {플러그인은} other {프로젝트는}} 소스 코드를 공개해야 하는 라이선스를 사용하고 있습니다. 각 추가 버전에 해당하는 소스 코드 링크 또는 소스 파일을 제공해 주거나, 다른 라이선스를 고려해 보세요."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "소스 코드 제공"
   },
   "nags.identical-links.description": {
     "defaultMessage": "제공된 외부 링크가 동일합니다. 각 링크는 적절한 형식으로 한 번만 기입되어야 합니다."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "동일한 링크"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "설명에는 충분한 일반 텍스트 또는 이미지 대체 텍스트를 포함하여, 화면 읽기 도구를 사용하는 사용자나 인터넷 속도가 느린 사용자도 접근할 수 있도록 해야 합니다."
@@ -100,9 +91,6 @@
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "링크 단축기 사용 금지"
-  },
-  "nags.long-headers.description": {
-    "defaultMessage": "설명의 {count, plural, other {#개의 헤더}}{count, plural, other {}}가 너무 깁니다. 헤더는 간결해야 하며, 완전한 문장이 아닌 단락 제목 역할을 해야 합니다."
   },
   "nags.long-headers.title": {
     "defaultMessage": "헤더 단축"
@@ -134,9 +122,6 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "피드백 검토"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count, plural, other {#개의 해상도 태그}} ({tags})를 선택했습니다. 리소스 팩에는 일반적으로 기본 해상도와 일치하는 해상도 태그 하나만 포함되어야 합니다."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "올바른 해상도 선택"
   },
@@ -157,9 +142,6 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "언어 선택"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "{type, select, mod {모드} modpack {모드팩} resourcepack {리소스 팩} shader {셰이더} plugin {플러그인} datapack {데이터 팩} other {프로젝트}}에 적용되는 배포 라이선스를 선택하세요."
   },
   "nags.select-license.title": {
     "defaultMessage": "라이선스 선택"
@@ -200,9 +182,6 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "요약 정리"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "작성한 요약이 {length, plural, other {#자}}입니다. 적절한 정보를 제공하는 요약을 작성하려면 최소 {minChars, plural, other {#자}} 이상을 권장합니다."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "요약 확장"
   },
@@ -212,20 +191,11 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "이름 정리"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural, other {#}}개의 태그를 선택했습니다. 서버가 관련 검색 결과에 표시될 수 있도록 {maxTagCount}개 이하로 줄여주세요."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "올바른 태그를 선택해 주세요"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount, plural, other {#}}개의 태그를 선택했습니다. 프로젝트가 관련 검색 결과에 표시될 수 있도록 {maxTagCount}개 이하로 줄여주세요."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "올바른 태그를 선택해주세요"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "{type, select, resourcepack {오디오 또는 현지화 팩을 제외한 리소스 팩의 경우(해당된다면 적절한 태그를 선택해 주세요)} shader {셰이더} other {프로젝트}}의 콘텐츠를 보여주기 위해서는 최소 1장의 이미지가 필요합니다."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "갤러리 이미지 업로드"
@@ -249,4 +219,3 @@
     "defaultMessage": "링크 설정 방문"
   }
 }
-

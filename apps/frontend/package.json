@@ -11,6 +11,7 @@
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"src/{components,composables,layouts,middleware,modules,pages,plugins,utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore \"**/*.d.ts\" --ignore node_modules --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
+		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope apps/frontend",
 		"cf-deploy": "pnpm run build && wrangler deploy --env staging",
 		"cf-dev": "pnpm run build && wrangler dev --env staging",
 		"cf-typegen": "wrangler types"
@@ -38,7 +39,6 @@
 	},
 	"dependencies": {
 		"@formatjs/intl-localematcher": "^0.5.4",
-		"@intercom/messenger-js-sdk": "^0.0.14",
 		"@ltd/j-toml": "^1.38.0",
 		"@modrinth/api-client": "workspace:*",
 		"@modrinth/assets": "workspace:*",
@@ -55,6 +55,7 @@
 		"@vueuse/core": "^11.1.0",
 		"ace-builds": "^1.36.2",
 		"ansi-to-html": "^0.7.2",
+		"chart.js": "^4.5.1",
 		"dayjs": "^1.11.7",
 		"dompurify": "^3.1.7",
 		"floating-vue": "^5.2.2",

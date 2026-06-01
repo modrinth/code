@@ -17,6 +17,8 @@ pub struct AdsState {
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+#[cfg(any(windows, target_os = "macos"))]
+pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
 #[cfg(not(target_os = "linux"))]
 const ADS_USER_AGENT: &str = concat!(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
@@ -92,10 +94,12 @@ fn configure_ads_cookie_settings(
     }
 }
 
-fn set_webview_visible<R: Runtime>(
-    webview: &tauri::Webview<R>,
-    _visible: bool,
-) {
+fn set_webview_visible<R: Runtime>(webview: &tauri::Webview<R>, visible: bool) {
+    #[cfg(not(any(windows, target_os = "macos")))]
+    {
+        _ = visible;
+    }
+
     webview
         .with_webview(
             #[allow(unused_variables)]
@@ -103,11 +107,18 @@ fn set_webview_visible<R: Runtime>(
                 #[cfg(windows)]
                 {
                     let controller = wv.controller();
-                    unsafe { controller.SetIsVisible(_visible) }.ok();
+                    unsafe { controller.SetIsVisible(visible) }.ok();
                 }
             },
         )
         .ok();
+
+    #[cfg(target_os = "macos")]
+    if visible {
+        webview.show().ok();
+    } else {
+        webview.hide().ok();
+    }
 }
 
 fn set_webview_visible_for_window<R: Runtime>(
@@ -129,27 +140,48 @@ fn set_webview_visible_for_window<R: Runtime>(
     set_webview_visible(webview, visible && !is_minimized && !is_occluded);
 }
 
-#[cfg(windows)]
+#[cfg(any(windows, target_os = "macos"))]
 fn compute_ads_webview_occlusion<R: Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> Option<bool> {
     let main_window = app.get_window("main")?;
     let webviews = app.webviews();
     let webview = webviews.get("ads-window")?;
-    let position = webview.position().ok()?;
-    let size = webview.size().ok()?;
-    let hwnd = main_window.hwnd().ok()?;
 
-    Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
-        hwnd,
-        position.x,
-        position.y,
-        size.width,
-        size.height,
-    ))
+    #[cfg(target_os = "macos")]
+    {
+        let position = webview.position().ok()?;
+        let size = webview.size().ok()?;
+
+        Some(
+            crate::api::ads_occlusion_macos::is_ads_webview_occluded(
+                &main_window,
+                position.x,
+                position.y,
+                size.width,
+                size.height,
+            )
+            .unwrap_or(false),
+        )
+    }
+
+    #[cfg(windows)]
+    {
+        let position = webview.position().ok()?;
+        let size = webview.size().ok()?;
+        let hwnd = main_window.hwnd().ok()?;
+
+        Some(crate::api::ads_occlusion_windows::is_ads_webview_occluded(
+            hwnd,
+            position.x,
+            position.y,
+            size.width,
+            size.height,
+        ))
+    }
 }
 
-#[cfg(windows)]
+#[cfg(any(windows, target_os = "macos"))]
 async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
     let Some(occluded) = compute_ads_webview_occlusion(app) else {
         return;
@@ -281,7 +313,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 });
             }
 
-            #[cfg(windows)]
+            #[cfg(any(windows, target_os = "macos"))]
             {
                 let app_handle = app.clone();
 

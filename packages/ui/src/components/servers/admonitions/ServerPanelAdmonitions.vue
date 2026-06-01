@@ -92,6 +92,7 @@ const filesBusyHeader = computed(() =>
 
 const dismissedIds = reactive(new Set<string>())
 const cancellingIds = reactive(new Set<string>())
+const uploadCancelling = ref(false)
 const dismissedContentErrorKey = ref<string | null>(null)
 
 const contentErrorKey = computed(() =>
@@ -313,7 +314,21 @@ async function onBackupCancel(item: BackupAdmonitionEntry) {
 	if (cancellingIds.has(item.key)) return
 	cancellingIds.add(item.key)
 	try {
-		await client.archon.backups_v1.delete(ctx.serverId, ctx.worldId.value!, item.backupId)
+		if (item.operationId == null) {
+			await client.archon.backups_v1.delete(ctx.serverId, ctx.worldId.value!, item.backupId)
+		} else if (item.type === 'create') {
+			await client.archon.backups_queue_v1.cancelCreate(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
+		} else {
+			await client.archon.backups_queue_v1.cancelRestore(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
+		}
 		await invalidate()
 	} catch (err) {
 		cancellingIds.delete(item.key)
@@ -325,6 +340,21 @@ async function onBackupRetry(item: BackupAdmonitionEntry) {
 	await client.archon.backups_queue_v1.retry(ctx.serverId, ctx.worldId.value!, item.backupId)
 	dismissedIds.add(item.key)
 	await invalidate()
+}
+
+async function onUploadCancel() {
+	if (uploadCancelling.value) return
+	const cancel = ctx.cancelUpload.value
+	if (!cancel) return
+
+	uploadCancelling.value = true
+	try {
+		await cancel()
+	} catch (err) {
+		console.error('Failed to cancel upload', err)
+	} finally {
+		uploadCancelling.value = false
+	}
 }
 
 async function onDismissAll() {
@@ -375,7 +405,12 @@ function onContentErrorDismiss() {
 				@dismiss="onContentErrorDismiss"
 				@retry="emit('content-retry')"
 			/>
-			<UploadAdmonition v-else-if="item.kind === 'upload'" />
+			<UploadAdmonition
+				v-else-if="item.kind === 'upload'"
+				:cancelable="!!ctx.cancelUpload.value"
+				:cancelling="uploadCancelling"
+				@cancel="onUploadCancel"
+			/>
 			<FileOperationAdmonition
 				v-else-if="item.kind === 'fs-op'"
 				:op="item.op"

@@ -26,6 +26,7 @@ import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
+import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
@@ -120,22 +121,31 @@ const isLocalFile = computed(() => {
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	pendingUpdateVersion.value = version
+
 	const currentVersionId = ctx.updaterModalProps.value.currentVersionId
 	const currentVersion = form.updatingProjectVersions.value.find((v) => v.id === currentVersionId)
 	isUpdateDowngrade.value = currentVersion
 		? new Date(version.date_published) < new Date(currentVersion.date_published)
 		: false
-	if (event?.shiftKey) {
+	const shouldShowWarning =
+		isUpdateDowngrade.value ||
+		versionChangesGameVersion(version, ctx.updaterModalProps.value.currentGameVersion)
+
+	if (event?.shiftKey || !shouldShowWarning) {
 		handleModpackUpdateConfirm()
-	} else {
-		modpackUpdateModal.value?.show()
+		return
 	}
+
+	modpackUpdateModal.value?.show()
 }
 
 function handleModpackUpdateConfirm() {
-	if (pendingUpdateVersion.value) {
+	const version = pendingUpdateVersion.value
+	if (version) {
+		contentUpdaterModal.value?.hide()
 		form.cancelEditing()
-		form.handleUpdaterConfirm(pendingUpdateVersion.value)
+		ctx.closeSettings?.()
+		form.handleUpdaterConfirm(version)
 		pendingUpdateVersion.value = null
 	}
 }
@@ -176,7 +186,7 @@ defineExpose({
 const messages = defineMessages({
 	linkedInstanceTitle: {
 		id: 'installation-settings.linked-instance.title',
-		defaultMessage: 'Linked {projectType, select, server {server project} other {modpack}}',
+		defaultMessage: 'Linked {projectType}',
 	},
 	reinstallModpackTitle: {
 		id: 'installation-settings.reinstall-modpack.title',
@@ -185,7 +195,7 @@ const messages = defineMessages({
 	reinstallModpackDescription: {
 		id: 'installation-settings.reinstall-modpack.description',
 		defaultMessage:
-			"Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added.",
+			'Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added.',
 	},
 	editInstallationTitle: {
 		id: 'installation-settings.edit-installation.title',
@@ -194,7 +204,7 @@ const messages = defineMessages({
 	unlinkDescription: {
 		id: 'installation-settings.unlink.description',
 		defaultMessage:
-			"Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
+			"Unlinking permanently disconnects this {type} from the {projectType} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
 	},
 	repairInstanceTitle: {
 		id: 'installation-settings.repair.instance-title',
@@ -218,6 +228,30 @@ const messages = defineMessages({
 		id: 'installation-settings.edit.warning-instance',
 		defaultMessage:
 			"We don't recommend editing your installation settings after installing content. If you want to edit them, be cautious as it may cause issues.",
+	},
+	serverProjectLabel: {
+		id: 'installation-settings.linked.server-project',
+		defaultMessage: 'server project',
+	},
+	modpackLabel: {
+		id: 'installation-settings.linked.modpack',
+		defaultMessage: 'modpack',
+	},
+	serverLabel: {
+		id: 'installation-settings.type.server',
+		defaultMessage: 'server',
+	},
+	instanceLabel: {
+		id: 'installation-settings.type.instance',
+		defaultMessage: 'instance',
+	},
+	serverPossessiveLabel: {
+		id: 'installation-settings.type.server-possessive',
+		defaultMessage: "server's",
+	},
+	instancePossessiveLabel: {
+		id: 'installation-settings.type.instance-possessive',
+		defaultMessage: "instance's",
 	},
 	editWarningServer: {
 		id: 'installation-settings.edit.warning-server',
@@ -395,7 +429,9 @@ const messages = defineMessages({
 					<span class="text-lg font-semibold text-contrast">
 						{{
 							formatMessage(messages.linkedInstanceTitle, {
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
+								projectType: formatMessage(
+									showModpackVersionActions ? messages.modpackLabel : messages.serverProjectLabel,
+								),
 							})
 						}}
 					</span>
@@ -420,8 +456,10 @@ const messages = defineMessages({
 					<span class="text-primary">
 						{{
 							formatMessage(messages.unlinkDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
+								type: formatMessage(ctx.isServer ? messages.serverLabel : messages.instanceLabel),
+								projectType: formatMessage(
+									showModpackVersionActions ? messages.modpackLabel : messages.serverLabel,
+								),
 							})
 						}}
 					</span>
@@ -454,7 +492,9 @@ const messages = defineMessages({
 					<span class="text-primary">
 						{{
 							formatMessage(messages.reinstallModpackDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
+								type: formatMessage(
+									ctx.isServer ? messages.serverPossessiveLabel : messages.instancePossessiveLabel,
+								),
 							})
 						}}
 					</span>

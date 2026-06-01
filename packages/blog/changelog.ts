@@ -11,6 +11,221 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'app',
+		version: '0.14.2',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'web',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15+00:00`,
+		product: 'app',
+		version: '0.14.1',
+		body: `## Added
+- Pride Fundraiser 2026 banner in the Modrinth App sidebar with donation progress, supporter count, days remaining, and a donation link.
+- Modrinth Pride Fundraiser supporters can now access exclusive Mr. Pack Pride skins in the Modrinth App Skin selector.
+- Mr. Pack is now available as a default skin in the Modrinth App Skin selector.
+
+## Changed
+- Updated tooltips from pure black backgrounds to a style consistent with other popovers.
+- Floating tooltips and pop-ups now have stronger shadows.
+- Updated cards across Modrinth with consistent subtle borders.`,
+	},
+	{
+		date: `2026-05-31T16:45:15+00:00`,
+		product: 'web',
+		body: `## Added
+- Download count badges for 1 million, 10 million, 25 million, 50 million, 100 million, 250 million, and 500 million downloads.
+- Early adopter badges for users who helped test new project types before they launched.
+- Pride Fundraiser Supporter badge.
+
+## Changed
+- Redesigned user badges.
+- Content Moderators now also have the Modrinth Team badge.
+- Users with the Alpha Tester badge now also have the Beta Tester badge.
+- Updated cards across Modrinth with consistent subtle borders.
+- Updated tooltips from pure black backgrounds to a style consistent with other popovers.
+- Floating tooltips and pop-ups now have stronger shadows.
+
+## Fixed
+- Fixed card padding shifting after pages finished loading.`,
+	},
+	{
+		date: `2026-05-29T23:08:28+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed revenue not showing in 'All time' queries`,
+	},
+	{
+		date: `2026-05-29T22:06:30+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed lack of error notification when analytics errors.
+- Fixed failing to fetch analytics for an obscene amount of projects.`,
+	},
+	{
+		date: `2026-05-29T20:01:16+00:00`,
+		product: 'web',
+		body: `## Changed
+- Completely overhauled project analytics. See our [blog post](https://modrinth.com/news/article/analytics-overhaul/) to learn about it!
+
+## Fixed
+- Fixed i18n bug in the resubmit project modal.`,
+	},
+	{
+		date: `2026-05-29T01:44:44+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Account sign in buttons were showing in mobile navbar on iOs when hidden`,
+	},
+	{
+		date: `2026-05-27T22:30:20+00:00`,
+		product: 'app',
+		version: '0.14.0',
+		body: `## Added
+- Skin selections can now be previewed in the Skin selector before applying or resetting them.
+- The Tiny Takeover default skin pack in the Skin selector.
+- The skin preview in the Skin selections page now feels pain.
+
+## Changed
+- Renamed the Skins page to Skin selector and removed its beta label.
+- Redesigned the Skin selector with a sticky preview, larger skin cards, and collapsible skin pack sections.
+- Moved PNG skin uploads from a separate modal to the Add skin card in Saved skins.
+- Changed cape selection so each saved skin controls its own cape instead of using a separate default cape.
+- Moved cape selection into the Edit skin modal, with a \`None\` option for saving skins without capes.
+- Updated skin previews for more consistent framing across the Skin selector, skin editor, and skin cards.
+- Skin and cape changes made outside Modrinth App are now reflected when the Skin selector refreshes or on app launch safely.
+- Images from \`user-images.githubusercontent.com\` are no longer proxied.
+
+## Fixed
+- Fixed duplicate saved skin cards appearing when the same texture was saved with different arm or cape settings.
+- Fixed skins equipped outside Modrinth App disappearing from the Skin selector after switching to another skin.
+- Fixed skin selection hanging when a skin texture download stopped responding.
+- Fixed the hide nametag setting not updating the Skin selector preview until the page refreshed.`,
+	},
+	{
+		date: `2026-05-27T22:30:20+00:00`,
+		product: 'web',
+		body: `## Changed
+- Images from \`user-images.githubusercontent.com\` are no longer proxied.`,
+	},
+	{
+		date: `2026-05-24T17:46:23+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations.
+
+## Fixed
+- Fixed occasional error when loading version pages.`,
+	},
+	{
+		date: `2026-05-24T17:46:23+00:00`,
+		product: 'app',
+		version: '0.13.24',
+		body: `## Changed
+- Updated translations.`,
+	},
+	{
+		date: `2026-05-24T16:26:23+00:00`,
+		product: 'app',
+		version: '0.13.23',
+		body: `## Fixed
+- Fixed the discover page not working when the spanish language is selected.`,
+	},
+	{
+		date: `2026-05-24T16:26:23+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed the discover page not working when the spanish language is selected.`,
+	},
+	{
+		date: `2026-05-24T05:00:37+00:00`,
+		product: 'app',
+		version: '0.13.22',
+		body: `## Added
+- Added log spam detection and line compacting logic to prevent Modrinth App from crashing when viewing large log files.
+
+## Changed
+- Increased the default memory for instances from 2GB to 4GB (depending on your system memory).
+- Improved "Java installation" settings page design. Thanks [@creeperkatze](https://github.com/creeperkatze)`,
+	},
+	{
+		date: `2026-05-24T05:00:37+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed an issue where the page fails to load sometimes, requiring you to delete your cookies.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project embeds not loading in correctly.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'app',
+		version: '0.13.21',
+		body: `## Fixed
+- Fixed issue with content items visually duplicating over other content items in the Content tab table.`,
+	},
+	{
+		date: `2026-05-21T22:13:35+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed issue with content items visually duplicating over other content items in the Content tab table.
+- Fixed issue when cancelling a multi-file upload to the Files tab or Content tab, any files fully uploaded before cancelling are not removed on cancel.`,
+	},
+	{
+		date: `2026-05-20T19:48:04+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved date selection across the website.
+
+## Fixed
+- Fixed server project types sometimes appearing as modpacks in page titles and embeds.`,
+	},
+	{
+		date: `2026-05-20T19:48:04+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed the support portal bubble appearing in the wrong position in the bottom-right corner of the server panel.
+- Fixed modpack updates in the Content tab not appearing when a newer Modrinth version was available.`,
+	},
+	{
+		date: `2026-05-20T19:48:04+00:00`,
+		product: 'app',
+		version: '0.13.20',
+		body: `## Changed
+- Updated linked modpack version switching to show every available version and ask for confirmation before risky changes:
+	- Versions for a different game version.
+	- Downgrades.
+
+## Fixed
+- Fixed instance pages sometimes opening with an empty Content tab.
+- Fixed Content tab performance problems.
+- Fixed linked modpack content appearing as user-added after switching a bundled project to another version.
+- Fixed linked modpack content staying stale after updating, removing, enabling, disabling, or switching bundled content.
+- Fixed content installation problems from the Browse content page.`,
+	},
+	{
+		date: `2026-05-20T16:01:04.111Z`,
+		product: 'web',
+		body: `## Fixed
+- Fixed "Permissions" page showing in Modpack settings.`,
+	},
+	{
 		date: `2026-05-19T19:51:55+00:00`,
 		product: 'web',
 		body: `## Fixed

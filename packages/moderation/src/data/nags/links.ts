@@ -1,4 +1,4 @@
-import { defineMessage, useVIntl } from '@modrinth/ui'
+import { defineMessage, formatProjectTypeSentence, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -133,7 +133,7 @@ export const linksNags: Nag[] = [
 		id: 'identical-links',
 		title: defineMessage({
 			id: 'nags.identical-links.title',
-			defaultMessage: 'Identical Links',
+			defaultMessage: 'Clean up identical links',
 		}),
 		description: defineMessage({
 			id: 'nags.identical-links.description',
@@ -315,10 +315,10 @@ export const linksNags: Nag[] = [
 				defineMessage({
 					id: 'nags.gpl-license-source-required.description',
 					defaultMessage:
-						'Your {type, select, mod {mod} plugin {plugin} other {project}} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license.',
+						'Your {type} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license.',
 				}),
 				{
-					type: context.project.project_type,
+					type: formatProjectTypeSentence(formatMessage, context.project.project_type),
 				},
 			)
 		},

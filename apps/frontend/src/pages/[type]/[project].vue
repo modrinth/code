@@ -1371,7 +1371,7 @@ const messages = defineMessages({
 	},
 	downloadsStat: {
 		id: 'project.stats.downloads-label',
-		defaultMessage: 'download{count, plural, one {} other {s}}',
+		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
 	errorLoadingProject: {
 		id: 'project.error.loading',
@@ -1401,7 +1401,7 @@ const messages = defineMessages({
 	},
 	followersStat: {
 		id: 'project.stats.followers-label',
-		defaultMessage: 'follower{count, plural, one {} other {s}}',
+		defaultMessage: '{count, plural, one {follower} other {followers}}',
 	},
 	galleryTab: {
 		id: 'project.gallery.title',
@@ -2326,9 +2326,8 @@ watch(
 
 const projectTypeDisplay = computed(() => {
 	if (!project.value) return ''
-	return formatProjectType(
-		data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
-	)
+	const projectType = isServerProject.value ? 'minecraft_java_server' : project.value.project_type
+	return formatProjectType(data.$getProjectTypeForDisplay(projectType, project.value.loaders))
 })
 
 const following = computed(() => {

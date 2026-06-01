@@ -149,9 +149,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Procurar servidores"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "\"{name}\" vai ser **apagado permanentemente**, e não haverá maneira de o recuperar."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Tens a certeza que queres apagar permanentemente este mundo?"
   },
@@ -172,12 +169,6 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Sem servidores ou mundos adicionados"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "\"{name}\" vai ser removido da tua lista, incluindo dentro do jogo, e não haverá maneira de o recuperar."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "\"{name}\" ({address}) vai ser removido da tua lista, incluindo dentro do jogo, e não haverá maneira de o recuperar."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Tens a certeza que queres remover {name}?"

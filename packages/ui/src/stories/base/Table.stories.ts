@@ -28,6 +28,20 @@ const sampleUsers: User[] = [
 		role: 'Admin',
 	},
 ]
+const rangeSelectionUsers: User[] = Array.from({ length: 10 }, (_, index): User => {
+	const id = String(index + 1)
+	const paddedId = id.padStart(2, '0')
+	const statuses: User['status'][] = ['active', 'inactive', 'pending']
+	const roles = ['Admin', 'Editor', 'Maintainer', 'Reviewer', 'User']
+
+	return {
+		id,
+		name: `Member ${paddedId}`,
+		email: `member-${paddedId}@example.com`,
+		status: statuses[index % statuses.length],
+		role: roles[index % roles.length],
+	}
+})
 
 const meta = {
 	title: 'Base/Table',
@@ -57,7 +71,7 @@ export const Default: StoryObj = {
 	}),
 }
 
-export const WithSelection: StoryObj = {
+export const HorizontalOverflow: StoryObj = {
 	args: {},
 	render: () => ({
 		components: { Table },
@@ -69,6 +83,35 @@ export const WithSelection: StoryObj = {
 				{ key: 'role', label: 'Role' },
 			]
 			const data = sampleUsers
+			return { columns, data }
+		},
+		template: /* html */ `
+			<div class="max-w-80">
+				<Table :columns="columns" :data="data" table-min-width="44rem">
+					<template #header>
+						<div class="flex items-center justify-between gap-4">
+							<div class="text-lg font-semibold text-contrast">Members</div>
+							<div class="text-sm text-secondary">{{ data.length }} rows</div>
+						</div>
+					</template>
+				</Table>
+			</div>
+		`,
+	}),
+}
+
+export const WithSelection: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status' },
+				{ key: 'role', label: 'Role' },
+			]
+			const data = rangeSelectionUsers
 			const selectedIds = ref<string[]>([])
 			return { columns, data, selectedIds }
 		},
@@ -81,6 +124,73 @@ export const WithSelection: StoryObj = {
 					row-key="id"
 					v-model:selected-ids="selectedIds"
 				/>
+				<p class="text-secondary text-sm">Click a checkbox, then Shift-click another checkbox to select or clear the range.</p>
+				<p class="text-secondary">Selected IDs: {{ selectedIds.join(', ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const WithSelectionData: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status' },
+				{ key: 'role', label: 'Role' },
+			]
+			const selectionData = rangeSelectionUsers
+			const data = selectionData.filter((_, index) => index === 1 || index === 5)
+			const selectedIds = ref<string[]>([])
+			return { columns, data, selectionData, selectedIds }
+		},
+		template: /* html */ `
+			<div class="space-y-4">
+				<Table
+					:columns="columns"
+					:data="data"
+					:selection-data="selectionData"
+					show-selection
+					row-key="id"
+					v-model:selected-ids="selectedIds"
+				/>
+				<p class="text-secondary text-sm">Only rows 2 and 6 are visible; Shift-clicking between them selects IDs 2 through 6 from selectionData.</p>
+				<p class="text-secondary">Selected IDs: {{ selectedIds.join(', ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const WithSelectionIds: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Name' },
+				{ key: 'email', label: 'Email' },
+				{ key: 'status', label: 'Status' },
+				{ key: 'role', label: 'Role' },
+			]
+			const data = rangeSelectionUsers.filter((_, index) => index === 1 || index === 5)
+			const selectionIds = rangeSelectionUsers.map((user) => user.id)
+			const selectedIds = ref<string[]>([])
+			return { columns, data, selectionIds, selectedIds }
+		},
+		template: /* html */ `
+			<div class="space-y-4">
+				<Table
+					:columns="columns"
+					:data="data"
+					:selection-ids="selectionIds"
+					show-selection
+					row-key="id"
+					v-model:selected-ids="selectedIds"
+				/>
+				<p class="text-secondary text-sm">Only rows 2 and 6 are visible; Shift-clicking between them selects IDs 2 through 6 from selectionIds.</p>
 				<p class="text-secondary">Selected IDs: {{ selectedIds.join(', ') || 'None' }}</p>
 			</div>
 		`,

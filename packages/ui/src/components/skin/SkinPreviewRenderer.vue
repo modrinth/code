@@ -1,79 +1,79 @@
 <template>
 	<!-- eslint-disable vue/no-undef-components -->
-	<div ref="skinPreviewContainer" class="relative w-full h-full cursor-grab" @click="onCanvasClick">
+	<div
+		ref="skinPreviewContainer"
+		class="relative w-full h-full overflow-visible cursor-grab"
+		@click="onCanvasClick"
+	>
 		<div
-			class="absolute bottom-[18%] left-0 right-0 flex flex-col justify-center items-center mb-2 pointer-events-none z-10 gap-2"
+			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
+			:style="previewControlsPositionStyle"
 		>
-			<span class="text-primary text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+			<span
+				class="flex items-center justify-center gap-1.5 text-base font-medium leading-6 text-primary"
+			>
+				<UnfoldHorizontalIcon class="size-5 shrink-0" />
 				Drag to rotate
 			</span>
 		</div>
 		<div
-			class="absolute bottom-[10%] left-0 right-0 flex justify-center items-center pointer-events-auto z-10"
+			v-if="$slots.subtitle"
+			class="absolute left-0 right-0 z-10 flex items-center justify-center pointer-events-none"
+			:style="subtitlePositionStyle"
 		>
-			<slot name="subtitle" />
+			<div ref="subtitleElement" class="pointer-events-auto" @click="ignoreControlClick">
+				<slot name="subtitle" />
+			</div>
 		</div>
 		<div
-			v-if="nametag"
-			class="absolute top-[18%] left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-md pointer-events-none z-10 font-minecraft text-gray nametag-bg transition-all duration-200"
-			:style="{ fontSize: nametagFontSize }"
+			v-if="nametag || $slots['nametag-badge']"
+			class="absolute left-1/2 pointer-events-none z-10"
+			:style="nametagStyle"
 		>
-			{{ nametagText }}
+			<div
+				v-if="$slots['nametag-badge']"
+				class="absolute bottom-[calc(100%+1rem)] left-1/2 flex -translate-x-1/2 items-center justify-center"
+			>
+				<slot name="nametag-badge" />
+			</div>
+			<div v-if="nametag" class="px-3 py-1 rounded-md font-minecraft text-gray nametag-bg">
+				{{ nametagText }}
+			</div>
 		</div>
 
 		<TresCanvas
-			shadows
 			alpha
 			:antialias="true"
+			:dpr="rendererDpr"
 			:renderer-options="{
 				outputColorSpace: THREE.SRGBColorSpace,
 				toneMapping: THREE.NoToneMapping,
 				toneMappingExposure: 10.0,
 			}"
 			class="transition-opacity duration-500"
-			:class="{ 'opacity-0': !isReady, 'opacity-100': isReady }"
+			:class="{ 'opacity-0': !isPreviewVisible, 'opacity-100': isPreviewVisible }"
 			@pointerdown="onPointerDown"
 			@pointermove="onPointerMove"
 			@pointerup="onPointerUp"
 			@pointerleave="onPointerUp"
 		>
 			<Suspense>
-				<Group>
-					<Group
-						:rotation="[0, modelRotation, 0]"
-						:position="[0, -0.05 * scale, 1.95]"
-						:scale="[0.8 * scale, 0.8 * scale, 0.8 * scale]"
-					>
+				<Group
+					:rotation="animatedModelGroupRotation"
+					:position="animatedModelGroupPosition"
+					:scale="animatedModelGroupScale"
+				>
+					<Group :position="modelOffset">
 						<primitive v-if="scene" :object="scene" />
 					</Group>
-
-					<!-- <TresMesh
-            :position="[0, -0.095 * scale, 2]"
-            :rotation="[-Math.PI / 2, 0, 0]"
-            :scale="[0.4 * 0.75 * scale, 0.4 * 0.75 * scale, 0.4 * 0.75 * scale]"
-          >
-            <TresCircleGeometry :args="[1, 128]" />
-            <TresMeshBasicMaterial
-              color="#000000"
-              :opacity="0.5"
-              transparent
-              :depth-write="false"
-            />
-          </TresMesh> -->
 				</Group>
 			</Suspense>
 
 			<Suspense>
-				<EffectComposerPmndrs>
-					<FXAAPmndrs />
-				</EffectComposerPmndrs>
-			</Suspense>
-
-			<Suspense>
 				<TresMesh
-					:position="[0, -0.1 * scale, 2]"
+					:position="spotlightPosition"
 					:rotation="[-Math.PI / 2, 0, 0]"
-					:scale="[0.75 * scale, 0.75 * scale, 0.75 * scale]"
+					:scale="spotlightScale"
 				>
 					<TresCircleGeometry :args="[1, 128]" />
 					<TresShaderMaterial v-bind="radialSpotlightShader" />
@@ -82,57 +82,53 @@
 
 			<TresPerspectiveCamera
 				:make-default.camel="true"
-				:fov="fov"
-				:position="[0, 1.5, -3.25]"
-				:look-at="target"
+				:fov="cameraConfig.fov"
+				:position="cameraConfig.position"
+				:look-at="cameraConfig.target"
 			/>
 
 			<TresAmbientLight :intensity="2" />
-			<TresDirectionalLight :position="[-3, 4, -2]" :intensity="1.2" :cast-shadow="true" />
+			<TresDirectionalLight :position="[-3, 4, -2]" :intensity="1.2" />
 		</TresCanvas>
 
-		<div
-			v-if="!isReady"
-			class="w-full h-full flex items-center justify-center transition-opacity duration-500"
-			:class="{ 'opacity-100': !isReady, 'opacity-0': isReady }"
-		>
+		<div v-if="showLoading" class="absolute inset-0 flex items-center justify-center">
 			<div class="text-primary">Loading...</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
-import {
-	applyCapeTexture,
-	applyTexture,
-	createTransparentTexture,
-	loadTexture as loadSkinTexture,
-} from '@modrinth/utils'
-import { useGLTF } from '@tresjs/cientos'
-import { TresCanvas, useRenderLoop, useTexture } from '@tresjs/core'
-import { EffectComposerPmndrs, FXAAPmndrs } from '@tresjs/post-processing'
+import { ClassicPlayerModel, SlimPlayerModel, UnfoldHorizontalIcon } from '@modrinth/assets'
+import { TresCanvas } from '@tresjs/core'
 import * as THREE from 'three'
 import {
 	computed,
-	markRaw,
-	onBeforeMount,
+	nextTick,
+	onMounted,
 	onUnmounted,
 	ref,
-	shallowRef,
-	toRefs,
+	toRef,
+	useSlots,
 	useTemplateRef,
 	watch,
 } from 'vue'
 
-import { useDynamicFontSize } from '../../composables'
+import type {
+	SkinPreviewAnimationConfig,
+	SkinPreviewFitPadding,
+	SkinPreviewFraming,
+	SkinPreviewTuple,
+} from '#ui/composables/skin-rendering'
+import {
+	useSkinPreviewAnimation,
+	useSkinPreviewControls,
+	useSkinPreviewFit,
+	useSkinPreviewLoading,
+	useSkinPreviewScene,
+} from '#ui/composables/skin-rendering'
 
-interface AnimationConfig {
-	baseAnimation: string
-	randomAnimations: string[]
-	randomAnimationInterval?: number
-	transitionDuration?: number
-}
+import { useDynamicFontSize } from '../../composables'
+import { createRadialSpotlightShader, syncDamageFlashShader } from './skin-preview-shader'
 
 const props = withDefaults(
 	defineProps<{
@@ -140,18 +136,27 @@ const props = withDefaults(
 		capeSrc?: string
 		variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
 		nametag?: string
+		fit?: boolean
+		lockFit?: boolean
+		framing?: SkinPreviewFraming
+		fitZoom?: number
+		fitPadding?: Partial<SkinPreviewFitPadding>
+		/** @deprecated Manual framing fallback. */
 		scale?: number
+		/** @deprecated Manual framing fallback, or auto-fit FOV override when fit=true. */
 		fov?: number
 		initialRotation?: number
-		animationConfig?: AnimationConfig
+		animationConfig?: SkinPreviewAnimationConfig
 	}>(),
 	{
 		variant: 'CLASSIC',
-		scale: 1,
-		fov: 40,
 		capeSrc: undefined,
 		initialRotation: 15.75,
 		nametag: undefined,
+		fit: undefined,
+		lockFit: true,
+		framing: 'page',
+		fitZoom: 1,
 		animationConfig: () => ({
 			baseAnimation: 'idle',
 			randomAnimations: ['idle_sub_1', 'idle_sub_2', 'idle_sub_3'],
@@ -162,7 +167,155 @@ const props = withDefaults(
 )
 
 const skinPreviewContainer = useTemplateRef<HTMLElement>('skinPreviewContainer')
+const subtitleElement = useTemplateRef<HTMLElement>('subtitleElement')
+const slots = useSlots()
 const nametagText = computed(() => props.nametag)
+const hasSubtitle = computed(() => Boolean(slots.subtitle))
+const hasNametagBadge = computed(() => Boolean(slots['nametag-badge']))
+const isSubtitleWrapped = ref(false)
+const selectedModelSrc = computed(() =>
+	props.variant === 'SLIM' ? SlimPlayerModel : ClassicPlayerModel,
+)
+
+let subtitleResizeObserver: ResizeObserver | undefined
+
+function getSubtitleLayoutRoot(element: HTMLElement) {
+	const elementChildren = Array.from(element.children).filter(
+		(child): child is HTMLElement => child instanceof HTMLElement,
+	)
+
+	return elementChildren.length === 1 ? elementChildren[0] : element
+}
+
+function updateSubtitleWrapped() {
+	const element = subtitleElement.value
+	if (!element) {
+		isSubtitleWrapped.value = false
+		return
+	}
+
+	const layoutRoot = getSubtitleLayoutRoot(element)
+	const children = Array.from(layoutRoot.children).filter(
+		(child): child is HTMLElement => child instanceof HTMLElement,
+	)
+
+	if (children.length < 2) {
+		isSubtitleWrapped.value = false
+		return
+	}
+
+	const firstTop = children[0].getBoundingClientRect().top
+	isSubtitleWrapped.value = children.some(
+		(child) => Math.abs(child.getBoundingClientRect().top - firstTop) > 1,
+	)
+}
+
+function observeSubtitleElement() {
+	subtitleResizeObserver?.disconnect()
+
+	const element = subtitleElement.value
+	if (!element) {
+		isSubtitleWrapped.value = false
+		return
+	}
+
+	const layoutRoot = getSubtitleLayoutRoot(element)
+
+	subtitleResizeObserver = new ResizeObserver(updateSubtitleWrapped)
+	subtitleResizeObserver.observe(element)
+	if (layoutRoot !== element) {
+		subtitleResizeObserver.observe(layoutRoot)
+	}
+
+	void nextTick(updateSubtitleWrapped)
+}
+
+const {
+	cleanupAnimationState,
+	clickImpulseOffsetX,
+	clickImpulseRotationZ,
+	clickImpulseScaleX,
+	clickImpulseScaleY,
+	currentAnimation,
+	damageFlashIntensity,
+	getAvailableAnimations,
+	initializeAnimations,
+	playAnimation,
+	playClickInteraction,
+	stopAnimations,
+} = useSkinPreviewAnimation(toRef(props, 'animationConfig'))
+
+const {
+	ignoreControlClick,
+	modelRotation,
+	onCanvasClick,
+	onPointerDown,
+	onPointerMove,
+	onPointerUp,
+} = useSkinPreviewControls({
+	initialRotation: toRef(props, 'initialRotation'),
+	onClickWithoutDrag: () => {
+		playClickInteraction()
+	},
+})
+
+const { isModelLoaded, isTextureLoaded, modelCenter, modelSize, scene } = useSkinPreviewScene({
+	selectedModelSrc,
+	textureSrc: toRef(props, 'textureSrc'),
+	capeSrc: toRef(props, 'capeSrc'),
+	initializeAnimations,
+	cleanupAnimationState,
+})
+
+function syncDamageFlashShaderMaterials() {
+	syncDamageFlashShader(scene.value, damageFlashIntensity.value)
+}
+
+const {
+	cameraConfig,
+	fitEnabled,
+	hasResolvedFit,
+	modelGroupPosition,
+	modelGroupScale,
+	modelOffset,
+	nametagTop,
+	previewControlsPositionStyle,
+	spotlightPosition,
+	spotlightScale,
+	subtitlePositionStyle,
+} = useSkinPreviewFit({
+	containerElement: computed(() => skinPreviewContainer.value),
+	fit: toRef(props, 'fit'),
+	lockFit: toRef(props, 'lockFit'),
+	framing: toRef(props, 'framing'),
+	fitZoom: toRef(props, 'fitZoom'),
+	fitPadding: toRef(props, 'fitPadding'),
+	scale: toRef(props, 'scale'),
+	fov: toRef(props, 'fov'),
+	modelRotation,
+	nametag: toRef(props, 'nametag'),
+	hasSubtitle,
+	hasNametagBadge,
+	subtitleWrapped: isSubtitleWrapped,
+	modelCenter,
+	modelSize,
+	isModelLoaded,
+})
+
+const rendererDpr: [number, number] = [1, 1.5]
+const radialSpotlightShader = createRadialSpotlightShader()
+const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value && hasResolvedFit.value)
+const { isPreviewVisible, showLoading } = useSkinPreviewLoading(isReady)
+
+onMounted(observeSubtitleElement)
+
+watch(hasSubtitle, () => nextTick(observeSubtitleElement), { flush: 'post' })
+watch(scene, syncDamageFlashShaderMaterials, { immediate: true })
+watch(damageFlashIntensity, syncDamageFlashShaderMaterials)
+
+onUnmounted(() => {
+	subtitleResizeObserver?.disconnect()
+})
 
 const { fontSize: nametagFontSize } = useDynamicFontSize({
 	containerElement: skinPreviewContainer,
@@ -174,444 +327,34 @@ const { fontSize: nametagFontSize } = useDynamicFontSize({
 	fontFamily: 'inherit',
 })
 
-const selectedModelSrc = computed(() =>
-	props.variant === 'SLIM' ? SlimPlayerModel : ClassicPlayerModel,
-)
-
-const scene = shallowRef<THREE.Object3D | null>(null)
-const lastCapeSrc = ref<string | undefined>(undefined)
-const texture = shallowRef<THREE.Texture | null>(null)
-const capeTexture = shallowRef<THREE.Texture | null>(null)
-const transparentTexture = createTransparentTexture()
-
-const isModelLoaded = ref(false)
-const isTextureLoaded = ref(false)
-const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value)
-
-const mixer = ref<THREE.AnimationMixer | null>(null)
-const actions = ref<Record<string, THREE.AnimationAction>>({})
-const clock = new THREE.Clock()
-const currentAnimation = ref<string>('')
-const randomAnimationTimer = ref<number | null>(null)
-const lastRandomAnimation = ref<string>('')
-
-const radialSpotlightShader = computed(() => ({
-	uniforms: {
-		innerColor: { value: new THREE.Color(0x000000) },
-		outerColor: { value: new THREE.Color(0xffffff) },
-		innerOpacity: { value: 0.3 },
-		outerOpacity: { value: 0.0 },
-		falloffPower: { value: 1.2 },
-		shadowRadius: { value: 7 },
-	},
-	vertexShader: `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-	fragmentShader: `
-    uniform vec3 innerColor;
-    uniform vec3 outerColor;
-    uniform float innerOpacity;
-    uniform float outerOpacity;
-    uniform float falloffPower;
-    uniform float shadowRadius;
-
-    varying vec2 vUv;
-
-    void main() {
-      vec2 center = vec2(0.5, 0.5);
-      float dist = distance(vUv, center) * 2.0;
-
-      // Create shadow in the center
-      float shadowFalloff = 1.0 - smoothstep(0.0, shadowRadius, dist);
-
-      // Create overall spotlight falloff
-      float spotlightFalloff = 1.0 - smoothstep(0.0, 1.0, pow(dist, falloffPower));
-
-      // Combine both effects
-      vec3 color = mix(outerColor, innerColor, shadowFalloff);
-      float opacity = mix(outerOpacity, innerOpacity * shadowFalloff, spotlightFalloff);
-
-      gl_FragColor = vec4(color, opacity);
-    }
-  `,
-	transparent: true,
-	depthWrite: false,
-	depthTest: false,
+const nametagStyle = computed(() => ({
+	fontSize: nametagFontSize.value,
+	top: nametagTop.value,
+	transform: fitEnabled.value ? 'translate(-50%, calc(-100% - 0.75rem))' : 'translateX(-50%)',
 }))
 
-const { baseAnimation, randomAnimations } = toRefs(props.animationConfig)
+const animatedModelGroupRotation = computed<SkinPreviewTuple>(() => [
+	0,
+	modelRotation.value,
+	clickImpulseRotationZ.value,
+])
 
-function initializeAnimations(loadedScene: THREE.Object3D, clips: THREE.AnimationClip[]) {
-	if (!clips || clips.length === 0) {
-		console.warn('No animation clips found in the model')
-		return
-	}
+const animatedModelGroupPosition = computed<SkinPreviewTuple>(() => {
+	const [x, y, z] = modelGroupPosition.value
+	return [x + clickImpulseOffsetX.value, y, z]
+})
 
-	mixer.value = new THREE.AnimationMixer(loadedScene)
-	actions.value = {}
-
-	clips.forEach((clip) => {
-		const action = mixer.value!.clipAction(clip)
-
-		action.setLoop(THREE.LoopOnce, 1)
-		action.clampWhenFinished = true
-		actions.value[clip.name] = action
-	})
-
-	if (baseAnimation.value && actions.value[baseAnimation.value]) {
-		actions.value[baseAnimation.value].setLoop(THREE.LoopRepeat, Infinity)
-		playAnimation(baseAnimation.value)
-		setupRandomAnimationLoop()
-	} else {
-		console.warn(`Base animation "${baseAnimation.value}" not found`)
-
-		const firstAnimationName = Object.keys(actions.value)[0]
-		if (firstAnimationName) {
-			actions.value[firstAnimationName].setLoop(THREE.LoopRepeat, Infinity)
-			playAnimation(firstAnimationName)
-		}
-	}
-}
-
-function playAnimation(name: string) {
-	if (!mixer.value || !actions.value[name]) {
-		console.warn(`Animation "${name}" not found!`)
-		return false
-	}
-
-	const action = actions.value[name]
-
-	if (currentAnimation.value === name && action.isRunning() && name !== baseAnimation.value) {
-		console.log(`Animation "${name}" is already running, ignoring request`)
-		return false
-	}
-
-	const transitionDuration = props.animationConfig.transitionDuration || 0.3
-
-	Object.entries(actions.value).forEach(([actionName, actionInstance]) => {
-		if (actionName !== name && actionInstance.isRunning()) {
-			actionInstance.fadeOut(transitionDuration)
-		}
-	})
-
-	action.reset()
-
-	if (name === baseAnimation.value) {
-		action.setLoop(THREE.LoopRepeat, Infinity)
-	} else {
-		action.setLoop(THREE.LoopOnce, 1)
-		action.clampWhenFinished = true
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const onFinished = (event: any) => {
-			if (event.action === action) {
-				mixer.value?.removeEventListener('finished', onFinished)
-				if (currentAnimation.value === name && baseAnimation.value) {
-					action.fadeOut(transitionDuration)
-					const baseAction = actions.value[baseAnimation.value]
-					baseAction.reset()
-					baseAction.fadeIn(transitionDuration)
-					baseAction.play()
-					currentAnimation.value = baseAnimation.value
-				}
-			}
-		}
-
-		mixer.value.addEventListener('finished', onFinished)
-	}
-
-	action.fadeIn(transitionDuration)
-	action.play()
-
-	currentAnimation.value = name
-	return true
-}
-
-function setupRandomAnimationLoop() {
-	const interval = props.animationConfig.randomAnimationInterval || 10000
-
-	function scheduleNextAnimation() {
-		if (randomAnimationTimer.value) {
-			clearTimeout(randomAnimationTimer.value)
-		}
-
-		randomAnimationTimer.value = window.setTimeout(() => {
-			if (randomAnimations.value.length > 0 && currentAnimation.value === baseAnimation.value) {
-				const availableAnimations = randomAnimations.value.filter(
-					(anim) => anim !== lastRandomAnimation.value,
-				)
-
-				// If all animations have been used, reset and use the full list
-				const animationsToChooseFrom =
-					availableAnimations.length > 0 ? availableAnimations : randomAnimations.value
-
-				const randomIndex = Math.floor(Math.random() * animationsToChooseFrom.length)
-				const randomAnimationName = animationsToChooseFrom[randomIndex]
-
-				if (actions.value[randomAnimationName]) {
-					lastRandomAnimation.value = randomAnimationName
-					playRandomAnimation(randomAnimationName)
-				}
-			} else {
-				// If not in base animation, wait and try again
-				scheduleNextAnimation()
-			}
-		}, interval)
-	}
-
-	scheduleNextAnimation()
-}
-
-function playRandomAnimation(name: string) {
-	if (!mixer.value || !actions.value[name]) {
-		console.warn(`Animation "${name}" not found!`)
-		return
-	}
-
-	const action = actions.value[name]
-
-	if (currentAnimation.value === name && action.isRunning()) {
-		console.log(`Animation "${name}" is already running, ignoring request`)
-		return
-	}
-
-	const transitionDuration = props.animationConfig.transitionDuration || 0.3
-
-	if (baseAnimation.value && actions.value[baseAnimation.value].isRunning()) {
-		actions.value[baseAnimation.value].fadeOut(transitionDuration)
-	}
-
-	action.reset()
-	action.setLoop(THREE.LoopOnce, 1)
-	action.clampWhenFinished = true
-	action.fadeIn(transitionDuration)
-	action.play()
-
-	currentAnimation.value = name
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const onFinished = (event: any) => {
-		if (event.action === action) {
-			mixer.value?.removeEventListener('finished', onFinished)
-			if (currentAnimation.value === name && baseAnimation.value) {
-				action.fadeOut(transitionDuration)
-				const baseAction = actions.value[baseAnimation.value]
-				baseAction.reset()
-				baseAction.fadeIn(transitionDuration)
-				baseAction.play()
-				currentAnimation.value = baseAnimation.value
-
-				// Schedule the next random animation after returning to base
-				setupRandomAnimationLoop()
-			}
-		}
-	}
-
-	mixer.value.addEventListener('finished', onFinished)
-}
-
-function stopAnimations() {
-	if (mixer.value) {
-		mixer.value.stopAllAction()
-	}
-	currentAnimation.value = ''
-}
-
-function getAvailableAnimations(): string[] {
-	return Object.keys(actions.value)
-}
+const animatedModelGroupScale = computed<SkinPreviewTuple>(() => {
+	const [x, y, z] = modelGroupScale.value
+	return [x * clickImpulseScaleX.value, y * clickImpulseScaleY.value, z]
+})
 
 defineExpose({
 	playAnimation,
+	playClickInteraction,
 	stopAnimations,
 	getAvailableAnimations,
 	getCurrentAnimation: () => currentAnimation.value,
-})
-
-const { onLoop } = useRenderLoop()
-onLoop(() => {
-	if (mixer.value) {
-		mixer.value.update(clock.getDelta())
-	}
-})
-
-async function loadModel(src: string) {
-	try {
-		isModelLoaded.value = false
-		const { scene: loadedScene, animations } = await useGLTF(src)
-		scene.value = markRaw(loadedScene)
-
-		if (texture.value) {
-			applyTexture(scene.value, texture.value)
-		}
-
-		applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
-
-		if (animations && animations.length > 0) {
-			initializeAnimations(loadedScene, animations)
-		}
-
-		updateModelInfo()
-		isModelLoaded.value = true
-	} catch (error) {
-		console.error('Failed to load model:', error)
-		isModelLoaded.value = false
-	}
-}
-
-async function loadAndApplyTexture(src: string) {
-	if (!src) return null
-
-	try {
-		try {
-			return await loadSkinTexture(src)
-		} catch {
-			const tex = await useTexture([src])
-			tex.colorSpace = THREE.SRGBColorSpace
-			tex.flipY = false
-			tex.magFilter = THREE.NearestFilter
-			tex.minFilter = THREE.NearestFilter
-			return tex
-		}
-	} catch (error) {
-		console.error('Failed to load texture:', error)
-		return null
-	}
-}
-
-async function loadAndApplyCapeTexture(src: string | undefined) {
-	if (src === lastCapeSrc.value) return
-
-	lastCapeSrc.value = src
-
-	if (src) {
-		capeTexture.value = await loadAndApplyTexture(src)
-	} else {
-		capeTexture.value = null
-	}
-
-	if (scene.value) {
-		applyCapeTexture(scene.value, capeTexture.value, transparentTexture)
-	}
-}
-
-const centre = ref<[number, number, number]>([0, 1, 0])
-const modelHeight = ref(1.4)
-
-function updateModelInfo() {
-	if (!scene.value) return
-	try {
-		const bbox = new THREE.Box3().setFromObject(scene.value)
-		const mid = new THREE.Vector3()
-		bbox.getCenter(mid)
-		centre.value = [mid.x, mid.y, mid.z]
-		modelHeight.value = bbox.max.y - bbox.min.y
-	} catch (error) {
-		console.error('Failed to update model info:', error)
-	}
-}
-
-const target = computed(() => centre.value)
-
-const modelRotation = ref(props.initialRotation + Math.PI)
-const isDragging = ref(false)
-const previousX = ref(0)
-const hasDragged = ref(false)
-
-function onPointerDown(event: PointerEvent) {
-	;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
-	isDragging.value = true
-	previousX.value = event.clientX
-	hasDragged.value = false
-}
-
-function onPointerMove(event: PointerEvent) {
-	if (!isDragging.value) return
-	const deltaX = event.clientX - previousX.value
-	modelRotation.value += deltaX * 0.01
-	previousX.value = event.clientX
-	hasDragged.value = true
-}
-
-function onPointerUp(event: PointerEvent) {
-	isDragging.value = false
-	;(event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId)
-}
-
-function onCanvasClick() {
-	if (!hasDragged.value) {
-		if (actions.value['interact']) {
-			playRandomAnimation('interact')
-		}
-	}
-
-	hasDragged.value = false
-}
-
-watch(selectedModelSrc, (src) => loadModel(src))
-watch(
-	() => props.textureSrc,
-	async (newSrc) => {
-		isTextureLoaded.value = false
-		texture.value = await loadAndApplyTexture(newSrc)
-		if (scene.value && texture.value) {
-			applyTexture(scene.value, texture.value)
-		}
-		isTextureLoaded.value = true
-	},
-)
-watch(
-	() => props.capeSrc,
-	async (newCapeSrc) => {
-		await loadAndApplyCapeTexture(newCapeSrc)
-	},
-)
-
-watch(
-	() => props.animationConfig,
-	(newConfig) => {
-		if (randomAnimationTimer.value) {
-			clearTimeout(randomAnimationTimer.value)
-			randomAnimationTimer.value = null
-		}
-
-		if (mixer.value && newConfig.baseAnimation && actions.value[newConfig.baseAnimation]) {
-			playAnimation(newConfig.baseAnimation)
-			setupRandomAnimationLoop()
-		}
-	},
-	{ deep: true },
-)
-
-onBeforeMount(async () => {
-	try {
-		isTextureLoaded.value = false
-		texture.value = await loadAndApplyTexture(props.textureSrc)
-		isTextureLoaded.value = true
-
-		await loadModel(selectedModelSrc.value)
-
-		if (props.capeSrc) {
-			await loadAndApplyCapeTexture(props.capeSrc)
-		}
-	} catch (error) {
-		console.error('Failed to initialize skin preview:', error)
-	}
-})
-
-onUnmounted(() => {
-	if (randomAnimationTimer.value) {
-		clearTimeout(randomAnimationTimer.value)
-	}
-
-	if (mixer.value) {
-		mixer.value.stopAllAction()
-		mixer.value = null
-	}
 })
 </script>
 
