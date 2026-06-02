@@ -902,10 +902,10 @@ where
           and (
             pag.attribution is null
             or pag.attribution->>'kind' = 'no_permission'
-            or (
-              pag.attribution->'moderation_status' is not null
-              and pag.attribution->'moderation_status'->>'kind' != 'approved'
-            )
+            or coalesce(
+              pag.attribution->'moderation_status'->>'kind',
+              'approved'
+            ) != 'approved'
           )
         "#,
         &version_ids.iter().map(|v| v.0).collect::<Vec<_>>(),
@@ -960,11 +960,9 @@ where
         inner join project_attribution_groups pag on pag.id = paf.group_id
         where d.dependent_id = ANY($1)
           and d.dependency_file_name is not null
-          and pag.attribution is not null
-          and pag.attribution->>'kind' not in ('no_permission')
           and (
-            pag.attribution->'moderation_status' is null
-            or pag.attribution->'moderation_status'->>'kind' = 'approved'
+            pag.flame_project is not null
+            or pag.attribution is not null
           )
           and split_part(paf.name, '/', -1) = d.dependency_file_name
         "#,
