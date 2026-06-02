@@ -2,8 +2,9 @@ use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
+use crate::database::models::notification_item::DBNotification;
 use crate::database::redis::RedisPool;
-use crate::models::notifications::Notification;
+use crate::models::notifications::{Notification, NotificationBody};
 use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
@@ -128,6 +129,26 @@ pub async fn ws_init(
             },
         )?)
         .await;
+
+    let unread_server_invites = DBNotification::get_many_user_exposed_on_site(
+        user_id.into(),
+        &**pool,
+        &redis,
+    )
+    .await?
+    .into_iter()
+    .filter(|notification| {
+        !notification.read
+            && matches!(
+                &notification.body,
+                NotificationBody::ServerInvite { .. }
+            )
+    })
+    .map(Notification::from);
+
+    for notification in unread_server_invites {
+        let _ = session.text(serde_json::to_string(&notification)?).await;
+    }
 
     let db = db.clone();
     let socket_id = db.next_socket_id.fetch_add(1, Ordering::Relaxed);

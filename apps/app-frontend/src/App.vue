@@ -11,6 +11,7 @@ import {
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
+	CheckIcon,
 	CompassIcon,
 	DownloadIcon,
 	ExternalIcon,
@@ -40,6 +41,7 @@ import {
 	defineMessages,
 	I18nDebugPanel,
 	LoadingBar,
+	ModrinthHostingLogo,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -84,6 +86,7 @@ import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
+import ServerInvitePopupBody from '@/components/ui/notifications/ServerInvitePopupBody.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
@@ -756,7 +759,15 @@ command_listener(handleCommand)
 notification_listener(handleLiveNotification)
 
 async function markLiveNotificationRead(notification) {
-	await tauriApiClient.labrinth.notifications_v2.markAsRead(notification.id)
+	try {
+		await tauriApiClient.labrinth.notifications_v2.markAsRead(notification.id)
+	} catch (error) {
+		if (error instanceof ModrinthApiError && error.statusCode === 404) {
+			console.warn(`notification ${notification.id} could not be marked as read`, error)
+			return
+		}
+		throw error
+	}
 }
 
 async function respondToServerInvite(notification, action) {
@@ -765,12 +776,12 @@ async function respondToServerInvite(notification, action) {
 		throw new Error('Missing server ID for invite notification.')
 	}
 
-	await markLiveNotificationRead(notification)
 	await tauriApiClient.request(`/servers/${serverId}/invites/${action}`, {
 		api: 'archon',
 		version: 1,
 		method: 'POST',
 	})
+	await markLiveNotificationRead(notification)
 
 	return serverId
 }
@@ -804,21 +815,28 @@ async function handleLiveNotification(notification) {
 	const inviterId = notification.body.invited_by
 	const invitedBy =
 		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
-	const inviterName = invitedBy?.username ?? 'Someone'
 
 	addPopupNotification({
 		title: 'Modrinth Hosting',
-		text: `${inviterName} has invited you to join ${serverName}.`,
+		titleLogo: ModrinthHostingLogo,
+		bodyComponent: ServerInvitePopupBody,
+		bodyProps: {
+			inviterName: invitedBy?.username ?? null,
+			inviterAvatarUrl: invitedBy?.avatar_url ?? null,
+			serverName,
+		},
 		type: 'info',
 		buttons: [
 			{
 				label: 'Accept',
 				action: () => acceptServerInviteNotification(notification),
+				icon: CheckIcon,
 				color: 'brand',
 			},
 			{
 				label: 'Decline',
 				action: () => declineServerInviteNotification(notification),
+				icon: XIcon,
 				color: 'red',
 			},
 		],

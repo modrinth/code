@@ -18,28 +18,35 @@
 				>
 					<div class="flex flex-col gap-2 w-full">
 						<div class="flex items-center justify-between gap-2.5">
-							<div class="flex items-center gap-2">
-								<div
-									class="flex items-center"
-									:class="{
-										'text-red': item.type === 'error',
-										'text-orange': item.type === 'warning',
-										'text-green': item.type === 'download',
-										'text-contrast': item.type === 'success',
-										'text-blue':
-											!item.type ||
-											!['error', 'warning', 'success', 'download'].includes(item.type),
-									}"
-								>
-									<IssuesIcon v-if="item.type === 'warning'" class="h-5 w-5" />
-									<DownloadIcon v-else-if="item.type === 'download'" class="h-5 w-5" />
-									<CheckCircleIcon v-else-if="item.type === 'success'" class="h-5 w-5" />
-									<XCircleIcon v-else-if="item.type === 'error'" class="h-5 w-5" />
-									<InfoIcon v-else class="h-5 w-5" />
-								</div>
-								<div class="text-contrast font-semibold m-0 grow">
-									{{ item.title }}
-								</div>
+							<div class="flex min-w-0 flex-1 items-center gap-2">
+								<component
+									:is="item.titleLogo"
+									v-if="item.titleLogo"
+									class="h-7 w-auto min-w-0 max-w-full text-contrast"
+								/>
+								<template v-else>
+									<div
+										class="flex items-center"
+										:class="{
+											'text-red': item.type === 'error',
+											'text-orange': item.type === 'warning',
+											'text-green': item.type === 'download',
+											'text-contrast': item.type === 'success',
+											'text-blue':
+												!item.type ||
+												!['error', 'warning', 'success', 'download'].includes(item.type),
+										}"
+									>
+										<IssuesIcon v-if="item.type === 'warning'" class="h-5 w-5" />
+										<DownloadIcon v-else-if="item.type === 'download'" class="h-5 w-5" />
+										<CheckCircleIcon v-else-if="item.type === 'success'" class="h-5 w-5" />
+										<XCircleIcon v-else-if="item.type === 'error'" class="h-5 w-5" />
+										<InfoIcon v-else class="h-5 w-5" />
+									</div>
+									<div class="text-contrast font-semibold m-0 grow">
+										{{ item.title }}
+									</div>
+								</template>
 							</div>
 							<ButtonStyled size="small" type="transparent" circular>
 								<button @click="dismiss(item.id)">
@@ -50,6 +57,11 @@
 						<span v-if="item.text" class="text-primary">
 							{{ item.text }}
 						</span>
+						<component
+							:is="item.bodyComponent"
+							v-if="item.bodyComponent"
+							v-bind="item.bodyProps ?? {}"
+						/>
 					</div>
 					<div v-if="item.progressItems?.length" class="flex flex-col gap-3">
 						<div
@@ -89,6 +101,7 @@
 							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
 						>
 							<button @click="handleButtonClick(item.id, btn)">
+								<component :is="btn.icon" v-if="btn.icon" />
 								{{ btn.label }}
 							</button>
 						</ButtonStyled>
@@ -166,7 +179,7 @@ withDefaults(
 	top: calc(var(--top-bar-height, 3rem) + 1.5rem);
 	right: 1.5rem;
 	z-index: 200;
-	width: 400px;
+	width: 520px;
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;

@@ -1,8 +1,11 @@
+import type { Component } from 'vue'
+
 import { createContext } from '.'
 
 export interface PopupNotificationButton {
 	label: string
 	action: () => void
+	icon?: Component
 	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
 	keepOpen?: boolean
 }
@@ -18,6 +21,9 @@ export interface PopupNotificationProgressItem {
 export interface PopupNotification {
 	id: string | number
 	title: string
+	titleLogo?: Component
+	bodyComponent?: Component
+	bodyProps?: Record<string, unknown>
 	text?: string
 	type?: 'error' | 'warning' | 'success' | 'info' | 'download'
 	progress?: number
