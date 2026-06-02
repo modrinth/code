@@ -6,31 +6,31 @@
     "message": "Letöltések"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "További futó profilok elrejtése"
+    "message": "További futó példányok elrejtése"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Beállítás elsődleges profilként"
+    "message": "Beállítás elsődleges példányként"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Nincsenek futó profilok"
+    "message": "Nincsenek futó példányok"
   },
   "app.action-bar.offline": {
     "message": "Offline"
   },
   "app.action-bar.primary-instance": {
-    "message": "Elsődleges profil"
+    "message": "Elsődleges példány"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "További futó profilok megjelenítése"
+    "message": "További futó pédányok megjelenítése"
   },
   "app.action-bar.stop-instance": {
-    "message": "Profil megállítása"
+    "message": "Példány leállítása"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Aktív letöltések megtekintése"
   },
   "app.action-bar.view-instance": {
-    "message": "Profil megtekintése"
+    "message": "Példányok megtekintése"
   },
   "app.action-bar.view-logs": {
     "message": "Naplók megtekintése"
@@ -60,7 +60,7 @@
     "message": "Alapértelmezett nyitóoldal"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Letiltja a játékosod felett megjelenő névcímkét a Skinek oldalon."
+    "message": "Letiltja a játékosod felett megjelenő névcímkét a Kinézetek oldalon."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Névcímke eltüntetése"
@@ -105,13 +105,13 @@
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Szerver hozzáadása a profilhoz"
+    "message": "Szerver hozzáadása az példányhoz"
   },
   "app.browse.add-to-an-instance": {
-    "message": "Hozzáadás egy profilhoz"
+    "message": "Hozzáadás egy példányhoz"
   },
   "app.browse.add-to-instance": {
-    "message": "Hozzáadás a profilhoz"
+    "message": "Példányhoz adás"
   },
   "app.browse.add-to-instance-name": {
     "message": "Hozzáadás ehhez: {instanceName}"
@@ -123,7 +123,7 @@
     "message": "Már hozzá van adva"
   },
   "app.browse.back-to-instance": {
-    "message": "Vissza a profilhoz"
+    "message": "Vissza a példányhoz"
   },
   "app.browse.discover-content": {
     "message": "Tartalom böngészése"
@@ -198,7 +198,7 @@
     "message": "A modcsomag már telepítve van"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "Profil"
+    "message": "Példány"
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -328,6 +328,138 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Erőforráskezelés"
+  },
+  "app.skins.add-button": {
+    "message": "Kinézet hozzáadása"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Húzd ide a fájlt"
+  },
+  "app.skins.apply-button": {
+    "message": "Alkalmazás"
+  },
+  "app.skins.delete-button": {
+    "message": "Kinézet törlése"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Ezzel a kiválasztott kinézet véglegesen törlődik. Ez a művelet visszafordíthatatlan."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Biztos, hogy le akarod törölni ezt a kinézetet?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Nem sikerült beolvasni a feltöltött fájlt."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Hiba a fájl feldolgozása közben"
+  },
+  "app.skins.edit-button": {
+    "message": "Kinézet szerkesztése"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Kinézet hozzáadása"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Kinézet hozzáadása"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Karstílus"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Vékony"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Széles"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Köpeny"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Köpeny"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Kinézet szerkesztése"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Előbb módosíts valamit!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Nincs köpeny"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Nincs"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Textúra cseréje"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Kinézet mentése"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Mentés..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textúra"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Először tölts fel egy kinézetet!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Kinézet szerkesztése"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Előnézet"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Túl gyakran cseréled a kinézetedet. A Mojang szerverei ideiglenesen letiltották a további cseréket. Kérlek várj egy pillanatot, majd próbáld meg újra."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Lassíts!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Alap kinézetek"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Mentett kinézetek"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Bejelentkezés"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Kérlek jelentkezz be a Minecraft-fiókodba, hogy használni tudd a Modrinth App kinézetkezelési funkcióit."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Izgatott Modrinth-bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Kérlek jelentkezz be"
+  },
+  "app.skins.title": {
+    "message": "Kinézetváltó"
   },
   "app.update-popup.body": {
     "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
@@ -605,6 +737,24 @@
   "instance.settings.tabs.java": {
     "message": "Java és memória"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Egyéni környezeti változók"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Egyéni Java argumentumok"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Egyedi Java telepítés"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Egyéni memóriakiosztás"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Írja be a környezeti változókat..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Java argumentumok megadása..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Környezeti változók"
   },
@@ -619,6 +769,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Hozzárendelt memória"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "Ablak"

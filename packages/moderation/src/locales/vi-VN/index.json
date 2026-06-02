@@ -65,6 +65,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Truy cập trang thư viện"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type} của bạn đang sử dụng giấy phép hiện đang yêu cầu mã nguồn hiện đang có sẵn. Hãy cung cấp đường link dẫn đến mã nguồn hoặc file nguồn cho từng phiên bản, hoặc sử dụng một giấy phép khác."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Cung cấp mã nguồn"
   },
@@ -72,7 +75,7 @@
     "defaultMessage": "Một số liên kết ngoài của bạn có vẻ giống hệt nhau. Mỗi liên kết chỉ nên được nhập một lần và với loại liên kết phù hợp."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Liên kết giống nhau"
+    "defaultMessage": "Xóa các đường link giống nhau"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Phần mô tả của bạn nên chứa đủ văn bản thuần hoặc văn bản thay thế cho hình ảnh (alt-text), nhằm đảm bảo khả năng truy cập cho người dùng trình đọc màn hình hoặc có kết nối internet chậm."
@@ -155,6 +158,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Lựa chọn ngôn ngữ"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Lựa chọn giây phép mà {type} được phân phối theo."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Chọn giấy phép"
   },
@@ -218,6 +224,12 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
   },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Cần ít nhất một hình ảnh minh họa cho {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "gói tài nguyên, trừ gói tài nguyên nhạc hoặc phiên dịch. Nếu các trường hợp trên bao gồm gói tài nguyên của bạn, hãy lựa chọn một nhãn thích hợp"
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tải lên hình ảnh thư viện"
   },
@@ -240,3 +252,4 @@
     "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
+

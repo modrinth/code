@@ -59,6 +59,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Перейти в галерею"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ваш {type} использует лицензию, требующую доступность исходного кода. Предоставьте ссылку на исходный код или файл с исходными кодами для каждой дополнительной версии, либо же выберите другую лицензию."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Укажите исходный код"
   },
@@ -143,6 +146,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Укажите язык"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Выберите лицензию, под которой распространяется ваш {type}."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Укажите лицензию"
   },
@@ -196,6 +202,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Оставьте ключевые теги"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Нужно минимум одно изображение, чтобы показать контент, входящий в {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "набор ресурсов, кроме наборов аудио и локализации. Если это описывает ваш набор, выберите подходящий тег"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Добавьте изображения"

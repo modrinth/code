@@ -1,9 +1,12 @@
-use actix_web::{get, post, web};
-use chrono::{DateTime, Utc};
+use actix_web::{HttpRequest, get, post, web};
+use base64::Engine;
+use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
+use hmac::{Hmac, Mac};
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use sha2::Sha256;
 use std::collections::HashSet;
 use tracing::{info, warn};
 use uuid::Uuid;
@@ -134,11 +137,17 @@ impl CampaignDonation {
 #[utoipa::path]
 #[post("/webhook")]
 pub async fn tiltify_webhook(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     payouts_queue: web::Data<PayoutsQueue>,
-    web::Json(raw_payload): web::Json<serde_json::Value>,
+    body: String,
 ) -> Result<(), ApiError> {
+    verify_tiltify_webhook_signature(&req, &body)?;
+
+    let raw_payload = serde_json::from_str::<serde_json::Value>(&body)
+        .wrap_internal_err_with(|| eyre!("invalid Tiltify webhook JSON"))?;
+
     // deserialize the JSON in the request handler, not in the params,
     // since if the JSON fails to deserialize then it's *our* fault,
     // not the caller's.
@@ -233,6 +242,52 @@ pub async fn tiltify_webhook(
             .await
             .wrap_internal_err("clearing user caches")?;
     }
+
+    Ok(())
+}
+
+fn verify_tiltify_webhook_signature(
+    req: &HttpRequest,
+    body: &str,
+) -> Result<(), ApiError> {
+    let signature = req
+        .headers()
+        .get("X-Tiltify-Signature")
+        .and_then(|x| x.to_str().ok())
+        .wrap_request_err("missing Tiltify webhook signature")?;
+    let signature = base64::engine::general_purpose::STANDARD
+        .decode(signature)
+        .wrap_request_err("invalid Tiltify webhook signature")?;
+
+    let timestamp = req
+        .headers()
+        .get("X-Tiltify-Timestamp")
+        .and_then(|x| x.to_str().ok())
+        .wrap_request_err("missing Tiltify webhook timestamp")?;
+    let parsed_timestamp = DateTime::parse_from_rfc3339(timestamp)
+        .wrap_request_err("invalid Tiltify webhook timestamp")?;
+    let parsed_timestamp = parsed_timestamp.with_timezone(&Utc);
+    let age = Utc::now().signed_duration_since(parsed_timestamp);
+    if age < -Duration::minutes(1) || age > Duration::minutes(1) {
+        return Err(ApiError::Request(eyre!(
+            "expired Tiltify webhook timestamp",
+        )));
+    }
+
+    if ENV.TILTIFY_WEBHOOK_SIGNING_KEY.is_empty() {
+        return Err(ApiError::Internal(eyre!(
+            "TILTIFY_WEBHOOK_SIGNING_KEY must be set"
+        )));
+    }
+
+    let mut mac: Hmac<Sha256> =
+        Hmac::new_from_slice(ENV.TILTIFY_WEBHOOK_SIGNING_KEY.as_bytes())
+            .wrap_internal_err("initializing Tiltify webhook HMAC")?;
+    mac.update(timestamp.as_bytes());
+    mac.update(b".");
+    mac.update(body.as_bytes());
+    mac.verify_slice(&signature)
+        .wrap_request_err("invalid Tiltify webhook signature")?;
 
     Ok(())
 }

@@ -1778,9 +1778,6 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -2702,9 +2699,6 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Nog geen servers"
   },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Kies je favoriete mods en wij zorgen voor de rest."
-  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Mods installeren met één klik"
   },
@@ -2741,23 +2735,14 @@
   "servers.listing.new-label": {
     "defaultMessage": "Nieuw"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Uw bestanden worden nog <days-remaining>{daysRemaining} dagen bewaard {daysRemaining, plural, one {day} other {days} }</days-remaining>. Neem contact op met de helpdesk om de bestanden te downloaden voordat ze worden verwijderd. "
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Uw bestanden blijven na opzegging nog 30 dagen bewaard."
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "Uw account is door de moderators geblokkeerd. "
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Even geduld a.u.b. terwijl we uw server instellen. Dit kan tot 10 minuten duren."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Uw abonnement is opgezegd."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Uw abonnement is op <date>{formattedDate}</date> opgezegd. "
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Uw abonnement is opgezegd vanwege een mislukte betaling."

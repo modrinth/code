@@ -114,6 +114,9 @@ pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
 /// [`TimeRange::resolution`].
 pub const MAX_TIME_SLICES: usize = 1024;
 pub(crate) const UNKNOWN_LOADER: &str = "unknown";
+pub(crate) const UNKNOWN_COUNTRY: &str = "XX";
+pub(crate) const COUNTRY_PRIVACY_FLOOR: u64 = 50;
+pub(crate) const COUNTRY_PLAYTIME_PRIVACY_FLOOR_SECONDS: u64 = 4 * 60 * 60;
 
 // response
 
@@ -404,13 +407,25 @@ pub(crate) fn none_if_zero_version_id(v: DBVersionId) -> Option<VersionId> {
     if v.0 == 0 { None } else { Some(v.into()) }
 }
 
-pub(crate) fn condense_country(country: String, count: u64) -> String {
-    // Every country under '50' (view or downloads) should be condensed into 'XX'
-    if count < 50 {
-        "XX".to_string()
-    } else {
-        country
+pub(crate) fn apply_country_privacy(
+    country: &mut Option<String>,
+    country_filter_applied: bool,
+    count: u64,
+    floor: u64,
+) -> bool {
+    if count >= floor {
+        return true;
     }
+
+    if country_filter_applied {
+        return false;
+    }
+
+    if country.is_some() {
+        *country = Some(UNKNOWN_COUNTRY.to_string());
+    }
+
+    true
 }
 
 pub(crate) fn project_loader_map(
@@ -518,11 +533,11 @@ pub(crate) struct ClickhouseQueryParams {
 }
 
 pub(crate) enum ClickhouseFilterParam<'a> {
-    String(&'static str, &'a [String]),
+    String(&'a [String]),
     Bool(&'static str, &'a [bool]),
-    VersionId(&'static str, &'a [VersionId]),
-    AffiliateCodeId(&'static str, &'a [AffiliateCodeId]),
-    DownloadReason(&'static str, &'a [DownloadReason]),
+    VersionId(&'a [VersionId]),
+    AffiliateCodeId(&'a [AffiliateCodeId]),
+    DownloadReason(&'a [DownloadReason]),
 }
 
 impl ClickhouseFilterParam<'_> {
@@ -531,7 +546,7 @@ impl ClickhouseFilterParam<'_> {
         query: clickhouse::query::Query,
     ) -> clickhouse::query::Query {
         match self {
-            Self::String(name, values) => query.param(name, values),
+            Self::String(values) => query.bind(values),
             Self::Bool(name, values) => {
                 let value = match values {
                     [false] => 0,
@@ -540,36 +555,30 @@ impl ClickhouseFilterParam<'_> {
                 };
                 query.param(name, value)
             }
-            Self::VersionId(name, values) => {
+            Self::VersionId(values) => {
                 let values = values
                     .iter()
                     .map(|id| DBVersionId::from(*id))
                     .collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
-            Self::AffiliateCodeId(name, values) => {
+            Self::AffiliateCodeId(values) => {
                 let values = values
                     .iter()
                     .map(|id| DBAffiliateCodeId::from(*id))
                     .collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
-            Self::DownloadReason(name, values) => {
+            Self::DownloadReason(values) => {
                 let values =
                     values.iter().map(ToString::to_string).collect::<Vec<_>>();
-                query.param(name, values)
+                query.bind(values)
             }
         }
     }
 }
 
 impl ClickhouseQueryParams {
-    pub(crate) const PROJECT_IDS: Self = Self {
-        project_ids: true,
-        parent_version_ids: false,
-        affiliate_code_ids: false,
-    };
-
     pub(crate) const fn empty() -> Self {
         Self {
             project_ids: false,
@@ -614,13 +623,13 @@ where
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len());
     if params.project_ids {
-        query = query.param("project_ids", cx.project_ids);
+        query = query.bind(cx.project_ids);
     }
     if params.parent_version_ids {
-        query = query.param("parent_version_ids", cx.parent_version_ids);
+        query = query.bind(cx.parent_version_ids);
     }
     if params.affiliate_code_ids {
-        query = query.param("affiliate_code_ids", cx.affiliate_code_ids);
+        query = query.bind(cx.affiliate_code_ids);
     }
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
@@ -793,6 +802,45 @@ mod tests {
             serde_json::to_value(DownloadSource::Other).unwrap(),
             json!("other")
         );
+    }
+
+    #[test]
+    fn country_privacy_floor_suppresses_small_constrained_buckets() {
+        let mut country = None;
+        assert!(apply_country_privacy(
+            &mut country,
+            false,
+            1,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, None);
+
+        let mut country = Some("US".into());
+        assert!(apply_country_privacy(
+            &mut country,
+            false,
+            49,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, Some("XX".into()));
+
+        let mut country = Some("US".into());
+        assert!(!apply_country_privacy(
+            &mut country,
+            true,
+            49,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, Some("US".into()));
+
+        let mut country = Some("US".into());
+        assert!(apply_country_privacy(
+            &mut country,
+            true,
+            50,
+            COUNTRY_PRIVACY_FLOOR
+        ));
+        assert_eq!(country, Some("US".into()));
     }
 
     #[test]

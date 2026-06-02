@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Gagal memuat pengaturan server"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alpha"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -62,6 +65,9 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Gagal memuat perincian langganan."
   },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 hari} monthly {/bulan} quarterly {/kuartal} yearly {/tahun} other {{interval}}}"
+  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Tagihan Anda berikutnya akan jatuh tempo pada <charge-date>{date}</charge-date>."
   },
@@ -80,8 +86,38 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Berlangganan ulang ke Server"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Saring hasil..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Hasil tidak ditemukan untuk pencarian Anda!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Anda saat ini luring. Sambungkan ke internet untuk menelusuri Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Cari {projectType}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Proyek terpilih"
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Proyek terpilih belum terpasang"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Buang"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Proyek terpilih belum terpasang"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Lihat:"
+  },
   "button.accept": {
     "defaultMessage": "Terima"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Tambah server ke instans"
   },
   "button.affiliate-links": {
     "defaultMessage": "Tautan afiliasi"
@@ -152,6 +188,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Sembunyikan citra"
   },
+  "button.install": {
+    "defaultMessage": "Pasang"
+  },
   "button.max": {
     "defaultMessage": "Maks."
   },
@@ -169,6 +208,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Buka di folder"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Buka di Modrinth"
   },
   "button.play": {
     "defaultMessage": "Mainkan"
@@ -263,6 +305,12 @@
   "collections.label.private": {
     "defaultMessage": "Pribadi"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "konten"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Pilih {project}"
+  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Apakah Anda yakin ingin memperbarui  {count, plural, one {# project} other {# projects}} ke versi terbaru yang kompatibel? Disarankan untuk memperbarui konten satu per satu."
   },
@@ -280,6 +328,12 @@
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Peringatan penghapusan"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Hapus {count, number} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Hapus {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Menurunkan versi} other {Memperbarui versi}} dapat menyebabkan masalah kompatibilitas. Mod atau konten yang Anda tambahkan di atas paket akan tetap tersimpan, tetapi mungkin tidak cocok dengan versi baru."
@@ -326,6 +380,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} diperbarui"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Dimatikan"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Dihidupkan"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Pembaruan"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Peringatan"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Membuat cadangan..."
   },
@@ -344,8 +410,14 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Buat cadangan"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instans"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Tahan tombol Shift saat mengeklik untuk melewati pesan konfirmasi."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "dunia"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Konten paket mod Anda kini dapat ditemukan di sini!"
@@ -1156,9 +1228,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"

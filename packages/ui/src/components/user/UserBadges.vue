@@ -224,7 +224,7 @@ const BADGES = [
 			},
 		],
 		link: {
-			href: 'https://modrinth.com/pride',
+			href: 'https://modrinth.com/pride?from=badge',
 			message: defineMessage({
 				id: 'user.profile.badge.pride.link',
 				defaultMessage: `Click to visit our latest Pride fundraiser.`,
