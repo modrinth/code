@@ -297,6 +297,58 @@ function isActiveUpdateRequest(requestId: number) {
 	return activeUpdateRequestId.value === requestId
 }
 
+function sortVersionsByPublishedDate(versions: Labrinth.Versions.v2.Version[]) {
+	return [...versions].sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+}
+
+function mergeVersionIntoList(
+	versions: Labrinth.Versions.v2.Version[],
+	version: Labrinth.Versions.v2.Version,
+) {
+	const existingIndex = versions.findIndex((v) => v.id === version.id)
+	if (existingIndex === -1) {
+		return sortVersionsByPublishedDate([version, ...versions])
+	}
+
+	const mergedVersions = [...versions]
+	mergedVersions[existingIndex] = version
+	return sortVersionsByPublishedDate(mergedVersions)
+}
+
+async function getUpdaterProjectVersions(projectId: string, pinnedVersionId?: string) {
+	let fetchError: unknown = null
+	let versions = (await get_project_versions(projectId, 'bypass').catch((err) => {
+		fetchError = err
+		return null
+	})) as Labrinth.Versions.v2.Version[] | null
+
+	if (!versions) {
+		versions = (await get_project_versions(projectId).catch(() => null)) as
+			| Labrinth.Versions.v2.Version[]
+			| null
+	}
+
+	if (!versions && fetchError) {
+		handleError(fetchError as Error)
+	}
+
+	let mergedVersions = sortVersionsByPublishedDate(versions ?? [])
+
+	if (pinnedVersionId && !mergedVersions.some((version) => version.id === pinnedVersionId)) {
+		const pinnedVersion = (await get_version(pinnedVersionId, 'bypass').catch(
+			() => null,
+		)) as Labrinth.Versions.v2.Version | null
+
+		if (pinnedVersion) {
+			mergedVersions = mergeVersionIntoList(mergedVersions, pinnedVersion)
+		}
+	}
+
+	return mergedVersions
+}
+
 async function handleBrowseContent() {
 	if (!props.instance) return
 	await router.push({
@@ -543,16 +595,14 @@ async function handleUpdate(id: string) {
 	})
 	contentUpdaterModal.value?.show(initialVersionId)
 
-	const versions = (await get_project_versions(item.project.id).catch((e) => {
-		return handleError(e)
-	})) as Labrinth.Versions.v2.Version[] | null
+	const versions = await getUpdaterProjectVersions(item.project.id, initialVersionId)
 
 	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
 		return
 
 	loadingVersions.value = false
 
-	if (!versions) {
+	if (versions.length === 0) {
 		debug('handleUpdate: no versions returned', { projectId: item.project.id })
 		return
 	}
@@ -571,9 +621,6 @@ async function handleUpdate(id: string) {
 		updateVersionInList: versions.some((v) => v.id === item.update_version_id),
 	})
 
-	versions.sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)
 	const preselectedVersion =
 		versions.find((version) => version.id === initialVersionId) ?? versions[0] ?? null
 	debug('handleUpdate: resolved content updater preselection', {
@@ -611,22 +658,15 @@ async function handleSwitchVersion(item: ContentItem) {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(item.version.id, { switchMode: true })
+	const initialVersionId = item.version.id
+	contentUpdaterModal.value?.show(initialVersionId, { switchMode: true })
 
-	const versions = (await get_project_versions(item.project.id).catch((e) => {
-		return handleError(e)
-	})) as Labrinth.Versions.v2.Version[] | null
+	const versions = await getUpdaterProjectVersions(item.project.id, initialVersionId)
 
 	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
 		return
 
 	loadingVersions.value = false
-
-	if (!versions) return
-
-	versions.sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)
 
 	updatingProjectVersions.value = versions
 }
@@ -713,19 +753,17 @@ async function handleModpackUpdate() {
 	})
 	contentUpdaterModal.value?.show(initialVersionId)
 
-	const versions = (await get_project_versions(props.instance.linked_data.project_id).catch(
-		handleError,
-	)) as Labrinth.Versions.v2.Version[] | null
+	const versions = await getUpdaterProjectVersions(
+		props.instance.linked_data.project_id,
+		initialVersionId,
+	)
 
 	if (!isActiveUpdateRequest(requestId) || !updatingModpack.value) return
 
 	loadingVersions.value = false
 
-	if (!versions) return
+	if (versions.length === 0) return
 
-	versions.sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)
 	const preselectedVersion =
 		versions.find((version) => version.id === initialVersionId) ?? versions[0] ?? null
 	debug('handleModpackUpdate: resolved modpack updater preselection', {
@@ -760,12 +798,7 @@ async function fetchAndSpliceVersion(
 	)) as Labrinth.Versions.v2.Version | null
 	if (!isActiveUpdateRequest(requestId)) return
 	if (!fullVersion) return
-	const index = updatingProjectVersions.value.findIndex((v) => v.id === versionId)
-	if (index !== -1) {
-		const newVersions = [...updatingProjectVersions.value]
-		newVersions[index] = fullVersion
-		updatingProjectVersions.value = newVersions
-	}
+	updatingProjectVersions.value = mergeVersionIntoList(updatingProjectVersions.value, fullVersion)
 }
 
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {

@@ -426,6 +426,7 @@ const pendingIncompatibleUpdate = ref<{
 } | null>(null)
 // Store the initial version ID to select when versions become available
 const pendingInitialVersionId = ref<string | undefined>(undefined)
+const pinnedInitialVersionId = ref<string | undefined>(undefined)
 
 watch(
 	() => props.versions,
@@ -511,6 +512,7 @@ const filteredVersions = computed(() => {
 			(version) =>
 				version.id === props.currentVersionId ||
 				version.id === selectedVersion.value?.id ||
+				version.id === pinnedInitialVersionId.value ||
 				isVersionCompatible(version),
 		)
 	}
@@ -683,6 +685,7 @@ function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 	searchQuery.value = ''
 	hideIncompatibleState.value = !isModpack.value
 	pendingIncompatibleUpdate.value = null
+	pinnedInitialVersionId.value = initialVersionId
 	switchMode.value = options?.switchMode ?? false
 
 	debug('show() called', {
