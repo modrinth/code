@@ -447,14 +447,14 @@ impl From<DBNotification> for Notification {
                             name: "Accept".to_string(),
                             action_route: (
                                 "POST".to_string(),
-                                format!(""),
+                                String::new(),
                             ),
                         },
                         NotificationAction {
                             name: "Deny".to_string(),
                             action_route: (
                                 "POST".to_string(),
-                                format!(""),
+                                String::new(),
                             ),
                         },
                     ],
