@@ -298,6 +298,7 @@ vars! {
     TILTIFY_CLIENT_ID: String = "";
     TILTIFY_CLIENT_SECRET: String = "";
     TILTIFY_PRIDE_26_CAMPAIGN_ID: String = "";
+    TILTIFY_WEBHOOK_SIGNING_KEY: String = "";
 
     // server pinging
     SERVER_PING_MAX_CONCURRENT: usize = 16usize;

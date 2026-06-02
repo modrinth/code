@@ -432,7 +432,7 @@ impl From<DBNotification> for Notification {
                     ],
                 ),
                 NotificationBody::ServerInvite {
-                    server_id,
+                    server_id: _,
                     server_name,
                     role,
                     ..
@@ -447,14 +447,14 @@ impl From<DBNotification> for Notification {
                             name: "Accept".to_string(),
                             action_route: (
                                 "POST".to_string(),
-                                format!("hosting/servers/{server_id}/invite/accept"),
+                                format!(""),
                             ),
                         },
                         NotificationAction {
                             name: "Deny".to_string(),
                             action_route: (
                                 "POST".to_string(),
-                                format!("hosting/servers/{server_id}/invite/deny"),
+                                format!(""),
                             ),
                         },
                     ],

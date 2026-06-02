@@ -84,9 +84,11 @@ pub async fn create_email_sync(
 ) -> Result<CustomizeResponder<web::Json<Vec<UserId>>>, ApiError> {
     let CreateNotification { body, user_ids } =
         create_notification.into_inner();
-    let user_ids = user_ids
-        .into_iter()
-        .map(|x| DBUserId(x.0 as i64))
+    let raw_user_ids = user_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>();
+
+    let user_ids = raw_user_ids
+        .iter()
+        .map(|x| DBUserId(*x))
         .collect::<Vec<_>>();
 
     let mut txn = pool.begin().await?;
@@ -97,8 +99,31 @@ pub async fn create_email_sync(
         ));
     }
 
+    // Skip users who already have an identical notification
+    let body_value = serde_json::value::to_value(&body)?;
+    let already_notified = sqlx::query!(
+        "
+        SELECT DISTINCT user_id
+        FROM notifications
+        WHERE user_id = ANY($1::bigint[]) AND body = $2::jsonb
+        ",
+        &raw_user_ids[..],
+        body_value,
+    )
+    .fetch_all(&mut txn)
+    .await?
+    .into_iter()
+    .map(|row| DBUserId(row.user_id))
+    .collect::<std::collections::HashSet<_>>();
+
+    let notification_user_ids = user_ids
+        .clone()
+        .into_iter()
+        .filter(|id| !already_notified.contains(id))
+        .collect::<Vec<_>>();
+
     NotificationBuilder { body: body.clone() }
-        .insert_many_without_delivery(user_ids.clone(), &mut txn, &redis)
+        .insert_many_without_delivery(notification_user_ids, &mut txn, &redis)
         .await?;
 
     txn.commit().await?;

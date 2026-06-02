@@ -422,7 +422,7 @@ function getOptionClasses(item: ComboboxOption<T> & { key: string }, _index: num
 		item.class,
 		{
 			'bg-surface-4 text-contrast hover:brightness-[115%] focus:brightness-[115%]': !isSelected,
-			'bg-highlight-green text-green !cursor-default hover:bg-highlight-green focus:bg-highlight-green':
+			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green':
 				isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 		},
@@ -638,7 +638,11 @@ function handleTriggerClick(event: MouseEvent) {
 function handleOptionClick(option: ComboboxOption<T>, index: number) {
 	if (option.disabled || option.type === 'divider') return
 	const isSelected = props.listbox && option.value === props.modelValue
-	if (isSelected) return
+	if (isSelected) {
+		focusedIndex.value = index
+		if (option.type !== 'link') closeDropdown()
+		return
+	}
 
 	focusedIndex.value = index
 
