@@ -66,7 +66,10 @@
 				<div
 					class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[var(--color-text-secondary)]"
 				>
-					<span v-if="notification.read" class="inline-flex items-center font-bold text-[var(--color-text)]">
+					<span
+						v-if="notification.read"
+						class="inline-flex items-center font-bold text-[var(--color-text)]"
+					>
 						<CheckCircleIcon /> Read
 					</span>
 					<span v-tooltip="formatDateTime(notification.created)" class="inline-flex items-center">
@@ -118,198 +121,168 @@
 				</template>
 			</DoubleIcon>
 			<div class="notification__title">
-			<template v-if="type === 'project_update' && project && version">
-				A project you follow,
-				<nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link>
-				, has been updated:
-			</template>
-			<template v-else-if="type === 'team_invite' && project">
-				<nuxt-link
-					:to="`/user/${invitedBy.username}`"
-					class="iconified-link title-link inline-flex"
-				>
-					<Avatar
-						:src="invitedBy.avatar_url"
-						circle
-						size="xxs"
-						no-shadow
-						:raised="raised"
-						class="inline-flex"
-					/>
-					<span class="space">&nbsp;</span>
-					<span>{{ invitedBy.username }}</span>
-				</nuxt-link>
-				<span>
-					has invited you to join
-					<nuxt-link :to="getProjectLink(project)" class="title-link">
-						{{ project.title }} </nuxt-link
-					>.
-				</span>
-			</template>
-			<template v-else-if="type === 'organization_invite' && organization">
-				<nuxt-link
-					:to="`/user/${invitedBy.username}`"
-					class="iconified-link title-link inline-flex"
-				>
-					<Avatar
-						:src="invitedBy.avatar_url"
-						circle
-						size="xxs"
-						no-shadow
-						:raised="raised"
-						class="inline-flex"
-					/>
-					<span class="space">&nbsp;</span>
-					<span>{{ invitedBy.username }}</span>
-				</nuxt-link>
-				<span>
-					has invited you to join
-					<nuxt-link :to="`/organization/${organization.slug}`" class="title-link">
-						{{ organization.name }} </nuxt-link
-					>.
-				</span>
-			</template>
-			<template v-else-if="type === 'status_change' && project">
-				<nuxt-link :to="getProjectLink(project)" class="title-link">
-					{{ project.title }}
-				</nuxt-link>
-				<template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
-					has been
-					<ProjectStatusBadge :status="notification.body.new_status" />
+				<template v-if="type === 'project_update' && project && version">
+					A project you follow,
+					<nuxt-link :to="getProjectLink(project)" class="title-link">{{
+						project.title
+					}}</nuxt-link>
+					, has been updated:
 				</template>
-				<template v-else>
-					updated from
-					<ProjectStatusBadge :status="notification.body.old_status" />
-					to
-					<ProjectStatusBadge :status="notification.body.new_status" />
-				</template>
-				by the moderators.
-			</template>
-			<template v-else-if="type === 'moderator_message' && thread && project && !report">
-				Your project,
-				<nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link>
-				, has received
-				<template v-if="notification.grouped_notifs"> messages</template>
-				<template v-else>a message</template>
-				from the moderators.
-			</template>
-			<template v-else-if="type === 'moderator_message' && thread && report">
-				A moderator replied to your report of
-				<template v-if="version">
-					version
-					<nuxt-link :to="getVersionLink(project, version)" class="title-link">
-						{{ version.name }}
-					</nuxt-link>
-					of project
-				</template>
-				<nuxt-link v-if="project" :to="getProjectLink(project)" class="title-link">
-					{{ project.title }}
-				</nuxt-link>
-				<nuxt-link v-else-if="user" :to="getUserLink(user)" class="title-link">
-					{{ user.username }}
-				</nuxt-link>
-				.
-			</template>
-			<nuxt-link v-else :to="notification.link" class="title-link">
-				<span v-html="renderString(notification.title)" />
-			</nuxt-link>
-			<!--      <span v-else class="known-errors">Error reading notification.</span>-->
-		</div>
-		<div v-if="hasBody" class="notification__body">
-			<ThreadSummary
-				v-if="type === 'moderator_message' && thread"
-				:thread="thread"
-				:link="threadLink"
-				:raised="raised"
-				:messages="getMessages()"
-				class="thread-summary"
-				:auth="auth"
-			/>
-			<div v-else-if="type === 'project_update'" class="version-list">
-				<div
-					v-for="notif in (notification.grouped_notifs
-						? [notification, ...notification.grouped_notifs]
-						: [notification]
-					).filter((x) => x.extra_data.version)"
-					:key="notif.id"
-					class="version-link"
-				>
-					<VersionIcon />
+				<template v-else-if="type === 'team_invite' && project">
 					<nuxt-link
-						:to="getVersionLink(notif.extra_data.project, notif.extra_data.version)"
-						class="text-link"
+						:to="`/user/${invitedBy.username}`"
+						class="iconified-link title-link inline-flex"
 					>
-						{{ notif.extra_data.version.name }}
-					</nuxt-link>
-					<span class="version-info">
-						for
-						<Categories
-							:categories="getLoaderCategories(notif.extra_data.version)"
-							:type="notif.extra_data.project.project_type"
-							class="categories"
+						<Avatar
+							:src="invitedBy.avatar_url"
+							circle
+							size="xxs"
+							no-shadow
+							:raised="raised"
+							class="inline-flex"
 						/>
-						{{ $formatVersion(notif.extra_data.version.game_versions) }}
-						<span v-tooltip="formatDateTime(notif.extra_data.version.date_published)" class="date">
-							{{ formatRelativeTime(notif.extra_data.version.date_published) }}
-						</span>
+						<span class="space">&nbsp;</span>
+						<span>{{ invitedBy.username }}</span>
+					</nuxt-link>
+					<span>
+						has invited you to join
+						<nuxt-link :to="getProjectLink(project)" class="title-link">
+							{{ project.title }} </nuxt-link
+						>.
 					</span>
-				</div>
+				</template>
+				<template v-else-if="type === 'organization_invite' && organization">
+					<nuxt-link
+						:to="`/user/${invitedBy.username}`"
+						class="iconified-link title-link inline-flex"
+					>
+						<Avatar
+							:src="invitedBy.avatar_url"
+							circle
+							size="xxs"
+							no-shadow
+							:raised="raised"
+							class="inline-flex"
+						/>
+						<span class="space">&nbsp;</span>
+						<span>{{ invitedBy.username }}</span>
+					</nuxt-link>
+					<span>
+						has invited you to join
+						<nuxt-link :to="`/organization/${organization.slug}`" class="title-link">
+							{{ organization.name }} </nuxt-link
+						>.
+					</span>
+				</template>
+				<template v-else-if="type === 'status_change' && project">
+					<nuxt-link :to="getProjectLink(project)" class="title-link">
+						{{ project.title }}
+					</nuxt-link>
+					<template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
+						has been
+						<ProjectStatusBadge :status="notification.body.new_status" />
+					</template>
+					<template v-else>
+						updated from
+						<ProjectStatusBadge :status="notification.body.old_status" />
+						to
+						<ProjectStatusBadge :status="notification.body.new_status" />
+					</template>
+					by the moderators.
+				</template>
+				<template v-else-if="type === 'moderator_message' && thread && project && !report">
+					Your project,
+					<nuxt-link :to="getProjectLink(project)" class="title-link">{{
+						project.title
+					}}</nuxt-link>
+					, has received
+					<template v-if="notification.grouped_notifs"> messages</template>
+					<template v-else>a message</template>
+					from the moderators.
+				</template>
+				<template v-else-if="type === 'moderator_message' && thread && report">
+					A moderator replied to your report of
+					<template v-if="version">
+						version
+						<nuxt-link :to="getVersionLink(project, version)" class="title-link">
+							{{ version.name }}
+						</nuxt-link>
+						of project
+					</template>
+					<nuxt-link v-if="project" :to="getProjectLink(project)" class="title-link">
+						{{ project.title }}
+					</nuxt-link>
+					<nuxt-link v-else-if="user" :to="getUserLink(user)" class="title-link">
+						{{ user.username }}
+					</nuxt-link>
+					.
+				</template>
+				<nuxt-link v-else :to="notification.link" class="title-link">
+					<span v-html="renderString(notification.title)" />
+				</nuxt-link>
+				<!--      <span v-else class="known-errors">Error reading notification.</span>-->
 			</div>
-			<template v-else>
-				{{ notification.text }}
-			</template>
-		</div>
-		<span class="notification__date">
-			<span v-if="notification.read" class="read-badge inline-flex">
-				<CheckCircleIcon /> Read
-			</span>
-			<span v-tooltip="formatDateTime(notification.created)" class="inline-flex">
-				<CalendarIcon class="mr-1" /> Received
-				{{ formatRelativeTime(notification.created) }}
-			</span>
-		</span>
-		<div v-if="compact" class="notification__actions">
-			<template v-if="type === 'team_invite' || type === 'organization_invite'">
-				<ButtonStyled circular color="brand" type="transparent">
-					<button
-						v-tooltip="`Accept`"
-						@click="
-							() => {
-								acceptTeamInvite(notification.body.team_id)
-								read()
-							}
-						"
+			<div v-if="hasBody" class="notification__body">
+				<ThreadSummary
+					v-if="type === 'moderator_message' && thread"
+					:thread="thread"
+					:link="threadLink"
+					:raised="raised"
+					:messages="getMessages()"
+					class="thread-summary"
+					:auth="auth"
+				/>
+				<div v-else-if="type === 'project_update'" class="version-list">
+					<div
+						v-for="notif in (notification.grouped_notifs
+							? [notification, ...notification.grouped_notifs]
+							: [notification]
+						).filter((x) => x.extra_data.version)"
+						:key="notif.id"
+						class="version-link"
 					>
-						<CheckIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular color="red" type="transparent">
-					<button
-						v-tooltip="`Decline`"
-						@click="
-							() => {
-								removeSelfFromTeam(notification.body.team_id)
-								read()
-							}
-						"
-					>
-						<XIcon />
-					</button>
-				</ButtonStyled>
-			</template>
-			<ButtonStyled v-else-if="!notification.read" circular type="transparent">
-				<button v-tooltip="`Mark as read`" @click="read()">
-					<XIcon />
-				</button>
-			</ButtonStyled>
-		</div>
-		<div v-else class="notification__actions">
-			<div v-if="type !== null" class="input-group">
-				<template
-					v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
-				>
-					<ButtonStyled color="brand">
+						<VersionIcon />
+						<nuxt-link
+							:to="getVersionLink(notif.extra_data.project, notif.extra_data.version)"
+							class="text-link"
+						>
+							{{ notif.extra_data.version.name }}
+						</nuxt-link>
+						<span class="version-info">
+							for
+							<Categories
+								:categories="getLoaderCategories(notif.extra_data.version)"
+								:type="notif.extra_data.project.project_type"
+								class="categories"
+							/>
+							{{ $formatVersion(notif.extra_data.version.game_versions) }}
+							<span
+								v-tooltip="formatDateTime(notif.extra_data.version.date_published)"
+								class="date"
+							>
+								{{ formatRelativeTime(notif.extra_data.version.date_published) }}
+							</span>
+						</span>
+					</div>
+				</div>
+				<template v-else>
+					{{ notification.text }}
+				</template>
+			</div>
+			<span class="notification__date">
+				<span v-if="notification.read" class="read-badge inline-flex">
+					<CheckCircleIcon /> Read
+				</span>
+				<span v-tooltip="formatDateTime(notification.created)" class="inline-flex">
+					<CalendarIcon class="mr-1" /> Received
+					{{ formatRelativeTime(notification.created) }}
+				</span>
+			</span>
+			<div v-if="compact" class="notification__actions">
+				<template v-if="type === 'team_invite' || type === 'organization_invite'">
+					<ButtonStyled circular color="brand" type="transparent">
 						<button
+							v-tooltip="`Accept`"
 							@click="
 								() => {
 									acceptTeamInvite(notification.body.team_id)
@@ -318,11 +291,11 @@
 							"
 						>
 							<CheckIcon />
-							Accept
 						</button>
 					</ButtonStyled>
-					<ButtonStyled color="red">
+					<ButtonStyled circular color="red" type="transparent">
 						<button
+							v-tooltip="`Decline`"
 							@click="
 								() => {
 									removeSelfFromTeam(notification.body.team_id)
@@ -331,41 +304,78 @@
 							"
 						>
 							<XIcon />
-							Decline
 						</button>
 					</ButtonStyled>
 				</template>
-				<ButtonStyled v-else-if="!notification.read">
-					<button @click="read()">
-						<CheckIcon />
-						Mark as read
+				<ButtonStyled v-else-if="!notification.read" circular type="transparent">
+					<button v-tooltip="`Mark as read`" @click="read()">
+						<XIcon />
 					</button>
 				</ButtonStyled>
-				<CopyCode v-if="flags.developerMode" :text="notification.id" />
 			</div>
-			<div v-else class="input-group">
-				<ButtonStyled v-if="notification.link && notification.link !== '#'">
-					<nuxt-link :to="notification.link" target="_blank">
-						<ExternalIcon />
-						Open link
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled v-for="(action, actionIndex) in notification.actions" :key="actionIndex">
-					<button @click="performAction(notification, actionIndex)">
-						<CheckIcon v-if="action.title === 'Accept'" />
-						<XIcon v-else-if="action.title === 'Deny'" />
-						{{ action.title }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="notification.actions.length === 0 && !notification.read">
-					<button @click="performAction(notification, null)">
-						<CheckIcon />
-						Mark as read
-					</button>
-				</ButtonStyled>
-				<CopyCode v-if="flags.developerMode" :text="notification.id" />
+			<div v-else class="notification__actions">
+				<div v-if="type !== null" class="input-group">
+					<template
+						v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
+					>
+						<ButtonStyled color="brand">
+							<button
+								@click="
+									() => {
+										acceptTeamInvite(notification.body.team_id)
+										read()
+									}
+								"
+							>
+								<CheckIcon />
+								Accept
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="red">
+							<button
+								@click="
+									() => {
+										removeSelfFromTeam(notification.body.team_id)
+										read()
+									}
+								"
+							>
+								<XIcon />
+								Decline
+							</button>
+						</ButtonStyled>
+					</template>
+					<ButtonStyled v-else-if="!notification.read">
+						<button @click="read()">
+							<CheckIcon />
+							Mark as read
+						</button>
+					</ButtonStyled>
+					<CopyCode v-if="flags.developerMode" :text="notification.id" />
+				</div>
+				<div v-else class="input-group">
+					<ButtonStyled v-if="notification.link && notification.link !== '#'">
+						<nuxt-link :to="notification.link" target="_blank">
+							<ExternalIcon />
+							Open link
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled v-for="(action, actionIndex) in notification.actions" :key="actionIndex">
+						<button @click="performAction(notification, actionIndex)">
+							<CheckIcon v-if="action.title === 'Accept'" />
+							<XIcon v-else-if="action.title === 'Deny'" />
+							{{ action.title }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="notification.actions.length === 0 && !notification.read">
+						<button @click="performAction(notification, null)">
+							<CheckIcon />
+							Mark as read
+						</button>
+					</ButtonStyled>
+					<CopyCode v-if="flags.developerMode" :text="notification.id" />
+				</div>
 			</div>
-		</div>
 		</template>
 	</div>
 </template>
@@ -488,21 +498,20 @@ async function performAction(notification, actionIndex) {
 		await read()
 
 		if (actionIndex !== null) {
-			const [method, route] = notification.actions[actionIndex].action_route
+			const action = notification.actions[actionIndex]
 
-			// TODO: fix all this jank shit
-			if (route.startsWith('hosting/') || route.startsWith('/hosting/')) {
-				const archonRoute = route
-					.replace(/^\/?hosting/, '')
-					.replace('/invite/accept', '/invites/accept')
-					.replace('/invite/deny', '/invites/decline')
+			if (type.value === 'server_invite') {
+				const actionName = action.title.toLowerCase()
+				const inviteAction = actionName === 'accept' ? 'accept' : 'decline'
 
-				await client.request(archonRoute, {
+				await client.request(`/servers/${notification.body.server_id}/invites/${inviteAction}`, {
 					api: 'archon',
 					version: 1,
-					method: method.toUpperCase(),
+					method: 'POST',
 				})
 			} else {
+				const [method, route] = action.action_route
+
 				await useBaseFetch(route, {
 					method: method.toUpperCase(),
 				})

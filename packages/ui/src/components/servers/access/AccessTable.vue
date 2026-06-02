@@ -7,6 +7,7 @@
 		:columns="columns"
 		:data="tableMembers"
 		row-key="id"
+		table-min-width="42rem"
 	>
 		<template #cell-user="{ row: member }">
 			<AutoLink
@@ -107,7 +108,7 @@
 		class="overflow-hidden rounded-2xl border border-solid border-surface-5 sm:hidden"
 	>
 		<div
-			class="grid min-h-14 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_2.75rem] bg-surface-3"
+			class="grid min-h-14 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_4rem] bg-surface-3"
 		>
 			<div class="flex items-center pl-4 font-semibold text-secondary">
 				<button
@@ -149,7 +150,7 @@
 		<div
 			v-for="(member, index) in sortedMembers"
 			:key="member.id"
-			class="grid min-h-16 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_2.75rem] items-center border-0 border-t border-solid border-surface-5"
+			class="grid min-h-16 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_4rem] items-center border-0 border-t border-solid border-surface-5"
 			:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 		>
 			<div class="flex min-w-0 items-center pl-4">
@@ -222,7 +223,7 @@
 				</span>
 				<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
 			</div>
-			<div class="flex min-w-0 items-center justify-end pr-2">
+			<div class="flex min-w-0 items-center justify-end pr-4">
 				<ButtonStyled v-if="!member.isOwner" circular type="transparent">
 					<TeleportOverflowMenu :options="memberActionOptions(member)">
 						<MoreVerticalIcon aria-hidden="true" class="size-5" />
@@ -400,8 +401,8 @@ type OverflowMenuOption = {
 const columns = computed<TableColumn<AccessTableColumn>[]>(() => [
 	{ key: 'user', label: formatMessage(messages.userColumn), width: '32%', enableSorting: true },
 	{ key: 'role', label: formatMessage(messages.roleColumn), width: '28%', enableSorting: true },
-	{ key: 'joined', label: formatMessage(messages.joinedColumn), width: '28%', enableSorting: true },
-	{ key: 'actions', label: formatMessage(messages.actionsColumn), align: 'right', width: '12%' },
+	{ key: 'joined', label: formatMessage(messages.joinedColumn), enableSorting: true },
+	{ key: 'actions', label: formatMessage(messages.actionsColumn), align: 'right', width: '7rem' },
 ])
 
 const sortColumn = ref<string | undefined>('role')
