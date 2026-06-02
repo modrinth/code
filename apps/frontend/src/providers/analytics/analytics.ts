@@ -36,6 +36,7 @@ import type { OrganizationContext } from '../organization-context'
 import {
 	addVersionIdsFromTimeSlices,
 	addVersionProjectNamesFromTimeSlices,
+	ANALYTICS_START_TIME,
 	areAnalyticsFetchRequestsEqual,
 	buildAnalyticsCurrentTimeSlicesQueryKey,
 	buildAnalyticsFacetsRequest,
@@ -68,6 +69,7 @@ import {
 	sortStringValues,
 } from './analytics-filter-utils'
 import {
+	getProjectIdsMatchingStatusFilter,
 	getProjectOrganizationId,
 	getSingleQueryValue,
 	getUniqueAnalyticsDashboardProjects,
@@ -131,6 +133,17 @@ const ANALYTICS_TIME_SLICES_GC_TIME_MS = 30 * 1000
 const ANALYTICS_PREFETCH_GC_TIME_MS = 15 * 1000
 const ANALYTICS_FILTER_OPTIONS_GC_TIME_MS = 60 * 1000
 const ANALYTICS_MOBILE_LAYOUT_QUERY = '(pointer: coarse), (max-width: 800px)'
+const ANALYTICS_ALL_TIME_START_OFFSET_MONTHS = 2
+
+function subtractAnalyticsCalendarMonths(date: Date, months: number): Date {
+	const nextDate = new Date(date)
+	const day = nextDate.getDate()
+	nextDate.setDate(1)
+	nextDate.setMonth(nextDate.getMonth() - months)
+	const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate()
+	nextDate.setDate(Math.min(day, daysInMonth))
+	return nextDate
+}
 
 function getAnalyticsFetchErrorMessage(error: unknown): string {
 	if (error && typeof error === 'object') {
@@ -164,6 +177,7 @@ export interface AnalyticsDashboardContextValue {
 	selectedCustomTimeframeStartDate: Ref<string>
 	selectedCustomTimeframeEndDate: Ref<string>
 	selectedGroupBy: Ref<AnalyticsGroupByPreset>
+	analyticsAllTimeStartDate: ComputedRef<Date>
 	selectedBreakdowns: Ref<AnalyticsSelectedBreakdowns>
 	selectedFilters: Ref<AnalyticsSelectedFilters>
 	queryRefreshTimestamp: Ref<number>
@@ -549,6 +563,63 @@ export function createAnalyticsDashboardContext(
 
 		return getAnalyticsVersionIdsFromProjects(projects, sortedSelectedProjectIds.value)
 	})
+	const { data: filterOptionProjectVersions, isFetched: hasFetchedFilterOptionProjectVersions } =
+		useQuery({
+			queryKey: computed(() => [
+				'analytics',
+				'dashboard',
+				analyticsQueryUserId.value,
+				'filter-options',
+				'versions',
+				filterOptionVersionIds.value,
+			]),
+			queryFn: () =>
+				fetchAnalyticsVersionMetadataByIds(filterOptionVersionIds.value, (ids) =>
+					client.labrinth.versions_v3.getVersions(ids),
+				),
+			enabled: computed(
+				() =>
+					filterOptionProjectSources.value !== null && sortedSelectedProjectIds.value.length > 0,
+			),
+			placeholderData: [],
+			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+			refetchOnWindowFocus: false,
+		})
+
+	const projectsById = computed(
+		() => new Map(projects.value.map((project) => [project.id, project])),
+	)
+	const analyticsAllTimeStartDate = computed(() => {
+		const fallbackStartDate = new Date(ANALYTICS_START_TIME)
+		const filteredProjectIds = getProjectIdsMatchingStatusFilter(
+			selectedProjectIds.value.length > 0 ? selectedProjectIds.value : availableProjectIds.value,
+			projectStatusById.value,
+			selectedFilters.value,
+		)
+		let startTime = Number.POSITIVE_INFINITY
+
+		for (const projectId of filteredProjectIds) {
+			const publishedAt = projectsById.value.get(projectId)?.publishedAt
+			if (!publishedAt) {
+				continue
+			}
+
+			const projectStartTime = new Date(publishedAt).getTime()
+			if (Number.isFinite(projectStartTime)) {
+				startTime = Math.min(startTime, projectStartTime)
+			}
+		}
+
+		if (!Number.isFinite(startTime)) {
+			return fallbackStartDate
+		}
+
+		const offsetStartDate = subtractAnalyticsCalendarMonths(
+			new Date(startTime),
+			ANALYTICS_ALL_TIME_START_OFFSET_MONTHS,
+		)
+		return new Date(Math.max(offsetStartDate.getTime(), ANALYTICS_START_TIME))
+	})
 	const hasExplicitProjectSelectionQuery = computed(() =>
 		hasAnalyticsProjectSelectionQuery(route.query),
 	)
@@ -600,6 +671,7 @@ export function createAnalyticsDashboardContext(
 				customStartDate: selectedCustomTimeframeStartDate.value,
 				customEndDate: selectedCustomTimeframeEndDate.value,
 				nowTimestamp: queryRefreshTimestamp.value,
+				allTimeStartTimestamp: analyticsAllTimeStartDate.value.getTime(),
 			}) > REVENUE_MIN_TIMEFRAME_MS,
 	)
 
@@ -869,7 +941,17 @@ export function createAnalyticsDashboardContext(
 		{ deep: true },
 	)
 
-	const comparisonFetchRequest = computed(() => buildComparisonFetchRequest(fetchRequest.value))
+	const analyticsComparisonStartTime = computed(() => {
+		if (selectedTimeframeMode.value === 'preset' && selectedTimeframe.value === 'all_time') {
+			const fetchRequestStart = fetchRequest.value?.time_range.start
+			return new Date(fetchRequestStart ?? analyticsAllTimeStartDate.value).getTime()
+		}
+
+		return ANALYTICS_START_TIME
+	})
+	const comparisonFetchRequest = computed(() =>
+		buildComparisonFetchRequest(fetchRequest.value, analyticsComparisonStartTime.value),
+	)
 	const analyticsTimeSlicesFetchRequest = computed(
 		() => comparisonFetchRequest.value ?? fetchRequest.value,
 	)
@@ -959,7 +1041,10 @@ export function createAnalyticsDashboardContext(
 		}
 
 		const dailyFetchRequest = buildDailyAnalyticsFetchRequest(fetchRequest.value)
-		return buildComparisonFetchRequest(dailyFetchRequest) ?? dailyFetchRequest
+		return (
+			buildComparisonFetchRequest(dailyFetchRequest, analyticsComparisonStartTime.value) ??
+			dailyFetchRequest
+		)
 	})
 
 	watch(
@@ -1093,29 +1178,6 @@ export function createAnalyticsDashboardContext(
 		refetchOnWindowFocus: false,
 	})
 
-	const { data: filterOptionProjectVersions, isFetched: hasFetchedFilterOptionProjectVersions } =
-		useQuery({
-			queryKey: computed(() => [
-				'analytics',
-				'dashboard',
-				analyticsQueryUserId.value,
-				'filter-options',
-				'versions',
-				filterOptionVersionIds.value,
-			]),
-			queryFn: () =>
-				fetchAnalyticsVersionMetadataByIds(filterOptionVersionIds.value, (ids) =>
-					client.labrinth.versions_v3.getVersions(ids),
-				),
-			enabled: computed(
-				() =>
-					filterOptionProjectSources.value !== null && sortedSelectedProjectIds.value.length > 0,
-			),
-			placeholderData: [],
-			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
-			refetchOnWindowFocus: false,
-		})
-
 	const analyticsFacetsFilterOptionSummary = computed(() =>
 		getAnalyticsFacetsFilterOptionSummary(analyticsFacetsData.value?.facets),
 	)
@@ -1219,6 +1281,7 @@ export function createAnalyticsDashboardContext(
 			const splitTimeSlices = splitAnalyticsTimeSlices(
 				nextAnalyticsData.metrics,
 				fetchRequest.value,
+				analyticsComparisonStartTime.value,
 			)
 			timeSlices.value = splitTimeSlices.currentTimeSlices
 			previousTimeSlices.value = splitTimeSlices.previousTimeSlices
@@ -1495,6 +1558,7 @@ export function createAnalyticsDashboardContext(
 		selectedCustomTimeframeStartDate,
 		selectedCustomTimeframeEndDate,
 		selectedGroupBy,
+		analyticsAllTimeStartDate,
 		selectedBreakdowns,
 		selectedFilters,
 		queryRefreshTimestamp,
