@@ -274,9 +274,17 @@ async fn list(
             .cloned()
             .collect();
 
-        let attribution = group.attribution.and_then(|v| {
+        let mut attribution = group.attribution.and_then(|v| {
             serde_json::from_value::<AttributionResolution>(v).ok()
         });
+        if let Some(moderation_status) = attribution
+                .as_mut()
+                .and_then(|a| a.moderation_status.as_mut())
+            && !requester_is_mod
+        {
+            moderation_status.moderated_at = None;
+            moderation_status.moderated_by = None;
+        }
         let attributed_by = if attribution
             .as_ref()
             .is_some_and(|attribution| attribution.updated_by_moderator)
@@ -355,6 +363,10 @@ async fn update_group(
 
     let mut attribution = body.attribution;
     attribution.updated_by_moderator = user.role.is_mod();
+    if let Some(moderation_status) = &mut attribution.moderation_status {
+        moderation_status.moderated_at = Some(Utc::now());
+        moderation_status.moderated_by = Some(user.id);
+    }
 
     let result = sqlx::query!(
         "

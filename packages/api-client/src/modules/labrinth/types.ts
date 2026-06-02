@@ -266,6 +266,8 @@ export namespace Labrinth {
 			export type AttributionModerationStatus = {
 				kind: AttributionModerationStatusKind
 				reason: string
+				moderated_at?: string
+				moderated_by?: string
 			}
 
 			export type AttributionResolutionBase = {

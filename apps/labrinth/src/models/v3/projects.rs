@@ -720,6 +720,10 @@ pub struct AttributionModerationStatus {
     pub kind: AttributionModerationStatusKind,
     #[serde(default)]
     pub reason: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub moderated_at: Option<DateTime<Utc>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub moderated_by: Option<UserId>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
