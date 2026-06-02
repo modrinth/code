@@ -11,6 +11,7 @@ use crate::models::{
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
 pub struct LegacyNotification {
@@ -64,6 +65,12 @@ pub enum LegacyNotificationBody {
         organization_id: OrganizationId,
         invited_by: UserId,
         team_id: TeamId,
+        role: String,
+    },
+    ServerInvite {
+        server_id: Uuid,
+        server_name: String,
+        invited_by: UserId,
         role: String,
     },
     StatusChange {
@@ -166,6 +173,9 @@ impl LegacyNotification {
             NotificationBody::OrganizationInvite { .. } => {
                 Some("organization_invite".to_string())
             }
+            NotificationBody::ServerInvite { .. } => {
+                Some("server_invite".to_string())
+            }
             NotificationBody::StatusChange { .. } => {
                 Some("status_change".to_string())
             }
@@ -267,6 +277,17 @@ impl LegacyNotification {
                 organization_id,
                 invited_by,
                 team_id,
+                role,
+            },
+            NotificationBody::ServerInvite {
+                server_id,
+                server_name,
+                invited_by,
+                role,
+            } => LegacyNotificationBody::ServerInvite {
+                server_id,
+                server_name,
+                invited_by,
                 role,
             },
             NotificationBody::StatusChange {
