@@ -984,7 +984,7 @@ export function createAnalyticsDashboardContext(
 						nextQueryRefreshTimestamp,
 					),
 					queryFn: () =>
-						fetchAnalyticsTimeSlices(nextFetchRequest, (request) =>
+						fetchAnalyticsData(nextFetchRequest, (request) =>
 							client.labrinth.analytics_v3.fetch(request),
 						),
 					gcTime: ANALYTICS_PREFETCH_GC_TIME_MS,
