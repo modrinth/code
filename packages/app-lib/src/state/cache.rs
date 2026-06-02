@@ -1933,10 +1933,30 @@ pub async fn cache_file_hash(
         sha1_async(bytes).await?
     };
 
+    cache_file_hash_metadata(
+        profile_path,
+        path,
+        size as u64,
+        hash,
+        project_type,
+        exec,
+    )
+    .await
+}
+
+pub async fn cache_file_hash_metadata(
+    profile_path: &str,
+    path: &str,
+    size: u64,
+    hash: String,
+    project_type: Option<ProjectType>,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<()> {
+    // Streamed extraction already computed these values, so avoid buffering the file just to cache them.
     CachedEntry::upsert_many(
         &[CacheValue::FileHash(CachedFileHash {
             path: format!("{profile_path}/{path}"),
-            size: size as u64,
+            size,
             hash,
             project_type,
         })

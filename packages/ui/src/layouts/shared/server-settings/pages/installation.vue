@@ -572,7 +572,7 @@ provideInstallationSettings({
 		if (modpack.value.spec.platform === 'local_file') {
 			debug('reinstallModpack: local file, opening file picker')
 			const picked = await filePicker.pickModpackFile()
-			if (!picked) return
+			if (!picked?.file) return
 			try {
 				const handle = client.kyros.content_v1.uploadModpackFile(
 					worldId.value!,
