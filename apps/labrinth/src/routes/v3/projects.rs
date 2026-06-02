@@ -1,5 +1,5 @@
 use std::any::type_name;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
@@ -55,7 +55,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 pub fn utoipa_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
 ) {
-    cfg.service(project_get)
+    cfg.service(project_dependents_get)
+        .service(project_get)
         .service(project_get_check)
         .service(project_delete)
         .service(project_edit)
@@ -1258,6 +1259,138 @@ pub async fn project_get_check_internal(
 pub struct DependencyInfo {
     pub projects: Vec<Project>,
     pub versions: Vec<models::projects::Version>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectDependentsRequest {
+    pub ids: Vec<ProjectId>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectDependentsResponse {
+    pub dependents: HashMap<ProjectId, HashSet<DependentInfo>>,
+    pub projects: HashMap<ProjectId, Project>,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema, PartialEq, Eq, Hash)]
+pub struct DependentInfo {
+    pub dependent_project_id: ProjectId,
+    pub dependency_type: models::projects::DependencyType,
+}
+
+#[utoipa::path]
+#[post("/dependents")]
+pub async fn project_dependents_get(
+    req: HttpRequest,
+    web::Json(projects): web::Json<ProjectDependentsRequest>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<ProjectDependentsResponse>, ApiError> {
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
+    let requested_project_ids = projects
+        .ids
+        .iter()
+        .copied()
+        .map(db_ids::DBProjectId::from)
+        .collect::<Vec<_>>();
+    let requested_projects = db_models::DBProject::get_many_ids(
+        &requested_project_ids,
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("failed to fetch requested projects")?;
+    let visible_requested_projects =
+        filter_visible_projects(requested_projects, &user_option, &pool, false)
+            .await
+            .wrap_internal_err("failed to filter requested projects")?;
+    let project_ids = visible_requested_projects
+        .iter()
+        .map(|project| db_ids::DBProjectId::from(project.id).0)
+        .collect::<Vec<_>>();
+
+    let rows = sqlx::query!(
+        r#"
+        SELECT DISTINCT d.mod_dependency_id as "mod_dependency_id!", dependent_version.mod_id dependent_project_id, d.dependency_type
+        FROM dependencies d
+        INNER JOIN versions dependent_version ON dependent_version.id = d.dependent_id
+        WHERE d.mod_dependency_id = ANY($1)
+        "#,
+        &project_ids,
+    )
+    .fetch(&**pool)
+    .try_collect::<Vec<_>>()
+    .await
+    .wrap_internal_err("failed to fetch project dependents")?;
+
+    let dependent_project_ids = rows
+        .iter()
+        .map(|row| db_ids::DBProjectId(row.dependent_project_id))
+        .unique()
+        .collect::<Vec<_>>();
+
+    let dependent_projects = db_models::DBProject::get_many_ids(
+        &dependent_project_ids,
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("failed to fetch dependent projects")?;
+    let visible_projects =
+        filter_visible_projects(dependent_projects, &user_option, &pool, false)
+            .await
+            .wrap_internal_err("failed to filter dependent projects")?;
+
+    let visible_project_ids = visible_projects
+        .iter()
+        .map(|project| db_ids::DBProjectId::from(project.id))
+        .collect::<HashSet<_>>();
+
+    let mut dependents = visible_requested_projects
+        .iter()
+        .map(|project| project.id)
+        .map(|project_id| (project_id, HashSet::new()))
+        .collect::<HashMap<_, _>>();
+    for row in rows {
+        let dependent_project_id =
+            db_ids::DBProjectId(row.dependent_project_id);
+
+        if visible_project_ids.contains(&dependent_project_id) {
+            dependents
+                .entry(ProjectId::from(db_ids::DBProjectId(
+                    row.mod_dependency_id,
+                )))
+                .or_default()
+                .insert(DependentInfo {
+                    dependent_project_id: ProjectId::from(dependent_project_id),
+                    dependency_type:
+                        models::projects::DependencyType::from_string(
+                            &row.dependency_type,
+                        ),
+                });
+        }
+    }
+
+    let projects = visible_projects
+        .into_iter()
+        .map(|project| (project.id, project))
+        .collect();
+
+    Ok(web::Json(ProjectDependentsResponse {
+        dependents,
+        projects,
+    }))
 }
 
 #[utoipa::path]

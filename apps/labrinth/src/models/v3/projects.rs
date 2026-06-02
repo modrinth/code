@@ -928,7 +928,15 @@ impl VersionType {
 }
 
 #[derive(
-    Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+    Serialize,
+    Deserialize,
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {

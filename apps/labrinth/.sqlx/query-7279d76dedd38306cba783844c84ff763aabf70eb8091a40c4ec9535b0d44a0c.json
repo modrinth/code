@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT d.mod_dependency_id as \"mod_dependency_id!\", dependent_version.mod_id dependent_project_id, d.dependency_type\n        FROM dependencies d\n        INNER JOIN versions dependent_version ON dependent_version.id = d.dependent_id\n        WHERE d.mod_dependency_id = ANY($1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_dependency_id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "dependent_project_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "dependency_type",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "7279d76dedd38306cba783844c84ff763aabf70eb8091a40c4ec9535b0d44a0c"
+}
