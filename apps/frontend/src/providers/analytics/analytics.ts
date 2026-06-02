@@ -368,6 +368,7 @@ export function createAnalyticsDashboardContext(
 		},
 		enabled: computed(() => shouldFetchEffectiveUser.value && hasCompletedAnalyticsLoading.value),
 		placeholderData: null,
+		refetchOnWindowFocus: false,
 	})
 	const effectiveUsername = computed(() => {
 		if (effectiveUserId.value === options.auth.value.user?.id) {
@@ -407,6 +408,7 @@ export function createAnalyticsDashboardContext(
 			}
 		},
 		enabled: shouldFetchDashboardAllProjects,
+		refetchOnWindowFocus: false,
 	})
 
 	const areProjectsLoaded = computed(() => {
@@ -901,7 +903,7 @@ export function createAnalyticsDashboardContext(
 			)
 		},
 		enabled: computed(() => isAnalyticsFetchRequestReady(analyticsTimeSlicesFetchRequest.value)),
-		staleTime: 0,
+		refetchOnWindowFocus: false,
 		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
 	})
 	watch(currentAnalyticsError, (error) => {
@@ -1058,6 +1060,7 @@ export function createAnalyticsDashboardContext(
 				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
 		),
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+		refetchOnWindowFocus: false,
 	})
 
 	const { data: analyticsDownloadCountTimeSlices } = useQuery({
@@ -1087,6 +1090,7 @@ export function createAnalyticsDashboardContext(
 		),
 		placeholderData: [],
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+		refetchOnWindowFocus: false,
 	})
 
 	const { data: filterOptionProjectVersions, isFetched: hasFetchedFilterOptionProjectVersions } =
@@ -1109,6 +1113,7 @@ export function createAnalyticsDashboardContext(
 			),
 			placeholderData: [],
 			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+			refetchOnWindowFocus: false,
 		})
 
 	const analyticsFacetsFilterOptionSummary = computed(() =>
@@ -1270,6 +1275,7 @@ export function createAnalyticsDashboardContext(
 		enabled: computed(() => analyticsVersionIds.value.length > 0),
 		placeholderData: [],
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+		refetchOnWindowFocus: false,
 	})
 
 	const allVersionMetadata = computed(() => {
