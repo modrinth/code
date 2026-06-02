@@ -756,7 +756,7 @@ export function formatMetricValue(
 		case 'playtime': {
 			const hours = value / 3600
 			return formatMessage(analyticsStatCardMessages.playtimeHours, {
-				hours: hours.toFixed(1),
+				hours: Math.abs(hours) < 1 ? hours.toFixed(2) : hours.toFixed(1),
 			})
 		}
 		case 'views':
