@@ -64,23 +64,33 @@ pub async fn create(
         .insert_many(user_ids, &mut txn, &redis)
         .await?;
 
-    txn.commit().await?;
-
-    let notifications = DBNotification::get_many(&notification_ids, &**pool)
+    let notifications = DBNotification::get_many(&notification_ids, &mut txn)
         .await?
         .into_iter()
         .map(Notification::from)
         .collect::<Vec<_>>();
 
+    txn.commit().await?;
+
     for notification in notifications {
-        broadcast_friends_message(
+        let notification_id = notification.id;
+        let to_user = notification.user_id;
+        if let Err(error) = broadcast_friends_message(
             &redis,
             RedisFriendsMessage::Notification {
-                to_user: notification.user_id,
+                to_user,
                 notification,
             },
         )
-        .await?;
+        .await
+        {
+            tracing::warn!(
+                ?error,
+                ?notification_id,
+                ?to_user,
+                "failed to broadcast realtime notification"
+            );
+        }
     }
 
     Ok(HttpResponse::Accepted().finish())

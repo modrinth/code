@@ -180,6 +180,7 @@ withDefaults(
 	right: 1.5rem;
 	z-index: 200;
 	width: 520px;
+	max-width: calc(100vw - 3rem);
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
@@ -192,6 +193,7 @@ withDefaults(
 @media screen and (max-width: 500px) {
 	.popup-notification-group {
 		width: calc(100% - 1.5rem);
+		max-width: none;
 		right: 0.75rem;
 	}
 }
