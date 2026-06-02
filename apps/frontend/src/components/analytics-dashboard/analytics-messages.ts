@@ -224,6 +224,19 @@ export const analyticsGraphTitleMessages = defineMessages({
 })
 
 export const analyticsStatCardMessages = defineMessages({
+	monetizationBannerTitle: {
+		id: 'analytics.stat.monetization-banner.title',
+		defaultMessage: 'How does monetization work?',
+	},
+	monetizationBannerBody: {
+		id: 'analytics.stat.monetization-banner.body',
+		defaultMessage:
+			'Only views and downloads made through Modrinth are eligible for monetization and must pass fraud-prevention filtering. Modrinth App downloads also require the user to be logged in. Because all projects have a similar ratio of monetized downloads, your revenue would not meaningfully change if all downloads were counted.',
+	},
+	monetizationBannerLearnMore: {
+		id: 'analytics.stat.monetization-banner.learn-more',
+		defaultMessage: 'Learn more',
+	},
 	revenueValue: {
 		id: 'analytics.stat.revenue-value',
 		defaultMessage: '${value}',

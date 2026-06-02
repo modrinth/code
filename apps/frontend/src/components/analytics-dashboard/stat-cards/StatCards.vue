@@ -1,21 +1,45 @@
 <template>
-	<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-		<StatCard
-			v-for="card in statCards"
-			:key="card.key"
-			:label="card.label"
-			:stat-label="card.statLabel"
-			:vs-prev-period-percent="card.vsPrevPeriodPercent"
-			:icon="card.icon"
-			:active="activeStat === card.key"
-			:disabled="card.disabled"
-			@click="setActiveStat(card.key)"
-		/>
+	<div class="flex w-full flex-col gap-3">
+		<Admonition
+			v-if="showMonetizationBanner"
+			type="info"
+			:header="formatMessage(analyticsStatCardMessages.monetizationBannerTitle)"
+			show-actions-underneath
+			dismissible
+			@dismiss="dismissMonetizationBanner"
+		>
+			<div class="text-primary">
+				{{ formatMessage(analyticsStatCardMessages.monetizationBannerBody) }}
+			</div>
+			<template #actions>
+				<ButtonStyled color="blue">
+					<a href="https://modrinth.com/legal/cmp-info" target="_blank" class="w-fit !px-4">
+						{{ formatMessage(analyticsStatCardMessages.monetizationBannerLearnMore) }}
+						<RightArrowIcon aria-hidden="true" />
+					</a>
+				</ButtonStyled>
+			</template>
+		</Admonition>
+		<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+			<StatCard
+				v-for="card in statCards"
+				:key="card.key"
+				:label="card.label"
+				:stat-label="card.statLabel"
+				:vs-prev-period-percent="card.vsPrevPeriodPercent"
+				:icon="card.icon"
+				:active="activeStat === card.key"
+				:disabled="card.disabled"
+				@click="setActiveStat(card.key)"
+			/>
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { useFormatNumber, useVIntl } from '@modrinth/ui'
+import { RightArrowIcon } from '@modrinth/assets'
+import { Admonition, ButtonStyled, useFormatNumber, useVIntl } from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
 
 import {
 	type AnalyticsDashboardStat,
@@ -24,6 +48,8 @@ import {
 
 import { analyticsStatCardMessages, formatAnalyticsStatLabel } from '../analytics-messages.ts'
 import StatCard from './StatCard.vue'
+
+const MONETIZATION_BANNER_DISMISSED_KEY = 'analytics-monetization-banner-dismissed'
 
 const {
 	activeStat,
@@ -36,6 +62,10 @@ const {
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const { formatMessage } = useVIntl()
+const monetizationBannerDismissed = useLocalStorage(MONETIZATION_BANNER_DISMISSED_KEY, false)
+const showMonetizationBanner = computed(
+	() => selectedBreakdowns.value.includes('monetization') && !monetizationBannerDismissed.value,
+)
 
 const compactNumberFormatter = computed(
 	() =>
@@ -67,6 +97,10 @@ function formatPreviousPeriodPercent(value: number): string | null {
 	}
 
 	return formatPercent(value)
+}
+
+function dismissMonetizationBanner() {
+	monetizationBannerDismissed.value = true
 }
 
 const statCards = computed<
