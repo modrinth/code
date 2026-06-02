@@ -18,12 +18,12 @@
 						</nuxt-link>
 						<ChevronRightIcon />
 						<span class="flex grow font-extrabold text-contrast">{{
-							formatMessage(messages.settingsTitle)
-						}}</span>
+								formatMessage(messages.settingsTitle)
+							}}</span>
 						<div class="flex gap-2">
 							<ButtonStyled>
 								<nuxt-link to="/dashboard/projects"
-									><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
+								><ListIcon /> {{ formatMessage(messages.visitProjectsDashboard) }}
 								</nuxt-link>
 							</ButtonStyled>
 						</div>
@@ -94,6 +94,7 @@
 					() => {
 						debug('on-show fired')
 						loadVersions()
+						loadDependencies()
 						navigateTo({ query: route.query, hash: '#download' }, { replace: true })
 					}
 				"
@@ -154,9 +155,9 @@
 								<div class="disabled button-like">
 									<GameIcon aria-hidden="true" />
 									{{
-										currentGameVersion
-											? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-											: formatMessage(messages.gameVersionError)
+									currentGameVersion
+									? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
+									: formatMessage(messages.gameVersionError)
 									}}
 									<InfoIcon
 										v-tooltip="
@@ -184,14 +185,14 @@
 								<template #title>
 									<GameIcon aria-hidden="true" />
 									{{
-										currentGameVersion
-											? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-											: formatMessage(messages.selectGameVersion)
+									currentGameVersion
+									? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
+									: formatMessage(messages.selectGameVersion)
 									}}
 								</template>
 								<label for="game-versions-filtering" hidden>{{
 									formatMessage(messages.searchGameVersionsLabel)
-								}}</label>
+									}}</label>
 								<StyledInput
 									id="game-versions-filtering"
 									ref="gameVersionFilterInput"
@@ -274,11 +275,11 @@
 								<div class="disabled button-like">
 									<WrenchIcon aria-hidden="true" />
 									{{
-										currentPlatform
-											? formatMessage(messages.platformLabel, {
-													platform: currentPlatformText,
-												})
-											: formatMessage(messages.platformError)
+									currentPlatform
+									? formatMessage(messages.platformLabel, {
+									platform: currentPlatformText,
+									})
+									: formatMessage(messages.platformError)
 									}}
 									<InfoIcon
 										v-tooltip="
@@ -306,11 +307,11 @@
 								<template #title>
 									<WrenchIcon aria-hidden="true" />
 									{{
-										currentPlatform
-											? formatMessage(messages.platformLabel, {
-													platform: currentPlatformText,
-												})
-											: formatMessage(messages.selectPlatform)
+									currentPlatform
+									? formatMessage(messages.platformLabel, {
+									platform: currentPlatformText,
+									})
+									: formatMessage(messages.selectPlatform)
 									}}
 								</template>
 								<ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
@@ -370,6 +371,8 @@
 							<VersionSummary
 								v-if="filteredRelease"
 								:version="filteredRelease"
+								:required-deps="resolveRequiredDeps(filteredRelease)"
+
 								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
@@ -377,6 +380,8 @@
 							<VersionSummary
 								v-if="filteredBeta"
 								:version="filteredBeta"
+								:required-deps="resolveRequiredDeps(filteredBeta)"
+
 								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
@@ -384,6 +389,8 @@
 							<VersionSummary
 								v-if="filteredAlpha"
 								:version="filteredAlpha"
+								:required-deps="resolveRequiredDeps(filteredAlpha)"
+
 								:decorate-download-url="decorateModalDownloadUrl"
 								@on-download="onDownload"
 								@on-navigate="onVersionNavigate"
@@ -400,10 +407,10 @@
 								"
 							>
 								{{
-									formatMessage(messages.noVersionsAvailable, {
-										gameVersion: currentGameVersion,
-										platform: currentPlatformText,
-									})
+								formatMessage(messages.noVersionsAvailable, {
+								gameVersion: currentGameVersion,
+								platform: currentPlatformText,
+								})
 								}}
 							</p>
 						</AutomaticAccordion>
@@ -499,7 +506,7 @@
 									>
 										<DownloadIcon aria-hidden="true" />
 										{{
-											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
+										auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
 										}}
 									</button>
 								</ButtonStyled>
@@ -591,7 +598,7 @@
 														'--_color': 'var(--color-brand)',
 														'--_bg-color': 'var(--color-brand-highlight)',
 													}"
-													>{{ formatMessage(commonMessages.newBadge) }}</TagItem
+												>{{ formatMessage(commonMessages.newBadge) }}</TagItem
 												>
 											</h3>
 											<ButtonStyled size="small" circular>
@@ -844,11 +851,11 @@
 						class="mt-3"
 					>
 						{{
-							formatMessage(
-								hasEditDetailsPermission
-									? messages.environmentMigrationMessage
-									: messages.environmentMigrationNoPermissionMessage,
-							)
+						formatMessage(
+						hasEditDetailsPermission
+						? messages.environmentMigrationMessage
+						: messages.environmentMigrationNoPermissionMessage,
+						)
 						}}
 						<nuxt-link
 							to="/news/article/new-environments"
@@ -947,11 +954,11 @@
 								<HeartIcon aria-hidden="true" />
 								<div>
 									{{
-										capitalizeString(
-											formatMessage(commonMessages.projectFollowers, {
-												count: project.followers,
-											}),
-										)
+									capitalizeString(
+									formatMessage(commonMessages.projectFollowers, {
+									count: project.followers,
+									}),
+									)
 									}}
 								</div>
 							</div>
@@ -963,11 +970,11 @@
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
-										capitalizeString(
-											formatMessage(detailsMessages.published, {
-												date: publishedDate,
-											}),
-										)
+									capitalizeString(
+									formatMessage(detailsMessages.published, {
+									date: publishedDate,
+									}),
+									)
 									}}
 								</div>
 							</div>
@@ -976,7 +983,7 @@
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
-										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
+									capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
 									}}
 								</div>
 							</div>
@@ -989,11 +996,11 @@
 								<ScaleIcon aria-hidden="true" />
 								<div>
 									{{
-										capitalizeString(
-											formatMessage(detailsMessages.submitted, {
-												date: submittedDate,
-											}),
-										)
+									capitalizeString(
+									formatMessage(detailsMessages.submitted, {
+									date: submittedDate,
+									}),
+									)
 									}}
 								</div>
 							</div>
@@ -1006,7 +1013,7 @@
 								<VersionIcon aria-hidden="true" />
 								<div>
 									{{
-										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
+									capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
 									}}
 								</div>
 							</div>
@@ -1040,7 +1047,7 @@
 	</template>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	BookmarkIcon,
 	BookTextIcon,
@@ -1634,8 +1641,8 @@ const displayCollectionsSearch = ref('')
 const collections = computed(() =>
 	user.value && user.value.collections
 		? user.value.collections.filter((x) =>
-				x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase()),
-			)
+			x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase()),
+		)
 		: [],
 )
 
@@ -1678,8 +1685,8 @@ watch(
 					status === 404
 						? formatMessage(messages.projectNotFound)
 						: formatMessage(messages.errorLoadingProject, {
-								message: error.message ? `: ${error.message}` : '',
-							}),
+							message: error.message ? `: ${error.message}` : '',
+						}),
 			})
 		}
 	},
@@ -1746,26 +1753,26 @@ const serverRequiredContent = computed(() => {
 		onclickName:
 			content.project_id && content.project_id !== projectId.value
 				? () => {
-						navigateTo({
-							path: `/project/${content.project_id}`,
-							query: { ...PROJECT_DEP_MARKER_QUERY },
-						})
-					}
+					navigateTo({
+						path: `/project/${content.project_id}`,
+						query: { ...PROJECT_DEP_MARKER_QUERY },
+					})
+				}
 				: undefined,
 		onclickVersion:
 			content.project_id && content.project_id !== projectId.value
 				? () => {
-						navigateTo({
-							path: `/project/${content.project_id}/version/${serverModpackVersion.value?.id}`,
-							query: { ...PROJECT_DEP_MARKER_QUERY },
-						})
-					}
+					navigateTo({
+						path: `/project/${content.project_id}/version/${serverModpackVersion.value?.id}`,
+						query: { ...PROJECT_DEP_MARKER_QUERY },
+					})
+				}
 				: undefined,
 		onclickDownload: primaryFile?.url
 			? () =>
-					navigateTo(createProjectDownloadUrl(primaryFile.url, { reason: 'dependency' }), {
-						external: true,
-					})
+				navigateTo(createProjectDownloadUrl(primaryFile.url, { reason: 'dependency' }), {
+					external: true,
+				})
 			: undefined,
 		showCustomModpackTooltip: content.project_id === projectId.value,
 	}
@@ -1905,6 +1912,57 @@ function loadVersions() {
 // Load dependencies on demand (client-side only)
 function loadDependencies() {
 	dependenciesEnabled.value = true
+}
+
+const { data: depDownloadUrls } = useQuery({
+	queryKey: computed(() => [
+		'dep-versions-unfiltered',
+		(dependenciesRaw.value?.projects ?? []).map((p) => p.id).sort(),
+	]),
+	queryFn: async () => {
+		const map: Record<string, string | null> = {}
+		await Promise.all(
+			(dependenciesRaw.value?.projects ?? []).map(async (p) => {
+				try {
+					const versions = await client.labrinth.versions_v2.getProjectVersions(p.id, {
+						include_changelog: false,
+					})
+					const primaryFile = versions[0]?.files.find((f) => f.primary) ?? versions[0]?.files[0]
+					map[p.id] = primaryFile?.url ?? null
+				} catch {
+					map[p.id] = null
+				}
+			}),
+		)
+		return map
+	},
+	enabled: computed(() => (dependenciesRaw.value?.projects ?? []).length > 0),
+	staleTime: STALE_TIME_LONG,
+})
+
+function resolveRequiredDeps(version: { dependencies: { dependency_type: string; project_id?: string; version_id?: string }[] } | undefined) {
+	if (!version || !dependenciesRaw.value) return []
+	const { projects, versions } = dependenciesRaw.value
+	return version.dependencies
+		.filter(
+			(dep): dep is { dependency_type: string; project_id: string; version_id?: string } =>
+				dep.dependency_type === 'required' && !!dep.project_id,
+		)
+		.flatMap((dep) => {
+			const project = projects.find((p) => p.id === dep.project_id)
+			if (!project) return []
+			const depVersion = dep.version_id
+				? versions.find((v) => v.id === dep.version_id)
+				: versions.find((v) => v.project_id === dep.project_id)
+			const primaryFile = depVersion?.files?.find((f) => f.primary) ?? depVersion?.files?.[0]
+			return [{
+				id: project.id,
+				title: project.title,
+				slug: project.slug,
+				icon_url: project.icon_url ?? null,
+				downloadUrl: primaryFile?.url ?? depDownloadUrls.value?.[dep.project_id] ?? null,
+			}]
+		})
 }
 
 // Check if project has versions using the ID array from the V2 project
@@ -2252,8 +2310,8 @@ const members = computed(() => {
 	const owner = acceptedMembers.find((x) =>
 		organization.value
 			? organization.value.members?.some(
-					(orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
-				)
+				(orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
+			)
 			: x.is_owner,
 	)
 
@@ -2343,8 +2401,8 @@ const title = computed(() =>
 const description = computed(() =>
 	project.value
 		? `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
-				project.value.title
-			} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`
+			project.value.title
+		} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`
 		: '',
 )
 
