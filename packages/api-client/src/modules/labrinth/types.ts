@@ -272,6 +272,7 @@ export namespace Labrinth {
 				notes: string
 				image_urls: string[]
 				moderation_status?: AttributionModerationStatus | null
+				updated_by_moderator: boolean
 			}
 
 			export type AttributionResolution =

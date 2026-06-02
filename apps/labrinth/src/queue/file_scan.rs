@@ -561,6 +561,7 @@ fn default_external_license_attribution(
                         link_to_work,
                     },
                     moderation_status: None,
+                    updated_by_moderator: false,
                     notes: String::new(),
                     image_urls: Vec::new(),
                 })
@@ -573,6 +574,7 @@ fn default_external_license_attribution(
             serde_json::to_value(AttributionResolution {
                 kind: AttributionResolutionKind::NoPermission { link_to_work },
                 moderation_status: None,
+                updated_by_moderator: false,
                 notes: String::new(),
                 image_urls: Vec::new(),
             })

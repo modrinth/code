@@ -1,7 +1,6 @@
 use actix_web::{HttpRequest, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::Row;
 
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
@@ -82,7 +81,7 @@ async fn list(
     path: web::Path<ProjectId>,
 ) -> Result<web::Json<Vec<AttributionGroupResponse>>, ApiError> {
     let project_id: DBProjectId = path.into_inner().into();
-    let show_moderation_external_license_ids = get_user_from_headers(
+    let requester_is_mod = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -114,10 +113,14 @@ async fn list(
     let files = if group_ids.is_empty() {
         Vec::new()
     } else {
-        sqlx::query(
-            "
-			select paf.group_id, paf.name, convert_from(paf.sha1, 'UTF8') as sha1, paf.moderation_external_license_id,
-				coalesce(array_agg(distinct aev.id) filter (where aev.id is not null), '{}') as version_ids
+        sqlx::query!(
+            r#"
+			select
+				paf.group_id as "group_id!",
+				paf.name as "name!",
+				convert_from(paf.sha1, 'UTF8') as "sha1!",
+				paf.moderation_external_license_id,
+				coalesce(array_agg(distinct aev.id) filter (where aev.id is not null), '{}') as "version_ids!: Vec<i64>"
 			from project_attribution_files paf
 			left join override_file_sources ofs on ofs.sha1 = paf.sha1
 			left join files f on f.id = ofs.file_id
@@ -125,18 +128,18 @@ async fn list(
 			left join attribution_enforced_versions aev on aev.id = v.id
 			where paf.group_id = ANY($1)
 			group by paf.group_id, paf.name, paf.sha1, paf.moderation_external_license_id
-			",
+			"#,
+            &group_ids,
+            project_id as DBProjectId,
         )
-        .bind(&group_ids)
-        .bind(project_id as DBProjectId)
         .fetch_all(pool.as_ref())
         .await?
     };
 
-    let moderation_external_licenses = if show_moderation_external_license_ids {
+    let moderation_external_licenses = if requester_is_mod {
         let mut ids: Vec<i64> = files
             .iter()
-            .filter_map(|f| f.get("moderation_external_license_id"))
+            .filter_map(|f| f.moderation_external_license_id)
             .collect();
         ids.sort_unstable();
         ids.dedup();
@@ -193,7 +196,7 @@ async fn list(
 
     let mut all_version_ids: Vec<i64> = files
         .iter()
-        .flat_map(|f| f.get::<Vec<i64>, _>("version_ids"))
+        .flat_map(|f| f.version_ids.iter().copied())
         .collect();
     all_version_ids.sort_unstable();
     all_version_ids.dedup();
@@ -231,31 +234,27 @@ async fn list(
     for group in groups {
         let group_files: Vec<AttributionFileResponse> = files
             .iter()
-            .filter(|f| f.get::<i64, _>("group_id") == group.id.0)
+            .filter(|f| f.group_id == group.id.0)
             .map(|f| AttributionFileResponse {
-                name: f.get("name"),
-                sha1: f.get("sha1"),
-                moderation_external_license_id:
-                    if show_moderation_external_license_ids {
-                        f.get("moderation_external_license_id")
-                    } else {
-                        None
-                    },
-                moderation_external_license:
-                    if show_moderation_external_license_ids {
-                        f.get::<Option<i64>, _>(
-                            "moderation_external_license_id",
-                        )
-                        .and_then(|id| {
-                            moderation_external_licenses.get(&id).cloned()
-                        })
-                    } else {
-                        None
-                    },
+                name: f.name.clone(),
+                sha1: f.sha1.clone(),
+                moderation_external_license_id: if requester_is_mod {
+                    f.moderation_external_license_id
+                } else {
+                    None
+                },
+                moderation_external_license: if requester_is_mod {
+                    f.moderation_external_license_id.and_then(|id| {
+                        moderation_external_licenses.get(&id).cloned()
+                    })
+                } else {
+                    None
+                },
                 versions: {
                     let mut versions: Vec<_> = f
-                        .get::<Vec<i64>, _>("version_ids")
-                        .into_iter()
+                        .version_ids
+                        .iter()
+                        .copied()
                         .map(|id| VersionId(id as u64))
                         .collect();
                     versions.sort_by_key(|id| {
@@ -275,18 +274,29 @@ async fn list(
             .cloned()
             .collect();
 
+        let attribution = group.attribution.and_then(|v| {
+            serde_json::from_value::<AttributionResolution>(v).ok()
+        });
+        let attributed_by = if attribution
+            .as_ref()
+            .is_some_and(|attribution| attribution.updated_by_moderator)
+            && !requester_is_mod
+        {
+            None
+        } else {
+            group
+                .attributed_by
+                .map(|id| ariadne::ids::UserId(id as u64))
+        };
+
         result.push(AttributionGroupResponse {
             id: group.id.into(),
             flame_project: group
                 .flame_project
                 .and_then(|v| serde_json::from_value(v).ok()),
-            attribution: group
-                .attribution
-                .and_then(|v| serde_json::from_value(v).ok()),
+            attribution,
             attributed_at: group.attributed_at,
-            attributed_by: group
-                .attributed_by
-                .map(|id| ariadne::ids::UserId(id as u64)),
+            attributed_by,
             files: group_files,
             versions: group_versions,
         });
@@ -343,13 +353,16 @@ async fn update_group(
         ));
     }
 
+    let mut attribution = body.attribution;
+    attribution.updated_by_moderator = user.role.is_mod();
+
     let result = sqlx::query!(
         "
 		update project_attribution_groups
 		set attribution = $1, attributed_at = now(), attributed_by = $3
 		where id = $2
 		",
-        &serde_json::to_value(&body.attribution).unwrap_or_default(),
+        &serde_json::to_value(&attribution).unwrap_or_default(),
         group_id,
         user.id.0 as i64,
     )

@@ -728,6 +728,8 @@ pub struct AttributionResolution {
     pub kind: AttributionResolutionKind,
     #[serde(default)]
     pub moderation_status: Option<AttributionModerationStatus>,
+    #[serde(default)]
+    pub updated_by_moderator: bool,
     pub notes: String,
     pub image_urls: Vec<Url>,
 }
