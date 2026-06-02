@@ -35,11 +35,6 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             .configure(updates::config),
     );
     cfg.service(
-        web::scope("/hosting")
-            .wrap(default_cors())
-            .service(web::Redirect::to(ENV.ARCHON_URL.to_string()).permanent()),
-    );
-    cfg.service(
         web::scope("/analytics")
             .wrap(
                 Cors::default()
