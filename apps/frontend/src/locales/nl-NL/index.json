@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -2405,12 +2402,6 @@
   "project.settings.visit-dashboard": {
     "message": "Bezoek dashboard van het project"
   },
-  "project.stats.downloads-label": {
-    "message": "download{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "volger{count, plural, one {} other {s}}"
-  },
   "project.status.archived.message": {
     "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
   },
@@ -2579,26 +2570,14 @@
   "scopes.organizationWrite.label": {
     "message": "Schrijf organisaties"
   },
-  "scopes.patCreate.description": {
-    "message": "Creëer persoonlijke API tokens"
-  },
   "scopes.patCreate.label": {
     "message": "Creëer PAT's"
-  },
-  "scopes.patDelete.description": {
-    "message": "Verwijder uw persoonlijke API tokens"
   },
   "scopes.patDelete.label": {
     "message": "Verwijder PAT's"
   },
-  "scopes.patRead.description": {
-    "message": "Bekijk gemaakte API tokens"
-  },
   "scopes.patRead.label": {
     "message": "Lees PAT's"
-  },
-  "scopes.patWrite.description": {
-    "message": "Bewerk persoonlijke API tokens"
   },
   "scopes.patWrite.label": {
     "message": "Schrijf PAT's"

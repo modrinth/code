@@ -68,9 +68,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應輸入一次，並選擇正確的連結類型。"
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "連結內容重複"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
   },

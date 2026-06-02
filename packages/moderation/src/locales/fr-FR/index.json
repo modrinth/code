@@ -65,6 +65,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Voir la galerie"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Votre {type} utilise une license qui a besoin d'avoir le code source disponible. Merci de mettre un lien au code source ou aux fichiers source pour chaque version additionnelle, ou sinon vous pouvez changer de license."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fournir le code source"
   },
@@ -72,7 +75,7 @@
     "defaultMessage": "Certains de vos liens externes semblent être identiques. Chaque lien ne devrait être entré qu'une seule fois et avec le type de lien correspondant."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Liens identiques"
+    "defaultMessage": "Nettoyer des liens identiques"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Votre description doit contenir suffisamment de texte clair ou de texte alternatif pour les images, afin de rester accessible aux personnes utilisant des lecteurs d’écran ou disposant d’une connexion Internet lente."
@@ -155,6 +158,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Sélectionner une langue"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Sélectionnez la licence votre {type} est distribué."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Sélectionner une licence"
   },
@@ -218,6 +224,12 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Sélectionnez des tags précis"
   },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Au moins une image dans la galerie est nécessaire pour montrer le contenu de votre {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "Les Packs de ressources, sauf l'audio ou les packs de localisation. Si ceci décrit votre pack, merci d'utiliser des étiquettes appropriées"
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ajouter une image à la galerie"
   },
@@ -240,3 +252,4 @@
     "defaultMessage": "Accéder aux paramètres des liens"
   }
 }
+

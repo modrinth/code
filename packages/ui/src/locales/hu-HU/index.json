@@ -362,6 +362,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Letiltott"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Engedélyezett"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Frissítések"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Figyelmeztetések"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Biztonsági mentés létrehozása..."
   },
@@ -947,6 +959,9 @@
   "files.upload-dropdown.file-uploads": {
     "defaultMessage": "{fileType} feltöltések"
   },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "A feltöltött fájl típusa nem megfelelő"
+  },
   "files.upload-dropdown.unexpected-error": {
     "defaultMessage": "Váratlan hiba történt."
   },
@@ -1420,6 +1435,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Inkompatibilisek elrejtése"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "A(z) {version} verzió nem szerepel a telepítéssel kompatibilis programok között. Előfordulhat, hogy nem indul el, vagy nem a várt módon működik."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Frissíted az inkompatibilis verzióra?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Frissítés mindenképpen"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Változásnapló betöltése..."
@@ -2086,9 +2110,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2993,9 +3014,6 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Még nincsenek szerverek"
   },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Válaszd ki a kedvenc modjaidat, a többit bízd ránk!"
-  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Modok telepítése egy kattintással"
   },
@@ -3035,17 +3053,11 @@
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "A fájlok a lemondást követően 30 napig megmaradnak."
   },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "A szerveredet moderációs intézkedés keretében felfüggesztették."
-  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Kérlek, várj, amíg beállítjuk a szervered. Ez akár 10 percig is eltarthat."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Az előfizetésedet töröltük."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Előfizetésed <date>{formattedDate}</date>-én töröltük."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Előfizetésed fizetési hiba miatt töröltük."
@@ -3799,5 +3811,14 @@
   },
   "ui.confirm-leave-modal.header": {
     "defaultMessage": "Vannak nem mentett módosításaid"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Oldal elhagyása"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Maradás az oldalon"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Elhagyod az oldalt?"
   }
 }

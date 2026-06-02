@@ -196,9 +196,11 @@ watch(
 )
 
 async function triggerFileInput() {
-	const picked = await filePicker.pickModpackFile()
+	const picked = await filePicker.pickModpackFile({
+		readFile: ctx.flowType !== 'instance',
+	})
 	if (picked) {
-		ctx.modpackFile.value = picked.file
+		ctx.modpackFile.value = picked.file ?? null
 		ctx.modpackFilePath.value = picked.path ?? null
 		proceedWithModpack()
 	}
