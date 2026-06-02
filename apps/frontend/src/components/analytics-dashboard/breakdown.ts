@@ -30,9 +30,10 @@ export function getAnalyticsBreakdownValue(
 		case 'user_agent': {
 			const downloadSource = normalizeBreakdownValue(
 				'user_agent' in point ? point.user_agent : undefined,
+				UNKNOWN_BREAKDOWN_VALUE,
 			)
-			return downloadSource === ALL_BREAKDOWN_VALUE
-				? ALL_BREAKDOWN_VALUE
+			return downloadSource === UNKNOWN_BREAKDOWN_VALUE
+				? UNKNOWN_BREAKDOWN_VALUE
 				: getDownloadSourceLabel(downloadSource, formatMessage)
 		}
 		case 'download_reason':
