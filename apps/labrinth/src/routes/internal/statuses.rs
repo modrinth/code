@@ -3,6 +3,7 @@ use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::redis::RedisPool;
+use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
@@ -42,6 +43,7 @@ struct LauncherHeartbeatInit {
     code: String,
 }
 
+// TODO: Move launcher-specific tunnel traffic to a proper launcher websocket endpoint.
 #[get("launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
@@ -442,6 +444,25 @@ pub async fn send_message_to_user(
         for socket_id in socket_ids.iter() {
             if let Some(socket) = db.sockets.get(&socket_id) {
                 send_message(&socket, message).await?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+pub async fn send_notification_to_user(
+    db: &ActiveSockets,
+    user: UserId,
+    notification: &Notification,
+) -> Result<(), crate::database::models::DatabaseError> {
+    let message = serde_json::to_string(notification)?;
+
+    if let Some(socket_ids) = db.sockets_by_user_id.get(&user) {
+        for socket_id in socket_ids.iter() {
+            if let Some(socket) = db.sockets.get(&socket_id) {
+                let mut socket = socket.socket.clone();
+                let _ = socket.text(message.clone()).await;
             }
         }
     }

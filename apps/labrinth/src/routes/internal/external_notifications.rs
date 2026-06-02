@@ -7,12 +7,14 @@ use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
 use crate::models::users::Role;
 use crate::models::v3::notifications::{
-    NotificationBody, NotificationDeliveryStatus,
+    Notification, NotificationBody, NotificationDeliveryStatus,
 };
 use crate::models::v3::pats::Scopes;
 use crate::queue::email::EmailQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::routes::internal::statuses::broadcast_friends_message;
+use crate::sync::friends::RedisFriendsMessage;
 use crate::util::guards::external_notification_key_guard;
 use actix_web::http::StatusCode;
 use actix_web::web;
@@ -58,11 +60,28 @@ pub async fn create(
         ));
     }
 
-    NotificationBuilder { body }
+    let notification_ids = NotificationBuilder { body }
         .insert_many(user_ids, &mut txn, &redis)
         .await?;
 
     txn.commit().await?;
+
+    let notifications = DBNotification::get_many(&notification_ids, &**pool)
+        .await?
+        .into_iter()
+        .map(Notification::from)
+        .collect::<Vec<_>>();
+
+    for notification in notifications {
+        broadcast_friends_message(
+            &redis,
+            RedisFriendsMessage::Notification {
+                to_user: notification.user_id,
+                notification,
+            },
+        )
+        .await?;
+    }
 
     Ok(HttpResponse::Accepted().finish())
 }

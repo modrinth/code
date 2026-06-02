@@ -1,7 +1,7 @@
 use crate::ErrorKind;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
-use crate::event::emit::emit_friend;
+use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, Profile, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
@@ -22,6 +22,7 @@ use futures::{SinkExt, StreamExt};
 use reqwest::Method;
 use reqwest::header::HeaderValue;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
@@ -120,16 +121,34 @@ impl FriendsSocket {
                                 Ok(msg) => {
                                     let server_message = match msg {
                                         Message::Text(text) => {
-                                            ServerToClientMessage::deserialize(
+                                            match ServerToClientMessage::deserialize(
                                                 Either::Left(&text),
-                                            )
-                                            .ok()
+                                            ) {
+                                                Ok(message) => Some(message),
+                                                Err(_) => {
+                                                    if let Ok(notification) =
+                                                        serde_json::from_str::<Value>(&text)
+                                                    {
+                                                        let _ = Self::handle_notification(notification).await;
+                                                    }
+                                                    None
+                                                }
+                                            }
                                         }
                                         Message::Binary(bytes) => {
-                                            ServerToClientMessage::deserialize(
+                                            match ServerToClientMessage::deserialize(
                                                 Either::Right(&bytes),
-                                            )
-                                            .ok()
+                                            ) {
+                                                Ok(message) => Some(message),
+                                                Err(_) => {
+                                                    if let Ok(notification) =
+                                                        serde_json::from_slice::<Value>(&bytes)
+                                                    {
+                                                        let _ = Self::handle_notification(notification).await;
+                                                    }
+                                                    None
+                                                }
+                                            }
                                         }
                                         Message::Ping(bytes) => {
                                             if let Some(write) = write_handle
@@ -219,6 +238,19 @@ impl FriendsSocket {
                     return Err(crate::Error::from(e));
                 }
             }
+        }
+
+        Ok(())
+    }
+
+    async fn handle_notification(notification: Value) -> crate::Result<()> {
+        if notification
+            .get("body")
+            .and_then(|body| body.get("type"))
+            .and_then(Value::as_str)
+            .is_some()
+        {
+            emit_notification(notification).await?;
         }
 
         Ok(())
