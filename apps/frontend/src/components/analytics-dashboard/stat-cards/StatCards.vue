@@ -55,6 +55,7 @@ const {
 	activeStat,
 	setActiveStat,
 	currentTotals,
+	previousTotals,
 	percentChanges,
 	hasPreviousPeriodComparison,
 	selectedBreakdowns,
@@ -66,6 +67,7 @@ const monetizationBannerDismissed = useLocalStorage(MONETIZATION_BANNER_DISMISSE
 const showMonetizationBanner = computed(
 	() => selectedBreakdowns.value.includes('monetization') && !monetizationBannerDismissed.value,
 )
+const MAX_PREVIOUS_PERIOD_PERCENT_DISPLAY = 1000
 
 const compactNumberFormatter = computed(
 	() =>
@@ -87,16 +89,75 @@ function formatStatNumber(value: number): string {
 
 function formatPercent(value: number): string {
 	const rounded = Math.round(value * 10) / 10
+	if (rounded === 0) {
+		return '0%'
+	}
+
 	const signPrefix = rounded > 0 ? '+' : ''
 	return `${signPrefix}${rounded.toFixed(1)}%`
 }
 
-function formatPreviousPeriodPercent(value: number): string | null {
+function formatSignedStatNumber(value: number): string {
+	const signPrefix = value > 0 ? '+' : ''
+	return `${signPrefix}${formatStatNumber(value)}`
+}
+
+function formatSignedRevenue(value: number): string {
+	const signPrefix = value > 0 ? '+' : value < 0 ? '-' : ''
+	return `${signPrefix}${formatMessage(analyticsStatCardMessages.revenueValue, {
+		value: formatStatNumber(Math.abs(value)),
+	})}`
+}
+
+function formatSignedPlaytimeHours(value: number): string {
+	const rounded = Math.round(value * 10) / 10
+	if (rounded === 0) {
+		return '0'
+	}
+
+	if (Math.abs(rounded) >= 1000) {
+		const signPrefix = rounded > 0 ? '+' : ''
+		return `${signPrefix}${compactNumberFormatter.value.format(rounded)}`
+	}
+
+	const signPrefix = rounded > 0 ? '+' : ''
+	return `${signPrefix}${rounded.toFixed(1)}`
+}
+
+function formatSignedPlaytime(value: number): string {
+	return formatMessage(analyticsStatCardMessages.playtimeHours, {
+		hours: formatSignedPlaytimeHours(value / 3600),
+	})
+}
+
+function formatPreviousPeriodComparison(
+	stat: AnalyticsDashboardStat,
+	percentChange: number,
+	currentValue: number,
+	previousValue: number,
+): string | null {
 	if (!hasPreviousPeriodComparison.value) {
 		return null
 	}
 
-	return formatPercent(value)
+	const delta = currentValue - previousValue
+	if (previousValue === 0 && currentValue === 0) {
+		return formatPercent(percentChange)
+	}
+
+	if (previousValue !== 0 && Math.abs(percentChange) <= MAX_PREVIOUS_PERIOD_PERCENT_DISPLAY) {
+		return formatPercent(percentChange)
+	}
+
+	switch (stat) {
+		case 'revenue':
+			return formatSignedRevenue(delta)
+		case 'playtime':
+			return formatSignedPlaytime(delta)
+		case 'views':
+		case 'downloads':
+			return formatSignedStatNumber(delta)
+	}
 }
 
 function dismissMonetizationBanner() {
@@ -117,7 +178,12 @@ const statCards = computed<
 		key: 'views',
 		label: formatAnalyticsStatLabel('views', formatMessage),
 		statLabel: formatStatNumber(currentTotals.value.views),
-		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.views),
+		vsPrevPeriodPercent: formatPreviousPeriodComparison(
+			'views',
+			percentChanges.value.views,
+			currentTotals.value.views,
+			previousTotals.value.views,
+		),
 		icon: 'eye',
 		disabled: !isAnalyticsDashboardStatRelevant('views', selectedBreakdowns.value),
 	},
@@ -125,7 +191,12 @@ const statCards = computed<
 		key: 'downloads',
 		label: formatAnalyticsStatLabel('downloads', formatMessage),
 		statLabel: formatStatNumber(currentTotals.value.downloads),
-		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.downloads),
+		vsPrevPeriodPercent: formatPreviousPeriodComparison(
+			'downloads',
+			percentChanges.value.downloads,
+			currentTotals.value.downloads,
+			previousTotals.value.downloads,
+		),
 		icon: 'download',
 		disabled: !isAnalyticsDashboardStatRelevant('downloads', selectedBreakdowns.value),
 	},
@@ -135,7 +206,12 @@ const statCards = computed<
 		statLabel: formatMessage(analyticsStatCardMessages.revenueValue, {
 			value: formatStatNumber(currentTotals.value.revenue),
 		}),
-		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.revenue),
+		vsPrevPeriodPercent: formatPreviousPeriodComparison(
+			'revenue',
+			percentChanges.value.revenue,
+			currentTotals.value.revenue,
+			previousTotals.value.revenue,
+		),
 		icon: 'dollar',
 		disabled: !isAnalyticsDashboardStatRelevant('revenue', selectedBreakdowns.value),
 	},
@@ -145,7 +221,12 @@ const statCards = computed<
 		statLabel: formatMessage(analyticsStatCardMessages.playtimeHours, {
 			hours: formatStatNumber(currentTotals.value.playtime / 3600),
 		}),
-		vsPrevPeriodPercent: formatPreviousPeriodPercent(percentChanges.value.playtime),
+		vsPrevPeriodPercent: formatPreviousPeriodComparison(
+			'playtime',
+			percentChanges.value.playtime,
+			currentTotals.value.playtime,
+			previousTotals.value.playtime,
+		),
 		icon: 'clock',
 		disabled: !isAnalyticsDashboardStatRelevant('playtime', selectedBreakdowns.value),
 	},
