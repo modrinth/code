@@ -129,12 +129,11 @@ impl NotificationBuilder {
         Ok(())
     }
 
-    pub async fn insert_many(
+    async fn insert_many_records(
         &self,
-        users: Vec<DBUserId>,
+        users: &[DBUserId],
         transaction: &mut PgTransaction<'_>,
-        redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<Vec<i64>, DatabaseError> {
         let notification_ids =
             generate_many_notification_ids(users.len(), &mut *transaction)
                 .await?;
@@ -163,6 +162,20 @@ impl NotificationBuilder {
         .execute(&mut *transaction)
         .await?;
 
+        Ok(notification_ids)
+    }
+
+    pub async fn insert_many(
+        &self,
+        users: Vec<DBUserId>,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
+        let notification_ids =
+            self.insert_many_records(&users, transaction).await?;
+
+        let users_raw_ids = users.iter().map(|x| x.0).collect::<Vec<_>>();
+
         let notification_types = notification_ids
             .iter()
             .map(|_| self.body.notification_type().as_str())
@@ -178,6 +191,19 @@ impl NotificationBuilder {
         )
         .await?;
 
+        Ok(())
+    }
+
+    /// Like [`insert_many`], but skips queuing deliveries so the caller can
+    /// manually send the notifications.
+    pub async fn insert_many_without_delivery(
+        &self,
+        users: Vec<DBUserId>,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
+        self.insert_many_records(&users, transaction).await?;
+        DBNotification::clear_user_notifications_cache(&users, redis).await?;
         Ok(())
     }
 
@@ -569,6 +595,38 @@ impl DBNotification {
         .await?;
 
         Ok(Some(()))
+    }
+
+    pub async fn remove_many_matching_body(
+        body_filter: &serde_json::Value,
+        users: &[DBUserId],
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<usize, DatabaseError> {
+        let user_ids = users.iter().map(|x| x.0).collect::<Vec<i64>>();
+
+        let ids = sqlx::query!(
+            "
+            SELECT id
+            FROM notifications
+            WHERE body @> $1::jsonb
+              AND user_id = ANY($2::bigint[])
+            ",
+            body_filter,
+            &user_ids
+        )
+        .fetch(&mut *transaction)
+        .map_ok(|x| DBNotificationId(x.id))
+        .try_collect::<Vec<_>>()
+        .await?;
+
+        if ids.is_empty() {
+            return Ok(0);
+        }
+
+        Self::remove_many(&ids, transaction, redis).await?;
+
+        Ok(ids.len())
     }
 
     pub async fn clear_user_notifications_cache(
