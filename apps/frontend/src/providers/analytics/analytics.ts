@@ -901,6 +901,7 @@ export function createAnalyticsDashboardContext(
 			)
 		},
 		enabled: computed(() => isAnalyticsFetchRequestReady(analyticsTimeSlicesFetchRequest.value)),
+		staleTime: 0,
 		gcTime: ANALYTICS_TIME_SLICES_GC_TIME_MS,
 	})
 	watch(currentAnalyticsError, (error) => {
