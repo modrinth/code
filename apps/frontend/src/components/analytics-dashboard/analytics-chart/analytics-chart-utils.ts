@@ -770,7 +770,11 @@ function formatSmallAxisNumber(value: number): string {
 	}
 
 	const formattedValue = Math.abs(value) < 1 ? value.toFixed(2) : value.toFixed(1)
-	return formattedValue.replace(/\.?0+$/, '')
+	return trimTrailingFractionZeros(formattedValue)
+}
+
+function trimTrailingFractionZeros(value: string): string {
+	return value.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '')
 }
 
 const COMPACT_AXIS_UNITS = [
@@ -814,7 +818,7 @@ function formatCompactAxisValue(value: number): string {
 		return String(truncatedValue)
 	}
 
-	return roundedValue.toFixed(fractionDigitCount).replace(/\.?0+$/, '')
+	return trimTrailingFractionZeros(roundedValue.toFixed(fractionDigitCount))
 }
 
 export function formatAxisValue(
