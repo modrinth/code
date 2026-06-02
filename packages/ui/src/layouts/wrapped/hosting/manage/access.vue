@@ -495,14 +495,6 @@ const messages = defineMessages({
 		id: 'servers.access-page.notification.friend-request-failed.title',
 		defaultMessage: 'Friend request could not be sent',
 	},
-	inviteResendUnavailableTitle: {
-		id: 'servers.access-page.notification.invite-resend-unavailable.title',
-		defaultMessage: 'Invite cannot be resent',
-	},
-	inviteResendUnavailableText: {
-		id: 'servers.access-page.notification.invite-resend-unavailable.text',
-		defaultMessage: 'Invites are accepted automatically for this server.',
-	},
 	removeFailedTitle: {
 		id: 'servers.access-page.notification.remove-failed.title',
 		defaultMessage: 'Access could not be removed',
@@ -598,6 +590,13 @@ const serverUsersQueryKey = ['servers', 'users', 'v1', serverId]
 const serverUsersQuery = useQuery({
 	queryKey: serverUsersQueryKey,
 	queryFn: () => client.archon.server_users_v1.list(serverId),
+})
+
+const friendsQueryKey = ['user', 'friends', 'v3']
+useQuery({
+	queryKey: friendsQueryKey,
+	queryFn: () => client.labrinth.friends_v3.list(),
+	staleTime: 30_000,
 })
 
 const members = computed<ServerAccessMember[]>(() =>
@@ -1169,7 +1168,8 @@ function isSuppressedFriendRequestError(error: unknown) {
 		const normalizedMessage = message.toLowerCase()
 		return (
 			normalizedMessage.includes('you are already friends with this user') ||
-			normalizedMessage.includes('you cannot add yourself as a friend')
+			normalizedMessage.includes('you cannot add yourself as a friend') ||
+			normalizedMessage.includes('you cannot accept your own friend request')
 		)
 	})
 }
@@ -1325,12 +1325,30 @@ async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRo
 	await invalidateActionLog()
 }
 
-function resendInvite(member: ServerAccessMember) {
-	addNotification({
-		type: 'error',
-		title: formatMessage(messages.inviteResendUnavailableTitle),
-		text: formatMessage(messages.inviteResendUnavailableText, { target: member.user.username }),
-	})
+async function resendInvite(member: ServerAccessMember) {
+	if (!canManageUsers.value || !member.pending || member.role === 'owner') return
+
+	try {
+		await client.archon.server_users_v1.add(serverId, {
+			user_id: member.user.id,
+			role: accessRoleToApiRole(member.role),
+		})
+		await invalidateServerUsers()
+		await invalidateActionLog()
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.inviteResentTitle),
+			text: formatMessage(messages.inviteResentText, {
+				target: member.user.username,
+			}),
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.inviteFailedTitle),
+			text: formatErrorMessage(error),
+		})
+	}
 }
 
 async function cancelInvite(member: ServerAccessMember) {
@@ -1461,8 +1479,16 @@ async function grantAccess(payload: GrantServerAccessPayload) {
 }
 
 async function sendFriendRequest(userIdOrUsername: string) {
+	const friends = await queryClient.ensureQueryData({
+		queryKey: friendsQueryKey,
+		queryFn: () => client.labrinth.friends_v3.list(),
+	})
+
+	if (hasFriendRelationship(friends, userIdOrUsername)) return
+
 	try {
 		await client.labrinth.friends_v3.add(userIdOrUsername)
+		await queryClient.invalidateQueries({ queryKey: friendsQueryKey })
 	} catch (error) {
 		if (isSuppressedFriendRequestError(error)) return
 
@@ -1472,5 +1498,12 @@ async function sendFriendRequest(userIdOrUsername: string) {
 			text: formatErrorMessage(error),
 		})
 	}
+}
+
+function hasFriendRelationship(
+	friends: Labrinth.Friends.v3.UserFriend[],
+	userId: string,
+) {
+	return friends.some((friend) => friend.id === userId || friend.friend_id === userId)
 }
 </script>

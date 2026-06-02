@@ -1,52 +1,123 @@
 <template>
 	<div
-		class="notification"
-		:class="{
-			'has-body': hasBody,
-			compact: compact,
-			read: notification.read,
-		}"
+		:class="
+			type === 'server_invite'
+				? { read: notification.read }
+				: {
+						notification: true,
+						'has-body': hasBody,
+						compact: compact,
+						read: notification.read,
+					}
+		"
 	>
-		<nuxt-link
-			v-if="!type"
-			:to="notification.link"
-			class="notification__icon backed-svg"
-			:class="{ raised: raised }"
-		>
-			<BellIcon />
-		</nuxt-link>
-		<DoubleIcon v-else class="notification__icon">
-			<template #primary>
-				<nuxt-link v-if="project" :to="getProjectLink(project)" tabindex="-1">
-					<Avatar size="xs" :src="project.icon_url" :raised="raised" no-shadow />
-				</nuxt-link>
-				<nuxt-link
-					v-else-if="organization"
-					:to="`/organization/${organization.slug}`"
-					tabindex="-1"
+		<template v-if="type === 'server_invite'">
+			<div class="flex flex-col gap-4">
+				<ModrinthServersIcon class="h-auto w-56 max-w-full text-[var(--color-heading)]" />
+				<div
+					class="flex flex-wrap items-center gap-x-1.5 gap-y-2 text-lg leading-tight text-[var(--color-heading)]"
 				>
-					<Avatar size="xs" :src="organization.icon_url" :raised="raised" no-shadow />
-				</nuxt-link>
-				<nuxt-link v-else-if="user" :to="getUserLink(user)" tabindex="-1">
-					<Avatar size="xs" :src="user.avatar_url" :raised="raised" no-shadow />
-				</nuxt-link>
-				<Avatar v-else size="xs" :raised="raised" no-shadow />
-			</template>
-			<template #secondary>
-				<ScaleIcon
-					v-if="type === 'moderator_message' || type === 'status_change'"
-					class="moderation-color"
-				/>
-				<UserPlusIcon v-else-if="type === 'team_invite' && project" class="creator-color" />
-				<UserPlusIcon
-					v-else-if="type === 'organization_invite' && organization"
-					class="creator-color"
-				/>
-				<VersionIcon v-else-if="type === 'project_update' && project && version" />
-				<BellIcon v-else />
-			</template>
-		</DoubleIcon>
-		<div class="notification__title">
+					<nuxt-link
+						v-if="invitedBy"
+						:to="`/user/${invitedBy.username}`"
+						class="inline-flex items-center font-bold text-[var(--color-heading)] hover:underline"
+					>
+						<Avatar
+							:src="invitedBy.avatar_url"
+							circle
+							size="xxs"
+							no-shadow
+							:raised="raised"
+							class="mr-1.5 inline-flex"
+						/>
+						<span>{{ invitedBy.username }}</span>
+					</nuxt-link>
+					<span v-if="invitedBy">has invited you to join</span>
+					<span v-else>You have been invited to join</span>
+					<span class="font-bold text-[var(--color-heading)]">
+						{{ notification.body.server_name }}
+					</span>
+					<span>.</span>
+				</div>
+				<div
+					v-if="!notification.read"
+					class="flex flex-wrap items-center gap-3"
+					:class="{ 'gap-2': compact }"
+				>
+					<ButtonStyled :circular="compact" color="brand" :type="compact ? 'transparent' : null">
+						<button
+							v-tooltip="compact ? 'Accept' : null"
+							@click="performActionByTitle(notification, 'Accept')"
+						>
+							<CheckIcon />
+							<span v-if="!compact">Accept</span>
+						</button>
+					</ButtonStyled>
+					<ButtonStyled :circular="compact" color="red" :type="compact ? 'transparent' : null">
+						<button
+							v-tooltip="compact ? 'Decline' : null"
+							@click="performActionByTitle(notification, 'Deny')"
+						>
+							<XIcon />
+							<span v-if="!compact">Decline</span>
+						</button>
+					</ButtonStyled>
+				</div>
+				<div
+					class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[var(--color-text-secondary)]"
+				>
+					<span v-if="notification.read" class="inline-flex items-center font-bold text-[var(--color-text)]">
+						<CheckCircleIcon /> Read
+					</span>
+					<span v-tooltip="formatDateTime(notification.created)" class="inline-flex items-center">
+						<CalendarIcon class="mr-1" /> Received
+						{{ formatRelativeTime(notification.created) }}
+					</span>
+					<CopyCode v-if="flags.developerMode" :text="notification.id" />
+				</div>
+			</div>
+		</template>
+		<template v-else>
+			<nuxt-link
+				v-if="!type"
+				:to="notification.link"
+				class="notification__icon backed-svg"
+				:class="{ raised: raised }"
+			>
+				<BellIcon />
+			</nuxt-link>
+			<DoubleIcon v-else class="notification__icon">
+				<template #primary>
+					<nuxt-link v-if="project" :to="getProjectLink(project)" tabindex="-1">
+						<Avatar size="xs" :src="project.icon_url" :raised="raised" no-shadow />
+					</nuxt-link>
+					<nuxt-link
+						v-else-if="organization"
+						:to="`/organization/${organization.slug}`"
+						tabindex="-1"
+					>
+						<Avatar size="xs" :src="organization.icon_url" :raised="raised" no-shadow />
+					</nuxt-link>
+					<nuxt-link v-else-if="user" :to="getUserLink(user)" tabindex="-1">
+						<Avatar size="xs" :src="user.avatar_url" :raised="raised" no-shadow />
+					</nuxt-link>
+					<Avatar v-else size="xs" :raised="raised" no-shadow />
+				</template>
+				<template #secondary>
+					<ScaleIcon
+						v-if="type === 'moderator_message' || type === 'status_change'"
+						class="moderation-color"
+					/>
+					<UserPlusIcon v-else-if="type === 'team_invite' && project" class="creator-color" />
+					<UserPlusIcon
+						v-else-if="type === 'organization_invite' && organization"
+						class="creator-color"
+					/>
+					<VersionIcon v-else-if="type === 'project_update' && project && version" />
+					<BellIcon v-else />
+				</template>
+			</DoubleIcon>
+			<div class="notification__title">
 			<template v-if="type === 'project_update' && project && version">
 				A project you follow,
 				<nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link>
@@ -295,6 +366,7 @@
 				<CopyCode v-if="flags.developerMode" :text="notification.id" />
 			</div>
 		</div>
+		</template>
 	</div>
 </template>
 
@@ -328,6 +400,7 @@ import { markAsRead } from '~/helpers/platform-notifications'
 import { getProjectLink, getVersionLink } from '~/helpers/projects'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
+import ModrinthServersIcon from '../brand/ModrinthServersIcon.vue'
 import ThreadSummary from './thread/ThreadSummary.vue'
 
 const client = injectModrinthClient()
@@ -415,9 +488,25 @@ async function performAction(notification, actionIndex) {
 		await read()
 
 		if (actionIndex !== null) {
-			await useBaseFetch(`${notification.actions[actionIndex].action_route[1]}`, {
-				method: notification.actions[actionIndex].action_route[0].toUpperCase(),
-			})
+			const [method, route] = notification.actions[actionIndex].action_route
+
+			// TODO: fix all this jank shit
+			if (route.startsWith('hosting/') || route.startsWith('/hosting/')) {
+				const archonRoute = route
+					.replace(/^\/?hosting/, '')
+					.replace('/invite/accept', '/invites/accept')
+					.replace('/invite/deny', '/invites/decline')
+
+				await client.request(archonRoute, {
+					api: 'archon',
+					version: 1,
+					method: method.toUpperCase(),
+				})
+			} else {
+				await useBaseFetch(route, {
+					method: method.toUpperCase(),
+				})
+			}
 		}
 	} catch (err) {
 		addNotification({
@@ -427,6 +516,20 @@ async function performAction(notification, actionIndex) {
 		})
 	}
 	stopLoading()
+}
+
+function performActionByTitle(notification, title) {
+	const actionIndex = notification.actions.findIndex((action) => action.title === title)
+	if (actionIndex === -1) {
+		addNotification({
+			title: 'An error occurred',
+			text: `Missing ${title.toLowerCase()} action for notification.`,
+			type: 'error',
+		})
+		return
+	}
+
+	return performAction(notification, actionIndex)
 }
 
 function getMessages() {
