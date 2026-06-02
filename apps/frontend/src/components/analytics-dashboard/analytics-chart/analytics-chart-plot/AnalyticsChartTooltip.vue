@@ -18,7 +18,7 @@
 						({{ durationLabel }})
 					</span>
 				</span>
-				<span v-if="previousRangeLabel" class="min-w-0 truncate text-xs text-primary">
+				<span v-if="previousRangeLabel" class="min-w-0 space-x-1 truncate text-xs text-primary">
 					<span class="font-medium">{{ previousRangeLabel }}</span>
 					<span class="font-normal text-secondary">
 						{{ formatMessage(analyticsChartMessages.previousPeriodShort) }}
