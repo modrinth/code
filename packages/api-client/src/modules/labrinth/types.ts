@@ -1659,6 +1659,8 @@ export namespace Labrinth {
 				message_id?: string
 				invited_by?: string
 				organization_id?: string
+				server_id?: string
+				server_name?: string
 				team_id?: string
 				role?: string
 				old_status?: string
