@@ -26,7 +26,7 @@
 					:placeholder="formatMessage(messages.emailAddressPlaceholder)"
 					@keyup.enter="saveEmail()"
 				/>
-				<div class="input-group push-right">
+				<div class="input-group push-right mt-3">
 					<ButtonStyled>
 						<button @click="$refs.changeEmailModal.hide()">
 							<XIcon />
