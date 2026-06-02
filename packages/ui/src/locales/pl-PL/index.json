@@ -362,6 +362,12 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "Zaktualizowano {count}"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Wyłączone"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Załączone"
+  },
   "content.filter.updates": {
     "defaultMessage": "Aktualizacje"
   },
@@ -892,6 +898,18 @@
   },
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Pomniejsz"
+  },
+  "files.item-type.file": {
+    "defaultMessage": "plik"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "pliki"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "folder"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "foldery"
   },
   "files.layout.busy-warning": {
     "defaultMessage": "Operacje na plikach są wyłączone podczas trwania tej operacji."
@@ -1448,6 +1466,12 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Szukaj wersję gry..."
   },
+  "installation-settings.type.server": {
+    "defaultMessage": "serwer"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "serwery"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Rozłącz"
   },
@@ -1468,6 +1492,9 @@
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Napraw"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "serwer"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Tryb przygodowy"
@@ -2245,9 +2272,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -3263,9 +3287,6 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Brak serwerów"
   },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Wybierz swoje ulubione modyfikacje, a my zajmiemy się resztą."
-  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Instalacja modyfikacji za jednym kliknięciem"
   },
@@ -3302,23 +3323,14 @@
   "servers.listing.new-label": {
     "defaultMessage": "Nowe"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Twoje pliki nie zostaną usunięte przez <days-remaining>{daysRemaining} {daysRemaining, plural, one {dzień} other {dni} }</days-remaining>. Skontaktuj się ze wsparciem technicznym, aby pobrać pliki, przed ich usunięciem "
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Twoje pliki zostaną zachowane na okres 30 dni po anulowaniu subskrybcji."
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "Twój serwer został zawieszony poprzez działania moderatorskie. "
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Prosimy o cierpliwość, podczas gdy ustawiamy Twój serwer. Może to potrwać nawet 10 minut."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Twoja subskrypcja została anulowana."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Twoja subskrypcja została anulowana dnia <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Twoja subskrypcja została anulowana przez nieudaną płatność."
@@ -3544,6 +3556,9 @@
   },
   "servers.purchase.step.review.title": {
     "defaultMessage": "Przegląd"
+  },
+  "servers.region.australia": {
+    "defaultMessage": "Australia"
   },
   "servers.region.central-europe": {
     "defaultMessage": "Europa Środkowa"
@@ -4139,6 +4154,9 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Dziś"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Masz niezapisane zmiany."
   },
@@ -4159,5 +4177,17 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Odrzuć wszystkie"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Projekty tego użytkownika zebrały razem {download_sum} pobrań."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} pobrań"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Ten użytkownik pracuje w Modrinth."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Zespół Modrinth"
   }
 }

@@ -635,9 +635,6 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
-  "payment-method.mastercard": {
-    "defaultMessage": "Mastercard"
-  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -1314,3 +1311,4 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
+

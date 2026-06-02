@@ -317,9 +317,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Amaran pemadaman"
   },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Padam {itemType}"
-  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Penurunan taraf} other {Pengemaskinian}} boleh menyebabkan masalah keserasian. Mod atau kandungan yang anda tambahkan di atas pek mod akan disimpan, tetapi mungkin tidak serasi dengan versi baharu."
   },
@@ -364,6 +361,18 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} dikemas kini"
+  },
+  "content.filter.disabled": {
+    "defaultMessage": "Dinyahdayakan"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Didayakan"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Kemas kini"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Amaran"
   },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Sedang mencipta sandaran..."
@@ -515,6 +524,24 @@
   "creation-flow.modal.custom-setup.build-number.placeholder": {
     "defaultMessage": "Pilih nombor binaan"
   },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "Cari nombor binaan..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "Pemuat kandungan"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "Pilih versi permainan"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "Cari versi permainan..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "Alih keluar ikon"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Pilih ikon"
+  },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Terkini"
   },
@@ -524,14 +551,47 @@
   "creation-flow.modal.custom-setup.loader-version-type.stable": {
     "defaultMessage": "Stabil"
   },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "Versi pemuat"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "Pilih versi pemuat"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "Cari versi pemuat..."
+  },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Pemuat"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Nama"
   },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "Masukkan nama pemasangan"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "Tiada versi tersedia"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "Tetapan tambahan"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "Sebelum menetapkan semula pelayan"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "Senang"
+  },
   "creation-flow.modal.final-config.difficulty.hard": {
     "defaultMessage": "Sukar"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "Kesukaran"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "Biasa"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "Aman"
   },
   "creation-flow.modal.final-config.game-version.placeholder": {
     "defaultMessage": "Pilih versi permainan"
@@ -568,6 +628,30 @@
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
     "defaultMessage": "Datar"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "Tetapan penjana"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "Pilih tetapan penjana"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "Nama dunia"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "Masukkan nama dunia"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "Masukkan benih dunia"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "Dikuatkan"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "Lalai"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "Jenis dunia"
   },
   "creation-flow.modal.final-config.world-type.large-biomes": {
     "defaultMessage": "Biom Besar"
@@ -611,8 +695,68 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Kosongkan semua"
   },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "Layari pek mod"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "Import pek mod"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Tiada hasil dijumpai"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Cari pek mod"
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "Persediaan tersuai"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "Import pemasangan"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Pasang pek mod"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "Minecraft Vanila"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "Pilih jenis pemasangan"
+  },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "Pilih jenis pemasangan"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "Pilih jenis dunia"
+  },
+  "creation-flow.title.choose-modpack": {
+    "defaultMessage": "Pilih pek mod"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "Cipta pemasangan"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "Cipta dunia"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "Import pemasangan"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "Tetap semula pelayan"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "Sediakan pelayan"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Tidak"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Tidak dikenali"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Dengan atribusi"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Dengan atribusi dan sumber"
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Ya"
@@ -815,11 +959,20 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Muat naik daripada URL .zip"
   },
+  "files.operations.current-file": {
+    "defaultMessage": "Fail semasa: {file}"
+  },
   "files.operations.extracted": {
     "defaultMessage": "{size} diekstrak"
   },
   "files.operations.extracting": {
     "defaultMessage": "Mengekstrak {source}"
+  },
+  "files.operations.extracting-completed": {
+    "defaultMessage": "Pengekstrakan {source} selesai"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "Pengekstrakan {source} gagal"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "pek mod daripada URL"
@@ -1075,6 +1228,9 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Gagal mengemas kini kandungan"
+  },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Gagal memasang kandungan"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Gagal memuat kandungan pek mod"
@@ -1394,6 +1550,9 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Sembunyikan versi tidak serasi"
   },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Kemas kini juga"
+  },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Sedang memuat log perubahan..."
   },
@@ -1508,20 +1667,32 @@
   "label.filter-by": {
     "defaultMessage": "Tapis mengikut"
   },
+  "label.filters": {
+    "defaultMessage": "Penapis"
+  },
   "label.followed-projects": {
     "defaultMessage": "Projek yang diikuti"
   },
   "label.game-version": {
     "defaultMessage": "Versi permainan"
   },
+  "label.hide-selected-content": {
+    "defaultMessage": "Sembunyikan kandungan yang dipilih"
+  },
   "label.installation-info": {
     "defaultMessage": "Maklumat pemasangan"
+  },
+  "label.installed": {
+    "defaultMessage": "Dipasang"
   },
   "label.installed-modpack": {
     "defaultMessage": "Pek mod yang dipasang"
   },
   "label.installing": {
     "defaultMessage": "Sedang memasang..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Sedang memasang kandungan"
   },
   "label.loading": {
     "defaultMessage": "Sedang memuat..."
@@ -1598,6 +1769,9 @@
   "label.select-all": {
     "defaultMessage": "Pilih semua"
   },
+  "label.selected": {
+    "defaultMessage": "Dipilih"
+  },
   "label.selection-actions": {
     "defaultMessage": "Tindakan pilihan"
   },
@@ -1639,6 +1813,9 @@
   },
   "label.username": {
     "defaultMessage": "Nama pengguna"
+  },
+  "label.validating": {
+    "defaultMessage": "Mengesahkan"
   },
   "label.version": {
     "defaultMessage": "Versi"
@@ -1754,11 +1931,53 @@
   "markdown-editor.error-label": {
     "defaultMessage": "Ralat"
   },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Huraikan imej tersebut..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Keterangan (teks alt)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Masukkan imej"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Sumber imej"
+  },
   "markdown-editor.image-modal.upload-mode.link": {
     "defaultMessage": "Pautan"
   },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Muat naik"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Masukkan URL imej..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Masukkan"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Masukkan pautan"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Masukkan label..."
+  },
   "markdown-editor.link-modal.label-field.title": {
     "defaultMessage": "Label"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Masukkan URL pautan..."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Panjang maksimum:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Tidak terhad"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Tulis sesuatu..."
   },
   "markdown-editor.preview-label": {
     "defaultMessage": "Pralihat"
@@ -1766,20 +1985,65 @@
   "markdown-editor.preview-toggle.label": {
     "defaultMessage": "Pralihat"
   },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Tebal"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Senarai berbulet"
+  },
   "markdown-editor.toolbar.code": {
     "defaultMessage": "Kod"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Pengepala 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Pengepala 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Pengepala 3"
   },
   "markdown-editor.toolbar.image": {
     "defaultMessage": "Gambar"
   },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Condong"
+  },
   "markdown-editor.toolbar.link": {
     "defaultMessage": "Pautan"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Senarai tersusun"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Petik"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Coret tengah"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Video"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "Tiada fail disediakan"
   },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
   "markdown-editor.video-embed.title": {
     "defaultMessage": "Pemain video YouTube"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Masukkan video YouTube"
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Masukkan URL video YouTube"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "URL video YouTube"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Tambah kaedah pembayaran"
@@ -1930,9 +2194,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2579,6 +2840,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Muat naik"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Keizinan"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Versi"
   },
@@ -2623,6 +2887,9 @@
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Tidak disenaraikan oleh kakitangan"
+  },
+  "s.bg": {
+    "defaultMessage": "Tugas latar belakang berjalan"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Penapis dikunci"
@@ -2711,6 +2978,15 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanila"
   },
+  "servers.admonitions.background-task-running": {
+    "defaultMessage": "Tugas latar belakang berjalan"
+  },
+  "servers.backups.admonition.backup-cancelled.title": {
+    "defaultMessage": "Penyandaran dibatalkan"
+  },
+  "servers.backups.admonition.backup-completed.title": {
+    "defaultMessage": "Penyandaran selesai"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Sesuatu telah berlaku semasa mencipta {backupName}. Sila cuba lagi atau hubungi sokongan jika masalah berterusan."
   },
@@ -2723,6 +2999,9 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "Sandaran dalam barisan"
   },
+  "servers.backups.admonition.backup-timed-out.title": {
+    "defaultMessage": "Penyandaran tamat masa"
+  },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "Menyimpan data dunia dan konfigurasi pelayan untuk {backupName}. Ini mungkin mengambil masa beberapa minit."
   },
@@ -2732,20 +3011,50 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Sandaran anda"
   },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "Pemulihan dibatalkan"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Sesuatu telah berlaku semasa memulihkan daripada {backupName}. Sila cuba lagi atau hubungi sokongan jika masalah berterusan."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Pemulihan gagal"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Pemulihan dari {backupName} telah dimasukkan ke barisan dan akan bermula sebentar lagi."
   },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Pemulihan dibariskan"
+  },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Pelayan anda telah dipulihkan kepada {backupName} dan sedia untuk dimulakan."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Pemulihan selesai"
+  },
+  "servers.backups.admonition.restore-timed-out.title": {
+    "defaultMessage": "Pemulihan tamat masa"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Memulihkan pelayan anda daripada {backupName}. Ini mungkin mengambil masa beberapa minit."
   },
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Memulihkan daripada sandaran"
+  },
+  "servers.backups.delete-modal.admonition-header": {
+    "defaultMessage": "Amaran pemadaman"
+  },
+  "servers.backups.empty.description": {
+    "defaultMessage": "Cipta sandaran pertama anda"
+  },
+  "servers.backups.empty.heading": {
+    "defaultMessage": "Belum ada sandaran"
+  },
+  "servers.backups.filtered-empty.clear-filters": {
+    "defaultMessage": "Kosongkan tapisan"
+  },
+  "servers.backups.filtered-empty.heading": {
+    "defaultMessage": "Tiada sandaran yang sepadan"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
@@ -2762,11 +3071,20 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Pulihkan"
   },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "Pilih sandaran {name}"
+  },
+  "servers.backups.toolbar.create-backup": {
+    "defaultMessage": "Cipta sandaran"
+  },
   "servers.backups.toolbar.filter-auto": {
     "defaultMessage": "Auto"
   },
   "servers.backups.toolbar.filter-manual": {
     "defaultMessage": "Manual"
+  },
+  "servers.backups.toolbar.select-all": {
+    "defaultMessage": "Pilih semua"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Penciptaan sandaran sedang dijalankan"
@@ -2779,6 +3097,36 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "Penyegerakan kandungan sedang dijalankan"
+  },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Pemasangan gagal"
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Sedang memasang tambahan..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Sedang memasang pek mod..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Sedang memasang platform..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Kami sedang menyediakan pelayan anda"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Sedang menambah Java..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Sedang mengkonfigurasikan pelayan..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Sedang memuat turun mod..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Sedang menyusun fail..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Sedang menyediakan persekitaran..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Sudah mempunyai pelayan?"
@@ -2797,9 +3145,6 @@
   },
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Belum ada pelayan"
-  },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Pilih mod kegemaran anda dan kami uruskan selebihnya."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Pemasangan mod sekali klik"
@@ -2840,17 +3185,11 @@
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Fail anda akan disimpan selama 30 hari selepas pembatalan."
   },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "Pelayan anda telah digantung melalui tindakan penyederhanaan. "
-  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Sila tunggu sementara kami menyediakan pelayan anda. Ini boleh mengambil masa sehingga 10 minit."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Langganan anda telah dibatalkan."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Langganan anda telah dibatalkan pada <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Langganan anda telah dibatalkan kerana kegagalan pembayaran."
@@ -3083,6 +3422,15 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
+  "servers.region.north-america-central": {
+    "defaultMessage": "Amerika Utara Tengah"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Amerika Utara Timur"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Amerika Utara Barat"
+  },
   "servers.region.prompt": {
     "defaultMessage": "Di manakah anda mahu pelayan anda ditempatkan?"
   },
@@ -3094,6 +3442,30 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Eropah Barat"
+  },
+  "servers.setup.onboarding.installation-failed.title": {
+    "defaultMessage": "Pemasangan gagal"
+  },
+  "servers.setup.onboarding.modpack-upload-failed.title": {
+    "defaultMessage": "Pemuatnaikan pek mod gagal"
+  },
+  "servers.setup.onboarding.setup-server.button": {
+    "defaultMessage": "Sediakan pelayan"
+  },
+  "servers.setup.onboarding.step.choose.title": {
+    "defaultMessage": "Pilih apa yang hendak dimainkan"
+  },
+  "servers.setup.onboarding.step.configure-world.title": {
+    "defaultMessage": "Konfigurasikan dunia anda"
+  },
+  "servers.setup.onboarding.step.invite-friends.title": {
+    "defaultMessage": "Jemput rakan anda"
+  },
+  "servers.setup.onboarding.steps.heading": {
+    "defaultMessage": "Sediakan pelayan anda (~2 minit)"
+  },
+  "servers.setup.onboarding.welcome.title": {
+    "defaultMessage": "Selamat Datang ke Modrinth Hosting"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "Anda sedang dihadkan kekerapan. Sila cuba lagi kemudian."
@@ -3634,5 +4006,8 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Tinggalkan laman?"
+  },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "Ketepikan semua"
   }
 }

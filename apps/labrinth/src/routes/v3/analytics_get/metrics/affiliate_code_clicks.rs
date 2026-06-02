@@ -52,11 +52,11 @@ struct AffiliateCodeClickRow {
 
 const AFFILIATE_CODE_CLICKS: &str = {
     const USE_AFFILIATE_CODE_ID: &str = "{use_affiliate_code_id: Bool}";
-    const FILTER_AFFILIATE_CODE_ID: &str =
-        "{filter_affiliate_code_id: Array(UInt64)}";
+    const FILTER_AFFILIATE_CODE_ID: &str = "filter_affiliate_code_id";
 
     formatcp!(
-        "SELECT
+        "WITH ? AS {FILTER_AFFILIATE_CODE_ID}
+        SELECT
             widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
             if({USE_AFFILIATE_CODE_ID}, affiliate_code_id, 0) AS affiliate_code_id,
             COUNT(*) AS clicks
@@ -85,7 +85,6 @@ pub(crate) async fn fetch(
         ClickhouseQueryParams::empty(),
         &[("use_affiliate_code_id", uses(F::AffiliateCodeId))],
         vec![ClickhouseFilterParam::AffiliateCodeId(
-            "filter_affiliate_code_id",
             &metrics.filter_by.affiliate_code_id,
         )],
         |_| true,

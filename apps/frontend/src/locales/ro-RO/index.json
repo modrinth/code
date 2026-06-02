@@ -116,9 +116,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -1619,12 +1616,6 @@
   "project.settings.visit-dashboard": {
     "message": "Vizitează panoul de control al proiectelor"
   },
-  "project.stats.downloads-label": {
-    "message": "descărc{count, plural, one {are} other {ări}}"
-  },
-  "project.stats.followers-label": {
-    "message": "urmăritor{count, plural, one {} other {i}}"
-  },
   "project.status.archived.message": {
     "message": "Proiectul {title} a fost arhivat. Proiectul {title} nu va mai primi actualizări, cu excepția cazului în care autorul decide să-l dezarhiveze."
   },
@@ -1775,26 +1766,14 @@
   "scopes.organizationWrite.label": {
     "message": "Modifică organizații"
   },
-  "scopes.patCreate.description": {
-    "message": "Creează token-uri API personale"
-  },
   "scopes.patCreate.label": {
     "message": "Creează PAT-uri"
-  },
-  "scopes.patDelete.description": {
-    "message": "Șterge token-urile API personale"
   },
   "scopes.patDelete.label": {
     "message": "Șterge PAT-urile"
   },
-  "scopes.patRead.description": {
-    "message": "Vizualizează token-urile API create"
-  },
   "scopes.patRead.label": {
     "message": "Citește PAT-urile"
-  },
-  "scopes.patWrite.description": {
-    "message": "Editează token-urile API personale"
   },
   "scopes.patWrite.label": {
     "message": "Modifică PAT-urile"
