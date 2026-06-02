@@ -432,7 +432,7 @@ impl From<DBNotification> for Notification {
                     ],
                 ),
                 NotificationBody::ServerInvite {
-                    server_id,
+                    server_id: _,
                     server_name,
                     role,
                     ..
