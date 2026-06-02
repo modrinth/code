@@ -109,7 +109,7 @@ function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
 function formatCountryCode(countryCode: string, formatMessage: FormatMessage): string {
 	const normalized = countryCode.trim().toUpperCase()
 	if (normalized === OTHER_COUNTRY_CODE) {
-		return formatMessage(analyticsMessages.unknown)
+		return formatMessage(analyticsMessages.other)
 	}
 
 	if (!REGION_CODE_PATTERN.test(normalized)) {
@@ -146,6 +146,9 @@ export function formatBreakdownLabel(
 		normalizedLowercaseValue === 'other' ||
 		normalizedLowercaseValue === 'unknown'
 	) {
+		if (selectedBreakdown === 'country') {
+			return formatMessage(analyticsMessages.other)
+		}
 		return formatMessage(analyticsMessages.unknown)
 	}
 	if (selectedBreakdown === 'country') {
