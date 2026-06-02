@@ -12,6 +12,7 @@ import {
 	getSliceCount,
 } from '../analytics-chart/analytics-chart-utils'
 import type { FormatMessage } from '../analytics-messages'
+import { analyticsMessages } from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
 	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
@@ -121,9 +122,22 @@ export function buildAnalyticsTableRows({
 	}
 
 	function getCombinedBreakdownDisplay(displays: AnalyticsTableBreakdownDisplayValues) {
+		const unknownBreakdownLabel = formatMessage(analyticsMessages.unknown)
+		let hasUnknownBreakdownLabel = false
+
 		return selectedBreakdowns
 			.map((breakdown) => displays[breakdown])
 			.filter((displayValue): displayValue is string => Boolean(displayValue))
+			.filter((displayValue) => {
+				if (displayValue !== unknownBreakdownLabel) {
+					return true
+				}
+				if (hasUnknownBreakdownLabel) {
+					return false
+				}
+				hasUnknownBreakdownLabel = true
+				return true
+			})
 			.join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 	}
 

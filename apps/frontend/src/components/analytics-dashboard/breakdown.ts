@@ -99,5 +99,12 @@ function normalizeBreakdownValue(
 	fallback = ALL_BREAKDOWN_VALUE,
 ): string {
 	const normalized = value?.trim()
+	const normalizedLowercase = normalized?.toLowerCase()
+	if (
+		fallback === UNKNOWN_BREAKDOWN_VALUE &&
+		(normalizedLowercase === 'unknown' || normalizedLowercase === 'other')
+	) {
+		return fallback
+	}
 	return normalized && normalized.length > 0 ? normalized : fallback
 }
