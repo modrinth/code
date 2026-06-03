@@ -11,6 +11,33 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'app',
+		version: '0.14.3',
+		body: `## Added
+- Added toggle to hide play time from instance header.
+
+## Changed
+- Updated translations
+
+## Fixed
+- Fixed importing large .mrpack files in Modrinth App causing OS freezing or crashing.
+- Fixed the content update modal in the Content tab of instances hiding available updates in some cases.
+- Fixed copying full paths from the Files tab using mixed path separators on Windows.`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
 		date: `2026-05-31T16:45:15-07:00`,
 		product: 'app',
 		version: '0.14.2',

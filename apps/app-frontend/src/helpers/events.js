@@ -98,6 +98,10 @@ export async function friend_listener(callback) {
 	return await listen('friend', (event) => callback(event.payload))
 }
 
+export async function notification_listener(callback) {
+	return await listen('notification', (event) => callback(event.payload))
+}
+
 /// Payload for the 'log' event
 /*
     LogPayload {
