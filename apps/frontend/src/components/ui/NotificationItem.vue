@@ -32,12 +32,9 @@
 						/>
 						<span>{{ invitedBy.username }}</span>
 					</nuxt-link>
-					<span v-if="invitedBy">has invited you to join</span>
-					<span v-else>You have been invited to join</span>
-					<span class="font-bold text-[var(--color-heading)]">
-						{{ notification.body.server_name }}
-					</span>
-					<span>.</span>
+					<span v-if="invitedBy">has invited you to manage</span>
+					<span v-else>You have been invited to manage</span>
+					<span><strong class="font-bold text-[var(--color-heading)]">{{ notification.body.server_name }}</strong>.</span>
 				</div>
 				<div
 					v-if="!notification.read"
@@ -410,6 +407,7 @@ import ThreadSummary from './thread/ThreadSummary.vue'
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const emit = defineEmits(['update:notifications'])
+const router = useRouter()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -497,12 +495,17 @@ async function performAction(notification, actionIndex) {
 			if (type.value === 'server_invite') {
 				const actionName = action.title.toLowerCase()
 				const inviteAction = actionName === 'accept' ? 'accept' : 'decline'
+				const serverId = notification.body.server_id
 
-				await client.request(`/servers/${notification.body.server_id}/invites/${inviteAction}`, {
+				await client.request(`/servers/${serverId}/invites/${inviteAction}`, {
 					api: 'archon',
 					version: 1,
 					method: 'POST',
 				})
+
+				if (inviteAction === 'accept') {
+					await router.push(`/hosting/manage/${encodeURIComponent(serverId)}`)
+				}
 			} else {
 				const [method, route] = action.action_route
 

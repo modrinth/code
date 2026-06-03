@@ -204,10 +204,11 @@ impl NotificationBuilder {
         users: Vec<DBUserId>,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        self.insert_many_records(&users, transaction).await?;
+    ) -> Result<Vec<DBNotificationId>, DatabaseError> {
+        let notification_ids =
+            self.insert_many_records(&users, transaction).await?;
         DBNotification::clear_user_notifications_cache(&users, redis).await?;
-        Ok(())
+        Ok(notification_ids)
     }
 
     pub async fn insert_many_deliveries(
