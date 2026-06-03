@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Manage servers together",
+			"summary": "Add other users to your server, assign roles, and track what’s changed.",
+			"thumbnail": "https://modrinth.com/news/article/server-access/thumbnail.webp",
+			"date": "2026-06-03T20:10:28.823Z",
+			"link": "https://modrinth.com/news/article/server-access"
+		},
+		{
 			"title": "Pride 2026 Fundraiser: Matching up to $10,000",
 			"summary": "Celebrating our community and working together to make a difference.",
 			"thumbnail": "https://modrinth.com/news/article/pride-campaign-2026/thumbnail.webp",
