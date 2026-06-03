@@ -14,7 +14,7 @@
 		]"
 	>
 		<span
-			v-if="entity.iconUrl || entity.icon"
+			v-if="showAvatar || entity.icon"
 			class="inline-flex shrink-0 items-center justify-center"
 			:class="[
 				stackSecondary ? 'row-span-2 self-center' : 'mr-1',
@@ -22,12 +22,13 @@
 			]"
 		>
 			<Avatar
-				v-if="entity.iconUrl"
+				v-if="showAvatar"
 				:src="entity.iconUrl"
 				:alt="entity.label"
 				size="1.75rem"
 				no-shadow
 				raised
+				:tint-by="entity.label || entity.id"
 				:circle="entity.iconShape === 'circle'"
 				class="inline-flex shrink-0 border border-solid border-surface-5"
 				:class="entity.iconShape === 'circle' ? '!rounded-full' : '!rounded-lg'"
@@ -83,6 +84,7 @@ const props = withDefaults(
 const textWeightClass = computed(() =>
 	props.textWeight === 'semibold' ? 'font-semibold' : 'font-medium',
 )
+const showAvatar = computed(() => props.entity.iconUrl != null || props.entity.iconShape === 'circle')
 const labelRef = ref<HTMLElement | null>(null)
 const secondaryLabelRef = ref<HTMLElement | null>(null)
 </script>
