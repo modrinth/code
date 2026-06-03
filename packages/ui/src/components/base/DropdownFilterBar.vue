@@ -382,7 +382,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import ButtonStyled from './ButtonStyled.vue'
-import MultiSelect, { type MultiSelectItem, type MultiSelectOption } from './MultiSelect.vue'
+import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 import StyledInput from './StyledInput.vue'
 
 export type DropdownFilterBarOption = {
@@ -799,9 +799,7 @@ function getOptionsWithSelectedValues(
 		return options
 	}
 
-	const knownValues = new Set(
-		options.filter(isDropdownFilterOption).map((option) => option.value),
-	)
+	const knownValues = new Set(options.filter(isDropdownFilterOption).map((option) => option.value))
 	const missingSelectedOptions = selectedValues
 		.filter((value) => !knownValues.has(value))
 		.map((value) => ({
@@ -821,9 +819,7 @@ function getCategorySyntheticValues(categoryKey: string): Set<string> {
 	return category ? getCategorySyntheticValueSet(category) : new Set()
 }
 
-function getVisiblePreviewOptions(
-	category: DropdownFilterBarCategory,
-): MultiSelectItem<string>[] {
+function getVisiblePreviewOptions(category: DropdownFilterBarCategory): MultiSelectItem<string>[] {
 	return category.options.map((option) =>
 		isDropdownFilterSectionHeader(option)
 			? option

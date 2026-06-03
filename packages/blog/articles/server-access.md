@@ -2,14 +2,14 @@
 title: Manage servers together
 summary: Add other users to your server, assign roles, and track what’s changed.
 date: 2026-06-03T20:10:28.823Z
-authors: ['']
+authors: ['bOHH0P9Z', 'AJfd8YH6']
 ---
 
 Hey everyone,
 
 With this release, you can now give other users access to your server! This has been one of the most requested features for Modrinth Hosting and we’re excited to finally get it out.
 
-< [IMG] Server access pg >
+![The new Access tab in the Modrinth Hosting panel, featuring a list of invited users and their permissions, invite new users, and an activity log to see what changes are being made to your server and by whom.](./server-access.webp)
 
 ## TL;DR
 
@@ -23,7 +23,7 @@ You can now give other users access to your server so they can help manage conte
 
 Alongside this release, we’ve also improved state syncing between the website panel, app, and other users, so everything should stay up to date in real time.
 
-< [IMG] Invite modal >
+![A pop-up modal for adding a user to your server. Search by Modrinth username, select their role (editor or limited), and an option to also send them a friend request.](./add-user-modal.webp)
 
 ## Permission roles
 
@@ -54,7 +54,7 @@ Along with adding users, we’ve introduced an activity log. This is a chronolog
 
 You can select a time timeframe and filter by user or action type if you’re looking for something specific.
 
-< [IMG] Activity log with filters applied >
+![The activity log section of the Access tab, where you can see the user that performed an action on the left column, the action that was performed in the center, and the time it happened on the right.](./activity-log.webp)
 
 —
 

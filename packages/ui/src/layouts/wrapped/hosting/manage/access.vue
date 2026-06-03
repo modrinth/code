@@ -625,12 +625,7 @@ const actionLogActionGroups = [
 		key: 'users',
 		label: messages.actionGroupUsers,
 		icon: UsersIcon,
-		actions: [
-			'user_invited',
-			'user_invite_revoked',
-			'user_permission_modified',
-			'user_removed',
-		],
+		actions: ['user_invited', 'user_invite_revoked', 'user_permission_modified', 'user_removed'],
 	},
 	{
 		key: 'content',
@@ -1673,10 +1668,7 @@ async function sendFriendRequest(userIdOrUsername: string) {
 	}
 }
 
-function hasFriendRelationship(
-	friends: Labrinth.Friends.v3.UserFriend[],
-	userId: string,
-) {
+function hasFriendRelationship(friends: Labrinth.Friends.v3.UserFriend[], userId: string) {
 	return friends.some((friend) => friend.id === userId || friend.friend_id === userId)
 }
 
