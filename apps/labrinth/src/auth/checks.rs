@@ -7,42 +7,32 @@ use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::models::ids::FileId;
 use crate::models::projects::{
-    DependencyAttribution, MissingAttributionFile, OverrideSource, Version,
+    MissingAttributionFile, OverrideSource, Version,
 };
 use crate::models::users::User;
 use crate::queue::file_scan::{
-    DependencyAttributionData, get_dependency_attributions,
-    get_files_missing_attribution,
+    get_dependency_attributions, get_files_missing_attribution,
 };
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
 
-pub fn enrich_dependency_attributions(
-    version: &mut Version,
-    dep_attr: &std::collections::HashMap<
-        (database::models::ids::DBVersionId, String),
-        DependencyAttributionData,
-    >,
+pub async fn enrich_dependency_attributions(
+    versions: &mut [VersionQueryResult],
+    pool: &PgPool,
 ) {
-    let version_id = database::models::ids::DBVersionId(version.id.0 as i64);
-    for dep in &mut version.dependencies {
-        if let Some(file_name) = &dep.file_name
-            && let Some(attr) = dep_attr.get(&(version_id, file_name.clone()))
-        {
-            let attribution = DependencyAttribution {
-                link: attr.link.clone().and_then(|u| u.parse().ok()),
-                icon_url: attr.icon_url.clone().and_then(|u| u.parse().ok()),
-                license: attr
-                    .license
-                    .clone()
-                    .and_then(|v| serde_json::from_value(v).ok()),
-            };
-            if attribution.link.is_some()
-                || attribution.icon_url.is_some()
-                || attribution.license.is_some()
+    let version_ids = versions.iter().map(|v| v.inner.id).collect::<Vec<_>>();
+    let dep_attr = get_dependency_attributions(pool, &version_ids)
+        .await
+        .unwrap_or_default();
+
+    for version in versions {
+        for dep in &mut version.dependencies {
+            if let Some(attr) = dep_attr.get(&dep.id)
+                && (attr.attribution.flame_project.is_some()
+                    || attr.attribution.resolution.is_some())
             {
-                dep.attribution = Some(attribution);
+                dep.attribution = Some(attr.attribution.clone());
             }
         }
     }
@@ -248,9 +238,7 @@ pub async fn filter_visible_versions(
         .await
         .unwrap_or_default();
 
-    let dep_attr = get_dependency_attributions(pool, &version_ids)
-        .await
-        .unwrap_or_default();
+    enrich_dependency_attributions(&mut versions, pool).await;
 
     Ok(versions
         .into_iter()
@@ -277,7 +265,6 @@ pub async fn filter_visible_versions(
                 .unwrap_or_default();
             let mut version = Version::from(v);
             version.files_missing_attribution = files_missing;
-            enrich_dependency_attributions(&mut version, &dep_attr);
             version
         })
         .collect())

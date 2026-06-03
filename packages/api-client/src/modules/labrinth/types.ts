@@ -266,12 +266,15 @@ export namespace Labrinth {
 			export type AttributionModerationStatus = {
 				kind: AttributionModerationStatusKind
 				reason: string
+				moderated_at?: string
+				moderated_by?: string
 			}
 
 			export type AttributionResolutionBase = {
 				notes: string
 				image_urls: string[]
 				moderation_status?: AttributionModerationStatus | null
+				updated_by_moderator: boolean
 			}
 
 			export type AttributionResolution =
@@ -1270,11 +1273,47 @@ export namespace Labrinth {
 
 		// TODO: consolidate duplicated types between v2 and v3 versions
 		export namespace v3 {
+			export type FlameProject = {
+				id: number
+				title: string
+				url: string
+				icon_url: string
+			}
+
+			export type DependencyAttribution = {
+				flame_project?: FlameProject
+				resolution?: DependencyAttributionResolution
+			}
+
+			export type DependencyAttributionResolution =
+				| {
+						kind: 'license'
+						license: Labrinth.Attribution.Internal.AttributionLicense
+						link_to_work: string
+				  }
+				| {
+						kind: 'globally_allowed'
+						link_to_work: string
+				  }
+				| {
+						kind: 'my_project'
+						license: Labrinth.Attribution.Internal.AttributionLicense
+				  }
+				| {
+						kind: 'special_permissions'
+						link_to_work: string
+				  }
+				| {
+						kind: 'no_permission'
+						link_to_work?: string
+				  }
+
 			export interface Dependency {
 				dependency_type: Labrinth.Versions.v2.DependencyType
 				project_id?: string
 				file_name?: string
 				version_id?: string
+				attribution?: DependencyAttribution
 			}
 
 			export interface GetProjectVersionsParams {
