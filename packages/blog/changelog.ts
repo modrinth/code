@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-03T14:00:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed organization settings not loading.`,
+	},
+	{
 		date: `2026-06-02T16:37:52+00:00`,
 		product: 'app',
 		version: '0.14.3',
