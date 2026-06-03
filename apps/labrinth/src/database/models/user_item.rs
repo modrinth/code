@@ -286,7 +286,7 @@ impl DBUser {
         let lowercase_query = query.to_lowercase();
         let pattern = format!("{}%", escape_like(&lowercase_query));
 
-        let users = sqlx::query(
+        let users = sqlx::query!(
             "
             SELECT id, username, avatar_url
             FROM users
@@ -294,16 +294,16 @@ impl DBUser {
             ORDER BY LOWER(username) = $2 DESC, LOWER(username), username
             LIMIT 25
             ",
+            pattern,
+            lowercase_query
         )
-        .bind(pattern)
-        .bind(lowercase_query)
         .fetch_all(exec)
         .await?
         .into_iter()
         .map(|row| DBSearchUser {
-            id: DBUserId(row.get("id")),
-            username: row.get("username"),
-            avatar_url: row.get("avatar_url"),
+            id: DBUserId(row.id),
+            username: row.username,
+            avatar_url: row.avatar_url,
         })
         .collect();
 
