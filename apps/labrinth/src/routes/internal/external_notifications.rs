@@ -151,11 +151,41 @@ pub async fn create_email_sync(
         .filter(|id| !already_notified.contains(id))
         .collect::<Vec<_>>();
 
-    NotificationBuilder { body: body.clone() }
+    let notification_ids = NotificationBuilder { body: body.clone() }
         .insert_many_without_delivery(notification_user_ids, &mut txn, &redis)
         .await?;
 
+    let notifications = DBNotification::get_many(&notification_ids, &mut txn)
+        .await?
+        .into_iter()
+        .map(Notification::from)
+        .collect::<Vec<_>>();
+
     txn.commit().await?;
+
+    for notification in notifications {
+        let Notification {
+            user_id: to_user,
+            id: notification_id,
+            ..
+        } = notification;
+        if let Err(error) = broadcast_friends_message(
+            &redis,
+            RedisFriendsMessage::Notification {
+                to_user,
+                notification,
+            },
+        )
+        .await
+        {
+            tracing::warn!(
+                ?error,
+                ?notification_id,
+                ?to_user,
+                "failed to broadcast realtime notification"
+            );
+        }
+    }
 
     let mut email_txn = pool.begin().await?;
 
