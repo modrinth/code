@@ -9,11 +9,13 @@
 			:has-to-type="true"
 			@proceed="deleteAccount"
 		/>
-		<Modal
+		<NewModal
 			ref="changeEmailModal"
 			:header="`${auth.user.email ? formatMessage(messages.changeEmailHeaderChange) : formatMessage(messages.changeEmailHeaderAdd)}`"
+			width="600px"
+			class="change-email-modal"
 		>
-			<div class="universal-modal">
+			<div class="universal-body">
 				<p>{{ formatMessage(messages.emailNotPublicNotice) }}</p>
 				<label for="email-input">
 					<span class="label__title">{{ formatMessage(messages.emailAddressLabel) }}</span>
@@ -24,9 +26,12 @@
 					:maxlength="2048"
 					type="email"
 					:placeholder="formatMessage(messages.emailAddressPlaceholder)"
+					wrapper-class="w-full"
 					@keyup.enter="saveEmail()"
 				/>
-				<div class="input-group push-right mt-3">
+			</div>
+			<template #actions>
+				<div class="input-group push-right">
 					<ButtonStyled>
 						<button @click="$refs.changeEmailModal.hide()">
 							<XIcon />
@@ -40,8 +45,8 @@
 						</button>
 					</ButtonStyled>
 				</div>
-			</div>
-		</Modal>
+			</template>
+		</NewModal>
 		<Modal
 			ref="managePasswordModal"
 			:header="`${
@@ -477,6 +482,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
+	NewModal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
@@ -1025,5 +1031,25 @@ canvas {
 			margin-right: 0.35rem;
 		}
 	}
+}
+</style>
+
+<style lang="scss">
+.change-email-modal {
+	border-color: var(--color-bg);
+}
+
+.change-email-modal > :first-child {
+	background-color: var(--color-bg);
+	border-bottom-color: var(--color-bg);
+}
+
+.change-email-modal > :first-child > div:first-child > span {
+	color: var(--color-base);
+	font-size: 1.25rem;
+}
+
+.modal-root:has(.change-email-modal) .modal-overlay.standard {
+	background: hsla(0, 0%, 0%, 0.6);
 }
 </style>
