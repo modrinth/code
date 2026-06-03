@@ -13,6 +13,7 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use sqlx::Row;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
@@ -55,6 +56,13 @@ pub struct DBUser {
     pub allow_friend_requests: bool,
 
     pub is_subscribed_to_newsletter: bool,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct DBSearchUser {
+    pub id: DBUserId,
+    pub username: String,
+    pub avatar_url: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, utoipa::ToSchema)]
@@ -262,6 +270,44 @@ impl DBUser {
                 Ok(users)
             }).await?;
         Ok(val)
+    }
+
+    pub async fn search<'a, E>(
+        query: &str,
+        exec: E,
+    ) -> Result<Vec<DBSearchUser>, sqlx::Error>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        if query.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let lowercase_query = query.to_lowercase();
+        let pattern = format!("{}%", escape_like(&lowercase_query));
+
+        let users = sqlx::query(
+            "
+            SELECT id, username, avatar_url
+            FROM users
+            WHERE LOWER(username) LIKE $1 ESCAPE '\'
+            ORDER BY LOWER(username) = $2 DESC, LOWER(username), username
+            LIMIT 25
+            ",
+        )
+        .bind(pattern)
+        .bind(lowercase_query)
+        .fetch_all(exec)
+        .await?
+        .into_iter()
+        .map(|row| DBSearchUser {
+            id: DBUserId(row.get("id")),
+            username: row.get("username"),
+            avatar_url: row.get("avatar_url"),
+        })
+        .collect();
+
+        Ok(users)
     }
 
     pub async fn get_by_email<'a, E>(
@@ -1043,4 +1089,15 @@ impl DBUser {
             Ok(None)
         }
     }
+}
+
+fn escape_like(query: &str) -> String {
+    let mut escaped = String::with_capacity(query.len());
+    for ch in query.chars() {
+        if matches!(ch, '\\' | '%' | '_') {
+            escaped.push('\\');
+        }
+        escaped.push(ch);
+    }
+    escaped
 }
