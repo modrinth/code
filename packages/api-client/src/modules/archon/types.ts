@@ -539,6 +539,7 @@ export namespace Archon {
 			export type ServerUser = {
 				user: UserResp
 				added_on?: string | null
+				last_invite_sent?: string | null
 				permissions: UserScope
 			}
 
@@ -547,6 +548,11 @@ export namespace Archon {
 				user_id: string
 				added_on?: string | null
 				role: ServerUserRole
+			}
+
+			export type ReinviteResponse = {
+				sent: boolean
+				cooldown_seconds: number | null
 			}
 		}
 	}

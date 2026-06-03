@@ -176,6 +176,7 @@ const ACTION_LOG_PAGE_SIZE = 200
 const ACTION_LOG_FILTER_OVERLAY_MS = 750
 const SUPPORT_ACTION_LOG_USER_FILTER = 'support'
 const SERVER_SCOPED_ACTION_LOG_WORLD_FILTER = '__server_scoped__'
+const INVITE_RESEND_COOLDOWN_SECONDS = 2 * 60
 
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
@@ -186,6 +187,7 @@ const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 const pendingRemovalMember = ref<ServerAccessMember | null>(null)
 const shouldCancelInvite = ref(false)
+const reinviteCooldownUntilByUserId = ref<Record<string, number>>({})
 const editorScopes = [
 	'BASE_READ',
 	'POWER_ACTIONS',
@@ -724,6 +726,16 @@ const members = computed<ServerAccessMember[]>(() =>
 			const userId = serverUser.user.id
 			const username = serverUser.user.username || userId
 			const role = apiPermissionsToAccessRole(serverUser.permissions)
+			const nowReinviteAvailableAt = reinviteCooldownUntilByUserId.value[userId]
+			const apiReinviteAvailableAt = getInviteResendAvailableAt(serverUser.last_invite_sent)
+			const reinviteAvailableAt = [
+				nowReinviteAvailableAt,
+				apiReinviteAvailableAt,
+			].reduce((candidate, current) =>
+				candidate === undefined || (current !== undefined && current > candidate)
+					? current
+					: candidate,
+			)
 
 			return {
 				id: `${serverId}-${userId}`,
@@ -735,6 +747,9 @@ const members = computed<ServerAccessMember[]>(() =>
 				role,
 				joinedAt: serverUser.added_on ?? null,
 				pending: !serverUser.added_on,
+				inviteResendAvailableAt: reinviteAvailableAt
+					? new Date(reinviteAvailableAt).toISOString()
+					: undefined,
 				isOwner: role === 'owner',
 			}
 		})
@@ -1460,6 +1475,22 @@ function resolveMemberUserId(member: ServerAccessMember): string {
 	return member.user.id
 }
 
+function getInviteResendAvailableAt(lastInviteSent: string | null | undefined): number | undefined {
+	if (!lastInviteSent) return undefined
+	const lastInviteSentAt = new Date(lastInviteSent).getTime()
+	if (Number.isNaN(lastInviteSentAt)) return undefined
+	return lastInviteSentAt + INVITE_RESEND_COOLDOWN_SECONDS * 1000
+}
+
+function setReinviteCooldown(member: ServerAccessMember, cooldownSeconds: number | null) {
+	if (!cooldownSeconds) {
+		delete reinviteCooldownUntilByUserId.value[member.user.id]
+		return
+	}
+
+	reinviteCooldownUntilByUserId.value[member.user.id] = Date.now() + cooldownSeconds * 1000
+}
+
 async function updateMemberRole(member: ServerAccessMember, role: ServerAccessRole) {
 	if (!canManageUsers.value || member.isOwner || member.role === role || role === 'owner') return
 	const previousRole = member.role
@@ -1489,7 +1520,11 @@ async function resendInvite(member: ServerAccessMember) {
 	if (!canManageUsers.value || !member.pending || member.role === 'owner') return
 
 	try {
-		await client.archon.server_users_v1.reinvite(serverId, member.user.id)
+		const result = await client.archon.server_users_v1.reinvite(serverId, member.user.id)
+		setReinviteCooldown(member, result.cooldown_seconds)
+
+		if (!result.sent) return
+
 		await invalidateServerUsers()
 		await invalidateActionLog()
 		addNotification({
