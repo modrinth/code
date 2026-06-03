@@ -3263,6 +3263,27 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Backups"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Content and modpack"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Files and SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Power and console"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Server"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Settings and runtime"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Users and invites"
+  },
   "servers.access-page.activity-log-filter.action-types": {
     "defaultMessage": "Action types"
   },
@@ -3436,12 +3457,6 @@
   },
   "servers.access-page.notification.invite-failed.title": {
     "defaultMessage": "Invite could not be sent"
-  },
-  "servers.access-page.notification.invite-resend-unavailable.text": {
-    "defaultMessage": "Invites are accepted automatically for this server."
-  },
-  "servers.access-page.notification.invite-resend-unavailable.title": {
-    "defaultMessage": "Invite cannot be resent"
   },
   "servers.access-page.notification.invite-resent.text": {
     "defaultMessage": "Sent another invite to {target}."
