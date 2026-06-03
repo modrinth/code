@@ -284,7 +284,7 @@ impl DBUser {
         }
 
         let lowercase_query = query.to_lowercase();
-        let pattern = format!("{}%", escape_like(&lowercase_query));
+        let escaped_query = format!("{}%", escape_like(&lowercase_query));
 
         let users = sqlx::query!(
             "
@@ -294,7 +294,7 @@ impl DBUser {
             ORDER BY LOWER(username) = $2 DESC, LOWER(username), username
             LIMIT 25
             ",
-            pattern,
+            escaped_query,
             lowercase_query
         )
         .fetch_all(exec)
