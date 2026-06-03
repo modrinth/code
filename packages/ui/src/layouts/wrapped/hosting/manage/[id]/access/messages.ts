@@ -1,7 +1,4 @@
-import type { MessageDescriptor } from '#ui/composables/i18n'
 import { defineMessages } from '#ui/composables/i18n'
-
-import type { ActionLogFilterActionName } from './audit-log-utils'
 
 export const accessMessages = defineMessages({
 	searchUsersPlaceholder: {
@@ -315,4 +312,4 @@ export const actionLogActionMessages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.action.java-version-modified',
 		defaultMessage: 'Changed Java version',
 	},
-} satisfies Record<ActionLogFilterActionName, MessageDescriptor>)
+})
