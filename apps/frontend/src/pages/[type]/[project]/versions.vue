@@ -2,7 +2,7 @@
 	<section class="overflow-visible">
 		<!-- Loading state -->
 		<div
-			v-if="versionsLoading && !versions?.length"
+			v-if="showVersionsLoadingState"
 			class="flex items-center justify-center gap-2 py-8"
 		>
 			<SpinnerIcon class="animate-spin" />
@@ -290,9 +290,17 @@ const {
 	invalidate,
 	versions,
 	versionsLoading,
+	versionsLoaded,
 	loadVersions,
 	cdnDownloadReason,
 } = injectProjectPageContext()
+
+const showVersionsLoadingState = computed(
+	() =>
+		!versions.value?.length &&
+		(versionsLoading.value ||
+			(!versionsLoaded.value && (project.value?.versions?.length ?? 0) > 0)),
+)
 
 // Load versions on mount (client-side)
 onMounted(() => {

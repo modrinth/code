@@ -1892,6 +1892,7 @@ const versions = computed(() => {
 
 // Versions loading state
 const versionsLoading = computed(() => versionsV3Loading.value)
+const versionsLoaded = computed(() => versionsV3.value !== undefined || !!_versionsV3Error.value)
 
 // Load versions on demand (client-side only)
 function loadVersions() {
@@ -2735,6 +2736,7 @@ provideProjectPageContext({
 	// Lazy version loading
 	versions,
 	versionsLoading,
+	versionsLoaded,
 	// Lazy dependencies loading
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
