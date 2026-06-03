@@ -88,7 +88,24 @@
 			<div class="flex min-w-0 flex-1 flex-col" :class="{ 'gap-2.5': type === 'instance-ready' }">
 				<div class="flex min-w-0 flex-1 items-start gap-1">
 					<div class="flex min-w-0 flex-1 flex-col gap-[3px] text-base leading-5">
-						<p class="m-0 min-w-0 truncate font-medium text-contrast">{{ entityLabel }}</p>
+						<div
+							ref="headerOuterRef"
+							class="min-w-0 overflow-hidden font-medium text-contrast"
+							:class="{ 'notification-toast-header-fade-mask': isHeaderOverflowing }"
+							:style="
+								isHeaderOverflowing
+									? { '--notification-toast-header-scroll-distance': `-${headerOverflowAmount}px` }
+									: undefined
+							"
+						>
+							<p
+								ref="headerInnerRef"
+								class="m-0 w-fit whitespace-nowrap"
+								:class="{ 'notification-toast-header-scroll': isHeaderAnimating }"
+							>
+								{{ entityLabel }}
+							</p>
+						</div>
 						<p class="m-0 min-w-0 truncate font-normal text-primary">{{ statusLine }}</p>
 					</div>
 					<ButtonStyled size="small" type="transparent" circular>
@@ -139,7 +156,7 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -221,9 +238,49 @@ const statusLine = computed(() => {
 const showsBottomProgress = computed(
 	() => props.type === 'instance-download' || (props.type === 'instance-ready' && props.progress != null),
 )
+
+const headerOuterRef = ref<HTMLDivElement | null>(null)
+const headerInnerRef = ref<HTMLParagraphElement | null>(null)
+const isHeaderOverflowing = ref(false)
+const isHeaderAnimating = ref(false)
+const headerOverflowAmount = ref(0)
+
+let headerResizeObserver: ResizeObserver | null = null
+
+function checkHeaderOverflow() {
+	if (!headerOuterRef.value || !headerInnerRef.value) return
+	const overflow = headerInnerRef.value.scrollWidth - headerOuterRef.value.clientWidth
+	const overflowing = overflow > 0
+	isHeaderOverflowing.value = overflowing
+	isHeaderAnimating.value = overflowing
+	headerOverflowAmount.value = overflow + 12
+}
+
+onMounted(() => {
+	checkHeaderOverflow()
+	headerResizeObserver = new ResizeObserver(checkHeaderOverflow)
+	if (headerOuterRef.value) headerResizeObserver.observe(headerOuterRef.value)
+	if (headerInnerRef.value) headerResizeObserver.observe(headerInnerRef.value)
+})
+
+onBeforeUnmount(() => {
+	headerResizeObserver?.disconnect()
+})
+
+watch(entityLabel, () => {
+	requestAnimationFrame(checkHeaderOverflow)
+})
 </script>
 
 <style scoped>
+.notification-toast-header-fade-mask {
+	mask-image: linear-gradient(to right, black, black calc(100% - 12px), transparent);
+}
+
+.notification-toast-header-scroll {
+	animation: notification-toast-header-scroll 10s ease-in-out infinite;
+}
+
 .notification-toast-action {
 	--_height: 2rem;
 	--_radius: 0.75rem;
@@ -270,5 +327,20 @@ const showsBottomProgress = computed(
 
 .notification-bottom-progress-track {
 	background-color: color-mix(in srgb, var(--surface-2) 50%, transparent);
+}
+
+@keyframes notification-toast-header-scroll {
+	0% {
+		transform: translateX(0);
+	}
+
+	35%,
+	65% {
+		transform: translateX(var(--notification-toast-header-scroll-distance));
+	}
+
+	100% {
+		transform: translateX(0);
+	}
 }
 </style>

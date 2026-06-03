@@ -19,7 +19,7 @@
 						:key="progressItem.id"
 						type="instance-download"
 						:entity-name="progressItem.title || item.title"
-						:entity-icon-url="MinecraftServerIcon"
+						:entity-icon-url="progressItem.iconUrl ?? item.iconUrl ?? MinecraftServerIcon"
 						:status-text="downloadStatusText(progressItem)"
 						:progress="progressItem.progress"
 						:waiting="progressItem.waiting"
@@ -175,6 +175,7 @@ function downloadToastItems(item: PopupNotification): PopupNotificationProgressI
 			id: `${item.id}`,
 			title: item.title,
 			text: item.text,
+			iconUrl: item.iconUrl,
 			progress: item.progress ?? 0,
 			waiting: item.waiting ?? false,
 		},

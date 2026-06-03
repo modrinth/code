@@ -59,11 +59,13 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { hasServerPermission } from '#ui/composables/server-permissions'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerPermissions } from '#ui/composables/server-permissions'
+import { injectModrinthServerContext } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { useInlineBackup } from '../../composables/use-inline-backup'
 
@@ -78,7 +80,11 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
+const serverCtx = injectModrinthServerContext(null)
+const canManageBackups = computed(
+	() => !serverCtx || hasServerPermission(serverCtx.currentUserPermissions.value, 'BACKUPS'),
+)
+const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 const backup = useInlineBackup(() => props.backupName)
 

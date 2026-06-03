@@ -14,6 +14,7 @@ export interface PopupNotificationProgressItem {
 	id: string
 	title: string
 	text?: string
+	iconUrl?: string | null
 	progress: number
 	waiting: boolean
 }
@@ -25,6 +26,7 @@ export interface PopupNotification {
 	bodyComponent?: Component
 	bodyProps?: Record<string, unknown>
 	text?: string
+	iconUrl?: string | null
 	type?: 'error' | 'warning' | 'success' | 'info' | 'download'
 	progress?: number
 	waiting?: boolean

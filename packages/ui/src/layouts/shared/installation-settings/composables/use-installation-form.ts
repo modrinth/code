@@ -2,6 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { Ref } from 'vue'
 import { computed, nextTick, ref, watch } from 'vue'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import type { ContentUpdaterModal } from '../../content-tab'
@@ -20,6 +21,7 @@ export function useInstallationForm(
 		InstanceType<typeof IncompatibleContentModal> | null | undefined
 	>,
 ) {
+	const debug = useDebugLogger('InstallationSettingsForm')
 	const isEditing = ref(false)
 	const selectedPlatform = ctx.editingPlatformRef ?? ref(ctx.currentPlatform.value)
 	const selectedGameVersion = ctx.editingGameVersionRef ?? ref(ctx.currentGameVersion.value)
@@ -77,14 +79,56 @@ export function useInstallationForm(
 	})
 
 	watch(selectedPlatform, () => {
+		debug('selectedPlatform watch:', {
+			selectedPlatform: selectedPlatform.value,
+			selectedGameVersion: selectedGameVersion.value,
+			selectedLoaderVersion: selectedLoaderVersion.value,
+		})
 		selectedLoaderVersion.value = 0
 	})
 	watch(selectedGameVersion, () => {
+		debug('selectedGameVersion watch:', {
+			selectedPlatform: selectedPlatform.value,
+			selectedGameVersion: selectedGameVersion.value,
+			selectedLoaderVersion: selectedLoaderVersion.value,
+		})
 		selectedLoaderVersion.value = 0
 	})
 
+	watch(
+		[
+			isEditing,
+			isSaving,
+			isVerifying,
+			pendingPreview,
+			incompatibleContentVariant,
+		],
+		(value, oldValue) => {
+			debug('state watch:', {
+				oldValue,
+				value,
+				selectedPlatform: selectedPlatform.value,
+				selectedGameVersion: selectedGameVersion.value,
+				selectedLoaderVersion: selectedLoaderVersion.value,
+				isValid: isValid.value,
+				hasChanges: hasChanges.value,
+			})
+		},
+	)
+
 	async function save() {
-		if (ctx.isBusy.value) return
+		debug('save: start', {
+			isBusy: ctx.isBusy.value,
+			selectedPlatform: selectedPlatform.value,
+			selectedGameVersion: selectedGameVersion.value,
+			selectedLoaderVersion: selectedLoaderVersion.value,
+			isValid: isValid.value,
+			hasChanges: hasChanges.value,
+		})
+		if (ctx.isBusy.value) {
+			debug('save: ignored busy')
+			return
+		}
 		isSaving.value = true
 		try {
 			const platformChanged = selectedPlatform.value !== ctx.currentPlatform.value
@@ -92,22 +136,37 @@ export function useInstallationForm(
 			const gameVersionChanged = selectedGameVersion.value !== ctx.currentGameVersion.value
 
 			if (platformChanged && ctx.disableAllContent) {
+				debug('save: platform changed, showing incompatible modal', {
+					currentPlatform: ctx.currentPlatform.value,
+					selectedPlatform: selectedPlatform.value,
+				})
 				isSaving.value = false
 				incompatibleContentVariant.value = 'loader-change'
 				await nextTick()
+				debug('save: incompatible modal ref before show', {
+					hasRef: !!incompatibleContentModalRef?.value,
+				})
 				incompatibleContentModalRef?.value?.show()
 				return
 			}
 
 			if (isModded && gameVersionChanged && ctx.disableIncompatibleContent) {
+				debug('save: game version changed, showing incompatible modal', {
+					currentGameVersion: ctx.currentGameVersion.value,
+					selectedGameVersion: selectedGameVersion.value,
+				})
 				isSaving.value = false
 				incompatibleContentVariant.value = 'game-version-change'
 				await nextTick()
+				debug('save: incompatible modal ref before show', {
+					hasRef: !!incompatibleContentModalRef?.value,
+				})
 				incompatibleContentModalRef?.value?.show()
 				return
 			}
 
 			if (ctx.previewSave && isModded && gameVersionChanged) {
+				debug('save: previewSave start')
 				isVerifying.value = true
 				abortController = new AbortController()
 				const loaderVersionId =
@@ -129,8 +188,15 @@ export function useInstallationForm(
 				}
 
 				if (preview && (preview.diffs.length > 0 || preview.hasUnknownContent)) {
+					debug('save: preview returned diffs, showing content diff modal', {
+						diffs: preview.diffs.length,
+						hasUnknownContent: preview.hasUnknownContent,
+					})
 					pendingPreview.value = preview
 					await nextTick()
+					debug('save: content diff modal ref before show', {
+						hasRef: !!contentDiffModalRef?.value,
+					})
 					contentDiffModalRef?.value?.show()
 					return
 				}
@@ -138,11 +204,17 @@ export function useInstallationForm(
 
 			await performSave()
 		} catch {
+			debug('save: caught error, resetting isSaving')
 			isSaving.value = false
 		}
 	}
 
 	async function performSave() {
+		debug('performSave: start', {
+			selectedPlatform: selectedPlatform.value,
+			selectedGameVersion: selectedGameVersion.value,
+			selectedLoaderVersion: selectedLoaderVersion.value,
+		})
 		try {
 			const loaderVersionId =
 				selectedPlatform.value !== 'vanilla'
@@ -151,13 +223,19 @@ export function useInstallationForm(
 			await ctx.save(selectedPlatform.value, selectedGameVersion.value, loaderVersionId)
 			if (ctx.afterSave) await ctx.afterSave()
 			isEditing.value = false
+			debug('performSave: success')
 		} finally {
 			isSaving.value = false
+			debug('performSave: finally', { isSaving: isSaving.value, isEditing: isEditing.value })
 		}
 	}
 
 	async function confirmLoaderChange() {
-		if (ctx.isBusy.value) return
+		debug('confirmLoaderChange: start', { isBusy: ctx.isBusy.value })
+		if (ctx.isBusy.value) {
+			debug('confirmLoaderChange: ignored busy')
+			return
+		}
 		try {
 			if (ctx.disableAllContent) {
 				await ctx.disableAllContent()
@@ -171,7 +249,11 @@ export function useInstallationForm(
 	}
 
 	async function confirmAutoFix() {
-		if (ctx.isBusy.value) return
+		debug('confirmAutoFix: start', { isBusy: ctx.isBusy.value })
+		if (ctx.isBusy.value) {
+			debug('confirmAutoFix: ignored busy')
+			return
+		}
 		try {
 			if (ctx.previewSave) {
 				isVerifying.value = true
@@ -195,10 +277,17 @@ export function useInstallationForm(
 				}
 
 				if (preview && (preview.diffs.length > 0 || preview.hasUnknownContent)) {
+					debug('confirmAutoFix: preview returned diffs', {
+						diffs: preview.diffs.length,
+						hasUnknownContent: preview.hasUnknownContent,
+					})
 					pendingPreview.value = preview
 					incompatibleContentVariant.value = null
 					await nextTick()
 					await nextTick()
+					debug('confirmAutoFix: content diff modal ref before show', {
+						hasRef: !!contentDiffModalRef?.value,
+					})
 					contentDiffModalRef?.value?.show()
 					return
 				}
@@ -213,7 +302,11 @@ export function useInstallationForm(
 	}
 
 	async function confirmDisableConflicts() {
-		if (ctx.isBusy.value) return
+		debug('confirmDisableConflicts: start', { isBusy: ctx.isBusy.value })
+		if (ctx.isBusy.value) {
+			debug('confirmDisableConflicts: ignored busy')
+			return
+		}
 		try {
 			if (ctx.disableIncompatibleContent) {
 				await ctx.disableIncompatibleContent(selectedGameVersion.value)
@@ -243,7 +336,11 @@ export function useInstallationForm(
 	}
 
 	async function confirmSave() {
-		if (ctx.isBusy.value) return
+		debug('confirmSave: start', { isBusy: ctx.isBusy.value, hasPendingPreview: !!pendingPreview.value })
+		if (ctx.isBusy.value) {
+			debug('confirmSave: ignored busy')
+			return
+		}
 		pendingPreview.value = null
 		try {
 			await performSave()
@@ -253,12 +350,28 @@ export function useInstallationForm(
 	}
 
 	function cancelPreview() {
+		debug('cancelPreview: start', {
+			hasPendingPreview: !!pendingPreview.value,
+			incompatibleContentVariant: incompatibleContentVariant.value,
+			isSaving: isSaving.value,
+		})
 		pendingPreview.value = null
 		incompatibleContentVariant.value = null
 		isSaving.value = false
+		debug('cancelPreview: done')
 	}
 
 	function cancelEditing() {
+		debug('cancelEditing: start', {
+			selectedPlatform: selectedPlatform.value,
+			selectedGameVersion: selectedGameVersion.value,
+			selectedLoaderVersion: selectedLoaderVersion.value,
+			currentPlatform: ctx.currentPlatform.value,
+			currentGameVersion: ctx.currentGameVersion.value,
+			currentLoaderVersion: ctx.currentLoaderVersion.value,
+			isSaving: isSaving.value,
+			isVerifying: isVerifying.value,
+		})
 		abortController?.abort()
 		abortController = null
 		isVerifying.value = false
@@ -276,6 +389,13 @@ export function useInstallationForm(
 			0,
 		)
 		isEditing.value = false
+		debug('cancelEditing: done', {
+			selectedPlatform: selectedPlatform.value,
+			selectedGameVersion: selectedGameVersion.value,
+			selectedLoaderVersion: selectedLoaderVersion.value,
+			entries: entries.length,
+			isEditing: isEditing.value,
+		})
 	}
 
 	// Modpack updater state
@@ -284,36 +404,66 @@ export function useInstallationForm(
 	const loadingVersions = ref(false)
 	const loadingChangelog = ref(false)
 
+	watch([updatingModpack, loadingVersions, loadingChangelog], (value, oldValue) => {
+		debug('updater state watch:', {
+			oldValue,
+			value,
+			versions: updatingProjectVersions.value.length,
+			selectedPlatform: selectedPlatform.value,
+			selectedGameVersion: selectedGameVersion.value,
+		})
+	})
+
 	async function handleChangeModpackVersion() {
-		if (ctx.isBusy.value) return
+		debug('handleChangeModpackVersion: start', {
+			isBusy: ctx.isBusy.value,
+			currentVersionId: ctx.updaterModalProps.value.currentVersionId,
+			hasUpdaterRef: !!updaterModalRef.value,
+		})
+		if (ctx.isBusy.value) {
+			debug('handleChangeModpackVersion: ignored busy')
+			return
+		}
 		updatingModpack.value = true
 		loadingChangelog.value = false
 
 		const cached = ctx.getCachedModpackVersions()
 		if (cached) {
+			debug('handleChangeModpackVersion: using cached versions', { count: cached.length })
 			updatingProjectVersions.value = [...cached].sort(
 				(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
 			)
 			loadingVersions.value = false
 		} else {
+			debug('handleChangeModpackVersion: no cached versions')
 			updatingProjectVersions.value = []
 			loadingVersions.value = true
 		}
 
 		await nextTick()
+		debug('handleChangeModpackVersion: showing updater modal', {
+			hasUpdaterRef: !!updaterModalRef.value,
+			versions: updatingProjectVersions.value.length,
+		})
 		updaterModalRef.value?.show(ctx.updaterModalProps.value.currentVersionId || undefined)
 
 		if (!cached) {
 			try {
+				debug('handleChangeModpackVersion: fetching versions')
 				const versions = await ctx.fetchModpackVersions()
 				versions.sort(
 					(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
 				)
 				updatingProjectVersions.value = versions
+				debug('handleChangeModpackVersion: fetched versions', { count: versions.length })
 			} catch {
 				// Error handled by context
 			} finally {
 				loadingVersions.value = false
+				debug('handleChangeModpackVersion: fetch done', {
+					loadingVersions: loadingVersions.value,
+					versions: updatingProjectVersions.value.length,
+				})
 			}
 		}
 	}
@@ -328,6 +478,10 @@ export function useInstallationForm(
 	}
 
 	async function handleUpdaterVersionSelect(version: Labrinth.Versions.v2.Version) {
+		debug('handleUpdaterVersionSelect:', {
+			versionId: version.id,
+			hasChangelog: !!version.changelog,
+		})
 		if (version.changelog) return
 		loadingChangelog.value = true
 		try {
@@ -339,6 +493,10 @@ export function useInstallationForm(
 	}
 
 	async function handleUpdaterVersionHover(version: Labrinth.Versions.v2.Version) {
+		debug('handleUpdaterVersionHover:', {
+			versionId: version.id,
+			hasChangelog: !!version.changelog,
+		})
 		if (version.changelog) return
 		try {
 			const full = await ctx.getVersionChangelog(version.id)
@@ -349,18 +507,30 @@ export function useInstallationForm(
 	}
 
 	function resetUpdateState() {
+		debug('resetUpdateState: start', {
+			updatingModpack: updatingModpack.value,
+			versions: updatingProjectVersions.value.length,
+			loadingVersions: loadingVersions.value,
+			loadingChangelog: loadingChangelog.value,
+		})
 		updatingModpack.value = false
 		updatingProjectVersions.value = []
 		loadingVersions.value = false
 		loadingChangelog.value = false
+		debug('resetUpdateState: done')
 	}
 
 	async function handleUpdaterConfirm(version: Labrinth.Versions.v2.Version) {
-		if (ctx.isBusy.value) return
+		debug('handleUpdaterConfirm: start', { versionId: version.id, isBusy: ctx.isBusy.value })
+		if (ctx.isBusy.value) {
+			debug('handleUpdaterConfirm: ignored busy')
+			return
+		}
 		try {
 			await ctx.onModpackVersionConfirm(version)
 		} finally {
 			resetUpdateState()
+			debug('handleUpdaterConfirm: done')
 		}
 	}
 

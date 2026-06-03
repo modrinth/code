@@ -47,6 +47,7 @@ import { ref } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -60,6 +61,7 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('ConfirmUnlinkModal')
 
 const messages = defineMessages({
 	header: {
@@ -90,13 +92,34 @@ const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 
 function show() {
+	debug('show: called', {
+		hasModalRef: !!modal.value,
+		hasBackupCreatorRef: !!backupCreator.value,
+		buttonsDisabled: buttonsDisabled.value,
+		actionDisabled: props.actionDisabled,
+	})
 	modal.value?.show()
+	debug('show: returned from modal.show', {
+		hasModalRef: !!modal.value,
+		hasBackupCreatorRef: !!backupCreator.value,
+		buttonsDisabled: buttonsDisabled.value,
+		actionDisabled: props.actionDisabled,
+	})
 }
 
 function confirm() {
-	if (props.actionDisabled) return
+	debug('confirm: called', {
+		hasModalRef: !!modal.value,
+		buttonsDisabled: buttonsDisabled.value,
+		actionDisabled: props.actionDisabled,
+	})
+	if (props.actionDisabled) {
+		debug('confirm: ignored actionDisabled')
+		return
+	}
 	modal.value?.hide()
 	emit('unlink')
+	debug('confirm: emitted unlink')
 }
 
 defineExpose({
