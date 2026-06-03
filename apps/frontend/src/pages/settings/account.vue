@@ -13,7 +13,6 @@
 			ref="changeEmailModal"
 			:header="`${auth.user.email ? formatMessage(messages.changeEmailHeaderChange) : formatMessage(messages.changeEmailHeaderAdd)}`"
 			width="600px"
-			class="change-email-modal"
 		>
 			<div class="universal-body">
 				<p>{{ formatMessage(messages.emailNotPublicNotice) }}</p>
@@ -31,7 +30,7 @@
 				/>
 			</div>
 			<template #actions>
-				<div class="input-group push-right">
+				<div class="flex justify-end gap-2">
 					<ButtonStyled>
 						<button @click="$refs.changeEmailModal.hide()">
 							<XIcon />
@@ -1031,25 +1030,5 @@ canvas {
 			margin-right: 0.35rem;
 		}
 	}
-}
-</style>
-
-<style lang="scss">
-.change-email-modal {
-	border-color: var(--color-bg);
-}
-
-.change-email-modal > :first-child {
-	background-color: var(--color-bg);
-	border-bottom-color: var(--color-bg);
-}
-
-.change-email-modal > :first-child > div:first-child > span {
-	color: var(--color-base);
-	font-size: 1.25rem;
-}
-
-.modal-root:has(.change-email-modal) .modal-overlay.standard {
-	background: hsla(0, 0%, 0%, 0.6);
 }
 </style>
