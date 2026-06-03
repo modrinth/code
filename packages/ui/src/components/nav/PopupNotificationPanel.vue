@@ -13,7 +13,24 @@
 				@mouseenter="stopTimer(item)"
 				@mouseleave="setNotificationTimer(item)"
 			>
-				<div v-if="isDownloadNotification(item)" class="flex flex-col gap-4">
+				<NotificationToast
+					v-if="item.toast"
+					:type="item.toast.type"
+					:actor-name="item.toast.actorName"
+					:actor-avatar-url="item.toast.actorAvatarUrl"
+					:entity-name="item.toast.entityName"
+					:entity-icon-url="item.toast.entityIconUrl"
+					:status-text="item.toast.statusText"
+					:progress="item.toast.progress"
+					:waiting="item.toast.waiting"
+					@accept="handleToastAction(item, item.toast.onAccept)"
+					@decline="handleToastAction(item, item.toast.onDecline)"
+					@dismiss="handleToastAction(item, item.toast.onDismiss)"
+					@launch="handleToastAction(item, item.toast.onLaunch)"
+					@open-actor="item.toast.onOpenActor?.()"
+					@open-instance="handleToastAction(item, item.toast.onOpenInstance)"
+				/>
+				<div v-else-if="isDownloadNotification(item)" class="flex flex-col gap-4">
 					<NotificationToast
 						v-for="progressItem in downloadToastItems(item)"
 						:key="progressItem.id"
@@ -193,6 +210,11 @@ function handleButtonClick(id: string | number, btn: PopupNotificationButton) {
 	}
 }
 
+async function handleToastAction(item: PopupNotification, action?: () => void | Promise<void>) {
+	popupNotificationManager.removeNotification(item.id)
+	await action?.()
+}
+
 function progressColorForType(type: PopupNotification['type']) {
 	if (type === 'error') {
 		return 'red'
@@ -224,9 +246,9 @@ withDefaults(
 	top: calc(var(--top-bar-height, 3rem) + 1.5rem);
 	right: 1.5rem;
 	z-index: 200;
-	width: 360px;
-	min-width: 360px;
-	max-width: 360px;
+	width: min(420px, calc(100vw - 1.5rem));
+	min-width: min(420px, calc(100vw - 1.5rem));
+	max-width: min(420px, calc(100vw - 1.5rem));
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;

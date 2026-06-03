@@ -42,8 +42,6 @@ import {
 	LoadingBar,
 	NewsArticleCard,
 	NotificationPanel,
-	NotificationStack,
-	NotificationToast,
 	OverflowMenu,
 	PopupNotificationPanel,
 	ProgressSpinner,
@@ -244,7 +242,6 @@ const {
 const news = ref([])
 const availableSurvey = ref(false)
 const displayedServerInviteNotifications = new Set()
-const serverInviteNotifications = ref([])
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -804,25 +801,9 @@ async function declineServerInviteNotification(notification) {
 	}
 }
 
-function dismissServerInviteNotification(notificationId) {
-	serverInviteNotifications.value = serverInviteNotifications.value.filter(
-		(item) => item.id !== notificationId,
-	)
-}
-
 function openServerInviteInviterProfile(inviterName) {
 	if (!inviterName) return
 	openUrl(`${config.siteUrl}/user/${encodeURIComponent(inviterName)}`)
-}
-
-async function acceptServerInviteToast(item) {
-	dismissServerInviteNotification(item.id)
-	await acceptServerInviteNotification(item.notification)
-}
-
-async function declineServerInviteToast(item) {
-	dismissServerInviteNotification(item.id)
-	await declineServerInviteNotification(item.notification)
 }
 
 async function handleLiveNotification(notification) {
@@ -837,12 +818,18 @@ async function handleLiveNotification(notification) {
 	const invitedBy =
 		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
 
-	serverInviteNotifications.value.push({
-		id: notification.id,
-		notification,
-		serverName,
-		inviterName: invitedBy?.username ?? null,
-		inviterAvatarUrl: invitedBy?.avatar_url ?? null,
+	addPopupNotification({
+		title: serverName,
+		autoCloseMs: null,
+		toast: {
+			type: 'server-invite',
+			actorName: invitedBy?.username ?? null,
+			actorAvatarUrl: invitedBy?.avatar_url ?? null,
+			entityName: serverName,
+			onAccept: () => acceptServerInviteNotification(notification),
+			onDecline: () => declineServerInviteNotification(notification),
+			onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
+		},
 	})
 }
 
@@ -1619,24 +1606,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	</div>
 	<I18nDebugPanel />
 	<NotificationPanel :has-sidebar="sidebarVisible" />
-	<NotificationStack v-if="serverInviteNotifications.length > 0" :has-sidebar="sidebarVisible">
-		<NotificationToast
-			v-for="item in serverInviteNotifications"
-			:key="item.id"
-			type="server-invite"
-			:actor-name="item.inviterName"
-			:actor-avatar-url="item.inviterAvatarUrl"
-			:entity-name="item.serverName"
-			@accept="acceptServerInviteToast(item)"
-			@decline="declineServerInviteToast(item)"
-			@dismiss="dismissServerInviteNotification(item.id)"
-			@open-actor="openServerInviteInviterProfile(item.inviterName)"
-		/>
-	</NotificationStack>
-	<PopupNotificationPanel
-		v-if="serverInviteNotifications.length === 0"
-		:has-sidebar="sidebarVisible"
-	/>
+	<PopupNotificationPanel :has-sidebar="sidebarVisible" />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ContentInstallModal

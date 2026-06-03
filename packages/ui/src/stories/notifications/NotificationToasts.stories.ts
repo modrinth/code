@@ -15,7 +15,7 @@ const meta = {
 		(story) => ({
 			components: { story },
 			template:
-				'<div class="dark-mode flex w-[376px] flex-col gap-4 bg-surface-1 p-2"><story /></div>',
+				'<div class="dark-mode flex w-[436px] flex-col gap-4 bg-surface-1 p-2"><story /></div>',
 		}),
 	],
 } satisfies Meta

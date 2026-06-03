@@ -5,7 +5,7 @@
 			'has-sidebar': hasSidebar,
 		}"
 	>
-		<TransitionGroup name="notification-stack-item">
+		<TransitionGroup name="notification-stack-item" tag="div" class="notification-stack-items">
 			<slot />
 		</TransitionGroup>
 	</div>
@@ -28,10 +28,7 @@ withDefaults(
 	top: calc(var(--top-bar-height, 3rem) + 1rem);
 	right: 1rem;
 	z-index: 200;
-	display: flex;
-	width: 360px;
-	flex-direction: column;
-	gap: 1rem;
+	width: min(420px, calc(100vw - 1.5rem));
 }
 
 .notification-stack.has-sidebar {
@@ -41,18 +38,23 @@ withDefaults(
 @media screen and (max-width: 500px) {
 	.notification-stack {
 		right: 0.75rem;
-		width: 360px;
 	}
 }
 
-.notification-stack-item-enter-active,
-.notification-stack-item-leave-active,
-.notification-stack-item-move {
+.notification-stack-items {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+:global(.notification-stack-item-enter-active),
+:global(.notification-stack-item-leave-active),
+:global(.notification-stack-item-move) {
 	transition: all 0.3s ease-in-out;
 }
 
-.notification-stack-item-enter-from,
-.notification-stack-item-leave-to {
+:global(.notification-stack-item-enter-from),
+:global(.notification-stack-item-leave-to) {
 	opacity: 0;
 	transform: translateX(100%) scale(0.95);
 }
