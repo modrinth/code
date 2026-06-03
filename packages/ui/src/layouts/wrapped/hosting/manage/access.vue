@@ -85,6 +85,7 @@
 		<GrantAccessModal
 			ref="grantAccessModal"
 			:members="members"
+			:friend-ids="friendIds"
 			:resolve-user="resolveInviteUser"
 			:can-grant="canManageUsers"
 			:permission-denied-message="permissionDeniedMessage"
@@ -107,7 +108,19 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
+import {
+	DatabaseBackupIcon,
+	FileIcon,
+	FilterIcon,
+	PackageIcon,
+	PowerIcon,
+	SearchIcon,
+	ServerIcon,
+	SettingsIcon,
+	UserPlusIcon,
+	UsersIcon,
+} from '@modrinth/assets'
+import type { IconComponent } from '@modrinth/assets'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
@@ -236,11 +249,11 @@ const messages = defineMessages({
 	},
 	actionTypeFilter: {
 		id: 'servers.access-page.activity-log-filter.action-types',
-		defaultMessage: 'Action types',
+		defaultMessage: 'Actions',
 	},
 	actionTypeFilterSearch: {
 		id: 'servers.access-page.activity-log-filter.action-types-search',
-		defaultMessage: 'Search action types...',
+		defaultMessage: 'Search actions...',
 	},
 	actionGroupServer: {
 		id: 'servers.access-page.activity-log-filter.action-group.server',
@@ -586,6 +599,7 @@ const actionLogActionGroups = [
 	{
 		key: 'server',
 		label: messages.actionGroupServer,
+		icon: ServerIcon,
 		actions: [
 			'server_created',
 			'server_reallocated',
@@ -597,6 +611,7 @@ const actionLogActionGroups = [
 	{
 		key: 'power-console',
 		label: messages.actionGroupPowerConsole,
+		icon: PowerIcon,
 		actions: [
 			'server_started',
 			'server_stopped',
@@ -609,6 +624,7 @@ const actionLogActionGroups = [
 	{
 		key: 'users',
 		label: messages.actionGroupUsers,
+		icon: UsersIcon,
 		actions: [
 			'user_invited',
 			'user_invite_revoked',
@@ -619,6 +635,7 @@ const actionLogActionGroups = [
 	{
 		key: 'content',
 		label: messages.actionGroupContent,
+		icon: PackageIcon,
 		actions: [
 			'addon_added',
 			'addon_uploaded',
@@ -633,16 +650,19 @@ const actionLogActionGroups = [
 	{
 		key: 'files',
 		label: messages.actionGroupFiles,
+		icon: FileIcon,
 		actions: ['file_uploaded', 'file_edited', 'file_renamed', 'file_deleted', 'sftp_login'],
 	},
 	{
 		key: 'backups',
 		label: messages.actionGroupBackups,
+		icon: DatabaseBackupIcon,
 		actions: ['backup_created', 'backup_renamed', 'backup_restored', 'backup_deleted'],
 	},
 	{
 		key: 'settings',
 		label: messages.actionGroupSettings,
+		icon: SettingsIcon,
 		actions: [
 			'changed_server_name',
 			'changed_server_subdomain',
@@ -659,6 +679,7 @@ const actionLogActionGroups = [
 ] as const satisfies readonly {
 	key: string
 	label: (typeof messages)[keyof typeof messages]
+	icon: IconComponent
 	actions: readonly ActionLogFilterActionName[]
 }[]
 
@@ -703,11 +724,12 @@ const serverUsersQuery = useQuery({
 })
 
 const friendsQueryKey = ['user', 'friends', 'v3']
-useQuery({
+const friendsQuery = useQuery({
 	queryKey: friendsQueryKey,
 	queryFn: () => client.labrinth.friends_v3.list(),
 	staleTime: 30_000,
 })
+const friendIds = computed(() => getFriendRelationshipUserIds(friendsQuery.data.value ?? []))
 
 const members = computed<ServerAccessMember[]>(() =>
 	(serverUsersQuery.data.value ?? [])
@@ -893,11 +915,35 @@ const hasMoreActionLogEntries = computed(
 )
 const isLoadingMoreActionLogEntries = computed(() => actionLogQuery.isFetchingNextPage.value)
 const isActionLogFiltering = computed(() => isActionLogFilterTransitioning.value)
+const initialAuditLogUserFilterOptions = ref<DropdownFilterBarOption[]>([])
+
+watch(
+	() => actionLogQuery.data.value?.pages ?? [],
+	(pages) => {
+		if (actionLogEndpointFilter.value) return
+
+		initialAuditLogUserFilterOptions.value = mergeAuditLogUserFilterOptions(
+			initialAuditLogUserFilterOptions.value,
+			extractAuditLogUserFilterOptions(pages),
+		)
+	},
+	{ immediate: true },
+)
 
 const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
+	if (initialAuditLogUserFilterOptions.value.length > 0) {
+		return initialAuditLogUserFilterOptions.value
+	}
+
+	return extractAuditLogUserFilterOptions(actionLogQuery.data.value?.pages ?? [])
+})
+
+function extractAuditLogUserFilterOptions(
+	pages: Archon.Actions.v1.ActionLogResponse[],
+): DropdownFilterBarOption[] {
 	const options = new Map<string, DropdownFilterBarOption>()
 
-	for (const page of actionLogQuery.data.value?.pages ?? []) {
+	for (const page of pages) {
 		for (const entry of page.data) {
 			if (entry.actor.type === 'support') {
 				const userId = entry.actor.user_id ?? null
@@ -930,7 +976,20 @@ const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 	}
 
 	return [...options.values()].sort(compareFilterOptions)
-})
+}
+
+function mergeAuditLogUserFilterOptions(
+	existingOptions: DropdownFilterBarOption[],
+	nextOptions: DropdownFilterBarOption[],
+): DropdownFilterBarOption[] {
+	const options = new Map(existingOptions.map((option) => [option.value, option] as const))
+
+	for (const option of nextOptions) {
+		options.set(option.value, option)
+	}
+
+	return [...options.values()].sort(compareFilterOptions)
+}
 
 const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() => [
 	{
@@ -954,6 +1013,7 @@ const auditLogActionFilterOptions = computed<DropdownFilterBarItem[]>(() =>
 			type: 'section-header' as const,
 			key: group.key,
 			label: formatMessage(group.label),
+			icon: group.icon,
 		},
 		...group.actions.map((action) => ({
 			value: action,
@@ -1618,5 +1678,9 @@ function hasFriendRelationship(
 	userId: string,
 ) {
 	return friends.some((friend) => friend.id === userId || friend.friend_id === userId)
+}
+
+function getFriendRelationshipUserIds(friends: Labrinth.Friends.v3.UserFriend[]) {
+	return [...new Set(friends.flatMap((friend) => [friend.id, friend.friend_id]))]
 }
 </script>

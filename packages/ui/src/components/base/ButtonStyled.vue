@@ -349,20 +349,23 @@ const fontSize = computed(() => {
 }
 
 /*noinspection CssUnresolvedCustomProperty*/
-.btn-wrapper :deep(:is(button, a, .button-like):first-child) > svg:first-child,
-.btn-wrapper :slotted(:is(button, a, .button-like):first-child) > svg:first-child,
-.btn-wrapper :slotted(*) > :is(button, a, .button-like):first-child > svg:first-child,
+.btn-wrapper :deep(:is(button, a, .button-like):first-child) > svg,
+.btn-wrapper :slotted(:is(button, a, .button-like):first-child) > svg,
+.btn-wrapper :slotted(*) > :is(button, a, .button-like):first-child > svg,
 .btn-wrapper
 	:slotted(*)
 	> *:first-child
 	> :is(button, a, .button-like):first-child
-	> svg:first-child,
+	> svg,
 .btn-wrapper
 	:slotted(*)
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child
-	> svg:first-child {
+	> svg {
+	display: block;
+	width: var(--_icon-size, 1rem);
+	height: var(--_icon-size, 1rem);
 	min-width: var(--_icon-size, 1rem);
 	min-height: var(--_icon-size, 1rem);
 }

@@ -5,11 +5,22 @@
 			class="inline-flex min-w-0 max-w-full flex-wrap items-center gap-1 whitespace-normal align-middle @[800px]:flex-nowrap @[800px]:whitespace-nowrap"
 		>
 			<span class="shrink-0">{{ formatMessage(messages.deletedLabel) }}</span>
-			<EventEntityList class="min-w-0" :entities="addonEntities" :limit="1" single-line />
+			<EventEntityList
+				class="min-w-0"
+				:entities="addonEntities"
+				:limit="1"
+				single-line
+				entity-text-weight="semibold"
+			/>
 		</span>
 		<IntlFormatted v-else :message-id="message">
 			<template #content>
-				<EventEntityList :entities="addonEntities" :single-line="true" :limit="contentLimit" />
+				<EventEntityList
+					:entities="addonEntities"
+					:single-line="true"
+					:limit="contentLimit"
+					entity-text-weight="semibold"
+				/>
 			</template>
 			<template #files>
 				<EventEntityList :entities="fileNames ?? []" :single-line="true" :limit="1" />

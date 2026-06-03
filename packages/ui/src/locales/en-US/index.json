@@ -3264,10 +3264,10 @@
     "defaultMessage": "Vanilla"
   },
   "servers.access-page.activity-log-filter.action-types": {
-    "defaultMessage": "Action types"
+    "defaultMessage": "Actions"
   },
   "servers.access-page.activity-log-filter.action-types-search": {
-    "defaultMessage": "Search action types..."
+    "defaultMessage": "Search actions..."
   },
   "servers.access-page.activity-log-filter.action.addon-added": {
     "defaultMessage": "Added content"
@@ -3561,7 +3561,7 @@
     "defaultMessage": "Support"
   },
   "servers.audit-log.column.event": {
-    "defaultMessage": "Event"
+    "defaultMessage": "Actions"
   },
   "servers.audit-log.column.time": {
     "defaultMessage": "Time"

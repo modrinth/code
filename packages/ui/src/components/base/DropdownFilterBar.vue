@@ -272,7 +272,15 @@
 								class="flex items-center justify-between gap-3 px-4 py-2.5 text-sm font-semibold text-secondary"
 								:class="item.class"
 							>
-								<span class="min-w-0 truncate">{{ item.label }}</span>
+								<span class="flex min-w-0 items-center gap-2">
+									<component
+										:is="item.icon"
+										v-if="item.icon"
+										class="size-4 shrink-0"
+										aria-hidden="true"
+									/>
+									<span class="min-w-0 truncate">{{ item.label }}</span>
+								</span>
 								<button
 									v-if="hasSelectableSectionHeaderOptions(item)"
 									type="button"
@@ -369,7 +377,7 @@ import {
 } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
-import type { ComponentPublicInstance, CSSProperties } from 'vue'
+import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
@@ -388,6 +396,7 @@ export type DropdownFilterBarSectionHeader = {
 	type: 'section-header'
 	label: string
 	key?: string
+	icon?: Component
 	class?: string
 }
 

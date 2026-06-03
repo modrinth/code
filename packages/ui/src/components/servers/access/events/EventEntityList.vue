@@ -8,7 +8,11 @@
 		"
 	>
 		<template v-for="(entity, index) in visibleEntities" :key="entity.id">
-			<EventEntityLink :entity="entity" :class="singleLine ? 'min-w-0 shrink' : ''" />
+			<EventEntityLink
+				:entity="entity"
+				:text-weight="entityTextWeight"
+				:class="singleLine ? 'min-w-0 shrink' : ''"
+			/>
 			<span v-if="index < visibleEntities.length - 1" class="shrink-0 text-secondary">,</span>
 		</template>
 		<Tooltip
@@ -54,6 +58,7 @@
 							v-for="entity in hiddenEntities"
 							:key="entity.id"
 							:entity="entity"
+							:text-weight="entityTextWeight"
 							class="min-w-0 pr-4"
 							stack-secondary
 						/>
@@ -91,10 +96,12 @@ const props = withDefaults(
 		entities: EventEntity[]
 		limit?: number
 		singleLine?: boolean
+		entityTextWeight?: 'medium' | 'semibold'
 	}>(),
 	{
 		limit: 3,
 		singleLine: true,
+		entityTextWeight: 'medium',
 	},
 )
 

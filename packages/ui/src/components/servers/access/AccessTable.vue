@@ -78,7 +78,7 @@
 						v-tooltip="resendInviteTooltip(member)"
 						:aria-label="resendInviteLabel(member)"
 						:disabled="resendInviteDisabled(member)"
-						class="text-secondary hover:text-contrast disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
+						class="text-secondary hover:!filter-none hover:text-contrast focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
 						@click="handleResendInvite(member)"
 					>
 						<SendIcon aria-hidden="true" />
@@ -89,7 +89,7 @@
 						v-tooltip="memberAccessActionTooltip(member)"
 						:aria-label="memberAccessActionLabel(member)"
 						:disabled="!canManageUsers"
-						class="text-secondary hover:text-red disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
+						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none active:!scale-100 active:!filter-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-secondary"
 						@click="member.pending ? handleCancelInvite(member) : handleRemoveMember(member)"
 					>
 						<XIcon v-if="member.pending" aria-hidden="true" />
@@ -222,7 +222,10 @@
 			</div>
 			<div class="flex min-w-0 items-center justify-end pr-4">
 				<ButtonStyled v-if="!member.isOwner" circular type="transparent">
-					<TeleportOverflowMenu :options="memberActionOptions(member)">
+					<TeleportOverflowMenu
+						:options="memberActionOptions(member)"
+						btn-class="hover:!filter-none focus-visible:!filter-none active:!scale-100 active:!filter-none"
+					>
 						<MoreVerticalIcon aria-hidden="true" class="size-5" />
 						<span class="sr-only">
 							{{ formatMessage(messages.memberActionsLabel, { username: member.user.username }) }}

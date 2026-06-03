@@ -23,6 +23,10 @@
 				type="text"
 				:placeholder="searchPlaceholder || placeholder"
 				:disabled="disabled"
+				:autocomplete="searchAutocomplete"
+				:autocorrect="searchAutocorrect"
+				:autocapitalize="searchAutocapitalize"
+				:spellcheck="searchSpellcheck"
 				wrapper-class="w-full !bg-transparent"
 				:input-class="searchableInputClass"
 				class="relative z-[1]"
@@ -286,6 +290,10 @@ const props = withDefaults(
 		selectSearchTextOnFocus?: boolean
 		/** Show a search icon in the searchable input */
 		showSearchIcon?: boolean
+		searchAutocomplete?: string
+		searchAutocorrect?: 'on' | 'off'
+		searchAutocapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters'
+		searchSpellcheck?: boolean
 	}>(),
 	{
 		placeholder: 'Select an option',

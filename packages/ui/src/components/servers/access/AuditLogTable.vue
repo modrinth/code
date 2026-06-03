@@ -335,7 +335,7 @@ const messages = defineMessages({
 	},
 	eventColumn: {
 		id: 'servers.audit-log.column.event',
-		defaultMessage: 'Event',
+		defaultMessage: 'Actions',
 	},
 	timeColumn: {
 		id: 'servers.audit-log.column.time',

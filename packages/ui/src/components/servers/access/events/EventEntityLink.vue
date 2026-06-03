@@ -5,10 +5,10 @@
 		:class="[
 			stackSecondary ? '!grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-0.5' : '',
 			entity.to
-				? 'font-medium text-contrast hover:underline'
+				? `${textWeightClass} text-contrast hover:underline`
 				: entity.muted
 					? 'text-secondary'
-					: 'font-medium text-contrast',
+					: `${textWeightClass} text-contrast`,
 			entity.mono ? 'font-mono text-[0.925em]' : '',
 			'align-middle',
 		]"
@@ -49,8 +49,8 @@
 			class="min-w-0 whitespace-normal break-words text-secondary @[800px]:truncate @[800px]:whitespace-nowrap"
 			:class="
 				stackSecondary
-					? 'col-start-2 leading-5 @[800px]:whitespace-normal @[800px]:break-words'
-					: 'entity-secondary-label'
+					? `col-start-2 leading-5 @[800px]:whitespace-normal @[800px]:break-words ${textWeightClass}`
+					: `entity-secondary-label ${textWeightClass}`
 			"
 		>
 			<template v-if="stackSecondary">{{ entity.secondaryLabel }}</template>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -68,16 +68,21 @@ import { truncatedTooltip } from '#ui/utils/truncate'
 
 import type { EventEntity } from './types'
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		entity: EventEntity
 		stackSecondary?: boolean
+		textWeight?: 'medium' | 'semibold'
 	}>(),
 	{
 		stackSecondary: false,
+		textWeight: 'medium',
 	},
 )
 
+const textWeightClass = computed(() =>
+	props.textWeight === 'semibold' ? 'font-semibold' : 'font-medium',
+)
 const labelRef = ref<HTMLElement | null>(null)
 const secondaryLabelRef = ref<HTMLElement | null>(null)
 </script>

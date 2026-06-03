@@ -22,6 +22,10 @@
 					searchable
 					show-search-icon
 					:show-chevron="false"
+					search-autocomplete="off"
+					search-autocorrect="off"
+					search-autocapitalize="none"
+					:search-spellcheck="false"
 					@search-input="handleTargetSearch"
 					@select="handleTargetSelect"
 				>
@@ -91,12 +95,22 @@
 						</template>
 					</IntlFormatted>
 				</p>
-				<Checkbox
-					v-model="addAsFriend"
-					:label="formatMessage(messages.addAsFriend)"
-					label-class="text-base text-contrast"
-					class="mt-2"
-				/>
+				<Transition
+					enter-active-class="transition-all duration-300 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-20"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-20"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<Checkbox
+						v-if="showAddAsFriend"
+						v-model="addAsFriend"
+						:label="formatMessage(messages.addAsFriend)"
+						label-class="text-base text-contrast"
+						class="mt-2"
+					/>
+				</Transition>
 			</div>
 		</div>
 
@@ -143,6 +157,7 @@ const props = withDefaults(
 	defineProps<{
 		members?: ServerAccessMember[]
 		suggestions?: ServerAccessInviteSuggestion[]
+		friendIds?: string[]
 		resolveUser?: (target: string) => Promise<ServerAccessInviteSuggestion | null>
 		canGrant?: boolean
 		permissionDeniedMessage?: string
@@ -150,6 +165,7 @@ const props = withDefaults(
 	{
 		members: () => [],
 		suggestions: () => [],
+		friendIds: () => [],
 		canGrant: true,
 	},
 )
@@ -167,6 +183,7 @@ const suggestionMinimumLength = 2
 const resolvedSuggestion = ref<ServerAccessInviteSuggestion | null>(null)
 const targetLookupStatus = ref<'idle' | 'loading' | 'loaded'>('idle')
 const targetLookupRequestId = ref(0)
+const hasSelectedTarget = ref(false)
 
 const messages = defineMessages({
 	header: {
@@ -257,6 +274,15 @@ const grantableRoles = computed(() => [
 const normalizedTarget = computed(() => target.value.trim())
 const usesRemoteLookup = computed(() => !!props.resolveUser)
 const matchedSuggestion = computed(() => findSuggestion(normalizedTarget.value))
+const selectedTargetUserId = computed(() => matchedSuggestion.value?.id)
+const friendIdSet = computed(() => new Set(props.friendIds.map((id) => id.toLowerCase())))
+const targetIsFriend = computed(() => {
+	const userId = selectedTargetUserId.value
+	return !!userId && friendIdSet.value.has(userId.toLowerCase())
+})
+const showAddAsFriend = computed(
+	() => hasSelectedTarget.value && !!matchedSuggestion.value && !targetIsFriend.value,
+)
 const existingMember = computed(() => findExistingMember())
 const canInvite = computed(
 	() =>
@@ -355,6 +381,7 @@ const resolveTarget = useDebounceFn(async (query: string, requestId: number) => 
 function handleTargetSearch(value: string) {
 	target.value = value
 	resolvedSuggestion.value = null
+	hasSelectedTarget.value = false
 	targetLookupRequestId.value += 1
 
 	if (!usesRemoteLookup.value) return
@@ -370,6 +397,7 @@ function handleTargetSearch(value: string) {
 
 function handleTargetSelect(option: ComboboxOption<string>) {
 	target.value = option.value
+	hasSelectedTarget.value = true
 }
 
 function reset() {
@@ -379,6 +407,7 @@ function reset() {
 	resolvedSuggestion.value = null
 	targetLookupStatus.value = 'idle'
 	targetLookupRequestId.value += 1
+	hasSelectedTarget.value = false
 }
 
 function show(event?: MouseEvent) {
@@ -396,7 +425,7 @@ function submit() {
 	const payload: GrantServerAccessPayload = {
 		target: normalizedTarget.value,
 		role: selectedRole.value,
-		addAsFriend: addAsFriend.value,
+		addAsFriend: showAddAsFriend.value && addAsFriend.value,
 	}
 
 	hide()

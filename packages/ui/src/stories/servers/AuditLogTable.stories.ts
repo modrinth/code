@@ -65,7 +65,7 @@ const filterBarCategories = [
 	},
 	{
 		key: 'actions',
-		label: 'Action types',
+		label: 'Actions',
 		options: [
 			{ value: 'server_started', label: 'Started server' },
 			{ value: 'console_command_executed', label: 'Ran console command' },
