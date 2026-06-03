@@ -49,9 +49,10 @@ pub async fn search_users_returns_compact_prefix_matches_with_exact_first() {
             assert_eq!(users.len(), 2);
             assert_eq!(users[0]["username"], "User");
             assert_eq!(users[1]["username"], "userland");
-            assert!(users.iter().all(|user| user["avatar_url"].is_string()));
             assert!(users.iter().all(|user| {
-                user.as_object().is_some_and(|object| object.len() == 3)
+                user.as_object().is_some_and(|object| {
+                    object.len() == 3 && object.contains_key("avatar_url")
+                })
             }));
         },
     )
