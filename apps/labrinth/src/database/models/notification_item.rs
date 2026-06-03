@@ -40,7 +40,8 @@ impl NotificationBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
-        self.insert_many(vec![user], transaction, redis).await
+        self.insert_many(vec![user], transaction, redis).await?;
+        Ok(())
     }
 
     pub async fn insert_many_payout_notifications(
@@ -133,7 +134,7 @@ impl NotificationBuilder {
         &self,
         users: &[DBUserId],
         transaction: &mut PgTransaction<'_>,
-    ) -> Result<Vec<i64>, DatabaseError> {
+    ) -> Result<Vec<DBNotificationId>, DatabaseError> {
         let notification_ids =
             generate_many_notification_ids(users.len(), &mut *transaction)
                 .await?;
@@ -145,7 +146,7 @@ impl NotificationBuilder {
             .collect::<Vec<_>>();
 
         let users_raw_ids = users.iter().map(|x| x.0).collect::<Vec<_>>();
-        let notification_ids =
+        let notification_ids_raw =
             notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
 
         sqlx::query!(
@@ -155,7 +156,7 @@ impl NotificationBuilder {
             )
             SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::jsonb[])
             ",
-            &notification_ids[..],
+            &notification_ids_raw[..],
             &users_raw_ids[..],
             &bodies[..],
         )
@@ -170,11 +171,13 @@ impl NotificationBuilder {
         users: Vec<DBUserId>,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<Vec<DBNotificationId>, DatabaseError> {
         let notification_ids =
             self.insert_many_records(&users, transaction).await?;
 
         let users_raw_ids = users.iter().map(|x| x.0).collect::<Vec<_>>();
+        let notification_ids_raw =
+            notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
 
         let notification_types = notification_ids
             .iter()
@@ -184,14 +187,14 @@ impl NotificationBuilder {
         NotificationBuilder::insert_many_deliveries(
             transaction,
             redis,
-            &notification_ids,
+            &notification_ids_raw,
             &users_raw_ids,
             &notification_types,
             &users,
         )
         .await?;
 
-        Ok(())
+        Ok(notification_ids)
     }
 
     /// Like [`insert_many`], but skips queuing deliveries so the caller can
@@ -201,10 +204,11 @@ impl NotificationBuilder {
         users: Vec<DBUserId>,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        self.insert_many_records(&users, transaction).await?;
+    ) -> Result<Vec<DBNotificationId>, DatabaseError> {
+        let notification_ids =
+            self.insert_many_records(&users, transaction).await?;
         DBNotification::clear_user_notifications_cache(&users, redis).await?;
-        Ok(())
+        Ok(notification_ids)
     }
 
     pub async fn insert_many_deliveries(
