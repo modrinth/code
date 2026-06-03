@@ -11,7 +11,6 @@ import {
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
-	CheckIcon,
 	CompassIcon,
 	DownloadIcon,
 	ExternalIcon,
@@ -41,9 +40,10 @@ import {
 	defineMessages,
 	I18nDebugPanel,
 	LoadingBar,
-	ModrinthHostingLogo,
 	NewsArticleCard,
 	NotificationPanel,
+	NotificationStack,
+	NotificationToast,
 	OverflowMenu,
 	PopupNotificationPanel,
 	ProgressSpinner,
@@ -86,7 +86,6 @@ import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
-import ServerInvitePopupBody from '@/components/ui/notifications/ServerInvitePopupBody.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
@@ -245,6 +244,7 @@ const {
 const news = ref([])
 const availableSurvey = ref(false)
 const displayedServerInviteNotifications = new Set()
+const serverInviteNotifications = ref([])
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -804,6 +804,27 @@ async function declineServerInviteNotification(notification) {
 	}
 }
 
+function dismissServerInviteNotification(notificationId) {
+	serverInviteNotifications.value = serverInviteNotifications.value.filter(
+		(item) => item.id !== notificationId,
+	)
+}
+
+function openServerInviteInviterProfile(inviterName) {
+	if (!inviterName) return
+	openUrl(`${config.siteUrl}/user/${encodeURIComponent(inviterName)}`)
+}
+
+async function acceptServerInviteToast(item) {
+	dismissServerInviteNotification(item.id)
+	await acceptServerInviteNotification(item.notification)
+}
+
+async function declineServerInviteToast(item) {
+	dismissServerInviteNotification(item.id)
+	await declineServerInviteNotification(item.notification)
+}
+
 async function handleLiveNotification(notification) {
 	if (notification?.body?.type !== 'server_invite' || notification.read) return
 	if (displayedServerInviteNotifications.has(notification.id)) return
@@ -816,31 +837,12 @@ async function handleLiveNotification(notification) {
 	const invitedBy =
 		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
 
-	addPopupNotification({
-		title: 'Modrinth Hosting',
-		titleLogo: ModrinthHostingLogo,
-		bodyComponent: ServerInvitePopupBody,
-		bodyProps: {
-			inviterName: invitedBy?.username ?? null,
-			inviterAvatarUrl: invitedBy?.avatar_url ?? null,
-			serverName,
-		},
-		type: 'info',
-		buttons: [
-			{
-				label: 'Accept',
-				action: () => acceptServerInviteNotification(notification),
-				icon: CheckIcon,
-				color: 'brand',
-			},
-			{
-				label: 'Decline',
-				action: () => declineServerInviteNotification(notification),
-				icon: XIcon,
-				color: 'red',
-			},
-		],
-		autoCloseMs: null,
+	serverInviteNotifications.value.push({
+		id: notification.id,
+		notification,
+		serverName,
+		inviterName: invitedBy?.username ?? null,
+		inviterAvatarUrl: invitedBy?.avatar_url ?? null,
 	})
 }
 
@@ -1617,7 +1619,24 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	</div>
 	<I18nDebugPanel />
 	<NotificationPanel :has-sidebar="sidebarVisible" />
-	<PopupNotificationPanel :has-sidebar="sidebarVisible" />
+	<NotificationStack v-if="serverInviteNotifications.length > 0" :has-sidebar="sidebarVisible">
+		<NotificationToast
+			v-for="item in serverInviteNotifications"
+			:key="item.id"
+			type="server-invite"
+			:actor-name="item.inviterName"
+			:actor-avatar-url="item.inviterAvatarUrl"
+			:entity-name="item.serverName"
+			@accept="acceptServerInviteToast(item)"
+			@decline="declineServerInviteToast(item)"
+			@dismiss="dismissServerInviteNotification(item.id)"
+			@open-actor="openServerInviteInviterProfile(item.inviterName)"
+		/>
+	</NotificationStack>
+	<PopupNotificationPanel
+		v-if="serverInviteNotifications.length === 0"
+		:has-sidebar="sidebarVisible"
+	/>
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ContentInstallModal

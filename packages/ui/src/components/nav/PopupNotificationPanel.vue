@@ -13,7 +13,21 @@
 				@mouseenter="stopTimer(item)"
 				@mouseleave="setNotificationTimer(item)"
 			>
+				<div v-if="isDownloadNotification(item)" class="flex flex-col gap-4">
+					<NotificationToast
+						v-for="progressItem in downloadToastItems(item)"
+						:key="progressItem.id"
+						type="instance-download"
+						:entity-name="progressItem.title || item.title"
+						:entity-icon-url="MinecraftServerIcon"
+						:status-text="downloadStatusText(progressItem)"
+						:progress="progressItem.progress"
+						:waiting="progressItem.waiting"
+						@dismiss="dismiss(item.id)"
+					/>
+				</div>
 				<div
+					v-else
 					class="flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"
 				>
 					<div class="flex flex-col gap-2 w-full">
@@ -118,6 +132,7 @@ import {
 	DownloadIcon,
 	InfoIcon,
 	IssuesIcon,
+	MinecraftServerIcon,
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -127,9 +142,11 @@ import {
 	injectPopupNotificationManager,
 	type PopupNotification,
 	type PopupNotificationButton,
+	type PopupNotificationProgressItem,
 } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import ProgressBar from '../base/ProgressBar.vue'
+import NotificationToast from '../notifications/NotificationToast.vue'
 
 const popupNotificationManager = injectPopupNotificationManager()
 const notifications = computed<PopupNotification[]>(() =>
@@ -140,6 +157,33 @@ const stopTimer = (n: PopupNotification) => popupNotificationManager.stopNotific
 const setNotificationTimer = (n: PopupNotification) =>
 	popupNotificationManager.setNotificationTimer(n)
 const dismiss = (id: string | number) => popupNotificationManager.removeNotification(id)
+
+function isDownloadNotification(item: PopupNotification) {
+	return (
+		item.type === 'download' &&
+		(!!item.progressItems?.length || item.progress != null || item.waiting)
+	)
+}
+
+function downloadToastItems(item: PopupNotification): PopupNotificationProgressItem[] {
+	if (item.progressItems?.length) {
+		return item.progressItems
+	}
+
+	return [
+		{
+			id: `${item.id}`,
+			title: item.title,
+			text: item.text,
+			progress: item.progress ?? 0,
+			waiting: item.waiting ?? false,
+		},
+	]
+}
+
+function downloadStatusText(progressItem: PopupNotificationProgressItem) {
+	return progressItem.text?.replace(/^\d+%\s*/, '') ?? ''
+}
 
 function handleButtonClick(id: string | number, btn: PopupNotificationButton) {
 	btn.action()
@@ -179,9 +223,9 @@ withDefaults(
 	top: calc(var(--top-bar-height, 3rem) + 1.5rem);
 	right: 1.5rem;
 	z-index: 200;
-	width: 400px;
-	min-width: 300px;
-	max-width: min(400px, calc(100vw - 3rem));
+	width: 360px;
+	min-width: 360px;
+	max-width: 360px;
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
@@ -193,8 +237,6 @@ withDefaults(
 
 @media screen and (max-width: 500px) {
 	.popup-notification-group {
-		width: calc(100% - 1.5rem);
-		max-width: 400px;
 		right: 0.75rem;
 	}
 }
