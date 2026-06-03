@@ -164,7 +164,11 @@ pub async fn create_email_sync(
     txn.commit().await?;
 
     for notification in notifications {
-        let Notification { user_id: to_user, id: notification_id, .. } = notification;
+        let Notification {
+            user_id: to_user,
+            id: notification_id,
+            ..
+        } = notification;
         if let Err(error) = broadcast_friends_message(
             &redis,
             RedisFriendsMessage::Notification {
