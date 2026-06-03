@@ -132,7 +132,7 @@
 									:href="event.announcement_url"
 									target="_blank"
 									rel="noopener noreferrer"
-									class="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-primary underline !transition-all hover:text-contrast"
+									class="my-0.5 inline-flex items-center gap-1 text-xs font-medium text-primary underline !transition-all hover:text-contrast"
 								>
 									{{ formatMessage(analyticsChartMessages.seeAnnouncement) }}
 									<ExternalIcon class="size-3.5" aria-hidden="true" />

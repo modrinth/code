@@ -109,7 +109,7 @@ function getRegionDisplayNames(locale: string): Intl.DisplayNames | null {
 function formatCountryCode(countryCode: string, formatMessage: FormatMessage): string {
 	const normalized = countryCode.trim().toUpperCase()
 	if (normalized === OTHER_COUNTRY_CODE) {
-		return formatMessage(analyticsMessages.unknown)
+		return formatMessage(analyticsMessages.other)
 	}
 
 	if (!REGION_CODE_PATTERN.test(normalized)) {
@@ -146,6 +146,9 @@ export function formatBreakdownLabel(
 		normalizedLowercaseValue === 'other' ||
 		normalizedLowercaseValue === 'unknown'
 	) {
+		if (selectedBreakdown === 'country') {
+			return formatMessage(analyticsMessages.other)
+		}
 		return formatMessage(analyticsMessages.unknown)
 	}
 	if (selectedBreakdown === 'country') {
@@ -753,7 +756,7 @@ export function formatMetricValue(
 		case 'playtime': {
 			const hours = value / 3600
 			return formatMessage(analyticsStatCardMessages.playtimeHours, {
-				hours: hours.toFixed(1),
+				hours: Math.abs(hours) < 1 ? hours.toFixed(2) : hours.toFixed(1),
 			})
 		}
 		case 'views':
@@ -770,7 +773,11 @@ function formatSmallAxisNumber(value: number): string {
 	}
 
 	const formattedValue = Math.abs(value) < 1 ? value.toFixed(2) : value.toFixed(1)
-	return formattedValue.replace(/\.?0+$/, '')
+	return trimTrailingFractionZeros(formattedValue)
+}
+
+function trimTrailingFractionZeros(value: string): string {
+	return value.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '')
 }
 
 const COMPACT_AXIS_UNITS = [
@@ -814,7 +821,7 @@ function formatCompactAxisValue(value: number): string {
 		return String(truncatedValue)
 	}
 
-	return roundedValue.toFixed(fractionDigitCount).replace(/\.?0+$/, '')
+	return trimTrailingFractionZeros(roundedValue.toFixed(fractionDigitCount))
 }
 
 export function formatAxisValue(

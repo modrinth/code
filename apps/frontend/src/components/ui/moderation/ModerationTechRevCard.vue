@@ -565,7 +565,7 @@ const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
 const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
 const highlightedSourceCache = reactive<Map<string, { source: string; lines: string[] }>>(new Map())
-const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 10
+const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 2
 
 interface ClassGroup {
 	key: string

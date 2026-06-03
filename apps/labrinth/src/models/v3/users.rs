@@ -74,6 +74,13 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct SearchUser {
+    pub id: UserId,
+    pub username: String,
+    pub avatar_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UserCampaigns {
     pub pride_26: Option<Pride26CampaignDonation>,
 }
@@ -87,7 +94,9 @@ pub struct UserPayoutData {
     pub balance: Decimal,
 }
 
-use crate::database::models::user_item::{DBUser, Pride26CampaignDonation};
+use crate::database::models::user_item::{
+    DBSearchUser, DBUser, Pride26CampaignDonation,
+};
 
 impl From<DBUser> for User {
     fn from(data: DBUser) -> Self {
@@ -112,6 +121,16 @@ impl From<DBUser> for User {
             stripe_customer_id: None,
             allow_friend_requests: None,
             moderation_notes: None,
+        }
+    }
+}
+
+impl From<DBSearchUser> for SearchUser {
+    fn from(data: DBSearchUser) -> Self {
+        Self {
+            id: data.id.into(),
+            username: data.username,
+            avatar_url: data.avatar_url,
         }
     }
 }

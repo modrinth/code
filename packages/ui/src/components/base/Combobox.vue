@@ -74,7 +74,7 @@
 					class="h-5 w-5 shrink-0"
 				/>
 				<span class="min-w-0 truncate text-primary font-semibold leading-tight">
-					<slot name="selected">{{ triggerText }}</slot>
+					<slot name="selected" :label="triggerText">{{ triggerText }}</slot>
 				</span>
 			</div>
 			<div class="flex shrink-0 items-center gap-1">
