@@ -13,7 +13,6 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::Row;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
