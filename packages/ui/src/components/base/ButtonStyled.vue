@@ -352,11 +352,7 @@ const fontSize = computed(() => {
 .btn-wrapper :deep(:is(button, a, .button-like):first-child) > svg,
 .btn-wrapper :slotted(:is(button, a, .button-like):first-child) > svg,
 .btn-wrapper :slotted(*) > :is(button, a, .button-like):first-child > svg,
-.btn-wrapper
-	:slotted(*)
-	> *:first-child
-	> :is(button, a, .button-like):first-child
-	> svg,
+.btn-wrapper :slotted(*) > *:first-child > :is(button, a, .button-like):first-child > svg,
 .btn-wrapper
 	:slotted(*)
 	> *:first-child

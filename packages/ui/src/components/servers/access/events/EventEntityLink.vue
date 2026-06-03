@@ -86,7 +86,9 @@ const props = withDefaults(
 const textWeightClass = computed(() =>
 	props.textWeight === 'semibold' ? 'font-semibold' : 'font-medium',
 )
-const showAvatar = computed(() => props.entity.iconUrl != null || props.entity.iconShape === 'circle')
+const showAvatar = computed(
+	() => props.entity.iconUrl != null || props.entity.iconShape === 'circle',
+)
 const labelRef = ref<HTMLElement | null>(null)
 const secondaryLabelRef = ref<HTMLElement | null>(null)
 </script>

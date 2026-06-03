@@ -62,8 +62,8 @@ import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modr
 import { computed, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import { hasServerPermission } from '#ui/composables/server-permissions'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { hasServerPermission } from '#ui/composables/server-permissions'
 import { injectModrinthServerContext } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 

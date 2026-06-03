@@ -343,10 +343,16 @@ function handleSave() {
 }
 
 function handleShowRepairModal() {
-	debug('handleShowRepairModal: before show', { snapshot: stateSnapshot(), refs: modalRefsSnapshot() })
+	debug('handleShowRepairModal: before show', {
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
 	repairModal.value?.show()
 	nextTick(() => {
-		debug('handleShowRepairModal: after nextTick', { snapshot: stateSnapshot(), refs: modalRefsSnapshot() })
+		debug('handleShowRepairModal: after nextTick', {
+			snapshot: stateSnapshot(),
+			refs: modalRefsSnapshot(),
+		})
 	})
 }
 
@@ -1021,11 +1027,7 @@ const messages = defineMessages({
 				@confirm="handleModpackUpdateConfirm"
 				@cancel="handleModpackUpdateCancel"
 			/>
-			<ConfirmRepairModal
-				ref="repairModal"
-				:server="ctx.isServer"
-				@repair="handleRepair"
-			/>
+			<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="handleRepair" />
 			<ConfirmReinstallModal
 				ref="reinstallModal"
 				:server="ctx.isServer"

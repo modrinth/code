@@ -31,7 +31,8 @@
 							<span v-else class="font-medium text-contrast">Someone</span>
 							<span class="mx-1">{{ inviteActionText }}</span>
 							<template v-if="type === 'server-invite'">
-								<span class="font-medium text-contrast">{{ entityLabel }}</span>.
+								<span class="font-medium text-contrast">{{ entityLabel }}</span
+								>.
 							</template>
 							<template v-else>
 								<span class="inline-flex max-w-full items-center gap-[5px] align-[-4px]">
@@ -44,8 +45,10 @@
 										:tint-by="entityLabel"
 										class="!rounded-[7px]"
 									/>
-									<span class="min-w-0 truncate font-medium text-contrast">{{ entityLabel }}</span>
-								</span>.
+									<span class="min-w-0 truncate font-medium text-contrast">{{
+										entityLabel
+									}}</span> </span
+								>.
 							</template>
 						</template>
 					</p>
@@ -236,7 +239,9 @@ const statusLine = computed(() => {
 })
 
 const showsBottomProgress = computed(
-	() => props.type === 'instance-download' || (props.type === 'instance-ready' && props.progress != null),
+	() =>
+		props.type === 'instance-download' ||
+		(props.type === 'instance-ready' && props.progress != null),
 )
 
 const headerOuterRef = ref<HTMLDivElement | null>(null)

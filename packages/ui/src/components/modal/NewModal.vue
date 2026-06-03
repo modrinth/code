@@ -261,8 +261,7 @@ function show(event?: MouseEvent) {
 	debug('show: previous focus captured', {
 		header: props.header,
 		previousFocusTag: previousFocusEl instanceof HTMLElement ? previousFocusEl.tagName : null,
-		previousFocusClass:
-			previousFocusEl instanceof HTMLElement ? previousFocusEl.className : null,
+		previousFocusClass: previousFocusEl instanceof HTMLElement ? previousFocusEl.className : null,
 	})
 	pushModal()
 	debug('show: after pushModal', { header: props.header, stackSize: modalStackSize() })
@@ -279,7 +278,11 @@ function show(event?: MouseEvent) {
 		mouseX.value = Math.round(window.innerWidth / 2)
 		mouseY.value = Math.round(window.innerHeight / 2)
 	}
-	debug('show: mouse position set', { header: props.header, mouseX: mouseX.value, mouseY: mouseY.value })
+	debug('show: mouse position set', {
+		header: props.header,
+		mouseX: mouseX.value,
+		mouseY: mouseY.value,
+	})
 	setTimeout(() => {
 		debug('show: timeout before visible=true', {
 			header: props.header,

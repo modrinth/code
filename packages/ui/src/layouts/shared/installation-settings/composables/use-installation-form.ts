@@ -96,13 +96,7 @@ export function useInstallationForm(
 	})
 
 	watch(
-		[
-			isEditing,
-			isSaving,
-			isVerifying,
-			pendingPreview,
-			incompatibleContentVariant,
-		],
+		[isEditing, isSaving, isVerifying, pendingPreview, incompatibleContentVariant],
 		(value, oldValue) => {
 			debug('state watch:', {
 				oldValue,
@@ -336,7 +330,10 @@ export function useInstallationForm(
 	}
 
 	async function confirmSave() {
-		debug('confirmSave: start', { isBusy: ctx.isBusy.value, hasPendingPreview: !!pendingPreview.value })
+		debug('confirmSave: start', {
+			isBusy: ctx.isBusy.value,
+			hasPendingPreview: !!pendingPreview.value,
+		})
 		if (ctx.isBusy.value) {
 			debug('confirmSave: ignored busy')
 			return

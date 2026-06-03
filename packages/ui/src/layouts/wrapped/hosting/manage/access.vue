@@ -108,6 +108,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
+import type { IconComponent } from '@modrinth/assets'
 import {
 	DatabaseBackupIcon,
 	FileIcon,
@@ -120,7 +121,6 @@ import {
 	UserPlusIcon,
 	UsersIcon,
 } from '@modrinth/assets'
-import type { IconComponent } from '@modrinth/assets'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 

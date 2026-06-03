@@ -194,9 +194,8 @@ provideInstallationSettings({
 			const manifest = getManifest(loader)
 			return !!manifest?.value?.gameVersions?.some((x) => item.version === x.id)
 		})
-		const result = (showSnapshots
-			? filtered
-			: filtered.filter((x) => x.version_type === 'release')
+		const result = (
+			showSnapshots ? filtered : filtered.filter((x) => x.version_type === 'release')
 		).map((x) => ({ value: x.version, label: x.version }))
 		debug('resolveGameVersions:', {
 			loader,
@@ -227,7 +226,8 @@ provideInstallationSettings({
 			})
 			return result
 		}
-		const result = manifest.value.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
+		const result =
+			manifest.value.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
 		debug('resolveLoaderVersions: result', { loader, gameVersion, count: result.length })
 		return result
 	},
