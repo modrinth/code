@@ -86,7 +86,7 @@
 			ref="grantAccessModal"
 			:members="members"
 			:friend-ids="friendIds"
-			:resolve-user="resolveInviteUser"
+			:search-users="searchInviteUsers"
 			:can-grant="canManageUsers"
 			:permission-denied-message="permissionDeniedMessage"
 			@grant="grantAccess"
@@ -108,6 +108,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
+import type { IconComponent } from '@modrinth/assets'
 import {
 	DatabaseBackupIcon,
 	FileIcon,
@@ -120,7 +121,6 @@ import {
 	UserPlusIcon,
 	UsersIcon,
 } from '@modrinth/assets'
-import type { IconComponent } from '@modrinth/assets'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
@@ -523,14 +523,6 @@ const messages = defineMessages({
 		id: 'servers.access-page.notification.load-failed.text',
 		defaultMessage: 'Refresh the page to try again.',
 	},
-	userLookupFailedTitle: {
-		id: 'servers.access-page.notification.user-lookup-failed.title',
-		defaultMessage: 'User could not be found',
-	},
-	userLookupFailedText: {
-		id: 'servers.access-page.notification.user-lookup-failed.text',
-		defaultMessage: 'Could not find {target}. Check the username and try again.',
-	},
 	inviteFailedTitle: {
 		id: 'servers.access-page.notification.invite-failed.title',
 		defaultMessage: 'Invite could not be sent',
@@ -625,12 +617,7 @@ const actionLogActionGroups = [
 		key: 'users',
 		label: messages.actionGroupUsers,
 		icon: UsersIcon,
-		actions: [
-			'user_invited',
-			'user_invite_revoked',
-			'user_permission_modified',
-			'user_removed',
-		],
+		actions: ['user_invited', 'user_invite_revoked', 'user_permission_modified', 'user_removed'],
 	},
 	{
 		key: 'content',
@@ -1460,13 +1447,13 @@ function findMemberByTarget(target: string) {
 	)
 }
 
-async function resolveInviteUser(target: string): Promise<ServerAccessInviteSuggestion | null> {
-	const user = await client.labrinth.users_v2.get(target)
-	return {
+async function searchInviteUsers(query: string): Promise<ServerAccessInviteSuggestion[]> {
+	const users = await client.labrinth.users_v3.search(query)
+	return users.map((user) => ({
 		id: user.id,
 		username: user.username,
 		avatarUrl: user.avatar_url || undefined,
-	}
+	}))
 }
 
 function resolveMemberUserId(member: ServerAccessMember): string {
@@ -1502,10 +1489,7 @@ async function resendInvite(member: ServerAccessMember) {
 	if (!canManageUsers.value || !member.pending || member.role === 'owner') return
 
 	try {
-		await client.archon.server_users_v1.add(serverId, {
-			user_id: member.user.id,
-			role: accessRoleToApiRole(member.role),
-		})
+		await client.archon.server_users_v1.reinvite(serverId, member.user.id)
 		await invalidateServerUsers()
 		await invalidateActionLog()
 		addNotification({
@@ -1597,32 +1581,14 @@ async function grantAccess(payload: GrantServerAccessPayload) {
 	const target = payload.target.trim()
 	if (!target) return
 
-	const existingMember = findMemberByTarget(target)
+	const user = payload.user
+	const existingMember =
+		findMemberByTarget(user.id) ?? findMemberByTarget(user.username) ?? findMemberByTarget(target)
 	if (existingMember) {
 		await updateMemberRole(existingMember, payload.role)
 		if (payload.addAsFriend) {
-			const userId = await resolveMemberUserId(existingMember)
-			await sendFriendRequest(userId)
+			await sendFriendRequest(user.id)
 		}
-		return
-	}
-
-	let user: Labrinth.Users.v2.User
-	try {
-		user = await client.labrinth.users_v2.get(target)
-	} catch (error) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.userLookupFailedTitle),
-			text: formatErrorMessage(error) ?? formatMessage(messages.userLookupFailedText, { target }),
-		})
-		return
-	}
-
-	const resolvedMember = findMemberByTarget(user.id) ?? findMemberByTarget(user.username)
-	if (resolvedMember) {
-		await updateMemberRole(resolvedMember, payload.role)
-		if (payload.addAsFriend) await sendFriendRequest(user.id)
 		return
 	}
 
@@ -1673,10 +1639,7 @@ async function sendFriendRequest(userIdOrUsername: string) {
 	}
 }
 
-function hasFriendRelationship(
-	friends: Labrinth.Friends.v3.UserFriend[],
-	userId: string,
-) {
+function hasFriendRelationship(friends: Labrinth.Friends.v3.UserFriend[], userId: string) {
 	return friends.some((friend) => friend.id === userId || friend.friend_id === userId)
 }
 

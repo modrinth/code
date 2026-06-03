@@ -453,6 +453,14 @@ const { data: regions, isLoading: regionsLoading } = useQuery({
 	enabled: loggedIn,
 })
 
+const PING_COUNT = 20
+const PING_INTERVAL = 200
+const MAX_PING_TIME = 1000
+
+const initialIndex = {
+	'eu-lim': 31,
+}
+
 watch(
 	regions,
 	(newRegions) => {
@@ -476,14 +484,6 @@ async function fetchStock(
 ): Promise<number> {
 	const result = await client.archon.servers_v0.checkStock(region.shortcode, request)
 	return result.available
-}
-
-const PING_COUNT = 20
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
-
-const initialIndex = {
-	'eu-lim': 31,
 }
 
 function runPingTest(

@@ -18,7 +18,9 @@
 			class="inline-flex shrink-0 items-center justify-center"
 			:class="[
 				stackSecondary ? 'row-span-2 self-center' : 'mr-1',
-				entity.icon ? 'size-7 rounded-lg border border-solid border-surface-5 bg-surface-4 text-secondary' : '',
+				entity.icon
+					? 'size-7 rounded-lg border border-solid border-surface-5 bg-surface-4 text-secondary'
+					: '',
 			]"
 		>
 			<Avatar
@@ -84,7 +86,9 @@ const props = withDefaults(
 const textWeightClass = computed(() =>
 	props.textWeight === 'semibold' ? 'font-semibold' : 'font-medium',
 )
-const showAvatar = computed(() => props.entity.iconUrl != null || props.entity.iconShape === 'circle')
+const showAvatar = computed(
+	() => props.entity.iconUrl != null || props.entity.iconShape === 'circle',
+)
 const labelRef = ref<HTMLElement | null>(null)
 const secondaryLabelRef = ref<HTMLElement | null>(null)
 </script>

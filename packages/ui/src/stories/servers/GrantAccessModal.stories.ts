@@ -16,7 +16,7 @@ const meta = {
 		docs: {
 			description: {
 				component:
-					'Role descriptions use the same instance-focused copy as the access page. The username field resolves users asynchronously before showing the empty state.',
+					'Role descriptions use the same instance-focused copy as the access page. The username field searches users asynchronously before showing the empty state.',
 			},
 		},
 	},
@@ -35,17 +35,17 @@ export const Default: Story = {
 				{ id: 'fetch', username: 'Fetch' },
 				{ id: 'emma', username: 'Emma' },
 			]
-			async function resolveUser(target: string) {
+			async function searchUsers(query: string) {
 				await new Promise((resolve) => setTimeout(resolve, 250))
-				const normalizedTarget = target.trim().toLowerCase()
-				return users.find((user) => user.username.toLowerCase() === normalizedTarget) ?? null
+				const normalizedQuery = query.trim().toLowerCase()
+				return users.filter((user) => user.username.toLowerCase().startsWith(normalizedQuery))
 			}
 			function handleGrant(payload: GrantServerAccessPayload) {
 				lastAddedUser.value = `${payload.target} as ${payload.role}${
 					payload.addAsFriend ? ' with friend request' : ''
 				}`
 			}
-			return { modalRef, resolveUser, lastAddedUser, handleGrant }
+			return { modalRef, searchUsers, lastAddedUser, handleGrant }
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
@@ -53,7 +53,7 @@ export const Default: Story = {
 					<button @click="modalRef?.show($event)">Add user</button>
 				</ButtonStyled>
 				<p v-if="lastAddedUser" class="m-0 text-sm text-secondary">Last added: {{ lastAddedUser }}</p>
-				<GrantAccessModal ref="modalRef" :resolve-user="resolveUser" @grant="handleGrant" />
+				<GrantAccessModal ref="modalRef" :search-users="searchUsers" @grant="handleGrant" />
 			</div>
 		`,
 	}),
@@ -79,19 +79,19 @@ export const ExistingMember: Story = {
 					joinedAt: new Date().toISOString(),
 				},
 			]
-			async function resolveUser(target: string) {
+			async function searchUsers(query: string) {
 				await new Promise((resolve) => setTimeout(resolve, 250))
-				const normalizedTarget = target.trim().toLowerCase()
-				return users.find((user) => user.username.toLowerCase() === normalizedTarget) ?? null
+				const normalizedQuery = query.trim().toLowerCase()
+				return users.filter((user) => user.username.toLowerCase().startsWith(normalizedQuery))
 			}
-			return { modalRef, members, resolveUser }
+			return { modalRef, members, searchUsers }
 		},
 		template: /* html */ `
 			<div class="flex flex-col items-center gap-4">
 				<ButtonStyled color="brand">
 					<button @click="modalRef?.show($event)">Add existing user</button>
 				</ButtonStyled>
-				<GrantAccessModal ref="modalRef" :members="members" :resolve-user="resolveUser" />
+				<GrantAccessModal ref="modalRef" :members="members" :search-users="searchUsers" />
 			</div>
 		`,
 	}),

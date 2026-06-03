@@ -26,6 +26,8 @@
 					search-autocorrect="off"
 					search-autocapitalize="none"
 					:search-spellcheck="false"
+					@open="targetComboboxOpen = true"
+					@close="targetComboboxOpen = false"
 					@search-input="handleTargetSearch"
 					@select="handleTargetSelect"
 				>
@@ -158,7 +160,7 @@ const props = withDefaults(
 		members?: ServerAccessMember[]
 		suggestions?: ServerAccessInviteSuggestion[]
 		friendIds?: string[]
-		resolveUser?: (target: string) => Promise<ServerAccessInviteSuggestion | null>
+		searchUsers?: (query: string) => Promise<ServerAccessInviteSuggestion[]>
 		canGrant?: boolean
 		permissionDeniedMessage?: string
 	}>(),
@@ -179,11 +181,12 @@ const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const target = ref('')
 const selectedRole = ref<Exclude<ServerAccessRole, 'owner'>>('editor')
 const addAsFriend = ref(true)
-const suggestionMinimumLength = 2
-const resolvedSuggestion = ref<ServerAccessInviteSuggestion | null>(null)
+const suggestionMinimumLength = 1
+const remoteSuggestions = ref<ServerAccessInviteSuggestion[]>([])
 const targetLookupStatus = ref<'idle' | 'loading' | 'loaded'>('idle')
 const targetLookupRequestId = ref(0)
 const hasSelectedTarget = ref(false)
+const targetComboboxOpen = ref(false)
 
 const messages = defineMessages({
 	header: {
@@ -272,7 +275,7 @@ const grantableRoles = computed(() => [
 ])
 
 const normalizedTarget = computed(() => target.value.trim())
-const usesRemoteLookup = computed(() => !!props.resolveUser)
+const usesRemoteLookup = computed(() => !!props.searchUsers)
 const matchedSuggestion = computed(() => findSuggestion(normalizedTarget.value))
 const selectedTargetUserId = computed(() => matchedSuggestion.value?.id)
 const friendIdSet = computed(() => new Set(props.friendIds.map((id) => id.toLowerCase())))
@@ -280,17 +283,32 @@ const targetIsFriend = computed(() => {
 	const userId = selectedTargetUserId.value
 	return !!userId && friendIdSet.value.has(userId.toLowerCase())
 })
-const showAddAsFriend = computed(
-	() => hasSelectedTarget.value && !!matchedSuggestion.value && !targetIsFriend.value,
+const hasResolvedTarget = computed(() => {
+	const suggestion = matchedSuggestion.value
+	if (!suggestion) return false
+
+	const normalizedSuggestionId = suggestion.id.toLowerCase()
+	const normalizedSuggestionUsername = suggestion.username.toLowerCase()
+	const normalizedValue = normalizedTarget.value.toLowerCase()
+
+	return (
+		hasSelectedTarget.value ||
+		normalizedSuggestionId === normalizedValue ||
+		normalizedSuggestionUsername === normalizedValue
+	)
+})
+const showAddAsFriend = computed(() => canAddAsFriend.value && !targetComboboxOpen.value)
+const canAddAsFriend = computed(
+	() => hasResolvedTarget.value && !!matchedSuggestion.value && !targetIsFriend.value,
 )
 const existingMember = computed(() => findExistingMember())
 const canInvite = computed(
 	() =>
 		normalizedTarget.value.length > 0 &&
 		!!selectedRole.value &&
+		!!matchedSuggestion.value &&
 		!existingMember.value &&
-		(!usesRemoteLookup.value ||
-			(targetLookupStatus.value === 'loaded' && !!matchedSuggestion.value)),
+		(!usesRemoteLookup.value || (targetLookupStatus.value === 'loaded' && hasResolvedTarget.value)),
 )
 const canSubmit = computed(() => props.canGrant && canInvite.value)
 const permissionDeniedMessage = computed(
@@ -307,17 +325,14 @@ const targetLookupMessage = computed(() =>
 		: formatMessage(messages.noSuggestions),
 )
 const inviteSuggestions = computed(() => {
-	if (!resolvedSuggestion.value) return props.suggestions
+	const suggestions = new Map<string, ServerAccessInviteSuggestion>()
 
-	const hasResolvedSuggestion = props.suggestions.some(
-		(suggestion) =>
-			suggestion.id === resolvedSuggestion.value?.id ||
-			suggestion.username.toLowerCase() === resolvedSuggestion.value?.username.toLowerCase(),
-	)
+	for (const suggestion of [...remoteSuggestions.value, ...props.suggestions]) {
+		suggestions.set(suggestion.id.toLowerCase(), suggestion)
+		suggestions.set(suggestion.username.toLowerCase(), suggestion)
+	}
 
-	return hasResolvedSuggestion
-		? props.suggestions
-		: [resolvedSuggestion.value, ...props.suggestions]
+	return [...new Set(suggestions.values())]
 })
 const suggestionOptions = computed<ComboboxOption<string>[]>(() =>
 	inviteSuggestions.value.map((suggestion) => ({
@@ -358,19 +373,19 @@ function findExistingMember() {
 	})
 }
 
-const resolveTarget = useDebounceFn(async (query: string, requestId: number) => {
-	const resolveUser = props.resolveUser
-	if (!resolveUser) return
+const searchTargetUsers = useDebounceFn(async (query: string, requestId: number) => {
+	const searchUsers = props.searchUsers
+	if (!searchUsers) return
 
 	try {
-		const user = await resolveUser(query)
+		const users = await searchUsers(query)
 		if (requestId !== targetLookupRequestId.value || query !== normalizedTarget.value) return
 
-		resolvedSuggestion.value = user
+		remoteSuggestions.value = users
 	} catch {
 		if (requestId !== targetLookupRequestId.value || query !== normalizedTarget.value) return
 
-		resolvedSuggestion.value = null
+		remoteSuggestions.value = []
 	} finally {
 		if (requestId === targetLookupRequestId.value && query === normalizedTarget.value) {
 			targetLookupStatus.value = 'loaded'
@@ -380,7 +395,7 @@ const resolveTarget = useDebounceFn(async (query: string, requestId: number) => 
 
 function handleTargetSearch(value: string) {
 	target.value = value
-	resolvedSuggestion.value = null
+	remoteSuggestions.value = []
 	hasSelectedTarget.value = false
 	targetLookupRequestId.value += 1
 
@@ -392,7 +407,7 @@ function handleTargetSearch(value: string) {
 	}
 
 	targetLookupStatus.value = 'loading'
-	void resolveTarget(normalizedTarget.value, targetLookupRequestId.value)
+	void searchTargetUsers(normalizedTarget.value, targetLookupRequestId.value)
 }
 
 function handleTargetSelect(option: ComboboxOption<string>) {
@@ -404,10 +419,11 @@ function reset() {
 	target.value = ''
 	selectedRole.value = 'editor'
 	addAsFriend.value = true
-	resolvedSuggestion.value = null
+	remoteSuggestions.value = []
 	targetLookupStatus.value = 'idle'
 	targetLookupRequestId.value += 1
 	hasSelectedTarget.value = false
+	targetComboboxOpen.value = false
 }
 
 function show(event?: MouseEvent) {
@@ -421,11 +437,14 @@ function hide() {
 
 function submit() {
 	if (!canSubmit.value) return
+	const user = matchedSuggestion.value
+	if (!user) return
 
 	const payload: GrantServerAccessPayload = {
 		target: normalizedTarget.value,
+		user,
 		role: selectedRole.value,
-		addAsFriend: showAddAsFriend.value && addAsFriend.value,
+		addAsFriend: canAddAsFriend.value && addAsFriend.value,
 	}
 
 	hide()

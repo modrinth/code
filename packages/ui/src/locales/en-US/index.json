@@ -3488,12 +3488,6 @@
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Role could not be updated"
   },
-  "servers.access-page.notification.user-lookup-failed.text": {
-    "defaultMessage": "Could not find {target}. Check the username and try again."
-  },
-  "servers.access-page.notification.user-lookup-failed.title": {
-    "defaultMessage": "User could not be found"
-  },
   "servers.access-page.role-filter.all": {
     "defaultMessage": "All"
   },

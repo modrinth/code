@@ -430,8 +430,7 @@ function getOptionClasses(item: ComboboxOption<T> & { key: string }, _index: num
 		item.class,
 		{
 			'bg-surface-4 text-contrast hover:brightness-[115%] focus:brightness-[115%]': !isSelected,
-			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green':
-				isSelected,
+			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green': isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 		},
 	]

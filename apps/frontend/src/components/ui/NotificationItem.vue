@@ -34,7 +34,12 @@
 					</nuxt-link>
 					<span v-if="invitedBy">has invited you to manage</span>
 					<span v-else>You have been invited to manage</span>
-					<span><strong class="font-bold text-[var(--color-heading)]">{{ notification.body.server_name }}</strong>.</span>
+					<span
+						><strong class="font-bold text-[var(--color-heading)]">{{
+							notification.body.server_name
+						}}</strong
+						>.</span
+					>
 				</div>
 				<div
 					v-if="!notification.read"

@@ -1350,6 +1350,12 @@ export namespace Labrinth {
 				github_id?: number
 			}
 
+			export type SearchUser = {
+				id: string
+				username: string
+				avatar_url: string | null
+			}
+
 			export type AllProjectsResponse = {
 				projects: Projects.v3.Project[]
 				organizations: Record<string, Organizations.v3.Organization>
