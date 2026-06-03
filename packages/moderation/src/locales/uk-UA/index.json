@@ -65,6 +65,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Відвідайте сторінку галереї"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Ваш {type} використовує ліцензію, яка потребує щоб вихідний код був доступним. Будь ласка, надайте посилання на вихідний код або на вихідні файли для кожної додаткової версії, або розгляньте можливість використання іншої ліцензії."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
   },
@@ -72,7 +75,7 @@
     "defaultMessage": "Деякі з ваших посилань, схоже, однакові. Кожне посилання слід вводити лише один раз й у відповідне для нього поле."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Однакові посилання"
+    "defaultMessage": "Очистити однакові посилання"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Ваш опис повинен містити достатню кількість простого тексту або альтернативного тексту зображень, щоби він був зрозумілим для тих, хто використовує читачі екрану або має повільне з’єднання з інтернетом."
@@ -149,6 +152,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Виберіть мову"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Виберіть ліцензію за якою ваш {type} поширений."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Виберіть ліцензію"
   },
@@ -205,6 +211,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Виберіть відповідні теґи"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Потрібно щонайменше одне зображення з галереї, щоб показати вміст вашого {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "пакет ресурсів, включаючи аудіо чи пакеті локалізації. Якщо це описує ваш пакет, будь ласка виберіть відповідний теґ"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Завантажте зображення до галереї"

@@ -11,6 +11,7 @@ use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
@@ -49,11 +50,25 @@ pub struct DBUser {
     pub role: String,
     pub badges: Badges,
     #[serde(default)]
-    pub campaign_pride_26: Option<DateTime<Utc>>,
+    pub campaign_pride_26: Option<Pride26CampaignDonation>,
 
     pub allow_friend_requests: bool,
 
     pub is_subscribed_to_newsletter: bool,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct DBSearchUser {
+    pub id: DBUserId,
+    pub username: String,
+    pub avatar_url: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug, utoipa::ToSchema)]
+pub struct Pride26CampaignDonation {
+    pub last_donated_at: DateTime<Utc>,
+    pub has_badge: bool,
+    pub has_midas: bool,
 }
 
 impl DBUser {
@@ -186,8 +201,12 @@ impl DBUser {
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations
                             WHERE campaign_donations.user_id = users.id
-                                AND campaign_donations.amount_usd > 5
-                        ) AS campaign_pride_26,
+                        ) AS campaign_pride_26_last_donated_at,
+                        (
+                            SELECT SUM(campaign_donations.amount_usd)
+                            FROM campaign_donations
+                            WHERE campaign_donations.user_id = users.id
+                        ) AS campaign_pride_26_total_amount_donated_usd,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
                         venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
@@ -216,7 +235,21 @@ impl DBUser {
                             created: u.created,
                             role: u.role,
                             badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
-                            campaign_pride_26: u.campaign_pride_26,
+                            campaign_pride_26: u
+                                .campaign_pride_26_last_donated_at
+                                .zip(u.campaign_pride_26_total_amount_donated_usd)
+                                .map(
+                                    |(
+                                        last_donated_at,
+                                        total_amount_donated_usd,
+                                    )| Pride26CampaignDonation {
+                                        last_donated_at,
+                                        has_badge: total_amount_donated_usd
+                                            >= Decimal::ONE,
+                                        has_midas: total_amount_donated_usd
+                                            >= Decimal::from(5),
+                                    },
+                                ),
                             password: u.password,
                             paypal_id: u.paypal_id,
                             paypal_country: u.paypal_country,
@@ -236,6 +269,44 @@ impl DBUser {
                 Ok(users)
             }).await?;
         Ok(val)
+    }
+
+    pub async fn search<'a, E>(
+        query: &str,
+        exec: E,
+    ) -> Result<Vec<DBSearchUser>, sqlx::Error>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        if query.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let lowercase_query = query.to_lowercase();
+        let escaped_query = format!("{}%", escape_like(&lowercase_query));
+
+        let users = sqlx::query!(
+            "
+            SELECT id, username, avatar_url
+            FROM users
+            WHERE LOWER(username) LIKE $1 ESCAPE '\'
+            ORDER BY LOWER(username) = $2 DESC, LOWER(username), username
+            LIMIT 25
+            ",
+            escaped_query,
+            lowercase_query
+        )
+        .fetch_all(exec)
+        .await?
+        .into_iter()
+        .map(|row| DBSearchUser {
+            id: DBUserId(row.id),
+            username: row.username,
+            avatar_url: row.avatar_url,
+        })
+        .collect();
+
+        Ok(users)
     }
 
     pub async fn get_by_email<'a, E>(
@@ -1017,4 +1088,15 @@ impl DBUser {
             Ok(None)
         }
     }
+}
+
+fn escape_like(query: &str) -> String {
+    let mut escaped = String::with_capacity(query.len());
+    for ch in query.chars() {
+        if matches!(ch, '\\' | '%' | '_') {
+            escaped.push('\\');
+        }
+        escaped.push(ch);
+    }
+    escaped
 }

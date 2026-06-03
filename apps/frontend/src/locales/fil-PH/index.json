@@ -8,6 +8,126 @@
   "admin.billing.error.not-found": {
     "message": "Hindi mahanap na tagagamit"
   },
+  "analytics.action.add": {
+    "message": "Magdagdag"
+  },
+  "analytics.action.cancel": {
+    "message": "Kanselahin"
+  },
+  "analytics.action.refresh": {
+    "message": "I-refresh"
+  },
+  "analytics.action.reset": {
+    "message": "I-reset"
+  },
+  "analytics.breakdown.country": {
+    "message": "Bansa"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Rason ng pag-download"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Pinanggalingan ng pag-download"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Bersiyon ng laro"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Pag-iisa-isa"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Loader"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetisasyon"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Walang pag-iisa-isa"
+  },
+  "analytics.breakdown.project": {
+    "message": "Proyekto"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Estado ng proyekto"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Bersiyon ng proyekto"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Pag-iisa-isa ng {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Ipakita ang lahat"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Ipakta nang may-takda"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Ipakita ang unang 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} oras"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktibo"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Mga anotasyon"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Display"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Ratio"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Kabuoan"
+  },
+  "analytics.chart.view.area": {
+    "message": "Area"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Bar"
+  },
+  "analytics.chart.view.line": {
+    "message": "Line"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Lahat"
+  },
+  "analytics.group-by.1h": {
+    "message": "1oras"
+  },
+  "analytics.group-by.6h": {
+    "message": "6oras"
+  },
+  "analytics.group-by.date": {
+    "message": "Petsa"
+  },
+  "analytics.group-by.day": {
+    "message": "Araw"
+  },
+  "analytics.group-by.month": {
+    "message": "Buwan"
+  },
+  "analytics.group-by.week": {
+    "message": "Linggo"
+  },
+  "analytics.group-by.year": {
+    "message": "Taon"
+  },
+  "analytics.project-status.draft": {
+    "message": "Burador"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "Pagtingin"
+  },
+  "analytics.value.none": {
+    "message": "Wala"
+  },
   "app-marketing.download.description": {
     "message": "Magagamit ang aming desktop app sa iba’t-ibang plataporma, piliin ang iyong gugustohing bersiyon."
   },
@@ -121,9 +241,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -406,6 +523,12 @@
   },
   "collection.title": {
     "message": "{name} - Koleksiyon"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Tugunan"
+  },
+  "conversation-thread.action.send": {
+    "message": "Ipadala"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ang mga supplementary file ay para sa mga resource na pangsuporta katulad ng source code, hindi para sa ibang bersiyon or baryante."
@@ -901,6 +1024,30 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Pakisuri sa metadata sa environment"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Pangalan"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Uri"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Ikono"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Pangalan"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Uri"
   },
   "dashboard.reports.active-title": {
     "message": "Aktibong sumbong"
@@ -2462,12 +2609,6 @@
   "project.settings.visit-dashboard": {
     "message": "Bisitahin ang dashboard ng mga proyekto"
   },
-  "project.stats.downloads-label": {
-    "message": "download {count, plural, one {} other {}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {} other {na }}follower"
-  },
   "project.status.archived.message": {
     "message": "Inarkibo ang {title}. Ang {title} ay hindi na tatanggap ng mga update maliban kung iwawala nila ang pagkaarkibo ng proyekto."
   },
@@ -2636,26 +2777,14 @@
   "scopes.organizationWrite.label": {
     "message": "Pagsulat sa organisasyon"
   },
-  "scopes.patCreate.description": {
-    "message": "Paglikha ng mga personal API token"
-  },
   "scopes.patCreate.label": {
     "message": "Paglikha ng PAT"
-  },
-  "scopes.patDelete.description": {
-    "message": "Pagtanggal ng iyong mga personal API token"
   },
   "scopes.patDelete.label": {
     "message": "Pagtanggal ng PAT"
   },
-  "scopes.patRead.description": {
-    "message": "Pagtingin sa mga linikhang API token"
-  },
   "scopes.patRead.label": {
     "message": "Pagbasa ng PAT"
-  },
-  "scopes.patWrite.description": {
-    "message": "Pagbago ng mga personal API token"
   },
   "scopes.patWrite.label": {
     "message": "Pagsulat sa PAT"

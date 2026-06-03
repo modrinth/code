@@ -66,6 +66,7 @@ export function buildAnalyticsTableColumns({
 				key: getAnalyticsTableBreakdownColumnKey(breakdown),
 				label: getAnalyticsTableBreakdownColumnLabel(breakdown, formatMessage),
 				enableSorting: true,
+				width: breakdown === 'project' ? '25%' : undefined,
 			})
 		}
 	}
@@ -75,6 +76,7 @@ export function buildAnalyticsTableColumns({
 			key: 'project',
 			label: formatAnalyticsBreakdownLabel('project', formatMessage),
 			enableSorting: true,
+			width: '25%',
 		})
 	}
 

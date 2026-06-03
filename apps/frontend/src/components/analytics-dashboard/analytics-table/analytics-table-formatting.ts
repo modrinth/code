@@ -40,10 +40,12 @@ export function formatAnalyticsTableCompactPlaytime(
 	formatMessage: FormatMessage,
 ): string {
 	const totalSeconds = Math.max(0, Math.round(value))
+	const hours = totalSeconds / SECONDS_PER_HOUR
+	const fractionDigits = hours < 1 ? 2 : 1
 	return formatMessage(analyticsStatCardMessages.playtimeHours, {
-		hours: (totalSeconds / SECONDS_PER_HOUR).toLocaleString(undefined, {
-			minimumFractionDigits: 1,
-			maximumFractionDigits: 1,
+		hours: hours.toLocaleString(undefined, {
+			minimumFractionDigits: fractionDigits,
+			maximumFractionDigits: fractionDigits,
 		}),
 	})
 }

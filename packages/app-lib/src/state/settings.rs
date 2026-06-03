@@ -58,9 +58,11 @@ pub enum FeatureFlag {
     ServerRamAsBytesAlwaysOn,
     AlwaysShowAppControls,
     SkipUnknownPackWarning,
+    PrideFundraiser,
     ServersInApp,
     ServerProjectQa,
     I18nDebug,
+    ShowInstancePlayTime,
 }
 
 impl Settings {

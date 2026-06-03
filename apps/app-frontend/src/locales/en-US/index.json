@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "Select an option"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Displays how much time you've spent playing an instance."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Show play time"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Enables the ability to toggle the sidebar."
   },
@@ -430,6 +436,15 @@
   },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "You received these skins for donating to a Modrinth Pride fundraiser during Pride Month."
   },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"

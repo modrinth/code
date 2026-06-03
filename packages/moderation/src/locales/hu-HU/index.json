@@ -65,9 +65,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Úgy tűnik, hogy néhány külső hivatkozásod megegyezik. Minden hivatkozást csak egyszer szabad megadni, és a megfelelő hivatkozástípussal kell ellátni."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Azonos hivatkozások"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "A leírásnak elegendő mennyiségű egyszerű szöveget vagy képhelyettesítő szöveget kell tartalmaznia, hogy a képernyőolvasókat használók vagy lassú internetkapcsolattal rendelkezők számára is hozzáférhető legyen."
   },

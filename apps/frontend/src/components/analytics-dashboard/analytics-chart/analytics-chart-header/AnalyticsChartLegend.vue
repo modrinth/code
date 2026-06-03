@@ -10,7 +10,7 @@
 		>
 			<div
 				v-if="showLegendTopFade"
-				class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-5 bg-gradient-to-b from-surface-3 to-transparent"
+				class="z-1 pointer-events-none absolute left-0 right-0 top-0 h-5 bg-gradient-to-b from-surface-3 to-transparent"
 			/>
 		</Transition>
 
@@ -99,7 +99,7 @@
 		>
 			<div
 				v-if="showLegendBottomFade"
-				class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-5 bg-gradient-to-t from-surface-3 to-transparent"
+				class="z-1 pointer-events-none absolute bottom-0 left-0 right-0 h-5 bg-gradient-to-t from-surface-3 to-transparent"
 			/>
 		</Transition>
 	</div>

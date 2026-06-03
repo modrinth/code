@@ -793,6 +793,7 @@ import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const generatedState = useGeneratedState()
 
@@ -1096,7 +1097,7 @@ const userMenuOptions = computed(() => {
 			id: 'plus',
 			link: '/plus',
 			color: 'purple',
-			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(user.badges, 1 << 0),
+			shown: !flags.value.hidePlusPromoInUserMenu && !hasActiveMidas(user),
 		},
 		{
 			id: 'servers',

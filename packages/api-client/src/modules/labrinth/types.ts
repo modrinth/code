@@ -1,6 +1,17 @@
+import type { RawDecimal } from '../../utils/types'
 import type { ISO3166 } from '../iso3166/types'
 
 export namespace Labrinth {
+	export namespace Campaign {
+		export namespace Internal {
+			export type CampaignInfo = {
+				total_donations_usd: RawDecimal
+				target_usd: RawDecimal
+				num_donators: number
+			}
+		}
+	}
+
 	export namespace Billing {
 		export namespace Internal {
 			export type PriceDuration = 'five-days' | 'monthly' | 'quarterly' | 'yearly'
@@ -1025,6 +1036,7 @@ export namespace Labrinth {
 				icon_url: string | null
 				color: number | null
 				members: Projects.v3.TeamMember[]
+				moderation_notes?: Users.Common.ModerationNote | null
 			}
 
 			export type CreateOrganizationRequest = {
@@ -1249,7 +1261,7 @@ export namespace Labrinth {
 	}
 
 	export namespace Users {
-		namespace Common {
+		export namespace Common {
 			export type Role = 'developer' | 'moderator' | 'admin'
 
 			export type AuthProvider =
@@ -1266,6 +1278,15 @@ export namespace Labrinth {
 				paypal_country?: string
 				venmo_handle?: string
 				balance: number
+			}
+
+			export type ModerationNote = {
+				notes: string
+				last_modified: string
+				created_at: string
+				last_author: string
+				user_rating: number
+				version: number
 			}
 		}
 
@@ -1298,6 +1319,16 @@ export namespace Labrinth {
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
 
+			export type Pride26CampaignDonation = {
+				last_donated_at: string
+				has_badge: boolean
+				has_midas: boolean
+			}
+
+			export type UserCampaigns = {
+				pride_26: Pride26CampaignDonation | null
+			}
+
 			export type User = {
 				id: string
 				username: string
@@ -1306,6 +1337,7 @@ export namespace Labrinth {
 				created: string
 				role: Role
 				badges: number
+				campaigns: UserCampaigns
 				auth_providers?: AuthProvider[]
 				email?: string
 				email_verified?: boolean
@@ -1314,6 +1346,7 @@ export namespace Labrinth {
 				payout_data?: UserPayoutData
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
+				moderation_notes?: Common.ModerationNote | null
 				github_id?: number
 			}
 
@@ -1615,6 +1648,8 @@ export namespace Labrinth {
 				message_id?: string
 				invited_by?: string
 				organization_id?: string
+				server_id?: string
+				server_name?: string
 				team_id?: string
 				role?: string
 				old_status?: string

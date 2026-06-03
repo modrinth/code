@@ -11,6 +11,108 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-03T18:38:16+00:00`,
+		product: 'web',
+		body: `## Added
+- Added monetization breakdown dismissable explainer banner.
+
+## Fixed
+- Fixed previous-period's data being included in analytics tables instead of just current period.
+- Fixed revenue metric displaying stale data when switching between metrics.
+- Fixed incorrect Y-axis formatting for values with trailing decimal zeros.
+- Fixed table series selections being reset when switching in and out of the tab.
+- Fixed "All Time" analytics range to start from the project's publish date instead of analytics injest start date.
+- Fixed unknown download source data points not appearing in download source breakdown.
+- Fixed date picker number inputs displaying browser increment/decrement arrows.
+- Fixed metric cards showing incorrect percentage changes when switching comparison periods.
+- Fixed playtime values being rounded incorrectly, causing small values to display as 0.`,
+	},
+	{
+		date: `2026-06-03T14:00:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed organization settings not loading.`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'app',
+		version: '0.14.3',
+		body: `## Added
+- Added toggle to hide play time from instance header.
+
+## Changed
+- Updated translations
+
+## Fixed
+- Fixed importing large .mrpack files in Modrinth App causing OS freezing or crashing.
+- Fixed the content update modal in the Content tab of instances hiding available updates in some cases.
+- Fixed copying full paths from the Files tab using mixed path separators on Windows.`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'app',
+		version: '0.14.2',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15-07:00`,
+		product: 'web',
+		body: `## Added
+- New Australia region for Modrinth Hosting
+
+## Fixed
+- Germany Modrinth hosting region not providing latency data.`,
+	},
+	{
+		date: `2026-05-31T16:45:15+00:00`,
+		product: 'app',
+		version: '0.14.1',
+		body: `## Added
+- Pride Fundraiser 2026 banner in the Modrinth App sidebar with donation progress, supporter count, days remaining, and a donation link.
+- Modrinth Pride Fundraiser supporters can now access exclusive Mr. Pack Pride skins in the Modrinth App Skin selector.
+- Mr. Pack is now available as a default skin in the Modrinth App Skin selector.
+
+## Changed
+- Updated tooltips from pure black backgrounds to a style consistent with other popovers.
+- Floating tooltips and pop-ups now have stronger shadows.
+- Updated cards across Modrinth with consistent subtle borders.`,
+	},
+	{
+		date: `2026-05-31T16:45:15+00:00`,
+		product: 'web',
+		body: `## Added
+- Download count badges for 1 million, 10 million, 25 million, 50 million, 100 million, 250 million, and 500 million downloads.
+- Early adopter badges for users who helped test new project types before they launched.
+- Pride Fundraiser Supporter badge.
+
+## Changed
+- Redesigned user badges.
+- Content Moderators now also have the Modrinth Team badge.
+- Users with the Alpha Tester badge now also have the Beta Tester badge.
+- Updated cards across Modrinth with consistent subtle borders.
+- Updated tooltips from pure black backgrounds to a style consistent with other popovers.
+- Floating tooltips and pop-ups now have stronger shadows.
+
+## Fixed
+- Fixed card padding shifting after pages finished loading.`,
+	},
+	{
 		date: `2026-05-29T23:08:28+00:00`,
 		product: 'web',
 		body: `## Fixed

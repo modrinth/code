@@ -23,6 +23,26 @@ import _ArrowUpZAIcon from './icons/arrow-up-z-a.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BadgeCheckIcon from './icons/badge-check.svg?component'
 import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
+import _AlphaBadge from './icons/badges/alpha.svg?component'
+import _BetaBadge from './icons/badges/beta.svg?component'
+import _Downloads1mBadge from './icons/badges/downloads-1m.svg?component'
+import _Downloads10mBadge from './icons/badges/downloads-10m.svg?component'
+import _Downloads25mBadge from './icons/badges/downloads-25m.svg?component'
+import _Downloads50mBadge from './icons/badges/downloads-50m.svg?component'
+import _Downloads100mBadge from './icons/badges/downloads-100m.svg?component'
+import _Downloads250mBadge from './icons/badges/downloads-250m.svg?component'
+import _Downloads500mBadge from './icons/badges/downloads-500m.svg?component'
+import _EarlyDatapackBadge from './icons/badges/early-datapack.svg?component'
+import _EarlyHostingBadge from './icons/badges/early-hosting.svg?component'
+import _EarlyModpackBadge from './icons/badges/early-modpack.svg?component'
+import _EarlyPluginBadge from './icons/badges/early-plugin.svg?component'
+import _EarlyResourcepackBadge from './icons/badges/early-resourcepack.svg?component'
+import _EarlyServersBadge from './icons/badges/early-servers.svg?component'
+import _EarlyShadersBadge from './icons/badges/early-shaders.svg?component'
+import _ModeratorBadge from './icons/badges/moderator.svg?component'
+import _PlusBadge from './icons/badges/plus.svg?component'
+import _PrideBadge from './icons/badges/pride.svg?component'
+import _StaffBadge from './icons/badges/staff.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
@@ -423,6 +443,26 @@ export const ArrowUpZAIcon = _ArrowUpZAIcon
 export const AsteriskIcon = _AsteriskIcon
 export const BadgeCheckIcon = _BadgeCheckIcon
 export const BadgeDollarSignIcon = _BadgeDollarSignIcon
+export const AlphaBadge = _AlphaBadge
+export const BetaBadge = _BetaBadge
+export const Downloads1mBadge = _Downloads1mBadge
+export const Downloads10mBadge = _Downloads10mBadge
+export const Downloads25mBadge = _Downloads25mBadge
+export const Downloads50mBadge = _Downloads50mBadge
+export const Downloads100mBadge = _Downloads100mBadge
+export const Downloads250mBadge = _Downloads250mBadge
+export const Downloads500mBadge = _Downloads500mBadge
+export const EarlyDatapackBadge = _EarlyDatapackBadge
+export const EarlyHostingBadge = _EarlyHostingBadge
+export const EarlyModpackBadge = _EarlyModpackBadge
+export const EarlyPluginBadge = _EarlyPluginBadge
+export const EarlyResourcepackBadge = _EarlyResourcepackBadge
+export const EarlyServersBadge = _EarlyServersBadge
+export const EarlyShadersBadge = _EarlyShadersBadge
+export const ModeratorBadge = _ModeratorBadge
+export const PlusBadge = _PlusBadge
+export const PrideBadge = _PrideBadge
+export const StaffBadge = _StaffBadge
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
