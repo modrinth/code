@@ -17,7 +17,7 @@ import type {
 
 const ANALYTICS_START_TIMESTAMP = '2023-01-01T00:00:00.000Z'
 export const ANALYTICS_START_DATE_INPUT_VALUE = ANALYTICS_START_TIMESTAMP.slice(0, 10)
-const ANALYTICS_START_TIME = new Date(ANALYTICS_START_TIMESTAMP).getTime()
+export const ANALYTICS_START_TIME = new Date(ANALYTICS_START_TIMESTAMP).getTime()
 export const REVENUE_MIN_TIMEFRAME_MS = 1 * 24 * 60 * 60 * 1000 // need at least 1 day in timeframe range to show revenue
 const ANALYTICS_DAY_MS = 24 * 60 * 60 * 1000
 const ANALYTICS_MAX_TIME_SLICES = 256 // controls granularity allowed in "group by" for timeframe ranges
@@ -32,6 +32,7 @@ function isProjectAnalyticsPoint(
 
 export function buildComparisonFetchRequest(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+	minStartTime = ANALYTICS_START_TIME,
 ): AnalyticsProjectFetchRequest | null {
 	if (!isAnalyticsFetchRequestReady(fetchRequest)) {
 		return null
@@ -47,7 +48,7 @@ export function buildComparisonFetchRequest(
 
 	const previousStart = new Date(startTimestamp - duration)
 
-	if (previousStart.getTime() < ANALYTICS_START_TIME) {
+	if (previousStart.getTime() < minStartTime) {
 		return null
 	}
 
@@ -93,8 +94,12 @@ function getAnalyticsTimeSliceCount(
 export function splitAnalyticsTimeSlices(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
+	minStartTime = ANALYTICS_START_TIME,
 ): AnalyticsTimeSliceSplit {
-	if (!isAnalyticsFetchRequestReady(fetchRequest) || !buildComparisonFetchRequest(fetchRequest)) {
+	if (
+		!isAnalyticsFetchRequestReady(fetchRequest) ||
+		!buildComparisonFetchRequest(fetchRequest, minStartTime)
+	) {
 		return {
 			currentTimeSlices: timeSlices,
 			previousTimeSlices: [],
@@ -339,6 +344,7 @@ export function getAnalyticsTimeframeDurationMs({
 	customStartDate,
 	customEndDate,
 	nowTimestamp,
+	allTimeStartTimestamp = ANALYTICS_START_TIME,
 }: {
 	mode: AnalyticsTimeframeMode
 	preset: AnalyticsTimeframePreset
@@ -347,6 +353,7 @@ export function getAnalyticsTimeframeDurationMs({
 	customStartDate: string
 	customEndDate: string
 	nowTimestamp: number
+	allTimeStartTimestamp?: number
 }): number {
 	if (mode === 'preset') {
 		switch (preset) {
@@ -370,7 +377,7 @@ export function getAnalyticsTimeframeDurationMs({
 				return now.getTime() - yearStart.getTime()
 			}
 			case 'all_time': {
-				const allTimeDurationMs = nowTimestamp - ANALYTICS_START_TIME
+				const allTimeDurationMs = nowTimestamp - allTimeStartTimestamp
 				return Math.max(0, allTimeDurationMs)
 			}
 		}

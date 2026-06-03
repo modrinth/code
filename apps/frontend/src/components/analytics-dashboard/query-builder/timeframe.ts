@@ -84,6 +84,7 @@ function subtractCalendarMonths(date: Date, months: number): Date {
 export function getTimeRangeForPreset(
 	preset: AnalyticsTimeframePreset,
 	nowTimestamp: number,
+	allTimeStartDate: Date = new Date(Date.UTC(2023, 0, 1, 0, 0, 0, 0)),
 ): AnalyticsTimeRange {
 	const now = getRoundedNow(nowTimestamp)
 	const end = new Date(now)
@@ -130,7 +131,7 @@ export function getTimeRangeForPreset(
 		}
 		case 'all_time':
 			return {
-				start: new Date(Date.UTC(2023, 0, 1, 0, 0, 0, 0)),
+				start: new Date(allTimeStartDate),
 				end,
 			}
 		default:
@@ -193,6 +194,7 @@ export function getAnalyticsTimeRange({
 	customStartDate,
 	customEndDate,
 	nowTimestamp,
+	allTimeStartDate,
 }: {
 	mode: AnalyticsTimeframeMode
 	preset: AnalyticsTimeframePreset
@@ -201,6 +203,7 @@ export function getAnalyticsTimeRange({
 	customStartDate: string
 	customEndDate: string
 	nowTimestamp: number
+	allTimeStartDate?: Date
 }): AnalyticsTimeRange {
 	switch (mode) {
 		case 'last':
@@ -211,7 +214,7 @@ export function getAnalyticsTimeRange({
 			return getTimeRangeForCustomDateTimeRange(customStartDate, customEndDate)
 		case 'preset':
 		default:
-			return getTimeRangeForPreset(preset, nowTimestamp)
+			return getTimeRangeForPreset(preset, nowTimestamp, allTimeStartDate)
 	}
 }
 
@@ -269,6 +272,7 @@ export function useSelectedAnalyticsTimeRange() {
 		selectedCustomTimeframeStartDate,
 		selectedCustomTimeframeEndDate,
 		queryRefreshTimestamp,
+		analyticsAllTimeStartDate,
 	} = injectAnalyticsDashboardContext()
 
 	const selectedTimeRange = computed(() =>
@@ -280,6 +284,7 @@ export function useSelectedAnalyticsTimeRange() {
 			customStartDate: selectedCustomTimeframeStartDate.value,
 			customEndDate: selectedCustomTimeframeEndDate.value,
 			nowTimestamp: queryRefreshTimestamp.value,
+			allTimeStartDate: analyticsAllTimeStartDate.value,
 		}),
 	)
 

@@ -46,6 +46,7 @@ export function toAnalyticsDashboardProject(
 		iconUrl: project.icon_url ?? undefined,
 		downloads: project.downloads ?? 0,
 		status: getProjectStatusFilterValue(project.status),
+		publishedAt: project.published ?? undefined,
 	}
 }
 
