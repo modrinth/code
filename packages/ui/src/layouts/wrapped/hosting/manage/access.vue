@@ -187,7 +187,7 @@ const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
 const removeMemberConfirmModal = ref<InstanceType<typeof RemoveAccessModal> | null>(null)
 const pendingRemovalMember = ref<ServerAccessMember | null>(null)
 const shouldCancelInvite = ref(false)
-const reinviteCooldownUntilByUserId = ref<Record<string, number>>({})
+const reinviteCooldownUntilByUserId = ref<Record<string, number | undefined>>({})
 const editorScopes = [
 	'BASE_READ',
 	'POWER_ACTIONS',
@@ -728,13 +728,11 @@ const members = computed<ServerAccessMember[]>(() =>
 			const role = apiPermissionsToAccessRole(serverUser.permissions)
 			const nowReinviteAvailableAt = reinviteCooldownUntilByUserId.value[userId]
 			const apiReinviteAvailableAt = getInviteResendAvailableAt(serverUser.last_invite_sent)
-			const reinviteAvailableAt = [
-				nowReinviteAvailableAt,
-				apiReinviteAvailableAt,
-			].reduce((candidate, current) =>
-				candidate === undefined || (current !== undefined && current > candidate)
-					? current
-					: candidate,
+			const reinviteAvailableAt = [nowReinviteAvailableAt, apiReinviteAvailableAt].reduce(
+				(candidate, current) =>
+					candidate === undefined || (current !== undefined && current > candidate)
+						? current
+						: candidate,
 			)
 
 			return {
@@ -1484,7 +1482,7 @@ function getInviteResendAvailableAt(lastInviteSent: string | null | undefined): 
 
 function setReinviteCooldown(member: ServerAccessMember, cooldownSeconds: number | null) {
 	if (!cooldownSeconds) {
-		delete reinviteCooldownUntilByUserId.value[member.user.id]
+		reinviteCooldownUntilByUserId.value[member.user.id] = undefined
 		return
 	}
 
