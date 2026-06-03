@@ -1953,7 +1953,7 @@
     "message": "Frog"
   },
   "hosting-marketing.available-locations": {
-    "message": "Available in North America, Europe, and Southeast Asia for wide coverage."
+    "message": "Available in North America, Europe, Southeast Asia, and Australia for wide coverage."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Pay monthly"
@@ -2016,7 +2016,7 @@
     "message": "Where are Modrinth Hosting servers located? Can I choose a region?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "We have servers available across North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support."
+    "message": "We have servers available across North America, Europe, Southeast Asia, and Australia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "What Minecraft versions and loaders can be used?"

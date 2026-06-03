@@ -152,7 +152,7 @@
 								v-if="sortedMessages.length > 0"
 								:disabled="!replyBody || isLoading"
 								@click="
-									isApproved(project)
+									isApproved(project) && !isStaff(auth.user)
 										? openReplyModal()
 										: runBlockingAction('reply', () => sendReply())
 								"
@@ -169,7 +169,7 @@
 								v-else
 								:disabled="!replyBody || isLoading"
 								@click="
-									isApproved(project)
+									isApproved(project) && !isStaff(auth.user)
 										? openReplyModal()
 										: runBlockingAction('send', () => sendReply())
 								"

@@ -1,7 +1,8 @@
 use crate::database::PgPool;
+use crate::models::notifications::Notification;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::statuses::{
-    broadcast_to_local_friends, send_message_to_user,
+    broadcast_to_local_friends, send_message_to_user, send_notification_to_user,
 };
 use actix_web::web::Data;
 use ariadne::ids::UserId;
@@ -14,12 +15,23 @@ use tokio_stream::StreamExt;
 
 pub const FRIENDS_CHANNEL_NAME: &str = "friends";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum RedisFriendsMessage {
-    StatusUpdate { status: UserStatus },
-    UserOffline { user: UserId },
-    DirectStatusUpdate { to_user: UserId, status: UserStatus },
+    StatusUpdate {
+        status: UserStatus,
+    },
+    UserOffline {
+        user: UserId,
+    },
+    DirectStatusUpdate {
+        to_user: UserId,
+        status: UserStatus,
+    },
+    Notification {
+        to_user: UserId,
+        notification: Notification,
+    },
 }
 
 impl ToRedisArgs for RedisFriendsMessage {
@@ -76,6 +88,18 @@ pub async fn handle_pubsub(
                         &sockets,
                         to_user,
                         &ServerToClientMessage::StatusUpdate { status },
+                    )
+                    .await;
+                }
+
+                Ok(RedisFriendsMessage::Notification {
+                    to_user,
+                    notification,
+                }) => {
+                    let _ = send_notification_to_user(
+                        &sockets,
+                        to_user,
+                        &notification,
                     )
                     .await;
                 }
