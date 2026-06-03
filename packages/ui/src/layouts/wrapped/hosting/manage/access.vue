@@ -9,12 +9,12 @@
 				input-class="!h-10"
 				clearable
 			/>
-			<div class="flex shrink-0 gap-2 flex-wrap md:flex-nowrap">
+			<div class="flex shrink-0 items-center gap-2 flex-wrap md:flex-nowrap">
 				<Combobox
 					v-model="roleFilter"
 					:options="roleFilterOptions"
 					:display-value="selectedRoleFilterLabel"
-					trigger-class="min-w-[225px]"
+					trigger-class="min-w-[225px] !h-10 !min-h-10 !py-0"
 				>
 					<template #prefix>
 						<FilterIcon class="size-5 text-secondary" aria-hidden="true" />
@@ -76,6 +76,7 @@
 						:empty-search-label="formatMessage(messages.emptyFilterSearch)"
 						apply-immediately
 						use-filter-icon
+						checkbox-position="right"
 					/>
 				</template>
 			</AuditLogTable>
@@ -114,6 +115,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import DropdownFilterBar, {
 	type DropdownFilterBarCategory,
+	type DropdownFilterBarItem,
 	type DropdownFilterBarOption,
 } from '#ui/components/base/DropdownFilterBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -152,7 +154,7 @@ const props = withDefaults(
 		showAuditLogInstances?: boolean
 	}>(),
 	{
-		showAuditLogInstances: true,
+		showAuditLogInstances: false,
 	},
 )
 const showAuditLogInstances = computed(() => props.showAuditLogInstances)
@@ -174,6 +176,7 @@ const shouldCancelInvite = ref(false)
 const editorScopes = [
 	'BASE_READ',
 	'POWER_ACTIONS',
+	'EXEC_COMMANDS',
 	'FILES_WRITE',
 	'SETUP',
 	'BACKUPS',
@@ -238,6 +241,34 @@ const messages = defineMessages({
 	actionTypeFilterSearch: {
 		id: 'servers.access-page.activity-log-filter.action-types-search',
 		defaultMessage: 'Search action types...',
+	},
+	actionGroupServer: {
+		id: 'servers.access-page.activity-log-filter.action-group.server',
+		defaultMessage: 'Server',
+	},
+	actionGroupPowerConsole: {
+		id: 'servers.access-page.activity-log-filter.action-group.power-console',
+		defaultMessage: 'Power and console',
+	},
+	actionGroupUsers: {
+		id: 'servers.access-page.activity-log-filter.action-group.users',
+		defaultMessage: 'Users and invites',
+	},
+	actionGroupContent: {
+		id: 'servers.access-page.activity-log-filter.action-group.content',
+		defaultMessage: 'Content and modpack',
+	},
+	actionGroupFiles: {
+		id: 'servers.access-page.activity-log-filter.action-group.files',
+		defaultMessage: 'Files and SFTP',
+	},
+	actionGroupBackups: {
+		id: 'servers.access-page.activity-log-filter.action-group.backups',
+		defaultMessage: 'Backups',
+	},
+	actionGroupSettings: {
+		id: 'servers.access-page.activity-log-filter.action-group.settings',
+		defaultMessage: 'Settings and runtime',
 	},
 	server_created: {
 		id: 'servers.access-page.activity-log-filter.action.server-created',
@@ -551,6 +582,85 @@ const actionLogActionNames = [
 ] as const satisfies readonly Archon.Actions.v1.ActionName[]
 type ActionLogFilterActionName = (typeof actionLogActionNames)[number]
 const actionLogActionNameSet = new Set<string>(actionLogActionNames)
+const actionLogActionGroups = [
+	{
+		key: 'server',
+		label: messages.actionGroupServer,
+		actions: [
+			'server_created',
+			'server_reallocated',
+			'server_plan_changed',
+			'server_repaired',
+			'server_reset',
+		],
+	},
+	{
+		key: 'power-console',
+		label: messages.actionGroupPowerConsole,
+		actions: [
+			'server_started',
+			'server_stopped',
+			'server_restarted',
+			'server_killed',
+			'console_command_executed',
+			'console_cleared',
+		],
+	},
+	{
+		key: 'users',
+		label: messages.actionGroupUsers,
+		actions: [
+			'user_invited',
+			'user_invite_revoked',
+			'user_permission_modified',
+			'user_removed',
+		],
+	},
+	{
+		key: 'content',
+		label: messages.actionGroupContent,
+		actions: [
+			'addon_added',
+			'addon_uploaded',
+			'addon_disabled',
+			'addon_enabled',
+			'addon_updated',
+			'addon_deleted',
+			'modpack_changed',
+			'modpack_unlinked',
+		],
+	},
+	{
+		key: 'files',
+		label: messages.actionGroupFiles,
+		actions: ['file_uploaded', 'file_edited', 'file_renamed', 'file_deleted', 'sftp_login'],
+	},
+	{
+		key: 'backups',
+		label: messages.actionGroupBackups,
+		actions: ['backup_created', 'backup_renamed', 'backup_restored', 'backup_deleted'],
+	},
+	{
+		key: 'settings',
+		label: messages.actionGroupSettings,
+		actions: [
+			'changed_server_name',
+			'changed_server_subdomain',
+			'port_allocation_added',
+			'port_allocation_removed',
+			'loader_version_edited',
+			'game_version_edited',
+			'server_properties_modified',
+			'startup_command_modified',
+			'java_runtime_modified',
+			'java_version_modified',
+		],
+	},
+] as const satisfies readonly {
+	key: string
+	label: (typeof messages)[keyof typeof messages]
+	actions: readonly ActionLogFilterActionName[]
+}[]
 
 const roleOptions = computed<ServerAccessRoleOption[]>(() => [
 	{
@@ -795,9 +905,7 @@ const auditLogUserFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 				if (!options.has(SUPPORT_ACTION_LOG_USER_FILTER)) {
 					options.set(SUPPORT_ACTION_LOG_USER_FILTER, {
 						value: SUPPORT_ACTION_LOG_USER_FILTER,
-						label: user?.username
-							? `${formatMessage(messages.supportActor)} (${user.username})`
-							: formatMessage(messages.supportActor),
+						label: formatMessage(messages.supportActor),
 						searchTerms: [
 							SUPPORT_ACTION_LOG_USER_FILTER,
 							formatMessage(messages.supportActor),
@@ -840,14 +948,19 @@ const auditLogWorldFilterOptions = computed<DropdownFilterBarOption[]>(() => [
 	})),
 ])
 
-const auditLogActionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
-	actionLogActionNames
-		.map((action) => ({
+const auditLogActionFilterOptions = computed<DropdownFilterBarItem[]>(() =>
+	actionLogActionGroups.flatMap((group) => [
+		{
+			type: 'section-header' as const,
+			key: group.key,
+			label: formatMessage(group.label),
+		},
+		...group.actions.map((action) => ({
 			value: action,
 			label: formatActionLogAction(action),
 			searchTerms: [action, action.replaceAll('_', ' ')],
-		}))
-		.sort(compareFilterOptions),
+		})),
+	]),
 )
 
 const auditLogFilterCategories = computed<DropdownFilterBarCategory[]>(() => {

@@ -55,6 +55,7 @@
 							:key="entity.id"
 							:entity="entity"
 							class="min-w-0 pr-4"
+							stack-secondary
 						/>
 					</div>
 					<Transition

@@ -16,16 +16,18 @@ export const serverPermissionBits = {
 	NONE: 0n,
 	BASE_READ: 1n << 63n,
 	POWER_ACTIONS: 1n << 62n,
-	FILES_WRITE: 1n << 61n,
-	SETUP: 1n << 60n,
-	BACKUPS: 1n << 59n,
-	ADVANCED: 1n << 58n,
-	RESET_SERVER: 1n << 57n,
-	MANAGE_USERS: 1n << 56n,
+	EXEC_COMMANDS: 1n << 61n,
+	FILES_WRITE: 1n << 60n,
+	SETUP: 1n << 59n,
+	BACKUPS: 1n << 58n,
+	ADVANCED: 1n << 57n,
+	RESET_SERVER: 1n << 56n,
+	MANAGE_USERS: 1n << 55n,
 	SUPPORT_AGENT: 1n,
 	INFRA_MANAGER: 1n << 1n,
 	INFRA_MANAGER_READ: 1n << 2n,
 	INFRA_SERVERS_XFER: 1n << 3n,
+	INFRA_USERS: 1n << 4n,
 	SERVER_ADMIN: ((1n << 64n) - 1n) ^ ((1n << 15n) - 1n),
 } as const satisfies Record<ServerPermissionName, bigint>
 
@@ -88,6 +90,7 @@ export function useServerPermissions() {
 	const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 	const canUsePowerActions = computed(() => hasCurrentUserPermission('POWER_ACTIONS'))
+	const canExecuteCommands = computed(() => hasCurrentUserPermission('EXEC_COMMANDS'))
 	const canWriteFiles = computed(() => hasCurrentUserPermission('FILES_WRITE'))
 	const canSetup = computed(() => hasCurrentUserPermission('SETUP'))
 	const canManageBackups = computed(() => hasCurrentUserPermission('BACKUPS'))
@@ -103,6 +106,7 @@ export function useServerPermissions() {
 		permissionDeniedMessage,
 		hasCurrentUserPermission,
 		canUsePowerActions,
+		canExecuteCommands,
 		canWriteFiles,
 		canSetup,
 		canManageBackups,

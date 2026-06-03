@@ -514,6 +514,7 @@ export namespace Archon {
 				SERVER_ADMIN: 'SERVER_ADMIN',
 				BASE_READ: 'BASE_READ',
 				POWER_ACTIONS: 'POWER_ACTIONS',
+				EXEC_COMMANDS: 'EXEC_COMMANDS',
 				FILES_WRITE: 'FILES_WRITE',
 				SETUP: 'SETUP',
 				BACKUPS: 'BACKUPS',
@@ -524,6 +525,7 @@ export namespace Archon {
 				INFRA_MANAGER: 'INFRA_MANAGER',
 				INFRA_MANAGER_READ: 'INFRA_MANAGER_READ',
 				INFRA_SERVERS_XFER: 'INFRA_SERVERS_XFER',
+				INFRA_USERS: 'INFRA_USERS',
 			} as const
 
 			export type UserScope = string | number

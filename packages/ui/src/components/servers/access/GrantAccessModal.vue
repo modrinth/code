@@ -12,7 +12,7 @@
 				</label>
 				<Combobox
 					id="grant-access-target"
-					:model-value="target"
+					:model-value="undefined"
 					:options="suggestionOptions"
 					:search-placeholder="formatMessage(messages.targetPlaceholder)"
 					:placeholder="formatMessage(messages.targetPlaceholder)"
@@ -393,12 +393,14 @@ function hide() {
 function submit() {
 	if (!canSubmit.value) return
 
-	emit('grant', {
+	const payload: GrantServerAccessPayload = {
 		target: normalizedTarget.value,
 		role: selectedRole.value,
 		addAsFriend: addAsFriend.value,
-	})
+	}
+
 	hide()
+	emit('grant', payload)
 }
 
 defineExpose({ show, hide })

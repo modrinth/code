@@ -43,10 +43,7 @@
 					:options="roleComboboxOptions"
 					:display-value="formatRole(member.role)"
 					:disabled="!canManageUsers"
-					:trigger-class="
-						roleTriggerClass(member.role) +
-						` !inline-flex !w-auto !h-7 !min-h-0 !rounded-full !border !border-solid !px-2.5 !py-1 gap-1 !text-sm !font-semibold !leading-5`
-					"
+					:trigger-class="`${roleTriggerClass(member.role)} !inline-flex !w-auto !h-7 !min-h-0 !rounded-full !border !border-solid !px-2.5 !py-1 gap-1 !text-sm !font-semibold !leading-5`"
 					dropdown-class="!rounded-[24px] !bg-surface-3"
 					dropdown-min-width="18rem"
 					force-direction="down"

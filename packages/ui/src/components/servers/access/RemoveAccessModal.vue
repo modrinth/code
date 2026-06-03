@@ -1,30 +1,34 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(shouldCancel ? messages.cancelHeader : messages.header, { username })"
+		:header="
+			formatMessage(modalState.shouldCancel ? messages.cancelHeader : messages.header, {
+				username: modalState.username,
+			})
+		"
 		max-width="470px"
 	>
 		<div class="flex flex-col gap-4">
 			<Admonition type="warning">
 				{{
-					formatMessage(shouldCancel ? messages.cancelWarningBody : messages.warningBody, {
-						username,
+					formatMessage(modalState.shouldCancel ? messages.cancelWarningBody : messages.warningBody, {
+						username: modalState.username,
 					})
 				}}
 			</Admonition>
 
 			<div class="flex min-w-0 items-center gap-2 rounded-[20px] bg-surface-2 p-3">
 				<Avatar
-					:src="avatarUrl"
-					:alt="formatMessage(messages.userAvatarAlt, { username })"
-					:tint-by="username"
+					:src="modalState.avatarUrl"
+					:alt="formatMessage(messages.userAvatarAlt, { username: modalState.username })"
+					:tint-by="modalState.username"
 					size="40px"
 					circle
 					no-shadow
 				/>
 				<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 					<div class="flex min-w-0 items-center gap-1.5">
-						<span class="min-w-0 truncate font-medium text-contrast">{{ username }}</span>
+						<span class="min-w-0 truncate font-medium text-contrast">{{ modalState.username }}</span>
 						<span
 							v-if="memberStatusLabel"
 							class="inline-flex h-6 shrink-0 items-center rounded-full border border-solid px-2 py-1 text-sm font-medium leading-none"
@@ -61,9 +65,9 @@
 				</ButtonStyled>
 				<ButtonStyled color="orange">
 					<button v-tooltip="removePermissionTooltip" :disabled="!canRemove" @click="confirm">
-						<XIcon v-if="shouldCancel" aria-hidden="true" />
+						<TrashIcon v-if="modalState.shouldCancel" aria-hidden="true" />
 						<UserXIcon v-else aria-hidden="true" />
-						{{ formatMessage(shouldCancel ? messages.cancelButton : messages.removeButton) }}
+						{{ formatMessage(modalState.shouldCancel ? messages.cancelButton : messages.removeButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -72,8 +76,8 @@
 </template>
 
 <script setup lang="ts">
-import { UserXIcon, XIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { TrashIcon, UserXIcon, XIcon } from '@modrinth/assets'
+import { computed, ref, watch } from 'vue'
 
 import { useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
@@ -112,6 +116,14 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const modal = ref<InstanceType<typeof NewModal>>()
+const cachedState = ref({
+	username: '',
+	avatarUrl: undefined as string | undefined,
+	role: undefined as ServerAccessRole | undefined,
+	joinedAt: null as string | null,
+	pending: false,
+	shouldCancel: false,
+})
 
 const messages = defineMessages({
 	header: {
@@ -196,30 +208,47 @@ const messages = defineMessages({
 	},
 })
 
+const modalState = computed(() => (props.username ? currentState() : cachedState.value))
+
+watch(
+	() => [
+		props.username,
+		props.avatarUrl,
+		props.role,
+		props.joinedAt,
+		props.pending,
+		props.shouldCancel,
+	] as const,
+	() => {
+		if (props.username) cachedState.value = currentState()
+	},
+	{ immediate: true },
+)
+
 const memberStatusLabel = computed(() => {
-	if (!props.role) return null
-	return formatRole(props.role)
+	if (!modalState.value.role) return null
+	return formatRole(modalState.value.role)
 })
 
 const memberStatusClasses = computed(() => {
-	if (!props.role) return ''
-	return roleClasses(props.role)
+	if (!modalState.value.role) return ''
+	return roleClasses(modalState.value.role)
 })
 
 const memberSubtitle = computed(() => {
-	if (props.shouldCancel || props.pending) {
-		return props.joinedAt
-			? formatMessage(messages.invitedLabel, { time: formatRelativeTime(props.joinedAt) })
+	if (modalState.value.shouldCancel || modalState.value.pending) {
+		return modalState.value.joinedAt
+			? formatMessage(messages.invitedLabel, { time: formatRelativeTime(modalState.value.joinedAt) })
 			: formatMessage(messages.pendingInviteLabel)
 	}
 
-	return props.joinedAt
-		? formatMessage(messages.addedLabel, { time: formatRelativeTime(props.joinedAt) })
+	return modalState.value.joinedAt
+		? formatMessage(messages.addedLabel, { time: formatRelativeTime(modalState.value.joinedAt) })
 		: formatMessage(messages.unknownAddedLabel)
 })
 
 const effectMessages = computed(() =>
-	props.shouldCancel
+	modalState.value.shouldCancel
 		? [messages.cancelEffectAccess, messages.cancelEffectInvite]
 		: [messages.removeEffectAccess, messages.removeEffectJoin],
 )
@@ -230,6 +259,17 @@ const permissionDeniedMessage = computed(
 const removePermissionTooltip = computed(() =>
 	canRemove.value ? undefined : permissionDeniedMessage.value,
 )
+
+function currentState() {
+	return {
+		username: props.username,
+		avatarUrl: props.avatarUrl,
+		role: props.role,
+		joinedAt: props.joinedAt,
+		pending: props.pending,
+		shouldCancel: props.shouldCancel,
+	}
+}
 
 function formatRole(role: ServerAccessRole): string {
 	switch (role) {

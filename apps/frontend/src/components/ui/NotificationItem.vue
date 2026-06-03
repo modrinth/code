@@ -44,22 +44,16 @@
 					class="flex flex-wrap items-center gap-3"
 					:class="{ 'gap-2': compact }"
 				>
-					<ButtonStyled :circular="compact" color="brand" :type="compact ? 'transparent' : null">
-						<button
-							v-tooltip="compact ? 'Accept' : null"
-							@click="performActionByTitle(notification, 'Accept')"
-						>
+					<ButtonStyled color="brand">
+						<button @click="performActionByTitle(notification, 'Accept')">
 							<CheckIcon />
-							<span v-if="!compact">Accept</span>
+							Accept
 						</button>
 					</ButtonStyled>
-					<ButtonStyled :circular="compact" color="red" :type="compact ? 'transparent' : null">
-						<button
-							v-tooltip="compact ? 'Decline' : null"
-							@click="performActionByTitle(notification, 'Deny')"
-						>
+					<ButtonStyled color="red">
+						<button @click="performActionByTitle(notification, 'Deny')">
 							<XIcon />
-							<span v-if="!compact">Decline</span>
+							Decline
 						</button>
 					</ButtonStyled>
 				</div>

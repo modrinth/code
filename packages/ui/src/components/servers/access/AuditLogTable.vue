@@ -25,7 +25,7 @@
 					v-if="filteredEntries.length > 0"
 					v-model:sort-column="sortColumn"
 					v-model:sort-direction="sortDirection"
-					class="audit-log-table hidden @[800px]:block @[800px]:text-sm @[1040px]:text-base"
+					class="audit-log-table hidden @[800px]:block"
 					:columns="columns"
 					:data="tableEntries"
 					row-key="id"
@@ -112,9 +112,9 @@
 					<template #cell-time="{ row: entry }">
 						<span
 							v-tooltip="formatDate(entry.timestamp)"
-							class="inline-block max-w-full truncate whitespace-nowrap align-middle leading-5 @[1040px]:leading-6"
+							class="inline-block whitespace-nowrap align-middle leading-6"
 						>
-							{{ formatCompactRelativeTime(entry.timestamp) }}
+							{{ formatRelativeTime(entry.timestamp) }}
 						</span>
 					</template>
 				</Table>
@@ -168,11 +168,11 @@
 
 				<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
 					<div
-						class="hidden min-h-14 bg-surface-3 @[800px]:grid @[800px]:h-14 @[800px]:text-sm @[1040px]:text-base"
+						class="hidden min-h-14 bg-surface-3 @[800px]:grid @[800px]:h-14"
 						:class="
 							showWorldColumn
 								? '@[800px]:grid-cols-[18%_52%_20%_10%]'
-								: '@[800px]:grid-cols-[18%_72%_10%]'
+								: '@[800px]:grid-cols-[26%_58%_16%]'
 						"
 					>
 						<div class="hidden items-center pl-4 pr-2 font-semibold text-secondary @[800px]:flex">
@@ -234,7 +234,7 @@
 			<Transition name="audit-log-loading-fade">
 				<div
 					v-if="loading"
-					class="pointer-events-none absolute bottom-px left-px right-px top-0 z-20 animate-audit-log-bpulse rounded-[15px] bg-surface-3 @[800px]:top-[57px] @[800px]:rounded-t-none @[800px]:border-0 @[800px]:border-t @[800px]:border-solid @[800px]:border-surface-5"
+					class="pointer-events-none absolute bottom-px left-px right-px top-0 z-20 animate-audit-log-bpulse rounded-[15px] bg-surface-3 @[800px]:top-[57px] @[800px]:rounded-t-none"
 					aria-hidden="true"
 				/>
 			</Transition>
@@ -299,7 +299,6 @@ const filters = defineModel<ServerAuditLogFilters>('filters', {
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
-const formatCompactRelativeTime = useRelativeTime({ numeric: 'always', style: 'narrow' })
 const formatDate = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
 const slots = useSlots()
 const sortColumn = ref<string | undefined>('time')
@@ -307,7 +306,7 @@ const suppressSortRowTransitions = ref(false)
 const loadMoreSentinel = ref<HTMLElement | null>(null)
 const contentBody = ref<HTMLElement | null>(null)
 const contentHeight = ref<number | null>(null)
-const showWorldColumn = computed(() => props.showWorldColumn !== false)
+const showWorldColumn = computed(() => props.showWorldColumn === true)
 let loadMoreObserver: IntersectionObserver | null = null
 let contentResizeObserver: ResizeObserver | null = null
 let sortTransitionResetTimeout: ReturnType<typeof setTimeout> | null = null
@@ -410,11 +409,15 @@ type AuditLogTableRow = ServerAuditLogEntry & Record<string, unknown>
 
 const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => {
 	const tableColumns: TableColumn<AuditLogTableColumn>[] = [
-		{ key: 'user', label: formatMessage(messages.userColumn), width: '18%' },
+		{
+			key: 'user',
+			label: formatMessage(messages.userColumn),
+			width: showWorldColumn.value ? '18%' : '26%',
+		},
 		{
 			key: 'event',
 			label: formatMessage(messages.eventColumn),
-			width: showWorldColumn.value ? '52%' : '72%',
+			width: showWorldColumn.value ? '52%' : '58%',
 		},
 	]
 
@@ -431,7 +434,7 @@ const columns = computed<TableColumn<AuditLogTableColumn>[]>(() => {
 		label: formatMessage(messages.timeColumn),
 		align: 'right',
 		enableSorting: true,
-		width: '10%',
+		width: showWorldColumn.value ? '10%' : '16%',
 	})
 
 	return tableColumns
