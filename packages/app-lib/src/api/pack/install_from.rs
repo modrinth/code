@@ -315,6 +315,8 @@ pub async fn generate_pack_from_version_id(
         reason,
         game_version: profile.game_version.clone(),
         loader: profile.loader.as_str().to_string(),
+        dependent_on: None,
+        modpack: Some(version_id.clone()),
     };
 
     let file = fetch_advanced(

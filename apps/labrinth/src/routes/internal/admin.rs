@@ -2,7 +2,7 @@ use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{Download, DownloadReason};
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
@@ -45,9 +45,34 @@ pub struct DownloadMeta {
     pub reason: Option<DownloadReason>,
     pub game_version: Option<String>,
     pub loader: Option<String>,
+    pub dependent_on: Option<VersionId>,
+    pub modpack: Option<VersionId>,
 }
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
+
+async fn resolve_download_attribution_version(
+    pool: &PgPool,
+    redis: &RedisPool,
+    version_id: Option<VersionId>,
+    field: &str,
+) -> Result<u64, ApiError> {
+    let Some(version_id) = version_id else {
+        return Ok(0);
+    };
+
+    let version_id =
+        crate::database::models::ids::DBVersionId::from(version_id);
+
+    crate::database::models::DBVersion::get(version_id, pool, redis)
+        .await
+        .wrap_internal_err("failed to fetch download attribution version")?
+        .ok_or_else(|| {
+            ApiError::Request(eyre!("invalid `{field}` version specified"))
+        })?;
+
+    Ok(version_id.0 as u64)
+}
 
 // This is an internal route, cannot be used without key
 #[utoipa::path(
@@ -162,6 +187,21 @@ pub async fn count_download(
         }
     }
 
+    let dependent_on_version_id = resolve_download_attribution_version(
+        &pool,
+        &redis,
+        meta.as_ref().and_then(|m| m.dependent_on),
+        "dependent_on",
+    )
+    .await?;
+    let modpack_version_id = resolve_download_attribution_version(
+        &pool,
+        &redis,
+        meta.as_ref().and_then(|m| m.modpack),
+        "modpack",
+    )
+    .await?;
+
     let download = Download {
         recorded: get_current_tenths_of_ms(),
         domain: url.host_str().unwrap_or_default().to_string(),
@@ -212,6 +252,8 @@ pub async fn count_download(
             .and_then(|m| m.loader.as_ref())
             .map(|s| s.to_string())
             .unwrap_or_default(),
+        dependent_on_version_id,
+        modpack_version_id,
     };
     trace!("added download {download:#?}");
 

@@ -251,8 +251,15 @@ pub async fn profile_add_project_from_version(
     path: &str,
     version_id: &str,
     reason: DownloadReason,
+    dependent_on_version_id: Option<String>,
 ) -> Result<String> {
-    Ok(profile::add_project_from_version(path, version_id, reason).await?)
+    Ok(profile::add_project_from_version(
+        path,
+        version_id,
+        reason,
+        dependent_on_version_id,
+    )
+    .await?)
 }
 
 // Adds a project to a profile from a path
