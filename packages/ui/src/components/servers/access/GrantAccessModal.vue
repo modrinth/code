@@ -91,7 +91,11 @@
 				<p class="m-0 text-base text-primary">
 					<IntlFormatted :message-id="messages.permissionsHelp">
 						<template #link="{ children }">
-							<a class="font-medium text-blue hover:underline" href="/frog" target="_blank">
+							<a
+								class="font-medium text-blue hover:underline"
+								href="/news/article/server-access/"
+								target="_blank"
+							>
 								<component :is="() => children" />
 							</a>
 						</template>
