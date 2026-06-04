@@ -8,11 +8,13 @@
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-				{{ formatMessage(messages.admonitionBody, { count }) }}
+				{{ formatMessage(messages.admonitionBody, { count: props.count }) }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				:backup-name="backupTip ? `Before bulk update (${backupTip})` : 'Before bulk update'"
+				:backup-name="
+					props.backupTip ? `Before bulk update (${props.backupTip})` : 'Before bulk update'
+				"
 				:shift-click-hint-override="formatMessage(messages.shiftClickHint)"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
@@ -27,9 +29,13 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button :disabled="buttonsDisabled" @click="confirm">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="confirm"
+					>
 						<DownloadIcon />
-						{{ formatMessage(messages.updateButton, { count }) }}
+						{{ formatMessage(messages.updateButton, { count: props.count }) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -76,10 +82,12 @@ const messages = defineMessages({
 	},
 })
 
-defineProps<{
+const props = defineProps<{
 	count: number
 	server?: boolean
 	backupTip?: string
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string
 }>()
 
 const emit = defineEmits<{
@@ -95,6 +103,7 @@ function show() {
 }
 
 function confirm() {
+	if (props.actionDisabled) return
 	modal.value?.hide()
 	emit('update')
 }

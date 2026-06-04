@@ -28,6 +28,9 @@
 			:readonly="readonly"
 			:name="name"
 			:autocomplete="autocomplete"
+			:autocorrect="autocorrect"
+			:autocapitalize="autocapitalize"
+			:spellcheck="spellcheck"
 			:maxlength="maxlength"
 			:rows="rows"
 			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
@@ -55,6 +58,9 @@
 			:readonly="readonly"
 			:name="name"
 			:autocomplete="autocomplete"
+			:autocorrect="autocorrect"
+			:autocapitalize="autocapitalize"
+			:spellcheck="spellcheck"
 			:inputmode="inputmode"
 			:maxlength="maxlength"
 			:min="min"
@@ -124,6 +130,9 @@ const props = withDefaults(
 		id?: string
 		name?: string
 		autocomplete?: string
+		autocorrect?: 'on' | 'off'
+		autocapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters'
+		spellcheck?: boolean
 		inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url'
 		maxlength?: number
 		min?: number

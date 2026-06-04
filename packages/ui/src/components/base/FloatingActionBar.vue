@@ -31,11 +31,15 @@ const shown = computed(() => props.shown && (!props.hideWhenModalOpen || stackCo
 const floatingActionBarId = Symbol('floating-action-bar')
 const intercomBubbleClearanceRequestId = Symbol('floating-action-bar')
 const zIndex = computed(() => 100 + stackCount.value * 10 + 8 + (!props.belowModal ? 1 : 0))
-const leftOffset = computed(
-	() => pageContext?.floatingActionBarOffsets?.left.value ?? 'var(--left-bar-width, 0px)',
+const leftOffset = computed(() =>
+	stackCount.value > 0
+		? '0px'
+		: (pageContext?.floatingActionBarOffsets?.left.value ?? 'var(--left-bar-width, 0px)'),
 )
-const rightOffset = computed(
-	() => pageContext?.floatingActionBarOffsets?.right.value ?? 'var(--right-bar-width, 0px)',
+const rightOffset = computed(() =>
+	stackCount.value > 0
+		? '0px'
+		: (pageContext?.floatingActionBarOffsets?.right.value ?? 'var(--right-bar-width, 0px)'),
 )
 const barStyle = computed(() => ({
 	zIndex: zIndex.value,

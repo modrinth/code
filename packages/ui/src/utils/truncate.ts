@@ -22,6 +22,9 @@ export function truncatedTooltip(
 ): string | undefined {
 	const el = unref(element)
 	if (!el) return undefined
+	if (!tooltipText) return undefined
 
-	return el.scrollWidth > el.clientWidth ? tooltipText : undefined
+	return el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight
+		? tooltipText
+		: undefined
 }

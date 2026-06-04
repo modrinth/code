@@ -23,6 +23,10 @@
 				type="text"
 				:placeholder="searchPlaceholder || placeholder"
 				:disabled="disabled"
+				:autocomplete="searchAutocomplete"
+				:autocorrect="searchAutocorrect"
+				:autocapitalize="searchAutocapitalize"
+				:spellcheck="searchSpellcheck"
 				wrapper-class="w-full !bg-transparent"
 				:input-class="searchableInputClass"
 				class="relative z-[1]"
@@ -73,7 +77,7 @@
 					<slot name="selected" :label="triggerText">{{ triggerText }}</slot>
 				</span>
 			</div>
-			<div class="flex items-center gap-1">
+			<div class="flex shrink-0 items-center gap-1">
 				<slot name="suffix"></slot>
 				<ChevronLeftIcon
 					v-if="showChevron"
@@ -97,6 +101,7 @@
 					:class="[
 						props.dropdownClass,
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
+						props.dropdownClass,
 					]"
 					:style="dropdownStyle"
 					:role="listbox ? 'listbox' : 'menu'"
@@ -174,7 +179,7 @@
 						</div>
 					</div>
 
-					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
+					<div v-else-if="searchQuery" class="p-4 text-center text-sm text-secondary">
 						{{ noOptionsMessage }}
 					</div>
 
@@ -276,12 +281,19 @@ const props = withDefaults(
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
+		dropdownClass?: string
+		dropdownMinWidth?: string
+		minSearchLengthToOpen?: number
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
 		/** Select the searchable input text when the field receives focus */
 		selectSearchTextOnFocus?: boolean
 		/** Show a search icon in the searchable input */
 		showSearchIcon?: boolean
+		searchAutocomplete?: string
+		searchAutocorrect?: 'on' | 'off'
+		searchAutocapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters'
+		searchSpellcheck?: boolean
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -293,6 +305,7 @@ const props = withDefaults(
 		showIconInSelected: false,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		noOptionsMessage: 'No results found',
+		minSearchLengthToOpen: 0,
 		syncWithSelection: true,
 		selectSearchTextOnFocus: false,
 		showSearchIcon: false,
@@ -377,6 +390,10 @@ const triggerText = computed(() => {
 	return props.placeholder
 })
 
+const hasMinimumSearchLength = computed(
+	() => !props.searchable || searchQuery.value.trim().length >= props.minSearchLengthToOpen,
+)
+
 const optionsWithKeys = computed(() => {
 	return props.options.map((opt, index) => ({
 		...opt,
@@ -413,8 +430,7 @@ function getOptionClasses(item: ComboboxOption<T> & { key: string }, _index: num
 		item.class,
 		{
 			'bg-surface-4 text-contrast hover:brightness-[115%] focus:brightness-[115%]': !isSelected,
-			'bg-highlight-green text-green !cursor-default hover:bg-highlight-green focus:bg-highlight-green':
-				isSelected,
+			'bg-highlight-green text-green hover:bg-highlight-green focus:bg-highlight-green': isSelected,
 			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 		},
 	]
@@ -583,7 +599,8 @@ function destroyOptionsOverlayScrollbars() {
 }
 
 async function openDropdown() {
-	if (props.disabled || isOpen.value || !hasDropdownContent.value) return
+	if (props.disabled || isOpen.value || !hasMinimumSearchLength.value || !hasDropdownContent.value)
+		return
 
 	isOpen.value = true
 	emit('open')
@@ -628,7 +645,11 @@ function handleTriggerClick(event: MouseEvent) {
 function handleOptionClick(option: ComboboxOption<T>, index: number) {
 	if (option.disabled || option.type === 'divider') return
 	const isSelected = props.listbox && option.value === props.modelValue
-	if (isSelected) return
+	if (isSelected) {
+		focusedIndex.value = index
+		if (option.type !== 'link') closeDropdown()
+		return
+	}
 
 	focusedIndex.value = index
 
@@ -782,6 +803,10 @@ function handleSearchKeydown(event: KeyboardEvent) {
 function handleSearchInput() {
 	userHasTyped.value = true
 	emit('searchInput', searchQuery.value)
+	if (!hasMinimumSearchLength.value) {
+		closeDropdown()
+		return
+	}
 	if (!isOpen.value) {
 		openDropdown()
 	}
@@ -906,10 +931,16 @@ watch(hasDropdownContent, (value) => {
 	}
 })
 
+watch(hasMinimumSearchLength, (canOpen) => {
+	if (!canOpen) {
+		closeDropdown()
+	}
+})
+
 watch(
 	[() => props.modelValue, () => props.options],
 	([val]) => {
-		if (props.searchable && props.syncWithSelection && !isOpen.value) {
+		if (props.searchable && props.syncWithSelection && !isOpen.value && !userHasTyped.value) {
 			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
 			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
 		}
