@@ -114,14 +114,14 @@
 							inst.name
 						}}</span>
 					</button>
-					<ButtonStyled v-if="inst.installed" :disabled="true">
-						<button>
+					<ButtonStyled v-if="inst.installed">
+						<button disabled>
 							<CheckIcon />
 							{{ formatMessage(messages.installedBadge) }}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else-if="inst.compatible" :disabled="inst.installing">
-						<button @click="emit('install', inst)">
+					<ButtonStyled v-else-if="inst.compatible">
+						<button :disabled="inst.installing" @click="emit('install', inst)">
 							{{
 								inst.installing
 									? formatMessage(commonMessages.installingLabel)
