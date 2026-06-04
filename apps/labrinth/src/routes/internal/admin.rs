@@ -13,10 +13,12 @@ use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use crate::util::tags::valid_download_tags;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
+use ariadne::ids::base62_impl::parse_base62;
 use eyre::eyre;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
+use std::str::FromStr;
 use std::sync::Arc;
 use tracing::trace;
 
@@ -50,6 +52,64 @@ pub struct DownloadMeta {
 }
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
+
+fn parse_download_meta_version(
+    version_id: &str,
+    field: &str,
+) -> Result<VersionId, ApiError> {
+    parse_base62(version_id)
+        .map(VersionId)
+        .wrap_request_err_with(|| {
+            eyre!("invalid `{field}` version id '{version_id}'")
+        })
+}
+
+fn parse_download_meta_from_query(
+    url: &url::Url,
+) -> Result<Option<DownloadMeta>, ApiError> {
+    let mut meta = DownloadMeta {
+        reason: None,
+        game_version: None,
+        loader: None,
+        dependent_on: None,
+        modpack: None,
+    };
+
+    for (key, value) in url.query_pairs() {
+        match key.as_ref() {
+            "mr_download_reason" => {
+                meta.reason =
+                    Some(DownloadReason::from_str(&value).map_err(|_| {
+                        ApiError::Request(eyre!(
+                            "invalid download reason specified"
+                        ))
+                    })?);
+            }
+            "mr_game_version" => {
+                meta.game_version = Some(value.into_owned());
+            }
+            "mr_loader" => {
+                meta.loader = Some(value.into_owned());
+            }
+            "mr_dependent_on" => {
+                meta.dependent_on =
+                    Some(parse_download_meta_version(&value, "dependent_on")?);
+            }
+            "mr_modpack" => {
+                meta.modpack =
+                    Some(parse_download_meta_version(&value, "modpack")?);
+            }
+            _ => {}
+        }
+    }
+
+    Ok((meta.reason.is_some()
+        || meta.game_version.is_some()
+        || meta.loader.is_some()
+        || meta.dependent_on.is_some()
+        || meta.modpack.is_some())
+    .then_some(meta))
+}
 
 async fn resolve_download_attribution_version(
     pool: &PgPool,
@@ -114,10 +174,9 @@ pub async fn count_download(
     let project_id: crate::database::models::ids::DBProjectId =
         download_body.project_id.into();
 
-    let id_option =
-        ariadne::ids::base62_impl::parse_base62(&download_body.version_name)
-            .ok()
-            .map(|x| x as i64);
+    let id_option = parse_base62(&download_body.version_name)
+        .ok()
+        .map(|x| x as i64);
 
     let (version_id, project_id) = if let Some(version) = sqlx::query!(
         "
@@ -163,7 +222,7 @@ pub async fn count_download(
                 .map(Some)
                 .wrap_request_err("invalid download meta")?
         } else {
-            None
+            parse_download_meta_from_query(&url)?
         };
 
     if let Some(meta) = &meta {
