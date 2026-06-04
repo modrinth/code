@@ -108,6 +108,7 @@ export type AnalyticsDashboardProjectSource = ProjectTypeMetadata & {
 	icon_url?: string | null
 	downloads?: number | null
 	status?: string | null
+	published?: string | null
 }
 
 export type AnalyticsProjectVersionSource = {
@@ -121,6 +122,7 @@ export interface AnalyticsDashboardProject {
 	iconUrl?: string
 	downloads: number
 	status: ProjectStatusFilterValue
+	publishedAt?: string
 }
 
 export interface AnalyticsDashboardProjectGroup {

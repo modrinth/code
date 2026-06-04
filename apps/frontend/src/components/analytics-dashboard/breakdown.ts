@@ -30,9 +30,10 @@ export function getAnalyticsBreakdownValue(
 		case 'user_agent': {
 			const downloadSource = normalizeBreakdownValue(
 				'user_agent' in point ? point.user_agent : undefined,
+				UNKNOWN_BREAKDOWN_VALUE,
 			)
-			return downloadSource === ALL_BREAKDOWN_VALUE
-				? ALL_BREAKDOWN_VALUE
+			return downloadSource === UNKNOWN_BREAKDOWN_VALUE
+				? UNKNOWN_BREAKDOWN_VALUE
 				: getDownloadSourceLabel(downloadSource, formatMessage)
 		}
 		case 'download_reason':
@@ -98,5 +99,12 @@ function normalizeBreakdownValue(
 	fallback = ALL_BREAKDOWN_VALUE,
 ): string {
 	const normalized = value?.trim()
+	const normalizedLowercase = normalized?.toLowerCase()
+	if (
+		fallback === UNKNOWN_BREAKDOWN_VALUE &&
+		(normalizedLowercase === 'unknown' || normalizedLowercase === 'other')
+	) {
+		return fallback
+	}
 	return normalized && normalized.length > 0 ? normalized : fallback
 }
