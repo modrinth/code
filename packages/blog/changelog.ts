@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-04T15:59:11+00:00`,
+		product: 'hosting',
+		body: `## Added
+- You can now share access to the server panel through the Access tab. For more information [see the blogpost here](https://modrinth.com/news/article/server-access/).`,
+	},
+	{
 		date: `2026-06-03T18:38:16+00:00`,
 		product: 'web',
 		body: `## Added
