@@ -7,10 +7,10 @@
 	>
 		<slot />
 		<div
-			v-if="isDragging"
+			v-if="showOverlay"
 			:class="[
 				'absolute inset-0 flex items-center justify-center rounded-2xl bg-black/60 text-contrast shadow',
-				overlayClass,
+				props.overlayClass,
 			]"
 		>
 			<div class="text-center">
@@ -18,7 +18,7 @@
 				<p class="mt-2 text-xl">
 					{{
 						formatMessage(messages.dropToUpload, {
-							type: formatFileItemType(formatMessage, type?.toLocaleLowerCase(), true),
+							type: formatFileItemType(formatMessage, props.type?.toLocaleLowerCase(), true),
 						})
 					}}
 				</p>
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { UploadIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { formatFileItemType } from '#ui/utils/common-messages'
@@ -40,7 +40,8 @@ const emit = defineEmits<{
 	filesDropped: [files: File[]]
 }>()
 
-defineProps<{
+const props = defineProps<{
+	active?: boolean
 	overlayClass?: string
 	type?: string
 }>()
@@ -53,6 +54,7 @@ const messages = defineMessages({
 })
 
 const isDragging = ref(false)
+const showOverlay = computed(() => isDragging.value || props.active)
 const dragCounter = ref(0)
 
 const handleDragEnter = (event: DragEvent) => {

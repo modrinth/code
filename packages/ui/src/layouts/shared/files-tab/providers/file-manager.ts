@@ -10,6 +10,20 @@ import type {
 	UploadState,
 } from '../types'
 
+export type NativeFileDropEvent = {
+	type: 'enter' | 'over' | 'drop' | 'leave'
+	paths: string[]
+	position: {
+		x: number
+		y: number
+	}
+}
+
+export type NativeFileDropAdapter = {
+	listen: (handler: (event: NativeFileDropEvent) => void | Promise<void>) => Promise<() => void>
+	createFiles: (paths: string[]) => Promise<File[]>
+}
+
 export interface FileManagerContext {
 	items: Ref<FileItem[]>
 	loading: Ref<boolean>
@@ -33,6 +47,7 @@ export interface FileManagerContext {
 	downloadFile: (path: string, fileName: string) => Promise<void>
 
 	uploadFiles: (files: File[]) => void
+	nativeFileDrop?: NativeFileDropAdapter
 	cancelUpload?: () => void
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
 
