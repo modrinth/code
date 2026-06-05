@@ -1,35 +1,33 @@
 <template>
 	<ModalWrapper ref="detectJavaModal" header="Select java version" :show-ad-on-close="false">
-		<div class="auto-detect-modal">
-			<div class="table">
-				<div class="table-row table-head">
-					<div class="table-cell table-text">Version</div>
-					<div class="table-cell table-text">Path</div>
-					<div class="table-cell table-text">Actions</div>
-				</div>
-				<div v-for="javaInstall in chosenInstallOptions" :key="javaInstall.path" class="table-row">
-					<div class="table-cell table-text">
-						<span>{{ javaInstall.version }}</span>
-					</div>
-					<div v-tooltip="javaInstall.path" class="table-cell table-text">
-						<span>{{ javaInstall.path }}</span>
-					</div>
-					<div class="table-cell table-text manage">
-						<ButtonStyled v-if="currentSelected.path === javaInstall.path">
-							<button disabled><CheckIcon /> Selected</button>
+		<div class="flex flex-col gap-4">
+			<Table :columns="javaInstallColumns" :data="chosenInstallOptions" row-key="path">
+				<template #cell-version="{ value }">
+					<span class="font-semibold text-primary">{{ value }}</span>
+				</template>
+				<template #cell-path="{ value }">
+					<span v-tooltip="value" class="block truncate font-mono text-xs">{{ value }}</span>
+				</template>
+				<template #cell-actions="{ row }">
+					<div class="flex items-center justify-end">
+						<ButtonStyled v-if="currentSelected.path === row.path">
+							<button class="!shadow-none" disabled><CheckIcon /> Selected</button>
 						</ButtonStyled>
 						<ButtonStyled v-else>
-							<button @click="setJavaInstall(javaInstall)"><PlusIcon /> Select</button>
+							<button class="!shadow-none" @click="setJavaInstall(row)"><PlusIcon /> Select</button>
 						</ButtonStyled>
 					</div>
-				</div>
-				<div v-if="chosenInstallOptions.length === 0" class="table-row entire-row">
-					<div class="table-cell table-text">No java installations found!</div>
-				</div>
-			</div>
-			<div class="input-group push-right">
+				</template>
+				<template #empty-state>
+					<div class="p-4 text-secondary">No java installations found!</div>
+				</template>
+			</Table>
+			<div class="flex justify-end">
 				<ButtonStyled type="outlined">
-					<button @click="$refs.detectJavaModal.hide()">
+					<button
+						class="!shadow-none !border-surface-4 !border"
+						@click="$refs.detectJavaModal.hide()"
+					>
 						<XIcon />
 						Cancel
 					</button>
@@ -40,7 +38,7 @@
 </template>
 <script setup>
 import { CheckIcon, PlusIcon, XIcon } from '@icarus/assets'
-import { ButtonStyled, injectNotificationManager } from '@icarus/ui'
+import { ButtonStyled, injectNotificationManager, Table } from '@icarus/ui'
 import { ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -51,6 +49,11 @@ const { handleError } = injectNotificationManager()
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)
 const currentSelected = ref({})
+const javaInstallColumns = [
+	{ key: 'version', label: 'Version', width: '9rem' },
+	{ key: 'path', label: 'Path' },
+	{ key: 'actions', label: 'Actions', align: 'right', width: '10rem' },
+]
 
 defineExpose({
 	show: async (version, currentSelectedJava) => {
@@ -70,28 +73,5 @@ const emit = defineEmits(['submit'])
 function setJavaInstall(javaInstall) {
 	emit('submit', javaInstall)
 	detectJavaModal.value.hide()
-	
 }
 </script>
-<style lang="scss" scoped>
-.auto-detect-modal {
-	.table {
-		.table-row {
-			grid-template-columns: 1fr 4fr min-content;
-		}
-
-		span {
-			display: inherit;
-			align-items: center;
-			justify-content: center;
-		}
-
-		padding: 0.5rem;
-	}
-}
-
-.manage {
-	display: flex;
-	gap: 0.5rem;
-}
-</style>
