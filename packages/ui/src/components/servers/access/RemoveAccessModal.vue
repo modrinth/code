@@ -135,11 +135,11 @@ const cachedState = ref({
 const messages = defineMessages({
 	header: {
 		id: 'servers.remove-access-modal.header',
-		defaultMessage: 'Remove user',
+		defaultMessage: 'Revoke access',
 	},
 	cancelHeader: {
 		id: 'servers.remove-access-modal.cancel-header',
-		defaultMessage: 'Cancel invite',
+		defaultMessage: 'Revoke invite',
 	},
 	warningBody: {
 		id: 'servers.remove-access-modal.warning-body',
@@ -153,11 +153,11 @@ const messages = defineMessages({
 	},
 	removeButton: {
 		id: 'servers.remove-access-modal.remove-button',
-		defaultMessage: 'Remove user',
+		defaultMessage: 'Revoke access',
 	},
 	cancelButton: {
 		id: 'servers.remove-access-modal.cancel-button',
-		defaultMessage: 'Cancel invite',
+		defaultMessage: 'Revoke invite',
 	},
 	userAvatarAlt: {
 		id: 'servers.remove-access-modal.user-avatar-alt',

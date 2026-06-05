@@ -365,7 +365,7 @@ const messages = defineMessages({
 	},
 	removeUser: {
 		id: 'servers.access-table.action.remove-user',
-		defaultMessage: 'Remove user',
+		defaultMessage: 'Revoke access',
 	},
 	emptyState: {
 		id: 'servers.access-table.empty',

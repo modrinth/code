@@ -3528,7 +3528,7 @@
     "defaultMessage": "Cancel invite"
   },
   "servers.access-table.action.remove-user": {
-    "defaultMessage": "Remove user"
+    "defaultMessage": "Revoke access"
   },
   "servers.access-table.action.resend-invite": {
     "defaultMessage": "Resend invite"
@@ -4446,7 +4446,7 @@
     "defaultMessage": "Added {time}"
   },
   "servers.remove-access-modal.cancel-button": {
-    "defaultMessage": "Cancel invite"
+    "defaultMessage": "Revoke invite"
   },
   "servers.remove-access-modal.cancel-effect-access": {
     "defaultMessage": "They will not be added to this server"
@@ -4455,13 +4455,13 @@
     "defaultMessage": "You can send them another invite later"
   },
   "servers.remove-access-modal.cancel-header": {
-    "defaultMessage": "Cancel invite"
+    "defaultMessage": "Revoke invite"
   },
   "servers.remove-access-modal.cancel-warning-body": {
     "defaultMessage": "If you cancel this invite, {username} will need a new invitation before they can join this server."
   },
   "servers.remove-access-modal.header": {
-    "defaultMessage": "Remove user"
+    "defaultMessage": "Revoke access"
   },
   "servers.remove-access-modal.invited-label": {
     "defaultMessage": "Invited {time}"
@@ -4470,7 +4470,7 @@
     "defaultMessage": "Pending invite"
   },
   "servers.remove-access-modal.remove-button": {
-    "defaultMessage": "Remove user"
+    "defaultMessage": "Revoke access"
   },
   "servers.remove-access-modal.remove-effect-access": {
     "defaultMessage": "They will immediately lose access to the server panel and will no longer be able to edit content"
