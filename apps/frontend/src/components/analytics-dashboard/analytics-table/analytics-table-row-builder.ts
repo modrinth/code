@@ -12,6 +12,7 @@ import {
 	getSliceCount,
 } from '../analytics-chart/analytics-chart-utils'
 import type { FormatMessage } from '../analytics-messages'
+import { analyticsMessages } from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
 	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
@@ -64,6 +65,8 @@ export function buildAnalyticsTableRows({
 
 	const timeRange = fetchRequest.time_range
 	const sliceCount = getSliceCount(timeRange, timeSlices.length)
+	const currentTimeSlices =
+		timeSlices.length > sliceCount ? timeSlices.slice(timeSlices.length - sliceCount) : timeSlices
 	const includeDate = mode === 'date_breakdown'
 	const breakdownDisplayValues = new Map<string, string>()
 	const projectDisplayValues = new Map<string, string>()
@@ -119,9 +122,22 @@ export function buildAnalyticsTableRows({
 	}
 
 	function getCombinedBreakdownDisplay(displays: AnalyticsTableBreakdownDisplayValues) {
+		const unknownBreakdownLabel = formatMessage(analyticsMessages.unknown)
+		let hasUnknownBreakdownLabel = false
+
 		return selectedBreakdowns
 			.map((breakdown) => displays[breakdown])
 			.filter((displayValue): displayValue is string => Boolean(displayValue))
+			.filter((displayValue) => {
+				if (displayValue !== unknownBreakdownLabel) {
+					return true
+				}
+				if (hasUnknownBreakdownLabel) {
+					return false
+				}
+				hasUnknownBreakdownLabel = true
+				return true
+			})
 			.join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 	}
 
@@ -184,7 +200,7 @@ export function buildAnalyticsTableRows({
 		}
 	}
 
-	timeSlices.forEach((slice, sliceIndex) => {
+	currentTimeSlices.forEach((slice, sliceIndex) => {
 		const bucketLabel = includeDate ? getBucketLabel(sliceIndex) : undefined
 
 		for (const point of slice) {

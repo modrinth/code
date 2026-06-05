@@ -133,6 +133,7 @@ import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
@@ -143,9 +144,9 @@ import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '#imports'
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 
@@ -205,12 +206,12 @@ const applyDisabled = computed(() => {
 async function ensureOverview() {
 	if (regions.value.length || nodeHostnames.value.length) return
 	try {
-		const data = await useServersFetch<any>('/nodes/overview', { version: 'internal' })
-		regions.value = (data.regions || []).map((r: any) => ({
+		const data = await client.archon.nodes_internal.overview()
+		regions.value = data.regions.map((r) => ({
 			value: r.key,
 			label: `${r.display_name} (${r.key})`,
 		}))
-		nodeHostnames.value = data.node_hostnames || []
+		nodeHostnames.value = data.node_hostnames
 		if (!selectedRegion.value && regions.value.length) selectedRegion.value = regions.value[0].value
 	} catch (err) {
 		addNotification({ title: 'Failed to load nodes overview', text: String(err), type: 'error' })

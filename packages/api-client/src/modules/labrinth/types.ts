@@ -1350,9 +1350,26 @@ export namespace Labrinth {
 				github_id?: number
 			}
 
+			export type SearchUser = {
+				id: string
+				username: string
+				avatar_url: string | null
+			}
+
 			export type AllProjectsResponse = {
 				projects: Projects.v3.Project[]
 				organizations: Record<string, Organizations.v3.Organization>
+			}
+		}
+	}
+
+	export namespace Friends {
+		export namespace v3 {
+			export type UserFriend = {
+				id: string
+				friend_id: string
+				accepted: boolean
+				created: string
 			}
 		}
 	}
@@ -1648,6 +1665,8 @@ export namespace Labrinth {
 				message_id?: string
 				invited_by?: string
 				organization_id?: string
+				server_id?: string
+				server_name?: string
 				team_id?: string
 				role?: string
 				old_status?: string

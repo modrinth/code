@@ -16,6 +16,7 @@ export interface InstallationSettingsContext {
 	installationInfo: ComputedRef<InstallationInfoRow[]>
 	isLinked: ComputedRef<boolean>
 	isBusy: Ref<boolean> | ComputedRef<boolean>
+	busyMessage?: Ref<string | null> | ComputedRef<string | null>
 
 	modpack: Ref<InstallationModpackData | null> | ComputedRef<InstallationModpackData | null>
 

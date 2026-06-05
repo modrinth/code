@@ -8,6 +8,18 @@
   "admin.billing.error.not-found": {
     "message": "사용자를 찾을 수 없습니다"
   },
+  "analytics.action.add": {
+    "message": "추가"
+  },
+  "analytics.action.cancel": {
+    "message": "취소"
+  },
+  "analytics.action.refresh": {
+    "message": "새로고침"
+  },
+  "analytics.action.reset": {
+    "message": "리셋"
+  },
   "app-marketing.download.description": {
     "message": "데스크톱 앱은 모든 플랫폼에서 사용할 수 있습니다. 원하는 버전을 선택하세요."
   },
@@ -121,9 +133,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -1076,9 +1085,6 @@
   "dashboard.projects.links.source-code.label": {
     "message": "소스 코드"
   },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "프로젝트에 대한 정보, 문서 및 도움말을 제공하는 페이지입니다."
-  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "위키 페이지"
   },
@@ -1339,9 +1345,6 @@
   },
   "discover.install.error.no-server-world": {
     "message": "설치에 필요한 서버 월드가 없습니다."
-  },
-  "discover.install.error.unsupported-content-type": {
-    "message": "이 콘텐츠 유형은 찾아보기로서 서버에 설치할 수 없습니다."
   },
   "discover.install.heading.reset-modpack": {
     "message": "리셋 후 설치할 모드팩 선택"
@@ -1855,6 +1858,9 @@
   },
   "layout.banner.build-fail.title": {
     "message": "빌드 중 API에서 상태 생성 오류가 발생했습니다."
+  },
+  "layout.banner.preview.description": {
+    "message": "공식 Modrinth 웹사이트에 접속하려는 경우, {url}을(를) 방문하세요. 이 미리보기 배포판은 Modrinth 운영진이 테스트 목적으로 사용하며, 이는 {ref} 기반으로 빌드되었습니다."
   },
   "layout.banner.preview.title": {
     "message": "이 웹사이트는 Modrinth의 미리보기입니다."
@@ -3035,26 +3041,14 @@
   "scopes.organizationWrite.label": {
     "message": "조직 쓰기"
   },
-  "scopes.patCreate.description": {
-    "message": "개인 API 토큰 생성하기"
-  },
   "scopes.patCreate.label": {
     "message": "PAT 생성"
-  },
-  "scopes.patDelete.description": {
-    "message": "개인 API 토큰 삭제하기"
   },
   "scopes.patDelete.label": {
     "message": "PAT 삭제"
   },
-  "scopes.patRead.description": {
-    "message": "생성된 API 토큰 확인하기"
-  },
   "scopes.patRead.label": {
     "message": "PAT 읽기"
-  },
-  "scopes.patWrite.description": {
-    "message": "개인 API 토큰 편집하기"
   },
   "scopes.patWrite.label": {
     "message": "PAT 쓰기"

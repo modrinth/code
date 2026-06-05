@@ -39,6 +39,7 @@ use validator::Validate;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("user", web::get().to(user_auth_get));
     cfg.route("users", web::get().to(users_get));
+    cfg.route("users/search", web::get().to(users_search));
     cfg.route("user_email", web::get().to(admin_user_email));
 
     cfg.service(
@@ -325,6 +326,26 @@ pub async fn user_auth_get(
 #[derive(Serialize, Deserialize)]
 pub struct UserIds {
     pub ids: String,
+}
+
+#[derive(Deserialize)]
+pub struct UserSearchQuery {
+    pub query: String,
+}
+
+pub async fn users_search(
+    web::Query(query): web::Query<UserSearchQuery>,
+    pool: web::Data<PgPool>,
+) -> Result<web::Json<Vec<crate::models::users::SearchUser>>, ApiError> {
+    let query = query.query.trim();
+    let users = DBUser::search(query, &**pool)
+        .await
+        .wrap_internal_err("failed to search users")?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    Ok(web::Json(users))
 }
 
 pub async fn users_get(

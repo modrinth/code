@@ -62,7 +62,56 @@
 						</th>
 					</tr>
 				</thead>
-				<tbody :ref="setListContainer">
+				<TransitionGroup
+					v-if="rowTransitionName && !virtualized"
+					:name="rowTransitionName"
+					tag="tbody"
+				>
+					<tr v-if="data.length === 0" key="empty" class="bg-surface-2">
+						<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-5 p-0">
+							<slot name="empty-state">
+								<div class="text-secondary flex h-64 items-center justify-center">
+									No data available.
+								</div>
+							</slot>
+						</td>
+					</tr>
+					<template v-else>
+						<tr
+							v-for="(row, rowIndex) in renderedRows"
+							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
+							:class="getRowClass(getAbsoluteRowIndex(rowIndex))"
+						>
+							<td
+								v-if="showSelection"
+								class="w-12 border-solid border-0 border-t border-surface-5 focus:outline-none"
+							>
+								<Checkbox
+									:model-value="isSelected(row)"
+									class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
+									@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
+								/>
+							</td>
+							<td
+								v-for="column in columns"
+								:key="column.key"
+								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
+								:class="`text-${column.align ?? 'left'}`"
+							>
+								<slot
+									:name="`cell-${column.key}`"
+									:row="row"
+									:value="row[column.key]"
+									:column="column"
+									:index="getAbsoluteRowIndex(rowIndex)"
+								>
+									{{ row[column.key] ?? '' }}
+								</slot>
+							</td>
+						</tr>
+					</template>
+				</TransitionGroup>
+				<tbody v-else :ref="setListContainer">
 					<tr v-if="data.length === 0" class="bg-surface-2">
 						<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-5 p-0">
 							<slot name="empty-state">
@@ -83,7 +132,7 @@
 						<tr
 							v-for="(row, rowIndex) in renderedRows"
 							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-							:class="getAbsoluteRowIndex(rowIndex) % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
+							:class="getRowClass(getAbsoluteRowIndex(rowIndex))"
 						>
 							<td
 								v-if="showSelection"
@@ -169,6 +218,7 @@ const props = withDefaults(
 		virtualized?: boolean
 		virtualRowHeight?: number
 		virtualBufferSize?: number /* The number of extra rows rendered above and below the visible viewport */
+		rowTransitionName?: string
 		/**
 		 * Sets a minimum width for the table content, allowing horizontal overflow below that width.
 		 */
@@ -267,6 +317,10 @@ function getRowRenderKey(row: T, rowIndex: number): PropertyKey {
 	}
 
 	return rowIndex
+}
+
+function getRowClass(rowIndex: number): string {
+	return rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
 }
 
 function isSelected(row: T): boolean {

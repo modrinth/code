@@ -199,6 +199,13 @@ export const WithSelectionIds: StoryObj = {
 
 export const WithSorting: StoryObj = {
 	args: {},
+	parameters: {
+		docs: {
+			description: {
+				story: 'Sortable header hover and click targets are scoped to the label and sort icon.',
+			},
+		},
+	},
 	render: () => ({
 		components: { Table },
 		setup() {

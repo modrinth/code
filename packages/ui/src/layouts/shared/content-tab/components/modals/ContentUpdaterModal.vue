@@ -215,8 +215,10 @@
 				</ButtonStyled>
 				<ButtonStyled :color="incompatibilityWarningMode ? 'orange' : 'brand'">
 					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
 						:disabled="
 							actionLoading ||
+							props.actionDisabled ||
 							!selectedVersion ||
 							(!incompatibilityWarningMode && selectedVersion.id === currentVersionId)
 						"
@@ -424,6 +426,8 @@ const props = withDefaults(
 		loading?: boolean
 		/** Whether changelog is being loaded for the selected version */
 		loadingChangelog?: boolean
+		actionDisabled?: boolean
+		actionDisabledTooltip?: string
 	}>(),
 	{
 		projectType: undefined,
@@ -435,6 +439,8 @@ const props = withDefaults(
 		actionLoading: false,
 		loading: false,
 		loadingChangelog: false,
+		actionDisabled: false,
+		actionDisabledTooltip: undefined,
 	},
 )
 
@@ -475,6 +481,7 @@ const pendingIncompatibleUpdate = ref<{
 const suppressCancelOnHide = ref(false)
 // Store the initial version ID to select when versions become available
 const pendingInitialVersionId = ref<string | undefined>(undefined)
+const pinnedInitialVersionId = ref<string | undefined>(undefined)
 
 watch(
 	() => props.versions,
@@ -564,6 +571,7 @@ const filteredVersions = computed(() => {
 			(version) =>
 				version.id === props.currentVersionId ||
 				version.id === selectedVersion.value?.id ||
+				version.id === pinnedInitialVersionId.value ||
 				isVersionCompatible(version),
 		)
 	}
@@ -680,6 +688,7 @@ function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 }
 
 function handleUpdate(event: MouseEvent) {
+	if (props.actionLoading || props.actionDisabled) return
 	if (selectedVersion.value) {
 		if (incompatibilityWarningMode.value) {
 			emitUpdate(selectedVersion.value, event, { hide: false })
@@ -763,6 +772,7 @@ function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 	searchQuery.value = ''
 	hideIncompatibleState.value = incompatibilityWarningMode.value ? false : !isModpack.value
 	pendingIncompatibleUpdate.value = null
+	pinnedInitialVersionId.value = initialVersionId
 	switchMode.value = options?.switchMode ?? false
 
 	debug('show() called', {

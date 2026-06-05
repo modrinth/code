@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ מגה-בייט"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ מגה-בייט"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "פחות מ-150 מגה-בייט"
   },
@@ -2224,12 +2221,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "ללוח הבקרה של הפרויקטים"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {הורדה} other {הורדות}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {עוקב} other {עוקבים}}"
   },
   "project.status.archived.message": {
     "message": "הפרויקט {title} הועבר לארכיון. {title} לא יקבל עדכונים נוספים, אלא אם המחבר יחליט להוציא את הפרויקט מהארכיון."

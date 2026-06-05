@@ -59,6 +59,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Kunjungi laman galeri"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type} Anda menggunakan lisensi yang memerlukan kode sumber agar dapat tersedia. Mohon berikan tautan kode sumber atau berkas sumber untuk setiap versi tambahan, atau pertimbangkan untuk menggunakan lisensi lain."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Berikan kode sumber"
   },
@@ -66,7 +69,7 @@
     "defaultMessage": "Beberapa tautan eksternal Anda tampaknya identik. Setiap tautan seharusnya dimasukkan hanya sekali dan dengan jenis tautan yang sesuai."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Tautan Identik"
+    "defaultMessage": "Bersihkan tautan identik"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Keterangan Anda seharusnya berisi teks biasa atau teks alt gambar yang cukup, agar memastikan aksesibilitas terhadap pengguna pembaca layar atau pengguna dengan koneksi internet yang lambat."
@@ -143,6 +146,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Pilih bahasa"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Pilih lisensi yang digunakan untuk distribusi {type} Anda."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Pilih lisensi"
   },
@@ -196,6 +202,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Pilih tag yang tepat"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Setidaknya satu gambar galeri diperlukan untuk memamerkan konten dari {type} Anda."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "paket sumber, kecuali untuk paket suara atau penerjemahan. Bila keterangan ini sesuai dengan paket Anda, mohon pilih tag yang sesuai"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Unggah gambar galeri"

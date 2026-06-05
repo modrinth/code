@@ -65,9 +65,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Sesetengah daripada pautan luaran anda kelihatan sama. Setiap pautan hendaklah dimasukkan sekali sahaja dan dengan jenis pautan yang sesuai."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Pautan Serupa"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Keterangan anda harus mengandungi teks biasa atau teks alt gambar yang mencukupi, memastikan ia boleh diakses oleh mereka yang menggunakan pembaca skrin atau dengan sambungan internet yang perlahan."
   },

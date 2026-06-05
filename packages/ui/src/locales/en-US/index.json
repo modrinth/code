@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "You do not have permission."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Create affiliate link"
   },
@@ -3272,8 +3275,557 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Backups"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Content and modpack"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Files and SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Power and console"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Server"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Settings and runtime"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Users and invites"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Actions"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "Search actions..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "Added content"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Deleted content"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "Disabled content"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "Enabled content"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Updated content"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Uploaded content"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Created backup"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Deleted backup"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Renamed backup"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "Restored backup"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "Changed server name"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "Changed server subdomain"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "Cleared console"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "Ran console command"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "Deleted file"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "Edited file"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "Renamed file"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "Uploaded file"
+  },
+  "servers.access-page.activity-log-filter.action.game-version-edited": {
+    "defaultMessage": "Changed Minecraft version"
+  },
+  "servers.access-page.activity-log-filter.action.java-runtime-modified": {
+    "defaultMessage": "Changed Java runtime"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "Changed Java version"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "Changed loader version"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "Changed modpack"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Unlinked modpack"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "Added port allocation"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "Removed port allocation"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "Created server"
+  },
+  "servers.access-page.activity-log-filter.action.server-killed": {
+    "defaultMessage": "Killed server"
+  },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "Changed plan"
+  },
+  "servers.access-page.activity-log-filter.action.server-properties-modified": {
+    "defaultMessage": "Modified server properties"
+  },
+  "servers.access-page.activity-log-filter.action.server-reallocated": {
+    "defaultMessage": "Reallocated server"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "Repaired server"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "Reset server"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "Restarted server"
+  },
+  "servers.access-page.activity-log-filter.action.server-started": {
+    "defaultMessage": "Started server"
+  },
+  "servers.access-page.activity-log-filter.action.server-stopped": {
+    "defaultMessage": "Stopped server"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-login": {
+    "defaultMessage": "Logged in via SFTP"
+  },
+  "servers.access-page.activity-log-filter.action.startup-command-modified": {
+    "defaultMessage": "Changed startup command"
+  },
+  "servers.access-page.activity-log-filter.action.user-invite-revoked": {
+    "defaultMessage": "Revoked user invite"
+  },
+  "servers.access-page.activity-log-filter.action.user-invited": {
+    "defaultMessage": "Invited user"
+  },
+  "servers.access-page.activity-log-filter.action.user-permission-modified": {
+    "defaultMessage": "Changed user permissions"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "Removed user"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "Add filter"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "Clear filters"
+  },
+  "servers.access-page.activity-log-filter.empty-options": {
+    "defaultMessage": "No options available."
+  },
+  "servers.access-page.activity-log-filter.empty-search": {
+    "defaultMessage": "No options found."
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Instances"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Server"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "Support"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "User"
+  },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "Activity log"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "Add user"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "Friend request could not be sent"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "Cancelled the invite for {target}."
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "Invite cancelled"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "Invite could not be sent"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "Sent another invite to {target}."
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Invite resent"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "Invited {target} as {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Invite sent"
+  },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "Refresh the page to try again."
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Access could not be loaded"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Removed {target} from this server."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Access removed"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Access could not be removed"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "Role could not be updated"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "All"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "Role: {role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "Manage instance content, files, backups, and other settings."
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Owner"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "Full access including billing, members, and destructive actions."
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Limited"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Start, stop, and view the server without making changes."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Search {count} {count, plural, one {user} other {users}}..."
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Owner"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Limited"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "Cancel invite"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Remove user"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "Resend invite"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "Resend in {seconds}s"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Actions"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "Joined"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Role"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "User"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "No users match your filters."
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "Actions for {username}"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "Pending"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Background task running"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Support"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Actions"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Time"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "User"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "Instance"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Server instances are contained environments with their own installed content and world files."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Coming soon!"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "No activity matches your filters."
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "Perform an action on your server and you will see it here!"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "Added content <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "Changed content <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "Deleted content <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "Deleted content"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "Disabled content <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "Enabled content <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Updated content <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "Uploaded <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "Changed backup <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "Changed backup"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "Created backup <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "Created backup"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "Deleted backup <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "Deleted backup"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "Renamed backup <from></from> to <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "Renamed backup"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "Restored backup <backup></backup>"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "Restored backup"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "Changed server configuration"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "Cleared console"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "Ran console command <command></command>"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "Changed file <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "Deleted file <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Edited file <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "Renamed <from></from> to <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "Uploaded file <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Changed Minecraft version to <version></version>"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Changed Java runtime to <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Changed Java version to <java-version></java-version>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Changed loader to <loader></loader> <version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Changed loader to <loader></loader>"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "Changed loader version to <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "Cleared loader version"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Changed modpack"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Changed modpack to <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "Changed modpack to version <version></version>"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Unlinked modpack"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Unlinked modpack <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Unlinked modpack version <version></version>"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "Added port allocation <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Removed port allocation <port></port>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "Created server"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "Killed server"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "Changed server metadata"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "Changed server name to <name></name>"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "Changed plan to <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, one {# CPU} other {# CPUs}}"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "new plan"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} GB RAM"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB RAM"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB storage"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB storage"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Modified server properties <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Modified server properties"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Reallocated server"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Repaired server"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Reset server"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Restarted server"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Started server"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Stopped server"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Changed server subdomain to <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "Logged in via SFTP"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "Changed startup command to <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Unknown event"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Recorded server activity"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "Revoked invite for <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "Invited <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "Invited <target-user></target-user> with <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "Changed permissions for <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Changed permissions for <target-user></target-user> to <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "Removed <target-user></target-user>"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Server"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Backup {backupName} was cancelled."
@@ -3431,6 +3983,57 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "Content sync in progress"
   },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Also send a friend request"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "This user has already been invited"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "Add user"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "Invite"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "View the full list of permissions for each role <link>here</link>."
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "Editor"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "Manage instance content, files, backups, and other settings."
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "Select role"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Limited"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Start, stop, and view the server without making changes."
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Do not use their Minecraft username."
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Modrinth username"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "No matching users found."
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Enter Modrinth username"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "Searching..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation failed"
   },
@@ -3575,6 +4178,12 @@
   "servers.listing.notice.upgrading": {
     "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly."
   },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "Owned by {username}"
+  },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "Resubscribe"
   },
@@ -3623,8 +4232,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "No servers you own match your search."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "No servers found."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "No shared servers match your search."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Payment information is still loading. Opening checkout as soon as it is ready."
@@ -3668,6 +4283,12 @@
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Your server settings have moved"
   },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "Shared servers"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "Your servers"
+  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
   },
@@ -3685,6 +4306,12 @@
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "Owned by {username}"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Server icon"
@@ -3820,6 +4447,54 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Western Europe"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "Added {time}"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "Cancel invite"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "They will not be added to this server"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "You can send them another invite later"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "Cancel invite"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "If you cancel this invite, {username} will need a new invitation before they can join this server."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "Remove user"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "Invited {time}"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "Pending invite"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "Remove user"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "They will immediately lose access to the server panel and will no longer be able to edit content"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "They will still be able to join and play on the server unless you make separate changes"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "Added date unknown"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "If you remove a user from your server, you'll need to re-invite them to restore access."
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "What happens?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."

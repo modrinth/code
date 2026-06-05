@@ -29,7 +29,11 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button :disabled="buttonsDisabled" @click="confirm">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="confirm"
+					>
 						<DownloadIcon />
 						{{ formatMessage(messages.updateButton, { count: visibleCount }) }}
 					</button>
@@ -82,6 +86,8 @@ const props = defineProps<{
 	count: number
 	server?: boolean
 	backupTip?: string
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string
 }>()
 
 const emit = defineEmits<{
@@ -101,6 +107,7 @@ function show() {
 }
 
 function confirm() {
+	if (props.actionDisabled) return
 	modal.value?.hide()
 	emit('update')
 }

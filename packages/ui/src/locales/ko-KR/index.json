@@ -317,9 +317,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "삭제 주의"
   },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "{itemType} 삭제"
-  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {다운그레이드 진행 중} other {업데이트 진행 중}}에는 호환성 문제가 발생할 수 있습니다. 모드팩에 추가한 모드나 콘텐츠는 유지되지만, 새 버전과 호환되지 않을 수 있습니다."
   },
@@ -2261,9 +2258,6 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -3281,9 +3275,6 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "서버 없음"
   },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "즐겨찾는 모드들을 선택하시고 나머지는 저희에게 맡겨주세요."
-  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "원클릭 모드 설치"
   },
@@ -3323,17 +3314,11 @@
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "취소 후 30일 동안 파일이 보존됩니다."
   },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "관리자의 조치로 인해 서버가 정지되었습니다."
-  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "서버 설정이 완료될 때까지 잠시 기다려 주십시오. 최대 10분 정도 소요될 수 있습니다."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "구독이 취소되었습니다."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "구독이 <date>{formattedDate}</date>에 취소되었습니다."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "결제 실패로 인해 구독이 취소되었습니다."

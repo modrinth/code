@@ -14,6 +14,7 @@ import {
 import type { Ref } from 'vue'
 
 import { useFeatureFlags } from '~/composables/featureFlags.ts'
+import { withStagingArchonBaseUrl } from '~/helpers/archon.ts'
 
 async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 	try {
@@ -37,7 +38,8 @@ export function createModrinthClient(
 
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: config.apiBaseUrl,
-		archonBaseUrl: config.archonBaseUrl,
+		archonBaseUrl: () =>
+			withStagingArchonBaseUrl(config.archonBaseUrl, flags.value.archonApiStaging),
 		archonSentryCapture: () => flags.value.archonSentryCapture,
 		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features: [

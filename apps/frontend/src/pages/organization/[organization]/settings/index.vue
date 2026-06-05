@@ -85,7 +85,7 @@ const showPreviewImage = (files) => {
 	}
 }
 
-const orgId = useRouteId('orgId')
+const orgId = useRouteId('organization')
 
 const save = async () => {
 	// Save field changes via useSavable

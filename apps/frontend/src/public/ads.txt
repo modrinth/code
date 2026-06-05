@@ -523,3 +523,7 @@ blis.com, 33, RESELLER, 61453ae19a4b73f4
 
 #Yahoo
 yahoo.com, 100033, DIRECT, e1a5b5b6e3255540
+
+#IndexExchange
+indexexchange.com, 184169, DIRECT, 50b1c356f2c5c8fc
+indexexchange.com, 198988, DIRECT, 50b1c356f2c5c8fc

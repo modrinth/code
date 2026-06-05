@@ -40,7 +40,6 @@ export function useAnalyticsChartEvents(
 		placeholderData: [],
 		refetchOnMount: 'always',
 		retry: false,
-		staleTime: 0,
 	})
 
 	const localAnalyticsChartEvents = computed(() => analyticsEvents.value ?? [])

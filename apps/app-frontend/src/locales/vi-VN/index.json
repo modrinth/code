@@ -332,6 +332,147 @@
   "app.settings.tabs.resource-management": {
     "message": "Quản lý tài nguyên"
   },
+  "app.skins.add-button": {
+    "message": "Skin tự tạo"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Kéo và thả"
+  },
+  "app.skins.apply-button": {
+    "message": "Áp dụng"
+  },
+  "app.skins.delete-button": {
+    "message": "Xóa skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Hành động này sẽ xóa skin trên vĩnh viễn. Hành động này không thể khôi phục lại."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Bạn hoàn toàn muốn xóa skin này chứ?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Không đọc được file thả."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Có lỗi khi đọc file"
+  },
+  "app.skins.edit-button": {
+    "message": "Sửa skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Tạo skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Tạo skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Độ rộng cánh tay"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Gầy"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Béo"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Cape"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Cape"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Sửa skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Sửa skin trước đã!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Không cape"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Không"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Đổi skin"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Lưu skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Đang lưu..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Skin"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Nhập skin vào trước đã!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Sửa skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Xem trước"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Bạn đang chỉnh skin quá thường xuyên. Mãy chủ của Mojang đã tạm thời chặn lại các yêu cầu hiện thời. Đợi một lúc trước khi thử lại lần nữa."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Bình tĩnh lại!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Skin mặc định"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng Lẩu Gà Bình Thuận thế giới."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Skin đã lưu"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Đăng nhập"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Đặng nhập vào mội tài khoản Minecraft để sử dụng trình sửa Skin trong ứng dụng này."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Bot phấn khích"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Đăng nhập đã"
+  },
+  "app.skins.title": {
+    "message": "Trình sửa skin"
+  },
   "app.update-popup.body": {
     "message": "Phiên bản v{version} của Modrinth đã được chuẩn bị để cài đặt! Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc cập nhật tự động khi bạn đóng Modrinth."
   },
