@@ -8,7 +8,7 @@
 				:name="dependency.name"
 				:icon="dependency.icon"
 				:dependency-type="dependency.dependency_type"
-				:version-name="dependency.versionName"
+				:version-number="dependency.versionNumber"
 				@on-add-suggestion="
 					() =>
 						handleAddSuggestion({

@@ -6,6 +6,7 @@ import '../../assets/styles/defaults.scss'
 // ---
 // app-frontend css imports
 import '../../../apps/app-frontend/src/assets/stylesheets/global.scss'
+import './preview.scss'
 
 import type { Labrinth } from '@modrinth/api-client'
 import { GenericModrinthClient } from '@modrinth/api-client'

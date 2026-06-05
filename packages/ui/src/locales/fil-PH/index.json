@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Tingnan ang analitika"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alpha"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -47,20 +50,11 @@
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Error"
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 araw"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/buwan"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/tatlong buwan"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/taon"
-  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Plan"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Tingnan:"
   },
   "button.accept": {
     "defaultMessage": "Tanggapin"
@@ -251,6 +245,9 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Idiin ang Shift habang pumipindot upang laktawan ang kumpirmasyon."
   },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Karagdagang kontento"
   },
@@ -283,6 +280,42 @@
   },
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Pangalan"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "Karagdagang settings"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "Madali"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "Mahirap"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "Kahirapan"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "Katamtaman"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "Mapayapa"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "Patag"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Magdagdag"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "Magdagdag ng launcher path"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "Hindi"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Oo"
   },
   "files.editor.find-close": {
     "defaultMessage": "Isara"
@@ -326,8 +359,14 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Paliitin"
   },
+  "files.item-type.file": {
+    "defaultMessage": "talaksan"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "Nakapatay ang mga operasyon sa talaksan habang ang operasyon ay isinasagawa."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Error sa pagpatakbo ng dry run"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Bumalik sa tahanan"
@@ -362,14 +401,26 @@
   "files.upload-dropdown.cancelled": {
     "defaultMessage": "Kinansela"
   },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Nabigo - {error}"
+  },
   "files.upload-dropdown.file": {
     "defaultMessage": "Talaksan"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Isang di-inaasahang error na naganap."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} natitira"
   },
   "files.validation.name-label": {
     "defaultMessage": "Pangalan"
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "I-install"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Isang di-kilalang error na naganap"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -545,20 +596,17 @@
   "installation-settings.incompatible-content.loader-change-body": {
     "defaultMessage": "Sa pagpapalit ng loader, ang lahat ng na-install na kontento ay mapapatay. Sa halip, inimumungkahi namin na i-reset ang iyong server."
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Naka-link na {projectType, select, server {server project} other {modpack}}"
-  },
   "installation-settings.removed-incompatible": {
     "defaultMessage": "Tinanggal (di-magkatugma)"
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Ire-reinstall ang mga dependency ng Minecraft at susuriin para sa pagkasira. Maaari nitong malutas ang mga isyu kung ang laro ay hindi lumulunsad dahil sa mga error na magkaugnay sa launcher."
   },
   "installation-settings.saving": {
     "defaultMessage": "Sine-save..."
   },
   "installation-settings.unlink": {
     "defaultMessage": "Mag-unlink"
-  },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Sa pag-a-unlink ay habambuhay na madidiskonekta ang {type, select, server {server na} other {instansiyang}} ito sa proyektong {projectType, select, server {server} other {modpack}}, na mahahayaan kang makapagpalit ng loader at ng bersiyon ng Minecraft, ngunit hindi ka na makatatanggap ng mga susunod na update."
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Ayusin"
@@ -625,6 +673,12 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Taguin ang di-magkakatugma"
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "I-update sa di-magkatugmang bersiyon?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "I-update pa rin"
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Walang changelog para bersiyong ito."
@@ -803,6 +857,9 @@
   "label.version": {
     "defaultMessage": "Bersiyon"
   },
+  "label.view": {
+    "defaultMessage": "Tingnan"
+  },
   "label.visibility": {
     "defaultMessage": "Bisibilidad"
   },
@@ -908,6 +965,57 @@
   "locale.zh-TW": {
     "defaultMessage": "Tsino (Tradisyonal)"
   },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Error"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Bold"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Naka-bullet na listahan"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Kodigo"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Heading 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Heading 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Heading 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Larawan"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Italic"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Pagkasunod-sunod na listahan"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Sipi"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Strikethrough"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Video"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Magdagdag ng paraan ng pagbabayad"
   },
@@ -936,7 +1044,7 @@
     "defaultMessage": "Bakit Modrinth App ang gamitin"
   },
   "notification.error.title": {
-    "defaultMessage": "Isang kamaliang naganap"
+    "defaultMessage": "Isang error na naganap"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Tinanggap"
@@ -958,9 +1066,6 @@
   },
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Nabigo"
-  },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listed"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
@@ -997,9 +1102,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Bumigo"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Ipinagkait"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopyahin ang code sa clipboard"
@@ -1057,9 +1159,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -1793,6 +1892,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Pina-unlisted ng staff"
   },
+  "report.item-type.user": {
+    "defaultMessage": "tagagamit"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Kinandadong pansala"
   },
@@ -1910,6 +2012,12 @@
   "servers.backups.item.restore": {
     "defaultMessage": "I-restore"
   },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "Kusa"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Mayroon ka nang server?"
+  },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Mag-sign-in"
   },
@@ -1922,11 +2030,29 @@
   "servers.listing.support-label": {
     "defaultMessage": "Suporta"
   },
+  "servers.manage.checking-for-new-servers": {
+    "defaultMessage": "Nagsusuri para sa mga bagong server..."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Detalye ng error:"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Isang error na naganap"
+  },
   "servers.manage.reload-button": {
     "defaultMessage": "Mag-reload"
   },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Isang error ang naganap habang pagre-resubscribe sa iyong Modrinth server."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Error sa muling pag-subscribe"
+  },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Tagumpay"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {araw} other {na araw}} <hours-count>{hours}</hours-count> {hours, plural, one {oras} other {na oras}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuto} other {na minuto}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {segundo} other {na segundo}} ang natitira..."
   },
   "servers.medal-listing.upgrade-button": {
     "defaultMessage": "I-upgrade"
@@ -2006,6 +2132,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Suriin"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Australya"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Sentrong Yuropa"
   },
@@ -2014,9 +2143,6 @@
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
-  },
-  "servers.region.north-america": {
-    "defaultMessage": "Hilagang Amerika"
   },
   "servers.region.prompt": {
     "defaultMessage": "Saan mo nais malagay ang server mo?"
@@ -2030,8 +2156,14 @@
   "servers.region.western-europe": {
     "defaultMessage": "Kanlurang Yuropa"
   },
+  "servers.setup.onboarding.installation-failed.text": {
+    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-install. Mangyaring subukan muli mamaya."
+  },
+  "servers.setup.onboarding.modpack-upload-failed.text": {
+    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-upload. Mangyaring subukan muli mamaya."
+  },
   "servers.setup.reinstall-failed.text": {
-    "defaultMessage": "Isang di-inaasahang kamaliang nangyari habang nagre-reinstall. Mangyraing subukan muli makaya."
+    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-reinstall. Mangyaring subukan muli mamaya."
   },
   "settings.account.title": {
     "defaultMessage": "Account at seguridad"
@@ -2537,8 +2669,38 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Ìlapat"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Burahin"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Ngayon"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "araw"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "oras"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "buwan"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "linggo"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Mayroon kang hindi na-save na pagbabago."
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Ang tagagamit na ito ay nandirito simula pa sa Modrinth Alpha, na nagtapos noon Nobyembre 2020."
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "Ang tagagamit na ito ay nakilahok sa piniliang alpha test ng Modrinth Hosting bago pa inilunsad ang Beta ng Modrinth Hosting ng Nobyembre 2024."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Koponan ng Modrinth"
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
 	<button
-		class="group bg-transparent border-none p-0 m-0 flex items-center gap-3 checkbox-outer outline-offset-4 text-contrast"
+		class="group bg-transparent border-none p-0 m-0 flex items-center text-left gap-3 checkbox-outer outline-offset-4 text-contrast"
 		:disabled="disabled"
 		:class="
 			disabled
@@ -13,7 +13,7 @@
 		@click="toggle"
 	>
 		<span
-			class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid"
+			class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid shrink-0"
 			:class="{
 				'bg-brand border-button-border text-brand-inverted': modelValue,
 				'bg-surface-2 border-surface-5 text-primary': !modelValue,
@@ -35,7 +35,7 @@ import { CheckIcon, MinusIcon } from '@modrinth/assets'
 import type { HTMLAttributes } from 'vue'
 
 const emit = defineEmits<{
-	'update:modelValue': [boolean]
+	'update:modelValue': [modelValue: boolean, event?: MouseEvent]
 }>()
 
 const props = withDefaults(
@@ -59,9 +59,9 @@ const props = withDefaults(
 	},
 )
 
-function toggle() {
+function toggle(event: MouseEvent) {
 	if (!props.disabled) {
-		emit('update:modelValue', !props.modelValue)
+		emit('update:modelValue', !props.modelValue, event)
 	}
 }
 </script>

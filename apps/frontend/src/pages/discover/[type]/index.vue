@@ -19,6 +19,7 @@ import {
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
+	formatProjectTypeSentence,
 	injectModrinthClient,
 	PROJECT_DEP_MARKER_QUERY,
 	provideBrowseManager,
@@ -350,18 +351,16 @@ const messages = defineMessages({
 	},
 	seoTitle: {
 		id: 'discover.seo.title',
-		defaultMessage:
-			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}',
+		defaultMessage: 'Search {projectType}',
 	},
 	seoTitleWithQuery: {
 		id: 'discover.seo.title-with-query',
-		defaultMessage:
-			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}',
+		defaultMessage: 'Search {projectType} | {query}',
 	},
 	seoDescription: {
 		id: 'discover.seo.description',
 		defaultMessage:
-			'Search and browse thousands of Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}.',
+			'Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}.',
 	},
 	gameVersionShaderMessage: {
 		id: 'search.filter.game-version-shader-message',
@@ -417,13 +416,25 @@ searchState.refreshSearch()
 const ogTitle = computed(() =>
 	searchState.query.value
 		? formatMessage(messages.seoTitleWithQuery, {
-				projectType: projectType.value?.id ?? 'project',
+				projectType: formatProjectTypeSentence(
+					formatMessage,
+					projectType.value?.id ?? 'project',
+					2,
+				),
 				query: searchState.query.value,
 			})
-		: formatMessage(messages.seoTitle, { projectType: projectType.value?.id ?? 'project' }),
+		: formatMessage(messages.seoTitle, {
+				projectType: formatProjectTypeSentence(
+					formatMessage,
+					projectType.value?.id ?? 'project',
+					2,
+				),
+			}),
 )
 const description = computed(() =>
-	formatMessage(messages.seoDescription, { projectType: projectType.value?.id ?? 'project' }),
+	formatMessage(messages.seoDescription, {
+		projectType: formatProjectTypeSentence(formatMessage, projectType.value?.id ?? 'project', 2),
+	}),
 )
 
 useSeoMeta({

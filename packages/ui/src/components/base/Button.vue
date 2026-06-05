@@ -11,6 +11,10 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 	},
+	download: {
+		type: String,
+		default: null,
+	},
 	action: {
 		type: Function,
 		default: null,
@@ -106,6 +110,7 @@ const classes = computed(() => {
 		class="btn"
 		:class="classes"
 		:href="disabled ? undefined : link"
+		:download="download || undefined"
 		:target="external ? '_blank' : '_self'"
 		@click="
 			(event) => {

@@ -144,18 +144,19 @@ pub(crate) async fn watch_profiles_init(
     watcher: &FileWatcher,
     dirs: &DirectoryInfo,
 ) {
-    if let Ok(profiles_dir) = std::fs::read_dir(dirs.profiles_dir()) {
-        for profile_dir in profiles_dir {
-            if let Ok(file_name) = profile_dir.map(|x| x.file_name())
-                && let Some(file_name) = file_name.to_str()
-            {
-                if file_name.starts_with(".DS_Store") {
-                    continue;
-                };
+    let Ok(mut profiles_dir) = tokio::fs::read_dir(dirs.profiles_dir()).await
+    else {
+        return;
+    };
 
-                watch_profile(file_name, watcher, dirs).await;
-            }
+    while let Ok(Some(profile_dir)) = profiles_dir.next_entry().await {
+        let file_name = profile_dir.file_name();
+        let file_name = file_name.to_string_lossy();
+        if file_name.starts_with(".DS_Store") {
+            continue;
         }
+
+        watch_profile(&file_name, watcher, dirs).await;
     }
 }
 
@@ -166,46 +167,58 @@ pub(crate) async fn watch_profile(
 ) {
     let profile_path = dirs.profiles_dir().join(profile_path);
 
-    if profile_path.exists() && profile_path.is_dir() {
-        for sub_path in ProjectType::iterator()
-            .map(|x| x.get_folder())
-            .chain(["crash-reports", "saves"])
-        {
-            let full_path = profile_path.join(sub_path);
+    let Ok(metadata) = tokio::fs::metadata(&profile_path).await else {
+        return;
+    };
 
-            if !full_path.exists()
-                && !full_path.is_symlink()
-                && !sub_path.contains(".")
-                && let Err(e) =
-                    crate::util::io::create_dir_all(&full_path).await
-            {
-                tracing::error!(
-                    "Failed to create directory for watcher {full_path:?}: {e}"
-                );
-                return;
-            }
+    if !metadata.is_dir() {
+        return;
+    }
 
-            let mut watcher = watcher.write().await;
-            if let Err(e) = watcher
-                .watcher()
-                .watch(&full_path, RecursiveMode::Recursive)
-            {
-                tracing::error!(
-                    "Failed to watch directory for watcher {full_path:?}: {e}"
-                );
-                return;
-            }
-        }
+    let mut to_watch = Vec::new();
+    for sub_path in ProjectType::iterator()
+        .map(|x| x.get_folder())
+        .chain(["crash-reports", "saves"])
+    {
+        let full_path = profile_path.join(sub_path);
 
-        let mut watcher = watcher.write().await;
-        if let Err(e) = watcher
-            .watcher()
-            .watch(&profile_path, RecursiveMode::NonRecursive)
+        let meta = tokio::fs::symlink_metadata(&full_path).await;
+        let exists = meta.is_ok();
+        let is_symlink = meta.ok().is_some_and(|m| m.file_type().is_symlink());
+
+        if !exists
+            && !is_symlink
+            && !sub_path.contains(".")
+            && let Err(e) = crate::util::io::create_dir_all(&full_path).await
         {
             tracing::error!(
-                "Failed to watch root profile directory for watcher {profile_path:?}: {e}"
+                "Failed to create directory for watcher {full_path:?}: {e}"
             );
+            return;
         }
+
+        to_watch.push(full_path);
+    }
+
+    let mut watcher = watcher.write().await;
+    for full_path in &to_watch {
+        if let Err(e) =
+            watcher.watcher().watch(full_path, RecursiveMode::Recursive)
+        {
+            tracing::error!(
+                "Failed to watch directory for watcher {full_path:?}: {e}"
+            );
+            return;
+        }
+    }
+
+    if let Err(e) = watcher
+        .watcher()
+        .watch(&profile_path, RecursiveMode::NonRecursive)
+    {
+        tracing::error!(
+            "Failed to watch root profile directory for watcher {profile_path:?}: {e}"
+        );
     }
 }
 

@@ -11,6 +11,8 @@
 		:fade="props.initialSetup ? undefined : 'danger'"
 		:search-modpacks="searchModpacks"
 		:get-project-versions="getProjectVersions"
+		:finish-disabled="!canCompleteSetup"
+		:finish-disabled-tooltip="!canCompleteSetup ? permissionDeniedMessage : undefined"
 		@create="onFlowComplete"
 		@hide="$emit('hide')"
 		@browse-modpacks="$emit('browse-modpacks')"
@@ -24,6 +26,7 @@ import type { Archon, ModrinthApiError } from '@modrinth/api-client'
 import { computed, useTemplateRef } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers/api-client'
@@ -60,6 +63,7 @@ const serverContext = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 
 const serverLoaders = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
+const { canSetup, canResetServer, permissionDeniedMessage } = useServerPermissions()
 
 async function searchModpacks(query: string, limit: number = 10) {
 	return client.labrinth.projects_v2.search({
@@ -97,12 +101,20 @@ const initialLoader = computed(() => {
 })
 
 const initialGameVersion = computed(() => serverContext.server.value.mc_version ?? undefined)
+const canCompleteSetup = computed(() =>
+	props.initialSetup ? canSetup.value : canResetServer.value,
+)
 
 const creationFlowRef = useTemplateRef<InstanceType<typeof CreationFlowModal>>('creationFlowRef')
 const uploadProgressModal =
 	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 async function onFlowComplete(ctx: CreationFlowContextValue) {
+	if (!canCompleteSetup.value) {
+		ctx.loading.value = false
+		return
+	}
+
 	debug('onFlowComplete:', {
 		setupType: ctx.setupType.value,
 		hasModpackFile: !!ctx.modpackFile.value,
@@ -207,6 +219,8 @@ function emitReinstall(args?: { loader: string; lVersion: string; mVersion: stri
 }
 
 function show() {
+	if (!canCompleteSetup.value) return
+
 	void creationFlowRef.value?.ctx?.fetchLoaderMetadata('paper')
 	void creationFlowRef.value?.ctx?.fetchLoaderMetadata('purpur')
 	creationFlowRef.value?.show()

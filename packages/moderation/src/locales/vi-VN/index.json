@@ -66,7 +66,7 @@
     "defaultMessage": "Truy cập trang thư viện"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "{type, select, mod {Mod} plugin {Plugin} other {Dự án}} của bạn sử dụng giấy phép yêu cầu phải công khai mã nguồn. Vui lòng cung cấp liên kết mã nguồn hoặc tệp mã nguồn cho mỗi phiên bản bổ sung, hoặc cân nhắc sử dụng một giấy phép khác."
+    "defaultMessage": "{type} của bạn đang sử dụng giấy phép hiện đang yêu cầu mã nguồn hiện đang có sẵn. Hãy cung cấp đường link dẫn đến mã nguồn hoặc file nguồn cho từng phiên bản, hoặc sử dụng một giấy phép khác."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Cung cấp mã nguồn"
@@ -75,7 +75,7 @@
     "defaultMessage": "Một số liên kết ngoài của bạn có vẻ giống hệt nhau. Mỗi liên kết chỉ nên được nhập một lần và với loại liên kết phù hợp."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Liên kết giống nhau"
+    "defaultMessage": "Xóa các đường link giống nhau"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Phần mô tả của bạn nên chứa đủ văn bản thuần hoặc văn bản thay thế cho hình ảnh (alt-text), nhằm đảm bảo khả năng truy cập cho người dùng trình đọc màn hình hoặc có kết nối internet chậm."
@@ -159,7 +159,7 @@
     "defaultMessage": "Lựa chọn ngôn ngữ"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Chọn giấy phép mà {type, select, mod {mod} modpack {modpack} resourcepack {gói tài nguyên} shader {shader} plugin {plugin} datapack {gói dữ liệu} other {dự án}} của bạn được phát hành theo."
+    "defaultMessage": "Lựa chọn giây phép mà {type} được phân phối theo."
   },
   "nags.select-license.title": {
     "defaultMessage": "Chọn giấy phép"
@@ -225,7 +225,10 @@
     "defaultMessage": "Chọn các thẻ chính xác"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Cần có ít nhất một hình ảnh trong thư viện để giới thiệu nội dung của {type, select, resourcepack {gói tài nguyên} shader {shader} other {dự án}} của bạn, ngoại trừ các gói âm thanh hoặc bản địa hóa. Nếu điều này đúng với gói của bạn, vui lòng chọn thẻ phù hợp {shader {shader} other {project}}."
+    "defaultMessage": "Cần ít nhất một hình ảnh minh họa cho {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "gói tài nguyên, trừ gói tài nguyên nhạc hoặc phiên dịch. Nếu các trường hợp trên bao gồm gói tài nguyên của bạn, hãy lựa chọn một nhãn thích hợp"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tải lên hình ảnh thư viện"

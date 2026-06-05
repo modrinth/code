@@ -26,7 +26,7 @@ import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
 import ContentModpackCard from './components/ContentModpackCard.vue'
@@ -73,7 +73,7 @@ const messages = defineMessages({
 	},
 	searchPlaceholder: {
 		id: 'content.page-layout.search-placeholder',
-		defaultMessage: 'Search {count} {contentType}...',
+		defaultMessage: 'Search {count, number} {contentType}...',
 	},
 	browseContent: {
 		id: 'content.page-layout.browse-content',
@@ -151,6 +151,10 @@ const messages = defineMessages({
 
 const ctx = injectContentManager()
 
+function getItemId(item: ContentItem) {
+	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
+}
+
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
 const sortMode = ref<SortMode>('alphabetical-asc')
 
@@ -227,6 +231,7 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
+	getItemId,
 )
 
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
@@ -261,13 +266,15 @@ const filteredItems = computed(() => {
 const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
+		const id = getItemId(item)
 		return {
 			...base,
+			id,
 			disabled:
-				isChanging(base.id) ||
-				ctx.isBusy.value ||
-				isBulkOperating.value ||
-				item.installing === true,
+				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
+			disabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
+			toggleDisabled: ctx.isBusy.value,
+			toggleDisabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
 			installing: item.installing === true,
 			hasUpdate: item.has_update,
 			isClientOnly:
@@ -314,10 +321,10 @@ const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 
 function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => i.id === id)
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (item) {
 		pendingDeletionItems.value = [item]
-		if (event?.shiftKey) {
+		if (event?.shiftKey && !ctx.isBusy.value) {
 			confirmDelete()
 		} else {
 			confirmDeletionModal.value?.show()
@@ -327,7 +334,7 @@ function handleDeleteById(id: string, event?: MouseEvent) {
 
 function showBulkDeleteModal(event?: MouseEvent) {
 	pendingDeletionItems.value = [...selectedItems.value]
-	if (event?.shiftKey) {
+	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmDelete()
 	} else {
 		confirmDeletionModal.value?.show()
@@ -335,6 +342,7 @@ function showBulkDeleteModal(event?: MouseEvent) {
 }
 
 async function confirmDelete() {
+	if (ctx.isBusy.value) return
 	const itemsToDelete = [...pendingDeletionItems.value]
 	pendingDeletionItems.value = []
 	if (itemsToDelete.length === 0) return
@@ -356,11 +364,14 @@ async function confirmDelete() {
 
 	if (itemsToDelete.length === 1) {
 		const item = itemsToDelete[0]
-		const id = item.id
+		const id = getItemId(item)
 		markChanging(id)
-		await ctx.deleteItem(item)
-		removeFromSelection(id)
-		unmarkChanging(id)
+		try {
+			await ctx.deleteItem(item)
+			removeFromSelection(id)
+		} finally {
+			unmarkChanging(id)
+		}
 		return
 	}
 
@@ -369,14 +380,15 @@ async function confirmDelete() {
 		itemsToDelete,
 		async (item) => {
 			await ctx.deleteItem(item)
-			removeFromSelection(item.id)
+			removeFromSelection(getItemId(item))
 		},
 		{ onComplete: clearSelection },
 	)
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	const item = ctx.items.value.find((i) => i.id === id)
+	if (ctx.isBusy.value) return
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
 	markChanging(id)
 	try {
@@ -387,6 +399,7 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 }
 
 async function bulkEnable() {
+	if (ctx.isBusy.value) return
 	const items = selectedItems.value.filter((item) => !item.enabled)
 	if (items.length === 0) return
 	if (ctx.bulkEnableItems) {
@@ -407,6 +420,7 @@ async function bulkEnable() {
 }
 
 async function bulkDisable() {
+	if (ctx.isBusy.value) return
 	const items = selectedItems.value.filter((item) => item.enabled)
 	if (items.length === 0) return
 	if (ctx.bulkDisableItems) {
@@ -431,7 +445,7 @@ function handleUpdateById(id: string) {
 }
 
 function handleSwitchVersionById(id: string) {
-	const item = ctx.items.value.find((i) => i.id === id)
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (item) {
 		ctx.switchVersion?.(item)
 	}
@@ -448,7 +462,7 @@ function promptUpdateAll(event?: MouseEvent) {
 	const items = ctx.items.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
-	if (event?.shiftKey) {
+	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
 		confirmBulkUpdateModal.value?.show()
@@ -460,7 +474,7 @@ function promptUpdateSelected(event?: MouseEvent) {
 	const items = selectedItems.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
-	if (event?.shiftKey) {
+	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
 		confirmBulkUpdateModal.value?.show()
@@ -468,6 +482,7 @@ function promptUpdateSelected(event?: MouseEvent) {
 }
 
 async function confirmBulkUpdate() {
+	if (ctx.isBusy.value) return
 	const items = pendingBulkUpdateItems.value
 	if (items.length === 0 || !hasBulkUpdateSupport.value) return
 
@@ -518,12 +533,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					:owner="ctx.modpack.value.owner"
 					:categories="ctx.modpack.value.categories"
 					:has-update="ctx.modpack.value.hasUpdate"
-					:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
-					:disabled-text="
-						ctx.modpack.value.disabledText ??
-						ctx.busyMessage?.value ??
-						(ctx.isBusy.value ? formatMessage(messages.pleaseWait) : undefined)
-					"
+					:disabled="ctx.modpack.value.disabled"
+					:disabled-text="ctx.modpack.value.disabledText"
 					:show-content-hint="
 						!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
 					"
@@ -555,7 +566,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								:placeholder="
 									formatMessage(messages.searchPlaceholder, {
 										count: tableItems.length,
-										contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
+										contentType: formatContentTypeSentence(
+											formatMessage,
+											ctx.contentTypeLabel.value,
+											tableItems.length,
+										),
 									})
 								"
 							/>
@@ -666,14 +681,18 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									color-fill="text"
 									hover-color-fill="background"
 								>
-									<button :disabled="isBulkOperating || ctx.isBusy.value" @click="promptUpdateAll">
+									<button
+										v-tooltip="formatMessage(messages.updateAll)"
+										:disabled="isBulkOperating"
+										@click="promptUpdateAll"
+									>
 										<DownloadIcon />
 										{{ formatMessage(messages.updateAll) }}
 									</button>
 								</ButtonStyled>
 
 								<ButtonStyled type="transparent">
-									<button :disabled="refreshing || ctx.isBusy.value" @click="handleRefresh">
+									<button :disabled="refreshing" @click="handleRefresh">
 										<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
 										{{ formatMessage(commonMessages.refreshButton) }}
 									</button>
@@ -710,7 +729,12 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							ctx.modpack.value
 								? formatMessage(messages.emptyModpackHint)
 								: formatMessage(messages.emptyHint, {
-										contentType: `${ctx.contentTypeLabel.value}s`,
+										contentType: formatContentTypeSentence(
+											formatMessage,
+											ctx.contentTypeLabel.value,
+											2,
+											'content',
+										),
 									})
 						}}
 					</template>
@@ -752,12 +776,14 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:selected-items="selectedItems"
 			:content-type-label="ctx.contentTypeLabel.value"
 			:is-busy="ctx.isBusy.value"
+			:busy-tooltip="ctx.busyMessage?.value"
 			:is-bulk-operating="isBulkOperating"
 			:bulk-operation="bulkOperation"
 			:bulk-progress="bulkProgress"
 			:bulk-total="bulkTotal"
 			:bulk-waiting="bulkWaiting"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
+			:get-item-id="getItemId"
 			@clear="clearSelection"
 			@enable="bulkEnable"
 			@disable="bulkDisable"
@@ -772,7 +798,6 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				>
 					<button
 						v-tooltip="formatMessage(commonMessages.updateButton)"
-						:disabled="ctx.isBusy.value"
 						@click="promptUpdateSelected"
 					>
 						<DownloadIcon />
@@ -835,7 +860,6 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				>
 					<button
 						v-tooltip="formatMessage(commonMessages.deleteLabel)"
-						:disabled="ctx.isBusy.value"
 						@click="showBulkDeleteModal"
 					>
 						<TrashIcon />
@@ -851,6 +875,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
 			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
+			:action-disabled="ctx.isBusy.value"
+			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
@@ -858,6 +884,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			ref="confirmBulkUpdateModal"
 			:count="pendingBulkUpdateItems.length"
 			:server="ctx.deletionContext === 'server'"
+			:action-disabled="ctx.isBusy.value"
+			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@update="confirmBulkUpdate"
 		/>
 		<ConfirmUnlinkModal
@@ -865,6 +893,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			ref="confirmUnlinkModal"
 			:server="ctx.deletionContext === 'server'"
 			:backup-tip="ctx.modpack.value?.project.title"
+			:action-disabled="ctx.isBusy.value"
+			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

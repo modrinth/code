@@ -8,6 +8,51 @@
   "admin.billing.error.not-found": {
     "message": "找不到使用者"
   },
+  "analytics.action.add": {
+    "message": "新增"
+  },
+  "analytics.action.cancel": {
+    "message": "取消"
+  },
+  "analytics.action.refresh": {
+    "message": "重新整理"
+  },
+  "analytics.action.reset": {
+    "message": "重設"
+  },
+  "analytics.breakdown.country": {
+    "message": "國家或地區"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "來源"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "版本"
+  },
+  "analytics.breakdown.loader": {
+    "message": "平臺"
+  },
+  "analytics.breakdown.project": {
+    "message": "專案"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "狀態"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "版本"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "顯示全部"
+  },
+  "analytics.chart.controls.button": {
+    "message": "控制"
+  },
+  "analytics.chart.controls.display": {
+    "message": "顯示"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth 事件"
+  },
   "app-marketing.download.description": {
     "message": "我們的桌面應用程式可在所有平臺上使用，請選擇你所需的版本。"
   },
@@ -410,9 +455,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補充檔案是用於提供原始碼等支援性資源，而非用於替代版本或變體。"
   },
-  "create.collection.collection-info": {
-    "message": "你的新收藏將建立為公開收藏，{count, plural,=0 {不包含任何專案}other {包含 # 個專案}}。"
-  },
   "create.collection.create-collection": {
     "message": "建立收藏"
   },
@@ -575,9 +617,6 @@
   "dashboard.affiliate-links.search": {
     "message": "搜尋聯盟連結..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "來自 {count} 個專案"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "總下載量"
   },
@@ -598,9 +637,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "試試調整篩選器或搜尋字詞。"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} 個專案"
   },
   "dashboard.collections.label.search-input": {
     "message": "搜尋收藏"
@@ -875,35 +911,11 @@
   "dashboard.head-title": {
     "message": "儀表板"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "全部標記為已讀"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "查看紀錄"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "您沒有任何未讀通知。"
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "載入通知時發生錯誤："
-  },
-  "dashboard.notifications.history.label": {
-    "message": "紀錄"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "通知紀錄"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "查看全部"
   },
   "dashboard.notifications.link.view-history": {
     "message": "查看通知紀錄"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "查看另外 {extraNotifs} 則通知"
-  },
-  "dashboard.notifications.loading": {
-    "message": "正在載入通知..."
   },
   "dashboard.organizations.button.create": {
     "message": "建立組織"
@@ -953,6 +965,9 @@
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord 邀請"
   },
+  "dashboard.projects.links.header.edit": {
+    "message": "編輯連結"
+  },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "供使用者回報關於你專案的錯誤、問題與疑慮之處。"
   },
@@ -978,7 +993,7 @@
     "message": "原始碼"
   },
   "dashboard.projects.links.wiki-page.description": {
-    "message": "包含專案資訊、文件及說明的頁面。"
+    "message": "包含專案資訊、文件及說明的頁面"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Wiki 頁面"
@@ -1229,6 +1244,24 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "請填寫稅務表單"
   },
+  "discover.install.back-to-server": {
+    "message": "回到伺服器"
+  },
+  "discover.install.back-to-setup": {
+    "message": "回到設定"
+  },
+  "discover.install.cancel-reset": {
+    "message": "取消重設"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "沒有可安裝的伺服器世界。"
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "無法從「探索」頁面將這類內容類型安裝至伺服器。"
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "在重設後選擇要安裝的模組包"
+  },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
   },
@@ -1243,6 +1276,12 @@
   },
   "error.collection.404.title": {
     "message": "找不到收藏"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "你目前登入的帳號："
+  },
+  "error.generic.401.title": {
+    "message": "你沒有這個頁面的存取權"
   },
   "error.generic.404.subtitle": {
     "message": "你要找的頁面似乎不存在。"
@@ -1387,9 +1426,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Modrinth Hosting 伺服器位於哪裡？我可以選擇區域嗎？"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "我們目前在北美、歐洲與東南亞設有伺服器，你可以在購買時選擇。未來還會推出更多區域！如果你想切換區域，請聯絡支援團隊。"
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "可以使用哪些 Minecraft 版本與載入器？"
@@ -1670,6 +1706,9 @@
   "layout.action.create-new": {
     "message": "新增..."
   },
+  "layout.action.external-projects": {
+    "message": "外部專案"
+  },
   "layout.action.file-lookup": {
     "message": "檔案查詢"
   },
@@ -1723,9 +1762,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "建構時無法從 API 取得狀態資料。"
-  },
-  "layout.banner.preview.description": {
-    "message": "如果你是想前往 Modrinth 的官方網站，請前往 <link>https://modrinth.com</link>。這個預覽部署版本僅供 Modrinth 工作人員測試使用。它是基於 <branch-link>{owner}/{branch}</branch-link> @ {commit} 建構而成。"
   },
   "layout.banner.preview.title": {
     "message": "這是 Modrinth 網站的預覽部署版本。"
@@ -1921,6 +1957,9 @@
   },
   "moderation.moderate": {
     "message": "管理"
+  },
+  "moderation.page.external-projects": {
+    "message": "外部專案"
   },
   "moderation.page.projects": {
     "message": "專案"
@@ -2258,9 +2297,6 @@
   "profile.label.collection": {
     "message": "收藏"
   },
-  "profile.label.downloads": {
-    "message": "下載次數：{count}"
-  },
   "profile.label.joined": {
     "message": "加入時間"
   },
@@ -2279,9 +2315,6 @@
   "profile.label.organizations": {
     "message": "組織"
   },
-  "profile.label.projects": {
-    "message": "{count} 個專案"
-  },
   "profile.label.saving": {
     "message": "儲存中..."
   },
@@ -2290,9 +2323,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — 前往 Modrinth 下載 {username} 的專案"
-  },
-  "profile.stats.projects-followers": {
-    "message": "<stat>{count}</stat> 位專案追蹤者"
   },
   "profile.user-id": {
     "message": "使用者 ID：{id}"
@@ -2615,17 +2645,47 @@
   "project.settings.general.url.title": {
     "message": "網址"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "請提供證明，以確認你擁有重新發布下列所有檔案的權限；此外，任何遭保留的版本都將自動發布。"
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "在提交專案進行審查之前，請先提供你擁有下列所有檔案重新發布權限的證明。"
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "未知的嵌入內容"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "所有外部內容均已標明出處。"
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "出處標註已完成！"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "你的所有版本皆不含外部內容，因此無需擔心取得授權的問題。"
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "一切就緒！"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "你上傳的部分外部內容不具備重新發布權限。如要在 Modrinth 上發布，請移除侵權內容。"
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "部分內容無法包含在內"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "如果你包含的內容並非託管於 Modrinth，你需要告知我們其來源，並確認你擁有重新發布這些檔案的權限。請參閱我們的<link>指南</link>以了解如何正確處理！"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "了解引用標註的處理方式"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "了解更多"
+  },
   "project.settings.title": {
     "message": "設定"
   },
   "project.settings.visit-dashboard": {
     "message": "前往專案資訊主頁"
-  },
-  "project.stats.downloads-label": {
-    "message": "次下載"
-  },
-  "project.stats.followers-label": {
-    "message": "位追蹤者"
   },
   "project.status.archived.message": {
     "message": "{title} 已封存。{title} 將不會再收到任何後續更新，除非作者決定解除封存該專案。"
@@ -2633,26 +2693,23 @@
   "project.versions.title": {
     "message": "版本"
   },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {這個版本} other {這些版本}}目前被扣留且不公開。請提供你擁有轉載該模組包版本中特定檔案的許可證明。"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "解決"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {版本 {version_name}} other {版本}}因未知的嵌入內容而被扣留"
+  },
   "report.already-reported": {
     "message": "你已檢舉 {title}"
-  },
-  "report.already-reported-description": {
-    "message": "你已經針對這個{item, select, project {專案} version {版本} user {使用者} other {內容}}提交過檢舉報告。如果你有更多資訊，可以為該報告補充詳細說明。"
-  },
-  "report.back-to-item": {
-    "message": "返回{item, select, project {專案} version {版本} user {使用者} other {內容}}"
   },
   "report.body.description": {
     "message": "若可行且相關，請一併附上連結與圖片。空白或資訊不足的檢舉將會被關閉且不予處理。"
   },
   "report.body.title": {
     "message": "請提供檢舉的更多背景資訊"
-  },
-  "report.checking": {
-    "message": "正在檢查{item, select, project {專案} version {版本} user {使用者} other {內容}}..."
-  },
-  "report.could-not-find": {
-    "message": "找不到{item, select, project {專案} version {版本} user {使用者} other {內容}}"
   },
   "report.for.violation": {
     "message": "違反 Modrinth《<rules-link>內容規範</rules-link>》或《<terms-link>使用條款</terms-link>》"
@@ -2693,14 +2750,8 @@
   "report.please-report": {
     "message": "請檢舉："
   },
-  "report.question.content-id": {
-    "message": "該{item, select, project {專案} version {版本} user {使用者} other {內容}}的 ID 是什麼？"
-  },
   "report.question.content-type": {
     "message": "你要檢舉什麼類型的內容？"
-  },
-  "report.question.report-reason": {
-    "message": "這個{item, select, project {專案} version {版本} user {使用者} other {內容}}違反了 Modrinth 的哪項規範？"
   },
   "report.report-content": {
     "message": "向管理員檢舉內容"
@@ -2814,25 +2865,25 @@
     "message": "寫入組織"
   },
   "scopes.patCreate.description": {
-    "message": "建立個人 API 權杖"
+    "message": "建立個人存取權杖"
   },
   "scopes.patCreate.label": {
     "message": "建立個人存取權杖"
   },
   "scopes.patDelete.description": {
-    "message": "刪除你的個人 API 權杖"
+    "message": "刪除你的個人存取權杖"
   },
   "scopes.patDelete.label": {
     "message": "刪除個人存取權杖"
   },
   "scopes.patRead.description": {
-    "message": "檢視已建立的 API 權杖"
+    "message": "檢視建立的個人存取權杖"
   },
   "scopes.patRead.label": {
     "message": "讀取個人存取權杖"
   },
   "scopes.patWrite.description": {
-    "message": "編輯個人 API 權杖"
+    "message": "編輯個人存取權杖"
   },
   "scopes.patWrite.label": {
     "message": "寫入個人存取權杖"
@@ -3001,6 +3052,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "與伺服器同步"
+  },
+  "servers.manage.content.title": {
+    "message": "內容 - {serverName} - Modrinth"
   },
   "servers.notice.actions": {
     "message": "動作"
@@ -3200,6 +3254,12 @@
   "settings.account.security.two-factor.description": {
     "message": "為你的帳號登入程序增加額外的安全防護。"
   },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "移除 2FA"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "設定 2FA"
+  },
   "settings.account.security.two-factor.title": {
     "message": "雙重驗證"
   },
@@ -3377,20 +3437,11 @@
   "settings.billing.interval.month": {
     "message": "月"
   },
-  "settings.billing.interval.monthly": {
-    "message": "每月"
-  },
   "settings.billing.interval.quarter": {
     "message": "季"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "每季"
-  },
   "settings.billing.interval.year": {
     "message": "年"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "每年"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "在 modrinth.com 與 Modrinth App 上享受無廣告的瀏覽體驗"
@@ -3476,9 +3527,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} 個共用 CPU（最高可爆發至 {bursts} 個 CPU）"
   },
@@ -3545,17 +3593,8 @@
   "settings.billing.subscription.title": {
     "message": "訂閱"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "正在切換至{interval}計費"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "切換至{interval}計費"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "每月帳單將額外收取 {amount}／年"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "於 {date} 轉換為 {interval} 付款週期"
   },
   "settings.billing.update-method": {
     "message": "更新方式"

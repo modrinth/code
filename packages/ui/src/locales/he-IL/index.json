@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "צפה ניתוחים"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "טעינת הגרסה נכשלה"
+  },
   "badge.beta": {
     "defaultMessage": "בטא"
   },
@@ -40,6 +43,12 @@
   },
   "badge.new": {
     "defaultMessage": "חדש"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "הפרויקטים שנבחרו עוד לא הותקנו"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "לראות:"
   },
   "button.accept": {
     "defaultMessage": "קבל"
@@ -233,12 +242,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "אזהרת מחיקה"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "מחק {count} {itemType}{count, plural, one {} other {ים}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "מחק {itemType}{count, plural, one {} other {ים}}"
-  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} נוספו"
   },
@@ -283,9 +286,6 @@
   },
   "content.page-layout.share.label": {
     "defaultMessage": "שתף"
-  },
-  "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "מעדכן {סוגתוכן}..."
   },
   "files.move-modal.current-location": {
     "defaultMessage": "מיקום נוכחי"
@@ -515,9 +515,6 @@
   "label.rejected": {
     "defaultMessage": "נדחה"
   },
-  "label.rewards-program-terms-agreement": {
-    "defaultMessage": "אני מסכים ל </terms-link>תנאי תוכנית התגמולים <terms-link>"
-  },
   "label.saved": {
     "defaultMessage": "נשמר"
   },
@@ -596,9 +593,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "נכשל"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "רשום"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "מפקח"
   },
@@ -631,9 +625,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "נכשל"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "מוסתר"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "העתק קוד אל הלוח"
@@ -1085,9 +1076,6 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "כמה זיכרון RAM תרצה שהשרת שלך יקבל?"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "צפון אמריקה"
-  },
   "servers.region.prompt": {
     "defaultMessage": "באיזה מיקום תרצה שהשרת שלך יימצא?"
   },
@@ -1260,4 +1248,3 @@
     "defaultMessage": "יש לך שינויים שלא נשמרו."
   }
 }
-

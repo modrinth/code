@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tDELETE FROM analytics_events\n\t\t\tWHERE id = $1\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a53a7681f3e8ab918d225d16690b20d5856c1747c651a52e7d94d8a2ee23dc08"
+}

@@ -3,7 +3,7 @@
     "message": "Скачивание Java {version}"
   },
   "app.action-bar.downloads": {
-    "message": "Скачивания"
+    "message": "Загрузки"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Скрыть другие активные сборки"
@@ -27,7 +27,7 @@
     "message": "Остановить сборку"
   },
   "app.action-bar.view-active-downloads": {
-    "message": "Посмотреть текущие скачивания"
+    "message": "Посмотреть текущие загрузки"
   },
   "app.action-bar.view-instance": {
     "message": "Посмотреть сборку"
@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Нет связи с серверами аутентификации"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Добавить сервер в сборку"
-  },
   "app.browse.add-servers-to-instance": {
     "message": "Добавление серверов в сборку"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Добавить в сборку"
   },
   "app.browse.add-to-instance": {
     "message": "Добавить в сборку"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Уже добавлено"
   },
+  "app.browse.back-to-instance": {
+    "message": "Вернуться к сборке"
+  },
   "app.browse.discover-content": {
     "message": "Поиск проектов"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Скрывать добавленные"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Скрывать установленные"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Установка контента в сборку"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Сборки"
   },
-  "app.browse.server.install": {
-    "message": "Установить"
-  },
-  "app.browse.server.installed": {
-    "message": "Установлено"
+  "app.browse.server-instance-content-warning": {
+    "message": "Добавление контента может сломать совместимость при подключении к серверу. Весь добавленный контент также будет удалён при обновлении сервера."
   },
   "app.browse.server.installing": {
     "message": "Установка"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Экспорт сборки"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Добавить «{file}» в экспорт?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Название сборки"
   },
@@ -171,7 +168,7 @@
     "message": "Название сборки"
   },
   "app.export-modal.select-files-label": {
-    "message": "Выберите файлы и папки для экспорта"
+    "message": "Выберите файлы для экспорта"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версии"
@@ -209,9 +206,6 @@
   "app.instance.mods.project-was-added": {
     "message": "«{name}» добавлен"
   },
-  "app.instance.mods.projects-were-added": {
-    "message": "{count, plural, one {Добавлен # проект} few {Добавлено # проекта} other {Добавлено # проектов}}"
-  },
   "app.instance.mods.share-text": {
     "message": "Что в моей сборке:"
   },
@@ -226,9 +220,6 @@
   },
   "app.instance.worlds.browse-servers": {
     "message": "Найти серверы"
-  },
-  "app.instance.worlds.delete-world-description": {
-    "message": "«{name}» будет **удалён навсегда**. Его невозможно восстановить."
   },
   "app.instance.worlds.delete-world-title": {
     "message": "Вы действительно хотите удалить этот мир?"
@@ -251,17 +242,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Нет серверов и миров"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "«{name}» будет удалён из списка — в том числе в игре. Его невозможно восстановить."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "«{name}» ({address}) будет удалён из списка — в том числе в игре. Его невозможно восстановить."
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "Вы действительно хотите удалить {name}?"
-  },
-  "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Поиск по {count, plural, one {# миру} other {# мирам}}..."
   },
   "app.instance.worlds.this-server": {
     "message": "этот сервер"
@@ -274,9 +256,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Необходимая сборка"
@@ -302,6 +281,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Обновите {name} до последней версии, чтобы запустить игру."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Этот проект уже установлен"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Вернуться к поиску"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Установка контента в сборку"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
   },
@@ -325,6 +313,141 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Управление ресурсами"
+  },
+  "app.skins.add-button": {
+    "message": "Добавить скин"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Перетащите сюда"
+  },
+  "app.skins.apply-button": {
+    "message": "Применить"
+  },
+  "app.skins.delete-button": {
+    "message": "Удалить скин"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Выбранный скин будет удалён навсегда. Это действие необратимо."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Вы действительно хотите удалить этот скин?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Не удалось прочитать перетащенный файл."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Ошибка обработки файла"
+  },
+  "app.skins.edit-button": {
+    "message": "Изменить скин"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Добавить скин"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Добавление скина"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Руки"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Тонкие"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Широкие"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Плащ"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Плащ"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Настройка скина"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Сначала внесите изменения в скин!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Без плаща"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Нет"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Заменить текстуру"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Сохранить скин"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Сохранение..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Текстура"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Сначала загрузите скин!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Изменить"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Предпросмотр"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Слишком частая смена скина. Серверы Mojang временно заблокировали дальнейшие запросы. Подождите немного, прежде чем попробовать снова."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Не так быстро!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Стандартные скины"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Сохранённые скины"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Войти"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Чтобы использовать функции управления скинами Modrinth App, войдите в свою учётную запись Minecraft."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Восторженный Modrinth Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Войдите"
+  },
+  "app.skins.title": {
+    "message": "Выбор скина"
   },
   "app.update-popup.body": {
     "message": "Версия Modrinth App {version} готова к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
@@ -354,7 +477,7 @@
     "message": "Доступно обновление"
   },
   "app.update.complete-toast.text": {
-    "message": "Нажмите здесь, чтобы посмотреть изменения."
+    "message": "Нажмите, чтобы посмотреть список изменений."
   },
   "app.update.complete-toast.title": {
     "message": "Версия {version} успешно установлена!"
@@ -388,9 +511,6 @@
   },
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
   },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"
@@ -484,9 +604,6 @@
   },
   "instance.edit-world.title": {
     "message": "Настройка мира"
-  },
-  "instance.files.adding-files": {
-    "message": "Добавление файлов ({completed, number}/⁠{total, number})"
   },
   "instance.files.save-as": {
     "message": "Сохранить как..."
@@ -605,6 +722,24 @@
   "instance.settings.tabs.java": {
     "message": "Java и память"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Переопределение переменных среды"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Переопределение аргументов Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Переопределение расположения Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Переопределение выделенной памяти"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Введите переменные среды..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Введите аргументы Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Переменные среды"
   },
@@ -619,6 +754,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Выделенная память"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "Окно"
@@ -692,6 +830,24 @@
   "instance.worlds.world_in_use": {
     "message": "Мир используется"
   },
+  "minecraft-account.add-account": {
+    "message": "Добавить"
+  },
+  "minecraft-account.label": {
+    "message": "Учётная запись Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Вход не выполнен"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Удалить"
+  },
+  "minecraft-account.select-account": {
+    "message": "Выберите профиль"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Войти в Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Управляется сборкой"
   },
@@ -717,7 +873,7 @@
     "message": "Загрузчик управляется сервером"
   },
   "unknown-pack-warning-modal.body": {
-    "message": "Проверяются только файлы, загруженные на Modrinth, в том числе файлы .mrpack."
+    "message": "Файл проверяется только в том случае, если он загружен на Modrinth, независимо от его формата (включая .mrpack)."
   },
   "unknown-pack-warning-modal.dont-show-again": {
     "message": "Больше не предупреждать"

@@ -1,15 +1,114 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Ladataan Java-versiota {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Lataukset"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Piilota enemmän käynnissä olevia instansseja"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Aseta ensisijaiseksi instanssiksi"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Ei instansseja käynnissä"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline-tilassa"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Ensisijainen instanssi"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Näytä enemmän käynnissä olevia instansseja"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Pysäytä instanssi"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Näytä aktiiviset lataukset"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Katso intanssia"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Katso lokeja"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Mahdollistaa edistyneen renderöinnin, kuten sumennus efektit, jotka voivat aiheuttaa suorituskykyongelmia ilman laitteistokiihdytettyä renderöintiä."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Edistynyt renderointi"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Valitse haluamasi väriteema Modrinth Appille."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Väriteema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Muuta sivua mille laukaisin avautuu."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Koti"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Kirjasto"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Oletus laskeutumissivu"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Kytkee pois päältä nimikyltin pelaajasi päällä skinit sivulla."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Piilota nimikyltti"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Sisällyttää viimeaikaiset maailmat \"Hyppää takaisin sisään\" osiossa Koti sivulla."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Hyppää takaisin sisään maailmoihin"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Pienennä laukaisin kun Minecraft prosessi käynnistyy."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Piilota käynnistysohjelma"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Käytä järjestelmän ikkuna kehystä (Vaatii sovelluksen uudelleen käynnistämisen)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Natiivit koristukset"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Valitse vaihtoehto"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Laittaa päälle mahdollisuuden kytkeä sivupalkkia."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Kytke sivupalkki"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Jos yrität asentaa Modrinth-pakettitiedoston (.mrpack), jota ei ole isännöity Modrinthissä, varmistamme, että ymmärrät riskit ennen asennusta."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Varoita minua ennen tuntemattomien modipakettien asentamista"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraftin todennuspalvelimet eivät ehkä ole tällä hetkellä tavoitettavissa. Tarkista internetyhteytesi ja yritä myöhemmin uudelleen."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Todennuspalvelimiin ei saada yhteyttä"
   },
-  "app.browse.add-server-to-instance": {
+  "app.browse.add-servers-to-instance": {
     "message": "Lisää palvelin instanssiin"
   },
-  "app.browse.add-servers-to-instance": {
-    "message": "Lisää palvelimia instanssiisi"
+  "app.browse.add-to-an-instance": {
+    "message": "Lisää instanssiin"
   },
   "app.browse.add-to-instance": {
     "message": "Lisää instanssiin"
@@ -23,14 +122,32 @@
   "app.browse.already-added": {
     "message": "On jo asennettu"
   },
+  "app.browse.back-to-instance": {
+    "message": "Takaisin instanssiin"
+  },
   "app.browse.discover-content": {
     "message": "Löydä sisältöä"
   },
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Lataa sisältöä instanssiin"
+  "app.browse.hide-added-servers": {
+    "message": "Piilota lisätyt palvelimet"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modipaketit"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Sisällön lisääminen voi rikkoa yhteensopivuuden palvelimelle liittyessä. Kaikki lisätty sisältö katoaa myös kun päivität palvelin instanssin sisällön."
+  },
+  "app.browse.server.installing": {
+    "message": "Asennetaan"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Asennetaan modipakettia..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Lisää modipaketin kuvaus..."
@@ -41,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Vie modipaketti"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Sisällytä \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Modipaketin nimi"
   },
@@ -48,7 +168,7 @@
     "message": "Modipaketin nimi"
   },
   "app.export-modal.select-files-label": {
-    "message": "Valitse tiedostot ja kansiot pakettiin"
+    "message": "Muuta mitkä tiedostot sisältyvät tähän vientiin"
   },
   "app.export-modal.version-number-label": {
     "message": "Versio numero"
@@ -91,6 +211,9 @@
   },
   "app.instance.mods.share-text": {
     "message": "Tsekkaa projektit joita käytän minun modipaketissani!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Jaetaan modipaketti sisältöä"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Onnistuneesti ladattu"
@@ -175,6 +298,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Pävitys vaaditaan pelataksesi {name}. Päivitä viimeisimpään versioon pelataksesi."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Tämä projekti on jo asennettu"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Takaisin sisällön löytöön"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Asenna sisältöä instanssiin"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Kehittäjätila käytössä."
@@ -479,6 +611,24 @@
   "instance.settings.tabs.java": {
     "message": "Java ja muisti"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Mukautetut ympäristö muuttujat"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Mukautetut Java argumentit"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Mukautettu Java asennus"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Mukautettu muistin allokointi"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Syötä ympäristö muuttujat..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Syötä Java argumentit..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Ympäristö muuttujat"
   },
@@ -493,6 +643,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Muisti allokoitu"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/javaan/johtava/polku/"
   },
   "instance.settings.tabs.window": {
     "message": "Ikkuna"
@@ -566,6 +719,24 @@
   "instance.worlds.world_in_use": {
     "message": "Maailma on käytössä"
   },
+  "minecraft-account.add-account": {
+    "message": "Lisää tili"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft tili"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Ei kirjautuneena sisään"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Poista tili"
+  },
+  "minecraft-account.select-account": {
+    "message": "Valitse tili"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Kirjaudu sisään Minecraftiin"
+  },
   "search.filter.locked.instance": {
     "message": "Annettu instanssin toimesta"
   },
@@ -589,5 +760,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Modialusta on palvelimen tarjoama"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Tiedosto tarkistetaan vain jos se on ladattu Modrinthiin, riippumatta tiedoston muodosta (mukaanlukien .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Älä näytä tätä varoitusta uudestaan"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Vahvista asennus"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Asenna jokatapauksessa"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Haittaohjelmia levitetään usein modipaketti tiedostojen kautta jakamalla niitä alustoilla kuten Discordissa."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Emme löytäneet tätä tiedostoa Modrinthista. Suosittelemme vahvasti että asennat tiedostoja vain lähteistä joihin luotat."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Tuntematon tiedosto varoitus"
   }
 }

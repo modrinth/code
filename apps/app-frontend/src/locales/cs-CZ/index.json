@@ -1,15 +1,114 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Stahování Javy {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Stažené Soubory"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Skrýt více spuštěných instancí"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Použít jako primární instanci"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Žádné spuštěné instance"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primární instance"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Zobrazit další spuštěné instance"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Ukončit instanci"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Zobrazit probíhající stahování"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Zobrazit instanci"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Zobrazit záznamy"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Umožňuje pokročilé vykreslování, jako jsou efekty rozostření, které mohou způsobit problémy s výkonem bez hardwarového vykreslení."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Pokročilé vykreslování"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Vyberte si váš preferovaný motiv pro aplikaci Modrinth."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Barevný motiv"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Změňte stránku, na které se spouštěč otevře."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Domov"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Knihovna"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Výchozí úvodní stránka"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Zakáže zobrazení jmenovky nad vaší postavou na stránce skinů."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Skrýt jmenovku"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "V sekci „Vrátit se do hry“ na úvodní stránce jsou uvedeny nejnovější světy."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Skočit zpět do světů"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimalizovat spouštěč při spuštění procesu Minecraftu."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimalizovat spouštěč"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Použít systémový rámeček okna (vyžaduje restart aplikace)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Nativní dekorace"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Vyberte možnost"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Umožňí přepínat zobrazení postranního panelu."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Přepnout postranní panel"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Pokud se pokusíte nainstalovat soubor Modrinth Pack (.mrpack), který není hostován na Modrinth, zajistíme, abyste si před instalací uvědomili související rizika."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Upozorni mě před instalací neznámých modpacků"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Autořizační servery Minecraftu aktuálně nejsou k dispozici. Zkontrolujte si své připojení k internetu a zkuste to znovu později."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
-  "app.browse.add-server-to-instance": {
+  "app.browse.add-servers-to-instance": {
     "message": "Přidat server do instance"
   },
-  "app.browse.add-servers-to-instance": {
-    "message": "Přidat servery do instance"
+  "app.browse.add-to-an-instance": {
+    "message": "Přidat do instalace"
   },
   "app.browse.add-to-instance": {
     "message": "Přidat do instalace"
@@ -23,14 +122,32 @@
   "app.browse.already-added": {
     "message": "Už přidáno"
   },
+  "app.browse.back-to-instance": {
+    "message": "Zpět k instanci"
+  },
   "app.browse.discover-content": {
     "message": "Prozkoumat obsah"
   },
   "app.browse.discover-servers": {
     "message": "Prozkoumat servery"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Nainstalovat obsah do instnce"
+  "app.browse.hide-added-servers": {
+    "message": "Skrýt již přidané servery"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Balíčky Modifikací"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Přidání obsahu může narušit kompatibilitu při připojení k serveru. Veškerý přidaný obsah se navíc ztratí při aktualizaci obsahu instance serveru."
+  },
+  "app.browse.server.installing": {
+    "message": "Instalování"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Probíhá instalace modpacku..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Přidej popis modpacku..."
@@ -41,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Exportovat modpack"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Zahrnout \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Jméno Modpacku"
   },
@@ -48,7 +168,7 @@
     "message": "Jméno modpacku"
   },
   "app.export-modal.select-files-label": {
-    "message": "Vybrat soubory a složky co zahrnout do modpacku"
+    "message": "Nastavte, které soubory mají být do tohoto exportu zahrnuty"
   },
   "app.export-modal.version-number-label": {
     "message": "Číslo verze"
@@ -104,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Procházet servery"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "\"{name}\" bude **navždy smazáno** a nebude způsob, jak to obnovit."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Opravdu si jsi jistý, že chceš navždy smazat tenhle svět?"
   },
@@ -128,8 +245,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Žádné servery nebo světy nebyly přidány"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "„{name}“ bude odstraněn z tvého seznamu, včetně hry, a nebude žádný způsob, jak ho obnovit."
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) bude odstraněn z vašeho seznamu, a to i ve hře, a nebude možné jej obnovit."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Opravdu chceš odstranit {name}?"
@@ -140,6 +257,9 @@
   "app.instance.worlds.this-server": {
     "message": "tento server"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Požadovaný obsah"
+  },
   "app.modal.install-to-play.header": {
     "message": "Nainstaluj ke hraní"
   },
@@ -149,11 +269,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one  {#mód} other  {#módy}}"
   },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Povinný modpack"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Tento server k hraní vyžaduje módy. Klikni na instalovat pro získání potřebných módů z Modrinth."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Sdílená instance"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Sdílená serverová instance"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Zobrazit obsah"
   },
   "app.modal.update-to-play.header": {
     "message": "Updatuj ke hraní"
@@ -163,6 +292,15 @@
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Je nutná aktualizace ke hraní {name}. Prosím updatuj na nejnovější verzi k spuštění hry."
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Tento projekt je již nainstalován"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Zpět na Prozkoumat"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Nainstalovat obsah do instnce"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
@@ -188,8 +326,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Správa zdrojů"
   },
+  "app.update-popup.body": {
+    "message": "Aplikace Modrinth v{version} je připravena k instalaci! Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Aplikace Modrinth v{version} je k dispozici. Aktualizujte pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "Aplikace Modrinth v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
+  },
+  "app.update-popup.changelog": {
+    "message": "Seznam změn"
+  },
   "app.update-popup.download": {
     "message": "Stáhnout ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "Stahování bylo dokončeno"
+  },
+  "app.update-popup.reload": {
+    "message": "Načíst znovu"
+  },
+  "app.update-popup.title": {
+    "message": "Je k dispozici aktualizace"
   },
   "app.update.complete-toast.text": {
     "message": "Kliknutím sem zobrazíte seznam změn."
@@ -205,6 +367,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Restartovat aplikaci pro nainstalování aktualizace"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "priklad.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Vyberte možnost"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Nekompatibilní verze {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ještě nehráno"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Přidat přítele"
@@ -257,9 +437,6 @@
   "friends.heading.pending": {
     "message": "Čeká na vyřízení"
   },
-  "friends.no-friends-match": {
-    "message": "Žádní přátelé neodpovídají '{query}''"
-  },
   "friends.search-friends-placeholder": {
     "message": "Hledat přátele..."
   },
@@ -304,6 +481,12 @@
   },
   "instance.edit-world.title": {
     "message": "Upravit svět"
+  },
+  "instance.files.adding-files": {
+    "message": "Přidávání souborů ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Uložit jako..."
   },
   "instance.server-modal.address": {
     "message": "Adresa"
@@ -485,6 +668,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Server je nekompatibilní"
   },
+  "instance.worlds.linked_server": {
+    "message": "Spravováno projektem serveru"
+  },
   "instance.worlds.no_contact": {
     "message": "Server se nepodařilo spojit"
   },
@@ -503,6 +689,24 @@
   "instance.worlds.world_in_use": {
     "message": "Svět je použit"
   },
+  "minecraft-account.add-account": {
+    "message": "Přidat účet"
+  },
+  "minecraft-account.label": {
+    "message": "Účet Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Nejste přihlášeni"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Odstranit účet"
+  },
+  "minecraft-account.select-account": {
+    "message": "Vyberte účet"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Přihlásit se do Minecraftu"
+  },
   "search.filter.locked.instance": {
     "message": "Poskytováno instancí"
   },
@@ -515,6 +719,9 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchronizováno z instancí"
   },
+  "search.filter.locked.server": {
+    "message": "Poskytováno serverem"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "Jen klientské mody mohou být přidány na server"
   },
@@ -523,5 +730,26 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader zprostředkovává server"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "Soubor je zkontrolován pouze v případě, že je nahrán na Modrinth, a to bez ohledu na jeho formát (včetně formátu .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Toto varování již nezobrazovat"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Potvrdit instalaci"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Přesto nainstalovat"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Malware se často šíří prostřednictvím souborů s modpacky, které se sdílejí na platformách jako Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Tento soubor jsme na Modrinthu nenašli. Důrazně doporučujeme instalovat pouze soubory z důvěryhodných zdrojů."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Upozornění na neznámý soubor"
   }
 }

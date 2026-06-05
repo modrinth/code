@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Dodaj serwer do instancji"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Dodaj serwery do swojej instancji"
+    "message": "Dodawanie serwera do instancji"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Dodaj do instancji"
   },
   "app.browse.add-to-instance": {
     "message": "Dodaj do instancji"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Już dodano"
   },
+  "app.browse.back-to-instance": {
+    "message": "Powrót do instancji"
+  },
   "app.browse.discover-content": {
     "message": "Odkrywaj zawartość"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Ukryj już dodane serwery"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Ukryj już dodane zasoby"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Zainstaluj zasoby do instancji"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Paczki modów"
   },
-  "app.browse.server.install": {
-    "message": "Zainstaluj"
-  },
-  "app.browse.server.installed": {
-    "message": "Zainstalowano"
+  "app.browse.server-instance-content-warning": {
+    "message": "Dodawanie zawartości może zepsuć kompatybilność podczas dołączania na serwer. Jakakolwiek dodana zawartość zostanie stracona, gdy zaktualizujesz zawartość instancji serwera."
   },
   "app.browse.server.installing": {
     "message": "Instalowanie"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Eksportuj paczkę modów"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Dołączyć \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Nazwa paczki modów"
   },
@@ -171,7 +168,7 @@
     "message": "Nazwa paczki modów"
   },
   "app.export-modal.select-files-label": {
-    "message": "Wybierz pliki i foldery, które mają znaleźć się w paczce"
+    "message": "Skonfiguruje jakie pliki zostaną załączone w tym eksporcie"
   },
   "app.export-modal.version-number-label": {
     "message": "Numer wersji"
@@ -180,7 +177,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i wszystkie zainstalowane treści."
+    "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Tej akcji nie można odwrócić"
@@ -208,9 +205,6 @@
   },
   "app.instance.mods.project-was-added": {
     "message": "Dodano \"{name}\""
-  },
-  "app.instance.mods.projects-were-added": {
-    "message": "Dodano {count} {count, plural, one {projekt} few {projekty} other {projektów}}"
   },
   "app.instance.mods.share-text": {
     "message": "Sprawdź projekty, które używam w mojej paczce modów!"
@@ -275,9 +269,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "Zainstaluj"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Wymagana paczka modów"
   },
@@ -302,6 +293,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Aktualizacja jest wymagana, aby grać w {name}. Proszę zaktualizować do najnowszej wersji, aby uruchomić grę."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Ten projekt jest już zainstalowany"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Powróć do odkrywania"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Zainstaluj zasoby do instancji"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
   },
@@ -325,6 +325,69 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Zarządzanie zasobami"
+  },
+  "app.skins.add-button": {
+    "message": "Dodaj skina"
+  },
+  "app.skins.apply-button": {
+    "message": "Zastosuj"
+  },
+  "app.skins.delete-button": {
+    "message": "Usuń skina"
+  },
+  "app.skins.edit-button": {
+    "message": "Edytuj skina"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Dodaj skina"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Dodawanie skina"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Peleryna"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Pelerynki"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Edytuj skina"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Brak peleryny"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Nic"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Zapisz skina"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Zapisywanie..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Tekstura"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Edytuj skina"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Zwolnij!"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Domyślne skiny"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Zaloguj Się"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Proszę zaloguj się"
+  },
+  "app.skins.title": {
+    "message": "Wybierz skina"
   },
   "app.update-popup.body": {
     "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
@@ -388,9 +451,6 @@
   },
   "friends.action.add-friend": {
     "message": "Dodaj znajomego"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {zaproszenie} few {zaproszenia} other {zaproszeń}} do znajomych"
   },
   "friends.add-friend.submit": {
     "message": "Wyślij zaproszenie"
@@ -605,6 +665,24 @@
   "instance.settings.tabs.java": {
     "message": "Java i pamięć"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Zmienne środowiskowe"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Niestandardowe argumenty Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Niestandardowa instalacja Javy"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Niestandardowa alokacja pamięci"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Zmienne środowiskowe..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Argumenty Javy..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Zmienne środowiskowe"
   },
@@ -619,6 +697,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Przypisana pamięć"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "Okno"
@@ -691,6 +772,24 @@
   },
   "instance.worlds.world_in_use": {
     "message": "Świat jest w użytku"
+  },
+  "minecraft-account.add-account": {
+    "message": "Dodaj konto"
+  },
+  "minecraft-account.label": {
+    "message": "Konto Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Nie zalogowano"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Usuń konto"
+  },
+  "minecraft-account.select-account": {
+    "message": "Wybierz konto"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Zaloguj się do Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Podane przez instancję"

@@ -75,6 +75,7 @@ function toggleItem(item: T) {
 	flex-wrap: wrap;
 
 	.btn {
+		border: 1px solid transparent;
 		&.capitalize {
 			text-transform: capitalize;
 		}
@@ -86,16 +87,13 @@ function toggleItem(item: T) {
 
 		&:focus-visible {
 			outline: 0.25rem solid var(--color-focus-ring);
-			border-radius: 0.25rem;
 		}
 	}
 
 	.selected {
-		color: var(--color-contrast);
+		color: var(--color-brand);
 		background-color: var(--color-brand-highlight);
-		box-shadow:
-			inset 0 0 0 transparent,
-			0 0 0 2px var(--color-brand);
+		border: 1px solid var(--color-brand);
 	}
 }
 </style>

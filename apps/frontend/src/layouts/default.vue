@@ -34,25 +34,39 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<RussiaBanner v-if="isRussia" />
-		<TaxIdMismatchBanner v-if="showTinMismatchBanner" />
-		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
+		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
+		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
+		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
 		<VerifyEmailBanner
-			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
+			v-if="
+				flags.showAllBanners ||
+				(auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email')
+			"
 			:has-email="!!auth?.user?.email"
 		/>
 		<SubscriptionPaymentFailedBanner
 			v-if="
-				user.subscriptions.some((x) => x.status === 'payment-failed') &&
-				route.path !== '/settings/billing'
+				flags.showAllBanners ||
+				(user.subscriptions.some((x) => x.status === 'payment-failed') &&
+					route.path !== '/settings/billing')
 			"
 		/>
-		<PreviewBanner v-if="config.public.buildEnv === 'production' && config.public.preview" />
-		<StagingBanner v-if="config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')" />
+		<PreviewBanner
+			v-if="
+				flags.showAllBanners || (config.public.buildEnv === 'production' && config.public.preview)
+			"
+		/>
+		<StagingBanner
+			v-if="
+				flags.showAllBanners ||
+				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com')
+			"
+		/>
 		<GeneratedStateErrorsBanner
 			:errors="generatedStateErrors"
 			:api-url="config.public.apiBaseUrl"
 		/>
+		<ViewOnModrinthBanner />
 		<header
 			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
@@ -453,7 +467,7 @@
 				<OverflowMenu
 					v-if="auth.user"
 					:dropdown-id="`${basePopoutId}-user`"
-					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 pr-1"
 					:options="userMenuOptions"
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
@@ -747,9 +761,13 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonSettingsMessages,
+	createHostingIntercomIdentityKey,
 	defineMessages,
 	injectModrinthClient,
+	injectPageContext,
 	OverflowMenu,
+	providePageContext,
+	useHostingIntercom,
 	useVIntl,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
@@ -767,6 +785,7 @@ import SubscriptionPaymentFailedBanner from '~/components/ui/banner/Subscription
 import TaxComplianceBanner from '~/components/ui/banner/TaxComplianceBanner.vue'
 import TaxIdMismatchBanner from '~/components/ui/banner/TaxIdMismatchBanner.vue'
 import VerifyEmailBanner from '~/components/ui/banner/VerifyEmailBanner.vue'
+import ViewOnModrinthBanner from '~/components/ui/banner/ViewOnModrinthBanner.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
@@ -774,6 +793,7 @@ import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const generatedState = useGeneratedState()
 
@@ -793,6 +813,25 @@ const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
+const pageContext = injectPageContext()
+const hostingIntercomActive = computed(() => route.path.startsWith('/hosting') && !!auth.value.user)
+const hostingIntercomServerId = computed(() => {
+	const rawId = route.params.id
+	return Array.isArray(rawId) ? rawId[0] : rawId
+})
+const hostingIntercom = useHostingIntercom({
+	enabled: hostingIntercomActive,
+	appId: computed(() => config.public.intercomAppId),
+	fetchToken: fetchIntercomToken,
+	identityKey: computed(() =>
+		createHostingIntercomIdentityKey(auth.value.user, hostingIntercomServerId.value),
+	),
+})
+
+providePageContext({
+	...pageContext,
+	intercomBubble: hostingIntercom.intercomBubble,
+})
 
 const { data: payoutBalance } = useQuery({
 	queryKey: ['payout', 'balance'],
@@ -820,6 +859,12 @@ const showTinMismatchBanner = computed(() => {
 })
 
 const basePopoutId = useId()
+
+async function fetchIntercomToken() {
+	return $fetch('/api/intercom/messenger-jwt', {
+		query: hostingIntercomServerId.value ? { server_id: hostingIntercomServerId.value } : {},
+	})
+}
 
 const navMenuMessages = defineMessages({
 	home: {
@@ -1052,7 +1097,7 @@ const userMenuOptions = computed(() => {
 			id: 'plus',
 			link: '/plus',
 			color: 'purple',
-			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(user.badges, 1 << 0),
+			shown: !flags.value.hidePlusPromoInUserMenu && !hasActiveMidas(user),
 		},
 		{
 			id: 'servers',
@@ -1133,7 +1178,7 @@ const isDiscovering = computed(
 )
 
 const isDiscoveringSubpage = computed(
-	() => route.name && route.name.startsWith('type-id') && !route.query.sid,
+	() => route.name && route.name.startsWith('type-project') && !route.query.sid,
 )
 
 const isRussia = computed(() => country.value === 'ru')
@@ -1212,6 +1257,10 @@ async function logoutUser() {
 }
 
 function runAnalytics() {
+	if (import.meta.dev) {
+		return
+	}
+
 	const config = useRuntimeConfig()
 	const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
 
@@ -1342,7 +1391,11 @@ const { cycle: changeTheme } = useTheme()
 
 		&-mobile {
 			.account-container {
+				opacity: 0;
 				padding-bottom: 0;
+				pointer-events: none;
+				transition: opacity 0.15s ease-in-out;
+				visibility: hidden;
 
 				.account-button {
 					padding: var(--spacing-card-md);
@@ -1365,6 +1418,12 @@ const { cycle: changeTheme } = useTheme()
 			&.expanded {
 				transform: translateY(0);
 				box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
+
+				.account-container {
+					opacity: 1;
+					pointer-events: auto;
+					visibility: visible;
+				}
 			}
 		}
 	}
