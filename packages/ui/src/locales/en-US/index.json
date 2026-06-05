@@ -3525,7 +3525,7 @@
     "defaultMessage": "Limited"
   },
   "servers.access-table.action.cancel-invite": {
-    "defaultMessage": "Cancel invite"
+    "defaultMessage": "Revoke invite"
   },
   "servers.access-table.action.remove-user": {
     "defaultMessage": "Revoke access"

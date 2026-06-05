@@ -361,7 +361,7 @@ const messages = defineMessages({
 	},
 	cancelInvite: {
 		id: 'servers.access-table.action.cancel-invite',
-		defaultMessage: 'Cancel invite',
+		defaultMessage: 'Revoke invite',
 	},
 	removeUser: {
 		id: 'servers.access-table.action.remove-user',
