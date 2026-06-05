@@ -350,6 +350,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Disabled"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Enabled"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Updates"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Warnings"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creating backup..."
   },
