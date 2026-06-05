@@ -22,10 +22,14 @@
 					searchable
 					show-search-icon
 					:show-chevron="false"
-					search-autocomplete="off"
+					search-type="search"
+					search-name="modrinth-server-access-member-search"
+					search-inputmode="search"
+					search-autocomplete="new-password"
 					search-autocorrect="off"
 					search-autocapitalize="none"
 					:search-spellcheck="false"
+					:search-input-attrs="passwordManagerIgnoreAttrs"
 					@open="targetComboboxOpen = true"
 					@close="targetComboboxOpen = false"
 					@search-input="handleTargetSearch"
@@ -191,6 +195,13 @@ const targetLookupStatus = ref<'idle' | 'loading' | 'loaded'>('idle')
 const targetLookupRequestId = ref(0)
 const hasSelectedTarget = ref(false)
 const targetComboboxOpen = ref(false)
+const passwordManagerIgnoreAttrs = {
+	'data-1p-ignore': 'true',
+	'data-bwignore': 'true',
+	'data-form-type': 'other',
+	'data-lpignore': 'true',
+	'data-protonpass-ignore': 'true',
+}
 
 const messages = defineMessages({
 	header: {

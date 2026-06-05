@@ -858,6 +858,12 @@ export namespace Archon {
 				id: string
 			}
 
+			export type UserInfo = {
+				id: string
+				username: string
+				avatar_url: string | null
+			}
+
 			export type DeleteManyBackupRequest = {
 				backup_ids: string[]
 			}
@@ -865,22 +871,26 @@ export namespace Archon {
 			export type ActiveOperation = {
 				backup_id: string
 				operation_type: BackupQueueOperationType
-				operation_id?: number | null
+				operation_id: number | null
 				has_parent: boolean
 				scheduled_for: string
+				started_at: string | null
 				synthetic_legacy: boolean
+				user_info: UserInfo | null
 			}
 
 			export type BackupQueueOperation = {
 				operation_type: BackupQueueOperationType
-				operation_id?: number | null
+				operation_id: number | null
 				state: BackupQueueState
 				scheduled_for: string
-				completed_at?: string | null
+				started_at: string | null
+				completed_at: string | null
 				has_parent: boolean
-				error?: string | null
+				error: string | null
 				should_prompt: boolean
 				synthetic_legacy: boolean
+				user_info: UserInfo | null
 			}
 
 			export type BackupQueueBackup = {

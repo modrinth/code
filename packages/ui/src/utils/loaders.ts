@@ -9,6 +9,7 @@ export const loaderDisplayNames: Record<string, string> = {
 	forge: 'Forge',
 	quilt: 'Quilt',
 	paper: 'Paper',
+	spigot: 'Spigot',
 	purpur: 'Purpur',
 	bukkit: 'Bukkit',
 	vanilla: 'Vanilla',

@@ -5,6 +5,7 @@ import {
 	ServersManageAccessPage,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const client = injectModrinthClient()
 const { serverId } = injectModrinthServerContext()
@@ -26,8 +27,12 @@ try {
 } catch {
 	// Let mounted layouts' useQuery surface errors; do not fail route setup.
 }
+
+function userProfileLink(username: string) {
+	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
+}
 </script>
 
 <template>
-	<ServersManageAccessPage />
+	<ServersManageAccessPage :user-profile-link="userProfileLink" />
 </template>

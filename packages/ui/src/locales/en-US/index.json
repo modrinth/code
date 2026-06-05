@@ -3414,7 +3414,7 @@
     "defaultMessage": "Changed user permissions"
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
-    "defaultMessage": "Removed user"
+    "defaultMessage": "Revoked access"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "Add filter"
@@ -3450,10 +3450,10 @@
     "defaultMessage": "Friend request could not be sent"
   },
   "servers.access-page.notification.invite-cancelled.text": {
-    "defaultMessage": "Cancelled the invite for {target}."
+    "defaultMessage": "Revoked the invite for {target}."
   },
   "servers.access-page.notification.invite-cancelled.title": {
-    "defaultMessage": "Invite cancelled"
+    "defaultMessage": "Invite revoked"
   },
   "servers.access-page.notification.invite-failed.title": {
     "defaultMessage": "Invite could not be sent"
@@ -3477,10 +3477,10 @@
     "defaultMessage": "Access could not be loaded"
   },
   "servers.access-page.notification.member-removed.text": {
-    "defaultMessage": "Removed {target} from this server."
+    "defaultMessage": "Revoked access for {target}."
   },
   "servers.access-page.notification.member-removed.title": {
-    "defaultMessage": "Access removed"
+    "defaultMessage": "Access revoked"
   },
   "servers.access-page.notification.remove-failed.title": {
     "defaultMessage": "Access could not be removed"
@@ -3525,10 +3525,10 @@
     "defaultMessage": "Limited"
   },
   "servers.access-table.action.cancel-invite": {
-    "defaultMessage": "Cancel invite"
+    "defaultMessage": "Revoke invite"
   },
   "servers.access-table.action.remove-user": {
-    "defaultMessage": "Remove user"
+    "defaultMessage": "Revoke access"
   },
   "servers.access-table.action.resend-invite": {
     "defaultMessage": "Resend invite"
@@ -3807,7 +3807,7 @@
     "defaultMessage": "Changed permissions for <target-user></target-user> to <permission-label>{permissions}</permission-label>"
   },
   "servers.audit-log.event.user-removed": {
-    "defaultMessage": "Removed <target-user></target-user>"
+    "defaultMessage": "Revoked access for <target-user></target-user>"
   },
   "servers.audit-log.scope.server": {
     "defaultMessage": "Server"
@@ -3934,6 +3934,12 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
+  },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Support"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
@@ -4440,7 +4446,7 @@
     "defaultMessage": "Added {time}"
   },
   "servers.remove-access-modal.cancel-button": {
-    "defaultMessage": "Cancel invite"
+    "defaultMessage": "Revoke invite"
   },
   "servers.remove-access-modal.cancel-effect-access": {
     "defaultMessage": "They will not be added to this server"
@@ -4449,13 +4455,13 @@
     "defaultMessage": "You can send them another invite later"
   },
   "servers.remove-access-modal.cancel-header": {
-    "defaultMessage": "Cancel invite"
+    "defaultMessage": "Revoke invite"
   },
   "servers.remove-access-modal.cancel-warning-body": {
-    "defaultMessage": "If you cancel this invite, {username} will need a new invitation before they can join this server."
+    "defaultMessage": "If you revoke this invite, {username} will need a new invitation before they can join this server."
   },
   "servers.remove-access-modal.header": {
-    "defaultMessage": "Remove user"
+    "defaultMessage": "Revoke access"
   },
   "servers.remove-access-modal.invited-label": {
     "defaultMessage": "Invited {time}"
@@ -4464,7 +4470,7 @@
     "defaultMessage": "Pending invite"
   },
   "servers.remove-access-modal.remove-button": {
-    "defaultMessage": "Remove user"
+    "defaultMessage": "Revoke access"
   },
   "servers.remove-access-modal.remove-effect-access": {
     "defaultMessage": "They will immediately lose access to the server panel and will no longer be able to edit content"
@@ -4479,7 +4485,7 @@
     "defaultMessage": "{username}'s avatar"
   },
   "servers.remove-access-modal.warning-body": {
-    "defaultMessage": "If you remove a user from your server, you'll need to re-invite them to restore access."
+    "defaultMessage": "If you revoke a user's access to your server, you'll need to re-invite them to restore access."
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "What happens?"

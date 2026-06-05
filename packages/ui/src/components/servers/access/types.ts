@@ -1,6 +1,12 @@
+import type { RouteLocationRaw } from 'vue-router'
+
 import type { AuditActor, AuditWorld, ParsedAuditEvent } from './events/types'
 
 export type ServerAccessRole = 'owner' | 'editor' | 'viewer'
+export type ServerAccessUserProfileLink =
+	| RouteLocationRaw
+	| (() => void | Promise<void>)
+	| undefined
 
 export interface ServerAccessUser extends AuditActor {
 	id: string

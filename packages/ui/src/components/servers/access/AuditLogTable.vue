@@ -12,7 +12,7 @@
 				:trigger-class="timeframePickerTriggerClass"
 			/>
 			<template v-if="slots.filters">
-				<div class="hidden h-8 w-[1px] shrink-0 bg-surface-5 @[640px]:ml-1 @[640px]:block"></div>
+				<div class="hidden h-8 w-[1px] shrink-0 bg-surface-4 @[640px]:ml-1 @[640px]:block"></div>
 				<div class="flex min-w-0 flex-wrap items-center gap-2">
 					<slot name="filters"></slot>
 				</div>
@@ -128,7 +128,7 @@
 					<div
 						v-for="entry in filteredEntries"
 						:key="entry.id"
-						class="flex min-w-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+						class="flex min-w-0 flex-col gap-3 rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
 					>
 						<AutoLink
 							v-tooltip="actorName(entry)"
@@ -166,7 +166,7 @@
 					</div>
 				</TransitionGroup>
 
-				<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+				<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-4">
 					<div
 						class="hidden min-h-14 bg-surface-3 @[800px]:grid @[800px]:h-14"
 						:class="
@@ -224,7 +224,7 @@
 						</div>
 					</div>
 					<div
-						class="border-0 border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary @[800px]:border-t"
+						class="border-0 border-solid border-surface-4 bg-surface-2 px-4 py-8 text-center text-secondary @[800px]:border-t"
 					>
 						{{ formatMessage(emptyStateMessage) }}
 					</div>

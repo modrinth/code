@@ -1,14 +1,14 @@
 <template>
-	<div class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+	<div class="overflow-hidden rounded-2xl border border-solid border-surface-4">
 		<div
 			v-if="hasHeaderSlot"
-			class="border-solid border-0 border-b border-surface-5 bg-surface-3 p-4"
+			class="border-solid border-0 border-b border-surface-4 bg-surface-3 p-4"
 		>
 			<slot name="header" />
 		</div>
 		<div class="overflow-x-auto overflow-y-hidden">
 			<table
-				class="w-full table-fixed border-separate border-spacing-0 border-surface-5"
+				class="w-full table-fixed border-separate border-spacing-0 border-surface-4"
 				:style="tableMinWidth ? { minWidth: tableMinWidth } : undefined"
 			>
 				<colgroup>
@@ -68,7 +68,7 @@
 					tag="tbody"
 				>
 					<tr v-if="data.length === 0" key="empty" class="bg-surface-2">
-						<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-5 p-0">
+						<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-4 p-0">
 							<slot name="empty-state">
 								<div class="text-secondary flex h-64 items-center justify-center">
 									No data available.
@@ -84,7 +84,7 @@
 						>
 							<td
 								v-if="showSelection"
-								class="w-12 border-solid border-0 border-t border-surface-5 focus:outline-none"
+								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
 							>
 								<Checkbox
 									:model-value="isSelected(row)"
@@ -95,7 +95,7 @@
 							<td
 								v-for="column in columns"
 								:key="column.key"
-								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
+								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
 								:class="`text-${column.align ?? 'left'}`"
 							>
 								<slot
@@ -113,7 +113,7 @@
 				</TransitionGroup>
 				<tbody v-else :ref="setListContainer">
 					<tr v-if="data.length === 0" class="bg-surface-2">
-						<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-5 p-0">
+						<td :colspan="columnSpan" class="border-solid border-0 border-t border-surface-4 p-0">
 							<slot name="empty-state">
 								<div class="text-secondary flex h-64 items-center justify-center">
 									No data available.
@@ -136,7 +136,7 @@
 						>
 							<td
 								v-if="showSelection"
-								class="w-12 border-solid border-0 border-t border-surface-5 focus:outline-none"
+								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
 							>
 								<Checkbox
 									:model-value="isSelected(row)"
@@ -147,7 +147,7 @@
 							<td
 								v-for="column in columns"
 								:key="column.key"
-								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
+								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
 								:class="`text-${column.align ?? 'left'}`"
 							>
 								<slot

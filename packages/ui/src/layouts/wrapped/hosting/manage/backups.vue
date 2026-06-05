@@ -156,6 +156,7 @@
 									<BackupItem
 										class="my-1.5 min-w-0 flex-1"
 										:backup="backup"
+										:creator="backupCreator(backup)"
 										:selected="selectedIds.has(backup.id)"
 										:highlighted="highlightedBackupId === backup.id"
 										:restore-disabled="backupRestoreDisabled"
@@ -459,6 +460,15 @@ type BackupGroup = {
 	label: string
 	icon: Component | null
 	backups: Archon.BackupsQueue.v1.BackupQueueBackup[]
+}
+
+function backupCreator(
+	backup: Archon.BackupsQueue.v1.BackupQueueBackup,
+): Archon.BackupsQueue.v1.UserInfo | null {
+	return (
+		backup.history.find((operation) => operation.operation_type === 'create' && operation.user_info)
+			?.user_info ?? null
+	)
 }
 
 const groupedBackups = computed((): BackupGroup[] => {

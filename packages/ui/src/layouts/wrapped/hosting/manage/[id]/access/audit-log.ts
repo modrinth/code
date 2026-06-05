@@ -260,6 +260,7 @@ export function useAccessAuditLog({
 				key: group.key,
 				label: formatMessage(group.label),
 				icon: group.icon,
+				dividerBefore: true,
 			},
 			...group.actions.map((action) => ({
 				value: action,
