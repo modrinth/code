@@ -3935,6 +3935,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
   },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Support"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
