@@ -36,7 +36,6 @@ pub struct DownloadMeta {
     pub game_version: String,
     pub loader: String,
     pub dependent_on: Option<String>,
-    pub modpack: Option<String>,
 }
 
 impl DownloadMeta {

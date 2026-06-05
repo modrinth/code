@@ -409,8 +409,7 @@ pub async fn install_zipped_mrpack_files(
         reason,
         game_version: profile.game_version.clone(),
         loader: profile.loader.as_str().to_string(),
-        dependent_on: None,
-        modpack: version_id.clone(),
+        dependent_on: version_id.clone(),
     };
 
     let num_files = pack.files.len();

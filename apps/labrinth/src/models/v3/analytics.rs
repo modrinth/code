@@ -30,7 +30,6 @@ pub struct Download {
     pub game_version: String,
     pub loader: String,
     pub dependent_on_version_id: u64,
-    pub modpack_version_id: u64,
 }
 
 /// Why a project was downloaded.

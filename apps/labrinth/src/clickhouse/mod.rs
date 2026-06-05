@@ -248,8 +248,7 @@ pub async fn init_client_with_database(
             ADD COLUMN IF NOT EXISTS reason String,
             ADD COLUMN IF NOT EXISTS game_version String,
             ADD COLUMN IF NOT EXISTS loader String,
-            ADD COLUMN IF NOT EXISTS dependent_on_version_id UInt64,
-            ADD COLUMN IF NOT EXISTS modpack_version_id UInt64
+            ADD COLUMN IF NOT EXISTS dependent_on_version_id UInt64
             "
         ))
         .execute()

@@ -48,7 +48,6 @@ pub struct DownloadMeta {
     pub game_version: Option<String>,
     pub loader: Option<String>,
     pub dependent_on: Option<VersionId>,
-    pub modpack: Option<VersionId>,
 }
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
@@ -72,7 +71,6 @@ fn parse_download_meta_from_query(
         game_version: None,
         loader: None,
         dependent_on: None,
-        modpack: None,
     };
 
     for (key, value) in url.query_pairs() {
@@ -95,10 +93,6 @@ fn parse_download_meta_from_query(
                 meta.dependent_on =
                     Some(parse_download_meta_version(&value, "dependent_on")?);
             }
-            "mr_modpack" => {
-                meta.modpack =
-                    Some(parse_download_meta_version(&value, "modpack")?);
-            }
             _ => {}
         }
     }
@@ -106,8 +100,7 @@ fn parse_download_meta_from_query(
     Ok((meta.reason.is_some()
         || meta.game_version.is_some()
         || meta.loader.is_some()
-        || meta.dependent_on.is_some()
-        || meta.modpack.is_some())
+        || meta.dependent_on.is_some())
     .then_some(meta))
 }
 
@@ -253,13 +246,6 @@ pub async fn count_download(
         "dependent_on",
     )
     .await?;
-    let modpack_version_id = resolve_download_attribution_version(
-        &pool,
-        &redis,
-        meta.as_ref().and_then(|m| m.modpack),
-        "modpack",
-    )
-    .await?;
 
     let download = Download {
         recorded: get_current_tenths_of_ms(),
@@ -312,7 +298,6 @@ pub async fn count_download(
             .map(|s| s.to_string())
             .unwrap_or_default(),
         dependent_on_version_id,
-        modpack_version_id,
     };
     trace!("added download {download:#?}");
 

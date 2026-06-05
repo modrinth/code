@@ -1247,10 +1247,6 @@ impl Profile {
             game_version: profile.game_version.clone(),
             loader: profile.loader.as_str().to_string(),
             dependent_on: dependent_on_version_id,
-            modpack: profile
-                .linked_data
-                .as_ref()
-                .map(|linked_data| linked_data.version_id.clone()),
         };
 
         let version =
