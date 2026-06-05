@@ -647,6 +647,7 @@ const selectableProjectTypes = computed(() => {
 		{ label: 'Resource Packs', href: `/browse/resourcepack${suffix}` },
 		{ label: 'Data Packs', href: `/browse/datapack${suffix}`, shown: dataPacks },
 		{ label: 'Shaders', href: `/browse/shader${suffix}` },
+		{ label: 'Servers', href: `/browse/server${suffix}` },
 	]
 })
 
@@ -1104,4 +1105,3 @@ provideBrowseManager({
 		</Teleport>
 	</div>
 </template>
-
