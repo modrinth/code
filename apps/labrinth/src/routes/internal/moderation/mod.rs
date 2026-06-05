@@ -47,6 +47,9 @@ pub struct ProjectsRequestOptions {
     /// How many projects to skip.
     #[serde(default)]
     pub offset: u32,
+    /// Whether to filter by modpacks that have external dependencies.
+    #[serde(default)]
+    pub has_external_dependencies: Option<bool>,
 }
 
 fn default_count() -> u16 {
@@ -62,6 +65,8 @@ pub struct FetchedProject {
     pub project: Project,
     /// Who owns the project.
     pub ownership: Ownership,
+    /// How many external file dependencies the project has.
+    pub external_dependencies_count: i64,
 }
 
 /// Fetched information on who owns a project.
@@ -184,13 +189,22 @@ pub async fn get_projects_internal(
 
     use futures::stream::TryStreamExt;
 
-    let project_ids = sqlx::query!(
-        "
-        SELECT id
+    let project_rows = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            external_dependencies_count as "external_dependencies_count!"
         FROM (
             SELECT DISTINCT ON (m.id)
                 m.id,
-                m.queued
+                m.queued,
+                (
+                    SELECT COUNT(*)
+                    FROM versions v
+                    INNER JOIN dependencies d ON d.dependent_id = v.id
+                    WHERE v.mod_id = m.id
+                        AND d.dependency_file_name IS NOT NULL
+                ) external_dependencies_count
             FROM mods m
 
             /* -- Temporarily, don't exclude projects in tech rev q
@@ -206,19 +220,35 @@ pub async fn get_projects_internal(
 
             GROUP BY m.id
         ) t
+        WHERE
+            ($4::boolean IS NULL OR (external_dependencies_count > 0) = $4)
         ORDER BY queued ASC
         OFFSET $3
         LIMIT $2
-        ",
+        "#,
         ProjectStatus::Processing.as_str(),
         request_opts.count as i64,
-        request_opts.offset as i64
+        request_opts.offset as i64,
+        request_opts.has_external_dependencies,
     )
     .fetch(&**pool)
-    .map_ok(|m| database::models::DBProjectId(m.id))
-    .try_collect::<Vec<database::models::DBProjectId>>()
+    .try_collect::<Vec<_>>()
     .await
     .wrap_internal_err("failed to fetch projects awaiting review")?;
+
+    let project_ids = project_rows
+        .iter()
+        .map(|m| database::models::DBProjectId(m.id))
+        .collect::<Vec<_>>();
+    let project_metadata = project_rows
+        .into_iter()
+        .map(|m| {
+            (
+                database::models::DBProjectId(m.id),
+                m.external_dependencies_count,
+            )
+        })
+        .collect::<HashMap<_, _>>();
 
     let projects =
         database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
@@ -234,7 +264,16 @@ pub async fn get_projects_internal(
 
     let map_project =
         |(project, ownership): (Project, Ownership)| -> FetchedProject {
-            FetchedProject { ownership, project }
+            let external_dependencies_count = project_metadata
+                .get(&database::models::DBProjectId(project.id.0 as i64))
+                .copied()
+                .unwrap_or_default();
+
+            FetchedProject {
+                ownership,
+                project,
+                external_dependencies_count,
+            }
         };
 
     let projects = projects
