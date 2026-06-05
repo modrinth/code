@@ -99,7 +99,7 @@ const skinNametag = computed(() =>
 	settings.value.hide_nametag_skins_page ? undefined : username.value,
 )
 
-let userCheckInterval: number | null = null
+let userCheckInterval: ReturnType<typeof setInterval> | null = null
 
 const deleteSkinModal = ref()
 const skinToDelete = ref<Skin | null>(null)

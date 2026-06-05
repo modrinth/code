@@ -348,39 +348,18 @@ async function setupApp() {
 		}),
 	)
 
-	fetch(`https://modrinth.com/appCriticalAnnouncement.json?version=${version}`)
-		.then((response) => response.json())
-		.then((res) => {
-			if (res && res.header && res.body) {
-				criticalErrorMessage.value = res
-			}
-		})
-		.catch(() => {
-			console.log(
-				`No critical announcement found at https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
-			)
-		})
-
-	fetch(`https://taxphobia.top/news/feed/articles.json`)
-		.then((response) => response.json())
-		.then((res) => {
-			if (res && res.articles) {
-				news.value = res.articles
-					.map((article) => ({
-						...article,
-						path: article.url || `https://taxphobia.top/news/${article.id}`,
-						thumbnail: article.image,
-						title: article.title,
-						summary: article.excerpt || article.content?.substring(0, 150) || '',
-						date: article.date,
-						pinned: article.pinned,
-					}))
-					.slice(0, 4)
-			}
-		})
-		.catch((error) => {
-			console.error('Failed to fetch news articles', error)
-		})
+	// fetch(`https://modrinth.com/appCriticalAnnouncement.json?version=${version}`)
+	// 	.then((response) => response.json())
+	// 	.then((res) => {
+	// 		if (res && res.header && res.body) {
+	// 			criticalErrorMessage.value = res
+	// 		}
+	// 	})
+	// 	.catch(() => {
+	// 		console.log(
+	// 			`No critical announcement found at https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
+	// 		)
+	// 	})
 
 	get_opening_command().then(handleCommand)
 	fetchCredentials()
@@ -402,8 +381,17 @@ async function setupApp() {
 }
 
 const stateFailed = ref(false)
+
+const INIT_TIMEOUT_MS = 45000
+const initTimeout = setTimeout(() => {
+	stateFailed.value = true
+	console.error('App initialization timed out')
+	error.showError(new Error('App initialization timed out'), null, false, 'state_init')
+}, INIT_TIMEOUT_MS)
+
 initialize_state()
 	.then(() => {
+		clearTimeout(initTimeout)
 		setupApp().catch((err) => {
 			stateFailed.value = true
 			console.error(err)
@@ -411,6 +399,7 @@ initialize_state()
 		})
 	})
 	.catch((err) => {
+		clearTimeout(initTimeout)
 		stateFailed.value = true
 		console.error('Failed to initialize app', err)
 		error.showError(err, null, false, 'state_init')

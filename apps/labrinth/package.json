@@ -11,5 +11,5 @@
 		"test": "if-ci sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift && cargo nextest run --all-targets --no-fail-fast"
 	},
 	"prettier": "@icarus/tooling-config/labrinth.prettier.config.cjs",
-	"version": "0.2.4"
+	"version": "0.2.5"
 }

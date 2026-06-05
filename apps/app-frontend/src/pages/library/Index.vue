@@ -16,8 +16,6 @@ const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
-const instances = shallowRef(await list().catch(handleError))
-
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
 	offline.value = true
@@ -26,11 +24,16 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const unlistenProfile = await profile_listener(async () => {
-	instances.value = await list().catch(handleError)
-})
+const instances = shallowRef(await list().catch(handleError))
+
+let unlistenProfile: (() => void) | null = null
+
 onUnmounted(() => {
-	unlistenProfile()
+	unlistenProfile?.()
+})
+
+unlistenProfile = await profile_listener(async () => {
+	instances.value = await list().catch(handleError)
 })
 </script>
 

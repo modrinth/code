@@ -186,12 +186,12 @@ const maxInstancesPerRow = ref(1)
 const maxProjectsPerRow = ref(1)
 
 const calculateCardsPerRow = () => {
-	if (rows.value.length === 0) {
+	if (!rows.value || rows.value.length === 0) {
 		return
 	}
 
 	// Calculate how many cards fit in one row
-	const containerWidth = rows.value[0].clientWidth
+	const containerWidth = rows.value[0]?.clientWidth ?? 0
 	// Convert container width from pixels to rem
 	const containerWidthInRem =
 		containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)

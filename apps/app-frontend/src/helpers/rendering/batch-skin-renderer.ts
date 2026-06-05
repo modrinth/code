@@ -356,7 +356,16 @@ export async function getPlayerHeadUrl(skin: Skin): Promise<string> {
 	return await generateHeadRender(skin)
 }
 
+let renderQueue: Promise<void> = Promise.resolve()
+
 export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promise<void> {
+	const previousRender = renderQueue
+	let resolveQueue: (() => void) | null = null
+	renderQueue = new Promise<void>((resolve) => {
+		resolveQueue = resolve
+	})
+	await previousRender
+
 	try {
 		const skinKeys = skins.map(
 			(skin) => `${skin.texture_key}+${skin.variant}+${skin.cape_id ?? 'no-cape'}`,
@@ -443,5 +452,7 @@ export async function generateSkinPreviews(skins: Skin[], capes: Cape[]): Promis
 
 		await skinPreviewStorage.debugCalculateStorage()
 		await headStorage.debugCalculateStorage()
+
+		resolveQueue?.()
 	}
 }

@@ -7,9 +7,9 @@
 			<header class="flex shrink-0 items-center justify-between gap-4" data-tauri-drag-region>
 				<div class="flex items-center gap-3">
 					<div
-						class="flex size-12 items-center justify-center rounded-2xl bg-surface-2 shadow-lg"
+						class="flex size-14 items-center justify-center rounded-2xl bg-surface-2 shadow-lg"
 					>
-						<IcarusIcon class="size-8" />
+						<img :src="icarusLogo" class="size-10 object-contain" />
 					</div>
 					<div>
 						<p class="m-0 text-sm font-semibold text-secondary">Welcome to Icarus Launcher</p>
@@ -40,13 +40,16 @@
 								v-for="launcher in launchers"
 								:key="launcher.name"
 								class="flex aspect-square items-center justify-center rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
-								:class="{ 'opacity-45': !detectedLauncherNames.has(launcher.name) }"
+								:class="{
+									'opacity-45': !detectedLauncherNames.has(launcher.name),
+								}"
 								:title="launcher.label"
 							>
 								<component
 									:is="launcher.component"
 									v-if="launcher.component"
 									class="max-h-full max-w-full"
+									:style="['ModrinthApp', 'Curseforge'].includes(launcher.name) ? { transform: 'scale(3)', transformOrigin: 'center' } : undefined"
 								/>
 								<img
 									v-else
@@ -194,6 +197,7 @@ import {
 import { ButtonStyled, Checkbox, injectInstanceImport, injectNotificationManager } from '@icarus/ui'
 import { computed, onMounted, ref, type Component } from 'vue'
 
+import icarusLogo from '@/assets/icarus_logo.png'
 import ATLauncherIcon from '@/assets/external/atlauncher.svg?url'
 import GDLauncherIcon from '@/assets/external/gdlauncher.png?url'
 import MultiMCIcon from '@/assets/external/multimc.webp?url'

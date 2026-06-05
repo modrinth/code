@@ -54,10 +54,16 @@ async function fetchTaxphobiaModpacks() {
 	}
 }
 
+let unlistenProfile: (() => void) | null = null
+
+onUnmounted(() => {
+	unlistenProfile?.()
+})
+
 await fetchInstances()
 await fetchTaxphobiaModpacks()
 
-const unlistenProfile = await profile_listener(
+unlistenProfile = await profile_listener(
 	async (e: { event: string; profile_path_id: string }) => {
 		await fetchInstances()
 
@@ -66,10 +72,6 @@ const unlistenProfile = await profile_listener(
 		}
 	},
 )
-
-onUnmounted(() => {
-	unlistenProfile()
-})
 </script>
 
 <template>

@@ -2515,7 +2515,7 @@ dependencies = [
 
 [[package]]
 name = "daedalus_client"
-version = "0.2.2"
+version = "0.2.4"
 dependencies = [
  "async_zip",
  "bytes",
@@ -7594,7 +7594,7 @@ dependencies = [
 
 [[package]]
 name = "pteron"
-version = "1.0.0-local"
+version = "0.2.5"
 dependencies = [
  "ariadne",
  "async-compression",
@@ -7671,7 +7671,7 @@ dependencies = [
 
 [[package]]
 name = "pteron_gui"
-version = "0.2.2"
+version = "0.2.5"
 dependencies = [
  "async_zip",
  "chrono",
