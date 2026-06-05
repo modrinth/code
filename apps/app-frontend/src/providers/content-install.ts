@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentInstallInstance, ContentInstallProjectInfo, ContentItem } from '@modrinth/ui'
-import { createContext } from '@modrinth/ui'
+import { createContext, defineMessage, useVIntl } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -45,6 +45,11 @@ interface ModpackAlreadyInstalledModalRef {
 const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
 const SUPPORTED_LOADERS: Set<string> = new Set(['vanilla', 'forge', 'fabric', 'quilt', 'neoforge'])
 const VANILLA_COMPATIBLE_LOADERS: Set<string> = new Set(['minecraft', 'datapack'])
+const noCompatibleVersionsMessage = defineMessage({
+	id: 'app.content-install.no-compatible-versions',
+	defaultMessage:
+		'No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically.',
+})
 
 function sortLoaders(loaders: string[]): string[] {
 	return loaders.slice().sort((a, b) => {
@@ -113,6 +118,7 @@ export function createContentInstall(opts: {
 	router: Router
 	handleError: (err: unknown) => void
 }): ContentInstallContext {
+	const { formatMessage } = useVIntl()
 	const instances = ref<ContentInstallInstance[]>([])
 	const compatibleLoaders = ref<string[]>([])
 	const gameVersions = ref<string[]>([])
@@ -513,7 +519,9 @@ export function createContentInstall(opts: {
 			project.project_type === 'resourcepack' || project.project_type === 'datapack'
 				? (instance.game_version ?? '')
 				: `${instance.loader ?? ''} ${instance.game_version ?? ''}`.trim()
-		incompatibilityWarningMessage.value = `No available versions match ${compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically.`
+		incompatibilityWarningMessage.value = formatMessage(noCompatibleVersionsMessage, {
+			compatibilityLabel,
+		})
 
 		await nextTick()
 		incompatibilityWarningModalRef?.show(version.id)
