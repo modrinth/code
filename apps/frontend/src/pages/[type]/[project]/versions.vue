@@ -1,10 +1,7 @@
 <template>
 	<section class="overflow-visible">
 		<!-- Loading state -->
-		<div
-			v-if="showVersionsLoadingState"
-			class="flex items-center justify-center gap-2 py-8"
-		>
+		<div v-if="showVersionsLoadingState" class="flex items-center justify-center gap-2 py-8">
 			<SpinnerIcon class="animate-spin" />
 			<span>Loading versions...</span>
 		</div>
