@@ -98,14 +98,10 @@
 					v-for="inst in filteredInstances"
 					:key="inst.id"
 					class="flex items-center justify-between px-6 py-1.5"
-					:class="
-						!inst.compatible ? 'opacity-40' : inst.installed ? 'opacity-60' : 'hover:bg-surface-3'
-					"
+					:class="inst.installed ? 'opacity-60' : 'hover:bg-surface-3'"
 				>
 					<button
-						v-tooltip="
-							!inst.compatible ? 'This instance is not compatible with this project' : undefined
-						"
+						v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
 						class="flex min-w-0 cursor-pointer items-center gap-2.5 overflow-hidden border-0 bg-transparent p-0 text-left"
 						@click="emit('navigate', inst)"
 					>
@@ -120,8 +116,17 @@
 							{{ formatMessage(messages.installedBadge) }}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else-if="inst.compatible">
-						<button :disabled="inst.installing" @click="emit('install', inst)">
+					<ButtonStyled
+						v-else
+						:type="inst.compatible ? 'standard' : 'outlined'"
+						:color="inst.compatible ? 'standard' : 'orange'"
+					>
+						<button
+							v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
+							:disabled="inst.installing"
+							@click="emit('install', inst)"
+						>
+							<TriangleAlertIcon v-if="!inst.compatible" />
 							{{
 								inst.installing
 									? formatMessage(commonMessages.installingLabel)
@@ -247,6 +252,7 @@ import {
 	EyeIcon,
 	EyeOffIcon,
 	SearchIcon,
+	TriangleAlertIcon,
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -295,6 +301,11 @@ const messages = defineMessages({
 	installButton: {
 		id: 'instances.content-install.install-button',
 		defaultMessage: 'Install',
+	},
+	incompatibleTooltip: {
+		id: 'instances.content-install.incompatible-tooltip',
+		defaultMessage:
+			'This instance uses a different loader or game version than this project supports.',
 	},
 	selectIcon: {
 		id: 'instances.content-install.select-icon',
@@ -452,7 +463,7 @@ function removeIcon() {
 function resetState() {
 	tab.value = props.defaultTab ?? 'existing'
 	searchFilter.value = ''
-	hideUninstallable.value = true
+	hideUninstallable.value = false
 	instanceName.value = `New instance (${props.instances.length + 1})`
 	iconPath.value = null
 	iconPreviewUrl.value = null
@@ -471,7 +482,6 @@ function resetState() {
 }
 
 function handleHide() {
-	resetState()
 	emit('cancel')
 }
 

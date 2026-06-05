@@ -79,9 +79,6 @@
 				variant === 'outlined'
 					? 'bg-transparent border border-solid border-button-bg rounded-l-xl border-r-0'
 					: 'bg-surface-4 border-none rounded-xl',
-				{
-					'placeholder:text-sm': type === 'search',
-				},
 			]"
 			@input="onInput"
 			@focus="isFocused = true"

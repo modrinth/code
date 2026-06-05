@@ -1646,6 +1646,9 @@
   "instances.content-install.header": {
     "defaultMessage": "Install project"
   },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "This instance uses a different loader or game version than this project supports."
+  },
   "instances.content-install.install-button": {
     "defaultMessage": "Install"
   },
@@ -1718,6 +1721,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "This version is not marked as compatible with this instance. Dependencies will not be installed automatically."
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "Choose version"
+  },
   "instances.updater-modal.incompatible-update.description": {
     "defaultMessage": "{version} is not marked as compatible with this installation. It may fail to launch or behave unexpectedly."
   },
@@ -1726,6 +1735,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "Update anyway"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Install anyway"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Loading changelog..."

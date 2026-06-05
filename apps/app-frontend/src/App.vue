@@ -36,6 +36,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentInstallModal,
+	ContentUpdaterModal,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -75,7 +76,6 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
-import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
@@ -612,6 +612,16 @@ const {
 	handleModpackDuplicateCreateAnyway: handleContentInstallModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance: handleContentInstallModpackDuplicateGoToInstance,
 	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
+	incompatibilityWarningVersions: contentInstallIncompatibilityWarningVersions,
+	incompatibilityWarningCurrentGameVersion: contentInstallIncompatibilityWarningCurrentGameVersion,
+	incompatibilityWarningCurrentLoader: contentInstallIncompatibilityWarningCurrentLoader,
+	incompatibilityWarningProjectType: contentInstallIncompatibilityWarningProjectType,
+	incompatibilityWarningProjectIconUrl: contentInstallIncompatibilityWarningProjectIconUrl,
+	incompatibilityWarningProjectName: contentInstallIncompatibilityWarningProjectName,
+	incompatibilityWarningMessage: contentInstallIncompatibilityWarningMessage,
+	incompatibilityWarningInstalling: contentInstallIncompatibilityWarningInstalling,
+	handleIncompatibilityWarningInstall: handleContentInstallIncompatibilityWarningInstall,
+	handleIncompatibilityWarningCancel: handleContentInstallIncompatibilityWarningCancel,
 } = contentInstall
 
 const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
@@ -632,6 +642,12 @@ const installToPlayModal = ref()
 const updateToPlayModal = ref()
 
 const modrinthLoginFlowWaitModal = ref()
+
+watch(incompatibilityWarningModal, (modal) => {
+	if (modal) {
+		setContentIncompatibilityWarningModal(modal)
+	}
+})
 
 setupAuthProvider(credentials, async (_redirectPath) => {
 	await signIn()
@@ -1631,7 +1647,22 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@go-to-instance="handleModpackDuplicateGoToInstance"
 	/>
 	<AddServerToInstanceModal ref="addServerToInstanceModal" />
-	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
+	<ContentUpdaterModal
+		ref="incompatibilityWarningModal"
+		mode="incompatibility-warning"
+		:versions="contentInstallIncompatibilityWarningVersions"
+		:current-game-version="contentInstallIncompatibilityWarningCurrentGameVersion"
+		:current-loader="contentInstallIncompatibilityWarningCurrentLoader"
+		current-version-id=""
+		:is-app="true"
+		:project-type="contentInstallIncompatibilityWarningProjectType"
+		:project-icon-url="contentInstallIncompatibilityWarningProjectIconUrl"
+		:project-name="contentInstallIncompatibilityWarningProjectName"
+		:warning="contentInstallIncompatibilityWarningMessage"
+		:action-loading="contentInstallIncompatibilityWarningInstalling"
+		@update="handleContentInstallIncompatibilityWarningInstall"
+		@cancel="handleContentInstallIncompatibilityWarningCancel"
+	/>
 	<ModpackAlreadyInstalledModal
 		ref="contentInstallModpackAlreadyInstalledModal"
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
