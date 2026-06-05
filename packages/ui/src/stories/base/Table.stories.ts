@@ -265,6 +265,52 @@ export const WithActionsColumn: StoryObj = {
 	}),
 }
 
+export const WithLocalizedActionsColumn: StoryObj = {
+	args: {},
+	render: () => ({
+		components: { Table, ButtonStyled, EditIcon, TrashIcon },
+		setup() {
+			const columns = [
+				{ key: 'name', label: 'Nombre' },
+				{ key: 'email', label: 'Correo' },
+				{ key: 'role', label: 'Rol' },
+				{ key: 'actions', label: 'Acciones', align: 'right' as const, width: '240px' },
+			]
+			const data = sampleUsers
+
+			function handleEdit(row: User) {
+				alert(`Editar usuario: ${row.name}`)
+			}
+
+			function handleDelete(row: User) {
+				alert(`Eliminar usuario: ${row.name}`)
+			}
+
+			return { columns, data, handleEdit, handleDelete }
+		},
+		template: /* html */ `
+			<Table :columns="columns" :data="data">
+				<template #cell-actions="{ row }">
+					<div class="flex items-center justify-end gap-2">
+						<ButtonStyled color="brand" type="transparent" @click="handleEdit(row)">
+							<button class="flex items-center gap-1">
+								<EditIcon class="size-4" />
+								Editar
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="red" type="transparent" @click="handleDelete(row)">
+							<button class="flex items-center gap-1">
+								<TrashIcon class="size-4" />
+								Eliminar
+							</button>
+						</ButtonStyled>
+					</div>
+				</template>
+			</Table>
+		`,
+	}),
+}
+
 export const FullFeatured: StoryObj = {
 	args: {},
 	render: () => ({
