@@ -61,6 +61,10 @@ const ORGINVITE_INVITER_NAME: &str = "organizationinvite.inviter.name";
 const ORGINVITE_ORG_NAME: &str = "organizationinvite.organization.name";
 const ORGINVITE_ROLE_NAME: &str = "organizationinvite.role.name";
 
+const SERVERINVITE_INVITER_NAME: &str = "inviter.name";
+const SERVERINVITE_SERVER_NAME: &str = "server.name";
+const SERVERINVITE_ROLE_NAME: &str = "server.role";
+
 const STATUSCHANGE_PROJECT_NAME: &str = "statuschange.project.name";
 const STATUSCHANGE_OLD_STATUS: &str = "statuschange.old.status";
 const STATUSCHANGE_NEW_STATUS: &str = "statuschange.new.status";
@@ -734,6 +738,27 @@ async fn collect_template_variables(
             body: dynamic_email_body(redis, title, body_md, key).await?,
             title: title.to_string(),
         }),
+
+        NotificationBody::ServerInvite {
+            server_name,
+            invited_by,
+            role,
+            ..
+        } => {
+            let inviter = DBUser::get_id(
+                DBUserId(invited_by.0 as i64),
+                &mut *exec,
+                redis,
+            )
+            .await?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
+
+            map.insert(SERVERINVITE_INVITER_NAME, inviter.username);
+            map.insert(SERVERINVITE_SERVER_NAME, server_name.clone());
+            map.insert(SERVERINVITE_ROLE_NAME, role.clone());
+
+            Ok(EmailTemplate::Static(map))
+        }
 
         NotificationBody::ProjectUpdate { .. }
         | NotificationBody::ModeratorMessage { .. }

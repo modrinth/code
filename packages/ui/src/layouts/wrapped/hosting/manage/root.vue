@@ -3,7 +3,7 @@
 		v-if="filteredNotices.length > 0"
 		class="relative mx-auto mb-4 flex w-full min-w-0 flex-col gap-3 px-6"
 		:class="{
-			'max-w-[1280px]': isNuxt,
+			'max-w-[1280px]': constrainWidth,
 		}"
 	>
 		<ServerNotice
@@ -107,7 +107,7 @@
 		}"
 		:class="[
 			'server-panel-' + revealState,
-			isNuxt ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
+			constrainWidth ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
 		<template v-if="revealState !== 'pending' || isOnboarding">
@@ -343,9 +343,8 @@
 </template>
 
 <script setup lang="ts">
-import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
+import { ModrinthApiError } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -361,9 +360,9 @@ import {
 	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
+	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
@@ -385,6 +384,7 @@ import {
 } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
+	hasServerPermission,
 	useDebugLogger,
 	useLoadingBarToken,
 	useModrinthServersConsole,
@@ -395,6 +395,7 @@ import {
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
+import { useServerPanelSync } from '#ui/composables/server-panel-sync'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -402,6 +403,8 @@ import {
 	injectNotificationManager,
 	provideServerSettingsModal,
 } from '#ui/providers'
+import type { ServerStats } from '#ui/providers/server-context'
+import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 import {
 	pendingServerContentInstallsEvent,
@@ -431,8 +434,6 @@ const props = withDefaults(
 		siteUrl?: string
 		products?: Labrinth.Billing.Internal.Product[]
 		authUser?: { id: string; username: string; email: string; created: string }
-		fetchIntercomToken?: () => Promise<{ token: string }>
-		intercomAppId?: string
 		navigateToBilling?: () => void
 		navigateToServers?: () => void
 		browseModpacks?: (args: {
@@ -445,6 +446,7 @@ const props = withDefaults(
 			worldId: string | null
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
+		constrainWidth?: boolean
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -455,12 +457,11 @@ const props = withDefaults(
 		siteUrl: undefined,
 		products: () => [],
 		authUser: undefined,
-		fetchIntercomToken: undefined,
-		intercomAppId: 'ykeritl9',
 		navigateToBilling: undefined,
 		navigateToServers: undefined,
 		browseModpacks: undefined,
 		browseContent: undefined,
+		constrainWidth: false,
 	},
 )
 
@@ -497,7 +498,7 @@ const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+const constrainWidth = computed(() => props.constrainWidth)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -565,6 +566,11 @@ const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQue
 	computed(() => props.serverId),
 	worldId,
 )
+
+const { disconnect: disconnectPanelSync } = useServerPanelSync({
+	serverId: computed(() => props.serverId),
+	worldId,
+})
 
 const { image: serverImage } = useServerImage(
 	props.serverId,
@@ -677,6 +683,7 @@ const {
 	serverId: computed(() => props.serverId),
 	worldId,
 	server: serverData,
+	serverFull,
 	isSyncingContent,
 	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,
@@ -687,6 +694,10 @@ const {
 })
 
 const isUploading = computed(() => uploadState.value.isUploading)
+const canSetup = computed(() =>
+	hasServerPermission(serverData.value?.current_user_permissions ?? 0, 'SETUP'),
+)
+const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
 	if (isUploading.value) {
@@ -719,7 +730,7 @@ if (typeof window !== 'undefined') {
 }
 
 type CachedWsState = {
-	stats: Stats
+	stats: ServerStats
 	cpuData: number[]
 	ramData: number[]
 	powerState: Archon.Websocket.v0.PowerState
@@ -825,6 +836,12 @@ const navLinks = computed<Tab[]>(() => [
 		label: 'Backups',
 		href: `/hosting/manage/${props.serverId}/backups`,
 		icon: DatabaseBackupIcon,
+		subpages: [],
+	},
+	{
+		label: 'Access',
+		href: `/hosting/manage/${props.serverId}/access`,
+		icon: UsersIcon,
 		subpages: [],
 	},
 	...props.additionalTabs,
@@ -937,6 +954,13 @@ function loadTallyScript() {
 
 async function handleContentRetry() {
 	if (!worldId.value) return
+	if (!canSetup.value) {
+		addNotification({
+			type: 'error',
+			text: permissionDeniedMessage.value,
+		})
+		return
+	}
 	try {
 		await client.archon.content_v1.repair(props.serverId, worldId.value)
 	} catch (err) {
@@ -1360,19 +1384,13 @@ function initializeServer() {
 	}
 }
 
-let intercomInitialized = false
-
 const cleanup = () => {
 	isMounted.value = false
 
 	saveWsStateToCache()
 
-	if (intercomInitialized) {
-		shutdown()
-		intercomInitialized = false
-	}
-
 	cleanupCoreRuntime(props.serverId)
+	disconnectPanelSync()
 
 	isReconnecting.value = false
 	isLoading.value = true
@@ -1398,53 +1416,6 @@ onMounted(() => {
 			}
 		})
 	}
-
-	const tryInitIntercom = () => {
-		if (intercomInitialized) return
-		if (!props.authUser || !props.fetchIntercomToken) {
-			console.debug('[PYROSERVERS][INTERCOM] waiting for auth user and token fetcher', {
-				hasAuthUser: !!props.authUser,
-				hasFetchIntercomToken: !!props.fetchIntercomToken,
-			})
-			return
-		}
-		intercomInitialized = true
-		console.debug('[PYROSERVERS][INTERCOM] initializing secure support chat')
-		props
-			.fetchIntercomToken()
-			.then(({ token }) => {
-				console.debug('[PYROSERVERS][INTERCOM] fetched messenger JWT, booting widget')
-				Intercom({
-					app_id: props.intercomAppId!,
-					intercom_user_jwt: token,
-					session_duration: 1000 * 60 * 60 * 24,
-				})
-				window.setTimeout(() => {
-					const hasWidget = !!document.querySelector(
-						'.intercom-lightweight-app, #intercom-container, #intercom-frame',
-					)
-					if (!hasWidget) {
-						console.warn(
-							'[PYROSERVERS][INTERCOM] boot completed but no Intercom widget was detected',
-						)
-					}
-				}, 2500)
-			})
-			.catch((error) => {
-				intercomInitialized = false
-				console.warn('[PYROSERVERS][INTERCOM] failed to initialize secure support chat', error)
-			})
-	}
-	tryInitIntercom()
-	const stopIntercomWatch = watch(
-		() => props.authUser,
-		(user) => {
-			if (user) {
-				tryInitIntercom()
-				stopIntercomWatch()
-			}
-		},
-	)
 
 	DOMPurify.addHook(
 		'afterSanitizeAttributes',

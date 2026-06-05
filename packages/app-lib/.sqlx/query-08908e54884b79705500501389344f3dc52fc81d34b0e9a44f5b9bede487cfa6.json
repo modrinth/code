@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "08908e54884b79705500501389344f3dc52fc81d34b0e9a44f5b9bede487cfa6"
+}

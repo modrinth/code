@@ -327,15 +327,22 @@ const props = withDefaults(
 )
 
 function getModpackLoaders(version: VersionWithDisplayUrlEnding): string[] {
+	const loaders = Array.isArray(version.loaders) ? version.loaders : []
+
 	if (props.project.project_type !== 'modpack') {
-		return version.loaders
+		return loaders
 	}
 
-	if (version.mrpack_loaders?.length) {
-		return version.mrpack_loaders
+	const mrpackLoaders = Array.isArray(version.mrpack_loaders) ? version.mrpack_loaders : []
+	if (mrpackLoaders.length) {
+		return mrpackLoaders
 	}
 
-	return version.loaders.filter((loader) => loader !== 'mrpack')
+	return loaders.filter((loader) => loader !== 'mrpack')
+}
+
+function getGameVersions(version: VersionWithDisplayUrlEnding): string[] {
+	return Array.isArray(version.game_versions) ? version.game_versions : []
 }
 
 function hasNoModLoader(loaders: string[]): boolean {
@@ -350,10 +357,12 @@ function hasNoModLoader(loaders: string[]): boolean {
 const normalizedVersions = computed<DisplayVersion[]>(() =>
 	props.versions.map((version) => {
 		const loaders = getModpackLoaders(version)
+		const gameVersions = getGameVersions(version)
 		const noModLoader = hasNoModLoader(loaders)
 
 		return {
 			...version,
+			game_versions: gameVersions,
 			loaders: noModLoader ? [] : loaders,
 			noModLoader,
 		}

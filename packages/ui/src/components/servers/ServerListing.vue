@@ -35,10 +35,26 @@
 			</div>
 			<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
 			<div class="ml-4 flex flex-col gap-1.5">
-				<div class="flex flex-row items-center gap-2">
+				<div class="flex flex-row items-center gap-2.5">
 					<h2 class="m-0 text-xl font-bold text-contrast" :class="{ 'opacity-50': isDisabled }">
 						{{ name }}
 					</h2>
+					<div
+						v-if="owner"
+						v-tooltip="formatMessage(messages.ownerTooltip, { username: owner.username })"
+						class="flex min-w-0 items-center gap-1 rounded-full bg-surface-4 px-2 pr-2.5 py-1 text-sm font-medium text-primary !border !border-surface-5 border-solid"
+						:class="{ 'opacity-50': isDisabled }"
+					>
+						<Avatar
+							:src="owner.avatarUrl"
+							:alt="formatMessage(messages.ownerAvatarAlt, { username: owner.username })"
+							:tint-by="owner.username"
+							size="1.25rem"
+							circle
+							no-shadow
+						/>
+						<span class="max-w-32 truncate">{{ owner.username }}</span>
+					</div>
 					<div
 						v-if="isConfiguring && noticeType !== 'cancelled' && noticeType !== 'setToCancel'"
 						class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
@@ -262,6 +278,7 @@ import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import IntlFormatted from '../base/IntlFormatted.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
+import type { ServerListingOwner } from './access/types'
 import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './labels/ServerInfoLabels.vue'
 
@@ -281,6 +298,14 @@ const messages = defineMessages({
 		id: 'servers.listing.using-project-label',
 		defaultMessage: 'Using {projectTitle}',
 	},
+	ownerTooltip: {
+		id: 'servers.listing.owner-tooltip',
+		defaultMessage: 'Owned by {username}',
+	},
+	ownerAvatarAlt: {
+		id: 'servers.listing.owner-avatar-alt',
+		defaultMessage: "{username}'s avatar",
+	},
 	provisioningNotice: {
 		id: 'servers.listing.notice.provisioning',
 		defaultMessage: 'Please wait while we set up your server. This can take up to 10 minutes.',
@@ -296,7 +321,7 @@ const messages = defineMessages({
 	},
 	subscriptionCancelledOnDate: {
 		id: 'servers.listing.notice.subscription-cancelled-on-date',
-		defaultMessage: 'Your subscription was cancelled on <date>{formattedDate}</date>. ',
+		defaultMessage: 'Your subscription was cancelled on <date>{formattedDate}</date>.',
 	},
 	subscriptionCancelledPaymentFailed: {
 		id: 'servers.listing.notice.subscription-cancelled-payment-failed',
@@ -310,7 +335,7 @@ const messages = defineMessages({
 	filesKeptForDownload: {
 		id: 'servers.listing.notice.files-kept-for-download',
 		defaultMessage:
-			'Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining>. Contact support to download the files before they are deleted. ',
+			'Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days}}</days-remaining>. Contact support to download the files before they are deleted.',
 	},
 	subscriptionSetToCancel: {
 		id: 'servers.listing.notice.subscription-set-to-cancel',
@@ -326,7 +351,7 @@ const messages = defineMessages({
 	},
 	moderatedNotice: {
 		id: 'servers.listing.notice.moderated',
-		defaultMessage: 'Your server has been suspended by moderation action. ',
+		defaultMessage: 'Your server has been suspended by moderation action.',
 	},
 	suspendedNotice: {
 		id: 'servers.listing.notice.suspended',
@@ -364,7 +389,7 @@ const messages = defineMessages({
 	pendingChangeNotice: {
 		id: 'servers.listing.notice.pending-change',
 		defaultMessage:
-			'Your server will {verb} to the {planSize} Plan on <date>{formattedDate}</date>. ',
+			'Your server will {verb, select, downgrade {downgrade} other {upgrade}} to the {planSize} Plan on <date>{formattedDate}</date>.',
 	},
 })
 
@@ -402,6 +427,7 @@ type ServerListingProps = {
 	cancellationDate?: string | Date | null
 	onResubscribe?: (() => void) | null
 	onDownloadBackup?: (() => void) | null
+	owner?: ServerListingOwner
 }
 
 const props = defineProps<ServerListingProps>()

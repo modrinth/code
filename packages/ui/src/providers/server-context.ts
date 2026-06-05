@@ -1,5 +1,4 @@
 import type { Archon, UploadState } from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
 
 import type { MessageDescriptor } from '#ui/composables/i18n'
@@ -16,10 +15,31 @@ export interface FilesystemAuth {
 	token: string
 }
 
+export type CancelUploadHandler = () => void | Promise<void>
+
+export interface ServerStatsSample {
+	cpu_percent: number
+	ram_usage_bytes: number
+	ram_total_bytes: number
+	storage_usage_bytes: number
+	storage_total_bytes: number
+}
+
+export interface ServerStats {
+	current: ServerStatsSample
+	past: ServerStatsSample
+	graph: {
+		cpu: number[]
+		ram: number[]
+	}
+}
+
 export interface ModrinthServerContext {
 	readonly serverId: string
 	readonly worldId: Ref<string | null>
 	readonly server: Ref<Archon.Servers.v0.Server>
+	readonly serverFull: ComputedRef<Archon.Servers.v1.ServerFull | null>
+	readonly currentUserPermissions: ComputedRef<Archon.Servers.v0.UserScope>
 
 	// Websocket state
 	readonly isConnected: Ref<boolean>
@@ -27,7 +47,7 @@ export interface ModrinthServerContext {
 	readonly powerState: Ref<Archon.Websocket.v0.PowerState>
 	readonly powerStateDetails: Ref<{ oom_killed?: boolean; exit_code?: number } | undefined>
 	readonly isServerRunning: ComputedRef<boolean>
-	readonly stats: Ref<Stats>
+	readonly stats: Ref<ServerStats>
 	readonly uptimeSeconds: Ref<number>
 
 	// Content sync state
@@ -44,7 +64,7 @@ export interface ModrinthServerContext {
 
 	// File upload state
 	readonly uploadState: Ref<UploadState>
-	readonly cancelUpload: Ref<(() => void) | null>
+	readonly cancelUpload: Ref<CancelUploadHandler | null>
 
 	// File operations (extract, move, etc.)
 	readonly activeOperations: ComputedRef<FileOperation[]>

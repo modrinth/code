@@ -29,14 +29,8 @@
   "nags.add-links.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Mind a {totalAvailableTags} elérhető címkét kiválasztottad. A címkék célja az, hogy segítsék a felhasználókat a megfelelő projektek megtalálásában. Kérjük, csak a projekthez releváns címkéket válaszd ki."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "A jelenlegi leírás {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Fejtsd ki a leírást"
@@ -65,17 +59,11 @@
   "nags.gallery.title": {
     "defaultMessage": "Látogasd meg a Képek fület"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "A {type, select, mod {mod} plugin {bővítmény} other {projekt}} licensze megköveteli, hogy a forráskód elérhető legyen. Kérünk, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licensz használatát."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Úgy tűnik, hogy néhány külső hivatkozásod megegyezik. Minden hivatkozást csak egyszer szabad megadni, és a megfelelő hivatkozástípussal kell ellátni."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Azonos hivatkozások"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "A leírásnak elegendő mennyiségű egyszerű szöveget vagy képhelyettesítő szöveget kell tartalmaznia, hogy a képernyőolvasókat használók vagy lassú internetkapcsolattal rendelkezők számára is hozzáférhető legyen."
@@ -96,13 +84,10 @@
     "defaultMessage": "Adj meg egy érvényes licenszlinket"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Tilos linkrövidítők vagy más módszerek használata a külső linkek vagy licenszkapcsolatok céljának elrejtésére. Kérünk, csak megfelelő, teljes hosszúságú linkeket használj."
+    "defaultMessage": "Tilos linkrövidítők vagy más módszerek használata a külső linkek vagy licenszkapcsolatok céljának elrejtésére. Kérlek csak megfelelő, teljes hosszúságú linkeket használj."
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Ne használj linkrövidítőket"
-  },
-  "nags.long-headers.description": {
-    "defaultMessage": "A leírásodban {count} fejléc túl hosszú. A fejlécek legyenek tömörek, és csak szakaszcímként szolgáljanak, ne teljes mondatként."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Rövidebb fejlécek"
@@ -120,7 +105,7 @@
     "defaultMessage": "Adj hozzá helyettesítő szöveget"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "A Discord meghívók más típusú linkekhez nem használhatók. Kérünk, a Discord linkedet csak a Discord meghívó link mezőbe írd be."
+    "defaultMessage": "A Discord meghívók más típusú linkekhez nem használhatók. Kérlek a Discord linkedet csak a Discord meghívó link mezőbe írd be."
   },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Discord meghívó áthelyezése"
@@ -133,9 +118,6 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Visszajelzések áttekintése"
-  },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count} felbontáscímkét választottál ki ({tags}). A forráscsomagokhoz általában csak egy felbontáscímke szükséges, amely a fő felbontásukkal egyezik."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
@@ -157,9 +139,6 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Nyelv kiválasztása"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Válaszd ki, milyen licensz alatt terjeszted {type, select, mod {a mododat} modpack {a modcsomagodat} resourcepack {a forráscsomagodat} shader {a shaderedet} plugin {a bővítményedet} datapack {az adatcsomagodat} other {a projektedet}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Válassz egy licenszet"
@@ -200,9 +179,6 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Tisztítsd meg az összegzést"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "A jelenlegi összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Fejtsd ki az összegzést"
   },
@@ -218,14 +194,8 @@
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy projekted biztosan megjelenjen a releváns keresési eredmények között."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Legalább egy kép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy képet"
@@ -249,4 +219,3 @@
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   }
 }
-

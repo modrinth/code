@@ -4,6 +4,14 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useModalStack } from '../../composables/modal-stack'
 import { injectPageContext } from '../../providers'
 
+const visibleFloatingActionBars = new Set<symbol>()
+
+function updateFloatingActionBarBodyClass() {
+	if (typeof document === 'undefined') return
+
+	document.body.classList.toggle('floating-action-bar-shown', visibleFloatingActionBars.size > 0)
+}
+
 const props = defineProps<{
 	shown: boolean
 	ariaLabel?: string
@@ -20,13 +28,18 @@ const compact = ref(false)
 const { stackCount } = useModalStack()
 const pageContext = injectPageContext(null)
 const shown = computed(() => props.shown && (!props.hideWhenModalOpen || stackCount.value === 0))
+const floatingActionBarId = Symbol('floating-action-bar')
 const intercomBubbleClearanceRequestId = Symbol('floating-action-bar')
 const zIndex = computed(() => 100 + stackCount.value * 10 + 8 + (!props.belowModal ? 1 : 0))
-const leftOffset = computed(
-	() => pageContext?.floatingActionBarOffsets?.left.value ?? 'var(--left-bar-width, 0px)',
+const leftOffset = computed(() =>
+	stackCount.value > 0
+		? '0px'
+		: (pageContext?.floatingActionBarOffsets?.left.value ?? 'var(--left-bar-width, 0px)'),
 )
-const rightOffset = computed(
-	() => pageContext?.floatingActionBarOffsets?.right.value ?? 'var(--right-bar-width, 0px)',
+const rightOffset = computed(() =>
+	stackCount.value > 0
+		? '0px'
+		: (pageContext?.floatingActionBarOffsets?.right.value ?? 'var(--right-bar-width, 0px)'),
 )
 const barStyle = computed(() => ({
 	zIndex: zIndex.value,
@@ -60,7 +73,13 @@ function updateIntercomBubbleClearance() {
 	const intercomBubble = pageContext?.intercomBubble
 	if (!intercomBubble) return
 
-	if (typeof window === 'undefined' || !shown.value || !barEl.value || !toolbarEl.value) {
+	if (
+		typeof window === 'undefined' ||
+		!shown.value ||
+		stackCount.value > 0 ||
+		!barEl.value ||
+		!toolbarEl.value
+	) {
 		clearIntercomBubbleClearance()
 		return
 	}
@@ -86,7 +105,13 @@ function updateIntercomBubbleClearance() {
 function updateBodyState(isShown = shown.value) {
 	if (typeof document === 'undefined') return
 
-	document.body.classList.toggle('floating-action-bar-shown', isShown)
+	if (isShown) {
+		visibleFloatingActionBars.add(floatingActionBarId)
+	} else {
+		visibleFloatingActionBars.delete(floatingActionBarId)
+	}
+
+	updateFloatingActionBarBodyClass()
 	if (!isShown) {
 		clearIntercomBubbleClearance()
 	}
@@ -138,6 +163,7 @@ watch(
 		shown,
 		leftOffset,
 		rightOffset,
+		stackCount,
 		() => pageContext?.intercomBubble?.horizontalPadding.value,
 		() => pageContext?.intercomBubble?.width.value,
 	],
@@ -157,8 +183,9 @@ onUnmounted(() => {
 		window.cancelAnimationFrame(updateFrame)
 	}
 	clearIntercomBubbleClearance()
+	visibleFloatingActionBars.delete(floatingActionBarId)
 	if (typeof document === 'undefined') return
-	document.body.classList.remove('floating-action-bar-shown')
+	updateFloatingActionBarBodyClass()
 })
 </script>
 

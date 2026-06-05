@@ -10,6 +10,7 @@ export interface LoadingBarType {
 	version?: string
 	profile_path?: string
 	pack_name?: string
+	icon?: string | null
 }
 
 export interface LoadingBar {

@@ -96,7 +96,7 @@
     "message": "Якщо ви спробуєте встановити файл пакета Modrinth (.mrpack), який не розміщено на Modrinth, ми переконаємося, що ви розумієте ризики, перш ніж установлювати його."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Попереджати мене перед установленням невідомих збірок"
+    "message": "Попередження перед установленням невідомих збірок"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Сервери автентифікації Minecraft можуть зараз не працювати. Перевірте з’єднання з інтернетом та спробуйте пізніше."
@@ -168,7 +168,7 @@
     "message": "Назва збірки"
   },
   "app.export-modal.select-files-label": {
-    "message": "Змінити які файли додані до експорту"
+    "message": "Змініть файли, які додані до експорту"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версії"
@@ -222,10 +222,7 @@
     "message": "Додати сервер"
   },
   "app.instance.worlds.browse-servers": {
-    "message": "Переглянути сервера"
-  },
-  "app.instance.worlds.delete-world-description": {
-    "message": "«{name}» буде **назавжди видалено** й у вас не буде можливости відновлення."
+    "message": "Переглянути сервери"
   },
   "app.instance.worlds.delete-world-title": {
     "message": "Ви впевнені, що хочете назавжди видалити цей світ?"
@@ -248,12 +245,6 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Сервера або світи не додано"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "«{name}» буде видалено з вашого списку, включно в грі, і без можливости відновлення."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "«{name}» ({address}) буде видалено з вашого списку, включно в грі, і без можливости відновлення."
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "Ви впевнені, що хочете видалити «{name}»?"
   },
@@ -271,9 +262,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установити"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Потрібна збірка"
@@ -331,6 +319,138 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Керування ресурсами"
+  },
+  "app.skins.add-button": {
+    "message": "Додати скін"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Перетягніть і вставте"
+  },
+  "app.skins.apply-button": {
+    "message": "Застосувати"
+  },
+  "app.skins.delete-button": {
+    "message": "Видалити скін"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Це видалить вибраний скін назавжди. Ця дія не може бути скасована."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Чи ви впевнені що хочете видалити цей скін?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Неможливо відкрити вибраний файл."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Помилка обробки файлу"
+  },
+  "app.skins.edit-button": {
+    "message": "Редагувати скін"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Додати скін"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Додавання скіна"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Стиль рук"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Тонкі"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Широкі"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Плащ"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Плащ"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Редагування скіна"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Відредагуйте скін для початку!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Без плаща"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Без"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Замінити текстуру"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Зберегти вигляд"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Збереження…"
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Текстура"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Завантажте скін для початку!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Редагувати скін"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Попередній перегляд"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Ви змінюєте свій скін дуже часто. Сервери Mojang тимчасово заблокували подальші запити. Зачекайте трохи перш ніж спробувати знову."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Шановний!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Усталені скіни"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Збережені скіни"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Увійдіть"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Будь ласка, увійдіть у свій обліковий запис Minecraft, щоб використовувати особливості керування скінами в Modrinth App."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Схвильований бот Modrinth"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Увійдіть"
+  },
+  "app.skins.title": {
+    "message": "Вибір скіну"
   },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте застосунок Modrinth."
@@ -394,9 +514,6 @@
   },
   "friends.action.add-friend": {
     "message": "Додати друга"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} запит{count, plural, one { у} few {и в} many {ів у} other {у в}} друзі"
   },
   "friends.add-friend.submit": {
     "message": "Надіслати запит у друзі"
@@ -611,6 +728,24 @@
   "instance.settings.tabs.java": {
     "message": "Java та пам’ять"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Власні змінні середовища"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Власні аргументи Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Власна інсталяція Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Власний розподіл пам'яті"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Уведіть змінні середовища…"
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Уведіть аргументи Java…"
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Змінні середовища"
   },
@@ -625,6 +760,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Виділена пам’ять"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/шлях/до/java"
   },
   "instance.settings.tabs.window": {
     "message": "Вікно"
@@ -702,10 +840,10 @@
     "message": "Додати обліковий запис"
   },
   "minecraft-account.label": {
-    "message": "Майнкрафт аккаунт"
+    "message": "Обліковий запис Minecraft"
   },
   "minecraft-account.not-signed-in": {
-    "message": "Не ввійдено в систему"
+    "message": "Не авторизовано"
   },
   "minecraft-account.remove-account": {
     "message": "Видалити обліковий запис"
@@ -714,7 +852,7 @@
     "message": "Обрати обліковий запис"
   },
   "minecraft-account.sign-in": {
-    "message": "Увійти в Майнкрафт"
+    "message": "Увійти в Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Надано профілем"
@@ -747,10 +885,10 @@
     "message": "Не показувати більше це попередження"
   },
   "unknown-pack-warning-modal.header": {
-    "message": "Підтвердити інсталяцію"
+    "message": "Підтвердити встановлення"
   },
   "unknown-pack-warning-modal.install-anyway": {
-    "message": "Усе одно інсталювати"
+    "message": "Усе одно встановити"
   },
   "unknown-pack-warning-modal.malware-statement": {
     "message": "Шкідливе програмне забезпечення часто поширюють через файли збірок, які публікуються на таких платформах, як Discord."

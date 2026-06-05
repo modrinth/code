@@ -5,7 +5,7 @@
 		:button-class="buttonClass ?? 'flex flex-col gap-2 justify-start items-start'"
 		:content-class="contentClass"
 		title-wrapper-class="flex flex-col gap-2 justify-start items-start"
-		:open-by-default="!locked && (openByDefault !== undefined ? openByDefault : true)"
+		:open-by-default="openByDefault !== undefined ? openByDefault : true"
 	>
 		<template #title>
 			<slot name="header" :filter="filterType">

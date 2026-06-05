@@ -22,7 +22,7 @@ export const serverProjectsNags: Nag[] = [
 				id: 'nags.server.title',
 				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-server',
 		},
 	},
 	{
@@ -45,7 +45,7 @@ export const serverProjectsNags: Nag[] = [
 				id: 'nags.server.title',
 				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-server',
 		},
 	},
 	{
@@ -68,7 +68,7 @@ export const serverProjectsNags: Nag[] = [
 				id: 'nags.server.title',
 				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-server',
 		},
 	},
 	{
@@ -97,7 +97,7 @@ export const serverProjectsNags: Nag[] = [
 				id: 'nags.server.title',
 				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-server',
 		},
 	},
 ]

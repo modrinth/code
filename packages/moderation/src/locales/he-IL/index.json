@@ -65,17 +65,11 @@
   "nags.gallery.title": {
     "defaultMessage": "בקר בדף הגלריה"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "ה{type, select, mod {מוד} plugin {פלאגין} other {פרויקט}} שלך משתמש ברישיון הדורש זמינות של קוד מקור. אנא ספק קישור לקוד מקור או קובץ מקורות עבור כל גרסה נוספת, או שקול להשתמש ברישיון אחר."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ספק קוד מקור"
   },
   "nags.identical-links.description": {
     "defaultMessage": "חלק מהקישורים החיצוניים שלך נראים זהים. יש להזין כל קישור פעם אחת בלבד ועם סוג הקישור המתאים."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "קישורים זהים"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "התיאור שלך צריך להכיל מספיק טקסט פשוט או טקסט חלופי לתמונה, כדי שיישאר נגיש למשתמשים עם הקראות מסך או חיבורי אינטרנט איטיים."
@@ -100,9 +94,6 @@
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "אל תשתמש במקצרי קישורים"
-  },
-  "nags.long-headers.description": {
-    "defaultMessage": "{כמות, plural, one {כותרת אחת בתיאור שלך ארוכה מדי.} other {{כמות} כותרות בתיאור שלך ארוכות מדי.}} כותרות צריכות להיות תמציתיות ולשמש ככותרות סעיפים, ולא כמשפטים שלמים."
   },
   "nags.long-headers.title": {
     "defaultMessage": "קצר כותרות"
@@ -231,4 +222,3 @@
     "defaultMessage": "בקר בהגדרות הקישורים"
   }
 }
-

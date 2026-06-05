@@ -8,6 +8,33 @@
   "admin.billing.error.not-found": {
     "message": "Користувача не знайдено"
   },
+  "analytics.action.add": {
+    "message": "Додати"
+  },
+  "analytics.action.cancel": {
+    "message": "Скасувати"
+  },
+  "analytics.action.reset": {
+    "message": "Скинути"
+  },
+  "analytics.breakdown.country": {
+    "message": "Країна"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Версія гри"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Завантажувач"
+  },
+  "analytics.breakdown.project": {
+    "message": "Проєкт"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Стан проєкту"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Версія проєкту"
+  },
   "app-marketing.download.description": {
     "message": "Наш застосунок доступний на всіх платформах, виберіть бажану вами версію."
   },
@@ -121,9 +148,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ МБ"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ МБ"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 МБ"
@@ -521,9 +545,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Додаткові файли призначені для допоміжних ресурсів, таких як початковий код, а не для альтернативних версій чи варіантів."
   },
-  "create.collection.collection-info": {
-    "message": "Ваша нова добірка після створення буде публічною {count, plural,=0 {без проєктів} one {і міститиме # проєкт} few {і міститиме # проєкти} other {і міститиме # проєктів}}."
-  },
   "create.collection.create-collection": {
     "message": "Створити добірку"
   },
@@ -686,9 +707,6 @@
   "dashboard.affiliate-links.search": {
     "message": "Пошук партнерських посилань…"
   },
-  "dashboard.analytics.from-projects": {
-    "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Всього завантажень"
   },
@@ -709,9 +727,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Спробуйте налаштувати фільтри або пошукові терміни."
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Пошук у ваших добірках"
@@ -995,9 +1010,6 @@
   "dashboard.notifications.link.view-history": {
     "message": "Побачити історію сповіщень"
   },
-  "dashboard.notifications.link.view-more": {
-    "message": "Побачити {extraNotifs} ще {extraNotifs, plural, one {повідомлення} few {повідомлень} many {повідомлень} other {повідомлень}}"
-  },
   "dashboard.organizations.button.create": {
     "message": "Створити організацію"
   },
@@ -1006,9 +1018,6 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Не вдалося отримати організації"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} {count, plural, one {учасник} few {учасники} many {учасників} other {учасників}}"
   },
   "dashboard.organizations.title": {
     "message": "Організації"
@@ -1090,9 +1099,6 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Вихідний код"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Сторінка, що містить інформацію, документацію та допомогу для проєкту."
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Сторінка вікі"
@@ -1355,20 +1361,8 @@
   "discover.install.error.no-server-world": {
     "message": "Жоден світ сервера недоступний для встановлення."
   },
-  "discover.install.error.unsupported-content-type": {
-    "message": "Цей тип умісту не можна встановити на сервер із перегляду."
-  },
   "discover.install.heading.reset-modpack": {
     "message": "Вибір збірки для встановлення після скидання"
-  },
-  "discover.seo.description": {
-    "message": "Знаходьте та переглядайте тисячі {projectType, select, mod {модів} modpack {збірок} resourcepack {пакетів ресурсів} shader {шейдерів} plugin {плаґінів} datapack {пакетів даних} other {проєтів}} для Minecraft на Modrinth з миттєвим, точним результатом пошуку. Наші фільтри допоможуть швидко знайти найкращі {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} other {проєкти}} для Minecraft."
-  },
-  "discover.seo.title": {
-    "message": "Знайти {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} other {проєкти}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Знайти {projectType, select, mod {моди} modpack {збірки} resourcepack {пакети ресурсів} shader {шейдери} plugin {плаґіни} datapack {пакети даних} other {проєкти}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Можливо, ви помилилися в посиланні на добірку."
@@ -1881,7 +1875,7 @@
     "message": "Помилка під час створення стану з API під час побудови."
   },
   "layout.banner.preview.description": {
-    "message": "Якщо ви хочете отримати доступ до офіційного сайту Modrinth, відвідайте {url}. Це розгортання попереднього перегляду використовується персоналом Modrinth для тестування. Він був створений за допомогою <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Якщо ви хотіли отримати доступ до офіційного сайту Modrinth, відвідайте {url}. Це розгортання попереднього перегляду використовується персоналом Modrinth для тестування. Воно було створено за допомогою {ref}."
   },
   "layout.banner.preview.title": {
     "message": "Це попередній перегляд розгортки вебсайту Modrinth."
@@ -2417,9 +2411,6 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {завантаження} few {завантаження} many {завантажень} other {завантажень}}"
-  },
   "profile.label.joined": {
     "message": "Приєднався"
   },
@@ -2438,9 +2429,6 @@
   "profile.label.organizations": {
     "message": "Організації"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
-  },
   "profile.label.saving": {
     "message": "Збереження…"
   },
@@ -2449,9 +2437,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — Завантажуйте проєкти {username} на Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> відстежує} few {<stat>{count}</stat> відстежує} other {<stat>{count}</stat> відстежують}}"
   },
   "profile.user-id": {
     "message": "ID користувача: {id}"
@@ -2718,7 +2703,7 @@
     "message": "Ваш проєкт опубліковано та доступний для виявлення на Modrinth."
   },
   "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Ваш проєкт є приватним, тобто доступ до нього можливий лише за прямим посиланням і його неможливо знайти на Modrinth."
+    "message": "Ваш проєкт приватний. Доступ до нього можна отримати лише за прямим посиланням. Його неможливо знайти на Modrinth."
   },
   "project.moderation.admonition.approved.body.visibility-message": {
     "message": "Ви можете змінити видимість свого проєкту в <visibility-settings-link>параметрах видимости</visibility-settings-link> проєкту."
@@ -2888,29 +2873,17 @@
   "project.settings.permissions.learn-more": {
     "message": "Дізнатися більше"
   },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Пошук {count} {count, plural, one {зовнішнього проєкту} few {зовнішніх проєктів} many {зовнішніх проєктів} other {зовнішніх проєктів}}…"
-  },
   "project.settings.title": {
     "message": "Налаштування"
   },
   "project.settings.visit-dashboard": {
     "message": "Панель керування проєктами"
   },
-  "project.stats.downloads-label": {
-    "message": "завантажен{count, plural, one {ня} few {ня} other {ь}}"
-  },
-  "project.stats.followers-label": {
-    "message": "відстежу{count, plural, one {є} few {є} other {ють}}"
-  },
   "project.status.archived.message": {
     "message": "«{title}» було архівовано. «{title}» не отримуватиме подальших оновлень допоки автор не вирішить розархівувати проєкт."
   },
   "project.versions.title": {
     "message": "Версії"
-  },
-  "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
   },
   "project.versions.withheld-versions-warning.resolve-button": {
     "message": "Розв'язати"
@@ -2921,23 +2894,11 @@
   "report.already-reported": {
     "message": "Ви вже повідомляли про «{title}»"
   },
-  "report.already-reported-description": {
-    "message": "У вас уже є відкрита скарга на {item, select, project {цей проєкт} version {цю версію} user {цього користувача} other {цей вміст}}. Ви можете додати більше деталей до своєї скарги, якщо у вас є подробиці."
-  },
-  "report.back-to-item": {
-    "message": "Повернутися до {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}"
-  },
   "report.body.description": {
     "message": "За можливости додавайте посилання і зображення, якщо це доречно. Порожні або недостатні скарги буде закрито й проігноровано."
   },
   "report.body.title": {
     "message": "Будь ласка, надайте більше деталей про вашу скаргу"
-  },
-  "report.checking": {
-    "message": "Перевірка {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}…"
-  },
-  "report.could-not-find": {
-    "message": "Не вдалося знайти {item, select, project {проєкт} version {версію} user {користувача} other {вміст}}"
   },
   "report.for.violation": {
     "message": "Порушення <rules-link>Правил</rules-link> або <terms-link>Умов використання</terms-link> Modrinth"
@@ -2978,14 +2939,8 @@
   "report.please-report": {
     "message": "Можна скаржитись на:"
   },
-  "report.question.content-id": {
-    "message": "Який ID у {item, select, project {проєкта} version {версії} user {користувача} other {вмісту}}?"
-  },
   "report.question.content-type": {
     "message": "Який тип умісту ви оскаржуєте?"
-  },
-  "report.question.report-reason": {
-    "message": "Яке з правил Modrinth порушує {item, select, project {цей проєкт} version {ця версія} user {цей користувач} other {цей вміст}}?"
   },
   "report.report-content": {
     "message": "Повідомити модераторів про вміст"
@@ -3098,26 +3053,14 @@
   "scopes.organizationWrite.label": {
     "message": "Редагувати організації"
   },
-  "scopes.patCreate.description": {
-    "message": "Створювати особисті API-токени"
-  },
   "scopes.patCreate.label": {
     "message": "Створювати токени доступу"
-  },
-  "scopes.patDelete.description": {
-    "message": "Видаляти ваші особисті API-токени"
   },
   "scopes.patDelete.label": {
     "message": "Видаляти токени доступу"
   },
-  "scopes.patRead.description": {
-    "message": "Переглядати створені API-токени"
-  },
   "scopes.patRead.label": {
     "message": "Дивитися токени доступу"
-  },
-  "scopes.patWrite.description": {
-    "message": "Змінювати особисті API-токени"
   },
   "scopes.patWrite.label": {
     "message": "Редагувати токени доступу"
@@ -3665,20 +3608,11 @@
   "settings.billing.interval.month": {
     "message": "місяць"
   },
-  "settings.billing.interval.monthly": {
-    "message": "щомісячно"
-  },
   "settings.billing.interval.quarter": {
     "message": "квартал"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "щоквартально"
-  },
   "settings.billing.interval.year": {
     "message": "рік"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "щорічно"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Перегляд сторінок modrinth.com і Modrinth App без реклами"
@@ -3764,9 +3698,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} спільних ЦП (з можливістю посилення до {bursts} ЦП)"
   },
@@ -3795,13 +3726,13 @@
     "message": "Запит на поновлення підписки надіслано"
   },
   "settings.billing.pyro.resubscribe.success.text": {
-    "message": "Підписка на сервер успішно поновлена"
+    "message": "Передплата на сервер успішно поновлена"
   },
   "settings.billing.pyro.status.failed": {
     "message": "Не вдалося оплатити підписку. Будь ласка, оновіть ваш спосіб оплати й спробуйте підписатися повторно."
   },
   "settings.billing.pyro.status.processing": {
-    "message": "Ваш платіж обробляється. Сервер буде активовано після успішної оплати."
+    "message": "Ваш платіж обробляється. Сервер увімкнеться після успішної оплати."
   },
   "settings.billing.pyro.storage": {
     "message": "SSD на {gb} ГБ"
@@ -3810,10 +3741,10 @@
     "message": "{gb} ГБ підкачування"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Керування вашими підписками на Modrinth Servers."
+    "message": "Керування вашими передплатами на Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Підписка на Сервери Modrinth"
+    "message": "Передплата на сервери Modrinth"
   },
   "settings.billing.renews": {
     "message": "Поновлення {date}"
@@ -3828,22 +3759,13 @@
     "message": "Підписатися"
   },
   "settings.billing.subscription.description": {
-    "message": "Керування вашими підписками Modrinth."
+    "message": "Керування вашими передплатами Modrinth."
   },
   "settings.billing.subscription.title": {
     "message": "Підписки"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Перехід на оплату {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Перейти на оплату {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Щомісячна оплата обійдеться вам у додаткові {amount} на рік"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Перехід на оплату {interval} {date}"
   },
   "settings.billing.update-method": {
     "message": "Оновити спосіб"

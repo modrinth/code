@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 pub mod affiliate_code_item;
+pub mod analytics_event_item;
 pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
@@ -44,6 +45,7 @@ pub mod users_subscriptions_credits;
 pub mod version_item;
 
 pub use affiliate_code_item::DBAffiliateCode;
+pub use analytics_event_item::DBAnalyticsEvent;
 pub use collection_item::DBCollection;
 pub use ids::*;
 pub use image_item::DBImage;

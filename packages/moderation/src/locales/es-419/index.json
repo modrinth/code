@@ -30,7 +30,7 @@
     "defaultMessage": "Agregar enlaces externos"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Has seleccionado todas las {totalAvailableTags, plural, one {# etiqueta disponible} other {# etiquetas disponibles}}. Esto va en contra del propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
+    "defaultMessage": "Has seleccionado las {totalAvailableTags, plural, one {# etiqueta disponible} other {# etiquetas disponibles}}. Esto va en contra del propósito de las etiquetas, que es ayudar a los usuarios a encontrar proyectos relevantes. Selecciona solo las etiquetas que sean relevantes para tu proyecto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona las etiquetas adecuadas"
@@ -66,16 +66,13 @@
     "defaultMessage": "Ver galería"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Your {type, select, mod {mod} plugin {plugin} other {project}} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license."
+    "defaultMessage": "Tu {type} usa una licencia que requiere que el código fuente esté disponible. Proporciona un enlace al código fuente o un archivo de fuentes para cada versión adicional, o considera usar otra licencia."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Proporciona el código fuente"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Enlaces idénticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Tu descripción debe incluir suficiente texto plano o texto alternativo para imágenes, de modo que sea accesible para quienes usan lectores de pantalla o tienen conexiones lentas a Internet."
@@ -93,16 +90,16 @@
     "defaultMessage": "La URL de tu licencia parece estar mal formada. Proporciona una URL válida para el texto de tu licencia."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "Agregar un enlace de licencia válido"
+    "defaultMessage": "Agrega un enlace de licencia válido"
   },
   "nags.link-shortener-usage.description": {
     "defaultMessage": "Se prohíbe el uso de acortadores de enlaces u otros métodos para ocultar el destino de tus enlaces externos o de licencia. Usa únicamente enlaces completos."
   },
   "nags.link-shortener-usage.title": {
-    "defaultMessage": "No use acortadores de enlaces"
+    "defaultMessage": "No uses acortadores de enlaces"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# encabezado} other {# encabezados}} en tu descripción {count, plural, one {es} other {son}} demasiado largo(s). Los encabezados deben ser concisos y actuar como títulos de sección, no como frases completas."
+    "defaultMessage": "{count, plural, one {# encabezado} other {# encabezados}} en tu descripción {count, plural, one {es} other {son}} demasiado {count, plural, one {largo} other {largos}}. Los encabezados deben ser concisos y actuar como títulos de sección, no como frases completas."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Acortar encabezados"
@@ -111,7 +108,7 @@
     "defaultMessage": "Los proyectos no deben usar el nombre Minecraft ni incluir \"Minecraft\" como parte importante del nombre."
   },
   "nags.minecraft-title-clause.title": {
-    "defaultMessage": "Evita infringir derechos de marca"
+    "defaultMessage": "Evite infringir los derechos de marca"
   },
   "nags.missing-alt-text.description": {
     "defaultMessage": "Algunas de tus imágenes no tienen texto alternativo, lo cual es importante para la accesibilidad, sobre todo para usuarios con discapacidad visual."
@@ -141,13 +138,13 @@
     "defaultMessage": "Elige la resolución correcta"
   },
   "nags.select-compatibility.description": {
-    "defaultMessage": "Selecciona las versiones que soporta tu servidor, elige un modpack o sube el tuyo."
+    "defaultMessage": "Selecciona las versiones que soporta tu servidor, elige un modpack o carga el tuyo."
   },
   "nags.select-compatibility.title": {
     "defaultMessage": "Selecciona compatibilidad"
   },
   "nags.select-country.description": {
-    "defaultMessage": "Informe a los jugadores en qué región se encuentra su servidor."
+    "defaultMessage": "Informa a los jugadores en qué región se encuentra tu servidor."
   },
   "nags.select-country.title": {
     "defaultMessage": "Selecciona una región"
@@ -159,7 +156,7 @@
     "defaultMessage": "Selecciona un idioma"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selecciona la licencia bajo la cual se distribuye tu {type, select, mod {mod} modpack {modpack} resourcepack {paquete de recursos} shader {shader} plugin {plugin} datapack {paquete de datos} other {proyecto}}."
+    "defaultMessage": "Selecciona la licencia bajo la cual se distribuye tu {type}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecciona una licencia"
@@ -225,7 +222,7 @@
     "defaultMessage": "Selecciona etiquetas adecuadas"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": ""
+    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"
