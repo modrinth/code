@@ -71,6 +71,7 @@ import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
+import FirstRunImport from '@/components/ui/FirstRunImport.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
@@ -469,6 +470,17 @@ function onSuspenseResolve() {
 	if (routerToken) {
 		loading.end(routerToken)
 		routerToken = null
+	}
+}
+
+async function completeFirstRunImport() {
+	try {
+		const settings = await getSettings()
+		settings.onboarded = true
+		await setSettings(settings)
+		showOnboarding.value = false
+	} catch (err) {
+		handleError(err)
 	}
 }
 
@@ -935,6 +947,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@browse-modpacks="handleBrowseModpacks"
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />
+		<FirstRunImport v-if="showOnboarding" @complete="completeFirstRunImport" />
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
@@ -1472,4 +1485,3 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	}
 }
 </style>
-
