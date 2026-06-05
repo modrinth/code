@@ -8,7 +8,7 @@ interface LogEntry {
 	filename: string
 	name?: string
 	log_type: string
-	stdout?: string
+	output?: string | null
 	age?: number
 	live?: boolean
 }
@@ -50,12 +50,12 @@ async function getHistoricalLogs(profilePathId: string, instancePath: string): P
 	const entry = getOrCreate(profilePathId)
 	if (entry.logList) return entry.logList
 
-	const logs: LogEntry[] = await get_logs(instancePath, false)
+	const logs: LogEntry[] = await get_logs(instancePath, true)
 	entry.logList = logs
 
 	for (const log of logs) {
-		if (log.stdout && log.stdout !== '') {
-			entry.historicalCache.set(log.filename, log.stdout)
+		if (log.output) {
+			entry.historicalCache.set(log.filename, log.output)
 		}
 	}
 

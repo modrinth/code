@@ -77,7 +77,7 @@ function buildLogList(rawLogs) {
 					log.filename !== 'latest_stdout.log' &&
 					log.filename !== 'latest_stdout' &&
 					log.filename !== 'launcher_log.txt' &&
-					log.stdout !== '' &&
+					(log.output == null || log.output !== '') &&
 					(log.filename.includes('.log') || log.filename.endsWith('.txt')),
 			)
 			.map((log) => ({
