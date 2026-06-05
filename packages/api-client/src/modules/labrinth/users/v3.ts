@@ -38,6 +38,25 @@ export class LabrinthUsersV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Search users by username prefix.
+	 *
+	 * @param query - Username search query
+	 * @returns Promise resolving to compact user search results
+	 *
+	 * GET /v3/users/search?query=:query
+	 */
+	public async search(query: string): Promise<Labrinth.Users.v3.SearchUser[]> {
+		return this.client.request<Labrinth.Users.v3.SearchUser[]>(
+			`/users/search?query=${encodeURIComponent(query)}`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Get all projects the authenticated user can access directly or through
 	 * their organizations.
 	 *

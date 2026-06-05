@@ -1,3 +1,7 @@
+import type { Archon } from '@modrinth/api-client'
+
+export type ServerLoader = Archon.Servers.v0.Loader | 'Bukkit'
+
 export const loaderDisplayNames: Record<string, string> = {
 	fabric: 'Fabric',
 	neoforge: 'NeoForge',
@@ -6,6 +10,7 @@ export const loaderDisplayNames: Record<string, string> = {
 	quilt: 'Quilt',
 	paper: 'Paper',
 	purpur: 'Purpur',
+	bukkit: 'Bukkit',
 	vanilla: 'Vanilla',
 }
 

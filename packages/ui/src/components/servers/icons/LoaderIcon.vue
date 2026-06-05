@@ -224,9 +224,10 @@
 
 <script setup lang="ts">
 import { LoaderIcon } from '@modrinth/assets'
-import type { Loaders } from '@modrinth/utils'
+
+import type { ServerLoader } from '#ui/utils/loaders'
 
 defineProps<{
-	loader: Loaders
+	loader: ServerLoader
 }>()
 </script>

@@ -8,6 +8,7 @@
 			v-model:is-find-open="isFindOpen"
 			v-model:find-query="inFileFindQuery"
 			:is-editing-image="isEditingImage"
+			:readonly="isEditorReadOnly"
 			:find-match-count="findMatchCount"
 			:current-find-match="currentFindMatch"
 			@find-next="findNext"
@@ -22,6 +23,7 @@
 			v-model:value="fileContent"
 			:lang="editorLanguage"
 			theme="modrinth"
+			:readonly="isEditorReadOnly"
 			:print-margin="false"
 			:style="{ height: editorHeight, fontSize: '0.875rem' }"
 			class="ace-modrinth rounded-[20px]"
@@ -144,6 +146,11 @@ const editorLanguage = computed(() => {
 	const ext = getFileExtension(props.file?.name ?? '')
 	return getEditorLanguage(ext)
 })
+const isEditorReadOnly = computed(() => ctx.isBusy?.value ?? false)
+
+watch(isEditorReadOnly, (readOnly) => {
+	editorInstance.value?.setReadOnly(readOnly)
+})
 
 watch(
 	() => props.file,
@@ -206,6 +213,7 @@ function resetState() {
 
 function onEditorInit(editor: Ace.Editor) {
 	editorInstance.value = editor
+	editor.setReadOnly(isEditorReadOnly.value)
 
 	editor.commands.addCommand({
 		name: 'save',
@@ -223,6 +231,7 @@ function onEditorInit(editor: Ace.Editor) {
 		name: 'replace',
 		bindKey: { win: 'Ctrl-H', mac: 'Command-Option-F' },
 		exec: () => {
+			if (isEditorReadOnly.value) return
 			isFindOpen.value = true
 			nextTick(() => findReplaceRef.value?.openReplace())
 		},
@@ -231,6 +240,7 @@ function onEditorInit(editor: Ace.Editor) {
 
 async function saveFileContent(exit: boolean = false) {
 	if (!props.file) return
+	if (ctx.isBusy?.value) return
 
 	try {
 		const normalizedPath = props.file.path.startsWith('/') ? props.file.path : `/${props.file.path}`
@@ -312,7 +322,7 @@ function closeFind() {
 
 function replaceOne(query: string) {
 	const editor = editorInstance.value
-	if (!editor || findMatchCount.value === 0) return
+	if (!editor || isEditorReadOnly.value || findMatchCount.value === 0) return
 	editor.replace(query)
 	nextTick(() => {
 		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
@@ -323,7 +333,7 @@ function replaceOne(query: string) {
 
 function replaceAllOccurrences(query: string) {
 	const editor = editorInstance.value
-	if (!editor || findMatchCount.value === 0) return
+	if (!editor || isEditorReadOnly.value || findMatchCount.value === 0) return
 	editor.replaceAll(query)
 	nextTick(() => {
 		const count = countOccurrences(fileContent.value, inFileFindQuery.value)

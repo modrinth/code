@@ -72,6 +72,7 @@
 						}}
 						<Tooltip
 							theme="dismissable-prompt"
+							class="inline-flex shrink-0"
 							:triggers="['hover', 'focus']"
 							no-auto-focus
 							:aria-id="`${baseId}-date-segment-tooltip-${i}`"
@@ -106,6 +107,7 @@
 						{{ formatMessage(messages.processing) }}
 						<Tooltip
 							theme="dismissable-prompt"
+							class="inline-flex shrink-0"
 							:triggers="['hover', 'focus']"
 							no-auto-focus
 							:aria-id="`${baseId}-processing-tooltip`"

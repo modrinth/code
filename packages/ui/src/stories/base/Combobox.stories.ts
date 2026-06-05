@@ -176,6 +176,17 @@ export const WithSubLabel: Story = {
 	},
 }
 
+export const LongSelectedLabel: Story = {
+	args: {
+		modelValue: 'long',
+		options: [
+			{ value: 'short', label: 'Short label' },
+			{ value: 'long', label: 'A much longer selected value that should truncate cleanly' },
+		],
+		triggerClass: 'w-64',
+	},
+}
+
 export const MixedSubLabels: Story = {
 	args: {
 		options: [
@@ -200,6 +211,35 @@ export const SearchableNoFilter: Story = {
 		searchable: true,
 		searchPlaceholder: 'Search actions...',
 		disableSearchFilter: true,
+	},
+}
+
+export const SearchableMinimumLength: Story = {
+	args: {
+		options: [
+			{ value: 'fetch', label: 'Fetch' },
+			{ value: 'emma', label: 'Emma' },
+			{ value: 'boris', label: 'Boris' },
+			{ value: 'coolbot', label: 'Coolbot' },
+		],
+		searchable: true,
+		searchPlaceholder: 'Enter a username or email',
+		minSearchLengthToOpen: 2,
+		noOptionsMessage: 'No matching users found.',
+	},
+}
+
+export const SearchableModpacks: Story = {
+	args: {
+		options: [
+			{ value: 'download', label: 'Download', icon: DownloadIcon },
+			{ value: 'share', label: 'Share', icon: ShareIcon },
+			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
+			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
+		],
+		searchable: true,
+		searchPlaceholder: 'Search modpacks...',
+		noOptionsMessage: 'No modpacks found',
 	},
 }
 

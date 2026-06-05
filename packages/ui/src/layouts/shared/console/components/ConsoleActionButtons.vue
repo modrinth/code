@@ -1,7 +1,11 @@
 <template>
 	<div class="flex items-center gap-1">
 		<ButtonStyled v-if="showClear && hasLogs" type="transparent">
-			<button @click="emit('clear')">
+			<button
+				v-tooltip="clearDisabled ? clearDisabledTooltip : undefined"
+				:disabled="clearDisabled"
+				@click="emit('clear')"
+			>
 				<XIcon />
 				Clear
 			</button>
@@ -56,6 +60,8 @@ defineProps<{
 	shareDisabledTooltip?: string
 	sharing?: boolean
 	fullscreen?: boolean
+	clearDisabled?: boolean
+	clearDisabledTooltip?: string
 	showDelete?: boolean
 	deleteDisabled?: boolean
 	deleteDisabledTooltip?: string
