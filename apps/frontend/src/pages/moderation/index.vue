@@ -328,7 +328,7 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
+async function findFirstEligibleProject(): Promise<ModerationProject | null> {
 	let skippedCount = 0
 
 	while (moderationQueue.hasItems) {
@@ -338,29 +338,43 @@ async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 		const project = filteredProjects.value.find((p) => p.project.id === currentId)
 		if (!project) {
 			await moderationQueue.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
+			continue
+		}
+
+		if (project.project.status !== 'processing') {
+			await moderationQueue.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
 			continue
 		}
 
 		try {
 			const lockStatus = await moderationQueue.checkLock(currentId)
 
-			if (!lockStatus.locked || lockStatus.expired) {
+			if (!lockStatus.locked || lockStatus.expired || lockStatus.is_own_lock) {
 				if (skippedCount > 0) {
 					addNotification({
-						title: 'Skipped locked projects',
-						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
+						title: 'Skipped projects',
+						text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
 						type: 'info',
 					})
 				}
 				return project
 			}
 
-			// Project is locked, skip it
 			await moderationQueue.completeCurrentProject(currentId, 'skipped')
 			skippedCount++
 		} catch {
 			return project
 		}
+	}
+
+	if (skippedCount > 0) {
+		addNotification({
+			title: 'Skipped projects',
+			text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
+			type: 'info',
+		})
 	}
 
 	return null
@@ -374,12 +388,12 @@ async function moderateAllInFilter() {
 	await moderationQueue.setQueue(projectIds)
 
 	// Find first unlocked project
-	const targetProject = await findFirstUnlockedProject()
+	const targetProject = await findFirstEligibleProject()
 
 	if (!targetProject) {
 		addNotification({
-			title: 'All projects locked',
-			text: 'All projects in queue are currently being moderated by others.',
+			title: 'No projects available',
+			text: 'All projects in queue are already moderated or locked by others.',
 			type: 'warning',
 		})
 		return
@@ -410,13 +424,12 @@ async function startFromProject(projectId: string) {
 		await moderationQueue.setQueue(projectIds)
 	}
 
-	// Find first unlocked project
-	const targetProject = await findFirstUnlockedProject()
+	const targetProject = await findFirstEligibleProject()
 
 	if (!targetProject) {
 		addNotification({
-			title: 'All projects locked',
-			text: 'All projects in queue are currently being moderated by others.',
+			title: 'No projects available',
+			text: 'All projects in queue are already moderated or locked by others.',
 			type: 'warning',
 		})
 		return
@@ -434,4 +447,3 @@ async function startFromProject(projectId: string) {
 	})
 }
 </script>
-

@@ -682,11 +682,11 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 
 	// Quick re-check if close to expiry (last 5 seconds of TTL)
 	if (now - next.validatedAt > PREFETCH_STALE_MS - 5000) {
-		const recheck = await moderationQueue.checkLock(next.projectId)
-		if (recheck.locked && !recheck.expired) {
-			// Project got locked, remove from queue and try next
+		const recheckResults = await batchCheckQueueCandidates([next.projectId])
+		const recheck = recheckResults.get(next.projectId)
+		if (!isEligibleQueueCandidate(recheck)) {
 			prefetchQueue.value.shift()
-			return navigateToNextUnlockedProject() // Recurse to try next
+			return navigateToNextUnlockedProject()
 		}
 	}
 
@@ -698,33 +698,14 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 		next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
 	)
 
-	if (next.skippedIds.length > 0) {
-		addNotification({
-			title: 'Skipped locked projects',
-			text: `Skipped ${next.skippedIds.length} project(s) being moderated by others.`,
-			type: 'info',
-		})
-	}
+	notifySkippedQueueProjects(next.skippedIds.length)
 
-	// Trigger prefetch replenishment in background (don't await)
 	maintainPrefetchQueue()
 
-	// Navigate to canonical URL if we have metadata (avoids middleware redirect)
-	if (next.slug && next.projectType) {
-		const urlType = getProjectTypeForUrlShorthand(next.projectType, [], tags.value)
-
-		navigateTo({
-			path: `/${urlType}/${next.slug}`,
-			state: { showChecklist: true },
-		})
-	} else {
-		// Fallback: use project ID (will trigger middleware redirect)
-		navigateTo({
-			name: 'type-project',
-			params: { type: 'project', project: next.projectId },
-			state: { showChecklist: true },
-		})
-	}
+	navigateToQueueProject(
+		{ slug: next.slug, projectType: next.projectType, locked: false, isProcessing: true },
+		next.projectId,
+	)
 	return true
 }
 
@@ -844,51 +825,105 @@ function reviewAnyway() {
 	maintainPrefetchQueue()
 }
 
-// Batch check locks and fetch project metadata in parallel
-interface LockCheckResult {
+// Batch check locks, processing status, and fetch project metadata in parallel
+interface QueueCandidateCheck {
 	locked: boolean
 	expired?: boolean
 	isOwnLock?: boolean
 	slug?: string
 	projectType?: string
+	status?: string
+	isProcessing: boolean
 }
 
-async function batchCheckLocksWithMetadata(
-	projectIds: string[],
-): Promise<Map<string, LockCheckResult>> {
-	const results = new Map<string, LockCheckResult>()
+function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
+	if (!result?.isProcessing) return false
+	return !result.locked || !!result.expired || !!result.isOwnLock
+}
 
-	// Check locks and fetch minimal project data in parallel
+function notifySkippedQueueProjects(count: number) {
+	if (count <= 0) return
+	addNotification({
+		title: 'Skipped projects',
+		text: `Skipped ${count} project(s) already moderated or locked by others.`,
+		type: 'info',
+	})
+}
+
+function navigateToQueueProject(result: QueueCandidateCheck, projectId: string) {
+	if (result.slug && result.projectType) {
+		const urlType = getProjectTypeForUrlShorthand(result.projectType, [], tags.value)
+		navigateTo({
+			path: `/${urlType}/${result.slug}`,
+			state: { showChecklist: true },
+		})
+	} else {
+		navigateTo({
+			name: 'type-project',
+			params: { type: 'project', project: projectId },
+			state: { showChecklist: true },
+		})
+	}
+}
+
+async function batchCheckQueueCandidates(
+	projectIds: string[],
+): Promise<Map<string, QueueCandidateCheck>> {
+	const results = new Map<string, QueueCandidateCheck>()
+
 	const checks = await Promise.allSettled(
 		projectIds.map(async (id) => {
-			// Parallel: check lock AND fetch project metadata
 			const [lockResponse, projectData] = await Promise.all([
 				moderationQueue.checkLock(id),
 				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
 			])
+
+			const status = (projectData as { status?: string } | null)?.status
 
 			return {
 				id,
 				locked: lockResponse.locked,
 				expired: lockResponse.expired,
 				isOwnLock: lockResponse.is_own_lock,
-				slug: (projectData as { slug?: string })?.slug,
-				projectType: (projectData as { project_type?: string })?.project_type,
+				slug: (projectData as { slug?: string } | null)?.slug,
+				projectType: (projectData as { project_type?: string } | null)?.project_type,
+				status,
+				isProcessing: projectData === null ? true : status === 'processing',
 			}
 		}),
 	)
 
-	// Use forEach with index to avoid indexOf bug on PromiseSettledResult
 	checks.forEach((result, index) => {
 		if (result.status === 'fulfilled') {
 			results.set(result.value.id, result.value)
 		} else {
-			// On error, mark as needing fallback (no metadata)
-			results.set(projectIds[index], { locked: false })
+			results.set(projectIds[index], { locked: false, isProcessing: true })
 		}
 	})
 
 	return results
+}
+
+async function findNextEligibleQueueProject(candidateIds: string[]) {
+	const skippedIds: string[] = []
+	let checkedCount = 0
+
+	while (checkedCount < candidateIds.length) {
+		const batch = candidateIds.slice(checkedCount, checkedCount + PREFETCH_BATCH_SIZE)
+		checkedCount += batch.length
+
+		const results = await batchCheckQueueCandidates(batch)
+
+		for (const id of batch) {
+			const result = results.get(id)
+			if (isEligibleQueueCandidate(result)) {
+				return { projectId: id, result: result!, skippedIds: [...skippedIds] }
+			}
+			skippedIds.push(id)
+		}
+	}
+
+	return null
 }
 
 // Maintain a queue of prefetched unlocked projects for instant navigation
@@ -922,13 +957,10 @@ async function maintainPrefetchQueue() {
 		const remainingItems =
 			currentIndex >= 0 ? queueItems.slice(currentIndex + 1) : queueItems.slice(1)
 
-		const candidateIds = remainingItems
-			.filter((id) => !prefetchedIds.has(id))
-			.slice(0, PREFETCH_BATCH_SIZE * 2) // Check up to 10 candidates
+		const candidateIds = remainingItems.filter((id) => !prefetchedIds.has(id))
 
 		if (candidateIds.length === 0) return
 
-		// 5. Batch check locks AND fetch metadata in parallel
 		const skippedIds: string[] = []
 		let checkedCount = 0
 
@@ -939,31 +971,18 @@ async function maintainPrefetchQueue() {
 			const batch = candidateIds.slice(checkedCount, checkedCount + PREFETCH_BATCH_SIZE)
 			checkedCount += batch.length
 
-			const results = await batchCheckLocksWithMetadata(batch)
+			const results = await batchCheckQueueCandidates(batch)
 
 			for (const id of batch) {
 				const result = results.get(id)
-				// Treat as unlocked if: not locked, OR expired, OR it's our own lock
-				if (!result?.locked || result?.expired || result?.isOwnLock) {
-					// Found unlocked project with metadata
-					if (result?.slug && result?.projectType) {
-						prefetchQueue.value.push({
-							projectId: id,
-							slug: result.slug,
-							projectType: result.projectType,
-							validatedAt: Date.now(),
-							skippedIds: [...skippedIds],
-						})
-					} else {
-						// No metadata - still add but will need fallback navigation
-						prefetchQueue.value.push({
-							projectId: id,
-							slug: '', // Empty = use fallback
-							projectType: '',
-							validatedAt: Date.now(),
-							skippedIds: [...skippedIds],
-						})
-					}
+				if (isEligibleQueueCandidate(result)) {
+					prefetchQueue.value.push({
+						projectId: id,
+						slug: result?.slug ?? '',
+						projectType: result?.projectType ?? '',
+						validatedAt: Date.now(),
+						skippedIds: [...skippedIds],
+					})
 
 					if (prefetchQueue.value.length >= PREFETCH_TARGET_COUNT) break
 				} else {
@@ -978,8 +997,6 @@ async function maintainPrefetchQueue() {
 
 // Debounced prefetch to prevent spam from rapid stage changes
 const debouncedPrefetch = useDebounceFn(maintainPrefetchQueue, 300)
-
-const MAX_SKIP_ATTEMPTS = 10
 
 async function skipToNextProject() {
 	// Skip the current project
@@ -1004,60 +1021,28 @@ async function skipToNextProject() {
 
 	debug('[skipToNextProject] No prefetch, entering fallback with batch checking')
 
-	// Fallback: batch check remaining projects with metadata (excluding current)
-	const remainingIds: string[] = []
-	const queueItems = moderationQueue.currentQueue.items
-
-	// Build list of remaining projects, excluding current
-	for (const id of queueItems) {
-		if (id === currentProjectId) continue
-		if (remainingIds.length >= MAX_SKIP_ATTEMPTS) break
-		remainingIds.push(id)
-	}
+	const remainingIds = moderationQueue.currentQueue.items.filter((id) => id !== currentProjectId)
 
 	if (remainingIds.length > 0) {
-		const results = await batchCheckLocksWithMetadata(remainingIds)
+		const next = await findNextEligibleQueueProject(remainingIds)
 
-		let skippedCount = 0
-		for (const id of remainingIds) {
-			const result = results.get(id)
-			// Treat as unlocked if: not locked, OR expired, OR it's our own lock
-			if (!result?.locked || result?.expired || result?.isOwnLock) {
-				// Found unlocked - skip the locked ones before it
-				if (skippedCount > 0) {
-					addNotification({
-						title: 'Skipped locked projects',
-						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
-						type: 'info',
-					})
-				}
-
-				// Navigate to canonical URL if we have metadata
-				if (result?.slug && result?.projectType) {
-					const urlType = getProjectTypeForUrlShorthand(result.projectType, [], tags.value)
-					navigateTo({
-						path: `/${urlType}/${result.slug}`,
-						state: { showChecklist: true },
-					})
-				} else {
-					// Fallback: use project ID
-					navigateTo({
-						name: 'type-project',
-						params: { type: 'project', project: id },
-						state: { showChecklist: true },
-					})
-				}
-				return
-			}
-			await moderationQueue.completeCurrentProject(id, 'skipped')
-			skippedCount++
+		if (next) {
+			await Promise.all(
+				next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
+			)
+			notifySkippedQueueProjects(next.skippedIds.length)
+			navigateToQueueProject(next.result, next.projectId)
+			return
 		}
 
-		// All checked were locked
-		debug('[skipToNextProject] All projects were locked, skippedCount:', skippedCount)
+		await Promise.all(
+			remainingIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
+		)
+
+		debug('[skipToNextProject] No eligible projects in queue')
 		addNotification({
-			title: 'All projects locked',
-			text: 'All remaining projects are currently being moderated by others.',
+			title: 'No projects available',
+			text: 'All remaining projects are already moderated or locked by others.',
 			type: 'warning',
 		})
 	}
@@ -1272,8 +1257,17 @@ onMounted(async () => {
 	document.addEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('left')
 
-	// Check if project has already been reviewed (not in processing status)
 	if (projectV2.value.status !== 'processing') {
+		if (moderationQueue.isQueueMode && moderationQueue.queueLength > 1) {
+			addNotification({
+				title: 'Project already moderated',
+				text: 'Skipping to the next project in the queue.',
+				type: 'info',
+			})
+			await skipToNextProject()
+			return
+		}
+
 		alreadyReviewed.value = true
 		return
 	}
@@ -2056,72 +2050,36 @@ async function endChecklist(status?: string) {
 			})
 		}
 	} else {
-		// Use prefetched data if available for instant navigation
 		if (!(await navigateToNextUnlockedProject())) {
-			// Fallback: batch check remaining projects with metadata
-			const remainingIds: string[] = []
 			const currentProjectId = projectV2.value?.id
-			const queueItems = moderationQueue.currentQueue.items
+			const remainingIds = moderationQueue.currentQueue.items.filter(
+				(id) => id !== currentProjectId,
+			)
 
-			// Build list of remaining projects, excluding current
-			for (const id of queueItems) {
-				if (id === currentProjectId) continue
-				if (remainingIds.length >= MAX_SKIP_ATTEMPTS) break
-				remainingIds.push(id)
-			}
-
-			let foundUnlocked = false
+			let foundEligible = false
 			if (remainingIds.length > 0) {
-				const results = await batchCheckLocksWithMetadata(remainingIds)
+				const next = await findNextEligibleQueueProject(remainingIds)
 
-				let skippedCount = 0
-				for (const id of remainingIds) {
-					const result = results.get(id)
-					// Treat as unlocked if: not locked, OR expired, OR it's our own lock
-					if (!result?.locked || result?.expired || result?.isOwnLock) {
-						// Found unlocked - skip the locked ones before it
-						if (skippedCount > 0) {
-							addNotification({
-								title: 'Skipped locked projects',
-								text: `Skipped ${skippedCount} project(s) being moderated by others.`,
-								type: 'info',
-							})
-						}
-
-						// Navigate to canonical URL if we have metadata
-						if (result?.slug && result?.projectType) {
-							const urlType = getProjectTypeForUrlShorthand(result.projectType, [], tags.value)
-							navigateTo({
-								path: `/${urlType}/${result.slug}`,
-								state: { showChecklist: true },
-							})
-						} else {
-							// Fallback: use project ID
-							navigateTo({
-								name: 'type-project',
-								params: { type: 'project', project: id },
-								state: { showChecklist: true },
-							})
-						}
-						foundUnlocked = true
-						break
-					}
-					await moderationQueue.completeCurrentProject(id, 'skipped')
-					skippedCount++
-				}
-
-				// If no unlocked projects found, show notification
-				if (!foundUnlocked && skippedCount > 0) {
+				if (next) {
+					await Promise.all(
+						next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
+					)
+					notifySkippedQueueProjects(next.skippedIds.length)
+					navigateToQueueProject(next.result, next.projectId)
+					foundEligible = true
+				} else {
+					await Promise.all(
+						remainingIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
+					)
 					addNotification({
-						title: 'All projects locked',
-						text: 'All remaining projects are currently being moderated by others.',
+						title: 'No projects available',
+						text: 'All remaining projects are already moderated or locked by others.',
 						type: 'warning',
 					})
 				}
 			}
 
-			// If no unlocked projects found, go back to moderation queue
-			if (!foundUnlocked) {
+			if (!foundEligible) {
 				await navigateTo({
 					name: 'moderation',
 				})
