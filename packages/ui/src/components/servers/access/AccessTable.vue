@@ -62,7 +62,7 @@
 		<template #cell-joined="{ row: member }">
 			<span
 				v-if="member.pending"
-				class="inline-flex h-7 items-center rounded-full border border-surface-5 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
+				class="inline-flex h-7 items-center rounded-full border border-surface-4 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
 			>
 				{{ formatMessage(messages.pendingLabel) }}
 			</span>
@@ -103,7 +103,7 @@
 
 	<div
 		v-if="members.length > 0"
-		class="overflow-hidden rounded-2xl border border-solid border-surface-5 sm:hidden"
+		class="overflow-hidden rounded-2xl border border-solid border-surface-4 sm:hidden"
 	>
 		<div
 			class="grid min-h-14 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_4rem] bg-surface-3"
@@ -148,7 +148,7 @@
 		<div
 			v-for="(member, index) in sortedMembers"
 			:key="member.id"
-			class="grid min-h-16 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_4rem] items-center border-0 border-t border-solid border-surface-5"
+			class="grid min-h-16 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_4rem] items-center border-0 border-t border-solid border-surface-4"
 			:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 		>
 			<div class="flex min-w-0 items-center pl-4">
@@ -209,7 +209,7 @@
 			<div class="min-w-0 py-3 pr-2 text-right text-secondary">
 				<span
 					v-if="member.pending"
-					class="inline-flex h-7 max-w-full items-center rounded-full border border-surface-5 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
+					class="inline-flex h-7 max-w-full items-center rounded-full border border-surface-4 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
 				>
 					{{ formatMessage(messages.pendingLabel) }}
 				</span>
@@ -250,7 +250,7 @@
 		</div>
 	</div>
 
-	<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+	<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-4">
 		<div
 			class="grid min-h-14 grid-cols-[3.75rem_7.25rem_minmax(0,1fr)_2.75rem] bg-surface-3 sm:h-14 sm:grid-cols-[32%_28%_28%_12%]"
 		>
@@ -268,7 +268,7 @@
 			</div>
 		</div>
 		<div
-			class="border-0 border-t border-solid border-surface-5 bg-surface-2 px-4 py-8 text-center text-secondary"
+			class="border-0 border-t border-solid border-surface-4 bg-surface-2 px-4 py-8 text-center text-secondary"
 		>
 			{{ formatMessage(messages.emptyState) }}
 		</div>
