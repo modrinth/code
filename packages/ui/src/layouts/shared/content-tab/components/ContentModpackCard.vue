@@ -224,6 +224,7 @@ onUnmounted(() => {
 						<Tooltip
 							v-if="hasContentListener"
 							theme="dismissable-prompt"
+							class="inline-flex"
 							:triggers="[]"
 							:shown="showContentHint && isExpanded"
 							:auto-hide="false"
@@ -293,6 +294,7 @@ onUnmounted(() => {
 					<Tooltip
 						v-if="collapsedOptions.length"
 						theme="dismissable-prompt"
+						class="inline-flex"
 						:triggers="[]"
 						:shown="showContentHint && !isExpanded"
 						:auto-hide="false"

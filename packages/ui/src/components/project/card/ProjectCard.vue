@@ -62,7 +62,11 @@
 								:hide-label="true"
 							/>
 							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
-							<ServerRegion v-if="serverRegion" :region="serverRegion" />
+							<ServerRegion
+								v-if="serverRegion"
+								:region="serverRegion"
+								class="smart-clickable:allow-pointer-events"
+							/>
 						</template>
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -158,7 +162,11 @@
 					<div class="flex items-center gap-1">
 						<template v-if="isServerProject">
 							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
-							<ServerRegion v-if="serverRegion" :region="serverRegion" />
+							<ServerRegion
+								v-if="serverRegion"
+								:region="serverRegion"
+								class="smart-clickable:allow-pointer-events"
+							/>
 						</template>
 						<ProjectCardEnvironment
 							v-if="environment"

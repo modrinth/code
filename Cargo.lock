@@ -3060,29 +3060,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "elasticsearch"
-version = "9.1.0-alpha.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12bb303aa6e1d28c0c86b6fbfe484fd0fd3f512629aeed1ac4f6b85f81d9834a"
-dependencies = [
- "base64 0.22.1",
- "bytes",
- "dyn-clone",
- "flate2",
- "lazy_static",
- "parking_lot",
- "percent-encoding",
- "reqwest 0.12.24",
- "rustc_version",
- "serde",
- "serde_json",
- "serde_with",
- "tokio",
- "url",
- "void",
-]
-
-[[package]]
 name = "elliptic-curve"
 version = "0.13.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5275,7 +5252,6 @@ dependencies = [
  "dotenv-build",
  "dotenvy",
  "either",
- "elasticsearch",
  "eyre",
  "futures",
  "futures-util",
@@ -10538,6 +10514,7 @@ dependencies = [
  "flate2",
  "fs4",
  "futures",
+ "futures-lite 2.6.1",
  "heck 0.5.0",
  "hickory-resolver 0.25.2",
  "indicatif",
@@ -10589,6 +10566,8 @@ version = "1.0.0-local"
 dependencies = [
  "async_zip",
  "chrono",
+ "core-foundation 0.10.1",
+ "core-graphics",
  "daedalus",
  "dashmap",
  "either",
@@ -10596,6 +10575,7 @@ dependencies = [
  "hyper 1.7.0",
  "hyper-util",
  "native-dialog",
+ "objc2-app-kit",
  "paste",
  "path-util",
  "serde",
@@ -10621,6 +10601,7 @@ dependencies = [
  "urlencoding",
  "uuid 1.18.1",
  "webview2-com",
+ "windows",
  "windows-core 0.61.2",
 ]
 

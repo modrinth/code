@@ -12,7 +12,7 @@
     "message": "Zur primären Instanz machen"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Keine Instanzen laufen"
+    "message": "Keine aktiven Instanzen"
   },
   "app.action-bar.offline": {
     "message": "Offline"
@@ -48,7 +48,7 @@
     "message": "Farbschema"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Ändere die Seite, die beim Öffnen des Launchers angezeigt wird."
+    "message": "Ändere die Kategorie, die beim Öffnen des Launchers angezeigt wird."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authentifizierungsserver sind nicht erreichbar"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Server zur Instanz hinzufügen"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Server zu deiner Instanz hinzufügen"
+    "message": "Server zu Instanz hinzufügen"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Zu Instanz hinzufügen"
   },
   "app.browse.add-to-instance": {
     "message": "Zur Instanz hinzufügen"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Bereits hinzugefügt"
   },
+  "app.browse.back-to-instance": {
+    "message": "Zurück zur Instanz"
+  },
   "app.browse.discover-content": {
     "message": "Inhalte entdecken"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Bereits hinzugefügte Server ausblenden"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Bereits installierte Inhalte ausblenden"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Inhalt in Instanz installieren"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
-  "app.browse.server.install": {
-    "message": "Installieren"
-  },
-  "app.browse.server.installed": {
-    "message": "Installiert"
+  "app.browse.server-instance-content-warning": {
+    "message": "Das Hinzufügen von Inhalten kann die Kompatibilität beim Beitreten zum Server beeinträchtigen. Außerdem gehen alle hinzugefügten Inhalte verloren, wenn du die Inhalte der Serverinstanz aktualisierst."
   },
   "app.browse.server.installing": {
     "message": "Wird installiert"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Modpack exportieren"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "\"{file}\" einschließen?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpackname"
   },
@@ -171,7 +168,7 @@
     "message": "Modpackname"
   },
   "app.export-modal.select-files-label": {
-    "message": "Wähle Dateien und Ordner aus, die in das Paket sollen"
+    "message": "Konfiguriere, welche Dateien in diesen Export enthalten sind"
   },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
@@ -227,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Server durchsuchen"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "„{name}“ wird **endgültig gelöscht**, und es gibt keine Möglichkeit, sie wiederherzustellen."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Möchtest du diese Welt wirklich endgültig löschen?"
   },
@@ -250,12 +244,6 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Keine Server oder Welten hinzugefügt"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "„{name}“ wird aus deiner Liste entfernt, auch im Spiel, und es gibt keine Möglichkeit, ihn wiederherzustellen."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "„{name}“ ({address}) wird aus deiner Liste entfernt, inklusive im Spiel, und es gibt keine Möglichkeit, ihn wiederherzustellen."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Möchtest du {name} wirklich entfernen?"
@@ -302,6 +290,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Zum Spielen von {name} ist eine Aktualisierung erforderlich. Bitte aktualisiere auf die neueste Version, um das Spiel zu starten."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Dieses Projekt ist bereits installiert"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Zurück zum Entdecken"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Inhalt in Instanz installieren"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."
   },
@@ -325,6 +322,147 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Ressourcenmanagement"
+  },
+  "app.skins.add-button": {
+    "message": "Skin hinzufügen"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Ziehen und Ablegen"
+  },
+  "app.skins.apply-button": {
+    "message": "Anwenden"
+  },
+  "app.skins.delete-button": {
+    "message": "Skin löschen"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Dadurch wird der ausgewählte Skin permanent gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Möchtest du diesen Skin wirklich löschen?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Die abgelegte Datei konnte nicht gelesen werden."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Fehler bei der Verarbeitung der Datei"
+  },
+  "app.skins.edit-button": {
+    "message": "Skin bearbeiten"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Skin hinzufügen"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Einen Skin hinzufügen"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Arm-Stil"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Schlank"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Breit"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Umhang"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Umhang"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Skin bearbeiten"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Nimm zuerst eine Änderung am Skin vor!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Kein Umhang"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Keinen"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Textur ersetzen"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Skin speichern"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Wird gespeichert..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textur"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Lade zuerst ein Skin hoch!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Skin bearbeiten"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Vorschau"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Du wechselst dein Skin zu oft. Die Server von Mojang haben weitere Anfragen vorübergehend blockiert. Bitte warte einen Moment, bevor du es erneut versuchst."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Langsamer!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Standard-Skins"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Du hast diese Skins erhalten, da du während des Pride-Monats für eine Modrinth-Pride-Spendenaktion gespendet hast."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Gespeicherte Skins"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Anmelden"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Bitte melde dich bei deinem Minecraft-Konto an, um die Funktionen zur Skin-Verwaltung der Modrinth-App nutzen zu können."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Begeisterter Modrinth-Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Bitte melde dich an"
+  },
+  "app.skins.title": {
+    "message": "Skin-Auswahl"
   },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} ist bereit zur Installation! Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
@@ -519,7 +657,7 @@
     "message": "Wird gelöscht..."
   },
   "instance.settings.tabs.general.duplicate-button": {
-    "message": "Kopieren"
+    "message": "Duplizieren"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "Kann während der Installation nicht dupliziert werden."
@@ -605,6 +743,24 @@
   "instance.settings.tabs.java": {
     "message": "Java und Arbeitsspeicher"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Benutzerdefinierte Umgebungsvariablen"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Benutzerdefinierte Java-Argumente"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Benutzerdefinierte Java-Installation"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Benutzerdefinierte Speicherzuweisung"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Umgebungsvariablen eingeben..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Java-Argumente eingeben..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Umgebungsvariablen"
   },
@@ -619,6 +775,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Zugewiesener Arbeitsspeicher"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/pfad/zu/java"
   },
   "instance.settings.tabs.window": {
     "message": "Fenster"

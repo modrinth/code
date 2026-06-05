@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -554,6 +551,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Opprett tilknytningslenke"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Ingen tilknytte koder funnet."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Feil ved lasting av tilknytningslenker"
   },
@@ -571,6 +571,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Søk i tilknytningslenker..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "fra{count} {count, plural, one {projekt} other {projekt}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Totale nedlastinger"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Totale følgere"
   },
   "dashboard.collections.button.create-new": {
     "message": "Lag ny"
@@ -595,6 +604,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Dine samlinger"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Søk etter samlinger..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Navn (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Nylig lagde"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Nylig lasta opp"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Last ned {formType}"
@@ -847,6 +868,57 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du har brukt opp uttakingsgrensa di <b>{withdrawLimit}</b>. Du må fullføre et skatteskjema for å ta flere uttak."
+  },
+  "dashboard.head-title": {
+    "message": "Kontrollpanel"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Se alle"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Vis varslingshistorie"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Vis {extraNotifs} flere {extraNotifs, plural, one {varsling} other {varslinger}}"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Lag organisering"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Lag ei organisering!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Kunne ikke få tak i organiseringer"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {medlem} other {medlemmer}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organiseringer"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Du kan redigere flere prosjekt samtidig ved å velge dem nedafor."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Serverprosjekt støtter ikke massredigering"
+  },
+  "dashboard.projects.empty": {
+    "message": "Du har ingen prosjekt ennå. Klikk på den grønne knappen oppi høgre hjørne for å begynne."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Prosjekt"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "og {count} flere..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Visk vekk lenka"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Rediger lenker"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Endringer blir utført på <strong>{count}</strong> {count, plural, one {prosjekt} other {prosjekt}}."
   },
   "dashboard.revenue.available-now": {
     "message": "Tilgjengelig nå"
@@ -1162,9 +1234,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Hvor oppholder Modrinth Hosting-serverne seg? Kan jeg velge en region?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Akkurat nå, så har tilgjengelige servere i Nord-Amerika, Europa, og Sørøst-Asia som du kan velge etter kjøpet ditt. Det kommer flere regioner i framtida! Viss du vil bytte regionen din, vær så snill å ta kontakt med støtte."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Hvilke Minecraft-versjoner-og-loadere kan brukes?"
@@ -1499,9 +1568,6 @@
   "layout.banner.build-fail.title": {
     "message": "Error når det kom til å generer tilstanden fra API-en når den blei bygd."
   },
-  "layout.banner.preview.description": {
-    "message": "Viss du meinte å gå til den offisielle Modrinth-nettsida, gå til <link>https://modrinth.com</link>. Denne forhandsvisnigsutplasseringa blir brukt av Modrinth-personalet for testing. Den blei bygd ved å bruke <branch-link>{owner}/{branch}</branch-link> @ {commit}."
-  },
   "layout.banner.preview.title": {
     "message": "Dette er ei forhandsvisning av distribusjonen til Modrinth-nettsida."
   },
@@ -1702,9 +1768,6 @@
   },
   "moderation.page.reports": {
     "message": "Rapporteringer"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Teknisk forhandsvisning"
   },
   "muralpay.account-type.checking": {
     "message": "Sjekking"
@@ -2396,12 +2459,6 @@
   "project.settings.visit-dashboard": {
     "message": "Besøk prosjekt-dashbordet"
   },
-  "project.stats.downloads-label": {
-    "message": "last ned{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "følger{count, plural, one {} other {s}}"
-  },
   "project.status.archived.message": {
     "message": "{title} har blitt arkivert. {title} kommer ikke til å få noen nye oppdateringer, hvis ikke forfatteren bestemmer seg for å dearkivere prosjektet."
   },
@@ -2411,23 +2468,11 @@
   "report.already-reported": {
     "message": "Du har allerede rapportert {title}"
   },
-  "report.already-reported-description": {
-    "message": "Du har en åpen rapport for denne/dette {item, select, project {prosjektet} version {versjonen} user {brukeren} other {innholdet}} allerede. Du kan legge til flere detaljer til rapporten din hvis du har mer informasjon du vil legge til."
-  },
-  "report.back-to-item": {
-    "message": "Tilbake til {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}"
-  },
   "report.body.description": {
     "message": "Viss det er mulig, inkluder lenker og bilder. Tomme eller utilstrekkelige rapporter kommer til å bli lukka ned og ignorert."
   },
   "report.body.title": {
     "message": "Vær så snill å kom med mer kontekst om prosjektet ditt"
-  },
-  "report.checking": {
-    "message": "Sjekker {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}..."
-  },
-  "report.could-not-find": {
-    "message": "Kunne ikke finne {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}"
   },
   "report.for.violation": {
     "message": "Brudd på <rules-link>Reglene</rules-link> til Modrinth eller <terms-link>Bruksvilkåra</terms-link> deres"
@@ -2468,14 +2513,8 @@
   "report.please-report": {
     "message": "Vær så snill å rapporter:"
   },
-  "report.question.content-id": {
-    "message": "Hva er ID-en til {item, select, project {prosjektet} version {versjonen} user {brukeren} other {innholdet}}?"
-  },
   "report.question.content-type": {
     "message": "Hvilken type innhold rapporterer du?"
-  },
-  "report.question.report-reason": {
-    "message": "Hvilke av reglene til Modrinth bryter dette: {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}?"
   },
   "report.report-content": {
     "message": "Rapporter innhold til moderatorene"
@@ -2588,26 +2627,14 @@
   "scopes.organizationWrite.label": {
     "message": "Skriv organisasjoner"
   },
-  "scopes.patCreate.description": {
-    "message": "Lag personlige API-tokens"
-  },
   "scopes.patCreate.label": {
     "message": "Lag PAT-er"
-  },
-  "scopes.patDelete.description": {
-    "message": "Slett de personlige API-tokenene dine"
   },
   "scopes.patDelete.label": {
     "message": "Slett PAT-er"
   },
-  "scopes.patRead.description": {
-    "message": "Vis laga API-tokener"
-  },
   "scopes.patRead.label": {
     "message": "Les PAT-er"
-  },
-  "scopes.patWrite.description": {
-    "message": "Rediger personlige API-tokener"
   },
   "scopes.patWrite.label": {
     "message": "Skriv PAT-er"
@@ -3149,14 +3176,8 @@
   "settings.billing.interval.month": {
     "message": "måned"
   },
-  "settings.billing.interval.monthly": {
-    "message": "månedlig"
-  },
   "settings.billing.interval.year": {
     "message": "år"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "årlig"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Reklamefri surfing av modrinth.com og Modrinth App-en"
@@ -3242,9 +3263,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} Delte CPU-er (utbryter opp til {bursts} CPU-er)"
   },
@@ -3308,17 +3326,8 @@
   "settings.billing.subscription.title": {
     "message": "Abonnement"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Bytt til {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Bytt til {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Månedlig fakturering kommer til å koste deg yttligere {amount} hvert year"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Bytter til {interval} fakturering på {date}"
   },
   "settings.billing.update-method": {
     "message": "Oppdater metode"

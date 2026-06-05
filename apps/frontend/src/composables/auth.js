@@ -1,3 +1,10 @@
+function normalizeAuthToken(value) {
+	if (typeof value === 'string') {
+		return value
+	}
+	return ''
+}
+
 export const useAuth = async (oldToken = null) => {
 	const auth = useState('auth', () => ({
 		user: null,
@@ -23,36 +30,45 @@ export const initAuth = async (oldToken = null) => {
 	}
 
 	const route = useRoute()
+	const config = useRuntimeConfig()
 	const authCookie = useCookie('auth-token', {
 		maxAge: 60 * 60 * 24 * 365 * 10,
 		sameSite: 'lax',
-		secure: true,
+		secure: config.public.cookieSecure,
 		httpOnly: false,
 		path: '/',
 	})
 
 	if (oldToken) {
-		authCookie.value = oldToken
+		const normalized = normalizeAuthToken(oldToken)
+		if (normalized) {
+			authCookie.value = normalized
+		}
 	}
 
-	if (route.query.code && !route.fullPath.includes('new_account=true')) {
-		authCookie.value = route.query.code
+	const oauthCode = normalizeAuthToken(route.query.code)
+	if (oauthCode && !route.fullPath.includes('new_account=true')) {
+		authCookie.value = oauthCode
 	}
 
 	if (route.fullPath.includes('new_account=true') && route.path !== '/auth/welcome') {
 		const redirect = route.path.startsWith('/auth/') ? null : route.fullPath
 
 		await navigateTo(
-			`/auth/welcome?authToken=${route.query.code}${
+			`/auth/welcome?authToken=${oauthCode}${
 				redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''
 			}`,
 		)
 	}
 
-	if (authCookie.value) {
-		auth.token = authCookie.value
+	const tokenStr = normalizeAuthToken(authCookie.value)
 
-		if (!auth.token || !auth.token.startsWith('mra_')) {
+	if (authCookie.value != null && tokenStr === '') {
+		authCookie.value = null
+	} else if (tokenStr) {
+		auth.token = tokenStr
+
+		if (!auth.token.startsWith('mra_')) {
 			return auth
 		}
 
@@ -60,6 +76,7 @@ export const initAuth = async (oldToken = null) => {
 			auth.user = await useBaseFetch(
 				'user',
 				{
+					apiVersion: 3,
 					headers: {
 						Authorization: auth.token,
 					},
@@ -71,7 +88,7 @@ export const initAuth = async (oldToken = null) => {
 		}
 	}
 
-	if (!auth.user && auth.token) {
+	if (!auth.user && auth.token && typeof auth.token === 'string') {
 		try {
 			const session = await useBaseFetch(
 				'session/refresh',
@@ -84,18 +101,23 @@ export const initAuth = async (oldToken = null) => {
 				true,
 			)
 
-			auth.token = session.session
-			authCookie.value = auth.token
-
-			auth.user = await useBaseFetch(
-				'user',
-				{
-					headers: {
-						Authorization: auth.token,
+			auth.token = normalizeAuthToken(session.session)
+			if (auth.token) {
+				authCookie.value = auth.token
+				auth.user = await useBaseFetch(
+					'user',
+					{
+						apiVersion: 3,
+						headers: {
+							Authorization: auth.token,
+						},
 					},
-				},
-				true,
-			)
+					true,
+				)
+			} else {
+				authCookie.value = null
+				auth.token = ''
+			}
 		} catch {
 			authCookie.value = null
 		}

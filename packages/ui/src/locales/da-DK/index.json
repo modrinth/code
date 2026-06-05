@@ -185,12 +185,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Advarsel ved sletning"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Slet {count} {itemType}{count, plural, one {} other {er}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Slet {itemType}{count, plural, one {} other {er}}"
-  },
   "content.page-layout.please-wait": {
     "defaultMessage": "Vent venligst"
   },
@@ -560,9 +554,6 @@
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "Mislykkedes"
   },
-  "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listet"
-  },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderator"
   },
@@ -595,9 +586,6 @@
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Fejl"
-  },
-  "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Tilbageholdt"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopiér kode til udklipsholder"
@@ -646,9 +634,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -1159,9 +1144,6 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Hvor meget RAM vil du have din server har?"
-  },
-  "servers.region.north-america": {
-    "defaultMessage": "Nordamerika"
   },
   "servers.region.prompt": {
     "defaultMessage": "Hvor vil du gerne have din server er lokaliseret?"

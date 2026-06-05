@@ -29,7 +29,7 @@ const messages = defineMessages({
 		<template #description>
 			<span>{{ formatMessage(messages.description) }}</span>
 		</template>
-		<template #actions>
+		<template #actions_right>
 			<div class="flex w-fit flex-row">
 				<ButtonStyled color="red">
 					<nuxt-link to="https://support.modrinth.com" target="_blank" rel="noopener">

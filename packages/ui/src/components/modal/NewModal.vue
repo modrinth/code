@@ -25,6 +25,7 @@
 					aria-modal="true"
 					:aria-labelledby="headerId"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+					v-bind="$attrs"
 					@keydown="handleKeyDown"
 				>
 					<div
@@ -83,6 +84,7 @@
 
 						<div
 							ref="scrollContainer"
+							data-modal-content
 							:class="[
 								'flex-1 min-h-0',
 								props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
@@ -111,7 +113,9 @@
 
 					<div
 						v-else
+						data-modal-content
 						:class="[
+							'min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6',
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
@@ -132,6 +136,7 @@
 import { XIcon } from '@modrinth/assets'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
+import { useDebugLogger } from '../../composables/debug-logger'
 import { useVIntl } from '../../composables/i18n'
 import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
@@ -140,6 +145,7 @@ import { commonMessages } from '../../utils/common-messages'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('NewModal')
 
 const modalBehavior = injectModalBehavior(null)
 const {
@@ -229,54 +235,138 @@ function getFocusableElements(): HTMLElement[] {
 }
 
 function show(event?: MouseEvent) {
+	debug('show: start', {
+		header: props.header,
+		open: open.value,
+		visible: visible.value,
+		stackSize: modalStackSize(),
+		hasEvent: !!event,
+	})
 	props.onShow?.()
+	debug('show: after onShow', { header: props.header })
 	const wasEmpty = modalStackSize() === 0
 	stackDepth.value = modalStackSize()
+	debug('show: before open=true', {
+		header: props.header,
+		wasEmpty,
+		stackDepth: stackDepth.value,
+	})
 	open.value = true
+	debug('show: after open=true', {
+		header: props.header,
+		open: open.value,
+		modalBodyExists: !!modalBodyRef.value,
+	})
 	previousFocusEl = document.activeElement
+	debug('show: previous focus captured', {
+		header: props.header,
+		previousFocusTag: previousFocusEl instanceof HTMLElement ? previousFocusEl.tagName : null,
+		previousFocusClass: previousFocusEl instanceof HTMLElement ? previousFocusEl.className : null,
+	})
 	pushModal()
+	debug('show: after pushModal', { header: props.header, stackSize: modalStackSize() })
 	if (wasEmpty) modalBehavior?.onShow?.()
+	debug('show: after modalBehavior onShow', { header: props.header })
 
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('keydown', handleWindowKeyDown)
 	window.addEventListener('mousedown', updateMousePosition)
+	debug('show: listeners attached', { header: props.header })
 	if (event) {
 		updateMousePosition(event)
 	} else {
 		mouseX.value = Math.round(window.innerWidth / 2)
 		mouseY.value = Math.round(window.innerHeight / 2)
 	}
+	debug('show: mouse position set', {
+		header: props.header,
+		mouseX: mouseX.value,
+		mouseY: mouseY.value,
+	})
 	setTimeout(() => {
+		debug('show: timeout before visible=true', {
+			header: props.header,
+			open: open.value,
+			visible: visible.value,
+			modalBodyExists: !!modalBodyRef.value,
+		})
 		visible.value = true
+		debug('show: timeout after visible=true', {
+			header: props.header,
+			open: open.value,
+			visible: visible.value,
+			modalBodyExists: !!modalBodyRef.value,
+		})
 		nextTick(() => {
+			debug('show: nextTick focus start', {
+				header: props.header,
+				modalBodyExists: !!modalBodyRef.value,
+			})
 			const focusable = getFocusableElements()
+			debug('show: focusable elements', {
+				header: props.header,
+				count: focusable.length,
+				firstTag: focusable[0]?.tagName,
+			})
 			if (focusable.length > 0) {
 				focusable[0].focus()
 			} else {
 				modalBodyRef.value?.focus()
 			}
+			debug('show: nextTick focus done', { header: props.header })
 		})
 	}, 50)
+	debug('show: end', { header: props.header })
 }
 
 function hide() {
-	if (props.disableClose) return
+	debug('hide: start', {
+		header: props.header,
+		open: open.value,
+		visible: visible.value,
+		disableClose: props.disableClose,
+		stackSize: modalStackSize(),
+	})
+	if (props.disableClose) {
+		debug('hide: ignored disableClose', { header: props.header })
+		return
+	}
 	props.onHide?.()
+	debug('hide: after onHide', { header: props.header })
 	visible.value = false
+	debug('hide: after visible=false', { header: props.header, visible: visible.value })
 	popModal()
+	debug('hide: after popModal', { header: props.header, stackSize: modalStackSize() })
 	if (modalStackSize() === 0) {
 		modalBehavior?.onHide?.()
 		document.body.style.overflow = ''
 	}
 	window.removeEventListener('keydown', handleWindowKeyDown)
 	window.removeEventListener('mousedown', updateMousePosition)
+	debug('hide: listeners removed', { header: props.header })
 	if (previousFocusEl instanceof HTMLElement) {
+		debug('hide: restoring focus', {
+			header: props.header,
+			previousFocusTag: previousFocusEl.tagName,
+			previousFocusClass: previousFocusEl.className,
+		})
 		previousFocusEl.focus()
 	}
 	previousFocusEl = null
 	setTimeout(() => {
+		debug('hide: timeout before open=false', {
+			header: props.header,
+			open: open.value,
+			visible: visible.value,
+		})
 		open.value = false
+		debug('hide: timeout after open=false', {
+			header: props.header,
+			open: open.value,
+			visible: visible.value,
+		})
 	}, 300)
+	debug('hide: end', { header: props.header })
 }
 
 defineExpose({
@@ -304,6 +394,12 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 }
 
 onUnmounted(() => {
+	debug('unmounted', {
+		header: props.header,
+		open: open.value,
+		visible: visible.value,
+		stackSize: modalStackSize(),
+	})
 	if (open.value) {
 		popModal()
 		window.removeEventListener('keydown', handleWindowKeyDown)
@@ -345,6 +441,10 @@ function handleKeyDown(event: KeyboardEvent) {
 		}
 	}
 }
+
+defineOptions({
+	inheritAttrs: false,
+})
 </script>
 
 <style lang="scss" scoped>

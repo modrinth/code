@@ -337,7 +337,7 @@ pub async fn revenue_get(
             "
             SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start
             FROM payouts_values
-            WHERE user_id = $1 AND created BETWEEN $2 AND $3
+            WHERE user_id = $1 AND created >= $2 AND created < $3
             GROUP by mod_id, interval_start ORDER BY interval_start
             ",
             user.id.0 as i64,
@@ -356,7 +356,7 @@ pub async fn revenue_get(
             "
             SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start
             FROM payouts_values
-            WHERE mod_id = ANY($1) AND created BETWEEN $2 AND $3
+            WHERE mod_id = ANY($1) AND created >= $2 AND created < $3
             GROUP by mod_id, interval_start ORDER BY interval_start
             ",
             &project_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>(),

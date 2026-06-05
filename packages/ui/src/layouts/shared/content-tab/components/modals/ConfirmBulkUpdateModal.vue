@@ -8,11 +8,13 @@
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-				{{ formatMessage(messages.admonitionBody, { count }) }}
+				{{ formatMessage(messages.admonitionBody, { count: visibleCount }) }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				:backup-name="backupTip ? `Before bulk update (${backupTip})` : 'Before bulk update'"
+				:backup-name="
+					visibleBackupTip ? `Before bulk update (${visibleBackupTip})` : 'Before bulk update'
+				"
 				:shift-click-hint-override="formatMessage(messages.shiftClickHint)"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
@@ -27,9 +29,13 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button :disabled="buttonsDisabled" @click="confirm">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="confirm"
+					>
 						<DownloadIcon />
-						{{ formatMessage(messages.updateButton, { count }) }}
+						{{ formatMessage(messages.updateButton, { count: visibleCount }) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -76,10 +82,12 @@ const messages = defineMessages({
 	},
 })
 
-defineProps<{
+const props = defineProps<{
 	count: number
 	server?: boolean
 	backupTip?: string
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string
 }>()
 
 const emit = defineEmits<{
@@ -89,12 +97,17 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
+const visibleCount = ref(props.count)
+const visibleBackupTip = ref(props.backupTip)
 
 function show() {
+	visibleCount.value = props.count
+	visibleBackupTip.value = props.backupTip
 	modal.value?.show()
 }
 
 function confirm() {
+	if (props.actionDisabled) return
 	modal.value?.hide()
 	emit('update')
 }

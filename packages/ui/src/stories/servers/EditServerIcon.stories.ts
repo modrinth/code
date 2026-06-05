@@ -1,11 +1,14 @@
 import type { Archon, UploadState } from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
 import EditServerIcon from '../../components/servers/edit-server-icon/EditServerIcon.vue'
 import { provideModrinthServerContext } from '../../providers'
-import type { ModrinthServerContext } from '../../providers/server-context'
+import type {
+	CancelUploadHandler,
+	ModrinthServerContext,
+	ServerStats,
+} from '../../providers/server-context'
 
 const meta = {
 	title: 'Servers/EditServerIcon',
@@ -22,7 +25,7 @@ const meta = {
 					upstream: null,
 				} as Archon.Servers.v0.Server)
 
-				const stats = ref<Stats>({
+				const stats = ref<ServerStats>({
 					current: {
 						cpu_percent: 0,
 						ram_usage_bytes: 0,
@@ -59,6 +62,8 @@ const meta = {
 					},
 					worldId: ref(null),
 					server,
+					serverFull: computed(() => null),
+					currentUserPermissions: computed(() => 0),
 					isConnected: ref(true),
 					isWsAuthIncorrect: ref(false),
 					powerState: ref('running'),
@@ -73,7 +78,7 @@ const meta = {
 					fsQueuedOps: ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([]),
 					refreshFsAuth: async () => {},
 					uploadState,
-					cancelUpload: ref(null),
+					cancelUpload: ref<CancelUploadHandler | null>(null),
 					activeOperations: computed(() => []),
 					dismissOperation: async () => {},
 				}

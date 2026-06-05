@@ -25,6 +25,8 @@ import {
 	PayPalIcon,
 	PlugIcon,
 	PolygonIcon,
+	ScaleIcon,
+	ServerIcon,
 	UnknownIcon,
 	UpdatedIcon,
 	USDCColorIcon,
@@ -49,6 +51,7 @@ export const PROJECT_TYPE_ICONS: Record<ProjectType, Component> = {
 	plugin: PlugIcon,
 	datapack: BracesIcon,
 	project: BoxIcon,
+	minecraft_java_server: ServerIcon,
 }
 
 export const PAYMENT_METHOD_ICONS: Record<string, Component> = {
@@ -68,6 +71,7 @@ export const SEVERITY_ICONS: Record<string, Component> = {
 	error: XCircleIcon,
 	critical: XCircleIcon,
 	success: CheckCircleIcon,
+	moderation: ScaleIcon,
 }
 
 export const PROJECT_STATUS_ICONS: Record<ProjectStatus, Component> = {

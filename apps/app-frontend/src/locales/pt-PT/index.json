@@ -1,15 +1,66 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "A descarregar a versão do java {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "Downloads"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Esconder mais instâncias a correr"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Transformar na instância principal"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Nenhuma instância a correr"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Instância principal"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Mostrar mais instâncias a correr"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Para instância"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Ver instâncias ativas"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Ver instância"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Ver logs"
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Renderização avançada"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Seleciona a tua cor preferida para a Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Cor de tema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Mudar a página em que o launcher abre."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Casa"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Livraria"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Página de carregamento principal"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Os servidores de autenticação do Minecraft poderão estar em baixo de momento. Verifica a tua ligação à internet e tenta novamente mais tarde."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível alcançar os servidores de autenticação"
-  },
-  "app.browse.add-server-to-instance": {
-    "message": "Adicionar servidor à instância"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "Adicionar servidores à tua instância"
   },
   "app.browse.add-to-instance": {
     "message": "Adicionar à instância"
@@ -29,9 +80,6 @@
   "app.browse.discover-servers": {
     "message": "Descobrir servidores"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "Instalar conteúdo à instância"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Insere a descrição do modpack..."
   },
@@ -46,9 +94,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nome do Modpack"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Seleciona as pastas e ficheiros a incluir no pack"
   },
   "app.export-modal.version-number-label": {
     "message": "Número da versão"
@@ -104,9 +149,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Procurar servidores"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "\"{name}\" vai ser **apagado permanentemente**, e não haverá maneira de o recuperar."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Tens a certeza que queres apagar permanentemente este mundo?"
   },
@@ -127,12 +169,6 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Sem servidores ou mundos adicionados"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "\"{name}\" vai ser removido da tua lista, incluindo dentro do jogo, e não haverá maneira de o recuperar."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "\"{name}\" ({address}) vai ser removido da tua lista, incluindo dentro do jogo, e não haverá maneira de o recuperar."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Tens a certeza que queres remover {name}?"

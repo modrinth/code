@@ -54,7 +54,7 @@
     "defaultMessage": "{sharedCpus} CPUs compartidas"
   },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "Estás a punto de renovar tu suscripción a <server-name>{serverName}</server-name>. Tu suscripción será reactivada y tu servidor continuará funcionando sin interrupciones."
+    "defaultMessage": "Estás a punto de renovar tu suscripción a <server-name>{serverName}</server-name>. Tu suscripción se reactivará y tu servidor seguirá funcionando sin interrupciones."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "No se puede renovar la suscripción, no se pudieron cargar los detalles."
@@ -64,18 +64,6 @@
   },
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Error al cargar los detalles de la suscripción."
-  },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 días"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/mes"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/trimestre"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/año"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Tu próximo cargo será el <charge-date>{date}</charge-date>."
@@ -95,8 +83,44 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Renovar suscripción del servidor"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Filtrar resultados..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "¡No se encontraron resultados para tu búsqueda!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Actualmente estás desconectado. ¡Conéctate a internet para navegar en Modrinth!"
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Proyectos seleccionados"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Instalar {count, plural, one {# proyecto} other {# proyectos}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# proyecto seleccionado} other {# proyectos seleccionados}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Has seleccionado {count, plural, one {# proyecto} other {# proyectos}} para instalar. Instálalos ahora o vuelve atrás sin instalarlos."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Proyectos seleccionados aún no instalados"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Descartar"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Proyectos seleccionados aún no instalados"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Ver:"
+  },
   "button.accept": {
     "defaultMessage": "Aceptar"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Añadir servidor a la instancia"
   },
   "button.affiliate-links": {
     "defaultMessage": "Enlaces de afiliado"
@@ -167,6 +191,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Ocultar snapshots"
   },
+  "button.install": {
+    "defaultMessage": "Instalar"
+  },
   "button.max": {
     "defaultMessage": "Máx"
   },
@@ -184,6 +211,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Abrir en la carpeta"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Abrir en Modrinth"
   },
   "button.play": {
     "defaultMessage": "Jugar"
@@ -261,10 +291,10 @@
     "defaultMessage": "Actualizar"
   },
   "button.upload-image": {
-    "defaultMessage": "Subir imagen"
+    "defaultMessage": "Cargar imagen"
   },
   "changelog.justNow": {
-    "defaultMessage": "Ahora mismo"
+    "defaultMessage": "Hace un momento"
   },
   "changelog.product.app": {
     "defaultMessage": "Aplicación"
@@ -277,6 +307,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Privado"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Seleccionar {project}"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Estás seguro de querer actualizar {count, plural,one {# proyecto} other {# proyectos}} a su última versión compatible? Se recomienda actualizar el contenido de uno-en-uno."
@@ -291,25 +324,19 @@
     "defaultMessage": "Mantén pulsada la tecla Shift mientras haces clic en \"Actualizar todo\" para omitir esta confirmación en el futuro."
   },
   "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "Actualizar {count, plural, one {# project} other {# projects}}"
+    "defaultMessage": "Actualizar {count, plural, one {# proyecto} other {# proyectos}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Eliminar un mod puede afectar permanentemente tu mundo y puede causar contenido perdido o problemas inesperados cuando se carga de nuevo."
+    "defaultMessage": "Eliminar un mod puede afectar permanentemente tu mundo y provocar que falte contenido o que surjan problemas inesperados al volver a cargarlo."
   },
   "content.confirm-deletion.admonition-header": {
-    "defaultMessage": "Advertencia de borrado"
-  },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Eliminar {count} {itemType}{count, plural, uno {} otro {s}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Eliminar {itemType}{count, plural, uno {} otro {s}}"
+    "defaultMessage": "Advertencia de eliminación"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Bajar de versión} other {Actualizar}} puede causar problemas de compatibilidad. Los mods o contenido que agregaste sobre el modpack se mantendrán, pero podrían no ser compatibles con la nueva versión."
   },
   "content.confirm-modpack-update.admonition-header": {
-    "defaultMessage": "{action, select, downgrade {Degradar} other {Actualizar}} advertencia"
+    "defaultMessage": "Advertencia {action, select, downgrade {al bajar de versión} other {de actualizar}}"
   },
   "content.confirm-modpack-update.confirm-button": {
     "defaultMessage": "{action, select, downgrade {Desactualizar} other {Actualizar}} modpack"
@@ -350,6 +377,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizados"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Desactivado"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Activado"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Actualizaciones"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Advertencias"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando respaldo..."
   },
@@ -368,11 +407,14 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Crear respaldo"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instancia"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Mantén pulsada la tecla Shift mientras haces clic para omitir la confirmación."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Te recomendamos crear un respaldo antes de continuar, para que puedas restaurar tu {type, select,server {mundo} other {instancia}} si algo se rompe."
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "¡Ya puedes encontrar el contenido de tu modpack aquí!"
@@ -416,9 +458,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Por favor, espera"
   },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "Buscar {count} {contentType}..."
-  },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nombres de archivos"
   },
@@ -438,10 +477,10 @@
     "defaultMessage": "Allfabético"
   },
   "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Recientes Primero"
+    "defaultMessage": "Más recientes primero"
   },
   "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Antiguos primero"
+    "defaultMessage": "Más antiguo primero"
   },
   "content.page-layout.sort.label": {
     "defaultMessage": "Ordenar por {mode}"
@@ -482,9 +521,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Actualizando {contentType}..."
   },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} seleccionado"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} seleccionados"
   },
@@ -516,7 +552,7 @@
     "defaultMessage": "Buscar número de compilación..."
   },
   "creation-flow.modal.custom-setup.content-loader.label": {
-    "defaultMessage": "Cargador de contenido"
+    "defaultMessage": "Loader de contenido"
   },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Seleccionar versión del juego"
@@ -540,13 +576,13 @@
     "defaultMessage": "Estable"
   },
   "creation-flow.modal.custom-setup.loader-version.label": {
-    "defaultMessage": "Versión del cargador"
+    "defaultMessage": "Versión del loader"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
-    "defaultMessage": "Seleccionar versión del cargador"
+    "defaultMessage": "Seleccionar versión del loader"
   },
   "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
-    "defaultMessage": "Buscar la versión del Loader..."
+    "defaultMessage": "Buscar versión del loader..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Loader"
@@ -555,16 +591,16 @@
     "defaultMessage": "Nombre"
   },
   "creation-flow.modal.custom-setup.name.placeholder": {
-    "defaultMessage": "Introducir nombre de instancia"
+    "defaultMessage": "Introduce el nombre de la instancia"
   },
   "creation-flow.modal.custom-setup.options.no-versions-available": {
-    "defaultMessage": "Ninguna versión disponible"
+    "defaultMessage": "No hay versiones disponibles"
   },
   "creation-flow.modal.final-config.additional-settings.title": {
     "defaultMessage": "Configuraciones adicionales"
   },
   "creation-flow.modal.final-config.backup.before-reset-server.name": {
-    "defaultMessage": "Antes de resetear el servidor"
+    "defaultMessage": "Antes de reiniciar el servidor"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "Fácil"
@@ -582,28 +618,28 @@
     "defaultMessage": "Pacífico"
   },
   "creation-flow.modal.final-config.game-version.placeholder": {
-    "defaultMessage": "Seleccionar versión del juego"
+    "defaultMessage": "Selecciona la versión del juego"
   },
   "creation-flow.modal.final-config.gamemode.creative": {
     "defaultMessage": "Creativo"
   },
   "creation-flow.modal.final-config.gamemode.hardcore": {
-    "defaultMessage": "Hardcore"
+    "defaultMessage": "Extremo"
   },
   "creation-flow.modal.final-config.gamemode.label": {
-    "defaultMessage": "Gamemode"
+    "defaultMessage": "Modo de juego"
   },
   "creation-flow.modal.final-config.gamemode.survival": {
     "defaultMessage": "Supervivencia"
   },
   "creation-flow.modal.final-config.generate-structures.description": {
-    "defaultMessage": "Controla si aldeas, strongholds, y otras estructuras se generan en chunks nuevos."
+    "defaultMessage": "Controla si las aldeas, las strongholds y otras estructuras se generan en los chunks nuevos."
   },
   "creation-flow.modal.final-config.generate-structures.label": {
     "defaultMessage": "Generar estructuras"
   },
   "creation-flow.modal.final-config.generator-settings-json.placeholder": {
-    "defaultMessage": "Introduzca la configuración JSON del generador"
+    "defaultMessage": "Introduce la configuración JSON del generador"
   },
   "creation-flow.modal.final-config.generator-settings.custom": {
     "defaultMessage": "Personalizado"
@@ -612,31 +648,31 @@
     "defaultMessage": "Predeterminado"
   },
   "creation-flow.modal.final-config.generator-settings.description": {
-    "defaultMessage": "Usado para customización avanzada de mundos, como Superflat layers."
+    "defaultMessage": "Se utiliza para la personalización avanzada del mundo, como las capas del mundo extra-plano personalizadas."
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
     "defaultMessage": "Plano"
   },
   "creation-flow.modal.final-config.generator-settings.label": {
-    "defaultMessage": "Configuración de generador"
+    "defaultMessage": "Configuración del generador"
   },
   "creation-flow.modal.final-config.generator-settings.placeholder": {
-    "defaultMessage": "Seleccionar configuración de generador"
+    "defaultMessage": "Selecciona la configuración del generador"
   },
   "creation-flow.modal.final-config.world-name.label": {
     "defaultMessage": "Nombre del mundo"
   },
   "creation-flow.modal.final-config.world-name.placeholder": {
-    "defaultMessage": "Introduzca el nombre del mundo"
+    "defaultMessage": "Introduce el nombre del mundo"
   },
   "creation-flow.modal.final-config.world-seed.description": {
-    "defaultMessage": "Deje en blanco para que se genere una semilla aleatoria."
+    "defaultMessage": "Déjalo en blanco para obtener una semilla aleatoria."
   },
   "creation-flow.modal.final-config.world-seed.label-with-optional": {
-    "defaultMessage": "Semilla de mundo <optional>(Opcional)</optional>"
+    "defaultMessage": "Semilla del mundo <optional>(Opcional)</optional>"
   },
   "creation-flow.modal.final-config.world-seed.placeholder": {
-    "defaultMessage": "Introduzca la semilla del mundo"
+    "defaultMessage": "Introduce la similla del mundo"
   },
   "creation-flow.modal.final-config.world-type.amplified": {
     "defaultMessage": "Amplificado"
@@ -651,13 +687,13 @@
     "defaultMessage": "Biomas grandes"
   },
   "creation-flow.modal.final-config.world-type.placeholder": {
-    "defaultMessage": "Seleccione el tipo de mundo"
+    "defaultMessage": "Selecciona el tipo de mundo"
   },
   "creation-flow.modal.final-config.world-type.single-biome": {
-    "defaultMessage": "Un solo bioma"
+    "defaultMessage": "Bioma único"
   },
   "creation-flow.modal.final-config.world-type.superflat": {
-    "defaultMessage": "Superplano"
+    "defaultMessage": "Extraplano"
   },
   "creation-flow.modal.import-instance.action.add": {
     "defaultMessage": "Añadir"
@@ -666,25 +702,25 @@
     "defaultMessage": "Personalizado ({pathName})"
   },
   "creation-flow.modal.import-instance.detecting-launcher-instances": {
-    "defaultMessage": "Detectando instancias de launcher..."
+    "defaultMessage": "Detectando instancias del launcher..."
   },
   "creation-flow.modal.import-instance.launcher-instances.title": {
-    "defaultMessage": "Instancias de launcher"
+    "defaultMessage": "Instancias del launcher"
   },
   "creation-flow.modal.import-instance.launcher-path.add": {
-    "defaultMessage": "Añade el directorio del launcher"
+    "defaultMessage": "Añade la ruta del launcher"
   },
   "creation-flow.modal.import-instance.launcher-path.placeholder": {
-    "defaultMessage": "Directorio al launcher..."
+    "defaultMessage": "Ruta al launcher..."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.text": {
-    "defaultMessage": "Ninguna instancia importable fue encontrada en el directorio especificado."
+    "defaultMessage": "No se encontraron instancias importables en la ruta especificada."
   },
   "creation-flow.modal.import-instance.notification.no-instances-found.title": {
-    "defaultMessage": "Ninguna instancia encontrada"
+    "defaultMessage": "No se encontraron instancias"
   },
   "creation-flow.modal.import-instance.search.placeholder": {
-    "defaultMessage": "Buscar instancia por nombre"
+    "defaultMessage": "Buscar nombre de instancia"
   },
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Borrar todo"
@@ -696,52 +732,52 @@
     "defaultMessage": "Importar modpack"
   },
   "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "¿Ya sabes cuál es el modpack que quieres instalar?"
+    "defaultMessage": "¿Ya sabes qué modpack quieres instalar?"
   },
   "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ningún resultado encontrado"
+    "defaultMessage": "No se encontraron resultados"
   },
   "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Buscar por modpack"
+    "defaultMessage": "Buscar un modpack"
   },
   "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Una instancia es una configuración de Minecraft con un específico loader, versión, y mods."
+    "defaultMessage": "Una instancia es una configuración de Minecraft con un loader, una versión y unos mods específicos."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
-    "defaultMessage": "Empieza desde cero primero eligiendo un loader y una versión de juego."
+    "defaultMessage": "Empieza desde cero eligiendo un loader y una versión del juego."
   },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Configuración personalizada"
   },
   "creation-flow.modal.setup-type.option.import-instance.description": {
-    "defaultMessage": "Importa una instancia de Prism, CurseForge, o similar."
+    "defaultMessage": "Importa una instancia desde Prism, CurseForge, o similar."
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importar instancia"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Descubre modpacks en Modrinth o importe uno desde un archivo."
+    "defaultMessage": "Explora los modpacks en Modrinth o importa uno desde un archivo."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Instalar modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
-    "defaultMessage": "Minecraft clásico sin ningún mod o puglins."
+    "defaultMessage": "Minecraft clásico, sin mods ni plugins."
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
     "defaultMessage": "Minecraft vanilla"
   },
   "creation-flow.modal.setup-type.title.installation": {
-    "defaultMessage": "Seleccione tipo de instalación"
+    "defaultMessage": "Selecciona el tipo de instalación"
   },
   "creation-flow.modal.setup-type.title.instance": {
-    "defaultMessage": "Elige tipo de instancia"
+    "defaultMessage": "Elige el tipo de instancia"
   },
   "creation-flow.modal.setup-type.title.world": {
-    "defaultMessage": "Seleccione tipo de mundo"
+    "defaultMessage": "Selecciona el tipo de mundo"
   },
   "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Elige modpack"
+    "defaultMessage": "Elige un modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Crear instancia"
@@ -758,6 +794,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Configurar servidor"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "No"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Permanente, no"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Sin identificar"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Con atribución"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Con atribución y fuente"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Sí"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Resumen de la extracción"
   },
@@ -765,7 +819,7 @@
     "defaultMessage": "Sobrescribir"
   },
   "files.conflict-modal.overwrite-many-warning": {
-    "defaultMessage": "Más de 100 archivos se sobrescribirán si continúas con la extracción; estos son algunos de ellos."
+    "defaultMessage": "Si continúas con la extracción, se sobrescribirán más de 100 archivos; estos son algunos de ellos."
   },
   "files.conflict-modal.overwrite-warning": {
     "defaultMessage": "Los siguientes {count} archivos ya existen en tu servidor y se sobrescribirán si continúas con la extracción."
@@ -773,17 +827,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} sobrescritos"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Sobrescrito"
-  },
   "files.conflict-modal.warning-header": {
-    "defaultMessage": "Los archivos se sobrescribirán"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "Crear {type, select,directory {carpeta} other {archivo}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Crear {type, select,directory {carpeta} other {archivo}}"
+    "defaultMessage": "Se sobrescribirán archivos"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "por ej., mi-carpeta"
@@ -796,9 +841,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Borrar archivo"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select,directory {Esta carpeta y todo su contenido serán eliminados permanentemente. Esta acción no se puede deshacer.} other {Este archivo será eliminado permanentemente. Esta acción no se puede deshacer.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "No se pudo cargar el contenido del archivo."
@@ -861,13 +903,13 @@
     "defaultMessage": "Error al guardar"
   },
   "files.error.go-to-home": {
-    "defaultMessage": "Ir a la carpeta de inicio"
+    "defaultMessage": "Ir a la carpeta principal"
   },
   "files.error.try-again": {
-    "defaultMessage": "Inténtalo de nuevo"
+    "defaultMessage": "Volver a intentar"
   },
   "files.image_viewer.image_too_large": {
-    "defaultMessage": "Imagen demasiado grande para visualizarse (máx. {maxDimension}x{maxDimension} píxeles)"
+    "defaultMessage": "La imagen es demasiado grande para mostrarla (máx. {maxDimension}x{maxDimension} píxeles)"
   },
   "files.image_viewer.invalid_image": {
     "defaultMessage": "Archivo de imagen inválido o vacío."
@@ -886,6 +928,18 @@
   },
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Alejar el zoom"
+  },
+  "files.item-type.file": {
+    "defaultMessage": "archivo"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "archivos"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "carpeta"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "carpetas"
   },
   "files.layout.busy-warning": {
     "defaultMessage": "Las operaciones de archivos están deshabilitadas mientras se realiza la operación."
@@ -909,7 +963,7 @@
     "defaultMessage": "No se pueden cargar los archivos"
   },
   "files.layout.extraction-started-title": {
-    "defaultMessage": "Inició la extracción"
+    "defaultMessage": "Extracción iniciada"
   },
   "files.layout.selected-count": {
     "defaultMessage": "{count} seleccionados"
@@ -925,9 +979,6 @@
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "por ej., /mi-carpeta"
-  },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select,directory {Mover carpeta} other {Mover archivo}}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Volver a inicio"
@@ -972,19 +1023,19 @@
     "defaultMessage": "Cargar archivo .zip desde URL"
   },
   "files.operations.current-file": {
-    "defaultMessage": "Actual archivo: {file}"
+    "defaultMessage": "Archivo actual: {file}"
   },
   "files.operations.extracted": {
-    "defaultMessage": "{size} extraído"
+    "defaultMessage": "{size} extraídos"
   },
   "files.operations.extracting": {
     "defaultMessage": "Extrayendo {source}"
   },
   "files.operations.extracting-completed": {
-    "defaultMessage": "Extracción de {source} terminada"
+    "defaultMessage": "Extracción de {source} finalizada"
   },
   "files.operations.extracting-failed": {
-    "defaultMessage": "Extracción de {source} fallada"
+    "defaultMessage": "Extracción de {source} fallida"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack desde URL"
@@ -996,7 +1047,7 @@
     "defaultMessage": "Nuevo nombre"
   },
   "files.row.item-count": {
-    "defaultMessage": "{count, plural,one {# item} other {# items}}"
+    "defaultMessage": "{count, plural, one {# elemento} other {# elementos}}"
   },
   "files.table-header.created": {
     "defaultMessage": "Creado"
@@ -1041,7 +1092,7 @@
     "defaultMessage": "{fileType} cargas"
   },
   "files.upload-dropdown.incorrect-file-type": {
-    "defaultMessage": "La carga tiene un tipo de archivo incorrecto"
+    "defaultMessage": "El tipo de archivo cargado es incorrecto"
   },
   "files.upload-dropdown.unexpected-error": {
     "defaultMessage": "Ha ocurrido un error inesperado."
@@ -1049,14 +1100,11 @@
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} restantes"
   },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Suelta los {type, select,undefined {archivos} other {{type}s}} para cargarlos"
-  },
   "files.validation.name-invalid-directory": {
-    "defaultMessage": "El nombre solo debe tener caracteres alfanuméricos, guiones, guiones bajos o espacios."
+    "defaultMessage": "El nombre solo debe contener caracteres alfanuméricos, guiones, guiones bajos o espacios."
   },
   "files.validation.name-invalid-file": {
-    "defaultMessage": "El nombre solo debe tener caracteres alfanuméricos, guiones, guiones bajos, puntos o espacios."
+    "defaultMessage": "El nombre solo debe contener caracteres alfanuméricos, guiones, guiones bajos, puntos o espacios."
   },
   "files.validation.name-label": {
     "defaultMessage": "Nombre"
@@ -1101,7 +1149,7 @@
     "defaultMessage": "Copia la URL"
   },
   "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Explora CurseForge y localiza el modpack que deseas."
+    "defaultMessage": "Explora en CurseForge y localiza el modpack que deseas."
   },
   "files.zip-url-modal.step-find-title": {
     "defaultMessage": "Encuentra el modpack"
@@ -1119,7 +1167,7 @@
     "defaultMessage": "Copia y pega la URL de descarga directa de un archivo .zip."
   },
   "files.zip-url-modal.zip-header": {
-    "defaultMessage": "Subiendo contenido del .zip desde URL"
+    "defaultMessage": "Cargando el contenido de un archivo .zip desde URL"
   },
   "form.label.address-line": {
     "defaultMessage": "Dirección"
@@ -1199,6 +1247,21 @@
   "form.placeholder.state": {
     "defaultMessage": "Introduce el estado"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural,one {# byte} other {# bytes}}"
+  },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
+  },
   "header.category.category": {
     "defaultMessage": "Categoría"
   },
@@ -1234,6 +1297,9 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Error al actualizar el contenido"
+  },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "Error al instalar el contenido"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Error al cargar el contenido del modpack"
@@ -1278,7 +1344,7 @@
     "defaultMessage": "Error al desvincular el modpack"
   },
   "hosting.loader.loader-version": {
-    "defaultMessage": "{loader, select, null {Versión del Loader} other {Versión del {loader}}}"
+    "defaultMessage": "{loader, select, null {Versión del loader} other {Versión del {loader}}}"
   },
   "hosting.loader.repair-started-text": {
     "defaultMessage": "Se reparó la instalación de tu servidor."
@@ -1311,7 +1377,7 @@
     "defaultMessage": "Opciones de soporte"
   },
   "hosting.specs.burst": {
-    "defaultMessage": "Hilos de hasta {cpus} CPU"
+    "defaultMessage": "Aumenta hasta {cpus} CPUs"
   },
   "hosting.specs.burst.tooltip": {
     "defaultMessage": "La función de aumento de CPU permite que tu servidor utilice temporalmente subprocesos adicionales para ayudar a mitigar los picos de TPS. Haz clic para obtener más información."
@@ -1368,7 +1434,7 @@
     "defaultMessage": "Confirmar"
   },
   "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Cambiar a {gameVersion} modificará el siguiente contenido en tu servidor."
+    "defaultMessage": "Si cambias a {gameVersion}, se modificará el siguiente contenido en tu servidor."
   },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Revisar los cambios del contenido"
@@ -1406,17 +1472,14 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Cambiar de loader es destructivo"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Vinculado a {projectType, select, server {proyecto de servidor} other {modpack}}"
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "modpack"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} versión"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Tendrás que reiniciar el servidor para cambiar de loader."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Reinstalar el modpack restablece el contenido {type, select, server {del servidor} other {de la instancia}} a su estado original, eliminando cualquier mod o contenido que hayas agregado."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Reinstalar modpack"
@@ -1445,11 +1508,20 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Buscar versión del juego..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "instancia"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "de la instancia"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "servidor"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "del servidor"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Desvincular"
-  },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Desvincular desconecta permanentemente {type, select, server {este servidor} other {la instancia}} del proyecto {projectType, select, server {servidor} other {modpack}}, permitiéndote cambiar el loader y la versión de Minecraft, pero no recibirás actualizaciones futuras."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Verificando..."
@@ -1466,14 +1538,14 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstalar modpack"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "La reparación reinstala el loader y las dependencias de Minecraft sin borrar tu contenido. Esto puede resolver problemas si tu {type, select, server {servidor no inicia correctamente} other {juego no inicia debido a errores relacionados con el launcher}}."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "Reparar {type, select, server {el servidor} other {la instancia}}"
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "instancia"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparar"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "servidor"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modo aventura"
@@ -1524,7 +1596,7 @@
     "defaultMessage": "Nueva instancia"
   },
   "instances.content-install.no-instances": {
-    "defaultMessage": "No se encontró instancias compatibles"
+    "defaultMessage": "No se encontraron instancias compatibles"
   },
   "instances.content-install.remove-icon": {
     "defaultMessage": "Eliminar ícono"
@@ -1551,7 +1623,7 @@
     "defaultMessage": "Ningún proyecto coincide con tu búsqueda."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Buscar {count, number} {count, plural, one {proyecto} other {proyectos}}"
+    "defaultMessage": "Buscar en {count, number} {count, plural, one {proyecto} other {proyectos}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actual"
@@ -1573,6 +1645,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Ocultar incompatible"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} no está marcada como compatible con esta instalación. Es posible que no se inicie o que funcione de forma inesperada."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "¿Actualizar a una versión incompatible?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Actualizar de todos modos"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Cargando el registro de cambios..."
@@ -1602,10 +1683,10 @@
     "defaultMessage": "Actualizar a {version}"
   },
   "instances.updater-modal.warning-app": {
-    "defaultMessage": "Actualizar puede romper tu instancia. Revisa el registro de cambios de la versión y haz un respaldo primero."
+    "defaultMessage": "Actualizar puede dañar tu instancia. Revisa los registros de cambios de la versión y haz una copia de seguridad primero."
   },
   "instances.updater-modal.warning-web": {
-    "defaultMessage": "Actualizar puede romper tu mundo. Revisa el registro de cambios y haz un respaldo primero."
+    "defaultMessage": "Actualizar puede dañar tu mundo. Revisa los registros de cambios de la versión y haz una copia de seguridad primero."
   },
   "label.actions": {
     "defaultMessage": "Acciones"
@@ -1688,20 +1769,35 @@
   "label.filter-by": {
     "defaultMessage": "Filtrar por"
   },
+  "label.filters": {
+    "defaultMessage": "Filtros"
+  },
   "label.followed-projects": {
     "defaultMessage": "Proyectos seguidos"
   },
   "label.game-version": {
     "defaultMessage": "Versión del juego"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "Ocultar contenido ya instalado"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Ocultar contenido seleccionado"
+  },
   "label.installation-info": {
     "defaultMessage": "Información de la instalación"
+  },
+  "label.installed": {
+    "defaultMessage": "Instalado"
   },
   "label.installed-modpack": {
     "defaultMessage": "Modpack instalado"
   },
   "label.installing": {
     "defaultMessage": "Instalando..."
+  },
+  "label.installing-content": {
+    "defaultMessage": "Instalando contenido"
   },
   "label.loading": {
     "defaultMessage": "Cargando..."
@@ -1778,6 +1874,9 @@
   "label.select-all": {
     "defaultMessage": "Seleccionar todo"
   },
+  "label.selected": {
+    "defaultMessage": "Seleccionado"
+  },
   "label.selection-actions": {
     "defaultMessage": "Acciones de selección"
   },
@@ -1820,8 +1919,14 @@
   "label.username": {
     "defaultMessage": "Usuario"
   },
+  "label.validating": {
+    "defaultMessage": "Validando"
+  },
   "label.version": {
     "defaultMessage": "Versión"
+  },
+  "label.view": {
+    "defaultMessage": "Ver"
   },
   "label.visibility": {
     "defaultMessage": "Visibilidad"
@@ -1928,6 +2033,150 @@
   "locale.zh-TW": {
     "defaultMessage": "Chino (Tradicional)"
   },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "Reemplaza esto con una descripción"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Error"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "Describe la imagen es su totalidad, como si se la estuvieras describiendo a alguien que no puede verla."
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Describe la imagen..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "Descripción (texto alternativo)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "Inserta la imagen"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "Fuente de la imagen"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Enlace"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "Subir"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "Arrastra y suelta para cargar el archivo o haz clic para seleccionarlo"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Ingresa URL de la imagen..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Insertar"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "Insertar enlace"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Ingresa una etiqueta..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Etiqueta"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Inserta el enlace URL..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "Este editor admite el <markdown-link>formato Markdown</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Longitud máxima:"
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Ilimitado"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "Escribe algo..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Vista previa"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Vista previa"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Negrita"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "Lista punteada"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Código"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Encabezado 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Encabezado 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Encabezado 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Imagen"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Cursiva"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Enlace"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Lista numérica"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Citación"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Tachado"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Video"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "No se ha proporcionado ningún archivo"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "No se especificó un método de subida de imagen"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "URL inválida. Este dominio no está permitido."
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "URL inválida. Asegúrate de que la URL esté bien formada."
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "Protocolo no compatible. Utilice http o https."
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "Reproductor de videos de YouTube"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Inserta video de YouTube"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Ingresa un enlace válido para un video de YouTube."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Introduce la URL del video de YouTube"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "URL del video de YouTube"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Agregar método de pago"
   },
@@ -1980,7 +2229,7 @@
     "defaultMessage": "Fallido"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Listado"
+    "defaultMessage": "Público"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Moderador"
@@ -2004,7 +2253,7 @@
     "defaultMessage": "Devuelto"
   },
   "omorphia.component.badge.label.safe": {
-    "defaultMessage": "Fallido"
+    "defaultMessage": "Aprobado"
   },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Programado"
@@ -2019,7 +2268,7 @@
     "defaultMessage": "Fallido"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Retenido"
+    "defaultMessage": "No listado por el Staff"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copiar código al portapapeles"
@@ -2040,7 +2289,7 @@
     "defaultMessage": "Un {type}"
   },
   "omorphia.component.environment-indicator.label.unsupported": {
-    "defaultMessage": "No soportado"
+    "defaultMessage": "No compatible"
   },
   "payment-method.amazon_pay": {
     "defaultMessage": "Amazon Pay"
@@ -2079,7 +2328,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2232,7 +2481,7 @@
     "defaultMessage": "Organización"
   },
   "project.about.creators.owner": {
-    "defaultMessage": "Propietario del proyecto"
+    "defaultMessage": "Dueño del proyecto"
   },
   "project.about.creators.title": {
     "defaultMessage": "Creadores"
@@ -2655,7 +2904,7 @@
     "defaultMessage": "Este de EE. UU."
   },
   "project.server.region.us_west": {
-    "defaultMessage": "Oste de EE. UU."
+    "defaultMessage": "Oeste de EE. UU."
   },
   "project.server.status.offline": {
     "defaultMessage": "Sin conexión"
@@ -2724,7 +2973,7 @@
     "defaultMessage": "Solo los proyectos de tipo mod o modpack pueden tener metadatos de entorno."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
-    "defaultMessage": "Este tipo de proyecto no es compatible con metadatos de entorno."
+    "defaultMessage": "Este tipo de proyecto no es compatible con metadatos de entorno"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Solo servidor dedicado"
@@ -2789,6 +3038,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Subir"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Permisos"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Versiones"
   },
@@ -2834,8 +3086,20 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "No listado por el Staff"
   },
+  "report.item-type.content": {
+    "defaultMessage": "contenido"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "proyecto"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "usuario"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "versión"
+  },
   "s.bg": {
-    "defaultMessage": "Tarea en segundo plano ejecutándose"
+    "defaultMessage": "Tarea ejecutándose en segundo plano"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtro bloqueado"
@@ -2925,19 +3189,19 @@
     "defaultMessage": "Vanilla"
   },
   "servers.admonitions.background-task-running": {
-    "defaultMessage": "Tarea en segundo plano ejecutándose"
+    "defaultMessage": "Tarea ejecutándose en segundo plano"
   },
   "servers.backups.admonition.backup-cancelled.description": {
-    "defaultMessage": "Respaldo {backupName} fue cancelado."
+    "defaultMessage": "El respaldo {backupName} fue cancelado."
   },
   "servers.backups.admonition.backup-cancelled.title": {
     "defaultMessage": "Respaldo cancelado"
   },
   "servers.backups.admonition.backup-completed.description": {
-    "defaultMessage": "{backupName} termino exitosamente."
+    "defaultMessage": "{backupName} completado exitosamente."
   },
   "servers.backups.admonition.backup-completed.title": {
-    "defaultMessage": "Respaldo terminado"
+    "defaultMessage": "Respaldo completado"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Algo salió mal al crear {backupName}. Por favor, inténtalo de nuevo o contacta con soporte si el problema continúa."
@@ -2952,10 +3216,10 @@
     "defaultMessage": "Respaldo programado"
   },
   "servers.backups.admonition.backup-timed-out.description": {
-    "defaultMessage": "El tiempo de espera para restaurar de {backupName} se agotó. Puedes intentar otra vez o contactar soporte si el problema persiste."
+    "defaultMessage": "La creación de {backupName} superó el tiempo de espera. Inténtalo de nuevo o contacta a soporte si el problema persiste."
   },
   "servers.backups.admonition.backup-timed-out.title": {
-    "defaultMessage": "Tiempo de espera de la copia de seguridad agotado"
+    "defaultMessage": "Se ha agotado el tiempo de espera del respaldo"
   },
   "servers.backups.admonition.creating-backup.description": {
     "defaultMessage": "Guardando los datos del mundo y la configuración del servidor para {backupName}. Esto puede tardar un par de minutos."
@@ -2967,34 +3231,34 @@
     "defaultMessage": "Tu respaldo"
   },
   "servers.backups.admonition.restore-cancelled.description": {
-    "defaultMessage": "Recuperación de {backupName} fue cancelada."
+    "defaultMessage": "Se canceló la restauración de {backupName}."
   },
   "servers.backups.admonition.restore-cancelled.title": {
-    "defaultMessage": "Recuperación cancelada"
+    "defaultMessage": "Restauración cancelada"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Algo salió mal durante la restauración desde {backupName}. Por favor, inténtalo de nuevo o contacta con soporte si el problema continúa."
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Recuperación fallada"
+    "defaultMessage": "Error al restaurar"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Restauración desde {backupName} en espera y comenzará en breve."
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Recuperación en cola"
+    "defaultMessage": "Restauración programada"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Tu servidor se ha restaurado a {backupName} y está listo para iniciarse."
   },
   "servers.backups.admonition.restore-successful.title": {
-    "defaultMessage": "Recuperación terminada"
+    "defaultMessage": "Restauración finalizada"
   },
   "servers.backups.admonition.restore-timed-out.description": {
-    "defaultMessage": "El tiempo de espera para restaurar de {backupName} se agotó. Puedes intentar otra vez o contactar soporte si el problema persiste."
+    "defaultMessage": "La restauración de {backupName} superó el tiempo de espera. Inténtalo de nuevo o contacta a soporte si el problema persiste."
   },
   "servers.backups.admonition.restore-timed-out.title": {
-    "defaultMessage": "Tiempo de espera de la recuperación agotada"
+    "defaultMessage": "Se ha agotado el tiempo de espera de la restauración"
   },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Restaurando tu servidor desde {backupName}. Esto puede tardar un par de minutos."
@@ -3003,16 +3267,16 @@
     "defaultMessage": "Restaurando desde respaldo"
   },
   "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural,one {Acciones masivas seleccionado para un respaldo} other {Acciones masivas seleccionados para # respaldos}}"
+    "defaultMessage": "{count, plural, one {Acciones masivas para un respaldo seleccionado} other {Acciones masivas para # respaldos seleccionados}}"
   },
   "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Borrando {total, plural, one {# respaldo} other {# respaldos}}..."
+    "defaultMessage": "Eliminando {total, plural, one {# respaldo} other {# respaldos}}..."
   },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# respaldo seleccionado} other {# respaldos seleccionados}}"
   },
   "servers.backups.delete-modal.admonition-body": {
-    "defaultMessage": "Una vez borrado, {count, plural, one {este respaldo no puede} other {estos respaldos no pueden}} ser recuperado. Se borra permanentemente."
+    "defaultMessage": "Una vez {count, plural, one {eliminado, este respaldo no podrá ser recuperado} other {eliminados, estos respaldos no prodrán ser recuperados}}. La eliminación es permanente."
   },
   "servers.backups.delete-modal.admonition-header": {
     "defaultMessage": "Advertencia de eliminación"
@@ -3021,22 +3285,22 @@
     "defaultMessage": "{count, plural, one {Respaldo} other {Respaldos ({count})}}"
   },
   "servers.backups.delete-modal.confirm": {
-    "defaultMessage": "Borrar {count, plural, one {respaldo} other {# respaldos}}"
+    "defaultMessage": "Eliminar {count, plural, one {respaldo} other {# respaldos}}"
   },
   "servers.backups.delete-modal.header": {
-    "defaultMessage": "Borrar {count, plural, one {respaldo} other {respaldos}}"
+    "defaultMessage": "Eliminar {count, plural, one {respaldo} other {respaldos}}"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Crea tu primer respaldo"
   },
   "servers.backups.empty.heading": {
-    "defaultMessage": "Ningún respaldo todavía"
+    "defaultMessage": "Aún no hay respaldos"
   },
   "servers.backups.filtered-empty.clear-filters": {
     "defaultMessage": "Borrar filtros"
   },
   "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Intenta un filtro diferente o borre los filtros para ver todos los respaldos."
+    "defaultMessage": "Prueba con otro filtro o desactiva los filtros para ver todos los respaldos."
   },
   "servers.backups.filtered-empty.heading": {
     "defaultMessage": "Ningún respaldo coincide"
@@ -3057,13 +3321,13 @@
     "defaultMessage": "Restaurar"
   },
   "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecciona respaldo {name}"
+    "defaultMessage": "Selecciona el respaldo {name}"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Crear respaldo"
   },
   "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
+    "defaultMessage": "Automático"
   },
   "servers.backups.toolbar.filter-manual": {
     "defaultMessage": "Manual"
@@ -3083,6 +3347,54 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "Sincronización de contenido en curso"
   },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "Fallo en la instalación"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "Se ha producido un error interno durante la instalación de la plataforma. Por favor, inténtalo de nuevo."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "No se pudo instalar el loader o la versión de Minecraft especificados. Es posible que no sean válidos o que no sean compatibles."
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "No se pudo instalar el modpack. Es posible que esté dañado o que no sea compatible."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Esta versión del modpack no incluye ningún archivo descargable. Es posible que se haya empaquetado incorrectamente."
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "Se produjo un error inesperado durante la instalación."
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Esta versión de Minecraft o del loader aún no es compatible con Modrinth Hosting."
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "Instalando addons..."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Instalando modpack..."
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "Instalando plataforma..."
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Estamos preparando tu servidor"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "Añadiendo java..."
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "Configurando servidor..."
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "Descargando mods..."
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "Organizando archivos..."
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "Preparando entorno..."
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "¿Ya tienes un servidor?"
   },
@@ -3096,19 +3408,16 @@
     "defaultMessage": "Nuevo servidor"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Instala mods, invita amigos, y jueguen todos juntos desde la Modrinth App."
+    "defaultMessage": "Instala mods, invita amigos, y jueguen juntos todo desde la Modrinth App."
   },
   "servers.list-empty.no-servers-title": {
-    "defaultMessage": "No se han encontrado servidores todavía"
-  },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Elige tus mods favoritos y nosotros nos encargamos del resto."
+    "defaultMessage": "Aún no hay servidores"
   },
   "servers.list-empty.one-click-mod-installs-title": {
-    "defaultMessage": "Instala mod en un clic"
+    "defaultMessage": "Instalación de mods en un clic"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Invita a tus amigos y deja que se unan fácilmente desde la App de Modrinth."
+    "defaultMessage": "Invita a tus amigos y ayúdalos a que se unan fácilmente desde la Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Juega con amigos"
@@ -3117,7 +3426,7 @@
     "defaultMessage": "Iniciar sesión"
   },
   "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Prepara tu servidor tal como si fuera un mundo de un solo jugador."
+    "defaultMessage": "Configura tu servidor como si fuera un mundo de un solo jugador."
   },
   "servers.list-empty.simple-setup-title": {
     "defaultMessage": "Configuración simple"
@@ -3140,26 +3449,14 @@
   "servers.listing.new-label": {
     "defaultMessage": "Nuevo"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Tus archivos se mantrendran por <days-remaining>{daysRemaining} {daysRemaining, plural, one {día} other {días} }más</days-remaining>. Contacta con el soporta para descargarlos antes de que sean eliminados. "
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
-    "defaultMessage": "Tus archivos se preservarán por 30 días tras la cancelación."
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "Tu servidor ha sido suspendido por acciones de moderación."
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "Tu servidor va a {verb} al {planSize} Plan en <date>{formattedDate}</date>. "
+    "defaultMessage": "Tus archivos se conservarán durante 30 días tras la cancelación."
   },
   "servers.listing.notice.provisioning": {
-    "defaultMessage": "Por favor espere mientras preparamos tu servidor. Esto puede tomar hasta 10 minutos."
+    "defaultMessage": "Por favor, espera mientras configuramos su servidor. Esto puede tardar hasta 10 minutos."
   },
   "servers.listing.notice.subscription-cancelled": {
-    "defaultMessage": "Tu suscripción ha sido cancelada."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Tu suscripción fue cancelada el <date>{formattedDate}</date>. "
+    "defaultMessage": "Tu suscripción fue cancelada."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Tu suscripción se canceló por un error en el pago."
@@ -3168,13 +3465,13 @@
     "defaultMessage": "Tu suscripción se canceló el <date>{formattedDate}</date> por un error en el pago. "
   },
   "servers.listing.notice.subscription-set-to-cancel": {
-    "defaultMessage": "Tu suscripción no será renovada."
+    "defaultMessage": "Tu suscripción está programada para cancelarse."
   },
   "servers.listing.notice.subscription-set-to-cancel-on-date": {
-    "defaultMessage": "Tu suscripción será cancelada el <date>{formattedDate}</date>. "
+    "defaultMessage": "Tu suscripción está programada para cancelarse el <date>{formattedDate}</date>. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Tu servidor ha sido suspendido. Por favor contacta al Soporte de Modrinth para más información."
+    "defaultMessage": "Tu servidor ha sido suspendido. Por favor contacta al equipo de soporte de Modrinth para más información."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "El hardware de tu servidor se está actualizando y volverá a estar en línea en breve."
@@ -3201,10 +3498,10 @@
     "defaultMessage": "Carga en progreso"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Contactar al Soporte de Modrinth"
+    "defaultMessage": "Contacta al soporte de Modrinth"
   },
   "servers.manage.error.alert-notice": {
-    "defaultMessage": "Nuestros sistemas alertan automáticamente a nuestro equipo cuando hay un problema. Ya estamos trabajando para que vuelvan a estar en línea."
+    "defaultMessage": "Nuestros sistemas nos alertan cuando hay problemas. Ya estamos trabajando ponerlos de vuelta en línea."
   },
   "servers.manage.error.description": {
     "defaultMessage": "Podríamos estar teniendo problemas temporales con nuestros servidores."
@@ -3216,7 +3513,7 @@
     "defaultMessage": "Si compraste tu servidor de Modrinth Hosting recientemente, está en cola y aparecerá aquí en cuanto esté listo. <warning>No intentes comprar un servidor nuevo.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Si requieres soporte personalizado sobre el estatus de tu servidor, por favor contacta al Soporte de Modrinth."
+    "defaultMessage": "Si necesitas soporte personalizado acerca del estado de tu servidor, por favor contacta al soporte de Modrinth."
   },
   "servers.manage.error.title": {
     "defaultMessage": "No se pudo cargar los servidores"
@@ -3231,10 +3528,10 @@
     "defaultMessage": "No se encontraron servidores."
   },
   "servers.manage.purchase-unavailable.text": {
-    "defaultMessage": "La información está cargando. Se abrirá "
+    "defaultMessage": "La información de pago aún se está cargando. Se abrirá la página de pago tan pronto como esté lista."
   },
   "servers.manage.purchase-unavailable.title": {
-    "defaultMessage": "Compra no disponible."
+    "defaultMessage": "Compra no disponible"
   },
   "servers.manage.reload-button": {
     "defaultMessage": "Refrescar"
@@ -3279,13 +3576,13 @@
     "defaultMessage": "Servidor nuevo"
   },
   "servers.medal-listing.notice.medal-trial-ended": {
-    "defaultMessage": "La prueba de tu servidor Medal ha finalizado y tu servidor ha sido suspendido. Por favor, mejora tu plan para seguir usándolo."
+    "defaultMessage": "La prueba gratis de tu servidor Medal ha terminado y ha sido suspendido. Por favor, mejora tu plan para seguir usándolo."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Tu servidor ha sido suspendido. Por favor actualiza tu información de facturación o contacta al Soporte de Modrinth para más información."
+    "defaultMessage": "Tu servidor ha sido suspendido. Por favor actualiza tu información de pago o contacta al soporte de Modrinth para más información."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Tu servidor ha sido suspendido por: {reason}. Por favor actualiza tu información de facturación o contacta al Soporte de Modrinth para más información."
+    "defaultMessage": "Tu servidor ha sido suspendido: {reason}. Por favor actualiza tu información de pago o contacta al soporte de Modrinth para más información."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "El hardware de tu servidor se está actualizando y volverá a estar en línea en breve."
@@ -3398,8 +3695,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Norteamérica"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Norteamérica Central"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Norteamérica del Este"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Norteamérica del Oeste"
   },
   "servers.region.prompt": {
     "defaultMessage": "¿Dónde te gustaría que se ubicara tu servidor?"
@@ -3414,40 +3717,40 @@
     "defaultMessage": "Europa Occidental"
   },
   "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Se ha producido un error inesperado durante la instalación. Inténtalo de nuevo más tarde."
+    "defaultMessage": "Se produjo un error inesperado durante la instalación. Por favor, inténtalo de nuevo más tarde."
   },
   "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Instalación fallida"
+    "defaultMessage": "Error en la instalación"
   },
   "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Se ha producido un error inesperado durante la carga. Inténtalo de nuevo más tarde."
+    "defaultMessage": "Se produjo un error inesperado durante la carga. Por favor, inténtalo de nuevo más tarde."
   },
   "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Carga de modpack fallada"
+    "defaultMessage": "Error al cargar el modpack"
   },
   "servers.setup.onboarding.setup-server.button": {
-    "defaultMessage": "Configurar servidor"
+    "defaultMessage": "Configurar el servidor"
   },
   "servers.setup.onboarding.step.choose.description": {
-    "defaultMessage": "Selecciona tu modpack favorito de Modrinth, o elige un loader y añade los mods que quiera."
+    "defaultMessage": "Escoge tu modpack favorito de Modrinth, o elige un loader y añade los mods que quieras."
   },
   "servers.setup.onboarding.step.choose.title": {
-    "defaultMessage": "Elige que jugar"
+    "defaultMessage": "Elige a qué jugar"
   },
   "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Configure tu mundo. Elige tu gamemode y semilla de mundo."
+    "defaultMessage": "Configura tu mundo igual que en el modo para un solo jugador. Elige el modo de juego y la semilla del mundo."
   },
   "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Configure tu mundo"
+    "defaultMessage": "Configura tu mundo"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Comparte tu servidor con amigos copiando el link y dejándoles saber que mods necesitan para poder unirse."
+    "defaultMessage": "Comparte tu servidor con tus amigos copiando la dirección y diciéndoles qué mods necesitarán para unirse."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Invita a tus amigos"
   },
   "servers.setup.onboarding.steps.heading": {
-    "defaultMessage": "Configura tu servidor (~2mins)"
+    "defaultMessage": "Configura tu servidor (~2min)"
   },
   "servers.setup.onboarding.uploading.progress": {
     "defaultMessage": "Cargando ({percent, number}%)"
@@ -3456,7 +3759,7 @@
     "defaultMessage": "Tu servidor está listo. ¡Esto es lo que necesitas hacer para empezar a jugar!"
   },
   "servers.setup.onboarding.welcome.title": {
-    "defaultMessage": "¡Bienvenido a Modrinth Hosting!"
+    "defaultMessage": "Bienvenido a Modrinth Hosting"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "Haz alcanzado el límite de solicitudes. Por favor, inténtalo de nuevo más tarde."
@@ -3465,7 +3768,7 @@
     "defaultMessage": "No se puede reinstalar el servidor"
   },
   "servers.setup.reinstall-failed.text": {
-    "defaultMessage": "Se produjó un error inesperado durante la reinstalación. Por favor, inténtalo de nuevo más tarde."
+    "defaultMessage": "Se produjo un error inesperado durante la reinstalación. Por favor, inténtalo de nuevo más tarde."
   },
   "servers.setup.reinstall-failed.title": {
     "defaultMessage": "Error en la reinstalación"
@@ -3582,7 +3885,7 @@
     "defaultMessage": "64x"
   },
   "tag.category.8x-": {
-    "defaultMessage": "8x o menos"
+    "defaultMessage": "8x o menor"
   },
   "tag.category.adventure": {
     "defaultMessage": "Aventura"
@@ -3983,6 +4286,21 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Aplicar"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Cancelar"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "horas"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "meses"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "semanas"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Tienes cambios sin guardar."
   },
@@ -4005,7 +4323,7 @@
     "defaultMessage": "{count, plural, one {# alerta} other {# alertas}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
-    "defaultMessage": "Descartar todas"
+    "defaultMessage": "Descartar todo"
   }
 }
 

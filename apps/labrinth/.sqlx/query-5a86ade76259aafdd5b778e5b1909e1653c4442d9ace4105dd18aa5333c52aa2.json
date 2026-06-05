@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE moderation_notes\n            SET\n              last_modified = NOW(),\n              last_author = $1,\n              version = version + 1,\n              notes = COALESCE($2::text, notes),\n              user_rating = COALESCE($3::integer, user_rating)\n            WHERE (\n                ($4::bigint IS NOT NULL AND user_id = $4) OR\n                ($5::bigint IS NOT NULL AND organization_id = $5)\n              )\n              AND version = $6\n            RETURNING version\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Int4",
+        "Int8",
+        "Int8",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "5a86ade76259aafdd5b778e5b1909e1653c4442d9ace4105dd18aa5333c52aa2"
+}

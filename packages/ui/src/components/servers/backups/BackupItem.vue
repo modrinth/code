@@ -4,6 +4,7 @@ import {
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
+	IntercomBubbleIcon,
 	MoreVerticalIcon,
 	RotateCounterClockwiseIcon,
 	ShieldIcon,
@@ -15,6 +16,8 @@ import { computed, ref } from 'vue'
 import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages, truncatedTooltip } from '../../../utils'
+import AutoLink from '../../base/AutoLink.vue'
+import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
 
@@ -32,32 +35,62 @@ const emit = defineEmits<{
 const props = withDefaults(
 	defineProps<{
 		backup: Archon.BackupsQueue.v1.BackupQueueBackup
+		creator?: Archon.BackupsQueue.v1.UserInfo | null
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string
 		showCopyIdAction?: boolean
 		showDebugInfo?: boolean
 		restoreDisabled?: string
+		writeDisabled?: boolean
+		writeDisabledTooltip?: string
 		selected?: boolean
+		highlighted?: boolean
 	}>(),
 	{
+		creator: undefined,
 		preview: false,
 		kyrosUrl: undefined,
 		jwt: undefined,
 		showCopyIdAction: false,
 		showDebugInfo: false,
 		restoreDisabled: undefined,
+		writeDisabled: false,
+		writeDisabledTooltip: undefined,
 		selected: false,
+		highlighted: false,
 	},
 )
 
 const nameRef = ref<HTMLElement | null>(null)
+
+const backupCreator = computed(() => {
+	if (props.creator !== undefined) return props.creator
+
+	return (
+		props.backup.history.find(
+			(operation) => operation.operation_type === 'create' && operation.user_info,
+		)?.user_info ?? null
+	)
+})
+
+const creatorProfileLink = computed(() =>
+	backupCreator.value && backupCreator.value.id !== 'support'
+		? `https://modrinth.com/user/${encodeURIComponent(backupCreator.value.username)}`
+		: undefined,
+)
 
 const backupIcon = computed(() => {
 	if (props.backup.automated) {
 		return ShieldIcon
 	}
 	return UserRoundIcon
+})
+
+const itemBorderClass = computed(() => {
+	if (props.selected) return 'border-brand-green'
+	if (props.highlighted) return 'border-purple backup-item-highlighted'
+	return 'border-transparent'
 })
 
 const overflowMenuOptions = computed<OverflowOption[]>(() => {
@@ -81,13 +114,20 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 		disabled: !props.kyrosUrl || !props.jwt,
 	})
 
-	options.push({ id: 'rename', action: () => emit('rename') })
+	options.push({
+		id: 'rename',
+		action: () => emit('rename'),
+		disabled: props.writeDisabled,
+		tooltip: props.writeDisabled ? props.writeDisabledTooltip : undefined,
+	})
 
 	options.push({ divider: true })
 	options.push({
 		id: 'delete',
 		color: 'red',
 		action: () => emit('delete'),
+		disabled: props.writeDisabled,
+		tooltip: props.writeDisabled ? props.writeDisabledTooltip : undefined,
 	})
 
 	return options
@@ -118,12 +158,34 @@ const messages = defineMessages({
 		id: 'servers.backups.item.manual-backup',
 		defaultMessage: 'Manual backup',
 	},
+	creatorAvatarAlt: {
+		id: 'servers.backups.item.creator-avatar-alt',
+		defaultMessage: "{username}'s avatar",
+	},
+	supportCreator: {
+		id: 'servers.backups.item.creator.support',
+		defaultMessage: 'Support',
+	},
 })
+
+const creatorName = computed(() => {
+	if (!backupCreator.value) return ''
+	if (backupCreator.value.id !== 'support') return backupCreator.value.username
+	return backupCreator.value.username === 'support'
+		? formatMessage(messages.supportCreator)
+		: backupCreator.value.username
+})
+
+const creatorAvatarSrc = computed(() =>
+	backupCreator.value?.id === 'support'
+		? IntercomBubbleIcon
+		: (backupCreator.value?.avatar_url ?? undefined),
+)
 </script>
 <template>
 	<div
 		class="flex items-center gap-4 rounded-[20px] border border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
-		:class="props.selected ? 'border-brand-green' : 'border-transparent'"
+		:class="itemBorderClass"
 	>
 		<div class="flex min-w-0 flex-1 items-center gap-4">
 			<!-- Icon tile -->
@@ -155,9 +217,35 @@ const messages = defineMessages({
 						{{ formatMessage(messages.auto) }}
 					</span>
 				</div>
-				<div class="flex items-center gap-1.5 text-sm font-medium text-secondary">
+				<div class="flex items-center gap-2 text-sm font-medium text-secondary">
 					<template v-if="preview">
 						<span>{{ formatDateTime(backup.created_at) }}</span>
+					</template>
+					<template v-else-if="backupCreator">
+						<AutoLink
+							:to="creatorProfileLink"
+							:target="creatorProfileLink ? '_blank' : undefined"
+							:rel="creatorProfileLink ? 'noopener noreferrer' : undefined"
+							class="group flex min-w-0 items-center gap-1.5"
+							:class="creatorProfileLink ? 'text-secondary hover:underline' : 'text-primary'"
+						>
+							<Avatar
+								:src="creatorAvatarSrc"
+								:alt="formatMessage(messages.creatorAvatarAlt, { username: creatorName })"
+								:tint-by="creatorName"
+								size="24px"
+								circle
+								no-shadow
+								class="shrink-0 transition"
+								:class="creatorProfileLink ? 'group-hover:brightness-125' : ''"
+							/>
+							<span
+								class="min-w-0 truncate font-medium"
+								:class="backupCreator.id === 'support' ? 'text-blue' : ''"
+							>
+								{{ creatorName }}
+							</span>
+						</AutoLink>
 					</template>
 					<template v-else>
 						<span>
@@ -215,3 +303,25 @@ const messages = defineMessages({
 		}}</pre>
 	</div>
 </template>
+
+<style scoped>
+@keyframes backup-item-highlight-pulse {
+	0%,
+	100% {
+		box-shadow:
+			0 0 0 0 var(--color-purple-highlight),
+			0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+			0px 1px 3px 0px rgba(0, 0, 0, 0.15);
+	}
+	50% {
+		box-shadow:
+			0 0 0 3px var(--color-purple-highlight),
+			0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+			0px 1px 3px 0px rgba(0, 0, 0, 0.15);
+	}
+}
+
+.backup-item-highlighted {
+	animation: backup-item-highlight-pulse 1.25s ease-in-out infinite;
+}
+</style>
