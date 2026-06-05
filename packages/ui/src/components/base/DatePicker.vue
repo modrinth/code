@@ -1580,6 +1580,15 @@ defineExpose({
 .modrinth-date-picker :deep(.flatpickr-current-month input.cur-year) {
 	@apply min-w-[76px] px-2 text-center;
 }
+.modrinth-date-picker :deep(input[type='number']) {
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+.modrinth-date-picker :deep(input[type='number']::-webkit-inner-spin-button),
+.modrinth-date-picker :deep(input[type='number']::-webkit-outer-spin-button) {
+	margin: 0;
+	-webkit-appearance: none;
+}
 .modrinth-date-picker
 	:deep(.flatpickr-current-month .numInputWrapper:has(input.cur-year:disabled)) {
 	@apply cursor-not-allowed;

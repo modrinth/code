@@ -894,12 +894,6 @@ function isRevenueHourlyGroupBy(groupBy: AnalyticsGroupByPreset): boolean {
 	return groupBy === '1h' || groupBy === '6h'
 }
 
-function getAllTimeYearGroupStart(end: Date): Date {
-	const start = new Date(end)
-	start.setFullYear(2021)
-	return start
-}
-
 const groupByOptions = computed<ComboboxOption<AnalyticsGroupByPreset>[]>(() => {
 	const timeframeMinutes = selectedTimeframeDurationMinutes.value
 	const options = groupByPresetOptions.map((option) => {
@@ -1159,13 +1153,7 @@ function buildMetricFilters(
 
 const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 	const rawRange = selectedTimeRange.value
-	const rawStart =
-		selectedTimeframeMode.value === 'preset' &&
-		selectedTimeframe.value === 'all_time' &&
-		selectedGroupBy.value === 'year'
-			? getAllTimeYearGroupStart(rawRange.end)
-			: rawRange.start
-	const { start, end } = ensureMinimumTimeRange(rawStart, rawRange.end)
+	const { start, end } = ensureMinimumTimeRange(rawRange.start, rawRange.end)
 
 	const groupByMs = getAnalyticsGroupByPresetMinutes(selectedGroupBy.value) * 60 * 1000
 	const desiredSlices = Math.max(1, Math.floor((end.getTime() - start.getTime()) / groupByMs))

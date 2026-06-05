@@ -109,15 +109,15 @@ const filterOptions = computed(() => {
 		platform: [],
 	}
 
-	const platformSet = new Set()
-	const gameVersionSet = new Set()
-	const channelSet = new Set()
+	const platformSet = new Set<Filter>()
+	const gameVersionSet = new Set<Filter>()
+	const channelSet = new Set<Filter>()
 
 	for (const version of props.versions) {
-		for (const loader of version.loaders) {
+		for (const loader of Array.isArray(version.loaders) ? version.loaders : []) {
 			platformSet.add(loader)
 		}
-		for (const gameVersion of version.game_versions) {
+		for (const gameVersion of Array.isArray(version.game_versions) ? version.game_versions : []) {
 			gameVersionSet.add(gameVersion)
 		}
 		channelSet.add(version.version_type)

@@ -19,9 +19,9 @@
 					Configuring server...
 				</div>
 				<div v-else class="flex flex-wrap items-center gap-2">
-					<div v-if="props.server?.loader" class="flex items-center gap-2 font-medium capitalize">
+					<div v-if="props.server?.loader" class="flex items-center gap-2 font-medium">
 						<LoaderIcon :loader="props.server.loader" class="flex shrink-0 [&&]:size-5" />
-						{{ props.server.loader }} {{ props.server.mc_version }}
+						{{ formatLoaderLabel(props.server.loader) }} {{ props.server.mc_version }}
 					</div>
 
 					<div
@@ -81,7 +81,7 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { NuxtModrinthClient } from '@modrinth/api-client'
-import { LinkIcon, LoaderIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
+import { LinkIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
@@ -91,6 +91,9 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { formatLoaderLabel } from '#ui/utils/loaders'
+
+import LoaderIcon from '../icons/LoaderIcon.vue'
 
 type ServerProjectSummary = {
 	id: string

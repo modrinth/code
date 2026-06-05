@@ -52,6 +52,7 @@ const {
 	selectedCustomTimeframeEndDate,
 	selectedGroupBy,
 	queryRefreshTimestamp,
+	analyticsAllTimeStartDate,
 	refreshAnalyticsQuery,
 } = injectAnalyticsDashboardContext()
 
@@ -107,6 +108,7 @@ function handleTimeframeDraftChange(selection: TimeFramePickerSelection) {
 		customStartDate: selection.customStartDate,
 		customEndDate: selection.customEndDate,
 		nowTimestamp: queryRefreshTimestamp.value,
+		allTimeStartDate: analyticsAllTimeStartDate.value,
 	})
 	const { start, end } = ensureMinimumTimeRange(range.start, range.end)
 	const durationMinutes = Math.max(1, Math.floor((end.getTime() - start.getTime()) / 60000))

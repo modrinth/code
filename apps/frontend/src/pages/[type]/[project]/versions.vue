@@ -40,11 +40,11 @@
 				:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 			>
 				<template #actions="{ version }">
-					<ButtonStyled circular type="transparent">
+					<ButtonStyled v-if="getPrimaryFile(version)" circular type="transparent">
 						<a
 							v-tooltip="`Download`"
 							:href="createDownloadUrl(version)"
-							:download="getPrimaryFile(version).filename"
+							:download="getPrimaryFile(version)?.filename"
 							class="hover:!bg-button-bg [&>svg]:!text-green"
 							aria-label="Download"
 							@click="emit('onDownload')"
@@ -99,10 +99,11 @@
 									color: 'primary',
 									hoverFilled: true,
 									link: createDownloadUrl(version),
-									download: getPrimaryFile(version).filename,
+									download: getPrimaryFile(version)?.filename,
 									action: () => {
 										emit('onDownload')
 									},
+									shown: !!getPrimaryFile(version),
 								},
 								{
 									id: 'new-tab',
@@ -323,7 +324,7 @@ const emit = defineEmits(['onDownload', 'deleteVersion'])
 const baseDropdownId = useId()
 
 function getPrimaryFile(version) {
-	return version.files.find((x) => x.primary) || version.files[0]
+	return version.files?.find((x) => x.primary) || version.files?.[0]
 }
 
 watch(
@@ -338,7 +339,10 @@ watch(
 )
 
 function createDownloadUrl(version) {
-	return createProjectDownloadUrl(getPrimaryFile(version).url, {
+	const file = getPrimaryFile(version)
+	if (!file?.url) return undefined
+
+	return createProjectDownloadUrl(file.url, {
 		reason: cdnDownloadReason.value,
 	})
 }

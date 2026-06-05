@@ -18,7 +18,7 @@
 						({{ durationLabel }})
 					</span>
 				</span>
-				<span v-if="previousRangeLabel" class="min-w-0 truncate text-xs text-primary">
+				<span v-if="previousRangeLabel" class="min-w-0 space-x-1 truncate text-xs text-primary">
 					<span class="font-medium">{{ previousRangeLabel }}</span>
 					<span class="font-normal text-secondary">
 						{{ formatMessage(analyticsChartMessages.previousPeriodShort) }}
@@ -197,6 +197,7 @@ function getEntryAriaLabel(entry: AnalyticsChartTooltipEntry) {
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
 const ONE_HOUR_MS = 60 * 60 * 1000
 const ONE_MINUTE_MS = 60 * 1000
+const DATE_LOCALE = 'en-US'
 
 function formatRangeLabel(
 	start: Date,
@@ -225,13 +226,13 @@ function formatRangeLabel(
 	}
 
 	if (includeTime) {
-		const startLabel = new Intl.DateTimeFormat(undefined, startOptions).format(start)
-		const endLabel = new Intl.DateTimeFormat(undefined, timeOptions).format(end)
+		const startLabel = new Intl.DateTimeFormat(DATE_LOCALE, startOptions).format(start)
+		const endLabel = new Intl.DateTimeFormat(DATE_LOCALE, timeOptions).format(end)
 		const range = `${startLabel}–${endLabel}`
 
 		if (!showTrailingYear) return range
 
-		const yearLabel = new Intl.DateTimeFormat(undefined, { year: 'numeric' }).format(end)
+		const yearLabel = new Intl.DateTimeFormat(DATE_LOCALE, { year: 'numeric' }).format(end)
 		return `${range}, ${yearLabel}`
 	}
 
@@ -244,13 +245,13 @@ function formatRangeLabel(
 		endOptions = { day: 'numeric' }
 	}
 
-	const startLabel = new Intl.DateTimeFormat(undefined, startOptions).format(start)
-	const endLabel = new Intl.DateTimeFormat(undefined, endOptions).format(end)
+	const startLabel = new Intl.DateTimeFormat(DATE_LOCALE, startOptions).format(start)
+	const endLabel = new Intl.DateTimeFormat(DATE_LOCALE, endOptions).format(end)
 	const range = `${startLabel}–${endLabel}`
 
 	if (!showTrailingYear) return range
 
-	const yearLabel = new Intl.DateTimeFormat(undefined, { year: 'numeric' }).format(end)
+	const yearLabel = new Intl.DateTimeFormat(DATE_LOCALE, { year: 'numeric' }).format(end)
 	return `${range}, ${yearLabel}`
 }
 

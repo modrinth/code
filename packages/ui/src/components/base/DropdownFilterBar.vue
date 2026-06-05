@@ -109,7 +109,7 @@
 			<button
 				ref="addMenuTrigger"
 				type="button"
-				:class="addButtonClass"
+				:class="addButtonClass ?? '!border'"
 				:aria-expanded="isAddMenuOpen"
 				aria-haspopup="menu"
 				@click="handleAddMenuTriggerClick"
@@ -262,58 +262,87 @@
 						:style="activeCategoryOptionsListStyle"
 					>
 						<div
-							v-for="{ option, index } in renderedVisibleActiveCategoryOptions"
-							:key="`${activeCategory.key}-${option.value}`"
+							v-for="{ item, index } in renderedVisibleActiveCategoryOptions"
+							:key="getActiveCategoryItemKey(item, index)"
 							:class="shouldVirtualizeActiveCategoryOptions ? 'absolute left-0 right-0' : undefined"
 							:style="getActiveCategoryOptionWrapperStyle(index)"
 						>
+							<div
+								v-if="isDropdownFilterSectionHeader(item)"
+								class="flex items-center justify-between gap-3 border-0 px-4 py-2.5 text-sm font-semibold text-secondary"
+								:class="[
+									item.class,
+									item.dividerBefore && index > 0
+										? 'border-t border-solid border-surface-5'
+										: undefined,
+								]"
+							>
+								<span class="flex min-w-0 items-center gap-2">
+									<component
+										:is="item.icon"
+										v-if="item.icon"
+										class="size-4 shrink-0"
+										aria-hidden="true"
+									/>
+									<span class="min-w-0 truncate">{{ item.label }}</span>
+								</span>
+								<button
+									v-if="hasSelectableSectionHeaderOptions(item)"
+									type="button"
+									class="border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-colors hover:text-contrast"
+									@click="toggleSectionHeaderOptions(item)"
+								>
+									{{ areSectionHeaderOptionsSelected(item) ? 'Clear' : 'Select all' }}
+								</button>
+							</div>
 							<button
+								v-else
 								type="button"
 								class="flex w-full cursor-pointer items-center gap-2.5 border-0 px-4 py-3.5 text-left text-contrast shadow-none transition-all duration-150 bg-surface-4 hover:brightness-[115%] focus-visible:brightness-[115%] focus-visible:outline-none"
 								:class="[
 									shouldVirtualizeActiveCategoryOptions ? 'h-12' : undefined,
 									{
-										'brightness-[115%]': option.selected,
-										'pointer-events-none cursor-not-allowed opacity-50': option.disabled,
+										'brightness-[115%]': item.selected,
+										'pointer-events-none cursor-not-allowed opacity-50': item.disabled,
 									},
 								]"
-								:aria-disabled="option.disabled || undefined"
-								:aria-checked="option.selected"
+								:aria-disabled="item.disabled || undefined"
+								:aria-checked="item.selected"
 								role="checkbox"
-								@click="toggleFilterOption(activeCategory.key, option)"
+								@click="toggleFilterOption(activeCategory.key, item)"
 							>
 								<span
 									v-if="checkboxPosition === 'left'"
 									class="checkbox-shadow flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-[1px] border-solid"
 									:class="
-										option.selected
+										item.selected
 											? 'border-button-border bg-brand text-brand-inverted'
 											: 'border-surface-5 bg-surface-2'
 									"
 								>
-									<CheckIcon v-if="option.selected" aria-hidden="true" stroke-width="3" />
+									<CheckIcon v-if="item.selected" aria-hidden="true" stroke-width="3" />
 								</span>
 								<div class="flex min-w-0 flex-1 items-center justify-between gap-3">
 									<slot
 										v-if="$slots.option"
 										name="option"
 										:category="activeCategory"
-										:option="option"
-										:selected="option.selected"
+										:option="item"
+										:selected="item.selected"
 										:index="index"
 									></slot>
 									<template v-else>
 										<span
 											class="min-w-0 truncate font-semibold leading-tight"
-											:class="option.selected ? 'text-contrast' : 'text-primary'"
+											:class="item.selected ? 'text-contrast' : 'text-primary'"
 										>
-											{{ option.label }}
+											{{ item.label }}
 										</span>
 										<slot
 											name="option-right"
 											:category="activeCategory"
-											:option="option"
-											:selected="option.selected"
+											:option="item"
+											:selected="item.selected"
 										></slot>
 									</template>
 								</div>
@@ -321,7 +350,7 @@
 									v-if="checkboxPosition === 'right'"
 									class="flex shrink-0 items-center justify-center text-brand"
 								>
-									<CheckIcon v-if="option.selected" aria-hidden="true" class="size-5" />
+									<CheckIcon v-if="item.selected" aria-hidden="true" class="size-5" />
 								</span>
 							</button>
 						</div>
@@ -353,12 +382,12 @@ import {
 } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
-import type { ComponentPublicInstance, CSSProperties } from 'vue'
+import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
 import ButtonStyled from './ButtonStyled.vue'
-import MultiSelect, { type MultiSelectOption } from './MultiSelect.vue'
+import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
 import StyledInput from './StyledInput.vue'
 
 export type DropdownFilterBarOption = {
@@ -368,10 +397,21 @@ export type DropdownFilterBarOption = {
 	disabled?: boolean
 }
 
+export type DropdownFilterBarSectionHeader = {
+	type: 'section-header'
+	label: string
+	key?: string
+	icon?: Component
+	class?: string
+	dividerBefore?: boolean
+}
+
+export type DropdownFilterBarItem = DropdownFilterBarOption | DropdownFilterBarSectionHeader
+
 export type DropdownFilterBarCategory = {
 	key: string
 	label: string
-	options: DropdownFilterBarOption[]
+	options: DropdownFilterBarItem[]
 	syntheticOptions?: DropdownFilterBarOption[]
 	searchable?: boolean
 	searchPlaceholder?: string
@@ -388,8 +428,12 @@ type RenderedDropdownFilterBarOption = DropdownFilterBarOption & {
 	selected: boolean
 }
 
+type RenderedDropdownFilterBarItem =
+	| RenderedDropdownFilterBarOption
+	| DropdownFilterBarSectionHeader
+
 type VisibleDropdownFilterBarOption = {
-	option: RenderedDropdownFilterBarOption
+	item: RenderedDropdownFilterBarItem
 	index: number
 }
 
@@ -464,6 +508,7 @@ const props = withDefaults(
 		showClear?: boolean
 		showLabel?: boolean
 		useFilterIcon?: boolean
+		applyImmediately?: boolean
 		showPreviewFilterIcon?: boolean
 		previewTriggerClass?: string
 		addButtonClass?: string
@@ -478,6 +523,7 @@ const props = withDefaults(
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
+		applyImmediately: false,
 		showPreviewFilterIcon: false,
 		emptyOptionsLabel: 'No options available.',
 		emptySearchLabel: 'No options found.',
@@ -518,6 +564,18 @@ const categoryButtonRefs = new Map<string, HTMLElement>()
 let pendingCategoryTimeout: ReturnType<typeof setTimeout> | null = null
 let previousMousePosition: Point | null = null
 let addMenuPositionRafId: number | null = null
+
+function isDropdownFilterSectionHeader(
+	item: DropdownFilterBarItem | RenderedDropdownFilterBarItem,
+): item is DropdownFilterBarSectionHeader {
+	return 'type' in item && item.type === 'section-header'
+}
+
+function isDropdownFilterOption(
+	item: DropdownFilterBarItem | RenderedDropdownFilterBarItem,
+): item is DropdownFilterBarOption {
+	return !isDropdownFilterSectionHeader(item)
+}
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 	const source = isAddMenuOpen.value ? 'draft' : 'committed'
@@ -569,15 +627,32 @@ const filteredActiveCategoryOptions = computed(() => {
 		return activeCategory.value.options
 	}
 
-	return activeCategory.value.options.filter((option) => {
-		if (option.label.toLowerCase().includes(query)) {
-			return true
+	const items: DropdownFilterBarItem[] = []
+	let pendingSectionHeader: DropdownFilterBarSectionHeader | null = null
+
+	for (const option of activeCategory.value.options) {
+		if (isDropdownFilterSectionHeader(option)) {
+			pendingSectionHeader = option
+			continue
 		}
-		if (option.value.toLowerCase().includes(query)) {
-			return true
+
+		const matches =
+			option.label.toLowerCase().includes(query) ||
+			option.value.toLowerCase().includes(query) ||
+			(option.searchTerms?.some((term) => term.toLowerCase().includes(query)) ?? false)
+
+		if (!matches) {
+			continue
 		}
-		return option.searchTerms?.some((term) => term.toLowerCase().includes(query)) ?? false
-	})
+
+		if (pendingSectionHeader) {
+			items.push(pendingSectionHeader)
+			pendingSectionHeader = null
+		}
+		items.push(option)
+	}
+
+	return items
 })
 
 const shouldVirtualizeActiveCategoryOptions = computed(
@@ -599,11 +674,13 @@ const {
 })
 
 const renderedVisibleActiveCategoryOptions = computed<VisibleDropdownFilterBarOption[]>(() =>
-	visibleActiveCategoryOptions.value.map((option, offset) => ({
-		option: {
-			...option,
-			selected: activeCategorySelectedValueSet.value.has(option.value),
-		},
+	visibleActiveCategoryOptions.value.map((item, offset) => ({
+		item: isDropdownFilterSectionHeader(item)
+			? item
+			: {
+					...item,
+					selected: activeCategorySelectedValueSet.value.has(item.value),
+				},
 		index: activeCategoryOptionsVisibleRange.value.start + offset,
 	})),
 )
@@ -721,14 +798,14 @@ function areSelectedFiltersEqual(
 }
 
 function getOptionsWithSelectedValues(
-	options: DropdownFilterBarOption[],
+	options: DropdownFilterBarItem[],
 	selectedValues: string[],
-): DropdownFilterBarOption[] {
+): DropdownFilterBarItem[] {
 	if (selectedValues.length === 0) {
 		return options
 	}
 
-	const knownValues = new Set(options.map((option) => option.value))
+	const knownValues = new Set(options.filter(isDropdownFilterOption).map((option) => option.value))
 	const missingSelectedOptions = selectedValues
 		.filter((value) => !knownValues.has(value))
 		.map((value) => ({
@@ -748,15 +825,17 @@ function getCategorySyntheticValues(categoryKey: string): Set<string> {
 	return category ? getCategorySyntheticValueSet(category) : new Set()
 }
 
-function getVisiblePreviewOptions(
-	category: DropdownFilterBarCategory,
-): MultiSelectOption<string>[] {
-	return category.options.map((option) => ({
-		value: option.value,
-		label: option.label,
-		searchTerms: option.searchTerms,
-		disabled: option.disabled,
-	})) as MultiSelectOption<string>[]
+function getVisiblePreviewOptions(category: DropdownFilterBarCategory): MultiSelectItem<string>[] {
+	return category.options.map((option) =>
+		isDropdownFilterSectionHeader(option)
+			? option
+			: {
+					value: option.value,
+					label: option.label,
+					searchTerms: option.searchTerms,
+					disabled: option.disabled,
+				},
+	) as MultiSelectItem<string>[]
 }
 
 function getPreviewOptionLabel(
@@ -764,7 +843,7 @@ function getPreviewOptionLabel(
 	selectedValue: string,
 ): string | undefined {
 	return [...(category.syntheticOptions ?? []), ...category.options].find(
-		(option) => option.value === selectedValue,
+		(option) => isDropdownFilterOption(option) && option.value === selectedValue,
 	)?.label
 }
 
@@ -796,6 +875,9 @@ function setSelectedValues(
 		draftSelectedFilters.value = nextFilters
 		if (isAddMenuOpen.value && activeCategoryKey.value === categoryKey) {
 			scheduleSubmenuPositionUpdate()
+		}
+		if (props.applyImmediately) {
+			emit('update:modelValue', nextFilters)
 		}
 	} else {
 		emit('update:modelValue', nextFilters)
@@ -950,6 +1032,70 @@ function toggleFilterOption(categoryKey: string, option: DropdownFilterBarOption
 	toggleFilterValue(categoryKey, option.value, !isFilterValueSelected(categoryKey, option.value))
 }
 
+function getActiveCategoryItemKey(item: RenderedDropdownFilterBarItem, index: number) {
+	return isDropdownFilterSectionHeader(item)
+		? (item.key ?? `${activeCategory.value?.key ?? 'category'}-section-${item.label}-${index}`)
+		: `${activeCategory.value?.key ?? 'category'}-${item.value}`
+}
+
+function getSectionHeaderOptions(sectionHeader: DropdownFilterBarSectionHeader) {
+	const category = activeCategory.value
+	if (!category) {
+		return []
+	}
+
+	const sectionHeaderIndex = category.options.findIndex((item) => item === sectionHeader)
+	if (sectionHeaderIndex === -1) {
+		return []
+	}
+
+	const options: DropdownFilterBarOption[] = []
+	for (let index = sectionHeaderIndex + 1; index < category.options.length; index += 1) {
+		const item = category.options[index]
+		if (!item || isDropdownFilterSectionHeader(item)) {
+			break
+		}
+		if (!item.disabled) {
+			options.push(item)
+		}
+	}
+
+	return options
+}
+
+function hasSelectableSectionHeaderOptions(sectionHeader: DropdownFilterBarSectionHeader) {
+	return getSectionHeaderOptions(sectionHeader).length > 1
+}
+
+function areSectionHeaderOptionsSelected(sectionHeader: DropdownFilterBarSectionHeader) {
+	const options = getSectionHeaderOptions(sectionHeader)
+	return (
+		options.length > 0 &&
+		options.every((option) => activeCategorySelectedValueSet.value.has(option.value))
+	)
+}
+
+function toggleSectionHeaderOptions(sectionHeader: DropdownFilterBarSectionHeader) {
+	const category = activeCategory.value
+	if (!category) {
+		return
+	}
+
+	const options = getSectionHeaderOptions(sectionHeader)
+	if (options.length === 0) {
+		return
+	}
+
+	const optionValues = options.map((option) => option.value)
+	const optionValueSet = new Set(optionValues)
+	const currentValues = activeCategorySelectedValues.value
+	const nextValues = areSectionHeaderOptionsSelected(sectionHeader)
+		? currentValues.filter((value) => !optionValueSet.has(value))
+		: [...currentValues, ...optionValues.filter((value) => !currentValues.includes(value))]
+
+	setSelectedValues(category.key, nextValues, 'draft')
+}
+
 function getActiveCategoryOptionWrapperStyle(index: number): CSSProperties | undefined {
 	if (!shouldVirtualizeActiveCategoryOptions.value) {
 		return undefined
@@ -1076,9 +1222,13 @@ function getPreviewSelectedValues(categoryKey: string): string[] {
 }
 
 function setPreviewSelectedValues(categoryKey: string, values: string[]) {
+	const normalizedValues = normalizeSelectedValues(values)
 	previewSelectedValueDrafts.value = {
 		...previewSelectedValueDrafts.value,
-		[categoryKey]: normalizeSelectedValues(values),
+		[categoryKey]: normalizedValues,
+	}
+	if (props.applyImmediately) {
+		setSelectedValues(categoryKey, normalizedValues)
 	}
 }
 

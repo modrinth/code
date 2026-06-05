@@ -11,6 +11,29 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-04T15:59:11+00:00`,
+		product: 'hosting',
+		body: `## Added
+- You can now share access to the server panel through the Access tab. For more information [see the blogpost here](https://modrinth.com/news/article/server-access/).`,
+	},
+	{
+		date: `2026-06-03T18:38:16+00:00`,
+		product: 'web',
+		body: `## Added
+- Added monetization breakdown dismissable explainer banner.
+
+## Fixed
+- Fixed previous-period's data being included in analytics tables instead of just current period.
+- Fixed revenue metric displaying stale data when switching between metrics.
+- Fixed incorrect Y-axis formatting for values with trailing decimal zeros.
+- Fixed table series selections being reset when switching in and out of the tab.
+- Fixed "All Time" analytics range to start from the project's publish date instead of analytics injest start date.
+- Fixed unknown download source data points not appearing in download source breakdown.
+- Fixed date picker number inputs displaying browser increment/decrement arrows.
+- Fixed metric cards showing incorrect percentage changes when switching comparison periods.
+- Fixed playtime values being rounded incorrectly, causing small values to display as 0.`,
+	},
+	{
 		date: `2026-06-03T14:00:39+00:00`,
 		product: 'web',
 		body: `## Fixed
