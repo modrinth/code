@@ -2282,9 +2282,8 @@ const hasEditDetailsPermission = computed(() => {
 
 const projectTypeDisplay = computed(() => {
 	if (!project.value) return ''
-	return formatProjectType(
-		data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
-	)
+	const projectType = isServerProject.value ? 'minecraft_java_server' : project.value.project_type
+	return formatProjectType(data.$getProjectTypeForDisplay(projectType, project.value.loaders))
 })
 
 const following = computed(() => {
