@@ -63,7 +63,7 @@ const messages = defineMessages({
 	},
 	removed: {
 		id: 'servers.audit-log.event.user-removed',
-		defaultMessage: 'Removed <target-user></target-user>',
+		defaultMessage: 'Revoked access for <target-user></target-user>',
 	},
 	ownerRole: {
 		id: 'servers.access-role.owner',

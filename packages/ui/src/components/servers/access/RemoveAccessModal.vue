@@ -144,12 +144,12 @@ const messages = defineMessages({
 	warningBody: {
 		id: 'servers.remove-access-modal.warning-body',
 		defaultMessage:
-			"If you remove a user from your server, you'll need to re-invite them to restore access.",
+			"If you revoke a user's access to your server, you'll need to re-invite them to restore access.",
 	},
 	cancelWarningBody: {
 		id: 'servers.remove-access-modal.cancel-warning-body',
 		defaultMessage:
-			'If you cancel this invite, {username} will need a new invitation before they can join this server.',
+			'If you revoke this invite, {username} will need a new invitation before they can join this server.',
 	},
 	removeButton: {
 		id: 'servers.remove-access-modal.remove-button',

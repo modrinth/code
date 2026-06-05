@@ -103,19 +103,19 @@ export const accessMessages = defineMessages({
 	},
 	inviteCancelledTitle: {
 		id: 'servers.access-page.notification.invite-cancelled.title',
-		defaultMessage: 'Invite cancelled',
+		defaultMessage: 'Invite revoked',
 	},
 	inviteCancelledText: {
 		id: 'servers.access-page.notification.invite-cancelled.text',
-		defaultMessage: 'Cancelled the invite for {target}.',
+		defaultMessage: 'Revoked the invite for {target}.',
 	},
 	memberRemovedTitle: {
 		id: 'servers.access-page.notification.member-removed.title',
-		defaultMessage: 'Access removed',
+		defaultMessage: 'Access revoked',
 	},
 	memberRemovedText: {
 		id: 'servers.access-page.notification.member-removed.text',
-		defaultMessage: 'Removed {target} from this server.',
+		defaultMessage: 'Revoked access for {target}.',
 	},
 	loadFailedTitle: {
 		id: 'servers.access-page.notification.load-failed.title',
@@ -178,7 +178,7 @@ export const actionLogActionMessages = defineMessages({
 	},
 	user_removed: {
 		id: 'servers.access-page.activity-log-filter.action.user-removed',
-		defaultMessage: 'Removed user',
+		defaultMessage: 'Revoked access',
 	},
 	addon_added: {
 		id: 'servers.access-page.activity-log-filter.action.addon-added',
