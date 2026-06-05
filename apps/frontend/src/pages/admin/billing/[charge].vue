@@ -360,7 +360,6 @@ const formatDateTimeShort = useFormatDateTime({
 	minute: 'numeric',
 })
 
-const route = useRoute()
 const vintl = useVIntl()
 
 const { formatMessage } = vintl
@@ -373,13 +372,15 @@ const messages = defineMessages({
 	},
 })
 
+const chargeId = useRouteId('charge')
+
 const {
 	data: user,
 	error: userError,
 	suspense: userSuspense,
 } = useQuery({
-	queryKey: ['user', route.params.id],
-	queryFn: () => labrinth.users_v2.get(route.params.id),
+	queryKey: ['user', chargeId],
+	queryFn: () => labrinth.users_v2.get(chargeId),
 })
 
 onServerPrefetch(userSuspense)

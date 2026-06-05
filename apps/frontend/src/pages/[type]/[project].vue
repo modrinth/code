@@ -3,7 +3,7 @@
 		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
-		<div v-if="route.name.startsWith('type-id-settings')" class="normal-page no-sidebar">
+		<div v-if="route.name.startsWith('type-project-settings')" class="normal-page no-sidebar">
 			<div class="normal-page__header">
 				<div
 					class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-3 border-0 border-b-[1px] border-solid border-divider pb-4 text-lg font-semibold"
@@ -32,7 +32,7 @@
 					:project="project"
 					:versions="versions"
 					:current-member="currentMember"
-					:is-settings="route.name.startsWith('type-id-settings')"
+					:is-settings="route.name.startsWith('type-project-settings')"
 					:set-processing="setProcessing"
 					:all-members="allMembers"
 					:update-members="invalidateProject"
@@ -480,7 +480,7 @@
 									v-if="!isServerProject"
 									size="large"
 									:color="
-										(auth.user && currentMember) || route.name === 'type-id-version-version'
+										(auth.user && currentMember) || route.name === 'type-project-version-version'
 											? `standard`
 											: `brand`
 									"
@@ -502,7 +502,7 @@
 									v-else
 									size="large"
 									:color="
-										(auth.user && currentMember) || route.name === 'type-id-version-version'
+										(auth.user && currentMember) || route.name === 'type-project-version-version'
 											? `standard`
 											: `brand`
 									"
@@ -524,7 +524,7 @@
 									size="large"
 									circular
 									:color="
-										route.name === 'type-id-version-version' || (auth.user && currentMember)
+										route.name === 'type-project-version-version' || (auth.user && currentMember)
 											? `standard`
 											: `brand`
 									"
@@ -542,7 +542,7 @@
 									size="large"
 									circular
 									:color="
-										route.name === 'type-id-version-version' || (auth.user && currentMember)
+										route.name === 'type-project-version-version' || (auth.user && currentMember)
 											? `standard`
 											: `brand`
 									"
@@ -811,7 +811,7 @@
 						:project="project"
 						:versions="versions"
 						:current-member="currentMember"
-						:is-settings="route.name.startsWith('type-id-settings')"
+						:is-settings="route.name.startsWith('type-project-settings')"
 						:route-name="route.name"
 						:set-processing="setProcessing"
 						:collapsed="collapsedChecklist"
@@ -1130,7 +1130,7 @@ import { useModerationQueue } from '~/services/moderation-queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
-	key: (route) => `${route.params.id}`,
+	key: (route) => `${route.params.project}`,
 })
 
 const data = useNuxtApp()
@@ -1143,6 +1143,26 @@ const { addNotification } = notifications
 
 const auth = await useAuth()
 const user = await useUser()
+
+// Route param for initial lookup (middleware caches by both slug and ID)
+const routeProjectId = useRouteId('project')
+
+const { createProjectDownloadUrl } = useCdnDownloadContext()
+
+const downloadReason = ref('standalone')
+
+function absorbDepQuery() {
+	if (route.query.dep === PROJECT_DEP_MARKER_QUERY.dep) {
+		downloadReason.value = 'dependency'
+		if (import.meta.client) {
+			const newQuery = { ...route.query }
+			delete newQuery.dep
+			void router.replace({ path: route.path, query: newQuery, hash: route.hash })
+		}
+	}
+}
+
+watch(() => route.query.dep, absorbDepQuery, { immediate: true })
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
@@ -1605,7 +1625,7 @@ const collections = computed(() =>
 )
 
 if (
-	!route.params.id ||
+	!routeProjectId ||
 	!(
 		tags.value.projectTypes.find((x) => x.id === route.params.type) ||
 		route.params.type === 'project'
@@ -1618,17 +1638,14 @@ if (
 	})
 }
 
-// Route param for initial lookup (middleware caches by both slug and ID)
-const routeProjectId = computed(() => route.params.id)
-
 // Use DI client for TanStack Query
 const client = injectIcarusClient()
 const queryClient = useQueryClient()
 
 // V2 Project - hits middleware cache (uses route param for lookup)
 const { data: projectRaw, error: projectV2Error } = useQuery({
-	queryKey: computed(() => ['project', 'v2', routeProjectId.value]),
-	queryFn: () => client.labrinth.projects_v2.get(routeProjectId.value),
+	queryKey: computed(() => ['project', 'v2', routeProjectId]),
+	queryFn: () => client.labrinth.projects_v2.get(routeProjectId),
 	staleTime: STALE_TIME,
 })
 
@@ -1677,8 +1694,8 @@ const {
 	error: _projectV3Error,
 	isPending: projectV3Pending,
 } = useQuery({
-	queryKey: computed(() => ['project', 'v3', routeProjectId.value]),
-	queryFn: () => client.labrinth.projects_v3.get(routeProjectId.value),
+	queryKey: computed(() => ['project', 'v3', routeProjectId]),
+	queryFn: () => client.labrinth.projects_v3.get(routeProjectId),
 	staleTime: STALE_TIME,
 })
 
@@ -1826,6 +1843,8 @@ const { data: organizationRaw } = useQuery({
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
+const isSettings = computed(() => route.name.startsWith('type-project-settings'))
+
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
 	return (versionsV3.value ?? []).map((v) => {
@@ -1868,7 +1887,7 @@ const hasVersions = computed(() => (project.value?.versions?.length ?? 0) > 0)
 async function updateProjectRoute() {
 	if (
 		project.value &&
-		route.params.id !== project.value.slug &&
+		routeProjectId !== project.value.slug &&
 		!flags.value.disablePrettyProjectUrlRedirects
 	) {
 		await navigateTo(
@@ -1876,7 +1895,7 @@ async function updateProjectRoute() {
 				name: route.name,
 				params: {
 					...route.params,
-					id: project.value.slug,
+					project: project.value.slug,
 				},
 				query: route.query,
 				hash: route.hash,
@@ -1887,9 +1906,9 @@ async function updateProjectRoute() {
 }
 
 async function invalidateProject() {
-	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', routeProjectId.value] })
-	if (routeProjectId.value !== projectId.value) {
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId] })
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', routeProjectId] })
+	if (routeProjectId !== projectId.value) {
 		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId.value] })
 		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId.value] })
 	}
@@ -1907,16 +1926,16 @@ const patchProjectMutation = useMutation({
 	onMutate: async ({ projectId, data }) => {
 		// Cancel outgoing refetches for both slug-based and ID-based cache keys
 		// The query may be keyed by slug (routeProjectId) but we also have the actual UUID (projectId)
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-		if (routeProjectId.value !== projectId) {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId] })
+		if (routeProjectId !== projectId) {
 			await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 		}
 
 		// Snapshot previous value from the active query (uses route param as key)
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId])
 
 		// Optimistic update on the active query key
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', routeProjectId], (old) => {
 			if (!old) return old
 			return { ...old, ...data }
 		})
@@ -1927,7 +1946,7 @@ const patchProjectMutation = useMutation({
 	onError: (err, _variables, context) => {
 		// Rollback on error using the active query key
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', routeProjectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -1949,16 +1968,16 @@ const patchStatusMutation = useMutation({
 
 	onMutate: async ({ projectId, status }) => {
 		// Cancel outgoing refetches for both slug-based and ID-based cache keys
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
-		if (routeProjectId.value !== projectId) {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId] })
+		if (routeProjectId !== projectId) {
 			await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 		}
 
 		// Snapshot previous value from the active query (uses route param as key)
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId])
 
 		// Optimistic update on the active query key
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', routeProjectId], (old) => {
 			if (!old) return old
 			return { ...old, status }
 		})
@@ -1969,7 +1988,7 @@ const patchStatusMutation = useMutation({
 	onError: (err, _variables, context) => {
 		// Rollback on error using the active query key
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', routeProjectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -2075,11 +2094,11 @@ const createGalleryItemMutation = useMutation({
 	},
 
 	onMutate: async ({ title, description, featured, ordering }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId] })
 
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId])
 
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', routeProjectId], (old) => {
 			if (!old) return old
 			const newItem = {
 				url: '',
@@ -2101,7 +2120,7 @@ const createGalleryItemMutation = useMutation({
 
 	onError: (err, _variables, context) => {
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', routeProjectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -2126,11 +2145,11 @@ const editGalleryItemMutation = useMutation({
 	},
 
 	onMutate: async ({ imageUrl, title, description, featured, ordering }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId] })
 
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId])
 
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', routeProjectId], (old) => {
 			if (!old) return old
 			return {
 				...old,
@@ -2154,7 +2173,7 @@ const editGalleryItemMutation = useMutation({
 
 	onError: (err, _variables, context) => {
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', routeProjectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -2174,11 +2193,11 @@ const deleteGalleryItemMutation = useMutation({
 	},
 
 	onMutate: async ({ imageUrl }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+		await queryClient.cancelQueries({ queryKey: ['project', 'v2', routeProjectId] })
 
-		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId.value])
+		const previousProject = queryClient.getQueryData(['project', 'v2', routeProjectId])
 
-		queryClient.setQueryData(['project', 'v2', routeProjectId.value], (old) => {
+		queryClient.setQueryData(['project', 'v2', routeProjectId], (old) => {
 			if (!old) return old
 			return {
 				...old,
@@ -2191,7 +2210,7 @@ const deleteGalleryItemMutation = useMutation({
 
 	onError: (err, _variables, context) => {
 		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', routeProjectId.value], context.previousProject)
+			queryClient.setQueryData(['project', 'v2', routeProjectId], context.previousProject)
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -2297,7 +2316,19 @@ const canCreateServerFrom = computed(() => {
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
 })
 
-if (!route.name.startsWith('type-id-settings')) {
+const createCanonicalUrl = () =>
+	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
+
+useHead({
+	link: [
+		{
+			rel: 'canonical',
+			href: createCanonicalUrl,
+		},
+	],
+})
+
+if (!route.name.startsWith('type-project-settings')) {
 	useSeoMeta({
 		title: () => title.value,
 		description: () => description.value,

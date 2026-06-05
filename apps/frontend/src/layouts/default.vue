@@ -1120,7 +1120,7 @@ const isDiscovering = computed(
 )
 
 const isDiscoveringSubpage = computed(
-	() => route.name && route.name.startsWith('type-id') && !route.query.sid,
+	() => route.name && route.name.startsWith('type-project') && !route.query.sid,
 )
 
 const isRussia = computed(() => country.value === 'ru')

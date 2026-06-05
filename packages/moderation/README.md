@@ -225,7 +225,7 @@ Example:
   link: {
     path: 'settings/description',
     title: messages.editDescriptionTitle,
-    shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
+    shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-description',
   },
 }
 ```

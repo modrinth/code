@@ -23,7 +23,7 @@ export const coreNags: Nag[] = [
 				id: 'nags.moderation.title',
 				defaultMessage: 'Visit moderation thread',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-moderation',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-moderation',
 		},
 	},
 	{
@@ -45,7 +45,7 @@ export const coreNags: Nag[] = [
 				id: 'nags.versions.title',
 				defaultMessage: 'Visit versions page',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-versions',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-versions',
 		},
 	},
 	{
@@ -67,7 +67,8 @@ export const coreNags: Nag[] = [
 				id: 'nags.settings.description.title',
 				defaultMessage: 'Visit description settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-description',
 		},
 	},
 	{
@@ -89,7 +90,7 @@ export const coreNags: Nag[] = [
 				id: 'nags.settings.title',
 				defaultMessage: 'Visit general settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings',
 		},
 	},
 	{
@@ -132,7 +133,7 @@ export const coreNags: Nag[] = [
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-gallery',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-gallery',
 		},
 	},
 	{
@@ -158,7 +159,7 @@ export const coreNags: Nag[] = [
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-gallery',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-gallery',
 		},
 	},
 	{
@@ -190,7 +191,7 @@ export const coreNags: Nag[] = [
 				id: 'nags.settings.license.title',
 				defaultMessage: 'Visit license settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-license',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-license',
 		},
 	},
 ]

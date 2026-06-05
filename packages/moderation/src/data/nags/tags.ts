@@ -44,7 +44,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.settings.tags.title',
 				defaultMessage: 'Visit tag settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -84,7 +84,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -123,7 +123,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -172,7 +172,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -219,7 +219,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 ]
