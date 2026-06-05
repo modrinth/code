@@ -11,9 +11,10 @@
 	>
 		<template #cell-user="{ row: member }">
 			<AutoLink
-				:to="userProfilePath(member.user.username)"
+				:to="getUserProfileLink(member.user.username)"
+				:target="userProfileTarget(member.user.username)"
 				class="inline-flex max-w-full min-w-0 items-center gap-2"
-				:class="userProfilePath(member.user.username) ? 'text-primary hover:underline' : ''"
+				:class="getUserProfileLink(member.user.username) ? 'text-primary hover:underline' : ''"
 			>
 				<Avatar
 					:src="member.user.avatarUrl"
@@ -153,9 +154,10 @@
 			<div class="flex min-w-0 items-center pl-4">
 				<AutoLink
 					v-tooltip="member.user.username"
-					:to="userProfilePath(member.user.username)"
+					:to="getUserProfileLink(member.user.username)"
+					:target="userProfileTarget(member.user.username)"
 					class="inline-flex min-w-0 items-center gap-2"
-					:class="userProfilePath(member.user.username) ? 'text-primary hover:underline' : ''"
+					:class="getUserProfileLink(member.user.username) ? 'text-primary hover:underline' : ''"
 				>
 					<Avatar
 						:src="member.user.avatarUrl"
@@ -293,7 +295,12 @@ import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import Table, { type SortDirection, type TableColumn } from '../../base/Table.vue'
 import TeleportOverflowMenu from '../../base/TeleportOverflowMenu.vue'
-import type { ServerAccessMember, ServerAccessRole, ServerAccessRoleOption } from './types'
+import type {
+	ServerAccessMember,
+	ServerAccessRole,
+	ServerAccessRoleOption,
+	ServerAccessUserProfileLink,
+} from './types'
 
 const props = withDefaults(
 	defineProps<{
@@ -301,6 +308,7 @@ const props = withDefaults(
 		roles: ServerAccessRoleOption[]
 		canManageUsers?: boolean
 		permissionDeniedMessage?: string
+		userProfileLink?: (username: string) => ServerAccessUserProfileLink
 	}>(),
 	{
 		canManageUsers: true,
@@ -533,9 +541,14 @@ function roleTriggerClass(role: ServerAccessRole): string {
 	return roleClasses(role)
 }
 
-function userProfilePath(username: string): string | undefined {
+function getUserProfileLink(username: string): ServerAccessUserProfileLink {
 	if (!username || username.includes('@')) return undefined
-	return `/user/${encodeURIComponent(username)}`
+	return props.userProfileLink?.(username) ?? `/user/${encodeURIComponent(username)}`
+}
+
+function userProfileTarget(username: string): string | undefined {
+	const link = getUserProfileLink(username)
+	return typeof link === 'string' && link.startsWith('http') ? '_blank' : undefined
 }
 
 function resendInviteCooldownSeconds(member: ServerAccessMember): number {

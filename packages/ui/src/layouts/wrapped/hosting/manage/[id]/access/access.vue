@@ -39,6 +39,7 @@
 			:roles="roleOptions"
 			:can-manage-users="canManageUsers"
 			:permission-denied-message="permissionDeniedMessage"
+			:user-profile-link="props.userProfileLink"
 			@update-role="updateMemberRole"
 			@resend-invite="resendInvite"
 			@cancel-invite="requestCancelInvite"
@@ -127,6 +128,7 @@ import {
 	type ServerAccessMember,
 	type ServerAccessRole,
 	type ServerAccessRoleOption,
+	type ServerAccessUserProfileLink,
 } from '#ui/components/servers/access'
 import { useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -144,6 +146,7 @@ type RoleFilter = ServerAccessRole | 'all'
 const props = withDefaults(
 	defineProps<{
 		showAuditLogInstances?: boolean
+		userProfileLink?: (username: string) => ServerAccessUserProfileLink
 	}>(),
 	{
 		showAuditLogInstances: false,
