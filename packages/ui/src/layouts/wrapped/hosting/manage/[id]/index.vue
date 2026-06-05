@@ -306,7 +306,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError } from '@modrinth/api-client'
+import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	CopyIcon,
@@ -685,6 +685,7 @@ const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
+const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const constrainWidth = computed(() => props.constrainWidth)
 const queryClient = useQueryClient()
 const route = useRoute()
