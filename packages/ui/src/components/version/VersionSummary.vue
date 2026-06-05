@@ -12,7 +12,12 @@
 			</p>
 		</div>
 		<ButtonStyled color="brand">
-			<a :href="downloadUrl" class="min-w-0" @click="emit('onDownload')">
+			<a
+				:href="downloadUrl"
+				:download="primaryFilename"
+				class="min-w-0"
+				@click="emit('onDownload')"
+			>
 				<DownloadIcon aria-hidden="true" /> Download
 			</a>
 		</ButtonStyled>
@@ -41,10 +46,15 @@ const props = defineProps<{
 	version: Version
 }>()
 
+const primaryFile = computed<VersionFile>(
+	() => props.version.files.find((x) => x.primary) || props.version.files[0],
+)
+
 const downloadUrl = computed(() => {
-	const primary: VersionFile = props.version.files.find((x) => x.primary) || props.version.files[0]
-	return primary.url
+	return primaryFile.value.url
 })
+
+const primaryFilename = computed(() => primaryFile.value.filename)
 
 const emit = defineEmits<{
 	onDownload: []

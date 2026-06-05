@@ -80,6 +80,7 @@
 								color: 'primary',
 								hoverFilled: true,
 								link: getPrimaryFile(version).url,
+								download: getPrimaryFile(version).filename,
 								action: () => {
 									emit('onDownload')
 								},

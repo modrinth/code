@@ -47,6 +47,7 @@
 						<a
 							v-tooltip="`Download`"
 							:href="getPrimaryFile(version).url"
+							:download="getPrimaryFile(version).filename"
 							class="hover:!bg-button-bg [&>svg]:!text-green"
 							aria-label="Download"
 							@click="emit('onDownload')"
@@ -101,6 +102,7 @@
 									color: 'primary',
 									hoverFilled: true,
 									link: getPrimaryFile(version).url,
+									download: getPrimaryFile(version).filename,
 									action: () => {
 										emit('onDownload')
 									},
