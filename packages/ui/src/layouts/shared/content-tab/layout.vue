@@ -151,6 +151,10 @@ const messages = defineMessages({
 
 const ctx = injectContentManager()
 
+function getItemId(item: ContentItem) {
+	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
+}
+
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
 const sortMode = ref<SortMode>('alphabetical-asc')
 
@@ -227,6 +231,7 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
+	getItemId,
 )
 
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
@@ -261,13 +266,12 @@ const filteredItems = computed(() => {
 const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
+		const id = getItemId(item)
 		return {
 			...base,
+			id,
 			disabled:
-				isChanging(base.id) ||
-				ctx.isBusy.value ||
-				isBulkOperating.value ||
-				item.installing === true,
+				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
 			installing: item.installing === true,
 			hasUpdate: item.has_update,
 			isClientOnly:
@@ -314,7 +318,7 @@ const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 
 function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => i.id === id)
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (item) {
 		pendingDeletionItems.value = [item]
 		if (event?.shiftKey) {
@@ -356,11 +360,14 @@ async function confirmDelete() {
 
 	if (itemsToDelete.length === 1) {
 		const item = itemsToDelete[0]
-		const id = item.id
+		const id = getItemId(item)
 		markChanging(id)
-		await ctx.deleteItem(item)
-		removeFromSelection(id)
-		unmarkChanging(id)
+		try {
+			await ctx.deleteItem(item)
+			removeFromSelection(id)
+		} finally {
+			unmarkChanging(id)
+		}
 		return
 	}
 
@@ -369,14 +376,14 @@ async function confirmDelete() {
 		itemsToDelete,
 		async (item) => {
 			await ctx.deleteItem(item)
-			removeFromSelection(item.id)
+			removeFromSelection(getItemId(item))
 		},
 		{ onComplete: clearSelection },
 	)
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	const item = ctx.items.value.find((i) => i.id === id)
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
 	markChanging(id)
 	try {
@@ -431,7 +438,7 @@ function handleUpdateById(id: string) {
 }
 
 function handleSwitchVersionById(id: string) {
-	const item = ctx.items.value.find((i) => i.id === id)
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (item) {
 		ctx.switchVersion?.(item)
 	}
@@ -758,6 +765,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:bulk-total="bulkTotal"
 			:bulk-waiting="bulkWaiting"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
+			:get-item-id="getItemId"
 			@clear="clearSelection"
 			@enable="bulkEnable"
 			@disable="bulkDisable"

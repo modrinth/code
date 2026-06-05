@@ -77,6 +77,9 @@ export interface ContentManagerContext {
 	// Share support (optional — when undefined, share button becomes hidden entirely)
 	shareItems?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void
 
+	// Stable per-row identity. ContentItem.id can be a content hash, so it is not always unique.
+	getItemId?: (item: ContentItem) => string
+
 	// Bulk operation guard — set by layout, checked by providers to suppress refreshes
 	isBulkOperating?: Ref<boolean>
 

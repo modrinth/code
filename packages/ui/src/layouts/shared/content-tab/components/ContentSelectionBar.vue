@@ -73,6 +73,7 @@ interface Props {
 	bulkTotal?: number
 	bulkWaiting?: boolean
 	ariaLabel?: string
+	getItemId?: (item: ContentItem) => string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -84,6 +85,7 @@ const props = withDefaults(defineProps<Props>(), {
 	bulkTotal: 0,
 	bulkWaiting: false,
 	ariaLabel: undefined,
+	getItemId: undefined,
 })
 
 const emit = defineEmits<{

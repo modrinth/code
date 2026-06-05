@@ -33,12 +33,12 @@ use std::io::Cursor;
 /// Content item with rich metadata for frontend display
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ContentItem {
-    /// Unique identifier (the file name)
+    /// Display file name.
     pub file_name: String,
     /// Relative path to the file within the profile
     pub file_path: String,
-    /// Stable frontend identifier (SHA1 hash of file content, survives renames).
-    /// Not a project or version ID.
+    /// SHA1 hash of file content. Stable across renames, but not unique when
+    /// duplicate files have identical contents.
     pub id: String,
     /// File size in bytes
     pub size: u64,

@@ -218,6 +218,82 @@ const loadingChangelog = ref(false)
 const updatingModpack = ref(false)
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isModpackUpdateDowngrade = ref(false)
+const activeContentOperationKeys = ref(new Set<string>())
+
+let activeContentOperationCount = 0
+let updateRequestId = 0
+const activeUpdateRequestId = ref(0)
+
+function fileNameFromPath(path: string) {
+	return path.split('/').pop() ?? path
+}
+
+function getContentItemId(item: ContentItem | null | undefined) {
+	return item?.file_path ?? item?.file_name ?? item?.id ?? ''
+}
+
+function getContentOperationKeys(item: ContentItem) {
+	return [getContentItemId(item), item.file_path, item.file_name].filter(
+		(key): key is string => !!key,
+	)
+}
+
+function hasContentOperation(item: ContentItem) {
+	const keys = getContentOperationKeys(item)
+	return keys.some((key) => activeContentOperationKeys.value.has(key))
+}
+
+function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
+	item.installing = busy
+	modpackContentModal.value?.updateItem(originalFileName, {
+		installing: busy,
+		disabled: busy,
+	})
+	if (item.file_name !== originalFileName) {
+		modpackContentModal.value?.updateItem(item.file_name, {
+			installing: busy,
+			disabled: busy,
+		})
+	}
+}
+
+function beginContentOperation(item: ContentItem) {
+	if (hasContentOperation(item)) return null
+
+	const keys = getContentOperationKeys(item)
+	activeContentOperationKeys.value = new Set([...activeContentOperationKeys.value, ...keys])
+	activeContentOperationCount++
+	isBulkOperating.value = true
+	setContentItemBusy(item, true)
+
+	return { keys, originalFileName: item.file_name }
+}
+
+function finishContentOperation(
+	item: ContentItem,
+	operation: { keys: string[]; originalFileName: string },
+) {
+	const nextKeys = new Set(activeContentOperationKeys.value)
+	for (const key of operation.keys) {
+		nextKeys.delete(key)
+	}
+	activeContentOperationKeys.value = nextKeys
+	activeContentOperationCount = Math.max(0, activeContentOperationCount - 1)
+	setContentItemBusy(item, false, operation.originalFileName)
+	if (activeContentOperationCount === 0) {
+		isBulkOperating.value = false
+	}
+}
+
+function beginUpdateRequest() {
+	updateRequestId++
+	activeUpdateRequestId.value = updateRequestId
+	return updateRequestId
+}
+
+function isActiveUpdateRequest(requestId: number) {
+	return activeUpdateRequestId.value === requestId
+}
 
 async function handleBrowseContent() {
 	if (!props.instance) return
@@ -341,8 +417,11 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 }
 
 async function handleUpdate(id: string) {
-	const item = projects.value.find((p) => p.id === id)
+	const item = projects.value.find((p) => getContentItemId(p) === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
+
+	const requestId = beginUpdateRequest()
+	const itemId = getContentItemId(item)
 
 	debug('handleUpdate triggered', {
 		fileName: item.file_name,
@@ -369,6 +448,9 @@ async function handleUpdate(id: string) {
 	const versions = (await get_project_versions(item.project.id).catch((e) => {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
+
+	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
+		return
 
 	loadingVersions.value = false
 
@@ -401,6 +483,9 @@ async function handleUpdate(id: string) {
 async function handleSwitchVersion(item: ContentItem) {
 	if (!item.project?.id || !item.version?.id) return
 
+	const requestId = beginUpdateRequest()
+	const itemId = getContentItemId(item)
+
 	updatingModpack.value = false
 	updatingProject.value = item
 	updatingProjectVersions.value = []
@@ -414,6 +499,9 @@ async function handleSwitchVersion(item: ContentItem) {
 	const versions = (await get_project_versions(item.project.id).catch((e) => {
 		return handleError(e)
 	})) as Labrinth.Versions.v2.Version[] | null
+
+	if (!isActiveUpdateRequest(requestId) || getContentItemId(updatingProject.value) !== itemId)
+		return
 
 	loadingVersions.value = false
 
@@ -789,8 +877,9 @@ provideContentManager({
 	showContentHint,
 	dismissContentHint,
 	shareItems: handleShareItems,
+	getItemId: getContentItemId,
 	mapToTableItem: (item: ContentItem) => ({
-		id: item.id,
+		id: getContentItemId(item),
 		project: item.project ?? {
 			id: item.file_name,
 			slug: null,
@@ -890,4 +979,3 @@ onUnmounted(() => {
 	unlistenProfiles()
 })
 </script>
-
