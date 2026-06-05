@@ -92,37 +92,34 @@ function parseChangelogEntries(src: string): ChangelogEntry[] {
 	return entries
 }
 
-function findAppAndHosting(entries: ChangelogEntry[], version: string): { appBody: string; hostingEntries: ChangelogEntry[] } {
+function getLatestUncoveredHosting(entries: ChangelogEntry[], lastReleaseDate: string | undefined): ChangelogEntry[] {
+	const latestHosting = entries.find((e) => e.product === 'hosting')
+	if (!latestHosting || !lastReleaseDate) {
+		return latestHosting ? [latestHosting] : []
+	}
+
+	const latestHostingTime = new Date(latestHosting.date).getTime()
+	const lastReleaseTime = new Date(lastReleaseDate).getTime()
+	if (Number.isNaN(latestHostingTime) || Number.isNaN(lastReleaseTime)) {
+		return [latestHosting]
+	}
+
+	return latestHostingTime > lastReleaseTime ? [latestHosting] : []
+}
+
+function findAppAndHosting(
+	entries: ChangelogEntry[],
+	version: string,
+	lastReleaseDate: string | undefined,
+): { appBody: string; hostingEntries: ChangelogEntry[] } | undefined {
 	const currentIdx = entries.findIndex((e) => e.product === 'app' && e.version === version)
 	if (currentIdx === -1) {
-		throw new Error(`No app changelog entry found for version ${version}`)
-	}
-
-	let newerAppIdx = -1
-	for (let i = currentIdx - 1; i >= 0; i--) {
-		if (entries[i].product === 'app') {
-			newerAppIdx = i
-			break
-		}
-	}
-	let previousAppIdx = entries.length
-	for (let i = currentIdx + 1; i < entries.length; i++) {
-		if (entries[i].product === 'app') {
-			previousAppIdx = i
-			break
-		}
-	}
-
-	const hostingEntries: ChangelogEntry[] = []
-	for (let i = newerAppIdx + 1; i < previousAppIdx; i++) {
-		if (entries[i].product === 'hosting') {
-			hostingEntries.push(entries[i])
-		}
+		return undefined
 	}
 
 	return {
 		appBody: entries[currentIdx].body,
-		hostingEntries,
+		hostingEntries: getLatestUncoveredHosting(entries, lastReleaseDate),
 	}
 }
 
@@ -219,9 +216,16 @@ function mergeAppAndHosting(appBody: string, hostingEntries: ChangelogEntry[]): 
 function main() {
 	const { dryRun, version, outFile } = parseArgs(process.argv.slice(2))
 	const changelogPath = join(REPO_ROOT, 'packages/blog/changelog.ts')
+	const lastReleaseDate = process.env.LAST_GITHUB_RELEASE_PUBLISHED_AT || undefined
 	const src = fs.readFileSync(changelogPath, 'utf8')
 	const entries = parseChangelogEntries(src)
-	const { appBody, hostingEntries } = findAppAndHosting(entries, version)
+	const entry = findAppAndHosting(entries, version, lastReleaseDate)
+	if (!entry) {
+		fs.writeFileSync(outFile, '', 'utf8')
+		return
+	}
+
+	const { appBody, hostingEntries } = entry
 	const output = mergeAppAndHosting(appBody, hostingEntries)
 
 	fs.writeFileSync(outFile, output, 'utf8')

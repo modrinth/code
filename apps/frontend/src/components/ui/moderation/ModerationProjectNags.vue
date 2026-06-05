@@ -233,7 +233,7 @@ const visibleNags = computed<Nag[]>(() => {
 			link: {
 				path: 'moderation',
 				title: messages.visitModerationPage,
-				shouldShow: () => props.routeName !== 'type-id-moderation',
+				shouldShow: () => props.routeName !== 'type-project-moderation',
 			},
 		})
 	}

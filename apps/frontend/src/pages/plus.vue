@@ -38,11 +38,7 @@
 				{{ calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly) }}% with
 				annual billing!
 			</p>
-			<ButtonStyled
-				v-if="auth.user && isPermission(auth.user.badges, 1 << 0)"
-				color="purple"
-				size="large"
-			>
+			<ButtonStyled v-if="auth.user && hasActiveMidas(auth.user)" color="purple" size="large">
 				<nuxt-link to="/settings/billing">
 					<SettingsIcon aria-hidden="true" />
 					Manage subscription
@@ -95,8 +91,8 @@ import {
 import { calculateSavings, getCurrency } from '@modrinth/utils'
 
 import { useBaseFetch } from '@/composables/fetch.js'
-import { isPermission } from '@/utils/permissions.ts'
 import { products } from '~/generated/state.json'
+import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const { addNotification } = injectNotificationManager()
 const formatPrice = useFormatPrice()

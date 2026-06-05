@@ -27,6 +27,11 @@ const messages = defineMessages({
 		id: 'hosting.plan.select-plan',
 		defaultMessage: 'Select plan',
 	},
+	billedInterval: {
+		id: 'servers.purchase.step.plan.billed',
+		defaultMessage:
+			'billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}',
+	},
 })
 
 const plans: Record<
@@ -132,7 +137,9 @@ const billingMonths = computed(() => {
 				<span class="m-0 text-2xl font-bold text-contrast">
 					{{ formatPrice(price / billingMonths, currency, true) }}
 					<span class="text-lg font-semibold text-secondary">
-						/ month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
+						/ month<template v-if="interval !== 'monthly'"
+							>, {{ formatMessage(messages.billedInterval, { interval }) }}</template
+						>
 					</span>
 				</span>
 				<p class="m-0 max-w-[18rem]">{{ formatMessage(plans[plan].description) }}</p>

@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "获取订阅信息失败。"
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 天"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/月"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/季度"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/年"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "你的下一次扣费日期为 <charge-date>{date}</charge-date>。"
   },
@@ -95,8 +83,38 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "重新订阅服务器"
   },
+  "browse.filter-results": {
+    "defaultMessage": "筛选结果……"
+  },
+  "browse.no-results": {
+    "defaultMessage": "没有找到您的查询结果！"
+  },
+  "browse.offline": {
+    "defaultMessage": "你目前处于离线状态。连接互联网来浏览Modrinth！"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "搜索{projectType}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "选定的项目"
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "选定的项目尚未安装"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "丢弃"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "选定的项目尚未安装"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "查看："
+  },
   "button.accept": {
     "defaultMessage": "接受"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "将服务器添加到实例"
   },
   "button.affiliate-links": {
     "defaultMessage": "推广链接"
@@ -167,6 +185,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "隐藏快照版本"
   },
+  "button.install": {
+    "defaultMessage": "安装"
+  },
   "button.max": {
     "defaultMessage": "最大"
   },
@@ -184,6 +205,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "在文件夹中打开"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "在 Modrinth 中打开"
   },
   "button.play": {
     "defaultMessage": "开始游戏"
@@ -278,8 +302,11 @@
   "collections.label.private": {
     "defaultMessage": "私有"
   },
-  "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "是否确定要将 {count, plural,  other {# 个项目}}更新至最新的兼容版本？建议逐个更新内容。"
+  "content-type.content.lowercase": {
+    "defaultMessage": "内容"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "选择 {project}"
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "更新警告"
@@ -290,9 +317,6 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "在点击“全部更新”时按住 Shift 键，以后将跳过此确认。"
   },
-  "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "更新 {count, plural, other {# 个项目}}"
-  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "删除模组可能会对你的游戏世界造成永久性影响，并可能导致再次加载时出现内容缺失或意外问题。"
   },
@@ -300,10 +324,10 @@
     "defaultMessage": "删除警告"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "删除 {count} 个{itemType}"
+    "defaultMessage": "删除{count, number}个{itemType}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "删除{itemType}{count, plural,one {} other {s}}"
+    "defaultMessage": "删除 {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {降级} other {更新}}可能会导致兼容性问题。你在整合包基础上额外添加的模组或内容将被保留，但可能与新版本不兼容。"
@@ -350,6 +374,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "更新了 {count} 项"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "已禁用"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "已启用"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "更新"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "警告"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "正在创建备份……"
   },
@@ -368,11 +404,14 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "创建备份"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "实例"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "在点击时按住 Shift 键可跳过确认步骤。"
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "我们建议你在继续之前先创建备份，以便在出现任何问题时可以恢复你的{type, select, server {存档} other {实例}}。"
+  "content.inline-backup.world-label": {
+    "defaultMessage": "世界"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "你现在可以在这里找到你的整合包内容！"
@@ -415,9 +454,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "请稍等"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "搜索 {count} 个{contentType}……"
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "文件名"
@@ -482,9 +518,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "正在更新 {contentType}……"
   },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "已选择 {count} 个 {contentType}"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "已选择 {count, number} 个"
   },
@@ -499,9 +532,6 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "导入"
-  },
-  "creation-flow.button.import-instances": {
-    "defaultMessage": "导入 {count} 个实例"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "初始化服务器"
@@ -758,6 +788,24 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "初始化服务器"
   },
+  "external-project-license-status.no": {
+    "defaultMessage": "否"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "永久拒绝"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "未知"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "已署名"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "已署名及来源"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "是"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "解压概览"
   },
@@ -773,17 +821,14 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "将覆盖 {count} 个文件"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "覆盖"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "文件将被覆盖"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "新建{type, select, directory {文件夹} other {文件}}"
+    "defaultMessage": "创建 {type}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "新建一个{type, select, directory {文件夹} other {文件}}"
+    "defaultMessage": "创建一个 {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "如：my-folder"
@@ -796,9 +841,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "删除文件"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {此文件夹及其所有内容将被永久删除。此操作无法撤销。} other {此文件将被永久删除。此操作无法撤销。}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "无法加载文件内容。"
@@ -887,6 +929,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "缩小"
   },
+  "files.item-type.file": {
+    "defaultMessage": "文件"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "文件"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "文件夹"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "文件夹"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "操作进行中，文件操作已被禁用。"
   },
@@ -927,7 +981,7 @@
     "defaultMessage": "如：/my-folder"
   },
   "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {移动文件夹} other {移动文件}}"
+    "defaultMessage": "移动{type}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "返回主目录"
@@ -995,9 +1049,6 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "新名称"
   },
-  "files.row.item-count": {
-    "defaultMessage": "{count} 项"
-  },
   "files.table-header.created": {
     "defaultMessage": "创建时间"
   },
@@ -1050,7 +1101,7 @@
     "defaultMessage": " ：剩余 {count}"
   },
   "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "拖拽{type, select, undefined {文件} other { {type} }}到此处上传"
+    "defaultMessage": "把{type}拖到此处上传"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "名称只能包含字母、数字、连字符（-）、下划线（_）或空格。"
@@ -1199,6 +1250,18 @@
   "form.placeholder.state": {
     "defaultMessage": "输入州/省"
   },
+  "format.bytes.1": {
+    "defaultMessage": "{count, number} KiB"
+  },
+  "format.bytes.2": {
+    "defaultMessage": "{count, number} MiB"
+  },
+  "format.bytes.3": {
+    "defaultMessage": "{count, number} GiB"
+  },
+  "format.bytes.4": {
+    "defaultMessage": "{count, number} TiB"
+  },
   "header.category.category": {
     "defaultMessage": "类别"
   },
@@ -1234,6 +1297,9 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "更新内容失败"
+  },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "安装内容失败"
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "加载整合包内容失败"
@@ -1406,17 +1472,17 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "更改加载器具有破坏性"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "链接 {projectType, select, server {服务器项目} other {整合包}}"
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "整合包"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "服务器项目"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} 版本"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "你需要重置服务器以切换加载器。"
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "重新安装模组包会将 {type, select, server {服务器的} other {实例}} 内容重置为原始状态，移除你添加的任何模组或内容。"
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "重新安装整合包"
@@ -1445,11 +1511,20 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "搜索游戏版本……"
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "实例"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "实例"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "服务器"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "服务器"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "取消链接"
-  },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "取消链接会永久断开此 {type, select, server {服务器} other {实例}} 与 {projectType, select, server {服务器} other {整合包}} 项目的连接，并允许你更改加载器和 Minecraft 版本，但你将无法获得后续的更新。"
   },
   "installation-settings.verifying": {
     "defaultMessage": "正在验证……"
@@ -1466,14 +1541,17 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "重新安装整合包"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "修复将会重新安装加载器和 Minecraft 依赖项，但不会删除你的内容。如果你的{type, select, server {服务器无法正常启动} other {游戏因启动器相关错误而无法启动}}，执行此操作可能会解决问题。"
-  },
   "instance.confirm-repair.header": {
-    "defaultMessage": "修复 {type, select, server {服务器} other {实例}}"
+    "defaultMessage": "修复 {type}"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "实例"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "修复"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "服务器"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "冒险模式"
@@ -1550,9 +1628,6 @@
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "没有符合搜索条件的项目。"
   },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
   },
@@ -1573,6 +1648,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "隐藏不兼容项"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} 未被标记为与当前安装兼容。它可能无法启动或出现不可预期的行为。"
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "更新至不兼容版本？"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "仍然更新"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "正在加载更新日志..."
@@ -1688,20 +1772,35 @@
   "label.filter-by": {
     "defaultMessage": "筛选"
   },
+  "label.filters": {
+    "defaultMessage": "过滤器"
+  },
   "label.followed-projects": {
     "defaultMessage": "已关注的项目"
   },
   "label.game-version": {
     "defaultMessage": "游戏版本"
   },
+  "label.hide-installed-content": {
+    "defaultMessage": "隐藏已安装内容"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "隐藏所选内容"
+  },
   "label.installation-info": {
     "defaultMessage": "安装信息"
+  },
+  "label.installed": {
+    "defaultMessage": "已安装"
   },
   "label.installed-modpack": {
     "defaultMessage": "已安装整合包"
   },
   "label.installing": {
     "defaultMessage": "安装中……"
+  },
+  "label.installing-content": {
+    "defaultMessage": "安装内容"
   },
   "label.loading": {
     "defaultMessage": "加载中……"
@@ -1778,6 +1877,9 @@
   "label.select-all": {
     "defaultMessage": "选择全部"
   },
+  "label.selected": {
+    "defaultMessage": "已选"
+  },
   "label.selection-actions": {
     "defaultMessage": "选择操作"
   },
@@ -1820,8 +1922,14 @@
   "label.username": {
     "defaultMessage": "用户名"
   },
+  "label.validating": {
+    "defaultMessage": "验证"
+  },
   "label.version": {
     "defaultMessage": "版本"
+  },
+  "label.view": {
+    "defaultMessage": "视图"
   },
   "label.visibility": {
     "defaultMessage": "可见性"
@@ -1928,6 +2036,150 @@
   "locale.zh-TW": {
     "defaultMessage": "中文（繁体）"
   },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "用文字描述替代"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "出错"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "尽可能地描述这张图片，以此关照不能加载图片的人。"
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "描述此图片…"
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "描述（替代文本）"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "插入图片"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "图片来源"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "链接"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "上传"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "拖放上传或单击选择文件"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "输入图片URL…"
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "插入"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "插入链接"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "输入标签……"
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "标签"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "输入链接URL…"
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "此编辑器支持 <markdown-link>Markdown 格式</markdown-link>。"
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "长度限制："
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "无限制"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "写点什么……"
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "预览"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "预览"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "加粗"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "项目清单"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "代码"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "一级标题"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "二级标题"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "三级标题"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "图片"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "斜体"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "链接"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "已排序列表"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "引用"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "折叠内容"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "删除线"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "视频"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "没有提供文件"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "未提供图像上传处理程序"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL链接"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "无效的URL。此域名不被允许使用。"
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "无效的URL。请确保URL格式正确。"
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "不支持的协议。请使用 http 或 https。"
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "YouTube 视频播放器"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "插入 YouTube 视频"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "输入一个有效的 YouTube 视频链接。"
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "输入 YouTube 视频 URL"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "YouTube视频URL"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "添加支付方式"
   },
@@ -2019,7 +2271,7 @@
     "defaultMessage": "失败"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "暂扣"
+    "defaultMessage": "由管理员下架"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "将代码复制到剪贴板"
@@ -2079,7 +2331,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "万事达卡"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2126,35 +2378,14 @@
   "project-type.all": {
     "defaultMessage": "全部"
   },
-  "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, other {数据包}}"
-  },
   "project-type.datapack.category": {
     "defaultMessage": "数据包"
-  },
-  "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, other {数据包}}"
-  },
-  "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, other {模组}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "模组"
   },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, other {模组}}"
-  },
-  "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, other {整合包}}"
-  },
   "project-type.modpack.category": {
     "defaultMessage": "整合包"
-  },
-  "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, other {整合包}}"
-  },
-  "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural, other {插件}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "插件"
@@ -2162,41 +2393,17 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {插件} other {插件集}}"
   },
-  "project-type.project.capital": {
-    "defaultMessage": "项目"
-  },
   "project-type.project.category": {
     "defaultMessage": "项目"
-  },
-  "project-type.project.lowercase": {
-    "defaultMessage": "{count, plural, other {项目}}"
-  },
-  "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, other {资源包}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "资源包"
   },
-  "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, other {资源包}}"
-  },
-  "project-type.server.capital": {
-    "defaultMessage": "{count, plural, other {服务器}}"
-  },
   "project-type.server.category": {
     "defaultMessage": "服务器"
   },
-  "project-type.server.lowercase": {
-    "defaultMessage": "{count, plural, other {服务器}}"
-  },
-  "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, other {光影包}}"
-  },
   "project-type.shader.category": {
     "defaultMessage": "光影包"
-  },
-  "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, other {光影包}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "支持的运行环境"
@@ -2321,9 +2528,6 @@
   "project.about.tags.title": {
     "defaultMessage": "标签"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count, number} {count, plural, other {次下载}}"
-  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "客户端和服务端都需要。"
   },
@@ -2390,20 +2594,8 @@
   "project.environment.unknown.title": {
     "defaultMessage": "未知运行环境"
   },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} {count, plural, other {人关注}}"
-  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 在线"
-  },
-  "project.online-player-count.tooltip": {
-    "defaultMessage": "{count} {countPlural, plural, other {个玩家}} 在线"
-  },
-  "project.recent-plays": {
-    "defaultMessage": "{count} {countPlural, plural, other {人最近游玩}}"
-  },
-  "project.recent-plays.tooltip": {
-    "defaultMessage": "在过去两周内共有 {count} {countPlural, plural, other {人}}通过 Modrinth 游玩"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "这个项目使用了自定义整合包"
@@ -2789,6 +2981,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "上传"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "权限"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "版本"
   },
@@ -2833,6 +3028,18 @@
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "由管理员下架"
+  },
+  "report.item-type.content": {
+    "defaultMessage": "内容"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "项目"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "用户"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "版本"
   },
   "s.bg": {
     "defaultMessage": "后台任务正在运行"
@@ -3002,15 +3209,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "从备份中恢复"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "已选择 {count} 个备份的批量操作"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "正在删除 {total} 个备份……"
-  },
-  "servers.backups.bulk-bar.selected-count": {
-    "defaultMessage": "{count} 个备份被选中"
-  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "一旦删除， {count, plural, one {这个备份将不能} other {这些备份将不能}}被恢复。删除是永久性的。"
   },
@@ -3022,9 +3220,6 @@
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "删除{count, plural, one {备份} other { # 个备份}}"
-  },
-  "servers.backups.delete-modal.header": {
-    "defaultMessage": "删除备份"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "创建你的第一个备份"
@@ -3083,6 +3278,54 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "正在同步內容"
   },
+  "servers.installing-banner.error.header": {
+    "defaultMessage": "安装失败"
+  },
+  "servers.installing-banner.error.internal-platform": {
+    "defaultMessage": "安装平台时发生内部错误，请重试。"
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "指定的加载器或 Minecraft 版本无法安装。它可能无效或不受支持。"
+  },
+  "servers.installing-banner.error.modpack-install-failed": {
+    "defaultMessage": "整合包无法安装。它可能已损坏或不兼容。"
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "这个整合包版本不包含可下载的文件，可能是打包方式有问题。"
+  },
+  "servers.installing-banner.error.unknown": {
+    "defaultMessage": "安装过程中发生意外错误。"
+  },
+  "servers.installing-banner.error.unsupported-loader-version": {
+    "defaultMessage": "Modrinth Hosting 目前尚不支持此版本的 Minecraft 或加载器。"
+  },
+  "servers.installing-banner.phase.installing-addons": {
+    "defaultMessage": "正在安装组件……"
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "正在安装整合包……"
+  },
+  "servers.installing-banner.phase.installing-platform": {
+    "defaultMessage": "正在安装平台……"
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "我们正在准备你的服务器"
+  },
+  "servers.installing-banner.ticker.adding-java": {
+    "defaultMessage": "正在添加 Java……"
+  },
+  "servers.installing-banner.ticker.configuring-server": {
+    "defaultMessage": "正在配置服务器……"
+  },
+  "servers.installing-banner.ticker.downloading-mods": {
+    "defaultMessage": "正在下载模组……"
+  },
+  "servers.installing-banner.ticker.organizing-files": {
+    "defaultMessage": "正在整理文件……"
+  },
+  "servers.installing-banner.ticker.setting-up-environment": {
+    "defaultMessage": "正在设置运行环境……"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已经有服务器了吗？"
   },
@@ -3100,9 +3343,6 @@
   },
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "目前还没有服务器"
-  },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "挑选你喜爱的模组，剩下的就交给我们处理。"
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "一键安装模组"
@@ -3140,26 +3380,14 @@
   "servers.listing.new-label": {
     "defaultMessage": "新"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "你的文件还将保留 <days-remaining>{daysRemaining} {daysRemaining, plural, one {天} other {天}}</days-remaining>。请在文件被删除前联系支持团队以下载文件。"
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "取消订阅后，你的文件将保留 30 天。"
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "你的服务器因管理操作停用。"
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "你的服务器将在 <date>{formattedDate}</date> {verb, select, downgrade {降级} upgrade {升级} other {切换}}到{planSize}计划。"
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "请等待我们设置你的服务器。这可能需要长达10分钟的时间。"
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "你的订阅已取消。"
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "你的订阅已于 <date>{formattedDate}</date> 取消。"
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "由于付款失败，你的订阅已被取消。"
@@ -3257,9 +3485,6 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "成功"
   },
-  "servers.manage.search-placeholder": {
-    "defaultMessage": "搜索 {count} {count, plural, other {个服务器}}..."
-  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3271,9 +3496,6 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "你的服务器设置已移动"
-  },
-  "servers.medal-listing.countdown.remaining": {
-    "defaultMessage": "<days-count>{days}</days-count> {days, plural, other {天}} <hours-count>{hours}</hours-count> {hours, plural, other {小时}} <minutes-count>{minutes}</minutes-count> {minutes, plural, other {分钟}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {秒}} 剩余……"
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "新服务器"
@@ -3398,8 +3620,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "内存"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "北美"
+  "servers.region.north-america-central": {
+    "defaultMessage": "北美中部"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "北美东部"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "北美西部"
   },
   "servers.region.prompt": {
     "defaultMessage": "你希望服务器位于何处？"
@@ -3532,9 +3760,6 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "搜索语言..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural, =0 {没有符合搜索条件的语言} other {共有 # 个语言符合搜索条件}}。"
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "没有符合搜索条件的语言。"
@@ -3983,6 +4208,39 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "应用"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "取消"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "清除"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "未选择时间范围。"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "所有时间"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "今天"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "昨天"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "日"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "小时"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "月"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "周"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "你有未保存的修改。"
   },
@@ -4001,11 +4259,7 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "离开页面？"
   },
-  "ui.stacked-admonitions.alert-count": {
-    "defaultMessage": "{count} 个警报"
-  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "全部忽略"
   }
 }
-

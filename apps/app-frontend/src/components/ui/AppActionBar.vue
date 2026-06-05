@@ -133,6 +133,7 @@ import {
 	type PopupNotificationProgressItem,
 	useVIntl,
 } from '@modrinth/ui'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { Dropdown } from 'floating-vue'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -284,6 +285,7 @@ function goToTerminal(path?: string) {
 }
 
 const currentLoadingBars = ref<LoadingBar[]>([])
+const currentLoadingBarIconUrls = ref<Record<string, string | null>>({})
 const notificationId = ref<string | number | null>(null)
 const dismissed = ref(false)
 
@@ -301,6 +303,16 @@ function getLoadingProgress(loadingBar: LoadingBar): number {
 function getLoadingText(loadingBar: LoadingBar): string {
 	const percent = Math.floor(getLoadingProgress(loadingBar) * 100)
 	return loadingBar.message ? `${percent}% ${loadingBar.message}` : `${percent}%`
+}
+
+function getDisplayIconUrl(icon: string | null | undefined): string | null {
+	if (!icon) {
+		return null
+	}
+	if (/^(https?:|data:|blob:|asset:|tauri:)/.test(icon)) {
+		return icon
+	}
+	return convertFileSrc(icon)
 }
 
 function getNotification(): PopupNotification | null {
@@ -326,6 +338,7 @@ function buildDownloadItems(): PopupNotificationProgressItem[] {
 		id: getLoadingBarKey(bar),
 		title: bar.title ?? '',
 		text: getLoadingText(bar),
+		iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
 		progress: getLoadingProgress(bar),
 		waiting: !bar.total || bar.total <= 0,
 	}))
@@ -399,6 +412,32 @@ async function refreshLoadingBars() {
 	currentLoadingBars.value = Object.values(bars)
 		.map(formatLoadingBars)
 		.filter((bar) => bar?.bar_type?.type !== 'launcher_update')
+
+	const profilePaths = Array.from(
+		new Set(
+			currentLoadingBars.value
+				.map((bar) => bar.bar_type?.profile_path)
+				.filter((path): path is string => !!path),
+		),
+	)
+	const profiles = profilePaths.length
+		? await getInstances(profilePaths).catch((error) => {
+				handleError(error)
+				return []
+			})
+		: []
+	const profileIconUrls = new Map(
+		profiles.map((profile) => [profile.path, getDisplayIconUrl(profile.icon_path)]),
+	)
+	currentLoadingBarIconUrls.value = Object.fromEntries(
+		currentLoadingBars.value.map((bar) => {
+			const barIconUrl = getDisplayIconUrl(bar.bar_type?.icon)
+			const profileIconUrl = bar.bar_type?.profile_path
+				? profileIconUrls.get(bar.bar_type.profile_path)
+				: null
+			return [getLoadingBarKey(bar), barIconUrl ?? profileIconUrl ?? null]
+		}),
+	)
 
 	currentLoadingBars.value.sort((a, b) => {
 		const aKey = `${a.loading_bar_uuid ?? a.id ?? ''}`

@@ -119,7 +119,7 @@ export const formatProjectType = (name, short = false) => {
 			return 'PLG'
 		} else if (name === 'datapack') {
 			return 'DPK'
-		} else if (name === 'server') {
+		} else if (name === 'minecraft_java_server') {
 			return 'SRV'
 		}
 	}

@@ -35,16 +35,15 @@
 </template>
 
 <script setup lang="ts">
-// No ReadyTransition wrapper: console and ServerManageStats own their loading UX; there is no single TanStack "ready" gate for this tab.
 import type { Mclogs } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
+import ServerManageStats from '#ui/components/servers/ServerManageStats.vue'
 import { useModrinthServersConsole } from '#ui/composables'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import { ConsolePageLayout, provideConsoleManager } from '#ui/layouts/shared/console'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
-
-import ServerManageStats from './components/ServerManageStats.vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -66,6 +65,7 @@ const {
 	powerStateDetails: _powerStateDetails,
 } = injectModrinthServerContext()
 const modrinthServersConsole = useModrinthServersConsole()
+const { canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
 
 watch(
 	() => props.showAdvancedDebugInfo,
@@ -109,6 +109,7 @@ const dismissCrash = () => {
 provideConsoleManager({
 	logLines: modrinthServersConsole.output,
 	sendCommand: (cmd: string) => {
+		if (!canUsePowerActions.value) return
 		try {
 			client.archon.sockets.send(serverId, { event: 'command', cmd })
 		} catch (error) {
@@ -116,7 +117,12 @@ provideConsoleManager({
 		}
 	},
 	showCommandInput: true,
-	disableCommandInput: computed(() => serverPowerState.value !== 'running'),
+	disableCommandInput: computed(
+		() => !canUsePowerActions.value || serverPowerState.value !== 'running',
+	),
+	disableCommandInputTooltip: computed(() =>
+		canUsePowerActions.value ? undefined : permissionDeniedMessage.value,
+	),
 	loading: computed(
 		() =>
 			!isConnected.value ||
@@ -124,6 +130,7 @@ provideConsoleManager({
 			isWsAuthIncorrect.value,
 	),
 	onClear: async () => {
+		if (!canUsePowerActions.value) return
 		modrinthServersConsole.clear()
 		try {
 			await client.kyros.logs_v1.clear()
@@ -131,6 +138,10 @@ provideConsoleManager({
 			console.error('Failed to clear server logs:', error)
 		}
 	},
+	clearDisabled: computed(() => !canUsePowerActions.value),
+	clearDisabledTooltip: computed(() =>
+		canUsePowerActions.value ? undefined : permissionDeniedMessage.value,
+	),
 	shareDisabled: computed(() => !isConnected.value),
 	emptyStateType: 'server',
 	crashAnalysis,

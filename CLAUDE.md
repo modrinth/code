@@ -64,7 +64,7 @@ The website and app `prepr` commands
 
 Each project may have its own `CLAUDE.md` with detailed instructions:
 
-- [`apps/labrinth/CLAUDE.md`](apps/labrinth/CLAUDE.md) — Backend API
+- [`apps/labrinth/AGENTS.md`](apps/labrinth/AGENTS.md) — Backend API
 - [`apps/frontend/CLAUDE.md`](apps/frontend/CLAUDE.md) - Frontend Website
 
 ## Code Guidelines

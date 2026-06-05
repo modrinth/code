@@ -239,6 +239,7 @@ impl TempUser {
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
+                campaign_pride_26: None,
                 allow_friend_requests: true,
                 is_subscribed_to_newsletter: false,
             }
@@ -1117,7 +1118,14 @@ pub async fn init(
     }
 
     let user_id = if let Some(token) = info.token {
-        let (_, user) = get_user_record_from_bearer_token(
+        // Linking a new auth provider changes how the account can be accessed,
+        // so only first-party session tokens may authorize this flow. OAuth and
+        // PAT tokens can be delegated or stored outside an interactive login.
+        if !token.starts_with("mra_") {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
+
+        let (scopes, user) = get_user_record_from_bearer_token(
             &req,
             Some(&token),
             &**client,
@@ -1127,6 +1135,10 @@ pub async fn init(
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+        if !scopes.contains(Scopes::USER_AUTH_WRITE) {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
 
         Some(user.id)
     } else {
@@ -1562,6 +1574,7 @@ pub async fn create_account_with_password(
         created: Utc::now(),
         role: Role::Developer.to_string(),
         badges: Badges::default(),
+        campaign_pride_26: None,
         allow_friend_requests: true,
         is_subscribed_to_newsletter: new_account
             .sign_up_newsletter

@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            insert into campaign_donations (id, tiltify_event_id, raw_data, donated_at, amount_usd, user_id)\n            values ($1, $2::text::uuid, $3, $4, $5, $6)\n            on conflict (tiltify_event_id) do nothing\n            returning id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Jsonb",
+        "Timestamptz",
+        "Numeric",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "2f883a2641f3276be6e57f7fcce0f1c7cc2ba03e09094750dc501df45d8421d5"
+}

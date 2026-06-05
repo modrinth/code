@@ -13,33 +13,71 @@
 				@mouseenter="stopTimer(item)"
 				@mouseleave="setNotificationTimer(item)"
 			>
+				<NotificationToast
+					v-if="item.toast"
+					:type="item.toast.type"
+					:actor-name="item.toast.actorName"
+					:actor-avatar-url="item.toast.actorAvatarUrl"
+					:entity-name="item.toast.entityName"
+					:entity-icon-url="item.toast.entityIconUrl"
+					:status-text="item.toast.statusText"
+					:progress="item.toast.progress"
+					:waiting="item.toast.waiting"
+					@accept="handleToastAction(item, item.toast.onAccept)"
+					@decline="handleToastAction(item, item.toast.onDecline)"
+					@dismiss="handleToastAction(item, item.toast.onDismiss)"
+					@launch="handleToastAction(item, item.toast.onLaunch)"
+					@open-actor="item.toast.onOpenActor?.()"
+					@open-instance="handleToastAction(item, item.toast.onOpenInstance)"
+				/>
+				<div v-else-if="isDownloadNotification(item)" class="flex flex-col gap-4">
+					<NotificationToast
+						v-for="progressItem in downloadToastItems(item)"
+						:key="progressItem.id"
+						type="instance-download"
+						:entity-name="progressItem.title || item.title"
+						:entity-icon-url="progressItem.iconUrl ?? item.iconUrl ?? MinecraftServerIcon"
+						:status-text="downloadStatusText(progressItem)"
+						:progress="progressItem.progress"
+						:waiting="progressItem.waiting"
+						@dismiss="dismiss(item.id)"
+					/>
+				</div>
 				<div
+					v-else
 					class="flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"
 				>
 					<div class="flex flex-col gap-2 w-full">
 						<div class="flex items-center justify-between gap-2.5">
-							<div class="flex items-center gap-2">
-								<div
-									class="flex items-center"
-									:class="{
-										'text-red': item.type === 'error',
-										'text-orange': item.type === 'warning',
-										'text-green': item.type === 'download',
-										'text-contrast': item.type === 'success',
-										'text-blue':
-											!item.type ||
-											!['error', 'warning', 'success', 'download'].includes(item.type),
-									}"
-								>
-									<IssuesIcon v-if="item.type === 'warning'" class="h-5 w-5" />
-									<DownloadIcon v-else-if="item.type === 'download'" class="h-5 w-5" />
-									<CheckCircleIcon v-else-if="item.type === 'success'" class="h-5 w-5" />
-									<XCircleIcon v-else-if="item.type === 'error'" class="h-5 w-5" />
-									<InfoIcon v-else class="h-5 w-5" />
-								</div>
-								<div class="text-contrast font-semibold m-0 grow">
-									{{ item.title }}
-								</div>
+							<div class="flex min-w-0 flex-1 items-center gap-2">
+								<component
+									:is="item.titleLogo"
+									v-if="item.titleLogo"
+									class="h-7 w-auto min-w-0 max-w-full text-contrast"
+								/>
+								<template v-else>
+									<div
+										class="flex items-center"
+										:class="{
+											'text-red': item.type === 'error',
+											'text-orange': item.type === 'warning',
+											'text-green': item.type === 'download',
+											'text-contrast': item.type === 'success',
+											'text-blue':
+												!item.type ||
+												!['error', 'warning', 'success', 'download'].includes(item.type),
+										}"
+									>
+										<IssuesIcon v-if="item.type === 'warning'" class="h-5 w-5" />
+										<DownloadIcon v-else-if="item.type === 'download'" class="h-5 w-5" />
+										<CheckCircleIcon v-else-if="item.type === 'success'" class="h-5 w-5" />
+										<XCircleIcon v-else-if="item.type === 'error'" class="h-5 w-5" />
+										<InfoIcon v-else class="h-5 w-5" />
+									</div>
+									<div class="text-contrast font-semibold m-0 grow">
+										{{ item.title }}
+									</div>
+								</template>
 							</div>
 							<ButtonStyled size="small" type="transparent" circular>
 								<button @click="dismiss(item.id)">
@@ -50,6 +88,11 @@
 						<span v-if="item.text" class="text-primary">
 							{{ item.text }}
 						</span>
+						<component
+							:is="item.bodyComponent"
+							v-if="item.bodyComponent"
+							v-bind="item.bodyProps ?? {}"
+						/>
 					</div>
 					<div v-if="item.progressItems?.length" class="flex flex-col gap-3">
 						<div
@@ -89,6 +132,7 @@
 							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
 						>
 							<button @click="handleButtonClick(item.id, btn)">
+								<component :is="btn.icon" v-if="btn.icon" />
 								{{ btn.label }}
 							</button>
 						</ButtonStyled>
@@ -105,6 +149,7 @@ import {
 	DownloadIcon,
 	InfoIcon,
 	IssuesIcon,
+	MinecraftServerIcon,
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -114,9 +159,11 @@ import {
 	injectPopupNotificationManager,
 	type PopupNotification,
 	type PopupNotificationButton,
+	type PopupNotificationProgressItem,
 } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import ProgressBar from '../base/ProgressBar.vue'
+import NotificationToast from '../notifications/NotificationToast.vue'
 
 const popupNotificationManager = injectPopupNotificationManager()
 const notifications = computed<PopupNotification[]>(() =>
@@ -128,11 +175,44 @@ const setNotificationTimer = (n: PopupNotification) =>
 	popupNotificationManager.setNotificationTimer(n)
 const dismiss = (id: string | number) => popupNotificationManager.removeNotification(id)
 
+function isDownloadNotification(item: PopupNotification) {
+	return (
+		item.type === 'download' &&
+		(!!item.progressItems?.length || item.progress != null || item.waiting)
+	)
+}
+
+function downloadToastItems(item: PopupNotification): PopupNotificationProgressItem[] {
+	if (item.progressItems?.length) {
+		return item.progressItems
+	}
+
+	return [
+		{
+			id: `${item.id}`,
+			title: item.title,
+			text: item.text,
+			iconUrl: item.iconUrl,
+			progress: item.progress ?? 0,
+			waiting: item.waiting ?? false,
+		},
+	]
+}
+
+function downloadStatusText(progressItem: PopupNotificationProgressItem) {
+	return progressItem.text?.replace(/^\d+%\s*/, '') ?? ''
+}
+
 function handleButtonClick(id: string | number, btn: PopupNotificationButton) {
 	btn.action()
 	if (!btn.keepOpen) {
 		popupNotificationManager.removeNotification(id)
 	}
+}
+
+async function handleToastAction(item: PopupNotification, action?: () => void | Promise<void>) {
+	popupNotificationManager.removeNotification(item.id)
+	await action?.()
 }
 
 function progressColorForType(type: PopupNotification['type']) {
@@ -166,7 +246,9 @@ withDefaults(
 	top: calc(var(--top-bar-height, 3rem) + 1.5rem);
 	right: 1.5rem;
 	z-index: 200;
-	width: 400px;
+	width: min(420px, calc(100vw - 1.5rem));
+	min-width: min(420px, calc(100vw - 1.5rem));
+	max-width: min(420px, calc(100vw - 1.5rem));
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
@@ -178,7 +260,6 @@ withDefaults(
 
 @media screen and (max-width: 500px) {
 	.popup-notification-group {
-		width: calc(100% - 1.5rem);
 		right: 0.75rem;
 	}
 }

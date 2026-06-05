@@ -2,19 +2,21 @@ import { useAppQueryClient } from '~/composables/query-client'
 import { useServerModrinthClient } from '~/server/utils/api-client'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-	if (!to.path.startsWith('/user/') || !to.params.id) {
+	const userParam = to.params.user ?? to.params.id
+	const userId = Array.isArray(userParam) ? userParam[0] : userParam
+
+	if (!to.path.startsWith('/user/') || !userId) {
 		return
 	}
 
 	const queryClient = useAppQueryClient()
 	const authToken = useCookie('auth-token')
 	const client = useServerModrinthClient({ authToken: authToken.value || undefined })
-	const userId = to.params.id as string
 
 	try {
 		const user = await queryClient.fetchQuery({
 			queryKey: ['user', userId],
-			queryFn: () => client.labrinth.users_v2.get(userId),
+			queryFn: () => client.labrinth.users_v3.get(userId),
 		})
 
 		if (!user) return

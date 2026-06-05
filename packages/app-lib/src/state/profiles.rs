@@ -12,7 +12,7 @@ use dashmap::DashMap;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::path::Path;
@@ -940,40 +940,143 @@ impl Profile {
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<DashMap<String, ProfileFile>> {
+        self.get_projects_inner(
+            cache_behaviour,
+            pool,
+            fetch_semaphore,
+            None,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_projects_excluding_modpack_files(
+        &self,
+        excluded_hashes: &HashSet<String>,
+        excluded_project_ids: &HashSet<String>,
+        cache_behaviour: Option<CacheBehaviour>,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<DashMap<String, ProfileFile>> {
+        self.get_projects_inner(
+            cache_behaviour,
+            pool,
+            fetch_semaphore,
+            Some(excluded_hashes),
+            Some(excluded_project_ids),
+        )
+        .await
+    }
+
+    async fn get_projects_inner(
+        &self,
+        cache_behaviour: Option<CacheBehaviour>,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+        excluded_hashes: Option<&HashSet<String>>,
+        excluded_project_ids: Option<&HashSet<String>>,
+    ) -> crate::Result<DashMap<String, ProfileFile>> {
         let (keys, file_hashes) =
             self.scan_and_hash(pool, fetch_semaphore).await?;
 
-        let file_updates = file_hashes
-            .iter()
-            .map(|x| Self::get_cache_key(x, self))
+        let excluded_hashes = excluded_hashes.filter(|ids| !ids.is_empty());
+        let excluded_project_ids =
+            excluded_project_ids.filter(|ids| !ids.is_empty());
+
+        let file_hashes = file_hashes
+            .into_iter()
+            .filter(|hash| {
+                excluded_hashes
+                    .is_none_or(|excluded| !excluded.contains(&hash.hash))
+            })
             .collect::<Vec<_>>();
 
-        let file_hashes_ref =
-            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
-        let file_updates_ref =
-            file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
-        let (file_info, file_updates) = tokio::try_join!(
-            CachedEntry::get_file_many(
-                &file_hashes_ref,
-                cache_behaviour,
-                pool,
-                fetch_semaphore,
-            ),
-            CachedEntry::get_file_update_many(
-                &file_updates_ref,
-                cache_behaviour,
-                pool,
-                fetch_semaphore,
-            )
-        )?;
+        let (file_hashes, file_info_by_hash, file_updates) =
+            if let Some(excluded_project_ids) = excluded_project_ids {
+                let file_hashes_ref =
+                    file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+                let file_info = CachedEntry::get_file_many(
+                    &file_hashes_ref,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
 
-        let mut keys_by_path: std::collections::HashMap<
-            String,
-            InitialScanFile,
-        > = keys.into_iter().map(|k| (k.path.clone(), k)).collect();
+                let file_info_by_hash: HashMap<String, CachedFile> = file_info
+                    .into_iter()
+                    .map(|f| (f.hash.clone(), f))
+                    .collect();
 
-        let file_info_by_hash: std::collections::HashMap<String, CachedFile> =
-            file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
+                let file_hashes = file_hashes
+                    .into_iter()
+                    .filter(|hash| {
+                        file_info_by_hash.get(&hash.hash).is_none_or(|file| {
+                            !excluded_project_ids.contains(&file.project_id)
+                        })
+                    })
+                    .collect::<Vec<_>>();
+
+                let file_updates = file_hashes
+                    .iter()
+                    .filter(|x| file_info_by_hash.contains_key(&x.hash))
+                    .map(|x| Self::get_cache_key(x, self))
+                    .collect::<Vec<_>>();
+
+                let file_updates_ref =
+                    file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+                let file_updates = CachedEntry::get_file_update_many(
+                    &file_updates_ref,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
+
+                (file_hashes, file_info_by_hash, file_updates)
+            } else {
+                let file_updates = file_hashes
+                    .iter()
+                    .map(|x| Self::get_cache_key(x, self))
+                    .collect::<Vec<_>>();
+
+                let file_hashes_ref =
+                    file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+                let file_updates_ref =
+                    file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+                let (file_info, file_updates) = tokio::try_join!(
+                    CachedEntry::get_file_many(
+                        &file_hashes_ref,
+                        cache_behaviour,
+                        pool,
+                        fetch_semaphore,
+                    ),
+                    CachedEntry::get_file_update_many(
+                        &file_updates_ref,
+                        cache_behaviour,
+                        pool,
+                        fetch_semaphore,
+                    )
+                )?;
+
+                let file_info_by_hash: HashMap<String, CachedFile> = file_info
+                    .into_iter()
+                    .map(|f| (f.hash.clone(), f))
+                    .collect();
+
+                (file_hashes, file_info_by_hash, file_updates)
+            };
+
+        let mut keys_by_path: HashMap<String, InitialScanFile> =
+            keys.into_iter().map(|k| (k.path.clone(), k)).collect();
+
+        let mut updates_by_hash: HashMap<String, Vec<String>> = HashMap::new();
+        for update in file_updates {
+            updates_by_hash
+                .entry(update.hash)
+                .or_default()
+                .push(update.update_version_id);
+        }
 
         let files = DashMap::new();
 
@@ -989,11 +1092,8 @@ impl Profile {
                 );
 
                 let update_version_id = if let Some(metadata) = &file {
-                    let update_ids: Vec<String> = file_updates
-                        .iter()
-                        .filter(|x| x.hash == hash.hash)
-                        .map(|x| x.update_version_id.clone())
-                        .collect();
+                    let update_ids =
+                        updates_by_hash.remove(&hash.hash).unwrap_or_default();
 
                     if !update_ids.contains(&metadata.version_id) {
                         update_ids.into_iter().next()

@@ -1,15 +1,51 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "جاز تنزيل إصدار جافا {version}"
+  },
+  "app.action-bar.downloads": {
+    "message": "التنزيلات"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "إخفاء المزيد من الحالات قيد التشغيل"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "إنشاء نسخة أساسية"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "لا توجد نسخ قيد التشغيل"
+  },
+  "app.action-bar.offline": {
+    "message": "غير متصل"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "النسخة ألرئيسية"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "عرض المزيد من النسخ قيد التشغيل"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "إيقاف النسخة"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "عرض التحميلات الفعالة"
+  },
+  "app.action-bar.view-instance": {
+    "message": "عرض النسخة"
+  },
+  "app.action-bar.view-logs": {
+    "message": "عرض التسجيل"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "صفحة الرئيسية"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "مكتبة"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "قد تكون خوادم مصادقة ماينكرافت معطلة حاليًا. تحقق من اتصالك بالإنترنت وحاول مرة أخرى لاحقًا."
   },
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
-  },
-  "app.browse.add-server-to-instance": {
-    "message": "أضف الخادم للنموذج"
-  },
-  "app.browse.add-servers-to-instance": {
-    "message": "أضف الخوادم لنموذجك"
   },
   "app.browse.add-to-instance": {
     "message": "أضف للنموذج"
@@ -29,9 +65,6 @@
   "app.browse.discover-servers": {
     "message": "استكشف خوادم"
   },
-  "app.browse.install-content-to-instance": {
-    "message": "تثبيت محتوى لنموذجك"
-  },
   "app.browse.server.installing": {
     "message": "جاري التثبيت"
   },
@@ -49,9 +82,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "إسم حزمة التعديل"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "حدد الملفات والمجلدات المراد تضمينها في الحزمة"
   },
   "app.export-modal.version-number-label": {
     "message": "رقم الإصدار"
@@ -572,6 +602,15 @@
   "instance.worlds.world_in_use": {
     "message": "العالم قيد الاستخدام"
   },
+  "minecraft-account.add-account": {
+    "message": "إضافة حساب"
+  },
+  "minecraft-account.select-account": {
+    "message": "اختيار الحساب"
+  },
+  "minecraft-account.sign-in": {
+    "message": "سجل دخولك لـ ماينكرافت"
+  },
   "search.filter.locked.instance": {
     "message": "مقدَّم من النسخة"
   },
@@ -595,5 +634,8 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "يتم توفير المحمّل من قبل الخادم"
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "لا تعرض هذا التحذير مجددا"
   }
 }

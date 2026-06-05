@@ -1,39 +1,41 @@
 <template>
-	<NewModal ref="linkModal" header="Insert link">
+	<NewModal ref="linkModal" :header="formatMessage(messages.linkModalHeader)" class="!w-[40rem]">
 		<div class="modal-insert">
 			<label class="label" for="insert-link-label">
-				<span class="label__title">Label</span>
+				<span class="label__title">{{ formatMessage(messages.linkModalLabelFieldTitle) }}</span>
 			</label>
 			<StyledInput
 				id="insert-link-label"
 				v-model="linkText"
 				:icon="AlignLeftIcon"
 				type="text"
-				placeholder="Enter label..."
+				:placeholder="formatMessage(messages.linkModalLabelFieldPlaceholder)"
 				clearable
 				wrapper-class="w-full"
 			/>
 			<label class="label" for="insert-link-url">
-				<span class="label__title">URL<span class="required">*</span></span>
+				<span class="label__title">
+					{{ formatMessage(messages.urlLabel) }}<span class="required">*</span>
+				</span>
 			</label>
 			<StyledInput
 				id="insert-link-url"
 				v-model="linkUrl"
 				:icon="LinkIcon"
 				type="text"
-				placeholder="Enter the link's URL..."
+				:placeholder="formatMessage(messages.linkModalUrlFieldPlaceholder)"
 				clearable
 				wrapper-class="w-full"
 				@input="validateURL"
 			/>
 			<template v-if="linkValidationErrorMessage">
 				<span class="label">
-					<span class="label__title">Error</span>
+					<span class="label__title">{{ formatMessage(messages.errorLabel) }}</span>
 					<span class="label__description">{{ linkValidationErrorMessage }}</span>
 				</span>
 			</template>
 			<span class="label">
-				<span class="label__title">Preview</span>
+				<span class="label__title">{{ formatMessage(messages.previewLabel) }}</span>
 				<span class="label__description"></span>
 			</span>
 			<div class="markdown-body-wrapper">
@@ -45,7 +47,9 @@
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<ButtonStyled type="outlined">
-					<button @click="() => linkModal?.hide()"><XIcon /> Cancel</button>
+					<button @click="() => linkModal?.hide()">
+						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button
@@ -57,18 +61,21 @@
 							}
 						"
 					>
-						<PlusIcon /> Insert
+						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
-	<NewModal ref="imageModal" header="Insert image">
+	<NewModal ref="imageModal" :header="formatMessage(messages.imageModalHeader)" class="!w-[40rem]">
 		<div class="modal-insert">
 			<label class="label" for="insert-image-alt">
-				<span class="label__title">Description (alt text)<span class="required">*</span></span>
+				<span class="label__title">
+					{{ formatMessage(messages.imageModalDescriptionFieldTitle) }}
+					<span class="required">*</span>
+				</span>
 				<span class="label__description">
-					Describe the image completely as you would to someone who could not see the image.
+					{{ formatMessage(messages.imageModalDescriptionFieldDescription) }}
 				</span>
 			</label>
 			<StyledInput
@@ -76,15 +83,22 @@
 				v-model="linkText"
 				:icon="AlignLeftIcon"
 				type="text"
-				placeholder="Describe the image..."
+				:placeholder="formatMessage(messages.imageModalDescriptionFieldPlaceholder)"
 				clearable
 				wrapper-class="w-full"
 			/>
 			<label class="label" for="insert-link-url">
-				<span class="label__title">URL<span class="required">*</span></span>
+				<span class="label__title">
+					{{ formatMessage(messages.urlLabel) }}<span class="required">*</span>
+				</span>
 			</label>
 			<div v-if="props.onImageUpload" class="image-strategy-chips">
-				<Chips v-model="imageUploadOption" :items="['upload', 'link']" />
+				<Chips
+					v-model="imageUploadOption"
+					:items="['upload', 'link']"
+					:format-label="formatImageUploadOption"
+					:aria-label="formatMessage(messages.imageModalUploadModeLabel)"
+				/>
 			</div>
 			<div
 				v-if="props.onImageUpload && imageUploadOption === 'upload'"
@@ -92,7 +106,7 @@
 			>
 				<FileInput
 					accept="image/png,image/jpeg,image/gif,image/webp"
-					prompt="Drag and drop to upload or click to select file"
+					:prompt="formatMessage(messages.imageModalUploadPrompt)"
 					long-style
 					should-always-reset
 					class="file-input"
@@ -107,19 +121,19 @@
 				v-model="linkUrl"
 				:icon="ImageIcon"
 				type="text"
-				placeholder="Enter the image URL..."
+				:placeholder="formatMessage(messages.imageModalUrlFieldPlaceholder)"
 				clearable
 				wrapper-class="w-full"
 				@input="validateURL"
 			/>
 			<template v-if="linkValidationErrorMessage">
 				<span class="label">
-					<span class="label__title">Error</span>
+					<span class="label__title">{{ formatMessage(messages.errorLabel) }}</span>
 					<span class="label__description">{{ linkValidationErrorMessage }}</span>
 				</span>
 			</template>
 			<span class="label">
-				<span class="label__title">Preview</span>
+				<span class="label__title">{{ formatMessage(messages.previewLabel) }}</span>
 				<span class="label__description"></span>
 			</span>
 			<div class="markdown-body-wrapper">
@@ -131,7 +145,9 @@
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<ButtonStyled type="outlined">
-					<button @click="() => imageModal?.hide()"><XIcon /> Cancel</button>
+					<button @click="() => imageModal?.hide()">
+						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button
@@ -143,36 +159,40 @@
 							}
 						"
 					>
-						<PlusIcon /> Insert
+						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
-	<NewModal ref="videoModal" header="Insert YouTube video">
+	<NewModal ref="videoModal" :header="formatMessage(messages.videoModalHeader)" class="!w-[40rem]">
 		<div class="modal-insert">
 			<label class="label" for="insert-video-url">
-				<span class="label__title">YouTube video URL<span class="required">*</span></span>
-				<span class="label__description"> Enter a valid link to a YouTube video. </span>
+				<span class="label__title">
+					{{ formatMessage(messages.videoModalUrlFieldTitle) }}<span class="required">*</span>
+				</span>
+				<span class="label__description">
+					{{ formatMessage(messages.videoModalUrlFieldDescription) }}
+				</span>
 			</label>
 			<StyledInput
 				id="insert-video-url"
 				v-model="linkUrl"
 				:icon="YouTubeIcon"
 				type="text"
-				placeholder="Enter YouTube video URL"
+				:placeholder="formatMessage(messages.videoModalUrlFieldPlaceholder)"
 				clearable
 				wrapper-class="w-full"
 				@input="validateURL"
 			/>
 			<template v-if="linkValidationErrorMessage">
 				<span class="label">
-					<span class="label__title">Error</span>
+					<span class="label__title">{{ formatMessage(messages.errorLabel) }}</span>
 					<span class="label__description">{{ linkValidationErrorMessage }}</span>
 				</span>
 			</template>
 			<span class="label">
-				<span class="label__title">Preview</span>
+				<span class="label__title">{{ formatMessage(messages.previewLabel) }}</span>
 				<span class="label__description"></span>
 			</span>
 
@@ -185,7 +205,9 @@
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<ButtonStyled type="outlined">
-					<button @click="() => videoModal?.hide()"><XIcon /> Cancel</button>
+					<button @click="() => videoModal?.hide()">
+						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button
@@ -197,37 +219,41 @@
 							}
 						"
 					>
-						<PlusIcon /> Insert
+						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
 		</div>
 	</NewModal>
 	<div class="block grow w-full">
-		<div class="editor-action-row">
-			<div class="editor-actions">
-				<template
-					v-for="(buttonGroup, _i) in Object.values(BUTTONS).filter((bg) => bg.display)"
-					:key="_i"
-				>
-					<div class="divider"></div>
-					<template v-for="button in buttonGroup.buttons" :key="button.label">
-						<ButtonStyled circular>
-							<button
-								v-tooltip="button.label"
-								:aria-label="button.label"
-								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
-								:disabled="previewMode || disabled"
-								@click="() => button.action(editor)"
-							>
-								<component :is="button.icon" />
-							</button>
-						</ButtonStyled>
+		<div class="editor-action-row w-full">
+			<div class="w-full flex justify-between items-center flex-wrap gap-2">
+				<div class="editor-actions">
+					<template
+						v-for="(buttonGroup, _i) in Object.values(BUTTONS).filter((bg) => bg.display)"
+						:key="_i"
+					>
+						<div class="divider"></div>
+						<template v-for="button in buttonGroup.buttons" :key="button.label.id">
+							<ButtonStyled circular>
+								<button
+									v-tooltip="formatMessage(button.label)"
+									:aria-label="formatMessage(button.label)"
+									:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
+									:disabled="previewMode || disabled"
+									@click="() => button.action(editor)"
+								>
+									<component :is="button.icon" />
+								</button>
+							</ButtonStyled>
+						</template>
 					</template>
-				</template>
-				<div class="preview">
-					<Toggle id="preview" v-model="previewMode" />
-					<label class="label" for="preview"> Preview </label>
+				</div>
+				<div class="flex items-center gap-2">
+					<Toggle id="preview" v-model="previewMode" small />
+					<label class="label" for="preview">
+						{{ formatMessage(messages.editorPreviewToggleLabel) }}
+					</label>
 				</div>
 			</div>
 		</div>
@@ -235,20 +261,29 @@
 		<div v-if="!previewMode" class="info-blurb mt-2">
 			<div class="info-blurb">
 				<InfoIcon />
-				<span
-					>This editor supports
-					<a
-						class="markdown-resource-link"
-						href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"
-						target="_blank"
-						>Markdown formatting</a
-					>.</span
-				>
+				<IntlFormatted :message-id="messages.editorMarkdownFormattingSupport">
+					<template #markdown-link="{ children }">
+						<a
+							class="markdown-resource-link"
+							href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"
+							target="_blank"
+						>
+							<component :is="() => children" />
+						</a>
+					</template>
+				</IntlFormatted>
 			</div>
 			<div :class="{ hide: !props.maxLength }" class="max-length-label">
-				<span>Max length: </span>
+				<span>{{ formatMessage(messages.editorMaxLengthLabel) }} </span>
 				<span>
-					{{ props.maxLength ? `${currentValue?.length || 0}/${props.maxLength}` : 'Unlimited' }}
+					{{
+						props.maxLength
+							? formatMessage(messages.editorMaxLengthValue, {
+									currentLength: currentValue?.length || 0,
+									maxLength: props.maxLength,
+								})
+							: formatMessage(messages.editorMaxLengthUnlimited)
+					}}
 				</span>
 			</div>
 		</div>
@@ -298,12 +333,213 @@ import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
+import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages.ts'
 import NewModal from '../modal/NewModal.vue'
 import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
+import IntlFormatted from './IntlFormatted.vue'
 import StyledInput from './StyledInput.vue'
 import Toggle from './Toggle.vue'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	insertButton: {
+		id: 'markdown-editor.insert-button',
+		defaultMessage: 'Insert',
+	},
+	urlLabel: {
+		id: 'markdown-editor.url-label',
+		defaultMessage: 'URL',
+	},
+	errorLabel: {
+		id: 'markdown-editor.error-label',
+		defaultMessage: 'Error',
+	},
+	previewLabel: {
+		id: 'markdown-editor.preview-label',
+		defaultMessage: 'Preview',
+	},
+	linkModalHeader: {
+		id: 'markdown-editor.link-modal.header',
+		defaultMessage: 'Insert link',
+	},
+	linkModalLabelFieldTitle: {
+		id: 'markdown-editor.link-modal.label-field.title',
+		defaultMessage: 'Label',
+	},
+	linkModalLabelFieldPlaceholder: {
+		id: 'markdown-editor.link-modal.label-field.placeholder',
+		defaultMessage: 'Enter label...',
+	},
+	linkModalUrlFieldPlaceholder: {
+		id: 'markdown-editor.link-modal.url-field.placeholder',
+		defaultMessage: "Enter the link's URL...",
+	},
+	imageModalHeader: {
+		id: 'markdown-editor.image-modal.header',
+		defaultMessage: 'Insert image',
+	},
+	imageModalDescriptionFieldTitle: {
+		id: 'markdown-editor.image-modal.description-field.title',
+		defaultMessage: 'Description (alt text)',
+	},
+	imageModalDescriptionFieldDescription: {
+		id: 'markdown-editor.image-modal.description-field.description',
+		defaultMessage:
+			'Describe the image completely as you would to someone who could not see the image.',
+	},
+	imageModalDescriptionFieldPlaceholder: {
+		id: 'markdown-editor.image-modal.description-field.placeholder',
+		defaultMessage: 'Describe the image...',
+	},
+	imageModalUploadModeLabel: {
+		id: 'markdown-editor.image-modal.upload-mode.label',
+		defaultMessage: 'Image source',
+	},
+	imageModalUploadModeUpload: {
+		id: 'markdown-editor.image-modal.upload-mode.upload',
+		defaultMessage: 'Upload',
+	},
+	imageModalUploadModeLink: {
+		id: 'markdown-editor.image-modal.upload-mode.link',
+		defaultMessage: 'Link',
+	},
+	imageModalUploadPrompt: {
+		id: 'markdown-editor.image-modal.upload.prompt',
+		defaultMessage: 'Drag and drop to upload or click to select file',
+	},
+	imageModalUrlFieldPlaceholder: {
+		id: 'markdown-editor.image-modal.url-field.placeholder',
+		defaultMessage: 'Enter the image URL...',
+	},
+	videoModalHeader: {
+		id: 'markdown-editor.video-modal.header',
+		defaultMessage: 'Insert YouTube video',
+	},
+	videoModalUrlFieldTitle: {
+		id: 'markdown-editor.video-modal.url-field.title',
+		defaultMessage: 'YouTube video URL',
+	},
+	videoModalUrlFieldDescription: {
+		id: 'markdown-editor.video-modal.url-field.description',
+		defaultMessage: 'Enter a valid link to a YouTube video.',
+	},
+	videoModalUrlFieldPlaceholder: {
+		id: 'markdown-editor.video-modal.url-field.placeholder',
+		defaultMessage: 'Enter YouTube video URL',
+	},
+	editorPreviewToggleLabel: {
+		id: 'markdown-editor.preview-toggle.label',
+		defaultMessage: 'Preview',
+	},
+	editorMarkdownFormattingSupport: {
+		id: 'markdown-editor.markdown-formatting-support',
+		defaultMessage: 'This editor supports <markdown-link>Markdown formatting</markdown-link>.',
+	},
+	editorMaxLengthLabel: {
+		id: 'markdown-editor.max-length.label',
+		defaultMessage: 'Max length:',
+	},
+	editorMaxLengthValue: {
+		id: 'markdown-editor.max-length.value',
+		defaultMessage: '{currentLength}/{maxLength}',
+	},
+	editorMaxLengthUnlimited: {
+		id: 'markdown-editor.max-length.unlimited',
+		defaultMessage: 'Unlimited',
+	},
+	editorPlaceholder: {
+		id: 'markdown-editor.placeholder',
+		defaultMessage: 'Write something...',
+	},
+	toolbarHeading1: {
+		id: 'markdown-editor.toolbar.heading-1',
+		defaultMessage: 'Heading 1',
+	},
+	toolbarHeading2: {
+		id: 'markdown-editor.toolbar.heading-2',
+		defaultMessage: 'Heading 2',
+	},
+	toolbarHeading3: {
+		id: 'markdown-editor.toolbar.heading-3',
+		defaultMessage: 'Heading 3',
+	},
+	toolbarBold: {
+		id: 'markdown-editor.toolbar.bold',
+		defaultMessage: 'Bold',
+	},
+	toolbarItalic: {
+		id: 'markdown-editor.toolbar.italic',
+		defaultMessage: 'Italic',
+	},
+	toolbarStrikethrough: {
+		id: 'markdown-editor.toolbar.strikethrough',
+		defaultMessage: 'Strikethrough',
+	},
+	toolbarCode: {
+		id: 'markdown-editor.toolbar.code',
+		defaultMessage: 'Code',
+	},
+	toolbarSpoiler: {
+		id: 'markdown-editor.toolbar.spoiler',
+		defaultMessage: 'Spoiler',
+	},
+	toolbarBulletedList: {
+		id: 'markdown-editor.toolbar.bulleted-list',
+		defaultMessage: 'Bulleted list',
+	},
+	toolbarOrderedList: {
+		id: 'markdown-editor.toolbar.ordered-list',
+		defaultMessage: 'Ordered list',
+	},
+	toolbarQuote: {
+		id: 'markdown-editor.toolbar.quote',
+		defaultMessage: 'Quote',
+	},
+	toolbarLink: {
+		id: 'markdown-editor.toolbar.link',
+		defaultMessage: 'Link',
+	},
+	toolbarImage: {
+		id: 'markdown-editor.toolbar.image',
+		defaultMessage: 'Image',
+	},
+	toolbarVideo: {
+		id: 'markdown-editor.toolbar.video',
+		defaultMessage: 'Video',
+	},
+	videoEmbedTitle: {
+		id: 'markdown-editor.video-embed.title',
+		defaultMessage: 'YouTube video player',
+	},
+	urlValidationErrorMalformed: {
+		id: 'markdown-editor.url-validation-error.malformed',
+		defaultMessage: 'Invalid URL. Make sure the URL is well-formed.',
+	},
+	urlValidationErrorUnsupportedProtocol: {
+		id: 'markdown-editor.url-validation-error.unsupported-protocol',
+		defaultMessage: 'Unsupported protocol. Use http or https.',
+	},
+	urlValidationErrorBlockedDomain: {
+		id: 'markdown-editor.url-validation-error.blocked-domain',
+		defaultMessage: 'Invalid URL. This domain is not allowed.',
+	},
+	uploadErrorNoHandler: {
+		id: 'markdown-editor.upload-error.no-handler',
+		defaultMessage: 'No image upload handler provided',
+	},
+	uploadErrorNoFile: {
+		id: 'markdown-editor.upload-error.no-file',
+		defaultMessage: 'No file provided',
+	},
+	defaultImageAltText: {
+		id: 'markdown-editor.default-image-alt-text',
+		defaultMessage: 'Replace this with a description',
+	},
+})
 
 const props = withDefaults(
 	defineProps<{
@@ -325,7 +561,7 @@ const props = withDefaults(
 		disabled: false,
 		headingButtons: true,
 		onImageUpload: undefined,
-		placeholder: 'Write something...',
+		placeholder: undefined,
 		maxLength: undefined,
 		maxHeight: undefined,
 		minHeight: undefined,
@@ -338,6 +574,9 @@ let isDisabledCompartment: Compartment | null = null
 let editorThemeCompartment: Compartment | null = null
 
 const emit = defineEmits(['update:modelValue'])
+const resolvedPlaceholder = computed(
+	() => props.placeholder ?? formatMessage(messages.editorPlaceholder),
+)
 
 onMounted(() => {
 	const updateListener = EditorView.updateListener.of((update) => {
@@ -393,7 +632,7 @@ onMounted(() => {
 				uploadImagesFromList(clipboardData.files)
 					.then(function (url) {
 						const selection = markdownCommands.yankSelection(view)
-						const altText = selection || 'Replace this with a description'
+						const altText = selection || formatMessage(messages.defaultImageAltText)
 						const linkMarkdown = `![${altText}](${url})`
 						return markdownCommands.replaceSelection(view, linkMarkdown)
 					})
@@ -466,7 +705,7 @@ onMounted(() => {
 				addKeymap: false,
 			}),
 			keymap.of(historyKeymap),
-			cm_placeholder(props.placeholder || ''),
+			cm_placeholder(resolvedPlaceholder.value),
 			inputFilter,
 			isDisabledCompartment.of(disabledCompartment),
 			editorThemeCompartment.of(theme),
@@ -494,7 +733,7 @@ onBeforeUnmount(() => {
 })
 
 type ButtonAction = {
-	label: string
+	label: MessageDescriptor
 	icon: Component
 	action: (editor: EditorView | null) => void
 }
@@ -515,12 +754,12 @@ function runEditorCommand(command: (view: EditorView) => boolean, editor: Editor
 }
 
 const composeCommandButton = (
-	name: string,
+	label: MessageDescriptor,
 	icon: Component,
 	command: (view: EditorView) => boolean,
 ) => {
 	return {
-		label: name,
+		label,
 		icon,
 		action: (e: EditorView | null) => runEditorCommand(command, e),
 	}
@@ -531,33 +770,41 @@ const BUTTONS: ButtonGroupMap = {
 		display: props.headingButtons,
 		hideOnMobile: false,
 		buttons: [
-			composeCommandButton('Heading 1', Heading1Icon, markdownCommands.toggleHeader),
-			composeCommandButton('Heading 2', Heading2Icon, markdownCommands.toggleHeader2),
-			composeCommandButton('Heading 3', Heading3Icon, markdownCommands.toggleHeader3),
+			composeCommandButton(messages.toolbarHeading1, Heading1Icon, markdownCommands.toggleHeader),
+			composeCommandButton(messages.toolbarHeading2, Heading2Icon, markdownCommands.toggleHeader2),
+			composeCommandButton(messages.toolbarHeading3, Heading3Icon, markdownCommands.toggleHeader3),
 		],
 	},
 	stylizing: {
 		display: true,
 		hideOnMobile: false,
 		buttons: [
-			composeCommandButton('Bold', BoldIcon, markdownCommands.toggleBold),
-			composeCommandButton('Italic', ItalicIcon, markdownCommands.toggleItalic),
+			composeCommandButton(messages.toolbarBold, BoldIcon, markdownCommands.toggleBold),
+			composeCommandButton(messages.toolbarItalic, ItalicIcon, markdownCommands.toggleItalic),
 			composeCommandButton(
-				'Strikethrough',
+				messages.toolbarStrikethrough,
 				StrikethroughIcon,
 				markdownCommands.toggleStrikethrough,
 			),
-			composeCommandButton('Code', CodeIcon, markdownCommands.toggleCodeBlock),
-			composeCommandButton('Spoiler', ScanEyeIcon, markdownCommands.toggleSpoiler),
+			composeCommandButton(messages.toolbarCode, CodeIcon, markdownCommands.toggleCodeBlock),
+			composeCommandButton(messages.toolbarSpoiler, ScanEyeIcon, markdownCommands.toggleSpoiler),
 		],
 	},
 	lists: {
 		display: true,
 		hideOnMobile: false,
 		buttons: [
-			composeCommandButton('Bulleted list', ListBulletedIcon, markdownCommands.toggleBulletList),
-			composeCommandButton('Ordered list', ListOrderedIcon, markdownCommands.toggleOrderedList),
-			composeCommandButton('Quote', TextQuoteIcon, markdownCommands.toggleQuote),
+			composeCommandButton(
+				messages.toolbarBulletedList,
+				ListBulletedIcon,
+				markdownCommands.toggleBulletList,
+			),
+			composeCommandButton(
+				messages.toolbarOrderedList,
+				ListOrderedIcon,
+				markdownCommands.toggleOrderedList,
+			),
+			composeCommandButton(messages.toolbarQuote, TextQuoteIcon, markdownCommands.toggleQuote),
 		],
 	},
 	components: {
@@ -565,17 +812,17 @@ const BUTTONS: ButtonGroupMap = {
 		hideOnMobile: false,
 		buttons: [
 			{
-				label: 'Link',
+				label: messages.toolbarLink,
 				icon: LinkIcon,
 				action: () => openLinkModal(),
 			},
 			{
-				label: 'Image',
+				label: messages.toolbarImage,
 				icon: ImageIcon,
 				action: () => openImageModal(),
 			},
 			{
-				label: 'Video',
+				label: messages.toolbarVideo,
 				icon: YouTubeIcon,
 				action: () => openVideoModal(),
 			},
@@ -693,12 +940,12 @@ function cleanUrl(input: string): string {
 	try {
 		url = new URL(input)
 	} catch {
-		throw new Error('Invalid URL. Make sure the URL is well-formed.')
+		throw new Error(formatMessage(messages.urlValidationErrorMalformed))
 	}
 
 	// Check for unsupported protocols
 	if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-		throw new Error('Unsupported protocol. Use http or https.')
+		throw new Error(formatMessage(messages.urlValidationErrorUnsupportedProtocol))
 	}
 
 	// If the scheme is "http", automatically upgrade it to "https"
@@ -709,7 +956,7 @@ function cleanUrl(input: string): string {
 	// Block certain domains for compliance
 	const blockedDomains = ['forgecdn', 'cdn.discordapp', 'media.discordapp']
 	if (blockedDomains.some((domain) => url.hostname.includes(domain))) {
-		throw new Error('Invalid URL. This domain is not allowed.')
+		throw new Error(formatMessage(messages.urlValidationErrorBlockedDomain))
 	}
 
 	return url.toString()
@@ -733,7 +980,7 @@ const linkMarkdown = computed(() => {
 const uploadImagesFromList = async (files: FileList): Promise<string> => {
 	const file = files[0]
 	if (!props.onImageUpload) {
-		throw new Error('No image upload handler provided')
+		throw new Error(formatMessage(messages.uploadErrorNoHandler))
 	}
 	if (file) {
 		try {
@@ -746,7 +993,7 @@ const uploadImagesFromList = async (files: FileList): Promise<string> => {
 			}
 		}
 	}
-	throw new Error('No file provided')
+	throw new Error(formatMessage(messages.uploadErrorNoFile))
 }
 
 const handleImageUpload = async (files: FileList) => {
@@ -765,6 +1012,15 @@ const handleImageUpload = async (files: FileList) => {
 }
 
 const imageUploadOption = ref<string>('upload')
+function formatImageUploadOption(option: string) {
+	if (option === 'upload') {
+		return formatMessage(messages.imageModalUploadModeUpload)
+	}
+	if (option === 'link') {
+		return formatMessage(messages.imageModalUploadModeLink)
+	}
+	return option
+}
 const imageMarkdown = computed(() => (linkMarkdown.value.length ? `!${linkMarkdown.value}` : ''))
 
 const canInsertImage = computed(() => {
@@ -781,7 +1037,7 @@ const youtubeRegex =
 const videoMarkdown = computed(() => {
 	const match = youtubeRegex.exec(linkUrl.value)
 	if (match) {
-		return `<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/${match[1]}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
+		return `<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/${match[1]}" title="${formatMessage(messages.videoEmbedTitle)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
 	}
 	return ''
 })
@@ -924,11 +1180,13 @@ function openVideoModal() {
 }
 
 .modal-insert {
-	padding: var(--gap-lg);
-
 	.label {
 		margin-block: var(--gap-lg) var(--gap-sm);
 		display: block;
+
+		&:first-child {
+			margin-top: 0;
+		}
 	}
 
 	.label__title {

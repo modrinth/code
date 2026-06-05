@@ -14,7 +14,7 @@ import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatProjectTypeSentence } from '#ui/utils/common-messages'
 import type { SortType } from '#ui/utils/search'
 
 import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
@@ -47,8 +47,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 const messages = defineMessages({
 	searchPlaceholder: {
 		id: 'browse.search.placeholder',
-		defaultMessage:
-			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} server {servers} other {projects}}...',
+		defaultMessage: 'Search {projectType}...',
 	},
 	viewPrefix: {
 		id: 'browse.view-prefix',
@@ -88,7 +87,11 @@ const messages = defineMessages({
 		:icon="SearchIcon"
 		type="text"
 		autocomplete="off"
-		:placeholder="formatMessage(messages.searchPlaceholder, { projectType: ctx.projectType.value })"
+		:placeholder="
+			formatMessage(messages.searchPlaceholder, {
+				projectType: formatProjectTypeSentence(formatMessage, ctx.projectType.value, 2),
+			})
+		"
 		clearable
 		wrapper-class="w-full"
 		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
@@ -99,7 +102,11 @@ const messages = defineMessages({
 		<Combobox
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
-			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
+			:class="
+				ctx.variant === 'web'
+					? '!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0'
+					: '!w-[16rem] min-w-max max-w-full'
+			"
 			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
 			<template #prefix>
@@ -112,7 +119,11 @@ const messages = defineMessages({
 		<Combobox
 			:model-value="ctx.maxResults.value"
 			:options="maxResultsOptions"
-			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[9rem]'"
+			:class="
+				ctx.variant === 'web'
+					? '!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0'
+					: '!w-[9rem] min-w-max max-w-full'
+			"
 			:placeholder="formatMessage(commonMessages.viewLabel)"
 			@update:model-value="(val: number) => (ctx.maxResults.value = val)"
 		>
@@ -296,7 +307,7 @@ const messages = defineMessages({
 			</template>
 		</ProjectCardList>
 
-		<div :class="ctx.variant === 'web' ? 'pagination-after my-3' : 'flex justify-end'">
+		<div :class="ctx.variant === 'web' ? 'pagination-after mt-3' : 'flex justify-end mt-3'">
 			<Pagination
 				:page="ctx.currentPage.value"
 				:count="ctx.pageCount.value"

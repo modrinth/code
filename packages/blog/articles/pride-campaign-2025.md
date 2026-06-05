@@ -17,6 +17,6 @@ While Pride Month provides a special opportunity to focus our efforts, the need 
 
 As part of this campaign, we also added the option to donate part of a Modrinth rewards balance to a variety of charities. This means Modrinth creators can directly use the revenue they earned from ads and [Modrinth+](/plus) to donate to dozens of causes close to their heart. The Trevor Project is one option, alongside other prominent non-profits such as the American Cancer Society, St. Jude's Children's Research Hospital, Doctors Without Borders, and the Southern Poverty Law Center. You can donate your Modrinth balance to these groups and many more by clicking the "Withdraw" button on [your revenue dashboard](/dashboard/revenue).
 
-Modrinth's June 2025 campaign will be kept for posterity at [this link](https://modrinth.com/pride).
+Modrinth's June 2025 campaign will be kept for posterity at [this link](https://give.thetrevorproject.org/team/663311).
 
 **[You can donate to The Trevor Project at any time at this link.](https://www.thetrevorproject.org/)**

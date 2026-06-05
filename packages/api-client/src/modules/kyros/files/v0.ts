@@ -94,6 +94,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	 * @param file - File to upload
 	 * @param options - Optional progress callback and feature overrides
 	 * @returns UploadHandle with promise, onProgress, and cancel
+	 * @deprecated Use `kyros.upload_sessions_v1` for bulk uploads so cancellation can remove staged files before finalize.
 	 */
 	public uploadFile(
 		path: string,

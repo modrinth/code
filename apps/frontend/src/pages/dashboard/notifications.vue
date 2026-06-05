@@ -94,31 +94,31 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	historyLabel: {
-		id: 'dashboard.notifications.history.label',
+		id: 'dashboard.overview.notifications.history.label',
 		defaultMessage: 'History',
 	},
 	notificationHistoryTitle: {
-		id: 'dashboard.notifications.history.title',
+		id: 'dashboard.overview.notifications.history.title',
 		defaultMessage: 'Notification history',
 	},
 	viewHistory: {
-		id: 'dashboard.notifications.button.view-history',
+		id: 'dashboard.overview.notifications.button.view-history',
 		defaultMessage: 'View history',
 	},
 	markAllAsRead: {
-		id: 'dashboard.notifications.button.mark-all-as-read',
+		id: 'dashboard.overview.notifications.button.mark-all-as-read',
 		defaultMessage: 'Mark all as read',
 	},
 	loadingNotifications: {
-		id: 'dashboard.notifications.loading',
+		id: 'dashboard.overview.notifications.loading',
 		defaultMessage: 'Loading notifications...',
 	},
 	errorLoadingNotifications: {
-		id: 'dashboard.notifications.error.loading',
+		id: 'dashboard.overview.notifications.error.loading',
 		defaultMessage: 'Error loading notifications:',
 	},
 	noUnreadNotifications: {
-		id: 'dashboard.notifications.empty.no-unread',
+		id: 'dashboard.overview.notifications.empty.no-unread',
 		defaultMessage: "You don't have any unread notifications.",
 	},
 })

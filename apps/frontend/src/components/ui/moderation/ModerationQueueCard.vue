@@ -1,5 +1,5 @@
 <template>
-	<div class="shadow-card rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4">
+	<div class="shadow-card rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
 				<NuxtLink
@@ -47,6 +47,16 @@
 						>
 							<span class="text-sm text-secondary">Requesting</span>
 							<Badge :type="queueEntry.project.requested_status" class="text-sm" />
+						</div>
+						<div
+							v-if="showExternalDependencies"
+							v-tooltip="'External dependencies'"
+							class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+						>
+							<FileIcon aria-hidden="true" class="size-4 text-secondary" />
+							<span class="text-sm font-medium text-secondary">
+								{{ queueEntry.external_dependencies_count }}
+							</span>
 						</div>
 					</div>
 					<div v-if="queueEntry.ownership?.kind === 'user'">
@@ -107,8 +117,8 @@
 							<LinkIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-tooltip="'Begin review'" circular color="orange">
-						<button @click="openProjectForReview">
+					<ButtonStyled circular color="orange">
+						<button v-tooltip="'Begin review'" @click="openProjectForReview">
 							<ScaleIcon />
 						</button>
 					</ButtonStyled>
@@ -119,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FileIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Badge,
@@ -151,6 +161,7 @@ const formatDateTimeFull = useFormatDateTime({
 
 const props = defineProps<{
 	queueEntry: ModerationProject
+	showExternalDependencies?: boolean
 }>()
 
 const emit = defineEmits<{

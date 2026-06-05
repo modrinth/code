@@ -21,7 +21,7 @@
     "message": "Instancia principal"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "Mostrar mas instancias en ejecución"
+    "message": "Mostrar más instancias en ejecución"
   },
   "app.action-bar.stop-instance": {
     "message": "Finalizar instancia"
@@ -48,7 +48,7 @@
     "message": "Tema de color"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Cambia la página en la que el launcher se abre en."
+    "message": "Cambia la página en la que el lanzador inicia."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Inicio"
@@ -72,13 +72,13 @@
     "message": "Vuelve a jugar tus mundos"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiza el launcher cuando un proceso de Minecraft empieza."
+    "message": "Minimiza el lanzador cuando un proceso de Minecraft empieza."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimiza el launcher"
+    "message": "Minimiza el lanzador"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Usa los sistemas de frame de Windows (se requiere resetear la aplicación)."
+    "message": "Usa los sistemas de marco de Windows (se requiere resetear la aplicación)."
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Decoraciones nativas"
@@ -93,10 +93,10 @@
     "message": "Alternar barra lateral"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Si intentas instalar un archivo de paquete de Modrinth (.mrpack) que no esté alojado en Modrinth, te advertiremos de los riesgos antes de instalarlo."
+    "message": "Si intentas instalar un archivo de paquete de Modrinth (.mrpack) que no esté alojado en Modrinth, debes comprender los riesgos que esto conlleva antes de instalarlo."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Adviérteme antes de instalarme modpacks desconocidos"
+    "message": "Advertir antes de instalarme paquetes de mods desconocidos"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Los servidores de autenticación de Minecraft pueden no estar funcionando en este momento. Verifica tu conexión a internet e inténtalo de nuevo más tarde."
@@ -104,11 +104,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede conectar con los servidores de autenticación"
   },
-  "app.browse.add-server-to-instance": {
-    "message": "Añadir servidor a la instancia"
-  },
   "app.browse.add-servers-to-instance": {
-    "message": "Añadir servidor a tu instancia"
+    "message": "Añadir servidor a instancia"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Añadir a una instancia"
   },
   "app.browse.add-to-instance": {
     "message": "Añadir a la instancia"
@@ -122,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Ya está añadido"
   },
+  "app.browse.back-to-instance": {
+    "message": "Volver a la instancia"
+  },
   "app.browse.discover-content": {
     "message": "Descubrir contenido"
   },
@@ -131,20 +134,11 @@
   "app.browse.hide-added-servers": {
     "message": "Ocultar servidores ya añadidos"
   },
-  "app.browse.hide-installed-content": {
-    "message": "Ocultar contenido instalado"
-  },
-  "app.browse.install-content-to-instance": {
-    "message": "Instalar contenido a una instancia"
-  },
   "app.browse.project-type.modpacks": {
-    "message": "Modpacks"
+    "message": "Paquetes de Mods"
   },
-  "app.browse.server.install": {
-    "message": "Instalar"
-  },
-  "app.browse.server.installed": {
-    "message": "Instalado"
+  "app.browse.server-instance-content-warning": {
+    "message": "Añadir contenido puede comprometer la compatibilidad a la hora de unirse a un servidor. Cualquier contenido añadido se perderá cuando actualices la instancia del servidor."
   },
   "app.browse.server.installing": {
     "message": "Instalando"
@@ -164,6 +158,9 @@
   "app.export-modal.header": {
     "message": "Exportar modpack"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "¿Incluir \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Nombre del modpack"
   },
@@ -171,7 +168,7 @@
     "message": "Nombre del modpack"
   },
   "app.export-modal.select-files-label": {
-    "message": "Seleccione archivos y carpetas para incluir en el paquete"
+    "message": "Configura que archivos se incluirán en esta instancia"
   },
   "app.export-modal.version-number-label": {
     "message": "Número de versión"
@@ -302,6 +299,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Una actualización es requerida para jugar {name}. Por favor actualízala a la versión más reciente para ejecutar el juego."
   },
+  "app.project.install-button.already-installed": {
+    "message": "El proyecto ya está instalado"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Volver a descubrir"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Instalar contenido"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
   },
@@ -325,6 +331,15 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
+  },
+  "app.skins.add-button": {
+    "message": "Añadir skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Arrastrar y soltar"
+  },
+  "app.skins.apply-button": {
+    "message": "Aplicar"
   },
   "app.update-popup.body": {
     "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
@@ -605,6 +620,24 @@
   "instance.settings.tabs.java": {
     "message": "Java y memoria"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variables de entorno personalizadas"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumentos personalizados de Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Instalación personalizada de Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Asignación de memoria personalizada"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Introduce las variables de entorno..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Introduce los argumentos de Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variables de entorno"
   },
@@ -619,6 +652,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memoria asignada"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/ruta/a/java"
   },
   "instance.settings.tabs.window": {
     "message": "Ventana"
@@ -691,6 +727,24 @@
   },
   "instance.worlds.world_in_use": {
     "message": "El mundo está en uso"
+  },
+  "minecraft-account.add-account": {
+    "message": "Añadir cuenta"
+  },
+  "minecraft-account.label": {
+    "message": "Cuenta de Minecraft"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Registrarse"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Eliminar cuenta"
+  },
+  "minecraft-account.select-account": {
+    "message": "Seleccionar cuenta"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Registrarse en Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Proporcionado por la instancia"

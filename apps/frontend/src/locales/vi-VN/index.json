@@ -8,6 +8,54 @@
   "admin.billing.error.not-found": {
     "message": "Không tìm thấy người dùng"
   },
+  "analytics.action.add": {
+    "message": "Tạo"
+  },
+  "analytics.action.cancel": {
+    "message": "Hủy"
+  },
+  "analytics.action.refresh": {
+    "message": "Làm mới"
+  },
+  "analytics.action.reset": {
+    "message": "Dặt lại"
+  },
+  "analytics.breakdown.country": {
+    "message": "Quốc gia"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Lý do tải"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Nguồn tải"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Phiên bản game"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Loader"
+  },
+  "analytics.breakdown.project": {
+    "message": "Dự án"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Trạng thái dự án"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Phiên bản dự án"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Hiện thị tất cả"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Hiển thị 8 hạng đầu"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Hiển thị"
+  },
   "app-marketing.download.description": {
     "message": "Ứng dụng máy tính của chúng tôi có sẵn trên mọi nền tảng, hãy chọn phiên bản bạn muốn."
   },
@@ -121,9 +169,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -407,11 +452,83 @@
   "collection.title": {
     "message": "{name} - Bộ sưu tập"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Thêm ghi chú bí mật"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Chấp thuận"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Chấp thuận với phản hồi"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Đóng luồng"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Đóng với phản hồi"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Từ chối"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Từ chối với phản hồi"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Mở lại luồng"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Phản hồi"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Phản hồi đến luồng"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Gửi lại để xét duyệt"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Gửi lại để xét duyệt kèm phản hồi"
+  },
+  "conversation-thread.action.send": {
+    "message": "Gửi"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Gửi để xem xét"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Gửi để xem xét với phản hồi"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Chuyển sang bản nháp"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Chuyển sang bản nháp kèm phản hồi"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Thu hồi"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Thu hồi với phản hồi"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Luồng này đã bị đóng và tin nhắn mới không thể gửi được vào."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Lỗi khi đóng báo cáo"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Lỗi khi mở lại báo cáo"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Lỗi khi gửi tin nhắn"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Đang phản hồi vào luồng..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Gửi một tin nhắn..."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
-  },
-  "create.collection.collection-info": {
-    "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
   },
   "create.collection.create-collection": {
     "message": "Tạo bộ sưu tập"
@@ -554,6 +671,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Tạo link affiliate"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "Không tìm thấy mã liên kết nào."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Lỗi tải link affiliate"
   },
@@ -571,6 +691,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Tìm kiếm link affiliate..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "từ {count} {count, plural, one {dự án} other {dự án}} khác"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Tổng số lượt tải xuống"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Tổng số người theo dõi"
   },
   "dashboard.collections.button.create-new": {
     "message": "Tạo mới"
@@ -595,6 +724,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Bộ sưu tập của bạn"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Tìm kiếm các bộ sưu tập..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Tên (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Mới tạo gần đây"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Mới được cập nhật"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Tải xuống {formType}"
@@ -744,7 +885,7 @@
     "message": "Mạng"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Bạn sắp chạm đến ngưỡng rút tiền. Bạn có thể rút <b>{amountRemaining}<b> ngay bây giờ, nhưng cần có biểu mẫu thuế để rút thêm."
+    "message": "Bạn sắp chạm đến ngưỡng rút tiền. Bạn có thể rút <b>{amountRemaining}</b> ngay bây giờ, nhưng cần có biểu mẫu thuế để rút thêm."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Tài khoản"
@@ -847,6 +988,18 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Bạn đã sử dụng hết giới hạn rút tiền <b>{withdrawLimit}</b>. Bạn cần hoàn thành biểu mẫu thuế để rút thêm."
+  },
+  "dashboard.head-title": {
+    "message": "Bảng điều khiển"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Xem tất cả"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Xem lịch sử thông báo"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Xem thêm {extraNotifs} {extraNotifs, plural, one {thông báo} other {thông báo}} khác"
   },
   "dashboard.revenue.available-now": {
     "message": "Khả dụng ngay"
@@ -1162,9 +1315,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Những máy chủ Modrinth Hosting được nằm ở đâu? Tôi có thể chọn khu vực không?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Chúng tôi có các máy chủ có sẵn ở Bắc Mỹ, Châu Âu và Đông Nam Á tại thời điểm này mà bạn có thể chọn khi mua. Nhiều khu vực sẽ đến trong tương lai! Nếu bạn muốn chuyển đổi khu vực của mình, vui lòng liên hệ với bộ phận hỗ trợ."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Những phiên bản Minecraft và modloader nào có thể được sử dụng?"
@@ -1499,9 +1649,6 @@
   "layout.banner.build-fail.title": {
     "message": "Lỗi tạo trạng thái từ API trong quá trình build."
   },
-  "layout.banner.preview.description": {
-    "message": "Nếu bạn muốn truy cập trang web chính thức của Modrinth, hãy truy cập <link>https://modrinth.com</link>. Bản triển khai xem trước này được nhân viên Modrinth sử dụng cho mục đích thử nghiệm. Nó được xây dựng từ <branch-link>{owner}/{branch}</branch-link> @ {commit}."
-  },
   "layout.banner.preview.title": {
     "message": "Đây là bản mẫu của trang web Modrinth."
   },
@@ -1702,9 +1849,6 @@
   },
   "moderation.page.reports": {
     "message": "Báo cáo"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Đánh giá kỹ thuật"
   },
   "muralpay.account-type.checking": {
     "message": "Tài khoản thanh toán"
@@ -2066,9 +2210,6 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Tải xuống các dự án của {username} trên Modrinth"
   },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> người theo dõi dự án}}"
-  },
   "profile.user-id": {
     "message": "ID người dùng: {id}"
   },
@@ -2396,12 +2537,6 @@
   "project.settings.visit-dashboard": {
     "message": "Truy cập bảng điều khiển dự án"
   },
-  "project.stats.downloads-label": {
-    "message": "lượt tải"
-  },
-  "project.stats.followers-label": {
-    "message": "người theo dõi"
-  },
   "project.status.archived.message": {
     "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
   },
@@ -2411,23 +2546,11 @@
   "report.already-reported": {
     "message": "Bạn đã báo cáo {title}"
   },
-  "report.already-reported-description": {
-    "message": "Bạn đã có một báo cáo đang mở cho {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}} này. Bạn có thể bổ sung chi tiết vào báo cáo của mình nếu có thêm thông tin."
-  },
-  "report.back-to-item": {
-    "message": "Quay lại {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}}"
-  },
   "report.body.description": {
     "message": "Hãy kèm theo liên kết và hình ảnh nếu có và phù hợp. Các báo cáo trống hoặc không đầy đủ sẽ bị đóng và bỏ qua."
   },
   "report.body.title": {
     "message": "Vui lòng cung cấp thêm ngữ cảnh cho báo cáo của bạn"
-  },
-  "report.checking": {
-    "message": "Đang kiểm tra {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}}..."
-  },
-  "report.could-not-find": {
-    "message": "Không tìm thấy {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}}"
   },
   "report.for.violation": {
     "message": "Vi phạm <rules-link>Quy định</rules-link> hoặc <terms-link>Điều khoản sử dụng</terms-link> của Modrinth"
@@ -2468,14 +2591,8 @@
   "report.please-report": {
     "message": "Vui lòng báo cáo:"
   },
-  "report.question.content-id": {
-    "message": "ID của {item, select, project {dự án} version {phiên bản} user {người dùng} other {nội dung}} này là gì?"
-  },
   "report.question.content-type": {
     "message": "Bạn đang báo cáo loại nội dung nào?"
-  },
-  "report.question.report-reason": {
-    "message": "{item, select, project {Dự án} version {Phiên bản} user {Người dùng} other {Nội dung}} này đang vi phạm quy định nào của Modrinth?"
   },
   "report.report-content": {
     "message": "Báo cáo nội dung cho kiểm duyệt viên"
@@ -2588,26 +2705,14 @@
   "scopes.organizationWrite.label": {
     "message": "Ghi tổ chức"
   },
-  "scopes.patCreate.description": {
-    "message": "Tạo token API cá nhân"
-  },
   "scopes.patCreate.label": {
     "message": "Tạo PAT"
-  },
-  "scopes.patDelete.description": {
-    "message": "Xoá token API cá nhân của bạn"
   },
   "scopes.patDelete.label": {
     "message": "Xoá PAT"
   },
-  "scopes.patRead.description": {
-    "message": "Xem token API đã tạo"
-  },
   "scopes.patRead.label": {
     "message": "Đọc PAT"
-  },
-  "scopes.patWrite.description": {
-    "message": "Chỉnh sửa token API cá nhân"
   },
   "scopes.patWrite.label": {
     "message": "Ghi PAT"
@@ -3149,14 +3254,8 @@
   "settings.billing.interval.month": {
     "message": "tháng"
   },
-  "settings.billing.interval.monthly": {
-    "message": "hằng tháng"
-  },
   "settings.billing.interval.year": {
     "message": "năm"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "hằng năm"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Duyệt web không quảng cáo trên modrinth.com và app Modrinth"
@@ -3242,9 +3341,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPU dùng chung (Tăng tốc tối đa {bursts} CPU)"
   },
@@ -3308,17 +3404,8 @@
   "settings.billing.subscription.title": {
     "message": "Gói đăng ký"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Đang chuyển sang {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Chuyển sang {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Thanh toán hàng tháng sẽ tốn thêm {amount} mỗi năm"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Chuyển sang thanh toán theo {interval} vào ngày {date}"
   },
   "settings.billing.update-method": {
     "message": "Cập nhật phương thức"

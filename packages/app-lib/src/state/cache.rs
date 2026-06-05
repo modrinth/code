@@ -875,6 +875,7 @@ impl CachedEntry {
             .fetch_all(pool)
             .await?;
 
+            let now = Utc::now().timestamp();
             for row in query {
                 let parsed_data = if let Some(data) = row.data.clone() {
                     Some(Self::deserialize_cache_value(type_, data, &row.id)?)
@@ -882,7 +883,7 @@ impl CachedEntry {
                     None
                 };
 
-                if row.expires <= Utc::now().timestamp() {
+                if row.expires <= now {
                     if cache_behaviour == CacheBehaviour::MustRevalidate {
                         continue;
                     } else {
@@ -890,16 +891,18 @@ impl CachedEntry {
                     }
                 }
 
-                remaining_keys.retain(|x| {
-                    x != &&*row.id
-                        && !row.alias.as_ref().is_some_and(|y| {
+                let row_id = row.id.clone();
+                let row_alias = row.alias.clone();
+                let remove_matching_key = |x: &&str| {
+                    x != &&*row_id
+                        && !row_alias.as_ref().is_some_and(|y| {
                             if type_.case_sensitive_alias().unwrap_or(true) {
                                 x == y
                             } else {
                                 y.to_lowercase() == x.to_lowercase()
                             }
                         })
-                });
+                };
 
                 if let Some(data) = parsed_data {
                     if data.get_type() != type_ {
@@ -912,6 +915,8 @@ impl CachedEntry {
                         .as_error());
                     }
 
+                    remaining_keys.retain(remove_matching_key);
+
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,
@@ -919,6 +924,8 @@ impl CachedEntry {
                         data: Some(data),
                         expires: row.expires,
                     });
+                } else {
+                    remaining_keys.retain(remove_matching_key);
                 }
             }
         }
@@ -1925,10 +1932,30 @@ pub async fn cache_file_hash(
         sha1_async(bytes).await?
     };
 
+    cache_file_hash_metadata(
+        profile_path,
+        path,
+        size as u64,
+        hash,
+        project_type,
+        exec,
+    )
+    .await
+}
+
+pub async fn cache_file_hash_metadata(
+    profile_path: &str,
+    path: &str,
+    size: u64,
+    hash: String,
+    project_type: Option<ProjectType>,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<()> {
+    // Streamed extraction already computed these values, so avoid buffering the file just to cache them.
     CachedEntry::upsert_many(
         &[CacheValue::FileHash(CachedFileHash {
             path: format!("{profile_path}/{path}"),
-            size: size as u64,
+            size,
             hash,
             project_type,
         })

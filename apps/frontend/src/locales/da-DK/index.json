@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -1012,9 +1009,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Hvor er Modrinth Hosting servere placeret? Kan jeg vælge et område?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Vi har servere tilgængelig i Nord Amerika, Europa, og Sydøst Asien på nuværende tidspunkt som du kan vælge imellem under købet. Flere områder kommer i fremtiden! Hvis du gerne vil skifte til dit område, venligst kontakt support."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Hvilken Minecraft version og loaders kan blive brugt?"
@@ -1919,12 +1913,6 @@
   "project.settings.title": {
     "message": "Indstillinger"
   },
-  "project.stats.downloads-label": {
-    "message": "download{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "følger{count, plural, one {} other {e}}"
-  },
   "project.status.archived.message": {
     "message": "{title} er blevet arkiveret. {title} vil ikke modtage flere opdateringer medmindre forfatteren beslutter sig for at fjerne projektet fra arkivet."
   },
@@ -1934,20 +1922,11 @@
   "report.already-reported": {
     "message": "Du har allerede rapporteret {title}"
   },
-  "report.already-reported-description": {
-    "message": "Du har allerede en åben anmeldelse for {item, select, project {dette projekt} version {denne version} user {denne bruger} other {dette indhold}}. Du kan tilføje flere detaljer til denne anmeldse hvis du har mere information at tilføje."
-  },
-  "report.back-to-item": {
-    "message": "Tilbage til {item, select, project {projekt} version {version} user {bruger} other {indhold}}"
-  },
   "report.body.description": {
     "message": "Inkluder links og billeder hvis muligt og relevant. Tomme eller upræcise rapporter vil blive lukket eller ignoreret."
   },
   "report.body.title": {
     "message": "Venligst tilføj mere information omkring din anmeldelse"
-  },
-  "report.could-not-find": {
-    "message": "Kunne ikke finde {item, select, project {projekt} version {version} user {bruger} other {indhold}}"
   },
   "report.for.violation.description": {
     "message": "Eksempler inkluderer ondsindet, spam, stødende, vildledende, misvisende og ulovligt indhold."
@@ -1964,14 +1943,8 @@
   "report.please-report": {
     "message": "Venligst anmeld:"
   },
-  "report.question.content-id": {
-    "message": "Hvad er IDet på {item, select, project {projektet} version {versionen} user {brugeren} other {indholdet}}?"
-  },
   "report.question.content-type": {
     "message": "Hvilket form for indhold anmelder du?"
-  },
-  "report.question.report-reason": {
-    "message": "Hvilke af Modrinths regler bryder {item, select, project {projektet} version {versionen} user {brugeren} other {indholdet}}?"
   },
   "report.submit": {
     "message": "Indsend anmeldelse"
