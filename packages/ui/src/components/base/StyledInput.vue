@@ -21,6 +21,7 @@
 		<textarea
 			v-if="multiline"
 			:id="id"
+			v-bind="inputAttrs"
 			ref="inputRef"
 			:value="model"
 			:placeholder="placeholder"
@@ -50,6 +51,7 @@
 		<input
 			v-else
 			:id="id"
+			v-bind="inputAttrs"
 			ref="inputRef"
 			:type="type"
 			:value="model"
@@ -149,6 +151,7 @@ const props = withDefaults(
 		resize?: 'none' | 'vertical' | 'both'
 		inputClass?: string
 		wrapperClass?: string
+		inputAttrs?: Record<string, string | number | boolean | undefined>
 	}>(),
 	{
 		type: 'text',
