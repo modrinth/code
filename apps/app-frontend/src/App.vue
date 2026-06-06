@@ -863,7 +863,7 @@ async function handleCommand(e) {
 			})
 		}
 	} else if (e.event === 'LaunchProfile') {
-		await run(e.path).catch(handleError)
+		await run(decodeURIComponent(e.path)).catch(handleError)
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
