@@ -36,13 +36,29 @@
 			</div>
 			<Avatar v-else src="https://cdn-raw.modrinth.com/medal_icon.webp" size="64px" class="z-10" />
 			<div class="z-10 ml-4 flex min-w-0 flex-col gap-1.5">
-				<div class="flex flex-row items-center gap-2">
+				<div class="flex flex-row items-center gap-2.5">
 					<h2
 						class="m-0 truncate text-xl font-bold text-contrast"
 						:class="{ 'opacity-50': isDisabled }"
 					>
 						{{ name }}
 					</h2>
+					<div
+						v-if="owner"
+						v-tooltip="formatMessage(messages.ownerTooltip, { username: owner.username })"
+						class="flex min-w-0 items-center gap-1.5 rounded-full bg-surface-4/80 px-2 py-1 text-sm font-medium text-primary !border !border-surface-5 border-solid"
+						:class="{ 'opacity-50': isDisabled }"
+					>
+						<Avatar
+							:src="owner.avatarUrl"
+							:alt="formatMessage(messages.ownerAvatarAlt, { username: owner.username })"
+							:tint-by="owner.username"
+							size="1.25rem"
+							circle
+							no-shadow
+						/>
+						<span class="max-w-32 truncate">{{ owner.username }}</span>
+					</div>
 
 					<span class="truncate" :class="{ 'opacity-50': isDisabled }">
 						<IntlFormatted
@@ -158,6 +174,7 @@ import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import CopyCode from '../../base/CopyCode.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
+import type { ServerListingOwner } from '../access/types'
 import ServerInfoLabels from '../labels/ServerInfoLabels.vue'
 import MedalBackgroundImage from './MedalBackgroundImage.vue'
 
@@ -176,6 +193,7 @@ type MedalServerListingProps = {
 	upstream?: Archon.Servers.v0.Upstream | null
 	flows?: Archon.Servers.v0.Flows
 	medal_expires?: string
+	owner?: ServerListingOwner
 }
 
 const props = defineProps<MedalServerListingProps>()
@@ -221,6 +239,14 @@ const messages = defineMessages({
 	usingProjectLabel: {
 		id: 'servers.medal-listing.using-project-label',
 		defaultMessage: 'Using {projectTitle}',
+	},
+	ownerTooltip: {
+		id: 'servers.medal-listing.owner-tooltip',
+		defaultMessage: 'Owned by {username}',
+	},
+	ownerAvatarAlt: {
+		id: 'servers.medal-listing.owner-avatar-alt',
+		defaultMessage: "{username}'s avatar",
 	},
 	newServerLabel: {
 		id: 'servers.medal-listing.new-server-label',

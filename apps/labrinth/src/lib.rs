@@ -26,6 +26,7 @@ use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
+use crate::util::tiltify::TiltifyClient;
 use sync::friends::handle_pubsub;
 
 pub mod auth;
@@ -73,6 +74,7 @@ pub struct LabrinthConfig {
     pub archon_client: web::Data<ArchonClient>,
     pub gotenberg_client: GotenbergClient,
     pub http_client: web::Data<HttpClient>,
+    pub tiltify_client: web::Data<TiltifyClient>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -108,6 +110,8 @@ pub fn app_setup(
     let scheduler = scheduler::Scheduler::new();
 
     let http_client = web::Data::new(HttpClient::new());
+    let tiltify_client =
+        web::Data::new(TiltifyClient::new(http_client.get_ref().clone()));
     {
         let pool_ref = pool.clone();
         let http_ref = http_client.clone();
@@ -312,6 +316,7 @@ pub fn app_setup(
         anrok_client,
         gotenberg_client,
         http_client,
+        tiltify_client,
         archon_client: web::Data::new(
             ArchonClient::from_env()
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
@@ -343,6 +348,7 @@ pub fn app_config(
     .app_data(labrinth_config.search_backend.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.http_client.clone())
+    .app_data(labrinth_config.tiltify_client.clone())
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())

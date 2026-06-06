@@ -65,17 +65,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Impossibile caricare i dati dell'abbonamento."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 giorni"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/mese"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/trimestre"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/anno"
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 giorni} monthly {/mese} quarterly {/trimestre} yearly {/anno} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Il prossimo addebito avverrà il <charge-date>{date}</charge-date>."
@@ -105,7 +96,7 @@
     "defaultMessage": "Al momento sembri offline. Connettiti a Internet per usare Modrinth!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Cerca {projectType, select, mod {mod} modpack {pacchetti di mod} resourcepack {pacchetti di risorse} shader {shader} plugin {plugin} datapack {pacchetti di dati} server {server} other {progetti}}..."
+    "defaultMessage": "Cerca {projectType}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Progetti selezionati"
@@ -323,6 +314,12 @@
   "collections.label.private": {
     "defaultMessage": "Privata"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "contenuto"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {elemento} other {elementi}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Seleziona {project}"
   },
@@ -348,10 +345,10 @@
     "defaultMessage": "Avviso di rimozione"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Elimina {count} {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {contenuto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {contenuti}}}}"
+    "defaultMessage": "Elimina {count, number} {itemType}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Elimina {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {contenuto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {contenuti}}}}"
+    "defaultMessage": "Elimina {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Retrocedere} other {Aggiornare}} potrebbe causare problemi di compatibilità. Le mod o i contenuti aggiunti al pacchetto saranno tenuti, ma potrebbero non essere compatibili con l'altra versione."
@@ -377,9 +374,6 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Scollega"
   },
-  "content.diff-modal.added-count": {
-    "defaultMessage": "{count, plural, one {# aggiunta} other {# aggiunte}}"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Aggiunto (dipendenza)"
   },
@@ -389,14 +383,20 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Aggiornato"
   },
-  "content.diff-modal.removed-count": {
-    "defaultMessage": "{count, plural, one {# rimozione} other {# rimozioni}}"
-  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Non è stato possibile analizzare alcuni contenuti sul tuo server, pertanto potrebbero essere affetti da questa modifica."
   },
-  "content.diff-modal.updated-count": {
-    "defaultMessage": "{count, plural, one {# aggiornamento} other {# aggiornamenti}}"
+  "content.filter.disabled": {
+    "defaultMessage": "Disabilitati"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Abilitati"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Aggiornamenti"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Avvisi"
   },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando il backup..."
@@ -416,11 +416,14 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Crea backup"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "istanza"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Salta la conferma tenendo premuto Shift."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Si consiglia di creare un backup prima di procedere, così da poterlo ripristinare nel caso qualcosa {type, select, server {nel tuo mondo} other {nella tua istanza}} vada storto."
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mondo"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "I contenuti del tuo pacchetto ora si trovano qui!"
@@ -465,7 +468,7 @@
     "defaultMessage": "Attendere"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Cerca tra {count} {contentType}..."
+    "defaultMessage": "Cerca tra {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nomi dei file"
@@ -529,12 +532,6 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Aggiornando {contentType}..."
-  },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType, select, mod {mod selezionata} mods {mod selezionate} plugin {plugin selezionato} plugins {plugin selezionati} datapack {pacchetto selezionato} datapacks {pacchetti selezionati} project {progetto selezionato} projects {progetti selezionati} other {{count, plural, one {contenuto selezionato} other {contenuti selezionati}}}}"
-  },
-  "content.selection-bar.selected-count-simple": {
-    "defaultMessage": "{count, plural, one {# selezionato} other {# selezionati}}"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Crea istanza"
@@ -830,6 +827,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Sovrascrivi"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Sovrascriverà <file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Proseguendo con l'estrazione, oltre 100 file verranno sovrascritti; eccone alcuni."
   },
@@ -839,17 +839,11 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} sovrascritti"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Sovrascritto"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "I file verranno sovrascritti"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "Crea {type, select, directory {cartella} other {file}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Crea {type, select, directory {una cartella} other {un file}}"
+    "defaultMessage": "Crea {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "es. la-mia-cartella"
@@ -863,8 +857,11 @@
   "files.delete-modal.header": {
     "defaultMessage": "Elimina file"
   },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Questa cartella e tutti i suoi contenuti verranno eliminati} other {Questo file verrà eliminato}} per sempre. Questa azione non può essere annullata."
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "Questo file verrà eliminato permanentemente. Questa azione non può essere annullata."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "Questa cartella e tutti i suoi contenuti verranno eliminati permanentemente. Questa azione non può essere annullata."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Impossibile caricare i contenuti del file."
@@ -953,6 +950,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Riduci"
   },
+  "files.item-type.file": {
+    "defaultMessage": "file"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "file"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "cartella"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "cartelle"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "Attendi il termine dell'operazione precedente prima di effettuarne un'altra."
   },
@@ -977,9 +986,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Estrazione iniziata"
   },
-  "files.layout.selected-count": {
-    "defaultMessage": "{count, plural, one {# selezionato} other {# selezionati}}"
-  },
   "files.layout.unsaved-changes": {
     "defaultMessage": "Hai modifiche non salvate."
   },
@@ -993,7 +999,7 @@
     "defaultMessage": "es. /la-mia-cartella"
   },
   "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Sposta cartella} other {Sposta file}}"
+    "defaultMessage": "Sposta {type}"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Torna alla home"
@@ -1111,12 +1117,6 @@
   },
   "files.upload-dropdown.unexpected-error": {
     "defaultMessage": "Si è verificato un errore imprevisto."
-  },
-  "files.upload-dropdown.uploads-left": {
-    "defaultMessage": " - {count, select, one {# rimanente} other {# rimanenti}}"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Trascina qui i file per caricarli"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Il nome può contenere solo lettere, numeri, spazi o trattini alti o bassi."
@@ -1264,9 +1264,6 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Inserisci lo stato/provincia"
-  },
-  "format.bytes.0": {
-    "defaultMessage": "{count, number} byte"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1491,7 +1488,13 @@
     "defaultMessage": "Cambiare loader è un'azione distruttiva"
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "{projectType, select, server {Server} other {Pacchetto}} collegato"
+    "defaultMessage": "{projectType} collegato"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "Pacchetto"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "Server"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Versione di {loader}"
@@ -1500,7 +1503,7 @@
     "defaultMessage": "Dovrai reimpostare il server prima di cambiare loader."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Reinstallare il pacchetto di mod reimposterà i contenuti {type, select, server {del tuo server} other {della tua istanza}} al loro stato originario, rimuovendo qualsiasi mod o contenuti aggiunti."
+    "defaultMessage": "Reinstallare il pacchetto di mod reimposterà i contenuti {type} al loro stato originario, rimuovendo qualsiasi mod o contenuti aggiunti."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Reinstalla pacchetto di mod"
@@ -1529,11 +1532,20 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Cerca tra le versioni del gioco..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "istanza"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "dell'istanza"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "server"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "del server"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Scollega"
-  },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Scollegare disconnetterà {type, select, server {questo server} other {questa istanza}} dal {projectType, select, server {server} other {pacchetto di mod}} permanentemente. Questo ti permetterà di cambiare loader e versione di Minecraft, ma non riceverai aggiornamenti futuri."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Verificando..."
@@ -1550,14 +1562,23 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstalla pacchetto"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Riparare reinstallerà il loader e le dipendenze di Minecraft senza rimuovere i contenuti. Se il tuo {type, select, server {server non si avvia correttamente} other {gioco non si avvia per colpa del launcher}}, prova questa opzione."
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "Ripara e reinstalla il loader e le dipendenze di Minecraft senza rimuovere i contenuti. Se il tuo gioco non si avvia per colpa del launcher, prova questa opzione."
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "Ripara e reinstalla il loader e le dipendenze di Minecraft senza rimuovere i contenuti. Se il tuo server non si avvia correttamente, prova questa opzione."
   },
   "instance.confirm-repair.header": {
-    "defaultMessage": "Riparazione {type, select, server {del server} other {dell'istanza}}"
+    "defaultMessage": "Ripara {type}"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "istanza"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Ripara"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "server"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modalità avventura"
@@ -1657,6 +1678,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Nascondi incompatibili"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "La {version} non è contrassegnata come compatibile per questa installazione. Potrebbe avere comportamenti imprevisti o errori nell'avvio."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "Aggiornare alla versione incompatibile?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Aggiorna comunque"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Caricando le informazioni..."
@@ -2331,7 +2361,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2356,6 +2386,9 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.label.badges": {
+    "defaultMessage": "Distintivi"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Pubblicato {date}"
@@ -2387,14 +2420,8 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "pacchett{count, plural, one {o} other {i}} di dati"
   },
-  "project-type.mod.capital": {
-    "defaultMessage": "Mod"
-  },
   "project-type.mod.category": {
     "defaultMessage": "Mod"
-  },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "mod"
   },
   "project-type.modpack.capital": {
     "defaultMessage": "Pacchett{count, plural, one {o} other {i}} di mod"
@@ -2405,14 +2432,8 @@
   "project-type.modpack.lowercase": {
     "defaultMessage": "pacchett{count, plural, one {o} other {i}} di mod"
   },
-  "project-type.plugin.capital": {
-    "defaultMessage": "Plugin"
-  },
   "project-type.plugin.category": {
     "defaultMessage": "Plugin"
-  },
-  "project-type.plugin.lowercase": {
-    "defaultMessage": "plugin"
   },
   "project-type.project.capital": {
     "defaultMessage": "Progett{count, plural, one {o} other {i}}"
@@ -2432,23 +2453,11 @@
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "pacchett{count, plural, one {o} other {i}} di risorse"
   },
-  "project-type.server.capital": {
-    "defaultMessage": "Server"
-  },
   "project-type.server.category": {
     "defaultMessage": "Server"
   },
-  "project-type.server.lowercase": {
-    "defaultMessage": "server"
-  },
-  "project-type.shader.capital": {
-    "defaultMessage": "Shader"
-  },
   "project-type.shader.category": {
     "defaultMessage": "Shader"
-  },
-  "project-type.shader.lowercase": {
-    "defaultMessage": "shader"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ambienti supportati"
@@ -2573,9 +2582,6 @@
   "project.about.tags.title": {
     "defaultMessage": "Tag"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count, number} download"
-  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Necessario sul client e sul server."
   },
@@ -2641,9 +2647,6 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente sconosciuto"
-  },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} follower"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
@@ -2898,7 +2901,7 @@
     "defaultMessage": "Russia"
   },
   "project.server.region.south_america": {
-    "defaultMessage": "America meridionale"
+    "defaultMessage": "Sud America"
   },
   "project.server.region.tooltip": {
     "defaultMessage": "Server situato in {regionName}"
@@ -3089,6 +3092,18 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Nascosto dallo staff"
   },
+  "report.item-type.content": {
+    "defaultMessage": "contenuto"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "progetto"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "utente"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "versione"
+  },
   "s.bg": {
     "defaultMessage": "Attività in esecuzione nel background"
   },
@@ -3257,12 +3272,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Ripristinando dal backup..."
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, =0 {Operazioni da effettuare sui backup} one {Operazioni da effettuare sul backup selezionato} other {Operazioni da effettuare su # backup selezionati}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Eliminando {total} backup..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup selezionato} other {# backup selezionati}}"
   },
@@ -3277,9 +3286,6 @@
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "Elimina{count, plural, one {} other { #}} backup"
-  },
-  "servers.backups.delete-modal.header": {
-    "defaultMessage": "Elimina backup"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Prova a creare il tuo primo backup!"
@@ -3443,17 +3449,11 @@
   "servers.listing.new-label": {
     "defaultMessage": "Nuovo"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "I file saranno preservati ancora per <days-remaining>{daysRemaining, plural, one {# giorno} other {# giorni}}</days-remaining>. Contatta l'assistenza per scaricarli prima che verranno eliminati. "
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "I file saranno preservati per 30 giorni dopo l'annullamento."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Il server è stato sospeso dal team di moderazione. "
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "Il server passerà al piano \"{planSize}\" il <date>{formattedDate}</date>. "
+    "defaultMessage": "Il server è stato sospeso dal team di moderazione."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Attendi mentre prepariamo il tuo server. Potrebbe richiedere fino a 10 minuti."
@@ -3462,7 +3462,7 @@
     "defaultMessage": "Il tuo abbonamento è stato annullato."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "L'abbonamento è stato annullato il <date>{formattedDate}</date>. "
+    "defaultMessage": "L'abbonamento è stato annullato il <date>{formattedDate}</date>."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "L'abbonamento è stato annullato per mancato pagamento."
@@ -3560,9 +3560,6 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Rinnovo riuscito"
   },
-  "servers.manage.search-placeholder": {
-    "defaultMessage": "Cerca tra {count} server..."
-  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3644,6 +3641,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metodo di pagamento"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "addebitato {interval, select, monthly {mensilmente} quarterly {trimerstralmente} yearly {annualmente} other {{interval}}}"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Disponibile in Nord America, in Europa e nel Sud-est asiatico."
   },
@@ -3692,6 +3692,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Riepilogo"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Australia"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Europa centrale"
   },
@@ -3701,8 +3704,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "America settentrionale"
+  "servers.region.north-america-central": {
+    "defaultMessage": "Nord America centrale"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Nord America orientale"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Nord America occidentale"
   },
   "servers.region.prompt": {
     "defaultMessage": "Dove vorresti che il tuo server sia situato?"
@@ -3830,9 +3839,6 @@
   "settings.language.categories.search-result": {
     "defaultMessage": "Risultati di ricerca"
   },
-  "settings.language.description": {
-    "defaultMessage": "Scegli la tua lingua che preferisci per l'interfaccia. Le traduzioni sono contribuite da volontari <crowdin-link>su Crowdin</crowdin-link>."
-  },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Cerca una lingua..."
   },
@@ -3850,9 +3856,6 @@
   },
   "settings.language.title": {
     "defaultMessage": "Lingua"
-  },
-  "settings.language.warning": {
-    "defaultMessage": "È possibile che alcune frasi rimangano in inglese in quanto la piattaforma non è ancora stata tradotta del tutto e per tutte le lingue."
   },
   "settings.pats.title": {
     "defaultMessage": "Token di accesso (PAT)"
@@ -4286,6 +4289,93 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Applica"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Annulla"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Ripristina"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Intervallo di date personalizzato..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Decrementa quantità"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "Nessun intervallo selezionato."
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "Data di fine"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Aumenta quantità"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select, hours {{amount, plural, one {Nell'ultima ora} other {Nelle ultime # ore}}} days {{amount, plural, one {Nell'ultimo giorno} other {Negli ultimi # giorni}}} weeks {{amount, plural, one {Nell'ultima settimana} other {Nelle ultime # settimane}}} months {{amount, plural, one {Nell'ultimo mese} other {Negli ultimi # mesi}}} other {Negli ultimi {amount} giorni}}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "Negli ultimi"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Di sempre"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Ultimi 14 giorni"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Ultimi 180 giorni"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Ultimi 30 giorni"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Ultimi 7 giorni"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Ultimi 90 giorni"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Oggi"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "Anno attuale"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Ieri"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Seleziona intervallo"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Selezionato"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Selezionando"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "Data di inizio"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Quantità"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Unità"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "giorni"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "ore"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "mesi"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "settimane"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Hai modifiche non salvate."
   },
@@ -4309,6 +4399,101 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Cancella tutto"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Quest'utente è qui dai tempi dell'alpha di Modrinth, conclusasi a novembre 2020."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Tester Alpha"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Quest'utente è qui dai tempi della beta di Modrinth, conclusasi a febbraio 2022."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Clicca per sapere di più sulla beta di Modrinth."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Tester Beta"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "I progetti di quest'utente hanno raggiunto collettivamente i {download_sum} download."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} Download"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "Quest'utente ha contribuito a testare i pacchetti di dati su Modrinth prima del loro rilascio a gennaio 2023."
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "Primi nell'Adottare i Pacchetti di Dati"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "Quest'utente ha contribuito a testare i pacchetti di mod su Modrinth prima del loro rilascio a maggio 2022."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "Primi nell'Adottare i Pacchetti di Mod"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "Quest'utente ha contribuito a testare i plugin su Modrinth prima del loro rilascio ad agosto 2022."
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "Primi nell'Adottare i Plugin"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "Quest'utente ha contribuito a testare i pacchetti di risorse su Modrinth prima del loro rilascio ad agosto 2022."
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "Primi nell'Adottare i Pacchetti di Risorse"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "Quest'utente ha contribuito a testare i server su Modrinth prima del loro rilascio a marzo 2026."
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "Primi nell'Adottare i Server"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "Quest'utente ha contribuito a testare le shader su Modrinth prima del loro rilascio a gennaio 2023."
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "Primi nell'Adottare le Shader"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "Quest'utente ha partecipato al test alpha chiuso di Modrinth Hosting prima del rilascio della beta a novembre 2024."
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "Alpha Tester di Modrinth Hosting"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "Quest'utente lavora per Modrinth come moderatore dei contenuti."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "I moderatori dei contenuti revisionano i progetti, gestiscono le segnalazioni e aiutano a mantenere Modrinth sicuro."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "Moderatore dei contenuti"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Quest'utente sta facendo di tutto per sostenere Modrinth e i creatori sulla piattaforma."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Clicca per scoprire come puoi diventare anche tu un membro."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Iscritto a Modrinth+"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Quest'utente ha partecipato a una delle raccolte fondi per la nostra comunità LGBTQ+."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "Clicca per vedere la nostra ultima raccolta fondi per il Pride."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Sostenitore del Pride"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Quest'utente lavora per Modrinth."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Team di Modrinth"
   }
 }
-

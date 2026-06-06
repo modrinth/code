@@ -5,6 +5,8 @@ import type { CircuitBreakerState, CircuitBreakerStorage } from '../features/cir
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
 import type { UploadHandle, UploadRequestOptions } from '../types/upload'
+import { appendRequestParams, parseResponseErrorData, toFetchBody } from '../utils/fetch'
+import { GenericSyncClient } from './sync-generic'
 import { GenericWebSocketClient } from './websocket-generic'
 import { XHRUploadClient } from './xhr-upload-client'
 
@@ -97,6 +99,12 @@ export class NuxtModrinthClient extends XHRUploadClient {
 			enumerable: true,
 			configurable: false,
 		})
+		Object.defineProperty(this.archon, 'sync', {
+			value: new GenericSyncClient(this),
+			writable: false,
+			enumerable: true,
+			configurable: false,
+		})
 	}
 
 	/**
@@ -162,6 +170,40 @@ export class NuxtModrinthClient extends XHRUploadClient {
 			})
 
 			return response
+		} catch (error) {
+			throw this.normalizeError(error)
+		}
+	}
+
+	protected async executeStreamRequest(
+		url: string,
+		options: RequestOptions,
+	): Promise<ReadableStream<Uint8Array>> {
+		try {
+			const response = await fetch(appendRequestParams(url, options.params), {
+				method: options.method ?? 'GET',
+				headers: options.headers,
+				body: toFetchBody(options.body),
+				signal: options.signal,
+				// @ts-expect-error - import.meta is provided by Nuxt
+				cache: import.meta.server ? undefined : 'no-store',
+			})
+
+			if (!response.ok) {
+				throw this.createNormalizedError(
+					new Error(`HTTP ${response.status}: ${response.statusText}`),
+					response.status,
+					await parseResponseErrorData(response),
+				)
+			}
+
+			if (!response.body) {
+				throw new ModrinthApiError('Streaming response has no readable body', {
+					statusCode: response.status,
+				})
+			}
+
+			return response.body
 		} catch (error) {
 			throw this.normalizeError(error)
 		}

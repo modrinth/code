@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT user_id\n        FROM notifications\n        WHERE user_id = ANY($1::bigint[]) AND body = $2::jsonb\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a29d71466a0842f634d0a068a45951273c087bc112a9848e9bdda37c7fe61747"
+}

@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Lỗi tải thông tin đăng ký."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 ngày"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/tháng"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/quý"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/năm"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Lần thanh toán tiếp theo sẽ là vào <charge-date> {date} </charge-date>."
   },
@@ -95,8 +83,41 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Đăng ký lại máy chủ"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Lọc kết quả..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Không tìm được thứ bạn đang tìm kiếm!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Bạn đã Mất kết nối. Hãy kết nối mạng để tìm kiếm Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Tìm kiếm {projectType}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Dự án được chọn"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Tải {count, plural, one {#dự án} other {#các dự án bên}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Dự án được chọn chưa được cài"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Loại bỏ"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Dự án được chọn chưa được cài"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Chế độ xem:"
+  },
   "button.accept": {
     "defaultMessage": "Chấp nhận"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Thếm máy chủ"
   },
   "button.affiliate-links": {
     "defaultMessage": "Liên kết affiliate"
@@ -167,6 +188,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Ẩn các bản snapshot"
   },
+  "button.install": {
+    "defaultMessage": "Cài đặt"
+  },
   "button.max": {
     "defaultMessage": "Tối đa"
   },
@@ -184,6 +208,9 @@
   },
   "button.open-in-folder": {
     "defaultMessage": "Mở thư mục"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Mở trong trình duyệt"
   },
   "button.play": {
     "defaultMessage": "Chơi"
@@ -278,6 +305,15 @@
   "collections.label.private": {
     "defaultMessage": "Riêng tư"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "nội dung"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural,one {vật phẩm}other {vật phẩm}}"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Chọn {project}"
+  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Bạn có chắc chắn muốn cập nhật {count, plural, one {# dự án} other {# dự án}} lên phiên bản tương thích mới nhất không? Đề xuất: Bạn nên cập nhật từng cái một."
   },
@@ -300,10 +336,10 @@
     "defaultMessage": "Cảnh báo trước khi xoá"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Xóa {count} {itemType}{count, plural, other {}}"
+    "defaultMessage": "Xóa {count, number} {itemType}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Xóa {itemType} {count, plural, other {}}"
+    "defaultMessage": "Xóa {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Việc hạ phiên bản} other {Việc cập nhật}} có thể gây ra lỗi tương thích. Những mod mà bạn thêm vào modpack sẽ được giữ lại nhưng chúng có thể sẽ không tương thích với phiên bản mới của modpack."
@@ -350,6 +386,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} đã được cập nhật"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Đang tắt"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Đang bật"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Cần cập nhật"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Cảnh báo"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Đang tạo bản sao lưu..."
   },
@@ -368,11 +416,14 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Tạo bản sao lưu"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "cấu hình"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Giữ nút Shift khi click để bỏ qua xác nhận."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Chúng tôi khuyên bạn nên tạo bản sao lưu trước khi tiếp tục để có thể khôi phục {type, select, server {thế giới} other {phiên chơi}} của mình nếu có sự cố xảy ra."
+  "content.inline-backup.world-label": {
+    "defaultMessage": "thế giới"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Nội dung modpack của bạn hiện đã có ở đây!"
@@ -417,7 +468,7 @@
     "defaultMessage": "Vui lòng chờ"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Tìm {count} {contentType}..."
+    "defaultMessage": "Tfim {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Tên tệp"
@@ -483,10 +534,274 @@
     "defaultMessage": "Đang cập nhật {contentType}..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} đã được chọn"
+    "defaultMessage": "{count, number} {contentType} hiện được chọn"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} đã được chọn"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Tạo cấu hình"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "Tạo thế giới"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Hoàn tất"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "Nhập"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Nhập {count, plural, one {# cấu hình} other {# cấu hình}}"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "Tạo máy chủ"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "Số bản dựng"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "Chọn số bản dựng"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "Tìm số bản dựng..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "Mod loader"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "Chọn phiên bản game"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "Tìm phiên bản Game..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "Xóa biểu tượng"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Chọn biểu tượng"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Mới nhất"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Khác"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Ổn định"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "Phiên bản modloader"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "Chọn phiên bản modloader"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "Tìm phiên bản modloader..."
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Loader"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Tên"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "Nhập tên cấu hình"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "Không có phiên bản khả dụng"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "Lựa chọn khác"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "Trước khi xóa máy chủ"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "Dễ"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "Khó"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "Độ khó"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "Trung bình"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "Yên bình"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "Chọn phiên bản game"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "Sáng tạo"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "Hardcore"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "Chế độ"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "Sinh tồn"
+  },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "Sửa đổi về việc Làng, Cổng The End, hoặc các công trình tương tự được tạo ra hay không."
+  },
+  "creation-flow.modal.final-config.generate-structures.label": {
+    "defaultMessage": "Tạo Công trình"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "Nhập dòng cài dặt JSON cho bộ tạo thế giới tại đây"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "Tùy chỉnh"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "Mặc định"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "Được sử dụng để tùy chỉnh thế giới như việc tùy chỉnh các lớp khối trong thế giới siêu phẳng."
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "Phẳng"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "Tên thế giới"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "Nhập tên thế giới"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "Để trống cho hạt giống ngẫu nhiên."
+  },
+  "creation-flow.modal.final-config.world-seed.label-with-optional": {
+    "defaultMessage": "Hạt giống thế giới <optional>(Không bắt buộc)</optional>"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "Nhập hạt giống thế giới"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "Khuếch đại"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "Mặc định"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "Loại thế giới"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "Chọn loại thế giới"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "Siêu phẳng"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Tạo"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "Tự chọn ({pathName})"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "Đang nhận dạng cấu hình..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "Cấu hình trình khởi chạy khác"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "Thêm vị trí trình khởi chạy"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "Vị trí đến trình khởi chạy..."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "Không tìm thấy cấu hình trong vị trí trên."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "Không cấu hình được thấy"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "Tìm tên cấu hình"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "Xóa hết"
+  },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "Duyệt modpack"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "Thêm modpack"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "Biết modpack bạn định cài là gì rồi?"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Không tìm thấy"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Tìm modpack"
+  },
+  "creation-flow.modal.setup-type.instance.description": {
+    "defaultMessage": "Cấu hình là một bản cài Minecraft với mod, phiên bản và loader của riêng nó."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.description": {
+    "defaultMessage": "Cài từ đầu bằng cách lựa chọn mod loader và phiên bản game."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "Cấu hình tùy chỉnh"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.description": {
+    "defaultMessage": "Nhập từ Prism, Curseforge, Tlauncher hoặc tương tự."
+  },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "Nhập cấu hình"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Duyệt modpack trên Modrinth hoặc nhập từ tệp."
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Cài modpack"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "Minecraft thường, không mod hay plugin khác."
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "Vanilla Minecraft"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "Chọn loại bản cài"
+  },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "Chọn loại cấu hình"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "Chọn loại thế giới"
+  },
+  "creation-flow.title.choose-modpack": {
+    "defaultMessage": "Chọn modpack"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "Tạo cấu hình"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "Tạo thế giới"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "Nhập cấu hình"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "Cài lại máy chủ"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "Tạo máy chủ"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "Không"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Không bao giờ"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Tóm tắt trích xuất"
@@ -503,17 +818,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} bị ghi đè"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Ghi đè"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Những tệp sẽ bị ghi đè"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "Tạo {type, select, directory {thư mục} other {tệp}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Tạo một {type, select, directory {thư mục} other {tệp}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "v.d. thu-muc-cua-toi"
@@ -526,9 +832,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Xoá tệp"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Thư mục này và toàn bộ nội dung của nó sẽ bị xoá vĩnh viễn. Hành động này một đi không trở lại.} other {Tệp này sẽ bị xoá vĩnh viễn. Hành động này một đi không trở lại.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Không thể tải nội dung tệp."
@@ -656,9 +959,6 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "v.d. /thu-muc-cua-toi"
   },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Quay về trang chủ"
   },
@@ -754,9 +1054,6 @@
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "Tệp"
-  },
-  "files.upload-dropdown.file-uploads": {
-    "defaultMessage": "Tải lên"
   },
   "files.upload-dropdown.incorrect-file-type": {
     "defaultMessage": "Sai định dạng khi tải lên"
@@ -962,6 +1259,9 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Thất bại trong việc tải file lên"
   },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Cài đặt hỗ trợ"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"
   },
@@ -1037,23 +1337,20 @@
   "installation-settings.incompatible-content.auto-fix-button": {
     "defaultMessage": "Tự động sửa"
   },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Đổi modloader"
+  },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Vô hiệu quá xung đột"
   },
   "installation-settings.incompatible-content.game-version-warning-title": {
     "defaultMessage": "Cảnh báo không tương thích"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Đã liên kết {projectType, select, server {dự án máy chủ} other {modpack}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "Phiên bản {loader}"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Bạn sẽ cần khởi động lại máy chủ để đổi mod loader."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Việc cài đặt lại modpack sẽ đặt lại nội dung của {type, select, server {máy chủ} other {phiên chơi}} về trạng thái ban đầu, đồng thời gỡ bỏ mọi mod hoặc nội dung mà bạn đã thêm vào."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Cài đặt lại modpack"
@@ -1085,9 +1382,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "Huỷ liên kết"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Hủy liên kết sẽ ngắt kết nối vĩnh viễn {type, select, server {máy chủ} other {phiên chơi}} này khỏi dự án {projectType, select, server {máy chủ} other {modpack}}, cho phép bạn thay đổi trình nạp và phiên bản Minecraft, nhưng bạn sẽ không nhận được các bản cập nhật trong tương lai."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "Đang xác minh..."
   },
@@ -1102,12 +1396,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Cài đặt lại modpack"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Việc sửa chữa sẽ cài đặt lại trình nạp và các phụ thuộc của Minecraft mà không xóa nội dung của bạn. Điều này có thể giải quyết các sự cố nếu {type, select, server {máy chủ không khởi động đúng cách} other {trò chơi không khởi chạy do lỗi liên quan đến trình khởi chạy}}."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "Sửa {type, select, server {server} other {instance}}"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Sửa"
@@ -1126,9 +1414,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Chế độ chơi không xác định"
-  },
-  "instances.content-install.compatible-count": {
-    "defaultMessage": "Tương thích {count} cái với {count, plural, other {instance}}"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Phiên chơi có sẵn"
@@ -1703,9 +1988,6 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -1751,41 +2033,17 @@
   "project-type.all": {
     "defaultMessage": "Tất cả"
   },
-  "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, other {Data Pack}}"
-  },
   "project-type.datapack.category": {
     "defaultMessage": "Data Pack"
-  },
-  "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, other {data pack}}"
-  },
-  "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, other {Mod}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Mod"
   },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, other {mod}}"
-  },
-  "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, other {Modpack}}"
-  },
   "project-type.modpack.category": {
     "defaultMessage": "Modpack"
   },
-  "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, other {modpack}}"
-  },
-  "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural, other {Plugin}}"
-  },
   "project-type.plugin.category": {
     "defaultMessage": "Plugin"
-  },
-  "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural, other {plugin}}"
   },
   "project-type.project.capital": {
     "defaultMessage": "{count, plural, one {Dự án} other {Dự án}}"
@@ -1793,35 +2051,14 @@
   "project-type.project.category": {
     "defaultMessage": "Dự án"
   },
-  "project-type.project.lowercase": {
-    "defaultMessage": "{count, plural, other {dự án}}"
-  },
-  "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, other {Gói tài nguyên}}"
-  },
   "project-type.resourcepack.category": {
     "defaultMessage": "Gói tài nguyên"
-  },
-  "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, other {gói tài nguyên}}"
-  },
-  "project-type.server.capital": {
-    "defaultMessage": "{count, plural, other {Máy chủ}}"
   },
   "project-type.server.category": {
     "defaultMessage": "Máy chủ"
   },
-  "project-type.server.lowercase": {
-    "defaultMessage": "{count, plural, other {máy chủ}}"
-  },
-  "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, other {Shader}}"
-  },
   "project-type.shader.category": {
     "defaultMessage": "Shader"
-  },
-  "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, other {shader}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Môi trường được hỗ trợ"
@@ -2669,9 +2906,6 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "Bạn muốn máy chủ mình có bao nhiêu dung lượng RAM?"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "Bắc Mỹ"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Bạn muốn khu vực máy chủ của bạn được nằm ở đâu?"
   },
@@ -2755,9 +2989,6 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Tìm kiếm một ngôn ngữ..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural, =0 {Không có ngôn ngữ nào} other {Có # ngôn ngữ}} khớp với tìm kiếm của bạn."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Không có ngôn ngữ phù hợp với tìm kiếm của bạn."
@@ -3193,6 +3424,8 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Rời khỏi trang nhé?"
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Thành viên Modrinth+"
   }
 }
-

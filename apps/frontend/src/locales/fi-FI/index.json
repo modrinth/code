@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MT"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MT"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MT"
   },
@@ -191,8 +188,20 @@
   "app-marketing.hero.download-modrinth-app-for-os": {
     "message": "Lataa Modrinth App alustalle {os}"
   },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Kuvakaappaus Cobblemon instanssin pää valikko näytöstä."
+  },
   "app-marketing.hero.more-download-options": {
     "message": "Lisää lataus vaihtoehtoja"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Piilota muut paketit"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Emme suosittele että käytät näitä ellet tiedä mitä teet."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Näytä muut paketit"
   },
   "auth.authorize.action.authorize": {
     "message": "Valtuuta"
@@ -253,9 +262,6 @@
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Anna koodi..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-Link> Unohditko salasanasi? </forgot-password-Link> • <create-account-link>Luo tili</create-account-link>"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Kirjaudu sisään käyttäen"
@@ -335,14 +341,29 @@
   "collection.button.edit-icon": {
     "message": "Muokkaa kuvaketta"
   },
+  "collection.button.remove-icon": {
+    "message": "Poista kuvake"
+  },
   "collection.button.remove-project": {
     "message": "Poista projekti"
+  },
+  "collection.button.replace-icon": {
+    "message": "Korvaa kuvake"
+  },
+  "collection.button.select-icon": {
+    "message": "Valitse kuvake"
   },
   "collection.button.unfollow-project": {
     "message": "Lopeta projektin seuraaminen"
   },
+  "collection.delete-modal.description": {
+    "message": "Tämä poistaa pysyvästi tämän kokoelman. Tätä toimea ei voida peruuttaa."
+  },
   "collection.delete-modal.title": {
     "message": "Oletko varma että haluat poistaa tämän kokoelman?"
+  },
+  "collection.editing": {
+    "message": "Muokataan kokoelmaa"
   },
   "collection.error.not-found": {
     "message": "Kokoelmaa ei löydy"
@@ -350,11 +371,20 @@
   "collection.label.created-at": {
     "message": "Luotu {ago}"
   },
+  "collection.label.curated-by": {
+    "message": "Kuratoinut"
+  },
+  "collection.label.no-projects": {
+    "message": "Ei vielä projekteja kokelmassa"
+  },
   "collection.label.projects-count": {
     "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Päivitetty {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Kokoelmasi"
   },
   "collection.return-link.user": {
     "message": "{user}:n profiili"
@@ -362,8 +392,119 @@
   "collection.title": {
     "message": "{name} - kokoelma"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Lisää yksityinen muistiinpano"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Hyväksy"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Hyväksy vastauksella"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Sulje keskustelu"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Sulje vastauksella"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Hylkää"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Hylkää vastauksella"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Avaa keskustelu uudelleen"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Vastaa"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Vastaa keskusteluun"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Lähetä uudelleen arvioitavaksi"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Lähetä uudelleen arvioitavaksi vastauksella"
+  },
+  "conversation-thread.action.send": {
+    "message": "Lähetä"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Lähetä arvioitavaksi"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Lähetä arvioitavaksi vastauksella"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Vastaa keskusteluun..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Lähetä viesti..."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Vastaa keskusteluun"
+  },
   "create.collection.collection-info": {
     "message": "Sinun uusi kokoelma luodaan julkiseksi kokoelmaksi {count, plural, =0 {no projects} one {# project} other {# projects}}:lla. "
+  },
+  "create.collection.create-collection": {
+    "message": "Luo kokoelma"
+  },
+  "create.collection.name-label": {
+    "message": "Nimi"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Syötä kokoelman nimi..."
+  },
+  "create.collection.summary-label": {
+    "message": "Yhteenveto"
+  },
+  "create.collection.title": {
+    "message": "Luodaan kokoelmaa"
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Ota yhteyttä tukeen"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "kokoelma"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisaatio"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "kokoelmat"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organisaatiot"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projektit"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projekti"
+  },
+  "create.organization.create-organization": {
+    "message": "Luo organisaatio"
+  },
+  "create.organization.name-label": {
+    "message": "Nimi"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Syötä organisaation nimi..."
+  },
+  "create.organization.summary-label": {
+    "message": "Yhteenveto"
+  },
+  "create.project.visibility-private": {
+    "message": "Yksityinen"
+  },
+  "create.project.visibility-public": {
+    "message": "Julkinen"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Piilotettu"
   },
   "dashboard.collections.button.create-new": {
     "message": "Luo uusi"
@@ -374,17 +515,164 @@
   "dashboard.collections.long-title": {
     "message": "Kokoelmasi"
   },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nimi (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Äskettäin luotu"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Äskettäin päivitetty"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Lataa {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Kaikki valmista! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Yksityishenkilö"
+  },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Vero lomake"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Oletko Yhdysvaltain kansalainen?"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Lisätiedot"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Määrä"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Yksityishenkilö"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
     "message": "Vahvista lompakkosi osoite"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Maksutapa"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal-tili"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Vavhistamaton sähköposti"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Matalammat maksut saatavilla"
   },
+  "dashboard.head-title": {
+    "message": "Hallintapaneeli"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Sinulla ei ole lukemattomia ilmoituksia."
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Näytä kaikki"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Näytä ilmoitushistoria"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Luo organisaatio"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Tee organisaatio!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Organisaatioiden haku epäonnistui"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {jäsen} other {jäsentä}}"
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projektit"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "ja {count} lisää..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Tyhjennä linkki"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Muokkaa linkkejä"
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Kutsulinkki sinun Discord-palvelimellesi."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord-kutsu"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Olemassa oleva linkki tyhjennetään"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Syötä kelvollinen Discord-kutsu URL"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Syötä kelvollinen URL"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Näytä kaikki projektit"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Lähdekoodi"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wikisivu"
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Kuvake projektille {title}"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Nouseva"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Laskeva"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Nimi"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Tila"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Tyyppi"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Kuvake"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nimi"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Tila"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tyyppi"
+  },
+  "dashboard.report.title": {
+    "message": "Raportti {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Aktiiviset raportit"
+  },
+  "dashboard.reports.title": {
+    "message": "Raportit"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Saatavilla nyt"
+  },
   "dashboard.revenue.processing": {
     "message": "Prosessoidaan"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Lataa CSV-tiedostona"
   },
   "error.collection.404.list_item.1": {
     "message": "Saatoit kirjoittaa kokoelman URL osoitteen väärin."
@@ -419,11 +707,50 @@
   "error.project.404.list_title": {
     "message": "Miksi?"
   },
+  "error.project.404.title": {
+    "message": "Projektia ei löytynyt"
+  },
   "error.user.404.list_title": {
     "message": "Miksi?"
   },
+  "error.user.404.title": {
+    "message": "Käyttäjää ei löytynyt"
+  },
+  "frog": {
+    "message": "Löysit sammakon! 🐸"
+  },
   "frog.title": {
     "message": "Sammakko"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Varmuuskopiot sisällyttäen"
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Helppokäyttöinen tiedostoselain"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Etsi, hallinnoi, muokkaa ja lataa tiedostoja suoraan palvelimellesi helposti."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Apua kun sitä tarvitset"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Ota yhteyttä Modrinthin tiimiin milloin tahansa palvelinasioissa."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP pääsy"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Tiedät jo mitä tarvitset?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Kokeile ilmaista <orange>3Gt palvelinta</orange> 5 päivän ajan, jonka tarjoaa <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Lue lisää"
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Loppuunmyyty"
   },
   "landing.button.discover-mods": {
     "message": "Löydä modeja"
@@ -511,6 +838,9 @@
   },
   "layout.action.new-project": {
     "message": "Uusi projekti"
+  },
+  "layout.action.publish": {
+    "message": "Julkaise"
   },
   "layout.avatar.alt": {
     "message": "Avatarisi"

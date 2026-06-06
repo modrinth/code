@@ -34,7 +34,7 @@
 
 					<Combobox
 						v-model="currentSortType"
-						class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
+						class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
 						:options="sortTypes"
 						:placeholder="formatMessage(commonMessages.sortByLabel)"
 						@select="goToPage(1)"
@@ -42,7 +42,7 @@
 						<template #selected>
 							<span class="flex flex-row gap-2 align-middle font-semibold">
 								<SortAscIcon
-									v-if="currentSortType === 'Oldest'"
+									v-if="currentSortType === 'Oldest' || currentSortType === 'Least external deps'"
 									class="size-5 flex-shrink-0 text-secondary"
 								/>
 								<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
@@ -113,6 +113,7 @@
 				v-else
 				:key="item.project.id"
 				:queue-entry="item"
+				:show-external-dependencies="currentFilterType === MODPACK_FILTER_TYPE"
 				@start-from-project="startFromProject"
 			/>
 		</div>
@@ -246,12 +247,25 @@ const filterTypes: ComboboxOption<string>[] = [
 const filterTypeValues = filterTypes.map((option) => option.value)
 const DEFAULT_FILTER_TYPE = filterTypeValues[0]
 
-const sortTypes: ComboboxOption<string>[] = [
+const MODPACK_FILTER_TYPE = 'Modpacks'
+
+const baseSortTypes: ComboboxOption<string>[] = [
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
 ]
-const sortTypeValues = sortTypes.map((option) => option.value)
-const DEFAULT_SORT_TYPE = sortTypeValues[0]
+const modpackSortTypes: ComboboxOption<string>[] = [
+	{ value: 'Most external deps', label: 'Most external deps' },
+	{ value: 'Least external deps', label: 'Least external deps' },
+]
+const DEFAULT_SORT_TYPE = baseSortTypes[0].value
+const modpackSortTypeValues = modpackSortTypes.map((option) => option.value)
+
+const sortTypes = computed(() => {
+	if (currentFilterType.value === MODPACK_FILTER_TYPE) {
+		return [...baseSortTypes, ...modpackSortTypes]
+	}
+	return baseSortTypes
+})
 
 const itemsPerPageOptions: ComboboxOption<number>[] = [
 	{ value: 20, label: '20' },
@@ -269,17 +283,31 @@ function parseFilterTypeFromQuery(value: LocationQueryValue | LocationQueryValue
 	return filterTypeValues.includes(query) ? query : DEFAULT_FILTER_TYPE
 }
 
-function parseSortTypeFromQuery(value: LocationQueryValue | LocationQueryValue[]): string {
+function parseSortTypeFromQuery(
+	value: LocationQueryValue | LocationQueryValue[],
+	filterType: string,
+): string {
 	const query = queryAsStringOrEmpty(value)
-	return sortTypeValues.includes(query) ? query : DEFAULT_SORT_TYPE
+	const validValues = [
+		...baseSortTypes.map((option) => option.value),
+		...(filterType === MODPACK_FILTER_TYPE ? modpackSortTypeValues : []),
+	]
+	return validValues.includes(query) ? query : DEFAULT_SORT_TYPE
 }
 
 const currentFilterType = ref(parseFilterTypeFromQuery(route.query.filter))
-const currentSortType = ref(parseSortTypeFromQuery(route.query.sort))
+const currentSortType = ref(parseSortTypeFromQuery(route.query.sort, currentFilterType.value))
 
 watch(
 	currentFilterType,
 	(newFilter) => {
+		if (
+			newFilter !== MODPACK_FILTER_TYPE &&
+			modpackSortTypeValues.includes(currentSortType.value)
+		) {
+			currentSortType.value = DEFAULT_SORT_TYPE
+		}
+
 		const currentQuery = { ...route.query }
 		if (newFilter && newFilter !== DEFAULT_FILTER_TYPE) {
 			currentQuery.filter = newFilter
@@ -326,7 +354,7 @@ watch(
 watch(
 	() => route.query.sort,
 	(newSortParam) => {
-		const newValue = parseSortTypeFromQuery(newSortParam)
+		const newValue = parseSortTypeFromQuery(newSortParam, currentFilterType.value)
 		if (currentSortType.value !== newValue) {
 			currentSortType.value = newValue
 		}
@@ -423,7 +451,23 @@ const typeFiltered = computed(() => {
 const filteredProjects = computed(() => {
 	const filtered = [...typeFiltered.value]
 
-	if (currentSortType.value === 'Oldest') {
+	if (currentSortType.value === 'Most external deps') {
+		filtered.sort((a, b) => {
+			const depsDiff = b.external_dependencies_count - a.external_dependencies_count
+			if (depsDiff !== 0) return depsDiff
+			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
+			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
+			return dateA - dateB
+		})
+	} else if (currentSortType.value === 'Least external deps') {
+		filtered.sort((a, b) => {
+			const depsDiff = a.external_dependencies_count - b.external_dependencies_count
+			if (depsDiff !== 0) return depsDiff
+			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
+			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
+			return dateA - dateB
+		})
+	} else if (currentSortType.value === 'Oldest') {
 		filtered.sort((a, b) => {
 			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
 			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
@@ -471,7 +515,17 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
+function notifySkippedProjects(skippedCount: number) {
+	if (skippedCount <= 0) return
+	addNotification({
+		title: 'Skipped projects',
+		text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
+		type: 'info',
+		autoCloseMs: 2000,
+	})
+}
+
+async function findFirstEligibleProject(): Promise<ModerationProject | null> {
 	let skippedCount = 0
 
 	while (moderationQueue.hasItems) {
@@ -481,30 +535,32 @@ async function findFirstUnlockedProject(): Promise<ModerationProject | null> {
 		const project = filteredProjects.value.find((p) => p.project.id === currentId)
 		if (!project) {
 			await moderationQueue.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
+			continue
+		}
+
+		if (project.project.status !== 'processing') {
+			await moderationQueue.completeCurrentProject(currentId, 'skipped')
+			skippedCount++
 			continue
 		}
 
 		try {
 			const lockStatus = await moderationQueue.checkLock(currentId)
 
-			if (!lockStatus.locked || lockStatus.expired) {
-				if (skippedCount > 0) {
-					addNotification({
-						title: 'Skipped locked projects',
-						text: `Skipped ${skippedCount} project(s) being moderated by others.`,
-						type: 'info',
-					})
-				}
+			if (!lockStatus.locked || lockStatus.expired || lockStatus.is_own_lock) {
+				notifySkippedProjects(skippedCount)
 				return project
 			}
 
-			// Project is locked, skip it
 			await moderationQueue.completeCurrentProject(currentId, 'skipped')
 			skippedCount++
 		} catch {
 			return project
 		}
 	}
+
+	notifySkippedProjects(skippedCount)
 
 	return null
 }
@@ -517,22 +573,22 @@ async function moderateAllInFilter() {
 	await moderationQueue.setQueue(projectIds)
 
 	// Find first unlocked project
-	const targetProject = await findFirstUnlockedProject()
+	const targetProject = await findFirstEligibleProject()
 
 	if (!targetProject) {
 		addNotification({
-			title: 'All projects locked',
-			text: 'All projects in queue are currently being moderated by others.',
+			title: 'No projects available',
+			text: 'All projects in queue are already moderated or locked by others.',
 			type: 'warning',
 		})
 		return
 	}
 
 	navigateTo({
-		name: 'type-id',
+		name: 'type-project',
 		params: {
 			type: 'project',
-			id: targetProject.project.slug,
+			project: targetProject.project.slug,
 		},
 		state: {
 			showChecklist: true,
@@ -553,23 +609,22 @@ async function startFromProject(projectId: string) {
 		await moderationQueue.setQueue(projectIds)
 	}
 
-	// Find first unlocked project
-	const targetProject = await findFirstUnlockedProject()
+	const targetProject = await findFirstEligibleProject()
 
 	if (!targetProject) {
 		addNotification({
-			title: 'All projects locked',
-			text: 'All projects in queue are currently being moderated by others.',
+			title: 'No projects available',
+			text: 'All projects in queue are already moderated or locked by others.',
 			type: 'warning',
 		})
 		return
 	}
 
 	navigateTo({
-		name: 'type-id',
+		name: 'type-project',
 		params: {
 			type: 'project',
-			id: targetProject.project.slug,
+			project: targetProject.project.slug,
 		},
 		state: {
 			showChecklist: true,

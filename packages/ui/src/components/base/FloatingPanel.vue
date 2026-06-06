@@ -13,11 +13,13 @@ const props = withDefaults(
 		disabled?: boolean
 		buttonClass?: string
 		panelClass?: string
+		autoFocus?: boolean
 	}>(),
 	{
 		placement: 'bottom-end',
 		distance: 8,
 		disabled: false,
+		autoFocus: true,
 	},
 )
 
@@ -157,9 +159,11 @@ async function open() {
 	await updatePanelPosition()
 	startPositionTracking()
 
-	setTimeout(() => {
-		focusPanelContent()
-	}, 50)
+	if (props.autoFocus) {
+		setTimeout(() => {
+			focusPanelContent()
+		}, 50)
+	}
 }
 
 function close() {

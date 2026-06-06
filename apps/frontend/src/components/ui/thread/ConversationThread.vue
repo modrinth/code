@@ -14,7 +14,7 @@
 				<p class="m-0">
 					<IntlFormatted
 						:message-id="messages.resubmitModalDescription"
-						:message-values="{ projectTitle: project.title }"
+						:values="{ projectTitle: project.title }"
 					>
 						<template #project-title="{ children }">
 							<span class="font-semibold text-contrast">
@@ -152,7 +152,7 @@
 								v-if="sortedMessages.length > 0"
 								:disabled="!replyBody || isLoading"
 								@click="
-									isApproved(project)
+									isApproved(project) && !isStaff(auth.user)
 										? openReplyModal()
 										: runBlockingAction('reply', () => sendReply())
 								"
@@ -169,7 +169,7 @@
 								v-else
 								:disabled="!replyBody || isLoading"
 								@click="
-									isApproved(project)
+									isApproved(project) && !isStaff(auth.user)
 										? openReplyModal()
 										: runBlockingAction('send', () => sendReply())
 								"

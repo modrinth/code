@@ -65,17 +65,11 @@
   "nags.gallery.title": {
     "defaultMessage": "Bezoek de galerij pagina"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Je {type, select,mod {mod}plugin {plugin}other {project}} gebruikt een licentie die vereist dat de source code beschikbaar is. Gelieve de source code link of source bestanden for elke extra versie te verstrekken, of overweeg een andere licentie te gebruiken."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Sommige van je externe links lijken identiek te zijn, elke link moet maar een keer worden ingevuld met de juiste link type."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Identieke links"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Uw beschrijving moet voldoende platte tekst of alternatieve afbeeldingstekst bevatten, zodat deze ook toegankelijk is voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
@@ -158,9 +152,6 @@
   "nags.select-language.title": {
     "defaultMessage": "Selecteer een taal"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Selecteer de licentie waaronder je {type, select,mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is gedistibrueerd."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Selecteer een licentie"
   },
@@ -201,7 +192,7 @@
     "defaultMessage": "Verhelder de samenvatting"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Je samenvatting is {length, plural,one {# character} other {# characters}}. Minimaal {minChars, plural, one {# character}} is aanbevolen om een informatieve en interessante samevatting te maken."
+    "defaultMessage": "Je samenvatting is {length, plural, one {# character} other {# characters}}. Minimaal {minChars, plural, one {# character} other {# characters}} is aanbevolen om een informatieve en interessante samevatting te maken."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Breidt de samenvatting uit"
@@ -218,14 +209,8 @@
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecteer relevante tags"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": ""
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": ""
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"
@@ -249,4 +234,3 @@
     "defaultMessage": "Bezoek linkjes instellingen"
   }
 }
-

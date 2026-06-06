@@ -36,6 +36,8 @@ interface Props {
 	modpackName?: string
 	modpackIconUrl?: string
 	enableToggle?: boolean
+	actionDisabled?: boolean
+	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 	switchVersion?: (item: ContentItem) => void
 }
@@ -44,6 +46,8 @@ const props = withDefaults(defineProps<Props>(), {
 	modpackName: undefined,
 	modpackIconUrl: undefined,
 	enableToggle: false,
+	actionDisabled: false,
+	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
 	switchVersion: undefined,
 })
@@ -52,6 +56,7 @@ const emit = defineEmits<{
 	'update:enabled': [item: ContentItem, value: boolean]
 	'bulk:enable': [items: ContentItem[]]
 	'bulk:disable': [items: ContentItem[]]
+	hide: []
 }>()
 
 const messages = defineMessages({
@@ -247,12 +252,17 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		installing: item.installing === true,
+		toggleDisabled: props.actionDisabled,
+		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		isClientOnly:
 			isClientOnlyEnvironment(item.environment) ||
 			!!item.pack_client_retained ||
 			!!item.pack_client_depends,
 		clientWarning: getClientWarningType(item),
-		disabled: disabledIds.value.has(item.file_name),
+		disabled:
+			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
+		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		overflowOptions: [
 			...(props.switchVersion
 				? [
@@ -283,17 +293,20 @@ function getTypeIcon(type: string) {
 }
 
 function handleEnabledChange(fileName: string, value: boolean) {
+	if (props.actionDisabled) return
 	const item = items.value.find((i) => i.file_name === fileName)
 	if (!item) return
 	emit('update:enabled', item, value)
 }
 
 function bulkEnable() {
+	if (props.actionDisabled) return
 	emit('bulk:enable', [...selectedItems.value])
 	selectedIds.value = []
 }
 
 function bulkDisable() {
+	if (props.actionDisabled) return
 	emit('bulk:disable', [...selectedItems.value])
 	selectedIds.value = []
 }
@@ -318,6 +331,10 @@ function showLoading() {
 
 function hide() {
 	modal.value?.hide()
+}
+
+function handleHide() {
+	emit('hide')
 }
 
 function getState(): ModpackContentModalState | null {
@@ -361,7 +378,15 @@ function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled
 	}
 }
 
-defineExpose({ show, showLoading, hide, getState, restore, updateItem })
+function setItems(contentItems: ContentItem[]) {
+	const contentFileNames = new Set(contentItems.map((item) => item.file_name))
+	items.value = contentItems
+	selectedIds.value = selectedIds.value.filter((id) => contentFileNames.has(id))
+	disabledIds.value = new Set([...disabledIds.value].filter((id) => contentFileNames.has(id)))
+	loading.value = false
+}
+
+defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems })
 </script>
 
 <template>
@@ -369,6 +394,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 		ref="modal"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
+		:on-hide="handleHide"
 		no-padding
 	>
 		<template #title>
@@ -544,6 +570,8 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 		<ContentSelectionBar
 			v-if="props.enableToggle"
 			:selected-items="selectedItems"
+			:is-busy="props.actionDisabled"
+			:busy-tooltip="props.actionDisabledTooltip"
 			style="--left-bar-width: 0px; --right-bar-width: 0px"
 			@clear="selectedIds = []"
 			@enable="bulkEnable"

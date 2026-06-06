@@ -1,5 +1,4 @@
 <script setup>
-import { Intercom, shutdown as shutdownIntercom } from '@intercom/messenger-js-sdk'
 import {
 	AuthFeature,
 	ModrinthApiError,
@@ -37,6 +36,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentInstallModal,
+	ContentUpdaterModal,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -53,6 +53,7 @@ import {
 	providePopupNotificationManager,
 	useDebugLogger,
 	useFormatBytes,
+	useHostingIntercom,
 	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -75,7 +76,6 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
-import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
@@ -84,24 +84,25 @@ import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
+import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
-import { useIntercomPositioning } from '@/composables/intercom-positioning'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
-import { command_listener, warning_listener } from '@/helpers/events.js'
+import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list, run } from '@/helpers/profile.js'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
+import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
 import {
 	areUpdatesEnabled,
 	enqueueUpdateForInstallation,
@@ -132,15 +133,40 @@ import { AppPopupNotificationManager } from './providers/app-popup-notifications
 const themeStore = useTheming()
 const router = useRouter()
 const route = useRoute()
-const intercomBubblePositioning = useIntercomPositioning({ route, themeStore })
-const {
-	sidebarToggled,
-	forceSidebar,
-	sidebarVisible,
-	intercomBubblePosition,
-	updateIntercomBubbleStyles,
-	clearIntercomBubbleStyles,
-} = intercomBubblePositioning
+const APP_LEFT_NAV_WIDTH = '4rem'
+const APP_SIDEBAR_WIDTH = 300
+const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
+const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
+const credentials = ref()
+const sidebarToggled = ref(true)
+const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
+	sidebarToggled.value = !themeStore.toggleSidebar
+})
+const forceSidebar = computed(
+	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
+)
+const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
+const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
+const prideFundraiserEnabled = computed(
+	() => themeStore.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
+)
+const hostingIntercomIdentityKey = computed(() => {
+	const rawServerId = route.params.id
+	const serverId = Array.isArray(rawServerId) ? rawServerId[0] : rawServerId
+	const userId = credentials.value?.user_id ?? credentials.value?.user?.id ?? 'anonymous'
+	return `${userId}:${serverId ?? 'hosting'}`
+})
+const hostingIntercom = useHostingIntercom({
+	enabled: computed(() => hostingRouteActive.value && !!credentials.value?.session),
+	appId: 'ykeritl9',
+	fetchToken: fetchIntercomToken,
+	identityKey: hostingIntercomIdentityKey,
+	horizontalPadding: computed(() =>
+		sidebarVisible.value
+			? APP_SIDEBAR_WIDTH + INTERCOM_BUBBLE_DEFAULT_PADDING
+			: INTERCOM_BUBBLE_DEFAULT_PADDING,
+	),
+})
 
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
@@ -172,10 +198,20 @@ const tauriApiClient = new TauriModrinthClient({
 	],
 })
 provideModrinthClient(tauriApiClient)
+const { data: authenticatedModrinthUser } = useQuery({
+	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
+	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
+	enabled: () => !!credentials.value?.session,
+	retry: false,
+})
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
-	...intercomBubblePositioning.pageContext,
+	floatingActionBarOffsets: {
+		left: ref(APP_LEFT_NAV_WIDTH),
+		right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
+	},
+	intercomBubble: hostingIntercom.intercomBubble,
 	featureFlags: {
 		serverRamAsBytesAlwaysOn: computed(() =>
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
@@ -205,6 +241,7 @@ const {
 
 const news = ref([])
 const availableSurvey = ref(false)
+const displayedServerInviteNotifications = new Set()
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -259,8 +296,7 @@ onMounted(async () => {
 onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
-	shutdownHostingIntercom()
-	clearIntercomBubbleStyles()
+	unsubscribeSidebarToggle()
 
 	await unlistenUpdateDownload?.()
 })
@@ -307,6 +343,7 @@ async function setupApp() {
 		locale,
 		telemetry,
 		collapsed_navigation,
+		hide_nametag_skins_page,
 		advanced_rendering,
 		onboarded,
 		default_page,
@@ -337,6 +374,7 @@ async function setupApp() {
 	themeStore.setThemeState(theme)
 	themeStore.collapsedNavigation = collapsed_navigation
 	themeStore.advancedRendering = advanced_rendering
+	themeStore.hideNametagSkinsPage = hide_nametag_skins_page
 	themeStore.toggleSidebar = toggle_sidebar
 	themeStore.devMode = developer_mode
 	themeStore.featureFlags = feature_flags
@@ -574,6 +612,16 @@ const {
 	handleModpackDuplicateCreateAnyway: handleContentInstallModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance: handleContentInstallModpackDuplicateGoToInstance,
 	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
+	incompatibilityWarningVersions: contentInstallIncompatibilityWarningVersions,
+	incompatibilityWarningCurrentGameVersion: contentInstallIncompatibilityWarningCurrentGameVersion,
+	incompatibilityWarningCurrentLoader: contentInstallIncompatibilityWarningCurrentLoader,
+	incompatibilityWarningProjectType: contentInstallIncompatibilityWarningProjectType,
+	incompatibilityWarningProjectIconUrl: contentInstallIncompatibilityWarningProjectIconUrl,
+	incompatibilityWarningProjectName: contentInstallIncompatibilityWarningProjectName,
+	incompatibilityWarningMessage: contentInstallIncompatibilityWarningMessage,
+	incompatibilityWarningInstalling: contentInstallIncompatibilityWarningInstalling,
+	handleIncompatibilityWarningInstall: handleContentInstallIncompatibilityWarningInstall,
+	handleIncompatibilityWarningCancel: handleContentInstallIncompatibilityWarningCancel,
 } = contentInstall
 
 const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
@@ -593,9 +641,13 @@ const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
 const updateToPlayModal = ref()
 
-const credentials = ref()
-
 const modrinthLoginFlowWaitModal = ref()
+
+watch(incompatibilityWarningModal, (modal) => {
+	if (modal) {
+		setContentIncompatibilityWarningModal(modal)
+	}
+})
 
 setupAuthProvider(credentials, async (_redirectPath) => {
 	await signIn()
@@ -653,21 +705,16 @@ async function logOut() {
 	await fetchCredentials()
 }
 
-const MIDAS_BITFLAG = 1 << 0
 const hasPlus = computed(
 	() =>
-		credentials.value &&
-		credentials.value.user &&
-		(credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
+		!!credentials.value?.user &&
+		(hasMidasBadge(credentials.value.user) ||
+			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
 )
 
 const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
-const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
-
-let intercomBooting = false
-let intercomBooted = false
 
 async function fetchIntercomToken() {
 	const creds = await getCreds()
@@ -676,8 +723,10 @@ async function fetchIntercomToken() {
 	}
 
 	const params = new URLSearchParams()
-	if (route.path.startsWith('/hosting/manage/') && typeof route.params.id === 'string') {
-		params.set('server_id', route.params.id)
+	const rawServerId = route.params.id
+	const serverId = Array.isArray(rawServerId) ? rawServerId[0] : rawServerId
+	if (route.path.startsWith('/hosting/manage/') && typeof serverId === 'string') {
+		params.set('server_id', serverId)
 	}
 	const query = params.size > 0 ? `?${params.toString()}` : ''
 
@@ -692,69 +741,6 @@ async function fetchIntercomToken() {
 	}
 	return await response.json()
 }
-
-async function bootIntercom() {
-	if (
-		intercomBooting ||
-		intercomBooted ||
-		!hostingRouteActive.value ||
-		!credentials.value?.session
-	) {
-		return
-	}
-
-	intercomBooting = true
-	console.debug('[APP][INTERCOM] initializing secure support chat')
-	try {
-		const { token } = await fetchIntercomToken()
-		Intercom({
-			app_id: 'ykeritl9',
-			intercom_user_jwt: token,
-			session_duration: 1000 * 60 * 60 * 24,
-			alignment: 'right',
-			horizontal_padding: intercomBubblePosition.value.horizontalPadding,
-			vertical_padding: intercomBubblePosition.value.verticalPadding,
-		})
-		intercomBooted = true
-	} catch (error) {
-		console.warn('[APP][INTERCOM] failed to initialize secure support chat', error)
-	} finally {
-		intercomBooting = false
-	}
-}
-
-function shutdownHostingIntercom() {
-	if (!intercomBooted && !intercomBooting) return
-	shutdownIntercom()
-	intercomBooting = false
-	intercomBooted = false
-}
-
-watch(
-	intercomBubblePosition,
-	(position) => {
-		updateIntercomBubbleStyles(position)
-		if (intercomBooted) {
-			window.Intercom?.('update', {
-				horizontal_padding: position.horizontalPadding,
-				vertical_padding: position.verticalPadding,
-			})
-		}
-	},
-	{ immediate: true },
-)
-
-watch(
-	[hostingRouteActive, credentials],
-	([active]) => {
-		if (active) {
-			void bootIntercom()
-		} else {
-			shutdownHostingIntercom()
-		}
-	},
-	{ immediate: true },
-)
 
 watch(showAd, () => {
 	if (!showAd.value) {
@@ -783,6 +769,86 @@ const accounts = ref(null)
 provide('accountsCard', accounts)
 
 command_listener(handleCommand)
+notification_listener(handleLiveNotification)
+
+async function markLiveNotificationRead(notification) {
+	try {
+		await tauriApiClient.labrinth.notifications_v2.markAsRead(notification.id)
+	} catch (error) {
+		if (error instanceof ModrinthApiError && error.statusCode === 404) {
+			console.warn(`notification ${notification.id} could not be marked as read`, error)
+			return
+		}
+		throw error
+	}
+}
+
+async function respondToServerInvite(notification, action) {
+	const serverId = notification.body?.server_id
+	if (typeof serverId !== 'string') {
+		throw new Error('Missing server ID for invite notification.')
+	}
+
+	await tauriApiClient.request(`/servers/${serverId}/invites/${action}`, {
+		api: 'archon',
+		version: 1,
+		method: 'POST',
+	})
+	await markLiveNotificationRead(notification)
+
+	return serverId
+}
+
+async function acceptServerInviteNotification(notification) {
+	try {
+		const serverId = await respondToServerInvite(notification, 'accept')
+		await router.push(`/hosting/manage/${encodeURIComponent(serverId)}`)
+		queryClient.invalidateQueries({ queryKey: ['servers'] })
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+async function declineServerInviteNotification(notification) {
+	try {
+		await respondToServerInvite(notification, 'decline')
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+function openServerInviteInviterProfile(inviterName) {
+	if (!inviterName) return
+	openUrl(`${config.siteUrl}/user/${encodeURIComponent(inviterName)}`)
+}
+
+async function handleLiveNotification(notification) {
+	if (notification?.body?.type !== 'server_invite' || notification.read) return
+	if (displayedServerInviteNotifications.has(notification.id)) return
+
+	displayedServerInviteNotifications.add(notification.id)
+
+	const serverName =
+		typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
+	const inviterId = notification.body.invited_by
+	const invitedBy =
+		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+
+	addPopupNotification({
+		title: serverName,
+		autoCloseMs: null,
+		toast: {
+			type: 'server-invite',
+			actorName: invitedBy?.username ?? null,
+			actorAvatarUrl: invitedBy?.avatar_url ?? null,
+			entityName: serverName,
+			onAccept: () => acceptServerInviteNotification(notification),
+			onDecline: () => declineServerInviteNotification(notification),
+			onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
+		},
+	})
+}
+
 async function handleCommand(e) {
 	if (!e) return
 
@@ -1273,7 +1339,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<CompassIcon />
 			</NavButton>
-			<NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
+			<NavButton v-tooltip.right="'Skin selector'" to="/skins">
 				<ChangeSkinIcon />
 			</NavButton>
 			<NavButton
@@ -1523,6 +1589,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
 					</div>
+					<PrideFundraiserBanner
+						v-if="prideFundraiserEnabled"
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					/>
 					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
 						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
 						<div class="space-y-4 flex flex-col items-center w-full">
@@ -1579,7 +1649,22 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@go-to-instance="handleModpackDuplicateGoToInstance"
 	/>
 	<AddServerToInstanceModal ref="addServerToInstanceModal" />
-	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
+	<ContentUpdaterModal
+		ref="incompatibilityWarningModal"
+		mode="incompatibility-warning"
+		:versions="contentInstallIncompatibilityWarningVersions"
+		:current-game-version="contentInstallIncompatibilityWarningCurrentGameVersion"
+		:current-loader="contentInstallIncompatibilityWarningCurrentLoader"
+		current-version-id=""
+		:is-app="true"
+		:project-type="contentInstallIncompatibilityWarningProjectType"
+		:project-icon-url="contentInstallIncompatibilityWarningProjectIconUrl"
+		:project-name="contentInstallIncompatibilityWarningProjectName"
+		:warning="contentInstallIncompatibilityWarningMessage"
+		:action-loading="contentInstallIncompatibilityWarningInstalling"
+		@update="handleContentInstallIncompatibilityWarningInstall"
+		@cancel="handleContentInstallIncompatibilityWarningCancel"
+	/>
 	<ModpackAlreadyInstalledModal
 		ref="contentInstallModpackAlreadyInstalledModal"
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
@@ -1822,14 +1907,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg: var(--color-scrollbar) !important;
 	--os-handle-bg-hover: var(--color-scrollbar) !important;
 	--os-handle-bg-active: var(--color-scrollbar) !important;
-}
-
-.intercom-lightweight-app-launcher,
-.intercom-launcher-frame,
-iframe[name='intercom-launcher-frame'] {
-	right: var(--app-support-launcher-right, 20px) !important;
-	bottom: var(--app-support-launcher-bottom, 20px) !important;
-	z-index: 9 !important;
 }
 
 .mac {

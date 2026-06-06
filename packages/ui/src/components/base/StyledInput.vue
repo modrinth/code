@@ -21,6 +21,7 @@
 		<textarea
 			v-if="multiline"
 			:id="id"
+			v-bind="inputAttrs"
 			ref="inputRef"
 			:value="model"
 			:placeholder="placeholder"
@@ -28,9 +29,12 @@
 			:readonly="readonly"
 			:name="name"
 			:autocomplete="autocomplete"
+			:autocorrect="autocorrect"
+			:autocapitalize="autocapitalize"
+			:spellcheck="spellcheck"
 			:maxlength="maxlength"
 			:rows="rows"
-			class="w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
+			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
 			:class="[
 				inputClass,
 				'pl-3 pr-3 py-2 text-base',
@@ -47,6 +51,7 @@
 		<input
 			v-else
 			:id="id"
+			v-bind="inputAttrs"
 			ref="inputRef"
 			:type="type"
 			:value="model"
@@ -55,12 +60,15 @@
 			:readonly="readonly"
 			:name="name"
 			:autocomplete="autocomplete"
+			:autocorrect="autocorrect"
+			:autocapitalize="autocapitalize"
+			:spellcheck="spellcheck"
 			:inputmode="inputmode"
 			:maxlength="maxlength"
 			:min="min"
 			:max="max"
 			:step="step"
-			class="w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
+			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
 			:class="[
 				inputClass,
 				variant === 'filled' && icon ? 'pl-10' : 'pl-3',
@@ -71,9 +79,6 @@
 				variant === 'outlined'
 					? 'bg-transparent border border-solid border-button-bg rounded-l-xl border-r-0'
 					: 'bg-surface-4 border-none rounded-xl',
-				{
-					'placeholder:text-sm': type === 'search',
-				},
 			]"
 			@input="onInput"
 			@focus="isFocused = true"
@@ -84,7 +89,7 @@
 		<button
 			v-if="!multiline && clearable && model && !disabled && !readonly && variant === 'filled'"
 			type="button"
-			class="absolute right-0.5 z-[1] p-2 bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer select-none"
+			class="absolute right-0.5 z-[1] p-2 touch-manipulation bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer select-none"
 			aria-label="Clear input"
 			@click="clear"
 		>
@@ -95,7 +100,7 @@
 		<button
 			v-if="!multiline && variant === 'outlined'"
 			type="button"
-			class="flex items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
+			class="flex touch-manipulation items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
 			:aria-label="clearable && model ? 'Clear input' : 'Search'"
 			:tabindex="clearable && model ? undefined : -1"
 			@click="clearable && model ? clear() : undefined"
@@ -124,6 +129,9 @@ const props = withDefaults(
 		id?: string
 		name?: string
 		autocomplete?: string
+		autocorrect?: 'on' | 'off'
+		autocapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters'
+		spellcheck?: boolean
 		inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url'
 		maxlength?: number
 		min?: number
@@ -140,6 +148,7 @@ const props = withDefaults(
 		resize?: 'none' | 'vertical' | 'both'
 		inputClass?: string
 		wrapperClass?: string
+		inputAttrs?: Record<string, string | number | boolean | undefined>
 	}>(),
 	{
 		type: 'text',

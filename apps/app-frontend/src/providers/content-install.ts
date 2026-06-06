@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentInstallInstance, ContentInstallProjectInfo, ContentItem } from '@modrinth/ui'
-import { createContext } from '@modrinth/ui'
+import { createContext, defineMessage, useVIntl } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -34,7 +34,7 @@ import {
 } from '@/store/install.js'
 
 interface ModalRef {
-	show: () => void
+	show: (initialVersionId?: string) => void
 	hide: () => void
 }
 
@@ -42,19 +42,14 @@ interface ModpackAlreadyInstalledModalRef {
 	show: (instanceName: string, instancePath: string) => void
 }
 
-interface IncompatibilityWarningModalRef {
-	show: (
-		instance: GameInstance,
-		project: Labrinth.Projects.v2.Project,
-		versions: Labrinth.Versions.v2.Version[],
-		version: Labrinth.Versions.v2.Version,
-		callback: (versionId?: string) => void,
-	) => void
-}
-
 const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
 const SUPPORTED_LOADERS: Set<string> = new Set(['vanilla', 'forge', 'fabric', 'quilt', 'neoforge'])
 const VANILLA_COMPATIBLE_LOADERS: Set<string> = new Set(['minecraft', 'datapack'])
+const noCompatibleVersionsMessage = defineMessage({
+	id: 'app.content-install.no-compatible-versions',
+	defaultMessage:
+		'No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically.',
+})
 
 function sortLoaders(loaders: string[]): string[] {
 	return loaders.slice().sort((a, b) => {
@@ -91,7 +86,17 @@ export interface ContentInstallContext {
 	setModpackAlreadyInstalledModal: (ref: ModpackAlreadyInstalledModalRef) => void
 	handleModpackDuplicateCreateAnyway: () => Promise<void>
 	handleModpackDuplicateGoToInstance: (instancePath: string) => void
-	setIncompatibilityWarningModal: (ref: IncompatibilityWarningModalRef) => void
+	setIncompatibilityWarningModal: (ref: ModalRef) => void
+	incompatibilityWarningVersions: Ref<Labrinth.Versions.v2.Version[]>
+	incompatibilityWarningCurrentGameVersion: Ref<string>
+	incompatibilityWarningCurrentLoader: Ref<string>
+	incompatibilityWarningProjectType: Ref<string | undefined>
+	incompatibilityWarningProjectIconUrl: Ref<string | undefined>
+	incompatibilityWarningProjectName: Ref<string | undefined>
+	incompatibilityWarningMessage: Ref<string | undefined>
+	incompatibilityWarningInstalling: Ref<boolean>
+	handleIncompatibilityWarningInstall: (version: Labrinth.Versions.v2.Version) => Promise<void>
+	handleIncompatibilityWarningCancel: () => void
 	install: (
 		projectId: string,
 		versionId?: string | null,
@@ -113,6 +118,7 @@ export function createContentInstall(opts: {
 	router: Router
 	handleError: (err: unknown) => void
 }): ContentInstallContext {
+	const { formatMessage } = useVIntl()
 	const instances = ref<ContentInstallInstance[]>([])
 	const compatibleLoaders = ref<string[]>([])
 	const gameVersions = ref<string[]>([])
@@ -124,6 +130,14 @@ export function createContentInstall(opts: {
 
 	const projectInfo = ref<ContentInstallProjectInfo | null>(null)
 	const installingItems = ref<Map<string, ContentItem[]>>(new Map())
+	const incompatibilityWarningVersions = ref<Labrinth.Versions.v2.Version[]>([])
+	const incompatibilityWarningCurrentGameVersion = ref('')
+	const incompatibilityWarningCurrentLoader = ref('')
+	const incompatibilityWarningProjectType = ref<string | undefined>(undefined)
+	const incompatibilityWarningProjectIconUrl = ref<string | undefined>(undefined)
+	const incompatibilityWarningProjectName = ref<string | undefined>(undefined)
+	const incompatibilityWarningMessage = ref<string | undefined>(undefined)
+	const incompatibilityWarningInstalling = ref(false)
 
 	function addInstallingItem(
 		instancePath: string,
@@ -239,11 +253,15 @@ export function createContentInstall(opts: {
 
 	let modalRef: ModalRef | null = null
 	let modpackAlreadyInstalledModalRef: ModpackAlreadyInstalledModalRef | null = null
-	let incompatibilityWarningModalRef: IncompatibilityWarningModalRef | null = null
+	let incompatibilityWarningModalRef: ModalRef | null = null
 	let currentProject: Labrinth.Projects.v2.Project | null = null
 	let currentVersions: Labrinth.Versions.v2.Version[] = []
 	let currentCallback: (versionId?: string) => void = () => {}
 	let profileMap: Record<string, GameInstance> = {}
+	let incompatibilityWarningInstance: GameInstance | null = null
+	let incompatibilityWarningProject: Labrinth.Projects.v2.Project | null = null
+	let incompatibilityWarningCallback: (versionId?: string) => void = () => {}
+	let incompatibilityWarningInstalled = false
 
 	let pendingModpackInstall: {
 		project: Labrinth.Projects.v2.Project
@@ -410,14 +428,34 @@ export function createContentInstall(opts: {
 	async function handleInstallToInstance(instance: ContentInstallInstance) {
 		const profile = profileMap[instance.id]
 		const storeInstance = instances.value.find((i) => i.id === instance.id)
-		if (storeInstance) storeInstance.installing = true
+		if (!currentProject || !profile) {
+			opts.handleError('No project or instance found')
+			return
+		}
 
 		const version = findPreferredVersion(currentVersions, currentProject, profile)
 		if (!version) {
-			if (storeInstance) storeInstance.installing = false
-			opts.handleError('No compatible version found')
+			if (currentVersions.length > 0 && incompatibilityWarningModalRef) {
+				const onIncompatibleInstall = (versionId?: string) => {
+					if (versionId && storeInstance) {
+						storeInstance.installed = true
+					}
+					currentCallback(versionId)
+				}
+				await showIncompatibilityWarning(
+					profile,
+					currentProject,
+					currentVersions,
+					currentVersions[0],
+					onIncompatibleInstall,
+				)
+			} else {
+				opts.handleError('No version found')
+			}
 			return
 		}
+
+		if (storeInstance) storeInstance.installing = true
 
 		const installedProjectIds: string[] = []
 		if (currentProject) {
@@ -456,6 +494,73 @@ export function createContentInstall(opts: {
 		} finally {
 			removeInstallingItems(instance.id, installedProjectIds)
 		}
+	}
+
+	async function showIncompatibilityWarning(
+		instance: GameInstance,
+		project: Labrinth.Projects.v2.Project,
+		versions: Labrinth.Versions.v2.Version[],
+		version: Labrinth.Versions.v2.Version,
+		callback: (versionId?: string) => void,
+	) {
+		incompatibilityWarningInstance = instance
+		incompatibilityWarningProject = project
+		incompatibilityWarningCallback = callback
+		incompatibilityWarningInstalled = false
+		incompatibilityWarningInstalling.value = false
+		incompatibilityWarningVersions.value = versions
+		incompatibilityWarningCurrentGameVersion.value = instance.game_version ?? ''
+		incompatibilityWarningCurrentLoader.value = instance.loader ?? ''
+		incompatibilityWarningProjectType.value = project.project_type
+		incompatibilityWarningProjectIconUrl.value = project.icon_url ?? undefined
+		incompatibilityWarningProjectName.value = project.title
+
+		const compatibilityLabel =
+			project.project_type === 'resourcepack' || project.project_type === 'datapack'
+				? (instance.game_version ?? '')
+				: `${instance.loader ?? ''} ${instance.game_version ?? ''}`.trim()
+		incompatibilityWarningMessage.value = formatMessage(noCompatibleVersionsMessage, {
+			compatibilityLabel,
+		})
+
+		await nextTick()
+		incompatibilityWarningModalRef?.show(version.id)
+		trackEvent('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
+	}
+
+	async function handleIncompatibilityWarningInstall(version: Labrinth.Versions.v2.Version) {
+		if (!incompatibilityWarningInstance || !incompatibilityWarningProject) return
+
+		incompatibilityWarningInstalling.value = true
+		try {
+			await add_project_from_version(incompatibilityWarningInstance.path, version.id, 'standalone')
+		} catch (err) {
+			opts.handleError(err)
+			incompatibilityWarningInstalling.value = false
+			return
+		}
+
+		incompatibilityWarningInstalling.value = false
+		incompatibilityWarningInstalled = true
+		incompatibilityWarningCallback(version.id)
+		incompatibilityWarningModalRef?.hide()
+
+		trackEvent('ProjectInstall', {
+			loader: incompatibilityWarningInstance.loader,
+			game_version: incompatibilityWarningInstance.game_version,
+			id: incompatibilityWarningProject.id,
+			version_id: version.id,
+			project_type: incompatibilityWarningProject.project_type,
+			title: incompatibilityWarningProject.title,
+			source: 'ProjectIncompatibilityWarningModal',
+		})
+	}
+
+	function handleIncompatibilityWarningCancel() {
+		if (!incompatibilityWarningInstalled) {
+			incompatibilityWarningCallback()
+		}
+		incompatibilityWarningInstalled = false
 	}
 
 	async function handleCreateAndInstall(data: {
@@ -614,7 +719,7 @@ export function createContentInstall(opts: {
 					removeInstallingItems(instancePath, installedProjectIds)
 				}
 			} else {
-				incompatibilityWarningModalRef?.show(instance, project, projectVersions, version, callback)
+				await showIncompatibilityWarning(instance, project, projectVersions, version, callback)
 			}
 		} else {
 			let versions = (
@@ -668,9 +773,19 @@ export function createContentInstall(opts: {
 			pendingModpackInstall = null
 			opts.router.push(`/instance/${encodeURIComponent(instancePath)}`)
 		},
-		setIncompatibilityWarningModal(ref: IncompatibilityWarningModalRef) {
+		setIncompatibilityWarningModal(ref: ModalRef) {
 			incompatibilityWarningModalRef = ref
 		},
+		incompatibilityWarningVersions,
+		incompatibilityWarningCurrentGameVersion,
+		incompatibilityWarningCurrentLoader,
+		incompatibilityWarningProjectType,
+		incompatibilityWarningProjectIconUrl,
+		incompatibilityWarningProjectName,
+		incompatibilityWarningMessage,
+		incompatibilityWarningInstalling,
+		handleIncompatibilityWarningInstall,
+		handleIncompatibilityWarningCancel,
 		install,
 		installingItems,
 	}

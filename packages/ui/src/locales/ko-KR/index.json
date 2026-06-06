@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "구독 정보를 불러오는 데 실패했습니다."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5일"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/개월"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/분기"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/연"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "다음 결제일은 <charge-date>{date}</charge-date>입니다."
   },
@@ -104,20 +92,8 @@
   "browse.offline": {
     "defaultMessage": "현재 오프라인 상태입니다. Modrinth를 이용하려면 인터넷에 연결하세요!"
   },
-  "browse.search.placeholder": {
-    "defaultMessage": "{projectType, select, mod {모드} modpack {모드팩} resourcepack {리소스팩} shader {셰이더} plugin {플러그인} datapack {데이터팩} server {서버} other {프로젝트}} 검색..."
-  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "선택된 프로젝트"
-  },
-  "browse.selected-projects-floating-bar.install": {
-    "defaultMessage": "프로젝트 {count}개 설치"
-  },
-  "browse.selected-projects-floating-bar.selected-count": {
-    "defaultMessage": "프로젝트 {count, plural, other {#}}개 선택됨"
-  },
-  "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "설치할 프로젝트로 {count, plural,  other {#}}개를 선택했습니다. 지금 설치하거나 설치하지 않고 돌아갈 수 있습니다."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "선택된 프로젝트가 아직 설치되지 않았습니다"
@@ -326,9 +302,6 @@
   "content.card.select-project": {
     "defaultMessage": "{project} 선택"
   },
-  "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "{count}개의 프로젝트를 최신 호환 버전으로 업데이트하시겠습니까? 콘텐츠는 하나씩 업데이트 하는 것을 권장합니다."
-  },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "업데이트 주의"
   },
@@ -338,20 +311,11 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "향후 이 확인 메시지를 건너뛰려면 Shift 키를 누른 상태에서 “모두 업데이트”를 클릭하세요."
   },
-  "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "프로젝트 {count}개 업데이트"
-  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "모드를 삭제하면 세계에 영구적인 영향을 미칠 수 있으며, 다시 로드할 때 콘텐츠가 누락되거나 예기치 않은 문제가 발생할 수 있습니다."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "삭제 주의"
-  },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "{itemType} {count}개 삭제"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "{itemType} 삭제"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {다운그레이드 진행 중} other {업데이트 진행 중}}에는 호환성 문제가 발생할 수 있습니다. 모드팩에 추가한 모드나 콘텐츠는 유지되지만, 새 버전과 호환되지 않을 수 있습니다."
@@ -398,6 +362,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count}개 업데이트됨"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "비활성화"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "활성화"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "업데이트"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "경고"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "백업 생성 중..."
   },
@@ -418,9 +394,6 @@
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Shift 키를 누른 상태로 클릭해서 확인을 건너뛸 수 있습니다."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "문제가 발생할 경우 {type, select, server {세계} other {인스턴스}}를 복원할 수 있도록 진행하기 전에 백업을 생성하는 것이 좋습니다."
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "여기서 모드팩의 콘텐츠를 확인할 수 있습니다!"
@@ -463,9 +436,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "기다려 주십시오"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "{count}개의 {contentType} 검색..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "파일 이름"
@@ -530,9 +500,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType} 업데이트 중..."
   },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{contentType} {count}개 선택됨"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number}개 선택됨"
   },
@@ -547,9 +514,6 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "가져오기"
-  },
-  "creation-flow.button.import-instances": {
-    "defaultMessage": "인스턴스 {count, plural, other {#}}개 가져오기"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "서버 설정"
@@ -839,17 +803,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count}개 덮어써짐"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "덮어써짐"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "파일이 덮어써짐"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "{type, select, directory {폴더} other {파일}} 생성"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "{type, select, directory {폴더} other {파일}} 생성"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "예: my-folder"
@@ -862,9 +817,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "파일 삭제"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {이 폴더와 그 안의 모든 내용물이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.} other {이 파일이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "파일 내용물을 불러올 수 없습니다."
@@ -992,9 +944,6 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "예: /my-folder"
   },
-  "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {폴더 이동} other {파일 이동}}"
-  },
   "files.navbar.back-to-home": {
     "defaultMessage": "홈으로 돌아가기"
   },
@@ -1061,9 +1010,6 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "새 이름"
   },
-  "files.row.item-count": {
-    "defaultMessage": "항목 {count}개"
-  },
   "files.table-header.created": {
     "defaultMessage": "생성"
   },
@@ -1114,9 +1060,6 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count}개 남음"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "여기에 {type, select, undefined {파일} other {{type}}} 드래그하여 업로드"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "이름에는 영문, 숫자, 하이픈, 밑줄, 공백만 포함되어야 합니다."
@@ -1264,9 +1207,6 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "주/도 입력"
-  },
-  "format.bytes.0": {
-    "defaultMessage": "{count, plural, other {# 바이트}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1490,17 +1430,11 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "로더 변경 시 데이터 손실 위험"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "연결된 {projectType, select, server {서버 프로젝트} other {모드팩}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} 버전"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "로더를 변경하려면 서버를 초기화해야 합니다."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "모드팩을 재설치하면 {type, select, server {서버의} other {인스턴스의}} 콘텐츠가 초기화되어 추가했던 모든 모드나 콘텐츠가 제거됩니다."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "모드팩 재설치"
@@ -1532,9 +1466,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "연결 해제"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "연결을 해제하면 이 {type, select, server {서버} other {인스턴스}}가 {projectType, select, server {서버} other {모드팩}} 프로젝트에서 영구적으로 분리되어 로더와 Minecraft 버전을 변경할 수 있지만, 향후 업데이트를 받을 수 없게 됩니다."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "확인 중..."
   },
@@ -1549,12 +1480,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "모드팩 재설치"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "복구 기능을 사용하면 사용자의 콘텐츠는 삭제되지 않은 채 로더와 Minecraft 종속성이 재설치됩니다. {type, select, server {서버가 제대로 시작되지 않는 경우} other {런처 관련 오류로 인해 게임이 실행되지 않는 경우}}, 이 방법으로 문제가 해결될 수 있습니다."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "{type, select, server {서버} other {인스턴스}} 복구"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "복구"
@@ -1573,9 +1498,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "알 수 없는 게임 모드"
-  },
-  "instances.content-install.compatible-count": {
-    "defaultMessage": "호환되는 인스턴스 {count}개"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "존재하는 인스턴스"
@@ -1634,9 +1556,6 @@
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
   },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "{count, number}개의 프로젝트 검색"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
   },
@@ -1657,6 +1576,15 @@
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "호환되지 않는 항목 숨기기"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version}이 설치와 호환되지 않는 것으로 표시되어 있습니다. 실행에 실패하거나 예기치 않게 작동할 수 있습니다."
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "호환되지 않는 버전으로 업데이트하시겠습니까?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "업데이트"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "변경사항 불러오는 중..."
@@ -2330,9 +2258,6 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -2378,44 +2303,17 @@
   "project-type.all": {
     "defaultMessage": "모두"
   },
-  "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, other {데이터 팩}}"
-  },
   "project-type.datapack.category": {
     "defaultMessage": "데이터 팩"
-  },
-  "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, other {데이터 팩}}"
-  },
-  "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, other {모드}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "모드"
   },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, other {모드}}"
-  },
-  "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, other {모드팩}}"
-  },
   "project-type.modpack.category": {
     "defaultMessage": "모드팩"
   },
-  "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, other {모드팩}}"
-  },
-  "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural, other {플러그인}}"
-  },
   "project-type.plugin.category": {
     "defaultMessage": "플러그인"
-  },
-  "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural, other {플러그인}}"
-  },
-  "project-type.project.capital": {
-    "defaultMessage": "프로젝트"
   },
   "project-type.project.category": {
     "defaultMessage": "프로젝트"
@@ -2423,14 +2321,8 @@
   "project-type.project.lowercase": {
     "defaultMessage": "{count, plural, one {프로젝트} other {프로젝트}}"
   },
-  "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, other {리소스 팩}}"
-  },
   "project-type.resourcepack.category": {
     "defaultMessage": "리소스 팩"
-  },
-  "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, other {리소스 팩}}"
   },
   "project-type.server.capital": {
     "defaultMessage": "{count, plural, one {서버} other {서버}}"
@@ -2441,14 +2333,8 @@
   "project-type.server.lowercase": {
     "defaultMessage": "{count, plural, one {서버} other {서버}}"
   },
-  "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, other {셰이더}}"
-  },
   "project-type.shader.category": {
     "defaultMessage": "셰이더"
-  },
-  "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, other {셰이더}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "지원되는 실행 환경"
@@ -2653,9 +2539,6 @@
   },
   "project.recent-plays": {
     "defaultMessage": "{count} {countPlural, plural, one {회 최근 플레이} other {회 최근 플레이}}"
-  },
-  "project.recent-plays.tooltip": {
-    "defaultMessage": "Modrinth에서 지난 2주동안 {count}회 플레이"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "이 프로젝트는 사용자 지정 모드팩을 사용합니다"
@@ -3257,15 +3140,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "백업으로부터 복원하는 중"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "백업 {total, plural, other {#}}개 삭제 중..."
-  },
-  "servers.backups.bulk-bar.selected-count": {
-    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
-  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "삭제하면 {count, plural, one {해당 백업은} other {해당 백업들은}} 복구할 수 없습니다. 되돌릴 수 없습니다."
   },
@@ -3277,9 +3151,6 @@
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "백업 {count, plural, one {삭제} other {#개 삭제}}"
-  },
-  "servers.backups.delete-modal.header": {
-    "defaultMessage": "백업 삭제"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "첫 백업 생성하기"
@@ -3404,9 +3275,6 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "서버 없음"
   },
-  "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "즐겨찾는 모드들을 선택하시고 나머지는 저희에게 맡겨주세요."
-  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "원클릭 모드 설치"
   },
@@ -3443,26 +3311,14 @@
   "servers.listing.new-label": {
     "defaultMessage": "새로운"
   },
-  "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "파일은 <days-remaining>{daysRemaining}일 동안 보관됩니다. 삭제되기 전에 파일을 다운로드하려면 지원팀에 문의하세요."
-  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "취소 후 30일 동안 파일이 보존됩니다."
-  },
-  "servers.listing.notice.moderated": {
-    "defaultMessage": "관리자의 조치로 인해 서버가 정지되었습니다."
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "서버는 <date>{formattedDate}</date>에 {verb} {planSize} 플랜으로 업그레이드됩니다."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "서버 설정이 완료될 때까지 잠시 기다려 주십시오. 최대 10분 정도 소요될 수 있습니다."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "구독이 취소되었습니다."
-  },
-  "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "구독이 <date>{formattedDate}</date>에 취소되었습니다."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "결제 실패로 인해 구독이 취소되었습니다."
@@ -3514,9 +3370,6 @@
   },
   "servers.manage.error.details": {
     "defaultMessage": "오류 세부정보:"
-  },
-  "servers.manage.error.queue-notice": {
-    "defaultMessage": "최근에 Modrinth Hosting 서버를 구매하셨다면, 현재 대기 중이며 준비가 완료되는 대로 여기에 표시될 것입니다. <경고>새 서버를 구매하려고 시도하지 마십시오.</경고>"
   },
   "servers.manage.error.support-notice": {
     "defaultMessage": "\n서버 상태와 관련하여 개별적인 지원이 필요하시면 Modrinth 지원팀에 문의해 주세요."
@@ -3701,8 +3554,14 @@
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america": {
-    "defaultMessage": "북아메리카"
+  "servers.region.north-america-central": {
+    "defaultMessage": "중앙 북미"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "동부 북미"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "서부 북미"
   },
   "servers.region.prompt": {
     "defaultMessage": "서버가 어디에 위치했으면 좋겠나요?"
@@ -3835,9 +3694,6 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "언어 검색..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "검색어와 일치하는 언어가 {matches, plural, =0 {없습니다} other {#개 있습니다}}."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "검색어와 일치하는 언어가 없습니다."
@@ -4304,11 +4160,7 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "페이지를 떠나겠습니까?"
   },
-  "ui.stacked-admonitions.alert-count": {
-    "defaultMessage": "알림 {count}개"
-  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "모두 닫기"
   }
 }
-
