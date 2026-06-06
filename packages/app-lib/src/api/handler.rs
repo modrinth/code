@@ -28,10 +28,12 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         Some(("server", id)) => {
             CommandPayload::InstallServer { id: id.to_string() }
         }
-        // /launch/{id}   -    Launches a profile
-        Some(("launch", id)) => CommandPayload::LaunchProfile {
-            path: id.to_string(),
-        },
+        // /launch/profile/{id}   -    Launches a profile
+        Some(("launch", rest)) if rest.starts_with("profile/") => {
+            CommandPayload::LaunchProfile {
+                path: rest.trim_start_matches("profile/").to_string(),
+            }
+        }
         _ => {
             emit_warning(&format!(
                 "Invalid command, unrecognized path: {sublink}"
