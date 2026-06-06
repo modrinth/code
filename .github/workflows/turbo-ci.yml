@@ -122,6 +122,14 @@ jobs:
           restore-keys: |
             pnpm-cache-
 
+      - name: Cache Gradle distribution
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.gradle/wrapper/dists
+            ~/.gradle/caches
+          key: ${{ runner.os }}-${{ runner.arch }}-gradle-${{ hashFiles('packages/app-lib/java/gradle/wrapper/gradle-wrapper.properties') }}
+
       - name: Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
         with:
