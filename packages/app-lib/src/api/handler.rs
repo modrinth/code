@@ -7,7 +7,7 @@ use crate::{
     },
     util::io,
 };
-use url::percent_encoding::percent_decode_str;
+use urlencoding::decode;
 
 /// Handles external functions (such as through URL deep linkage)
 /// Link is extracted value (link) in somewhat URL format, such as
@@ -32,7 +32,7 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         // /launch/profile/{id}   -    Launches a profile
         Some(("launch", rest)) if rest.starts_with("profile/") => {
             let raw = rest.trim_start_matches("profile/");
-            match percent_decode_str(raw).decode_utf8() {
+            match decode(raw) {
                 Ok(decoded) => CommandPayload::LaunchProfile {
                     path: decoded.to_string(),
                 },
