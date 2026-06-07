@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
+import { save } from '@tauri-apps/plugin-dialog'
 
 import { get_full_path, get_mod_full_path } from '@/helpers/profile'
 
@@ -45,6 +46,20 @@ export async function highlightInFolder(path) {
 
 export async function showLauncherLogsFolder() {
 	return await invoke('plugin:utils|show_launcher_logs_folder', {})
+}
+
+export async function createProfileShortcut(profileName, profilePath) {
+	const outputPath = await save({
+		defaultPath: `Modrinth - ${profileName}`,
+	})
+
+	if (!outputPath) return null
+
+	return await invoke('plugin:shortcuts|create_profile_shortcut', {
+		profileName,
+		profilePath,
+		outputPath,
+	})
 }
 
 // Opens a profile's folder in the OS file explorer
