@@ -1,22 +1,18 @@
 <template>
 	<div>
-		<CreateProjectVersionModal
-			v-if="currentMember"
-			ref="createProjectVersionModal"
-			@save="resetProjectVersions"
-		/>
+		<CreateProjectVersionModal v-if="currentMember" ref="editModal" @save="handleVersionSaved" />
 		<ConfirmModal
 			v-if="currentMember"
-			ref="modal_confirm"
-			title="Are you sure you want to delete this version?"
-			description="This will remove this version forever (like really forever)."
+			ref="confirmModal"
+			:title="formatMessage(messages.confirmTitle)"
+			:description="formatMessage(messages.confirmDescription)"
 			:has-to-type="false"
-			proceed-label="Delete"
+			:proceed-label="formatMessage(messages.proceedDeletion)"
 			@proceed="deleteVersion()"
 		/>
 		<NewModal
 			v-if="auth.user && currentMember"
-			ref="modal_package_mod"
+			ref="packageModal"
 			:header="formatMessage(messages.packageDataPackHeader)"
 		>
 			<div class="flex max-w-[35rem] flex-col">
@@ -32,14 +28,14 @@
 				<MultiSelect
 					id="package-mod-loaders"
 					v-model="packageLoaders"
-					class="package-loader-select"
+					class="max-w-[20rem]"
 					:options="packageLoaderOptions"
 					:searchable="false"
 					:placeholder="formatMessage(messages.modLoadersPlaceholder)"
 				/>
 				<div class="ml-auto mt-4 flex items-center gap-2">
 					<ButtonStyled type="outlined">
-						<button @click="modal_package_mod?.hide()">
+						<button @click="packageModal?.hide()">
 							<XIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
@@ -53,241 +49,329 @@
 				</div>
 			</div>
 		</NewModal>
-		<div>
+		<div class="flex flex-col">
 			<nuxt-link
 				class="mb-4 flex w-fit items-center gap-2 rounded-lg p-2 pl-0 text-link"
 				:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
 			>
 				<ChevronLeftIcon class="shrink-0" /> {{ formatMessage(messages.allVersions) }}
 			</nuxt-link>
-			<Admonition
-				type="circle-warning"
-				:header="formatMessage(messages.unknownEmbeddedContent)"
-				:body="formatMessage(messages.unknownEmbeddedContentDescription)"
-				class="mb-4"
-			>
-				<template #actions>
-					<div class="flex">
-						<ButtonStyled color="orange">
-							<nuxt-link
-								:to="`/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/settings/permissions`"
+			<template v-if="version">
+				<Admonition
+					v-if="version.files_missing_attribution?.length"
+					type="circle-warning"
+					:header="formatMessage(messages.unknownEmbeddedContent)"
+					:body="formatMessage(messages.unknownEmbeddedContentDescription)"
+					class="mb-4"
+				>
+					<template #actions>
+						<div class="flex">
+							<ButtonStyled color="orange">
+								<nuxt-link
+									:to="`/${project.project_type}/${
+										project.slug ? project.slug : project.id
+									}/settings/permissions`"
+								>
+									{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
+									<RightArrowIcon />
+								</nuxt-link>
+							</ButtonStyled>
+						</div>
+					</template>
+				</Admonition>
+				<VersionPage
+					:version="version"
+					:enrichment="enrichment"
+					:dependency-link-creator="createDependencyLink"
+					class="mb-4"
+				>
+					<template #headerActions="{ primaryFile, promotedFiles }">
+						<ButtonStyled color="brand">
+							<a
+								v-tooltip="
+									primaryFile?.url
+										? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
+										: formatMessage(messages.noPrimaryFile)
+								"
+								:href="decoratedPrimaryFileUrl"
+								:download="primaryFile?.filename"
+								:disabled="primaryFile?.url === undefined"
+								@click="emit('onDownload')"
 							>
-								{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
-								<RightArrowIcon />
-							</nuxt-link>
+								<DownloadIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.downloadButton) }}
+							</a>
 						</ButtonStyled>
-					</div>
-				</template>
-			</Admonition>
-			<VersionPage
-				v-if="version"
-				:version="version"
-				:enrichment="enrichment"
-				:dependency-link-creator="createDependencyLink"
-				class="mb-4"
-			>
-				<template #headerActions="{ primaryFile, promotedFiles }">
-					<ButtonStyled color="brand">
-						<a
-							v-tooltip="
-								primaryFile?.url
-									? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
-									: formatMessage(messages.noPrimaryFile)
-							"
-							:href="decoratedPrimaryFileUrl"
-							:download="primaryFile?.filename"
-							:disabled="primaryFile?.url === undefined"
-							@click="emit('onDownload')"
-						>
-							<DownloadIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.downloadButton) }}
-						</a>
-					</ButtonStyled>
-					<ButtonStyled
-						v-for="file in promotedFiles.filter(
-							(x) =>
-								!!x &&
-								(x.file_type === 'required-resource-pack' ||
-									x.file_type === 'optional-resource-pack'),
-						)"
-						:key="`promoted-file-${file.hashes.sha1}`"
-						color="brand"
-						color-fill="text"
-					>
-						<a
-							v-tooltip="file.filename + ' (' + formatBytes(file.size) + ')'"
-							:href="
-								createProjectDownloadUrl(file.url, {
-									reason: 'dependency',
-								})
-							"
-							:download="primaryFile?.filename"
-							:disabled="primaryFile?.url === undefined"
-							@click="emit('onDownload')"
-						>
-							<DownloadIcon aria-hidden="true" />
-							<template v-if="file.file_type === 'required-resource-pack'">
-								{{ formatMessage(messages.requiredResourcePack) }}
-							</template>
-							<template v-else-if="file.file_type === 'optional-resource-pack'">
-								{{ formatMessage(messages.optionalResourcePack) }}
-							</template>
-						</a>
-					</ButtonStyled>
-					<template v-if="currentMember">
 						<ButtonStyled
-							v-if="
-								version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
-							"
+							v-for="file in promotedFiles.filter(
+								(x) =>
+									!!x &&
+									(x.file_type === 'required-resource-pack' ||
+										x.file_type === 'optional-resource-pack'),
+							)"
+							:key="`promoted-file-${file.hashes.sha1}`"
+							color="brand"
+							color-fill="text"
 						>
-							<button @click="modal_package_mod?.show()">
-								<PackageClosedIcon aria-hidden="true" />
-								{{ formatMessage(messages.packageAsMod) }}
+							<a
+								v-tooltip="file.filename + ' (' + formatBytes(file.size) + ')'"
+								:href="
+									createProjectDownloadUrl(file.url, {
+										reason: 'dependency',
+									})
+								"
+								:download="primaryFile?.filename"
+								:disabled="primaryFile?.url === undefined"
+								@click="emit('onDownload')"
+							>
+								<DownloadIcon aria-hidden="true" />
+								<template v-if="file.file_type === 'required-resource-pack'">
+									{{ formatMessage(messages.requiredResourcePack) }}
+								</template>
+								<template v-else-if="file.file_type === 'optional-resource-pack'">
+									{{ formatMessage(messages.optionalResourcePack) }}
+								</template>
+							</a>
+						</ButtonStyled>
+						<template v-if="currentMember">
+							<ButtonStyled
+								v-if="
+									version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
+								"
+							>
+								<button @click="packageModal?.show()">
+									<PackageClosedIcon aria-hidden="true" />
+									{{ formatMessage(messages.packageAsMod) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled>
+								<OverflowMenu
+									:dropdown-id="`${baseId}-edit-overflow`"
+									class="btn-dropdown-animation"
+									:options="[
+										{
+											id: 'edit-metadata',
+											action: () => handleOpenEditVersionModal(version!.id, project.id, 'metadata'),
+										},
+										{
+											id: 'edit-details',
+											action: () =>
+												handleOpenEditVersionModal(version!.id, project.id, 'add-details'),
+										},
+										{
+											id: 'edit-files',
+											action: () =>
+												handleOpenEditVersionModal(version!.id, project.id, 'add-files'),
+										},
+										{
+											id: 'delete',
+											color: 'red',
+											action: () => confirmModal?.show(),
+										},
+									]"
+								>
+									<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.edit) }}
+									<DropdownIcon class="h-5 w-5 text-secondary" />
+									<template #edit-metadata>
+										<BoxIcon aria-hidden="true" />
+										{{ formatMessage(messages.editMetadata) }}
+									</template>
+									<template #edit-details>
+										<InfoIcon aria-hidden="true" />
+										{{ formatMessage(messages.editDetails) }}
+									</template>
+									<template #edit-files>
+										<FileIcon aria-hidden="true" />
+										{{ formatMessage(messages.editFiles) }}
+									</template>
+									<template #delete>
+										<TrashIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.deleteLabel) }}
+									</template>
+								</OverflowMenu>
+							</ButtonStyled>
+						</template>
+						<ButtonStyled v-else color="red" color-fill="text">
+							<nuxt-link v-if="!auth.user" :to="signInRouteObj">
+								<ReportIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.reportButton) }}
+							</nuxt-link>
+							<button v-else @click="() => reportVersion(version!.id)">
+								<ReportIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.reportButton) }}
 							</button>
 						</ButtonStyled>
+					</template>
+					<template #supplementaryResourceActions="{ file }">
 						<ButtonStyled>
+							<a
+								:href="decorateDownloadUrl(file.url)"
+								:title="`Download ${file.filename}`"
+								:download="file.filename"
+								tabindex="0"
+							>
+								<DownloadIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.downloadButton) }}
+							</a>
+						</ButtonStyled>
+						<ButtonStyled type="outlined" circular>
 							<OverflowMenu
-								:dropdown-id="`${baseId}-edit-overflow`"
-								class="btn-dropdown-animation"
+								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
 									{
-										id: 'edit-metadata',
-										action: () => handleOpenEditVersionModal(version!.id, project.id, 'metadata'),
+										id: 'copy-sha1',
+										action: () => copyFileHash(file, 'sha1'),
 									},
 									{
-										id: 'edit-details',
-										action: () =>
-											handleOpenEditVersionModal(version!.id, project.id, 'add-details'),
-									},
-									{
-										id: 'edit-files',
-										action: () => handleOpenEditVersionModal(version!.id, project.id, 'add-files'),
-									},
-									{
-										id: 'delete',
-										color: 'red',
-										action: () => modal_confirm.show(),
+										id: 'copy-sha512',
+										action: () => copyFileHash(file, 'sha512'),
 									},
 								]"
+								:dropdown-id="`${baseId}-supplementary-resource-actions`"
 							>
-								<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.edit) }}
-								<DropdownIcon class="h-5 w-5 text-secondary" />
-								<template #edit-metadata>
-									<BoxIcon aria-hidden="true" />
-									{{ formatMessage(messages.editMetadata) }}
+								<MoreVerticalIcon aria-hidden="true" />
+								<template #copy-sha1>
+									<CopyIcon aria-hidden="true" />
+									{{ formatMessage(messages.copySha1) }}
 								</template>
-								<template #edit-details>
-									<InfoIcon aria-hidden="true" />
-									{{ formatMessage(messages.editDetails) }}
-								</template>
-								<template #edit-files>
-									<FileIcon aria-hidden="true" />
-									{{ formatMessage(messages.editFiles) }}
-								</template>
-								<template #delete>
-									<TrashIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.deleteLabel) }}
+								<template #copy-sha512>
+									<CopyIcon aria-hidden="true" />
+									{{ formatMessage(messages.copySha512) }}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
 					</template>
-					<ButtonStyled v-else color="red" color-fill="text">
-						<nuxt-link v-if="!auth.user" :to="signInRouteObj">
-							<ReportIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.reportButton) }}
-						</nuxt-link>
-						<button v-else @click="() => reportVersion(version!.id)">
-							<ReportIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.reportButton) }}
-						</button>
-					</ButtonStyled>
-				</template>
-				<template #supplementaryResourceActions="{ file }">
-					<ButtonStyled>
-						<a
-							:href="decorateDownloadUrl(file.url)"
-							:title="`Download ${file.filename}`"
-							:download="file.filename"
-							tabindex="0"
-						>
-							<DownloadIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.downloadButton) }}
-						</a>
-					</ButtonStyled>
-					<ButtonStyled type="outlined" circular>
-						<OverflowMenu
-							:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-							:options="[
-								{
-									id: 'copy-sha1',
-									action: () => copyFileHash(file, 'sha1'),
-								},
-								{
-									id: 'copy-sha512',
-									action: () => copyFileHash(file, 'sha512'),
-								},
-							]"
-							:dropdown-id="`${baseId}-supplementary-resource-actions`"
-						>
-							<MoreVerticalIcon aria-hidden="true" />
-							<template #copy-sha1>
-								<CopyIcon aria-hidden="true" />
-								{{ formatMessage(messages.copySha1) }}
-							</template>
-							<template #copy-sha512>
-								<CopyIcon aria-hidden="true" />
-								{{ formatMessage(messages.copySha512) }}
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-				</template>
-				<template #dependencyActions="{ dependency }">
-					<ButtonStyled circular>
-						<nuxt-link
-							v-if="createDependencyLink(dependency)"
-							v-tooltip="
-								formatMessage(dependency.version ? messages.viewVersion : messages.viewProject)
-							"
-							:to="createDependencyLink(dependency)"
-							target="_blank"
-						>
-							<ExternalIcon />
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled circular color="brand" color-fill="text">
-						<a
-							v-if="dependency.version && dependency.dependency.dependency_type !== 'incompatible'"
-							v-tooltip="
-								dependencyVersionPrimaryFiles[dependency.version.id]
-									? dependencyVersionPrimaryFiles[dependency.version.id].filename +
-										' (' +
-										formatBytes(dependencyVersionPrimaryFiles[dependency.version.id].size) +
-										')'
-									: formatMessage(messages.noPrimaryFile)
-							"
-							:href="
-								createProjectDownloadUrl(dependencyVersionPrimaryFiles[dependency.version.id].url, {
-									reason: 'dependency',
-								})
-							"
-							:download="dependencyVersionPrimaryFiles[dependency.version.id].filename"
-							:disabled="dependencyVersionPrimaryFiles[dependency.version.id].url === undefined"
-						>
-							<DownloadIcon />
-						</a>
-						<a
-							v-else-if="dependency.project"
-							v-tooltip="formatMessage(messages.downloadProject)"
-							:href="`/project/${dependency.project.id}#download`"
-							target="_blank"
-						>
-							<DownloadIcon />
-						</a>
-					</ButtonStyled>
-				</template>
-			</VersionPage>
+					<template #dependencyActions="{ dependency }">
+						<ButtonStyled circular>
+							<nuxt-link
+								v-if="createDependencyLink(dependency)"
+								v-tooltip="
+									formatMessage(dependency.version ? messages.viewVersion : messages.viewProject)
+								"
+								:to="createDependencyLink(dependency)"
+								target="_blank"
+							>
+								<ExternalIcon />
+							</nuxt-link>
+						</ButtonStyled>
+						<ButtonStyled circular color="brand" color-fill="text">
+							<a
+								v-if="
+									dependency.version && dependency.dependency.dependency_type !== 'incompatible'
+								"
+								v-tooltip="
+									dependencyVersionPrimaryFiles[dependency.version.id]
+										? dependencyVersionPrimaryFiles[dependency.version.id].filename +
+											' (' +
+											formatBytes(dependencyVersionPrimaryFiles[dependency.version.id].size) +
+											')'
+										: formatMessage(messages.noPrimaryFile)
+								"
+								:href="
+									createProjectDownloadUrl(
+										dependencyVersionPrimaryFiles[dependency.version.id].url,
+										{
+											reason: 'dependency',
+										},
+									)
+								"
+								:download="dependencyVersionPrimaryFiles[dependency.version.id].filename"
+								:disabled="dependencyVersionPrimaryFiles[dependency.version.id].url === undefined"
+							>
+								<DownloadIcon />
+							</a>
+							<a
+								v-else-if="dependency.project"
+								v-tooltip="formatMessage(messages.downloadProject)"
+								:href="`/project/${dependency.project.id}#download`"
+								target="_blank"
+							>
+								<DownloadIcon />
+							</a>
+						</ButtonStyled>
+					</template>
+				</VersionPage>
+				<section
+					v-if="
+						projectV3.project_types.includes('mod') || projectV3.project_types.includes('plugin')
+					"
+					class="flex flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-surface-2 p-0"
+				>
+					<button
+						@click="devInfoCollapsed = !devInfoCollapsed"
+						class="group m-0 flex w-full min-w-0 appearance-none items-center gap-3 rounded-2xl rounded-b-none bg-surface-3 p-4 text-left outline-offset-[-3px]"
+					>
+						<DropdownIcon
+							aria-hidden="true"
+							class="size-5 text-contrast transition-transform"
+							:class="{ 'rotate-180': !devInfoCollapsed }"
+						/>
+						<h3 class="m-0 flex items-center gap-2 text-base font-semibold">
+							{{ formatMessage(messages.devInfo) }}
+						</h3>
+					</button>
+					<Collapsible
+						:collapsed="devInfoCollapsed"
+						class="rounded-b-2xl border-0 border-t border-solid border-surface-5"
+					>
+						<div class="flex flex-col p-4">
+							<p class="mb-3 mt-0 leading-normal">
+								<IntlFormatted :message-id="messages.mavenDescription">
+									<template #gradle-link="{ children }">
+										<a href="https://gradle.org/" class="text-link" target="_blank" rel="noopener">
+											<component :is="() => children" />
+										</a>
+									</template>
+								</IntlFormatted>
+							</p>
+							<p class="mb-4 mt-0 leading-normal">
+								{{ formatMessage(messages.mavenNote) }}
+							</p>
+							<h4 class="mb-2 mt-0 font-medium text-contrast">
+								{{ formatMessage(messages.mavenCoordinates) }}
+							</h4>
+							<CopyCode :text="coordinatesSnippet" />
+							<h4 class="mb-2 mt-4 font-medium text-contrast">
+								{{ formatMessage(messages.versionId) }}
+							</h4>
+							<CopyCode :text="version.id" />
+							<h4 class="mb-2 mt-4 font-medium text-contrast">
+								{{ formatMessage(messages.gradleSnippet) }}
+							</h4>
+							<pre
+								class="m-0 overflow-x-auto rounded-xl border border-solid border-surface-4 bg-surface-3 text-sm"
+								>{{ gradleSnippet }}</pre
+							>
+						</div>
+					</Collapsible>
+				</section>
+			</template>
+			<template v-else-if="versionError">
+				Uh oh, something went wrong.
+				<pre>
+					{{ versionError }}
+				</pre
+				>
+			</template>
+			<template v-else>
+				<div class="flex flex-col gap-4 pb-[30rem]">
+					<div
+						class="mt-4 flex h-[8rem] w-full animate-pulse items-center justify-center rounded-2xl bg-surface-3"
+					></div>
+					<hr class="m-0 w-full animate-pulse border-surface-4" />
+					<div class="grid gap-4 sm:grid-cols-2">
+						<div
+							class="flex h-[6rem] w-full animate-pulse items-center justify-center rounded-2xl bg-surface-3"
+						></div>
+						<div
+							class="flex h-[6rem] w-full animate-pulse items-center justify-center rounded-2xl bg-surface-3"
+						></div>
+					</div>
+					<div
+						class="flex h-[18rem] w-full animate-pulse items-center justify-center rounded-2xl bg-surface-3"
+					></div>
+				</div>
+			</template>
 		</div>
 	</div>
 </template>
@@ -313,289 +397,174 @@ import {
 import {
 	Admonition,
 	ButtonStyled,
+	Collapsible,
 	commonMessages,
 	commonProjectSettingsMessages,
 	ConfirmModal,
+	CopyCode,
 	defineMessages,
-	ENVIRONMENTS_COPY,
 	formatLoader,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	IntlFormatted,
 	MultiSelect,
 	NewModal,
 	OverflowMenu,
-	PROJECT_DEP_MARKER_QUERY,
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
-import { useImageUpload } from '~/composables/image-upload.ts'
+import { STALE_TIME } from '~/composables/queries/project'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
+
 const emit = defineEmits<{
 	onDownload: []
 }>()
 
-// Composables
 const data = useNuxtApp()
 const route = useNativeRoute()
-const signInRouteObj = computed(() => getSignInRouteObj(route))
 const router = useRouter()
 const auth = await useAuth()
 const tags = useGeneratedState()
-const flags = useFeatureFlags()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
-const formatDateTime = useFormatDateTime({
-	timeStyle: 'short',
-	dateStyle: 'long',
-})
 const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 const formatBytes = useFormatBytes()
 const { formatMessage } = useVIntl()
 
-// Helper for accessing nuxt app $formatVersion
-const formatVersionDisplay = (versions: string[]) => (data as any).$formatVersion(versions)
-
-// Get data from DI context
 const {
 	projectV2: project,
+	projectV3,
 	currentMember,
 	allMembers: members,
-	versions: contextVersions,
+	versions,
+	versionsLoading,
 	loadVersions,
 	dependencies: contextDependencies,
-	dependenciesLoading: contextDependenciesLoading,
 	loadDependencies,
 	invalidate,
 	cdnDownloadReason,
 } = injectProjectPageContext()
 
+loadVersions()
+loadDependencies()
+
+const flags = useFeatureFlags()
+const devInfoCollapsed = computed({
+	get: () => flags.value.versionDevInfoCollapsed,
+	set: (value) => {
+		flags.value.versionDevInfoCollapsed = value
+		saveFeatureFlags()
+	},
+})
+
 const baseId = useId()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 
-// Load versions and dependencies in parallel
-await Promise.all([loadVersions(), loadDependencies()])
+const versionRouteParam = computed(() => route.params.version as string)
+const isLatestRoute = computed(() => versionRouteParam.value === 'latest')
 
-// Template refs
-const createProjectVersionModal = useTemplateRef('createProjectVersionModal')
-const modal_confirm = useTemplateRef('modal_confirm')
-const modal_package_mod = useTemplateRef('modal_package_mod')
+const latestVersionId = computed(() => {
+	if (!isLatestRoute.value) {
+		return null
+	}
 
-// Reactive state from data()
-const newFiles = ref<File[]>([])
-const newFileTypes = ref<Array<{ display: string; value: string } | null>>([])
-const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
-const packageLoaderOptions = [
-	{ value: 'fabric', label: formatLoader(formatMessage, 'fabric') },
-	{ value: 'forge', label: formatLoader(formatMessage, 'forge') },
-	{ value: 'quilt', label: formatLoader(formatMessage, 'quilt') },
-	{ value: 'neoforge', label: formatLoader(formatMessage, 'neoforge') },
-]
-const showKnownErrors = ref(false)
-const shouldPreventActions = ref(false)
-const uploadedImageIds = ref<string[]>([])
+	let allVersions = versions.value ?? []
 
-const dependenciesMetaLoading = ref(true)
-const dependenciesLoading = computed(
-	() => contextDependenciesLoading.value || dependenciesMetaLoading.value,
+	const loaderFilter = route.query.loader
+	if (typeof loaderFilter === 'string') {
+		allVersions = allVersions.filter((x) => x.loaders.includes(loaderFilter))
+	}
+
+	const gameVersionFilter = route.query.version
+	if (typeof gameVersionFilter === 'string') {
+		allVersions = allVersions.filter((x) => x.game_versions.includes(gameVersionFilter))
+	}
+
+	if (allVersions.length === 0) return null
+
+	return allVersions.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
+})
+
+const versionLookupKey = computed(() =>
+	isLatestRoute.value ? latestVersionId.value : versionRouteParam.value,
 )
 
-// File types constant
-const fileTypes = ref([
-	{
-		display: 'Required resource pack',
-		value: 'required-resource-pack',
-	},
-	{
-		display: 'Optional resource pack',
-		value: 'optional-resource-pack',
-	},
-])
+const {
+	data: version,
+	refetch: refetchVersion,
+	error: versionError,
+} = useQuery({
+	queryKey: computed(
+		() => ['project', project.value.id, 'version', 'v3', versionLookupKey.value] as const,
+	),
+	queryFn: () =>
+		client.labrinth.versions_v3.getVersionFromIdOrNumber(project.value.id, versionLookupKey.value!),
+	enabled: computed(() => !!project.value.id && !!versionLookupKey.value),
+	staleTime: STALE_TIME,
+})
 
-// Mutable state initialized during setup
-const version = ref<Labrinth.Versions.v3.Version>()
-const enrichment = ref<Labrinth.Projects.v2.DependencyInfo>()
-const primaryFile = ref<Record<string, any>>({})
-const alternateFile = ref<Record<string, any> | undefined>(undefined)
-const replaceFile = ref<File | null>(null)
-const oldFileTypes = ref<Array<{ display: string; value: string } | null>>([])
-
-if (route.params.version === 'latest') {
-	let versionList = contextVersions.value ?? []
-	if (route.query.loader) {
-		versionList = versionList.filter((x: any) => x.loaders.includes(route.query.loader))
-	}
-	if (route.query.version) {
-		versionList = versionList.filter((x: any) => x.game_versions.includes(route.query.version))
-	}
-	if (versionList.length === 0) {
-		throw createError({
-			fatal: true,
-			statusCode: 404,
-			message: 'No version matches the filters',
-		})
-	}
-	version.value = versionList.reduce((a: any, b: any) =>
-		a.date_published > b.date_published ? a : b,
-	)
-} else {
-	let foundVersion = ((contextVersions.value ?? []) as any[]).find(
-		(x: any) => x.id === route.params.version,
-	)
-
-	if (!foundVersion) {
-		foundVersion = ((contextVersions.value ?? []) as any[]).find(
-			(x: any) => x.displayUrlEnding === route.params.version,
-		)
-	}
-
-	if (!foundVersion) {
-		foundVersion = ((contextVersions.value ?? []) as any[]).find(
-			(x: any) => x.version_number === route.params.version,
-		)
-	}
-
-	if (foundVersion) {
-		const versionV3 = (await useBaseFetch(
-			`project/${project.value.id}/version/${route.params.version}`,
-			{ apiVersion: 3 },
-		)) as any
-		if (versionV3) {
-			foundVersion.environment = versionV3.environment
-			foundVersion.changelog = versionV3.changelog
-		}
-		version.value = foundVersion
-	} else {
-		// cache is stale (e.g., version was just created/reuploaded)
-		try {
-			const versionV3 = (await useBaseFetch(
-				`project/${project.value.id}/version/${route.params.version}`,
-				{ apiVersion: 3 },
-			)) as any
-			if (versionV3) {
-				version.value = versionV3
-				// Refresh cache to include this version
-				await invalidate()
-			}
-		} catch {
-			// API fetch failed - version truly doesn't exist, will 404 below
-		}
-	}
-}
-
-if (!version.value || Object.keys(version.value).length === 0) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: 'Version not found',
-	})
-}
-
-// Deep clone version to make it reactive and avoid mutating the original
-version.value = JSON.parse(JSON.stringify(version.value))
-primaryFile.value =
-	version.value.files?.find((file: any) => file.primary) ?? version.value.files?.[0] ?? {}
-alternateFile.value = version.value.files?.find(
-	(file: any) => file.file_type && file.file_type.includes('resource-pack'),
-)
-
-// Process dependencies
 watch(
-	[contextDependencies],
-	() => {
-		const deps = contextDependencies.value ?? { projects: [], versions: [] }
-
-		if (contextDependencies.value) {
-			enrichment.value = contextDependencies.value
+	versionError,
+	(error) => {
+		if (error) {
+			showError({
+				fatal: true,
+				statusCode: 404,
+				message: 'Version not found',
+			})
 		}
-
-		dependenciesMetaLoading.value = false
 	},
-	{ deep: true, immediate: true },
+	{ immediate: true },
 )
 
-oldFileTypes.value = (version.value.files ?? []).map(
-	(x: any) => fileTypes.value.find((y) => y.value === x.file_type) ?? null,
+watch(
+	[isLatestRoute, latestVersionId, versionsLoading, versions],
+	() => {
+		if (isLatestRoute.value && !versionsLoading.value && versions.value && !latestVersionId.value) {
+			showError({
+				fatal: true,
+				statusCode: 404,
+				message: 'No version matches the filters',
+			})
+		}
+	},
+	{ immediate: true },
 )
 
-// Computed properties
-const title = computed(() => `${version.value.name} - ${project.value.title}`)
+const enrichment = computed(() => contextDependencies.value ?? undefined)
 
-const modpackLoaders = computed<string[]>(() => {
-	if (project.value.project_type !== 'modpack') {
-		return []
-	}
-
-	if (Array.isArray(version.value.mrpack_loaders) && version.value.mrpack_loaders.length > 0) {
-		return version.value.mrpack_loaders
-	}
-
-	return (version.value.loaders ?? []).filter((loader: string) => loader !== 'mrpack')
-})
-
-const noModpackLoader = computed(
-	() =>
-		project.value.project_type === 'modpack' &&
-		((modpackLoaders.value.length === 1 && modpackLoaders.value[0] === 'minecraft') ||
-			modpackLoaders.value.length === 0),
+const primaryFile = computed(
+	() => version.value?.files?.find((file) => file.primary) ?? version.value?.files?.[0],
 )
 
-const description = computed(
-	() =>
-		`Download ${project.value.title} ${
-			version.value.version_number
-		} on Modrinth. Supports ${(data as any).$formatVersion(version.value.game_versions)} ${(
-			version.value.loaders ?? []
-		)
-			.map((x: string) => x.charAt(0).toUpperCase() + x.slice(1))
-			.join(
-				' & ',
-			)}. Published on ${formatDate(version.value.date_published)}. ${version.value.downloads} downloads.`,
+const title = computed(() =>
+	version.value ? ` ${version.value.version_number} - ${project.value.title}` : undefined,
 )
 
-const usesFeaturedVersions = computed(() =>
-	(contextVersions.value ?? []).some((v: any) => v.featured),
-)
+const description = computed(() => {
+	if (!version.value) return ''
 
-const fieldErrors = computed(
-	() =>
-		version.value.version_number === '' ||
-		(version.value.game_versions?.length ?? 0) === 0 ||
-		((version.value.loaders?.length ?? 0) === 0 && project.value.project_type !== 'resourcepack') ||
-		(newFiles.value.length === 0 && (version.value.files?.length ?? 0) === 0 && !replaceFile.value),
-)
-
-const sortedDeps = computed(() => {
-	const order = ['required', 'optional', 'incompatible', 'embedded']
-	return [...(version.value.dependencies ?? [])].sort(
-		(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
+	return `Download ${project.value.title} ${
+		version.value.version_number
+	} on Modrinth. Supports ${(data as any).$formatVersion(version.value.game_versions)} ${(
+		version.value.loaders ?? []
 	)
+		.map((x: string) => x.charAt(0).toUpperCase() + x.slice(1))
+		.join(
+			' & ',
+		)}. Published on ${formatDate(version.value.date_published)}. ${version.value.downloads} downloads.`
 })
 
-const decoratedPrimaryFileUrl = computed(() =>
-	createProjectDownloadUrl(primaryFile.value?.url, { reason: cdnDownloadReason.value }),
-)
-
-function decorateDownloadUrl(url: string) {
-	return createProjectDownloadUrl(url, { reason: cdnDownloadReason.value })
-}
-
-function navigateToDependency(dependency: { link: string }) {
-	return router.push({
-		path: dependency.link,
-		query: { ...PROJECT_DEP_MARKER_QUERY },
-	})
-}
-
-const environment = computed(
-	() => ENVIRONMENTS_COPY[version.value.environment as keyof typeof ENVIRONMENTS_COPY],
-)
-
-// SEO
 useSeoMeta({
 	title,
 	description,
@@ -603,118 +572,66 @@ useSeoMeta({
 	ogDescription: description,
 })
 
-// Methods
+const editModal = useTemplateRef('editModal')
+const confirmModal = useTemplateRef('confirmModal')
+const packageModal = useTemplateRef('packageModal')
+
+const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
+const packageLoaderOptions = [
+	{ value: 'fabric', label: formatLoader(formatMessage, 'fabric') },
+	{ value: 'forge', label: formatLoader(formatMessage, 'forge') },
+	{ value: 'quilt', label: formatLoader(formatMessage, 'quilt') },
+	{ value: 'neoforge', label: formatLoader(formatMessage, 'neoforge') },
+]
+
+async function handleVersionSaved() {
+	await Promise.all([
+		invalidate(),
+		queryClient.invalidateQueries({ queryKey: ['project', project.value.id, 'version', 'v3'] }),
+		refetchVersion(),
+	])
+}
+
 function handleOpenEditVersionModal(versionId: string, projectId: string, stageId: string) {
 	if (!currentMember.value) return
-	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
+	editModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
 
-async function _onImageUpload(file: File) {
-	const response = await useImageUpload(file, { context: 'version' })
-
-	uploadedImageIds.value.push(response.id)
-	uploadedImageIds.value = uploadedImageIds.value.slice(-10)
-
-	return response.url
-}
-
-function getPreviousLink() {
-	if (router.options.history.state.back) {
-		if ((router.options.history.state.back as string).includes('/versions')) {
-			return router.options.history.state.back as string
-		}
-	}
-	return `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}/versions`
-}
-
-function getPreviousLabel() {
-	return router.options.history.state.back &&
-		(router.options.history.state.back as string).endsWith('/versions')
-		? 'Back to versions'
-		: 'All versions'
-}
-
-async function createVersionRaw(versionData: Record<string, any>) {
-	const formData = new FormData()
-
-	const fileParts = newFiles.value.map((f, idx) => `${f.name}-${idx}`)
-	if (replaceFile.value) {
-		fileParts.unshift(replaceFile.value.name.concat('-primary'))
-	}
-
-	if (project.value.project_type === 'resourcepack') {
-		versionData.loaders = ['minecraft']
-	}
-
-	const newVersion = {
-		project_id: versionData.project_id,
-		file_parts: fileParts,
-		version_number: versionData.version_number,
-		version_title: versionData.name || versionData.version_number,
-		version_body: versionData.changelog,
-		dependencies: versionData.dependencies,
-		game_versions: versionData.game_versions,
-		loaders: versionData.loaders,
-		release_channel: versionData.version_type,
-		featured: versionData.featured,
-		file_types: newFileTypes.value.reduce(
-			(acc, x, i) => ({
-				...acc,
-				[fileParts[replaceFile.value ? i + 1 : i]]: x ? x.value : null,
-			}),
-			{},
-		),
-	}
-
-	formData.append('data', JSON.stringify(newVersion))
-
-	if (replaceFile.value) {
-		formData.append(
-			replaceFile.value.name.concat('-primary'),
-			new Blob([replaceFile.value]),
-			replaceFile.value.name,
-		)
-	}
-
-	for (let i = 0; i < newFiles.value.length; i++) {
-		formData.append(
-			fileParts[replaceFile.value ? i + 1 : i],
-			new Blob([newFiles.value[i]]),
-			newFiles.value[i].name,
-		)
-	}
-
-	const responseData = (await useBaseFetch('version', {
-		method: 'POST',
-		body: formData,
-		headers: {
-			'Content-Disposition': formData as any,
-		},
-	})) as any
-
-	await resetProjectVersions()
-
-	await router.push(
-		`/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}/version/${responseData.id}`,
-	)
-}
+const deleteVersionMutation = useMutation({
+	mutationFn: () => client.labrinth.versions_v3.deleteVersion(version.value!.id),
+	onSuccess: async () => {
+		addNotification({
+			title: 'Version deleted',
+			text: 'The version has been successfully deleted.',
+			type: 'success',
+		})
+		await invalidate()
+		await router.replace(`/${project.value.project_type}/${project.value.id}/settings/versions`)
+	},
+	onError: (err: { data?: { description?: string } }) => {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
+	},
+})
 
 async function deleteVersion() {
 	startLoading()
-
-	await useBaseFetch(`version/${version.value.id}`, {
-		method: 'DELETE',
-	})
-
-	await resetProjectVersions()
-	await router.replace(`/${project.value.project_type}/${project.value.id}/versions`)
-	stopLoading()
+	try {
+		await deleteVersionMutation.mutateAsync()
+	} finally {
+		stopLoading()
+	}
 }
 
-async function createDataPackVersionHandler() {
-	shouldPreventActions.value = true
-	startLoading()
-	try {
+const createDataPackVersionMutation = useMutation({
+	mutationFn: async () => {
+		if (!version.value || !primaryFile.value) {
+			throw new Error('Version data is not available')
+		}
+
 		const blob = await createDataPackVersion(
 			project.value,
 			version.value,
@@ -724,46 +641,65 @@ async function createDataPackVersionHandler() {
 			packageLoaders.value,
 		)
 
-		newFiles.value = []
-		newFileTypes.value = []
-		replaceFile.value = new File(
-			[blob],
-			`${project.value.slug}-${version.value.version_number}.jar`,
-		)
+		const file = new File([blob], `${project.value.slug}-${version.value.version_number}.jar`)
 
-		await createVersionRaw({
+		const draftVersion: Labrinth.Versions.v3.DraftVersion = {
 			project_id: project.value.id,
-			author_id: currentMember.value?.user.id,
-			name: version.value.name,
+			name: version.value.name ?? version.value.version_number,
 			version_number: `${version.value.version_number}+mod`,
-			changelog: version.value.changelog,
+			changelog: version.value.changelog ?? '',
 			version_type: version.value.version_type,
-			dependencies: version.value.dependencies,
+			dependencies: version.value.dependencies ?? [],
 			game_versions: version.value.game_versions,
 			loaders: packageLoaders.value,
 			featured: version.value.featured,
-		})
+		}
 
-		modal_package_mod.value?.hide()
+		const uploadHandle = client.labrinth.versions_v3.createVersion(draftVersion, [{ file }], 'mod')
+		return uploadHandle.promise
+	},
+	onSuccess: async (newVersion) => {
+		packageModal.value?.hide()
 
 		addNotification({
 			title: 'Packaging Success',
 			text: 'Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.',
 			type: 'success',
 		})
-	} catch (err: any) {
+
+		await invalidate()
+		await router.push(
+			`/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}/version/${newVersion.id}`,
+		)
+	},
+	onError: (err: { data?: { description?: string } }) => {
 		addNotification({
 			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
+			text: err.data?.description ?? String(err),
 			type: 'error',
 		})
+	},
+})
+
+async function createDataPackVersionHandler() {
+	if (packageLoaders.value.length === 0) return
+
+	startLoading()
+	try {
+		await createDataPackVersionMutation.mutateAsync()
+	} finally {
+		stopLoading()
 	}
-	stopLoading()
-	shouldPreventActions.value = false
 }
 
-async function resetProjectVersions() {
-	await invalidate()
+const decoratedPrimaryFileUrl = computed(() => {
+	const url = primaryFile.value?.url
+	if (!url) return undefined
+	return createProjectDownloadUrl(url, { reason: cdnDownloadReason.value })
+})
+
+function decorateDownloadUrl(url: string) {
+	return createProjectDownloadUrl(url, { reason: cdnDownloadReason.value })
 }
 
 const messages = defineMessages({
@@ -856,6 +792,43 @@ const messages = defineMessages({
 		id: 'version.package-as-mod.mod-loaders.placeholder',
 		defaultMessage: 'Choose mod loaders...',
 	},
+	confirmTitle: {
+		id: 'version.confirm-delete.title',
+		defaultMessage: 'Are you sure you want to delete this version?',
+	},
+	confirmDescription: {
+		id: 'version.confirm-delete.description',
+		defaultMessage: 'This version will be permanently deleted. This action cannot be undone.',
+	},
+	proceedDeletion: {
+		id: 'version.confirm-delete.proceed',
+		defaultMessage: 'Delete version',
+	},
+	devInfo: {
+		id: 'version.section.content.dev-info',
+		defaultMessage: 'Developer information',
+	},
+	mavenDescription: {
+		id: 'version.section.content.dev-info.maven-description',
+		defaultMessage:
+			'Projects on Modrinth are automatically available through a Maven repository for use with JVM build tools such as <gradle-link>Gradle</gradle-link>.',
+	},
+	mavenNote: {
+		id: 'version.section.content.dev-info.maven-note',
+		defaultMessage: `Note: When available, you should use the creator's maven repo instead as it will have transitive dependency information that the Modrinth Maven API does not. You may also end up with duplicate dependencies if you use a mix of Modrinth and non-Modrinth Maven repositories for your dependencies, because the group identifier will be different when served through the Modrinth Maven API.`,
+	},
+	mavenCoordinates: {
+		id: 'version.section.content.dev-info.maven-coordinates',
+		defaultMessage: `Maven coordinates:`,
+	},
+	versionId: {
+		id: 'version.section.content.dev-info.version-id',
+		defaultMessage: `Version ID:`,
+	},
+	gradleSnippet: {
+		id: 'version.section.content.dev-info.gradle-snippet',
+		defaultMessage: `build.gradle:`,
+	},
 })
 
 const copyFileHash = async (
@@ -868,10 +841,10 @@ const copyFileHash = async (
 const dependencyVersionPrimaryFiles = computed(() => {
 	const versions = enrichment.value?.versions
 	const primaryFileMap: Record<string, Labrinth.Versions.v2.VersionFile> = {}
-	versions?.forEach((version) => {
-		const primaryFile = version.files.find((version) => version.primary) ?? version.files[0]
+	versions?.forEach((depVersion) => {
+		const depPrimaryFile = depVersion.files.find((file) => file.primary) ?? depVersion.files[0]
 
-		primaryFileMap[version.id] = primaryFile
+		primaryFileMap[depVersion.id] = depPrimaryFile
 	})
 	return primaryFileMap
 })
@@ -891,255 +864,32 @@ function createDependencyLink(context: {
 			})
 		: undefined
 }
+
+const coordinatesSnippet = computed(() => `maven.modrinth:${project.value.id}:${version.value?.id}`)
+const gradleSnippet = computed(
+	() => `repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        // forRepositories(fg.repository) // Uncomment when using ForgeGradle
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+// Standard Gradle dependency
+dependencies {
+    implementation "${coordinatesSnippet.value}"
+}
+
+// Legacy Loom dependency
+dependencies {
+    modImplementation "${coordinatesSnippet.value}"
+}`,
+)
 </script>
-
-<style lang="scss" scoped>
-.changelog-editor-spacing {
-	padding-block: var(--gap-md);
-}
-
-.version-page {
-	display: grid;
-
-	grid-template:
-		'title' auto
-		'changelog' auto
-		'dependencies' auto
-		'metadata' auto
-		'files' auto
-		/ 1fr;
-
-	@media (min-width: 1200px) {
-		grid-template:
-			'title title' auto
-			'changelog metadata' auto
-			'dependencies metadata' auto
-			'files metadata' auto
-			'dummy metadata' 1fr
-			/ 1fr 20rem;
-	}
-
-	column-gap: var(--spacing-card-md);
-
-	.version-page__title {
-		grid-area: title;
-
-		.version-header {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			gap: var(--spacing-card-md);
-
-			h2,
-			input[type='text'] {
-				margin: 0;
-				font-size: var(--font-size-2xl);
-				font-weight: bold;
-			}
-
-			input[type='text'] {
-				max-width: 100%;
-				min-width: 0;
-				flex-grow: 1;
-				width: 2rem;
-			}
-
-			.featured {
-				display: flex;
-				align-items: center;
-				gap: var(--spacing-card-xs);
-
-				svg {
-					height: 1.45rem;
-				}
-			}
-		}
-
-		.known-errors {
-			margin-bottom: 1rem;
-		}
-	}
-
-	h3 {
-		font-size: var(--font-size-lg);
-		margin: 0 0 0.5rem 0;
-	}
-
-	.version-page__changelog {
-		grid-area: changelog;
-		overflow-x: hidden;
-	}
-
-	.version-page__dependencies {
-		grid-area: dependencies;
-
-		.dependency {
-			align-items: center;
-			display: flex;
-			gap: var(--spacing-card-sm);
-			padding: var(--spacing-card-sm);
-
-			.info {
-				display: flex;
-				flex-direction: column;
-				gap: var(--spacing-card-xs);
-
-				.project-title {
-					font-weight: bold;
-				}
-
-				.dep-type {
-					color: var(--color-text-secondary);
-
-					&.incompatible {
-						color: var(--color-red);
-					}
-
-					&::first-letter {
-						text-transform: capitalize;
-					}
-				}
-			}
-
-			button {
-				margin-left: auto;
-			}
-		}
-
-		.add-dependency {
-			h4 {
-				margin-bottom: var(--spacing-card-sm);
-			}
-
-			.input-group {
-				&:not(:last-child) {
-					margin-bottom: var(--spacing-card-sm);
-				}
-
-				input {
-					flex-grow: 2;
-				}
-			}
-		}
-	}
-
-	.version-page__files {
-		grid-area: files;
-
-		.file {
-			--text-color: var(--color-button-text);
-			--background-color: var(--color-button-bg);
-
-			&.primary {
-				--background-color: var(--color-brand-highlight);
-				--text-color: var(--color-button-text-active);
-			}
-
-			display: flex;
-			align-items: center;
-
-			font-weight: 500;
-			color: var(--text-color);
-			background-color: var(--background-color);
-			padding: var(--spacing-card-sm) var(--spacing-card-bg);
-			border-radius: var(--size-rounded-sm);
-
-			svg {
-				min-width: 1.1rem;
-				min-height: 1.1rem;
-				margin-right: 0.5rem;
-			}
-
-			.filename {
-				word-wrap: anywhere;
-			}
-
-			.file-size {
-				margin-left: 1ch;
-				font-weight: 400;
-				white-space: nowrap;
-			}
-
-			.file-type {
-				margin-left: 1ch;
-				font-style: italic;
-				font-weight: 300;
-			}
-
-			.raised-button {
-				margin-left: auto;
-				background-color: var(--color-raised-bg);
-			}
-
-			&:not(:nth-child(2)) {
-				margin-top: 0.5rem;
-			}
-		}
-
-		.additional-files {
-			h4 {
-				margin-bottom: 0.5rem;
-			}
-
-			label {
-				margin-top: 0.5rem;
-			}
-		}
-	}
-}
-
-.version-page__metadata {
-	grid-area: metadata;
-
-	h4 {
-		margin: 1rem 0 0.25rem 0;
-	}
-
-	.maven-section {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-
-		button {
-			max-width: 100%;
-		}
-	}
-
-	.team-member {
-		align-items: center;
-		padding: 0.25rem 0.5rem;
-
-		.member-info {
-			overflow: hidden;
-			margin: auto 0 auto 0.75rem;
-
-			.name {
-				font-weight: bold;
-			}
-
-			p {
-				font-size: var(--font-size-sm);
-				margin: 0.2rem 0;
-			}
-		}
-	}
-}
-
-.separator {
-	margin: var(--spacing-card-sm) 0;
-}
-
-.modal-package-mod {
-	padding: var(--spacing-card-bg);
-	display: flex;
-	flex-direction: column;
-
-	.markdown-body {
-		margin-bottom: 1rem;
-	}
-
-	.package-loader-select {
-		max-width: 20rem;
-	}
-}
-</style>

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useFormatBytes } from '#ui/composables/format-bytes.ts'
 import { useFormatDateTime } from '#ui/composables/format-date-time.ts'
+import { useCompactNumber, useFormatNumber } from '#ui/composables/format-number.ts'
 import { useRelativeTime } from '#ui/composables/how-ago.ts'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n.ts'
 import { commonMessages, fileTypeMessages, projectCompatibilityMessages } from '#ui/utils/common-messages.ts'
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, FileIcon, SearchIcon } from '@modrinth/assets'
-import { renderHighlightedString } from '@modrinth/utils'
+import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
@@ -15,6 +16,7 @@ import Table from '../base/Table.vue'
 import TagItem from '../base/TagItem.vue'
 import TagTagItem from '../base/TagTagItem.vue'
 import EnvironmentTags from '../project/EnvironmentTags.vue'
+import VersionChannelTag from './VersionChannelTag.vue'
 import VersionDependencyItem from './VersionDependencyItem.vue'
 
 const { formatMessage } = useVIntl()
@@ -25,20 +27,19 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 const formatBytes = useFormatBytes()
+const formatNumber = useFormatNumber()
+const { formatCompactNumber } = useCompactNumber()
 
 const props = defineProps<{
 	version: Labrinth.Versions.v3.Version
 	enrichment?: Labrinth.Projects.v2.DependencyInfo
 	dependencyLinkCreator: (context: DependencyContext) => string | undefined
-	showDevInfo?: boolean
 }>()
 
 const versionNumber = computed(() => props.version.version_number)
 const versionSubtitle = computed(() => props.version.name)
 const publishDate = computed(() => formatRelativeTime(props.version.date_published))
 const publishDateTooltip = computed(() => formatDateTime(props.version.date_published))
-
-const releaseChannel = computed(() => RELEASE_CHANNELS[props.version.version_type])
 
 const isModpack = computed(() => props.version.loaders.includes('mrpack'))
 const platforms = computed(() => isModpack.value ? props.version.mrpack_loaders : props.version.loaders)
@@ -126,12 +127,6 @@ const supplementaryResources = computed(() =>
 	}))
 )
 
-const RELEASE_CHANNELS = {
-	release: commonMessages.release,
-	beta: commonMessages.beta,
-	alpha: commonMessages.alpha,
-}
-
 const messages = defineMessages({
 	compatibility: {
 		id: 'version.section.compatibility',
@@ -181,13 +176,12 @@ const messages = defineMessages({
 		id: 'version.section.content.search-placeholder',
 		defaultMessage: 'Search content...',
 	},
-	devInfo: {
-		id: 'version.section.content.dev-info',
-		defaultMessage: 'Developer information',
-	},
 })
 
 const contentSearchQuery = ref('')
+
+const formattedDownloads = computed(() => formatNumber(props.version.downloads))
+const compactDownloads = computed(() => formatCompactNumber(props.version.downloads))
 </script>
 <template>
 	<div class="flex flex-col gap-4">
@@ -196,12 +190,7 @@ const contentSearchQuery = ref('')
 				<div class="flex flex-wrap gap-2 items-center">
 					<h2 class="m-0 leading-tight font-semibold">{{ versionNumber }}</h2>
 					<div>
-						<TagItem
-							class="py-1.5"
-							:style="{ '--_bg-color': 'var(--color-green-bg)', '--_color': 'var(--color-green)' }"
-						>
-							{{ formatMessage(releaseChannel) }}
-						</TagItem>
+						<VersionChannelTag :channel="version.version_type" />
 					</div>
 				</div>
 				<div class="flex items-center gap-2 flex-col sm:flex-row">
@@ -210,7 +199,12 @@ const contentSearchQuery = ref('')
 					<span class="flex items-center gap-2 sm:content">
 						<span v-tooltip="publishDateTooltip">{{ publishDate }}</span>
 						<span class="bg-surface-5 size-1.5 rounded-full" />
-						<span class="flex items-center gap-1"><DownloadIcon class="size-5"/> {{ version.downloads }}</span>
+						<span v-tooltip="compactDownloads !== formattedDownloads ?
+							capitalizeString(
+								formatMessage(commonMessages.projectDownloads, {
+									count: props.version.downloads,
+								}),
+							) : undefined" class="flex items-center gap-1"><DownloadIcon class="size-5"/> {{ compactDownloads }}</span>
 					</span>
 				</div>
 			</div>

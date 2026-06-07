@@ -53,6 +53,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showViewProdRouteBanner: false,
 	showModeratorProjectMemberUi: false,
 	showModeratorPrivateMessageHighlight: true,
+	versionDevInfoCollapsed: true,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
