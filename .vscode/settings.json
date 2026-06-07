@@ -1,7 +1,12 @@
 {
 	"prettier.endOfLine": "lf",
 	"editor.formatOnSave": true,
-	"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+	"eslint.validate": [
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact"
+	],
 	"editor.detectIndentation": false,
 	"editor.insertSpaces": false,
 	"files.eol": "\n",
@@ -32,7 +37,6 @@
 	},
 	"css.lint.unknownAtRules": "ignore",
 	"scss.lint.unknownAtRules": "ignore",
-
 	"i18n-ally.localesPaths": [
 		"packages/ui/src/locales",
 		"apps/frontend/src/locales",
@@ -41,7 +45,6 @@
 	"i18n-ally.pathMatcher": "{locale}/index.{ext}",
 	"i18n-ally.keystyle": "flat",
 	"i18n-ally.sourceLanguage": "en-US",
-	"i18n-ally.displayLanguage": "en-US",
 	"i18n-ally.namespace": false,
 	"i18n-ally.includeSubfolders": true
 }
