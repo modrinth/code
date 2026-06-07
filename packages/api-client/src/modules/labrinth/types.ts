@@ -1336,12 +1336,12 @@ export namespace Labrinth {
 				| 'signature'
 				| 'unknown'
 
-			export interface VersionFileHash {
-				sha512: string
-				sha1: string
+			export type FileHashType = 'sha512' | 'sha1'
+			export type VersionFileHash = {
+				[key in FileHashType]: string
 			}
 
-			interface VersionFile {
+			export interface VersionFile {
 				hashes: VersionFileHash
 				url: string
 				filename: string

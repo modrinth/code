@@ -1,6 +1,10 @@
 <template>
-	<div v-if="version" class="version-page">
-		<CreateProjectVersionModal v-if="currentMember" ref="createProjectVersionModal" />
+	<div>
+		<CreateProjectVersionModal
+			v-if="currentMember"
+			ref="createProjectVersionModal"
+			@save="resetProjectVersions"
+		/>
 		<ConfirmModal
 			v-if="currentMember"
 			ref="modal_confirm"
@@ -10,20 +14,20 @@
 			proceed-label="Delete"
 			@proceed="deleteVersion()"
 		/>
-		<Modal v-if="auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
-			<div class="modal-package-mod universal-labels">
-				<div class="markdown-body">
-					<p>
-						Package your data pack as a mod. This will create a new version with support for the
-						selected mod loaders. You will be redirected to the new version and can edit it to your
-						liking.
-					</p>
-				</div>
-				<label for="package-mod-loaders">
-					<span class="label__title">Mod loaders</span>
-					<span class="label__description">
-						The mod loaders you would like to package your data pack for.
-					</span>
+		<NewModal
+			v-if="auth.user && currentMember"
+			ref="modal_package_mod"
+			:header="formatMessage(messages.packageDataPackHeader)"
+		>
+			<div class="flex max-w-[35rem] flex-col">
+				<p class="m-0 mb-4">
+					{{ formatMessage(messages.packageDataPackDescription) }}
+				</p>
+				<label for="package-mod-loaders" class="mb-2 flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(messages.modLoadersLabel)
+					}}</span>
+					<span>{{ formatMessage(messages.modLoadersDescription) }}</span>
 				</label>
 				<MultiSelect
 					id="package-mod-loaders"
@@ -31,438 +35,305 @@
 					class="package-loader-select"
 					:options="packageLoaderOptions"
 					:searchable="false"
-					placeholder="Choose loaders..."
-					force-direction="up"
+					:placeholder="formatMessage(messages.modLoadersPlaceholder)"
 				/>
-				<div class="button-group">
-					<ButtonStyled>
+				<div class="ml-auto mt-4 flex items-center gap-2">
+					<ButtonStyled type="outlined">
 						<button @click="modal_package_mod?.hide()">
 							<XIcon aria-hidden="true" />
-							Cancel
+							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button @click="createDataPackVersionHandler">
+						<button @click="createDataPackVersionHandler" :disabled="packageLoaders.length === 0">
+							{{ formatMessage(messages.packageDataPack) }}
 							<RightArrowIcon aria-hidden="true" />
-							Begin packaging data pack
 						</button>
 					</ButtonStyled>
 				</div>
 			</div>
-		</Modal>
-		<div class="version-page__title universal-card">
-			<Breadcrumbs
-				:current-title="version.name"
-				:link-stack="[
-					{
-						href: getPreviousLink(),
-						label: getPreviousLabel(),
-					},
-				]"
-			/>
-			<div class="version-header">
-				<template v-if="isEditing">
-					<StyledInput
-						v-model="version.name"
-						placeholder="Enter a version title..."
-						:maxlength="256"
-					/>
+		</NewModal>
+		<div>
+			<nuxt-link
+				class="mb-4 flex w-fit items-center gap-2 rounded-lg p-2 pl-0 text-link"
+				:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
+			>
+				<ChevronLeftIcon class="shrink-0" /> {{ formatMessage(messages.allVersions) }}
+			</nuxt-link>
+			<Admonition
+				type="circle-warning"
+				:header="formatMessage(messages.unknownEmbeddedContent)"
+				:body="formatMessage(messages.unknownEmbeddedContentDescription)"
+				class="mb-4"
+			>
+				<template #actions>
+					<div class="flex">
+						<ButtonStyled color="orange">
+							<nuxt-link
+								:to="`/${project.project_type}/${
+									project.slug ? project.slug : project.id
+								}/settings/permissions`"
+							>
+								{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
+								<RightArrowIcon />
+							</nuxt-link>
+						</ButtonStyled>
+					</div>
 				</template>
-				<h2 :class="{ 'sr-only': isEditing }">
-					{{ version.name }}
-				</h2>
-			</div>
-			<div v-if="fieldErrors && showKnownErrors" class="known-errors">
-				<ul>
-					<li v-if="version.version_number === ''">Your version must have a version number.</li>
-					<li v-if="version.game_versions.length === 0">
-						Your version must have the supported Minecraft versions selected.
-					</li>
-					<li v-if="newFiles.length === 0 && version.files.length === 0 && !replaceFile">
-						Your version must have a file uploaded.
-					</li>
-					<li v-if="version.loaders.length === 0 && project.project_type !== 'resourcepack'">
-						Your version must have the supported mod loaders selected.
-					</li>
-				</ul>
-			</div>
-			<div v-if="isCreating" class="input-group">
-				<ButtonStyled color="brand">
-					<button :disabled="shouldPreventActions" @click="createVersion">
-						<PlusIcon aria-hidden="true" />
-						Create
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<nuxt-link
-						v-if="auth.user"
-						:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
-					>
-						<XIcon aria-hidden="true" />
-						Cancel
-					</nuxt-link>
-				</ButtonStyled>
-			</div>
-			<div v-else-if="isEditing" class="input-group">
-				<ButtonStyled color="brand">
-					<button :disabled="shouldPreventActions" @click="saveEditedVersion">
-						<SaveIcon aria-hidden="true" />
-						Save
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-if="usesFeaturedVersions">
-					<button
-						v-tooltip="
-							`Featured versions are being phased out. If you're still using this for something in the API, seek an alternative soon.`
-						"
-						@click="version.featured = !version.featured"
-					>
-						<StarIcon aria-hidden="true" />
-						<template v-if="!version.featured"> Feature version (deprecated)</template>
-						<template v-else> Unfeature version (deprecated)</template>
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<nuxt-link
-						v-if="currentMember"
-						class="action"
-						:to="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`"
-					>
-						<XIcon aria-hidden="true" />
-						Discard changes
-					</nuxt-link>
-				</ButtonStyled>
-			</div>
-			<div v-else class="input-group mt-2">
-				<ButtonStyled v-if="primaryFile?.url" color="brand">
-					<a
-						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
-						:href="decoratedPrimaryFileUrl"
-						:download="primaryFile.filename"
-						@click="emit('onDownload')"
-					>
-						<DownloadIcon aria-hidden="true" />
-						Download
-					</a>
-				</ButtonStyled>
-				<ButtonStyled v-if="!auth.user">
-					<nuxt-link :to="signInRouteObj">
-						<ReportIcon aria-hidden="true" />
-						Report
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled v-else-if="!currentMember">
-					<button @click="() => reportVersion(version.id)">
-						<ReportIcon aria-hidden="true" />
-						Report
-					</button>
-				</ButtonStyled>
-
-				<template v-if="currentMember">
-					<ButtonStyled v-if="version.files_missing_attribution?.length > 0" color="orange">
-						<nuxt-link :to="`/project/${project.id}/settings/permissions`">
-							Resolve missing permissions
-							<RightArrowIcon aria-hidden="true" />
-						</nuxt-link>
+			</Admonition>
+			<VersionPage
+				v-if="version"
+				:version="version"
+				:enrichment="enrichment"
+				:dependency-link-creator="createDependencyLink"
+				class="mb-4"
+			>
+				<template #headerActions="{ primaryFile, promotedFiles }">
+					<ButtonStyled color="brand">
+						<a
+							v-tooltip="
+								primaryFile?.url
+									? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
+									: formatMessage(messages.noPrimaryFile)
+							"
+							:href="decoratedPrimaryFileUrl"
+							:download="primaryFile?.filename"
+							:disabled="primaryFile?.url === undefined"
+							@click="emit('onDownload')"
+						>
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadButton) }}
+						</a>
 					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="handleOpenEditVersionModal(version.id, project.id, 'metadata')">
-							<BoxIcon aria-hidden="true" />
-							Edit metadata
-						</button>
+					<ButtonStyled
+						v-for="file in promotedFiles.filter(
+							(x) =>
+								!!x &&
+								(x.file_type === 'required-resource-pack' ||
+									x.file_type === 'optional-resource-pack'),
+						)"
+						:key="`promoted-file-${file.hashes.sha1}`"
+						color="brand"
+						color-fill="text"
+					>
+						<a
+							v-tooltip="file.filename + ' (' + formatBytes(file.size) + ')'"
+							:href="
+								createProjectDownloadUrl(file.url, {
+									reason: 'dependency',
+								})
+							"
+							:download="primaryFile?.filename"
+							:disabled="primaryFile?.url === undefined"
+							@click="emit('onDownload')"
+						>
+							<DownloadIcon aria-hidden="true" />
+							<template v-if="file.file_type === 'required-resource-pack'">
+								{{ formatMessage(messages.requiredResourcePack) }}
+							</template>
+							<template v-else-if="file.file_type === 'optional-resource-pack'">
+								{{ formatMessage(messages.optionalResourcePack) }}
+							</template>
+						</a>
 					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-details')">
-							<InfoIcon aria-hidden="true" />
-							Edit details
-						</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="handleOpenEditVersionModal(version.id, project.id, 'add-files')">
-							<FileIcon aria-hidden="true" />
-							Edit files
-						</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button
+					<template v-if="currentMember">
+						<ButtonStyled
 							v-if="
 								version.loaders.some((x: string) => tags.loaderData.dataPackLoaders.includes(x))
 							"
-							@click="modal_package_mod?.show()"
 						>
-							<BoxIcon aria-hidden="true" />
-							Package as mod
+							<button @click="modal_package_mod?.show()">
+								<PackageClosedIcon aria-hidden="true" />
+								{{ formatMessage(messages.packageAsMod) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled>
+							<OverflowMenu
+								:dropdown-id="`${baseId}-edit-overflow`"
+								class="btn-dropdown-animation"
+								:options="[
+									{
+										id: 'edit-metadata',
+										action: () => handleOpenEditVersionModal(version!.id, project.id, 'metadata'),
+									},
+									{
+										id: 'edit-details',
+										action: () =>
+											handleOpenEditVersionModal(version!.id, project.id, 'add-details'),
+									},
+									{
+										id: 'edit-files',
+										action: () => handleOpenEditVersionModal(version!.id, project.id, 'add-files'),
+									},
+									{
+										id: 'delete',
+										color: 'red',
+										action: () => modal_confirm.show(),
+									},
+								]"
+							>
+								<SettingsIcon aria-hidden="true" /> {{ formatMessage(messages.edit) }}
+								<DropdownIcon class="h-5 w-5 text-secondary" />
+								<template #edit-metadata>
+									<BoxIcon aria-hidden="true" />
+									{{ formatMessage(messages.editMetadata) }}
+								</template>
+								<template #edit-details>
+									<InfoIcon aria-hidden="true" />
+									{{ formatMessage(messages.editDetails) }}
+								</template>
+								<template #edit-files>
+									<FileIcon aria-hidden="true" />
+									{{ formatMessage(messages.editFiles) }}
+								</template>
+								<template #delete>
+									<TrashIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.deleteLabel) }}
+								</template>
+							</OverflowMenu>
+						</ButtonStyled>
+					</template>
+					<ButtonStyled v-else color="red" color-fill="text">
+						<nuxt-link v-if="!auth.user" :to="signInRouteObj">
+							<ReportIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.reportButton) }}
+						</nuxt-link>
+						<button v-else @click="() => reportVersion(version!.id)">
+							<ReportIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.reportButton) }}
 						</button>
 					</ButtonStyled>
 				</template>
-			</div>
-		</div>
-		<div class="version-page__changelog universal-card">
-			<h3>Changelog</h3>
-			<div
-				class="markdown-body"
-				v-html="
-					version.changelog ? renderHighlightedString(version.changelog) : 'No changelog specified.'
-				"
-			/>
-		</div>
-		<div
-			v-if="sortedDeps.length > 0 || (isEditing && project.project_type !== 'modpack')"
-			class="version-page__dependencies universal-card"
-		>
-			<h3>Dependencies</h3>
-
-			<div v-if="dependenciesLoading"><SpinnerIcon /> Loading dependencies...</div>
-
-			<template v-if="!dependenciesLoading">
-				<div
-					v-for="(dependency, index) in sortedDeps.filter((x) => !x.file_name)"
-					:key="index"
-					class="dependency"
-					:class="{ 'button-transparent': !isEditing }"
-					@click="!isEditing ? navigateToDependency(dependency) : {}"
-				>
-					<Avatar
-						:src="dependency.project ? dependency.project.icon_url : null"
-						alt="dependency-icon"
-						size="sm"
-					/>
-					<nuxt-link
-						v-if="!isEditing"
-						:to="{ path: dependency.link, query: PROJECT_DEP_MARKER_QUERY }"
-						class="info"
-						@click.stop
-					>
-						<span class="project-title">
-							{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
-						</span>
-						<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
-							Version {{ dependency.version.version_number }} is
-							{{ dependency.dependency_type }}
-						</span>
-						<span v-else class="dep-type" :class="dependency.dependency_type">
-							{{ dependency.dependency_type }}
-						</span>
-					</nuxt-link>
-					<div v-else class="info">
-						<span class="project-title">
-							{{ dependency.project ? dependency.project.title : 'Unknown Project' }}
-						</span>
-						<span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
-							Version {{ dependency.version.version_number }} is
-							{{ dependency.dependency_type }}
-						</span>
-						<span v-else class="dep-type" :class="dependency.dependency_type">
-							{{ dependency.dependency_type }}
-						</span>
-					</div>
-					<ButtonStyled v-if="isEditing && project.project_type !== 'modpack'">
-						<button @click="version.dependencies.splice(index, 1)">
-							<TrashIcon aria-hidden="true" />
-							Remove
-						</button>
+				<template #supplementaryResourceActions="{ file }">
+					<ButtonStyled>
+						<a
+							:href="decorateDownloadUrl(file.url)"
+							:title="`Download ${file.filename}`"
+							:download="file.filename"
+							tabindex="0"
+						>
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadButton) }}
+						</a>
 					</ButtonStyled>
-				</div>
-
-				<div
-					v-for="(dependency, index) in sortedDeps.filter((x) => x.file_name)"
-					:key="index"
-					class="dependency"
-				>
-					<Avatar alt="dependency-icon" size="sm" />
-					<div class="info">
-						<span class="project-title">
-							{{ dependency.file_name }}
-						</span>
-						<span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
-					</div>
-				</div>
-			</template>
-		</div>
-		<div class="version-page__files universal-card">
-			<h3>Files</h3>
-			<div
-				v-for="file in version.files"
-				:key="file.hashes.sha1"
-				:class="{
-					file: true,
-					primary: primaryFile.hashes.sha1 === file.hashes.sha1,
-				}"
-			>
-				<FileIcon aria-hidden="true" />
-				<span class="filename">
-					<strong>{{ file.filename }}</strong>
-					<span class="file-size">({{ formatBytes(file.size) }})</span>
-					<span v-if="primaryFile.hashes.sha1 === file.hashes.sha1" class="file-type">
-						Primary
-					</span>
-					<span
-						v-else-if="file.file_type === 'required-resource-pack' && !isEditing"
-						class="file-type"
-					>
-						Required resource pack
-					</span>
-					<span
-						v-else-if="file.file_type === 'optional-resource-pack' && !isEditing"
-						class="file-type"
-					>
-						Optional resource pack
-					</span>
-				</span>
-				<ButtonStyled>
-					<a
-						:href="decorateDownloadUrl(file.url)"
-						class="raised-button"
-						:title="`Download ${file.filename}`"
-						:download="file.filename"
-						tabindex="0"
-					>
-						<DownloadIcon aria-hidden="true" />
-						Download
-					</a>
-				</ButtonStyled>
-			</div>
-		</div>
-		<div class="version-page__metadata">
-			<div class="universal-card full-width-inputs">
-				<h3>Metadata</h3>
-				<div>
-					<h4>Release channel</h4>
-					<Badge
-						v-if="version.version_type === 'release'"
-						class="value"
-						type="release"
-						color="green"
-					/>
-					<Badge
-						v-else-if="version.version_type === 'beta'"
-						class="value"
-						type="beta"
-						color="orange"
-					/>
-					<Badge
-						v-else-if="version.version_type === 'alpha'"
-						class="value"
-						type="alpha"
-						color="red"
-					/>
-				</div>
-				<div>
-					<h4>Version number</h4>
-					<span>{{ version.version_number }}</span>
-				</div>
-				<div v-if="project.project_type !== 'resourcepack'">
-					<h4>Loaders</h4>
-
-					<span v-if="noModpackLoader">No mod loader</span>
-					<Categories v-else :categories="version.loaders ?? []" :type="project.project_type" />
-				</div>
-				<div>
-					<h4>Game versions</h4>
-					<span>{{ formatVersionDisplay(version.game_versions) }}</span>
-				</div>
-				<div v-if="!isEditing && environment">
-					<h4>Environment</h4>
-					<div class="flex items-center gap-1.5">
-						<template v-if="(environment as any).icon">
-							<component :is="(environment as any).icon" />
-						</template>
-						<span>
-							{{ environment.title.defaultMessage }}
-						</span>
-					</div>
-				</div>
-				<div v-if="!isEditing">
-					<h4>Downloads</h4>
-					<span>{{ version.downloads }}</span>
-				</div>
-				<div v-if="!isEditing">
-					<h4>Publication date</h4>
-					<span>
-						{{ formatDateTime(version.date_published) }}
-					</span>
-				</div>
-				<div v-if="!isEditing && version.author">
-					<h4>Publisher</h4>
-					<div
-						class="team-member columns button-transparent"
-						@click="router.push('/user/' + version.author.user.username)"
-					>
-						<Avatar
-							:src="version.author.avatar_url"
-							:alt="version.author.user.username"
-							size="sm"
-							circle
-						/>
-
-						<div class="member-info">
-							<nuxt-link :to="'/user/' + version.author.user.username" class="name">
-								<p>
-									{{ version.author.name }}
-								</p>
-							</nuxt-link>
-							<p v-if="version.author.role" class="role">
-								{{ version.author.role }}
-							</p>
-							<p v-else-if="version.author_id === 'GVFjtWTf'" class="role">Archivist</p>
-						</div>
-					</div>
-				</div>
-				<div v-if="!isEditing">
-					<h4>Version ID</h4>
-					<CopyCode :text="version.id" />
-				</div>
-				<div v-if="!isEditing && flags.developerMode">
-					<h4>Maven coordinates</h4>
-					<div class="maven-section">
-						<CopyCode :text="`maven.modrinth:${project.id}:${version.id}`" />
-					</div>
-				</div>
-			</div>
+					<ButtonStyled type="outlined" circular>
+						<OverflowMenu
+							:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+							:options="[
+								{
+									id: 'copy-sha1',
+									action: () => copyFileHash(file, 'sha1'),
+								},
+								{
+									id: 'copy-sha512',
+									action: () => copyFileHash(file, 'sha512'),
+								},
+							]"
+							:dropdown-id="`${baseId}-supplementary-resource-actions`"
+						>
+							<MoreVerticalIcon aria-hidden="true" />
+							<template #copy-sha1>
+								<CopyIcon aria-hidden="true" />
+								{{ formatMessage(messages.copySha1) }}
+							</template>
+							<template #copy-sha512>
+								<CopyIcon aria-hidden="true" />
+								{{ formatMessage(messages.copySha512) }}
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
+				</template>
+				<template #dependencyActions="{ dependency }">
+					<ButtonStyled circular>
+						<nuxt-link
+							v-if="createDependencyLink(dependency)"
+							v-tooltip="
+								formatMessage(dependency.version ? messages.viewVersion : messages.viewProject)
+							"
+							:to="createDependencyLink(dependency)"
+							target="_blank"
+						>
+							<ExternalIcon />
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled circular color="brand" color-fill="text">
+						<a
+							v-if="dependency.version && dependency.dependency.dependency_type !== 'incompatible'"
+							v-tooltip="
+								dependencyVersionPrimaryFiles[dependency.version.id]
+									? dependencyVersionPrimaryFiles[dependency.version.id].filename +
+										' (' +
+										formatBytes(dependencyVersionPrimaryFiles[dependency.version.id].size) +
+										')'
+									: formatMessage(messages.noPrimaryFile)
+							"
+							:href="
+								createProjectDownloadUrl(dependencyVersionPrimaryFiles[dependency.version.id].url, {
+									reason: 'dependency',
+								})
+							"
+							:download="dependencyVersionPrimaryFiles[dependency.version.id].filename"
+							:disabled="dependencyVersionPrimaryFiles[dependency.version.id].url === undefined"
+						>
+							<DownloadIcon />
+						</a>
+						<a
+							v-else-if="dependency.project"
+							v-tooltip="formatMessage(messages.downloadProject)"
+							:href="`/project/${dependency.project.id}#download`"
+							target="_blank"
+						>
+							<DownloadIcon />
+						</a>
+					</ButtonStyled>
+				</template>
+			</VersionPage>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
+	ChevronLeftIcon,
+	CopyIcon,
 	DownloadIcon,
+	DropdownIcon,
+	ExternalIcon,
 	FileIcon,
 	InfoIcon,
-	PlusIcon,
+	MoreVerticalIcon,
+	PackageClosedIcon,
 	ReportIcon,
 	RightArrowIcon,
-	SaveIcon,
-	SpinnerIcon,
-	StarIcon,
+	SettingsIcon,
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Avatar,
-	Badge,
+	Admonition,
 	ButtonStyled,
-	Categories,
+	commonMessages,
+	commonProjectSettingsMessages,
 	ConfirmModal,
-	CopyCode,
+	defineMessages,
 	ENVIRONMENTS_COPY,
+	formatLoader,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MultiSelect,
+	NewModal,
+	OverflowMenu,
 	PROJECT_DEP_MARKER_QUERY,
-	StyledInput,
 	useFormatBytes,
 	useFormatDateTime,
+	useVIntl,
+	VersionPage,
 } from '@modrinth/ui'
-import { renderHighlightedString } from '@modrinth/utils'
 
-import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import Modal from '~/components/ui/Modal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { useImageUpload } from '~/composables/image-upload.ts'
-import { inferVersionInfo } from '~/helpers/infer'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 const emit = defineEmits<{
@@ -485,6 +356,7 @@ const formatDateTime = useFormatDateTime({
 })
 const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 const formatBytes = useFormatBytes()
+const { formatMessage } = useVIntl()
 
 // Helper for accessing nuxt app $formatVersion
 const formatVersionDisplay = (versions: string[]) => (data as any).$formatVersion(versions)
@@ -503,6 +375,8 @@ const {
 	cdnDownloadReason,
 } = injectProjectPageContext()
 
+const baseId = useId()
+
 // Load versions and dependencies in parallel
 await Promise.all([loadVersions(), loadDependencies()])
 
@@ -511,24 +385,15 @@ const createProjectVersionModal = useTemplateRef('createProjectVersionModal')
 const modal_confirm = useTemplateRef('modal_confirm')
 const modal_package_mod = useTemplateRef('modal_package_mod')
 
-// Initial mode calculation
-const path = route.name?.toString().split('-') ?? []
-const initialMode = path[path.length - 1]
-
 // Reactive state from data()
-const _dependencyAddMode = ref('project')
-const _newDependencyType = ref('required')
-const newDependencyId = ref('')
-const _showSnapshots = ref(false)
 const newFiles = ref<File[]>([])
-const deleteFiles = ref<string[]>([])
 const newFileTypes = ref<Array<{ display: string; value: string } | null>>([])
 const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
 const packageLoaderOptions = [
-	{ value: 'fabric', label: 'Fabric' },
-	{ value: 'forge', label: 'Forge' },
-	{ value: 'quilt', label: 'Quilt' },
-	{ value: 'neoforge', label: 'Neoforge' },
+	{ value: 'fabric', label: formatLoader(formatMessage, 'fabric') },
+	{ value: 'forge', label: formatLoader(formatMessage, 'forge') },
+	{ value: 'quilt', label: formatLoader(formatMessage, 'quilt') },
+	{ value: 'neoforge', label: formatLoader(formatMessage, 'neoforge') },
 ]
 const showKnownErrors = ref(false)
 const shouldPreventActions = ref(false)
@@ -552,60 +417,14 @@ const fileTypes = ref([
 ])
 
 // Mutable state initialized during setup
-const isCreating = ref(false)
-const isEditing = ref(false)
-const version = ref<Record<string, any>>({})
+const version = ref<Labrinth.Versions.v3.Version>()
+const enrichment = ref<Labrinth.Projects.v2.DependencyInfo>()
 const primaryFile = ref<Record<string, any>>({})
 const alternateFile = ref<Record<string, any> | undefined>(undefined)
 const replaceFile = ref<File | null>(null)
 const oldFileTypes = ref<Array<{ display: string; value: string } | null>>([])
 
-// Initialize version data
-if (initialMode === 'edit') {
-	isEditing.value = true
-}
-
-if (route.params.version === 'create') {
-	isCreating.value = true
-	isEditing.value = true
-
-	version.value = {
-		id: 'none',
-		project_id: project.value.id,
-		author_id: currentMember.value?.user.id,
-		name: '',
-		version_number: '',
-		changelog: '',
-		date_published: Date.now(),
-		downloads: 0,
-		version_type: 'release',
-		files: [],
-		dependencies: [],
-		game_versions: [],
-		loaders: [],
-		featured: false,
-	}
-
-	// For navigation from versions page / upload file prompt
-	if (import.meta.client && history.state && history.state.newPrimaryFile) {
-		replaceFile.value = history.state.newPrimaryFile
-
-		try {
-			const inferredData = await inferVersionInfo(
-				replaceFile.value!,
-				project.value as any,
-				tags.value.gameVersions,
-			)
-
-			version.value = {
-				...version.value,
-				...inferredData,
-			}
-		} catch (err) {
-			console.error('Error parsing version file data', err)
-		}
-	}
-} else if (route.params.version === 'latest') {
+if (route.params.version === 'latest') {
 	let versionList = contextVersions.value ?? []
 	if (route.query.loader) {
 		versionList = versionList.filter((x: any) => x.loaders.includes(route.query.loader))
@@ -690,23 +509,10 @@ watch(
 	() => {
 		const deps = contextDependencies.value ?? { projects: [], versions: [] }
 
-		for (const dependency of version.value.dependencies ?? []) {
-			dependency.version = deps.versions.find((x: any) => x.id === dependency.version_id)
-
-			if (dependency.version) {
-				dependency.project = deps.projects.find((x: any) => x.id === dependency.version.project_id)
-			}
-
-			if (!dependency.project) {
-				dependency.project = deps.projects.find((x: any) => x.id === dependency.project_id)
-			}
-
-			dependency.link = dependency.project
-				? `/${dependency.project.project_type}/${dependency.project.slug ?? dependency.project.id}${
-						dependency.version ? `/version/${encodeURI(dependency.version.version_number)}` : ''
-					}`
-				: ''
+		if (contextDependencies.value) {
+			enrichment.value = contextDependencies.value
 		}
+
 		dependenciesMetaLoading.value = false
 	},
 	{ deep: true, immediate: true },
@@ -717,9 +523,7 @@ oldFileTypes.value = (version.value.files ?? []).map(
 )
 
 // Computed properties
-const title = computed(
-	() => `${isCreating.value ? 'Create Version' : version.value.name} - ${project.value.title}`,
-)
+const title = computed(() => `${version.value.name} - ${project.value.title}`)
 
 const modpackLoaders = computed<string[]>(() => {
 	if (project.value.project_type !== 'modpack') {
@@ -799,16 +603,6 @@ useSeoMeta({
 	ogDescription: description,
 })
 
-// Watch route changes
-watch(
-	() => route.path,
-	() => {
-		const routePath = route.name?.toString().split('-') ?? []
-		const mode = routePath[routePath.length - 1]
-		isEditing.value = mode === 'edit' || route.params.version === 'create'
-	},
-)
-
 // Methods
 function handleOpenEditVersionModal(versionId: string, projectId: string, stageId: string) {
 	if (!currentMember.value) return
@@ -838,185 +632,6 @@ function getPreviousLabel() {
 		(router.options.history.state.back as string).endsWith('/versions')
 		? 'Back to versions'
 		: 'All versions'
-}
-
-async function _addDependency(
-	dependencyAddModeParam: string,
-	newDependencyIdParam: string,
-	newDependencyTypeParam: string,
-	hideErrors?: boolean,
-) {
-	try {
-		if (dependencyAddModeParam === 'project') {
-			const project = (await useBaseFetch(`project/${newDependencyIdParam}`)) as any
-
-			if (version.value.dependencies.some((dep: any) => project.id === dep.project_id)) {
-				addNotification({
-					title: 'Dependency already added',
-					text: 'You cannot add the same dependency twice.',
-					type: 'error',
-				})
-			} else {
-				version.value.dependencies.push({
-					project,
-					project_id: project.id,
-					dependency_type: newDependencyTypeParam,
-					link: `/${project.project_type}/${project.slug ?? project.id}`,
-				})
-			}
-		} else if (dependencyAddModeParam === 'version') {
-			const versionData = (await useBaseFetch(`version/${newDependencyIdParam}`)) as any
-			const project = (await useBaseFetch(`project/${versionData.project_id}`)) as any
-
-			if (version.value.dependencies.some((dep: any) => versionData.id === dep.version_id)) {
-				addNotification({
-					title: 'Dependency already added',
-					text: 'You cannot add the same dependency twice.',
-					type: 'error',
-				})
-			} else {
-				version.value.dependencies.push({
-					version: versionData,
-					project,
-					version_id: versionData.id,
-					project_id: project.id,
-					dependency_type: newDependencyTypeParam,
-					link: `/${project.project_type}/${project.slug ?? project.id}/version/${encodeURI(
-						versionData.version_number,
-					)}`,
-				})
-			}
-		}
-
-		newDependencyId.value = ''
-	} catch {
-		if (!hideErrors) {
-			addNotification({
-				title: 'Invalid Dependency',
-				text: 'The specified dependency could not be found',
-				type: 'error',
-			})
-		}
-	}
-}
-
-async function saveEditedVersion() {
-	startLoading()
-
-	if (fieldErrors.value) {
-		showKnownErrors.value = true
-		stopLoading()
-		return
-	}
-
-	try {
-		if (newFiles.value.length > 0) {
-			const formData = new FormData()
-			const fileParts = newFiles.value.map((f, idx) => `${f.name}-${idx}`)
-
-			formData.append(
-				'data',
-				JSON.stringify({
-					file_types: newFileTypes.value.reduce(
-						(acc, x, i) => ({
-							...acc,
-							[fileParts[i]]: x ? x.value : null,
-						}),
-						{},
-					),
-				}),
-			)
-
-			for (let i = 0; i < newFiles.value.length; i++) {
-				formData.append(fileParts[i], new Blob([newFiles.value[i]]), newFiles.value[i].name)
-			}
-
-			await useBaseFetch(`version/${version.value.id}/file`, {
-				method: 'POST',
-				body: formData,
-				headers: {
-					'Content-Disposition': formData as any,
-				},
-			})
-		}
-
-		const body: Record<string, any> = {
-			name: version.value.name || version.value.version_number,
-			version_number: version.value.version_number,
-			changelog: version.value.changelog,
-			version_type: version.value.version_type,
-			dependencies: version.value.dependencies,
-			game_versions: version.value.game_versions,
-			loaders: version.value.loaders,
-			primary_file: ['sha1', primaryFile.value.hashes.sha1],
-			featured: version.value.featured,
-			file_types: oldFileTypes.value.map((x, i) => {
-				return {
-					algorithm: 'sha1',
-					hash: version.value.files[i].hashes.sha1,
-					file_type: x ? x.value : null,
-				}
-			}),
-		}
-
-		if (project.value.project_type === 'modpack') {
-			delete body.dependencies
-		}
-
-		await useBaseFetch(`version/${version.value.id}`, {
-			method: 'PATCH',
-			body,
-		})
-
-		for (const hash of deleteFiles.value) {
-			await useBaseFetch(`version_file/${hash}?version_id=${version.value.id}`, {
-				method: 'DELETE',
-			})
-		}
-
-		await resetProjectVersions()
-
-		await router.replace(
-			`/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}/version/${encodeURI(
-				((contextVersions.value ?? []) as any[]).find((x: any) => x.id === version.value.id)
-					?.displayUrlEnding ?? version.value.id,
-			)}`,
-		)
-	} catch (err: any) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}
-	stopLoading()
-}
-
-async function createVersion() {
-	shouldPreventActions.value = true
-	startLoading()
-
-	if (fieldErrors.value) {
-		showKnownErrors.value = true
-		shouldPreventActions.value = false
-		stopLoading()
-		return
-	}
-
-	try {
-		await createVersionRaw(version.value)
-	} catch (err: any) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}
-
-	stopLoading()
-	shouldPreventActions.value = false
 }
 
 async function createVersionRaw(versionData: Record<string, any>) {
@@ -1149,6 +764,132 @@ async function createDataPackVersionHandler() {
 
 async function resetProjectVersions() {
 	await invalidate()
+}
+
+const messages = defineMessages({
+	noPrimaryFile: {
+		id: 'version.download.no-primary-file',
+		defaultMessage: 'Error: No primary file found',
+	},
+	edit: {
+		id: 'version.edit.button',
+		defaultMessage: 'Edit',
+	},
+	editMetadata: {
+		id: 'version.edit.metadata',
+		defaultMessage: 'Edit metadata',
+	},
+	editDetails: {
+		id: 'version.edit.details',
+		defaultMessage: 'Edit details',
+	},
+	editFiles: {
+		id: 'version.edit.files',
+		defaultMessage: 'Edit files',
+	},
+	packageAsMod: {
+		id: 'version.package-as-mod.button',
+		defaultMessage: 'Package as mod',
+	},
+	copySha1: {
+		id: 'version.supplementary-resources.copy-hash-sha1',
+		defaultMessage: 'Copy SHA-1',
+	},
+	copySha512: {
+		id: 'version.supplementary-resources.copy-hash-sha512',
+		defaultMessage: 'Copy SHA-512',
+	},
+	allVersions: {
+		id: 'version.all-versions',
+		defaultMessage: 'All versions',
+	},
+	unknownEmbeddedContent: {
+		id: 'version.unknown-embedded-content.title',
+		defaultMessage: 'Withheld due to unknown embedded content',
+	},
+	unknownEmbeddedContentDescription: {
+		id: 'version.unknown-embedded-content.description',
+		defaultMessage: `This version is currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included.`,
+	},
+	viewProject: {
+		id: 'version.dependency.view-project',
+		defaultMessage: `View project`,
+	},
+	viewVersion: {
+		id: 'version.dependency.view-version',
+		defaultMessage: `View version`,
+	},
+	downloadProject: {
+		id: 'version.download.download-dependency',
+		defaultMessage: 'Download dependency',
+	},
+	requiredResourcePack: {
+		id: 'version.download.required-resource-pack',
+		defaultMessage: 'Required resource pack',
+	},
+	optionalResourcePack: {
+		id: 'version.download.optional-resource-pack',
+		defaultMessage: 'Optional resource pack',
+	},
+	packageDataPack: {
+		id: 'version.package-as-mod.submit-button',
+		defaultMessage: 'Package data pack',
+	},
+	packageDataPackHeader: {
+		id: 'version.package-as-mod.header',
+		defaultMessage: 'Packaging data pack as a mod',
+	},
+	packageDataPackDescription: {
+		id: 'version.package-as-mod.description',
+		defaultMessage:
+			'This will create a new version with support for the selected mod loaders. You will be redirected to the new version and can edit it to your liking.',
+	},
+	modLoadersLabel: {
+		id: 'version.package-as-mod.mod-loaders',
+		defaultMessage: 'Mod loaders',
+	},
+	modLoadersDescription: {
+		id: 'version.package-as-mod.mod-loaders.description',
+		defaultMessage: 'The mod loaders you would like to package your data pack for.',
+	},
+	modLoadersPlaceholder: {
+		id: 'version.package-as-mod.mod-loaders.placeholder',
+		defaultMessage: 'Choose mod loaders...',
+	},
+})
+
+const copyFileHash = async (
+	file: Labrinth.Versions.v3.VersionFile,
+	method: Labrinth.Versions.v3.FileHashType,
+) => {
+	await navigator.clipboard.writeText(file.hashes[method])
+}
+
+const dependencyVersionPrimaryFiles = computed(() => {
+	const versions = enrichment.value?.versions
+	const primaryFileMap: Record<string, Labrinth.Versions.v2.VersionFile> = {}
+	versions?.forEach((version) => {
+		const primaryFile = version.files.find((version) => version.primary) ?? version.files[0]
+
+		primaryFileMap[version.id] = primaryFile
+	})
+	return primaryFileMap
+})
+
+function createDependencyLink(context: {
+	project?: Labrinth.Projects.v2.Project
+	version?: Labrinth.Versions.v2.Version
+}) {
+	const baseUrl = context.version
+		? `/project/${context.version.project_id}/version/${context.version.id}`
+		: context.project
+			? `/project/${context.project.id}`
+			: undefined
+	return baseUrl
+		? createProjectDownloadUrl(baseUrl, {
+				reason: 'dependency',
+			})
+		: undefined
 }
 </script>
 

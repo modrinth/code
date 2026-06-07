@@ -16,7 +16,7 @@
 		/>
 		<Admonition
 			v-if="withheldVersions.length > 0"
-			type="warning"
+			type="circle-warning"
 			class="mb-4"
 			:header="
 				formatMessage(messages.withheldVersionsWarningTitle, {
@@ -41,7 +41,8 @@
 								project.slug ? project.slug : project.id
 							}/settings/permissions`"
 						>
-							{{ formatMessage(messages.withheldVersionsWarningResolve) }} <RightArrowIcon />
+							{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
+							<RightArrowIcon />
 						</nuxt-link>
 					</ButtonStyled>
 				</div>
@@ -333,6 +334,7 @@ import {
 import {
 	Admonition,
 	ButtonStyled,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
@@ -469,10 +471,6 @@ const messages = defineMessages({
 		id: 'project.versions.withheld-versions-warning.description',
 		defaultMessage:
 			'{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}.',
-	},
-	withheldVersionsWarningResolve: {
-		id: 'project.versions.withheld-versions-warning.resolve-button',
-		defaultMessage: 'Resolve',
 	},
 })
 </script>
