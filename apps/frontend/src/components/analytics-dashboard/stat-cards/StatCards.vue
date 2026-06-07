@@ -26,6 +26,7 @@
 				:key="card.key"
 				:label="card.label"
 				:stat-label="card.statLabel"
+				:stat-tooltip="card.statTooltip"
 				:vs-prev-period-percent="card.vsPrevPeriodPercent"
 				:icon="card.icon"
 				:active="activeStat === card.key"
@@ -47,6 +48,7 @@ import {
 } from '~/providers/analytics/analytics'
 
 import { analyticsStatCardMessages, formatAnalyticsStatLabel } from '../analytics-messages.ts'
+import { formatAnalyticsTableFullPlaytime } from '../analytics-table/analytics-table-formatting.ts'
 import StatCard from './StatCard.vue'
 
 const MONETIZATION_BANNER_DISMISSED_KEY = 'analytics-monetization-banner-dismissed'
@@ -77,6 +79,30 @@ const compactNumberFormatter = computed(
 		}),
 )
 
+const underDollarRevenueFormatter = computed(
+	() =>
+		new Intl.NumberFormat(undefined, {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}),
+)
+
+const preciseRevenueFormatter = computed(
+	() =>
+		new Intl.NumberFormat(undefined, {
+			minimumFractionDigits: 5,
+			maximumFractionDigits: 5,
+		}),
+)
+
+const tooltipRevenueFormatter = computed(
+	() =>
+		new Intl.NumberFormat(undefined, {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}),
+)
+
 function formatStatNumber(value: number): string {
 	const rounded = Math.round(value)
 
@@ -85,6 +111,37 @@ function formatStatNumber(value: number): string {
 	}
 
 	return formatNumber(rounded)
+}
+
+function formatFullStatNumber(value: number): string {
+	return formatNumber(Math.round(value))
+}
+
+function formatRevenueNumber(value: number): string {
+	if (Math.abs(value) > 0 && Math.abs(value) < 1) {
+		return underDollarRevenueFormatter.value.format(value)
+	}
+
+	return formatStatNumber(value)
+}
+
+function formatRevenueValue(value: number): string {
+	return formatMessage(analyticsStatCardMessages.revenueValue, {
+		value: formatRevenueNumber(value),
+	})
+}
+
+function formatPreciseRevenueValue(value: number): string {
+	return formatMessage(analyticsStatCardMessages.revenueValue, {
+		value:
+			Math.abs(value) < 1
+				? preciseRevenueFormatter.value.format(value)
+				: tooltipRevenueFormatter.value.format(value),
+	})
+}
+
+function formatPlaytimeTooltip(value: number): string {
+	return formatAnalyticsTableFullPlaytime(value, formatMessage)
 }
 
 function formatPercent(value: number): string {
@@ -105,7 +162,7 @@ function formatSignedStatNumber(value: number): string {
 function formatSignedRevenue(value: number): string {
 	const signPrefix = value > 0 ? '+' : value < 0 ? '-' : ''
 	return `${signPrefix}${formatMessage(analyticsStatCardMessages.revenueValue, {
-		value: formatStatNumber(Math.abs(value)),
+		value: formatRevenueNumber(Math.abs(value)),
 	})}`
 }
 
@@ -169,6 +226,7 @@ const statCards = computed<
 		key: AnalyticsDashboardStat
 		label: string
 		statLabel: string
+		statTooltip?: string
 		vsPrevPeriodPercent: string | null
 		icon: string
 		disabled: boolean
@@ -178,6 +236,7 @@ const statCards = computed<
 		key: 'views',
 		label: formatAnalyticsStatLabel('views', formatMessage),
 		statLabel: formatStatNumber(currentTotals.value.views),
+		statTooltip: formatFullStatNumber(currentTotals.value.views),
 		vsPrevPeriodPercent: formatPreviousPeriodComparison(
 			'views',
 			percentChanges.value.views,
@@ -191,6 +250,7 @@ const statCards = computed<
 		key: 'downloads',
 		label: formatAnalyticsStatLabel('downloads', formatMessage),
 		statLabel: formatStatNumber(currentTotals.value.downloads),
+		statTooltip: formatFullStatNumber(currentTotals.value.downloads),
 		vsPrevPeriodPercent: formatPreviousPeriodComparison(
 			'downloads',
 			percentChanges.value.downloads,
@@ -203,9 +263,8 @@ const statCards = computed<
 	{
 		key: 'revenue',
 		label: formatAnalyticsStatLabel('revenue', formatMessage),
-		statLabel: formatMessage(analyticsStatCardMessages.revenueValue, {
-			value: formatStatNumber(currentTotals.value.revenue),
-		}),
+		statLabel: formatRevenueValue(currentTotals.value.revenue),
+		statTooltip: formatPreciseRevenueValue(currentTotals.value.revenue),
 		vsPrevPeriodPercent: formatPreviousPeriodComparison(
 			'revenue',
 			percentChanges.value.revenue,
@@ -221,6 +280,7 @@ const statCards = computed<
 		statLabel: formatMessage(analyticsStatCardMessages.playtimeHours, {
 			hours: formatStatNumber(currentTotals.value.playtime / 3600),
 		}),
+		statTooltip: formatPlaytimeTooltip(currentTotals.value.playtime),
 		vsPrevPeriodPercent: formatPreviousPeriodComparison(
 			'playtime',
 			percentChanges.value.playtime,
