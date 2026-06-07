@@ -1,6 +1,9 @@
 use crate::database;
 use crate::database::PgPool;
+use crate::database::models::ids::DBUserId;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::redis::RedisPool;
+use crate::models::notifications::NotificationBody;
 use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
@@ -34,6 +37,8 @@ pub enum BackgroundTask {
     /// Attempts to ping Minecraft Java servers as if we were a client, to
     /// collect info on if they're online, game version, description, etc.
     PingMinecraftJavaServers,
+    /// Queues Discord Creator Club role claim emails for newly eligible users.
+    DiscordRoleEmailCampaign,
 }
 
 impl BackgroundTask {
@@ -89,6 +94,9 @@ impl BackgroundTask {
             }
             PingMinecraftJavaServers => {
                 ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
+            }
+            DiscordRoleEmailCampaign => {
+                discord_role_email_campaign(pool, redis_pool).await
             }
         }
     }
@@ -205,6 +213,83 @@ pub async fn payouts(
         .wrap_err("removing payouts for refunded charges failed")?;
 
     info!("Done running payouts");
+    Ok(())
+}
+
+pub async fn discord_role_email_campaign(
+    pool: PgPool,
+    redis_pool: RedisPool,
+) -> eyre::Result<()> {
+    info!("Started indexing Discord role email campaign");
+
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_err("failed to begin Discord role email campaign transaction")?;
+
+    let lock_acquired = sqlx::query_scalar::<_, bool>(
+        "SELECT pg_try_advisory_xact_lock(hashtextextended('discord_role_email_campaign', 0))",
+    )
+    .fetch_one(&mut txn)
+    .await
+    .wrap_err("failed to acquire Discord role email campaign lock")?;
+
+    if !lock_acquired {
+        info!("Discord role email campaign is already running");
+        return Ok(());
+    }
+
+    let user_ids = sqlx::query_scalar::<_, i64>(
+        r#"
+        WITH
+          user_project_downloads AS (
+            SELECT
+              tm.user_id,
+              SUM(m.downloads)::BIGINT total_downloads
+            FROM team_members tm
+            INNER JOIN mods m ON m.team_id = tm.team_id
+            WHERE tm.accepted = TRUE
+            GROUP BY tm.user_id
+          )
+        SELECT u.id
+        FROM users u
+        INNER JOIN user_project_downloads upd ON upd.user_id = u.id
+        WHERE u.email IS NOT NULL
+          AND u.email_verified = TRUE
+          AND upd.total_downloads > 20000
+          AND NOT EXISTS (
+            SELECT 1
+            FROM notifications n
+            WHERE n.user_id = u.id
+              AND n.body ->> 'type' = 'discord_role_creator_club'
+          )
+        ORDER BY upd.total_downloads DESC, u.id
+        LIMIT 1000
+        "#,
+    )
+    .fetch_all(&mut txn)
+    .await
+    .wrap_err("failed to fetch Discord role email campaign recipients")?
+    .into_iter()
+    .map(DBUserId)
+    .collect::<Vec<_>>();
+
+    let count = user_ids.len();
+
+    if !user_ids.is_empty() {
+        NotificationBuilder {
+            body: NotificationBody::DiscordRoleCreatorClub,
+        }
+        .insert_many(user_ids, &mut txn, &redis_pool)
+        .await
+        .wrap_err("failed to queue Discord role email notifications")?;
+    }
+
+    txn.commit()
+        .await
+        .wrap_err("failed to commit Discord role email campaign transaction")?;
+
+    info!(count, "Finished indexing Discord role email campaign");
     Ok(())
 }
 

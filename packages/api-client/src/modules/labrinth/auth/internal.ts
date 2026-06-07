@@ -29,4 +29,18 @@ export class LabrinthAuthInternalModule extends AbstractModule {
 			method: 'POST',
 		})
 	}
+
+	/**
+	 * Create a signed Discord community bot handoff URL
+	 */
+	public async createDiscordCommunityLink(): Promise<Labrinth.Auth.Internal.DiscordCommunityLinkResponse> {
+		return this.client.request<Labrinth.Auth.Internal.DiscordCommunityLinkResponse>(
+			'/auth/discord-community-link',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+			},
+		)
+	}
 }
