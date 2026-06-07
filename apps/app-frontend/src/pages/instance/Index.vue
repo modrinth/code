@@ -197,6 +197,10 @@
 										id: 'export-mrpack',
 										action: () => exportModal?.show(),
 									},
+									{
+										id: 'create-shortcut',
+										action: () => createShortcut(),
+									},
 								]"
 							>
 								<MoreVerticalIcon />
@@ -204,6 +208,7 @@
 								<template #host-a-server> <ServerIcon /> Create a server </template>
 								<template #open-folder> <FolderOpenIcon /> Open folder </template>
 								<template #export-mrpack> <PackageIcon /> Export modpack </template>
+								<template #create-shortcut> <ExternalIcon /> Create shortcut </template>
 							</OverflowMenu>
 						</ButtonStyled>
 					</div>
@@ -324,7 +329,7 @@ import { type InstanceContentData, loadInstanceContentData } from '@/helpers/ins
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import { createProfileShortcut, showProfileInFolder } from '@/helpers/utils.js'
 import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
@@ -333,7 +338,7 @@ import { useBreadcrumbs, useTheming } from '@/store/state'
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
-const { handleError } = injectNotificationManager()
+const { addNotification, handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
 const queryClient = useQueryClient()
 const route = useRoute()
@@ -576,6 +581,21 @@ const handlePlayServer = async () => {
 
 const repairInstance = async () => {
 	await finish_install(instance.value).catch(handleError)
+}
+
+const createShortcut = async () => {
+	if (!instance.value) return
+	try {
+		const shortcutPath = await createProfileShortcut(instance.value.name, instance.value.path)
+		if (!shortcutPath) return
+
+		addNotification({
+			type: 'success',
+			title: 'Shortcut created',
+		})
+	} catch (error) {
+		handleError(error)
+	}
 }
 
 const handleRightClick = (event: MouseEvent) => {

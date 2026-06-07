@@ -14,6 +14,7 @@ pub mod process;
 pub mod profile;
 pub mod profile_create;
 pub mod settings;
+pub mod shortcuts;
 pub mod tags;
 pub mod utils;
 
