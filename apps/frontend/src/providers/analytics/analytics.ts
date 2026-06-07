@@ -169,6 +169,11 @@ export interface AnalyticsDashboardContextValue {
 	hasProjectContext: ComputedRef<boolean>
 	projectGroups: ComputedRef<AnalyticsDashboardProjectGroup[]>
 	projects: ComputedRef<AnalyticsDashboardProject[]>
+	dashboardUserProjectIds: ComputedRef<string[]>
+	dashboardOrganizationProjectIds: ComputedRef<string[]>
+	defaultProjectIds: ComputedRef<string[]>
+	isUsingDashboardUserOverride: ComputedRef<boolean>
+	dashboardProjectUserName: ComputedRef<string>
 	selectedProjectIds: Ref<string[]>
 	selectedTimeframeMode: Ref<AnalyticsTimeframeMode>
 	selectedTimeframe: Ref<AnalyticsTimeframePreset>
@@ -198,6 +203,7 @@ export interface AnalyticsDashboardContextValue {
 	versionProjectIconUrlsById: ComputedRef<Map<string, string>>
 	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
 	availableProjectStatuses: ComputedRef<ProjectStatusFilterValue[]>
+	availableProjectDownloadsById: ComputedRef<Map<string, number>>
 	projectDownloadsById: ComputedRef<Map<string, number>>
 	projectVersionDownloadsById: ComputedRef<Map<string, number>>
 	gameVersionDownloadsByVersion: ComputedRef<Map<string, number>>
@@ -519,6 +525,45 @@ export function createAnalyticsDashboardContext(
 	)
 
 	const availableProjectIds = computed(() => projects.value.map((project) => project.id))
+	const dashboardUserProjectIds = computed(() => {
+		if (!shouldFetchDashboardAllProjects.value) {
+			return [...availableProjectIds.value]
+		}
+
+		const response = dashboardAllProjects.value
+		if (!response) {
+			return []
+		}
+
+		const availableProjectIdSet = new Set(availableProjectIds.value)
+		return response.projects
+			.filter(
+				(project) => !getProjectOrganizationId(project) && availableProjectIdSet.has(project.id),
+			)
+			.map((project) => project.id)
+	})
+	const dashboardOrganizationProjectIds = computed(() => {
+		if (!shouldFetchDashboardAllProjects.value) {
+			return []
+		}
+
+		const response = dashboardAllProjects.value
+		if (!response) {
+			return []
+		}
+
+		const availableProjectIdSet = new Set(availableProjectIds.value)
+		return response.projects
+			.filter(
+				(project) => getProjectOrganizationId(project) && availableProjectIdSet.has(project.id),
+			)
+			.map((project) => project.id)
+	})
+	const defaultProjectIds = computed(() =>
+		dashboardOrganizationProjectIds.value.length > 0 && dashboardUserProjectIds.value.length > 0
+			? dashboardUserProjectIds.value
+			: availableProjectIds.value,
+	)
 	const projectNamesById = computed(
 		() => new Map(projects.value.map((project) => [project.id, project.name])),
 	)
@@ -537,6 +582,7 @@ export function createAnalyticsDashboardContext(
 		const presentStatuses = new Set(projects.value.map((project) => project.status))
 		return PROJECT_STATUS_FILTER_VALUES.filter((status) => presentStatuses.has(status))
 	})
+	const sortedAvailableProjectIds = computed(() => sortStringValues(availableProjectIds.value))
 	const sortedSelectedProjectIds = computed(() => sortStringValues(selectedProjectIds.value))
 	const filterOptionProjectSources = computed<AnalyticsProjectVersionSource[] | null>(() => {
 		if (hasProjectContext.value && options.projectPageContext) {
@@ -642,6 +688,7 @@ export function createAnalyticsDashboardContext(
 				selectedFilters: selectedFilters.value,
 			},
 			availableProjectIds.value,
+			defaultProjectIds.value,
 		)
 		const isGraphDefault = isAnalyticsGraphStateDefault(
 			{
@@ -741,6 +788,7 @@ export function createAnalyticsDashboardContext(
 			selectedGraphDatasetIds,
 		},
 		availableProjectIds,
+		defaultProjectIds,
 		sanitizeSelectedFilters: sanitizeAnalyticsSelectedFiltersForContext,
 	})
 
@@ -846,9 +894,10 @@ export function createAnalyticsDashboardContext(
 				return
 			}
 
-			const availableProjectIds = new Set(nextProjects.map((project) => project.id))
+			const nextAvailableProjectIds = nextProjects.map((project) => project.id)
+			const availableProjectIds = new Set(nextAvailableProjectIds)
 			if (!hasExplicitProjectSelectionQuery.value) {
-				const nextSelectedProjectIds = nextProjects.map((project) => project.id)
+				const nextSelectedProjectIds = [...defaultProjectIds.value]
 				syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds)
 				syncProjectEventsVisibilityForProjectSelection(nextSelectedProjectIds)
 				if (!areStringArraysEqual(selectedProjectIds.value, nextSelectedProjectIds)) {
@@ -858,9 +907,14 @@ export function createAnalyticsDashboardContext(
 				return
 			}
 
-			const retainedSelection = selectedProjectIds.value.filter((id) => availableProjectIds.has(id))
+			const queryProjectSelection = readAnalyticsQueryBuilderState(
+				route.query,
+				nextAvailableProjectIds,
+				defaultProjectIds.value,
+			).selectedProjectIds
+			const retainedSelection = queryProjectSelection.filter((id) => availableProjectIds.has(id))
 			const nextSelectedProjectIds =
-				retainedSelection.length > 0 ? retainedSelection : nextProjects.map((project) => project.id)
+				retainedSelection.length > 0 ? retainedSelection : [...defaultProjectIds.value]
 
 			syncSelectedBreakdownsForProjectSelection(nextSelectedProjectIds)
 			syncProjectEventsVisibilityForProjectSelection(nextSelectedProjectIds)
@@ -916,6 +970,7 @@ export function createAnalyticsDashboardContext(
 			selectedBreakdowns,
 			selectedFilters,
 			availableProjectIds,
+			defaultProjectIds,
 		],
 		() => {
 			syncQueryBuilderRouteQuery()
@@ -1090,6 +1145,16 @@ export function createAnalyticsDashboardContext(
 
 		return buildAnalyticsFacetsRequest(sortedSelectedProjectIds.value, nextFetchRequest.time_range)
 	})
+	const availableProjectDownloadCountRequest = computed<Labrinth.Analytics.v3.FetchRequest | null>(
+		() => {
+			const nextFetchRequest = fetchRequest.value
+			if (!nextFetchRequest || sortedAvailableProjectIds.value.length === 0) {
+				return null
+			}
+
+			return buildAnalyticsFacetsRequest(sortedAvailableProjectIds.value, nextFetchRequest.time_range)
+		},
+	)
 
 	const {
 		data: analyticsFacetsData,
@@ -1144,6 +1209,36 @@ export function createAnalyticsDashboardContext(
 				hasCompletedAnalyticsLoading.value &&
 				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
 		),
+		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+		refetchOnWindowFocus: false,
+	})
+
+	const { data: availableProjectDownloadCountTimeSlices } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			analyticsQueryUserId.value,
+			'filter-options',
+			'available-project-download-counts',
+			availableProjectDownloadCountRequest.value,
+			queryRefreshTimestamp.value,
+		]),
+		queryFn: () => {
+			const nextRequest = availableProjectDownloadCountRequest.value
+			if (!isAnalyticsFetchRequestReady(nextRequest)) {
+				return []
+			}
+
+			return fetchAnalyticsTimeSlices(nextRequest, (request) =>
+				client.labrinth.analytics_v3.fetch(request),
+			)
+		},
+		enabled: computed(
+			() =>
+				hasCompletedAnalyticsLoading.value &&
+				isAnalyticsFetchRequestReady(availableProjectDownloadCountRequest.value),
+		),
+		placeholderData: [],
 		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
 		refetchOnWindowFocus: false,
 	})
@@ -1390,6 +1485,9 @@ export function createAnalyticsDashboardContext(
 		const countTimeSlices = analyticsDownloadCountTimeSlices.value ?? []
 		return countTimeSlices.length > 0 ? countTimeSlices : timeSlices.value
 	})
+	const availableProjectDownloadsById = computed(() =>
+		getProjectDownloadsByIdFromTimeSlices(availableProjectDownloadCountTimeSlices.value ?? []),
+	)
 	const projectDownloadsById = computed(() =>
 		getProjectDownloadsByIdFromTimeSlices(downloadCountTimeSlices.value),
 	)
@@ -1484,7 +1582,10 @@ export function createAnalyticsDashboardContext(
 			return
 		}
 
-		const defaultQueryState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds.value)
+		const defaultQueryState = buildDefaultAnalyticsQueryBuilderState(
+			availableProjectIds.value,
+			defaultProjectIds.value,
+		)
 		const defaultGraphState = buildDefaultAnalyticsGraphState(defaultQueryState.selectedProjectIds)
 
 		selectedProjectIds.value = defaultQueryState.selectedProjectIds
@@ -1550,6 +1651,11 @@ export function createAnalyticsDashboardContext(
 		hasProjectContext,
 		projectGroups,
 		projects,
+		dashboardUserProjectIds,
+		dashboardOrganizationProjectIds,
+		defaultProjectIds,
+		isUsingDashboardUserOverride,
+		dashboardProjectUserName: effectiveUsername,
 		selectedProjectIds,
 		selectedTimeframeMode,
 		selectedTimeframe,
@@ -1579,6 +1685,7 @@ export function createAnalyticsDashboardContext(
 		versionProjectIconUrlsById,
 		projectStatusById,
 		availableProjectStatuses,
+		availableProjectDownloadsById,
 		projectDownloadsById,
 		projectVersionDownloadsById,
 		gameVersionDownloadsByVersion,

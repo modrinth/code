@@ -69,6 +69,29 @@
 				<template v-if="hasProjectOptions" #top>
 					<div>
 						<button
+							v-if="showProjectPresets"
+							type="button"
+							class="flex w-full cursor-pointer items-center gap-1.5 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
+							:aria-selected="isUserProjectsOptionSelected"
+							:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+							role="option"
+							@click="selectUserProjectsMode"
+							@keydown.enter.stop
+							@keydown.space.stop
+						>
+							<LayersIcon
+								class="h-5 w-5 shrink-0 text-primary"
+								:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+							/>
+							<span class="min-w-0 flex-1 font-semibold leading-tight">
+								{{ userProjectsLabel }}
+							</span>
+							<span class="flex shrink-0 items-center justify-center text-brand">
+								<CheckIcon v-if="isUserProjectsOptionSelected" aria-hidden="true" class="size-5" />
+							</span>
+						</button>
+						<button
+							v-if="!showProjectPresets || showAllProjectsPreset"
 							type="button"
 							class="flex w-full cursor-pointer items-center gap-1.5 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
 							:aria-selected="isAllProjectsOptionSelected"
@@ -210,7 +233,11 @@
 										decoding="async"
 									/>
 									<LayersIcon
-										v-else-if="isAllProjectsOptionSelected || areAllProjectsSelected"
+										v-else-if="
+											isUserProjectsOptionSelected ||
+											isAllProjectsOptionSelected ||
+											areAllProjectRowsSelected
+										"
 										class="size-5 shrink-0 text-primary"
 									/>
 									<BoxIcon v-else class="size-5 shrink-0 text-primary" />
@@ -253,6 +280,33 @@
 						<template v-if="hasProjectOptions" #top>
 							<div>
 								<button
+									v-if="showProjectPresets"
+									type="button"
+									class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
+									:aria-selected="isUserProjectsOptionSelected"
+									:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+									role="option"
+									@click="selectUserProjectsMode"
+									@keydown.enter.stop
+									@keydown.space.stop
+								>
+									<LayersIcon
+										class="h-5 w-5 shrink-0 text-primary"
+										:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
+									/>
+									<span class="min-w-0 flex-1 font-semibold leading-tight">
+										{{ userProjectsLabel }}
+									</span>
+									<span class="flex shrink-0 items-center justify-center text-brand">
+										<CheckIcon
+											v-if="isUserProjectsOptionSelected"
+											aria-hidden="true"
+											class="size-5"
+										/>
+									</span>
+								</button>
+								<button
+									v-if="!showProjectPresets || showAllProjectsPreset"
 									type="button"
 									class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-4 px-4 py-3 text-left shadow-none transition-all duration-150 hover:brightness-[115%] focus:brightness-[115%]"
 									:aria-selected="isAllProjectsOptionSelected"
@@ -449,11 +503,17 @@ const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
 const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+type ProjectSelectionPreset = 'user' | 'all'
 
 const {
 	hasProjectContext,
 	projectGroups,
 	projects,
+	dashboardUserProjectIds,
+	dashboardOrganizationProjectIds,
+	defaultProjectIds,
+	isUsingDashboardUserOverride,
+	dashboardProjectUserName,
 	selectedProjectIds,
 	selectedTimeframeMode,
 	selectedTimeframe,
@@ -467,7 +527,7 @@ const {
 	activeStat,
 	showPreviousPeriod,
 	projectStatusById,
-	projectDownloadsById,
+	availableProjectDownloadsById,
 	queryResetToken,
 	refreshAnalyticsQuery,
 	setFetchRequest,
@@ -535,12 +595,25 @@ const projectSelectOptions = computed<MultiSelectItem<string>[]>(() => {
 
 const allProjectIds = computed(() => projectOptions.value.map((project) => project.value))
 const hasProjectOptions = computed(() => projectOptions.value.length > 0)
+const userProjectIds = computed(() =>
+	dashboardOrganizationProjectIds.value.length > 0
+		? dashboardUserProjectIds.value
+		: defaultProjectIds.value,
+)
+const showProjectPresets = computed(
+	() =>
+		hasProjectOptions.value &&
+		dashboardUserProjectIds.value.length > 0 &&
+		dashboardOrganizationProjectIds.value.length > 0,
+)
+const showAllProjectsPreset = computed(() => dashboardOrganizationProjectIds.value.length > 0)
 const noProjectsMessage = computed(() =>
 	hasProjectContext.value
 		? formatMessage(analyticsMessages.noDataAvailableForAnalytics)
 		: formatMessage(analyticsMessages.noProjectsAvailable),
 )
 const isProjectSelectOpen = ref(false)
+const draftProjectSelectionPreset = ref<ProjectSelectionPreset | null>(null)
 const draftSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 const projectDownloadsThreshold = ref<number | null>(null)
 const projectDownloadsThresholdProjectIds = ref<string[] | null>(null)
@@ -558,15 +631,48 @@ function normalizeProjectSelection(projectIds: string[]) {
 	return projectIds.length > 0 ? [...projectIds] : [...allProjectIds.value]
 }
 
+function getProjectSelectionPreset(projectIds: string[]): ProjectSelectionPreset | null {
+	if (!showProjectPresets.value) {
+		return null
+	}
+
+	if (isSameProjectSelection(projectIds, userProjectIds.value)) {
+		return 'user'
+	}
+
+	if (isSameProjectSelection(projectIds, allProjectIds.value)) {
+		return 'all'
+	}
+
+	return null
+}
+
+function setDraftProjectSelection(projectIds: string[]) {
+	const preset = getProjectSelectionPreset(projectIds)
+	draftProjectSelectionPreset.value = preset
+	if (preset) {
+		draftSelectedProjectIds.value = []
+		return
+	}
+
+	draftSelectedProjectIds.value = isSameProjectSelection(projectIds, allProjectIds.value)
+		? []
+		: [...projectIds]
+}
+
 watch(selectedProjectIds, (nextSelectedProjectIds) => {
 	if (isProjectSelectOpen.value) {
 		return
 	}
 
-	draftSelectedProjectIds.value = [...nextSelectedProjectIds]
+	setDraftProjectSelection(nextSelectedProjectIds)
 })
 
 watch(draftSelectedProjectIds, (nextSelectedProjectIds) => {
+	if (draftProjectSelectionPreset.value && nextSelectedProjectIds.length > 0) {
+		draftProjectSelectionPreset.value = null
+	}
+
 	if (projectDownloadsThreshold.value === null) {
 		return
 	}
@@ -587,25 +693,40 @@ watch(queryResetToken, () => {
 	isBreakdownSelectOpen.value = false
 	draftSelectedBreakdowns.value = [...selectedBreakdowns.value]
 	clearProjectDownloadsThreshold()
-	draftSelectedProjectIds.value = isSameProjectSelection(
-		selectedProjectIds.value,
-		allProjectIds.value,
-	)
-		? []
-		: [...selectedProjectIds.value]
+	setDraftProjectSelection(selectedProjectIds.value)
 })
 
-const areAllProjectsSelected = computed(() => {
+const areAllProjectRowsSelected = computed(() => {
 	return isSameProjectSelection(draftSelectedProjectIds.value, allProjectIds.value)
 })
-const isAllProjectsOptionSelected = computed(() => draftSelectedProjectIds.value.length === 0)
+const isAllProjectsOptionSelected = computed(() =>
+	showProjectPresets.value
+		? draftProjectSelectionPreset.value === 'all'
+		: draftSelectedProjectIds.value.length === 0,
+)
+const isUserProjectsOptionSelected = computed(() => {
+	return showProjectPresets.value && draftProjectSelectionPreset.value === 'user'
+})
+const userProjectsLabel = computed(() => {
+	if (isUsingDashboardUserOverride.value) {
+		return formatMessage(analyticsMessages.userProjects, {
+			username: dashboardProjectUserName.value,
+		})
+	}
+
+	return formatMessage(analyticsMessages.yourProjects)
+})
 
 const selectedProjectLabel = computed(() => {
 	if (!hasProjectOptions.value) {
 		return noProjectsMessage.value
 	}
 
-	if (isAllProjectsOptionSelected.value || areAllProjectsSelected.value) {
+	if (isUserProjectsOptionSelected.value) {
+		return userProjectsLabel.value
+	}
+
+	if (isAllProjectsOptionSelected.value || areAllProjectRowsSelected.value) {
 		return formatMessage(analyticsMessages.allProjects)
 	}
 
@@ -623,8 +744,9 @@ const selectedProjectLabel = computed(() => {
 
 const selectedProjectIconUrl = computed(() => {
 	if (
+		isUserProjectsOptionSelected.value ||
 		isAllProjectsOptionSelected.value ||
-		areAllProjectsSelected.value ||
+		areAllProjectRowsSelected.value ||
 		draftSelectedProjectIds.value.length !== 1
 	) {
 		return undefined
@@ -639,12 +761,7 @@ function getProjectIconUrl(projectId: string): string | undefined {
 
 function handleProjectSelectOpen() {
 	isProjectSelectOpen.value = true
-	draftSelectedProjectIds.value = isSameProjectSelection(
-		selectedProjectIds.value,
-		allProjectIds.value,
-	)
-		? []
-		: [...selectedProjectIds.value]
+	setDraftProjectSelection(selectedProjectIds.value)
 }
 
 function handleProjectSelectClose(
@@ -657,9 +774,14 @@ function handleProjectSelectClose(
 function commitDraftSelectedProjects(
 	nextSelectedProjectIds: string[] = draftSelectedProjectIds.value,
 ) {
-	const nextProjectIds = normalizeProjectSelection(nextSelectedProjectIds)
+	const nextProjectIds =
+		draftProjectSelectionPreset.value === 'user'
+			? [...userProjectIds.value]
+			: draftProjectSelectionPreset.value === 'all'
+				? [...allProjectIds.value]
+				: normalizeProjectSelection(nextSelectedProjectIds)
 
-	draftSelectedProjectIds.value = [...nextProjectIds]
+	setDraftProjectSelection(nextProjectIds)
 	if (!isSameProjectSelection(selectedProjectIds.value, nextProjectIds)) {
 		if (isSameProjectSelection(nextProjectIds, allProjectIds.value)) {
 			showPreviousPeriod.value = false
@@ -670,6 +792,17 @@ function commitDraftSelectedProjects(
 
 function selectAllProjectsMode() {
 	clearProjectDownloadsThreshold()
+	if (showProjectPresets.value) {
+		draftProjectSelectionPreset.value = 'all'
+	} else {
+		draftProjectSelectionPreset.value = null
+	}
+	draftSelectedProjectIds.value = []
+}
+
+function selectUserProjectsMode() {
+	clearProjectDownloadsThreshold()
+	draftProjectSelectionPreset.value = 'user'
 	draftSelectedProjectIds.value = []
 }
 
@@ -753,9 +886,10 @@ function applyProjectDownloadsThreshold(threshold: number | null) {
 	}
 
 	const projectIds = projects.value
-		.filter((project) => (projectDownloadsById.value.get(project.id) ?? 0) > threshold)
+		.filter((project) => (availableProjectDownloadsById.value.get(project.id) ?? 0) > threshold)
 		.map((project) => project.id)
 
+	draftProjectSelectionPreset.value = null
 	projectDownloadsThresholdProjectIds.value = projectIds
 	draftSelectedProjectIds.value = projectIds
 }

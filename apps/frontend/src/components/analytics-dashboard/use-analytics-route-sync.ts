@@ -53,6 +53,7 @@ export interface UseAnalyticsRouteSyncOptions {
 	queryBuilder: AnalyticsQueryBuilderRefs
 	graph: AnalyticsGraphRefs
 	availableProjectIds: Ref<string[]>
+	defaultProjectIds: Ref<string[]>
 	sanitizeSelectedFilters: (
 		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters: AnalyticsSelectedFilters,
@@ -60,7 +61,8 @@ export interface UseAnalyticsRouteSyncOptions {
 }
 
 export function useAnalyticsRouteSync(options: UseAnalyticsRouteSyncOptions) {
-	const { queryBuilder, graph, availableProjectIds, sanitizeSelectedFilters } = options
+	const { queryBuilder, graph, availableProjectIds, defaultProjectIds, sanitizeSelectedFilters } =
+		options
 	const route = useRoute()
 	const router = useRouter()
 
@@ -116,6 +118,7 @@ export function useAnalyticsRouteSync(options: UseAnalyticsRouteSyncOptions) {
 			getSelectedAnalyticsQueryBuilderState(),
 			availableProjectIds.value,
 			getSelectedAnalyticsGraphState(),
+			defaultProjectIds.value,
 		)
 
 		const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(route.query, nextRouteQuery)
@@ -144,7 +147,11 @@ export function useAnalyticsRouteSync(options: UseAnalyticsRouteSyncOptions) {
 	}
 
 	function applyRouteQueryToState(nextQuery: LocationQuery) {
-		const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
+		const nextQueryState = readAnalyticsQueryBuilderState(
+			nextQuery,
+			availableProjectIds.value,
+			defaultProjectIds.value,
+		)
 		const availableProjectIdSet = new Set(availableProjectIds.value)
 		const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
 			availableProjectIdSet.has(projectId),
