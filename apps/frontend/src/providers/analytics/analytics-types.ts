@@ -94,6 +94,7 @@ export type MutableRouteQuery = Record<
 export type ProjectTypeMetadata = {
 	project_type?: string | null
 	project_types?: readonly string[] | null
+	projectTypes?: readonly string[] | null
 }
 
 export type AnalyticsProjectFetchRequest = Labrinth.Analytics.v3.FetchRequest & {
@@ -123,6 +124,7 @@ export interface AnalyticsDashboardProject {
 	downloads: number
 	status: ProjectStatusFilterValue
 	publishedAt?: string
+	projectTypes: string[]
 }
 
 export interface AnalyticsDashboardProjectGroup {

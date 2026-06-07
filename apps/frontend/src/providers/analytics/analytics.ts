@@ -74,6 +74,7 @@ import {
 	getSingleQueryValue,
 	getUniqueAnalyticsDashboardProjects,
 	isAnalyticsEligibleProject,
+	isPluginProject,
 	toAnalyticsDashboardProject,
 	UNKNOWN_ORGANIZATION_NAME,
 } from './analytics-project-utils'
@@ -721,17 +722,36 @@ export function createAnalyticsDashboardContext(
 				allTimeStartTimestamp: analyticsAllTimeStartDate.value.getTime(),
 			}) > REVENUE_MIN_TIMEFRAME_MS,
 	)
+	const isPlaytimeAvailableForProjectSelection = computed(() => {
+		const selectedProjectIdSet = new Set(selectedProjectIds.value)
+		const selectedProjects = projects.value.filter((project) =>
+			selectedProjectIdSet.has(project.id),
+		)
+
+		return (
+			selectedProjects.length === 0 ||
+			selectedProjects.some((project) => !isPluginProject(project))
+		)
+	})
 
 	function isAnalyticsDashboardStatAvailableForTimeframe(stat: AnalyticsDashboardStat): boolean {
 		return stat !== 'revenue' || isRevenueTimeframeAvailable.value
+	}
+
+	function isAnalyticsDashboardStatAvailableForProjectSelection(
+		stat: AnalyticsDashboardStat,
+	): boolean {
+		return stat !== 'playtime' || isPlaytimeAvailableForProjectSelection.value
 	}
 
 	function getRelevantAnalyticsDashboardStats(
 		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters: AnalyticsSelectedFilters = selectedFilters.value,
 	): readonly AnalyticsDashboardStat[] {
-		return getEnabledAnalyticsStatsForState(breakdowns, filters).filter((stat) =>
-			isAnalyticsDashboardStatAvailableForTimeframe(stat),
+		return getEnabledAnalyticsStatsForState(breakdowns, filters).filter(
+			(stat) =>
+				isAnalyticsDashboardStatAvailableForTimeframe(stat) &&
+				isAnalyticsDashboardStatAvailableForProjectSelection(stat),
 		)
 	}
 
@@ -816,7 +836,13 @@ export function createAnalyticsDashboardContext(
 	}
 
 	watch(
-		[selectedBreakdowns, selectedFilters, activeStat, isRevenueTimeframeAvailable],
+		[
+			selectedBreakdowns,
+			selectedFilters,
+			activeStat,
+			isRevenueTimeframeAvailable,
+			isPlaytimeAvailableForProjectSelection,
+		],
 		([nextBreakdowns, nextFilters, nextActiveStat]) => {
 			if (isAnalyticsDashboardStatRelevant(nextActiveStat, nextBreakdowns, nextFilters)) {
 				return
