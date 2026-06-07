@@ -103,6 +103,14 @@ const tooltipRevenueFormatter = computed(
 		}),
 )
 
+const underHourPlaytimeFormatter = computed(
+	() =>
+		new Intl.NumberFormat(undefined, {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}),
+)
+
 function formatStatNumber(value: number): string {
 	const rounded = Math.round(value)
 
@@ -142,6 +150,14 @@ function formatPreciseRevenueValue(value: number): string {
 
 function formatPlaytimeTooltip(value: number): string {
 	return formatAnalyticsTableFullPlaytime(value, formatMessage)
+}
+
+function formatPlaytimeNumber(value: number): string {
+	if (Math.abs(value) > 0 && Math.abs(value) < 1) {
+		return underHourPlaytimeFormatter.value.format(value)
+	}
+
+	return formatStatNumber(value)
 }
 
 function formatPercent(value: number): string {
@@ -278,7 +294,7 @@ const statCards = computed<
 		key: 'playtime',
 		label: formatAnalyticsStatLabel('playtime', formatMessage),
 		statLabel: formatMessage(analyticsStatCardMessages.playtimeHours, {
-			hours: formatStatNumber(currentTotals.value.playtime / 3600),
+			hours: formatPlaytimeNumber(currentTotals.value.playtime / 3600),
 		}),
 		statTooltip: formatPlaytimeTooltip(currentTotals.value.playtime),
 		vsPrevPeriodPercent: formatPreviousPeriodComparison(
