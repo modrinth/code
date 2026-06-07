@@ -350,6 +350,12 @@
   "analytics.project.select": {
     "message": "Select projects"
   },
+  "analytics.project.user": {
+    "message": "{username}'s projects"
+  },
+  "analytics.project.your": {
+    "message": "Your projects"
+  },
   "analytics.query.filter.add": {
     "message": "Add filter"
   },
@@ -2845,6 +2851,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "A Modrinth user."
+  },
+  "profile.button.analytics": {
+    "message": "View user analytics"
   },
   "profile.button.billing": {
     "message": "Manage user billing"

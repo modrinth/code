@@ -729,8 +729,7 @@ export function createAnalyticsDashboardContext(
 		)
 
 		return (
-			selectedProjects.length === 0 ||
-			selectedProjects.some((project) => !isPluginProject(project))
+			selectedProjects.length === 0 || selectedProjects.some((project) => !isPluginProject(project))
 		)
 	})
 
@@ -1178,7 +1177,10 @@ export function createAnalyticsDashboardContext(
 				return null
 			}
 
-			return buildAnalyticsFacetsRequest(sortedAvailableProjectIds.value, nextFetchRequest.time_range)
+			return buildAnalyticsFacetsRequest(
+				sortedAvailableProjectIds.value,
+				nextFetchRequest.time_range,
+			)
 		},
 	)
 

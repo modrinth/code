@@ -479,7 +479,10 @@ export function isAnalyticsQueryBuilderStateDefault(
 	availableProjectIds: string[],
 	defaultProjectIds: string[] = availableProjectIds,
 ): boolean {
-	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds, defaultProjectIds)
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(
+		availableProjectIds,
+		defaultProjectIds,
+	)
 	const areDefaultProjectsSelected =
 		defaultProjectIds.length === 0
 			? state.selectedProjectIds.length === 0
@@ -671,7 +674,10 @@ export function readAnalyticsQueryBuilderState(
 	availableProjectIds: string[],
 	defaultProjectIds: string[] = availableProjectIds,
 ): AnalyticsQueryBuilderState {
-	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds, defaultProjectIds)
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(
+		availableProjectIds,
+		defaultProjectIds,
+	)
 	const selectedProjectIdsFromQuery = parseListQueryValue(query[QUERY_KEY_PROJECT_IDS])
 	let selectedProjectIds = defaultState.selectedProjectIds
 	if (selectedProjectIdsFromQuery.includes(PROJECT_SELECTION_ALL_QUERY_VALUE)) {
