@@ -10,7 +10,7 @@ INSERT INTO users (
 	id, username, email, role, badges, balance, email_verified
 )
 VALUES (
-	60829878552966, 'fixture_hgwxdegw', 'calum@modrinth.com',
+	60829878552966, 'fixture_hgwxdegw', 'admin@modrinth.invalid',
 	'developer', 15, 0, TRUE
 )
 ON CONFLICT (id) DO UPDATE SET
