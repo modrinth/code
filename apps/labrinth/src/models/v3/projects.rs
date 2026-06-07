@@ -775,7 +775,7 @@ pub struct Version {
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
     /// Files in this version that contain override files not yet attributed.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub files_missing_attribution: Vec<MissingAttributionFile>,
     /// A list of projects that this version depends on.
     pub dependencies: Vec<Dependency>,
