@@ -69,7 +69,8 @@
 					<FileUploadDragAndDrop
 						ref="fileUploadRef"
 						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
-						:active="nativeFileDragActive"
+						:disabled="isBusy"
+						@drop-error="handleDropError"
 						@files-dropped="handleDroppedFiles"
 					>
 						<FileTableHeader
@@ -244,7 +245,6 @@ import { useFileSelection } from './composables/file-selection'
 import { useFileSorting } from './composables/file-sorting'
 import { useFileUndoRedo } from './composables/file-undo-redo'
 import { injectFileManager } from './providers/file-manager'
-import type { NativeFileDropEvent } from './providers/file-manager'
 import type { FileContextMenuOption, FileItem } from './types'
 
 const { formatMessage } = useVIntl()
@@ -358,7 +358,6 @@ const {
 // Sticky observer for the table header
 const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
 const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
-const nativeFileDragActive = ref(false)
 const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl)
 
 // Refs
@@ -594,52 +593,12 @@ function handleDroppedFiles(files: File[]) {
 	ctx.uploadFiles(files)
 }
 
-function canHandleNativeFileDrop() {
-	return !isEditing.value && !isBusy.value
-}
-
-function isPositionOverFileDrop(position: NativeFileDropEvent['position']) {
-	const element = fileUploadEl.value
-	if (!element) return false
-
-	const rect = element.getBoundingClientRect()
-	return (
-		position.x >= rect.left &&
-		position.x <= rect.right &&
-		position.y >= rect.top &&
-		position.y <= rect.bottom
-	)
-}
-
-async function handleNativeFileDrop(event: NativeFileDropEvent) {
-	if (event.type === 'leave') {
-		nativeFileDragActive.value = false
-		return
-	}
-
-	const canDrop =
-		event.paths.length > 0 && canHandleNativeFileDrop() && isPositionOverFileDrop(event.position)
-
-	if (event.type === 'enter' || event.type === 'over') {
-		nativeFileDragActive.value = canDrop
-		return
-	}
-
-	const shouldUpload = event.type === 'drop' && canDrop
-	nativeFileDragActive.value = false
-
-	if (!shouldUpload || !ctx.nativeFileDrop) return
-
-	try {
-		const files = await ctx.nativeFileDrop.createFiles(event.paths)
-		handleDroppedFiles(files)
-	} catch (error) {
-		addNotification({
-			title: formatMessage(commonMessages.uploadFailedLabel),
-			text: error instanceof Error ? error.message : undefined,
-			type: 'error',
-		})
-	}
+function handleDropError(error: unknown) {
+	addNotification({
+		title: formatMessage(commonMessages.uploadFailedLabel),
+		text: error instanceof Error ? error.message : undefined,
+		type: 'error',
+	})
 }
 
 function initiateFileUpload() {
@@ -744,40 +703,12 @@ watch(
 	},
 )
 
-let nativeFileDropUnlisten: (() => void) | null = null
-let nativeFileDropUnmounted = false
-
-async function setupNativeFileDrop() {
-	if (!ctx.nativeFileDrop) return
-
-	let unlisten: () => void
-	try {
-		unlisten = await ctx.nativeFileDrop.listen(handleNativeFileDrop)
-	} catch {
-		return
-	}
-
-	if (nativeFileDropUnmounted) {
-		unlisten()
-		return
-	}
-
-	nativeFileDropUnlisten = unlisten
-}
-
 // Keyboard shortcuts
 onMounted(() => {
 	document.addEventListener('keydown', onKeydown)
-	void setupNativeFileDrop()
 })
 
 onUnmounted(() => {
-	nativeFileDropUnmounted = true
-	nativeFileDragActive.value = false
-	if (nativeFileDropUnlisten) {
-		nativeFileDropUnlisten()
-		nativeFileDropUnlisten = null
-	}
 	document.removeEventListener('keydown', onKeydown)
 })
 </script>

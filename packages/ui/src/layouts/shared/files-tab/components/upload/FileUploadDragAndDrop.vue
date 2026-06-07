@@ -1,9 +1,10 @@
 <template>
 	<div
-		@dragenter.prevent="handleDragEnter"
-		@dragover.prevent="handleDragOver"
-		@dragleave.prevent="handleDragLeave"
-		@drop.prevent="handleDrop"
+		ref="dropTargetRef"
+		@dragenter="dropTargetProps.onDragenter"
+		@dragover="dropTargetProps.onDragover"
+		@dragleave="dropTargetProps.onDragleave"
+		@drop="dropTargetProps.onDrop"
 	>
 		<slot />
 		<div
@@ -31,6 +32,7 @@
 import { UploadIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import { useFileDropTarget } from '#ui/composables/file-drop'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { formatFileItemType } from '#ui/utils/common-messages'
 
@@ -38,10 +40,11 @@ const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
 	filesDropped: [files: File[]]
+	dropError: [error: unknown]
 }>()
 
 const props = defineProps<{
-	active?: boolean
+	disabled?: boolean
 	overlayClass?: string
 	type?: string
 }>()
@@ -53,36 +56,12 @@ const messages = defineMessages({
 	},
 })
 
-const isDragging = ref(false)
-const showOverlay = computed(() => isDragging.value || props.active)
-const dragCounter = ref(0)
-
-const handleDragEnter = (event: DragEvent) => {
-	event.preventDefault()
-	dragCounter.value++
-	isDragging.value = true
-}
-
-const handleDragOver = (event: DragEvent) => {
-	event.preventDefault()
-}
-
-const handleDragLeave = (event: DragEvent) => {
-	event.preventDefault()
-	dragCounter.value--
-	if (dragCounter.value === 0) {
-		isDragging.value = false
-	}
-}
-
-const handleDrop = (event: DragEvent) => {
-	event.preventDefault()
-	isDragging.value = false
-	dragCounter.value = 0
-
-	const files = event.dataTransfer?.files
-	if (files) {
-		emit('filesDropped', Array.from(files))
-	}
-}
+const dropTargetRef = ref<HTMLElement | null>(null)
+const { isDragging, dropTargetProps } = useFileDropTarget({
+	target: dropTargetRef,
+	disabled: computed(() => props.disabled ?? false),
+	onFiles: (files) => emit('filesDropped', files),
+	onError: (error) => emit('dropError', error),
+})
+const showOverlay = computed(() => isDragging.value)
 </script>

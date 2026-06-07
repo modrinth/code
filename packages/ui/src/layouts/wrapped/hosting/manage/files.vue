@@ -18,11 +18,9 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
 import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
-import type { NativeFileDropAdapter } from '../../../shared/files-tab/providers/file-manager'
 import type { EditingFile, FileItem } from '../../../shared/files-tab/types'
 
 const props = defineProps<{
-	nativeFileDrop?: NativeFileDropAdapter
 	showDebugInfo?: boolean
 	showRefreshButton?: boolean
 }>()
@@ -458,7 +456,6 @@ provideFileManager({
 	writeFile,
 	downloadFile,
 	uploadFiles,
-	nativeFileDrop: props.nativeFileDrop,
 	cancelUpload,
 	uploadState,
 	refresh: refreshList,
