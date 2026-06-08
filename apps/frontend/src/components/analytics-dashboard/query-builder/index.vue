@@ -434,7 +434,7 @@ import {
 	getAnalyticsStatsForBreakdown,
 	getAnalyticsStatsForFilterCategory,
 	getEnabledAnalyticsStatsForState,
-} from './query-filter.ts'
+} from './query-filter-utils.ts'
 import QueryBuilderFilter from './QueryFilter.vue'
 import {
 	ensureMinimumTimeRange,

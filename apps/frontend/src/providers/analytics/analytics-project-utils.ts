@@ -1,7 +1,7 @@
 import {
 	getProjectStatusFilterValue,
 	type ProjectStatusFilterValue,
-} from '~/components/analytics-dashboard/query-builder/query-filter'
+} from '~/components/analytics-dashboard/query-builder/query-filter-utils'
 
 import type {
 	AnalyticsDashboardProject,
