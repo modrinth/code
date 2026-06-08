@@ -479,9 +479,6 @@
   "app.skins.title": {
     "message": "Kinézetváltó"
   },
-  "app.update-popup.body": {
-    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
-  },
   "app.update-popup.body.download-complete": {
     "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
   },
@@ -511,15 +508,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Verzió {version} sikeresen telepítve!"
-  },
-  "app.update.download-update": {
-    "message": "Frissítés letöltése"
-  },
-  "app.update.downloading-update": {
-    "message": "Frissítés letöltése ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "A telepítéshez újraindítás szükséges"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "pelda.modrinth.gg"

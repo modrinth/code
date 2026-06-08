@@ -1,6 +1,12 @@
 {
+  "app.action-bar.download-update": {
+    "message": "Download update"
+  },
   "app.action-bar.downloading-java": {
     "message": "Downloading Java {version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "Downloading update"
   },
   "app.action-bar.downloads": {
     "message": "Downloads"
@@ -20,11 +26,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primary instance"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Reload to update"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Show more running instances"
   },
   "app.action-bar.stop-instance": {
     "message": "Stop instance"
+  },
+  "app.action-bar.update": {
+    "message": "Update"
   },
   "app.action-bar.view-active-downloads": {
     "message": "View active downloads"
@@ -482,9 +494,6 @@
   "app.skins.title": {
     "message": "Skin selector"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
@@ -504,7 +513,7 @@
     "message": "Download complete"
   },
   "app.update-popup.reload": {
-    "message": "Reload"
+    "message": "Reload to update"
   },
   "app.update-popup.title": {
     "message": "Update available"
@@ -514,15 +523,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} was successfully installed!"
-  },
-  "app.update.download-update": {
-    "message": "Download update"
-  },
-  "app.update.downloading-update": {
-    "message": "Downloading update ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Reload to install update"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

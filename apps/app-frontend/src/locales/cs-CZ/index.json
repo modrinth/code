@@ -359,9 +359,6 @@
   "app.skins.section.saved-skins": {
     "message": "Uložené skiny"
   },
-  "app.update-popup.body": {
-    "message": "Aplikace Modrinth v{version} je připravena k instalaci! Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
   },
@@ -391,15 +388,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Verze {version} byla úspěšně nainstalována!"
-  },
-  "app.update.download-update": {
-    "message": "Stáhnout aktualizaci"
-  },
-  "app.update.downloading-update": {
-    "message": "Stahování aktualizace ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Restartovat aplikaci pro nainstalování aktualizace"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "priklad.modrinth.gg"

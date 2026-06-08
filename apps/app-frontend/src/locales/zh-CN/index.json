@@ -470,9 +470,6 @@
   "app.skins.title": {
     "message": "皮肤选择器"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
   },
@@ -502,15 +499,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安装！"
-  },
-  "app.update.download-update": {
-    "message": "下载更新"
-  },
-  "app.update.downloading-update": {
-    "message": "下载更新中（{percent}%）"
-  },
-  "app.update.reload-to-update": {
-    "message": "重启以安装更新"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

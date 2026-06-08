@@ -470,9 +470,6 @@
   "app.skins.title": {
     "message": "Seleziona una skin"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
   },
@@ -502,15 +499,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "La versione {version} è stata installata con successo!"
-  },
-  "app.update.download-update": {
-    "message": "Scarica aggiornamento"
-  },
-  "app.update.downloading-update": {
-    "message": "Scaricando l'aggiornamento ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Ricarica per installare l'aggiornamento"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
