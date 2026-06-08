@@ -1,10 +1,11 @@
 import type { InferredClientModules } from '../modules'
 import { buildModuleStructure } from '../modules'
-import type { ClientConfig } from '../types/client'
+import type { BaseUrlConfig, ClientConfig } from '../types/client'
 import type { RequestContext, RequestOptions } from '../types/request'
 import type { UploadMetadata, UploadProgress, UploadRequestOptions } from '../types/upload'
 import type { AbstractFeature } from './abstract-feature'
 import type { AbstractModule } from './abstract-module'
+import type { AbstractSyncClient } from './abstract-sync'
 import { AbstractUploadClient } from './abstract-upload-client'
 import type { AbstractWebSocketClient } from './abstract-websocket'
 import { ModrinthApiError, ModrinthServerError } from './errors'
@@ -32,7 +33,10 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	private _moduleNamespaces: Map<string, Record<string, AbstractModule>> = new Map()
 
 	public readonly labrinth!: InferredClientModules['labrinth']
-	public readonly archon!: ArchonClientModules & { sockets: AbstractWebSocketClient }
+	public readonly archon!: ArchonClientModules & {
+		sockets: AbstractWebSocketClient
+		sync: AbstractSyncClient
+	}
 	public readonly kyros!: InferredClientModules['kyros']
 	public readonly iso3166!: InferredClientModules['iso3166']
 	public readonly mclogs!: InferredClientModules['mclogs']
@@ -116,9 +120,9 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	async request<T>(path: string, options: RequestOptions): Promise<T> {
 		let baseUrl: string
 		if (options.api === 'labrinth') {
-			baseUrl = this.config.labrinthBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
-			baseUrl = this.config.archonBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
 		} else {
 			baseUrl = options.api
 		}
@@ -160,13 +164,55 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		}
 	}
 
+	async stream(path: string, options: RequestOptions): Promise<ReadableStream<Uint8Array>> {
+		let baseUrl: string
+		if (options.api === 'labrinth') {
+			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
+		} else if (options.api === 'archon') {
+			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
+		} else {
+			baseUrl = options.api
+		}
+
+		const url = this.buildUrl(path, baseUrl, options.version)
+		const defaultHeaders = await this.buildDefaultHeaders()
+		const mergedOptions: RequestOptions = {
+			method: 'GET',
+			retry: false,
+			circuitBreaker: false,
+			...options,
+			headers: {
+				...defaultHeaders,
+				Accept: 'text/event-stream',
+				...options.headers,
+			},
+		}
+		this.attachArchonSentryCaptureHeader(mergedOptions)
+
+		const context = this.buildContext(url, path, mergedOptions)
+
+		try {
+			return await this.executeFeatureChain<ReadableStream<Uint8Array>>(context, () =>
+				this.executeStreamRequest(context.url, context.options),
+			)
+		} catch (error) {
+			const apiError = this.normalizeError(error, context)
+			await this.config.hooks?.onError?.(apiError, context)
+
+			throw apiError
+		}
+	}
+
 	/**
 	 * Execute the feature chain and the actual request
 	 *
 	 * Features are executed in order, with each feature calling next() to continue.
 	 * The last "feature" in the chain is the actual request execution.
 	 */
-	protected async executeFeatureChain<T>(context: RequestContext): Promise<T> {
+	protected async executeFeatureChain<T>(
+		context: RequestContext,
+		executeTerminal: () => Promise<T> = () => this.executeRequest<T>(context.url, context.options),
+	): Promise<T> {
 		// Filter to only features that should apply
 		const applicableFeatures = this.features.filter((feature) => feature.shouldApply(context))
 
@@ -184,7 +230,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			} else {
 				// We've reached the end of the chain, execute the actual request
 				await this.config.hooks?.onRequest?.(context)
-				return this.executeRequest<T>(context.url, context.options)
+				return executeTerminal()
 			}
 		}
 
@@ -241,6 +287,10 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		const cleanPath = path.startsWith('/') ? path : `/${path}`
 
 		return `${base}${versionPath}${cleanPath}`
+	}
+
+	protected resolveBaseUrl(baseUrl: BaseUrlConfig): string {
+		return typeof baseUrl === 'function' ? baseUrl() : baseUrl
 	}
 
 	/**
@@ -353,6 +403,11 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	 * @throws {Error} Platform-specific errors that will be normalized by normalizeError()
 	 */
 	protected abstract executeRequest<T>(url: string, options: RequestOptions): Promise<T>
+
+	protected abstract executeStreamRequest(
+		url: string,
+		options: RequestOptions,
+	): Promise<ReadableStream<Uint8Array>>
 
 	/**
 	 * Execute the actual XHR upload

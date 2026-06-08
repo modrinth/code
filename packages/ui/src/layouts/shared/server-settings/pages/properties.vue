@@ -56,6 +56,8 @@
 										v-model="combinedGamemode"
 										:items="gamemodeItems"
 										:format-label="capitalize"
+										:disabled-items="canUseAdvancedSettings ? [] : gamemodeItems"
+										:disabled-tooltip="permissionDeniedMessage"
 									/>
 								</div>
 
@@ -68,6 +70,8 @@
 										v-model="selectedDifficulty"
 										:items="difficultyItems"
 										:format-label="capitalize"
+										:disabled-items="canUseAdvancedSettings ? [] : difficultyItems"
+										:disabled-tooltip="permissionDeniedMessage"
 									/>
 								</div>
 
@@ -75,10 +79,12 @@
 									<span class="font-semibold text-contrast">Max players</span>
 									<StyledInput
 										id="server-property-max-players"
+										v-tooltip="advancedActionTooltip"
 										:model-value="liveProperties.max_players"
 										type="number"
 										placeholder="20"
 										wrapper-class="w-full max-w-[450px]"
+										:disabled="!canUseAdvancedSettings"
 										@update:model-value="liveProperties.max_players = String($event)"
 									/>
 								</div>
@@ -88,8 +94,10 @@
 									<StyledInput
 										id="server-property-motd"
 										v-model="liveProperties.motd"
+										v-tooltip="advancedActionTooltip"
 										placeholder="A Minecraft Server"
 										wrapper-class="w-full max-w-[450px]"
+										:disabled="!canUseAdvancedSettings"
 									/>
 								</div>
 
@@ -100,7 +108,9 @@
 									<span class="font-semibold text-contrast">Allow flight</span>
 									<Toggle
 										id="server-property-allow-flight"
+										v-tooltip="advancedActionTooltip"
 										:model-value="liveProperties.allow_flight === 'true'"
+										:disabled="!canUseAdvancedSettings"
 										@update:model-value="liveProperties.allow_flight = $event ? 'true' : 'false'"
 									/>
 								</div>
@@ -112,7 +122,9 @@
 									<span class="font-semibold text-contrast">Allow cheats</span>
 									<Toggle
 										id="server-property-allow-cheats"
+										v-tooltip="advancedActionTooltip"
 										:model-value="liveProperties.allow_cheats === 'true'"
+										:disabled="!canUseAdvancedSettings"
 										@update:model-value="liveProperties.allow_cheats = $event ? 'true' : 'false'"
 									/>
 								</div>
@@ -122,7 +134,12 @@
 									class="flex flex-row items-center justify-between gap-4 h-10"
 								>
 									<span class="font-semibold text-contrast">Enable whitelist</span>
-									<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
+									<Toggle
+										id="server-property-whitelist"
+										v-model="whitelistEnabled"
+										v-tooltip="advancedActionTooltip"
+										:disabled="!canUseAdvancedSettings"
+									/>
 								</div>
 
 								<div
@@ -133,6 +150,8 @@
 									<Toggle
 										id="server-property-spawn-protection-toggle"
 										v-model="spawnProtectionEnabled"
+										v-tooltip="advancedActionTooltip"
+										:disabled="!canUseAdvancedSettings"
 									/>
 								</div>
 
@@ -143,10 +162,12 @@
 									<span class="font-semibold text-contrast">Protection radius</span>
 									<StyledInput
 										id="server-property-spawn-protection-radius"
+										v-tooltip="advancedActionTooltip"
 										:model-value="liveProperties.spawn_protection"
 										type="number"
 										wrapper-class="w-full sm:w-[100px]"
 										input-class="text-right"
+										:disabled="!canUseAdvancedSettings"
 										@update:model-value="liveProperties.spawn_protection = String($event)"
 									/>
 								</div>
@@ -188,8 +209,10 @@
 												>
 													<Toggle
 														:id="`server-property-${key}`"
+														v-tooltip="advancedActionTooltip"
 														:model-value="liveProperties[key] === 'true'"
 														:aria-labelledby="`property-label-${key}`"
+														:disabled="!canUseAdvancedSettings"
 														@update:model-value="liveProperties[key] = $event ? 'true' : 'false'"
 													/>
 												</div>
@@ -199,11 +222,13 @@
 												>
 													<StyledInput
 														:id="`server-property-${key}`"
+														v-tooltip="advancedActionTooltip"
 														:model-value="liveProperties[key]"
 														type="number"
 														placeholder="Type here..."
 														wrapper-class="w-full"
 														:aria-labelledby="`property-label-${key}`"
+														:disabled="!canUseAdvancedSettings"
 														@update:model-value="liveProperties[key] = String($event)"
 													/>
 												</div>
@@ -211,9 +236,11 @@
 													<StyledInput
 														:id="`server-property-${key}`"
 														v-model="liveProperties[key]"
+														v-tooltip="advancedActionTooltip"
 														placeholder="Type here..."
 														wrapper-class="w-full"
 														:aria-labelledby="`property-label-${key}`"
+														:disabled="!canUseAdvancedSettings"
 													/>
 												</div>
 											</div>
@@ -253,7 +280,7 @@
 			:is-visible="hasUnsavedChanges || isUpdating"
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
-			restart
+			:restart="canUsePowerActions"
 			:save="
 				async () => {
 					await saveProperties()
@@ -273,6 +300,7 @@ import { computed, ref, watch } from 'vue'
 
 import { Accordion, Admonition, AutoLink, Chips, StyledInput, Toggle } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
@@ -284,6 +312,11 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
+const { canUseAdvancedSettings, canUsePowerActions, permissionDeniedMessage } =
+	useServerPermissions()
+const advancedActionTooltip = computed(() =>
+	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
+)
 const filesTabLink = computed(
 	() => `/hosting/manage/${encodeURIComponent(serverId)}/files?path=/&editing=server.properties`,
 )
@@ -486,7 +519,7 @@ function buildPatch(): Archon.Content.v1.PatchPropertiesFields {
 	return patch
 }
 
-const { mutateAsync: saveProperties, isPending: isUpdating } = useMutation({
+const { mutateAsync: savePropertiesMutation, isPending: isUpdating } = useMutation({
 	mutationFn: () =>
 		client.archon.properties_v1.patchProperties(serverId, worldId.value!, buildPatch()),
 	onSuccess: async () => {
@@ -506,6 +539,11 @@ const { mutateAsync: saveProperties, isPending: isUpdating } = useMutation({
 		})
 	},
 })
+
+async function saveProperties() {
+	if (!canUseAdvancedSettings.value) return
+	await savePropertiesMutation()
+}
 
 function resetProperties() {
 	syncFormFromData()

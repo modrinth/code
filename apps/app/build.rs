@@ -114,10 +114,12 @@ fn main() {
                         "get_available_capes",
                         "get_available_skins",
                         "add_and_equip_custom_skin",
-                        "set_default_cape",
                         "equip_skin",
                         "remove_custom_skin",
+                        "save_custom_skin",
                         "unequip_skin",
+                        "flush_pending_skin_change",
+                        "flush_pending_skin_change_for_profile",
                         "normalize_skin_texture",
                         "get_dragged_skin_data",
                     ])

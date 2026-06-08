@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -281,9 +278,6 @@
   "auth.sign-up.action.create-account": {
     "message": "Account aanmaken"
   },
-  "auth.sign-up.legal-dislaimer": {
-    "message": "Door een account te creëren, ga je akkoord met de <terms-link>Voorwaarden</terms-link> en het </privacy-policy-link>Privacybeleid</privacy-policy-link> van Modrinth."
-  },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Wachtwoorden komen niet overeen!"
   },
@@ -337,9 +331,6 @@
   },
   "auth.welcome.description": {
     "message": "Je bent nu deel van de geweldige community van makers en ontdekkers die mods bouwen, downloaden en up-to-date blijven van geweldige mods."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Door een account te hebben gemaakt, ben je akkoord gegaan met de <terms-link>Voorwaarden</terms-link> en het </privacy-policy-link>Privacybeleid</privacy-policy-link> van Modrinth."
   },
   "auth.welcome.long-title": {
     "message": "Welkom op Modrinth!"
@@ -454,9 +445,6 @@
   },
   "create.limit-alert.limit-reached": {
     "message": "{type} limiet bereikt"
-  },
-  "create.limit-alert.limit-reached-description": {
-    "message": "Je hebt het {type} limiet bereikt. Neem contact op met support om je limiet te verhogen."
   },
   "create.limit-alert.type-collection": {
     "message": "Collectie"
@@ -1027,15 +1015,6 @@
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Gelieve het belastingformulier in te vullen"
-  },
-  "discover.seo.description": {
-    "message": "Zoek en blader door duizenden Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} op Modrinth met directe, nauwkeurige zoekresultaten. Onze filters helpen je snel de beste Minecraft {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}."
-  },
-  "discover.seo.title": {
-    "message": "Zoek {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Zoek {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} other {projects}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "U heeft mogelijk de URL van de collectie fout ingetypt."
@@ -2423,12 +2402,6 @@
   "project.settings.visit-dashboard": {
     "message": "Bezoek dashboard van het project"
   },
-  "project.stats.downloads-label": {
-    "message": "download{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "volger{count, plural, one {} other {s}}"
-  },
   "project.status.archived.message": {
     "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
   },
@@ -2438,23 +2411,11 @@
   "report.already-reported": {
     "message": "U heeft al {title} gerapporteerd"
   },
-  "report.already-reported-description": {
-    "message": "Je hebt al een open report voor {item, select, project {project} version {version} user {user} other {content}}, je kan nog meer informatie toevoegen aan de report als je nog meer informatie hebt."
-  },
-  "report.back-to-item": {
-    "message": "Terug naar {item, select, project {project} version {version} user {user} other {content}}"
-  },
   "report.body.description": {
     "message": "Voeg linken en afbeelding als het mogelijk en relevant is. Lege of onvoldoende rapportages zullen gesloten worden en geregeerd worden."
   },
   "report.body.title": {
     "message": "Geef alstublieft aanvoegende context over uw rapportage"
-  },
-  "report.checking": {
-    "message": "Controleren {item, select, project {project} version {version} user {user} other {content}}..."
-  },
-  "report.could-not-find": {
-    "message": "Kan {item, select, project {project} version {version} user {user} other {content}} niet vinden"
   },
   "report.for.violation": {
     "message": "Het schenden van Modrinth <rules-link> Regels</rules-link> of <terms-link>Termen</terms-link>"
@@ -2495,14 +2456,8 @@
   "report.please-report": {
     "message": "Graag rapporteer:"
   },
-  "report.question.content-id": {
-    "message": "Wat is het ID van {item, select, project {project} version {version} user {user} other {content}}?"
-  },
   "report.question.content-type": {
     "message": "Welk type conteant wil je rapporteren?"
-  },
-  "report.question.report-reason": {
-    "message": "Welke regels van Modrinth is {item, select, project {project} version {version} user {user} other {content}} zich niet aan het houden?"
   },
   "report.report-content": {
     "message": "Meld content aan moderators"
@@ -2615,26 +2570,14 @@
   "scopes.organizationWrite.label": {
     "message": "Schrijf organisaties"
   },
-  "scopes.patCreate.description": {
-    "message": "Creëer persoonlijke API tokens"
-  },
   "scopes.patCreate.label": {
     "message": "Creëer PAT's"
-  },
-  "scopes.patDelete.description": {
-    "message": "Verwijder uw persoonlijke API tokens"
   },
   "scopes.patDelete.label": {
     "message": "Verwijder PAT's"
   },
-  "scopes.patRead.description": {
-    "message": "Bekijk gemaakte API tokens"
-  },
   "scopes.patRead.label": {
     "message": "Lees PAT's"
-  },
-  "scopes.patWrite.description": {
-    "message": "Bewerk persoonlijke API tokens"
   },
   "scopes.patWrite.label": {
     "message": "Schrijf PAT's"
@@ -3173,26 +3116,14 @@
   "settings.billing.charges.title": {
     "message": "Eerdere aanklachten"
   },
-  "settings.billing.expires": {
-    "message": "Vervalt op {datum}"
-  },
   "settings.billing.interval.month": {
     "message": "maand"
-  },
-  "settings.billing.interval.monthly": {
-    "message": "maandelijks"
   },
   "settings.billing.interval.quarter": {
     "message": "kwartaal"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "Per kwartaal"
-  },
   "settings.billing.interval.year": {
     "message": "jaar"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "jaarlijks"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Reclamevrij surfen op modrinth.com en in de Modrinth app"
@@ -3205,9 +3136,6 @@
   },
   "settings.billing.midas.benefits.title": {
     "message": "Voordelen"
-  },
-  "settings.billing.midas.save-per-year": {
-    "message": "Bespaar {bedrag} per jaar door over te stappen op jaarfacturering!"
   },
   "settings.billing.midas.status.cancelled.line1": {
     "message": "Je hebt je abonnement opgezegd."
@@ -3248,9 +3176,6 @@
   "settings.billing.next": {
     "message": "Volgende:"
   },
-  "settings.billing.or-yearly-save": {
-    "message": "Of {prijs} per jaar (bespaar {percent}%)!"
-  },
   "settings.billing.payment_method.action.add": {
     "message": "Voeg betalings-methode toe"
   },
@@ -3277,9 +3202,6 @@
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
-  },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
   },
   "settings.billing.pyro.cpu": {
     "message": "{shared} Gedeelde CPU's (pieken tot {bursts} CPU's)"
@@ -3329,14 +3251,8 @@
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Server Abonnementen"
   },
-  "settings.billing.renews": {
-    "message": "Vernieuwt {datum}"
-  },
   "settings.billing.resubscribe": {
     "message": "Opnieuw abonneren"
-  },
-  "settings.billing.since": {
-    "message": "Sinds {datum}"
   },
   "settings.billing.subscribe": {
     "message": "Abonneren"
@@ -3346,18 +3262,6 @@
   },
   "settings.billing.subscription.title": {
     "message": "Abonnementen"
-  },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Overstappen naar {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Schakel over naar {interval}"
-  },
-  "settings.billing.switch.tooltip.monthly-additional-per-year": {
-    "message": "Bij maandelijkse facturering betaalt u {bedrag} extra per jaar"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Gaat op {datum} over op facturering per {interval}"
   },
   "settings.billing.update-method": {
     "message": "Update methode"

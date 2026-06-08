@@ -53,11 +53,11 @@
 										{{ formatDate(version.date_published) }}</span
 									>
 								</div>
-								<ButtonStyled color="brand" type="transparent">
+								<ButtonStyled v-if="getPrimaryFile(version)" color="brand" type="transparent">
 									<a
 										class="ml-auto"
 										:href="createDownloadUrl(version)"
-										:download="getPrimaryFile(version).filename"
+										:download="getPrimaryFile(version)?.filename"
 										:title="`Download ${version.name}`"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -145,10 +145,10 @@ const filteredVersions = computed(() => {
 		(projectVersion) =>
 			(selectedGameVersions.length === 0 ||
 				selectedGameVersions.some((gameVersion) =>
-					projectVersion.game_versions.includes(gameVersion),
+					getVersionGameVersions(projectVersion).includes(gameVersion),
 				)) &&
 			(selectedLoaders.length === 0 ||
-				selectedLoaders.some((loader) => projectVersion.loaders.includes(loader))) &&
+				selectedLoaders.some((loader) => getVersionLoaders(projectVersion).includes(loader))) &&
 			(selectedVersionTypes.length === 0 ||
 				selectedVersionTypes.includes(projectVersion.version_type)),
 	)
@@ -233,13 +233,24 @@ watch(
 )
 
 function getPrimaryFile(version) {
-	return version.files.find((x) => x.primary) || version.files[0]
+	return version.files?.find((x) => x.primary) || version.files?.[0]
 }
 
 function createDownloadUrl(version) {
-	return createProjectDownloadUrl(getPrimaryFile(version).url, {
+	const file = getPrimaryFile(version)
+	if (!file?.url) return undefined
+
+	return createProjectDownloadUrl(file.url, {
 		reason: cdnDownloadReason.value,
 	})
+}
+
+function getVersionGameVersions(version) {
+	return Array.isArray(version.game_versions) ? version.game_versions : []
+}
+
+function getVersionLoaders(version) {
+	return Array.isArray(version.loaders) ? version.loaders : []
 }
 </script>
 

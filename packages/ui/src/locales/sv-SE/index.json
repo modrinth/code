@@ -59,18 +59,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Misslyckades att ladda prenumerationsdetaljer."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 dagar"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/månad"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/kvartal"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/år"
-  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Plan"
   },
@@ -269,20 +257,11 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Uppdatera projekt"
   },
-  "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "Uppdatera {count} projekt"
-  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Att radera en mod kan ständigt påverka din värld och kan orsaka försvunnen innehåll eller oförväntade problem när den öppnas igen."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Raderingsvarning"
-  },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Radera {count} {count, plural, one {{itemType, select, project {projekt} version {version} user {användare} other {projekt}}} other {{itemType, select, project {projekt} version {versioner} user {användare} other {projekt}}}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Radera {count, plural, one {{itemType, select, project {projekt} version {version} user {användare} other {projekt}}} other {{itemType, select, project {projekt} version {versioner} user {användare} other {projekt}}}}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Att nedgradera} other {Att uppdatera}} kan orsaka kompatibilitetsproblem. Moddar eller innehåller du har lagt till själv kommer behållas, men kanske inte är kompatibel med nya versionen."
@@ -350,9 +329,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Håll Skift medan du klickar för att hoppa över bekräftelsen."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Vi rekommenderar att du skapar en säkerhetskopia så att du kan återställa din {type, select, server {värld} other {instans}} ifall något går sönder."
-  },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Modpaketets innehåll kan nu ses här!"
   },
@@ -394,9 +370,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Vänligen vänta"
-  },
-  "content.page-layout.search-placeholder": {
-    "defaultMessage": "Sök genom {count} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Filernas namn"
@@ -461,9 +434,6 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Uppdaterar {contentType}..."
   },
-  "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} valda"
-  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} valda"
   },
@@ -482,17 +452,8 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} överskrivna"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Överskriven"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Filer kommer att skrivas över"
-  },
-  "files.create-modal.create-button": {
-    "defaultMessage": "Skapa {type, select, directory {mapp} other {fil}}"
-  },
-  "files.create-modal.header": {
-    "defaultMessage": "Skapa en {type, select, directory {mapp} other {fil}}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "t.ex. min-mapp"
@@ -505,9 +466,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Radera fil"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Mappen och dess innehåll kommer raderas permanent. Det här kan inte ångras.} other {Filen kommer raderas permanent. Det här kan inte ångras.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Kunde inte ladda filens innehåll."
@@ -872,17 +830,11 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Vi rekommenderar inte att du ändrar installationsinställningarna efter att du har installerat innehållet. Om du vill ändra dem måste du starta om servern."
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Länkat {projectType, select, server {serverprojekt} other {modpaket}}"
-  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} version"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Du kommer att behöva ställa om din server för att ändra loader."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Ominstallering av modpaketet återställer {type, select, server {serverns} other {instansens}} innehåll till dess originella skick, vilket kommer ta bort moddar eller innehåll som du lagt till."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Ominstallera modpaket"
@@ -914,9 +866,6 @@
   "installation-settings.unlink": {
     "defaultMessage": "Avlänka"
   },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Att avlänka kommer permanent avkoppla denna {type, select, server {server} other {instans}} från {projectType, select, server {server} other {modpaket}}-projektet, vilket ska låta dig ändra loadern och Minecraft-versionen, men du kommer inte att få uppdateringar i framtiden."
-  },
   "installation-settings.verifying": {
     "defaultMessage": "Verifierar..."
   },
@@ -931,12 +880,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Ominstallera modpack"
-  },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Att laga kommer att ominstallera loadern och Minecraft-beroenden utan att radera ditt innehåll. Detta kan lösa problem om {type, select, server {din server inte startar som den ska} other {ditt spel inte startar på grund av lancher-relaterade fel}}."
-  },
-  "instance.confirm-repair.header": {
-    "defaultMessage": "Reparera {type, select, server {server} other {instans}}"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparera"
@@ -1015,9 +958,6 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Inga projekt matchar din sökning."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Sök genom {count, number} projekt"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -1496,9 +1436,6 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
-  "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
-  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -1808,14 +1745,8 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Okänd miljö"
   },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} följare"
-  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
-  },
-  "project.online-player-count.tooltip": {
-    "defaultMessage": "{count} spelare online"
   },
   "project.recent-plays": {
     "defaultMessage": "Spelades senast {count} {countPlural, plural, one {gång} other {gånger}}"
@@ -2552,9 +2483,6 @@
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Sök efter ett språk..."
   },
-  "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural, =0 {Inga språk matchar} other {# språk matchar}} din sökning."
-  },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Inget språk matchar din sökning."
   },
@@ -2976,4 +2904,3 @@
     "defaultMessage": "Du har osparade ändringar."
   }
 }
-

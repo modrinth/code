@@ -30,10 +30,11 @@ export const initAuth = async (oldToken = null) => {
 	}
 
 	const route = useRoute()
+	const config = useRuntimeConfig()
 	const authCookie = useCookie('auth-token', {
 		maxAge: 60 * 60 * 24 * 365 * 10,
 		sameSite: 'lax',
-		secure: true,
+		secure: config.public.cookieSecure,
 		httpOnly: false,
 		path: '/',
 	})
@@ -75,6 +76,7 @@ export const initAuth = async (oldToken = null) => {
 			auth.user = await useBaseFetch(
 				'user',
 				{
+					apiVersion: 3,
 					headers: {
 						Authorization: auth.token,
 					},
@@ -105,6 +107,7 @@ export const initAuth = async (oldToken = null) => {
 				auth.user = await useBaseFetch(
 					'user',
 					{
+						apiVersion: 3,
 						headers: {
 							Authorization: auth.token,
 						},

@@ -26,8 +26,9 @@
 		>
 			<StyledInput
 				v-model="commandInput"
+				v-tooltip="disableInput ? disableInputTooltip : undefined"
 				:icon="TerminalSquareIcon"
-				:placeholder="disableInput ? 'Server is not running' : 'Send a command'"
+				:placeholder="disableInput ? disabledInputPlaceholder : 'Send a command'"
 				:disabled="disableInput"
 				wrapper-class="w-full"
 				input-class="!h-10"
@@ -51,6 +52,8 @@ const props = withDefaults(
 		scrollback?: number
 		showInput?: boolean
 		disableInput?: boolean
+		disableInputTooltip?: string
+		disabledInputPlaceholder?: string
 		fullscreen?: boolean
 		emptyStateType?: 'server' | 'instance'
 		loading?: boolean
@@ -59,6 +62,8 @@ const props = withDefaults(
 		scrollback: Infinity,
 		showInput: false,
 		disableInput: false,
+		disableInputTooltip: undefined,
+		disabledInputPlaceholder: 'Server is not running',
 		fullscreen: false,
 		emptyStateType: undefined,
 		loading: false,
@@ -215,6 +220,7 @@ watch(
 )
 
 const submitCommand = () => {
+	if (props.disableInput) return
 	const cmd = commandInput.value.trim()
 	if (!cmd) return
 	emit('command', cmd)

@@ -272,9 +272,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "Instalar"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pacote de mods necessário"
   },
@@ -331,6 +328,147 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gerenciamento de recursos"
+  },
+  "app.skins.add-button": {
+    "message": "Adicionar skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Arraste e solte"
+  },
+  "app.skins.apply-button": {
+    "message": "Aplicar"
+  },
+  "app.skins.delete-button": {
+    "message": "Excluir skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Isto permanentemente deletará a skin selecionada. Esta ação não pode ser desfeita."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Tem certeza de que deseja excluir esta skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Falha ao ler o arquivo solto."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Erro ao processar o arquivo"
+  },
+  "app.skins.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Adicionar skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Adicionando skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Estilo do braço"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Fino"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Largo"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Capa"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Capa"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Editando skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Primeiro, faça uma edição na skin!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Sem capa"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Nenhum"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Substituir textura"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Salvar skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Salvando..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textura"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Primeiro, faça o envio de uma skin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Pré-visualizando"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Você está trocando de skin com muita frequência. Os servidores da Mojang bloquearam temporariamente novas solicitações. Aguarde um momento antes de tentar novamente."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Vá mais devagar!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Construtores & Biomas"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Skins padrões"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Orgulho LGBTQIA+ do Modrinth"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Você recebeu estas skins por doar para uma campanha de arrecadação de fundos do Orgulho LGBTQIA+ do Modrinth durante o Mês do Orgulho."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Skins salvas"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "A Era do Cobre"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Fazer login"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Faça login na sua conta do Minecraft para usar os recursos de gerenciamento de skins do Modrinth app."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Modrinth Bot animado"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Por favor, faça login"
+  },
+  "app.skins.title": {
+    "message": "Seletor de skin"
   },
   "app.update-popup.body": {
     "message": "O Modrinth App v{version} está pronto para ser instalado! Você pode recarregar para atualizar agora ou a atualização será feita automaticamente ao fechar o Modrinth App."
@@ -394,9 +532,6 @@
   },
   "friends.action.add-friend": {
     "message": "Adicionar um amigo"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count, plural, =0 {Nenhuma solicitação de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
   },
   "friends.add-friend.submit": {
     "message": "Enviar amizade"
@@ -645,7 +780,7 @@
     "message": "Memória alocada"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/caminho/para/java"
+    "message": "/caminho/ao/java"
   },
   "instance.settings.tabs.window": {
     "message": "Janela"

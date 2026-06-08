@@ -48,6 +48,26 @@ export const WithTime: Story = {
 	}),
 }
 
+export const Clearable: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27')
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-[300px]"
+					placeholder="Select a date..."
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
 export const OpenWithTime: Story = {
 	render: () => ({
 		components: { DatePicker },
@@ -88,6 +108,37 @@ export const Range: Story = {
 			<div class="flex max-w-sm flex-col gap-2">
 				<DatePicker v-model="value"
 				wrapperClass="w-[350px]" mode="range" default-view-date="2026-04-01" placeholder="Select a date range..." />
+				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const RangeWithTime: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref(['2026-04-13 09:00', '2026-04-29 17:30'])
+			const datePicker = ref<InstanceType<typeof DatePicker> | null>(null)
+
+			onMounted(async () => {
+				await nextTick()
+				datePicker.value?.open()
+			})
+
+			return { datePicker, value }
+		},
+		template: /* html */ `
+			<div class="flex h-[500px] max-w-sm flex-col gap-2">
+				<DatePicker
+					ref="datePicker"
+					v-model="value"
+					wrapperClass="w-[350px]"
+					mode="range"
+					enable-time
+					default-view-date="2026-04-01"
+					placeholder="Select a date and time range..."
+				/>
 				<p class="text-sm text-secondary">Selected value: {{ value?.join(' to ') || 'None' }}</p>
 			</div>
 		`,
@@ -292,6 +343,59 @@ export const OpenCalendar: Story = {
 	}),
 }
 
+export const CloseOnSelect: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-06-15')
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-[300px]"
+					close-on-select
+					default-view-date="2026-06-01"
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
+}
+
+export const CloseOnSelectInScrollablePanel: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-06-15')
+			return { value }
+		},
+		template: /* html */ `
+			<div class="h-[320px] w-[360px] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-2 p-4">
+				<div class="h-[360px]"></div>
+				<div class="flex max-w-sm flex-col gap-2">
+					<DatePicker
+						v-model="value"
+						wrapperClass="w-[300px]"
+						close-on-select
+						default-view-date="2026-06-01"
+					/>
+					<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+				</div>
+			</div>
+		`,
+	}),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Readonly touch selection closes without focusing the input in a way that scrolls its container.',
+			},
+		},
+	},
+}
+
 export const ForceAbove: Story = {
 	render: () => ({
 		components: { DatePicker },
@@ -413,6 +517,26 @@ export const Disabled: Story = {
 		modelValue: '2026-04-27',
 		disabled: true,
 	},
+}
+
+export const Editable: Story = {
+	render: () => ({
+		components: { DatePicker },
+		setup() {
+			const value = ref('2026-04-27')
+			return { value }
+		},
+		template: /* html */ `
+			<div class="flex max-w-sm flex-col gap-2">
+				<DatePicker
+					v-model="value"
+					wrapperClass="w-[300px]"
+					:readonly="false"
+				/>
+				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			</div>
+		`,
+	}),
 }
 
 export const CalendarClass: Story = {

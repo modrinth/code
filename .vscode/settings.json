@@ -9,7 +9,7 @@
 	"files.insertFinalNewline": true,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
-		"source.organizeImports": "always"
+		"source.organizeImports": "never"
 	},
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"[vue]": {

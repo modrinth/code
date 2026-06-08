@@ -65,17 +65,11 @@
   "nags.gallery.title": {
     "defaultMessage": "Visitar la página de la galería"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Tu {type, select, mod {mod} plugin {plugin} other {proyecto}} utiliza una licencia que requiere que el código fuente esté de libre acceso. Por favor, proporciona un enlace al código fuente o un archivo(s) para cada versión adicional, o considera usar una licencia diferente."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Proporcionar el código fuente"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Enlaces idénticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Tu Descripción debe contener suficiente texto sin formato o texto alternativo para imágenes, de modo que sea accesible para quienes utilizan lectores de pantalla o tienen conexiones lentas a Internet."
@@ -158,9 +152,6 @@
   "nags.select-language.title": {
     "defaultMessage": "Selecciona un idioma"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Selecciona la licencia bajo la que se distribuye tu {type, select, mod {mod} modpack {modpack} resourcepack {datapack} shader {shader} plugin {plugin} datapack {paquete de datos} other {proyecto}}."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Seleccionar una licencia"
   },
@@ -223,9 +214,6 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type, select, resourcepack {paquete de recursos, excepto para paquetes de audio o de traducción. Si esto describe tu paquete, selecciona la etiqueta correspondiente} shader {shader} other {proyecto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

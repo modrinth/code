@@ -135,7 +135,7 @@
     "message": "Ocultar servidores ya añadidos"
   },
   "app.browse.project-type.modpacks": {
-    "message": "Modpacks"
+    "message": "Paquetes de Mods"
   },
   "app.browse.server-instance-content-warning": {
     "message": "Añadir contenido puede comprometer la compatibilidad a la hora de unirse a un servidor. Cualquier contenido añadido se perderá cuando actualices la instancia del servidor."
@@ -331,6 +331,15 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
+  },
+  "app.skins.add-button": {
+    "message": "Añadir skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Arrastrar y soltar"
+  },
+  "app.skins.apply-button": {
+    "message": "Aplicar"
   },
   "app.update-popup.body": {
     "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
@@ -611,6 +620,24 @@
   "instance.settings.tabs.java": {
     "message": "Java y memoria"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variables de entorno personalizadas"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumentos personalizados de Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Instalación personalizada de Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Asignación de memoria personalizada"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Introduce las variables de entorno..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Introduce los argumentos de Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variables de entorno"
   },
@@ -625,6 +652,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memoria asignada"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/ruta/a/java"
   },
   "instance.settings.tabs.window": {
     "message": "Ventana"

@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -860,9 +857,6 @@
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Tarifas más bajas disponibles"
   },
-  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
-    "message": "Has seleccionado USD para PayPal Internacional. Te recomendamos que cambies a PayPal directo <direct-paypal-link> para obtener mejores tarifas (≈2% en lugar de ≈6%)."
-  },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retirada"
   },
@@ -920,9 +914,6 @@
   "dashboard.projects.links.button.edit": {
     "message": "Editar links"
   },
-  "dashboard.projects.links.changes-applied": {
-    "message": "Cambios seran a aplicados a {count} {count, plural,one {proyecto} other {proyectos}}."
-  },
   "dashboard.projects.links.description": {
     "message": "Los enlaces que especifique a continuación se sobrescribirán en cada uno de los proyectos seleccionados. Los que deje en blanco se ignorarán. Puede eliminar un enlace de todos los proyectos seleccionados mediante el botón de la papelera."
   },
@@ -955,9 +946,6 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Código base"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Una página que contiene información, documentación, y ayuda sobre el proyecto."
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Página de wiki"
@@ -2591,12 +2579,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visita el panel de proyectos"
   },
-  "project.stats.downloads-label": {
-    "message": "descarga{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "seguidor{count, plural,one {}other {es}}"
-  },
   "project.status.archived.message": {
     "message": "{title} ha sido archivado. {title} no recibirá ninguna futura actualización excepto que el autor decida desarchivar el proyecto."
   },
@@ -2606,23 +2588,11 @@
   "report.already-reported": {
     "message": "Ya has reportado {title}"
   },
-  "report.already-reported-description": {
-    "message": "Ya tienes un reporte abierto para este {item, select, project {project} version {version} user {user} other {content}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
-  },
-  "report.back-to-item": {
-    "message": "Volver a {item, select, project {project} version {version} user {user} other {content}}"
-  },
   "report.body.description": {
     "message": "Incluya enlaces e imágenes si es posible y relevante. Los informes vacíos o insuficientes serán cerrados e ignorados."
   },
   "report.body.title": {
     "message": "Por favor, proporcione más información sobre su informe"
-  },
-  "report.checking": {
-    "message": "Revisando {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}..."
-  },
-  "report.could-not-find": {
-    "message": "No se pudo encontrar {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}"
   },
   "report.for.violation": {
     "message": "Violación de las <rules-link>Normas</rules-link> o los <terms-link>Términos de uso</terms-link> de Modrinth"
@@ -2663,14 +2633,8 @@
   "report.please-report": {
     "message": "Por favor, informe:"
   },
-  "report.question.content-id": {
-    "message": "¿Cual es la ID de {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
-  },
   "report.question.content-type": {
     "message": "¿Qué tipo de contenido estás denunciando?"
-  },
-  "report.question.report-reason": {
-    "message": "¿Que regla de Mondrinth esta quebrantando {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
   },
   "report.report-content": {
     "message": "Denunciar contenido a los moderadores"
@@ -2783,26 +2747,14 @@
   "scopes.organizationWrite.label": {
     "message": "Escribir organizaciones"
   },
-  "scopes.patCreate.description": {
-    "message": "Crear tokens de API personales"
-  },
   "scopes.patCreate.label": {
     "message": "Crear PATs"
-  },
-  "scopes.patDelete.description": {
-    "message": "Eliminar tus tokens de API personales"
   },
   "scopes.patDelete.label": {
     "message": "Eliminar PATs"
   },
-  "scopes.patRead.description": {
-    "message": "Ver tokens de API creados"
-  },
   "scopes.patRead.label": {
     "message": "Leer PATs"
-  },
-  "scopes.patWrite.description": {
-    "message": "Editar tokens de API personales"
   },
   "scopes.patWrite.label": {
     "message": "Escribir PATs"
@@ -3347,20 +3299,11 @@
   "settings.billing.interval.month": {
     "message": "mes"
   },
-  "settings.billing.interval.monthly": {
-    "message": "mensual"
-  },
   "settings.billing.interval.quarter": {
     "message": "trimestre"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "trimestral"
-  },
   "settings.billing.interval.year": {
     "message": "año"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "anual"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Navegación sin anuncios en modrinth.com y Modrinth App"
@@ -3446,9 +3389,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} CPU compartidas (Picos de hasta {bursts} CPUs)"
   },
@@ -3515,17 +3455,8 @@
   "settings.billing.subscription.title": {
     "message": "Suscripciones"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Cambiando a {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Cambiar a {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "La facturación mensual te supondrá un coste adicional de {amount} al año"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Pasará a la facturación por {interval} a partir del {date}"
   },
   "settings.billing.update-method": {
     "message": "Actualizar método"
@@ -3715,9 +3646,6 @@
   },
   "settings.sessions.description": {
     "message": "Aquí están todos los dispositivos que están actualmente conectados con tu cuenta Modrinth. Puedes cerrar sesión en cada uno de ellos individualmente.\n\nSi ves una entrada que no reconoces, cierra sesión en ese dispositivo y cambia la contraseña de tu cuenta Modrinth inmediatamente."
-  },
-  "settings.sessions.last-accessed-ago": {
-    "message": "Último Acceso"
   },
   "settings.sessions.unknown-os": {
     "message": "Sistema operativo desconocido"

@@ -13,7 +13,7 @@ import {
 	UnlinkIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
@@ -23,6 +23,7 @@ import Chips from '#ui/components/base/Chips.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import PaperChannelBadge from '#ui/components/base/PaperChannelBadge.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel } from '#ui/utils/loaders'
@@ -41,6 +42,7 @@ import type { LoaderVersionEntry } from './types'
 
 const { formatMessage } = useVIntl()
 const ctx = injectInstallationSettings()
+const debug = useDebugLogger('InstallationSettingsLayout')
 
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const repairModal = ref<InstanceType<typeof ConfirmRepairModal>>()
@@ -61,6 +63,67 @@ const form = useInstallationForm(
 	incompatibleContentModal,
 )
 
+function stateSnapshot() {
+	return {
+		loading: ctx.loading.value,
+		isLinked: ctx.isLinked.value,
+		isBusy: ctx.isBusy.value,
+		busyMessage: ctx.busyMessage?.value,
+		isEditing: form.isEditing.value,
+		isSaving: form.isSaving.value,
+		isVerifying: form.isVerifying.value,
+		selectedPlatform: form.selectedPlatform.value,
+		selectedGameVersion: form.selectedGameVersion.value,
+		selectedLoaderVersion: form.selectedLoaderVersion.value,
+		hasChanges: form.hasChanges.value,
+		isValid: form.isValid.value,
+		updatingModpack: form.updatingModpack.value,
+		loadingVersions: form.loadingVersions.value,
+		pendingPreview: !!form.pendingPreview.value,
+		incompatibleContentVariant: form.incompatibleContentVariant.value,
+		repairing: ctx.repairing?.value,
+		reinstalling: ctx.reinstalling?.value,
+	}
+}
+
+function modalRefsSnapshot() {
+	return {
+		confirmLeaveModal: !!confirmLeaveModal.value,
+		repairModal: !!repairModal.value,
+		reinstallModal: !!reinstallModal.value,
+		unlinkModal: !!unlinkModal.value,
+		contentUpdaterModal: !!contentUpdaterModal.value,
+		contentDiffModal: !!contentDiffModal.value,
+		incompatibleContentModal: !!incompatibleContentModal.value,
+		modpackUpdateModal: !!modpackUpdateModal.value,
+	}
+}
+
+onMounted(() => {
+	debug('mounted', stateSnapshot(), modalRefsSnapshot())
+})
+
+onUpdated(() => {
+	debug('updated', stateSnapshot(), modalRefsSnapshot())
+})
+
+watch(
+	[
+		() => ctx.loading.value,
+		() => ctx.isLinked.value,
+		() => ctx.isBusy.value,
+		() => form.isEditing.value,
+		() => form.isSaving.value,
+		() => form.isVerifying.value,
+		() => form.updatingModpack.value,
+		() => form.pendingPreview.value,
+		() => form.incompatibleContentVariant.value,
+	],
+	(value, oldValue) => {
+		debug('state watch:', { oldValue, value, snapshot: stateSnapshot() })
+	},
+)
+
 function paperLoaderChannelTag(index: number): LoaderVersionEntry['channelTag'] | null {
 	if (form.selectedPlatform.value !== 'paper') return null
 	const entries = ctx.resolveLoaderVersions(
@@ -68,6 +131,13 @@ function paperLoaderChannelTag(index: number): LoaderVersionEntry['channelTag'] 
 		form.selectedGameVersion.value,
 	)
 	const tag = entries[index]?.channelTag
+	debug('paperLoaderChannelTag:', {
+		index,
+		selectedPlatform: form.selectedPlatform.value,
+		selectedGameVersion: form.selectedGameVersion.value,
+		entries: entries.length,
+		tag,
+	})
 	return tag === 'ALPHA' || tag === 'BETA' ? tag : null
 }
 
@@ -82,6 +152,7 @@ if (typeof window !== 'undefined') {
 	watch(
 		() => form.isSaving.value,
 		(saving) => {
+			debug('isSaving watch:', { saving })
 			if (saving) {
 				window.addEventListener('beforeunload', handleBeforeUnload)
 			} else {
@@ -91,10 +162,12 @@ if (typeof window !== 'undefined') {
 	)
 
 	onBeforeUnmount(() => {
+		debug('beforeUnmount', stateSnapshot(), modalRefsSnapshot())
 		window.removeEventListener('beforeunload', handleBeforeUnload)
 	})
 
 	onBeforeRouteLeave(async () => {
+		debug('beforeRouteLeave:', stateSnapshot())
 		if (form.isSaving.value) {
 			return (await confirmLeaveModal.value?.prompt()) ?? false
 		}
@@ -106,6 +179,14 @@ const disabledPlatforms = computed(() => {
 	if (!ctx.lockPlatform || ctx.currentPlatform.value === 'vanilla') return []
 	return ctx.availablePlatforms.filter((p) => p !== ctx.currentPlatform.value)
 })
+const platformDisabledItems = computed(() =>
+	ctx.isBusy.value ? ctx.availablePlatforms : disabledPlatforms.value,
+)
+const platformDisabledTooltip = computed(() =>
+	ctx.isBusy.value
+		? (ctx.busyMessage?.value ?? undefined)
+		: formatMessage(messages.platformLockTooltip),
+)
 
 const showModpackVersionActions = computed(() => {
 	const val = ctx.showModpackVersionActions
@@ -120,6 +201,17 @@ const isLocalFile = computed(() => {
 })
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
+	debug('handleModpackUpdateRequest: start', {
+		versionId: version.id,
+		versionNumber: version.version_number,
+		shiftKey: event?.shiftKey,
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
+	if (ctx.isBusy.value) {
+		debug('handleModpackUpdateRequest: ignored busy')
+		return
+	}
 	pendingUpdateVersion.value = version
 
 	const currentVersionId = ctx.updaterModalProps.value.currentVersionId
@@ -132,41 +224,83 @@ function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event
 		versionChangesGameVersion(version, ctx.updaterModalProps.value.currentGameVersion)
 
 	if (event?.shiftKey || !shouldShowWarning) {
+		debug('handleModpackUpdateRequest: confirming without warning', {
+			isUpdateDowngrade: isUpdateDowngrade.value,
+			shouldShowWarning,
+		})
 		handleModpackUpdateConfirm()
 		return
 	}
 
+	debug('handleModpackUpdateRequest: showing confirm modal', {
+		isUpdateDowngrade: isUpdateDowngrade.value,
+		shouldShowWarning,
+		refs: modalRefsSnapshot(),
+	})
 	modpackUpdateModal.value?.show()
 }
 
 function handleModpackUpdateConfirm() {
+	debug('handleModpackUpdateConfirm: start', {
+		pendingVersionId: pendingUpdateVersion.value?.id,
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
+	if (ctx.isBusy.value) {
+		debug('handleModpackUpdateConfirm: ignored busy')
+		return
+	}
 	const version = pendingUpdateVersion.value
 	if (version) {
+		debug('handleModpackUpdateConfirm: hiding updater and closing settings')
 		contentUpdaterModal.value?.hide()
 		form.cancelEditing()
 		ctx.closeSettings?.()
 		form.handleUpdaterConfirm(version)
 		pendingUpdateVersion.value = null
+		debug('handleModpackUpdateConfirm: done')
 	}
 }
 
 function handleModpackUpdateCancel() {
+	debug('handleModpackUpdateCancel', {
+		pendingVersionId: pendingUpdateVersion.value?.id,
+		snapshot: stateSnapshot(),
+	})
 	pendingUpdateVersion.value = null
 }
 
 function handleRepair() {
+	debug('handleRepair: start', { snapshot: stateSnapshot(), refs: modalRefsSnapshot() })
+	if (ctx.isBusy.value) {
+		debug('handleRepair: ignored busy')
+		return
+	}
 	form.cancelEditing()
 	ctx.repair()
+	debug('handleRepair: invoked ctx.repair')
 }
 
 function handleReinstall() {
+	debug('handleReinstall: start', { snapshot: stateSnapshot(), refs: modalRefsSnapshot() })
+	if (ctx.isBusy.value) {
+		debug('handleReinstall: ignored busy')
+		return
+	}
 	form.cancelEditing()
 	ctx.reinstallModpack()
+	debug('handleReinstall: invoked ctx.reinstallModpack')
 }
 
 function handleUnlink() {
+	debug('handleUnlink: start', { snapshot: stateSnapshot(), refs: modalRefsSnapshot() })
+	if (ctx.isBusy.value) {
+		debug('handleUnlink: ignored busy')
+		return
+	}
 	form.cancelEditing()
 	ctx.unlinkModpack()
+	debug('handleUnlink: invoked ctx.unlinkModpack')
 }
 
 const emit = defineEmits<{
@@ -174,9 +308,90 @@ const emit = defineEmits<{
 }>()
 
 function handleIncompatibleResetServer() {
+	debug('handleIncompatibleResetServer: start', { snapshot: stateSnapshot() })
+	if (ctx.isBusy.value) {
+		debug('handleIncompatibleResetServer: ignored busy')
+		return
+	}
 	form.cancelPreview()
 	form.cancelEditing()
 	emit('reset-server')
+	debug('handleIncompatibleResetServer: emitted reset-server')
+}
+
+function handleStartEditing() {
+	debug('handleStartEditing: before', stateSnapshot())
+	form.isEditing.value = true
+	nextTick(() => {
+		debug('handleStartEditing: after nextTick', stateSnapshot())
+	})
+}
+
+function handleCancelEditing() {
+	debug('handleCancelEditing: before', stateSnapshot())
+	form.cancelEditing()
+	nextTick(() => {
+		debug('handleCancelEditing: after nextTick', stateSnapshot())
+	})
+}
+
+function handleSave() {
+	debug('handleSave: before', stateSnapshot())
+	void form.save().finally(() => {
+		debug('handleSave: after promise', stateSnapshot())
+	})
+}
+
+function handleShowRepairModal() {
+	debug('handleShowRepairModal: before show', {
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
+	repairModal.value?.show()
+	nextTick(() => {
+		debug('handleShowRepairModal: after nextTick', {
+			snapshot: stateSnapshot(),
+			refs: modalRefsSnapshot(),
+		})
+	})
+}
+
+function handleShowUnlinkModal(event: MouseEvent) {
+	debug('handleShowUnlinkModal: before', {
+		shiftKey: event.shiftKey,
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
+	if (event.shiftKey) {
+		handleUnlink()
+		return
+	}
+	unlinkModal.value?.show()
+	nextTick(() => {
+		debug('handleShowUnlinkModal: after nextTick', {
+			snapshot: stateSnapshot(),
+			refs: modalRefsSnapshot(),
+		})
+	})
+}
+
+function handleShowReinstallModal(event: MouseEvent) {
+	debug('handleShowReinstallModal: before', {
+		shiftKey: event.shiftKey,
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
+	if (event.shiftKey) {
+		handleReinstall()
+		return
+	}
+	reinstallModal.value?.show()
+	nextTick(() => {
+		debug('handleShowReinstallModal: after nextTick', {
+			snapshot: stateSnapshot(),
+			refs: modalRefsSnapshot(),
+		})
+	})
 }
 
 defineExpose({
@@ -186,7 +401,7 @@ defineExpose({
 const messages = defineMessages({
 	linkedInstanceTitle: {
 		id: 'installation-settings.linked-instance.title',
-		defaultMessage: 'Linked {projectType, select, server {server project} other {modpack}}',
+		defaultMessage: 'Linked {projectType}',
 	},
 	reinstallModpackTitle: {
 		id: 'installation-settings.reinstall-modpack.title',
@@ -195,7 +410,7 @@ const messages = defineMessages({
 	reinstallModpackDescription: {
 		id: 'installation-settings.reinstall-modpack.description',
 		defaultMessage:
-			"Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added.",
+			'Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added.',
 	},
 	editInstallationTitle: {
 		id: 'installation-settings.edit-installation.title',
@@ -204,7 +419,7 @@ const messages = defineMessages({
 	unlinkDescription: {
 		id: 'installation-settings.unlink.description',
 		defaultMessage:
-			"Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
+			"Unlinking permanently disconnects this {type} from the {projectType} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
 	},
 	repairInstanceTitle: {
 		id: 'installation-settings.repair.instance-title',
@@ -228,6 +443,30 @@ const messages = defineMessages({
 		id: 'installation-settings.edit.warning-instance',
 		defaultMessage:
 			"We don't recommend editing your installation settings after installing content. If you want to edit them, be cautious as it may cause issues.",
+	},
+	serverProjectLabel: {
+		id: 'installation-settings.linked.server-project',
+		defaultMessage: 'server project',
+	},
+	modpackLabel: {
+		id: 'installation-settings.linked.modpack',
+		defaultMessage: 'modpack',
+	},
+	serverLabel: {
+		id: 'installation-settings.type.server',
+		defaultMessage: 'server',
+	},
+	instanceLabel: {
+		id: 'installation-settings.type.instance',
+		defaultMessage: 'instance',
+	},
+	serverPossessiveLabel: {
+		id: 'installation-settings.type.server-possessive',
+		defaultMessage: "server's",
+	},
+	instancePossessiveLabel: {
+		id: 'installation-settings.type.instance-possessive',
+		defaultMessage: "instance's",
 	},
 	editWarningServer: {
 		id: 'installation-settings.edit.warning-server',
@@ -389,6 +628,7 @@ const messages = defineMessages({
 					<div class="flex flex-wrap gap-2">
 						<ButtonStyled v-if="showModpackVersionActions">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
 								@click="form.handleChangeModpackVersion()"
@@ -405,16 +645,19 @@ const messages = defineMessages({
 					<span class="text-lg font-semibold text-contrast">
 						{{
 							formatMessage(messages.linkedInstanceTitle, {
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
+								projectType: formatMessage(
+									showModpackVersionActions ? messages.modpackLabel : messages.serverProjectLabel,
+								),
 							})
 						}}
 					</span>
 					<div>
 						<ButtonStyled color="orange">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="(e: MouseEvent) => (e.shiftKey ? handleUnlink() : unlinkModal?.show())"
+								@click="handleShowUnlinkModal"
 							>
 								<UnlinkIcon class="size-5" />
 								{{
@@ -430,8 +673,10 @@ const messages = defineMessages({
 					<span class="text-primary">
 						{{
 							formatMessage(messages.unlinkDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
+								type: formatMessage(ctx.isServer ? messages.serverLabel : messages.instanceLabel),
+								projectType: formatMessage(
+									showModpackVersionActions ? messages.modpackLabel : messages.serverLabel,
+								),
 							})
 						}}
 					</span>
@@ -445,11 +690,10 @@ const messages = defineMessages({
 					<div>
 						<ButtonStyled color="red">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="
-									(e: MouseEvent) => (e.shiftKey ? handleReinstall() : reinstallModal?.show())
-								"
+								@click="handleShowReinstallModal"
 							>
 								<SpinnerIcon v-if="ctx.reinstalling?.value" class="animate-spin" />
 								<DownloadIcon v-else class="size-5" />
@@ -464,7 +708,9 @@ const messages = defineMessages({
 					<span class="text-primary">
 						{{
 							formatMessage(messages.reinstallModpackDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
+								type: formatMessage(
+									ctx.isServer ? messages.serverPossessiveLabel : messages.instancePossessiveLabel,
+								),
 							})
 						}}
 					</span>
@@ -482,9 +728,10 @@ const messages = defineMessages({
 					<div>
 						<ButtonStyled>
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="repairModal?.show()"
+								@click="handleShowRepairModal"
 							>
 								<SpinnerIcon v-if="ctx.repairing?.value" class="animate-spin" />
 								<HammerIcon v-else class="size-5" />
@@ -525,8 +772,8 @@ const messages = defineMessages({
 								:items="ctx.availablePlatforms"
 								:format-label="formatLoaderLabel"
 								:capitalize="false"
-								:disabled-items="disabledPlatforms"
-								:disabled-tooltip="formatMessage(messages.platformLockTooltip)"
+								:disabled-items="platformDisabledItems"
+								:disabled-tooltip="platformDisabledTooltip"
 								:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
 							/>
 						</div>
@@ -537,6 +784,7 @@ const messages = defineMessages({
 							</span>
 							<Combobox
 								v-model="form.selectedGameVersion.value"
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								:options="form.gameVersionOptions.value"
 								searchable
 								sync-with-selection
@@ -547,11 +795,14 @@ const messages = defineMessages({
 									formatMessage(commonMessages.selectVersionPlaceholder)
 								"
 								:aria-label="formatMessage(messages.selectGameVersionAriaLabel)"
+								:disabled="ctx.isBusy.value"
 								@option-hover="ctx.onGameVersionHover?.($event)"
 							>
 								<template v-if="form.hasSnapshots.value" #dropdown-footer>
 									<button
+										v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+										:disabled="ctx.isBusy.value"
 										@mousedown.prevent
 										@click="form.showSnapshots.value = !form.showSnapshots.value"
 									>
@@ -580,6 +831,7 @@ const messages = defineMessages({
 							</span>
 							<Combobox
 								v-model="form.selectedLoaderVersion.value"
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								searchable
 								sync-with-selection
 								:placeholder="
@@ -597,6 +849,7 @@ const messages = defineMessages({
 										loader: form.formattedLoaderName.value,
 									})
 								"
+								:disabled="ctx.isBusy.value"
 							>
 								<template
 									v-if="form.selectedPlatform.value === 'paper'"
@@ -629,9 +882,15 @@ const messages = defineMessages({
 						<div class="flex flex-wrap gap-2">
 							<ButtonStyled color="brand">
 								<button
+									v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 									class="!shadow-none"
-									:disabled="!form.isValid.value || !form.hasChanges.value || form.isSaving.value"
-									@click="form.save()"
+									:disabled="
+										!form.isValid.value ||
+										!form.hasChanges.value ||
+										form.isSaving.value ||
+										ctx.isBusy.value
+									"
+									@click="handleSave"
 								>
 									<SpinnerIcon v-if="form.isSaving.value" class="animate-spin" />
 									<SaveIcon v-else />
@@ -645,7 +904,7 @@ const messages = defineMessages({
 								</button>
 							</ButtonStyled>
 							<ButtonStyled type="outlined">
-								<button @click="form.cancelEditing()">
+								<button @click="handleCancelEditing">
 									<XIcon />
 									{{ formatMessage(commonMessages.cancelButton) }}
 								</button>
@@ -672,9 +931,10 @@ const messages = defineMessages({
 					<div class="flex flex-wrap gap-2">
 						<ButtonStyled color="orange">
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="form.isEditing.value = true"
+								@click="handleStartEditing"
 							>
 								<PencilIcon class="size-5" />
 								{{ formatMessage(commonMessages.editButton) }}
@@ -706,9 +966,10 @@ const messages = defineMessages({
 					<div>
 						<ButtonStyled>
 							<button
+								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="repairModal?.show()"
+								@click="handleShowRepairModal"
 							>
 								<SpinnerIcon v-if="ctx.repairing?.value" class="animate-spin" />
 								<HammerIcon v-else class="size-5" />

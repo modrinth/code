@@ -8,6 +8,51 @@
   "admin.billing.error.not-found": {
     "message": "Пользователь не найден"
   },
+  "analytics.action.add": {
+    "message": "Добавить"
+  },
+  "analytics.action.cancel": {
+    "message": "Отмена"
+  },
+  "analytics.action.refresh": {
+    "message": "Перезагрузить"
+  },
+  "analytics.action.reset": {
+    "message": "Сбросить"
+  },
+  "analytics.breakdown.country": {
+    "message": "Страна"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Причина скачивания"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Источник скачивания"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Версия игры"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Загрузчик"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Монетизация"
+  },
+  "analytics.breakdown.project": {
+    "message": "Проект"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Статус проекта"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Версия проекта"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ч"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
   "app-marketing.download.description": {
     "message": "Наше приложение доступно на всех платформах — выберите желаемую версию."
   },
@@ -123,7 +168,7 @@
     "message": "∞ МБ"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ МБ"
+    "message": "∞ · ∞ МБ"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 МБ"
@@ -548,9 +593,6 @@
   "create.limit-alert.approaching-limit": {
     "message": "Почти исчерпан лимит {type} ({current}/{max})"
   },
-  "create.limit-alert.approaching-limit-description": {
-    "message": "Почти достигнут лимит в {max} {type}. Увеличьте его, обратившись в поддержку."
-  },
   "create.limit-alert.contact-support": {
     "message": "Связаться с поддержкой"
   },
@@ -686,9 +728,6 @@
   "dashboard.affiliate-links.search": {
     "message": "Поиск ссылок..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "с {count, plural, one {# проекта} other {# проектов}}"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Всего скачиваний"
   },
@@ -709,9 +748,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Попробуйте изменить фильтры или запрос."
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Поиск по коллекциям"
@@ -995,9 +1031,6 @@
   "dashboard.notifications.link.view-history": {
     "message": "История уведомлений"
   },
-  "dashboard.notifications.link.view-more": {
-    "message": "Посмотреть ещё {extraNotifs, number}"
-  },
   "dashboard.organizations.button.create": {
     "message": "Создать организацию"
   },
@@ -1006,9 +1039,6 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Не удалось получить организации"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count, plural, one {# участник} few {# участника} other {# участников}}"
   },
   "dashboard.organizations.title": {
     "message": "Организации"
@@ -1090,9 +1120,6 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Исходный код"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Страница содержит информацию, документацию и помощь для проекта."
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Вики"
@@ -1355,20 +1382,8 @@
   "discover.install.error.no-server-world": {
     "message": "Нет доступного мира сервера для установки."
   },
-  "discover.install.error.unsupported-content-type": {
-    "message": "Этот тип контента не поддерживается для установки на сервер."
-  },
   "discover.install.heading.reset-modpack": {
     "message": "Выбор сборки модов для установки после сброса"
-  },
-  "discover.seo.description": {
-    "message": "Тысячи {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}} для Minecraft на Modrinth. Мгновенный точный поиск и удобные фильтры помогут быстро найти лучшие {projectType, select, mod {моды} modpack {сборки} resourcepack {наборы ресурсов} shader {шейдеры} plugin {плагины} datapack {наборы данных} other {проекты}} для Minecraft."
-  },
-  "discover.seo.title": {
-    "message": "Поиск {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}}"
-  },
-  "discover.seo.title-with-query": {
-    "message": "Поиск {projectType, select, mod {модов} modpack {сборок} resourcepack {наборов ресурсов} shader {шейдеров} plugin {плагинов} datapack {наборов данных} other {проектов}} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "В адресе коллекции может быть ошибка."
@@ -1881,7 +1896,7 @@
     "message": "Ошибка генерации состояния от API во время сборки."
   },
   "layout.banner.preview.description": {
-    "message": "Официальный сайт Modrinth доступен по адресу {url}. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Официальный сайт Modrinth доступен по адресу {url}. Текущая предварительная версия предназначена для тестирования командой Modrinth и собрана из {ref}."
   },
   "layout.banner.preview.title": {
     "message": "Это предварительная версия сайта Modrinth."
@@ -2417,9 +2432,6 @@
   "profile.label.collection": {
     "message": "Коллекция"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {скачивание} few {скачивания} other {скачиваний}}"
-  },
   "profile.label.joined": {
     "message": "Регистрация:"
   },
@@ -2438,9 +2450,6 @@
   "profile.label.organizations": {
     "message": "Организации"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
-  },
   "profile.label.saving": {
     "message": "Сохранение..."
   },
@@ -2450,8 +2459,8 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} — Скачать проекты {username} на Modrinth"
   },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> подписчик} few {<stat>{count}</stat> подписчика} other {<stat>{count}</stat> подписчиков}} у проектов"
+  "profile.official-account": {
+    "message": "Официальный аккаунт Modrinth"
   },
   "profile.user-id": {
     "message": "ID пользователя: {id}"
@@ -2897,12 +2906,6 @@
   "project.settings.visit-dashboard": {
     "message": "Управление проектами"
   },
-  "project.stats.downloads-label": {
-    "message": "скачивани{count, plural, one {е} few {я} other {й}}"
-  },
-  "project.stats.followers-label": {
-    "message": "подписчик{count, plural, one {} few {а} other {ов}}"
-  },
   "project.status.archived.message": {
     "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },
@@ -2921,23 +2924,11 @@
   "report.already-reported": {
     "message": "Вы уже пожалова­лись на {title}"
   },
-  "report.already-reported-description": {
-    "message": "Жалоба на {item, select, project {этот проект} version {эту версию} user {этого пользователя} other {этот контент}} уже отправлена. Если у вас есть дополнительная информация, добавьте её к жалобе."
-  },
-  "report.back-to-item": {
-    "message": "Вернуться к {item, select, project {проекту} version {версии} user {пользователю} other {контенту}}"
-  },
   "report.body.description": {
     "message": "При желании прикрепите ссылки и изображения. Неполные жалобы закрываются без рассмотрения."
   },
   "report.body.title": {
     "message": "Добавьте подробности к жалобе"
-  },
-  "report.checking": {
-    "message": "Поиск {item, select, project {проекта} version {версии} user {пользователя} other {контента}}..."
-  },
-  "report.could-not-find": {
-    "message": "Не удалось найти {item, select, project {проект} version {версию} user {пользователя} other {контент}}"
   },
   "report.for.violation": {
     "message": "На нарушение наших <rules-link>правил</rules-link> или <terms-link>условий</terms-link>"
@@ -2978,14 +2969,8 @@
   "report.please-report": {
     "message": "На что жаловаться"
   },
-  "report.question.content-id": {
-    "message": "Какой ID у {item, select, project {проекта} version {версии} user {пользователя} other {контента}}?"
-  },
   "report.question.content-type": {
     "message": "На какой тип контента вы жалуетесь?"
-  },
-  "report.question.report-reason": {
-    "message": "Какое правило Modrinth нарушено {item, select, project {этим проектом} version {этой версией} user {этим пользователем} other {этим контентом}}?"
   },
   "report.report-content": {
     "message": "Жалоба модерато­рам на контент"
@@ -3326,6 +3311,9 @@
   "servers.plan.small.description": {
     "message": "Для 1–5 друзей и пары лёгких модов."
   },
+  "servers.purchase.step.plan.billed": {
+    "message": "{interval, select, monthly {на месяц} quarterly {на 3 месяца} yearly {на год} other {оплата {interval}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
   },
@@ -3487,6 +3475,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Добавьте ещё один уровень безопасности аккаунта при входе."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Отвязка аутентификатора"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Привязка аутентификатора"
   },
   "settings.account.security.two-factor.title": {
     "message": "Двухфакторная аутентификация"
@@ -3665,20 +3659,11 @@
   "settings.billing.interval.month": {
     "message": "месяц"
   },
-  "settings.billing.interval.monthly": {
-    "message": "ежемесячно"
-  },
   "settings.billing.interval.quarter": {
-    "message": "3 месяца"
-  },
-  "settings.billing.interval.quarterly.adjective": {
     "message": "3 месяца"
   },
   "settings.billing.interval.year": {
     "message": "год"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "ежегодно"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Отсутствие рекламы на сайте и в приложении"
@@ -3764,12 +3749,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} в {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
-  "settings.billing.pyro.cpu": {
-    "message": "{shared, plural, one {# разделяемый} other {# разделяемых}} CPU (рост до {bursts} CPU)"
-  },
   "settings.billing.pyro.linked-server.not-found": {
     "message": "Привязанный сервер не найден. Возможных причин несколько: сервер куплен только что — подождите, подготовка занимает до часа; сервер куплен давно — вероятно, его уже приостановили. Если что‑то не так, свяжитесь с поддержкой Modrinth, указав следующие данные:"
   },
@@ -3834,16 +3813,13 @@
     "message": "Подписки"
   },
   "settings.billing.switch.switching-to-interval": {
-    "message": "Переход на {interval, select, ежемесячно {месяц} ежегодно {год} other {{interval}}}"
+    "message": "Переход на {interval, select, monthly {месяц} yearly {год} other {{interval}}}"
   },
   "settings.billing.switch.to-interval": {
-    "message": "Перейти на {interval, select, ежемесячно {месяц} ежегодно {год} other {{interval}}}"
+    "message": "Перейти на {interval, select, monthly {месяц} yearly {год} other {{interval}}}"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Ежемесячная оплата обойдётся на {amount} в год дороже"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "{interval, select, ежемесячно {Ежемесячная оплата} ежегодно {Ежегодная оплата} 3 месяца {Оплата раз в 3 месяца} other {{interval} оплата}} с {date}"
   },
   "settings.billing.update-method": {
     "message": "Обновить способ"
@@ -3981,7 +3957,7 @@
     "message": "Вы действительно хотите удалить этот токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Изменение личного токена доступа"
+    "message": "Настройка личного токена доступа"
   },
   "settings.pats.token.action.edit": {
     "message": "Изменить токен"

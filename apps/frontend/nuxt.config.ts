@@ -75,10 +75,10 @@ export default defineNuxtConfig({
 		},
 		ssr: {
 			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
-			noExternal: ['v-tooltip'],
-			optimizeDeps: {
-				include: ['vue-router'],
-			},
+			noExternal: ['floating-vue', '@floating-ui/core', '@floating-ui/dom'],
+		},
+		optimizeDeps: {
+			include: ['vue-router', 'floating-vue', '@floating-ui/dom'],
 		},
 		define: {
 			global: {},
@@ -104,6 +104,9 @@ export default defineNuxtConfig({
 							params: {
 								overrides: {
 									removeViewBox: false,
+									cleanupIds: {
+										minify: false,
+									},
 								},
 							},
 						},
@@ -125,8 +128,6 @@ export default defineNuxtConfig({
 			const docTemplates = Object.keys(
 				await import('./src/templates/docs/index.ts').then((m) => m.default),
 			)
-			const blogArticles = await import('@modrinth/blog').then((m) => m.articles)
-			const { getChangelog } = await import('@modrinth/blog')
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
@@ -135,15 +136,6 @@ export default defineNuxtConfig({
 			}
 			for (const template of docTemplates) {
 				nitroConfig.prerender.routes.push(`/_internal/templates/doc/${template}`)
-			}
-			nitroConfig.prerender.routes.push('/news')
-			for (const article of blogArticles) {
-				nitroConfig.prerender.routes.push(`/news/article/${article.slug}`)
-			}
-			nitroConfig.prerender.routes.push('/news/changelog')
-			for (const entry of getChangelog()) {
-				const id = entry.version ?? entry.date.unix()
-				nitroConfig.prerender.routes.push(`/news/changelog/${entry.product}/${id}`)
 			}
 		},
 		async 'build:before'() {
@@ -232,6 +224,7 @@ export default defineNuxtConfig({
 				globalThis.INTERCOM_APP_ID ||
 				'ykeritl9',
 			production: isProduction(),
+			cookieSecure: isProduction(),
 			buildEnv: process.env.BUILD_ENV,
 			preview: process.env.PREVIEW === 'true',
 			featureFlagOverrides: getFeatureFlagOverrides(),
