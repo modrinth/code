@@ -14,7 +14,7 @@
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
 		</div>
-		<ButtonStyled color="brand" type="transparent" hover-color-fill="background">
+		<ButtonStyled color="brand" type="outlined" hover-color-fill="background">
 			<button
 				v-if="showUpdatePill"
 				type="button"
@@ -244,10 +244,6 @@ const messages = defineMessages({
 		id: 'app.action-bar.update',
 		defaultMessage: 'Update',
 	},
-	downloadUpdate: {
-		id: 'app.action-bar.download-update',
-		defaultMessage: 'Download update',
-	},
 	downloadingUpdate: {
 		id: 'app.action-bar.downloading-update',
 		defaultMessage: 'Downloading update',
@@ -274,7 +270,7 @@ const isUpdateDownloading = computed(
 		(downloadProgress.value > 0 && downloadProgress.value < 1 && !finishedDownloading.value),
 )
 const showUpdatePill = computed(
-	() => isUpdateVisible.value && (!isUpdateDownloading.value || metered.value),
+	() => isUpdateVisible.value && (finishedDownloading.value || metered.value),
 )
 const animateReadyPill = ref(false)
 const updateLabel = computed(() => {
@@ -297,7 +293,7 @@ const updatePillWidthClass = computed(() => {
 		return 'w-[166px]'
 	}
 
-	return metered.value ? 'w-[160px]' : 'w-[96px]'
+	return '!w-[96px]'
 })
 let readyPillAnimationFrame: number | null = null
 watch([showUpdatePill, finishedDownloading], async ([show, ready], [wasShown, wasReady]) => {
