@@ -1,7 +1,4 @@
 {
-  "app.action-bar.download-update": {
-    "message": "Download update"
-  },
   "app.action-bar.downloading-java": {
     "message": "Downloading Java {version}"
   },
