@@ -29,7 +29,7 @@ import {
 	PROJECT_STATUS_FILTER_VALUES,
 	type ProjectStatusFilterValue,
 	sanitizeAnalyticsSelectedFilters,
-} from '~/components/analytics-dashboard/query-builder/query-filter'
+} from '~/components/analytics-dashboard/query-builder/query-filter-utils'
 import { useAnalyticsRouteSync } from '~/components/analytics-dashboard/use-analytics-route-sync'
 
 import type { OrganizationContext } from '../organization-context'
