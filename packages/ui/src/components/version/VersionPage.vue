@@ -375,33 +375,6 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 				/>
 			</div>
 		</section>
-		<section v-if="supplementaryResources?.length > 0" id="supplementary-resources">
-			<h3 class="mt-0 mb-2 text-lg font-semibold">
-				{{ formatMessage(messages.supplementaryResources) }}
-			</h3>
-			<Table :columns="supplementaryResourcesTableColumns" :data="supplementaryResources">
-				<template #cell-file="{ row }">
-					{{ row.file.filename }}
-				</template>
-				<template #cell-type="{ row }">
-					{{
-						formatMessage(
-							!row.file.file_type || row.file.file_type === 'unknown'
-								? commonMessages.unknownLabel
-								: fileTypeMessages[row.file.file_type],
-						)
-					}}
-				</template>
-				<template #cell-size="{ row }">
-					{{ formatBytes(row.file.size) }}
-				</template>
-				<template #cell-actions="{ row }">
-					<div class="flex items-center justify-end gap-2">
-						<slot name="supplementaryResourceActions" :file="row.file" />
-					</div>
-				</template>
-			</Table>
-		</section>
 		<section v-if="includedContent?.length > 0" id="content">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">
 				{{
@@ -439,6 +412,33 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 				</template>
 				<template #cell-version="{ row }">
 					{{ (row.version ?? row.hasProject) ? formatMessage(commonMessages.unknownLabel) : '—' }}
+				</template>
+			</Table>
+		</section>
+		<section v-if="supplementaryResources?.length > 0" id="supplementary-resources">
+			<h3 class="mt-0 mb-2 text-lg font-semibold">
+				{{ formatMessage(messages.supplementaryResources) }}
+			</h3>
+			<Table :columns="supplementaryResourcesTableColumns" :data="supplementaryResources">
+				<template #cell-file="{ row }">
+					{{ row.file.filename }}
+				</template>
+				<template #cell-type="{ row }">
+					{{
+						formatMessage(
+							!row.file.file_type || row.file.file_type === 'unknown'
+								? commonMessages.unknownLabel
+								: fileTypeMessages[row.file.file_type],
+						)
+					}}
+				</template>
+				<template #cell-size="{ row }">
+					{{ formatBytes(row.file.size) }}
+				</template>
+				<template #cell-actions="{ row }">
+					<div class="flex items-center justify-end gap-2">
+						<slot name="supplementaryResourceActions" :file="row.file" />
+					</div>
 				</template>
 			</Table>
 		</section>
