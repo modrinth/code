@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Anda tidak memiliki izin."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Buat tautan afiliasi"
   },
@@ -416,6 +419,9 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Tahan tombol Shift saat mengeklik untuk melewati pesan konfirmasi."
   },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Kami menyarankan Anda membuat cadangan terlebih dahulu sebelum melanjutkan, sehingga Anda dapat memulihkan {type} Anda bila terjadi masalah."
+  },
   "content.inline-backup.world-label": {
     "defaultMessage": "dunia"
   },
@@ -460,6 +466,9 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Mohon tunggu"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Cari {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Nama berkas"
@@ -524,8 +533,134 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Memperbarui {contentType}..."
   },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} dipilih"
+  },
   "content.selection-bar.selected-count-simple": {
-    "defaultMessage": "{count, number} terpilih"
+    "defaultMessage": "{count, number} dipilih"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Buat instans"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "Buat dunia"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Selesai"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "Impor"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "Buat peladen"
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "Pemuat konten"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "Pilih versi permainan"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "Cari versi permainan..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "Hapus ikon"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Pilih ikon"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Termutakhir"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Lainnya"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Stabil"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "Versi lpemuat"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "Pilih versi pemuat"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "Cari versi loader..."
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Pemuat"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Nama"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "Masukkan nama instansi"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "Tidak ada versi tersedia"
+  },
+  "creation-flow.modal.final-config.additional-settings.title": {
+    "defaultMessage": "Pengaturan tambahan"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "Sebelum reset peladen"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "Mudah"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "Sulit"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "Kesulitan"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "Normal"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "Pilih versi permainan"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "Kreatif"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "Mode permainan"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "Datar"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "Pengaturan generator"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "Pilih pengaturan generator"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "Nama dunia"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "Masukkan nama dunia"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "Kosongkan untuk benih acak."
+  },
+  "creation-flow.modal.final-config.world-seed.label-with-optional": {
+    "defaultMessage": "Benih dunia <optional>(Opsional)</optional>"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "Masukkan seed dunia"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "Tipe dunia"
+  },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "Bioma Besar"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "Pilih tipe dunia"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "Bioma Tunggal"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Ringkasan pengekstrakan"

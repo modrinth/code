@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "Chọn một tuỳ chọn"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Hiển thị thời gian bạn đã dành để chơi bằng một cấu hình."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Hiện thời gian chơi"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Bật tính năng ẩn hiển thị thanh menu bên."
   },
@@ -272,9 +278,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "Tải xuống"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# mods}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Yêu cầu modpack"
   },
@@ -438,7 +441,7 @@
     "message": "Modrinth Pride"
   },
   "app.skins.section.modrinth-pride.tooltip": {
-    "message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng Lẩu Gà Bình Thuận thế giới."
+    "message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng tự hào LGBT thế giới."
   },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
@@ -462,7 +465,7 @@
     "message": "Đăng nhập"
   },
   "app.skins.sign-in.description": {
-    "message": "Đặng nhập vào mội tài khoản Minecraft để sử dụng trình sửa Skin trong ứng dụng này."
+    "message": "Đặng nhập vào mội tài khoản Minecraft để đổi skin Skin trong ứng dụng này."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Bot phấn khích"
@@ -471,7 +474,7 @@
     "message": "Đăng nhập đã"
   },
   "app.skins.title": {
-    "message": "Trình sửa skin"
+    "message": "Đổi skin"
   },
   "app.update-popup.body": {
     "message": "Phiên bản v{version} của Modrinth đã được chuẩn bị để cài đặt! Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc cập nhật tự động khi bạn đóng Modrinth."
@@ -535,9 +538,6 @@
   },
   "friends.action.add-friend": {
     "message": "Thêm một người bạn"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} yêu cầu kết bạn {count, plural, one {request} other {requests}}"
   },
   "friends.add-friend.submit": {
     "message": "Gửi yêu cầu kết bạn"

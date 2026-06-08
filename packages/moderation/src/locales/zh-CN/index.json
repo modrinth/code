@@ -59,11 +59,17 @@
   "nags.gallery.title": {
     "defaultMessage": "前往图库页"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "你的{type}使用了一个需要公开源代码的许可证。请为每个附加版本提供源代码链接或源代码文件，或者考虑使用不同的许可证。"
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
   },
   "nags.identical-links.description": {
     "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "清除重复的链接"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
@@ -140,6 +146,9 @@
   "nags.select-language.title": {
     "defaultMessage": "选择一个语言"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "选择你的 {type} 分发所使用的许可证。"
+  },
   "nags.select-license.title": {
     "defaultMessage": "选择一个许可证"
   },
@@ -193,6 +202,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "选择准确的标签"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "至少需要一个图像来展示你的 {type}的内容。"
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "资源包，但不包括音频包或本地化包。如果你的内容符合这一描述，请选择相应的标签"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上传图片至项目图库"

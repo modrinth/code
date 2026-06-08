@@ -47,11 +47,20 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Färgtema"
   },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Ändrar sidan som launchern öppnas på."
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hem"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Standardlandingssida"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Inaktiverar namnskylten ovanför din spelare på utseende-sidan."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
@@ -68,11 +77,20 @@
   "app.appearance-settings.select-option": {
     "message": "Välj ett alternativ"
   },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Låter dig växla sidofältet."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Växla sidofält"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Lägg till i en instans"
   },
   "app.browse.add-to-instance": {
     "message": "Lägg till i instans"
@@ -86,11 +104,17 @@
   "app.browse.already-added": {
     "message": "Redan tillagd"
   },
+  "app.browse.back-to-instance": {
+    "message": "Tillbaka till instans"
+  },
   "app.browse.discover-content": {
     "message": "Upptäck innehåll"
   },
   "app.browse.discover-servers": {
     "message": "Upptäck servrar"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Dölj servrar som redan är tillagda"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpaket"
@@ -100,6 +124,9 @@
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Installerar modpaket..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."

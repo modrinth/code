@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "権限がありません"
+  },
   "affiliate.create.button": {
     "defaultMessage": "アフィリエイトリンクを作成"
   },
@@ -87,7 +90,7 @@
     "defaultMessage": "サーバーに再登録"
   },
   "browse.filter-results": {
-    "defaultMessage": "フィルター"
+    "defaultMessage": "絞り込み"
   },
   "browse.no-results": {
     "defaultMessage": "検索が見つかりませんでした"
@@ -381,7 +384,7 @@
     "defaultMessage": "有効化済み"
   },
   "content.filter.updates": {
-    "defaultMessage": "アップデート"
+    "defaultMessage": "更新"
   },
   "content.filter.warnings": {
     "defaultMessage": "警告"
@@ -833,6 +836,12 @@
   "files.delete-modal.header": {
     "defaultMessage": "ファイルを削除"
   },
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "このファイルは完全に削除され、元に戻すことはできません。"
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "このフォルダと中身のすべてのデータは完全に削除され、元に戻すことはできません。"
+  },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "ファイルの内容を読み込めませんでした。"
   },
@@ -920,6 +929,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "縮小"
   },
+  "files.item-type.file": {
+    "defaultMessage": "ファイル"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "ファイル"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "フォルダ"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "フォルダ"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "ファイル操作進行中は新たにファイル操作を行うことができません。"
   },
@@ -958,6 +979,9 @@
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "例: /my-folder"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type}を移動"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "ホームに戻る"
@@ -1078,6 +1102,9 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": "- 残り{count}"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "ここに{type}をドロップ"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "名前には、英数字、ハイフン、アンダースコア、またはスペースのみを含める必要があります。"
@@ -1448,6 +1475,9 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "ローダーの交換は破壊的である"
   },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "Modパック"
+  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}のバージョン"
   },
@@ -1481,6 +1511,9 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "ゲームバージョンを検索…"
   },
+  "installation-settings.type.server": {
+    "defaultMessage": "サーバー"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "リンクを解除"
   },
@@ -1499,8 +1532,17 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Modパックを再インストール"
   },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "{type}を修復"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "インスタンス"
+  },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "修復"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "サーバー"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "アドベンチャーモード"
@@ -1710,7 +1752,7 @@
     "defaultMessage": "フィルター"
   },
   "label.filters": {
-    "defaultMessage": "フィルター"
+    "defaultMessage": "絞り込み"
   },
   "label.followed-projects": {
     "defaultMessage": "フォロー中のプロジェクト"
@@ -1951,6 +1993,66 @@
   },
   "locale.zh-TW": {
     "defaultMessage": "中国語 (繁体字)"
+  },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "画像を見ることができない人にも理解できるよう説明してください。"
+  },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "画像の説明..."
+  },
+  "markdown-editor.image-modal.description-field.title": {
+    "defaultMessage": "説明 (Altテキスト)"
+  },
+  "markdown-editor.image-modal.header": {
+    "defaultMessage": "画像の追加"
+  },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "画像のソース"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "リンク"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "アップロード"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "ドラッグ&ドロップまたはクリックでファイルをアップロード"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "画像のURLを入力..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "追加"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "リンクの追加"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "ラベルを入力..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "ラベル"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "リンクのURLを入力..."
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "出力"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "表示の切り替え"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "Youtube動画の追加"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Youtube動画への有効なリンクを入力してください。"
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Youtube動画のURLを入力..."
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "Youtube動画のURL"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "支払い方法を追加する"

@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Nemáš oprávnění."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Vytvořit affiliate odkaz"
   },
@@ -92,6 +95,9 @@
   "browse.offline": {
     "defaultMessage": "Právě nejste připojeni k internetu. Připojte se k internetu a prohlížejte si Modrinth!"
   },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Vybrané projekty"
+  },
   "button.accept": {
     "defaultMessage": "Přijmout"
   },
@@ -118,6 +124,9 @@
   },
   "button.continue": {
     "defaultMessage": "Pokračovat"
+  },
+  "button.copy-filename": {
+    "defaultMessage": "Kopírovat jméno souboru"
   },
   "button.copy-id": {
     "defaultMessage": "Kopírovat ID"
