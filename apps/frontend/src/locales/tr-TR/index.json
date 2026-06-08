@@ -2741,9 +2741,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Yardıma ihtiyacınız varsa veya ek sorularınız varsa, lütfen <help-center-link>Modrinth Yardım Merkezi'ni</help-center-link> ziyaret edin ve destekle iletişime geçmek için mavi baloncuğa tıklayın."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Üye kullanıcı arayüzünü göster"
-  },
   "project.moderation.thread.private-description": {
     "message": "Bu, Modrinth moderatörleri ile özel bir konuşma başlığıdır. Bu projeyle ilgili konularda size mesaj gönderebilirler."
   },
@@ -2848,9 +2845,6 @@
   },
   "project.versions.title": {
     "message": "Sürümler"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Çöz"
   },
   "report.already-reported": {
     "message": "Zaten {title} ögesini bildirdiniz"

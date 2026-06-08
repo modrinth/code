@@ -3113,9 +3113,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Falls du Hilfe brauchst oder du hast andere Anfragen, besuche bitte das <help-center-link>Modrinth Hilfe Center</help-center-link> und klicke auf die blaue Sprechblase um den Kundensupport zu kontaktieren."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Zeige Benutzer UI"
-  },
   "project.moderation.thread.private-description": {
     "message": "Dies ist eine private Konversation mit den Modrinth Moderatoren. Sie könnten dich bezüglich Problemen im Zusammenhang mit diesem Projekt kontaktieren."
   },
