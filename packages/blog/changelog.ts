@@ -11,6 +11,51 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-08T22:54:32+00:00`,
+		product: 'web',
+		body: `## Changed
+- Less common plugin loaders are now behind a "Show more" toggle.
+- Disable playtime metric if its purely a plugin project
+- Updated translations
+
+## Fixed
+- Fixed publishing checklist displaying that you have no versions sometimes when you do.
+- Add "Your projects" project dropdown preset option
+- Fix revenue and playtime rounding for values less than 1 in the metric card for total revenue and in tooltip total
+- Incorrectly showing empty state for versions page when refreshing on the page.
+- Malformed versions causing versions table page to crash`,
+	},
+	{
+		date: `2026-06-08T22:54:32+00:00`,
+		product: 'app',
+		version: '0.14.5',
+		body: `## Added
+- Added a new setting to the General tab of instance settings which allows you to control what content versions are considered an update. By default this will be set to release channel only.
+- Fixed drag and drop file upload not working in instances Files tab.
+- Fixed layering issue with the expanded console view in the Logs tab of instances and Modrinth Hosting panels.
+
+## Changed
+- Moved "Reload to update" button from the bottom left to the top right action bar.
+- Changed update notifications to show only after 24 hours of ignoring the "Reload to update" button.
+- Updated translations
+
+## Fixed
+- Fixed updater restarting the app even if you didn't ask it to.
+- Fixed user pages incorrectly opening in the app when clicking user objects in the Modrinth Hosting`,
+	},
+	{
+		date: `2026-06-08T22:54:32+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations
+
+## Fixed
+- Fixed drag and drop file upload not working in the Files tab.
+- Fixed the wrong loader icon showing up in the server panel header.
+- Fixed password managers incorrectly suggesting usernames for the invite modal on the access tab.
+- Backups now correctly show the user who created them.`,
+	},
+	{
 		date: `2026-06-04T15:59:11+00:00`,
 		product: 'hosting',
 		body: `## Added
