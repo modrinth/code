@@ -8,6 +8,141 @@
   "admin.billing.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
   },
+  "analytics.action.add": {
+    "message": "追加"
+  },
+  "analytics.action.cancel": {
+    "message": "キャンセル"
+  },
+  "analytics.action.refresh": {
+    "message": "更新"
+  },
+  "analytics.action.reset": {
+    "message": "リセット"
+  },
+  "analytics.breakdown.country": {
+    "message": "国"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "理由"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "流入元"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "マインクラフト"
+  },
+  "analytics.breakdown.generic": {
+    "message": "内訳"
+  },
+  "analytics.breakdown.loader": {
+    "message": "ローダー"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "収益化"
+  },
+  "analytics.breakdown.project": {
+    "message": "プロジェクト"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "ステータス"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "バージョン"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "すべて表示"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "上位8件を表示"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours}時間"
+  },
+  "analytics.chart.view.area": {
+    "message": "エリア"
+  },
+  "analytics.chart.view.bar": {
+    "message": "バー"
+  },
+  "analytics.chart.view.line": {
+    "message": "ライン"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "依存関係"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modパック"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "新規"
+  },
+  "analytics.download-reason.update": {
+    "message": "更新"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth Web"
+  },
+  "analytics.filter.search.countries": {
+    "message": "国を検索..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "ダウンロード回数の推移"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "収益の推移"
+  },
+  "analytics.project-event.project-approved": {
+    "message": "承認完了"
+  },
+  "analytics.project-status.approved": {
+    "message": "承認済み"
+  },
+  "analytics.stat.downloads": {
+    "message": "ダウンロード回数"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "もっと詳しく"
+  },
+  "analytics.stat.playtime": {
+    "message": "プレイ時間"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours}時間"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "前期比"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "前期比"
+  },
+  "analytics.stat.revenue": {
+    "message": "収益"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "表示回数"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "検索..."
+  },
+  "analytics.title": {
+    "message": "アナリティクス"
+  },
+  "analytics.value.monetized": {
+    "message": "設定済み"
+  },
+  "analytics.value.unmonetized": {
+    "message": "未設定"
+  },
   "app-marketing.download.description": {
     "message": "我々のデスクトップアプリはすべてのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"
   },
@@ -403,6 +538,15 @@
   },
   "collection.title": {
     "message": "{name} - コレクション"
+  },
+  "conversation-thread.action.approve": {
+    "message": "承認"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "送信して承認"
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "メッセージを送る..."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補足ファイルはソースコードなどの支援用リソースのためのものであり、別バージョンや派生版を配布するためのものではありません。"
@@ -1288,9 +1432,6 @@
   },
   "frog.title": {
     "message": "カエル"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "北米、ヨーロッパ、東南アジアで利用可能で、幅広い地域をカバーしています。"
   },
   "hosting-marketing.billing.monthly": {
     "message": "毎月で払う"
@@ -2506,6 +2647,12 @@
   },
   "project.license.title": {
     "message": "ライセンス"
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "プロジェクトが承認されました"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "これは下書きです。\nModrinthのモデレーターによって審査、承認されるまで、他のユーザーには表示されません。"
   },
   "project.moderation.title": {
     "message": "管理"

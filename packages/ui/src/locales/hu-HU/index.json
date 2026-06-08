@@ -117,7 +117,7 @@
     "defaultMessage": "Társulati linkek"
   },
   "button.analytics": {
-    "defaultMessage": "Statisztikák"
+    "defaultMessage": "Statisztika"
   },
   "button.back": {
     "defaultMessage": "Vissza"
@@ -213,7 +213,7 @@
     "defaultMessage": "Újratöltés"
   },
   "button.reinstall-modpack": {
-    "defaultMessage": "Modpack újratelepítése"
+    "defaultMessage": "Modcsomag újratelepítése"
   },
   "button.remove": {
     "defaultMessage": "Eltávolítás"
@@ -267,7 +267,7 @@
     "defaultMessage": "Regisztráció"
   },
   "button.stop": {
-    "defaultMessage": "Megállítás"
+    "defaultMessage": "Leállítás"
   },
   "button.switch-version": {
     "defaultMessage": "Verzió váltása"
@@ -298,6 +298,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Privát"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "tartalom"
   },
   "content.card.select-project": {
     "defaultMessage": "{project} kiválasztása"
@@ -392,14 +395,20 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "profil"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
   },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "világ"
+  },
   "content.modpack-card.content-hint-description": {
-    "defaultMessage": "A modpacked tartalma itt tallható!"
+    "defaultMessage": "Mostantól itt találhatod meg!"
   },
   "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modpack tartalma eltávolítva"
+    "defaultMessage": "A modcsomag tartalmát áthelyeztük"
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Ne mutasd többször"
@@ -414,7 +423,7 @@
     "defaultMessage": "Kérlek várd meg a művelet befejezését a tartalom szerkesztése előtt."
   },
   "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "További tartalom hozzáadása ehhez a modpackhez"
+    "defaultMessage": "További tartalom hozzáadása ehhez a modcsomaghoz"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Nincs tartalom telepítve"
@@ -1262,6 +1271,9 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Megerősítés"
   },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "A(z) {gameVersion} verzióra történő átállás a szervereden a következő tartalmakat módosítja."
+  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Tartalomváltozások áttekintése"
   },
@@ -1292,6 +1304,15 @@
   "installation-settings.incompatible-content.loader-change-body": {
     "defaultMessage": "A betöltő módosításakor az összes telepített tartalom letiltásra kerül. Javasoljuk ehelyett a szerver alaphelyzetbe állítását."
   },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Összekapcsolt {projectType}"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "modcsomag"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "szerverprojekt"
+  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} verzió"
   },
@@ -1299,10 +1320,10 @@
     "defaultMessage": "A betöltő megváltoztatásához vissza kell állítanod a szervert."
   },
   "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Modpack újratelepítése"
+    "defaultMessage": "Modcsomag újratelepítése"
   },
   "installation-settings.reinstalling-modpack": {
-    "defaultMessage": "Modpack újratelepítése folyamatban"
+    "defaultMessage": "Modcsomag újratelepítése..."
   },
   "installation-settings.repair.instance-description": {
     "defaultMessage": "Újratelepíti a Minecraft függőségeit, és ellenőrzi, hogy nincsenek-e sérült fájlok. Ez megoldhatja azokat a problémákat, ha a játék az indítóval kapcsolatos hibák miatt nem indul el."
@@ -1322,8 +1343,17 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Játékverzió keresése"
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "profil"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "szerver"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Leválasztás"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "A leválasztás véglegesen leválasztja ezt a {type}t a {projectType}projektről, így lehetőséged nyílik a betöltő és a Minecraft verziójának megváltoztatására, de a jövőbeli frissítéseket nem fogod megkapni."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Ellenőrzés…"
@@ -1401,7 +1431,7 @@
     "defaultMessage": "Ikon feltöltése"
   },
   "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ez a modack nem tartalmaz további tartalmat."
+    "defaultMessage": "Ez a modcsomag nem tartalmaz további tartalmakat."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nincsen tartalom"
@@ -3114,7 +3144,7 @@
     "defaultMessage": "Modrinth Hosting"
   },
   "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mostantól itt találhatók!"
+    "defaultMessage": "Mostantól itt található!"
   },
   "servers.manage.settings-hint.dismiss": {
     "defaultMessage": "Ne mutasd újra"
@@ -3820,5 +3850,11 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Elhagyod az oldalt?"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Ez a felhasználó projektjei összesen {download_sum} letöltést értek el."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} letöltés"
   }
 }

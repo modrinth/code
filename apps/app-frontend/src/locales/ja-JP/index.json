@@ -302,6 +302,15 @@
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
   },
+  "app.skins.modal.replace-texture-button": {
+    "message": "置きかえる"
+  },
+  "app.skins.modal.texture-section": {
+    "message": "テクスチャ"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "編集"
+  },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} のインストール準備が整いました！今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
   },
@@ -592,6 +601,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "メモリ割り当て"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "ウィンドウ"

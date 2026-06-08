@@ -2360,6 +2360,9 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.label.badges": {
+    "defaultMessage": "Значки"
+  },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Опубліковано {date}"
   },
@@ -3389,11 +3392,17 @@
   "servers.listing.notice.moderated": {
     "defaultMessage": "Ваш сервер призупинено модерацією."
   },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Ваш сервер {verb, select, downgrade {погіршиться} other {покращиться}} до плану «{planSize}» <date>{formattedDate}</date>."
+  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Зачекайте, поки ми налаштуємо ваш сервер. Це може тривати до 10 хвилин."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Вашу підписку скасовано."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Вашу підписку скасовано <date>{formattedDate}</date>."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Вашу підписку скасовано через помилку оплати."
@@ -3569,6 +3578,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Спосіб оплати"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "стягується {interval, select, monthly {щомісячно} quarterly {щоквартально} yearly {щорічно} other {{interval}}}"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Доступно у Північній Америці, Європі та Південно-східній Азії."
   },
@@ -3616,6 +3628,9 @@
   },
   "servers.purchase.step.review.title": {
     "defaultMessage": "Огляд"
+  },
+  "servers.region.australia": {
+    "defaultMessage": "Австралія"
   },
   "servers.region.central-europe": {
     "defaultMessage": "Центральна Європа"
@@ -4214,6 +4229,90 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Застосувати"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Скасувати"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Очистити"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Користувацький проміжок часу…"
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Зменшити проміжок дат"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "Проміжок дат не обрано."
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "Кінець"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Збільшити проміжок дат"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "За останні"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Увесь час"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Останні 14 днів"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Останні 180 днів"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Останні 30 днів"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Останні 7 днів"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Останні 90 днів"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Сьогодні"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "Цей рік"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Учора"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Обрати проміжок дат"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Обрано"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Обирається"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "Початок"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Проміжок"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Одиниця проміжку"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "днів"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "годин"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "місяців"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "тижнів"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "У вас є незбережені зміни."
   },
@@ -4234,5 +4333,50 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Відхилити все"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Цей користувач з нами від Modrinth Alpha, який завершився в листопаді 2020."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Alpha-тестувальник"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Цей користувач з нами від Modrinth Beta, який завершився в лютому 2022."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Натисніть, аби прочитати про запуск Modrinth Beta."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Beta-тестувальник"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Проєкти цього користувача зібрали загалом {download_sum} завантажень."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} завантажень"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Цей користувач активно підтримує Modrinth та творців на платформі."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Натисніть, аби дізнатися, як стати нашим підписником."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Підписник Modrinth+"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Цей користувач брав участь у принаймні одній благодійній акції Modrinth на підтримку спільноти ЛҐБТК+."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "Натисніть, аби переглянути останні акції."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Підтримувач прайду"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Цей користувач працює на Modrinth."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Команда Modrinth"
   }
 }

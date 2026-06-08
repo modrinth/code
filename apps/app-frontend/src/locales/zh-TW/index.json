@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "選擇選項"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "顯示您在該實例的遊玩時間"
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "顯示遊玩時間"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "啟用切換側邊欄的功能。"
   },
@@ -319,6 +325,84 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "資源管理"
+  },
+  "app.skins.add-button": {
+    "message": "新增皮膚"
+  },
+  "app.skins.apply-button": {
+    "message": "確認"
+  },
+  "app.skins.delete-button": {
+    "message": "刪除皮膚"
+  },
+  "app.skins.delete-modal.title": {
+    "message": "你確定要刪除這個皮膚嗎"
+  },
+  "app.skins.edit-button": {
+    "message": "編輯皮膚"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "新增皮膚"
+  },
+  "app.skins.modal.add-title": {
+    "message": "正在新增皮膚"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "披風"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "披風"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "編輯皮膚"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "無披風"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "無"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "覆蓋材質包"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "儲存皮膚"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "正在儲存"
+  },
+  "app.skins.modal.texture-section": {
+    "message": "材質包"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "馬上新增一個皮膚"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "編輯皮膚"
+  },
+  "app.skins.previewing-badge": {
+    "message": "正在預覽"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "慢一點"
+  },
+  "app.skins.section.default-skins": {
+    "message": "預設皮膚"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "皮膚已儲存"
+  },
+  "app.skins.sign-in.button": {
+    "message": "登入"
+  },
+  "app.skins.sign-in.title": {
+    "message": "請登入"
+  },
+  "app.skins.title": {
+    "message": "皮膚選擇"
   },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} 已準備好安裝！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
