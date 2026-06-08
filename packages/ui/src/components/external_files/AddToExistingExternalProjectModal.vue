@@ -2,7 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import { Accordion, ButtonStyled, NewModal, StyledInput } from '#ui/components'
 
@@ -93,22 +93,6 @@ const addFilesMutation = useMutation({
 			license_id: selectedProjectId.value,
 		})
 	},
-	onSuccess: async () => {
-		addNotification({
-			type: 'success',
-			title: 'Files added to existing entry',
-		})
-		await nextTick()
-		hide()
-		emit('success')
-	},
-	onError: (error: Error) => {
-		addNotification({
-			type: 'error',
-			title: 'Could not add files to existing entry',
-			text: error.message,
-		})
-	},
 })
 
 const canSubmit = computed(
@@ -163,8 +147,23 @@ async function executeSearch() {
 	}
 }
 
-function handleSubmit() {
-	addFilesMutation.mutate()
+async function handleSubmit() {
+	try {
+		await addFilesMutation.mutateAsync()
+		addNotification({
+			type: 'success',
+			title: 'Files added to existing entry',
+			autoCloseMs: 3000,
+		})
+		hide()
+		emit('success')
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Could not add files to existing entry',
+			text: error instanceof Error ? error.message : String(error),
+		})
+	}
 }
 
 function show(event?: MouseEvent) {

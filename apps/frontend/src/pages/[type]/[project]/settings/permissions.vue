@@ -307,9 +307,15 @@ const messages = defineMessages({
 })
 
 function defaultCardCollapsed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
-	return (
-		(!isModerator.value && !!group.attribution) || group?.attribution?.kind === 'globally_allowed'
-	)
+	if (group?.attribution?.kind === 'globally_allowed') {
+		return true
+	}
+	if (!isModerator.value) {
+		const hasAttribution = !!group.attribution
+		const rejectedProof = group.attribution?.moderation_status?.kind === 'bad_proof'
+		return hasAttribution && !rejectedProof
+	}
+	return false
 }
 
 function getCardCollapsed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
@@ -424,7 +430,7 @@ function dismissInfoBanner() {
 			<div>
 				<Combobox
 					v-model="currentSortType"
-					class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0"
+					class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0 [&>span]:h-[40px]"
 					:options="sortTypes"
 					:placeholder="formatMessage(commonMessages.sortByLabel)"
 				>

@@ -2591,9 +2591,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Jika anda memerlukan bantuan atau mempunyai pertanyaan tambahan, sila lawati <help-center-link>Pusat Bantuan Modrinth</help-center-link> dan klik gelembung biru untuk menghubungi sokongan."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Tunjukkan antara muka ahli"
-  },
   "project.moderation.thread.private-description": {
     "message": "Ini adalah bebenang perbualan peribadi dengan penyederhana Modrinth. Mereka mungkin akan menghantar mesej kepada anda tentang isu-isu berkaitan projek ini."
   },
@@ -2710,9 +2707,6 @@
   },
   "project.versions.title": {
     "message": "Versi"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Selesaikan"
   },
   "report.already-reported": {
     "message": "Anda telah melaporkan {title}"

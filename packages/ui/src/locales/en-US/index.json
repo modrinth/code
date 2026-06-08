@@ -47,6 +47,9 @@
   "badge.new": {
     "defaultMessage": "New"
   },
+  "badge.release": {
+    "defaultMessage": "Release"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -875,6 +878,9 @@
   "external-files.permissions-card.badge.pending": {
     "defaultMessage": "Pending"
   },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Attribution rejected"
+  },
   "external-files.permissions-card.custom-license-label": {
     "defaultMessage": "Link to license"
   },
@@ -943,6 +949,9 @@
   },
   "external-files.permissions-card.link-to-work-url-placeholder": {
     "defaultMessage": "link-to-work"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Reason"
   },
   "external-files.permissions-card.moderation.error.title": {
     "defaultMessage": "Could not save moderation review"
@@ -2762,6 +2771,9 @@
   "project.about.compatibility.platforms": {
     "defaultMessage": "Platforms"
   },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, one {Platform} other {Platforms}}"
+  },
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibility"
   },
@@ -3343,6 +3355,9 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Resolve"
   },
   "project.visibility.archived": {
     "defaultMessage": "Archived"
@@ -4801,5 +4816,95 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth Team"
+  },
+  "version.content.name": {
+    "defaultMessage": "Name"
+  },
+  "version.content.version": {
+    "defaultMessage": "Version"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "Dev jar"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadoc jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "Optional resource pack"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Primary"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Required resource pack"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "Signature file"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "Source jar"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Other"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Changes"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Compatibility"
+  },
+  "version.section.content": {
+    "defaultMessage": "Content"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Search content..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Any compatible version"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Any version"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Unavailable version"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "This version may have been deleted or is being reviewed by moderators."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "The required version may have been deleted or is being reviewed by moderators."
+  },
+  "version.section.files": {
+    "defaultMessage": "Files"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Included content"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Known incompatibilities"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "No changelog was provided."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "No mod loader"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Optional dependencies"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Required content"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Supplementary resources"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "File"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Size"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Type"
   }
 }

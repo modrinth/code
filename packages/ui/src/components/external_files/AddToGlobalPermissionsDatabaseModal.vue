@@ -2,7 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import {
 	Accordion,
@@ -62,37 +62,34 @@ const createMutation = useMutation({
 		}
 
 		const parsedFlameProjectId = Number.parseInt(flameProjectId.value.trim(), 10)
-		const files = props.group.files
-			.filter((file) => selectedSha1s.value.has(file.sha1))
-			.map((file) => ({
-				sha1: file.sha1,
-				name: file.name.split('/').pop() ?? file.name,
-			}))
+		const hasFlameId = Number.isFinite(parsedFlameProjectId)
+		const trimmedTitle = title.value.trim()
+		const trimmedLink = link.value.trim()
+		const trimmedProof = proof.value.trim()
+		const judgements: Labrinth.Moderation.Internal.ProjectJudgements = {}
 
-		return client.labrinth.external_projects_internal.create({
-			title: title.value.trim() || undefined,
-			status: status.value,
-			link: link.value.trim() || undefined,
-			proof: proof.value.trim() || undefined,
-			flame_project_id: Number.isFinite(parsedFlameProjectId) ? parsedFlameProjectId : undefined,
-			files,
-		})
-	},
-	onSuccess: async () => {
-		addNotification({
-			type: 'success',
-			title: 'Added to global database',
-		})
-		await nextTick()
-		hide()
-		emit('success')
-	},
-	onError: (error: Error) => {
-		addNotification({
-			type: 'error',
-			title: 'Could not add to global database',
-			text: error.message,
-		})
+		for (const sha1 of selectedSha1s.value) {
+			if (hasFlameId) {
+				judgements[sha1] = {
+					type: 'flame',
+					id: parsedFlameProjectId,
+					status: status.value,
+					link:
+						trimmedLink || `https://www.curseforge.com/minecraft/mc-mods/${parsedFlameProjectId}`,
+					title: trimmedTitle || moderatorAttributionGroupTitle(props.group),
+				}
+			} else {
+				judgements[sha1] = {
+					type: 'unknown',
+					status: status.value,
+					proof: trimmedProof || undefined,
+					link: trimmedLink || undefined,
+					title: trimmedTitle || undefined,
+				}
+			}
+		}
+
+		return client.labrinth.moderation_internal.setProjectJudgements(judgements)
 	},
 })
 
@@ -111,8 +108,23 @@ function resetForm() {
 	selectedSha1s.value = new Set(props.group.files.map((file) => file.sha1))
 }
 
-function handleSubmit() {
-	createMutation.mutate()
+async function handleSubmit() {
+	try {
+		await createMutation.mutateAsync()
+		addNotification({
+			type: 'success',
+			title: 'Added to global database',
+			autoCloseMs: 3000,
+		})
+		hide()
+		emit('success')
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Could not add to global database',
+			text: error instanceof Error ? error.message : String(error),
+		})
+	}
 }
 
 function show(event?: MouseEvent) {

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { defineMessage, useVIntl, type MessageDescriptor } from '#ui/composables/i18n.ts'
 import type { Labrinth } from '@modrinth/api-client'
 import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
-import { computed, type Component } from 'vue'
+import { type Component, computed } from 'vue'
+
+import { defineMessage, type MessageDescriptor, useVIntl } from '#ui/composables/i18n.ts'
+
 import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()

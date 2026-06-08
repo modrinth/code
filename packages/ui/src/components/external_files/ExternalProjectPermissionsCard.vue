@@ -58,7 +58,11 @@ const props = withDefaults(
 const collapsedModel = defineModel<boolean>('collapsed')
 
 const collapsed = computed({
-	get: () => collapsedModel.value ?? (!props.isModerator && !!props.group.attribution),
+	get: () =>
+		collapsedModel.value ??
+		(!props.isModerator &&
+			!!props.group.attribution &&
+			props.group.attribution?.moderation_status?.kind !== 'bad_proof'),
 	set: (value) => {
 		collapsedModel.value = value
 	},
@@ -129,6 +133,10 @@ const messages = defineMessages({
 		id: 'external-files.permissions-card.add-files-to-group',
 		defaultMessage: 'Add files...',
 	},
+	moderationReasonLabel: {
+		id: 'external-files.permissions-card.moderation-reason',
+		defaultMessage: 'Reason',
+	},
 })
 
 type EditingMode = 'attribution' | 'moderation_review'
@@ -144,9 +152,14 @@ const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionRes
 )
 
 const isAttributed = computed(() => initialAttribution.value !== null)
-const attributionStatusVariant = computed<'pending' | 'attributed' | 'no_permission'>(() => {
+const attributionStatusVariant = computed<
+	'pending' | 'attributed' | 'no_permission' | 'proof_rejected'
+>(() => {
 	if (isAttributed.value && props.group.attribution?.kind === 'no_permission') {
 		return 'no_permission'
+	}
+	if (isAttributed.value && props.group.attribution?.moderation_status?.kind === 'bad_proof') {
+		return 'proof_rejected'
 	}
 	if (isAttributed.value) {
 		return 'attributed'
@@ -382,6 +395,7 @@ const setModerationStatusMutation = useMutation({
 	onSuccess: async () => {
 		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.projectId] })
 		stopEditing()
+		collapsed.value = true
 		emit('updated')
 	},
 	onError: (error: Error) => {
@@ -553,7 +567,6 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 						{{ formatMessage(messages.notUsedInVersions) }}
 					</span>
 				</template>
-
 				<AttributionDisplay
 					v-if="!isEditingAttribution && initialAttribution"
 					:attribution="initialAttribution"
@@ -571,8 +584,8 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 					</template>
 					<template
 						v-if="
-							(isModerator || group.attribution.moderation_status) &&
-							group.attribution.kind !== 'globally_allowed'
+							(isModerator || group.attribution?.moderation_status) &&
+							group.attribution?.kind !== 'globally_allowed'
 						"
 						#footer
 					>
@@ -716,7 +729,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 										class="markdown-body"
 										v-html="
 											renderString(
-												group.attribution.moderation_status.reason || 'No reason provided',
+												group.attribution?.moderation_status?.reason || 'No reason provided',
 											)
 										"
 									/>
@@ -724,7 +737,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 							</div>
 							<div
 								v-if="
-									isModerator && !isEditingModerationReview && group.attribution.moderation_status
+									isModerator && !isEditingModerationReview && group.attribution?.moderation_status
 								"
 								class="ml-auto"
 							>

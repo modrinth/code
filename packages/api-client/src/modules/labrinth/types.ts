@@ -1804,6 +1804,28 @@ export namespace Labrinth {
 			export type ReleaseLockResponse = {
 				success: boolean
 			}
+
+			export type ProjectJudgementStatus = ExternalProjects.Internal.ExternalLicenseStatus
+
+			export type FlameJudgement = {
+				type: 'flame'
+				id: number
+				status: ProjectJudgementStatus
+				link: string
+				title: string
+			}
+
+			export type UnknownJudgement = {
+				type: 'unknown'
+				status: ProjectJudgementStatus
+				proof?: string
+				link?: string
+				title?: string
+			}
+
+			export type ProjectJudgement = FlameJudgement | UnknownJudgement
+
+			export type ProjectJudgements = Record<string, ProjectJudgement>
 		}
 	}
 
@@ -1978,15 +2000,6 @@ export namespace Labrinth {
 				exceptions?: string
 				proof?: string
 				flame_project_id?: number
-			}
-
-			export type CreateExternalLicenseRequest = {
-				title?: string
-				status: ExternalLicenseStatus
-				link?: string
-				proof?: string
-				flame_project_id?: number
-				files: LinkedFile[]
 			}
 
 			export type AddFileRequest = {

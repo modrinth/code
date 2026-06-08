@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { VersionChannel } from '@modrinth/utils'
+import { computed } from 'vue'
 
 import { commonMessages } from '#ui/utils/common-messages.ts'
-import { computed } from 'vue'
+
 import { useVIntl } from '../../composables/i18n'
 import TagItem from '../base/TagItem.vue'
 

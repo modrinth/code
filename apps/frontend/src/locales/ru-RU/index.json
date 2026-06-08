@@ -2747,9 +2747,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Если вам нужна помощь или уточнения, перейдите в <help-center-link>справочный центр Modrinth</help-center-link> и нажмите на синий значок для связи с поддержкой."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Показать интерфейс участника"
-  },
   "project.moderation.thread.private-description": {
     "message": "Это личная ветка обсуждения с модерацией Modrinth. Вам могут написать по вопросам, касающихся этого проекта."
   },
@@ -2872,9 +2869,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {This version is} other {These versions are}} в настоящее время скрыты и не опубликованы. Пожалуйста, предоставьте доказательства того, что у вас есть разрешение на распространение определенных файлов, включенных в модпак {count, plural, one {version} other {versions}}."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Решить"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name}} other {Versions}} скрыто из-за неизвестного встроенного контента"

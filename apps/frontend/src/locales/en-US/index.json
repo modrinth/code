@@ -3413,9 +3413,6 @@
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}."
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Resolve"
-  },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name}} other {Versions}} withheld due to unknown embedded content"
   },
@@ -4565,6 +4562,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "Subscribe to the Modrinth newsletter"
   },
+  "version.all-versions": {
+    "message": "All versions"
+  },
+  "version.confirm-delete.description": {
+    "message": "This version will be permanently deleted. This action cannot be undone."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Delete version"
+  },
+  "version.confirm-delete.title": {
+    "message": "Are you sure you want to delete this version?"
+  },
+  "version.dependency.view-project": {
+    "message": "View project"
+  },
+  "version.dependency.view-version": {
+    "message": "View version"
+  },
+  "version.download.download-dependency": {
+    "message": "Download dependency"
+  },
+  "version.download.no-primary-file": {
+    "message": "Error: No primary file found"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Optional resource pack"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Required resource pack"
+  },
+  "version.edit.button": {
+    "message": "Edit"
+  },
+  "version.edit.details": {
+    "message": "Edit details"
+  },
+  "version.edit.files": {
+    "message": "Edit files"
+  },
+  "version.edit.metadata": {
+    "message": "Edit metadata"
+  },
   "version.environment.none.description": {
     "message": "The environment for this version has not been specified."
   },
@@ -4576,5 +4615,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Unknown environment"
+  },
+  "version.package-as-mod.button": {
+    "message": "Package as mod"
+  },
+  "version.package-as-mod.description": {
+    "message": "This will create a new version with support for the selected mod loaders. You will be redirected to the new version and can edit it to your liking."
+  },
+  "version.package-as-mod.header": {
+    "message": "Packaging data pack as a mod"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Mod loaders"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "The mod loaders you would like to package your data pack for."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Choose mod loaders..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Package data pack"
+  },
+  "version.section.content.dev-info": {
+    "message": "Developer information"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Maven coordinates:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Projects on Modrinth are automatically available through a Maven repository for use with JVM build tools such as <gradle-link>Gradle</gradle-link>. To learn more about the Modrinth Maven API, <article-link>click here</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Note: When available, you should use the creator's maven repo instead as it will have transitive dependency information that the Modrinth Maven API does not. You may also end up with duplicate dependencies if you use a mix of Modrinth and non-Modrinth Maven repositories for your dependencies, because the group identifier will be different when served through the Modrinth Maven API."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "Version ID:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Copy SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Copy SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "This version is currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Withheld due to unknown embedded content"
   }
 }

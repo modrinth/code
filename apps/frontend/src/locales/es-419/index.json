@@ -2768,9 +2768,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz click en la burbuja azúl para contactar con soporte."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Mostrar vista de miembro"
-  },
   "project.moderation.thread.private-description": {
     "message": "Este es un hilo de conversación con los moderadores de Modrinth. Podrían enviarte un mensaje con observaciones relacionadas a este proyecto."
   },
@@ -2899,9 +2896,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Esta versión se encuentra retenida y no listada} other {Estas versiones se encuentran retenidas y no listadas}} publicamente. Por favor proporcione pruebas que tiene permiso de redistribuir algunos de los archivos presentes en {count, plural, one {la versión} other {las versiones}} del modpack."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Resolver"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Versión {version_name} retenida} other {Versiones retenidas}} debido a que incluye contenido desconocido"

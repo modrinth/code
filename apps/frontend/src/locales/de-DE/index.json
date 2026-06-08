@@ -2777,9 +2777,6 @@
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Diese Version ist} other {Diese Versionen sind}} derzeit zurückgehalten und nicht öffentlich gelistet. Bitte stelle einen Nachweis bereit, dass du die Erlaubnis hast, bestimmte Dateien weiterzuverbreiten, die im Modpack in {count, plural, one {Version} other {Versionen}} enthalten sind."
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Beheben"
-  },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name} wurde} other {Versionen wurden}} aufgrund unbekannter eingebetteter Inhalte zurückgehalten"
   },

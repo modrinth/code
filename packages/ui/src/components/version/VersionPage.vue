@@ -1,14 +1,20 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
+import { DownloadIcon, FileIcon, SearchIcon } from '@modrinth/assets'
+import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
+import { computed, ref } from 'vue'
+
 import { useFormatBytes } from '#ui/composables/format-bytes.ts'
 import { useFormatDateTime } from '#ui/composables/format-date-time.ts'
 import { useCompactNumber, useFormatNumber } from '#ui/composables/format-number.ts'
 import { useRelativeTime } from '#ui/composables/how-ago.ts'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n.ts'
-import { commonMessages, fileTypeMessages, projectCompatibilityMessages } from '#ui/utils/common-messages.ts'
-import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, FileIcon, SearchIcon } from '@modrinth/assets'
-import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import {
+	commonMessages,
+	fileTypeMessages,
+	projectCompatibilityMessages,
+} from '#ui/utils/common-messages.ts'
+
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import StyledInput from '../base/StyledInput.vue'
@@ -42,7 +48,9 @@ const publishDate = computed(() => formatRelativeTime(props.version.date_publish
 const publishDateTooltip = computed(() => formatDateTime(props.version.date_published))
 
 const isModpack = computed(() => props.version.loaders.includes('mrpack'))
-const platforms = computed(() => isModpack.value ? props.version.mrpack_loaders : props.version.loaders)
+const platforms = computed(() =>
+	isModpack.value ? props.version.mrpack_loaders : props.version.loaders,
+)
 const noModpackLoader = computed(
 	() =>
 		(isModpack.value &&
@@ -50,32 +58,57 @@ const noModpackLoader = computed(
 			props.version.mrpack_loaders?.[0] === 'minecraft') ||
 		props.version.mrpack_loaders?.length === 0,
 )
-const primaryFile = computed(() => props.version.files?.find((file: any) => file.primary) ?? props.version.files?.[0] ?? {})
-const promotedSupplementaryFiles = computed(() => props.version.files.filter((file) => true || file.file_type && ['required-resource-pack', 'optional-resource-pack'].includes(file.file_type)))
+const primaryFile = computed(
+	() => props.version.files?.find((file) => file.primary) ?? props.version.files?.[0] ?? {},
+)
+const promotedSupplementaryFiles = computed(() =>
+	props.version.files.filter(
+		(file) =>
+			file.file_type &&
+			['required-resource-pack', 'optional-resource-pack'].includes(file.file_type),
+	),
+)
 
 type DependencyContext = {
-	dependency: Labrinth.Versions.v3.Dependency,
-	project?: Labrinth.Projects.v2.Project,
+	dependency: Labrinth.Versions.v3.Dependency
+	project?: Labrinth.Projects.v2.Project
 	version?: Labrinth.Versions.v2.Version
 }
 
-const dependencies = computed<DependencyContext[]>(() => props.version.dependencies.map((dep) => ({
-	dependency: dep,
-	project: props.enrichment?.projects.find((x) => x.id === dep.project_id),
-	version: props.enrichment?.versions.find((x) => x.id === dep.version_id),
-} satisfies DependencyContext)))
+const dependencies = computed<DependencyContext[]>(() =>
+	props.version.dependencies.map(
+		(dep) =>
+			({
+				dependency: dep,
+				project: props.enrichment?.projects.find((x) => x.id === dep.project_id),
+				version: props.enrichment?.versions.find((x) => x.id === dep.version_id),
+			}) satisfies DependencyContext,
+	),
+)
 
-const requiredContent = computed(() => dependencies.value.filter((dep) => dep.dependency.dependency_type === 'required'))
-const optionalContent = computed(() => dependencies.value.filter((dep) => dep.dependency.dependency_type === 'optional'))
-const incompatibleContent = computed(() => dependencies.value.filter((dep) => dep.dependency.dependency_type === 'incompatible'))
+const requiredContent = computed(() =>
+	dependencies.value.filter((dep) => dep.dependency.dependency_type === 'required'),
+)
+const optionalContent = computed(() =>
+	dependencies.value.filter((dep) => dep.dependency.dependency_type === 'optional'),
+)
+const incompatibleContent = computed(() =>
+	dependencies.value.filter((dep) => dep.dependency.dependency_type === 'incompatible'),
+)
 const includedContent = computed(() =>
-	dependencies.value.filter((context) => context.dependency.dependency_type === 'embedded').map((context) => ({
-		icon_url: context.project ? context.project.icon_url : context.dependency.attribution?.icon_url,
-		name: context.project ? context.project.title : context.dependency.file_name,
-		version: context.version ? context.version.version_number : undefined,
-		link: context.project ? props.dependencyLinkCreator(context) : context.dependency.attribution?.link,
-		hasProject: !!context.project
-	})),
+	dependencies.value
+		.filter((context) => context.dependency.dependency_type === 'embedded')
+		.map((context) => ({
+			icon_url: context.project
+				? context.project.icon_url
+				: context.dependency.attribution?.icon_url,
+			name: context.project ? context.project.title : context.dependency.file_name,
+			version: context.version ? context.version.version_number : undefined,
+			link: context.project
+				? props.dependencyLinkCreator(context)
+				: context.dependency.attribution?.link,
+			hasProject: !!context.project,
+		})),
 )
 
 const contentTableColumns = computed(() => {
@@ -87,12 +120,14 @@ const contentTableColumns = computed(() => {
 		{
 			key: 'name',
 			label: formatMessage(defineMessage({ id: 'version.content.name', defaultMessage: 'Name' })),
-		}
+		},
 	]
 	if (includedContent.value.some((x) => x.version)) {
 		cols.push({
 			key: 'version',
-			label: formatMessage(defineMessage({ id: 'version.content.version', defaultMessage: 'Version' })),
+			label: formatMessage(
+				defineMessage({ id: 'version.content.version', defaultMessage: 'Version' }),
+			),
 		})
 	}
 	return cols
@@ -101,17 +136,23 @@ const contentTableColumns = computed(() => {
 const supplementaryResourcesTableColumns = computed(() => [
 	{
 		key: 'file',
-		label: formatMessage(defineMessage({ id: 'version.supplementary-resources.file', defaultMessage: 'File' })),
+		label: formatMessage(
+			defineMessage({ id: 'version.supplementary-resources.file', defaultMessage: 'File' }),
+		),
 		width: '20rem',
 	},
 	{
 		key: 'type',
-		label: formatMessage(defineMessage({ id: 'version.supplementary-resources.type', defaultMessage: 'Type' })),
+		label: formatMessage(
+			defineMessage({ id: 'version.supplementary-resources.type', defaultMessage: 'Type' }),
+		),
 		width: '14rem',
 	},
 	{
 		key: 'size',
-		label: formatMessage(defineMessage({ id: 'version.supplementary-resources.size', defaultMessage: 'Size' })),
+		label: formatMessage(
+			defineMessage({ id: 'version.supplementary-resources.size', defaultMessage: 'Size' }),
+		),
 		width: '5rem',
 	},
 	{
@@ -122,9 +163,11 @@ const supplementaryResourcesTableColumns = computed(() => [
 ])
 
 const supplementaryResources = computed(() =>
-	props.version.files.filter((file) => file.primary === false && file !== primaryFile.value).map((file) => ({
-		file: file,
-	}))
+	props.version.files
+		.filter((file) => file.primary === false && file !== primaryFile.value)
+		.map((file) => ({
+			file: file,
+		})),
 )
 
 const messages = defineMessages({
@@ -199,17 +242,28 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 					<span class="flex items-center gap-2 sm:content">
 						<span v-tooltip="publishDateTooltip">{{ publishDate }}</span>
 						<span class="bg-surface-5 size-1.5 rounded-full" />
-						<span v-tooltip="compactDownloads !== formattedDownloads ?
-							capitalizeString(
-								formatMessage(commonMessages.projectDownloads, {
-									count: props.version.downloads,
-								}),
-							) : undefined" class="flex items-center gap-1"><DownloadIcon class="size-5"/> {{ compactDownloads }}</span>
+						<span
+							v-tooltip="
+								compactDownloads !== formattedDownloads
+									? capitalizeString(
+											formatMessage(commonMessages.projectDownloads, {
+												count: props.version.downloads,
+											}),
+										)
+									: undefined
+							"
+							class="flex items-center gap-1"
+							><DownloadIcon class="size-5" /> {{ compactDownloads }}</span
+						>
 					</span>
 				</div>
 			</div>
 			<div class="flex gap-2 flex-wrap items-center">
-				<slot name="headerActions" :primary-file="primaryFile" :promoted-files="promotedSupplementaryFiles" />
+				<slot
+					name="headerActions"
+					:primary-file="primaryFile"
+					:promoted-files="promotedSupplementaryFiles"
+				/>
 			</div>
 		</div>
 		<hr class="w-full border-surface-4 m-0" />
@@ -218,6 +272,7 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 			<div class="grid md:grid-cols-2 gap-4">
 				<VersionDependencyItem
 					v-for="depContext in requiredContent"
+					:key="`required-dep-${depContext.dependency.version_id ?? depContext.dependency.project_id ?? depContext.dependency.file_name}`"
 					:context="depContext"
 					:dependency-link="dependencyLinkCreator(depContext)"
 					target="_blank"
@@ -229,15 +284,30 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 		</section>
 		<section id="compatibility">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.compatibility) }}</h3>
-			<div class="grid gap-3 md:gap-4 bg-surface-3 border border-solid border-surface-4 p-4 rounded-2xl md:p-0 md:border-0 md:bg-transparent" :class="version.environment ? 'md:grid-cols-3' : 'md:grid-cols-2'">
-				<div class="md:bg-surface-3 md:border md:border-solid md:border-surface-4 md:p-4 md:rounded-2xl">
+			<div
+				class="grid gap-3 md:gap-4 bg-surface-3 border border-solid border-surface-4 p-4 rounded-2xl md:p-0 md:border-0 md:bg-transparent"
+				:class="version.environment ? 'md:grid-cols-3' : 'md:grid-cols-2'"
+			>
+				<div
+					class="md:bg-surface-3 md:border md:border-solid md:border-surface-4 md:p-4 md:rounded-2xl"
+				>
 					{{ formatMessage(projectCompatibilityMessages.minecraftJava) }}
 					<div class="flex gap-1 flex-wrap mt-2">
-						<TagItem v-for="gameVersion in version.game_versions">{{ gameVersion }}</TagItem>
+						<TagItem
+							v-for="gameVersion in version.game_versions"
+							:key="`version-compat-game-version-${gameVersion}`"
+							>{{ gameVersion }}</TagItem
+						>
 					</div>
 				</div>
-				<div class="md:bg-surface-3 md:border md:border-solid md:border-surface-4 md:p-4 md:rounded-2xl">
-					{{ formatMessage(projectCompatibilityMessages.platformsPlural, { count: platforms?.length ?? 0 }) }}
+				<div
+					class="md:bg-surface-3 md:border md:border-solid md:border-surface-4 md:p-4 md:rounded-2xl"
+				>
+					{{
+						formatMessage(projectCompatibilityMessages.platformsPlural, {
+							count: platforms?.length ?? 0,
+						})
+					}}
 					<div class="flex gap-1 flex-wrap mt-2">
 						<template v-if="isModpack && noModpackLoader">
 							<TagItem class="border !border-solid border-surface-5 hover:no-underline">
@@ -245,7 +315,11 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 							</TagItem>
 						</template>
 						<template v-else>
-							<TagTagItem v-for="platform in platforms" :tag="platform" />
+							<TagTagItem
+								v-for="platform in platforms"
+								:key="`version-compat-platform-${platform}`"
+								:tag="platform"
+							/>
 						</template>
 					</div>
 				</div>
@@ -262,8 +336,9 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 		</section>
 		<section id="changes">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.changes) }}</h3>
-			<div class="p-4 bg-surface-3 rounded-2xl flex">
-				<div v-if="version.changelog"
+			<div class="p-4 bg-surface-3 rounded-2xl flex border-solid border border-surface-4">
+				<div
+					v-if="version.changelog"
 					class="markdown-body"
 					v-html="renderHighlightedString(version.changelog)"
 				/>
@@ -275,6 +350,7 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 			<div class="grid md:grid-cols-2 gap-4">
 				<VersionDependencyItem
 					v-for="depContext in optionalContent"
+					:key="`optional-dep-${depContext.dependency.version_id ?? depContext.dependency.project_id ?? depContext.dependency.file_name}`"
 					:context="depContext"
 					:dependency-link="dependencyLinkCreator(depContext)"
 					target="_blank"
@@ -285,10 +361,13 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 			</div>
 		</section>
 		<section v-if="incompatibleContent.length > 0" id="known-incompatibilities">
-			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.knownIncompatibilities) }}</h3>
+			<h3 class="mt-0 mb-2 text-lg font-semibold">
+				{{ formatMessage(messages.knownIncompatibilities) }}
+			</h3>
 			<div class="grid md:grid-cols-2 gap-4">
 				<VersionDependencyItem
 					v-for="depContext in incompatibleContent"
+					:key="`incompatible-dep-${depContext.dependency.version_id ?? depContext.dependency.project_id ?? depContext.dependency.file_name}`"
 					:context="depContext"
 					:dependency-link="dependencyLinkCreator(depContext)"
 					target="_blank"
@@ -297,13 +376,21 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 			</div>
 		</section>
 		<section v-if="supplementaryResources?.length > 0" id="supplementary-resources">
-			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.supplementaryResources) }}</h3>
+			<h3 class="mt-0 mb-2 text-lg font-semibold">
+				{{ formatMessage(messages.supplementaryResources) }}
+			</h3>
 			<Table :columns="supplementaryResourcesTableColumns" :data="supplementaryResources">
 				<template #cell-file="{ row }">
 					{{ row.file.filename }}
 				</template>
 				<template #cell-type="{ row }">
-					{{ formatMessage(!row.file.file_type || row.file.file_type === 'unknown' ? commonMessages.unknownLabel : fileTypeMessages[row.file.file_type]) }}
+					{{
+						formatMessage(
+							!row.file.file_type || row.file.file_type === 'unknown'
+								? commonMessages.unknownLabel
+								: fileTypeMessages[row.file.file_type],
+						)
+					}}
 				</template>
 				<template #cell-size="{ row }">
 					{{ formatBytes(row.file.size) }}
@@ -316,7 +403,13 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 			</Table>
 		</section>
 		<section v-if="includedContent?.length > 0" id="content">
-			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(version.loaders.includes('mrpack') ? messages.content : messages.includedContent) }}</h3>
+			<h3 class="mt-0 mb-2 text-lg font-semibold">
+				{{
+					formatMessage(
+						version.loaders.includes('mrpack') ? messages.content : messages.includedContent,
+					)
+				}}
+			</h3>
 			<Table :columns="contentTableColumns" :data="includedContent">
 				<template #header-actions>
 					<StyledInput
@@ -330,18 +423,22 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 				<template #cell-icon="{ row }">
 					<AutoLink :to="row.link" tabindex="-1" class="flex" target="_blank">
 						<Avatar v-if="row.icon_url" :src="row.icon_url" alt="" size="2rem" />
-						<div v-else class="size-[2rem] flex items-center justify-center"">
+						<div v-else class="size-[2rem] flex items-center justify-center">
 							<FileIcon class="size-5 text-secondary" />
 						</div>
 					</AutoLink>
 				</template>
 				<template #cell-name="{ row }">
-					<AutoLink :to="row.link" class="hover:underline hover:text-contrast flex w-fit" target="_blank">
+					<AutoLink
+						:to="row.link"
+						class="hover:underline hover:text-contrast flex w-fit"
+						target="_blank"
+					>
 						{{ row.name }}
 					</AutoLink>
 				</template>
 				<template #cell-version="{ row }">
-					{{ row.version ?? row.hasProject ? formatMessage(commonMessages.unknownLabel) : '—' }}
+					{{ (row.version ?? row.hasProject) ? formatMessage(commonMessages.unknownLabel) : '—' }}
 				</template>
 			</Table>
 		</section>

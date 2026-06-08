@@ -41,7 +41,7 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button @click="createDataPackVersionHandler" :disabled="packageLoaders.length === 0">
+						<button :disabled="packageLoaders.length === 0" @click="createDataPackVersionHandler">
 							{{ formatMessage(messages.packageDataPack) }}
 							<RightArrowIcon aria-hidden="true" />
 						</button>
@@ -293,13 +293,15 @@
 				</VersionPage>
 				<section
 					v-if="
-						projectV3.project_types.includes('mod') || projectV3.project_types.includes('plugin')
+						flags.alwaysShowVersionDevInfo ||
+						projectV3.project_types.includes('mod') ||
+						projectV3.project_types.includes('plugin')
 					"
-					class="flex flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-surface-2 p-0"
+					class="flex flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-2 p-0"
 				>
 					<button
-						@click="devInfoCollapsed = !devInfoCollapsed"
 						class="group m-0 flex w-full min-w-0 appearance-none items-center gap-3 rounded-2xl rounded-b-none bg-surface-3 p-4 text-left outline-offset-[-3px]"
+						@click="devInfoCollapsed = !devInfoCollapsed"
 					>
 						<DropdownIcon
 							aria-hidden="true"
@@ -312,13 +314,23 @@
 					</button>
 					<Collapsible
 						:collapsed="devInfoCollapsed"
-						class="rounded-b-2xl border-0 border-t border-solid border-surface-5"
+						class="rounded-b-2xl border-0 border-t border-solid border-surface-4"
 					>
 						<div class="flex flex-col p-4">
 							<p class="mb-3 mt-0 leading-normal">
 								<IntlFormatted :message-id="messages.mavenDescription">
 									<template #gradle-link="{ children }">
 										<a href="https://gradle.org/" class="text-link" target="_blank" rel="noopener">
+											<component :is="() => children" />
+										</a>
+									</template>
+									<template #article-link="{ children }">
+										<a
+											href="https://support.modrinth.com/en/articles/8801191-modrinth-maven"
+											class="text-link"
+											target="_blank"
+											rel="noopener"
+										>
 											<component :is="() => children" />
 										</a>
 									</template>
@@ -811,7 +823,7 @@ const messages = defineMessages({
 	mavenDescription: {
 		id: 'version.section.content.dev-info.maven-description',
 		defaultMessage:
-			'Projects on Modrinth are automatically available through a Maven repository for use with JVM build tools such as <gradle-link>Gradle</gradle-link>.',
+			'Projects on Modrinth are automatically available through a Maven repository for use with JVM build tools such as <gradle-link>Gradle</gradle-link>. To learn more about the Modrinth Maven API, <article-link>click here</article-link>.',
 	},
 	mavenNote: {
 		id: 'version.section.content.dev-info.maven-note',

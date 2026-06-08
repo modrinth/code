@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
 import { InfoIcon } from '@modrinth/assets'
+
+import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
+
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import type { DependencyContext } from './index.ts'
 
 const { formatMessage } = useVIntl()
 
-const props = withDefaults(
+withDefaults(
 	defineProps<{
 		context: DependencyContext
 		dependencyLink?: string
