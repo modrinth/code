@@ -482,9 +482,6 @@
   "app.skins.title": {
     "message": "스킨 선택"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
@@ -514,15 +511,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "{version} 버전이 성공적으로 설치되었습니다!"
-  },
-  "app.update.download-update": {
-    "message": "업데이트 다운로드"
-  },
-  "app.update.downloading-update": {
-    "message": "업데이트 다운로드 중 ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "새로고침하여 업데이트 설치"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

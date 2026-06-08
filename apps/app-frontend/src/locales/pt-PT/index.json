@@ -239,9 +239,6 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestão de recursos"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} está pronta para ser instalada! Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
   },
@@ -271,15 +268,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versão {version} foi instalada com sucesso!"
-  },
-  "app.update.download-update": {
-    "message": "Transferir atualização"
-  },
-  "app.update.downloading-update": {
-    "message": "A transferir atualização ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Recarrega para instalar a atualização"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "exemplo.modrinth.gg"

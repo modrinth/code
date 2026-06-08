@@ -311,9 +311,6 @@
   "app.skins.preview.edit-button": {
     "message": "編集"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} のインストール準備が整いました！今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
   },
@@ -343,15 +340,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "バージョン {version} が正常にインストールされました！"
-  },
-  "app.update.download-update": {
-    "message": "アップデートをダウンロード"
-  },
-  "app.update.downloading-update": {
-    "message": "アップデートをダウンロード中 ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "再起動して今すぐ更新"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

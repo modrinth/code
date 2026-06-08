@@ -437,9 +437,6 @@
   "app.skins.title": {
     "message": "Pemilih kekulit"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} sudah bersedia untuk dipasang! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} sudah selesai dimuat turun! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
   },
@@ -469,15 +466,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versi {version} telah berjaya dipasang!"
-  },
-  "app.update.download-update": {
-    "message": "Muat turun kemas kini"
-  },
-  "app.update.downloading-update": {
-    "message": "Sedang memuat turun kemas kini ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Muat semula untuk memasang kemas kini"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

@@ -464,9 +464,6 @@
   "app.skins.title": {
     "message": "Выбор скина"
   },
-  "app.update-popup.body": {
-    "message": "Версия Modrinth App {version} готова к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
@@ -496,15 +493,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Версия {version} успешно установлена!"
-  },
-  "app.update.download-update": {
-    "message": "Скачать обновление"
-  },
-  "app.update.downloading-update": {
-    "message": "Скачивание обновления ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Перезапустить и обновить"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

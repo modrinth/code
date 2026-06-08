@@ -353,9 +353,6 @@
   "app.skins.modal.texture-section": {
     "message": "Textur"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} är redo att laddas ner! Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
   },
@@ -385,15 +382,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} har installerats!"
-  },
-  "app.update.download-update": {
-    "message": "Ladda ner uppdatering"
-  },
-  "app.update.downloading-update": {
-    "message": "Laddar ner uppdatering ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Ladda om för att installera uppdatering"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

@@ -404,9 +404,6 @@
   "app.skins.title": {
     "message": "皮膚選擇"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} 已準備好安裝！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
   },
@@ -436,15 +433,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安裝！"
-  },
-  "app.update.download-update": {
-    "message": "下載更新"
-  },
-  "app.update.downloading-update": {
-    "message": "正在下載更新 ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "重新載入即可安裝更新"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

@@ -476,9 +476,6 @@
   "app.skins.title": {
     "message": "Đổi skin"
   },
-  "app.update-popup.body": {
-    "message": "Phiên bản v{version} của Modrinth đã được chuẩn bị để cài đặt! Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc cập nhật tự động khi bạn đóng Modrinth."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Phiên bản v{version} của Modrinth đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Modrinth."
   },
@@ -508,15 +505,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Phiên bản {version} đã được cài đặt thành công!"
-  },
-  "app.update.download-update": {
-    "message": "Tải về bản cập nhật"
-  },
-  "app.update.downloading-update": {
-    "message": "Đang tải xuống bản cập nhật ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Hãy khởi động lại để cài đặt bản cập nhật"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

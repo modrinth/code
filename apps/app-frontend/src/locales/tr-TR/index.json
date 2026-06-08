@@ -482,9 +482,6 @@
   "app.skins.title": {
     "message": "Skin seçici"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth Uygulaması v{version} yüklenmeye hazır! Güncellemek için yeniden başlatın veya Modrinth Uygulamasını kapattığınızda otomatik olarak güncellenecektir."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."
   },
@@ -514,15 +511,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "{version} sürümü başarıyla kuruldu!"
-  },
-  "app.update.download-update": {
-    "message": "Güncellemeyi indir"
-  },
-  "app.update.downloading-update": {
-    "message": "Güncelleme indiriliyor (%{percent})"
-  },
-  "app.update.reload-to-update": {
-    "message": "Güncellemeyi kurmak için yeniden başlatın"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

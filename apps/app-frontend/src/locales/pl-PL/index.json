@@ -476,9 +476,6 @@
   "app.skins.title": {
     "message": "Wybierz skórkę"
   },
-  "app.update-popup.body": {
-    "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Wersja Modrinth App v{version} została pobrana. Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
   },
@@ -508,15 +505,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Wersja {version} została pomyślnie zainstalowana!"
-  },
-  "app.update.download-update": {
-    "message": "Pobierz aktualizację"
-  },
-  "app.update.downloading-update": {
-    "message": "Pobieranie aktualizacji ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Załaduj ponownie, aby zainstalować aktualizację"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

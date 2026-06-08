@@ -455,9 +455,6 @@
   "app.skins.title": {
     "message": "Skin vælger"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} er klar til at blive installeret! Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
   },
@@ -487,15 +484,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} var installeret med succes!"
-  },
-  "app.update.download-update": {
-    "message": "Download opdatering"
-  },
-  "app.update.downloading-update": {
-    "message": "Downloader opdatering ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Genindlæs for at installere opdatering"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "eksemple.modrinth.gg"
