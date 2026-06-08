@@ -37,6 +37,7 @@ import { ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -45,6 +46,7 @@ defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('ConfirmRepairModal')
 
 const messages = defineMessages({
 	header: {
@@ -82,12 +84,16 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 
 function show() {
+	debug('show: called', { hasModalRef: !!modal.value })
 	modal.value?.show()
+	debug('show: returned from modal.show', { hasModalRef: !!modal.value })
 }
 
 function confirm() {
+	debug('confirm: called', { hasModalRef: !!modal.value })
 	modal.value?.hide()
 	emit('repair')
+	debug('confirm: emitted repair')
 }
 
 defineExpose({

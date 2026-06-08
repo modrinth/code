@@ -8,6 +8,168 @@
   "admin.billing.error.not-found": {
     "message": "Felhasználó nem található"
   },
+  "analytics.action.add": {
+    "message": "Hozzáadás"
+  },
+  "analytics.action.cancel": {
+    "message": "Mégse"
+  },
+  "analytics.action.refresh": {
+    "message": "Újratöltés"
+  },
+  "analytics.action.reset": {
+    "message": "Visszaállítás"
+  },
+  "analytics.breakdown.country": {
+    "message": "Ország"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Letöltés oka"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Forrás letöltése"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Játék verziója"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Részletezés"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Betöltő"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Bevételszerzés"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Nem részletezés"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projekt"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Projekt állapota"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Projekt verzió"
+  },
+  "analytics.breakdown.selected": {
+    "message": "{breakdown} szerinti részletezés"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Mindet megmutat"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Szűkített nézet"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Top 8 megjelenítése"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ó"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktív"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Megjegyzések"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Elemzési grafikonvezérlők, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Irányítások"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Elemzési grafikonok vezérlőelemei"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Kijelző"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth események"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Nincs Modrinth esemény a grafiokonon."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "A grafikonon nincs projektesemény."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Előző időszak"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Projekt események"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Arány"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Válasszon elemeket az alábbi táblázatból az adatok megjelenítéséhez."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# analitikai esemény} other {# analitikai esemény}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Közlemények megtekintése"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Bevételszerzési analitikai részletek megtekintése"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Csak a Modrinthon keresztül történő megtekintések és letöltések számítanak bele a bevételszerzésbe, és a letöltéshez a felhasználóknak be kell jelentkezniük."
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modcsomag"
+  },
+  "analytics.download-reason.update": {
+    "message": "Frissítés"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "A Modrinth weboldala"
+  },
+  "analytics.empty.no-data": {
+    "message": "Nincs elérhető adat"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Nincs elérhető adat a statisztikához"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Nincs elérhető projekt"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Nincs elérhető projekt a statisztikához"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Összes"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Kiadás"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Országok keresése..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Letöltési források keresése..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Projektverziók keresése..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Verziók keresése..."
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Verzió feltöltve"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Játékidő (másodpercben)"
+  },
   "app-marketing.download.description": {
     "message": "Asztali alkalmazásunk minden platformon elérhető, válaszd ki a kívánt verziót."
   },
@@ -121,9 +283,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -1028,9 +1187,6 @@
   "dashboard.projects.links.source-code.label": {
     "message": "Forráskód"
   },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Egy oldal, amely információkat, dokumentációt és segítséget tartalmaz a projekthez."
-  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Wiki oldal"
   },
@@ -1288,9 +1444,6 @@
   },
   "discover.install.error.no-server-world": {
     "message": "Nem található szerver világ ami letölthető."
-  },
-  "discover.install.error.unsupported-content-type": {
-    "message": "Ez a tartalomtípus nem telepíthető a szerverre a „” menüpontból."
   },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
@@ -2897,26 +3050,14 @@
   "scopes.organizationWrite.label": {
     "message": "Szervezetekhez írás"
   },
-  "scopes.patCreate.description": {
-    "message": "Személyes API tokenek létrehozása"
-  },
   "scopes.patCreate.label": {
     "message": "PAT-ek létrehozása"
-  },
-  "scopes.patDelete.description": {
-    "message": "Személyes API tokenek törlése"
   },
   "scopes.patDelete.label": {
     "message": "PAT-ek törlése"
   },
-  "scopes.patRead.description": {
-    "message": "Létrehozott API tokenek megtekintése"
-  },
   "scopes.patRead.label": {
     "message": "PAT-ek olvasása"
-  },
-  "scopes.patWrite.description": {
-    "message": "Személyes API tokenek szerkesztése"
   },
   "scopes.patWrite.label": {
     "message": "PAT-ek írása"

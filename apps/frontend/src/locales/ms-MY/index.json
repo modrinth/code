@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -407,6 +404,9 @@
   "collection.title": {
     "message": "{name} - Koleksi"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Tambah nota peribadi"
+  },
   "conversation-thread.action.approve": {
     "message": "Luluskan"
   },
@@ -449,6 +449,18 @@
   "conversation-thread.action.send-to-review-with-reply": {
     "message": "Hantar untuk semakan dengan balasan"
   },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Tetapkan kepada draf"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Tetapkan kepada draf dengan balasan"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Tahan"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Tahan dengan balasan"
+  },
   "conversation-thread.error.closing-report": {
     "message": "Ralat semasa menutup laporan"
   },
@@ -469,6 +481,9 @@
   },
   "conversation-thread.reply-modal.confirmation.label": {
     "message": "Saya akui bahawa penyederhana tidak memantau bebenang ini secara aktif."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Balas bebenang"
   },
   "conversation-thread.resubmit-modal.description": {
     "message": "Anda sedang menghantar <project-title>{projectTitle}</project-title> untuk disemak semula oleh penyederhana."
@@ -667,6 +682,9 @@
   },
   "dashboard.collections.long-title": {
     "message": "Koleksi anda"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Cari koleksi..."
   },
   "dashboard.collections.sort.name-ascending": {
     "message": "Nama (A-Z)"
@@ -944,11 +962,41 @@
   "dashboard.organizations.button.create": {
     "message": "Cipta organisasi"
   },
+  "dashboard.organizations.empty.cta": {
+    "message": "Cipta sebuah organisasi!"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisasi"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Tanda semua sebagai telah dibaca"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Lihat sejarah"
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Ralat semasa memuat pemberitahuan:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Sejarah"
+  },
   "dashboard.overview.notifications.history.title": {
     "message": "Sejarah pemberitahuan"
   },
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projek"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "dan {count} lagi..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Kosongkan pautan"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Sunting pautan"
   },
   "dashboard.projects.links.description": {
     "message": "Sebarang pautan yang anda nyatakan di bawah akan ditulis ganti pada setiap projek yang dipilih. Sebarang pautan yang anda biarkan kosong akan diabaikan. Anda boleh memadamkan pautan daripada semua projek yang dipilih menggunakan butang tong sampah."
@@ -982,9 +1030,6 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Kod sumber"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Laman yang mengandungi maklumat, dokumentasi dan bantuan untuk projek ini."
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Laman wiki"
@@ -1030,6 +1075,9 @@
   },
   "dashboard.projects.table.type": {
     "message": "Jenis"
+  },
+  "dashboard.report.title": {
+    "message": "Laporan {id}"
   },
   "dashboard.reports.active-title": {
     "message": "Laporan yang aktif"
@@ -1085,8 +1133,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Pembayaran dan pengeluaran anda akan dipaparkan di sini."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Bulan lalu"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Bulan ini"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Lihat semua"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Semua tahun"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Pengeluaran anda telah dikunci buat sementara waktu kerana TIN atau SSN anda tidak sepadan dengan rekod IRS. Sila hubungi sokongan untuk menetapkan semula dan menghantar semula borang cukai anda."
@@ -1099,6 +1156,27 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Pengeluaran"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Laporan yang aktif"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analitik"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Pencipta"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Papan pemuka"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Pemberitahuan"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisasi"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Gambaran"
   },
   "dashboard.sidebar.label.projects": {
     "message": "Projek"
@@ -1649,6 +1727,9 @@
   "layout.action.create-new": {
     "message": "Cipta baharu..."
   },
+  "layout.action.external-projects": {
+    "message": "Projek luaran"
+  },
   "layout.action.file-lookup": {
     "message": "Carian fail"
   },
@@ -1697,8 +1778,14 @@
   "layout.banner.add-email.description": {
     "message": "Atas sebab keselamatan, Modrinth memerlukan anda mendaftarkan alamat e-mel ke akaun anda."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Sentiasa abaikan"
+  },
   "layout.banner.build-fail.description": {
     "message": "Penggunaan bahagian hadapan Modrinth ini gagal menjana keadaan daripada API. Ini mungkin disebabkan oleh gangguan atau ralat dalam konfigurasi. Bina semula apabila API tersedia. Kod ralat: {errors}; URL API semasa ialah: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Abaikan"
   },
   "layout.banner.build-fail.title": {
     "message": "Ralat menjana keadaan daripada API semasa membina."
@@ -2870,26 +2957,14 @@
   "scopes.organizationWrite.label": {
     "message": "Tulis organisasi"
   },
-  "scopes.patCreate.description": {
-    "message": "Cipta token API peribadi"
-  },
   "scopes.patCreate.label": {
     "message": "Cipta PAT"
-  },
-  "scopes.patDelete.description": {
-    "message": "Memadamkan token API peribadi anda"
   },
   "scopes.patDelete.label": {
     "message": "Padam PAT"
   },
-  "scopes.patRead.description": {
-    "message": "Melihat token API yang dicipta"
-  },
   "scopes.patRead.label": {
     "message": "Baca PAT"
-  },
-  "scopes.patWrite.description": {
-    "message": "Menyunting token API peribadi"
   },
   "scopes.patWrite.label": {
     "message": "Tulis PAT"

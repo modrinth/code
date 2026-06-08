@@ -8,6 +8,51 @@
   "admin.billing.error.not-found": {
     "message": "Пользователь не найден"
   },
+  "analytics.action.add": {
+    "message": "Добавить"
+  },
+  "analytics.action.cancel": {
+    "message": "Отмена"
+  },
+  "analytics.action.refresh": {
+    "message": "Перезагрузить"
+  },
+  "analytics.action.reset": {
+    "message": "Сбросить"
+  },
+  "analytics.breakdown.country": {
+    "message": "Страна"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Причина скачивания"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Источник скачивания"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Версия игры"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Загрузчик"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Монетизация"
+  },
+  "analytics.breakdown.project": {
+    "message": "Проект"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Статус проекта"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Версия проекта"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ч"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
   "app-marketing.download.description": {
     "message": "Наше приложение доступно на всех платформах — выберите желаемую версию."
   },
@@ -123,7 +168,7 @@
     "message": "∞ МБ"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ МБ"
+    "message": "∞ · ∞ МБ"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 МБ"
@@ -1076,9 +1121,6 @@
   "dashboard.projects.links.source-code.label": {
     "message": "Исходный код"
   },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Страница содержит информацию, документацию и помощь для проекта."
-  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Вики"
   },
@@ -1339,9 +1381,6 @@
   },
   "discover.install.error.no-server-world": {
     "message": "Нет доступного мира сервера для установки."
-  },
-  "discover.install.error.unsupported-content-type": {
-    "message": "Этот тип контента не поддерживается для установки на сервер."
   },
   "discover.install.heading.reset-modpack": {
     "message": "Выбор сборки модов для установки после сброса"
@@ -2420,6 +2459,9 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} — Скачать проекты {username} на Modrinth"
   },
+  "profile.official-account": {
+    "message": "Официальный аккаунт Modrinth"
+  },
   "profile.user-id": {
     "message": "ID пользователя: {id}"
   },
@@ -3263,6 +3305,9 @@
   "servers.plan.small.description": {
     "message": "Для 1–5 друзей и пары лёгких модов."
   },
+  "servers.purchase.step.plan.billed": {
+    "message": "{interval, select, monthly {на месяц} quarterly {на 3 месяца} yearly {на год} other {оплата {interval}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
   },
@@ -3424,6 +3469,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Добавьте ещё один уровень безопасности аккаунта при входе."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Отвязка аутентификатора"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Привязка аутентификатора"
   },
   "settings.account.security.two-factor.title": {
     "message": "Двухфакторная аутентификация"
@@ -3755,6 +3806,12 @@
   "settings.billing.subscription.title": {
     "message": "Подписки"
   },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Переход на {interval, select, monthly {месяц} yearly {год} other {{interval}}}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Перейти на {interval, select, monthly {месяц} yearly {год} other {{interval}}}"
+  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Ежемесячная оплата обойдётся на {amount} в год дороже"
   },
@@ -3894,7 +3951,7 @@
     "message": "Вы действительно хотите удалить этот токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Изменение личного токена доступа"
+    "message": "Настройка личного токена доступа"
   },
   "settings.pats.token.action.edit": {
     "message": "Изменить токен"

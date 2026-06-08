@@ -1,12 +1,17 @@
 import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
+import { ArchonActionsV1Module } from './archon/actions/v1'
 import { ArchonBackupsV1Module } from './archon/backups/v1'
 import { ArchonBackupsQueueV1Module } from './archon/backups-queue/v1'
 import { ArchonContentV1Module } from './archon/content/v1'
+import { ArchonNodesInternalModule } from './archon/nodes/internal'
+import { ArchonNoticesV0Module } from './archon/notices/v0'
 import { ArchonOptionsV1Module } from './archon/options/v1'
 import { ArchonPropertiesV1Module } from './archon/properties/v1'
+import { ArchonServerUsersV1Module } from './archon/server-users/v1'
 import { ArchonServersV0Module } from './archon/servers/v0'
 import { ArchonServersV1Module } from './archon/servers/v1'
+import { ArchonTransfersInternalModule } from './archon/transfers/internal'
 import { ISO3166Module } from './iso3166'
 import { KyrosContentV1Module } from './kyros/content/v1'
 import { KyrosFilesV0Module } from './kyros/files/v0'
@@ -22,6 +27,7 @@ import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCampaignInternalModule } from './labrinth/campaign/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthExternalProjectsInternalModule } from './labrinth/external-projects/internal'
+import { LabrinthFriendsV3Module } from './labrinth/friends/v3'
 import { LabrinthGlobalsInternalModule } from './labrinth/globals/internal'
 import { LabrinthImagesV3Module } from './labrinth/images/v3'
 import { LabrinthLimitsV3Module } from './labrinth/limits/v3'
@@ -63,13 +69,18 @@ type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
  * TODO: Better way? Probably not
  */
 export const MODULE_REGISTRY = {
+	archon_actions_v1: ArchonActionsV1Module,
 	archon_backups_queue_v1: ArchonBackupsQueueV1Module,
 	archon_backups_v1: ArchonBackupsV1Module,
 	archon_content_v1: ArchonContentV1Module,
+	archon_nodes_internal: ArchonNodesInternalModule,
+	archon_notices_v0: ArchonNoticesV0Module,
 	archon_options_v1: ArchonOptionsV1Module,
 	archon_properties_v1: ArchonPropertiesV1Module,
+	archon_server_users_v1: ArchonServerUsersV1Module,
 	archon_servers_v0: ArchonServersV0Module,
 	archon_servers_v1: ArchonServersV1Module,
+	archon_transfers_internal: ArchonTransfersInternalModule,
 	iso3166_data: ISO3166Module,
 	mclogs_insights_v1: MclogsInsightsV1Module,
 	mclogs_logs_v1: MclogsLogsV1Module,
@@ -87,6 +98,7 @@ export const MODULE_REGISTRY = {
 	labrinth_campaign_internal: LabrinthCampaignInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_external_projects_internal: LabrinthExternalProjectsInternalModule,
+	labrinth_friends_v3: LabrinthFriendsV3Module,
 	labrinth_globals_internal: LabrinthGlobalsInternalModule,
 	labrinth_images_v3: LabrinthImagesV3Module,
 	labrinth_moderation_internal: LabrinthModerationInternalModule,

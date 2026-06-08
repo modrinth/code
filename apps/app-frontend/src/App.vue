@@ -36,6 +36,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentInstallModal,
+	ContentUpdaterModal,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -75,7 +76,6 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
-import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
@@ -95,7 +95,7 @@ import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
-import { command_listener, warning_listener } from '@/helpers/events.js'
+import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
@@ -241,6 +241,7 @@ const {
 
 const news = ref([])
 const availableSurvey = ref(false)
+const displayedServerInviteNotifications = new Set()
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -611,6 +612,16 @@ const {
 	handleModpackDuplicateCreateAnyway: handleContentInstallModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance: handleContentInstallModpackDuplicateGoToInstance,
 	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
+	incompatibilityWarningVersions: contentInstallIncompatibilityWarningVersions,
+	incompatibilityWarningCurrentGameVersion: contentInstallIncompatibilityWarningCurrentGameVersion,
+	incompatibilityWarningCurrentLoader: contentInstallIncompatibilityWarningCurrentLoader,
+	incompatibilityWarningProjectType: contentInstallIncompatibilityWarningProjectType,
+	incompatibilityWarningProjectIconUrl: contentInstallIncompatibilityWarningProjectIconUrl,
+	incompatibilityWarningProjectName: contentInstallIncompatibilityWarningProjectName,
+	incompatibilityWarningMessage: contentInstallIncompatibilityWarningMessage,
+	incompatibilityWarningInstalling: contentInstallIncompatibilityWarningInstalling,
+	handleIncompatibilityWarningInstall: handleContentInstallIncompatibilityWarningInstall,
+	handleIncompatibilityWarningCancel: handleContentInstallIncompatibilityWarningCancel,
 } = contentInstall
 
 const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
@@ -631,6 +642,12 @@ const installToPlayModal = ref()
 const updateToPlayModal = ref()
 
 const modrinthLoginFlowWaitModal = ref()
+
+watch(incompatibilityWarningModal, (modal) => {
+	if (modal) {
+		setContentIncompatibilityWarningModal(modal)
+	}
+})
 
 setupAuthProvider(credentials, async (_redirectPath) => {
 	await signIn()
@@ -752,6 +769,86 @@ const accounts = ref(null)
 provide('accountsCard', accounts)
 
 command_listener(handleCommand)
+notification_listener(handleLiveNotification)
+
+async function markLiveNotificationRead(notification) {
+	try {
+		await tauriApiClient.labrinth.notifications_v2.markAsRead(notification.id)
+	} catch (error) {
+		if (error instanceof ModrinthApiError && error.statusCode === 404) {
+			console.warn(`notification ${notification.id} could not be marked as read`, error)
+			return
+		}
+		throw error
+	}
+}
+
+async function respondToServerInvite(notification, action) {
+	const serverId = notification.body?.server_id
+	if (typeof serverId !== 'string') {
+		throw new Error('Missing server ID for invite notification.')
+	}
+
+	await tauriApiClient.request(`/servers/${serverId}/invites/${action}`, {
+		api: 'archon',
+		version: 1,
+		method: 'POST',
+	})
+	await markLiveNotificationRead(notification)
+
+	return serverId
+}
+
+async function acceptServerInviteNotification(notification) {
+	try {
+		const serverId = await respondToServerInvite(notification, 'accept')
+		await router.push(`/hosting/manage/${encodeURIComponent(serverId)}`)
+		queryClient.invalidateQueries({ queryKey: ['servers'] })
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+async function declineServerInviteNotification(notification) {
+	try {
+		await respondToServerInvite(notification, 'decline')
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+function openServerInviteInviterProfile(inviterName) {
+	if (!inviterName) return
+	openUrl(`${config.siteUrl}/user/${encodeURIComponent(inviterName)}`)
+}
+
+async function handleLiveNotification(notification) {
+	if (notification?.body?.type !== 'server_invite' || notification.read) return
+	if (displayedServerInviteNotifications.has(notification.id)) return
+
+	displayedServerInviteNotifications.add(notification.id)
+
+	const serverName =
+		typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
+	const inviterId = notification.body.invited_by
+	const invitedBy =
+		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+
+	addPopupNotification({
+		title: serverName,
+		autoCloseMs: null,
+		toast: {
+			type: 'server-invite',
+			actorName: invitedBy?.username ?? null,
+			actorAvatarUrl: invitedBy?.avatar_url ?? null,
+			entityName: serverName,
+			onAccept: () => acceptServerInviteNotification(notification),
+			onDecline: () => declineServerInviteNotification(notification),
+			onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
+		},
+	})
+}
+
 async function handleCommand(e) {
 	if (!e) return
 
@@ -1550,7 +1647,22 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@go-to-instance="handleModpackDuplicateGoToInstance"
 	/>
 	<AddServerToInstanceModal ref="addServerToInstanceModal" />
-	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
+	<ContentUpdaterModal
+		ref="incompatibilityWarningModal"
+		mode="incompatibility-warning"
+		:versions="contentInstallIncompatibilityWarningVersions"
+		:current-game-version="contentInstallIncompatibilityWarningCurrentGameVersion"
+		:current-loader="contentInstallIncompatibilityWarningCurrentLoader"
+		current-version-id=""
+		:is-app="true"
+		:project-type="contentInstallIncompatibilityWarningProjectType"
+		:project-icon-url="contentInstallIncompatibilityWarningProjectIconUrl"
+		:project-name="contentInstallIncompatibilityWarningProjectName"
+		:warning="contentInstallIncompatibilityWarningMessage"
+		:action-loading="contentInstallIncompatibilityWarningInstalling"
+		@update="handleContentInstallIncompatibilityWarningInstall"
+		@cancel="handleContentInstallIncompatibilityWarningCancel"
+	/>
 	<ModpackAlreadyInstalledModal
 		ref="contentInstallModpackAlreadyInstalledModal"
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"

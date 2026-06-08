@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "Select an option"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Displays how much time you've spent playing an instance."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Show play time"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Enables the ability to toggle the sidebar."
   },
@@ -142,6 +148,9 @@
   },
   "app.browse.server.installing": {
     "message": "Installing"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"

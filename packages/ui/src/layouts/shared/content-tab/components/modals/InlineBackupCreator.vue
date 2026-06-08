@@ -13,13 +13,17 @@
 			<ButtonStyled v-if="!backup.backupComplete.value && !backup.backupFailed.value">
 				<button
 					v-tooltip="
-						backup.externalBackupInProgress.value
-							? formatMessage(messages.backupInProgress)
-							: undefined
+						!canManageBackups
+							? permissionDeniedMessage
+							: backup.externalBackupInProgress.value
+								? formatMessage(messages.backupInProgress)
+								: undefined
 					"
 					class="!shadow-none"
-					:disabled="backup.isBackingUp.value || backup.externalBackupInProgress.value"
-					@click="backup.startBackup()"
+					:disabled="
+						!canManageBackups || backup.isBackingUp.value || backup.externalBackupInProgress.value
+					"
+					@click="startBackup"
 				>
 					<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
 					<PlusIcon v-else class="size-5" />
@@ -55,10 +59,13 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { hasServerPermission } from '#ui/composables/server-permissions'
+import { injectModrinthServerContext } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { useInlineBackup } from '../../composables/use-inline-backup'
 
@@ -73,8 +80,24 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const serverCtx = injectModrinthServerContext(null)
+const canManageBackups = computed(
+	() => !serverCtx || hasServerPermission(serverCtx.currentUserPermissions.value, 'BACKUPS'),
+)
+const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 const backup = useInlineBackup(() => props.backupName)
+
+function startBackup() {
+	if (
+		!canManageBackups.value ||
+		backup.externalBackupInProgress.value ||
+		backup.isBackingUp.value
+	) {
+		return
+	}
+	backup.startBackup()
+}
 
 watch(
 	() => backup.isBackingUp.value,

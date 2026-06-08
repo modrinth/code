@@ -113,10 +113,11 @@
 								color: 'primary',
 								hoverFilled: true,
 								link: createDownloadUrl(version),
-								download: getPrimaryFile(version).filename,
+								download: getPrimaryFile(version)?.filename,
 								action: () => {
 									emit('onDownload')
 								},
+								shown: !!getPrimaryFile(version),
 							},
 							{
 								id: 'new-tab',
@@ -405,7 +406,7 @@ const emit = defineEmits(['onDownload'])
 const baseDropdownId = useId()
 
 function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
-	return version.files.find((x) => x.primary) || version.files[0]
+	return version.files?.find((x) => x.primary) || version.files?.[0]
 }
 
 watch(
@@ -420,7 +421,10 @@ watch(
 )
 
 function createDownloadUrl(version: Labrinth.Versions.v3.Version) {
-	return createProjectDownloadUrl(getPrimaryFile(version).url, {
+	const file = getPrimaryFile(version)
+	if (!file?.url) return undefined
+
+	return createProjectDownloadUrl(file.url, {
 		reason: cdnDownloadReason.value,
 	})
 }

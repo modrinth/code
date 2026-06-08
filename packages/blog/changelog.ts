@@ -11,6 +11,62 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-04T15:59:11+00:00`,
+		product: 'hosting',
+		body: `## Added
+- You can now share access to the server panel through the Access tab. For more information [see the blogpost here](https://modrinth.com/news/article/server-access/).`,
+	},
+	{
+		date: `2026-06-03T18:38:16+00:00`,
+		product: 'web',
+		body: `## Added
+- Added monetization breakdown dismissable explainer banner.
+
+## Fixed
+- Fixed previous-period's data being included in analytics tables instead of just current period.
+- Fixed revenue metric displaying stale data when switching between metrics.
+- Fixed incorrect Y-axis formatting for values with trailing decimal zeros.
+- Fixed table series selections being reset when switching in and out of the tab.
+- Fixed "All Time" analytics range to start from the project's publish date instead of analytics injest start date.
+- Fixed unknown download source data points not appearing in download source breakdown.
+- Fixed date picker number inputs displaying browser increment/decrement arrows.
+- Fixed metric cards showing incorrect percentage changes when switching comparison periods.
+- Fixed playtime values being rounded incorrectly, causing small values to display as 0.`,
+	},
+	{
+		date: `2026-06-03T14:00:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed organization settings not loading.`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'app',
+		version: '0.14.3',
+		body: `## Added
+- Added toggle to hide play time from instance header.
+
+## Changed
+- Updated translations
+
+## Fixed
+- Fixed importing large .mrpack files in Modrinth App causing OS freezing or crashing.
+- Fixed the content update modal in the Content tab of instances hiding available updates in some cases.
+- Fixed copying full paths from the Files tab using mixed path separators on Windows.`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-06-02T16:37:52+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
 		date: `2026-05-31T16:45:15-07:00`,
 		product: 'app',
 		version: '0.14.2',

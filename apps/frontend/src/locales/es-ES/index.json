@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -949,9 +946,6 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Código base"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Una página que contiene información, documentación, y ayuda sobre el proyecto."
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Página de wiki"
@@ -2585,12 +2579,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visita el panel de proyectos"
   },
-  "project.stats.downloads-label": {
-    "message": "descarga{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "seguidor{count, plural,one {}other {es}}"
-  },
   "project.status.archived.message": {
     "message": "{title} ha sido archivado. {title} no recibirá ninguna futura actualización excepto que el autor decida desarchivar el proyecto."
   },
@@ -2759,26 +2747,14 @@
   "scopes.organizationWrite.label": {
     "message": "Escribir organizaciones"
   },
-  "scopes.patCreate.description": {
-    "message": "Crear tokens de API personales"
-  },
   "scopes.patCreate.label": {
     "message": "Crear PATs"
-  },
-  "scopes.patDelete.description": {
-    "message": "Eliminar tus tokens de API personales"
   },
   "scopes.patDelete.label": {
     "message": "Eliminar PATs"
   },
-  "scopes.patRead.description": {
-    "message": "Ver tokens de API creados"
-  },
   "scopes.patRead.label": {
     "message": "Leer PATs"
-  },
-  "scopes.patWrite.description": {
-    "message": "Editar tokens de API personales"
   },
   "scopes.patWrite.label": {
     "message": "Escribir PATs"

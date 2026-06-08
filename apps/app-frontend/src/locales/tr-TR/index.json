@@ -104,6 +104,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "Doğrulama sunucularına erişilemedi"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "Sunucuyu kuruluma ekle"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Bir kuruluma ekle"
+  },
   "app.browse.add-to-instance": {
     "message": "Kuruluma ekle"
   },
@@ -116,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Zaten ekli"
   },
+  "app.browse.back-to-instance": {
+    "message": "Kuruluma dön"
+  },
   "app.browse.discover-content": {
     "message": "İçerik keşfet"
   },
@@ -127,6 +136,9 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Mod paketleri"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Yeni bir içerik eklemek sunucuya girerkenki uyumluluğu bozabilir. Herhangi eklenmiş içerik ise sunucu kurulumunu güncellemeye çalıştığınızda kaybolacaktır."
   },
   "app.browse.server.installing": {
     "message": "Yükleniyor"
@@ -146,11 +158,17 @@
   "app.export-modal.header": {
     "message": "Mod paketini dışa aktar"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "\"{file}\" dahil mi?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Mod Paketi Adı"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketi adı"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Bu dışa aktarmaya hangi dosyaların dahil edileceğini yapılandırma"
   },
   "app.export-modal.version-number-label": {
     "message": "Sürüm numarası"
@@ -281,6 +299,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} oyununu oynamak için güncelleme gereklidir. Oyunu başlatmak için lütfen en son sürüme güncelleyin."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Bu proje zaten kurulu"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Keşfete geri dön"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "İçeriği kuruluma yükle"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Geliştirici modu açıldı."
   },
@@ -304,6 +331,138 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Kaynak yönetimi"
+  },
+  "app.skins.add-button": {
+    "message": "Skin ekle"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Sürükle bırak"
+  },
+  "app.skins.apply-button": {
+    "message": "Uygula"
+  },
+  "app.skins.delete-button": {
+    "message": "Skin'i sil"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Bu seçilmiş skin'i kalıcı olarak silecektir. Bu işlem geri alınamaz."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Bu skin'i silmek istediğinize gerçekten emin misiniz?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Bıraktığınız dosya okunamadı."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Dosya işlenirken hata oluştu"
+  },
+  "app.skins.edit-button": {
+    "message": "Skin'i düzenle"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Skin ekle"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Skin ekleme"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Kol stili"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "İnce"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Klasik"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Pelerin"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Pelerin"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Skin düzenleme"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Önce skin'e bir düzenleme yapın!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Pelerin yok"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Hiçbiri"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Dokuyu değiştir"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Skin'i kaydet"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Kaydediliyor..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Doku"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "İlk başta skin yükleyin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Skin'i düzenle"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Önizleme"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Skin'inizi çok hızlı değiştiriyorsunuz. Mojang'ın sunucuları geçici olarak diğer istekleri engelledi. Lütfen tekrar denemeden önce biraz bekleyin."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Yavaşla!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "İnşaatçılar & Biyomlar"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Varsayılan skinler"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Kaydedilen Skinler"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Giriş Yap"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Modrinth appdeki skin yönetim özelliklerini kullanmak için lütfen Minecraft hesabınıza giriş yapın."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Heyecanlı Modrinth Bot'u"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Lütfen giriş yapın"
+  },
+  "app.skins.title": {
+    "message": "Skin seçici"
   },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} güncellemesi indirilmeye hazır! Hemen güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecek."
@@ -581,6 +740,24 @@
   "instance.settings.tabs.java": {
     "message": "Java ve bellek"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Özel ortam değişkenleri"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Özel Java argümanları"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Özel Java kurulumu"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Özel bellek tahsisi"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Ortam değişkenlerini girin..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Java argümanlarını girin..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Ortam değişkenleri"
   },
@@ -595,6 +772,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Ayrılan bellek"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/java/kurulum/yolu"
   },
   "instance.settings.tabs.window": {
     "message": "Pencere"

@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -940,9 +937,6 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "ソースコード"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "プロジェクトに関する情報、ドキュメント、ヘルプが掲載されているページ"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "ウィキページ"
@@ -2750,26 +2744,14 @@
   "scopes.organizationWrite.label": {
     "message": "組織の書き込み"
   },
-  "scopes.patCreate.description": {
-    "message": "個人用APIトークンを作成する"
-  },
   "scopes.patCreate.label": {
     "message": "PATを作成する"
-  },
-  "scopes.patDelete.description": {
-    "message": "個人用APIトークンを削除する"
   },
   "scopes.patDelete.label": {
     "message": "PATを削除する"
   },
-  "scopes.patRead.description": {
-    "message": "作成したAPIトークンを表示する"
-  },
   "scopes.patRead.label": {
     "message": "PATを読み取る"
-  },
-  "scopes.patWrite.description": {
-    "message": "個人用APIトークンを編集する"
   },
   "scopes.patWrite.label": {
     "message": "PATの書き込み"

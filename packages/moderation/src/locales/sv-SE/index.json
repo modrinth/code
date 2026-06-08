@@ -68,9 +68,6 @@
   "nags.identical-links.description": {
     "defaultMessage": "Några av dina externa länkar ser ut att vara likadana. Varje länk ska bara anges en gång och med den passande länktypen."
   },
-  "nags.identical-links.title": {
-    "defaultMessage": "Likadana länkar"
-  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Din beskrivning ska ha tillräckligt med vanlig text eller bild-alternativtext, för att hålla det tillgängligt till de som använder skärmavläsare eller de med långsamma internetkopplingar."
   },

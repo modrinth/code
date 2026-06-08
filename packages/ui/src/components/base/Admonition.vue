@@ -12,7 +12,7 @@
 		<div class="col-start-2 flex min-w-0 flex-1 flex-col gap-2">
 			<div
 				v-if="header || $slots.header || normalizedTimestamp"
-				class="flex flex-wrap items-center gap-2 text-lg font-bold leading-6"
+				class="flex flex-wrap items-center gap-2 text-lg font-semibold leading-6"
 			>
 				<slot name="header">{{ header }}</slot>
 				<span

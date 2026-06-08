@@ -57,8 +57,11 @@ jobs:
 
       - name: Extract app changelog
         env:
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ env.VERSION_TAG }}
-        run: npx --yes tsx scripts/build-theseus-release-notes.ts
+        run: |
+          LAST_GITHUB_RELEASE_PUBLISHED_AT=$(gh api "repos/${{ github.repository }}/releases/latest" --jq '.published_at // ""' 2>/dev/null || true)
+          LAST_GITHUB_RELEASE_PUBLISHED_AT="$LAST_GITHUB_RELEASE_PUBLISHED_AT" npx --yes tsx scripts/build-theseus-release-notes.ts
 
       - name: Generate version manifest
         run: |

@@ -10514,6 +10514,7 @@ dependencies = [
  "flate2",
  "fs4",
  "futures",
+ "futures-lite 2.6.1",
  "heck 0.5.0",
  "hickory-resolver 0.25.2",
  "indicatif",
