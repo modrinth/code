@@ -30,6 +30,10 @@ import { isStaff } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
+import { setupAttributionModerationProvider } from '~/providers/setup/attribution-moderation'
+
+setupAttributionModerationProvider()
+
 const auth = await useAuth()
 const flags = useFeatureFlags()
 

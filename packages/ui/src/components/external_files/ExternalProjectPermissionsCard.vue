@@ -13,7 +13,6 @@ import {
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { attributionQuickReplies, type QuickReply } from '@modrinth/moderation'
 import { renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
@@ -24,10 +23,12 @@ import { commonMessages } from '#ui/utils'
 
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import {
+	injectAttributionModeration,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 } from '../../providers'
+import type { QuickReply } from '../../providers/attribution-moderation'
 import StyledInput from '../base/StyledInput.vue'
 import AddFilesToAttributionGroupModal from './AddFilesToAttributionGroupModal.vue'
 import AddToExistingExternalProjectModal from './AddToExistingExternalProjectModal.vue'
@@ -83,6 +84,7 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { allMembers } = injectProjectPageContext()
+const attributionModeration = injectAttributionModeration(null)
 
 const attributorMember = computed(() => {
 	const userId = props.group.attributed_by
@@ -425,7 +427,7 @@ async function handleQuickReply(reply: QuickReply) {
 }
 
 const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
-	const replies = attributionQuickReplies
+	const replies = attributionModeration?.attributionQuickReplies
 
 	if (!replies) return []
 

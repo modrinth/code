@@ -1,5 +1,6 @@
 export * from './api-client'
 export * from './app-backup'
+export * from './attribution-moderation'
 export * from './auth'
 export * from './content-manager'
 export { createContext } from './create-context'
