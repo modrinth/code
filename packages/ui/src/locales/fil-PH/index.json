@@ -1982,6 +1982,27 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Tagagamit"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Lahat"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Tungkulin"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Tagagamit"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Oras"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Tagagamit"
+  },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "May maling nangyari habang nililikha ang {backupName}. Mangyaring subukan muli o abutin ang suporta kung magpapatuloy ang suliranin."
   },

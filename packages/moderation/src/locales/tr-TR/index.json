@@ -32,6 +32,9 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Uygun etiketleri seç"
   },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
+  },
   "nags.description-too-short.title": {
     "defaultMessage": "Açıklamayı uzat"
   },
@@ -59,11 +62,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Galeriye göz at"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Sizin kullandığınız {type} lisansı, kaynak kodunun erişilebilir olmasını gerektiriyor. Lütfen her ek sürüm için bir kaynak kod bağlantısı veya kaynak dosyası sağlayın ya da farklı bir lisans kullanmayı düşünün."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Bazı dış bağlantılarınız aynı. Her bağlantı sadece bir kere doğru bağlantı türüyle girilmelidir."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Özdeş bağlantıları temizle"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Açıklaman yeterli düz yazı veya resim açıklamalı içermeli ki ekran okuyucu veya patates internet kullananlar için erişilebilir olsun."
@@ -143,6 +152,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Dil seç"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Lütfen {type} ürününüzün hangi lisans altında dağıtıldığını seçin."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Bir lisans seç"
   },
@@ -199,6 +211,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Uygun etiketleri seç"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type} içeriğinizi sergilemek için en az bir galeri görseli gereklidir."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "ses veya yerelleştirme paketleri hariç kaynak paketi. Eğer paketiniz bu tanıma uyuyorsa, lütfen uygun etiketi seçin"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"

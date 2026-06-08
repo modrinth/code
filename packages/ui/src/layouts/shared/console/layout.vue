@@ -458,4 +458,14 @@ async function handleShare() {
 .modrinth-console-fullscreen-active iframe[name='intercom-messenger-frame'] {
 	z-index: 14 !important;
 }
+
+.modrinth-console-fullscreen-active .loading-indicator-container,
+.modrinth-console-fullscreen-active .app-contents::before {
+	z-index: 14 !important;
+}
+
+.modrinth-console-fullscreen-active .app-grid-navbar,
+.modrinth-console-fullscreen-active .app-grid-statusbar {
+	z-index: 0 !important;
+}
 </style>

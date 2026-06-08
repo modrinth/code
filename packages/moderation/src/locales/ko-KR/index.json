@@ -62,11 +62,17 @@
   "nags.gallery.title": {
     "defaultMessage": "갤러리 페이지 보기"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "이 {type}은(는) 소스 코드를 공개해야 하는 라이선스를 사용하고 있습니다. 각 추가 버전에 해당하는 소스 코드 링크 또는 소스 파일을 제공해 주거나, 다른 라이선스를 고려해 보세요."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "소스 코드 제공"
   },
   "nags.identical-links.description": {
     "defaultMessage": "제공된 외부 링크가 동일합니다. 각 링크는 적절한 형식으로 한 번만 기입되어야 합니다."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "중복 링크 정리"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "설명에는 충분한 일반 텍스트 또는 이미지 대체 텍스트를 포함하여, 화면 읽기 도구를 사용하는 사용자나 인터넷 속도가 느린 사용자도 접근할 수 있도록 해야 합니다."
@@ -143,6 +149,9 @@
   "nags.select-language.title": {
     "defaultMessage": "언어 선택"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "{type}이(가) 배포되는 라이선스를 선택하세요."
+  },
   "nags.select-license.title": {
     "defaultMessage": "라이선스 선택"
   },
@@ -196,6 +205,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "올바른 태그를 선택해주세요"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type}의 내용을 보여주기 위해서는 갤러리 이미지가 최소 한 장 이상 필요합니다."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "오디오나 현지화 팩을 제외한 리소스 팩입니다. 팩이 이에 해당한다면, 적절한 태그를 선택해 주세요"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "갤러리 이미지 업로드"
