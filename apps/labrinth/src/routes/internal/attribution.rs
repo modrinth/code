@@ -282,7 +282,6 @@ async fn list(
                 .and_then(|a| a.moderation_status.as_mut())
             && !requester_is_mod
         {
-            moderation_status.moderated_at = None;
             moderation_status.moderated_by = None;
         }
         let attributed_by = if attribution
