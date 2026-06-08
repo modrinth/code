@@ -4,12 +4,14 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	Chips,
 	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
@@ -25,14 +27,22 @@ import type { GameInstance } from '../../../helpers/types'
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const queryClient = useQueryClient()
 
 const deleteConfirmModal = ref()
 
 const { instance } = injectInstanceSettings()
+type ReleaseChannel = GameInstance['preferred_update_channel']
+const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
 const groups = ref([...instance.value.groups])
+const savingReleaseChannel = ref(false)
+const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.preferred_update_channel)
+const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
+	savingReleaseChannel.value ? [...releaseChannelOptions] : [],
+)
 
 const newCategoryInput = ref('')
 
@@ -50,6 +60,52 @@ const allInstances = ref((await list()) as GameInstance[])
 const availableGroups = computed(() => [
 	...new Set([...allInstances.value.flatMap((instance) => instance.groups), ...groups.value]),
 ])
+
+function formatReleaseChannelLabel(channel: ReleaseChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelRelease)
+		case 'beta':
+			return formatMessage(messages.updateChannelBeta)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlpha)
+	}
+}
+
+function formatReleaseChannelDescription(channel: ReleaseChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelReleaseDescription)
+		case 'beta':
+			return formatMessage(messages.updateChannelBetaDescription)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlphaDescription)
+	}
+}
+
+watch(
+	() => [instance.value.path, instance.value.preferred_update_channel] as const,
+	() => {
+		if (!savingReleaseChannel.value) {
+			selectedReleaseChannel.value = instance.value.preferred_update_channel
+		}
+	},
+)
+
+watch(selectedReleaseChannel, async (channel, previousChannel) => {
+	const previousReleaseChannel = previousChannel ?? instance.value.preferred_update_channel
+	if (channel === instance.value.preferred_update_channel) return
+
+	savingReleaseChannel.value = true
+	const profilePath = instance.value.path
+	await edit(profilePath, { preferred_update_channel: channel })
+		.then(() => queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', profilePath] }))
+		.catch((error) => {
+			selectedReleaseChannel.value = previousReleaseChannel
+			handleError(error)
+		})
+	savingReleaseChannel.value = false
+})
 
 async function resetIcon() {
 	icon.value = undefined
@@ -174,6 +230,38 @@ const messages = defineMessages({
 	duplicateButton: {
 		id: 'instance.settings.tabs.general.duplicate-button',
 		defaultMessage: 'Duplicate',
+	},
+	updateChannel: {
+		id: 'instance.settings.tabs.general.update-channel',
+		defaultMessage: 'Update channel',
+	},
+	updateChannelReleaseDescription: {
+		id: 'instance.settings.tabs.general.update-channel.release.description',
+		defaultMessage: 'Only release versions will be shown as available updates.',
+	},
+	updateChannelBetaDescription: {
+		id: 'instance.settings.tabs.general.update-channel.beta.description',
+		defaultMessage: 'Release and beta versions will be shown as available updates.',
+	},
+	updateChannelAlphaDescription: {
+		id: 'instance.settings.tabs.general.update-channel.alpha.description',
+		defaultMessage: 'Release, beta, and alpha versions will be shown as available updates.',
+	},
+	updateChannelRelease: {
+		id: 'instance.settings.tabs.general.update-channel.release',
+		defaultMessage: 'Release',
+	},
+	updateChannelBeta: {
+		id: 'instance.settings.tabs.general.update-channel.beta',
+		defaultMessage: 'Beta',
+	},
+	updateChannelAlpha: {
+		id: 'instance.settings.tabs.general.update-channel.alpha',
+		defaultMessage: 'Alpha',
+	},
+	selectUpdateChannelAriaLabel: {
+		id: 'instance.settings.tabs.general.update-channel.select',
+		defaultMessage: 'Select update channel',
 	},
 	deleteInstance: {
 		id: 'instance.settings.tabs.general.delete',
@@ -301,6 +389,23 @@ const messages = defineMessages({
 			</div>
 			<p class="m-0">
 				{{ formatMessage(messages.libraryGroupsDescription) }}
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-2.5 mt-6">
+			<h2 class="m-0 text-lg font-semibold text-contrast block">
+				{{ formatMessage(messages.updateChannel) }}
+			</h2>
+			<Chips
+				v-model="selectedReleaseChannel"
+				:items="releaseChannelOptions"
+				:format-label="formatReleaseChannelLabel"
+				:capitalize="false"
+				:disabled-items="releaseChannelDisabledItems"
+				:aria-label="formatMessage(messages.selectUpdateChannelAriaLabel)"
+			/>
+			<p class="m-0">
+				{{ formatReleaseChannelDescription(selectedReleaseChannel) }}
 			</p>
 		</div>
 

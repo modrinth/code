@@ -713,6 +713,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Name"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Update channel"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release, beta, and alpha versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release and beta versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Release"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Only release versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Select update channel"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Launch hooks"
   },
