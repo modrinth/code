@@ -168,6 +168,14 @@ const {
 	onRangeSelected: (start, end, groupBy) => emit('range-select', start, end, groupBy),
 })
 
+function getTooltipTotalMetricValue(value: number): number {
+	if (props.activeStat === 'revenue' && Math.abs(value) < 1) {
+		return Math.round(value * 100) / 100
+	}
+
+	return value
+}
+
 const hoverTotalValue = computed(() => {
 	if (hoverState.sliceIndex === null) return 0
 	const sliceIndex = hoverState.sliceIndex
@@ -176,7 +184,7 @@ const hoverTotalValue = computed(() => {
 	return props.currentLegendEntries.reduce((sum, legendEntry) => {
 		if (legendEntry.hidden) return sum
 		const dataset = props.chartDatasetById.get(legendEntry.id)
-		return sum + (dataset?.data[sliceIndex] ?? 0)
+		return sum + getTooltipTotalMetricValue(dataset?.data[sliceIndex] ?? 0)
 	}, 0)
 })
 

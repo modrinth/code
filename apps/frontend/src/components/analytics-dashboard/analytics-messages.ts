@@ -39,6 +39,14 @@ export const analyticsMessages = defineMessages({
 		id: 'analytics.project.all',
 		defaultMessage: 'All projects',
 	},
+	yourProjects: {
+		id: 'analytics.project.your',
+		defaultMessage: 'Your projects',
+	},
+	userProjects: {
+		id: 'analytics.project.user',
+		defaultMessage: "{username}'s projects",
+	},
 	selectProjects: {
 		id: 'analytics.project.select',
 		defaultMessage: 'Select projects',
