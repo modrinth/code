@@ -1,8 +1,11 @@
+import type { Component } from 'vue'
+
 import { createContext } from '.'
 
 export interface PopupNotificationButton {
 	label: string
 	action: () => void
+	icon?: Component
 	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
 	keepOpen?: boolean
 }
@@ -11,19 +14,49 @@ export interface PopupNotificationProgressItem {
 	id: string
 	title: string
 	text?: string
+	iconUrl?: string | null
 	progress: number
 	waiting: boolean
+}
+
+export type PopupNotificationToastType =
+	| 'friend-request'
+	| 'server-invite'
+	| 'instance-invite'
+	| 'instance-download'
+	| 'instance-ready'
+
+export interface PopupNotificationToast {
+	type: PopupNotificationToastType
+	actorName?: string | null
+	actorAvatarUrl?: string | null
+	entityName?: string
+	entityIconUrl?: string | null
+	statusText?: string
+	progress?: number
+	waiting?: boolean
+	onAccept?: () => void | Promise<void>
+	onDecline?: () => void | Promise<void>
+	onDismiss?: () => void | Promise<void>
+	onLaunch?: () => void | Promise<void>
+	onOpenActor?: () => void | Promise<void>
+	onOpenInstance?: () => void | Promise<void>
 }
 
 export interface PopupNotification {
 	id: string | number
 	title: string
+	titleLogo?: Component
+	bodyComponent?: Component
+	bodyProps?: Record<string, unknown>
 	text?: string
+	iconUrl?: string | null
 	type?: 'error' | 'warning' | 'success' | 'info' | 'download'
 	progress?: number
 	waiting?: boolean
 	progressItems?: PopupNotificationProgressItem[]
 	buttons?: PopupNotificationButton[]
+	toast?: PopupNotificationToast
 	autoCloseMs?: number | null
 	timer?: NodeJS.Timeout
 }

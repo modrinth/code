@@ -49,7 +49,12 @@
 				</button>
 			</ButtonStyled>
 			<ButtonStyled v-else color="brand" size="large">
-				<button class="ml-auto" @click="openModal">
+				<button
+					v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
+					class="ml-auto"
+					:disabled="!canSetup"
+					@click="openModal"
+				>
 					{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
 				</button>
 			</ButtonStyled>
@@ -62,6 +67,8 @@
 			:show-snapshot-toggle="true"
 			:search-modpacks="searchModpacks"
 			:get-project-versions="getProjectVersions"
+			:finish-disabled="!canSetup"
+			:finish-disabled-tooltip="!canSetup ? permissionDeniedMessage : undefined"
 			@hide="() => {}"
 			@browse-modpacks="onBrowseModpacks"
 			@create="onCreate"
@@ -77,6 +84,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	useServerPermissions,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -90,6 +98,7 @@ import { injectModrinthServerContext } from '#ui/providers'
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const { canSetup, permissionDeniedMessage } = useServerPermissions()
 
 const messages = defineMessages({
 	welcomeTitle: {
@@ -196,11 +205,16 @@ const uploadPercent = computed(() =>
 	totalBytes.value > 0 ? Math.round((uploadedBytes.value / totalBytes.value) * 100) : 0,
 )
 
-const openModal = () => modalRef.value?.show()
+const openModal = () => {
+	if (!canSetup.value) return
+	modalRef.value?.show()
+}
 
 onBeforeUnmount(() => modalRef.value?.hide())
 
 function onBrowseModpacks() {
+	if (!canSetup.value) return
+
 	if (props.browseModpacks) {
 		props.browseModpacks({
 			serverId,
@@ -217,6 +231,11 @@ function onBrowseModpacks() {
 }
 
 onMounted(async () => {
+	if (!canSetup.value && route.query.resumeModal) {
+		router.replace({ query: {} })
+		return
+	}
+
 	if (route.query.resumeModal === 'setup-type') {
 		router.replace({ query: {} })
 		openModal()
@@ -263,6 +282,11 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 }
 
 const onCreate = async (config: CreationFlowContextValue) => {
+	if (!canSetup.value) {
+		config.loading.value = false
+		return
+	}
+
 	// Handle mrpack file upload
 	if (config.setupType.value === 'modpack' && config.modpackFile.value) {
 		modalRef.value?.hide()

@@ -66,7 +66,7 @@
     "defaultMessage": "Visitar página da galeria"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Seu {type, select, mod {mod} plugin {plugin} other {projeto}} usa uma licença que necessita que o código fonte esteja disponível. Por favor, providencie o link do código fonte ou o arquivo de origem para cada versão adicional, ou considere usar uma licença diferente."
+    "defaultMessage": "Seu {type} utiliza uma licença que exige um código-fonte para ser disponibilizado. Forneça um link do código-fonte ou seus arquivos de origem para cada versão adicional, ou considere utilizar outra licença."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Forneça o código-fonte"
@@ -75,7 +75,7 @@
     "defaultMessage": "Alguns dos seus links externos parecem ser idênticos. Cada link deve ser inserido apenas uma vez e com o tipo de link apropriado."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Links idênticos"
+    "defaultMessage": "Limpar links idênticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Sua descrição deve conter texto simples ou uma imagem com texto alternativo, mantendo-a acessível para aqueles que usam leitores de tela ou têm conexões de rede lentas."
@@ -159,7 +159,7 @@
     "defaultMessage": "Selecionar um idioma"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selecione a licença em que seu {type, select, mod {mod} modpack {pacote de mods} resourcepack {pacote de recurso} shader {sombreador} plugin {plugin} datapack {pacote de dados} other {projeto}} está distribuido."
+    "defaultMessage": "Selecione a licença sob a qual seu {type} é distribuído."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecione uma licença"
@@ -212,9 +212,6 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpe o nome"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Você selecionou {tagCount, plural,=0 {nenhuma tag} one {# tag} other {# tags}}. Por favor reduza para {maxTagCount} ou menos para garantir que seu servidor apareça nos resultados de pesquisa relevantes."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecione etiquetas específicas"
   },
@@ -225,7 +222,10 @@
     "defaultMessage": "Selecione etiquetas específicas"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Pelo menos uma imagem da galeria é requerida para mostrar o conteúdo do seu {type, select, resourcepack {pacote de recursos, com exceção do áudio e pacotes de localização. Se isto descreve seu pacote, por favor selecione a etiqueta apropriada} shader {sombreador} other {projeto}}."
+    "defaultMessage": "Pelo menos uma imagem de galeria é necessária para mostrar o conteúdo do seu {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pacote de recursos, exceto pacotes de áudio ou localização. Se esta descrição se aplica ao seu pacote, selecione a etiqueta apropriada"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Envie uma imagem para a galeria"
@@ -249,4 +249,3 @@
     "defaultMessage": "Visitar página de links"
   }
 }
-

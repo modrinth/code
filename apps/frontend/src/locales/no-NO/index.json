@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -2462,12 +2459,6 @@
   "project.settings.visit-dashboard": {
     "message": "Besøk prosjekt-dashbordet"
   },
-  "project.stats.downloads-label": {
-    "message": "last ned{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "følger{count, plural, one {} other {s}}"
-  },
   "project.status.archived.message": {
     "message": "{title} har blitt arkivert. {title} kommer ikke til å få noen nye oppdateringer, hvis ikke forfatteren bestemmer seg for å dearkivere prosjektet."
   },
@@ -2477,23 +2468,11 @@
   "report.already-reported": {
     "message": "Du har allerede rapportert {title}"
   },
-  "report.already-reported-description": {
-    "message": "Du har en åpen rapport for denne/dette {item, select, project {prosjektet} version {versjonen} user {brukeren} other {innholdet}} allerede. Du kan legge til flere detaljer til rapporten din hvis du har mer informasjon du vil legge til."
-  },
-  "report.back-to-item": {
-    "message": "Tilbake til {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}"
-  },
   "report.body.description": {
     "message": "Viss det er mulig, inkluder lenker og bilder. Tomme eller utilstrekkelige rapporter kommer til å bli lukka ned og ignorert."
   },
   "report.body.title": {
     "message": "Vær så snill å kom med mer kontekst om prosjektet ditt"
-  },
-  "report.checking": {
-    "message": "Sjekker {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}..."
-  },
-  "report.could-not-find": {
-    "message": "Kunne ikke finne {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}"
   },
   "report.for.violation": {
     "message": "Brudd på <rules-link>Reglene</rules-link> til Modrinth eller <terms-link>Bruksvilkåra</terms-link> deres"
@@ -2534,14 +2513,8 @@
   "report.please-report": {
     "message": "Vær så snill å rapporter:"
   },
-  "report.question.content-id": {
-    "message": "Hva er ID-en til {item, select, project {prosjektet} version {versjonen} user {brukeren} other {innholdet}}?"
-  },
   "report.question.content-type": {
     "message": "Hvilken type innhold rapporterer du?"
-  },
-  "report.question.report-reason": {
-    "message": "Hvilke av reglene til Modrinth bryter dette: {item, select, project {prosjekt} version {versjon} user {bruker} other {innhold}}?"
   },
   "report.report-content": {
     "message": "Rapporter innhold til moderatorene"
@@ -2654,26 +2627,14 @@
   "scopes.organizationWrite.label": {
     "message": "Skriv organisasjoner"
   },
-  "scopes.patCreate.description": {
-    "message": "Lag personlige API-tokens"
-  },
   "scopes.patCreate.label": {
     "message": "Lag PAT-er"
-  },
-  "scopes.patDelete.description": {
-    "message": "Slett de personlige API-tokenene dine"
   },
   "scopes.patDelete.label": {
     "message": "Slett PAT-er"
   },
-  "scopes.patRead.description": {
-    "message": "Vis laga API-tokener"
-  },
   "scopes.patRead.label": {
     "message": "Les PAT-er"
-  },
-  "scopes.patWrite.description": {
-    "message": "Rediger personlige API-tokener"
   },
   "scopes.patWrite.label": {
     "message": "Skriv PAT-er"
@@ -3215,14 +3176,8 @@
   "settings.billing.interval.month": {
     "message": "måned"
   },
-  "settings.billing.interval.monthly": {
-    "message": "månedlig"
-  },
   "settings.billing.interval.year": {
     "message": "år"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "årlig"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Reklamefri surfing av modrinth.com og Modrinth App-en"
@@ -3308,9 +3263,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} Delte CPU-er (utbryter opp til {bursts} CPU-er)"
   },
@@ -3374,17 +3326,8 @@
   "settings.billing.subscription.title": {
     "message": "Abonnement"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Bytt til {interval}"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Bytt til {interval}"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Månedlig fakturering kommer til å koste deg yttligere {amount} hvert year"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "Bytter til {interval} fakturering på {date}"
   },
   "settings.billing.update-method": {
     "message": "Oppdater metode"

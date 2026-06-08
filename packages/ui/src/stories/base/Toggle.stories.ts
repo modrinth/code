@@ -5,6 +5,13 @@ import Toggle from '../../components/base/Toggle.vue'
 const meta = {
 	title: 'Base/Toggle',
 	component: Toggle,
+	parameters: {
+		docs: {
+			description: {
+				component: 'Toggle uses touch manipulation so double tapping on mobile does not zoom.',
+			},
+		},
+	},
 } satisfies Meta<typeof Toggle>
 
 export default meta

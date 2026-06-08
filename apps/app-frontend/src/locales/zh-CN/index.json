@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "浏览服务器"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "“{name}”将被**永久删除**，并且无法恢复。"
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "你确定要永久删除这个世界吗？"
   },
@@ -248,12 +245,6 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未添加服务器或世界"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "将从你的列表中删除“{name}”，包括游戏内，并且无法恢复。"
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "将从你的列表中删除“{name}”（{address}），包括游戏内，并且无法恢复。"
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "你确定要删除 {name} 吗？"
   },
@@ -271,9 +262,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "安装"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} 个模组"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "需求整合包"
@@ -331,6 +319,141 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "资源管理"
+  },
+  "app.skins.add-button": {
+    "message": "添加皮肤"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "拖放"
+  },
+  "app.skins.apply-button": {
+    "message": "应用"
+  },
+  "app.skins.delete-button": {
+    "message": "删除皮肤"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "这会永久删除所选皮肤。这操作无法撤销。"
+  },
+  "app.skins.delete-modal.title": {
+    "message": "你确定要删除这个皮肤吗？"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "无法读取拖放的文件。"
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "处理文件时出错"
+  },
+  "app.skins.edit-button": {
+    "message": "编辑皮肤"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "添加皮肤"
+  },
+  "app.skins.modal.add-title": {
+    "message": "添加皮肤中"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "手臂样式"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "细"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "粗"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "披风"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "披风"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "编辑皮肤中"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "请先对皮肤进行编辑！"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "无披风"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "无"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "替换纹理"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "保存皮肤"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "保存中……"
+  },
+  "app.skins.modal.texture-section": {
+    "message": "纹理"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "请先上传皮肤！"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "编辑皮肤"
+  },
+  "app.skins.previewing-badge": {
+    "message": "预览"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "你更改皮肤过于频繁。Mojang服务器已暂时阻止了后续请求。请稍等片刻后再试。"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "慢点！"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "建造者与生物群系"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "追逐苍穹"
+  },
+  "app.skins.section.default-skins": {
+    "message": "默认皮肤"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "暴乱坐骑"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "已保存皮肤"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "阔步英雄"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "铜器时代"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "花园苏醒"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "微小占领"
+  },
+  "app.skins.sign-in.button": {
+    "message": "登录"
+  },
+  "app.skins.sign-in.description": {
+    "message": "请登录您的 Minecraft 账号，以便使用 Modrinth 应用的皮肤管理功能。"
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "兴奋的 Modrinth Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "请登录"
+  },
+  "app.skins.title": {
+    "message": "皮肤选择器"
   },
   "app.update-popup.body": {
     "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
@@ -394,9 +517,6 @@
   },
   "friends.action.add-friend": {
     "message": "添加好友"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} 个好友请求"
   },
   "friends.add-friend.submit": {
     "message": "发送好友请求"
@@ -611,6 +731,24 @@
   "instance.settings.tabs.java": {
     "message": "Java 及内存"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "自定义环境变量"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "自定义Java参数"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "自定义Java安装"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "自定义内存分配"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "输入环境变量……"
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "输入 Java 参数……"
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "环境变量"
   },
@@ -625,6 +763,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "内存分配"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "游戏窗口"

@@ -185,12 +185,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Advarsel ved sletning"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Slet {count} {itemType}{count, plural, one {} other {er}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "Slet {itemType}{count, plural, one {} other {er}}"
-  },
   "content.page-layout.please-wait": {
     "defaultMessage": "Vent venligst"
   },
@@ -640,9 +634,6 @@
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
-  },
-  "payment-method.mastercard": {
-    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"

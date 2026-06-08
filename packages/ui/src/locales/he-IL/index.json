@@ -242,12 +242,6 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "אזהרת מחיקה"
   },
-  "content.confirm-deletion.delete-button": {
-    "defaultMessage": "מחק {count} {itemType}{count, plural, one {} other {ים}}"
-  },
-  "content.confirm-deletion.header": {
-    "defaultMessage": "מחק {itemType}{count, plural, one {} other {ים}}"
-  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} נוספו"
   },
@@ -292,9 +286,6 @@
   },
   "content.page-layout.share.label": {
     "defaultMessage": "שתף"
-  },
-  "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "מעדכן {סוגתוכן}..."
   },
   "files.move-modal.current-location": {
     "defaultMessage": "מיקום נוכחי"
@@ -523,9 +514,6 @@
   },
   "label.rejected": {
     "defaultMessage": "נדחה"
-  },
-  "label.rewards-program-terms-agreement": {
-    "defaultMessage": "אני מסכים ל </terms-link>תנאי תוכנית התגמולים <terms-link>"
   },
   "label.saved": {
     "defaultMessage": "נשמר"
@@ -1260,4 +1248,3 @@
     "defaultMessage": "יש לך שינויים שלא נשמרו."
   }
 }
-

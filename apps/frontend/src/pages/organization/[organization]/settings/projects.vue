@@ -125,10 +125,9 @@
 					</div>
 				</section>
 				<p>
-					Changes will be applied to
-					<strong>{{ selectedProjects.length }}</strong> project{{
-						selectedProjects.length > 1 ? 's' : ''
-					}}.
+					{{
+						formatMessage(messages.editLinksAffectedProjects, { count: selectedProjects.length })
+					}}
 				</p>
 				<ul>
 					<li
@@ -339,6 +338,7 @@ import {
 	Checkbox,
 	commonMessages,
 	CopyCode,
+	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -358,6 +358,14 @@ import { injectOrganizationContext } from '~/providers/organization-context.ts'
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	editLinksAffectedProjects: {
+		id: 'organization.settings.projects.edit-links.affected-projects',
+		defaultMessage:
+			'Changes will be applied to {count, plural, one {# project} other {# projects}}.',
+	},
+})
 
 const { organization, projects, refresh } = injectOrganizationContext()
 

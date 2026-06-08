@@ -29,14 +29,8 @@
   "nags.add-links.title": {
     "defaultMessage": "Aggiungi link esterni"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Hai selezionato {totalAvailableTags, plural, one {l'unico tag disponibile} =8 {tutti gli # tag disponibili} =11 {tutti gli # tag disponibili} other {tutti i # tag disponibili}}. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "La tua descrizione è lunga {length, plural, one {# carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia chiara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Espandi la descrizione"
@@ -65,9 +59,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Visita la galleria"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "{type, select, mod {La tua mod} plugin {Il tuo plugin} other {Il tuo progetto}} usa una licenza che richiede il codice sorgente libero. Si prega di fornire un link al codice sorgente o allegarlo a ogni versione, oppure dovrai usare un'altra licenza."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornisci codice sorgente"
   },
@@ -75,7 +66,7 @@
     "defaultMessage": "Alcuni dei tuoi link esterni sembrano essere identici. I link dovrebbero essere inseriti solo una volta e con il tipo appropriato."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Link identici"
+    "defaultMessage": "Ripulisci link identici"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "La tua descrizione dovrebbe contenere abbastanza contenuto scritto e descrizioni testuali alternative alle immagini, cosicché sia accessibile a chi usi lettori dello schermo o abbia connessioni a Internet lente."
@@ -134,9 +125,6 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Feedback revisione"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona la risoluzione corretta"
   },
@@ -157,9 +145,6 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Seleziona le lingue"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Seleziona la licenza sotto cui {type, select, shader {sono} other {è}} distribuit{type, select, mod {a la tua mod} modpack {o il tuo pacchetto di mod} resourcepack {o il tuo pacchetto di risorse} shader {e le tue shader} plugin {o il tuo plugin} datapack {o il tuo pacchetto di dati} other {o il tuo progetto}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Seleziona la licenza"
@@ -200,9 +185,6 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Rivedi la sintesi"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "La tua sintesi è lunga {length, plural, one {# carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia allettante e informativa."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Espandi la sintesi"
   },
@@ -212,20 +194,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rivedi il nome"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Hai selezionato {tagCount} tag. Scegline al massimo {maxTagCount} cosicché il tuo server appaia in ricerche rilevanti."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
-  },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Hai selezionato {tagCount} tag. Dovresti tenerne al massimo {maxTagCount} per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
   },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "È necessaria almeno un'immagine che mostri il contenuto {type, select, resourcepack {del tuo pacchetto di risorse, a meno che contenga solo audio o traduzioni. In tal caso seleziona il tag appropriato} shader {delle tue shader} other {del tuo progetto}}."
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pacchetto di risorse, eccetto per audio e localizzazioni. Se ciò descrive il pacchetto, seleziona il tag appropriato"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Carica un'immagine"
@@ -249,4 +225,3 @@
     "defaultMessage": "Visita impostazioni dei link"
   }
 }
-

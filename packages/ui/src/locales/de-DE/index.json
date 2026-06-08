@@ -65,18 +65,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Details zum Abonnement konnten nicht geladen werden."
   },
-  "billing.resubscribe-modal.interval.five-days": {
-    "defaultMessage": "/5 Tage"
-  },
-  "billing.resubscribe-modal.interval.monthly": {
-    "defaultMessage": "/Monat"
-  },
-  "billing.resubscribe-modal.interval.quarterly": {
-    "defaultMessage": "/Quartal"
-  },
-  "billing.resubscribe-modal.interval.yearly": {
-    "defaultMessage": "/Jahr"
-  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Deine nächste Abrechnung erfolgt am <charge-date>{date}</charge-date>."
   },
@@ -105,7 +93,7 @@
     "defaultMessage": "Du bist derzeit offline. Verbinde dich mit dem Internet, um Modrinth zu durchsuchen!"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "Durchsuche {projectType, select, mod {Mods} modpack {Modpacks} resourcepack {Ressourcenpakete} shader {Shader} plugin {Plugins} datapack {Datenpakete} server {Server} other {Projekte}}..."
+    "defaultMessage": "Durchsuche {projectType}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Ausgewählte Projekte"
@@ -323,6 +311,9 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {Element} other {Elemente}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "{project} auswählen"
   },
@@ -348,10 +339,10 @@
     "defaultMessage": "Löschwarnung"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Lösche {count} {itemType}{count, plural, one {} other {s}}"
+    "defaultMessage": "{count, number} {itemType} löschen"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Lösche {itemType}{count, plural, one {} other {s}}"
+    "defaultMessage": "{itemType} löschen"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Downgraden} other {Aktualiseren}} kann zu Kompatibilitätsproblemen führen. Mods oder Inhalte, die du zusätzlich zum Modpack hinzugefügt hast, bleiben erhalten, sind jedoch eventuell nicht mit der neuen Version kompatibel."
@@ -398,6 +389,18 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} aktualisiert"
   },
+  "content.filter.disabled": {
+    "defaultMessage": "Deaktiviert"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Aktiviert"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Aktualisierungen"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Warnungen"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Sicherung wird erstellt..."
   },
@@ -416,11 +419,14 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Sicherung erstellen"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instanz"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Halte die Umschalttaste gedrückt, während du klickst, um die Bestätigung zu überspringen."
   },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Wir empfehlen, bevor du fortfährst eine Sicherung zu erstellen, damit du deine {type, select, server {Welt} other {Instanz}} wiederherstellen kannst, falls etwas schiefgeht."
+  "content.inline-backup.world-label": {
+    "defaultMessage": "Welt"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Die Inhalte deines Modpacks findest du jetzt hier!"
@@ -465,7 +471,7 @@
     "defaultMessage": "Bitte warten"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Durchsuche {count} {contentType}..."
+    "defaultMessage": "Durchsuche {count, number} {contentType}..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Dateinamen"
@@ -531,7 +537,7 @@
     "defaultMessage": "Aktualisiere {contentType}..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} ausgewählt"
+    "defaultMessage": "{count, number} {contentType} ausgewählt"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} ausgewählt"
@@ -839,17 +845,14 @@
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} überschrieben"
   },
-  "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Überschreibt"
-  },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Dateien werden überschrieben"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "{type, select, directory {Ordner} other {Datei}} erstellen"
+    "defaultMessage": "{type} erstellen"
   },
   "files.create-modal.header": {
-    "defaultMessage": "Erstelle {type, select, directory {einen Ordner} other {eine Datei}}"
+    "defaultMessage": "{type} erstellen"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "z. B. mein-ordner"
@@ -862,9 +865,6 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Datei löschen"
-  },
-  "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Dieser Ordner und sein gesamter Inhalt werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.} other {Diese Datei wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Inhalt der Datei konnte nicht geladen werden."
@@ -953,6 +953,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Herauszoomen"
   },
+  "files.item-type.file": {
+    "defaultMessage": "Datei"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "Dateien"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "Ordner"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "Ordner"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "Dateioperationen sind während des Vorgangs deaktiviert."
   },
@@ -993,7 +1005,7 @@
     "defaultMessage": "z. B. /mein-ordner"
   },
   "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Ordner verschieben} other {Datei verschieben}}"
+    "defaultMessage": "{type} verschieben"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Zurück zum Start"
@@ -1114,9 +1126,6 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} übrig"
-  },
-  "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Ziehe {type, select, undefined {Dateien} other {{type}s}} zum Hochladen hierher"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Name darf nur alphanumerische Zeichen, Bindestriche, Unterstriche oder Leerzeichen enthalten."
@@ -1490,17 +1499,17 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Das Ändern des Loaders ist irreversibel"
   },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Verlinktes {projectType, select, server {Serverprojekt} other {Modpack}}"
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "Modpack"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "Serverprojekt"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}version"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Du musst deinen Server zurücksetzen, um den Loader zu wechseln."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Die Neuinstallation des Modpacks setzt den Inhalt {type, select, server {des Servers} other {der Instanz}} auf den ursprünglichen Zustand zurück und entfernt alle von dir hinzugefügten Mods oder Inhalte."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Modpack neu installieren"
@@ -1529,11 +1538,20 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Spielversionen durchsuchen..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "Instanz"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "Instanz"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "Server"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "Server"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Trennen"
-  },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Durch das Entkoppeln wird {type, select, server {dieser Server} other {diese Instance}} dauerhaft vom {projectType, select, server {Server} other {Modpack}}projekt getrennt, sodass du den Loader und die Minecraft-Version ändern kannst, jedoch keine zukünftigen Updates mehr erhältst."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Wird überprüft..."
@@ -1550,14 +1568,17 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Modpack neu installieren"
   },
-  "instance.confirm-repair.body": {
-    "defaultMessage": "Das Reparieren installiert den Loader und die Minecraft-Abhängigkeiten neu, ohne deine Inhalte zu löschen. Dies kann Probleme beheben, falls dein {type, select, server {Server nicht richtig startet} other {Spiel aufgrund von Fehlern im Launcher nicht startet}}."
-  },
   "instance.confirm-repair.header": {
-    "defaultMessage": "{type, select, server {Server} other {Instanz}} reparieren"
+    "defaultMessage": "{type} reparieren"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "Instanz"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Reparieren"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "Server"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Abenteuermodus"
@@ -2340,7 +2361,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "MasterCard"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -2650,9 +2671,6 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Unbekannte Umgebung"
-  },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} Follower"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
@@ -3098,6 +3116,18 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Von Mitarbeitern entlistet"
   },
+  "report.item-type.content": {
+    "defaultMessage": "Inhalt"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "Projekt"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "Benutzer"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "Version"
+  },
   "s.bg": {
     "defaultMessage": "Hintergrundaufgabe wird ausgeführt"
   },
@@ -3453,16 +3483,13 @@
     "defaultMessage": "Neu"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Deine Dateien werden noch <days-remaining>{daysRemaining} {daysRemaining, plural, one {weiteren Tag} other {weitere Tage} }</days-remaining> aufbewahrt. Wende dich an den Support, um die Dateien herunterzuladen, bevor sie gelöscht werden. "
+    "defaultMessage": "Deine Dateien werden noch <days-remaining>{daysRemaining} {daysRemaining, plural, one {weiteren Tag} other {weitere Tage}}</days-remaining> aufbewahrt. Wende dich an den Support, um die Dateien herunterzuladen, bevor sie gelöscht werden."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Deine Dateien werden nach der Kündigung noch 30 Tage lang aufbewahrt."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Dein Server wurde aufgrund einer Moderationsmaßnahme deaktiviert. "
-  },
-  "servers.listing.notice.pending-change": {
-    "defaultMessage": "Dein Server wird am <date>{formattedDate}</date> auf den {planSize} Plan {verb}. "
+    "defaultMessage": "Dein Server wurde aufgrund einer Moderationsmaßnahme deaktiviert."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Bitte warte, während wir deinen Server einrichten. Dies kann bis zu 10 Minuten dauern."
@@ -3471,7 +3498,7 @@
     "defaultMessage": "Dein Abonnement wurde gekündigt."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Dein Abonnement wurde am <date>{formattedDate}</date> gekündigt. "
+    "defaultMessage": "Dein Abonnement wurde am <date>{formattedDate}</date> gekündigt."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Dein Abonnement wurde aufgrund eines Problems bei der Zahlung gekündigt."
@@ -3568,9 +3595,6 @@
   },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Erfolg"
-  },
-  "servers.manage.search-placeholder": {
-    "defaultMessage": "Durchsuche {count} Server"
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
@@ -4295,6 +4319,54 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Anwenden"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Abbrechen"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Löschen"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Benutzerdefiniertes festes Zeitfenster..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Zeitfenster verkürzen"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "Kein Datumsbereich ausgewählt."
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "Enddatum"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Zeitfenster verlängern"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "In der letzten"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Letzte 14 Tage"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Letzte 180 Tage"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Letzte 30 Tage"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Letzte 7 Tage"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Letzte 90 Tage"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Heute"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Gestern"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Du hast ungespeicherte Änderungen."
   },
@@ -4320,4 +4392,3 @@
     "defaultMessage": "Alle ausblenden"
   }
 }
-

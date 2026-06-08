@@ -8,6 +8,7 @@ import {
 	InstallationSettingsLayout,
 	provideAppBackup,
 	provideInstallationSettings,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
@@ -34,8 +35,16 @@ import type { Manifest } from '../../../helpers/types'
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
+const debug = useDebugLogger('AppInstallationSettings')
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
+
+debug('metadata load: start', {
+	instancePath: instance.value.path,
+	loader: instance.value.loader,
+	gameVersion: instance.value.game_version,
+	installStage: instance.value.install_stage,
+})
 
 const [
 	fabric_versions,
@@ -72,6 +81,15 @@ const [
 		.catch(handleError),
 ])
 
+debug('metadata load: done', {
+	hasFabricManifest: !!fabric_versions?.value,
+	hasForgeManifest: !!forge_versions?.value,
+	hasQuiltManifest: !!quilt_versions?.value,
+	hasNeoforgeManifest: !!neoforge_versions?.value,
+	gameVersions: all_game_versions?.value?.length ?? 0,
+	availablePlatforms: loaders?.value?.map((loader) => loader.name) ?? [],
+})
+
 const { data: modpackInfo } = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.path]),
 	queryFn: () => get_linked_modpack_info(instance.value.path, 'must_revalidate'),
@@ -95,11 +113,21 @@ function getManifest(loader: string) {
 		quilt: quilt_versions,
 		neoforge: neoforge_versions,
 	}
-	return map[loader]
+	const manifest = map[loader]
+	debug('getManifest:', {
+		loader,
+		hasManifest: !!manifest?.value,
+		gameVersions: manifest?.value?.gameVersions?.length ?? 0,
+	})
+	return manifest
 }
 
 provideAppBackup({
 	async createBackup() {
+		debug('createBackup: start', {
+			instancePath: instance.value.path,
+			instanceName: instance.value.name,
+		})
 		const allProfiles = await list()
 		const prefix = `${instance.value.name} - Backup #`
 		const existingNums = allProfiles
@@ -109,6 +137,7 @@ provideAppBackup({
 		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
 		const newPath = await duplicate(instance.value.path)
 		await edit(newPath, { name: `${prefix}${nextNum}` })
+		debug('createBackup: done', { newPath, backupName: `${prefix}${nextNum}` })
 	},
 })
 
@@ -165,32 +194,72 @@ provideInstallationSettings({
 			const manifest = getManifest(loader)
 			return !!manifest?.value?.gameVersions?.some((x) => item.version === x.id)
 		})
-		return (showSnapshots ? filtered : filtered.filter((x) => x.version_type === 'release')).map(
-			(x) => ({ value: x.version, label: x.version }),
-		)
+		const result = (
+			showSnapshots ? filtered : filtered.filter((x) => x.version_type === 'release')
+		).map((x) => ({ value: x.version, label: x.version }))
+		debug('resolveGameVersions:', {
+			loader,
+			showSnapshots,
+			totalVersions: versions.length,
+			filteredVersions: filtered.length,
+			resultVersions: result.length,
+		})
+		return result
 	},
 
 	resolveLoaderVersions(loader, gameVersion) {
-		if (loader === 'vanilla' || !gameVersion) return []
-		const manifest = getManifest(loader)
-		if (!manifest?.value) return []
-		if (loader === 'fabric' || loader === 'quilt') {
-			return manifest.value.gameVersions[0]?.loaders ?? []
+		if (loader === 'vanilla' || !gameVersion) {
+			debug('resolveLoaderVersions: skipped', { loader, gameVersion })
+			return []
 		}
-		return manifest.value.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
+		const manifest = getManifest(loader)
+		if (!manifest?.value) {
+			debug('resolveLoaderVersions: no manifest', { loader, gameVersion })
+			return []
+		}
+		if (loader === 'fabric' || loader === 'quilt') {
+			const result = manifest.value.gameVersions[0]?.loaders ?? []
+			debug('resolveLoaderVersions: fabric/quilt result', {
+				loader,
+				gameVersion,
+				count: result.length,
+			})
+			return result
+		}
+		const result =
+			manifest.value.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
+		debug('resolveLoaderVersions: result', { loader, gameVersion, count: result.length })
+		return result
 	},
 
 	resolveHasSnapshots(loader) {
 		const versions = all_game_versions?.value ?? []
-		if (loader === 'vanilla') return versions.some((x) => x.version_type !== 'release')
+		if (loader === 'vanilla') {
+			const result = versions.some((x) => x.version_type !== 'release')
+			debug('resolveHasSnapshots: vanilla', { loader, result })
+			return result
+		}
 		const manifest = getManifest(loader)
 		const supported = versions.filter(
 			(item) => !!manifest?.value?.gameVersions?.some((x) => item.version === x.id),
 		)
-		return supported.some((x) => x.version_type !== 'release')
+		const result = supported.some((x) => x.version_type !== 'release')
+		debug('resolveHasSnapshots:', {
+			loader,
+			totalVersions: versions.length,
+			supportedVersions: supported.length,
+			result,
+		})
+		return result
 	},
 
 	async save(platform, gameVersion, loaderVersionId) {
+		debug('save: called', {
+			instancePath: instance.value.path,
+			platform,
+			gameVersion,
+			loaderVersionId,
+		})
 		const editProfile: Record<string, string | undefined> = {
 			loader: platform,
 			game_version: gameVersion,
@@ -199,17 +268,21 @@ provideInstallationSettings({
 			editProfile.loader_version = loaderVersionId
 		}
 		await edit(instance.value.path, editProfile).catch(handleError)
+		debug('save: edit complete', { editProfile })
 	},
 
 	afterSave: async () => {
+		debug('afterSave: installing', { instancePath: instance.value.path })
 		await install(instance.value.path, false).catch(handleError)
 		trackEvent('InstanceRepair', {
 			loader: instance.value.loader,
 			game_version: instance.value.game_version,
 		})
+		debug('afterSave: done')
 	},
 
 	async repair() {
+		debug('repair: called', { instancePath: instance.value.path })
 		repairing.value = true
 		await install(instance.value.path, true).catch(handleError)
 		repairing.value = false
@@ -217,9 +290,11 @@ provideInstallationSettings({
 			loader: instance.value.loader,
 			game_version: instance.value.game_version,
 		})
+		debug('repair: done')
 	},
 
 	async reinstallModpack() {
+		debug('reinstallModpack: called', { instancePath: instance.value.path })
 		reinstalling.value = true
 		await update_repair_modrinth(instance.value.path).catch(handleError)
 		reinstalling.value = false
@@ -227,9 +302,11 @@ provideInstallationSettings({
 			loader: instance.value.loader,
 			game_version: instance.value.game_version,
 		})
+		debug('reinstallModpack: done')
 	},
 
 	async unlinkModpack() {
+		debug('unlinkModpack: called', { instancePath: instance.value.path })
 		await edit(instance.value.path, {
 			linked_data: null as unknown as undefined,
 		})
@@ -237,27 +314,38 @@ provideInstallationSettings({
 			queryKey: ['linkedModpackInfo', instance.value.path],
 		})
 		onUnlinked()
+		debug('unlinkModpack: done')
 	},
 
 	getCachedModpackVersions: () => null,
 	async fetchModpackVersions() {
+		debug('fetchModpackVersions: called', {
+			projectId: instance.value.linked_data?.project_id,
+		})
 		const versions = await get_project_versions(instance.value.linked_data!.project_id!).catch(
 			handleError,
 		)
+		debug('fetchModpackVersions: done', { count: versions?.length ?? 0 })
 		return (versions ?? []) as Labrinth.Versions.v2.Version[]
 	},
 
 	async getVersionChangelog(versionId: string) {
+		debug('getVersionChangelog: called', { versionId })
 		return (await get_version(versionId, 'must_revalidate').catch(
 			() => null,
 		)) as Labrinth.Versions.v2.Version | null
 	},
 
 	async onModpackVersionConfirm(version) {
+		debug('onModpackVersionConfirm: called', {
+			versionId: version.id,
+			instancePath: instance.value.path,
+		})
 		await update_managed_modrinth_version(instance.value.path, version.id)
 		await queryClient.invalidateQueries({
 			queryKey: ['linkedModpackInfo', instance.value.path],
 		})
+		debug('onModpackVersionConfirm: done')
 	},
 
 	updaterModalProps: computed(() => ({

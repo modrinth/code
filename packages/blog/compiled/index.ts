@@ -1,6 +1,7 @@
 // AUTO-GENERATED FILE - DO NOT EDIT
 import { article as a_new_chapter_for_modrinth_servers } from "./a_new_chapter_for_modrinth_servers";
 import { article as accelerating_development } from "./accelerating_development";
+import { article as analytics_overhaul } from "./analytics_overhaul";
 import { article as becoming_sustainable } from "./becoming_sustainable";
 import { article as capital_return } from "./capital_return";
 import { article as carbon_ads } from "./carbon_ads";
@@ -26,8 +27,10 @@ import { article as new_environments } from "./new_environments";
 import { article as new_site_beta } from "./new_site_beta";
 import { article as plugins_resource_packs } from "./plugins_resource_packs";
 import { article as pride_campaign_2025 } from "./pride_campaign_2025";
+import { article as pride_campaign_2026 } from "./pride_campaign_2026";
 import { article as redesign } from "./redesign";
 import { article as russian_censorship } from "./russian_censorship";
+import { article as server_access } from "./server_access";
 import { article as skins_now_in_modrinth_app } from "./skins_now_in_modrinth_app";
 import { article as standing_by_our_values } from "./standing_by_our_values";
 import { article as standing_by_our_values_russian } from "./standing_by_our_values_russian";
@@ -40,6 +43,7 @@ import { article as windows_borderless_malware_disclosure } from "./windows_bord
 export const articles = [
   a_new_chapter_for_modrinth_servers,
   accelerating_development,
+  analytics_overhaul,
   becoming_sustainable,
   capital_return,
   carbon_ads,
@@ -65,8 +69,10 @@ export const articles = [
   new_site_beta,
   plugins_resource_packs,
   pride_campaign_2025,
+  pride_campaign_2026,
   redesign,
   russian_censorship,
+  server_access,
   skins_now_in_modrinth_app,
   standing_by_our_values,
   standing_by_our_values_russian,

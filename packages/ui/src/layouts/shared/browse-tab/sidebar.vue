@@ -30,20 +30,27 @@ const filterClass = computed(() => {
 	if (ctx.filtersMenuOpen?.value) {
 		return 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
 	}
-	return 'card-shadow rounded-2xl bg-bg-raised'
+	return 'card-shadow rounded-2xl bg-surface-3 border border-solid border-surface-4'
 })
 
 const buttonClass = computed(() => {
 	if (isApp.value) {
-		return 'button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg'
+		return 'button-animation flex flex-col gap-1 px-3 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg'
 	}
-	return 'button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none'
+	return 'button-animation flex flex-col gap-1 px-6 py-3 w-full bg-transparent cursor-pointer border-none'
 })
 
 const contentClass = computed(() => (isApp.value ? 'mt-2 mb-3' : 'mb-4 mx-3'))
 const innerPanelClass = computed(() => (isApp.value ? 'ml-2 mr-3' : 'p-1'))
 
+function hasProvidedFilter(filterId: string): boolean {
+	return (ctx.providedFilters?.value ?? []).some((filter) => filter.type === filterId)
+}
+
 function getFilterOpenByDefault(filterId: string): boolean {
+	if (hasProvidedFilter(filterId)) {
+		return true
+	}
 	if (ctx.isServerType.value) {
 		return ![
 			'server_category_minecraft_server_meta',

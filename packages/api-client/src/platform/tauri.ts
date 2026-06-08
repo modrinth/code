@@ -1,6 +1,8 @@
 import type { ModrinthApiError } from '../core/errors'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
+import { appendRequestParams, parseResponseErrorData, toFetchBody } from '../utils/fetch'
+import { GenericSyncClient } from './sync-generic'
 import { GenericWebSocketClient } from './websocket-generic'
 import { XHRUploadClient } from './xhr-upload-client'
 
@@ -49,6 +51,12 @@ export class TauriModrinthClient extends XHRUploadClient {
 			enumerable: true,
 			configurable: false,
 		})
+		Object.defineProperty(this.archon, 'sync', {
+			value: new GenericSyncClient(this),
+			writable: false,
+			enumerable: true,
+			configurable: false,
+		})
 	}
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
@@ -57,36 +65,8 @@ export class TauriModrinthClient extends XHRUploadClient {
 			// This allows the package to be used in non-Tauri environments
 			const { fetch: tauriFetch } = await import('@tauri-apps/plugin-http')
 
-			let body: BodyInit | null | undefined = undefined
-			if (options.body) {
-				const raw = options.body
-				if (
-					typeof raw === 'object' &&
-					!(raw instanceof FormData) &&
-					!(raw instanceof URLSearchParams) &&
-					!(raw instanceof Blob) &&
-					!(raw instanceof ArrayBuffer) &&
-					!ArrayBuffer.isView(raw as ArrayBufferView)
-				) {
-					body = JSON.stringify(raw)
-				} else {
-					body = raw as BodyInit
-				}
-			}
-
-			let fullUrl = url
-			if (options.params) {
-				const filteredParams: Record<string, string> = {}
-				for (const [key, value] of Object.entries(options.params)) {
-					if (value !== undefined && value !== null) {
-						filteredParams[key] = String(value)
-					}
-				}
-				const queryString = new URLSearchParams(filteredParams).toString()
-				if (queryString) {
-					fullUrl = `${url}?${queryString}`
-				}
-			}
+			const body = toFetchBody(options.body)
+			const fullUrl = appendRequestParams(url, options.params)
 
 			const response = await tauriFetch(fullUrl, {
 				method: options.method ?? 'GET',
@@ -142,6 +122,41 @@ export class TauriModrinthClient extends XHRUploadClient {
 			} catch {
 				return text as T
 			}
+		} catch (error) {
+			throw this.normalizeError(error)
+		}
+	}
+
+	protected async executeStreamRequest(
+		url: string,
+		options: RequestOptions,
+	): Promise<ReadableStream<Uint8Array>> {
+		try {
+			const { fetch: tauriFetch } = await import('@tauri-apps/plugin-http')
+			const response = await tauriFetch(appendRequestParams(url, options.params), {
+				method: options.method ?? 'GET',
+				headers: options.headers,
+				body: toFetchBody(options.body),
+				signal: options.signal,
+			})
+
+			if (!response.ok) {
+				throw this.createNormalizedError(
+					new Error(`HTTP ${response.status}: ${response.statusText}`),
+					response.status,
+					await parseResponseErrorData(response),
+				)
+			}
+
+			if (!response.body) {
+				throw this.createNormalizedError(
+					new Error('Streaming response has no readable body'),
+					response.status,
+					undefined,
+				)
+			}
+
+			return response.body
 		} catch (error) {
 			throw this.normalizeError(error)
 		}

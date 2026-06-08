@@ -332,6 +332,135 @@
   "app.settings.tabs.resource-management": {
     "message": "리소스 관리"
   },
+  "app.skins.add-button": {
+    "message": "스킨 추가"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "드레그 엔 드롭"
+  },
+  "app.skins.apply-button": {
+    "message": "적용"
+  },
+  "app.skins.delete-button": {
+    "message": "스킨 지우기"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "선택한 스킨이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "이 스킨을 정말 삭제하시겠습니까?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "삭제된 파일을 읽는 데 실패했습니다."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "파일 처리 중 오류가 발생했습니다."
+  },
+  "app.skins.edit-button": {
+    "message": "스킨 편집"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "스킨 추가"
+  },
+  "app.skins.modal.add-title": {
+    "message": "스킨 추가"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "팔 형테"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Slim"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Wide"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "망토"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "망토"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "스킨 수정"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "먼저 스킨을 수정하세요"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "망토 없음"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "망토 없음"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "찾아보기"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "스킨 저장하기"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "저장중..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "스킨 파일"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "먼저 스킨을 업로드하세요"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "스킨 수정"
+  },
+  "app.skins.previewing-badge": {
+    "message": "미리보기"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "스킨을 너무 자주 변경하고 있습니다. Mojang 서버에서 일시적으로 추가 요청을 차단했습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "잠시 기다려주세요."
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "기본 스킨"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "저장된 스킨"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "로그인"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Modrinth 앱의 스킨 관리 기능을 사용하려면 Minecraft 계정에 로그인하세요."
+  },
+  "app.skins.sign-in.title": {
+    "message": "로그인하세요"
+  },
+  "app.skins.title": {
+    "message": "스킨 선택"
+  },
   "app.update-popup.body": {
     "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
@@ -394,9 +523,6 @@
   },
   "friends.action.add-friend": {
     "message": "친구 추가"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count}건의 친구 요청"
   },
   "friends.add-friend.submit": {
     "message": "친구 요청 보내기"

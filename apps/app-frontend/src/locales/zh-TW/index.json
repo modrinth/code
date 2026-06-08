@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "瀏覽伺服器"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "「{name}」將**永久刪除**，且無法還原。"
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "確定要永久刪除這個世界嗎？"
   },
@@ -248,12 +245,6 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未新增任何伺服器或世界"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "「{name}」將從你的清單中移除（包含遊戲內），且無法還原。"
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "「{name}」({address}) 將從你的清單中移除(包含遊戲內），且無法還原。"
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "確定要移除「{name}」嗎？"
   },
@@ -271,9 +262,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "安裝"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} 個模組"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "所需模組包"
@@ -394,9 +382,6 @@
   },
   "friends.action.add-friend": {
     "message": "新增好友"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} 個好友邀請"
   },
   "friends.add-friend.submit": {
     "message": "送出好友邀請"

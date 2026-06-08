@@ -11,7 +11,9 @@ export const DEFAULT_FEATURE_FLAGS = {
 	server_ram_as_bytes_always_on: false,
 	always_show_app_controls: false,
 	skip_unknown_pack_warning: false,
+	pride_fundraiser: true,
 	i18n_debug: false,
+	show_instance_play_time: true,
 }
 
 export const THEME_OPTIONS = ['dark', 'light', 'oled', 'system'] as const
@@ -23,6 +25,7 @@ export type ColorTheme = (typeof THEME_OPTIONS)[number]
 export type ThemeStore = {
 	selectedTheme: ColorTheme
 	advancedRendering: boolean
+	hideNametagSkinsPage: boolean
 	toggleSidebar: boolean
 
 	devMode: boolean
@@ -32,6 +35,7 @@ export type ThemeStore = {
 export const DEFAULT_THEME_STORE: ThemeStore = {
 	selectedTheme: 'dark',
 	advancedRendering: true,
+	hideNametagSkinsPage: false,
 	toggleSidebar: false,
 
 	devMode: false,

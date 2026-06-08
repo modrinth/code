@@ -373,7 +373,7 @@ const messages = defineMessages({
 	},
 	infiniteTimesInfiniteMB: {
 		id: 'app-marketing.features.performance.infinite-times-infinite-mb',
-		defaultMessage: '∞ * ∞ MB',
+		defaultMessage: '∞ × ∞ MB',
 	},
 	performant: {
 		id: 'app-marketing.features.performance.title',

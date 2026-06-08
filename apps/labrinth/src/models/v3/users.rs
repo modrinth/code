@@ -56,6 +56,7 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: Role,
     pub badges: Badges,
+    pub campaigns: UserCampaigns,
 
     pub auth_providers: Option<Vec<AuthProvider>>,
     pub email: Option<String>,
@@ -73,6 +74,18 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct SearchUser {
+    pub id: UserId,
+    pub username: String,
+    pub avatar_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct UserCampaigns {
+    pub pride_26: Option<Pride26CampaignDonation>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UserPayoutData {
     pub paypal_address: Option<String>,
     pub paypal_country: Option<String>,
@@ -81,7 +94,10 @@ pub struct UserPayoutData {
     pub balance: Decimal,
 }
 
-use crate::database::models::user_item::DBUser;
+use crate::database::models::user_item::{
+    DBSearchUser, DBUser, Pride26CampaignDonation,
+};
+
 impl From<DBUser> for User {
     fn from(data: DBUser) -> Self {
         Self {
@@ -94,6 +110,9 @@ impl From<DBUser> for User {
             created: data.created,
             role: Role::from_string(&data.role),
             badges: data.badges,
+            campaigns: UserCampaigns {
+                pride_26: data.campaign_pride_26,
+            },
             payout_data: None,
             auth_providers: None,
             has_password: None,
@@ -102,6 +121,16 @@ impl From<DBUser> for User {
             stripe_customer_id: None,
             allow_friend_requests: None,
             moderation_notes: None,
+        }
+    }
+}
+
+impl From<DBSearchUser> for SearchUser {
+    fn from(data: DBSearchUser) -> Self {
+        Self {
+            id: data.id.into(),
+            username: data.username,
+            avatar_url: data.avatar_url,
         }
     }
 }
@@ -142,6 +171,9 @@ impl User {
             created: db_user.created,
             role: Role::from_string(&db_user.role),
             badges: db_user.badges,
+            campaigns: UserCampaigns {
+                pride_26: db_user.campaign_pride_26,
+            },
             auth_providers: Some(auth_providers),
             has_password: Some(db_user.password.is_some()),
             has_totp: Some(db_user.totp_secret.is_some()),

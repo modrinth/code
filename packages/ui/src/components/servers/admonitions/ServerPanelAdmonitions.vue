@@ -12,6 +12,7 @@ import InstallingBanner, {
 } from '#ui/components/servers/InstallingBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
@@ -32,6 +33,7 @@ const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const ctx = injectModrinthServerContext()
 const route = useRoute()
+const { canSetup, canManageBackups, permissionDeniedMessage } = useServerPermissions()
 
 const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQueue(
 	computed(() => ctx.serverId),
@@ -311,10 +313,25 @@ async function onBackupDismiss(item: BackupAdmonitionEntry) {
 }
 
 async function onBackupCancel(item: BackupAdmonitionEntry) {
+	if (!canManageBackups.value) return
 	if (cancellingIds.has(item.key)) return
 	cancellingIds.add(item.key)
 	try {
-		await client.archon.backups_v1.delete(ctx.serverId, ctx.worldId.value!, item.backupId)
+		if (item.operationId == null) {
+			await client.archon.backups_v1.delete(ctx.serverId, ctx.worldId.value!, item.backupId)
+		} else if (item.type === 'create') {
+			await client.archon.backups_queue_v1.cancelCreate(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
+		} else {
+			await client.archon.backups_queue_v1.cancelRestore(
+				ctx.serverId,
+				ctx.worldId.value!,
+				item.operationId,
+			)
+		}
 		await invalidate()
 	} catch (err) {
 		cancellingIds.delete(item.key)
@@ -323,6 +340,7 @@ async function onBackupCancel(item: BackupAdmonitionEntry) {
 }
 
 async function onBackupRetry(item: BackupAdmonitionEntry) {
+	if (!canManageBackups.value) return
 	await client.archon.backups_queue_v1.retry(ctx.serverId, ctx.worldId.value!, item.backupId)
 	dismissedIds.add(item.key)
 	await invalidate()
@@ -388,6 +406,8 @@ function onContentErrorDismiss() {
 				:fallback-phase="isOnContentTab && !syncProgress ? 'Addons' : null"
 				:content-error="contentError"
 				:dismissible="dismissible && !!contentError"
+				:retry-disabled="!canSetup"
+				:retry-disabled-tooltip="permissionDeniedMessage"
 				@dismiss="onContentErrorDismiss"
 				@retry="emit('content-retry')"
 			/>
@@ -408,6 +428,8 @@ function onContentErrorDismiss() {
 				:item="item.entry"
 				:dismissible="dismissible"
 				:cancelling="cancellingIds.has(item.entry.key)"
+				:can-manage-backups="canManageBackups"
+				:permission-denied-message="permissionDeniedMessage"
 				@dismiss="onBackupDismiss(item.entry)"
 				@cancel="onBackupCancel(item.entry)"
 				@retry="onBackupRetry(item.entry)"
