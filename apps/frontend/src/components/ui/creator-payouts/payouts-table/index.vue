@@ -1,5 +1,11 @@
 <template>
-	<Table :columns="columns" :data="rows" row-key="rowKey" :body-cell-class="bodyCellClass">
+	<Table
+		:columns="columns"
+		:data="rows"
+		row-key="rowKey"
+		:body-cell-class="bodyCellClass"
+		row-transition-name="payout-day-row"
+	>
 		<template #header-period="{ column }">
 			<span class="text-sm font-normal">{{ column.label }}</span>
 		</template>
@@ -324,3 +330,18 @@ function valueClass(value: string): string {
 	return value === emptyValue ? emptyValueClass : 'text-secondary'
 }
 </script>
+
+<style scoped>
+:deep(.payout-day-row-enter-active),
+:deep(.payout-day-row-leave-active) {
+	transition:
+		opacity 150ms ease,
+		transform 150ms ease;
+}
+
+:deep(.payout-day-row-enter-from),
+:deep(.payout-day-row-leave-to) {
+	opacity: 0;
+	transform: translateY(-4px);
+}
+</style>
