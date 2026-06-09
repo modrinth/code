@@ -91,28 +91,8 @@ const initFiles = async () => {
 					folder === 'profile.json' ||
 					folder.startsWith('modrinth_logs') ||
 					folder.startsWith('.fabric') ||
-					folder.startsWith('essential') ||
-					folder.startsWith('.mixin.out') ||
 					folder.startsWith('__MACOSX'),
 			}))
-			.filter(
-				(pathData) =>
-					!pathData.path.includes('.DS_Store') &&
-					pathData.path !== 'mods/.connector' &&
-					!pathData.path.startsWith('mods/.connector/') &&
-					pathData.path !== '.sable/natives' &&
-					!pathData.path.startsWith('.sable/natives') &&
-					pathData.path !== 'local/crash_assistant' &&
-					!pathData.path.startsWith('local/crash_assistant') &&
-					pathData.path !== 'mods/mcef-libraries' &&
-					!pathData.path.startsWith('mods/mcef-libraries/') &&
-					pathData.path !== 'config/super_resolution/libraries' &&
-					!pathData.path.startsWith('config/super_resolution/libraries') &&
-					pathData.path !== 'config/veinminer/update' &&
-					!pathData.path.startsWith('config/veinminer/update') &&
-					pathData.path !== 'config/epicfight/native' &&
-					!pathData.path.startsWith('config/epicfight/native'),
-			)
 			.forEach((pathData) => {
 				const parent = pathData.path.split(sep).slice(0, -1).join(sep)
 				if (parent !== '') {
