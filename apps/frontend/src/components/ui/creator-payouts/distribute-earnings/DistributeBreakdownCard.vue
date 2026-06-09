@@ -1,8 +1,8 @@
 <template>
-	<div class="rounded-2xl border border-solid border-surface-5 bg-surface-2 p-7">
-		<h2 class="m-0 text-lg font-bold text-contrast">Distribution Breakdown</h2>
+	<div class="rounded-2xl border border-solid border-surface-4 bg-surface-2 p-7">
+		<h2 class="m-0 text-lg font-semibold text-contrast">Distribution Breakdown</h2>
 
-		<div class="mt-5 border-0 border-t border-solid border-surface-5 pt-5">
+		<div class="mt-5 border-0 border-t border-solid border-surface-4 pt-5">
 			<BreakdownRow label="Estimated Revenue" :value="formatCurrency(estimatedRevenue, { cents: true })" />
 			<BreakdownRow
 				label="Clean.io Fee"
@@ -16,7 +16,7 @@
 			/>
 		</div>
 
-		<div class="mt-4 border-0 border-t border-solid border-surface-5 pt-4">
+		<div class="mt-4 border-0 border-t border-solid border-surface-4 pt-4">
 			<BreakdownRow
 				label="Net Estimated Revenue"
 				:value="formatCurrency(payout.net_estimated_revenue_usd, { cents: true })"
@@ -24,16 +24,16 @@
 			/>
 		</div>
 
-		<div class="mt-4 border-0 border-t border-dashed border-surface-5 pt-4">
+		<div class="mt-4 border-0 border-t border-dashed border-surface-4 pt-4">
 			<BreakdownRow label="Actual Revenue" :value="actualRevenueLabel" />
 			<BreakdownRow label="Variance Resolution" :value="varianceResolutionLabel" />
 		</div>
 
-		<div class="mt-4 border-0 border-t border-solid border-surface-5 pt-4">
+		<div class="mt-4 border-0 border-t border-solid border-surface-4 pt-4">
 			<BreakdownRow label="Net Actual Revenue" :value="netActualLabel" strong />
 		</div>
 
-		<div class="mt-4 border-0 border-t border-solid border-surface-5 pt-4">
+		<div class="mt-4 border-0 border-t border-solid border-surface-4 pt-4">
 			<BreakdownRow label="Creator Revenue (75%)" :value="creatorRevenueLabel" />
 			<BreakdownRow label="Modrinth Revenue (25%)" :value="modrinthRevenueLabel" />
 		</div>
@@ -75,7 +75,7 @@ const BreakdownRow = defineComponent({
 					{
 						class: [
 							'text-base font-medium',
-							rowProps.strong ? 'text-contrast font-bold' : 'text-secondary',
+							rowProps.strong ? 'text-contrast font-semibold' : 'text-secondary',
 						],
 					},
 					rowProps.label,
@@ -85,7 +85,7 @@ const BreakdownRow = defineComponent({
 					{
 						class: [
 							'text-right text-base font-semibold',
-							rowProps.strong ? 'text-contrast text-xl font-extrabold' : 'text-primary',
+							rowProps.strong ? 'text-contrast text-xl font-semibold' : 'text-primary',
 							rowProps.negative ? 'text-red' : '',
 						],
 					},

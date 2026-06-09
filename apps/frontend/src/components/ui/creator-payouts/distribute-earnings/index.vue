@@ -11,8 +11,8 @@
 
 	<div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,42rem)]">
 		<div class="flex flex-col gap-6">
-			<div class="rounded-2xl border border-solid border-surface-5 bg-surface-2 p-7">
-				<h2 class="m-0 text-lg font-bold text-contrast">Aditude Payment</h2>
+			<div class="rounded-2xl border border-solid border-surface-4 bg-surface-2 p-7">
+				<h2 class="m-0 text-lg font-semibold text-contrast">Aditude Payment</h2>
 				<label class="mt-5 flex flex-col gap-3">
 					<span class="text-base font-semibold text-secondary">Amount Received</span>
 					<StyledInput

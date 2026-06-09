@@ -1,7 +1,7 @@
 <template>
 	<div class="normal-page no-sidebar !mb-20">
 		<div class="normal-page__content flex flex-col gap-6">
-			<h1 class="m-0 mt-6 text-3xl font-extrabold text-contrast">Creator Payouts</h1>
+			<h1 class="m-0 mt-6 text-3xl font-semibold text-contrast">Creator Payouts</h1>
 
 			<PayoutInitiatedCard
 				v-if="activeDistribution"
@@ -11,7 +11,7 @@
 			/>
 
 			<div v-if="!activeDistribution" class="grid gap-5 empty:hidden lg:grid-cols-3">
-				<DistributeMonthCard v-if="reviewPayout && activeDistribution" :payout="reviewPayout" />
+				<DistributeMonthCard v-if="reviewPayout" :payout="reviewPayout" />
 				<DistributeMonthCard
 					v-for="payout in pendingPayouts"
 					:key="payout.payouts_date"

@@ -1,12 +1,12 @@
 <template>
-	<div class="rounded-2xl border border-solid border-surface-5 bg-surface-2 p-7">
-		<h2 class="m-0 text-lg font-bold text-contrast">Adjustments</h2>
+	<div class="rounded-2xl border border-solid border-surface-4 bg-surface-2 p-7">
+		<h2 class="m-0 text-lg font-semibold text-contrast">Adjustments</h2>
 
-		<div v-if="adjustments.length > 0" class="mt-5 flex flex-col gap-3">
+		<div v-if="adjustments.length > 0" class="mt-5 flex flex-col gap-2.5">
 			<div
 				v-for="(adjustment, index) in adjustments"
 				:key="index"
-				class="grid grid-cols-[minmax(0,1fr)_11rem_auto] gap-3"
+				class="grid grid-cols-[minmax(0,1fr)_11rem_auto] gap-1.5"
 			>
 				<StyledInput
 					:model-value="adjustment.description"
@@ -33,7 +33,7 @@
 		</div>
 
 		<button
-			class="mt-5 flex h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-dashed border-surface-5 bg-transparent text-base font-semibold text-secondary transition-colors hover:text-contrast"
+			class="mt-5 flex h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-dashed border-surface-4 bg-transparent text-base font-semibold text-secondary transition-colors hover:text-contrast"
 			@click="addAdjustment"
 		>
 			<PlusIcon class="size-5" aria-hidden="true" />

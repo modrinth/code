@@ -23,7 +23,7 @@
 
 			<label class="flex flex-col gap-4">
 				<span class="text-xl font-medium text-secondary">
-					Enter <span class="font-extrabold text-contrast">{{
+					Enter <span class="font-semibold text-contrast">{{
 						formatCurrency(creatorAmount, { cents: true })
 					}}</span> to confirm
 				</span>
@@ -50,7 +50,7 @@
 						:value="totpDigits[index - 1]"
 						inputmode="numeric"
 						maxlength="1"
-						class="h-20 w-20 rounded-xl border border-solid border-surface-5 bg-surface-1.5 text-center text-2xl font-bold text-contrast outline-none transition-shadow focus:ring-4 focus:ring-brand-shadow"
+						class="h-20 w-20 rounded-xl border border-solid border-surface-4 bg-surface-1.5 text-center text-2xl font-semibold text-contrast outline-none transition-shadow focus:ring-4 focus:ring-brand-shadow"
 						@input="handleTotpInput($event, index - 1)"
 						@keydown="handleTotpKeydown($event, index - 1)"
 						@paste.prevent="handleTotpPaste"

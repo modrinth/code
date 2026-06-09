@@ -1,5 +1,5 @@
 <template>
-	<div v-if="selectedPayout" class="normal-page no-sidebar">
+	<div v-if="selectedPayout" class="normal-page no-sidebar !mb-20">
 		<div class="normal-page__content flex flex-col gap-8">
 			<NuxtLink
 				to="/admin/creator-payouts"
@@ -9,7 +9,7 @@
 				Back to Overview
 			</NuxtLink>
 
-			<h1 class="m-0 text-3xl font-extrabold text-contrast">
+			<h1 class="m-0 text-3xl font-semibold text-contrast">
 				{{ formatMonthYear(selectedPayout.payouts_date) }} Earnings
 			</h1>
 

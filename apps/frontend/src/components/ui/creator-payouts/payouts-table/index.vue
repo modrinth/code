@@ -164,7 +164,7 @@ function statusClass(status: Labrinth.Payouts.Internal.PayoutStatus): string {
 		case 'review':
 			return 'border-green bg-green-highlight text-green'
 		case 'paid':
-			return 'border-surface-5 bg-surface-3 text-secondary'
+			return 'border-surface-4 bg-surface-3 text-secondary'
 	}
 }
 

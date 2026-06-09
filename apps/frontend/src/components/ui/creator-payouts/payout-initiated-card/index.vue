@@ -7,12 +7,12 @@
 				<div class="size-3 rounded-full bg-blue" />
 			</div>
 			<div class="min-w-0">
-				<h2 class="m-0 text-lg font-bold text-contrast">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMonthYear(distribution.payouts_date) }} payout initiated
 				</h2>
 				<p class="m-0 text-base font-medium text-secondary">
 					{{ formatCurrency(creatorAmount, { cents: true }) }} to creators - Processing in
-					<span class="font-bold text-contrast">{{ countdownLabel }}</span>
+					<span class="font-semibold text-contrast">{{ countdownLabel }}</span>
 				</p>
 			</div>
 		</div>
