@@ -383,6 +383,12 @@
 								action: (event) => $refs.modal_batch_credit.show(event),
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'creator-payouts',
+								color: 'primary',
+								link: '/admin/creator-payouts',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -416,6 +422,9 @@
 						</template>
 						<template #servers-nodes>
 							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
+						<template #creator-payouts>
+							<BadgeDollarSignIcon aria-hidden="true" /> Creator payouts
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -716,6 +725,7 @@
 import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
+	BadgeDollarSignIcon,
 	BellIcon,
 	BoxIcon,
 	BracesIcon,
