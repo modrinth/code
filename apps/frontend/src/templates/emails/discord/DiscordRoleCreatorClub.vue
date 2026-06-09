@@ -13,9 +13,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 
 		<Text class="text-base">Hey <span class="no-auto-link">{user.name}</span>!</Text>
 
-		<Text class="text-base">
-			Your projects just passed 20,000 total downloads, nice!
-		</Text>
+		<Text class="text-base"> Your projects just passed 20,000 total downloads, nice! </Text>
 
 		<Text class="text-base">
 			We want to invite you to Modrinth's Creator Club, a space in our discord where you can chat
