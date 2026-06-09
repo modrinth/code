@@ -1336,6 +1336,7 @@ impl Profile {
         profile_path: &str,
         version_id: &str,
         reason: util::fetch::DownloadReason,
+        dependent_on_version_id: Option<String>,
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
         io_semaphore: &IoSemaphore,
@@ -1352,6 +1353,7 @@ impl Profile {
             reason,
             game_version: profile.game_version.clone(),
             loader: profile.loader.as_str().to_string(),
+            dependent_on: dependent_on_version_id,
         };
 
         let version =
