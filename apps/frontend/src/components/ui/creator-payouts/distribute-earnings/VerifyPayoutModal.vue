@@ -2,30 +2,22 @@
 	<NewModal
 		ref="modal"
 		header="Verify Payout"
-		width="46rem"
+		width="32rem"
 		max-width="calc(100vw - 2rem)"
 		:close-on-click-outside="!submitting"
 		:on-hide="reset"
 	>
-		<div class="flex flex-col gap-8">
-			<div
-				class="grid grid-cols-[auto_minmax(0,1fr)] gap-5 rounded-xl border border-solid border-orange bg-orange-highlight p-6 text-orange"
-			>
-				<TriangleAlertIcon class="mt-1 size-7" aria-hidden="true" />
-				<div class="flex flex-col gap-3">
-					<span class="text-xl font-semibold">You are about to initiate a payout</span>
-					<span class="text-xl leading-8">
-						This will distribute {{ formatCurrency(creatorAmount, { cents: true }) }} to creators
-						for {{ formatMonthYear(payout.payouts_date) }}.
-					</span>
-				</div>
-			</div>
+		<div class="flex flex-col gap-6">
+			<Admonition type="warning" header="You are about to initiate a payout">
+				This will distribute {{ formatCurrency(creatorAmount, { cents: true }) }} to creators for
+				{{ formatMonthYear(payout.payouts_date) }}.
+			</Admonition>
 
-			<label class="flex flex-col gap-4">
-				<span class="text-xl font-medium text-secondary">
-					Enter <span class="font-semibold text-contrast">{{
-						formatCurrency(creatorAmount, { cents: true })
-					}}</span> to confirm
+			<label class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">
+					Enter
+					{{ formatCurrency(creatorAmount, { cents: true }) }}
+					to confirm
 				</span>
 				<StyledInput
 					v-model="confirmedAmount"
@@ -34,15 +26,17 @@
 					:step="0.01"
 					placeholder="0.00"
 					wrapper-class="w-full"
-					input-class="!h-16 !text-2xl"
 				/>
 			</label>
 
-			<label class="flex flex-col gap-6">
-				<span class="text-xl font-medium text-secondary">
+			<div class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">
 					Enter 6-digit code from your authenticator app
 				</span>
-				<div class="flex flex-wrap gap-4">
+				<label
+					class="flex w-fit flex-wrap gap-1.5"
+					@pointerdown.prevent="focusFirstUnfilledCodeInput"
+				>
 					<input
 						v-for="index in 6"
 						:key="index"
@@ -50,15 +44,15 @@
 						:value="totpDigits[index - 1]"
 						inputmode="numeric"
 						maxlength="1"
-						class="h-20 w-20 rounded-xl border border-solid border-surface-4 bg-surface-1.5 text-center text-2xl font-semibold text-contrast outline-none transition-shadow focus:ring-4 focus:ring-brand-shadow"
+						class="h-12 w-11 appearance-none rounded-lg border-none bg-surface-4 p-1 text-center text-base font-medium text-primary outline-none transition-[shadow,color] focus:text-primary focus:ring-4 focus:ring-brand-shadow"
 						@input="handleTotpInput($event, index - 1)"
 						@keydown="handleTotpKeydown($event, index - 1)"
 						@paste.prevent="handleTotpPaste"
 					/>
-				</div>
-			</label>
+				</label>
+			</div>
 
-			<ButtonStyled color="green" size="large">
+			<ButtonStyled color="green">
 				<button class="w-full" :disabled="!canSubmit || submitting" @click="submit">
 					Verify & Run Payout
 					<ChevronRightIcon aria-hidden="true" />
@@ -70,9 +64,9 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
-import { computed, nextTick, ref } from 'vue'
+import { ChevronRightIcon } from '@modrinth/assets'
+import { Admonition, ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
+import { computed, nextTick, ref, type ComponentPublicInstance } from 'vue'
 
 import {
 	formatCurrency,
@@ -107,7 +101,7 @@ const canSubmit = computed(
 
 function show() {
 	modal.value?.show()
-	void nextTick(() => codeInputs.value[0]?.focus())
+	void nextTick(focusFirstUnfilledCodeInput)
 }
 
 function hide() {
@@ -120,10 +114,18 @@ function reset() {
 	codeInputs.value = []
 }
 
-function setCodeInput(element: Element | null, index: number) {
+function setCodeInput(element: Element | ComponentPublicInstance | null, index: number) {
 	if (element instanceof HTMLInputElement) {
 		codeInputs.value[index] = element
 	}
+}
+
+function focusFirstUnfilledCodeInput() {
+	const firstUnfilledIndex = totpDigits.value.findIndex((digit) => !digit)
+	const inputIndex = firstUnfilledIndex === -1 ? totpDigits.value.length - 1 : firstUnfilledIndex
+	const input = codeInputs.value[inputIndex]
+	input?.focus()
+	input?.setSelectionRange(input.value.length, input.value.length)
 }
 
 function handleTotpInput(event: Event, index: number) {
@@ -151,7 +153,7 @@ function handleTotpPaste(event: ClipboardEvent) {
 	}
 
 	totpDigits.value = Array.from({ length: 6 }, (_, index) => pastedCode[index] ?? '')
-	codeInputs.value[Math.min(pastedCode.length, 5)]?.focus()
+	void nextTick(focusFirstUnfilledCodeInput)
 }
 
 function submit() {
