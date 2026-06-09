@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "옵션 선택"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "인스턴스의 플레이 시간을 표시합니다."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "플레이 시간 표시"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "사이드바를 접거나 펼칠 수 있는 기능을 활성화합니다."
   },
@@ -142,6 +148,9 @@
   },
   "app.browse.server.installing": {
     "message": "설치 중"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "{compatibilityLabel} 버전과 일치하는 버전이 없습니다. 설치할 버전을 선택하세요. 종속성은 자동으로 설치되지 않습니다."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -431,6 +440,15 @@
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth 프라이드"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "프라이드 월간 동안 Modrinth 프라이드 모금 행사에 기부하여 이 스킨들을 받았습니다."
+  },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
   },
@@ -455,14 +473,14 @@
   "app.skins.sign-in.description": {
     "message": "Modrinth 앱의 스킨 관리 기능을 사용하려면 Minecraft 계정에 로그인하세요."
   },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Excited Modrinth Bot"
+  },
   "app.skins.sign-in.title": {
     "message": "로그인하세요"
   },
   "app.skins.title": {
     "message": "스킨 선택"
-  },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
@@ -493,15 +511,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "{version} 버전이 성공적으로 설치되었습니다!"
-  },
-  "app.update.download-update": {
-    "message": "업데이트 다운로드"
-  },
-  "app.update.downloading-update": {
-    "message": "업데이트 다운로드 중 ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "새로고침하여 업데이트 설치"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

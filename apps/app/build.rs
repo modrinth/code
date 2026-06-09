@@ -278,7 +278,11 @@ fn main() {
             .plugin(
                 "files",
                 InlinedPlugin::new()
-                    .commands(&["file_extract_zip", "file_save_as"])
+                    .commands(&[
+                        "file_extract_zip",
+                        "file_save_as",
+                        "file_read_dragged_file",
+                    ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

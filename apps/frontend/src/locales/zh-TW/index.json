@@ -23,26 +23,53 @@
   "analytics.breakdown.country": {
     "message": "國家或地區"
   },
+  "analytics.breakdown.download-reason": {
+    "message": "下載原因"
+  },
   "analytics.breakdown.download-source": {
-    "message": "來源"
+    "message": "下載來源"
   },
   "analytics.breakdown.game-version": {
-    "message": "版本"
+    "message": "遊戲版本"
+  },
+  "analytics.breakdown.generic": {
+    "message": "細項"
   },
   "analytics.breakdown.loader": {
-    "message": "平臺"
+    "message": "載入器"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "營利"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "未選取細項"
   },
   "analytics.breakdown.project": {
     "message": "專案"
   },
   "analytics.breakdown.project-status": {
-    "message": "狀態"
+    "message": "專案狀態"
   },
   "analytics.breakdown.project-version": {
-    "message": "版本"
+    "message": "專案版本"
+  },
+  "analytics.breakdown.selected": {
+    "message": "按{breakdown}分類"
   },
   "analytics.chart.action.show-all": {
     "message": "顯示全部"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "顯示有限項目"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "顯示前 8 項"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} 小時"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "註釋"
   },
   "analytics.chart.controls.button": {
     "message": "控制"
@@ -52,6 +79,198 @@
   },
   "analytics.chart.controls.modrinth-events": {
     "message": "Modrinth 事件"
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "上一期"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "專案事件"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "百分比"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>：{title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "檢視公告"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "檢視營利分析詳情"
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "營利分析詳情"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name}（上一期）"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "釘選"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "（上一期）"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "總計"
+  },
+  "analytics.chart.view.area": {
+    "message": "面積圖"
+  },
+  "analytics.chart.view.bar": {
+    "message": "長條圖"
+  },
+  "analytics.chart.view.line": {
+    "message": "曲線圖"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "前置模組"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "模組包"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "單獨下載"
+  },
+  "analytics.download-reason.update": {
+    "message": "更新"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth 網站"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "遊戲版本類型"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "全部"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "正式版"
+  },
+  "analytics.filter.search.countries": {
+    "message": "搜尋國家或地區..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "搜尋專案版本..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "搜尋版本..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "下載量趨勢"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "遊玩時間趨勢"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "收益趨勢"
+  },
+  "analytics.graph.title.views": {
+    "message": "瀏覽量趨勢"
+  },
+  "analytics.group-by.1h": {
+    "message": "1 小時"
+  },
+  "analytics.group-by.6h": {
+    "message": "6 小時"
+  },
+  "analytics.group-by.date": {
+    "message": "日期"
+  },
+  "analytics.group-by.day": {
+    "message": "天"
+  },
+  "analytics.group-by.month": {
+    "message": "月"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "按天分組"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "按小時分組"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "按月分組"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "按 6 小時分組"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "按週分組"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "按年分組"
+  },
+  "analytics.group-by.week": {
+    "message": "週"
+  },
+  "analytics.group-by.year": {
+    "message": "年"
+  },
+  "analytics.project-event.project-approved": {
+    "message": "專案獲核准"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} 版本發布"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "版本上傳"
+  },
+  "analytics.project.all": {
+    "message": "所有專案"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name}圖示"
+  },
+  "analytics.project.select": {
+    "message": "選取專案"
+  },
+  "analytics.query.filter.add": {
+    "message": "新增篩選條件"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "細項："
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "分組依據"
+  },
+  "analytics.stat.playtime": {
+    "message": "遊玩時間"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} 小時"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "vs 上一期"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "瀏覽量"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "遊玩時間（秒）"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "選取特定範圍"
+  },
+  "analytics.table.export-csv": {
+    "message": "匯出 CSV"
+  },
+  "analytics.table.export.grouped": {
+    "message": "按{groupBy}分組"
+  },
+  "analytics.title": {
+    "message": "數據分析"
+  },
+  "analytics.value.none": {
+    "message": "無"
   },
   "app-marketing.download.description": {
     "message": "我們的桌面應用程式可在所有平臺上使用，請選擇你所需的版本。"
@@ -452,6 +671,18 @@
   "collection.title": {
     "message": "{name} - 收藏"
   },
+  "conversation-thread.action.approve": {
+    "message": "核准"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "重新提交審查"
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "重新提交審查"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "提交審查"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補充檔案是用於提供原始碼等支援性資源，而非用於替代版本或變體。"
   },
@@ -708,7 +939,7 @@
     "message": "匯率"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
-    "message": "費用"
+    "message": "手續費"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
     "message": "禮物卡面額"
@@ -932,6 +1163,24 @@
   "dashboard.organizations.title": {
     "message": "組織"
   },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "檢視紀錄"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "你沒有任何未讀通知。"
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "載入通知時發生錯誤："
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "紀錄"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "通知紀錄"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "正在載入通知……"
+  },
   "dashboard.projects.bulk-edit-hint": {
     "message": "您可以透過在下方選擇項目來同時編輯多個項目。"
   },
@@ -952,9 +1201,6 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "編輯連結"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "更改將應用於<strong>{count}</strong>{count, plural,one {專案} other {專案}}。"
   },
   "dashboard.projects.links.description": {
     "message": "您在下方指定的任何連結都將被覆蓋到每個選定的項目中。留空的連結將被忽略。您可以使用垃圾桶按鈕從所有選定的項目中清除連結。"
@@ -1262,6 +1508,12 @@
   "discover.install.heading.reset-modpack": {
     "message": "在重設後選擇要安裝的模組包"
   },
+  "discover.seo.title": {
+    "message": "搜尋 {projectType}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "搜尋 {projectType} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
   },
@@ -1363,9 +1615,6 @@
   },
   "frog.title": {
     "message": "青蛙"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "服務範圍遍及北美、歐洲與東南亞，提供廣泛的區域覆蓋。"
   },
   "hosting-marketing.billing.monthly": {
     "message": "按月付費"
@@ -1760,8 +2009,14 @@
   "layout.banner.build-fail.description": {
     "message": "Modrinth 的前端無法從 API 取得資料，導致本次部署失敗。這可能是服務中斷或設定錯誤所致。請在 API 恢復可用時，再重新嘗試。錯誤碼：{errors}；目前的 API 網址是：{url}"
   },
+  "layout.banner.build-fail.ignore": {
+    "message": "忽略"
+  },
   "layout.banner.build-fail.title": {
     "message": "建構時無法從 API 取得狀態資料。"
+  },
+  "layout.banner.preview.description": {
+    "message": "如果你是想前往 Modrinth 的官方網站，請前往 {url}。這個預覽部署版本僅供 Modrinth 工作人員測試使用。它是基於 {ref} 建構而成。"
   },
   "layout.banner.preview.title": {
     "message": "這是 Modrinth 網站的預覽部署版本。"
@@ -2324,6 +2579,9 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} — 前往 Modrinth 下載 {username} 的專案"
   },
+  "profile.official-account": {
+    "message": "Modrinth 官方帳號"
+  },
   "profile.user-id": {
     "message": "使用者 ID：{id}"
   },
@@ -2582,6 +2840,18 @@
   "project.license.title": {
     "message": "授權條款"
   },
+  "project.moderation.admonition.approved.header": {
+    "message": "專案已獲核准"
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "專案草稿"
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "需要修改"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "專案審查中"
+  },
   "project.moderation.title": {
     "message": "審查"
   },
@@ -2694,22 +2964,28 @@
     "message": "版本"
   },
   "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {這個版本} other {這些版本}}目前被扣留且不公開。請提供你擁有轉載該模組包版本中特定檔案的許可證明。"
+    "message": "{count, plural, one {這個版本} other {這些版本}}目前被限制存取且不公開。請提供你擁有轉載該模組包{count, plural, other {版本}}版本中特定檔案的許可證明。"
   },
   "project.versions.withheld-versions-warning.resolve-button": {
     "message": "解決"
   },
   "project.versions.withheld-versions-warning.title": {
-    "message": "{count, plural, one {版本 {version_name}} other {版本}}因未知的嵌入內容而被扣留"
+    "message": "{count, plural, one {版本 {version_name}} other {版本}}因未知的嵌入內容而被限制存取"
   },
   "report.already-reported": {
     "message": "你已檢舉 {title}"
+  },
+  "report.back-to-item": {
+    "message": "回到{item}"
   },
   "report.body.description": {
     "message": "若可行且相關，請一併附上連結與圖片。空白或資訊不足的檢舉將會被關閉且不予處理。"
   },
   "report.body.title": {
     "message": "請提供檢舉的更多背景資訊"
+  },
+  "report.checking": {
+    "message": "正在檢查 {item}……"
   },
   "report.for.violation": {
     "message": "違反 Modrinth《<rules-link>內容規範</rules-link>》或《<terms-link>使用條款</terms-link>》"
@@ -3091,6 +3367,9 @@
   },
   "servers.plan.small.description": {
     "message": "適合 1 到 5 位好友及少量輕量模組。"
+  },
+  "servers.purchase.step.plan.billed": {
+    "message": "按{interval, select, monthly {月} quarterly {季} yearly {年} other {{interval}}}計費"
   },
   "settings.account.button.complete-setup": {
     "message": "完成設定"
@@ -3593,8 +3872,17 @@
   "settings.billing.subscription.title": {
     "message": "訂閱"
   },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "即將切換為按{interval, select, monthly {月} yearly {年} other {{interval}}}計費"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "切換至按{interval, select, monthly {月} yearly {年} other {{interval}}}計費"
+  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "每月帳單將額外收取 {amount}／年"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "將於{date}切換為按{interval, select, monthly {月} yearly {年} other {{interval}}}計費"
   },
   "settings.billing.update-method": {
     "message": "更新方式"

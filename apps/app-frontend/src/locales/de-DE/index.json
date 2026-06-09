@@ -48,7 +48,7 @@
     "message": "Farbschema"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Ändere die Kategorie, die beim Öffnen des Launchers angezeigt wird."
+    "message": "Ändere die Seite, die beim Öffnen des Launchers angezeigt wird."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
@@ -85,6 +85,12 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Wähle eine Option"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Zeigt an, wie viel Zeit du damit verbracht hast, eine Instanz zu spielen."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Spielzeit anzeigen"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Ermöglicht das Umschalten der Seitenleiste."
@@ -142,6 +148,9 @@
   },
   "app.browse.server.installing": {
     "message": "Wird installiert"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Keine verfügbaren Versionen stimmen mit {compatibilityLabel} überein. Wähle eine Version aus, um sie trotzdem zu installieren. Abhängigkeiten werden nicht automatisch installiert."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -464,9 +473,6 @@
   "app.skins.title": {
     "message": "Skin-Auswahl"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} ist bereit zur Installation! Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} wurde heruntergeladen. Neu laden, um jetzt zu aktualisieren, oder automatisch aktualisieren, wenn du die Modrinth App schließt."
   },
@@ -496,15 +502,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} wurde erfolgreich installiert!"
-  },
-  "app.update.download-update": {
-    "message": "Update herunterladen"
-  },
-  "app.update.downloading-update": {
-    "message": "Update wird heruntergeladen ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Neu laden, um das Update zu installieren"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

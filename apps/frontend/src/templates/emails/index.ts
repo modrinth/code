@@ -36,6 +36,9 @@ export default {
 	'server-invited': () => import('./server/ServerInvited.vue'),
 	'server-invited-no-account': () => import('./server/ServerInvitedNoAccount.vue'),
 
+	// Discord
+	'discord-role-creator-club': () => import('./discord/DiscordRoleCreatorClub.vue'),
+
 	// Organizations
 	'organization-invited': () => import('./organization/OrganizationInvited.vue'),
 } as Record<string, () => Promise<{ default: Component }>>

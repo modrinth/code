@@ -59,11 +59,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Kunjungi laman galeri"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type} anda menggunakan lesen yang memerlukan kod sumber tersedia. Sila berikan pautan kod sumber atau fail sumber untuk setiap versi tambahan atau pertimbangkan untuk menggunakan lesen yang berbeza."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Sediakan kod sumber"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Sesetengah daripada pautan luaran anda kelihatan sama. Setiap pautan hendaklah dimasukkan sekali sahaja dan dengan jenis pautan yang sesuai."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Bersihkan pautan yang serupa"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Keterangan anda harus mengandungi teks biasa atau teks alt gambar yang mencukupi, memastikan ia boleh diakses oleh mereka yang menggunakan pembaca skrin atau dengan sambungan internet yang perlahan."
@@ -140,6 +146,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Pilih bahasa"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Pilih lesen yang digunakan untuk pengedaran {type} anda."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Pilih lesen"
   },
@@ -193,6 +202,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Pilih tag yang tepat"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Sekurang-kurangnya satu gambar galeri diperlukan untuk mempamerkan kandungan {type} anda."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pek sumber anda, melainkan ianya pek audio atau terjemahan. Jika pek ini adalah pek audio atau terjemahan, sila pilih tag yang sesuai"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Muat naik gambar galeri"

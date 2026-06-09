@@ -424,7 +424,19 @@ defineExpose({ getAddSkinButtonElement })
 						:active="isSkinActive(skin)"
 						:tooltip="skin.name"
 						@select="emit('select', skin)"
-					/>
+					>
+						<template #overlay-buttons>
+							<ButtonStyled color="brand">
+								<button
+									:aria-label="formatMessage(messages.editSkinButton)"
+									class="pointer-events-auto"
+									@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
+								>
+									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+								</button>
+							</ButtonStyled>
+						</template>
+					</SkinButton>
 				</div>
 			</Accordion>
 		</div>

@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     sync::{
         LazyLock,
         atomic::{AtomicUsize, Ordering},
@@ -12,9 +12,16 @@ use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 
 use crate::{
-    database::models::{DBProjectId, DBVersionId},
-    models::{ids::VersionId, v3::analytics::DownloadReason},
+    database::{
+        PgPool,
+        models::{DBProjectId, DBVersion, DBVersionId},
+    },
+    models::{
+        ids::{ProjectId, VersionId},
+        v3::analytics::DownloadReason,
+    },
     routes::ApiError,
+    util::error::Context,
 };
 
 use super::super::{
@@ -39,6 +46,8 @@ pub enum ProjectDownloadsField {
     ProjectId,
     /// Version ID of this project.
     VersionId,
+    /// Project ID that caused this project to be downloaded.
+    DependentProjectId,
     /// Referrer domain which linked to this project.
     Domain,
     /// Normalized user agent used to download this project.
@@ -63,6 +72,9 @@ pub struct ProjectDownloadsFilters {
     /// Version IDs to include.
     #[serde(default)]
     pub version_id: Vec<VersionId>,
+    /// Dependent project IDs to include.
+    #[serde(default)]
+    pub dependent_project_id: Vec<ProjectId>,
     /// Referrer domains to include.
     #[serde(default)]
     pub domain: Vec<String>,
@@ -98,6 +110,9 @@ pub struct ProjectDownloads {
     /// [`ProjectDownloadsField::VersionId`].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) version_id: Option<VersionId>,
+    /// [`ProjectDownloadsField::DependentProjectId`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) dependent_project_id: Option<ProjectId>,
     /// [`ProjectDownloadsField::Monetized`].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) monetized: Option<bool>,
@@ -175,6 +190,7 @@ struct DownloadRow {
     domain: String,
     user_agent: String,
     version_id: DBVersionId,
+    dependent_on_version_id: DBVersionId,
     monetized: i8,
     country: String,
     reason: String,
@@ -188,6 +204,7 @@ const DOWNLOADS: &str = {
     const USE_DOMAIN: &str = "{use_domain: Bool}";
     const USE_USER_AGENT: &str = "{use_user_agent: Bool}";
     const USE_VERSION_ID: &str = "{use_version_id: Bool}";
+    const USE_DEPENDENT_PROJECT_ID: &str = "{use_dependent_project_id: Bool}";
     const USE_MONETIZED: &str = "{use_monetized: Bool}";
     const USE_COUNTRY: &str = "{use_country: Bool}";
     const USE_REASON: &str = "{use_reason: Bool}";
@@ -195,6 +212,8 @@ const DOWNLOADS: &str = {
     const USE_LOADER: &str = "{use_loader: Bool}";
     const FILTER_DOMAIN: &str = "filter_domain";
     const FILTER_VERSION_ID: &str = "filter_version_id";
+    const FILTER_DEPENDENT_ON_VERSION_ID: &str =
+        "filter_dependent_on_version_id";
     const FILTER_MONETIZED: &str = "{filter_monetized: UInt8}";
     const FILTER_COUNTRY: &str = "filter_country";
     const FILTER_REASON: &str = "filter_reason";
@@ -206,6 +225,7 @@ const DOWNLOADS: &str = {
             ? AS {PROJECT_IDS},
             ? AS {FILTER_DOMAIN},
             ? AS {FILTER_VERSION_ID},
+            ? AS {FILTER_DEPENDENT_ON_VERSION_ID},
             ? AS {FILTER_COUNTRY},
             ? AS {FILTER_REASON},
             ? AS {FILTER_GAME_VERSION},
@@ -217,6 +237,7 @@ const DOWNLOADS: &str = {
             if({USE_DOMAIN}, domain, '') AS domain,
             if({USE_USER_AGENT}, user_agent, '') AS user_agent,
             if({USE_VERSION_ID}, version_id, 0) AS version_id,
+            if({USE_DEPENDENT_PROJECT_ID}, dependent_on_version_id, 0) AS dependent_on_version_id,
             if({USE_MONETIZED}, CAST(user_id != 0 AS Int8), -1) AS monetized,
             if({USE_COUNTRY}, country, '') AS country,
             if({USE_REASON}, reason, '') AS reason,
@@ -233,12 +254,13 @@ const DOWNLOADS: &str = {
             AND downloads.project_id IN {PROJECT_IDS}
             AND (empty({FILTER_DOMAIN}) OR downloads.domain IN {FILTER_DOMAIN})
             AND (empty({FILTER_VERSION_ID}) OR downloads.version_id IN {FILTER_VERSION_ID})
+            AND (empty({FILTER_DEPENDENT_ON_VERSION_ID}) OR downloads.dependent_on_version_id IN {FILTER_DEPENDENT_ON_VERSION_ID})
             AND ({FILTER_MONETIZED} = 2 OR CAST(downloads.user_id != 0 AS UInt8) = {FILTER_MONETIZED})
             AND (empty({FILTER_COUNTRY}) OR downloads.country IN {FILTER_COUNTRY})
             AND (empty({FILTER_REASON}) OR downloads.reason IN {FILTER_REASON})
             AND (empty({FILTER_GAME_VERSION}) OR downloads.game_version IN {FILTER_GAME_VERSION})
             AND (empty({FILTER_LOADER}) OR downloads.loader IN {FILTER_LOADER})
-        GROUP BY bucket, source_project_id, project_id, domain, user_agent, version_id, monetized, country, reason, game_version, loader"
+        GROUP BY bucket, source_project_id, project_id, domain, user_agent, version_id, dependent_on_version_id, monetized, country, reason, game_version, loader"
     )
 };
 
@@ -249,11 +271,71 @@ struct DownloadBucket {
     domain: Option<String>,
     user_agent: Option<DownloadSource>,
     version_id: Option<DBVersionId>,
+    dependent_project_id: Option<DBProjectId>,
     monetized: Option<bool>,
     country: Option<String>,
     reason: Option<DownloadReason>,
     game_version: Option<String>,
     loader: Option<String>,
+}
+
+async fn fetch_dependent_on_version_filter(
+    metrics: &Metrics<ProjectDownloadsField, ProjectDownloadsFilters>,
+    pool: &PgPool,
+) -> Result<Vec<VersionId>, ApiError> {
+    if metrics.filter_by.dependent_project_id.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let project_ids = metrics
+        .filter_by
+        .dependent_project_id
+        .iter()
+        .map(|id| DBProjectId::from(*id).0)
+        .collect::<Vec<_>>();
+    let versions = sqlx::query!(
+        "
+        SELECT id FROM versions
+        WHERE mod_id = ANY($1)
+        ",
+        &project_ids
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch dependent project versions")?;
+
+    Ok(versions
+        .into_iter()
+        .map(|version| DBVersionId(version.id).into())
+        .collect())
+}
+
+async fn fetch_dependent_version_projects(
+    rows: &[DownloadRow],
+    cx: &QueryClickhouseContext<'_>,
+) -> Result<HashMap<DBVersionId, DBProjectId>, ApiError> {
+    let dependent_on_version_ids = rows
+        .iter()
+        .filter_map(|row| {
+            (row.dependent_on_version_id.0 != 0)
+                .then_some(row.dependent_on_version_id)
+        })
+        .collect::<HashSet<_>>();
+
+    if dependent_on_version_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    let dependent_on_version_ids =
+        dependent_on_version_ids.into_iter().collect::<Vec<_>>();
+    let versions =
+        DBVersion::get_many(&dependent_on_version_ids, cx.pool, cx.redis)
+            .await?;
+
+    Ok(versions
+        .into_iter()
+        .map(|version| (version.inner.id, version.inner.project_id))
+        .collect())
 }
 
 pub(crate) async fn fetch(
@@ -262,6 +344,14 @@ pub(crate) async fn fetch(
 ) -> Result<(), ApiError> {
     use ProjectDownloadsField as F;
     let uses = |field| metrics.bucket_by.contains(&field);
+    let dependent_on_version_filter =
+        fetch_dependent_on_version_filter(metrics, cx.pool).await?;
+    if !metrics.filter_by.dependent_project_id.is_empty()
+        && dependent_on_version_filter.is_empty()
+    {
+        return Ok(());
+    }
+
     let use_columns = &[
         ("use_project_id", uses(F::ProjectId)),
         ("use_domain", uses(F::Domain)),
@@ -270,6 +360,7 @@ pub(crate) async fn fetch(
             uses(F::UserAgent) || !metrics.filter_by.user_agent.is_empty(),
         ),
         ("use_version_id", uses(F::VersionId)),
+        ("use_dependent_project_id", uses(F::DependentProjectId)),
         ("use_monetized", uses(F::Monetized)),
         ("use_country", uses(F::Country)),
         ("use_reason", uses(F::Reason)),
@@ -290,6 +381,7 @@ pub(crate) async fn fetch(
     for filter_param in [
         ClickhouseFilterParam::String(&metrics.filter_by.domain),
         ClickhouseFilterParam::VersionId(&metrics.filter_by.version_id),
+        ClickhouseFilterParam::VersionId(&dependent_on_version_filter),
         ClickhouseFilterParam::Bool(
             "filter_monetized",
             &metrics.filter_by.monetized,
@@ -308,9 +400,17 @@ pub(crate) async fn fetch(
             .any(|(column_name, used)| *column_name == name && *used)
     };
     let mut cursor = query.fetch::<DownloadRow>()?;
-    let mut buckets = HashMap::<DownloadBucket, u64>::new();
+    let mut rows = Vec::new();
 
     while let Some(row) = cursor.next().await? {
+        rows.push(row);
+    }
+
+    let dependent_version_projects =
+        fetch_dependent_version_projects(&rows, cx).await?;
+    let mut buckets = HashMap::<DownloadBucket, u64>::new();
+
+    for row in rows {
         let normalized_source = normalize_download_source(&row.user_agent);
         if !metrics.filter_by.user_agent.is_empty()
             && !normalized_source.as_ref().is_some_and(|source| {
@@ -328,6 +428,15 @@ pub(crate) async fn fetch(
                 .then_some(normalized_source)
                 .flatten(),
             version_id: uses_column("use_version_id").then_some(row.version_id),
+            dependent_project_id: if uses(F::DependentProjectId)
+                && row.dependent_on_version_id.0 != 0
+            {
+                dependent_version_projects
+                    .get(&row.dependent_on_version_id)
+                    .copied()
+            } else {
+                None
+            },
             monetized: if uses_column("use_monetized") {
                 match row.monetized {
                     0 => Some(false),
@@ -382,6 +491,9 @@ pub(crate) async fn fetch(
                     version_id: key
                         .version_id
                         .and_then(none_if_zero_version_id),
+                    dependent_project_id: key
+                        .dependent_project_id
+                        .map(Into::into),
                     monetized: key.monetized,
                     country: key.country,
                     reason: key.reason,
@@ -468,6 +580,7 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
             (r"^unsup", P::Named("unsup")),
             (r"nothub/mrpack-install", P::Named("mrpack-install")),
             (r"^(packwiz-installer|packwiz/)", P::Named("Packwiz")),
+            (r"^mrpack4server", P::Named("mrpack4server")),
             (
                 r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
                 P::Website,

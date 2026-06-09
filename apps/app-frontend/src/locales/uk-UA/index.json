@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "Виберіть опцію"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Показує, скільки часу ви провели в цьому профілі."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Час гри"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Умикає можливість перемикання бокової панелі."
   },
@@ -419,6 +425,15 @@
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Ви отримали ці скіни за участь у благодійній акції Modrinth Pride під час місяця прайду."
+  },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
   },
@@ -452,9 +467,6 @@
   "app.skins.title": {
     "message": "Вибір скіну"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте застосунок Modrinth."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} завантажено. Перезапустіть зараз, щоб оновити його, або це відбудеться автоматично після закриття Modrinth App."
   },
@@ -484,15 +496,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Версію {version} успішно встановлено!"
-  },
-  "app.update.download-update": {
-    "message": "Завантажити оновлення"
-  },
-  "app.update.downloading-update": {
-    "message": "Завантаження оновлення ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Перезавантажте, щоб установити оновлення"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

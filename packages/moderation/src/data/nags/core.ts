@@ -38,7 +38,7 @@ export const coreNags: Nag[] = [
 		}),
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			context.versions.length < 1 && !context.projectV3?.minecraft_server,
+			context.projectV3?.versions?.length < 1 && !context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/versions',
 			title: defineMessage({

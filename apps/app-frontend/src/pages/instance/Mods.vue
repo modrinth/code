@@ -1227,6 +1227,15 @@ watch(
 	},
 )
 
+watch(
+	() => props.instance?.preferred_update_channel,
+	async (newValue, oldValue) => {
+		if (newValue !== oldValue) {
+			await initProjects('must_revalidate')
+		}
+	},
+)
+
 onUnmounted(() => {
 	isUnmounted = true
 	removeBeforeEach()
