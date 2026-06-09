@@ -4,7 +4,7 @@ import type { Labrinth } from '../types'
 const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	{
 		payouts_date: '2025-04',
-		days: [{ estimated_revenue_usd: 24_150 }],
+		days: createMockRevenueDays('2025-04', 24_150),
 		status: 'open',
 		fees_deducted_usd: 1_440,
 		variance_adjustment_usd: -2_650,
@@ -17,7 +17,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2025-03',
-		days: [{ estimated_revenue_usd: 48_200 }],
+		days: createMockRevenueDays('2025-03', 48_200),
 		status: 'pending',
 		fees_deducted_usd: 1_440,
 		variance_adjustment_usd: -2_650,
@@ -30,7 +30,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2025-02',
-		days: [{ estimated_revenue_usd: 45_500 }],
+		days: createMockRevenueDays('2025-02', 45_500),
 		status: 'pending',
 		fees_deducted_usd: 1_312,
 		variance_adjustment_usd: -2_500,
@@ -43,7 +43,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2025-01',
-		days: [{ estimated_revenue_usd: 42_000 }],
+		days: createMockRevenueDays('2025-01', 42_000),
 		status: 'review',
 		fees_deducted_usd: 1_200,
 		variance_adjustment_usd: -2_100,
@@ -56,7 +56,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-12',
-		days: [{ estimated_revenue_usd: 51_000 }],
+		days: createMockRevenueDays('2024-12', 51_000),
 		status: 'paid',
 		fees_deducted_usd: 1_520,
 		variance_adjustment_usd: -2_800,
@@ -74,7 +74,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-11',
-		days: [{ estimated_revenue_usd: 49_500 }],
+		days: createMockRevenueDays('2024-11', 49_500),
 		status: 'paid',
 		fees_deducted_usd: 1_472,
 		variance_adjustment_usd: -2_700,
@@ -92,7 +92,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-10',
-		days: [{ estimated_revenue_usd: 46_000 }],
+		days: createMockRevenueDays('2024-10', 46_000),
 		status: 'paid',
 		fees_deducted_usd: 1_360,
 		variance_adjustment_usd: -2_500,
@@ -110,7 +110,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-09',
-		days: [{ estimated_revenue_usd: 44_000 }],
+		days: createMockRevenueDays('2024-09', 44_000),
 		status: 'paid',
 		fees_deducted_usd: 1_280,
 		variance_adjustment_usd: -2_400,
@@ -128,7 +128,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-08',
-		days: [{ estimated_revenue_usd: 43_500 }],
+		days: createMockRevenueDays('2024-08', 43_500),
 		status: 'paid',
 		fees_deducted_usd: 1_264,
 		variance_adjustment_usd: -2_350,
@@ -146,7 +146,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-07',
-		days: [{ estimated_revenue_usd: 41_000 }],
+		days: createMockRevenueDays('2024-07', 41_000),
 		status: 'paid',
 		fees_deducted_usd: 1_200,
 		variance_adjustment_usd: -2_200,
@@ -164,7 +164,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-06',
-		days: [{ estimated_revenue_usd: 39_500 }],
+		days: createMockRevenueDays('2024-06', 39_500),
 		status: 'paid',
 		fees_deducted_usd: 1_152,
 		variance_adjustment_usd: -2_100,
@@ -182,7 +182,7 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 	},
 	{
 		payouts_date: '2024-05',
-		days: [{ estimated_revenue_usd: 38_000 }],
+		days: createMockRevenueDays('2024-05', 38_000),
 		status: 'paid',
 		fees_deducted_usd: 1_120,
 		variance_adjustment_usd: -2_000,
@@ -201,6 +201,34 @@ const mockHistory: Labrinth.Payouts.Internal.HistoryItem[] = [
 ]
 
 let mockDistribution: Labrinth.Payouts.Internal.DistributionRun | null = null
+
+function createMockRevenueDays(
+	payoutsDate: Labrinth.Payouts.Internal.YearMonth,
+	totalRevenue: number,
+): Labrinth.Payouts.Internal.RevenueDay[] {
+	const daysInMonth = getDaysInMonth(payoutsDate)
+	const weights = Array.from({ length: daysInMonth }, (_, index) => {
+		const weekdayLift = index % 7 === 4 || index % 7 === 5 ? 0.16 : 0
+		return 1 + ((index * 7) % 11) / 20 + weekdayLift
+	})
+	const totalWeight = weights.reduce((total, weight) => total + weight, 0)
+	let allocatedRevenue = 0
+
+	return weights.map((weight, index) => {
+		const estimatedRevenue =
+			index === weights.length - 1
+				? totalRevenue - allocatedRevenue
+				: Math.round((totalRevenue * weight) / totalWeight)
+		allocatedRevenue += estimatedRevenue
+
+		return { estimated_revenue_usd: estimatedRevenue }
+	})
+}
+
+function getDaysInMonth(payoutsDate: Labrinth.Payouts.Internal.YearMonth): number {
+	const [year, month] = payoutsDate.split('-').map(Number)
+	return new Date(year, month, 0).getDate()
+}
 
 export class LabrinthPayoutsInternalModule extends AbstractModule {
 	public getModuleID(): string {

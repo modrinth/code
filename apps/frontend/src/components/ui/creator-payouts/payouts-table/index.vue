@@ -1,5 +1,5 @@
 <template>
-	<Table :columns="columns" :data="rows" row-key="payouts_date" table-min-width="1180px">
+	<Table :columns="columns" :data="rows" row-key="rowKey" :body-cell-class="bodyCellClass">
 		<template #header-period="{ column }">
 			<span class="text-sm font-normal">{{ column.label }}</span>
 		</template>
@@ -44,29 +44,44 @@
 		</template>
 
 		<template #cell-period="{ row }">
-			<div
-				class="flex items-center gap-3 font-medium text-contrast"
+			<button
+				v-if="row.rowKind === 'period'"
+				type="button"
+				class="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left font-medium text-contrast"
 				:class="{ 'opacity-50': isDim(row) }"
+				:aria-expanded="row.isExpanded"
+				@click="toggleExpanded(row.payouts_date)"
 			>
-				<ChevronRightIcon class="size-5 text-secondary" aria-hidden="true" />
-				{{ formatMonthYear(row.payouts_date) }}
+				<ChevronRightIcon
+					class="size-5 shrink-0 text-secondary transition-transform"
+					:class="{ 'rotate-90': row.isExpanded }"
+					aria-hidden="true"
+				/>
+				{{ row.period }}
+			</button>
+			<div v-else class="flex items-center gap-3 pl-8 text-sm text-secondary">
+				{{ row.period }}
 			</div>
 		</template>
 
 		<template #cell-status="{ row }">
 			<span
+				v-if="row.rowKind === 'period'"
 				class="inline-flex rounded-full border border-solid px-3 py-0.5 text-sm font-medium"
 				:class="statusClass(row.status)"
 			>
 				{{ statusLabel(row.status) }}
 			</span>
+			<span v-else :class="emptyValueClass">{{ row.status }}</span>
 		</template>
 
 		<template #cell-fees="{ row }">
-			<span class="text-red">{{ formatSignedCurrency(-Math.abs(row.fees_deducted_usd)) }}</span>
+			<span :class="row.fees === emptyValue ? emptyValueClass : 'text-red'">{{ row.fees }}</span>
 		</template>
 		<template #cell-variance="{ row }">
-			<span class="text-red">{{ formatSignedCurrency(row.variance_adjustment_usd) }}</span>
+			<span :class="row.variance === emptyValue ? emptyValueClass : 'text-red'">{{
+				row.variance
+			}}</span>
 		</template>
 		<template #cell-estimated="{ row }">
 			<span :class="valueClass(row.estimated)">{{ row.estimated }}</span>
@@ -81,7 +96,7 @@
 			<span :class="valueClass(row.external)">{{ row.external }}</span>
 		</template>
 		<template #cell-netActual="{ row }">
-			<span :class="row.netActual === emptyValue ? 'text-primary' : 'font-medium text-contrast'">
+			<span :class="row.netActual === emptyValue ? emptyValueClass : 'font-medium text-contrast'">
 				{{ row.netActual }}
 			</span>
 		</template>
@@ -98,9 +113,15 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ChevronRightIcon, InfoIcon } from '@modrinth/assets'
 import { Table, type TableColumn } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
-import { formatCurrency, formatMonthYear, formatSignedCurrency } from '../utils'
+import {
+	formatCurrency,
+	formatMonthYear,
+	formatSignedCurrency,
+	getCreatorShare,
+	getModrinthShare,
+} from '../utils'
 
 type PayoutColumnKey =
 	| 'period'
@@ -115,13 +136,33 @@ type PayoutColumnKey =
 	| 'creator'
 	| 'modrinth'
 
-type PayoutRow = Labrinth.Payouts.Internal.HistoryItem & Record<PayoutColumnKey, string>
+type PayoutRowBase = Record<string, unknown> &
+	Record<PayoutColumnKey, string> & {
+		rowKey: string
+		rowKind: 'period' | 'day'
+		payouts_date: string
+		isDimmed: boolean
+		isExpanded: boolean
+	}
+
+type PeriodRow = PayoutRowBase & {
+	rowKind: 'period'
+	status: Labrinth.Payouts.Internal.PayoutStatus
+}
+
+type DayRow = PayoutRowBase & {
+	rowKind: 'day'
+}
+
+type PayoutRow = PeriodRow | DayRow
 
 const props = defineProps<{
 	payouts: Labrinth.Payouts.Internal.HistoryItem[]
 }>()
 
 const emptyValue = '—'
+const emptyValueClass = 'text-primary opacity-60'
+const expandedPayoutDates = ref<Set<string>>(new Set())
 
 const columns: TableColumn<PayoutColumnKey>[] = [
 	{ key: 'period', label: 'Period', width: '16%' },
@@ -137,11 +178,20 @@ const columns: TableColumn<PayoutColumnKey>[] = [
 	{ key: 'modrinth', label: 'Modrinth (25%)', align: 'right', width: '12%' },
 ]
 
-const rows = computed<PayoutRow[]>(() =>
-	[...props.payouts]
-		.sort((left, right) => right.payouts_date.localeCompare(left.payouts_date))
-		.map((payout) => ({
-			...payout,
+const rows = computed<PayoutRow[]>(() => {
+	const tableRows: PayoutRow[] = []
+
+	for (const payout of [...props.payouts].sort((left, right) =>
+		right.payouts_date.localeCompare(left.payouts_date),
+	)) {
+		const isExpanded = expandedPayoutDates.value.has(payout.payouts_date)
+
+		tableRows.push({
+			rowKey: `period-${payout.payouts_date}`,
+			rowKind: 'period',
+			payouts_date: payout.payouts_date,
+			isDimmed: payout.status === 'paid',
+			isExpanded,
 			period: formatMonthYear(payout.payouts_date),
 			status: payout.status,
 			estimated: formatCurrency(getEstimatedRevenue(payout)),
@@ -157,8 +207,82 @@ const rows = computed<PayoutRow[]>(() =>
 			modrinth: formatCurrency(
 				payout.modrinth_net_actual_revenue_usd ?? payout.modrinth_net_estimated_revenue_usd,
 			),
-		})),
-)
+		})
+
+		if (isExpanded) {
+			payout.days.forEach((day, dayIndex) => {
+				const dailyEstimatedRevenue = day.estimated_revenue_usd
+				const dailyFeesDeducted = getDailyFeesDeducted(payout)
+				const dailyNetEstimatedRevenue = getDailyNetEstimatedRevenue(
+					dailyEstimatedRevenue,
+					dailyFeesDeducted,
+				)
+
+				tableRows.push({
+					rowKey: `day-${payout.payouts_date}-${dayIndex}`,
+					rowKind: 'day',
+					payouts_date: payout.payouts_date,
+					isDimmed: payout.status === 'paid',
+					isExpanded: false,
+					period: formatDayLabel(payout.payouts_date, dayIndex),
+					status: emptyValue,
+					estimated: formatCurrency(dailyEstimatedRevenue),
+					fees: formatSignedCurrency(-dailyFeesDeducted),
+					variance: emptyValue,
+					netEstimated: formatCurrency(dailyNetEstimatedRevenue),
+					actual: emptyValue,
+					external: emptyValue,
+					netActual: emptyValue,
+					creator: formatCurrency(getDailyCreatorRevenue(dailyNetEstimatedRevenue)),
+					modrinth: formatCurrency(getDailyModrinthRevenue(dailyNetEstimatedRevenue)),
+				})
+			})
+		}
+	}
+
+	return tableRows
+})
+
+function toggleExpanded(payoutsDate: string) {
+	const nextExpandedPayoutDates = new Set(expandedPayoutDates.value)
+	if (nextExpandedPayoutDates.has(payoutsDate)) {
+		nextExpandedPayoutDates.delete(payoutsDate)
+	} else {
+		nextExpandedPayoutDates.add(payoutsDate)
+	}
+	expandedPayoutDates.value = nextExpandedPayoutDates
+}
+
+function formatDayLabel(payoutsDate: string, dayIndex: number): string {
+	const [year, month] = payoutsDate.split('-').map(Number)
+	return new Intl.DateTimeFormat(undefined, {
+		month: 'short',
+		day: 'numeric',
+	}).format(new Date(year, month - 1, dayIndex + 1, 12))
+}
+
+function getDailyFeesDeducted(payout: Labrinth.Payouts.Internal.HistoryItem): number {
+	return payout.days.length > 0 ? payout.fees_deducted_usd / payout.days.length : 0
+}
+
+function getDailyNetEstimatedRevenue(
+	estimatedRevenue: number | null,
+	feesDeducted: number,
+): number | undefined {
+	if (estimatedRevenue === null) {
+		return undefined
+	}
+
+	return estimatedRevenue - feesDeducted
+}
+
+function getDailyCreatorRevenue(netEstimatedRevenue: number | undefined): number | undefined {
+	return netEstimatedRevenue === undefined ? undefined : getCreatorShare(netEstimatedRevenue)
+}
+
+function getDailyModrinthRevenue(netEstimatedRevenue: number | undefined): number | undefined {
+	return netEstimatedRevenue === undefined ? undefined : getModrinthShare(netEstimatedRevenue)
+}
 
 function getEstimatedRevenue(payout: Labrinth.Payouts.Internal.HistoryItem): number | undefined {
 	const total = payout.days.reduce((sum, day) => sum + (day.estimated_revenue_usd ?? 0), 0)
@@ -189,10 +313,14 @@ function statusClass(status: Labrinth.Payouts.Internal.PayoutStatus): string {
 }
 
 function isDim(row: PayoutRow): boolean {
-	return row.status === 'paid'
+	return row.isDimmed
+}
+
+function bodyCellClass(row: PayoutRow): string {
+	return row.rowKind === 'day' ? 'h-8' : 'h-14'
 }
 
 function valueClass(value: string): string {
-	return value === emptyValue ? 'text-primary' : 'text-secondary'
+	return value === emptyValue ? emptyValueClass : 'text-secondary'
 }
 </script>
