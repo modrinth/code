@@ -1,32 +1,25 @@
 <template>
-	<div
-		class="bg-blue-highlight flex items-center justify-between gap-4 rounded-2xl border border-solid border-blue p-7"
+	<Admonition
+		type="info"
+		:header="`${formatMonthYear(distribution.payouts_date)} payout initiated`"
 	>
-		<div class="flex min-w-0 items-center gap-5">
-			<div
-				class="bg-blue-highlight grid size-11 shrink-0 place-items-center rounded-full text-blue"
-			>
-				<div class="size-3 rounded-full bg-blue" />
-			</div>
-			<div class="min-w-0">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMonthYear(distribution.payouts_date) }} payout initiated
-				</h2>
-				<p class="m-0 text-base font-medium text-secondary">
-					{{ formatCurrency(creatorAmount, { cents: true }) }} to creators — Processing in
-					<span class="font-semibold text-contrast">{{ countdownLabel }}</span>
-				</p>
-			</div>
+		<div class="text-primary">
+			{{ formatCurrency(creatorAmount, { cents: true }) }} to creators. Processing in
+			<span class="text-contrast">{{ countdownLabel }}</span>
 		</div>
 
-		<ButtonStyled type="outlined">
-			<button :disabled="cancelling" @click="$emit('cancel')">Cancel</button>
-		</ButtonStyled>
-	</div>
+		<template #top-right-actions>
+			<ButtonStyled type="outlined">
+				<button class="!border" type="button" :disabled="cancelling" @click="$emit('cancel')">
+					Cancel
+				</button>
+			</ButtonStyled>
+		</template>
+	</Admonition>
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from '@modrinth/ui'
+import { Admonition, ButtonStyled } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import {
