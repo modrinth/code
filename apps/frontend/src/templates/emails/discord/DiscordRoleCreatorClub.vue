@@ -11,21 +11,19 @@ import StyledEmail from '../shared/StyledEmail.vue'
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold">You're invited to the Creator Club</Heading>
 
-		<Text class="text-base">Hi <span class="no-auto-link">{user.name}</span>,</Text>
+		<Text class="text-base">Hey <span class="no-auto-link">{user.name}</span>!</Text>
 
 		<Text class="text-base">
-			Your projects have passed 20,000 total downloads, congratulations!
+			Your projects just passed 20,000 total downloads, nice!
 		</Text>
 
 		<Text class="text-base">
-			The Creator Club role in the Modrinth Discord is for creators like you. Link your Discord
-			account through Modrinth and we'll grant it automatically.
+			We want to invite you to Modrinth's Creator Club, a space in our discord where you can chat
+			with other creators, share feedback with us, and stay plugged in.
 		</Text>
 
 		<Text class="text-base">
-			Creator Club gives you access to dedicated Discord spaces: a feedback channel where you can
-			share input on creator features directly with the team, and a creator chat for talking with
-			other creators and Modrinth staff.
+			To join just link your Discord account through Modrinth and we'll grant access automatically!
 		</Text>
 
 		<Section class="mb-4 mt-4">
