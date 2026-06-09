@@ -65,7 +65,10 @@ use crate::{
     ErrorKind, State,
     state::{
         MinecraftCharacterExpressionState, MinecraftProfile,
-        minecraft_skins::{CustomMinecraftSkin, mojang_api},
+        minecraft_skins::{
+            CustomMinecraftSkin, CustomMinecraftSkinInsertPosition,
+            mojang_api,
+        },
     },
 };
 
@@ -400,6 +403,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
                     &texture_blob,
                     custom_skin.variant,
                     custom_skin.cape_id,
+                    CustomMinecraftSkinInsertPosition::Bottom,
                     &state.pool,
                 )
                 .await?;
@@ -445,7 +449,6 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         });
     }
 
-    custom_skins.sort_by(|a, b| a.texture.as_str().cmp(b.texture.as_str()));
     available_skins.extend(custom_skins);
 
     for default_skin in assets::DEFAULT_SKINS.iter() {
@@ -526,6 +529,7 @@ pub async fn add_and_equip_custom_skin(
         &texture_blob,
         variant,
         cape_id,
+        CustomMinecraftSkinInsertPosition::Top,
         &state.pool,
     )
     .await?;
@@ -598,6 +602,20 @@ async fn add_and_equip_custom_skin_now(
     let equipped_skin = profile.current_skin()?;
     let equipped_skin_texture_key = equipped_skin.texture_key();
     let equipped_skin_variant = equipped_skin.variant;
+    let insert_position =
+        if local_texture_key != equipped_skin_texture_key.as_ref() {
+            CustomMinecraftSkin::get_by_texture(
+                profile.id,
+                local_texture_key,
+                &state.pool,
+            )
+            .await?
+            .map_or(CustomMinecraftSkinInsertPosition::Top, |skin| {
+                CustomMinecraftSkinInsertPosition::At(skin.display_order)
+            })
+        } else {
+            CustomMinecraftSkinInsertPosition::Top
+        };
 
     let persistence_result = if cape_id.is_none()
         && is_bundled_skin(&equipped_skin_texture_key, equipped_skin_variant)
@@ -606,6 +624,7 @@ async fn add_and_equip_custom_skin_now(
             texture_key: equipped_skin_texture_key.to_string(),
             variant: equipped_skin_variant,
             cape_id: None,
+            display_order: 0,
         }
         .remove(profile.id, &state.pool)
         .await
@@ -616,6 +635,7 @@ async fn add_and_equip_custom_skin_now(
             &texture_blob,
             variant,
             cape_id,
+            insert_position,
             &state.pool,
         )
         .await
@@ -631,6 +651,7 @@ async fn add_and_equip_custom_skin_now(
             texture_key: local_texture_key.to_string(),
             variant,
             cape_id,
+            display_order: 0,
         }
         .remove(profile.id, &state.pool)
         .await?;
@@ -741,6 +762,7 @@ async fn persist_equipped_skin(
             texture_key: equipped_skin_texture_key.to_string(),
             variant: equipped_skin_variant,
             cape_id: None,
+            display_order: 0,
         }
         .remove(profile.id, &state.pool)
         .await?;
@@ -752,6 +774,7 @@ async fn persist_equipped_skin(
             texture_blob,
             equipped_skin_variant,
             skin.cape_id,
+            CustomMinecraftSkinInsertPosition::Bottom,
             &state.pool,
         )
         .await?;
@@ -762,6 +785,7 @@ async fn persist_equipped_skin(
             texture_key: skin.texture_key.to_string(),
             variant: skin.variant,
             cape_id: skin.cape_id,
+            display_order: 0,
         }
         .remove(profile.id, &state.pool)
         .await?;
@@ -788,6 +812,7 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
         texture_key: skin.texture_key.to_string(),
         variant: skin.variant,
         cape_id: skin.cape_id,
+        display_order: 0,
     }
     .remove(selected_credentials.offline_profile.id, &state.pool)
     .await?;
@@ -799,6 +824,25 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
     .await;
 
     Ok(())
+}
+
+/// Persists the custom saved skin order for the currently selected Minecraft profile.
+#[tracing::instrument]
+pub async fn set_custom_skin_order(
+    texture_keys: Vec<String>,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+
+    let selected_credentials = Credentials::get_default_credential(&state.pool)
+        .await?
+        .ok_or(ErrorKind::NoCredentialsError)?;
+
+    CustomMinecraftSkin::set_order(
+        selected_credentials.offline_profile.id,
+        &texture_keys,
+        &state.pool,
+    )
+    .await
 }
 
 /// Adds or updates a saved skin locally without applying it to Mojang.
@@ -831,12 +875,26 @@ pub async fn save_custom_skin(
         Arc::clone(&skin.texture_key)
     };
     let cape_id = cape.map(|cape| cape.id);
+    let insert_position = if replace_texture && old_texture_key != texture_key {
+        CustomMinecraftSkin::get_by_texture(
+            selected_credentials.offline_profile.id,
+            &old_texture_key,
+            &state.pool,
+        )
+        .await?
+        .map_or(CustomMinecraftSkinInsertPosition::Bottom, |skin| {
+            CustomMinecraftSkinInsertPosition::At(skin.display_order)
+        })
+    } else {
+        CustomMinecraftSkinInsertPosition::Bottom
+    };
 
     if cape_id.is_none() && is_bundled_skin(&texture_key, variant) {
         CustomMinecraftSkin {
             texture_key: texture_key.to_string(),
             variant,
             cape_id: None,
+            display_order: 0,
         }
         .remove(selected_credentials.offline_profile.id, &state.pool)
         .await?;
@@ -847,6 +905,7 @@ pub async fn save_custom_skin(
             &texture_blob,
             variant,
             cape_id,
+            insert_position,
             &state.pool,
         )
         .await?;
@@ -857,6 +916,7 @@ pub async fn save_custom_skin(
             texture_key: old_texture_key.to_string(),
             variant: skin.variant,
             cape_id: skin.cape_id,
+            display_order: 0,
         }
         .remove(selected_credentials.offline_profile.id, &state.pool)
         .await?;
@@ -1202,6 +1262,7 @@ async fn preserve_current_profile_skin(
             &texture,
             current_skin.variant,
             current_cape_id,
+            CustomMinecraftSkinInsertPosition::Bottom,
             &state.pool,
         )
         .await?;
@@ -1223,6 +1284,7 @@ async fn preserve_current_profile_skin(
         &texture,
         current_skin.variant,
         current_cape_id,
+        CustomMinecraftSkinInsertPosition::Bottom,
         &state.pool,
     )
     .await?;

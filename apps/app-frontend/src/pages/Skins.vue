@@ -46,6 +46,7 @@ import {
 	get_normalized_skin_texture,
 	normalize_skin_texture,
 	remove_custom_skin,
+	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
 import { handleSevereError } from '@/store/error'
@@ -269,6 +270,7 @@ let isUnmounted = false
 
 const isDraggingSkinFile = ref(false)
 const isAddSkinButtonDragActive = ref(false)
+const isSavedSkinReorderMode = ref(false)
 
 const deleteSkinModal = ref()
 const skinToDelete = ref<Skin | null>(null)
@@ -478,6 +480,44 @@ function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin)
 	}
 
 	generateSkinPreviews(skins.value, capes.value)
+}
+
+function reorderLocalSavedSkins(textureKeys: string[]) {
+	const requestedKeys = new Set(textureKeys)
+	const savedSkinList = skins.value.filter((skin) => skin.source !== 'default')
+	const savedSkinByKey = new Map(savedSkinList.map((skin) => [skin.texture_key, skin]))
+	const orderedSavedSkins = [
+		...textureKeys.map((key) => savedSkinByKey.get(key)).filter((skin): skin is Skin => !!skin),
+		...savedSkinList.filter((skin) => !requestedKeys.has(skin.texture_key)),
+	]
+	let savedSkinIndex = 0
+
+	skins.value = skins.value.flatMap((skin) => {
+		if (skin.source === 'default') {
+			return [skin]
+		}
+
+		const nextSkin = orderedSavedSkins[savedSkinIndex++]
+		return nextSkin ? [nextSkin] : []
+	})
+}
+
+async function onSavedSkinsReordered(textureKeys: string[]) {
+	const previousSkins = skins.value
+
+	reorderLocalSavedSkins(textureKeys)
+
+	try {
+		await set_custom_skin_order(textureKeys)
+	} catch (error) {
+		skins.value = previousSkins
+		handleError(error as Error)
+		await loadSkins()
+	}
+}
+
+function toggleSavedSkinReorderMode() {
+	isSavedSkinReorderMode.value = !isSavedSkinReorderMode.value
 }
 
 function schedulePendingSkinRefresh() {
@@ -853,7 +893,7 @@ await loadSkins()
 						<button
 							v-else
 							class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
-							:disabled="!selectedSkin"
+							:disabled="!selectedSkin || isSavedSkinReorderMode"
 							@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
 						>
 							<EditIcon />
@@ -873,9 +913,12 @@ await loadSkins()
 				:is-skin-selected="isSkinSelected"
 				:is-skin-active="isSkinActive"
 				:is-add-skin-button-drag-active="isAddSkinButtonDragActive"
+				:is-saved-skin-reorder-mode="isSavedSkinReorderMode"
 				@select="changeSkin"
 				@edit="(skin, event) => editSkinModal?.show(event, skin)"
 				@delete="confirmDeleteSkin"
+				@reorder-saved-skins="onSavedSkinsReordered"
+				@toggle-saved-skin-reorder="toggleSavedSkinReorderMode"
 				@add-skin="openAddSkinFileBrowser"
 				@add-skin-dragenter="onAddSkinDragOver"
 				@add-skin-dragover="onAddSkinDragOver"
