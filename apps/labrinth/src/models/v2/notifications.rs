@@ -153,6 +153,7 @@ pub enum LegacyNotificationBody {
         amount: u64,
         date_available: DateTime<Utc>,
     },
+    DiscordRoleCreatorClub,
     Custom {
         key: String,
         title: String,
@@ -241,6 +242,9 @@ impl LegacyNotification {
             }
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
+            }
+            NotificationBody::DiscordRoleCreatorClub => {
+                Some("discord_role_creator_club".to_string())
             }
             NotificationBody::Custom { .. } => Some("custom".to_string()),
             NotificationBody::LegacyMarkdown {
@@ -350,6 +354,9 @@ impl LegacyNotification {
                 amount,
                 date_available,
             },
+            NotificationBody::DiscordRoleCreatorClub => {
+                LegacyNotificationBody::DiscordRoleCreatorClub
+            }
             NotificationBody::LegacyMarkdown {
                 notification_type,
                 name,

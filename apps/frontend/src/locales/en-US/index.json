@@ -1466,6 +1466,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "You've used up your <b>{withdrawLimit}</b> withdrawal limit. You must complete a tax form to withdraw more."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "You're eligible for {roles}. Link your Discord account through Modrinth and we'll sync them automatically."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Link Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Claim your Discord roles"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creator"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Dashboard"
   },
