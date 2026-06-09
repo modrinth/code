@@ -927,6 +927,9 @@ async function confirmResetToOnboarding() {
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+			queryClient.invalidateQueries({
+				queryKey: ['servers', 'worlds', 'summary', 'v1', serverId],
+			}),
 		])
 		addNotification({
 			type: 'success',

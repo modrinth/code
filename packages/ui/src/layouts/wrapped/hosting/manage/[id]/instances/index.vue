@@ -40,8 +40,10 @@
 				v-for="world in worldSlots"
 				:key="world.id"
 				:world="world"
+				:switching="world.type === 'world' && switchingWorldId === world.id"
 				@create="handleCreateWorld"
 				@edit="handleEditWorld"
+				@switch="handleSwitchWorld"
 				@settings="handleWorldSettings"
 			/>
 		</div>
@@ -51,9 +53,9 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { InfoIcon, XIcon } from '@modrinth/assets'
-import { useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -62,6 +64,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
+	injectNotificationManager,
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
@@ -83,6 +86,18 @@ const messages = defineMessages({
 	instanceInfoDismiss: {
 		id: 'servers.manage.instances.info.dismiss',
 		defaultMessage: "Don't show this again",
+	},
+	switchSuccessTitle: {
+		id: 'servers.manage.instances.switch.success.title',
+		defaultMessage: 'Instance switched',
+	},
+	switchSuccessText: {
+		id: 'servers.manage.instances.switch.success.text',
+		defaultMessage: '{instance} is now the active instance.',
+	},
+	switchError: {
+		id: 'servers.manage.instances.switch.error',
+		defaultMessage: 'Failed to switch instance',
 	},
 })
 
@@ -125,9 +140,12 @@ const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed
 const client = injectModrinthClient()
 const { serverId, server, isServerRunning } = injectModrinthServerContext()
 const { openServerInstanceSettings } = injectServerSettingsModal()
+const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const queryClient = useQueryClient()
 const instanceInfoAdmonitionDismissed = useStorage(INSTANCE_INFO_ADMONITION_KEY, false)
+const switchingWorldId = ref<string | null>(null)
 
 const worldsQuery = useQuery({
 	queryKey: computed(() => ['servers', 'worlds', 'summary', 'v1', serverId]),
@@ -137,6 +155,38 @@ const worldsQuery = useQuery({
 
 const worldsPending = computed(() => worldsQuery.isLoading.value && !worldsQuery.data.value)
 const worldSlots = computed(() => worldsQuery.data.value ?? [])
+const switchWorldMutation = useMutation({
+	mutationFn: (worldId: string) => client.archon.servers_v1.switchWorld(serverId, worldId),
+	onMutate: (worldId) => {
+		switchingWorldId.value = worldId
+	},
+	onSuccess: async (_, worldId) => {
+		updateActiveWorld(worldId)
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: ['servers', 'worlds', 'summary', 'v1', serverId],
+			}),
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+		])
+		updateActiveWorld(worldId)
+		const worldName = getWorldSlotName(worldId)
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.switchSuccessTitle),
+			text: formatMessage(messages.switchSuccessText, { instance: worldName }),
+		})
+	},
+	onError: (error) => {
+		addNotification({
+			type: 'error',
+			text: error instanceof Error ? error.message : formatMessage(messages.switchError),
+		})
+	},
+	onSettled: () => {
+		switchingWorldId.value = null
+	},
+})
 
 async function loadWorldSlots(): Promise<WorldSlot[]> {
 	try {
@@ -322,6 +372,12 @@ function handleEditWorld(worldId: string) {
 	)
 }
 
+function handleSwitchWorld(worldId: string) {
+	const world = worldSlots.value.find((slot) => slot.type === 'world' && slot.id === worldId)
+	if (world?.type !== 'world' || world.active || switchWorldMutation.isPending.value) return
+	switchWorldMutation.mutate(worldId)
+}
+
 function handleWorldSettings(worldId: string) {
 	openServerInstanceSettings({ tabId: 'general', worldId })
 }
@@ -332,5 +388,39 @@ function handleCreateWorld() {
 
 function dismissInstanceInfoAdmonition() {
 	instanceInfoAdmonitionDismissed.value = true
+}
+
+function updateActiveWorld(worldId: string) {
+	queryClient.setQueryData<WorldSlot[]>(
+		['servers', 'worlds', 'summary', 'v1', serverId],
+		(current) =>
+			current?.map((slot) =>
+				slot.type === 'world'
+					? {
+							...slot,
+							active: slot.id === worldId,
+							lastActiveAt: slot.id === worldId ? new Date().toISOString() : slot.lastActiveAt,
+						}
+					: slot,
+			),
+	)
+	queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
+		['servers', 'v1', 'detail', serverId],
+		(current) =>
+			current
+				? {
+						...current,
+						worlds: current.worlds.map((world) => ({
+							...world,
+							is_active: world.id === worldId,
+						})),
+					}
+				: current,
+	)
+}
+
+function getWorldSlotName(worldId: string) {
+	const world = worldSlots.value.find((slot) => slot.type === 'world' && slot.id === worldId)
+	return world?.name ?? formatMessage(messages.instanceSlotName, { index: 1 })
 }
 </script>
