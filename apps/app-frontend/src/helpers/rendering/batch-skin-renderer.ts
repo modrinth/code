@@ -404,7 +404,7 @@ async function generateSkinPreviewsForGeneration(
 			const headKey = headKeys[i]
 
 			const rawCached = cachedSkinPreviews[skinKey]
-			if (rawCached) {
+			if (rawCached && !skinBlobUrlMap.has(skinKey)) {
 				const cached: RenderResult = {
 					forwards: URL.createObjectURL(rawCached.forwards),
 					backwards: URL.createObjectURL(rawCached.backwards),
@@ -413,7 +413,7 @@ async function generateSkinPreviewsForGeneration(
 			}
 
 			const cachedHead = cachedHeadPreviews[headKey]
-			if (cachedHead) {
+			if (cachedHead && !headBlobUrlMap.has(headKey)) {
 				headBlobUrlMap.set(headKey, URL.createObjectURL(cachedHead))
 			}
 		}
