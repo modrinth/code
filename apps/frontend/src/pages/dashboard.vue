@@ -192,8 +192,8 @@ useSeoMeta({
 
 const route = useNativeRoute()
 
-const hasLinkedDiscordAccount = computed(() =>
-	auth.value.user?.auth_providers?.includes('discord') === true,
+const hasLinkedDiscordAccount = computed(
+	() => auth.value.user?.auth_providers?.includes('discord') === true,
 )
 
 const { data: projects } = useQuery({
