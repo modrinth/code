@@ -291,16 +291,16 @@ async fn get_site_exposed_notifications(
     txn: &mut crate::database::PgTransaction<'_>,
 ) -> Result<Vec<Notification>, ApiError> {
     let raw_ids = notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
-    let exposed_ids = sqlx::query_scalar::<_, i64>(
+    let exposed_ids = sqlx::query_scalar!(
         r#"
-        SELECT n.id
+        SELECT n.id AS "id!"
         FROM notifications n
         INNER JOIN notifications_types nt ON nt.name = n.body ->> 'type'
         WHERE n.id = ANY($1::BIGINT[])
           AND nt.expose_in_site_notifications = TRUE
         "#,
+        &raw_ids[..],
     )
-    .bind(&raw_ids[..])
     .fetch_all(&mut *txn)
     .await?
     .into_iter()

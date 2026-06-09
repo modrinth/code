@@ -190,7 +190,7 @@ vars! {
     DISCORD_CLIENT_ID: String = "none";
     DISCORD_CLIENT_SECRET: String = "none";
     DISCORD_COMMUNITY_BOT_HANDOFF_URL: String = "http://localhost:3000/modrinth/handoff";
-    DISCORD_COMMUNITY_LINK_SECRET: String = "none";
+    DISCORD_COMMUNITY_LINK_SECRET: String = "";
     MICROSOFT_CLIENT_ID: String = "none";
     MICROSOFT_CLIENT_SECRET: String = "none";
     GOOGLE_CLIENT_ID: String = "none";

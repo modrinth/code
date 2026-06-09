@@ -1408,7 +1408,7 @@ pub async fn discord_community_link(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<web::Json<DiscordCommunityLinkResponse>, ApiError> {
-    if ENV.DISCORD_COMMUNITY_LINK_SECRET == "none"
+    if ENV.DISCORD_COMMUNITY_LINK_SECRET.is_empty()
         || ENV.DISCORD_COMMUNITY_BOT_HANDOFF_URL.is_empty()
     {
         return Err(ApiError::Internal(eyre!(

@@ -200,23 +200,6 @@ pub fn app_setup(
         });
 
         let pool_ref = pool.clone();
-        let redis_pool_ref = redis_pool.clone();
-        scheduler.run(Duration::from_secs(60 * 60 * 24), move || {
-            let pool_ref = pool_ref.clone();
-            let redis_pool_ref = redis_pool_ref.clone();
-            async move {
-                if let Err(e) = background_task::discord_role_email_campaign(
-                    pool_ref,
-                    redis_pool_ref,
-                )
-                .await
-                {
-                    warn!("Discord role email campaign task failed: {e:#}");
-                }
-            }
-        });
-
-        let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
         let stripe_client_ref = stripe_client.clone();
         let anrok_client_ref = anrok_client.clone();
