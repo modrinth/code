@@ -73,6 +73,7 @@
 					placeholder="Select start..."
 					input-class="w-full"
 					wrapper-class="w-full"
+					clearable
 					show-today
 				/>
 			</div>
@@ -89,6 +90,7 @@
 					placeholder="Select end..."
 					input-class="w-full"
 					wrapper-class="w-full"
+					clearable
 					show-today
 				/>
 			</div>
@@ -451,7 +453,7 @@ function openEditModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
 		title: event.title,
 		announcementUrl: event.announcement_url ?? '',
 		startsAt: getDateTimeInputValue(event.starts),
-		endsAt: getDateTimeInputValue(event.ends),
+		endsAt: isEventDateRange(event) ? getDateTimeInputValue(event.ends) : '',
 		metricKinds: event.for_metric_kind?.length ? [...event.for_metric_kind] : [...allMetricKinds],
 	}
 	committedAnnouncementUrl.value = event.announcement_url ?? ''

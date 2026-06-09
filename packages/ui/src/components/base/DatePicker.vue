@@ -35,7 +35,7 @@
 		<button
 			v-if="hasClearButton"
 			type="button"
-			class="absolute right-0.5 z-[1] touch-manipulation cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
+			class="absolute right-0.5 top-px z-[1] touch-manipulation cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
 			aria-label="Clear date"
 			@click.stop="clearValue"
 		>
@@ -161,7 +161,7 @@ const props = withDefaults(
 		mode: 'single',
 		showMonths: 1,
 		time24hr: false,
-		clearable: true,
+		clearable: false,
 		placeholder: 'Enter date',
 		showIcon: true,
 		showToday: false,
@@ -1104,12 +1104,7 @@ const selectedDates = computed(() => {
 })
 
 const hasClearButton = computed(
-	() =>
-		!props.calendarOnly &&
-		props.clearable &&
-		!props.disabled &&
-		!props.readonly &&
-		selectedDates.value.length > 0,
+	() => !props.calendarOnly && props.clearable && !props.disabled && selectedDates.value.length > 0,
 )
 
 const inputClasses = computed(() => [
@@ -1143,6 +1138,7 @@ watch(
 		props.calendarOnly,
 		props.closeOnSelect,
 		props.position,
+		props.clearable,
 	],
 	() => {
 		if (!picker.value) return
