@@ -29,7 +29,7 @@ export function formatShortDate(date: Date): string {
 
 export function formatCurrency(amount: number | null | undefined, options?: { cents?: boolean }) {
 	if (amount === null || amount === undefined || Number.isNaN(amount)) {
-		return '-'
+		return '—'
 	}
 
 	return new Intl.NumberFormat(undefined, {
@@ -42,7 +42,7 @@ export function formatCurrency(amount: number | null | undefined, options?: { ce
 
 export function formatSignedCurrency(amount: number | null | undefined): string {
 	if (amount === null || amount === undefined || Number.isNaN(amount)) {
-		return '-'
+		return '—'
 	}
 
 	const formatted = formatCurrency(Math.abs(amount))

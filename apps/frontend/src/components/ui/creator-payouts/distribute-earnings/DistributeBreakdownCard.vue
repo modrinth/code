@@ -60,6 +60,8 @@ const props = defineProps<{
 	adjustments: DistributionAdjustment[]
 }>()
 
+const emptyValue = '—'
+
 const BreakdownRow = defineComponent({
 	props: {
 		label: { type: String, required: true },
@@ -85,7 +87,11 @@ const BreakdownRow = defineComponent({
 					{
 						class: [
 							'text-right text-base font-semibold',
-							rowProps.strong ? 'text-contrast text-xl font-semibold' : 'text-primary',
+							rowProps.value === emptyValue
+								? 'text-primary'
+								: rowProps.strong
+									? 'text-contrast text-xl font-semibold'
+									: 'text-primary',
 							rowProps.negative ? 'text-red' : '',
 						],
 					},
@@ -103,22 +109,22 @@ const actualRevenue = computed(() => props.amountReceived ?? 0)
 const totalAdjustments = computed(() => getTotalAdjustments(props.adjustments))
 const netActualRevenue = computed(() => getNetActualRevenue(actualRevenue.value, props.adjustments))
 const actualRevenueLabel = computed(() =>
-	hasActualAmount.value ? formatCurrency(actualRevenue.value, { cents: true }) : '-',
+	hasActualAmount.value ? formatCurrency(actualRevenue.value, { cents: true }) : emptyValue,
 )
 const varianceResolutionLabel = computed(() =>
-	hasActualAmount.value ? formatSignedCurrency(totalAdjustments.value) : '-',
+	hasActualAmount.value ? formatSignedCurrency(totalAdjustments.value) : emptyValue,
 )
 const netActualLabel = computed(() =>
-	hasActualAmount.value ? formatCurrency(netActualRevenue.value, { cents: true }) : '-',
+	hasActualAmount.value ? formatCurrency(netActualRevenue.value, { cents: true }) : emptyValue,
 )
 const creatorRevenueLabel = computed(() =>
 	hasActualAmount.value
 		? formatCurrency(getCreatorShare(netActualRevenue.value), { cents: true })
-		: '-',
+		: emptyValue,
 )
 const modrinthRevenueLabel = computed(() =>
 	hasActualAmount.value
 		? formatCurrency(getModrinthShare(netActualRevenue.value), { cents: true })
-		: '-',
+		: emptyValue,
 )
 </script>

@@ -68,10 +68,28 @@
 		<template #cell-variance="{ row }">
 			<span class="text-red">{{ formatSignedCurrency(row.variance_adjustment_usd) }}</span>
 		</template>
+		<template #cell-estimated="{ row }">
+			<span :class="valueClass(row.estimated)">{{ row.estimated }}</span>
+		</template>
+		<template #cell-netEstimated="{ row }">
+			<span :class="valueClass(row.netEstimated)">{{ row.netEstimated }}</span>
+		</template>
+		<template #cell-actual="{ row }">
+			<span :class="valueClass(row.actual)">{{ row.actual }}</span>
+		</template>
+		<template #cell-external="{ row }">
+			<span :class="valueClass(row.external)">{{ row.external }}</span>
+		</template>
 		<template #cell-netActual="{ row }">
-			<span class="font-medium text-contrast">{{
-				formatCurrency(row.net_actual_revenue_usd)
-			}}</span>
+			<span :class="row.netActual === emptyValue ? 'text-primary' : 'font-medium text-contrast'">
+				{{ row.netActual }}
+			</span>
+		</template>
+		<template #cell-creator="{ row }">
+			<span :class="valueClass(row.creator)">{{ row.creator }}</span>
+		</template>
+		<template #cell-modrinth="{ row }">
+			<span :class="valueClass(row.modrinth)">{{ row.modrinth }}</span>
 		</template>
 	</Table>
 </template>
@@ -102,6 +120,8 @@ type PayoutRow = Labrinth.Payouts.Internal.HistoryItem & Record<PayoutColumnKey,
 const props = defineProps<{
 	payouts: Labrinth.Payouts.Internal.HistoryItem[]
 }>()
+
+const emptyValue = '—'
 
 const columns: TableColumn<PayoutColumnKey>[] = [
 	{ key: 'period', label: 'Period', width: '16%' },
@@ -170,5 +190,9 @@ function statusClass(status: Labrinth.Payouts.Internal.PayoutStatus): string {
 
 function isDim(row: PayoutRow): boolean {
 	return row.status === 'paid'
+}
+
+function valueClass(value: string): string {
+	return value === emptyValue ? 'text-primary' : 'text-secondary'
 }
 </script>

@@ -1,9 +1,11 @@
 <template>
 	<div
-		class="flex items-center justify-between gap-4 rounded-2xl border border-solid border-blue bg-blue-highlight p-7"
+		class="bg-blue-highlight flex items-center justify-between gap-4 rounded-2xl border border-solid border-blue p-7"
 	>
 		<div class="flex min-w-0 items-center gap-5">
-			<div class="grid size-11 shrink-0 place-items-center rounded-full bg-blue-highlight text-blue">
+			<div
+				class="bg-blue-highlight grid size-11 shrink-0 place-items-center rounded-full text-blue"
+			>
 				<div class="size-3 rounded-full bg-blue" />
 			</div>
 			<div class="min-w-0">
@@ -11,7 +13,7 @@
 					{{ formatMonthYear(distribution.payouts_date) }} payout initiated
 				</h2>
 				<p class="m-0 text-base font-medium text-secondary">
-					{{ formatCurrency(creatorAmount, { cents: true }) }} to creators - Processing in
+					{{ formatCurrency(creatorAmount, { cents: true }) }} to creators — Processing in
 					<span class="font-semibold text-contrast">{{ countdownLabel }}</span>
 				</p>
 			</div>
