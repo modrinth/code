@@ -61,6 +61,7 @@
 					{{
 						formatMessage(messages.discordRoleBannerBody, {
 							roles: eligibleDiscordRolesLabel,
+							count: eligibleDiscordRoles.length,
 						})
 					}}
 				</div>
@@ -162,7 +163,7 @@ const messages = defineMessages({
 	discordRoleBannerBody: {
 		id: 'dashboard.discord-roles.banner.body',
 		defaultMessage:
-			"You're eligible for {roles}. Link your Discord account through Modrinth and we'll sync them automatically.",
+			"You're eligible for the {roles} creator {count, plural, one {role} other {roles}} on Discord. Link your Discord account through Modrinth and we'll sync {count, plural, one {it} other {them}} automatically.",
 	},
 	discordRoleBannerCta: {
 		id: 'dashboard.discord-roles.banner.cta',
