@@ -9,7 +9,7 @@
 	>
 		<div class="flex flex-wrap items-center gap-2 pb-1">
 			<div
-				class="inline-flex items-center gap-2 rounded-full border border-solid border-surface-4 bg-surface-2 px-3 py-1 text-sm font-semibold text-secondary"
+				class="inline-flex items-center gap-2 rounded-full border border-solid border-surface-4 bg-surface-2 px-3 py-1 text-sm font-semibold"
 			>
 				<CalendarIcon v-if="payout.status === 'review'" class="size-4" aria-hidden="true" />
 				<ClockIcon v-else class="size-4" aria-hidden="true" />
@@ -17,7 +17,7 @@
 			</div>
 			<div
 				v-if="payout.status === 'review'"
-				class="inline-flex items-center gap-1 text-sm font-semibold text-red"
+				class="flex items-center gap-1 text-sm font-semibold text-red"
 			>
 				<CircleAlertIcon class="size-4" aria-hidden="true" />
 				{{ remainingLabel }}
@@ -27,11 +27,11 @@
 		<h2 class="m-0 text-xl font-semibold text-contrast">
 			{{ title }}
 		</h2>
-		<p class="m-0 max-w-[25rem] text-base font-medium text-secondary">
+		<p class="font-base m-0 text-base">
 			{{ description }}
 		</p>
 
-		<ButtonStyled v-if="payout.status === 'review'" type="outlined" class="mt-auto w-fit">
+		<ButtonStyled v-if="payout.status === 'review'" type="outlined">
 			<NuxtLink
 				:to="`/admin/creator-payouts/distribute?payouts_date=${payout.payouts_date}`"
 				class="w-fit"
