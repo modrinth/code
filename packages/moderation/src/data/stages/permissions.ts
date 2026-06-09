@@ -19,7 +19,8 @@ const permissions: Stage = {
 			shouldShow: (project, projectV3) =>
 				projectV3.project_types?.includes('modpack') && !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/externals-permissions/invalid.md?raw')).default,
+				(await import('../messages/checklist-messages/externals-permissions/invalid.md?raw'))
+					.default,
 		},
 		{
 			id: 'prohibited-extrernal-content',
@@ -31,7 +32,8 @@ const permissions: Stage = {
 			shouldShow: (project, projectV3) =>
 				projectV3.project_types?.includes('modpack') && !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/externals-permissions/prohibited.md?raw')).default,
+				(await import('../messages/checklist-messages/externals-permissions/prohibited.md?raw'))
+					.default,
 		},
 		{
 			id: 'missing-permissions',
@@ -43,7 +45,8 @@ const permissions: Stage = {
 			shouldShow: (project, projectV3) =>
 				projectV3.project_types?.includes('modpack') && !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/externals-permissions/missing.md?raw')).default,
+				(await import('../messages/checklist-messages/externals-permissions/missing.md?raw'))
+					.default,
 		},
 	],
 }

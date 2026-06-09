@@ -35,7 +35,8 @@ const titleSlug: Stage = {
 			weight: 100,
 			suggestedStatus: 'flagged',
 			severity: 'low',
-			message: async () => (await import('../messages/title/useless-info.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/title/useless-info.md?raw')).default,
 		},
 		{
 			id: 'title_minecraft_branding',
@@ -44,7 +45,8 @@ const titleSlug: Stage = {
 			weight: 100,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/title/minecraft-branding.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/title/minecraft-branding.md?raw')).default,
 		},
 		{
 			id: 'title_similarities',
@@ -53,7 +55,8 @@ const titleSlug: Stage = {
 			weight: 110,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/title/similarities.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/title/similarities.md?raw')).default,
 			enablesActions: [
 				{
 					id: 'title_similarities_options',
@@ -65,14 +68,16 @@ const titleSlug: Stage = {
 							weight: 111,
 							shouldShow: (project) => project.project_type === 'modpack',
 							message: async () =>
-								(await import('../messages/title/similarities-modpack.md?raw')).default,
+								(await import('../messages/checklist-messages/title/similarities-modpack.md?raw'))
+									.default,
 						},
 						{
 							label: 'Forked project',
 							weight: 112,
 							shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 							message: async () =>
-								(await import('../messages/title/similarities-fork.md?raw')).default,
+								(await import('../messages/checklist-messages/title/similarities-fork.md?raw'))
+									.default,
 						},
 					],
 				},
@@ -89,7 +94,8 @@ const titleSlug: Stage = {
 				{
 					label: 'Misused',
 					weight: 200,
-					message: async () => (await import('../messages/slug/misused.md?raw')).default,
+					message: async () =>
+						(await import('../messages/checklist-messages/slug/misused.md?raw')).default,
 				},
 			],
 		},

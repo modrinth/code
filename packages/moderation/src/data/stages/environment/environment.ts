@@ -23,7 +23,8 @@ const environment: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			shouldShow: (project) => project.project_type === 'mod' || project.project_type === 'modpack',
-			message: async () => (await import('../../messages/environment/inaccurate.md?raw')).default,
+			message: async () =>
+				(await import('../../messages/checklist-messages/environment/inaccurate.md?raw')).default,
 		} as ButtonAction,
 	],
 }
