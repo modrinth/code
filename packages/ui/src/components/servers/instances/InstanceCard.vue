@@ -177,22 +177,41 @@
 						{{ formatMessage(messages.editInstance) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled circular>
-					<button
-						v-tooltip="formatMessage(messages.instanceSettings)"
-						class="!shadow-none"
-						@click="emit('settings', world.id)"
-					>
-						<Settings2Icon aria-hidden="true" />
-					</button>
-				</ButtonStyled>
+				<div class="flex items-center gap-2">
+					<ButtonStyled v-if="!world.active" color="brand">
+						<button
+							class="!shadow-none"
+							:disabled="switching"
+							@click="emit('switch', world.id)"
+						>
+							<LoaderCircleIcon v-if="switching" class="animate-spin" aria-hidden="true" />
+							<RefreshCwIcon v-else aria-hidden="true" />
+							{{ formatMessage(messages.switchInstance) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled circular>
+						<button
+							v-tooltip="formatMessage(messages.instanceSettings)"
+							class="!shadow-none"
+							@click="emit('settings', world.id)"
+						>
+							<Settings2Icon aria-hidden="true" />
+						</button>
+					</ButtonStyled>
+				</div>
 			</footer>
 		</template>
 	</article>
 </template>
 
 <script setup lang="ts">
-import { PencilIcon, PlusIcon, Settings2Icon } from '@modrinth/assets'
+import {
+	LoaderCircleIcon,
+	PencilIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	Settings2Icon,
+} from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
 import { computed, useId, useTemplateRef } from 'vue'
 
@@ -238,6 +257,10 @@ const messages = defineMessages({
 		id: 'servers.manage.instances.card.edit',
 		defaultMessage: 'Edit instance',
 	},
+	switchInstance: {
+		id: 'servers.manage.instances.card.switch',
+		defaultMessage: 'Switch to instance',
+	},
 	instanceSettings: {
 		id: 'servers.manage.instances.card.settings',
 		defaultMessage: 'Instance settings',
@@ -275,11 +298,13 @@ type EmptyWorld = {
 
 const props = defineProps<{
 	world: UsedWorld | EmptyWorld
+	switching?: boolean
 }>()
 
 const emit = defineEmits<{
 	create: [slotId: string]
 	edit: [worldId: string]
+	switch: [worldId: string]
 	settings: [worldId: string]
 }>()
 

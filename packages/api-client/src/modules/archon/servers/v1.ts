@@ -66,4 +66,16 @@ export class ArchonServersV1Module extends AbstractModule {
 			method: 'POST',
 		})
 	}
+
+	/**
+	 * Switch the server to a world
+	 * POST /v1/servers/:id/worlds/:wid/active
+	 */
+	public async switchWorld(serverId: string, worldId: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}/active`, {
+			api: 'archon',
+			version: 1,
+			method: 'POST',
+		})
+	}
 }
