@@ -13,12 +13,14 @@ const props = withDefaults(
 		selected: boolean
 		active?: boolean
 		tooltip?: string
+		disabled?: boolean
 	}>(),
 	{
 		forwardImageSrc: undefined,
 		backwardImageSrc: undefined,
 		active: false,
 		tooltip: undefined,
+		disabled: false,
 	},
 )
 
@@ -52,13 +54,18 @@ watch(
 		class="skin-button group relative flex items-end justify-center overflow-hidden border border-solid transition-[border-color,box-shadow] duration-200"
 		:class="[
 			selected ? 'skin-button--selected' : '',
-			{ 'skin-button--with-actions': $slots['overlay-buttons'] },
+			active ? 'skin-button--active' : '',
+			{
+				'skin-button--with-actions': $slots['overlay-buttons'] && !disabled,
+				'skin-button--disabled': disabled,
+			},
 		]"
 	>
 		<button
 			class="absolute inset-0 z-10 cursor-pointer border-none bg-transparent p-0 focus-visible:outline-none"
 			:aria-label="tooltip ? `Select ${tooltip}` : 'Select skin'"
 			:aria-pressed="selected"
+			:disabled="disabled"
 			@click="emit('select')"
 		></button>
 
@@ -98,7 +105,7 @@ watch(
 		</span>
 
 		<span
-			v-if="$slots['overlay-buttons']"
+			v-if="$slots['overlay-buttons'] && !disabled"
 			class="pointer-events-none absolute inset-x-0 bottom-3 z-30 flex translate-y-2 items-center justify-start gap-1.5 px-3 opacity-0 transition-all duration-200 group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100"
 		>
 			<slot name="overlay-buttons" />
@@ -156,8 +163,8 @@ watch(
 	outline-offset: 2px;
 }
 
-.skin-button:hover,
-.skin-button:focus-within,
+.skin-button:not(.skin-button--disabled):hover,
+.skin-button:not(.skin-button--disabled):focus-within,
 .skin-button--with-actions:hover,
 .skin-button--with-actions:focus-within {
 	border-color: var(--surface-5);
@@ -167,11 +174,25 @@ watch(
 		0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
-.skin-button--selected,
-.skin-button--selected:hover,
-.skin-button--selected:focus-within {
+.skin-button.skin-button--selected,
+.skin-button.skin-button--selected:hover,
+.skin-button.skin-button--selected:focus-within,
+.skin-button.skin-button--selected.skin-button--with-actions:hover,
+.skin-button.skin-button--selected.skin-button--with-actions:focus-within,
+.skin-button.skin-button--active:hover,
+.skin-button.skin-button--active:focus-within,
+.skin-button.skin-button--active.skin-button--with-actions:hover,
+.skin-button.skin-button--active.skin-button--with-actions:focus-within {
 	border-color: var(--color-brand);
 	background: var(--color-brand-highlight);
+}
+
+.skin-button--disabled {
+	opacity: 0.65;
+}
+
+.skin-button--disabled button {
+	cursor: not-allowed;
 }
 
 .skin-button__image-parent {
@@ -185,7 +206,7 @@ watch(
 	backface-visibility: hidden;
 }
 
-.skin-button:hover .skin-button__image-parent {
+.skin-button:not(.skin-button--disabled):hover .skin-button__image-parent {
 	transform: rotateY(180deg) translateZ(0);
 }
 
@@ -208,7 +229,7 @@ watch(
 	transition: filter 200ms ease-in-out;
 }
 
-.group:hover .skin-button__image-parent img {
+.group:not(.skin-button--disabled):hover .skin-button__image-parent img {
 	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 </style>
