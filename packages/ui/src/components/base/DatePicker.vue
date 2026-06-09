@@ -199,6 +199,7 @@ let originalInputFocus: HTMLInputElement['focus'] | null = null
 let suppressNextInputFocusScroll = false
 const calendarBaseClass = 'modrinth-date-picker-calendar'
 const twoCalendarClass = 'has-two-calendars'
+const calendarPositionGap = 2
 const calendarStateClasses = [
 	'calendar-only',
 	'show-today',
@@ -1084,6 +1085,83 @@ function syncInputFocusScrollSuppression() {
 	inputFocusScrollSuppressionTarget = target
 }
 
+function setCalendarPositionClass(container: HTMLElement, className: string, isEnabled: boolean) {
+	container.classList.toggle(className, isEnabled)
+}
+
+function getCalendarPositionParts() {
+	const parts = props.position.split(' ')
+	return {
+		vertical: parts[0] ?? 'auto',
+		horizontal: parts[1] ?? null,
+	}
+}
+
+function getCalendarHeight(container: HTMLElement) {
+	const height = container.getBoundingClientRect().height
+	if (height > 0) return height
+
+	return Array.from(container.children).reduce(
+		(total, child) => total + (child instanceof HTMLElement ? child.offsetHeight : 0),
+		0,
+	)
+}
+
+function positionCalendar(instance: Instance, customPositionElement?: HTMLElement) {
+	const container = instance.calendarContainer
+	const positionElement = customPositionElement ?? instance._positionElement
+	if (!container || !positionElement) return
+
+	const calendarHeight = getCalendarHeight(container)
+	const calendarWidth = container.offsetWidth
+	const { vertical, horizontal } = getCalendarPositionParts()
+	const inputBounds = positionElement.getBoundingClientRect()
+	const distanceFromBottom = window.innerHeight - inputBounds.bottom
+	const showOnTop =
+		vertical === 'above' ||
+		(vertical !== 'below' &&
+			distanceFromBottom < calendarHeight &&
+			inputBounds.top > calendarHeight)
+
+	const top =
+		window.pageYOffset +
+		inputBounds.top +
+		(showOnTop
+			? -calendarHeight - calendarPositionGap
+			: positionElement.offsetHeight + calendarPositionGap)
+	let left = window.pageXOffset + inputBounds.left
+	let isCenter = false
+	let isRight = false
+
+	if (horizontal === 'center') {
+		left -= (calendarWidth - inputBounds.width) / 2
+		isCenter = true
+	} else if (horizontal === 'right') {
+		left -= calendarWidth - inputBounds.width
+		isRight = true
+	}
+
+	const viewportLeft = window.pageXOffset
+	const viewportRight = viewportLeft + document.documentElement.clientWidth
+	const isOverflowingRight = left + calendarWidth > viewportRight
+	const clampedLeft = Math.min(
+		Math.max(viewportLeft, left),
+		Math.max(viewportLeft, viewportRight - calendarWidth),
+	)
+
+	setCalendarPositionClass(container, 'arrowTop', !showOnTop)
+	setCalendarPositionClass(container, 'arrowBottom', showOnTop)
+	setCalendarPositionClass(container, 'arrowLeft', !isCenter && !isRight)
+	setCalendarPositionClass(container, 'arrowCenter', isCenter)
+	setCalendarPositionClass(container, 'arrowRight', isRight)
+	setCalendarPositionClass(container, 'rightMost', isOverflowingRight)
+	setCalendarPositionClass(container, 'centerMost', false)
+
+	container.style.top = `${top}px`
+	container.style.left = `${clampedLeft}px`
+	container.style.right = 'auto'
+}
+
 const resolvedDateFormat = computed(
 	() => props.dateFormat ?? (props.enableTime ? 'Y-m-d H:i' : 'Y-m-d'),
 )
@@ -1395,7 +1473,7 @@ function flatpickrOptions(): Options {
 		mode: props.mode,
 		noCalendar: false,
 		nextArrow: chevronRightIcon,
-		position: props.position,
+		position: positionCalendar,
 		prevArrow: chevronLeftIcon,
 		showMonths: resolvedShowMonths.value,
 		static: false,
@@ -1476,7 +1554,7 @@ defineExpose({
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar.arrowBottom) {
-	margin-top: -2.5rem;
+	margin-top: -0.5rem;
 }
 
 .modrinth-date-picker.calendar-only {
