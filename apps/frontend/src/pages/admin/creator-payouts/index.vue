@@ -1,5 +1,5 @@
 <template>
-	<div class="normal-page no-sidebar">
+	<div class="normal-page no-sidebar !mb-20">
 		<div class="normal-page__content flex flex-col gap-6">
 			<h1 class="m-0 mt-6 text-3xl font-extrabold text-contrast">Creator Payouts</h1>
 

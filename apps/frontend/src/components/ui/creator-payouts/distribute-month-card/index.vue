@@ -1,13 +1,13 @@
 <template>
 	<div
-		class="flex min-h-[17rem] flex-col rounded-2xl border border-solid p-7"
+		class="flex flex-col gap-2.5 rounded-2xl border border-solid p-5"
 		:class="
 			payout.status === 'review'
 				? 'border-surface-5 bg-surface-2'
 				: 'border-dashed border-surface-5 bg-surface-1.5 opacity-75'
 		"
 	>
-		<div class="mb-5 flex flex-wrap items-center gap-2">
+		<div class="flex flex-wrap items-center gap-2 pb-1">
 			<div
 				class="inline-flex items-center gap-2 rounded-full border border-solid border-surface-5 bg-surface-2 px-3 py-1 text-sm font-semibold text-secondary"
 			>
@@ -27,7 +27,7 @@
 		<h2 class="m-0 text-xl font-extrabold text-contrast">
 			{{ title }}
 		</h2>
-		<p class="mt-4 max-w-[25rem] text-base font-medium leading-6 text-secondary">
+		<p class="m-0 max-w-[25rem] text-base font-medium text-secondary">
 			{{ description }}
 		</p>
 

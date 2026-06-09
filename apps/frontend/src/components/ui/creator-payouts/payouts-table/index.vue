@@ -45,7 +45,7 @@
 
 		<template #cell-period="{ row }">
 			<div
-				class="flex items-center gap-3 font-bold text-contrast"
+				class="flex items-center gap-3 font-medium text-contrast"
 				:class="{ 'opacity-50': isDim(row) }"
 			>
 				<ChevronRightIcon class="size-5 text-secondary" aria-hidden="true" />
@@ -55,7 +55,7 @@
 
 		<template #cell-status="{ row }">
 			<span
-				class="inline-flex rounded-full border border-solid px-3 py-0.5 text-sm font-bold"
+				class="inline-flex rounded-full border border-solid px-3 py-0.5 text-sm font-medium"
 				:class="statusClass(row.status)"
 			>
 				{{ statusLabel(row.status) }}
@@ -69,7 +69,9 @@
 			<span class="text-red">{{ formatSignedCurrency(row.variance_adjustment_usd) }}</span>
 		</template>
 		<template #cell-netActual="{ row }">
-			<span class="font-bold text-contrast">{{ formatCurrency(row.net_actual_revenue_usd) }}</span>
+			<span class="font-medium text-contrast">{{
+				formatCurrency(row.net_actual_revenue_usd)
+			}}</span>
 		</template>
 	</Table>
 </template>
@@ -103,7 +105,7 @@ const props = defineProps<{
 
 const columns: TableColumn<PayoutColumnKey>[] = [
 	{ key: 'period', label: 'Period', width: '16%' },
-	{ key: 'status', label: 'Status', width: '11%' },
+	{ key: 'status', label: 'Status', width: '8.5%' },
 	{ key: 'estimated', label: 'Est Rev', align: 'right', width: '10%' },
 	{ key: 'fees', label: 'Fees', align: 'right', width: '10%' },
 	{ key: 'variance', label: 'Variance Adj', align: 'right', width: '12%' },
