@@ -192,6 +192,10 @@ useSeoMeta({
 
 const route = useNativeRoute()
 
+const hasLinkedDiscordAccount = computed(() =>
+	auth.value.user?.auth_providers?.includes('discord') === true,
+)
+
 const { data: projects } = useQuery({
 	queryKey: computed(() => ['dashboard-discord-role-eligibility', auth.value.user?.id, 'projects']),
 	queryFn: () => {
@@ -200,7 +204,7 @@ const { data: projects } = useQuery({
 
 		return client.labrinth.users_v2.getProjects(userId)
 	},
-	enabled: computed(() => !!auth.value.user?.id),
+	enabled: computed(() => !!auth.value.user?.id && !hasLinkedDiscordAccount.value),
 })
 
 const totalProjectDownloads = computed(() =>
@@ -238,7 +242,10 @@ const hasDismissedDiscordRoleBanner = computed(() =>
 	dismissedDiscordRoleBannerUsers.value.includes(auth.value.user?.id ?? ''),
 )
 const showDiscordRoleBanner = computed(
-	() => eligibleDiscordRoles.value.length > 0 && !hasDismissedDiscordRoleBanner.value,
+	() =>
+		eligibleDiscordRoles.value.length > 0 &&
+		!hasLinkedDiscordAccount.value &&
+		!hasDismissedDiscordRoleBanner.value,
 )
 
 function dismissDiscordRoleBanner() {
