@@ -227,8 +227,8 @@ pub async fn discord_role_email_campaign(
         .await
         .wrap_err("failed to begin Discord role email campaign transaction")?;
 
-    let lock_acquired = sqlx::query_scalar::<_, bool>(
-        "SELECT pg_try_advisory_xact_lock(hashtextextended('discord_role_email_campaign', 0))",
+    let lock_acquired = sqlx::query_scalar!(
+        r#"SELECT pg_try_advisory_xact_lock(hashtextextended('discord_role_email_campaign', 0)) AS "lock_acquired!""#,
     )
     .fetch_one(&mut txn)
     .await
@@ -239,7 +239,7 @@ pub async fn discord_role_email_campaign(
         return Ok(());
     }
 
-    let user_ids = sqlx::query_scalar::<_, i64>(
+    let user_ids = sqlx::query_scalar!(
         r#"
         WITH
           user_project_downloads AS (
@@ -251,7 +251,7 @@ pub async fn discord_role_email_campaign(
             WHERE tm.accepted = TRUE
             GROUP BY tm.user_id
           )
-        SELECT u.id
+        SELECT u.id AS "id!"
         FROM users u
         INNER JOIN user_project_downloads upd ON upd.user_id = u.id
         WHERE u.email IS NOT NULL

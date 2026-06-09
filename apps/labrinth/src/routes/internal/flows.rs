@@ -1393,7 +1393,6 @@ struct DiscordCommunityHandoffPayload {
 }
 
 #[utoipa::path(
-    post,
     operation_id = "discordCommunityLink",
     responses(
         (status = 200, description = "Discord community bot handoff URL", body = DiscordCommunityLinkResponse),
@@ -1428,7 +1427,7 @@ pub async fn discord_community_link(
     .1;
 
     let Some(discord_id) = db_user.discord_id else {
-        return Err(ApiError::Request(eyre!("discord_not_linked")));
+        return Err(ApiError::Request(eyre!("discord account is not linked")));
     };
 
     let now = Utc::now().timestamp();
