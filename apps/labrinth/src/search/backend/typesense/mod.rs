@@ -325,16 +325,16 @@ impl TypesenseClient {
         filter_by: &str,
     ) -> Result<()> {
         let resp = self
-			.request(
-				Method::DELETE,
-				&format!(
+            .request(
+                Method::DELETE,
+                &format!(
 					"/collections/{collection}/documents?filter_by={}&batch_size=1000",
 					urlencoding::encode(filter_by)
 				),
-			)
-			.send()
-			.await
-			.wrap_err("failed to DELETE Typesense documents by filter")?;
+            )
+            .send()
+            .await
+            .wrap_err("failed to DELETE Typesense documents by filter")?;
         if resp.status() == reqwest::StatusCode::NOT_FOUND {
             return Ok(());
         }
@@ -478,6 +478,13 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
+            SearchField::DependencyProjectId => TypesenseFieldSpec {
+                path: "dependency_project_id",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
         }
     }
 }
@@ -526,6 +533,7 @@ impl Typesense {
             json!({"name": "minecraft_java_server.verified_plays_2w", "type": "int64", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.is_online", "type": "bool", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.ping.data.players_online", "type": "int32", "sort": true, "optional": true}),
+            json!({"name": "dependencies", "type": "object[]", "optional": true}),
         ];
         fields.extend(TYPESENSE_SEARCH_FIELDS.iter().cloned());
 
