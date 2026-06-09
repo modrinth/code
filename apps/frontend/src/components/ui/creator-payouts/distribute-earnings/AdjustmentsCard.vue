@@ -1,12 +1,24 @@
 <template>
-	<div class="rounded-2xl border border-solid border-surface-4 bg-surface-2 p-7">
+	<ConfirmModal
+		ref="deleteAdjustmentModal"
+		title="Delete adjustment?"
+		:description="deleteAdjustmentDescription"
+		proceed-label="Delete"
+		:markdown="false"
+		width="36rem"
+		@proceed="confirmRemoveAdjustment"
+	/>
+
+	<div
+		class="flex flex-col gap-5 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-6"
+	>
 		<h2 class="m-0 text-lg font-semibold text-contrast">Adjustments</h2>
 
-		<div v-if="adjustments.length > 0" class="mt-5 flex flex-col gap-2.5">
+		<div v-if="adjustments.length > 0" class="flex flex-col gap-2.5">
 			<div
 				v-for="(adjustment, index) in adjustments"
 				:key="index"
-				class="grid grid-cols-[minmax(0,1fr)_11rem_auto] gap-1.5"
+				class="grid grid-cols-[minmax(0,1fr)_6.5rem_auto] gap-1.5"
 			>
 				<StyledInput
 					:model-value="adjustment.description"
@@ -25,37 +37,71 @@
 					@update:model-value="updateAdjustment(index, 'amount', Number($event ?? 0))"
 				/>
 				<ButtonStyled circular type="outlined" color="red">
-					<button :aria-label="`Remove adjustment ${index + 1}`" @click="removeAdjustment(index)">
+					<button
+						:aria-label="`Remove adjustment ${index + 1}`"
+						@click="openDeleteAdjustmentModal(index)"
+					>
 						<TrashIcon aria-hidden="true" />
 					</button>
 				</ButtonStyled>
 			</div>
 		</div>
 
-		<button
-			class="mt-5 flex h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-dashed border-surface-4 bg-transparent text-base font-semibold text-secondary transition-colors hover:text-contrast"
-			@click="addAdjustment"
-		>
-			<PlusIcon class="size-5" aria-hidden="true" />
-			Add Adjustment
-		</button>
+		<ButtonStyled type="outlined">
+			<button class="w-full" @click="addAdjustment">
+				<PlusIcon aria-hidden="true" />
+				Add Adjustment
+			</button>
+		</ButtonStyled>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { PlusIcon, TrashIcon } from '@modrinth/assets'
-import { ButtonStyled, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, ConfirmModal, StyledInput } from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
-import type { DistributionAdjustment } from '../utils'
+import { formatCurrency, type DistributionAdjustment } from '../utils'
 
 const adjustments = defineModel<DistributionAdjustment[]>({ required: true })
+const pendingDeleteIndex = ref<number | null>(null)
+const deleteAdjustmentModal = ref<InstanceType<typeof ConfirmModal> | null>(null)
+
+const pendingDeleteAdjustment = computed(() =>
+	pendingDeleteIndex.value === null ? null : adjustments.value[pendingDeleteIndex.value],
+)
+const deleteAdjustmentDescription = computed(() => {
+	const adjustment = pendingDeleteAdjustment.value
+
+	if (!adjustment) {
+		return ''
+	}
+
+	if (!adjustment.description) {
+		return `Delete adjustment for ${formatAdjustmentAmount(adjustment.amount)}`
+	}
+
+	return `Delete adjustment "${adjustment.description}" for ${formatAdjustmentAmount(adjustment.amount)}`
+})
 
 function addAdjustment() {
 	adjustments.value = [...adjustments.value, { description: '', amount: 0 }]
 }
 
-function removeAdjustment(index: number) {
-	adjustments.value = adjustments.value.filter((_, adjustmentIndex) => adjustmentIndex !== index)
+function openDeleteAdjustmentModal(index: number) {
+	pendingDeleteIndex.value = index
+	deleteAdjustmentModal.value?.show()
+}
+
+function confirmRemoveAdjustment() {
+	if (pendingDeleteIndex.value === null) {
+		return
+	}
+
+	adjustments.value = adjustments.value.filter(
+		(_, adjustmentIndex) => adjustmentIndex !== pendingDeleteIndex.value,
+	)
+	pendingDeleteIndex.value = null
 }
 
 function updateAdjustment(
@@ -66,5 +112,10 @@ function updateAdjustment(
 	adjustments.value = adjustments.value.map((adjustment, adjustmentIndex) =>
 		adjustmentIndex === index ? { ...adjustment, [field]: value } : adjustment,
 	)
+}
+
+function formatAdjustmentAmount(amount: number): string {
+	const formatted = formatCurrency(Math.abs(amount), { cents: true })
+	return amount < 0 ? `-${formatted}` : formatted
 }
 </script>
