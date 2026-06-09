@@ -44,7 +44,7 @@
 						:value="totpDigits[index - 1]"
 						inputmode="numeric"
 						maxlength="1"
-						class="h-12 w-11 appearance-none rounded-lg border-none bg-surface-4 p-1 text-center text-base font-medium text-primary outline-none transition-[shadow,color] focus:text-primary focus:ring-4 focus:ring-brand-shadow"
+						class="h-12 w-11 appearance-none rounded-xl border-none bg-surface-4 p-1 text-center text-base font-medium text-primary outline-none focus:text-primary focus:ring-4 focus:ring-brand-shadow"
 						@input="handleTotpInput($event, index - 1)"
 						@keydown="handleTotpKeydown($event, index - 1)"
 						@paste.prevent="handleTotpPaste"

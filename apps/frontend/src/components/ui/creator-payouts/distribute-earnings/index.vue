@@ -11,10 +11,12 @@
 
 	<div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,42rem)]">
 		<div class="flex flex-col gap-6">
-			<div class="rounded-2xl border border-solid border-surface-4 bg-surface-2 p-7">
+			<div
+				class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-6"
+			>
 				<h2 class="m-0 text-lg font-semibold text-contrast">Aditude Payment</h2>
-				<label class="mt-5 flex flex-col gap-3">
-					<span class="text-base font-semibold text-secondary">Amount Received</span>
+				<div class="flex flex-col gap-2.5">
+					<span class="text-base font-semibold text-contrast">Amount Received</span>
 					<StyledInput
 						v-model="amountReceived"
 						type="number"
@@ -22,9 +24,8 @@
 						placeholder="0.00"
 						:step="0.01"
 						wrapper-class="w-full"
-						input-class="!h-14 !text-xl"
 					/>
-				</label>
+				</div>
 			</div>
 
 			<AdjustmentsCard v-model="adjustments" />
@@ -38,7 +39,11 @@
 			/>
 
 			<ButtonStyled color="green" size="large">
-				<button class="w-full" :disabled="!canOpenVerification || submitting" @click="openVerifyModal">
+				<button
+					class="w-full"
+					:disabled="!canOpenVerification || submitting"
+					@click="openVerifyModal"
+				>
 					Reconcile & Distribute Earnings
 					<ChevronRightIcon aria-hidden="true" />
 				</button>
