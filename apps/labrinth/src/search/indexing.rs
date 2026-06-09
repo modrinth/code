@@ -397,7 +397,7 @@ pub async fn index_local(
             .get(&project.id)
             .map(|x| x.clone())
             .unwrap_or_default();
-        let dependency_project_id = dependencies
+        let dependency_project_ids = dependencies
             .iter()
             .map(|dependency| dependency.project_id.clone())
             .collect::<Vec<_>>();
@@ -541,7 +541,7 @@ pub async fn index_local(
                     featured_gallery: featured_gallery.clone(),
                     open_source,
                     color: project.color.map(|x| x as u32),
-                    dependency_project_id: dependency_project_id.clone(),
+                    dependency_project_ids: dependency_project_ids.clone(),
                     dependencies: dependencies.clone(),
                     loader_fields,
                     project_loader_fields: project_loader_fields.clone(),

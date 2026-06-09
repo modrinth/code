@@ -91,7 +91,7 @@ async fn search_projects() {
                 ),
                 (
                     json!([[format!(
-                        "dependency_project_id:{dependency_project_id}"
+                        "dependency_project_ids:{dependency_project_id}"
                     )]]),
                     vec![7],
                 ),
@@ -140,15 +140,15 @@ async fn search_projects() {
                 .search_deserialized(
                     Some(&format!("&{test_name}")),
                     Some(json!([[format!(
-                        "dependency_project_id:{dependency_project_id}"
+                        "dependency_project_ids:{dependency_project_id}"
                     )]])),
                     USER_USER_PAT,
                 )
                 .await;
             assert_eq!(projects.total_hits, 1);
-            assert_eq!(projects.hits[0].dependency_project_id.len(), 1);
+            assert_eq!(projects.hits[0].dependency_project_ids.len(), 1);
             assert_eq!(
-                projects.hits[0].dependency_project_id[0],
+                projects.hits[0].dependency_project_ids[0],
                 dependency_project_id
             );
             assert_eq!(projects.hits[0].dependencies.len(), 1);

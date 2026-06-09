@@ -195,7 +195,7 @@ pub enum SearchField {
     MinecraftJavaServerContentKind,
     MinecraftJavaServerContentSupportedGameVersions,
     MinecraftJavaServerPingData,
-    DependencyProjectId,
+    DependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -250,7 +250,7 @@ pub struct UploadSearchProject {
     pub open_source: bool,
     pub color: Option<u32>,
     #[serde(default)]
-    pub dependency_project_id: Vec<String>,
+    pub dependency_project_ids: Vec<String>,
     #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
 
@@ -309,7 +309,7 @@ pub struct ResultSearchProject {
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
     #[serde(default)]
-    pub dependency_project_id: Vec<String>,
+    pub dependency_project_ids: Vec<String>,
     #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
 
@@ -349,7 +349,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             gallery: source.gallery,
             featured_gallery: source.featured_gallery,
             color: source.color,
-            dependency_project_id: source.dependency_project_id,
+            dependency_project_ids: source.dependency_project_ids,
             dependencies: source.dependencies,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,

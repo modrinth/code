@@ -478,8 +478,8 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
-            SearchField::DependencyProjectId => TypesenseFieldSpec {
-                path: "dependency_project_id",
+            SearchField::DependencyProjectIds => TypesenseFieldSpec {
+                path: "dependency_project_ids",
                 ty: "string[]",
                 facet: true,
                 sort: false,
