@@ -146,7 +146,8 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-description.title',
 				defaultMessage: 'Edit description',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-description',
 		},
 	},
 	{
@@ -182,7 +183,8 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-description.title',
 				defaultMessage: 'Edit description',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-description',
 		},
 	},
 	{
@@ -217,7 +219,7 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-summary.title',
 				defaultMessage: 'Edit summary',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings',
 		},
 	},
 	{
@@ -255,7 +257,7 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-summary.title',
 				defaultMessage: 'Edit summary',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings',
 		},
 	},
 	{
@@ -280,7 +282,7 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-title.title',
 				defaultMessage: 'Edit title',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings',
 		},
 	},
 	{
@@ -313,7 +315,7 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-title.title',
 				defaultMessage: 'Edit title',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings',
 		},
 	},
 	{
@@ -339,7 +341,7 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-summary.title',
 				defaultMessage: 'Edit summary',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings',
 		},
 	},
 	{
@@ -365,7 +367,8 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-description.title',
 				defaultMessage: 'Edit description',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-description',
 		},
 	},
 	{
@@ -390,7 +393,8 @@ export const descriptionNags: Nag[] = [
 				id: 'nags.edit-description.title',
 				defaultMessage: 'Edit description',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-description',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-description',
 		},
 	},
 ]

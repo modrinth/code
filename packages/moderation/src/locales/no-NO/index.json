@@ -53,9 +53,6 @@
   "nags.gallery.title": {
     "defaultMessage": "Besøk galleriside"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Di{type, select, mod {n mod} plugin {tt plugin} other {tt prosjekt}} bruker en lisens som krever at kildekode er tilgjengelig. Vennligst oppgi en lenke til kildekoden eller kildefilen for hver ekstra versjon, eller vurder å bruke en annen lisens."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oppgi kildekode"
   },
@@ -122,9 +119,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Velg riktig oppløsning"
   },
-  "nags.select-license.description": {
-    "defaultMessage": "Velg lisensen som {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} distribueres under."
-  },
   "nags.select-license.title": {
     "defaultMessage": "Velg lisens"
   },
@@ -178,9 +172,6 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Velg riktige tagger"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Minst ett bilde i galleriet er påkrevd for å vise innholdet i {type, select, resourcepack {ressurspakken din} other {prosjektet ditt}}, med unntak av lyd- og lokaliseringspakker. Hvis dette gjelder pakken din, velg riktig tagg: shader {shader} eller annet {prosjekt}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Last opp et galleribilde"

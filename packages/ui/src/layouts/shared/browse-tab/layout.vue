@@ -14,7 +14,7 @@ import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatProjectTypeSentence } from '#ui/utils/common-messages'
 import type { SortType } from '#ui/utils/search'
 
 import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
@@ -47,8 +47,7 @@ const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
 const messages = defineMessages({
 	searchPlaceholder: {
 		id: 'browse.search.placeholder',
-		defaultMessage:
-			'Search {projectType, select, mod {mods} modpack {modpacks} resourcepack {resource packs} shader {shaders} plugin {plugins} datapack {datapacks} server {servers} other {projects}}...',
+		defaultMessage: 'Search {projectType}...',
 	},
 	viewPrefix: {
 		id: 'browse.view-prefix',
@@ -88,7 +87,11 @@ const messages = defineMessages({
 		:icon="SearchIcon"
 		type="text"
 		autocomplete="off"
-		:placeholder="formatMessage(messages.searchPlaceholder, { projectType: ctx.projectType.value })"
+		:placeholder="
+			formatMessage(messages.searchPlaceholder, {
+				projectType: formatProjectTypeSentence(formatMessage, ctx.projectType.value, 2),
+			})
+		"
 		clearable
 		wrapper-class="w-full"
 		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"

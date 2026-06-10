@@ -462,6 +462,7 @@ pub async fn update_project(
                 profile_path,
                 update_version,
                 fetch::DownloadReason::Update,
+                None,
                 &state.pool,
                 &state.fetch_semaphore,
                 &state.io_semaphore,
@@ -503,6 +504,7 @@ pub async fn add_project_from_version(
     profile_path: &str,
     version_id: &str,
     reason: fetch::DownloadReason,
+    dependent_on_version_id: Option<String>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
 
@@ -510,6 +512,7 @@ pub async fn add_project_from_version(
         profile_path,
         version_id,
         reason,
+        dependent_on_version_id,
         &state.pool,
         &state.fetch_semaphore,
         &state.io_semaphore,
@@ -916,6 +919,8 @@ async fn run_credentials(
             }
         }
     }
+
+    crate::minecraft_skins::flush_pending_skin_change().await?;
 
     crate::launcher::launch_minecraft(
         &java_args,

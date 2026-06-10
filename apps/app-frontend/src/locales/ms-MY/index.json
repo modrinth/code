@@ -143,6 +143,9 @@
   "app.browse.server.installing": {
     "message": "Sedang memasang"
   },
+  "app.content-install.no-compatible-versions": {
+    "message": "Tiada versi tersedia yang sepadan dengan {compatibilityLabel}. Pilih versi untuk dipasang juga. Kebergantungan tidak akan dipasang secara automatik."
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },
@@ -272,9 +275,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "Pasang"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# mod}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pek mod yang diperlukan"
   },
@@ -303,7 +303,7 @@
     "message": "Projek ini sudah dipasang"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Kembali melayar"
+    "message": "Kembali menemukan"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Pasang kandungan ke dalam pemasangan"
@@ -332,8 +332,110 @@
   "app.settings.tabs.resource-management": {
     "message": "Pengurusan sumber"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} sudah bersedia untuk dipasang! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
+  "app.skins.add-button": {
+    "message": "Tambah kekulit"
+  },
+  "app.skins.apply-button": {
+    "message": "Terapkan"
+  },
+  "app.skins.delete-button": {
+    "message": "Padam kekulit"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Ini akan memadamkan kekulit yang dipilih selama-lamanya. Tindakan ini tidak boleh dibuat asal."
+  },
+  "app.skins.edit-button": {
+    "message": "Sunting kekulit"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Tambah kekulit"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Gaya lengan"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Kurus"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Lebar"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Mantel"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Mantel"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Menyunting kekulit"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Tiada mantel"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Tiada"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Simpan kekulit"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Sedang menyimpan..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Tekstur"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Sunting kekulit"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Sedang pralihat"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Anda terlalu kerap menukar kekulit anda. Pelayan Mojang telah menyekat permintaan selanjutnya buat sementara waktu. Sila tunggu sebentar sebelum mencuba lagi."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Perlahanlah sikit!"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Anda menerima kekulit ini kerana menderma kepada acara pengumpulan dana Modrinth Pride semasa Pride Month."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Kekulit yang disimpan"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Daftar Masuk"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Sila daftar masuk ke akaun Minecraft anda untuk menggunakan ciri pengurusan kekulit milik Modrinth App."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Bot Modrinth yang Teruja"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Sila daftar masuk"
+  },
+  "app.skins.title": {
+    "message": "Pemilih kekulit"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} sudah selesai dimuat turun! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
@@ -365,15 +467,6 @@
   "app.update.complete-toast.title": {
     "message": "Versi {version} telah berjaya dipasang!"
   },
-  "app.update.download-update": {
-    "message": "Muat turun kemas kini"
-  },
-  "app.update.downloading-update": {
-    "message": "Sedang memuat turun kemas kini ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Muat semula untuk memasang kemas kini"
-  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -394,9 +487,6 @@
   },
   "friends.action.add-friend": {
     "message": "Tambah rakan"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, other {permintaan}} rakan"
   },
   "friends.add-friend.submit": {
     "message": "Hantar permintaan rakan"
@@ -611,6 +701,24 @@
   "instance.settings.tabs.java": {
     "message": "Java dan ingatan"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Pembolehubah persekitaran tersuai"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumen Java tersuai"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Pemasangan Java tersuai"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Peruntukan ingatan tersuai"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Masukkan pembolehubah persekitaran..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Masukkan argumen Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Pembolehubah persekitaran"
   },
@@ -625,6 +733,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Ingatan yang diperuntukkan"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/laluan/ke/java"
   },
   "instance.settings.tabs.window": {
     "message": "Tetingkap"

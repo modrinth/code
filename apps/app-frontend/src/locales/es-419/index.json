@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "Selecciona una opción"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Muestra cuánto tiempo has estado jugando en una instancia."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Mostrar tiempo de juego"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Permite mostrar u ocultar la barra lateral."
   },
@@ -104,6 +110,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede acceder a los servidores de autenticación"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "Añadiendo servidor a instancia"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Añadir a una instancia"
+  },
   "app.browse.add-to-instance": {
     "message": "Añadir a instancia"
   },
@@ -115,6 +127,9 @@
   },
   "app.browse.already-added": {
     "message": "Ya se ha añadido"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Volver a instancia"
   },
   "app.browse.discover-content": {
     "message": "Descubrir contenido"
@@ -128,8 +143,14 @@
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
+  "app.browse.server-instance-content-warning": {
+    "message": "Añadir contenido puede romper la compatibilidad cuando te unes al servidor. Cualquier contenido añadido tambien se perderá cuando actualizes el contenido en la instancia del servidor."
+  },
   "app.browse.server.installing": {
     "message": "Instalando"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "No hay versiones disponibles que coincidan con {compatibilityLabel}. Selecciona una versión para instalarla de todas formas. Las dependencias no se instalarán automáticamente."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -212,9 +233,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Explorar servidores"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "\"{name}\" se **eliminará permanentemente** y no habrá forma de recuperarlo."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "¿Estás seguro de que quieres eliminar este mundo de forma permanente?"
   },
@@ -235,12 +253,6 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "No hay servidores ni mundos añadidos"
-  },
-  "app.instance.worlds.remove-server-description": {
-    "message": "\"{name}\" se eliminará de tu lista, también dentro del juego, y no podrás recuperarlo."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "\"{name}\" ({address}) se eliminará de tu lista, también dentro del juego, y no podrás recuperarlo."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "¿Estás seguro de que quieres eliminar {name}?"
@@ -287,6 +299,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Se requiere una actualización para jugar {name}. Por favor, actualiza a la versión más reciente para iniciar el juego."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Este proyecto ya está instalado"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Volver a descubrir contenido"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Instalar contenido a la instancia"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
   },
@@ -311,8 +332,146 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
   },
-  "app.update-popup.body": {
-    "message": "¡Modrinth App v{version} está lista para instalarse! Actualiza ahora o automáticamente al cerrar la Modrinth App."
+  "app.skins.add-button": {
+    "message": "Añadir skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Arrastrar y soltar"
+  },
+  "app.skins.apply-button": {
+    "message": "Aplicar"
+  },
+  "app.skins.delete-button": {
+    "message": "Eliminar skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Esto eliminará permanentemente el skin seleccionado. Esta acción no se puede deshacer."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "¿Estás seguro de que quieres eliminar este skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Error al leer el archivo arrastrado."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Error al procesar el archivo"
+  },
+  "app.skins.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Añadir skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Añadiendo un skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Estilo de brazo"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Delgado"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Ancho"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Capa"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Capa"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Editando skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "¡Primero edita el skin!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Sin capa"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Ninguna"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Remplazar textura"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Guardar skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Guardando..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textura"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "¡Primero carga un skin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Previsualizando"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Estás cambiando tu skin muy frecuentemente. Los servidores de Mojang han bloqueado temporalmente las solicitdues futuras. Por favor, espera un momento antes de volver a intentarlo."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "¡Más despacio!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Constructores y Biomas"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Persigue los Cielos"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Skins predeterminadas"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Orgullo Modrinth"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Has recibido estas skins por donar a la fundación Orgullo Modrinth durante el Mes del Orgullo."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Monturas del Caos"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Skins guardados"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "La Era del Cobre"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "El Jardín Despierta"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Bebés al Poder"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Iniciar sesión"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Por favor, inicia sesión en tu cuenta de Minecraft para poder utilizar las funciones de gestión de skins de la Modrinth App."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Modrinth Bot emocionado"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Por favor, inicia sesión"
+  },
+  "app.skins.title": {
+    "message": "Selector de skin"
   },
   "app.update-popup.body.download-complete": {
     "message": "La descarga de la Modrinth App v{version} ha finalizado. Actualiza ahora o automáticamente al cerrar la Modrinth App."
@@ -343,15 +502,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "¡La versión {version} se ha instalado correctamente!"
-  },
-  "app.update.download-update": {
-    "message": "Descargar actualización"
-  },
-  "app.update.downloading-update": {
-    "message": "Descargando actualización ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Recarga para instalar la actualización"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "ejemplo.modrinth.gg"
@@ -590,6 +740,24 @@
   "instance.settings.tabs.java": {
     "message": "Java y memoria"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variables de entorno personalizadas"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumentos personalizados de Java"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Instalación personalizada de Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Asignación de memoria personalizada"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Introduce las variables de entorno..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Introduce los argumentos de Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variables de entorno"
   },
@@ -604,6 +772,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memoria asignada"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/ruta/de/java"
   },
   "instance.settings.tabs.window": {
     "message": "Ventana"

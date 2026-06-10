@@ -8,6 +8,69 @@
   "admin.billing.error.not-found": {
     "message": "Uživatel nebyl nalezen"
   },
+  "analytics.action.add": {
+    "message": "Přidat"
+  },
+  "analytics.action.cancel": {
+    "message": "Zrušit"
+  },
+  "analytics.action.refresh": {
+    "message": "Obnovit"
+  },
+  "analytics.action.reset": {
+    "message": "Obnovit"
+  },
+  "analytics.breakdown.country": {
+    "message": "Země"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Důvod stažení"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Zdroj stažení"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Verze hry"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Rozpis"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Načítač"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetizace"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projekt"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Stav projektu"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Verze projektu"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Rozpis {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Ukázat vše"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Zobrazit limitovaný"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Zobrazit top 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktivní"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Anotace"
+  },
   "app-marketing.download.description": {
     "message": "Naše aplikace je dostupná pro všechny počítačové platformy, vyberte si požadovanou verzi."
   },
@@ -37,6 +100,9 @@
   },
   "app-marketing.download.options-title": {
     "message": "Stahovácí možnosti"
+  },
+  "app-marketing.download.terms": {
+    "message": "Stažením aplikace Modrinth vyjadřujete souhlas s našimi <terms-link>Podmínkami</terms-link> a <privacy-link>Zásadami ochrany osobních údajů</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Stáhnout Modrinth App (Beta)"
@@ -104,6 +170,9 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
+  "app-marketing.features.performance.description": {
+    "message": "Aplikace Modrinth je výkonnější než mnoho předních  správců modů a využívá pouze 150MB paměti RAM!"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -115,9 +184,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -398,11 +464,50 @@
   "collection.title": {
     "message": "{name} - Kolekce"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Přidat soukromou poznámku"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Uzavřít vlákno"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Uzavřít s odpovědí"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Zamítnout"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Zamítnout s odpovědí"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Znovuotevřít vlákno"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Odpovědět"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Odpovědět vláknu"
+  },
+  "conversation-thread.action.send": {
+    "message": "Odeslat"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Odeslat ke kontrole"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Odeslat ke kontrole s odpovědí"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Odpovědět vláknu..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Odeslat zprávu..."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Odpovědět vláknu"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Doplňkové soubory slouží jako podpůrné materiály (např. zdrojový kód), ne jako alternativní verze či varianty."
-  },
-  "create.collection.collection-info": {
-    "message": "Tvá nová kolekce bude vytvořena jako veřejná a bude obsahovat {count, plural, =0 {žádné projekty} one {# projekt} few {# projekty} other {# projektů}}."
   },
   "create.collection.create-collection": {
     "message": "Vytvořit kolekci"
@@ -494,6 +599,9 @@
   "create.project.name-placeholder": {
     "message": "Zadejte název projektu..."
   },
+  "create.project.owner-label": {
+    "message": "Vlastník"
+  },
   "create.project.summary-description": {
     "message": "Popiště vaši organizace dvěma nebo jednou větou."
   },
@@ -545,8 +653,17 @@
   "dashboard.affiliate-links.revoke-confirm.title": {
     "message": "Jste si jistý, že chcete zrušit svůj affiliate odkaz „{title}“?"
   },
+  "dashboard.analytics.total-downloads": {
+    "message": "Celková stažení"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Celkoví sledující"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
+  },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Vytvořte svou první kolekci a začněte!"
   },
   "dashboard.collections.label.projects-count": {
     "message": "{count} {countPlural, plural, one {project} other {projects}}"
@@ -556,6 +673,15 @@
   },
   "dashboard.collections.long-title": {
     "message": "Vaše kolekce"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Jméno (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Nedávno vytvořeno"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Nedávno aktualizováno"
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Hotovo! 🎉"
@@ -572,8 +698,17 @@
   "dashboard.creator-withdraw-modal.details-label": {
     "message": "Detaily"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Množství"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Poplatek"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Hodnota dárkové karty"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Ekvivalent americkému dolaru"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Zvolte vaši zemi"
@@ -623,8 +758,17 @@
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": ""
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Zadejte množství"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Platební metoda"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Odměna"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Vyberte odměnu"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Odměny"
@@ -635,8 +779,56 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Vyčerpali jste svůj limit pro výběr <b>{withdrawLimit}</b>. Pro vyšší výběr musíte vyplnit daňový formulář."
   },
+  "dashboard.organizations.button.create": {
+    "message": "Vytvořit organizaci"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Vytvořte organizaci!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Nepodařilo se načíst organizace"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Označit vše jako přečtené"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Ukázat historii"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Historie"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Historie oznámení"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Načítání oznámení..."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projekty"
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord pozvánka"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Zadejte platnou URL"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Jméno"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Stav"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Jméno"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Stav"
+  },
   "dashboard.revenue.available-now": {
     "message": "K dispozici nyní"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Zůstatek"
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Odhadováno {date}"
@@ -647,8 +839,23 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Stáhnout jako CSV"
   },
+  "dashboard.sidebar.label.creators": {
+    "message": "Tvůrci"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Oznámení"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizace"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projekty"
+  },
   "dashboard.withdraw.completion.account": {
     "message": "Účet"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Množství"
   },
   "dashboard.withdraw.completion.date": {
     "message": "Datum"
@@ -656,8 +863,14 @@
   "dashboard.withdraw.completion.fee": {
     "message": "Poplatek"
   },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transakce"
+  },
   "dashboard.withdraw.completion.wallet": {
     "message": "Peněženka"
+  },
+  "discover.install.back-to-server": {
+    "message": "Zpět na server"
   },
   "error.collection.404.list_item.1": {
     "message": "Možná jste zadali URL adresu kolekce špatně."
@@ -748,6 +961,9 @@
   },
   "frog.title": {
     "message": "Žába"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Vlastní URL"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Monetizace"
@@ -1052,9 +1268,6 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Stáhněte si projekty od {username} na Modrinthu"
   },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> sledující projektu} few {<stat>{count}</stat> sledující projektu} other {<stat>{count}</stat> sledujících projektu}}"
-  },
   "profile.user-id": {
     "message": "ID uživatele: {id}"
   },
@@ -1198,12 +1411,6 @@
   },
   "project.settings.title": {
     "message": "Nastavení"
-  },
-  "project.stats.downloads-label": {
-    "message": "stažení{count, plural, one {} few {} many {} other {}}"
-  },
-  "project.stats.followers-label": {
-    "message": "sledující{count, plural, one {} few {} other{ch}}"
   },
   "project.versions.title": {
     "message": "Verze"

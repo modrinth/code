@@ -1,5 +1,11 @@
 - Use `ApiError` as the error type for API routes
-- Prefer `ApiError::Internal` and `ApiError::Request` over `ApiError::InvalidInput`
+- The return type of an HTTP route should not be `HttpResponse` if possible; always prefer more specific types
+  - Use `web::Json<T>` for JSON-encoded response
+  - Use `()` for no content
+- Prefer `ApiError` variants:
+  - `ApiError::Request` instead of `ApiError::InvalidInput`
+  - `ApiError::Auth` instead of `ApiError::CustomAuthentication`
+  - `ApiError::Internal` for database errors, 3rd party service errors, anything else internal
   - Use `eyre!` to construct a value for `Internal` and `Request` variants
 - Error messages (both for errors and exceptions) must be formatted as per the Rust API guidelines:
   - lowercase message
@@ -18,4 +24,5 @@
   - `Authorization: Bearer mra_user` for a regular user
   - `Modrinth-Admin: feedbeef` as admin key
 - If some steps require you to create a project/mod or version for testing, ask the user to go into the web frontend and manually create a project/version
+- When using `sqlx::query` etc. always use the macro form like `sqlx::query!` or `sqlx::query_scalar!` - never the plain function form. Avoid using `query_as!`.
 - DO NOT use `()` as an error type for operations, unless you have a very good reason. Either make a new error type, or use `eyre::Report`.

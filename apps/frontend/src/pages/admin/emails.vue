@@ -23,6 +23,10 @@ function copy(id: string) {
 	navigator.clipboard?.writeText(`/_internal/templates/email/${id}`).catch(() => {})
 }
 
+function uncachedPreviewUrl(id: string) {
+	return `/_internal/templates/email/${id}?preview=${Date.now()}`
+}
+
 const previewModal = ref<{ hide: () => void; show: () => void } | null>(null)
 const previewTemplate = ref<string | null>(null)
 const previewLoading = ref(false)
@@ -73,7 +77,7 @@ async function openPreview(id: string, event?: MouseEvent) {
 	variableValues.value = {}
 
 	try {
-		const response = await fetch(`/_internal/templates/email/${id}`)
+		const response = await fetch(uncachedPreviewUrl(id), { cache: 'no-store' })
 		previewHtml.value = await response.text()
 
 		if (!response.ok) {
@@ -103,7 +107,7 @@ function openPopupPreview(id: string, offset = 0) {
 	const left = window.screenX + (window.outerWidth - width) / 2 + ((offset * 28) % 320)
 	const top = window.screenY + (window.outerHeight - height) / 2 + ((offset * 28) % 320)
 	window.open(
-		`/_internal/templates/email/${id}`,
+		uncachedPreviewUrl(id),
 		`email-${id}`,
 		`popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no`,
 	)

@@ -5,6 +5,42 @@
   "app.action-bar.downloads": {
     "message": "التنزيلات"
   },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "إخفاء المزيد من الحالات قيد التشغيل"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "إنشاء نسخة أساسية"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "لا توجد نسخ قيد التشغيل"
+  },
+  "app.action-bar.offline": {
+    "message": "غير متصل"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "النسخة ألرئيسية"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "عرض المزيد من النسخ قيد التشغيل"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "إيقاف النسخة"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "عرض التحميلات الفعالة"
+  },
+  "app.action-bar.view-instance": {
+    "message": "عرض النسخة"
+  },
+  "app.action-bar.view-logs": {
+    "message": "عرض التسجيل"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "صفحة الرئيسية"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "مكتبة"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "قد تكون خوادم مصادقة ماينكرافت معطلة حاليًا. تحقق من اتصالك بالإنترنت وحاول مرة أخرى لاحقًا."
   },
@@ -200,9 +236,6 @@
   "app.settings.tabs.resource-management": {
     "message": "إدارة الموارد"
   },
-  "app.update-popup.body": {
-    "message": "تطبيق Modrinth v{version} جاهز للتثبيت! أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
-  },
   "app.update-popup.body.download-complete": {
     "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
   },
@@ -232,15 +265,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "تم تثبيت الإصدار {version} بنجاح!"
-  },
-  "app.update.download-update": {
-    "message": "تنزيل التحديث"
-  },
-  "app.update.downloading-update": {
-    "message": "جار تنزيل التحديث ({percent}٪)"
-  },
-  "app.update.reload-to-update": {
-    "message": "أعد التحميل لتثبيت التحديث"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "مثال.مودرنث.جج"
@@ -566,6 +590,15 @@
   "instance.worlds.world_in_use": {
     "message": "العالم قيد الاستخدام"
   },
+  "minecraft-account.add-account": {
+    "message": "إضافة حساب"
+  },
+  "minecraft-account.select-account": {
+    "message": "اختيار الحساب"
+  },
+  "minecraft-account.sign-in": {
+    "message": "سجل دخولك لـ ماينكرافت"
+  },
   "search.filter.locked.instance": {
     "message": "مقدَّم من النسخة"
   },
@@ -589,5 +622,8 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "يتم توفير المحمّل من قبل الخادم"
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "لا تعرض هذا التحذير مجددا"
   }
 }

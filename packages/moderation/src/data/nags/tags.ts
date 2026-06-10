@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { defineMessage, useVIntl } from '@modrinth/ui'
+import { defineMessage, formatCategory, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -44,7 +44,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.settings.tags.title',
 				defaultMessage: 'Visit tag settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -84,7 +84,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -123,7 +123,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -150,10 +150,7 @@ export const tagsNags: Nag[] = [
 				}),
 				{
 					count: resolutionTags.length,
-					tags: sortedTags
-						.join(', ')
-						.replace('8x-', '8x or lower')
-						.replace('512x+', '512x or higher'),
+					tags: sortedTags.map((tag) => formatCategory(formatMessage, tag)).join(', '),
 				},
 			)
 		},
@@ -172,7 +169,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 	{
@@ -219,7 +216,7 @@ export const tagsNags: Nag[] = [
 				id: 'nags.edit-tags.title',
 				defaultMessage: 'Edit tags',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-tags',
 		},
 	},
 ]

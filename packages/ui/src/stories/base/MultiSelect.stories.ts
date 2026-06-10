@@ -1,4 +1,4 @@
-import { CheckIcon } from '@modrinth/assets'
+import { BoxIcon, CheckIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, ref } from 'vue'
 
@@ -43,6 +43,29 @@ export const Default: Story = {
 		modelValue: ['en', 'es', 'fr', 'zh-CN'],
 		placeholder: 'Select languages',
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Options render flush to the dropdown edges with full-width hover and selected states.',
+			},
+		},
+	},
+}
+
+export const DeselectFocusState: Story = {
+	args: {
+		...Default.args,
+		modelValue: ['en'],
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Mouse focus after deselecting an option should not keep the selected brightness state applied.',
+			},
+		},
+	},
 }
 
 export const WithSearch: Story = {
@@ -51,6 +74,56 @@ export const WithSearch: Story = {
 		searchable: true,
 		searchPlaceholder: 'Search versions',
 	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Searchable dropdowns avoid auto-focusing search on mobile so opening the menu does not summon the soft keyboard.',
+			},
+		},
+	},
+}
+
+export const WithOptionRightSlot: Story = {
+	args: {
+		options: [
+			{ value: 'sodium-1.21.5', label: '1.21.5', searchTerms: ['Sodium'] },
+			{ value: 'sodium-1.21.4', label: '1.21.4', searchTerms: ['Sodium'] },
+			{ value: 'iris-1.20.1', label: '1.20.1', searchTerms: ['Iris'] },
+			{ value: 'modmenu-1.19.2', label: '1.19.2', searchTerms: ['Mod Menu'] },
+		],
+		modelValue: ['sodium-1.21.5'],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+	},
+	render: (args) => ({
+		components: { BoxIcon, MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			const projectNames: Record<string, string> = {
+				'sodium-1.21.5': 'Sodium',
+				'sodium-1.21.4': 'Sodium',
+				'iris-1.20.1': 'Iris',
+				'modmenu-1.19.2': 'Mod Menu',
+			}
+			return { args, projectNames, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #option-right="{ item }">
+						<span
+							v-tooltip="projectNames[item.value]"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
 }
 
 export const WithSelectAll: Story = {
@@ -62,12 +135,72 @@ export const WithSelectAll: Story = {
 	},
 }
 
-export const WithSelectionActions: Story = {
+export const SingleOptionWithSelectAll: Story = {
+	args: {
+		options: [{ value: 'sodium', label: 'Sodium' }],
+		modelValue: [],
+		placeholder: 'Select projects',
+		searchable: true,
+		includeSelectAllOption: true,
+		searchPlaceholder: 'Search projects',
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'Select all is hidden when there is only one enabled option.',
+			},
+		},
+	},
+}
+
+export const WithRightCheckbox: Story = {
 	args: {
 		...Default.args,
 		searchable: true,
+		includeSelectAllOption: true,
+		checkboxPosition: 'right',
+		searchPlaceholder: 'Search languages',
+	},
+}
+
+export const WithSelectionActions: Story = {
+	args: {
+		...Default.args,
+		modelValue: [],
+		searchable: true,
 		showSelectionActions: true,
 		searchPlaceholder: 'Search versions',
+		maxHeight: 180,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Selection actions stay above the scrollable options and compensate the scroll position when they appear.',
+			},
+		},
+	},
+}
+
+export const WithSections: Story = {
+	args: {
+		options: [
+			{ value: 'iris', label: 'Iris' },
+			{ value: 'sodium', label: 'Sodium' },
+			{ type: 'section-header', label: 'Single project group' },
+			{ value: 'lithium', label: 'Lithium', searchTerms: ['Single project group'] },
+			{ type: 'section-header', label: 'LambdAurora' },
+			{ value: 'lambda-better-grass', label: 'LambdaBetterGrass', searchTerms: ['LambdAurora'] },
+			{ value: 'auroras-decorations', label: "Aurora's Decorations", searchTerms: ['LambdAurora'] },
+			{ type: 'section-header', label: 'Terraformers' },
+			{ value: 'modmenu', label: 'Mod Menu', searchTerms: ['Terraformers'] },
+			{ value: 'terraform-api', label: 'Terraform API', searchTerms: ['Terraformers'] },
+		],
+		modelValue: ['iris', 'modmenu'],
+		placeholder: 'Select projects',
+		searchable: true,
+		showSelectionActions: true,
+		searchPlaceholder: 'Search projects',
 	},
 }
 
@@ -249,6 +382,50 @@ export const WithBottomSlot: Story = {
 	}),
 }
 
+export const VirtualizedLargeList: Story = {
+	args: {
+		options: Array.from({ length: 250 }, (_, index) => {
+			const version = `1.${Math.floor(index / 10) + 1}.${index % 10}`
+			return {
+				value: `version-${index + 1}`,
+				label: version,
+				searchTerms: [`Project ${Math.floor(index / 25) + 1}`],
+			}
+		}),
+		modelValue: ['version-3', 'version-47', 'version-132'],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+		showSelectionActions: true,
+		maxHeight: 320,
+	},
+	render: (args) => ({
+		components: { BoxIcon, MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			function getProjectName(value: string) {
+				const optionIndex = Number(value.replace('version-', '')) - 1
+				return `Project ${Math.floor(optionIndex / 25) + 1}`
+			}
+			return { args, getProjectName, selected }
+		},
+		template: /*html*/ `
+			<div style="width: 400px;">
+				<MultiSelect v-bind="args" v-model="selected">
+					<template #option-right="{ item }">
+						<span
+							v-tooltip="getProjectName(item.value)"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<BoxIcon class="size-6" />
+						</span>
+					</template>
+				</MultiSelect>
+			</div>
+		`,
+	}),
+}
+
 export const NoOptions: Story = {
 	args: {
 		...Default.args,
@@ -263,5 +440,39 @@ export const Empty: Story = {
 	args: {
 		...Default.args,
 		modelValue: [],
+	},
+}
+
+export const ScrollRepositioning: Story = {
+	args: {
+		options: Array.from({ length: 16 }, (_, index) => ({
+			value: `version-${index + 1}`,
+			label: `Version ${index + 1}`,
+		})),
+		modelValue: [],
+		placeholder: 'Select versions',
+		searchable: true,
+		searchPlaceholder: 'Search versions',
+	},
+	render: (args) => ({
+		components: { MultiSelect },
+		setup() {
+			const selected = ref(args.modelValue)
+			return { args, selected }
+		},
+		template: /*html*/ `
+			<div style="min-height: 150vh; padding-top: 45vh;">
+				<div style="width: min(100%, 22rem);">
+					<MultiSelect v-bind="args" v-model="selected" />
+				</div>
+			</div>
+		`,
+	}),
+	parameters: {
+		docs: {
+			description: {
+				story: 'Covers fixed dropdown repositioning while the page scrolls with the menu open.',
+			},
+		},
 	},
 }

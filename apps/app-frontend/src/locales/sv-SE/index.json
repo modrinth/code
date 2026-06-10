@@ -5,17 +5,92 @@
   "app.action-bar.downloads": {
     "message": "Nedladdningar"
   },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Göm fler pågående instanser"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Gör till primärinstans"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Ingen pågående instans"
+  },
   "app.action-bar.offline": {
     "message": "Offline"
   },
+  "app.action-bar.primary-instance": {
+    "message": "Primärinstans"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Visa fler pågående instanser"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Avsluta instans"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Visa aktiva nedladdningar"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Visa instans"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Visa loggar"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Aktiverar avancerad rendering som till exempel oskärpa vilket kan leda till prestandaproblem utan hårdvaruaccelererad rendering."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Avancerad rendering"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Välj färgtema för Modrinth-appen."
+  },
   "app.appearance-settings.color-theme.title": {
     "message": "Färgtema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Ändrar sidan som launchern öppnas på."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Hem"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Bibliotek"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Standardlandingssida"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Inaktiverar namnskylten ovanför din spelare på utseende-sidan."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Dölj namnskylt"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimera programstartare"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Använd systemets fönsterram (omstart av app krävs)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Inbyggda fönsterdekorationer"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Välj ett alternativ"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Låter dig växla sidofältet."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Växla sidofält"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Lägg till i en instans"
   },
   "app.browse.add-to-instance": {
     "message": "Lägg till i instans"
@@ -29,17 +104,29 @@
   "app.browse.already-added": {
     "message": "Redan tillagd"
   },
+  "app.browse.back-to-instance": {
+    "message": "Tillbaka till instans"
+  },
   "app.browse.discover-content": {
     "message": "Upptäck innehåll"
   },
   "app.browse.discover-servers": {
     "message": "Upptäck servrar"
   },
+  "app.browse.hide-added-servers": {
+    "message": "Dölj servrar som redan är tillagda"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpaket"
   },
   "app.browse.server.installing": {
     "message": "Installerar"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Installerar modpaket..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."
@@ -49,6 +136,9 @@
   },
   "app.export-modal.header": {
     "message": "Exportera modpaket"
+  },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Inkludera \"{file}\"?"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Modpaketets namn"
@@ -209,8 +299,59 @@
   "app.settings.tabs.resource-management": {
     "message": "Resurshantering"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} är redo att laddas ner! Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
+  "app.skins.add-button": {
+    "message": "Lägg till utseende"
+  },
+  "app.skins.delete-button": {
+    "message": "Ta bort utseende"
+  },
+  "app.skins.edit-button": {
+    "message": "Redigera utseende"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Lägg till utseende"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Lägga till ett utseende"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Arm stil"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Smal"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Bred"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Mantel"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Mantel"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Redigerar utseende"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Gör en ändring på utseendet först!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Ingen mantel"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Ingen"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Byt ut textur"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Spara utseende"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Sparar..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textur"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
@@ -241,15 +382,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} har installerats!"
-  },
-  "app.update.download-update": {
-    "message": "Ladda ner uppdatering"
-  },
-  "app.update.downloading-update": {
-    "message": "Laddar ner uppdatering ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Ladda om för att installera uppdatering"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -575,6 +707,24 @@
   "instance.worlds.world_in_use": {
     "message": "Värld används"
   },
+  "minecraft-account.add-account": {
+    "message": "Lägg till konto"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft konto"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Inte inloggad"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Ta bort konto"
+  },
+  "minecraft-account.select-account": {
+    "message": "Välj konto"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Logga in till Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Tillhandahållet av instansen"
   },
@@ -598,5 +748,8 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader tillhandahålls av servern"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Installera ändå"
   }
 }

@@ -44,6 +44,8 @@
 				:share-disabled="resolvedShareDisabled"
 				:sharing="isSharing"
 				:fullscreen="isFullscreen"
+				:clear-disabled="resolvedClearDisabled"
+				:clear-disabled-tooltip="resolvedClearDisabledTooltip"
 				:show-delete="showDelete"
 				:delete-disabled="resolvedDeleteDisabled"
 				:delete-disabled-tooltip="ctx.deleteDisabledTooltip"
@@ -59,6 +61,8 @@
 			class="min-h-0 flex-1"
 			:show-input="resolvedShowInput"
 			:disable-input="resolvedInputDisabled"
+			:disable-input-tooltip="resolvedInputDisabledTooltip"
+			:disabled-input-placeholder="resolvedInputDisabledPlaceholder"
 			:fullscreen="isFullscreen"
 			:empty-state-type="ctx.emptyStateType"
 			:loading="resolvedLoading"
@@ -217,6 +221,11 @@ const resolvedDisableInput = computed(() => {
 	return isRef(v) ? v.value : v
 })
 
+function unwrapMaybeRef<T>(value: T | { value: T } | undefined): T | undefined {
+	if (value === undefined) return undefined
+	return isRef(value) ? value.value : value
+}
+
 // needs historical log start/end flags on ws to be properly useful
 const resolvedLoading = computed(() => {
 	const v = ctx.loading
@@ -225,6 +234,14 @@ const resolvedLoading = computed(() => {
 })
 
 const resolvedInputDisabled = computed(() => resolvedDisableInput.value || resolvedLoading.value)
+
+const resolvedInputDisabledTooltip = computed(() =>
+	resolvedDisableInput.value ? unwrapMaybeRef(ctx.disableCommandInputTooltip) : undefined,
+)
+
+const resolvedInputDisabledPlaceholder = computed(() =>
+	resolvedInputDisabledTooltip.value ? 'Command input disabled' : 'Server is not running',
+)
 
 const resolvedShareDisabled = computed(() => {
 	const v = ctx.shareDisabled
@@ -239,6 +256,16 @@ const resolvedDeleteDisabled = computed(() => {
 	if (!v) return false
 	return isRef(v) ? v.value : v
 })
+
+const resolvedClearDisabled = computed(() => {
+	const v = ctx.clearDisabled
+	if (!v) return false
+	return isRef(v) ? v.value : v
+})
+
+const resolvedClearDisabledTooltip = computed(() =>
+	resolvedClearDisabled.value ? unwrapMaybeRef(ctx.clearDisabledTooltip) : undefined,
+)
 
 function handleTerminalReady(_terminal: Terminal) {
 	rewriteFiltered()
@@ -360,10 +387,12 @@ watch(resolvedLoading, (loading) => {
 })
 
 function handleCommand(cmd: string) {
+	if (resolvedInputDisabled.value) return
 	ctx.sendCommand?.(cmd)
 }
 
 function handleClear() {
+	if (resolvedClearDisabled.value) return
 	const term = terminalRef.value?.terminal
 	if (term) clearSearchHighlights(term)
 	terminalRef.value?.reset()
@@ -428,5 +457,15 @@ async function handleShare() {
 .modrinth-console-fullscreen-active iframe[name='intercom-launcher-frame'],
 .modrinth-console-fullscreen-active iframe[name='intercom-messenger-frame'] {
 	z-index: 14 !important;
+}
+
+.modrinth-console-fullscreen-active .loading-indicator-container,
+.modrinth-console-fullscreen-active .app-contents::before {
+	z-index: 14 !important;
+}
+
+.modrinth-console-fullscreen-active .app-grid-navbar,
+.modrinth-console-fullscreen-active .app-grid-statusbar {
+	z-index: 0 !important;
 }
 </style>

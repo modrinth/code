@@ -122,9 +122,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ מגה-בייט"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ מגה-בייט"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "פחות מ-150 מגה-בייט"
   },
@@ -1034,9 +1031,6 @@
   "error.generic.default.list_item.1": {
     "message": "בדוק אם Modrinth אינו זמין ב<status-link>דף הסטטוס</status-link> שלנו."
   },
-  "error.generic.default.list_item.2": {
-    "message": "אם זה ממשיך לקרות, אנא ידע/י את צוות Modrinth דרך <discord-server>שרת הדיסקורד</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "נסו שוב בעוד מספר דקות."
   },
@@ -1100,9 +1094,6 @@
   "frog.title": {
     "message": "צפרדע"
   },
-  "hosting-marketing.available-locations": {
-    "message": "זמין בצפון אמריקה, אירופה ודרום-מזרח אסיה לכיסוי נרחב."
-  },
   "hosting-marketing.billing.monthly": {
     "message": "תשלום חודשי"
   },
@@ -1162,9 +1153,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "היכן ממוקמים שרתי האחסון של Modrinth? האם ניתן לבחור אזור?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "כרגע זמינים עבורכם שרתים בצפון אמריקה, אירופה ודרום-מזרח אסיה, אותם ניתן לבחור בעמד הרכישה. אזורים נוספים יתווספו בעתיד! אם תרצו להחליף את האזור שלכם, אנא צרו קשר עם התמיכה."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "באילו גרסאות של מיינקראפט ובאילו Loaders ניתן להשתמש?"
@@ -1498,9 +1486,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "שגיאה ביצירת נתונים מהAPI במהלך הבנייה."
-  },
-  "layout.banner.preview.description": {
-    "message": "אם התכוונת לגשת לאתר הרשמי של Modrinth, בקר בכתובת <link>https://modrinth.com</link>. פריסת תצוגה מקדימה זו משמשת את צוות Modrinth למטרות בדיקה בלבד. היא נבנתה באמצעות <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "זוהי פריסת תצוגה מקדימה של אתר Modrinth."
@@ -2234,12 +2219,6 @@
   "project.settings.visit-dashboard": {
     "message": "ללוח הבקרה של הפרויקטים"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {הורדה} other {הורדות}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {עוקב} other {עוקבים}}"
-  },
   "project.status.archived.message": {
     "message": "הפרויקט {title} הועבר לארכיון. {title} לא יקבל עדכונים נוספים, אלא אם המחבר יחליט להוציא את הפרויקט מהארכיון."
   },
@@ -2249,23 +2228,11 @@
   "report.already-reported": {
     "message": "כבר דיווחת {title}"
   },
-  "report.already-reported-description": {
-    "message": "כבר קיים דיווח פתוח עבור ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}} הזה. אפשר להוסיף פרטים נוספים לדיווח אם יש לך מידע נוסף לשתף."
-  },
-  "report.back-to-item": {
-    "message": "חזרה ל{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}"
-  },
   "report.body.description": {
     "message": "מומלץ להוסיף קישורים ותמונות אם הם רלוונטיים. דיווחים ריקים או חסרים ייסגרו ללא טיפול."
   },
   "report.body.title": {
     "message": "נשמח לקבל פרטים נוספים על הדיווח שלך"
-  },
-  "report.checking": {
-    "message": "בודק את ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}..."
-  },
-  "report.could-not-find": {
-    "message": "לא נמצא {item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}"
   },
   "report.for.violation": {
     "message": "הפרה של <rules-link>חוקי Modrinth</rules-link> או <terms-link>תנאי השימוש</terms-link>"
@@ -2306,14 +2273,8 @@
   "report.please-report": {
     "message": "נא לדווח על:"
   },
-  "report.question.content-id": {
-    "message": "מהו ה-ID של ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}}?"
-  },
   "report.question.content-type": {
     "message": "מהו סוג התוכן שברצונך לדווח עליו?"
-  },
-  "report.question.report-reason": {
-    "message": "על איזה מחוקי Modrinth עובר ה{item, select, project {פרויקט} version {גרסה} user {משתמש} other {תוכן}} הזה?"
   },
   "report.report-content": {
     "message": "דיווח על תוכן למנהלים"

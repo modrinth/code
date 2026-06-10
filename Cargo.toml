@@ -64,6 +64,8 @@ clickhouse = "0.14.0"
 color-eyre = "0.6.5"
 color-thief = "0.2.2"
 const_format = "0.2.34"
+core-foundation = "0.10.1"
+core-graphics = "0.24.0"
 daedalus = { path = "packages/daedalus" }
 darling = { version = "0.23" }
 dashmap = "6.1.0"
@@ -77,13 +79,13 @@ dotenv-build = "0.1.1"
 dotenvy = "0.15.7"
 dunce = "1.0.5"
 either = "1.15.0"
-elasticsearch = "9.1.0-alpha.1"
 encoding_rs = "0.8.35"
 enumset = "1.1.10"
 eyre = "0.6.12"
 flate2 = "1.1.4"
 fs4 = { version = "0.13.1", default-features = false }
 futures = "0.3.31"
+futures-lite = "2.6.1"
 futures-util = "0.3.31"
 heck = "0.5.0"
 hex = "0.4.3"
@@ -124,6 +126,7 @@ murmur2 = "0.1.0"
 native-dialog = "0.9.2"
 notify = { version = "8.2.0", default-features = false }
 notify-debouncer-mini = { version = "0.7.0", default-features = false }
+objc2-app-kit = { version = "0.3.2", default-features = false }
 p256 = "0.13.2"
 parking_lot = "0.12.5"
 paste = "1.0.15"
@@ -189,7 +192,7 @@ tauri-plugin-http = "2.5.7"
 tauri-plugin-opener = "2.5.0"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-single-instance = "2.3.4"
-tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
+tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "0d30f2aa28ec668ce187d527da1c475da3c01cbc", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }

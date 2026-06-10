@@ -1,12 +1,12 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Se requiere una descripción que explique claramente el propósito y la función del proyecto."
+    "defaultMessage": "Se requiere una descripción que describa claramente el propósito y la función del proyecto."
   },
   "nags.add-description.title": {
     "defaultMessage": "Añadir una descripción"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Añadir un icono único, relevante y atractivo hace que tu proyecto sea identificable y ayuda a que destaque."
+    "defaultMessage": "Añadir un icono único, relevante y atractivo hace que tu proyecto sea identificable y lo ayuda a destacar."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Añadir un icono"
@@ -30,7 +30,7 @@
     "defaultMessage": "Añadir enlaces externos"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Has seleccionado todas las {totalAvailableTags, plural, one {# etiqueta disponible} other {# etiquetas disponibles}}. Esto anula el propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
+    "defaultMessage": "Has seleccionado {totalAvailableTags, plural, one {la única etiqueta disponible} other {todas las # etiquetas disponibles}}. Esto anula el propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
@@ -66,7 +66,7 @@
     "defaultMessage": "Visitar la página de la galería"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Tu {type, select, mod {mod} plugin {plugin} other {proyecto}} utiliza una licencia que requiere que el código fuente esté de libre acceso. Por favor, proporciona un enlace al código fuente o un archivo(s) para cada versión adicional, o considera usar una licencia diferente."
+    "defaultMessage": "Tu {type} utiliza una licencia que requiere que el código fuente esté disponible. Proporciona un enlace al código fuente o un archivo de fuentes para cada versión adicional, o considera la posibilidad de utilizar una licencia diferente."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Proporcionar el código fuente"
@@ -75,7 +75,7 @@
     "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado"
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Enlaces idénticos"
+    "defaultMessage": "Limpiar links idénticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Tu Descripción debe contener suficiente texto sin formato o texto alternativo para imágenes, de modo que sea accesible para quienes utilizan lectores de pantalla o tienen conexiones lentas a Internet."
@@ -159,7 +159,7 @@
     "defaultMessage": "Selecciona un idioma"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selecciona la licencia bajo la que se distribuye tu {type, select, mod {mod} modpack {modpack} resourcepack {datapack} shader {shader} plugin {plugin} datapack {paquete de datos} other {proyecto}}."
+    "defaultMessage": "Seleccione la licencia bajo la cual se distribuye su {type}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Seleccionar una licencia"
@@ -225,7 +225,10 @@
     "defaultMessage": "Selecciona etiquetas precisas"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type, select, resourcepack {paquete de recursos, excepto para paquetes de audio o de traducción. Si esto describe tu paquete, selecciona la etiqueta correspondiente} shader {shader} other {proyecto}}."
+    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pack de recursos, excepto para audio o packs de localización. Si esto describe tu pack, por favor, seleccionar la etiqueta apropiada"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

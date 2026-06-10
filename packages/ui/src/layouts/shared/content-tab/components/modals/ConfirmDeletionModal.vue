@@ -1,21 +1,25 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header, { count, itemType })"
-		:fade="variant === 'server' ? 'warning' : 'danger'"
+		:header="
+			formatMessage(messages.header, {
+				itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
+			})
+		"
+		:fade="props.variant === 'server' ? 'warning' : 'danger'"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition
-				:type="variant === 'server' ? 'warning' : 'critical'"
+				:type="props.variant === 'server' ? 'warning' : 'critical'"
 				:header="formatMessage(messages.admonitionHeader)"
 			>
 				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				:backup-name="backupTip ? `Before deletion (${backupTip})` : 'Before deletion'"
+				:backup-name="props.backupTip ? `Before deletion (${props.backupTip})` : 'Before deletion'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -28,10 +32,19 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled :color="variant === 'server' ? 'orange' : 'red'">
-					<button :disabled="buttonsDisabled" @click="confirm">
+				<ButtonStyled :color="props.variant === 'server' ? 'orange' : 'red'">
+					<button
+						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+						:disabled="buttonsDisabled || props.actionDisabled"
+						@click="confirm"
+					>
 						<TrashIcon />
-						{{ formatMessage(messages.deleteButton, { count, itemType }) }}
+						{{
+							formatMessage(messages.deleteButton, {
+								count: visibleCount,
+								itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
+							})
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -47,7 +60,7 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
@@ -56,7 +69,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	header: {
 		id: 'content.confirm-deletion.header',
-		defaultMessage: 'Delete {itemType}{count, plural, one {} other {s}}',
+		defaultMessage: 'Delete {itemType}',
 	},
 	admonitionHeader: {
 		id: 'content.confirm-deletion.admonition-header',
@@ -69,20 +82,24 @@ const messages = defineMessages({
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
-		defaultMessage: 'Delete {count} {itemType}{count, plural, one {} other {s}}',
+		defaultMessage: 'Delete {count, number} {itemType}',
 	},
 })
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
 		variant?: 'instance' | 'server'
 		backupTip?: string
+		actionDisabled?: boolean
+		actionDisabledTooltip?: string
 	}>(),
 	{
 		variant: 'instance',
 		backupTip: undefined,
+		actionDisabled: false,
+		actionDisabledTooltip: undefined,
 	},
 )
 
@@ -93,12 +110,17 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
+const visibleCount = ref(props.count)
+const visibleItemType = ref(props.itemType)
 
 function show() {
+	visibleCount.value = props.count
+	visibleItemType.value = props.itemType
 	modal.value?.show()
 }
 
 function confirm() {
+	if (props.actionDisabled) return
 	modal.value?.hide()
 	emit('delete')
 }

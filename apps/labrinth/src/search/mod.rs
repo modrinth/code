@@ -52,8 +52,6 @@ pub struct SearchRequest {
     #[serde(default)]
     pub show_metadata: bool,
     #[serde(default)]
-    pub elasticsearch_config: backend::elasticsearch::RequestConfig,
-    #[serde(default)]
     pub typesense_config: backend::typesense::RequestConfig,
 
     pub new_filters: Option<String>,
@@ -71,8 +69,6 @@ impl From<SearchQuery> for SearchRequest {
             index: query.index,
             limit: query.limit,
             show_metadata: false,
-            elasticsearch_config:
-                backend::elasticsearch::RequestConfig::default(),
             typesense_config: backend::typesense::RequestConfig::default(),
             new_filters: query.new_filters,
             facets: query.facets,
@@ -178,8 +174,6 @@ pub enum TasksCancelFilter {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SearchBackendKind {
-    Meilisearch,
-    Elasticsearch,
     Typesense,
 }
 
@@ -201,6 +195,7 @@ pub enum SearchField {
     MinecraftJavaServerContentKind,
     MinecraftJavaServerContentSupportedGameVersions,
     MinecraftJavaServerPingData,
+    DependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -212,8 +207,6 @@ impl FromStr for SearchBackendKind {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
-            "meilisearch" => SearchBackendKind::Meilisearch,
-            "elasticsearch" => SearchBackendKind::Elasticsearch,
             "typesense" => SearchBackendKind::Typesense,
             _ => return Err(InvalidSearchBackendKind),
         })
@@ -256,6 +249,10 @@ pub struct UploadSearchProject {
     pub version_published_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
+    #[serde(default)]
+    pub dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -265,6 +262,14 @@ pub struct UploadSearchProject {
     pub components: exp::ProjectQuery,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SearchProjectDependency {
+    pub project_id: String,
+    pub name: String,
+    pub slug: Option<String>,
+    pub icon_url: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -303,6 +308,10 @@ pub struct ResultSearchProject {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+    #[serde(default)]
+    pub dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -340,6 +349,8 @@ impl From<UploadSearchProject> for ResultSearchProject {
             gallery: source.gallery,
             featured_gallery: source.featured_gallery,
             color: source.color,
+            dependency_project_ids: source.dependency_project_ids,
+            dependencies: source.dependencies,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,
             components: source.components,
@@ -351,13 +362,6 @@ impl From<UploadSearchProject> for ResultSearchProject {
 
 pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
     match ENV.SEARCH_BACKEND {
-        SearchBackendKind::Meilisearch => {
-            let config = backend::MeilisearchConfig::new(meta_namespace);
-            Box::new(backend::Meilisearch::new(config))
-        }
-        SearchBackendKind::Elasticsearch => {
-            Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
-        }
         SearchBackendKind::Typesense => {
             let config = backend::TypesenseConfig::new(meta_namespace);
             Box::new(backend::Typesense::new(config))

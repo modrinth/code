@@ -260,9 +260,6 @@
   "app.modal.install-to-play.install-button": {
     "message": "ติดตั้ง"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# ม็อด}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "มอดแพ็กที่จำเป็น"
   },
@@ -311,9 +308,6 @@
   "app.settings.tabs.resource-management": {
     "message": "การจัดการทรัพยากร"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth v{version} พร้อมสำหรับการติดตั้งแล้ว! เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Modrinth"
-  },
   "app.update-popup.body.download-complete": {
     "message": "ดาวน์โหลด Modrinth v{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Modrinth"
   },
@@ -344,15 +338,6 @@
   "app.update.complete-toast.title": {
     "message": "เวอร์ชั่น {version} ถูกติดตั้งแล้ว"
   },
-  "app.update.download-update": {
-    "message": "ดาวน์โหลดอัปเดต"
-  },
-  "app.update.downloading-update": {
-    "message": "ดาวน์โหลดอัปเดตไปแล้ว ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "รีโหลดเพื่อติดตั้งอัปเดต"
-  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -373,9 +358,6 @@
   },
   "friends.action.add-friend": {
     "message": "เพิ่มเพื่อน"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "คำขอเป็นเพื่อน {count} {count, plural, other {คน}}"
   },
   "friends.add-friend.submit": {
     "message": "ส่งคำขอเป็นเพื่อน"

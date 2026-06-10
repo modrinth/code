@@ -1,5 +1,5 @@
 <template>
-	<div class="flex gap-4 items-center">
+	<div class="flex gap-2 items-center">
 		<ButtonStyled
 			v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts"
 			color="brand"
@@ -14,6 +14,31 @@
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
 		</div>
+		<ButtonStyled color="brand" type="outlined" hover-color-fill="background">
+			<button
+				v-if="showUpdatePill"
+				type="button"
+				class="!h-[34px] overflow-hidden text-sm !transition-[width,opacity,transform,background-color,color,filter] !duration-200 ease-out"
+				:class="[
+					updatePillWidthClass,
+					{
+						'update-pill-ready-hidden': finishedDownloading && !animateReadyPill,
+						'update-pill-ready-visible': finishedDownloading && animateReadyPill,
+					},
+				]"
+				:disabled="isUpdateDownloading"
+				:aria-busy="isUpdateDownloading"
+				@click="handleUpdateClick"
+			>
+				<RefreshCwIcon v-if="finishedDownloading" :class="{ 'animate-spin': restarting }" />
+				<DownloadIcon v-else />
+				<span v-if="isUpdateDownloading">
+					{{ formatMessage(messages.downloadingUpdate) }}
+					<span class="inline-block w-[3ch] text-right tabular-nums">{{ downloadPercent }}%</span>
+				</span>
+				<span v-else>{{ updateLabel }}</span>
+			</button>
+		</ButtonStyled>
 		<div
 			class="flex border-solid border-surface-5 text-sm items-center gap-2 py-1.5 px-3 rounded-xl border"
 		>
@@ -119,6 +144,7 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	OnlineIndicatorIcon,
+	RefreshCwIcon,
 	StarIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
@@ -133,8 +159,9 @@ import {
 	type PopupNotificationProgressItem,
 	useVIntl,
 } from '@modrinth/ui'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { Dropdown } from 'floating-vue'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
@@ -144,6 +171,11 @@ import { get_many as getInstances } from '@/helpers/profile.js'
 import type { LoadingBar } from '@/helpers/state'
 import { progress_bars_list } from '@/helpers/state'
 import type { GameInstance } from '@/helpers/types'
+import {
+	appUpdateState,
+	downloadAvailableAppUpdate,
+	installAvailableAppUpdate,
+} from '@/providers/app-update'
 
 const { handleError } = injectNotificationManager()
 const popupNotificationManager = injectPopupNotificationManager()
@@ -208,7 +240,95 @@ const messages = defineMessages({
 		id: 'app.action-bar.view-active-downloads',
 		defaultMessage: 'View active downloads',
 	},
+	update: {
+		id: 'app.action-bar.update',
+		defaultMessage: 'Update',
+	},
+	downloadingUpdate: {
+		id: 'app.action-bar.downloading-update',
+		defaultMessage: 'Downloading update',
+	},
+	reloadToUpdate: {
+		id: 'app.action-bar.reload-to-update',
+		defaultMessage: 'Reload to update',
+	},
 })
+
+const {
+	downloading,
+	downloadPercent,
+	downloadProgress,
+	finishedDownloading,
+	isVisible: isUpdateVisible,
+	metered,
+	restarting,
+} = appUpdateState
+
+const isUpdateDownloading = computed(
+	() =>
+		downloading.value ||
+		(downloadProgress.value > 0 && downloadProgress.value < 1 && !finishedDownloading.value),
+)
+const showUpdatePill = computed(
+	() => isUpdateVisible.value && (finishedDownloading.value || metered.value),
+)
+const animateReadyPill = ref(false)
+const updateLabel = computed(() => {
+	if (isUpdateDownloading.value) {
+		return formatMessage(messages.downloadingUpdate)
+	}
+
+	if (finishedDownloading.value) {
+		return formatMessage(messages.reloadToUpdate)
+	}
+
+	return formatMessage(messages.update)
+})
+const updatePillWidthClass = computed(() => {
+	if (isUpdateDownloading.value) {
+		return 'w-[219px]'
+	}
+
+	if (finishedDownloading.value) {
+		return 'w-[166px]'
+	}
+
+	return '!w-[96px]'
+})
+let readyPillAnimationFrame: number | null = null
+watch([showUpdatePill, finishedDownloading], async ([show, ready], [wasShown, wasReady]) => {
+	if (readyPillAnimationFrame !== null) {
+		cancelAnimationFrame(readyPillAnimationFrame)
+		readyPillAnimationFrame = null
+	}
+
+	if (!show || !ready) {
+		animateReadyPill.value = false
+		return
+	}
+
+	if (wasShown && wasReady) {
+		return
+	}
+
+	animateReadyPill.value = false
+	await nextTick()
+	readyPillAnimationFrame = requestAnimationFrame(() => {
+		animateReadyPill.value = true
+		readyPillAnimationFrame = null
+	})
+})
+async function handleUpdateClick() {
+	if (isUpdateDownloading.value) {
+		return
+	}
+
+	if (finishedDownloading.value) {
+		await installAvailableAppUpdate()
+	} else {
+		await downloadAvailableAppUpdate()
+	}
+}
 
 const currentProcesses = ref<RunningProcess[]>([])
 const selectedProcess = ref<RunningProcess | undefined>()
@@ -284,6 +404,7 @@ function goToTerminal(path?: string) {
 }
 
 const currentLoadingBars = ref<LoadingBar[]>([])
+const currentLoadingBarIconUrls = ref<Record<string, string | null>>({})
 const notificationId = ref<string | number | null>(null)
 const dismissed = ref(false)
 
@@ -301,6 +422,16 @@ function getLoadingProgress(loadingBar: LoadingBar): number {
 function getLoadingText(loadingBar: LoadingBar): string {
 	const percent = Math.floor(getLoadingProgress(loadingBar) * 100)
 	return loadingBar.message ? `${percent}% ${loadingBar.message}` : `${percent}%`
+}
+
+function getDisplayIconUrl(icon: string | null | undefined): string | null {
+	if (!icon) {
+		return null
+	}
+	if (/^(https?:|data:|blob:|asset:|tauri:)/.test(icon)) {
+		return icon
+	}
+	return convertFileSrc(icon)
 }
 
 function getNotification(): PopupNotification | null {
@@ -326,6 +457,7 @@ function buildDownloadItems(): PopupNotificationProgressItem[] {
 		id: getLoadingBarKey(bar),
 		title: bar.title ?? '',
 		text: getLoadingText(bar),
+		iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
 		progress: getLoadingProgress(bar),
 		waiting: !bar.total || bar.total <= 0,
 	}))
@@ -400,6 +532,32 @@ async function refreshLoadingBars() {
 		.map(formatLoadingBars)
 		.filter((bar) => bar?.bar_type?.type !== 'launcher_update')
 
+	const profilePaths = Array.from(
+		new Set(
+			currentLoadingBars.value
+				.map((bar) => bar.bar_type?.profile_path)
+				.filter((path): path is string => !!path),
+		),
+	)
+	const profiles = profilePaths.length
+		? await getInstances(profilePaths).catch((error) => {
+				handleError(error)
+				return []
+			})
+		: []
+	const profileIconUrls = new Map(
+		profiles.map((profile) => [profile.path, getDisplayIconUrl(profile.icon_path)]),
+	)
+	currentLoadingBarIconUrls.value = Object.fromEntries(
+		currentLoadingBars.value.map((bar) => {
+			const barIconUrl = getDisplayIconUrl(bar.bar_type?.icon)
+			const profileIconUrl = bar.bar_type?.profile_path
+				? profileIconUrls.get(bar.bar_type.profile_path)
+				: null
+			return [getLoadingBarKey(bar), barIconUrl ?? profileIconUrl ?? null]
+		}),
+	)
+
 	currentLoadingBars.value.sort((a, b) => {
 		const aKey = `${a.loading_bar_uuid ?? a.id ?? ''}`
 		const bKey = `${b.loading_bar_uuid ?? b.id ?? ''}`
@@ -430,5 +588,20 @@ onBeforeUnmount(() => {
 	window.removeEventListener('online', handleOnline)
 	unlistenProcess()
 	unlistenLoading()
+	if (readyPillAnimationFrame !== null) {
+		cancelAnimationFrame(readyPillAnimationFrame)
+	}
 })
 </script>
+
+<style scoped>
+.update-pill-ready-hidden {
+	opacity: 0;
+	transform: scale(0.96);
+}
+
+.update-pill-ready-visible {
+	opacity: 1;
+	transform: scale(1);
+}
+</style>

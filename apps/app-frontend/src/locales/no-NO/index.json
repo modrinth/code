@@ -59,15 +59,6 @@
   "app.update.complete-toast.title": {
     "message": "Versjon {version} ble installert!"
   },
-  "app.update.download-update": {
-    "message": "Last ned oppdatering"
-  },
-  "app.update.downloading-update": {
-    "message": "Laster ned oppdatering ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Last inn på nytt for å installere oppdateringen"
-  },
   "friends.action.add-friend": {
     "message": "Legg til en venn"
   },

@@ -1,6 +1,6 @@
 {
   "app.action-bar.downloading-java": {
-    "message": "Baixando java {version}"
+    "message": "Baixando Java {version}"
   },
   "app.action-bar.downloads": {
     "message": "Downloads"
@@ -9,19 +9,19 @@
     "message": "Ocultar mais instâncias em execução"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Criar instância primária"
+    "message": "Tornar instância principal"
   },
   "app.action-bar.no-instances-running": {
     "message": "Nenhuma instância em execução"
   },
   "app.action-bar.offline": {
-    "message": "Offline"
+    "message": "Inativo"
   },
   "app.action-bar.primary-instance": {
-    "message": "Instância primária"
+    "message": "Instância principal"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "Mostrar mais instâncias em execução"
+    "message": "Exibir mais instâncias em execução"
   },
   "app.action-bar.stop-instance": {
     "message": "Parar instância"
@@ -33,10 +33,10 @@
     "message": "Ver instância"
   },
   "app.action-bar.view-logs": {
-    "message": "Ver logs"
+    "message": "Ver registros"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Ativa a renderização avançada, como efeitos de desfoque que podem causar problemas de desempenho sem a renderização acelerada de hardware."
+    "message": "Ativa a renderização avançada, como desfoque que talvez afete o desempenho sem renderização acelerada do hardware."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Renderização avançada"
@@ -45,10 +45,10 @@
     "message": "Selecione seu tema de cores preferido para o Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
-    "message": "Tema de Cores"
+    "message": "Tema de cores"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Alterar a página em que o launcher é aberto."
+    "message": "Altera a página que o launcher é aberto."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Início"
@@ -60,25 +60,25 @@
     "message": "Página inicial padrão"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Desativa o nome acima do seu jogador na página de skins."
+    "message": "Desativa o nametag acima do seu jogador na página de Skins."
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "Ocultar nome"
+    "message": "Ocultar nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Inclui mundos recentes na seção \"Voltar à ação\" na página inicial."
+    "message": "Inclui mundos recentes na seção \"Retomar\" na página inicial."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Volte aos mundos"
+    "message": "Retomar aos mundos"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimize o launcher quando um processo do Minecraft for iniciado."
+    "message": "Minimize o launcher assim que algum processo do Minecraft iniciar."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimizar launcher"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Usar molduras de janela do sistema (requer reiniciar o aplicativo)."
+    "message": "Usar molduras de janela do sistema (exige reinicialização do aplicativo)."
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Decorações nativas"
@@ -86,14 +86,20 @@
   "app.appearance-settings.select-option": {
     "message": "Selecione uma opção"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Exibe a quantidade de tempo jogado de uma instância."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Exibir tempo jogado"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Ativa a capacidade de alternar a visibilidade da barra lateral."
+    "message": "Permite alternar a barra lateral."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Alternar barra lateral"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Se você tentar instalar um arquivo Modrinth Pack (.mrpack) que não esteja hospedado no Modrinth, garantiremos que você entenda os riscos antes de instalá-lo."
+    "message": "Se você tentar instalar um arquivo Modrinth Pack (.mrpack) não hospedado no Modrinth, garantiremos que você entenda os riscos antes de instalá-lo."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Avise-me antes de instalar pacotes de mods desconhecidos"
@@ -123,13 +129,13 @@
     "message": "Já adicionado"
   },
   "app.browse.back-to-instance": {
-    "message": "Voltar a instância"
+    "message": "Voltar à instância"
   },
   "app.browse.discover-content": {
-    "message": "Descubra conteúdo"
+    "message": "Descobrir conteúdo"
   },
   "app.browse.discover-servers": {
-    "message": "Descubra servidores"
+    "message": "Descobrir servidores"
   },
   "app.browse.hide-added-servers": {
     "message": "Ocultar servidores já adicionados"
@@ -138,10 +144,13 @@
     "message": "Pacotes de mods"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Adicionar conteúdo pode quebrar a compatibilidade ao entrar no servidor. Qualquer conteúdo adicionado também será perdido ao atualizar o conteúdo da instância do servidor."
+    "message": "Adicionar conteúdo talvez quebre a compatibilidade ao entrar no servidor. Qualquer conteúdo adicionado será perdido ao atualizar o conteúdo da instância do servidor."
   },
   "app.browse.server.installing": {
     "message": "Instalando"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Nenhuma versão disponível corresponde a {compatibilityLabel}. Selecione uma versão para instalar mesmo assim. As dependências não serão instaladas automaticamente."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -168,7 +177,7 @@
     "message": "Nome do pacote de mods"
   },
   "app.export-modal.select-files-label": {
-    "message": "Configure quais arquivos serão incluídos nessa exportação"
+    "message": "Configure quais arquivos serão incluídos na exportação"
   },
   "app.export-modal.version-number-label": {
     "message": "Número da versão"
@@ -177,7 +186,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Todos os dados da sua instância serão permanentemente excluídos, incluindo seus mundos, configurações e todo o conteúdo instalado."
+    "message": "Todos os dados para sua instância serão excluídos permanentemente, incluindo seus mundos, configs e todo o conteúdo instalado."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Esta ação não pode ser desfeita"
@@ -189,7 +198,7 @@
     "message": "Excluir instância"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Este pacote de mods já está instalado na instância <bold>{instanceName}</bold>. Tem certeza de que deseja duplicá-lo?"
+    "message": "Este pacote de mods já foi instalado na instância <bold>{instanceName}</bold>. Deseja mesmo duplicá-lo?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Criar"
@@ -210,10 +219,10 @@
     "message": "{count} projetos foram adicionados"
   },
   "app.instance.mods.share-text": {
-    "message": "Confira os projetos que estou usando no meu pacote de mods!"
+    "message": "Dê uma olhada nos projetos que estou usando no meu pacote de mods!"
   },
   "app.instance.mods.share-title": {
-    "message": "Compartilhando conteúdo do pacote de mods\n\n\n    \t\t\t\t\t\t\n    \t\t\t\t\t\t\t\n    \t\t\t\t\t\t\n    \t\t\t\t\t\t"
+    "message": "Compartilhando conteúdo do pacote de mods"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Adicionado com sucesso"
@@ -225,19 +234,19 @@
     "message": "Explorar servidores"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' será excluído permanentemente, e não haverá como recuperá-lo."
+    "message": "'{name}' será **excluído permanentemente**, e não poderá ser recuperado."
   },
   "app.instance.worlds.delete-world-title": {
-    "message": "Tem certeza de que deseja excluir este mundo permanentemente?"
+    "message": "Deseja mesmo excluir este mundo permanentemente?"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Modificado"
   },
   "app.instance.worlds.filter-offline": {
-    "message": "Offline"
+    "message": "Inativo"
   },
   "app.instance.worlds.filter-online": {
-    "message": "Online"
+    "message": "Ativo"
   },
   "app.instance.worlds.filter-vanilla": {
     "message": "Jogo padrão"
@@ -249,13 +258,13 @@
     "message": "Nenhum servidor ou mundo adicionado"
   },
   "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' será removido da sua lista, inclusive no jogo, e não haverá como recuperá-lo."
+    "message": "'{name}' será removido da lista, inclusive no jogo, e não poderá ser recuperado."
   },
   "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) será removido da sua lista, inclusive no jogo, e não haverá como recuperá-lo."
+    "message": "'{name}' ({address}) será removido da lista, inclusive no jogo, e não poderá ser recuperado."
   },
   "app.instance.worlds.remove-server-title": {
-    "message": "Tem certeza de que deseja remover {name}?"
+    "message": "Deseja mesmo remover {name}?"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Buscar {count} mundos..."
@@ -272,14 +281,11 @@
   "app.modal.install-to-play.install-button": {
     "message": "Instalar"
   },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
-  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pacote de mods necessário"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requer mods para jogar. Clique em Instalar para configurar os arquivos necessários a partir do Modrinth, e iniciar diretamente no servidor."
+    "message": "Este servidor exige mods para jogar. Clique em instalar para configurar os arquivos necessários através do Modrinth, e então iniciar diretamente no servidor."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instância compartilhada"
@@ -288,7 +294,7 @@
     "message": "Instância de servidor compartilhada"
   },
   "app.modal.install-to-play.view-contents": {
-    "message": "Ver conteúdos"
+    "message": "Ver conteúdo"
   },
   "app.modal.update-to-play.header": {
     "message": "Atualize para jogar"
@@ -297,19 +303,19 @@
     "message": "Atualização necessária"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "É necessária uma atualização para jogar {name}. Atualize para a versão mais recente para iniciar o jogo."
+    "message": "Uma atualização é necessária para jogar {name}. Atualize para a versão mais recente para iniciar o jogo."
   },
   "app.project.install-button.already-installed": {
     "message": "Este projeto já foi instalado"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Voltar ao explorar"
+    "message": "Voltar a descobrir"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Instalar conteúdo para a instância"
   },
   "app.settings.developer-mode-enabled": {
-    "message": "Modo de desenvolvedor ativado."
+    "message": "Modo desenvolvedor ativado."
   },
   "app.settings.downloading": {
     "message": "Baixando v{version}"
@@ -332,8 +338,146 @@
   "app.settings.tabs.resource-management": {
     "message": "Gerenciamento de recursos"
   },
-  "app.update-popup.body": {
-    "message": "O Modrinth App v{version} está pronto para ser instalado! Você pode recarregar para atualizar agora ou a atualização será feita automaticamente ao fechar o Modrinth App."
+  "app.skins.add-button": {
+    "message": "Adicionar skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Arraste e solte"
+  },
+  "app.skins.apply-button": {
+    "message": "Aplicar"
+  },
+  "app.skins.delete-button": {
+    "message": "Excluir skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Isso excluirá permanentemente a skin. Esta ação não pode ser desfeita."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Deseja mesmo excluir esta skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Falha ao ler o arquivo solto."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Erro ao processar arquivo"
+  },
+  "app.skins.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Adicionar skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Adicionando uma skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Estilo do braço"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Fino"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Largo"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Capa"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Capas"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Editando a skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Primeiramente, faça uma edição na skin!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Sem capa"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Nenhum"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Substituir textura"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Salvar skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Salvando..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textura"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Primeiramente, envie uma skin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Prévia"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Você está mudando de skin muitas vezes. Os servidores da Mojang bloquearam temporariamente novas solicitações. Aguarde um momento antes de tentar novamente."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Mais lento!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Construtores & Biomas"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Skins padrões"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Você recebeu estas skins por doar para uma campanha de arrecadação do Modrinth Pride durante o Mês de Orgulho."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Skins salvas"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "A Era do Cobre"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Iniciar sessão"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Faça login na sua conta do Minecraft para usar os recursos de gerenciamento de skins do Modrinth app."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Modrinth Bot animado"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Por favor, inicie sessão"
+  },
+  "app.skins.title": {
+    "message": "Seletor de skins"
   },
   "app.update-popup.body.download-complete": {
     "message": "O Modrinth App v{version} foi baixado. Recarregue para atualizar agora ou a atualização será aplicada automaticamente ao fechar o Modrinth App."
@@ -342,7 +486,7 @@
     "message": "O Modrinth App v{version} está disponível. Use seu gerenciador de pacotes para atualizar e obter os recursos e correções mais recentes!"
   },
   "app.update-popup.body.metered": {
-    "message": "O Modrinth App v{version} já está disponível! Como você está em uma rede limitada, não o baixamos automaticamente."
+    "message": "O Modrinth App v{version} já está disponível! Já que sua rede é limitada, não a instalamos automaticamente."
   },
   "app.update-popup.changelog": {
     "message": "Mudanças"
@@ -351,7 +495,7 @@
     "message": "Baixar ({size})"
   },
   "app.update-popup.download-complete": {
-    "message": "Download concluído"
+    "message": "Instalação concluída"
   },
   "app.update-popup.reload": {
     "message": "Recarregar"
@@ -364,15 +508,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versão {version} instalada!"
-  },
-  "app.update.download-update": {
-    "message": "Baixar atualização"
-  },
-  "app.update.downloading-update": {
-    "message": "Baixando atualização ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Recarregue para instalar a atualização"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "exemplo.modrinth.gg"
@@ -387,25 +522,25 @@
     "message": "Ainda não jogado"
   },
   "app.world.world-item.offline": {
-    "message": "Offline"
+    "message": "Inativo"
   },
   "app.world.world-item.players-online": {
-    "message": "{count} online"
+    "message": "{count} ativo(s)"
   },
   "friends.action.add-friend": {
-    "message": "Adicionar um amigo"
+    "message": "Adicionar amigo"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count, plural, =0 {Nenhuma solicitação de amizade} one {{count} solicitação de amizade} other {{count} solicitações de amizade}}"
+    "message": "{count} {count, plural, one {pedido} other {pedidos}} de amizade"
   },
   "friends.add-friend.submit": {
-    "message": "Enviar amizade"
+    "message": "Enviar pedido de amizade"
   },
   "friends.add-friend.title": {
-    "message": "Adicionando amigo"
+    "message": "Adicionar um amigo"
   },
   "friends.add-friend.username.description": {
-    "message": "Pode ser diferente do nome que ele usa no Minecraft!"
+    "message": "Pode diferir do nome de usuário do Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Insira o nome de usuário..."
@@ -611,6 +746,24 @@
   "instance.settings.tabs.java": {
     "message": "Java e memória"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Variáveis ​​de ambiente personalizadas"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Argumentos Java personalizados"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Instalação personalizada do Java"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Alocação de memória personalizada"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Insira as variáveis ​​de ambiente..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Insira os argumentos Java..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variáveis de ambiente"
   },
@@ -625,6 +778,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memória alocada"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/caminho/ao/java"
   },
   "instance.settings.tabs.window": {
     "message": "Janela"
@@ -660,13 +816,13 @@
     "message": "Servidor de Minecraft"
   },
   "instance.worlds.cant_connect": {
-    "message": "Não foi possível se conectar ao servidor"
+    "message": "Não foi possível conectar ao servidor"
   },
   "instance.worlds.copy_address": {
     "message": "Copiar endereço"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Não mostrar na tela inicial"
+    "message": "Não mostrar no início"
   },
   "instance.worlds.game_already_open": {
     "message": "A instância já está aberta"

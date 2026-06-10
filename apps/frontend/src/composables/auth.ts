@@ -19,10 +19,16 @@ export const PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY = 'auth-pending-sign-in-
 const AUTH_COOKIE_OPTIONS = {
 	maxAge: 60 * 60 * 24 * 365 * 10,
 	sameSite: 'lax',
-	secure: true,
 	httpOnly: false,
 	path: '/',
 } satisfies CookieOptions<string | null>
+
+const normalizeAuthToken = (value: unknown) => {
+	if (typeof value === 'string') {
+		return value
+	}
+	return ''
+}
 
 const getQueryString = (value: QueryValue) => {
 	if (Array.isArray(value)) {
@@ -55,21 +61,42 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 	}
 
 	const route = useRoute()
-	const authCookie = useCookie<string | null>('auth-token', AUTH_COOKIE_OPTIONS)
-	const authCode = getQueryString(route.query.code)
+	const config = useRuntimeConfig()
+	const authCookie = useCookie<string | null>('auth-token', {
+		...AUTH_COOKIE_OPTIONS,
+		secure: config.public.cookieSecure,
+	})
 
 	if (oldToken) {
-		authCookie.value = oldToken
+		const normalized = normalizeAuthToken(oldToken)
+		if (normalized) {
+			authCookie.value = normalized
+		}
 	}
 
-	if (authCode) {
-		authCookie.value = authCode
+	const oauthCode = normalizeAuthToken(route.query.code)
+	if (oauthCode && !route.fullPath.includes('new_account=true')) {
+		authCookie.value = oauthCode
 	}
 
-	if (authCookie.value) {
-		auth.token = authCookie.value
+	if (route.fullPath.includes('new_account=true') && route.path !== '/auth/welcome') {
+		const redirect = route.path.startsWith('/auth/') ? null : route.fullPath
 
-		if (!auth.token || !auth.token.startsWith('mra_')) {
+		await navigateTo(
+			`/auth/welcome?authToken=${oauthCode}${
+				redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''
+			}`,
+		)
+	}
+
+	const tokenStr = normalizeAuthToken(authCookie.value)
+
+	if (authCookie.value != null && tokenStr === '') {
+		authCookie.value = null
+	} else if (tokenStr) {
+		auth.token = tokenStr
+
+		if (!auth.token.startsWith('mra_')) {
 			return auth
 		}
 
@@ -77,6 +104,7 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 			auth.user = (await useBaseFetch(
 				'user',
 				{
+					apiVersion: 3,
 					headers: {
 						Authorization: auth.token,
 					},
@@ -99,20 +127,25 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 					},
 				},
 				true,
-			)) as { session: string }
+			)) as { session: unknown }
 
-			auth.token = session.session
-			authCookie.value = auth.token
-
-			auth.user = (await useBaseFetch(
-				'user',
-				{
-					headers: {
-						Authorization: auth.token,
+			auth.token = normalizeAuthToken(session.session)
+			if (auth.token) {
+				authCookie.value = auth.token
+				auth.user = (await useBaseFetch(
+					'user',
+					{
+						apiVersion: 3,
+						headers: {
+							Authorization: auth.token,
+						},
 					},
-				},
-				true,
-			)) as Labrinth.Users.v2.User
+					true,
+				)) as Labrinth.Users.v2.User
+			} else {
+				authCookie.value = null
+				auth.token = ''
+			}
 		} catch {
 			authCookie.value = null
 		}

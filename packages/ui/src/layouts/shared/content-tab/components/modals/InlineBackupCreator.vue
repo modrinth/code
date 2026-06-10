@@ -1,7 +1,11 @@
 <template>
 	<div class="flex flex-col gap-3">
 		<span class="text-primary">
-			{{ formatMessage(messages.warningBody, { type: backup.isServer ? 'server' : 'instance' }) }}
+			{{
+				formatMessage(messages.warningBody, {
+					type: formatMessage(backup.isServer ? messages.worldLabel : messages.instanceLabel),
+				})
+			}}
 		</span>
 
 		<div v-if="backup.available" class="flex items-center gap-2">
@@ -9,13 +13,17 @@
 			<ButtonStyled v-if="!backup.backupComplete.value && !backup.backupFailed.value">
 				<button
 					v-tooltip="
-						backup.externalBackupInProgress.value
-							? formatMessage(messages.backupInProgress)
-							: undefined
+						!canManageBackups
+							? permissionDeniedMessage
+							: backup.externalBackupInProgress.value
+								? formatMessage(messages.backupInProgress)
+								: undefined
 					"
 					class="!shadow-none"
-					:disabled="backup.isBackingUp.value || backup.externalBackupInProgress.value"
-					@click="backup.startBackup()"
+					:disabled="
+						!canManageBackups || backup.isBackingUp.value || backup.externalBackupInProgress.value
+					"
+					@click="startBackup"
 				>
 					<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
 					<PlusIcon v-else class="size-5" />
@@ -51,10 +59,13 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { hasServerPermission } from '#ui/composables/server-permissions'
+import { injectModrinthServerContext } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { useInlineBackup } from '../../composables/use-inline-backup'
 
@@ -69,8 +80,24 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const serverCtx = injectModrinthServerContext(null)
+const canManageBackups = computed(
+	() => !serverCtx || hasServerPermission(serverCtx.currentUserPermissions.value, 'BACKUPS'),
+)
+const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 const backup = useInlineBackup(() => props.backupName)
+
+function startBackup() {
+	if (
+		!canManageBackups.value ||
+		backup.externalBackupInProgress.value ||
+		backup.isBackingUp.value
+	) {
+		return
+	}
+	backup.startBackup()
+}
 
 watch(
 	() => backup.isBackingUp.value,
@@ -88,7 +115,15 @@ const messages = defineMessages({
 	warningBody: {
 		id: 'content.inline-backup.warning-body',
 		defaultMessage:
-			'We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {instance}} if anything breaks.',
+			'We recommend creating a backup before proceeding so you can restore your {type} if anything breaks.',
+	},
+	worldLabel: {
+		id: 'content.inline-backup.world-label',
+		defaultMessage: 'world',
+	},
+	instanceLabel: {
+		id: 'content.inline-backup.instance-label',
+		defaultMessage: 'instance',
 	},
 	createBackup: {
 		id: 'content.inline-backup.create-backup',

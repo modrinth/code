@@ -6,7 +6,7 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import type { BulkOperationType } from '../composables/bulk-operations'
 import type { ContentItem } from '../types'
@@ -16,7 +16,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	selectedCount: {
 		id: 'content.selection-bar.selected-count',
-		defaultMessage: '{count} {contentType} selected',
+		defaultMessage: '{count, number} {contentType} selected',
 	},
 	selectedCountSimple: {
 		id: 'content.selection-bar.selected-count-simple',
@@ -68,23 +68,27 @@ interface Props {
 	selectedItems: ContentItem[]
 	contentTypeLabel?: string
 	isBusy?: boolean
+	busyTooltip?: string | null
 	isBulkOperating?: boolean
 	bulkOperation?: BulkOperationType | null
 	bulkProgress?: number
 	bulkTotal?: number
 	bulkWaiting?: boolean
 	ariaLabel?: string
+	getItemId?: (item: ContentItem) => string
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	contentTypeLabel: undefined,
 	isBusy: false,
+	busyTooltip: undefined,
 	isBulkOperating: false,
 	bulkOperation: null,
 	bulkProgress: 0,
 	bulkTotal: 0,
 	bulkWaiting: false,
 	ariaLabel: undefined,
+	getItemId: undefined,
 })
 
 const emit = defineEmits<{
@@ -102,6 +106,10 @@ const iconStackWidth = computed(() => {
 	return 32 + (visibleItems.value.length - 1 + (overflowCount.value > 0 ? 1 : 0)) * iconStackOffset
 })
 
+function resolveItemId(item: ContentItem) {
+	return props.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
+}
+
 const allDisabled = computed(() => props.selectedItems.every((m) => !m.enabled))
 const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
 
@@ -110,7 +118,7 @@ const selectedCountText = computed(() => {
 	if (props.contentTypeLabel) {
 		return formatMessage(messages.selectedCount, {
 			count,
-			contentType: `${props.contentTypeLabel}${count === 1 ? '' : 's'}`,
+			contentType: formatContentTypeSentence(formatMessage, props.contentTypeLabel, count),
 		})
 	}
 	return formatMessage(messages.selectedCountSimple, { count })
@@ -118,9 +126,6 @@ const selectedCountText = computed(() => {
 
 const bulkProgressMessage = computed(() => {
 	if (!props.bulkOperation) return ''
-	const contentType = props.contentTypeLabel
-		? `${props.contentTypeLabel}${props.bulkTotal === 1 ? '' : 's'}`
-		: 'items'
 	const messageMap = {
 		enable: props.bulkWaiting ? messages.bulkEnablingWaiting : messages.bulkEnabling,
 		disable: props.bulkWaiting ? messages.bulkDisablingWaiting : messages.bulkDisabling,
@@ -130,7 +135,7 @@ const bulkProgressMessage = computed(() => {
 	return formatMessage(messageMap[props.bulkOperation], {
 		progress: props.bulkProgress,
 		total: props.bulkTotal,
-		contentType,
+		contentType: formatContentTypeSentence(formatMessage, props.contentTypeLabel, props.bulkTotal),
 	})
 })
 </script>
@@ -146,7 +151,7 @@ const bulkProgressMessage = computed(() => {
 			>
 				<div
 					v-for="(item, index) in visibleItems"
-					:key="item.id"
+					:key="resolveItemId(item)"
 					v-tooltip="item.project?.title ?? item.file_name"
 					class="absolute top-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4"
 					:style="{ left: `${index * iconStackOffset}px`, zIndex: visibleItems.length - index }"
@@ -154,7 +159,7 @@ const bulkProgressMessage = computed(() => {
 					<Avatar
 						:src="item.project?.icon_url"
 						:alt="item.project?.title ?? item.file_name"
-						:tint-by="item.id"
+						:tint-by="resolveItemId(item)"
 						size="100%"
 						no-shadow
 						class="selected-content-avatar"
@@ -193,9 +198,11 @@ const bulkProgressMessage = computed(() => {
 			<ButtonStyled type="transparent">
 				<button
 					v-tooltip="
-						allEnabled
-							? formatMessage(messages.allAlreadyEnabled)
-							: formatMessage(commonMessages.enableButton)
+						isBusy && busyTooltip
+							? busyTooltip
+							: allEnabled
+								? formatMessage(messages.allAlreadyEnabled)
+								: formatMessage(commonMessages.enableButton)
 					"
 					:disabled="isBusy || allEnabled"
 					@click="emit('enable')"
@@ -207,9 +214,11 @@ const bulkProgressMessage = computed(() => {
 			<ButtonStyled type="transparent">
 				<button
 					v-tooltip="
-						allDisabled
-							? formatMessage(messages.allAlreadyDisabled)
-							: formatMessage(commonMessages.disableButton)
+						isBusy && busyTooltip
+							? busyTooltip
+							: allDisabled
+								? formatMessage(messages.allAlreadyDisabled)
+								: formatMessage(commonMessages.disableButton)
 					"
 					:disabled="isBusy || allDisabled"
 					@click="emit('disable')"

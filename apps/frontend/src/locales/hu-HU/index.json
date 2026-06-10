@@ -8,6 +8,345 @@
   "admin.billing.error.not-found": {
     "message": "Felhasználó nem található"
   },
+  "analytics.action.add": {
+    "message": "Hozzáadás"
+  },
+  "analytics.action.cancel": {
+    "message": "Mégse"
+  },
+  "analytics.action.refresh": {
+    "message": "Újratöltés"
+  },
+  "analytics.action.reset": {
+    "message": "Visszaállítás"
+  },
+  "analytics.breakdown.country": {
+    "message": "Ország"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Letöltés oka"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Forrás letöltése"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Játék verziója"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Részletezés"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Betöltő"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Bevételszerzés"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Nem részletezés"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projekt"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Projekt állapota"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Projekt verzió"
+  },
+  "analytics.breakdown.selected": {
+    "message": "{breakdown} szerinti részletezés"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Mindet megmutat"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Szűkített nézet"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Top 8 megjelenítése"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ó"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktív"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Megjegyzések"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Elemzési grafikonvezérlők, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Irányítások"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Elemzési grafikonok vezérlőelemei"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Kijelző"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth események"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Nincs Modrinth esemény a grafiokonon."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "A grafikonon nincs projektesemény."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Előző időszak"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Projekt események"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Arány"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Válasszon elemeket az alábbi táblázatból az adatok megjelenítéséhez."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# analitikai esemény} other {# analitikai esemény}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Közlemények megtekintése"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Bevételszerzési analitikai részletek megtekintése"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Csak a Modrinthon keresztül történő megtekintések és letöltések számítanak bele a bevételszerzésbe, és a letöltéshez a felhasználóknak be kell jelentkezniük."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "A bevételszerző statisztika részletei"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Előző)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "A táblázat összes kijelölt sorának megjelenítése ronthatja az oldal teljesítményét."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Megjelenítse a grafikonon mind a {count} sort?"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "{name} elrejtése a grafikonon"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "A diagram eszköztippje kitűzve"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Kitűzve"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(előző)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "{name} megjelenítése a grafikonon"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Összesen"
+  },
+  "analytics.chart.view.area": {
+    "message": "Terület"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Oszlop"
+  },
+  "analytics.chart.view.line": {
+    "message": "Vonal"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Függőség"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modcsomag"
+  },
+  "analytics.download-reason.update": {
+    "message": "Frissítés"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "A Modrinth weboldala"
+  },
+  "analytics.downloads.suffix": {
+    "message": "letöltés"
+  },
+  "analytics.empty.no-data": {
+    "message": "Nincs elérhető adat"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Nincs elérhető adat a statisztikához"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Nincs elérhető projekt"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Nincs elérhető projekt a statisztikához"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Játékverzió típusa"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Összes"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Kiadás"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Országok keresése..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Letöltési források keresése..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Projektverziók keresése..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Verziók keresése..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Letöltések az idő függvényében"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Játékidő alakulása"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Bevétel alakulása"
+  },
+  "analytics.graph.title.views": {
+    "message": "Megtekintések alakulása"
+  },
+  "analytics.group-by.1h": {
+    "message": "1ó"
+  },
+  "analytics.group-by.6h": {
+    "message": "6ó"
+  },
+  "analytics.group-by.date": {
+    "message": "Dátum"
+  },
+  "analytics.group-by.day": {
+    "message": "Nap"
+  },
+  "analytics.group-by.month": {
+    "message": "Hónap"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Naponkénti csoportosítás"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Óránkénti csoportosítás"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Hónaponkénti csoportosítás"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "6 óránkénti csoportosítás"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Hetek szerinti csoportosítás"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Évenkénti csoportosítás"
+  },
+  "analytics.group-by.week": {
+    "message": "Hét"
+  },
+  "analytics.group-by.year": {
+    "message": "Év"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Eredmények lekérése…"
+  },
+  "analytics.options.loading": {
+    "message": "Betöltés..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projekt jóváhagyva"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Projekt privátra állítva"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Projekt állapota megváltozott"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projekt nem listázottra állítva"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} verzió kiadva"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Verzió feltöltve"
+  },
+  "analytics.project-status.approved": {
+    "message": "Jóváhagyva"
+  },
+  "analytics.project-status.archived": {
+    "message": "Archiválva"
+  },
+  "analytics.project-status.draft": {
+    "message": "Vázlat"
+  },
+  "analytics.project-status.other": {
+    "message": "Egyéb"
+  },
+  "analytics.project-status.private": {
+    "message": "Privát"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Elutasított"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Nem listázott"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Visszatartott"
+  },
+  "analytics.project.all": {
+    "message": "Összes projekt"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name} ikon"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Csoportosítás"
+  },
+  "analytics.query.label.project": {
+    "message": "Projekt:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Időkeret:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Letöltések"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Csak a Modrinthon keresztül történő megtekintések és letöltések jogosultak bevételszerzésre, és át kell menniük a csalásmegelőző szűrésen. A Modrinth App letöltéséhez a felhasználónak be kell jelentkeznie. Mivel az összes projekt esetében hasonló azoknak a letöltéseknek az aránya, amelyek bevételt generálnak, a bevételed nem változna jelentősen, ha az összes letöltést figyelembe vennénk."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Tudj meg többet"
+  },
+  "analytics.stat.playtime": {
+    "message": "Játékidő"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} óra"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Játékidő (másodpercben)"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Keresés..."
+  },
   "app-marketing.download.description": {
     "message": "Asztali alkalmazásunk minden platformon elérhető, válaszd ki a kívánt verziót."
   },
@@ -122,9 +461,6 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
-  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -187,9 +523,6 @@
   },
   "app-marketing.hero.download-modrinth-app": {
     "message": "Modrinth App letöltése"
-  },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Modrinth App letöltése {os} rendszerre"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon profil főmenüjének képernyőképe."
@@ -258,10 +591,10 @@
     "message": "Jelszavad visszaállítása"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Kérjük írja be a kétlépcsős hitelesítés kódját a folytatáshoz."
+    "message": "Kérlek írd be a kétlépcsős hitelesítés kódját a folytatáshoz."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Írja be a kétlépcsős hitelesítés kódját"
+    "message": "Írd be a kétlépcsős hitelesítés kódját"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Kód beírása..."
@@ -291,7 +624,7 @@
     "message": "Már van fiókod?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Iratkozzon fel a Modrinth frissítéseiről szóló értesítésekre"
+    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
   },
   "auth.sign-up.title": {
     "message": "Regisztráció"
@@ -333,7 +666,7 @@
     "message": "Email-cím hitelesítése"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Iratkozzon fel a Modrinth frissítéseiről szóló értesítésekre"
+    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
   },
   "auth.welcome.description": {
     "message": "Most már része vagy annak a fantasztikus fejlesztők és felfedezők közösségének, akik már építenek, letöltenek és naprakészek maradnak a csodálatos modokkal kapcsolatban."
@@ -342,7 +675,7 @@
     "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
-    "message": "Üdvözlünk a Modrinth-onl!"
+    "message": "Üdvözlünk a Modrinthon!"
   },
   "auth.welcome.title": {
     "message": "Üdvözlünk"
@@ -407,11 +740,89 @@
   "collection.title": {
     "message": "{name} - Gyűjtemény"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Privát megjegyzés"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Jóváhagyás"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Jóváhagyás és válasz"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Gondolatmenet lezárása"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Bezárás és válasz"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Elutasítás"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Elutasítás és válasz"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Szál újramegnyitása"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Válasz"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Válasz a beszélgetésre"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Benyújtás újra felülvizsgálatra"
+  },
+  "conversation-thread.action.send": {
+    "message": "Küldés"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Küldés áttekintésre"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Küldés áttekintésre válasszal"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Beállítás vázlatként"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Visszatartás"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Visszatartás és válasz"
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Hiba a jelentés bezárásában"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Hiba a jelentés újranyitásában"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Hiba történt az üzenet elküldésekor"
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Üzenet írása..."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "A projekted már jóváhagyásra került, ezért a moderátorcsapat nem követi aktívan ezt a témát. Ugyanakkor előfordulhat, hogy meglátják az üzenetedet, ha valami probléma adódik a projekteddel kapcsolatban."
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Ha kapcsolatba szeretnél lépni a moderátorcsapattal, kérjük, használd a <help-center-link>Modrinth Súgó</help-center-link> oldalt, és kattints a jobb alsó sarokban található kék buborékra az ügyfélszolgálat elérése érdekében."
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Megerősítem, hogy a moderátorok észrevételeit megfelelően figyelembe vettem."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "A(z) <project-title>{projectTitle}</project-title> projektet újra benyújtod a moderátorok felülvizsgálatára."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Benyújtás újra felülvizsgálatra"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Benyújtás felülvizsgálatra"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "A kiegészítő fájlok olyan kiegészítő forrásokhoz tartoznak, mint például a forráskód, nem pedig alternatív verziókhoz vagy változatokhoz."
-  },
-  "create.collection.collection-info": {
-    "message": "Az új gyűjteményed nyilvános gyűjteményként jön létre {count, plural, =0 {projektek nélkül} other {# projekttel}}."
   },
   "create.collection.create-collection": {
     "message": "Gyűjtemény létrehozása"
@@ -474,7 +885,7 @@
     "message": "Név"
   },
   "create.organization.name-placeholder": {
-    "message": "Adj meg a szerverzetednek egy nevet..."
+    "message": "Adj meg a szervezetednek egy nevet..."
   },
   "create.organization.ownership-info": {
     "message": "Át fogod ruházni a tulajdonjogod erre a szervezetre, de már meghívhatsz másokat és átruházhatod a tulajdonjogot bármikor."
@@ -572,9 +983,6 @@
   "dashboard.affiliate-links.search": {
     "message": "Társulati linkek keresése..."
   },
-  "dashboard.analytics.from-projects": {
-    "message": "{count} projektből"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Összes letöltés"
   },
@@ -595,9 +1003,6 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Próbáld meg módosítani a szűrőket vagy a keresési kifejezéseket."
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count} projekt"
   },
   "dashboard.collections.label.search-input": {
     "message": "Keresd meg a gyűjteményeidet"
@@ -872,23 +1277,8 @@
   "dashboard.head-title": {
     "message": "Irányítópult"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Összes megjelölése olvasottként"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Előzmények megtekintése"
-  },
   "dashboard.notifications.empty.no-unread": {
     "message": "Nincsenek olvasatlan értesítéseid."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Hiba az értesítések betöltése során:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Előzmények"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Értesítési előzmények"
   },
   "dashboard.notifications.link.see-all": {
     "message": "Összes megtekintése"
@@ -896,23 +1286,35 @@
   "dashboard.notifications.link.view-history": {
     "message": "Értesítési előzmények megtekintése"
   },
-  "dashboard.notifications.link.view-more": {
-    "message": "További {extraNotifs} értesítés megtekintése"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Értesítések betöltése"
-  },
   "dashboard.organizations.button.create": {
     "message": "Szervezet létrehozása"
   },
   "dashboard.organizations.empty.cta": {
     "message": "Hozz létre egy szervezetet!"
   },
-  "dashboard.organizations.member-count": {
-    "message": "{count} tag"
-  },
   "dashboard.organizations.title": {
     "message": "Szervezetek"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Összes megjelölése olvasottként"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Előzmények megtekintése"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Nincsenek olvasatlan értesítéseid."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Hiba az értesítések betöltése során:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Előzmények"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Értesítési előzmények"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Értesítések betöltése..."
   },
   "dashboard.projects.bulk-edit-hint": {
     "message": "Több projektet is szerkeszthetsz egyszerre, ha kiválasztod őket alább."
@@ -924,16 +1326,13 @@
     "message": "Projektek"
   },
   "dashboard.projects.links.and-more": {
-    "message": "és még {count} további..."
+    "message": "és még {count} másik..."
   },
   "dashboard.projects.links.button.clear-link": {
-    "message": "Link törlése"
+    "message": "Hivatkozás törlése"
   },
   "dashboard.projects.links.button.edit": {
     "message": "Linkek szerkesztése"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "A változtatások <strong>{count}</strong> projektre vonatkoznak."
   },
   "dashboard.projects.links.discord-invite.description": {
     "message": "Meghívólink a Discord szerveredre."
@@ -962,9 +1361,6 @@
   "dashboard.projects.links.source-code.label": {
     "message": "Forráskód"
   },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "Egy oldal, amely információkat, dokumentációt és segítséget tartalmaz a projekthez."
-  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Wiki oldal"
   },
@@ -973,6 +1369,9 @@
   },
   "dashboard.projects.project.moderator-message-aria": {
     "message": "A projekt üzenetet kapott a moderátoroktól. További információkért nézd meg a projektet."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Kérlek ellenőrizd a környezeti metaadatokat"
   },
   "dashboard.projects.sort.ascending": {
     "message": "Növekvő"
@@ -1044,7 +1443,7 @@
     "message": "Felvéve"
   },
   "dashboard.revenue.tos": {
-    "message": "A projektek Modrinth-ra való feltöltésével és a számládról történő pénzfelvétellel elfogadod a <terms-link>jutalomprogram feltételeit</terms-link>. Tudj meg többet a <info-link>jutalomprogramról</info-link>."
+    "message": "A projektek Modrinthra való feltöltésével és a számládról történő pénzfelvétellel elfogadod a <terms-link>jutalomprogram feltételeit</terms-link>. Tudj meg többet a <info-link>jutalomprogramról</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Letöltés CSV formátumban"
@@ -1211,6 +1610,15 @@
   "discover.install.back-to-server": {
     "message": "Vissza a szerverhez"
   },
+  "discover.install.back-to-setup": {
+    "message": "Vissza a beállításhoz"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Visszaállítás visszavonása"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Nem található szerver világ ami letölthető."
+  },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
   },
@@ -1218,13 +1626,19 @@
     "message": "Ez a gyűjtemény lehet hogy privát."
   },
   "error.collection.404.list_item.3": {
-    "message": "Gyűjteményt a Modrinth moderációs csapata eltávolíthatta, mert megsértette a <tou-link>Felhasználási feltételeinket</tou-link>."
+    "message": "A gyűjteményt a Modrinth moderációs csapata eltávolította, mert megsértette a <tou-link>Felhasználási feltételeinket</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Miért?"
   },
   "error.collection.404.title": {
     "message": "Nem található gyűjtemény"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Jelenleg a következőként vagy bejelentkezve:"
+  },
+  "error.generic.401.title": {
+    "message": "Nincs hozzáférésed ehhez az oldalhoz"
   },
   "error.generic.404.subtitle": {
     "message": "Ez az oldal ami iránt érdeklődsz úgy látszik, hogy nem létezik."
@@ -1307,9 +1721,6 @@
   "frog.title": {
     "message": "Béka"
   },
-  "hosting-marketing.available-locations": {
-    "message": "Észak-Amerikában, Európában és Délkelet-Ázsiában érhető el széles körű lefedettség mellett."
-  },
   "hosting-marketing.billing.monthly": {
     "message": "Havi fizetés"
   },
@@ -1369,9 +1780,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Hol találhatók a Modrinth Hosting szerverei? Kiválaszthatom a régiót?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Jelenleg Észak-Amerikában, Európában és Délkelet-Ázsiában állnak rendelkezésre szerverek, amelyek közül vásárláskor választhatsz. A jövőben további régiók is elérhetővé válnak! Ha szeretnéd megváltoztatni a régiót, vedd fel a kapcsolatot az ügyfélszolgálattal."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Melyik Minecraft verziók és betöltők használhatók?"
@@ -1578,7 +1986,7 @@
     "message": "Találd meg gyorsan és egyszerűen, amit keresel"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Egy hely a Minecraft {content}"
+    "message": "A hely a Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "adatcsomagoknak"
@@ -1641,7 +2049,7 @@
     "message": "Játékosoknak"
   },
   "landing.section.for-players.tagline": {
-    "message": "Fedez fel több mint {count, number} alkotást"
+    "message": "Fedezz fel több mint {count, number} alkotást"
   },
   "landing.subheading": {
     "message": "Fedezz fel, játssz és ossz meg Minecraft-tartalmakat a közösség számára létrehozott nyílt forráskódú platformunkon."
@@ -1651,6 +2059,9 @@
   },
   "layout.action.create-new": {
     "message": "Új létrehozása..."
+  },
+  "layout.action.external-projects": {
+    "message": "Külső projektek"
   },
   "layout.action.file-lookup": {
     "message": "Fájl keresés"
@@ -1700,17 +2111,20 @@
   "layout.banner.add-email.description": {
     "message": "Biztonsági okok miatt a Modrinthon kell egy e-mail cím a fiókodhoz."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Mindig mellőzd"
+  },
   "layout.banner.build-fail.description": {
-    "message": "A Modrinth felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérünk, próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
+    "message": "A Modrinth felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérlek próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Mellőz"
   },
   "layout.banner.build-fail.title": {
     "message": "Hiba történt az API állapotának generálása közben a fordítás során."
   },
-  "layout.banner.preview.description": {
-    "message": "Ha a hivatalos Modrinth weboldalt szeretnéd elérni, látogass el az <link>https://modrinth.com</link> oldalra. Ezt az előzetes telepítést a Modrinth munkatársai tesztelési célokra használják. A <branch-link>{owner}/{branch</branch-link> @ {commit} használatával készült."
-  },
   "layout.banner.preview.title": {
-    "message": "Ez a Modrinth weboldal előzetes telepítése."
+    "message": "Ez a Modrinth weboldal előzetes verziója."
   },
   "layout.banner.staging.description": {
     "message": "A tesztelési környezet teljesen elkülönül az éles Modrinth adatbázistól. Ezt tesztelési és hibakeresési célokra használják, és a Modrinth backend vagy frontend fejlesztés alatt álló, az éles példánynál újabb verzióit futtathatja."
@@ -1904,11 +2318,17 @@
   "moderation.moderate": {
     "message": "Moderált"
   },
+  "moderation.page.external-projects": {
+    "message": "Külső projektek"
+  },
   "moderation.page.projects": {
     "message": "Projektek"
   },
   "moderation.page.reports": {
     "message": "Jelentések"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Technikai áttekintés"
   },
   "muralpay.account-type.checking": {
     "message": "Ellenőrzés"
@@ -2237,9 +2657,6 @@
   "profile.label.collection": {
     "message": "Gyűjtemény"
   },
-  "profile.label.downloads": {
-    "message": "{count} letöltés"
-  },
   "profile.label.joined": {
     "message": "Csatlakozott"
   },
@@ -2258,9 +2675,6 @@
   "profile.label.organizations": {
     "message": "Szervezetek"
   },
-  "profile.label.projects": {
-    "message": "{count} projekt"
-  },
   "profile.label.saving": {
     "message": "Mentés..."
   },
@@ -2269,9 +2683,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Töltsd le {username} projektjeit a Modrinthon"
-  },
-  "profile.stats.projects-followers": {
-    "message": "<stat>{count}</stat> projektkövető"
   },
   "profile.user-id": {
     "message": "Felhasználói azonosító: {id}"
@@ -2478,7 +2889,7 @@
     "message": "Játékverziók keresése..."
   },
   "project.download.search-game-versions-label": {
-    "message": "Játékverziók keresése…"
+    "message": "Játékverziók keresése..."
   },
   "project.download.select-game-version": {
     "message": "Játékverzió kiválasztása"
@@ -2505,10 +2916,10 @@
     "message": "Átdolgoztuk a Modrinth Környezetek rendszerét, és új lehetőségek érhetők el. Kérjük, ellenőrizd, hogy a metaadatok helyesek-e."
   },
   "project.environment.migration.review-button": {
-    "message": "Környezet beállítások Átnézése"
+    "message": "Környezeti beállítások áttekintése"
   },
   "project.environment.migration.title": {
-    "message": "Kérjük, tekintse át a környezet metaadatait"
+    "message": "Kérlek tekintsd át a környezeti metaadatokat"
   },
   "project.error.loading": {
     "message": "Hiba a projektadatok {message} betöltése közben"
@@ -2530,6 +2941,36 @@
   },
   "project.license.title": {
     "message": "Licensz"
+  },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "A projekted privát, vagyis csak te és az általad meghívott személyek férhetnek hozzá."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "A projekt láthatóságát a projekt <visibility-settings-link>láthatósági beállításaiban</visibility-settings-link> módosíthatod."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Projekt jóváhagyva"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Ez egy projektvázlat, amelyet mások nem láthatnak, amíg azt felülvizsgálatra nem nyújtják be, és a Modrinth moderátori csapata jóvá nem hagyja."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Projektvázlat"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Miután elvégezted az összes szükséges lépést, és meggyőződtél arról, hogy a projekted megfelel a Modrinth <rules-link>Tartalmi szabályainak</rules-link>, benyújthatod a projektedet felülvizsgálatra."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Változtatások kérve lettek"
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Köszönjük türelmedet, amíg moderátoraink keményen dolgoznak a Modrinth biztonságának fenntartásán, és alig várjuk, hogy segíthessünk tartalmaid megosztásában! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Projekt áttekintés alatt"
+  },
+  "project.moderation.thread.title": {
+    "message": "Moderációs üzenetek"
   },
   "project.moderation.title": {
     "message": "Moderáció"
@@ -2594,17 +3035,20 @@
   "project.settings.general.url.title": {
     "message": "Link"
   },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Egyik verziód sem tartalmaz külső tartalmat, így nem kell aggódnod a jogosultságok beszerzése miatt."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Kész is van!"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "További információ"
+  },
   "project.settings.title": {
     "message": "Beállítások"
   },
   "project.settings.visit-dashboard": {
     "message": "Projektek irányítópult megnyitása"
-  },
-  "project.stats.downloads-label": {
-    "message": "letöltés"
-  },
-  "project.stats.followers-label": {
-    "message": "követő"
   },
   "project.status.archived.message": {
     "message": "A(z) {title} archiválásra került. A(z) {title} nem kap további frissítéseket, kivéve, ha a fejlesztő úgy dönt, hogy visszavonja a projekt archiválását."
@@ -2612,26 +3056,23 @@
   "project.versions.title": {
     "message": "Verziók"
   },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Ez a verzió} other {Ezek a verziók}} jelenleg vissza van tartva, és nem érhető{count, plural, one {} other {k}} el nyilvánosan. Kérjük, igazold, hogy engedéllyel rendelkezel a modcsomag {count, plural, one {verziójában} other {verzióiban}} található bizonyos fájlok terjesztésére."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Megoldás"
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {A(z) {version_name} verzió} other {A verziók}} ismeretlen beágyazott tartalom miatt vissza lett{count, plural, one {} other {ek}} tartva"
+  },
   "report.already-reported": {
     "message": "Már feljelentetted ezt: {title}"
-  },
-  "report.already-reported-description": {
-    "message": "Már létezik egy nyitott jelentésed ehhez a {item, select, project {projekthez} version {verzióhoz} user {felhasználóhoz} other {tartalomhoz}}. További részletekkel egészítheted ki a jelentésed, ha van további információ, amit hozzá szeretnél adni."
-  },
-  "report.back-to-item": {
-    "message": "Vissza a {item, select, project {projekthez} version {verzióhoz} user {felhasználóhoz} other {tartalomhoz}}"
   },
   "report.body.description": {
     "message": "Ha lehetséges és releváns, csatolj linkeket és képeket. Az üres vagy hiányos jelentéseket lezárjuk és figyelmen kívül hagyjuk."
   },
   "report.body.title": {
     "message": "Adj meg további kontextust a jelentéseddel kapcsolatban"
-  },
-  "report.checking": {
-    "message": "{item, select, project {Projekt} version {Verzió} user {Felhasználó} other {Tartalom}} ellenőrzése..."
-  },
-  "report.could-not-find": {
-    "message": "{item, select, project {Projekt} version {Verzió} user {Felhasználó} other {Tartalom}} nem található"
   },
   "report.for.violation": {
     "message": "A Modrinth <rules-link>Szabályzat</rules-link> vagy <terms-link>Felhasználási feltételek</terms-link> megsértése"
@@ -2672,14 +3113,8 @@
   "report.please-report": {
     "message": "Kérjük, az alábbiakat jelentsd:"
   },
-  "report.question.content-id": {
-    "message": "Mi a {item, select, project {projekt} version {verzió} user {felhasználó} other {tartalom}} azonosítója?"
-  },
   "report.question.content-type": {
     "message": "Milyen típusú tartalmat jelentesz?"
-  },
-  "report.question.report-reason": {
-    "message": "A Modrinth melyik szabályát szegi meg ez a {item, select, project {projekt} version {verzió} user {felhasználó} other {tartalom}}?"
   },
   "report.report-content": {
     "message": "Tartalom jelentése a moderátoroknak"
@@ -2792,26 +3227,14 @@
   "scopes.organizationWrite.label": {
     "message": "Szervezetekhez írás"
   },
-  "scopes.patCreate.description": {
-    "message": "Személyes API tokenek létrehozása"
-  },
   "scopes.patCreate.label": {
     "message": "PAT-ek létrehozása"
-  },
-  "scopes.patDelete.description": {
-    "message": "Személyes API tokenek törlése"
   },
   "scopes.patDelete.label": {
     "message": "PAT-ek törlése"
   },
-  "scopes.patRead.description": {
-    "message": "Létrehozott API tokenek megtekintése"
-  },
   "scopes.patRead.label": {
     "message": "PAT-ek olvasása"
-  },
-  "scopes.patWrite.description": {
-    "message": "Személyes API tokenek szerkesztése"
   },
   "scopes.patWrite.label": {
     "message": "PAT-ek írása"
@@ -2980,6 +3403,9 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Szinkronizálás a szerverrel"
+  },
+  "servers.manage.content.title": {
+    "message": "Tartalom – {serverName} – Modrinth"
   },
   "servers.notice.actions": {
     "message": "Műveletek"
@@ -3179,6 +3605,12 @@
   "settings.account.security.two-factor.description": {
     "message": "Biztosíts további védelmet a fiókodnak."
   },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "A kétlépcsős hitelesítés kikapcsolása"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "A kétlépcsős hitelesítés beállítása"
+  },
   "settings.account.security.two-factor.title": {
     "message": "Kétlépcsős hitelesítés"
   },
@@ -3318,10 +3750,10 @@
     "message": "által"
   },
   "settings.authorizations.description": {
-    "message": "Amikor engedélyezel egy alkalmazást a Modrinth-fiókjoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
+    "message": "Amikor engedélyezel egy alkalmazást a Modrinth fiókoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
   },
   "settings.authorizations.empty-state": {
-    "message": "Jelenleg nem tudjuk megjeleníteni a jogosult alkalmazásait, dolgozunk a probléma megoldásán. Kérjük, látogassa meg ezt az oldalt később!"
+    "message": "Jelenleg nem tudjuk megjeleníteni az azonosított alkalmazásokat, dolgozunk a probléma megoldásán. Kérlek látogasd meg ezt az oldalt később!"
   },
   "settings.authorizations.head-title": {
     "message": "Engedélyek"
@@ -3356,20 +3788,11 @@
   "settings.billing.interval.month": {
     "message": "hónap"
   },
-  "settings.billing.interval.monthly": {
-    "message": "havi"
-  },
   "settings.billing.interval.quarter": {
     "message": "negyedév"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "negyedéves"
-  },
   "settings.billing.interval.year": {
     "message": "év"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "éves"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Reklámmentes böngészés a modrinth.com-on és a Modrinth App-ban"
@@ -3455,9 +3878,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared} Megosztott CPU-k (maximum {bursts} CPU-ig terjedő löketek)"
   },
@@ -3524,17 +3944,8 @@
   "settings.billing.subscription.title": {
     "message": "Előfizetések"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "Váltás {interval} számlázásra"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "Váltás {interval} számlázásra "
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "A havi számlázás évente további {amount} költséggel jár"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "{interval} számlázásra vált {date} napon"
   },
   "settings.billing.update-method": {
     "message": "Fizetési mód változtatása"
@@ -3699,7 +4110,7 @@
     "message": "Bemutatkozás"
   },
   "settings.profile.description": {
-    "message": "A rofiladataid nyilvánosan megtekinthetők a Modrinth oldalon és a <docs-link>Modrinth API</docs-link>-n keresztül."
+    "message": "A profiladataid nyilvánosan megtekinthetők a Modrinthon és a <docs-link>Modrinth API</docs-link>-n keresztül."
   },
   "settings.profile.head-title": {
     "message": "Profilbeállítások"

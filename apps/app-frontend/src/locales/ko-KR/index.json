@@ -24,7 +24,7 @@
     "message": "실행 중인 인스턴스 보이기"
   },
   "app.action-bar.stop-instance": {
-    "message": "인스턴스 중지"
+    "message": "인스턴스 멈추기"
   },
   "app.action-bar.view-active-downloads": {
     "message": "다운로드 목록 보기"
@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "옵션 선택"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "인스턴스의 플레이 시간을 표시합니다."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "플레이 시간 표시"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "사이드바를 접거나 펼칠 수 있는 기능을 활성화합니다."
   },
@@ -104,6 +110,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "인증 서버에 연결할 수 없습니다"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "인스턴스에 서버 추가"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "인스턴스에 추가"
+  },
   "app.browse.add-to-instance": {
     "message": "인스턴스에 추가"
   },
@@ -115,6 +127,9 @@
   },
   "app.browse.already-added": {
     "message": "이미 추가됨"
+  },
+  "app.browse.back-to-instance": {
+    "message": "인스턴스로 돌아가기"
   },
   "app.browse.discover-content": {
     "message": "콘텐츠 탐색하기"
@@ -128,8 +143,14 @@
   "app.browse.project-type.modpacks": {
     "message": "모드팩"
   },
+  "app.browse.server-instance-content-warning": {
+    "message": "콘텐츠를 추가하면 서버 접속 시 호환이 안 될 수 있습니다. 또한 서버 인스턴스 콘텐츠를 업데이트하면 임의로 추가된 콘텐츠는 모두 손실됩니다."
+  },
   "app.browse.server.installing": {
     "message": "설치 중"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "{compatibilityLabel} 버전과 일치하는 버전이 없습니다. 설치할 버전을 선택하세요. 종속성은 자동으로 설치되지 않습니다."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -180,10 +201,10 @@
     "message": "이 모드팩은 이미 <bold>{instanceName}</bold> 인스턴스에 설치되어 있습니다. 정말로 복제하시겠습니까?"
   },
   "app.instance.modpack-already-installed.create": {
-    "message": "생성"
+    "message": "만들기"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "모드팩 이미 설치됨"
+    "message": "이미 설치된 모드팩"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "인스턴스"
@@ -287,6 +308,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}을(를) 플레이하려면 업데이트가 필요합니다. 게임을 실행하려면 최신 버전으로 업데이트해 주세요."
   },
+  "app.project.install-button.already-installed": {
+    "message": "이미 설치되어 있음"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "탐색으로 돌아가기"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "인스턴스에 콘텐츠 설치"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되었습니다."
   },
@@ -311,8 +341,146 @@
   "app.settings.tabs.resource-management": {
     "message": "리소스 관리"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
+  "app.skins.add-button": {
+    "message": "스킨 추가"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "드레그 엔 드롭"
+  },
+  "app.skins.apply-button": {
+    "message": "적용"
+  },
+  "app.skins.delete-button": {
+    "message": "스킨 지우기"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "선택한 스킨이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "이 스킨을 정말 삭제하시겠습니까?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "삭제된 파일을 읽는 데 실패했습니다."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "파일 처리 중 오류가 발생했습니다."
+  },
+  "app.skins.edit-button": {
+    "message": "스킨 편집"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "스킨 추가"
+  },
+  "app.skins.modal.add-title": {
+    "message": "스킨 추가"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "팔 형테"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Slim"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Wide"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "망토"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "망토"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "스킨 수정"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "먼저 스킨을 수정하세요"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "망토 없음"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "망토 없음"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "찾아보기"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "스킨 저장하기"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "저장중..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "스킨 파일"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "먼저 스킨을 업로드하세요"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "스킨 수정"
+  },
+  "app.skins.previewing-badge": {
+    "message": "미리보기"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "스킨을 너무 자주 변경하고 있습니다. Mojang 서버에서 일시적으로 추가 요청을 차단했습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "잠시 기다려주세요."
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "기본 스킨"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth 프라이드"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "프라이드 월간 동안 Modrinth 프라이드 모금 행사에 기부하여 이 스킨들을 받았습니다."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "저장된 스킨"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "로그인"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Modrinth 앱의 스킨 관리 기능을 사용하려면 Minecraft 계정에 로그인하세요."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Excited Modrinth Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "로그인하세요"
+  },
+  "app.skins.title": {
+    "message": "스킨 선택"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
@@ -344,15 +512,6 @@
   "app.update.complete-toast.title": {
     "message": "{version} 버전이 성공적으로 설치되었습니다!"
   },
-  "app.update.download-update": {
-    "message": "업데이트 다운로드"
-  },
-  "app.update.downloading-update": {
-    "message": "업데이트 다운로드 중 ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "새로고침하여 업데이트 설치"
-  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -373,9 +532,6 @@
   },
   "friends.action.add-friend": {
     "message": "친구 추가"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count}건의 친구 요청"
   },
   "friends.add-friend.submit": {
     "message": "친구 요청 보내기"
@@ -590,6 +746,24 @@
   "instance.settings.tabs.java": {
     "message": "Java 및 메모리"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "사용자 지정 환경 변수"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "사용자 지정 Java 매개변수"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "사용자 지정 Java 설치"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "사용자 지정 메모리 할당"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "환경 변수를 입력하세요..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Java 인수를 입력하세요..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "환경 변수"
   },
@@ -604,6 +778,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "할당된 메모리"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "창"
