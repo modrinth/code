@@ -82,6 +82,7 @@ const props = defineProps<{
 	isSkinSelected: (skin: Skin) => boolean
 	isSkinActive: (skin: Skin) => boolean
 	isAddSkinButtonDragActive: boolean
+	readOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -362,7 +363,8 @@ defineExpose({ getAddSkinButtonElement })
 						ref="addSkinButton"
 						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
 						dropzone
-						:drag-active="isAddSkinButtonDragActive"
+						:disabled="readOnly"
+						:drag-active="!readOnly && isAddSkinButtonDragActive"
 						@click="emit('add-skin')"
 						@dragenter="emit('add-skin-dragenter', $event)"
 						@dragover="emit('add-skin-dragover', $event)"
@@ -384,9 +386,10 @@ defineExpose({ getAddSkinButtonElement })
 						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 						:selected="isSkinSelected(skin)"
 						:active="isSkinActive(skin)"
+						:disabled="readOnly"
 						@select="emit('select', skin)"
 					>
-						<template #overlay-buttons>
+						<template v-if="!readOnly" #overlay-buttons>
 							<ButtonStyled color="brand">
 								<button
 									:aria-label="formatMessage(messages.editSkinButton)"
@@ -423,6 +426,7 @@ defineExpose({ getAddSkinButtonElement })
 						:selected="isSkinSelected(skin)"
 						:active="isSkinActive(skin)"
 						:tooltip="skin.name"
+						:disabled="readOnly"
 						@select="emit('select', skin)"
 					>
 						<template #overlay-buttons>
