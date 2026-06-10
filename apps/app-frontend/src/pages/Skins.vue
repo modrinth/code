@@ -584,7 +584,9 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 	generateSkinPreviews(skins.value, capes.value)
 
 	try {
-		await set_custom_skin_order(nextSavedSkins.map((skin) => skin.texture_key))
+		await set_custom_skin_order(
+			nextSavedSkins.filter((skin) => skin.source === 'custom').map((skin) => skin.texture_key),
+		)
 	} catch (error) {
 		skins.value = previousSkins
 		generateSkinPreviews(skins.value, capes.value)

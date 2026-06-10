@@ -159,6 +159,9 @@ const sections = computed<SkinSection[]>(() => [
 const draggableSavedSkins = ref<Skin[]>([])
 const isDraggingSavedSkin = ref(false)
 const canReorderSavedSkins = computed(() => draggableSavedSkins.value.length > 1)
+const fixedSavedSkins = computed(() =>
+	props.savedSkins.filter((skin) => !canPersistSkinOrder(skin)),
+)
 
 const sectionLayouts = computed(() => {
 	const layouts: Array<{ section: SkinSection; top: number; height: number; index: number }> = []
@@ -223,7 +226,7 @@ watch(
 			return
 		}
 
-		draggableSavedSkins.value = [...nextSkins]
+		draggableSavedSkins.value = nextSkins.filter(canPersistSkinOrder)
 	},
 	{ immediate: true },
 )
@@ -280,10 +283,18 @@ function savedSkinKey(skin: Skin) {
 	return skinKey(skin, 'saved-skin')
 }
 
+function canPersistSkinOrder(skin: Skin) {
+	return skin.source === 'custom'
+}
+
 function doSkinOrdersMatch(firstSkins: Skin[], secondSkins: Skin[]) {
+	const persistedSecondSkins = secondSkins.filter(canPersistSkinOrder)
+
 	return (
-		firstSkins.length === secondSkins.length &&
-		firstSkins.every((skin, index) => savedSkinKey(skin) === savedSkinKey(secondSkins[index]))
+		firstSkins.length === persistedSecondSkins.length &&
+		firstSkins.every(
+			(skin, index) => savedSkinKey(skin) === savedSkinKey(persistedSecondSkins[index]),
+		)
 	)
 }
 
@@ -295,7 +306,7 @@ function onSavedSkinDragEnd() {
 	isDraggingSavedSkin.value = false
 
 	if (doSkinOrdersMatch(draggableSavedSkins.value, props.savedSkins)) {
-		draggableSavedSkins.value = [...props.savedSkins]
+		draggableSavedSkins.value = props.savedSkins.filter(canPersistSkinOrder)
 		return
 	}
 
@@ -404,7 +415,7 @@ defineExpose({ getAddSkinButtonElement })
 					:list="draggableSavedSkins"
 					class="grid w-full grid-cols-3 gap-3 min-[1300px]:grid-cols-4 min-[1750px]:grid-cols-5 min-[2050px]:grid-cols-6"
 					:item-key="savedSkinKey"
-					:disabled="!canReorderSavedSkins"
+					:disabled="readOnly || !canReorderSavedSkins"
 					:animation="250"
 					:swap-threshold="1"
 					:invert-swap="false"
@@ -447,10 +458,50 @@ defineExpose({ getAddSkinButtonElement })
 							<SkinButton
 								class="h-full w-full min-w-0 box-border rounded-[20px]"
 								:forward-image-src="getBakedSkinTextures(skin)?.forwards"
-								:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 								:selected="isSkinSelected(skin)"
 								:active="isSkinActive(skin)"
 								:disabled="readOnly"
+								:is-dragging="isDraggingSavedSkin"
+								@select="emit('select', skin)"
+							>
+								<template v-if="!readOnly" #overlay-buttons>
+									<ButtonStyled color="brand">
+										<button
+											:aria-label="formatMessage(messages.editSkinButton)"
+											class="pointer-events-auto"
+											@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
+										>
+											<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+										</button>
+									</ButtonStyled>
+									<ButtonStyled v-show="!skin.is_equipped" circular color="red">
+										<button
+											v-tooltip="formatMessage(messages.deleteSkinButton)"
+											:aria-label="formatMessage(messages.deleteSkinButton)"
+											class="!rounded-[100%] pointer-events-auto"
+											@click.stop="emit('delete', skin)"
+										>
+											<TrashIcon />
+										</button>
+									</ButtonStyled>
+								</template>
+							</SkinButton>
+						</div>
+					</template>
+
+					<template #footer>
+						<div
+							v-for="skin in fixedSavedSkins"
+							:key="savedSkinKey(skin)"
+							class="relative aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
+						>
+							<SkinButton
+								class="h-full w-full min-w-0 box-border rounded-[20px]"
+								:forward-image-src="getBakedSkinTextures(skin)?.forwards"
+								:selected="isSkinSelected(skin)"
+								:active="isSkinActive(skin)"
+								:disabled="readOnly"
+								:is-dragging="isDraggingSavedSkin"
 								@select="emit('select', skin)"
 							>
 								<template v-if="!readOnly" #overlay-buttons>
@@ -488,11 +539,11 @@ defineExpose({ getAddSkinButtonElement })
 						:key="skinKey(skin, section.key)"
 						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
 						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
-						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 						:selected="isSkinSelected(skin)"
 						:active="isSkinActive(skin)"
 						:tooltip="skin.name"
 						:disabled="readOnly"
+						:is-dragging="isDraggingSavedSkin"
 						@select="emit('select', skin)"
 					>
 						<template #overlay-buttons>
