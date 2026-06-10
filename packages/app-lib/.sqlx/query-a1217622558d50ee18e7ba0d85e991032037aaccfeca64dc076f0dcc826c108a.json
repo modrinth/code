@@ -1,10 +1,6 @@
 {
   "db_name": "SQLite",
-<<<<<<<< HEAD:packages/app-lib/.sqlx/query-a1217622558d50ee18e7ba0d85e991032037aaccfeca64dc076f0dcc826c108a.json
   "query": "SELECT texture_key, variant AS 'variant: MinecraftSkinVariant', cape_id AS 'cape_id: Hyphenated', display_order FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
-========
-  "query": "SELECT texture_key, variant AS 'variant: MinecraftSkinVariant', cape_id AS 'cape_id: Hyphenated' FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? ORDER BY display_order ASC, rowid ASC LIMIT ? OFFSET ?",
->>>>>>>> truman/reorder-skins:packages/app-lib/.sqlx/query-e00fdeb5d19f4d836dd62d8ef400205d5d9fd63e23994c8c48f0721b49a79594.json
   "describe": {
     "columns": [
       {
@@ -38,9 +34,5 @@
       false
     ]
   },
-<<<<<<<< HEAD:packages/app-lib/.sqlx/query-a1217622558d50ee18e7ba0d85e991032037aaccfeca64dc076f0dcc826c108a.json
   "hash": "a1217622558d50ee18e7ba0d85e991032037aaccfeca64dc076f0dcc826c108a"
-========
-  "hash": "e00fdeb5d19f4d836dd62d8ef400205d5d9fd63e23994c8c48f0721b49a79594"
->>>>>>>> truman/reorder-skins:packages/app-lib/.sqlx/query-e00fdeb5d19f4d836dd62d8ef400205d5d9fd63e23994c8c48f0721b49a79594.json
 }
