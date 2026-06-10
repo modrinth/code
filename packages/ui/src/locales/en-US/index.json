@@ -612,7 +612,7 @@
     "defaultMessage": "Create instance"
   },
   "creation-flow.button.create-world": {
-    "defaultMessage": "Create world"
+    "defaultMessage": "Create instance"
   },
   "creation-flow.button.finish": {
     "defaultMessage": "Finish"
@@ -624,7 +624,7 @@
     "defaultMessage": "Import {count, plural, one {# instance} other {# instances}}"
   },
   "creation-flow.button.setup-server": {
-    "defaultMessage": "Setup server"
+    "defaultMessage": "Create instance"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Build number"
@@ -744,10 +744,10 @@
     "defaultMessage": "Select generator settings"
   },
   "creation-flow.modal.final-config.world-name.label": {
-    "defaultMessage": "World name"
+    "defaultMessage": "Instance name"
   },
   "creation-flow.modal.final-config.world-name.placeholder": {
-    "defaultMessage": "Enter world name"
+    "defaultMessage": "Enter instance name"
   },
   "creation-flow.modal.final-config.world-seed.description": {
     "defaultMessage": "Leave blank for a random seed."
@@ -840,10 +840,10 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Browse modpacks on Modrinth or import one from a file."
+    "defaultMessage": "Use a popular modpack as your starting point."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Install modpack"
+    "defaultMessage": "Modpack base"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Classic Minecraft with no mods or plugins."
@@ -858,7 +858,7 @@
     "defaultMessage": "Choose instance type"
   },
   "creation-flow.modal.setup-type.title.world": {
-    "defaultMessage": "Select world type"
+    "defaultMessage": "Select instance type"
   },
   "creation-flow.title.choose-modpack": {
     "defaultMessage": "Choose modpack"
@@ -867,7 +867,7 @@
     "defaultMessage": "Create instance"
   },
   "creation-flow.title.create-world": {
-    "defaultMessage": "Create world"
+    "defaultMessage": "Create instance"
   },
   "creation-flow.title.import-instance": {
     "defaultMessage": "Import instance"
@@ -876,7 +876,7 @@
     "defaultMessage": "Reset instance"
   },
   "creation-flow.title.set-up-server": {
-    "defaultMessage": "Set up server"
+    "defaultMessage": "Create instance"
   },
   "external-files.permissions-card.add-files-modal.confirm": {
     "defaultMessage": "{count, plural, one {Add file} other {Add files}}"
@@ -1712,6 +1712,9 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reset to onboarding"
   },
+  "hosting.loader.reset-to-onboarding-description": {
+    "defaultMessage": "Send this instance back into onboarding so setup can be completed again."
+  },
   "hosting.loader.reset-to-onboarding-modal-description": {
     "defaultMessage": "This will send the instance back into onboarding so setup can be completed again. Are you sure you want to continue?"
   },
@@ -1723,9 +1726,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Instance reset to onboarding"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Support options"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -3590,6 +3590,57 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "server.instance-settings.general.danger-zone.label": {
+    "defaultMessage": "Danger zone"
+  },
+  "server.instance-settings.general.instance-name.description": {
+    "defaultMessage": "This name is only visible on Modrinth."
+  },
+  "server.instance-settings.general.instance-name.error": {
+    "defaultMessage": "Failed to update instance name"
+  },
+  "server.instance-settings.general.instance-name.fallback": {
+    "defaultMessage": "Instance"
+  },
+  "server.instance-settings.general.instance-name.label": {
+    "defaultMessage": "Instance name"
+  },
+  "server.instance-settings.general.instance-name.saved.description": {
+    "defaultMessage": "The instance name has been updated."
+  },
+  "server.instance-settings.general.instance-name.saved.title": {
+    "defaultMessage": "Instance renamed"
+  },
+  "server.instance-settings.general.reset-everything.button": {
+    "defaultMessage": "Reset everything"
+  },
+  "server.instance-settings.general.reset-everything.description": {
+    "defaultMessage": "Reset your instance completely. This removes world data, content, and any configuration. A backup of the previous instance will remain available."
+  },
+  "server.instance-settings.general.reset-world-files.button": {
+    "defaultMessage": "Reset world data"
+  },
+  "server.instance-settings.general.reset-world-files.description": {
+    "defaultMessage": "Delete the current world data and generate a new one. Your content and files will stay the same."
+  },
+  "server.instance-settings.general.reset-world-files.error": {
+    "defaultMessage": "Failed to reset world data"
+  },
+  "server.instance-settings.general.reset-world-files.modal.description": {
+    "defaultMessage": "This deletes the world directory for this instance. Installed content and settings will stay the same."
+  },
+  "server.instance-settings.general.reset-world-files.modal.title": {
+    "defaultMessage": "Reset world data"
+  },
+  "server.instance-settings.general.reset-world-files.started.description": {
+    "defaultMessage": "The world directory is being reset."
+  },
+  "server.instance-settings.general.reset-world-files.started.title": {
+    "defaultMessage": "World data reset started"
+  },
+  "server.instance-settings.general.support-zone.label": {
+    "defaultMessage": "Support zone"
+  },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Backups"
   },
@@ -3889,33 +3940,6 @@
   },
   "servers.access-table.user-avatar-alt": {
     "defaultMessage": "{username}'s avatar"
-  },
-  "server.instance-settings.general.danger-zone.label": {
-    "defaultMessage": "Danger zone"
-  },
-  "server.instance-settings.general.instance-name.description": {
-    "defaultMessage": "This name is only visible on Modrinth."
-  },
-  "server.instance-settings.general.instance-name.fallback": {
-    "defaultMessage": "Instance"
-  },
-  "server.instance-settings.general.instance-name.label": {
-    "defaultMessage": "Instance name"
-  },
-  "server.instance-settings.general.not-implemented": {
-    "defaultMessage": "Not yet implemented"
-  },
-  "server.instance-settings.general.reset-everything.button": {
-    "defaultMessage": "Reset everything"
-  },
-  "server.instance-settings.general.reset-everything.description": {
-    "defaultMessage": "Reset your instance completely. This removes world data, content, and any configuration. A backup of the previous instance will remain available."
-  },
-  "server.instance-settings.general.reset-world-files.button": {
-    "defaultMessage": "Reset world data"
-  },
-  "server.instance-settings.general.reset-world-files.description": {
-    "defaultMessage": "Delete the current world data and generate a new one. Your content and files will stay the same."
   },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Background task running"
@@ -4730,6 +4754,15 @@
   "servers.manage.instances.card.settings": {
     "defaultMessage": "Instance settings"
   },
+  "servers.manage.instances.create.error": {
+    "defaultMessage": "Failed to create instance"
+  },
+  "servers.manage.instances.create.success.text": {
+    "defaultMessage": "{instance} is ready to configure."
+  },
+  "servers.manage.instances.create.success.title": {
+    "defaultMessage": "Instance created"
+  },
   "servers.manage.instances.info.body": {
     "defaultMessage": "An instance is a separate setup of your server with its own content, files, worlds, and settings. You can switch which instance your server runs at any time."
   },
@@ -5073,7 +5106,7 @@
     "defaultMessage": "Modpack upload failed"
   },
   "servers.setup.onboarding.setup-server.button": {
-    "defaultMessage": "Setup server"
+    "defaultMessage": "Create instance"
   },
   "servers.setup.onboarding.step.choose.description": {
     "defaultMessage": "Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want."
@@ -5094,7 +5127,7 @@
     "defaultMessage": "Invite your friends"
   },
   "servers.setup.onboarding.steps.heading": {
-    "defaultMessage": "Setup your server (~2mins)"
+    "defaultMessage": "Create instance (~2 mins)"
   },
   "servers.setup.onboarding.uploading.progress": {
     "defaultMessage": "Uploading ({percent, number}%)"

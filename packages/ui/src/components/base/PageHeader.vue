@@ -168,7 +168,7 @@
 									<component
 										:is="item.icon"
 										v-if="item.icon"
-										class="flex size-5 shrink-0"
+										class="flex size-5 shrink-0 text-current"
 										aria-hidden="true"
 										v-bind="item.iconProps"
 									/>
@@ -185,7 +185,7 @@
 									<component
 										:is="item.icon"
 										v-if="item.icon"
-										class="flex size-5 shrink-0"
+										class="flex size-5 shrink-0 text-current"
 										aria-hidden="true"
 										v-bind="item.iconProps"
 									/>
@@ -200,7 +200,7 @@
 									<component
 										:is="item.icon"
 										v-if="item.icon"
-										class="flex size-5 shrink-0"
+										class="flex size-5 shrink-0 text-current"
 										aria-hidden="true"
 										v-bind="item.iconProps"
 									/>
@@ -419,7 +419,7 @@
 							<component
 								:is="item.icon"
 								v-if="item.icon"
-								class="flex size-5 shrink-0"
+								class="flex size-5 shrink-0 text-current"
 								aria-hidden="true"
 								v-bind="item.iconProps"
 							/>
@@ -436,7 +436,7 @@
 							<component
 								:is="item.icon"
 								v-if="item.icon"
-								class="flex size-5 shrink-0"
+								class="flex size-5 shrink-0 text-current"
 								aria-hidden="true"
 								v-bind="item.iconProps"
 							/>
@@ -451,7 +451,7 @@
 							<component
 								:is="item.icon"
 								v-if="item.icon"
-								class="flex size-5 shrink-0"
+								class="flex size-5 shrink-0 text-current"
 								aria-hidden="true"
 								v-bind="item.iconProps"
 							/>

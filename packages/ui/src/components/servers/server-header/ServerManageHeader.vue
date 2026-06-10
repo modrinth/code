@@ -30,10 +30,10 @@ import { computed } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import PageHeader from '#ui/components/base/PageHeader.vue'
 import type { JoinedButtonAction } from '#ui/components/base/JoinedButtons.vue'
-import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
+import PageHeader from '#ui/components/base/PageHeader.vue'
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
+import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -212,7 +212,9 @@ const serverAddress = computed(() => {
 })
 
 const showAddress = computed(
-	() => !!serverAddress.value && (!props.server?.net?.domain || !userPreferences.value.hideSubdomainLabel),
+	() =>
+		!!serverAddress.value &&
+		(!props.server?.net?.domain || !userPreferences.value.hideSubdomainLabel),
 )
 
 const metadataItems = computed<HeaderMetadataItem[]>(() => {

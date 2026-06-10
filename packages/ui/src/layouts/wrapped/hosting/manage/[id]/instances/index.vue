@@ -40,27 +40,46 @@
 				v-for="world in worldSlots"
 				:key="world.id"
 				:world="world"
-				:switching="world.type === 'world' && switchingWorldId === world.id"
 				@create="handleCreateWorld"
 				@edit="handleEditWorld"
-				@switch="handleSwitchWorld"
 				@settings="handleWorldSettings"
 			/>
 		</div>
 	</div>
+
+	<CreationFlowModal
+		ref="createWorldModalRef"
+		type="world"
+		:available-loaders="SERVER_LOADERS"
+		:show-snapshot-toggle="true"
+		:search-modpacks="searchModpacks"
+		:get-project-versions="getProjectVersions"
+		:finish-disabled="!canSetup"
+		:finish-disabled-tooltip="!canSetup ? permissionDeniedMessage : undefined"
+		@browse-modpacks="handleBrowseModpacks"
+		@create="onCreateWorld"
+	/>
+
+	<UploadProgressModal ref="uploadProgressModal" />
 </template>
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { InfoIcon, XIcon } from '@modrinth/assets'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
+import {
+	type CreationFlowContextValue,
+	CreationFlowModal,
+	UploadProgressModal,
+} from '#ui/components'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import InstanceCard from '#ui/components/servers/instances/InstanceCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -87,17 +106,17 @@ const messages = defineMessages({
 		id: 'servers.manage.instances.info.dismiss',
 		defaultMessage: "Don't show this again",
 	},
-	switchSuccessTitle: {
-		id: 'servers.manage.instances.switch.success.title',
-		defaultMessage: 'Instance switched',
+	createSuccessTitle: {
+		id: 'servers.manage.instances.create.success.title',
+		defaultMessage: 'Instance created',
 	},
-	switchSuccessText: {
-		id: 'servers.manage.instances.switch.success.text',
-		defaultMessage: '{instance} is now the active instance.',
+	createSuccessText: {
+		id: 'servers.manage.instances.create.success.text',
+		defaultMessage: '{instance} is ready to configure.',
 	},
-	switchError: {
-		id: 'servers.manage.instances.switch.error',
-		defaultMessage: 'Failed to switch instance',
+	createError: {
+		id: 'servers.manage.instances.create.error',
+		defaultMessage: 'Failed to create instance',
 	},
 })
 
@@ -136,6 +155,7 @@ type ContentSummary = {
 
 const WORLD_SLOT_COUNT = 3
 const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed'
+const SERVER_LOADERS = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 
 const client = injectModrinthClient()
 const { serverId, server, isServerRunning } = injectModrinthServerContext()
@@ -143,9 +163,14 @@ const { openServerInstanceSettings } = injectServerSettingsModal()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const route = useRoute()
 const queryClient = useQueryClient()
+const { canSetup, permissionDeniedMessage } = useServerPermissions()
 const instanceInfoAdmonitionDismissed = useStorage(INSTANCE_INFO_ADMONITION_KEY, false)
-const switchingWorldId = ref<string | null>(null)
+const createWorldModalRef =
+	useTemplateRef<InstanceType<typeof CreationFlowModal>>('createWorldModalRef')
+const uploadProgressModal =
+	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 const worldsQuery = useQuery({
 	queryKey: computed(() => ['servers', 'worlds', 'summary', 'v1', serverId]),
@@ -155,38 +180,28 @@ const worldsQuery = useQuery({
 
 const worldsPending = computed(() => worldsQuery.isLoading.value && !worldsQuery.data.value)
 const worldSlots = computed(() => worldsQuery.data.value ?? [])
-const switchWorldMutation = useMutation({
-	mutationFn: (worldId: string) => client.archon.servers_v1.switchWorld(serverId, worldId),
-	onMutate: (worldId) => {
-		switchingWorldId.value = worldId
-	},
-	onSuccess: async (_, worldId) => {
-		updateActiveWorld(worldId)
-		await Promise.all([
-			queryClient.invalidateQueries({
-				queryKey: ['servers', 'worlds', 'summary', 'v1', serverId],
-			}),
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
-		])
-		updateActiveWorld(worldId)
-		const worldName = getWorldSlotName(worldId)
-		addNotification({
-			type: 'success',
-			title: formatMessage(messages.switchSuccessTitle),
-			text: formatMessage(messages.switchSuccessText, { instance: worldName }),
-		})
-	},
-	onError: (error) => {
-		addNotification({
-			type: 'error',
-			text: error instanceof Error ? error.message : formatMessage(messages.switchError),
-		})
-	},
-	onSettled: () => {
-		switchingWorldId.value = null
-	},
+
+onMounted(() => {
+	if (route.query.resumeModal !== 'create-instance') return
+	router.replace({ query: { ...route.query, resumeModal: undefined } })
+	createWorldModalRef.value?.show()
 })
+
+onBeforeUnmount(() => createWorldModalRef.value?.hide())
+
+async function searchModpacks(query: string, limit: number = 10) {
+	return client.labrinth.projects_v2.search({
+		query: query || undefined,
+		new_filters:
+			'project_types = "modpack" AND (client_side = "optional" OR client_side = "required") AND server_side = "required"',
+		limit,
+	})
+}
+
+async function getProjectVersions(projectId: string) {
+	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
+	return versions.map((version) => ({ id: version.id }))
+}
 
 async function loadWorldSlots(): Promise<WorldSlot[]> {
 	try {
@@ -198,7 +213,7 @@ async function loadWorldSlots(): Promise<WorldSlot[]> {
 			}),
 		)
 
-		return padWorldSlots(slots)
+		return padWorldSlots(sortWorldSlotsByCreatedAt(slots))
 	} catch {
 		return createDummyWorldSlots()
 	}
@@ -251,6 +266,16 @@ function padWorldSlots(slots: WorldSlot[]): WorldSlot[] {
 		})
 	}
 	return padded
+}
+
+function sortWorldSlotsByCreatedAt(slots: WorldSlot[]): WorldSlot[] {
+	return [...slots].sort((a, b) => getCreatedAtTimestamp(a) - getCreatedAtTimestamp(b))
+}
+
+function getCreatedAtTimestamp(slot: WorldSlot): number {
+	if (slot.type !== 'world') return Number.POSITIVE_INFINITY
+	const timestamp = new Date(slot.createdAt ?? '').getTime()
+	return Number.isFinite(timestamp) ? timestamp : Number.POSITIVE_INFINITY
 }
 
 function getLinkedModpack(modpack: Archon.Content.v1.ModpackFields | null): LinkedModpack | null {
@@ -372,55 +397,142 @@ function handleEditWorld(worldId: string) {
 	)
 }
 
-function handleSwitchWorld(worldId: string) {
-	const world = worldSlots.value.find((slot) => slot.type === 'world' && slot.id === worldId)
-	if (world?.type !== 'world' || world.active || switchWorldMutation.isPending.value) return
-	switchWorldMutation.mutate(worldId)
-}
-
 function handleWorldSettings(worldId: string) {
 	openServerInstanceSettings({ tabId: 'general', worldId })
 }
 
 function handleCreateWorld() {
-	openServerInstanceSettings({ tabId: 'installation' })
+	createWorldModalRef.value?.show()
 }
 
 function dismissInstanceInfoAdmonition() {
 	instanceInfoAdmonitionDismissed.value = true
 }
 
-function updateActiveWorld(worldId: string) {
-	queryClient.setQueryData<WorldSlot[]>(
-		['servers', 'worlds', 'summary', 'v1', serverId],
-		(current) =>
-			current?.map((slot) =>
-				slot.type === 'world'
-					? {
-							...slot,
-							active: slot.id === worldId,
-							lastActiveAt: slot.id === worldId ? new Date().toISOString() : slot.lastActiveAt,
-						}
-					: slot,
-			),
-	)
-	queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
-		['servers', 'v1', 'detail', serverId],
-		(current) =>
-			current
-				? {
-						...current,
-						worlds: current.worlds.map((world) => ({
-							...world,
-							is_active: world.id === worldId,
-						})),
-					}
-				: current,
+function handleBrowseModpacks() {
+	if (!canSetup.value) return
+
+	router.push({
+		path: '/discover/modpacks',
+		query: { sid: serverId, from: 'create-instance' },
+	})
+}
+
+async function onCreateWorld(ctx: CreationFlowContextValue) {
+	if (!canSetup.value) {
+		ctx.loading.value = false
+		return
+	}
+
+	const name = ctx.worldName.value.trim()
+	const properties = ctx.buildProperties()
+	let createdWorldId: string | null = null
+
+	try {
+		if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
+			const createdWorld = await client.archon.servers_v1.createWorld(serverId, {
+				name,
+				properties,
+				content: createBareWorldContent(ctx),
+			})
+			createdWorldId = createdWorld.id
+			createWorldModalRef.value?.hide()
+			const handle = client.kyros.content_v1.uploadModpackFile(
+				createdWorld.id,
+				ctx.modpackFile.value,
+				properties,
+				{ softOverride: false },
+			)
+			if (uploadProgressModal.value) {
+				await uploadProgressModal.value.track(handle)
+			} else {
+				await handle.promise
+			}
+		} else {
+			const createdWorld = await client.archon.servers_v1.createWorld(serverId, {
+				name,
+				properties,
+				content: createWorldContent(ctx),
+			})
+			createdWorldId = createdWorld.id
+		}
+
+		if (!createdWorldId) {
+			throw new Error(formatMessage(messages.createError))
+		}
+
+		server.value.status = 'installing'
+		await handleCreateWorldSuccess(createdWorldId, name)
+		createWorldModalRef.value?.hide()
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			text: error instanceof Error ? error.message : formatMessage(messages.createError),
+		})
+		if (createdWorldId) {
+			await invalidateWorldQueries()
+		}
+	} finally {
+		ctx.loading.value = false
+	}
+}
+
+function createWorldContent(ctx: CreationFlowContextValue): Archon.Servers.v1.WorldContent {
+	if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {
+		return {
+			content_variant: 'modpack',
+			spec: {
+				platform: 'modrinth',
+				project_id: ctx.modpackSelection.value.projectId,
+				version_id: ctx.modpackSelection.value.versionId,
+			},
+		}
+	}
+
+	return createBareWorldContent(ctx)
+}
+
+function createBareWorldContent(ctx: CreationFlowContextValue): Archon.Servers.v1.WorldContent {
+	const loader =
+		ctx.setupType.value === 'vanilla' ? 'vanilla' : toApiLoader(ctx.selectedLoader.value)
+	return {
+		content_variant: 'bare',
+		loader,
+		version: loader === 'vanilla' ? '' : (ctx.selectedLoaderVersion.value ?? ''),
+		game_version: ctx.selectedGameVersion.value ?? server.value?.mc_version ?? null,
+	}
+}
+
+async function handleCreateWorldSuccess(worldId: string, name: string) {
+	await invalidateWorldQueries()
+	addNotification({
+		type: 'success',
+		title: formatMessage(messages.createSuccessTitle),
+		text: formatMessage(messages.createSuccessText, { instance: name }),
+	})
+	await router.push(
+		`/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId)}`,
 	)
 }
 
-function getWorldSlotName(worldId: string) {
-	const world = worldSlots.value.find((slot) => slot.type === 'world' && slot.id === worldId)
-	return world?.name ?? formatMessage(messages.instanceSlotName, { index: 1 })
+async function invalidateWorldQueries() {
+	await Promise.all([
+		queryClient.invalidateQueries({
+			queryKey: ['servers', 'worlds', 'summary', 'v1', serverId],
+		}),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+	])
+	await queryClient.fetchQuery({
+		queryKey: ['servers', 'v1', 'detail', serverId],
+		queryFn: () => client.archon.servers_v1.get(serverId),
+	})
+}
+
+function toApiLoader(loader: string | null | undefined): Archon.Content.v1.Modloader {
+	const normalized = loader?.toLowerCase().replace(/[\s_-]/g, '') ?? 'vanilla'
+	if (normalized === 'neoforge') return 'neo_forge'
+	if (normalized === 'vanilla') return 'vanilla'
+	return normalized as Archon.Content.v1.Modloader
 }
 </script>

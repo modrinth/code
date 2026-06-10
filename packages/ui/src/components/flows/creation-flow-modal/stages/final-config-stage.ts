@@ -44,7 +44,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			: isReset
 				? ctx.formatMessage(creationFlowMessages.resetServerTitle)
 				: isOnboarding
-					? ctx.formatMessage(creationFlowMessages.setupServerButton)
+					? ctx.formatMessage(creationFlowMessages.createWorldButton)
 					: ctx.formatMessage(commonMessages.continueButton)
 		return {
 			label,

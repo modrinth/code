@@ -62,7 +62,7 @@
 
 		<CreationFlowModal
 			ref="modalRef"
-			type="server-onboarding"
+			type="world"
 			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 			:show-snapshot-toggle="true"
 			:search-modpacks="searchModpacks"
@@ -111,7 +111,7 @@ const messages = defineMessages({
 	},
 	setupStepsHeading: {
 		id: 'servers.setup.onboarding.steps.heading',
-		defaultMessage: 'Setup your server (~2mins)',
+		defaultMessage: 'Create instance (~2 mins)',
 	},
 	uploadingProgress: {
 		id: 'servers.setup.onboarding.uploading.progress',
@@ -119,7 +119,7 @@ const messages = defineMessages({
 	},
 	setupServerButton: {
 		id: 'servers.setup.onboarding.setup-server.button',
-		defaultMessage: 'Setup server',
+		defaultMessage: 'Create instance',
 	},
 	modpackUploadFailedTitle: {
 		id: 'servers.setup.onboarding.modpack-upload-failed.title',
@@ -178,7 +178,7 @@ async function getProjectVersions(projectId: string) {
 	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
 	return versions.map((v) => ({ id: v.id }))
 }
-const { serverId, worldId, server } = injectModrinthServerContext()
+const { serverId, server } = injectModrinthServerContext()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -218,7 +218,7 @@ function onBrowseModpacks() {
 	if (props.browseModpacks) {
 		props.browseModpacks({
 			serverId,
-			worldId: worldId.value,
+			worldId: null,
 			from: 'onboarding',
 		})
 		return
@@ -226,7 +226,7 @@ function onBrowseModpacks() {
 
 	router.push({
 		path: '/discover/modpacks',
-		query: { sid: serverId, from: 'onboarding', wid: worldId.value },
+		query: { sid: serverId, from: 'onboarding' },
 	})
 }
 
@@ -266,23 +266,23 @@ onMounted(async () => {
 	}
 })
 
-async function finalizeSetup() {
+async function finalizeSetup(createdWorldId: string) {
 	modalRef.value?.hide()
 	server.value.flows = { intro: false }
-	client.archon.servers_v1.endIntro(serverId).then(() => {
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-	})
+	await client.archon.servers_v1.endIntro(serverId)
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'worlds', 'summary', 'v1', serverId] }),
+	])
 	await router.push(
-		worldId.value
-			? `/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(worldId.value)}`
-			: `/hosting/manage/${encodeURIComponent(serverId)}/instances`,
+		`/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(createdWorldId)}`,
 	)
 }
 
-/** Map UI loader names to API Modloader values */
-function toApiLoader(loader: string): Archon.Content.v1.Modloader {
+function toApiLoader(loader: string | null | undefined): Archon.Content.v1.Modloader {
 	if (loader === 'neoforge') return 'neo_forge'
-	return loader as Archon.Content.v1.Modloader
+	return (loader ?? 'vanilla') as Archon.Content.v1.Modloader
 }
 
 const onCreate = async (config: CreationFlowContextValue) => {
@@ -291,20 +291,25 @@ const onCreate = async (config: CreationFlowContextValue) => {
 		return
 	}
 
-	// Handle mrpack file upload
-	if (config.setupType.value === 'modpack' && config.modpackFile.value) {
-		modalRef.value?.hide()
-		uploading.value = true
-		uploadedBytes.value = 0
-		totalBytes.value = config.modpackFile.value.size
+	const properties = config.buildProperties()
 
-		try {
+	try {
+		if (config.setupType.value === 'modpack' && config.modpackFile.value) {
+			const createdWorld = await client.archon.servers_v1.createWorld(serverId, {
+				name: config.worldName.value.trim(),
+				properties,
+				content: createBareWorldContent(config),
+			})
+			modalRef.value?.hide()
+			uploading.value = true
+			uploadedBytes.value = 0
+			totalBytes.value = config.modpackFile.value.size
 			const handle = client.kyros.content_v1.uploadModpackFile(
-				worldId.value!,
+				createdWorld.id,
 				config.modpackFile.value,
-				config.buildProperties(),
+				properties,
 				{
-					softOverride: true,
+					softOverride: false,
 					onProgress: ({ loaded, total }) => {
 						uploadedBytes.value = loaded
 						totalBytes.value = total
@@ -313,57 +318,57 @@ const onCreate = async (config: CreationFlowContextValue) => {
 			)
 			await handle.promise
 			server.value.status = 'installing'
-			await finalizeSetup()
-		} catch {
-			addNotification({
-				title: formatMessage(messages.modpackUploadFailedTitle),
-				text: formatMessage(messages.modpackUploadFailedText),
-				type: 'error',
-			})
-			config.loading.value = false
-			uploading.value = false
+			await finalizeSetup(createdWorld.id)
+			return
 		}
-		return
+
+		const createdWorld = await client.archon.servers_v1.createWorld(serverId, {
+			name: config.worldName.value.trim(),
+			properties,
+			content: createWorldContent(config),
+		})
+		server.value.status = 'installing'
+		await finalizeSetup(createdWorld.id)
+	} catch {
+		addNotification({
+			title:
+				config.setupType.value === 'modpack' && config.modpackFile.value
+					? formatMessage(messages.modpackUploadFailedTitle)
+					: formatMessage(messages.installationFailedTitle),
+			text:
+				config.setupType.value === 'modpack' && config.modpackFile.value
+					? formatMessage(messages.modpackUploadFailedText)
+					: formatMessage(messages.installationFailedText),
+			type: 'error',
+		})
+		config.loading.value = false
+		uploading.value = false
 	}
+}
 
-	let request: Archon.Content.v1.InstallWorldContent
-
-	const properties = config.buildProperties()
-
+function createWorldContent(config: CreationFlowContextValue): Archon.Servers.v1.WorldContent {
 	if (config.setupType.value === 'modpack' && config.modpackSelection.value) {
-		request = {
+		return {
 			content_variant: 'modpack',
 			spec: {
 				platform: 'modrinth',
 				project_id: config.modpackSelection.value.projectId,
 				version_id: config.modpackSelection.value.versionId,
 			},
-			soft_override: false,
-			properties,
-		}
-	} else {
-		const loader = config.selectedLoader.value
-		request = {
-			content_variant: 'bare',
-			loader: loader ? toApiLoader(loader) : 'vanilla',
-			version: config.selectedLoaderVersion.value ?? '',
-			game_version: config.selectedGameVersion.value ?? undefined,
-			soft_override: false,
-			properties,
 		}
 	}
 
-	try {
-		await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-		server.value.status = 'installing'
-		await finalizeSetup()
-	} catch {
-		addNotification({
-			title: formatMessage(messages.installationFailedTitle),
-			text: formatMessage(messages.installationFailedText),
-			type: 'error',
-		})
-		config.loading.value = false
+	return createBareWorldContent(config)
+}
+
+function createBareWorldContent(config: CreationFlowContextValue): Archon.Servers.v1.WorldContent {
+	const loader =
+		config.setupType.value === 'vanilla' ? 'vanilla' : toApiLoader(config.selectedLoader.value)
+	return {
+		content_variant: 'bare',
+		loader,
+		version: loader === 'vanilla' ? '' : (config.selectedLoaderVersion.value ?? ''),
+		game_version: config.selectedGameVersion.value ?? server.value?.mc_version ?? null,
 	}
 }
 

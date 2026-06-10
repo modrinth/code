@@ -25,7 +25,7 @@ await Promise.allSettled([
 		queryFn: () => client.archon.servers_v1.get(serverId),
 		staleTime: 30_000,
 	}),
-	queryClient.prefetchInfiniteQuery({
+	queryClient.ensureInfiniteQueryData({
 		queryKey: [
 			'servers',
 			'action-log',

@@ -761,6 +761,34 @@ export namespace Archon {
 				readiness: WorldReadiness
 			}
 
+			export type WorldContent =
+				| {
+						content_variant: 'modpack'
+						spec: Archon.Content.v1.ModpackSpec
+				  }
+				| {
+						content_variant: 'bare'
+						loader: Archon.Content.v1.Modloader
+						version: string
+						game_version?: string | null
+				  }
+
+			export type CreateWorld = {
+				name: string
+				icon_data?: string | null
+				properties?: Archon.Content.v1.PropertiesFields | null
+				content: WorldContent
+			}
+
+			export type CreateWorldResponse = {
+				id: string
+			}
+
+			export type PatchWorld = {
+				name?: string | null
+				icon_data?: string | null
+			}
+
 			export type WorldReadiness = {
 				data_synchronized_fetched: boolean
 			}
