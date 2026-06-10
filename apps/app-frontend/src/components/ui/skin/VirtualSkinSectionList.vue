@@ -2,7 +2,6 @@
 import {
 	DropdownIcon,
 	EditIcon,
-	MoveIcon,
 	PlusIcon,
 	TrashIcon,
 	UnknownIcon,
@@ -80,10 +79,6 @@ const messages = defineMessages({
 	deleteSkinButton: {
 		id: 'app.skins.delete-button',
 		defaultMessage: 'Delete skin',
-	},
-	reorderSkinButton: {
-		id: 'app.skins.reorder-button',
-		defaultMessage: 'Reorder skin',
 	},
 })
 
@@ -415,7 +410,7 @@ defineExpose({ getAddSkinButtonElement })
 					:list="draggableSavedSkins"
 					class="grid w-full grid-cols-3 gap-3 min-[1300px]:grid-cols-4 min-[1750px]:grid-cols-5 min-[2050px]:grid-cols-6"
 					:item-key="savedSkinKey"
-					handle=".skin-reorder-handle"
+					:disabled="!canReorderSavedSkins"
 					:animation="250"
 					:swap-threshold="1"
 					:invert-swap="false"
@@ -486,16 +481,6 @@ defineExpose({ getAddSkinButtonElement })
 									</ButtonStyled>
 								</template>
 							</SkinButton>
-							<ButtonStyled v-if="canReorderSavedSkins" circular>
-								<button
-									v-tooltip="formatMessage(messages.reorderSkinButton)"
-									:aria-label="formatMessage(messages.reorderSkinButton)"
-									class="skin-reorder-handle absolute bottom-3 right-3 z-40 cursor-grab active:cursor-grabbing"
-									@click.stop.prevent
-								>
-									<MoveIcon />
-								</button>
-							</ButtonStyled>
 						</div>
 					</template>
 				</Draggable>
