@@ -3,8 +3,6 @@
 
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
-export type IconComponent = FunctionalComponent<SVGAttributes>
-
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
@@ -190,6 +188,7 @@ import _MonitorSmartphoneIcon from './icons/monitor-smartphone.svg?component'
 import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
 import _MoreVerticalIcon from './icons/more-vertical.svg?component'
+import _MoveIcon from './icons/move.svg?component'
 import _NewspaperIcon from './icons/newspaper.svg?component'
 import _NoSignalIcon from './icons/no-signal.svg?component'
 import _NotepadTextIcon from './icons/notepad-text.svg?component'
@@ -426,6 +425,8 @@ import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
 import _ZoomOutIcon from './icons/zoom-out.svg?component'
 
+export type IconComponent = FunctionalComponent<SVGAttributes>
+
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
@@ -611,6 +612,7 @@ export const MonitorSmartphoneIcon = _MonitorSmartphoneIcon
 export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
 export const MoreVerticalIcon = _MoreVerticalIcon
+export const MoveIcon = _MoveIcon
 export const NewspaperIcon = _NewspaperIcon
 export const NoSignalIcon = _NoSignalIcon
 export const NotepadTextIcon = _NotepadTextIcon
