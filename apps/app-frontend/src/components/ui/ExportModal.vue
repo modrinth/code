@@ -16,7 +16,6 @@ import { ref } from 'vue'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
-import path from 'path'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
