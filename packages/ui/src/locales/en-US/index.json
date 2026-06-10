@@ -4445,9 +4445,6 @@
   "servers.manage.instances.info.body": {
     "defaultMessage": "An instance is a separate setup of your server with its own content, files, worlds, and settings. You can switch which instance your server runs at any time."
   },
-  "servers.manage.instances.info.dismiss": {
-    "defaultMessage": "Don't show this again"
-  },
   "servers.manage.instances.info.header": {
     "defaultMessage": "What is a server instance?"
   },

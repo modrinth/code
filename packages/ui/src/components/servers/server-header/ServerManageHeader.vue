@@ -296,16 +296,7 @@ const startActionText = computed(() =>
 	primaryActionText.value === 'Start' ? 'Start server' : primaryActionText.value,
 )
 
-const startableWorlds = computed(() => {
-	if (props.worlds.length > 0) return props.worlds
-
-	return [
-		{
-			id: 'current-world',
-			name: props.activeWorldName ?? 'current instance',
-		},
-	]
-})
+const powerActionWorlds = computed(() => (props.worlds.length > 1 ? props.worlds : []))
 
 const startSplitActions = computed<JoinedButtonAction[]>(() => [
 	{
@@ -314,7 +305,7 @@ const startSplitActions = computed<JoinedButtonAction[]>(() => [
 		icon: PlayIcon,
 		action: handlePrimaryAction,
 	},
-	...startableWorlds.value.map((world) => ({
+	...powerActionWorlds.value.map((world) => ({
 		id: `start-${world.id}`,
 		label: `Start with ${world.name}`,
 		icon: GlobeIcon,
@@ -330,7 +321,7 @@ const restartSplitActions = computed<JoinedButtonAction[]>(() => [
 		action: () => initiateAction('Restart'),
 	},
 	// TODO: Implement world scoping when Archon/Kyros support target worlds in power requests.
-	...startableWorlds.value.map((world) => ({
+	...powerActionWorlds.value.map((world) => ({
 		id: `restart-${world.id}`,
 		label: `Restart with ${world.name}`,
 		icon: GlobeIcon,

@@ -13,6 +13,8 @@ import type {
 	ServerStats,
 } from '../../providers/server-context'
 
+const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed'
+
 const meta = {
 	title: 'Servers/ServerPanelAdmonitions',
 	component: ServerPanelAdmonitions,
@@ -20,13 +22,25 @@ const meta = {
 		layout: 'padded',
 	},
 	decorators: [
-		(story) => ({
+		(story, context) => ({
 			components: { story },
 			setup() {
+				if (
+					typeof window !== 'undefined' &&
+					context.parameters.resetInstanceInfoAdmonition === true
+				) {
+					window.localStorage.removeItem(INSTANCE_INFO_ADMONITION_KEY)
+				}
+
 				const router = useRouter()
 				onMounted(() => {
-					router.replace('/hosting/manage/demo-server/instances/demo-world')
+					router.replace(
+						(context.parameters.routePath as string | undefined) ??
+							'/hosting/manage/demo-server/instances/demo-world',
+					)
 				})
+				const serverWorlds =
+					(context.parameters.serverWorlds as Archon.Servers.v1.WorldFull[] | undefined) ?? null
 
 				const server = ref({
 					server_id: 'demo-server',
@@ -79,7 +93,9 @@ const meta = {
 					},
 					worldId: ref(null),
 					server,
-					serverFull: computed(() => null),
+					serverFull: computed(() =>
+						serverWorlds ? ({ worlds: serverWorlds } as Archon.Servers.v1.ServerFull) : null,
+					),
 					currentUserPermissions: computed(() => 0),
 					isConnected: ref(true),
 					isWsAuthIncorrect: ref(false),
@@ -120,3 +136,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const WithUploadFileOpAndBusy: Story = {}
+
+export const InstanceInfo: Story = {
+	parameters: {
+		routePath: '/hosting/manage/demo-server/instances',
+		resetInstanceInfoAdmonition: true,
+		serverWorlds: [{ id: 'demo-world' }],
+	},
+}

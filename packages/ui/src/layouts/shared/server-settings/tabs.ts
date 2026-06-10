@@ -10,7 +10,7 @@ import {
 } from '@modrinth/assets'
 import type { Component } from 'vue'
 
-export type ServerSettingsTabId = 'general' | 'network' | 'advanced' | 'billing' | 'admin-billing'
+export type ServerSettingsTabId = 'general' | 'network' | 'billing' | 'admin-billing'
 
 export type ServerInstanceSettingsTabId = 'general' | 'installation' | 'properties' | 'advanced'
 
@@ -50,11 +50,6 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		id: 'network',
 		label: 'Network',
 		icon: VersionIcon,
-	},
-	{
-		id: 'advanced',
-		label: 'Advanced',
-		icon: TextQuoteIcon,
 	},
 	{
 		id: 'billing',

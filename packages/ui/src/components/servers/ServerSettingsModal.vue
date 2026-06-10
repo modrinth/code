@@ -8,7 +8,6 @@ import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
-	ServerSettingsAdvancedPage,
 	ServerSettingsGeneralPage,
 	ServerSettingsNetworkPage,
 	serverSettingsTabDefinitions,
@@ -61,7 +60,6 @@ const isApp = ref(true)
 const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
 	network: ServerSettingsNetworkPage,
-	advanced: ServerSettingsAdvancedPage,
 } as const
 
 provideServerSettings({

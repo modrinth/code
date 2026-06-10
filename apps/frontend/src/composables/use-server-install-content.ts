@@ -211,7 +211,9 @@ export function useServerInstallContent({
 	const { data: serverContentData, error: serverContentError } = useQuery({
 		queryKey: contentQueryKey,
 		queryFn: () =>
-			client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value!),
+			client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value!, {
+				from_modpack: false,
+			}),
 		enabled: computed(() => !!currentServerId.value && !!currentWorldId.value),
 	})
 

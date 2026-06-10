@@ -5,8 +5,8 @@ import {
 	DownloadIcon,
 	HeartIcon,
 	MoreVerticalIcon,
-	Settings2Icon,
 	SpinnerIcon,
+	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { Tooltip } from 'floating-vue'
@@ -275,7 +275,7 @@ onUnmounted(() => {
 									}
 								"
 							>
-								<Settings2Icon />
+								<WrenchIcon />
 							</button>
 						</ButtonStyled>
 					</div>
@@ -312,7 +312,7 @@ onUnmounted(() => {
 									{{ formatMessage(commonMessages.contentLabel) }}
 								</template>
 								<template #settings>
-									<Settings2Icon class="size-5" />
+									<WrenchIcon class="size-5" />
 									{{ formatMessage(commonMessages.settingsLabel) }}
 								</template>
 							</TeleportOverflowMenu></ButtonStyled
