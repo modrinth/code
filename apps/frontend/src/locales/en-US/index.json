@@ -2315,6 +2315,9 @@
   "landing.subheading": {
     "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
   },
+  "layout.action.analytics-events": {
+    "message": "Analytics events"
+  },
   "layout.action.change-theme": {
     "message": "Change theme"
   },
