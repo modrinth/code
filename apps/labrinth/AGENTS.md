@@ -24,3 +24,4 @@
   - `Authorization: Bearer mra_user` for a regular user
   - `Modrinth-Admin: feedbeef` as admin key
 - If some steps require you to create a project/mod or version for testing, ask the user to go into the web frontend and manually create a project/version
+- When using `sqlx::query` etc. always use the macro form like `sqlx::query!` or `sqlx::query_scalar!` - never the plain function form. Avoid using `query_as!`.

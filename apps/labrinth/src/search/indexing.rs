@@ -5,7 +5,6 @@ use futures::TryStreamExt;
 use heck::ToKebabCase;
 use itertools::Itertools;
 use regex::Regex;
-use sqlx::Row;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 use tracing::{info, warn};
@@ -125,8 +124,8 @@ pub async fn index_local(
     info!("Indexing local dependencies!");
 
     let dependencies: DashMap<DBProjectId, Vec<SearchProjectDependency>> =
-        sqlx::query(
-            "
+		sqlx::query!(
+			"
             SELECT DISTINCT v.mod_id dependent_project_id, d.mod_dependency_id dependency_project_id,
                 m.name dependency_name, m.slug dependency_slug, m.icon_url dependency_icon_url
             FROM versions v
@@ -136,34 +135,32 @@ pub async fn index_local(
                 AND d.mod_dependency_id IS NOT NULL
                 AND m.status = ANY($2)
             ",
-        )
-        .bind(&project_ids)
-        .bind(&searchable_statuses)
-        .fetch(pool)
-        .try_fold(
-            DashMap::new(),
-            |acc: DashMap<DBProjectId, Vec<SearchProjectDependency>>, m| {
-                let dependency_project_id: Option<i64> =
-                    m.get("dependency_project_id");
-                if let Some(dependency_project_id) = dependency_project_id {
-                    acc.entry(DBProjectId(m.get("dependent_project_id")))
-                        .or_default()
-                        .push(SearchProjectDependency {
-                            project_id: ProjectId::from(DBProjectId(
-                                dependency_project_id,
-                            ))
-                            .to_string(),
-                            name: m.get("dependency_name"),
-                            slug: m.get("dependency_slug"),
-                            icon_url: m.get("dependency_icon_url"),
-                        });
-                }
+			&project_ids,
+			&searchable_statuses,
+		)
+		.fetch(pool)
+		.try_fold(
+			DashMap::new(),
+			|acc: DashMap<DBProjectId, Vec<SearchProjectDependency>>, m| {
+				if let Some(dependency_project_id) = m.dependency_project_id {
+					acc.entry(DBProjectId(m.dependent_project_id))
+						.or_default()
+						.push(SearchProjectDependency {
+							project_id: ProjectId::from(DBProjectId(
+								dependency_project_id,
+							))
+							.to_string(),
+							name: m.dependency_name,
+							slug: m.dependency_slug,
+							icon_url: m.dependency_icon_url,
+						});
+				}
 
-                async move { Ok(acc) }
-            },
-        )
-        .await
-        .wrap_err("failed to fetch project dependencies")?;
+				async move { Ok(acc) }
+			},
+		)
+		.await
+		.wrap_err("failed to fetch project dependencies")?;
 
     struct PartialGallery {
         url: String,
