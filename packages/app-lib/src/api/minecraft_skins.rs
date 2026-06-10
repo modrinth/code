@@ -810,7 +810,7 @@ pub async fn reorder_custom_skins(skins: Vec<Skin>) -> crate::Result<()> {
         .ok_or(ErrorKind::NoCredentialsError)?;
     let profile_id = selected_credentials.offline_profile.id;
 
-    for skin in skins.iter() {
+    for skin in &skins {
         if !matches!(skin.source, SkinSource::CustomExternal) {
             continue;
         }
