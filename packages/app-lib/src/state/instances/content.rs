@@ -888,6 +888,7 @@ async fn get_modpack_identifiers(
         reason: DownloadReason::Modpack,
         game_version: profile.game_version.clone(),
         loader: profile.loader.as_str().to_string(),
+        dependent_on: Some(version_id.to_string()),
     };
 
     let mrpack_bytes = fetch_mirrors(

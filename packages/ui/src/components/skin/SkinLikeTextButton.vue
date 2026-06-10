@@ -7,12 +7,14 @@ const props = withDefaults(
 		tooltip?: string
 		dragActive?: boolean
 		dropzone?: boolean
+		disabled?: boolean
 	}>(),
 	{
 		selected: false,
 		tooltip: undefined,
 		dragActive: false,
 		dropzone: false,
+		disabled: false,
 	},
 )
 
@@ -28,6 +30,10 @@ function handleDragEvent(
 	eventName: 'dragenter' | 'dragover' | 'dragleave' | 'drop',
 	event: DragEvent,
 ) {
+	if (props.disabled) {
+		return
+	}
+
 	if (props.dropzone) {
 		event.preventDefault()
 		if (event.dataTransfer) {
@@ -53,7 +59,10 @@ defineExpose({ getRootElement })
 		:class="[
 			isHighlighted
 				? 'border-brand bg-brand-highlight'
-				: 'border-surface-5 bg-surface-2 hover:bg-surface-3',
+				: disabled
+					? 'border-surface-5 bg-surface-2'
+					: 'border-surface-5 bg-surface-2 hover:bg-surface-3',
+			disabled ? 'opacity-[0.65]' : '',
 		]"
 		@dragenter="handleDragEvent('dragenter', $event)"
 		@dragover="handleDragEvent('dragover', $event)"
@@ -64,6 +73,8 @@ defineExpose({ getRootElement })
 			type="button"
 			:aria-label="tooltip ?? undefined"
 			class="absolute inset-0 z-0 cursor-pointer border-none bg-transparent p-0"
+			:class="{ 'cursor-not-allowed': disabled }"
+			:disabled="disabled"
 			@click="(e) => emit('click', e)"
 		></button>
 

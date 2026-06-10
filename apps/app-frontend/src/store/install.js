@@ -71,7 +71,7 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 		return installed
 	}
 
-	const queueInstall = async (projectId, resolvedVersion) => {
+	const queueInstall = async (projectId, resolvedVersion, dependentOn) => {
 		if (!resolvedVersion?.id) return false
 
 		const versionId = resolvedVersion.id
@@ -91,7 +91,11 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 		if (resolvedProjectId) {
 			queuedProjectVersions.set(resolvedProjectId, versionId)
 		}
-		queuedInstalls.push({ versionId, projectId: resolvedProjectId })
+		queuedInstalls.push({
+			versionId,
+			projectId: resolvedProjectId,
+			dependentOnVersionId: dependentOn?.id,
+		})
 		return true
 	}
 
@@ -159,7 +163,7 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 			if (!resolved) continue
 
 			const { depVersion, depProjectId } = resolved
-			const queued = await queueInstall(depProjectId, depVersion)
+			const queued = await queueInstall(depProjectId, depVersion, inputVersion)
 			if (queued && depProjectId) {
 				await announceDependency(depProjectId, depVersion)
 			}
@@ -176,8 +180,8 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 	for (let i = 0; i < queuedInstalls.length; i += batchSize) {
 		const batch = queuedInstalls.slice(i, i + batchSize)
 		await Promise.all(
-			batch.map(async ({ versionId }) => {
-				await add_project_from_version(profile.path, versionId, reason)
+			batch.map(async ({ versionId, dependentOnVersionId }) => {
+				await add_project_from_version(profile.path, versionId, reason, dependentOnVersionId)
 			}),
 		)
 	}

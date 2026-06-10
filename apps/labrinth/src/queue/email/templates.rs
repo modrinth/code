@@ -90,6 +90,8 @@ const NEWOWNER_NAME: &str = "new_owner.name";
 const PAYOUTAVAILABLE_AMOUNT: &str = "payout.amount";
 const PAYOUTAVAILABLE_PERIOD: &str = "payout.period";
 
+const DISCORD_LINK_URL: &str = "discord.link_url";
+
 #[derive(Clone)]
 pub struct MailingIdentity {
     from_name: String,
@@ -601,6 +603,15 @@ async fn collect_template_variables(
         | NotificationBody::TwoFactorRemoved
         | NotificationBody::PasswordChanged
         | NotificationBody::PasswordRemoved => Ok(EmailTemplate::Static(map)),
+
+        NotificationBody::DiscordRoleCreatorClub => {
+            map.insert(
+                DISCORD_LINK_URL,
+                format!("{}/discord/link", ENV.SITE_URL.trim_end_matches('/')),
+            );
+
+            Ok(EmailTemplate::Static(map))
+        }
 
         NotificationBody::EmailChanged {
             new_email,
