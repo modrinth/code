@@ -69,7 +69,6 @@ watch(
 		</span>
 
 		<button
-			v-if="selectable"
 			class="absolute inset-0 z-10 cursor-pointer border-none bg-transparent p-0 focus-visible:outline-none"
 			:aria-label="tooltip ? `Select ${tooltip}` : 'Select skin'"
 			:aria-pressed="selected"
