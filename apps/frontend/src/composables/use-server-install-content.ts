@@ -67,9 +67,9 @@ const messages = defineMessages({
 		id: 'discover.install.error.no-server-world',
 		defaultMessage: 'No server instance is available for install.',
 	},
-	backToSetup: {
-		id: 'discover.install.back-to-setup',
-		defaultMessage: 'Back to setup',
+	backToCreateInstance: {
+		id: 'discover.install.back-to-create-instance',
+		defaultMessage: 'Back to create instance',
 	},
 	cancelReset: {
 		id: 'discover.install.cancel-reset',
@@ -82,6 +82,14 @@ const messages = defineMessages({
 	resetModpackHeading: {
 		id: 'discover.install.heading.reset-modpack',
 		defaultMessage: 'Selecting modpack to install after reset',
+	},
+	createInstanceModpackHeading: {
+		id: 'discover.install.heading.create-instance-modpack',
+		defaultMessage: 'Selecting modpack base',
+	},
+	createInstanceName: {
+		id: 'discover.install.create-instance-name',
+		defaultMessage: 'Create instance',
 	},
 	worldFallbackName: {
 		id: 'discover.install.world-fallback-name',
@@ -535,11 +543,6 @@ export function useServerInstallContent({
 	}
 
 	async function serverInstall(project: ServerInstallSearchResult) {
-		if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
-			handleError(new Error('No server to install to.'))
-			return
-		}
-
 		if (!browseSearchState) {
 			handleError(new Error('Search state is not ready.'))
 			return
@@ -547,6 +550,17 @@ export function useServerInstallContent({
 
 		const contentType = getCurrentServerInstallType()
 		const isModpack = contentType === 'modpack'
+		const isCreateInstanceFlow =
+			fromContext.value === 'create-instance' || fromContext.value === 'onboarding'
+
+		if (
+			!serverData.value ||
+			!currentServerId.value ||
+			(!currentWorldId.value && (!isCreateInstanceFlow || !isModpack))
+		) {
+			handleError(new Error('No server to install to.'))
+			return
+		}
 
 		try {
 			if (!isModpack && queuedServerInstallProjectIds.value.has(project.project_id)) {
@@ -620,9 +634,41 @@ export function useServerInstallContent({
 	}
 
 	async function onModpackFlowCreate(config: CreationFlowContextValue) {
-		if (!currentServerId.value || !currentWorldId.value || !config.modpackSelection.value) return
+		if (!currentServerId.value || !config.modpackSelection.value) return
 
 		try {
+			if (fromContext.value === 'create-instance' || fromContext.value === 'onboarding') {
+				const createdWorld = await client.archon.servers_v1.createWorld(currentServerId.value, {
+					name: config.worldName.value.trim(),
+					properties: config.buildProperties(),
+					content: {
+						content_variant: 'modpack',
+						spec: {
+							platform: 'modrinth',
+							project_id: config.modpackSelection.value.projectId,
+							version_id: config.modpackSelection.value.versionId,
+						},
+					},
+				} satisfies Archon.Servers.v1.CreateWorld)
+
+				if (fromContext.value === 'onboarding') {
+					await client.archon.servers_v1.endIntro(currentServerId.value)
+				}
+				await Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: ['servers', 'worlds', 'summary', 'v1', currentServerId.value],
+					}),
+					queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] }),
+					queryClient.invalidateQueries({
+						queryKey: ['servers', 'v1', 'detail', currentServerId.value],
+					}),
+				])
+				navigateTo(getServerInstanceContentPath(currentServerId.value, createdWorld.id))
+				return
+			}
+
+			if (!currentWorldId.value) return
+
 			await client.archon.content_v1.installContent(currentServerId.value, currentWorldId.value, {
 				content_variant: 'modpack',
 				spec: {
@@ -634,15 +680,7 @@ export function useServerInstallContent({
 				properties: config.buildProperties(),
 			} satisfies Archon.Content.v1.InstallWorldContent)
 
-			if (fromContext.value === 'onboarding') {
-				await client.archon.servers_v1.endIntro(currentServerId.value)
-				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
-				navigateTo(
-					getServerInstanceContentPath(currentServerId.value, currentWorldId.value ?? null),
-				)
-			} else {
-				navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
-			}
+			navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 		} catch (e) {
 			handleError(new Error(`Error installing modpack: ${e}`))
 			config.loading.value = false
@@ -652,6 +690,8 @@ export function useServerInstallContent({
 	const serverBackUrl = computed(() => {
 		if (!serverData.value) return ''
 		const id = serverData.value.server_id
+		if (fromContext.value === 'create-instance')
+			return `/hosting/manage/${id}/instances?resumeModal=create-instance`
 		if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
 		if (fromContext.value === 'reset-server')
 			return `/hosting/manage/${id}?openSettings=installation`
@@ -664,7 +704,8 @@ export function useServerInstallContent({
 	}
 
 	const serverBackLabel = computed(() => {
-		if (fromContext.value === 'onboarding') return formatMessage(messages.backToSetup)
+		if (fromContext.value === 'create-instance') return formatMessage(messages.backToCreateInstance)
+		if (fromContext.value === 'onboarding') return formatMessage(messages.backToCreateInstance)
 		if (fromContext.value === 'reset-server') return formatMessage(messages.cancelReset)
 		return formatMessage(messages.backToServer)
 	})
@@ -672,9 +713,13 @@ export function useServerInstallContent({
 	const serverBrowseHeading = computed(() =>
 		fromContext.value === 'reset-server'
 			? formatMessage(messages.resetModpackHeading)
-			: formatMessage(commonMessages.installingContentLabel),
+			: fromContext.value === 'create-instance' || fromContext.value === 'onboarding'
+				? formatMessage(messages.createInstanceModpackHeading)
+				: formatMessage(commonMessages.installingContentLabel),
 	)
 	const currentWorld = computed(() => {
+		if (fromContext.value === 'create-instance') return null
+
 		const full = serverFullData.value
 		if (!full) return null
 
@@ -689,7 +734,10 @@ export function useServerInstallContent({
 	const installContext = computed(() => {
 		if (!serverData.value) return null
 		return {
-			name: currentWorld.value?.name ?? formatMessage(messages.worldFallbackName),
+			name:
+				fromContext.value === 'create-instance'
+					? formatMessage(messages.createInstanceName)
+					: (currentWorld.value?.name ?? formatMessage(messages.worldFallbackName)),
 			loader: currentWorld.value?.content?.modloader ?? serverData.value.loader ?? '',
 			loaderVersion:
 				currentWorld.value?.content?.modloader_version ?? serverData.value.loader_version ?? '',
@@ -707,7 +755,7 @@ export function useServerInstallContent({
 			installProgress: queuedInstallProgress.value,
 			clearQueued: clearQueuedServerInstalls,
 			clearSelected: clearQueuedServerInstalls,
-			onBack: flushQueuedServerInstalls,
+			onBack: fromContext.value === 'create-instance' ? undefined : flushQueuedServerInstalls,
 			discardSelectedAndBack: discardQueuedServerInstallsAndBack,
 			installSelected: installQueuedServerInstallsAndBack,
 		}

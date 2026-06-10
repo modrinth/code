@@ -1682,9 +1682,6 @@
   "discover.install.back-to-server": {
     "message": "Kembali ke pelayan"
   },
-  "discover.install.back-to-setup": {
-    "message": "Kembali ke persediaan"
-  },
   "discover.install.cancel-reset": {
     "message": "Batalkan penetapan semula"
   },

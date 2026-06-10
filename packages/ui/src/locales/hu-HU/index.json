@@ -359,9 +359,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} eltávolítva"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "A szerverén található egyes tartalmakat nem sikerült elemezni, ezért előfordulhat, hogy ez a változás hatással lesz rájuk."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
   },
@@ -389,20 +386,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "A biztonsági mentés folyamatban van, érdemes várni a mentés befejezésére a művelet végrehajtása előtt."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "A biztonsági mentés néhány percet igénybe vehet, függ a szerver nagyságától."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "profil"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "világ"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Mostantól itt találhatod meg!"
@@ -1214,12 +1202,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Javítás befejezve"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Szerver javítása"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "A szerverről minden adatot eltávolít, beleértve a világokat, a modokat és a konfigurációs fájlokat is. A biztonsági mentések megmaradnak, és visszaállíthatók."
-  },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
   },
@@ -1271,9 +1253,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Megerősítés"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "A(z) {gameVersion} verzióra történő átállás a szervereden a következő tartalmakat módosítja."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Tartalomváltozások áttekintése"
   },
@@ -1301,9 +1280,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Nem kompatibilis tartalom van telepítve"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "A betöltő módosításakor az összes telepített tartalom letiltásra kerül. Javasoljuk ehelyett a szerver alaphelyzetbe állítását."
-  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Összekapcsolt {projectType}"
   },
@@ -1315,9 +1291,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} verzió"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "A betöltő megváltoztatásához vissza kell állítanod a szervert."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Modcsomag újratelepítése"
@@ -1501,12 +1474,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Frissítés a(z) {version} verzióra"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "A frissítés meghibásodást okozhat a profilban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "A frissítés meghibásodást okozhat a világban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
   },
   "label.actions": {
     "defaultMessage": "Műveletek"
@@ -3304,12 +3271,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Válaszd ki, mit szeretnél játszani"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Állítsd be a világodat, akárcsak az egyjátékos módban. Válaszd ki a játékmódot és a világ kezdőértékét."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Állítsd be a világodat"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Oszd meg a szerveredet a barátaiddal úgy, hogy kimásolod a címet, és megmondod nekik, melyik modokra lesz szükségük a csatlakozáshoz."

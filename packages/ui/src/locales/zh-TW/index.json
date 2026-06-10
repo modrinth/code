@@ -356,9 +356,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "已移除 {count} 個"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "你伺服器上的部分內容無法進行分析，且可能會受到這項變更的影響。"
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "已更新 {count} 個"
   },
@@ -386,23 +383,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "備份正在進行中，建議等候完成後再執行此動作。"
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "建立備份可能需耗時數分鐘，視伺服器大小而定。"
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "建立備份"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "實例"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "按住 Shift 鍵並點選以跳過確認。"
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "我們建議您在繼續操作之前建立備份，以便在出現任何問題時可以還原您的{type}。"
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "世界"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "你模組包的內容現在可以在這裡找到了！"
@@ -1352,12 +1337,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "修復完成"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "重設伺服器"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "重設為初始設定"
   },
@@ -1372,9 +1351,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "伺服器已重設為初始設定狀態"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "支援選項"
   },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
@@ -1433,9 +1409,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "確定"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "變更為 {gameVersion} 將會修改你伺服器上的下列內容。"
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "檢視內容變更"
   },
@@ -1466,9 +1439,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "安裝了不相容的內容"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "變更載入器時，所有已安裝的內容都將被停用。我們建議改為重設你的伺服器。"
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "變更載入器具有破壞性"
   },
@@ -1480,9 +1450,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} 版本"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "你需要重設伺服器才能切換載入器。"
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "重新安裝模組包"
@@ -1681,12 +1648,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "更新到 {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "更新可能會導致實例損壞。請先查看版本更新日誌並備份。"
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "更新可能會導致世界損壞。請先查看版本更新日誌並備份。"
   },
   "label.actions": {
     "defaultMessage": "動作"
@@ -3520,12 +3481,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "選擇你想玩的內容"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "你可以像在單人遊戲中一樣設定世界。選擇遊戲模式與世界種子碼。"
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "設定你的世界"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "複製位址並告訴好友加入時需要哪些模組，即可將你的伺服器分享給他們。"

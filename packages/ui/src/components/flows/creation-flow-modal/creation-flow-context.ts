@@ -38,11 +38,11 @@ const purpurSupportedVersionsQueryKey = ['creation-flow', 'purpur', 'supported-v
 export const creationFlowMessages = defineMessages({
 	createWorldTitle: {
 		id: 'creation-flow.title.create-world',
-		defaultMessage: 'Create world',
+		defaultMessage: 'Create instance',
 	},
 	setUpServerTitle: {
 		id: 'creation-flow.title.set-up-server',
-		defaultMessage: 'Set up server',
+		defaultMessage: 'Create instance',
 	},
 	resetServerTitle: {
 		id: 'creation-flow.title.reset-server',
@@ -54,7 +54,7 @@ export const creationFlowMessages = defineMessages({
 	},
 	createWorldButton: {
 		id: 'creation-flow.button.create-world',
-		defaultMessage: 'Create world',
+		defaultMessage: 'Create instance',
 	},
 	createInstanceButton: {
 		id: 'creation-flow.button.create-instance',
@@ -62,7 +62,7 @@ export const creationFlowMessages = defineMessages({
 	},
 	setupServerButton: {
 		id: 'creation-flow.button.setup-server',
-		defaultMessage: 'Setup server',
+		defaultMessage: 'Create instance',
 	},
 	finishButton: {
 		id: 'creation-flow.button.finish',
@@ -88,7 +88,7 @@ export const creationFlowMessages = defineMessages({
 
 export const flowTypeHeadingMessages: Record<FlowType, MessageDescriptor> = {
 	world: creationFlowMessages.createWorldTitle,
-	'server-onboarding': creationFlowMessages.setUpServerTitle,
+	'server-onboarding': creationFlowMessages.createWorldTitle,
 	'reset-server': creationFlowMessages.resetServerTitle,
 	instance: creationFlowMessages.createInstanceTitle,
 }
@@ -218,9 +218,6 @@ export interface CreationFlowContextValue {
 
 export const [injectCreationFlowContext, provideCreationFlowContext] =
 	createContext<CreationFlowContextValue>('CreationFlowModal')
-
-// TODO: replace with actual world count from the world list once available
-let worldCounter = 0
 
 export interface CreationFlowOptions {
 	availableLoaders?: string[]
@@ -431,8 +428,7 @@ export function createCreationFlowContext(
 		}
 		setupType.value = null
 		isImportMode.value = false
-		worldCounter++
-		worldName.value = flowType === 'world' ? `World ${worldCounter}` : ''
+		worldName.value = flowType === 'world' ? 'My instance' : ''
 		gamemode.value = 'survival'
 		difficulty.value = 'normal'
 		worldSeed.value = ''

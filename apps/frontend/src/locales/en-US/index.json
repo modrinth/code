@@ -1829,20 +1829,26 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Please complete tax form"
   },
+  "discover.install.back-to-create-instance": {
+    "message": "Back to create instance"
+  },
   "discover.install.back-to-server": {
     "message": "Back to server"
   },
-  "discover.install.back-to-setup": {
-    "message": "Back to setup"
-  },
   "discover.install.cancel-reset": {
     "message": "Cancel reset"
+  },
+  "discover.install.create-instance-name": {
+    "message": "Create instance"
   },
   "discover.install.error.no-server-world": {
     "message": "No server instance is available for install."
   },
   "discover.install.error.unsupported-content-type": {
     "message": "This content type cannot be installed to a server from Discover."
+  },
+  "discover.install.heading.create-instance-modpack": {
+    "message": "Selecting modpack base"
   },
   "discover.install.heading.reset-modpack": {
     "message": "Selecting modpack to install after reset"

@@ -392,9 +392,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} entfernt"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Einige Inhalte auf deinem Server konnten nicht analysiert werden und sind möglicherweise von dieser Änderung betroffen."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} aktualisiert"
   },
@@ -422,23 +419,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Eine Sicherung wird gerade erstellt. Es wird empfohlen, mit dieser Aktion zu warten, bis der Vorgang abgeschlossen ist."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Das Erstellen einer Sicherung kann je nach Größe deines Servers einige Minuten dauern."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Sicherung erstellen"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "Instanz"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Halte die Umschalttaste gedrückt, während du klickst, um die Bestätigung zu überspringen."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Wir empfehlen, bevor du fortfährst eine Sicherung zu erstellen, damit du deine {type} wiederherstellen kannst, falls etwas schiefgeht."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "Welt"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Die Inhalte deines Modpacks findest du jetzt hier!"
@@ -1403,12 +1388,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Reparatur abgeschlossen"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Server zurücksetzen"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Löscht alle Daten auf deinem Server, einschließlich deiner Welten, Mods und Konfigurationsdateien. Die Sicherungen bleiben erhalten und können wiederhergestellt werden."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Auf Onboarding zurücksetzen"
   },
@@ -1423,9 +1402,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server auf Onboarding zurückgesetzt"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Supportoptionen"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Spitzenlasten von bis zu {cpus} CPUs"
@@ -1484,9 +1460,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Bestätigen"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Die Änderung auf {gameVersion} wird die folgenden Inhalte deines Servers modifizieren."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Inhaltsänderungen ansehen"
   },
@@ -1517,9 +1490,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Inkompatibler Inhalt installiert"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Durch das Ändern des Loaders werden alle installierten Inhalte deaktiviert. Wir empfehlen stattdessen, deinen Server zurückzusetzen."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Das Ändern des Loaders ist irreversibel"
   },
@@ -1534,9 +1504,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}version"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Du musst deinen Server zurücksetzen, um den Loader zu wechseln."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Die Neuinstallation des Modpacks setzt den Inhalt des {type} auf den ursprünglichen Zustand zurück und entfernt alle von dir hinzugefügten Mods oder Inhalte."
@@ -1765,12 +1732,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Auf {version} aktualisieren"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Das Aktualisieren kann deine Instanz beschädigen. Schau dir zuerst die Änderungen an und erstelle eine Sicherung."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Das Aktualisieren kann deine Welt beschädigen. Schau dir zuerst die Änderungen an und erstelle eine Sicherung."
   },
   "label.actions": {
     "defaultMessage": "Aktionen"
@@ -4516,12 +4477,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Wähle, was du spielen möchtest"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Konfiguriere deine Welt genau wie im Einzelspielermodus. Wähle deinen Spielmodus und den Startwert der Welt aus."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Konfiguriere deine Welt"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Teile deinen Server mit Freunden, indem du die Adresse kopierst und ihnen mitteilst, welche Mods sie zum Beitreten benötigen."

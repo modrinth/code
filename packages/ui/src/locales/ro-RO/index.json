@@ -377,9 +377,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} îndepărtat"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Niște conținut in serverul tău nu poate fi analizat și poate fi afectat de această schimbare."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizat"
   },
@@ -407,14 +404,8 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "O copie de rezervă se creează, este recomandat să aștepți ca sa se termine înainte de perfomarea acestei acțiuni."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Crearea copiei de rezervă poate dura câteva minute depinzând de dimensiunea serverului."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Creează o copie de rezervă"
-  },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "instanță"
   },
   "content.page-layout.share.label": {
     "defaultMessage": "Distribuie"
@@ -1108,12 +1099,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Actualizare la {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Actualizarea iți poate strica instanța. Mai întâi verifică schimbările versiunii si creează un backup."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Actualizarea iți poate strica lumea. Mai întâi verifică schimbările versiunii si creează un backup."
   },
   "label.actions": {
     "defaultMessage": "Acțiuni"

@@ -374,9 +374,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "Đã xoá {count}"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Một số nội dung trên máy chủ của bạn không thể phân tích được và có thể bị ảnh hưởng bởi thay đổi này."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} đã được cập nhật"
   },
@@ -404,20 +401,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Quá trình sao lưu đang diễn ra, bạn nên đợi hoàn tất trước khi thực hiện hành động này."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Việc tạo backup có thể mất vài phút tùy thuộc vào kích thước server của bạn."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Tạo bản sao lưu"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "cấu hình"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Giữ nút Shift khi click để bỏ qua xác nhận."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "thế giới"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Nội dung modpack của bạn hiện đã có ở đây!"
@@ -1370,12 +1358,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Đã khắc phục"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Cài lại máy chủ"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Xóa tất cả dữ liệu trong máy chủ, bao gồm thế giới, mod, và tệp cấu hình. Các bản sao lưu vẫn sẽ được giữ nguyên và có thể dùng khôi phục lại."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Cài lại về sự khởi đầu"
   },
@@ -1390,9 +1372,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Đã cài lại máy chủ"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Cài đặt hỗ trợ"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"
@@ -1451,9 +1430,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Xác nhận"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Việc thay đổi sang phiên bản {gameVersion} sẽ sửa đổi các nội dung sau trên server của bạn."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Xem lại thay đổi nội dung"
   },
@@ -1484,9 +1460,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Phát hiện nội dung không tương tích"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Khi đổi modloader, mọi nội dung được tải sẽ bị tắt. Chúng tôi khuyến khích bạn cài lại máy chủ của bạn hơn."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Đổi loader rất hủy hại"
   },
@@ -1501,9 +1474,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Phiên bản {loader}"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Bạn sẽ cần khởi động lại máy chủ để đổi mod loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Cài lại modpack sẽ cài lại {type} về trạng thái ban đầu và xóa bỏ tất cả các mod và nội dung bạn đã thêm vào."
@@ -1717,12 +1687,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Cập nhật lên {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Việc cập nhật có thể gây lỗi cho phiên chơi của bạn. Hãy kiểm tra nhật ký thay đổi và sao lưu dữ liệu trước khi thực hiện."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Việc cập nhật có thể gây lỗi cho thế giới của bạn. Hãy kiểm tra nhật ký thay đổi và sao lưu dữ liệu trước khi thực hiện."
   },
   "label.actions": {
     "defaultMessage": "Hành động"
@@ -3712,12 +3676,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Chọn thứ để chơi"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Thiết lập thế giới của bạn y hệt chơi đơn. Chọn Chế độ và hạt giống thế giới."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Chỉnh sửa thế giới"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Chia sẻ máy chủ của bạn với bạn bè bằng cách sao chép địa chỉ và cho họ biết họ sẽ cần dùng bản mod nào để vào."

@@ -377,9 +377,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} dihapus"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Beberapa konten pada server Anda tidak dapat dianalisis dan mungkin dipengaruhi oleh perubahan ini."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} diperbarui"
   },
@@ -407,23 +404,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Proses pencadangan sedang berlangsung; disarankan untuk menunggu hingga proses tersebut selesai sebelum melakukan tindakan ini."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Pembuatan cadangan mungkin memerlukan waktu beberapa menit, tergantung pada ukuran server Anda."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Buat cadangan"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "instans"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Tahan tombol Shift saat mengeklik untuk melewati pesan konfirmasi."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Kami menyarankan Anda membuat cadangan terlebih dahulu sebelum melanjutkan, sehingga Anda dapat memulihkan {type} Anda bila terjadi masalah."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "dunia"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Konten paket mod Anda kini dapat ditemukan di sini!"

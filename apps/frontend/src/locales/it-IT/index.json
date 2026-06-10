@@ -1811,9 +1811,6 @@
   "discover.install.back-to-server": {
     "message": "Torna al server"
   },
-  "discover.install.back-to-setup": {
-    "message": "Torna alla configurazione"
-  },
   "discover.install.cancel-reset": {
     "message": "Annulla ripristino"
   },

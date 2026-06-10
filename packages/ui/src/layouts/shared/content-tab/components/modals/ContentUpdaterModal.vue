@@ -198,9 +198,7 @@
 				<span>{{
 					warning ??
 					formatMessage(
-						incompatibilityWarningMode
-							? messages.incompatibilityWarning
-							: messages.updateWarning,
+						incompatibilityWarningMode ? messages.incompatibilityWarning : messages.updateWarning,
 						{
 							type: updateWarningTargetType,
 						},

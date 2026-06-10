@@ -371,9 +371,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} 件削除されました"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "サーバー上のコンテンツの一部は分析できず、この変更の影響を受ける可能性があります。"
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} 件更新されました"
   },
@@ -401,23 +398,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "バックアップを作成中です。バックアップが完了してからこの操作を実行することをおすすめします。"
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "サーバーのサイズによっては、バックアップの作成に数分かかる場合があります。"
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "バックアップを作成"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "インスタンス"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Shiftを押しながらクリックすることで確認をスキップできます。"
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "操作を進める前にバックアップを作成することをおすすめします。もし{type}に問題が発生しても、バックアップから復元できるようになります。"
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "ワールド"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "あなたのModパックのコンテンツは、こちらで確認できます！"
@@ -1355,12 +1340,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "修理完了"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "サーバーをリセット"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "サーバー上のすべてのデータ（ワールド、MOD、設定ファイルなど）を削除します。バックアップは保持され、復元可能です。"
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "オンボーディング画面にリセット"
   },
@@ -1375,9 +1354,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "サーバーがオンボーディングにリセットされました"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "サポートオプション"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus}個のCPUに増加"
@@ -1436,9 +1412,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "確認"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "{gameVersion}に変更するとサーバ上の以下のコンテンツが変更されます。"
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "コンテンツの変更を確認"
   },
@@ -1469,9 +1442,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "互換性のないコンテンツがインストールされています"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "ローダーを変更すると、インストール済みのコンテンツはすべて無効になります。代わりにサーバーをリセットすることをお勧めします。"
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "ローダーの交換は破壊的である"
   },
@@ -1480,9 +1450,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}のバージョン"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "ローダーを切り替えるにはサーバをリセットする必要があります。"
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Modパックを再インストール"
@@ -1663,12 +1630,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}に更新"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "更新はインスタンスを破損する可能性があります。事前にバージョンの変更履歴を確認して、バックアップしてください。"
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "更新はワールドを破損する可能性があります。事前にバージョンの変更履歴を確認して、バックアップしてください。"
   },
   "label.actions": {
     "defaultMessage": "アクション"

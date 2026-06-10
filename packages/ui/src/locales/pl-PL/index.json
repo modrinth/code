@@ -374,9 +374,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "Usunięto {count}"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Niektóre treści na Twoim serwerze nie mogły zostać przeanalizowane i mogą być objęte tą zmianą."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "Zaktualizowano {count}"
   },
@@ -404,23 +401,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Kopia zapasowa jest podczas tworzenia, zalecane jest zaczekanie, aż się zakończy, przed wykonaniem tej akcji."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Tworzenie kopii zapasowej, może to potrwać kilkanaście minut, w zależności od rozmiaru twojego serwera."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Utwórz kopię zapasową"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "Twoją instancję"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Przytrzymaj Shift podczas przyciskania, aby pominąć potwierdzenie."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Zalecamy utworzenie kopii zapasowej, by można było przywrócić {type} w wypadku problemów."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "Twój świat"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Treści Twojej paczki modów teraz możesz znaleźć tutaj!"
@@ -1367,12 +1352,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Naprawa ukończona"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Zresetuj serwer"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Usuwa wszystkie dane na twoim serwerze, wliczając w to światy, modyfikacje i pliki konfiguracyjne. Kopie zapasowe zostaną nieruszone i będzie możliwość ich przywrócenia."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Resetuj do trybu onboardingu"
   },
@@ -1387,9 +1366,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serwer zresetowany do trybu onboardingu"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opcje pomocy"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"
@@ -1448,9 +1424,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Zatwierdź"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Zmiana na wersje {gameVersion} zmodyfikuję poniższe zasoby na twoim serwerze."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Przejrzyj zmiany w treści"
   },
@@ -1481,9 +1454,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Zainstalowano niekompatybilne treści"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Przy zmianie loadera wszystkie zainstalowane treści zostaną wyłączone. Zamiast tego zalecamy resetowanie serwera."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Zmiana loadera jest destruktywna"
   },
@@ -1498,9 +1468,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Wersja {loader}"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Musisz zrestartować swój serwer, aby zmienić wersje silnika."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Ponownie pobranie paczki modów przywróci {type} do swojego pierwotnego stanu, usuwając mody lub inną zawartość dodaną ręcznie."
@@ -1717,12 +1684,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Zaktualizuj do {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Aktualizowanie może uszkodzić twoją instalację. Zrób kopię zapasową i przeglądnij dzienniki zmian wersji."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Aktualizowanie może uszkodzić twój świat. Zrób kopię zapasową i przeglądnij dzienniki zmian wersji."
   },
   "label.actions": {
     "defaultMessage": "Akcje"
@@ -4297,12 +4258,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Wybierz w co grać"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Ustaw swój świat tak, jak w trybie jednoosobowym. Wybierz tryb gry i ziarno świata."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Skonfiguruj swój świat"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Udostępnij swój serwer znajomym kopiując adres i uzgadniając z nimi jakie mody muszą zainstalować, by się połączyć."

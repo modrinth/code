@@ -356,9 +356,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} verwijderd"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Sommige content op je server kon niet worden geanalyseerd en kan beïnvloed worden door deze wijziging."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} bijgewerkt"
   },
@@ -373,9 +370,6 @@
   },
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Er is een back-up bezig, het wordt aangeraden te wachten totdat deze klaar is voordat je deze actie doet."
-  },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Een back-up maken kan enkele minuten duren, afhankelijk van de grootte van je server."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Back-up maken"
@@ -1016,12 +1010,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Herstellen voltooid"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Server opnieuw opstarten"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Hiermee worden alle gegevens op je server verwijderd, inclusief je werelden, mods en configuratiebestanden. Back-ups blijven behouden en kunnen worden hersteld."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Terug naar de introductie"
   },
@@ -1036,9 +1024,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server opnieuw ingesteld voor onboarding"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Ondersteuningsmogelijkheden"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
@@ -1097,9 +1082,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Bevestigen"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Als je dit wijzigt in {gameVersion}, worden de volgende gegevens op je server aangepast."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Wijzigingen in de inhoud controleren"
   },
@@ -1130,17 +1112,11 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Er is incompatibele inhoud geïnstalleerd"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Als je de loader wijzigt, wordt alle geïnstalleerde inhoud uitgeschakeld. We raden je aan om in plaats daarvan je server te resetten."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Het vervangen van loaders is schadelijk"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}-versie"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Je moet je server opnieuw opstarten om van loader te wisselen."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Modpack opnieuw installeren"
@@ -1306,12 +1282,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Toon compatibele"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Een update kan uw instantie onbruikbaar maken. Bekijk eerst het wijzigingslogboeken  van de versie en maak een back-up."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Een update kan je wereld op zijn kop zetten. Bekijk eerst de wijzigingslogboeken van de versie en maak een back-up."
   },
   "label.actions": {
     "defaultMessage": "Acties"

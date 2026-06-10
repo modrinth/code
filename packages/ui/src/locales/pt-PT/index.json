@@ -326,9 +326,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removidos"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Parte do conteúdo no seu servidor não pôde ser analisada e pode ser afetada por essa alteração."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} atualizados"
   },
@@ -343,9 +340,6 @@
   },
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Um backup está a decorrer, recomenda-se esperar que ele termine antes de realizar esta ação."
-  },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "A criação do backup pode levar vários minutos, dependendo do tamanho do teu servidor."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
@@ -2541,4 +2535,3 @@
     "defaultMessage": "Tens alterações por guardar."
   }
 }
-

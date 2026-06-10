@@ -359,9 +359,6 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Обновлён"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Некоторые файлы на вашем сервере распознать не удалось. Это может повлиять на их работу."
-  },
   "content.filter.disabled": {
     "defaultMessage": "Отключённые"
   },
@@ -386,20 +383,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Идет резервное копирование. Рекомендуется дождаться его завершения, прежде чем продолжать."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Создание резервной копии может занять несколько минут, в зависимости от размера вашего сервера."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Создать резервную копию"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "сборка"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Удерживайте Shift при нажатии, чтобы пропустить подтверждение."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "мир"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Теперь он находится здесь!"
@@ -1301,12 +1289,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Исправление завершено"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Переустановка сервера"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Это действие удалит все данные на сервере, включая ваши миры, моды и конфигурационные файлы. Резервные копии останутся нетронутыми, вы сможете их восстановить."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Сбросить до первого запуска"
   },
@@ -1321,9 +1303,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер сброшен до первого запуска"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Настройки поддержки"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Рост до {cpus} CPU"
@@ -1379,9 +1358,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Подтвердить"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Смена версии на {gameVersion} затронет следующий контент на вашем сервере."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Просмотреть изменения контента"
   },
@@ -1412,9 +1388,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Установлены несовместимые проекты"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "При смене загрузчика модов, все установленные проекты будут отключены. Вместо этого рекомендуется сбросить сервер."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Смена загрузчика небезопасна"
   },
@@ -1429,9 +1402,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Версия {loader}"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Необходимо сбросить сервер для изменения загрузчика."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Переустановка сборки сбросит контент, который использует {type}, до исходного состояния, удалив все добавленные вами моды и файлы."
@@ -1657,12 +1627,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Обновить до {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Обновление может повредить вашу сборку. Сперва ознакомьтесь со списком изменений версии и создайте резервную копию."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Обновление может повредить ваш мир. Сперва ознакомьтесь со списком изменений версии и создайте резервную копию."
   },
   "label.actions": {
     "defaultMessage": "Действия"
@@ -4330,12 +4294,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Выберите во что поиграть"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Настройте ваш мир прямо как в одиночной игре. Выберите режим игры и ключ для генерации мира."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Настройте ваш мир"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Поделитесь сервером со своими друзьями, копируя адрес сервер и дайте им знать какие моды нужны."

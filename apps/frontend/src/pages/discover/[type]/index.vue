@@ -584,7 +584,13 @@ provideBrowseManager({
 	<CreationFlowModal
 		v-if="currentServerId && projectType?.id === 'modpack'"
 		ref="onboardingModalRef"
-		:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
+		:type="
+			fromContext === 'reset-server'
+				? 'reset-server'
+				: fromContext === 'create-instance' || fromContext === 'onboarding'
+					? 'world'
+					: 'server-onboarding'
+		"
 		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 		:show-snapshot-toggle="true"
 		:on-back="onOnboardingBack"

@@ -368,9 +368,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "Видалено {count}"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Деякий уміст на вашому сервері не вдалося проаналізувати, тож ця зміна може вплинути на нього."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} оновлено"
   },
@@ -398,23 +395,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Триває процес створення резервної копії. Рекомендовано дочекатися завершення, а лише тоді виконувати цю дію."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Створення резервної копії може зайняти кілька хвилин, залежно від розміру вашого сервера."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Створити резервну копію"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "профіль"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Утримуйте клавішу Shift під час натискання, щоб пропустити підтвердження."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Ми рекомендуємо створити резервну копію перш ніж продовжувати, щоб ви могли відновити свій {type}, якщо щось піде не так."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "світ"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Уміст вашої збірки тепер можна знайти тут!"
@@ -1340,12 +1325,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Лагодження завершено"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Скинути сервер"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Скинути до початкового стану"
   },
@@ -1360,9 +1339,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер скинуто до початкового стану"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Налаштування підтримки"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
@@ -1421,9 +1397,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Підтвердити"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Зміна версії на {gameVersion} призведе таких змін умісту на вашому сервері."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Перегляд змін умісту"
   },
@@ -1454,9 +1427,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Установлено несумісний уміст"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "При зміні завантажувача весь встановлений уміст буде вимкнено. Натомість рекомендуємо скинути налаштування сервера."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Змінення завантажувача деструктивне"
   },
@@ -1471,9 +1441,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Версія {loader}"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Щоб змінювати завантажувач потрібно скинути сервер."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Перевстановлення збірки скине вміст {type} до початкового стану, видаливши всі моди та вміст, які ви додавали."
@@ -1687,12 +1654,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Оновити до {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Оновлення може зламати ваш профіль. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Оновлення може зламати ваш світ. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
   },
   "label.actions": {
     "defaultMessage": "Дії"
@@ -3682,12 +3643,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Виберіть в що грати"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Налаштуйте свій світ, як у грі наодинці. Виберіть свій ігровий режим і зерно світу."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Налаштуйте свій світ"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Поділіться своїм сервером з друзями, скопіювавши адресу та повідомивши їм, які моди потрібні, щоб приєднатися."

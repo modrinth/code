@@ -386,9 +386,6 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Aggiornato"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Non è stato possibile analizzare alcuni contenuti sul tuo server, pertanto potrebbero essere affetti da questa modifica."
-  },
   "content.filter.disabled": {
     "defaultMessage": "Disabilitati"
   },
@@ -413,20 +410,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "È in corso un backup. Aspetta che finisca prima di compiere questa azione."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Creare un backup potrebbe richiedere diversi minuti, a seconda dalla dimensione del tuo server."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Crea backup"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "istanza"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Salta la conferma tenendo premuto Shift."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "mondo"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "I contenuti del tuo pacchetto ora si trovano qui!"
@@ -1370,12 +1358,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Riparazione completata"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Reimposta server"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Rimuove tutti i dati dal tuo server, inclusi i mondi, mod, e configurazioni. Eventuali backup rimarranno intatti e potranno essere ripristinati."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reinizializza"
   },
@@ -1390,9 +1372,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server reinizializzato"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opzioni di assistenza"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"
@@ -1451,9 +1430,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Conferma"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Passare alla {gameVersion} modificherà i seguenti contenuti nel tuo server."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Conferma le modifiche"
   },
@@ -1484,9 +1460,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Contenuto incompatibile installato"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Cambiando loader, tutti i contenuti installati verranno disabilitati. Consigliamo invece di reimpostare il server."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Cambiare loader è un'azione distruttiva"
   },
@@ -1501,9 +1474,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Versione di {loader}"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Dovrai reimpostare il server prima di cambiare loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Reinstallare il pacchetto di mod reimposterà i contenuti {type} al loro stato originario, rimuovendo qualsiasi mod o contenuti aggiunti."
@@ -1729,12 +1699,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Aggiorna alla {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Aggiornare potrebbe portare problemi alla tua istanza. Controlla i cambiamenti e fai prima un backup."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Aggiornare potrebbe portare problemi al tuo mondo. Controlla i cambiamenti e fai prima un backup."
   },
   "label.actions": {
     "defaultMessage": "Azioni"
@@ -4435,12 +4399,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Scegli a cosa giocare"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Imposta il tuo mondo come faresti nel gioco. Scegline la modalità e il seme."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Configura il tuo mondo"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Condividi il server con chi vuoi, copiando l'indirizzo e l'elenco di mod di cui avranno bisogno per entrare."

@@ -1337,9 +1337,6 @@
   "discover.install.back-to-server": {
     "message": "서버로 돌아가기"
   },
-  "discover.install.back-to-setup": {
-    "message": "설정으로 돌아가기"
-  },
   "discover.install.cancel-reset": {
     "message": "리셋 취소"
   },

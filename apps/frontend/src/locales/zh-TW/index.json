@@ -1493,9 +1493,6 @@
   "discover.install.back-to-server": {
     "message": "回到伺服器"
   },
-  "discover.install.back-to-setup": {
-    "message": "回到設定"
-  },
   "discover.install.cancel-reset": {
     "message": "取消重設"
   },

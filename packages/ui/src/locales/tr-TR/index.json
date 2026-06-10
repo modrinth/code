@@ -386,9 +386,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} kaldırıldı"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Sunucundaki bazı içerikler analiz edilemedi ve bu değişiklikten etkilenebilir."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} güncellendi"
   },
@@ -416,23 +413,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Bunu yapmadan önce yedek alma işleminin bitmesini beklemeniz önerilir."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Sunucunuzun boyutuna göre yedek oluşturmak bir kaç dakika alabilir."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Yedek oluştur"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "oturum"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Doğrulamayı atlamak için tıklarken Shift basılı tutun."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Herhangi bir sorun durumunda {type} inizi geri yükleyebilmeniz için, devam etmeden önce mutlaka bir yedekleme oluşturmanızı öneririz."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "dünya"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Mod paketinizin içeriği artık burada bulunabilir!"
@@ -1394,12 +1379,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Tamir tamamlandı"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Sunucuyu sıfırla"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
   },
@@ -1414,9 +1393,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Destek seçenekleri"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -1475,9 +1451,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Onayla"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "{gameVersion} sürümüne geçmek sunucundaki şu içeriği değiştirecek."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "İçerik değişikliklerini güncelleyin"
   },
@@ -1508,9 +1481,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Uyumsuz içerik yüklü"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Yükleyiciyi değiştirdiğinizde tüm yüklü içerik kapatılacak. Onun yerine sunucunuzu sıfırlamanızı öneririz."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Yükleyici değiştirmek tehlikelidir"
   },
@@ -1525,9 +1495,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} sürümü"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Yükleyici değiştirmek için sunucunuzu sıfırlamalısınız."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Mod pakını yeniden yüklemek, {type} içeriğini orijinal haline döndürür ve eklediğiniz tüm modları veya içeriği kaldırır."
@@ -1753,12 +1720,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}'e güncelle"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Güncellemek kurulumunuzu bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Güncellemek dünyanızı bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
   },
   "label.actions": {
     "defaultMessage": "Eylemler"
@@ -4438,12 +4399,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Ne oynayacağınızı seçin"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Dünyanızı tıpkı tek oyunculu modda olduğu gibi kurun. Oyun modunuzu ve dünya seed'inizi seçin."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Dünyanızı yapılandırın"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Adresi kopyalayarak ve katılmak için hangi modlara ihtiyaç duyacaklarını bildirerek sunucunuzu arkadaşlarınızla paylaşın."

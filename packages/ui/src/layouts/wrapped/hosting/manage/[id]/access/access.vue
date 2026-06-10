@@ -222,6 +222,7 @@ const serverUsersQueryKey = ['servers', 'users', 'v1', serverId]
 const serverUsersQuery = useQuery({
 	queryKey: serverUsersQueryKey,
 	queryFn: () => client.archon.server_users_v1.list(serverId),
+	staleTime: 30_000,
 })
 
 const friendsQueryKey = ['user', 'friends', 'v3']

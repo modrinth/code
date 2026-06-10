@@ -377,9 +377,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count}개 제거됨"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "서버의 일부 콘텐츠를 분석할 수 없었으며, 이번 변경 사항의 영향을 받을 수 있습니다."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count}개 업데이트됨"
   },
@@ -407,23 +404,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "백업이 진행 중입니다. 백업이 완료될 때까지 기다리십시오."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "서버의 크기에 따라서 백업을 생성하는데 몇 분 정도 소요 될 수 있습니다."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "백업 생성"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "인스턴스"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Shift 키를 누른 상태로 클릭해서 확인을 건너뛸 수 있습니다."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "문제가 발생할 경우 {type}을(를) 복원할 수 있도록 진행하기 전에 백업을 생성하는 것이 좋습니다."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "세계"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "여기서 모드팩의 콘텐츠를 확인할 수 있습니다!"
@@ -1379,12 +1364,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "복구 완료"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "서버 초기화"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "서버에 저장된 세계, 모드, 설정 파일 등의 모든 데이터가 삭제됩니다. 백업 파일은 그대로 유지되며, 필요 시 복원할 수 있습니다."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "온보딩 상태로 재설정"
   },
@@ -1399,9 +1378,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "온보딩 상태로 서버 재설정"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "지원 옵션"
   },
   "hosting.specs.burst": {
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
@@ -1460,9 +1436,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "확인"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "{gameVersion}으로 변경하면 서버의 다음 콘텐츠가 변경됩니다."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "콘텐츠 변경 확인"
   },
@@ -1493,9 +1466,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "호환되지 않는 콘텐츠 설치됨"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "로더를 변경하면 설치된 모든 콘텐츠가 비활성화됩니다. 대신 서버를 초기화하는 것을 권장합니다."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "로더 변경 시 데이터 손실 위험"
   },
@@ -1510,9 +1480,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} 버전"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "로더를 변경하려면 서버를 초기화해야 합니다."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "모드팩을 재설치하면 {type}의 콘텐츠가 초기화되어 추가했던 모든 모드나 콘텐츠가 제거됩니다."
@@ -1735,12 +1702,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}으로 업데이트"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "업데이트로 인해 인스턴스에 문제가 발생할 수 있습니다. 버전 변경 내역을 확인하고 먼저 백업을 진행하세요."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "업데이트로 인해 세계가 손상될 수 있습니다. 버전 변경 내역을 확인하고 먼저 백업을 진행하세요."
   },
   "label.actions": {
     "defaultMessage": "작업"
@@ -4294,12 +4255,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "플레이할 콘텐츠 선택"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "싱글플레이와 똑같이 세계를 설정합니다. 게임 모드와 세계 생성 시드를 선택합니다."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "세계 구성하기"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "서버 주소를 복사해서 친구들과 공유하고, 접속에 필요한 모드를 알려주세요."

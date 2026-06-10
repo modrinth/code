@@ -1568,9 +1568,6 @@
   "discover.install.back-to-server": {
     "message": "Повернутися до сервера"
   },
-  "discover.install.back-to-setup": {
-    "message": "Повернутися до налаштування"
-  },
   "discover.install.cancel-reset": {
     "message": "Скасувати скидання"
   },

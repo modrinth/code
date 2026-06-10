@@ -305,9 +305,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "Odstraněno {count}"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Některý obsah na vašem serveru nebylo možné analyzovat a tato změna se ho může týkat."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "Aktualizováno {count}"
   },
@@ -322,9 +319,6 @@
   },
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Probíhá zálohování. Doporučujeme počkat na jeho dokončení, než tuto akci provedeš."
-  },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Vytvoření zálohy může trvat několik minut dle velikosti tvého serveru."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Vytvořit zálohu"

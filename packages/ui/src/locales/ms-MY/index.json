@@ -365,9 +365,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} dialih keluar"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Sesetengah kandungan pada pelayan anda tidak dapat dianalisis dan mungkin terjejas oleh perubahan ini."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} dikemas kini"
   },
@@ -395,23 +392,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Sandaran sedang dijalankan, disyorkan untuk menunggu sehingga penyandaran selesai sebelum melakukan tindakan ini."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Penciptaan sandaran mungkin mengambil masa beberapa minit bergantung pada saiz pelayan anda."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Cipta sandaran"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "pemasangan"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Tahan Shift sambil mengklik untuk melangkau pengesahan."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Kami mengesyorkan agar anda membuat sandaran sebelum meneruskan supaya anda boleh memulihkan {type} anda sekiranya terdapat sebarang kerosakan."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "dunia"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Kandungan pek mod anda kini boleh didapati di sini!"
@@ -1337,12 +1322,6 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Pembaikan selesai"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Tetap semula pelayan"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal dan boleh dipulihkan."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
   },
@@ -1357,9 +1336,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Pilihan sokongan"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
@@ -1418,9 +1394,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Pastikan"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Menukar kepada {gameVersion} akan mengubah suai kandungan berikut pada pelayan anda."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Semak perubahan kandungan"
   },
@@ -1451,9 +1424,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Kandungan yang tidak serasi dipasang"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Apabila menukar pemuat, semua kandungan yang telah dipasang akan dinyahdayakan. Kami mengesyorkan supaya anda menetapkan semula pelayan anda."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Menukar pemuat boleh menyebabkan kerosakan"
   },
@@ -1462,9 +1432,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Versi {loader}"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Anda perlu menetap semula pelayan anda untuk menukar pemuat."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Pemasangan semula pek mod akan menetapkan semula kandungan {type} kepada keadaan asalnya yang akan mengalih keluar sebarang mod atau kandungan yang telah anda tambahkan."
@@ -1678,12 +1645,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Kemas kini ke {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Pengemaskinian boleh merosakkan pemasangan anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Pengemaskinian boleh merosakkan dunia anda. Semak log perubahan versi dan buat sandaran terlebih dahulu."
   },
   "label.actions": {
     "defaultMessage": "Tindakan"
@@ -3967,12 +3928,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Pilih apa yang hendak dimainkan"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Sediakan dunia anda seperti dunia ekapemain. Pilih mod permainan dan benih dunia."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Konfigurasikan dunia anda"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Kongsikan pelayan anda dengan rakan-rakan anda dengan menyalin alamat dan memberitahu mereka mod yang mereka perlukan untuk sertai."

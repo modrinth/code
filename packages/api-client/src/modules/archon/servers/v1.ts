@@ -44,6 +44,42 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Create a world
+	 * POST /v1/servers/:id/worlds
+	 */
+	public async createWorld(
+		serverId: string,
+		request: Archon.Servers.v1.CreateWorld,
+	): Promise<Archon.Servers.v1.CreateWorldResponse> {
+		return this.client.request<Archon.Servers.v1.CreateWorldResponse>(
+			`/servers/${serverId}/worlds`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/**
+	 * Modify a world
+	 * PATCH /v1/servers/:id/worlds/:wid
+	 */
+	public async patchWorld(
+		serverId: string,
+		worldId: string,
+		request: Archon.Servers.v1.PatchWorld,
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}`, {
+			api: 'archon',
+			version: 1,
+			method: 'PATCH',
+			body: request,
+		})
+	}
+
+	/**
 	 * End the intro flow for a server
 	 * DELETE /v1/servers/:id/flows/intro
 	 */
@@ -61,18 +97,6 @@ export class ArchonServersV1Module extends AbstractModule {
 	 */
 	public async resetToOnboarding(serverId: string, worldId: string): Promise<void> {
 		await this.client.request(`/servers/${serverId}/worlds/${worldId}/onboard`, {
-			api: 'archon',
-			version: 1,
-			method: 'POST',
-		})
-	}
-
-	/**
-	 * Switch the server to a world
-	 * POST /v1/servers/:id/worlds/:wid/active
-	 */
-	public async switchWorld(serverId: string, worldId: string): Promise<void> {
-		await this.client.request(`/servers/${serverId}/worlds/${worldId}/active`, {
 			api: 'archon',
 			version: 1,
 			method: 'POST',
