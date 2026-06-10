@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-	DropdownIcon,
-	EditIcon,
-	PlusIcon,
-	TrashIcon,
-	UnknownIcon,
-} from '@modrinth/assets'
+import { DropdownIcon, EditIcon, PlusIcon, TrashIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	ButtonStyled,
@@ -456,8 +450,8 @@ defineExpose({ getAddSkinButtonElement })
 								:backward-image-src="getBakedSkinTextures(skin)?.backwards"
 								:selected="isSkinSelected(skin)"
 								:active="isSkinActive(skin)"
-								@select="emit('select', skin)"
 								:disabled="readOnly"
+								@select="emit('select', skin)"
 							>
 								<template v-if="!readOnly" #overlay-buttons>
 									<ButtonStyled color="brand">
