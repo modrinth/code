@@ -66,8 +66,7 @@ use crate::{
     state::{
         MinecraftCharacterExpressionState, MinecraftProfile,
         minecraft_skins::{
-            CustomMinecraftSkin, CustomMinecraftSkinInsertPosition,
-            mojang_api,
+            CustomMinecraftSkin, CustomMinecraftSkinInsertPosition, mojang_api,
         },
     },
 };
@@ -610,20 +609,21 @@ async fn add_and_equip_custom_skin_now(
     let equipped_skin = profile.current_skin()?;
     let equipped_skin_texture_key = equipped_skin.texture_key();
     let equipped_skin_variant = equipped_skin.variant;
-    let insert_position =
-        if local_texture_key != equipped_skin_texture_key.as_ref() {
-            CustomMinecraftSkin::get_by_texture(
-                profile.id,
-                local_texture_key,
-                &state.pool,
-            )
-            .await?
-            .map_or(CustomMinecraftSkinInsertPosition::Top, |skin| {
-                CustomMinecraftSkinInsertPosition::At(skin.display_order)
-            })
-        } else {
-            CustomMinecraftSkinInsertPosition::Top
-        };
+    let insert_position = if local_texture_key
+        != equipped_skin_texture_key.as_ref()
+    {
+        CustomMinecraftSkin::get_by_texture(
+            profile.id,
+            local_texture_key,
+            &state.pool,
+        )
+        .await?
+        .map_or(CustomMinecraftSkinInsertPosition::Top, |skin| {
+            CustomMinecraftSkinInsertPosition::At(skin.display_order)
+        })
+    } else {
+        CustomMinecraftSkinInsertPosition::Top
+    };
 
     let persistence_result = if cape_id.is_none()
         && is_bundled_skin(&equipped_skin_texture_key, equipped_skin_variant)
