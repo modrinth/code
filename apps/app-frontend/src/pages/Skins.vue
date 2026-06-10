@@ -30,7 +30,7 @@ import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import VirtualSkinSectionList from '@/components/ui/skin/VirtualSkinSectionList.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_default_user, login as login_flow, users } from '@/helpers/auth'
+import { check_reachable, get_default_user, login as login_flow, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
 import type { Cape, Skin, SkinTextureUrl } from '@/helpers/skins.ts'
@@ -190,6 +190,7 @@ const client = injectModrinthClient()
 const themeStore = useTheming()
 const skins = ref<Skin[]>([])
 const capes = ref<Cape[]>([])
+const offline = ref(!navigator.onLine)
 
 const accountsCard = inject('accountsCard') as Ref<typeof AccountsCard>
 const currentUser = ref(undefined)
@@ -208,6 +209,16 @@ const savedSkins = computed(() => {
 		handleError(error as Error)
 		return []
 	}
+})
+const authServerQuery = useQuery({
+	queryKey: ['authServerReachability'],
+	queryFn: async () => {
+		await check_reachable()
+		return true
+	},
+	refetchInterval: 5 * 60 * 1000,
+	retry: false,
+	refetchOnWindowFocus: false,
 })
 const { data: modrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', auth.user.value?.id]),
@@ -258,8 +269,18 @@ const currentCape = computed(() => {
 })
 
 const skinTexture = computedAsync(async () => {
-	if (selectedSkin.value?.texture) {
-		return await get_normalized_skin_texture(selectedSkin.value)
+	const skin = selectedSkin.value
+	if (skin?.texture) {
+		try {
+			return await get_normalized_skin_texture(skin)
+		} catch (error) {
+			if (skin.texture.startsWith('data:image/')) {
+				return skin.texture
+			}
+
+			handleError(error as Error)
+			return ''
+		}
 	} else {
 		return ''
 	}
@@ -267,6 +288,9 @@ const skinTexture = computedAsync(async () => {
 const capeTexture = computed(() => currentCape.value?.texture)
 const skinVariant = computed(() => selectedSkin.value?.variant)
 const skinNametag = computed(() => (themeStore.hideNametagSkinsPage ? undefined : username.value))
+const isSkinManagementReadOnly = computed(
+	() => offline.value || (authServerQuery.isError.value && !authServerQuery.isLoading.value),
+)
 const hasPendingSkinChange = computed(
 	() => !skinsMatch(selectedSkin.value, originalSelectedSkin.value),
 )
@@ -283,11 +307,15 @@ const deleteSkinModal = ref()
 const skinToDelete = ref<Skin | null>(null)
 
 function confirmDeleteSkin(skin: Skin) {
+	if (isSkinManagementReadOnly.value) return
+
 	skinToDelete.value = skin
 	deleteSkinModal.value?.show()
 }
 
 async function deleteSkin() {
+	if (isSkinManagementReadOnly.value) return
+
 	const deletedSkin = skinToDelete.value
 	if (!deletedSkin) return
 
@@ -313,7 +341,23 @@ async function loadCapes() {
 
 async function loadSkins() {
 	try {
-		skins.value = (await get_available_skins()) ?? []
+		const loadedSkins = (await get_available_skins()) ?? []
+		const loadedEquippedSkin = loadedSkins.find((s) => s.is_equipped)
+		const locallyKnownEquippedSkin =
+			originalSelectedSkin.value &&
+			(loadedSkins.find((skin) => skinsMatch(skin, originalSelectedSkin.value)) ??
+				(originalSelectedSkin.value.texture.startsWith('data:image/')
+					? originalSelectedSkin.value
+					: undefined))
+		const shouldPreserveKnownEquippedSkin =
+			isSkinManagementReadOnly.value &&
+			locallyKnownEquippedSkin &&
+			!skinsMatch(loadedEquippedSkin, locallyKnownEquippedSkin)
+
+		skins.value =
+			shouldPreserveKnownEquippedSkin && locallyKnownEquippedSkin
+				? mergeEquippedSkin(loadedSkins, locallyKnownEquippedSkin)
+				: loadedSkins
 		generateSkinPreviews(skins.value, capes.value)
 		selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
 		originalSelectedSkin.value = selectedSkin.value
@@ -322,6 +366,28 @@ async function loadSkins() {
 			handleError(error)
 		}
 	}
+}
+
+function mergeEquippedSkin(list: Skin[], equippedSkin: Skin) {
+	let foundEquippedSkin = false
+	const mergedSkins = list.map((skin) => {
+		const isEquipped = skinsMatch(skin, equippedSkin)
+		foundEquippedSkin ||= isEquipped
+
+		return {
+			...skin,
+			is_equipped: isEquipped,
+		}
+	})
+
+	if (!foundEquippedSkin) {
+		mergedSkins.unshift({
+			...equippedSkin,
+			is_equipped: true,
+		})
+	}
+
+	return mergedSkins
 }
 
 function skinsMatch(a?: Skin | null, b?: Skin | null) {
@@ -394,6 +460,8 @@ function getDefaultSkinSectionSortIndex(section: string) {
 }
 
 function changeSkin(newSkin: Skin) {
+	if (isSkinManagementReadOnly.value) return
+
 	selectedSkin.value = newSkin
 }
 
@@ -566,7 +634,13 @@ function schedulePendingSkinRefresh() {
 
 async function applySelectedSkin() {
 	const skinToApply = selectedSkin.value
-	if (!skinToApply || !hasPendingSkinChange.value || isApplyingSkin.value) return
+	if (
+		!skinToApply ||
+		!hasPendingSkinChange.value ||
+		isApplyingSkin.value ||
+		isSkinManagementReadOnly.value
+	)
+		return
 
 	isApplyingSkin.value = true
 	try {
@@ -635,10 +709,14 @@ async function login() {
 }
 
 function openAddSkinFileBrowser() {
+	if (isSkinManagementReadOnly.value) return
+
 	addSkinFileInput.value?.click()
 }
 
 async function onAddSkinFileInputChange(e: Event) {
+	if (isSkinManagementReadOnly.value) return
+
 	const files = (e.target as HTMLInputElement).files
 	const file = files?.[0]
 
@@ -681,6 +759,8 @@ function isPositionOverAddSkinButton(position: { x: number; y: number }) {
 }
 
 async function handleAddSkinNativeDragDrop(event: { payload: DragDropEvent }) {
+	if (isSkinManagementReadOnly.value) return
+
 	const payload = event.payload
 
 	if (payload.type === 'leave') {
@@ -729,6 +809,8 @@ async function handleAddSkinNativeDragDrop(event: { payload: DragDropEvent }) {
 }
 
 function onAddSkinDragOver(event: DragEvent) {
+	if (isSkinManagementReadOnly.value) return
+
 	if (!isSkinFileDrag(event)) {
 		return
 	}
@@ -737,10 +819,14 @@ function onAddSkinDragOver(event: DragEvent) {
 }
 
 function onAddSkinDragLeave() {
+	if (isSkinManagementReadOnly.value) return
+
 	isAddSkinButtonDragActive.value = false
 }
 
 async function onAddSkinDrop(event: DragEvent) {
+	if (isSkinManagementReadOnly.value) return
+
 	isAddSkinButtonDragActive.value = false
 
 	const file = Array.from(event.dataTransfer?.files ?? []).find(
@@ -770,6 +856,8 @@ async function setupAddSkinDragDropListener() {
 }
 
 async function processSkinFileBuffer(buffer: Uint8Array | ArrayBuffer) {
+	if (isSkinManagementReadOnly.value) return
+
 	const fakeEvent = new MouseEvent('click')
 	const originalSkinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(buffer)
 	try {
@@ -789,13 +877,24 @@ watch(
 	() => {},
 )
 
+watch(isSkinManagementReadOnly, (readOnly) => {
+	if (readOnly) {
+		isDraggingSkinFile.value = false
+		isAddSkinButtonDragActive.value = false
+	}
+})
+
 onMounted(() => {
+	window.addEventListener('offline', onOffline)
+	window.addEventListener('online', onOnline)
 	userCheckInterval = window.setInterval(checkUserChanges, 250)
 	void setupAddSkinDragDropListener()
 })
 
 onUnmounted(() => {
 	isUnmounted = true
+	window.removeEventListener('offline', onOffline)
+	window.removeEventListener('online', onOnline)
 
 	if (userCheckInterval !== null) {
 		window.clearInterval(userCheckInterval)
@@ -811,6 +910,15 @@ onUnmounted(() => {
 		unlistenAddSkinDragDrop = null
 	}
 })
+
+function onOffline() {
+	offline.value = true
+}
+
+function onOnline() {
+	offline.value = false
+	void authServerQuery.refetch()
+}
 
 async function checkUserChanges() {
 	try {
@@ -883,7 +991,7 @@ await loadSkins()
 						>
 							<button
 								class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 text-contrast shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
-								:disabled="isApplyingSkin"
+								:disabled="isApplyingSkin || isSkinManagementReadOnly"
 								@click="resetSelectedSkin"
 							>
 								<RotateCounterClockwiseIcon />
@@ -891,7 +999,7 @@ await loadSkins()
 							</button>
 							<button
 								class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-brand px-4 py-2.5 text-base font-semibold leading-5 text-[rgba(0,0,0,0.9)] shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
-								:disabled="isApplyingSkin"
+								:disabled="isApplyingSkin || isSkinManagementReadOnly"
 								@click="applySelectedSkin"
 							>
 								<SpinnerIcon v-if="isApplyingSkin" class="animate-spin" />
@@ -902,7 +1010,7 @@ await loadSkins()
 						<button
 							v-else
 							class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 bg-surface-4 px-4 py-2.5 text-base font-semibold leading-5 shadow-md transition-[filter,transform] duration-200 enabled:hover:brightness-[--hover-brightness] enabled:focus-visible:brightness-[--hover-brightness] enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0"
-							:disabled="!selectedSkin"
+							:disabled="!selectedSkin || isSkinManagementReadOnly"
 							@click="(e: MouseEvent) => selectedSkin && editSkinModal?.show(e, selectedSkin)"
 						>
 							<EditIcon />
@@ -922,6 +1030,7 @@ await loadSkins()
 				:is-skin-selected="isSkinSelected"
 				:is-skin-active="isSkinActive"
 				:is-add-skin-button-drag-active="isAddSkinButtonDragActive"
+				:read-only="isSkinManagementReadOnly"
 				@select="changeSkin"
 				@edit="(skin, event) => editSkinModal?.show(event, skin)"
 				@delete="confirmDeleteSkin"
