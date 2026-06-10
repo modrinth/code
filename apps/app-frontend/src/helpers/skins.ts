@@ -142,6 +142,12 @@ export async function remove_custom_skin(skin: Skin): Promise<void> {
 	})
 }
 
+export async function reorder_custom_skins(skins: Skin[]): Promise<void> {
+	await invoke('plugin:minecraft-skins|reorder_custom_skins', {
+		skins,
+	})
+}
+
 export async function save_custom_skin(
 	skin: Skin,
 	textureBlob: Uint8Array,

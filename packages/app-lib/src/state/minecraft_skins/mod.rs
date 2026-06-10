@@ -44,6 +44,23 @@ impl CustomMinecraftSkin {
 
         let mut transaction = db.begin().await?;
 
+        let display_order = sqlx::query_scalar!(
+            "SELECT display_order FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
+            minecraft_user_id,
+            texture_key
+        )
+        .fetch_optional(&mut *transaction)
+        .await?;
+        let display_order = match display_order {
+            Some(display_order) => display_order,
+            None => sqlx::query_scalar!(
+                "SELECT COALESCE(MAX(display_order) + 1, 0) AS 'display_order!: i64' FROM custom_minecraft_skins WHERE minecraft_user_uuid = ?",
+                minecraft_user_id
+            )
+            .fetch_one(&mut *transaction)
+            .await?,
+        };
+
         sqlx::query!(
             "DELETE FROM custom_minecraft_skins WHERE minecraft_user_uuid = ? AND texture_key = ?",
             minecraft_user_id,
@@ -60,8 +77,8 @@ impl CustomMinecraftSkin {
 		.await?;
 
         sqlx::query!(
-			"INSERT OR REPLACE INTO custom_minecraft_skins (minecraft_user_uuid, texture_key, variant, cape_id) VALUES (?, ?, ?, ?)",
-			minecraft_user_id, texture_key, variant, cape_id
+			"INSERT OR REPLACE INTO custom_minecraft_skins (minecraft_user_uuid, texture_key, variant, cape_id, display_order) VALUES (?, ?, ?, ?, ?)",
+			minecraft_user_id, texture_key, variant, cape_id, display_order
 		)
 		.execute(&mut *transaction)
 		.await?;
@@ -106,13 +123,16 @@ impl CustomMinecraftSkin {
     ) -> crate::Result<impl Stream<Item = Self>> {
         let minecraft_user_id = minecraft_user_id.as_hyphenated();
 
-        Ok(stream::iter(sqlx::query!(
+        Ok(stream::iter(sqlx::query_as!(
+            CustomMinecraftSkinRow,
             "SELECT texture_key, variant AS 'variant: MinecraftSkinVariant', cape_id AS 'cape_id: Hyphenated' \
             FROM custom_minecraft_skins \
             WHERE minecraft_user_uuid = ? \
-            ORDER BY rowid ASC \
+            ORDER BY display_order ASC, rowid ASC \
             LIMIT ? OFFSET ?",
-            minecraft_user_id, count, offset
+            minecraft_user_id,
+            count,
+            offset
         )
         .fetch_all(&mut *db.acquire().await?)
         .await?)
@@ -158,6 +178,34 @@ impl CustomMinecraftSkin {
         )
         .execute(&mut *db.acquire().await?)
         .await?;
+
+        Ok(())
+    }
+
+    pub async fn reorder(
+        minecraft_user_id: Uuid,
+        texture_keys: &[String],
+        db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let minecraft_user_id = minecraft_user_id.as_hyphenated();
+        let mut transaction = db.begin().await?;
+
+        for (display_order, texture_key) in texture_keys.iter().enumerate() {
+            let display_order = display_order as i64;
+
+            sqlx::query!(
+                "UPDATE custom_minecraft_skins \
+                SET display_order = ? \
+                WHERE minecraft_user_uuid = ? AND texture_key = ?",
+                display_order,
+                minecraft_user_id,
+                texture_key
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        transaction.commit().await?;
 
         Ok(())
     }

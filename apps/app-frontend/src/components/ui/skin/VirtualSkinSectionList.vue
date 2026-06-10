@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { DropdownIcon, EditIcon, PlusIcon, TrashIcon, UnknownIcon } from '@modrinth/assets'
+import {
+	DropdownIcon,
+	EditIcon,
+	MoveIcon,
+	PlusIcon,
+	TrashIcon,
+	UnknownIcon,
+} from '@modrinth/assets'
 import {
 	Accordion,
 	ButtonStyled,
@@ -13,6 +20,7 @@ import {
 import { useElementSize, useWindowSize } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import Draggable from 'vuedraggable'
 
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
 import type { Skin } from '@/helpers/skins.ts'
@@ -73,6 +81,10 @@ const messages = defineMessages({
 		id: 'app.skins.delete-button',
 		defaultMessage: 'Delete skin',
 	},
+	reorderSkinButton: {
+		id: 'app.skins.reorder-button',
+		defaultMessage: 'Reorder skin',
+	},
 })
 
 const props = defineProps<{
@@ -88,6 +100,7 @@ const emit = defineEmits<{
 	select: [skin: Skin]
 	edit: [skin: Skin, event: MouseEvent]
 	delete: [skin: Skin]
+	'reorder-saved-skins': [skins: Skin[]]
 	'add-skin': []
 	'add-skin-dragenter': [event: DragEvent]
 	'add-skin-dragover': [event: DragEvent]
@@ -153,6 +166,10 @@ const sections = computed<SkinSection[]>(() => [
 	})),
 ])
 
+const draggableSavedSkins = ref<Skin[]>([])
+const isDraggingSavedSkin = ref(false)
+const canReorderSavedSkins = computed(() => draggableSavedSkins.value.length > 1)
+
 const sectionLayouts = computed(() => {
 	const layouts: Array<{ section: SkinSection; top: number; height: number; index: number }> = []
 	let top = 0
@@ -210,6 +227,18 @@ watch(
 )
 
 watch(
+	() => props.savedSkins,
+	(nextSkins) => {
+		if (isDraggingSavedSkin.value) {
+			return
+		}
+
+		draggableSavedSkins.value = [...nextSkins]
+	},
+	{ immediate: true },
+)
+
+watch(
 	listWidth,
 	(width) => {
 		if (
@@ -255,6 +284,32 @@ function defaultSkinSectionKey(title: string) {
 
 function skinKey(skin: Skin, prefix: string) {
 	return `${prefix}-${skin.source}-${skin.texture_key}-${skin.variant}-${skin.cape_id ?? 'no-cape'}`
+}
+
+function savedSkinKey(skin: Skin) {
+	return skinKey(skin, 'saved-skin')
+}
+
+function doSkinOrdersMatch(firstSkins: Skin[], secondSkins: Skin[]) {
+	return (
+		firstSkins.length === secondSkins.length &&
+		firstSkins.every((skin, index) => savedSkinKey(skin) === savedSkinKey(secondSkins[index]))
+	)
+}
+
+function onSavedSkinDragStart() {
+	isDraggingSavedSkin.value = true
+}
+
+function onSavedSkinDragEnd() {
+	isDraggingSavedSkin.value = false
+
+	if (doSkinOrdersMatch(draggableSavedSkins.value, props.savedSkins)) {
+		draggableSavedSkins.value = [...props.savedSkins]
+		return
+	}
+
+	emit('reorder-saved-skins', [...draggableSavedSkins.value])
 }
 
 function isSectionOpen(key: string) {
@@ -354,61 +409,93 @@ defineExpose({ getAddSkinButtonElement })
 					</Tooltip>
 				</template>
 
-				<div
+				<Draggable
 					v-if="section.kind === 'saved'"
+					:list="draggableSavedSkins"
 					class="grid w-full grid-cols-3 gap-3 min-[1300px]:grid-cols-4 min-[1750px]:grid-cols-5 min-[2050px]:grid-cols-6"
+					:item-key="savedSkinKey"
+					handle=".skin-reorder-handle"
+					:animation="250"
+					:swap-threshold="1"
+					:invert-swap="false"
+					:force-fallback="true"
+					:fallback-on-body="true"
+					:fallback-tolerance="4"
+					ghost-class="skin-reorder-ghost"
+					chosen-class="skin-reorder-chosen"
+					drag-class="skin-reorder-drag"
+					fallback-class="skin-reorder-fallback"
+					@start="onSavedSkinDragStart"
+					@end="onSavedSkinDragEnd"
 				>
-					<SkinLikeTextButton
-						ref="addSkinButton"
-						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
-						dropzone
-						:drag-active="isAddSkinButtonDragActive"
-						@click="emit('add-skin')"
-						@dragenter="emit('add-skin-dragenter', $event)"
-						@dragover="emit('add-skin-dragover', $event)"
-						@dragleave="emit('add-skin-dragleave', $event)"
-						@drop="emit('add-skin-drop', $event)"
-					>
-						<template #icon>
-							<PlusIcon class="size-8" />
-						</template>
-						{{ formatMessage(messages.addSkinButton) }}
-						<template #subtitle>{{ formatMessage(messages.dragAndDropSubtitle) }}</template>
-					</SkinLikeTextButton>
+					<template #header>
+						<SkinLikeTextButton
+							ref="addSkinButton"
+							class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
+							dropzone
+							:drag-active="isAddSkinButtonDragActive"
+							@click="emit('add-skin')"
+							@dragenter="emit('add-skin-dragenter', $event)"
+							@dragover="emit('add-skin-dragover', $event)"
+							@dragleave="emit('add-skin-dragleave', $event)"
+							@drop="emit('add-skin-drop', $event)"
+						>
+							<template #icon>
+								<PlusIcon class="size-8" />
+							</template>
+							{{ formatMessage(messages.addSkinButton) }}
+							<template #subtitle>{{ formatMessage(messages.dragAndDropSubtitle) }}</template>
+						</SkinLikeTextButton>
+					</template>
 
-					<SkinButton
-						v-for="skin in section.skins"
-						:key="skinKey(skin, 'saved-skin')"
-						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
-						:forward-image-src="getBakedSkinTextures(skin)?.forwards"
-						:backward-image-src="getBakedSkinTextures(skin)?.backwards"
-						:selected="isSkinSelected(skin)"
-						:active="isSkinActive(skin)"
-						@select="emit('select', skin)"
-					>
-						<template #overlay-buttons>
-							<ButtonStyled color="brand">
+					<template #item="{ element: skin }">
+						<div
+							:key="savedSkinKey(skin)"
+							class="relative aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
+						>
+							<SkinButton
+								class="h-full w-full min-w-0 box-border rounded-[20px]"
+								:forward-image-src="getBakedSkinTextures(skin)?.forwards"
+								:backward-image-src="getBakedSkinTextures(skin)?.backwards"
+								:selected="isSkinSelected(skin)"
+								:active="isSkinActive(skin)"
+								@select="emit('select', skin)"
+							>
+								<template #overlay-buttons>
+									<ButtonStyled color="brand">
+										<button
+											:aria-label="formatMessage(messages.editSkinButton)"
+											class="pointer-events-auto"
+											@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
+										>
+											<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+										</button>
+									</ButtonStyled>
+									<ButtonStyled v-show="!skin.is_equipped" circular color="red">
+										<button
+											v-tooltip="formatMessage(messages.deleteSkinButton)"
+											:aria-label="formatMessage(messages.deleteSkinButton)"
+											class="!rounded-[100%] pointer-events-auto"
+											@click.stop="emit('delete', skin)"
+										>
+											<TrashIcon />
+										</button>
+									</ButtonStyled>
+								</template>
+							</SkinButton>
+							<ButtonStyled v-if="canReorderSavedSkins" circular>
 								<button
-									:aria-label="formatMessage(messages.editSkinButton)"
-									class="pointer-events-auto"
-									@click.stop="(event: MouseEvent) => emit('edit', skin, event)"
+									v-tooltip="formatMessage(messages.reorderSkinButton)"
+									:aria-label="formatMessage(messages.reorderSkinButton)"
+									class="skin-reorder-handle absolute bottom-3 right-3 z-40 cursor-grab active:cursor-grabbing"
+									@click.stop.prevent
 								>
-									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+									<MoveIcon />
 								</button>
 							</ButtonStyled>
-							<ButtonStyled v-show="!skin.is_equipped" circular color="red">
-								<button
-									v-tooltip="formatMessage(messages.deleteSkinButton)"
-									:aria-label="formatMessage(messages.deleteSkinButton)"
-									class="!rounded-[100%] pointer-events-auto"
-									@click.stop="emit('delete', skin)"
-								>
-									<TrashIcon />
-								</button>
-							</ButtonStyled>
-						</template>
-					</SkinButton>
-				</div>
+						</div>
+					</template>
+				</Draggable>
 
 				<div
 					v-else
@@ -442,3 +529,18 @@ defineExpose({ getAddSkinButtonElement })
 		</div>
 	</div>
 </template>
+
+<style scoped>
+:global(.skin-reorder-ghost) {
+	opacity: 0.35;
+}
+
+:global(.skin-reorder-drag) {
+	cursor: grabbing;
+}
+
+:global(.skin-reorder-fallback) {
+	opacity: 0.9;
+	pointer-events: none;
+}
+</style>
