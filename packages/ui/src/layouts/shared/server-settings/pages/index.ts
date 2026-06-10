@@ -1,4 +1,3 @@
-export { default as ServerSettingsAdvancedPage } from './advanced.vue'
 export { default as ServerSettingsGeneralPage } from './general.vue'
 export { default as ServerSettingsInstallationPage } from './installation.vue'
 export { default as ServerInstanceSettingsAdvancedPage } from './instance-advanced.vue'
