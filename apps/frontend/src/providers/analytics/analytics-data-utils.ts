@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter'
+import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter-utils'
 
 import { getProjectIdsMatchingStatusFilter } from './analytics-project-utils'
 import type {

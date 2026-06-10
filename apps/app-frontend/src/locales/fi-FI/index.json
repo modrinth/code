@@ -332,9 +332,6 @@
   "app.settings.tabs.resource-management": {
     "message": "Resurssien hallinta"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App versio {version} on valmis asennettavaksi. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
   },
@@ -364,15 +361,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versio {version} asennettiin onnistuneesti!"
-  },
-  "app.update.download-update": {
-    "message": "Lataa päivitys"
-  },
-  "app.update.downloading-update": {
-    "message": "Ladataan päivitystä ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Lataa uudelleen asentaaksesi päivityksen"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

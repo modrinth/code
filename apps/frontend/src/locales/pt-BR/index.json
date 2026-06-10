@@ -192,7 +192,7 @@
     "message": "Independente"
   },
   "analytics.download-reason.update": {
-    "message": "Atualizar"
+    "message": "Atualização"
   },
   "analytics.download-source.app": {
     "message": "Modrinth App"
@@ -367,6 +367,15 @@
   },
   "analytics.stat.downloads": {
     "message": "Downloads"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Somente visualizações e downloads feitos através do Modrinth são elegíveis para monetização e devem passar por filtros de prevenção de fraudes. Os downloads do aplicativo Modrinth também exigem que o usuário esteja logado. Como todos os projetos têm uma proporção semelhante de downloads monetizados, sua receita não mudaria significativamente se todos os downloads fossem contabilizados."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Saiba mais"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Como funciona a monetização?"
   },
   "analytics.stat.playtime": {
     "message": "Tempo jogado"
@@ -1941,7 +1950,7 @@
     "message": "Sapo"
   },
   "hosting-marketing.available-locations": {
-    "message": "Disponível na América do Norte, Europa e Sudeste Asiático para ampla cobertura."
+    "message": "Disponível na América do Norte, Europa, Sudeste Asiático e Austrália para ampla cobertura."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Pagar mensalmente"
@@ -2004,7 +2013,7 @@
     "message": "Onde estão localizados os servidores do Modrinth Hosting? Posso escolher uma região?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "No momento, temos servidores disponíveis na América do Norte, Europa e Sudeste Asiático, que você pode escolher no momento da compra. Mais regiões serão adicionadas no futuro! Se desejar alterar sua região, entre em contato com o suporte."
+    "message": "No momento, temos servidores disponíveis na América do Norte, Europa, Sudeste Asiático e Austrália, que você pode escolher no momento da compra. Mais regiões serão adicionadas no futuro! Se desejar alterar sua região, entre em contato com o suporte."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Quais versões e carregadores do Minecraft podem ser usados?"
@@ -2259,7 +2268,7 @@
     "message": "Versão {version} lançada para {gameVersion}"
   },
   "landing.section.for-creators.description": {
-    "message": "Dê um lar online para suas criações e alcance um enorme público de jogadores dedicados."
+    "message": "Dê um lar ativo para suas criações e alcance um enorme público de jogadores dedicados."
   },
   "landing.section.for-creators.label": {
     "message": "Para criadores"
@@ -3546,10 +3555,10 @@
     "message": "Criar organizações"
   },
   "scopes.organizationDelete.description": {
-    "message": "Apagar organizações"
+    "message": "Excluir organizações"
   },
   "scopes.organizationDelete.label": {
-    "message": "Apagar organizações"
+    "message": "Excluir organizações"
   },
   "scopes.organizationRead.description": {
     "message": "Acessar organizações"
@@ -3573,7 +3582,7 @@
     "message": "Excluir seus tokens de acesso pessoal"
   },
   "scopes.patDelete.label": {
-    "message": "Apagar TAPs"
+    "message": "Excluir TAPs"
   },
   "scopes.patRead.description": {
     "message": "Ver tokens de acesso pessoal criados"
@@ -3612,10 +3621,10 @@
     "message": "Criar projetos"
   },
   "scopes.projectDelete.description": {
-    "message": "Apagar seus projetos"
+    "message": "Excluir seus projetos"
   },
   "scopes.projectDelete.label": {
-    "message": "Apagar projetos"
+    "message": "Excluir projetos"
   },
   "scopes.projectRead.description": {
     "message": "Acessar todos os seus projetos"
@@ -3636,10 +3645,10 @@
     "message": "Criar relatórios"
   },
   "scopes.reportDelete.description": {
-    "message": "Apagar relatórios"
+    "message": "Excluir relatórios"
   },
   "scopes.reportDelete.label": {
-    "message": "Apagar relatórios"
+    "message": "Excluir relatórios"
   },
   "scopes.reportRead.description": {
     "message": "Ler relatórios"
@@ -3660,10 +3669,10 @@
     "message": "Acessar sessões"
   },
   "scopes.sessionDelete.description": {
-    "message": "Apagar sessões"
+    "message": "Excluir sessões"
   },
   "scopes.sessionDelete.label": {
-    "message": "Apagar sessões"
+    "message": "Excluir sessões"
   },
   "scopes.sessionRead.description": {
     "message": "Acessar sessões ativas"
@@ -3690,10 +3699,10 @@
     "message": "Modificar dados de autenticação"
   },
   "scopes.userDelete.description": {
-    "message": "Apagar sua conta"
+    "message": "Excluir sua conta"
   },
   "scopes.userDelete.label": {
-    "message": "Apagar sua conta"
+    "message": "Excluir sua conta"
   },
   "scopes.userRead.description": {
     "message": "Acessar suas informações públicas do perfil"
@@ -3720,10 +3729,10 @@
     "message": "Criar versões"
   },
   "scopes.versionDelete.description": {
-    "message": "Apagar uma versão"
+    "message": "Excluir uma versão"
   },
   "scopes.versionDelete.label": {
-    "message": "Apagar versões"
+    "message": "Excluir versões"
   },
   "scopes.versionRead.description": {
     "message": "Acessar todas as versões"
@@ -4434,13 +4443,13 @@
     "message": "Criar token pessoal de acesso"
   },
   "settings.pats.modal.delete.action": {
-    "message": "Apagar este token"
+    "message": "Excluir este token"
   },
   "settings.pats.modal.delete.description": {
     "message": "Isto removerá esse token para sempre (para sempre mesmo)."
   },
   "settings.pats.modal.delete.title": {
-    "message": "Tem certeza de que deseja apagar este token?"
+    "message": "Tem certeza de que deseja excluir este token?"
   },
   "settings.pats.modal.edit.title": {
     "message": "Editar token pessoal de acesso"

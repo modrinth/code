@@ -383,6 +383,12 @@
 								action: (event) => $refs.modal_batch_credit.show(event),
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'analytics-events',
+								color: 'primary',
+								link: '/admin/analytics/events',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -416,6 +422,9 @@
 						</template>
 						<template #servers-nodes>
 							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
+						<template #analytics-events>
+							<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -953,6 +962,10 @@ const messages = defineMessages({
 	manageAffiliates: {
 		id: 'layout.action.manage-affiliates',
 		defaultMessage: 'Manage affiliate links',
+	},
+	analyticsEvents: {
+		id: 'layout.action.analytics-events',
+		defaultMessage: 'Analytics events',
 	},
 	newProject: {
 		id: 'layout.action.new-project',

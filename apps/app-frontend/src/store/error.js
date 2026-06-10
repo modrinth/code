@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+import { findMinecraftAuthError } from '@/components/ui/minecraft-auth-error-modal/minecraft-auth-errors'
+
 export const useError = defineStore('errorsStore', {
 	state: () => ({
 		errorModal: null,
@@ -15,7 +17,8 @@ export const useError = defineStore('errorsStore', {
 		showError(error, context, closable = true, source = null) {
 			if (
 				error.message &&
-				error.message.includes('Minecraft authentication error:') &&
+				(error.message.includes('Minecraft authentication error:') ||
+					findMinecraftAuthError(error.message)) &&
 				this.minecraftAuthErrorModal
 			) {
 				this.minecraftAuthErrorModal.show(error)

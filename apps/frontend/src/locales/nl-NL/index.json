@@ -1112,9 +1112,6 @@
   "frog.title": {
     "message": "Kikker"
   },
-  "hosting-marketing.available-locations": {
-    "message": "Beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië voor een brede dekking."
-  },
   "hosting-marketing.billing.monthly": {
     "message": "Betaal maandelijks"
   },
@@ -1174,9 +1171,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Waar bevinden de servers van Modrinth Hosting zich? Kan ik een regio kiezen?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Op dit moment hebben we servers beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië, waaruit u bij aankoop kunt kiezen. In de toekomst komen er nog meer regio’s bij! Als u van regio wilt wisselen, neem dan contact op met de klantenservice."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Welke Minecraft-versies en loaders kunnen worden gebruikt?"

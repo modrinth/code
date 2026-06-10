@@ -86,14 +86,20 @@
   "app.appearance-settings.select-option": {
     "message": "Seleziona"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Mostra quanto tempo hai speso giocando a un'istanza."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Mostra tempo di gioco"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Scegli se mostrare o nascondere la barra laterale."
+    "message": "Mostra o nascondi la barra laterale."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Abilita la barra laterale"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Visti i rischi, apparirà un avviso prima di installare un file Modrinth Pack (.mrpack) non proveniente da Modrinth."
+    "message": "Mostrerà un avviso prima di installare un file Modrinth Pack (.mrpack) non proveniente da Modrinth, a causa dei possibili rischi."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Avvisami se installo pacchetti sconosciuti"
@@ -138,10 +144,13 @@
     "message": "Pacchetti di mod"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Aggiungere dei contenuti potrebbe portare problemi entrando nel server. Qualsiasi contenuto aggiunto sarà anche perso aggiornando i contenuti dell'istanza del server."
+    "message": "Aggiungere dei contenuti potrebbe causare problemi entrando nel server. Inoltre, qualsiasi contenuto aggiunto sarà perso a ogni aggiornamento dei contenuti dell'istanza."
   },
   "app.browse.server.installing": {
     "message": "Installazione"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Nessuna versione disponibile corrisponde a {compatibilityLabel}. Seleziona una versione da installare comunque. Le dipendenze non verranno scaricate automaticamente."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -461,9 +470,6 @@
   "app.skins.title": {
     "message": "Seleziona una skin"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
   },
@@ -493,15 +499,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "La versione {version} è stata installata con successo!"
-  },
-  "app.update.download-update": {
-    "message": "Scarica aggiornamento"
-  },
-  "app.update.downloading-update": {
-    "message": "Scaricando l'aggiornamento ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Ricarica per installare l'aggiornamento"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

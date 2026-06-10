@@ -188,9 +188,6 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Tisztítsd meg a nevet"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural,one {# tag} other {# tags}} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy szervered biztosan megjelenjen a releváns keresési eredmények között."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },

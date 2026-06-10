@@ -65,11 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Odwiedź stronę galerii"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Twój {type} używa licencji, która wymaga dostępności kodu źródłowego. Podaj link do kodu źródłowego lub plik ze źródłami dla każdej dodatkowej wersji albo rozważ użycie innej licencji."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Podaj kod źródłowy"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Niektóre z Twoich linków zewnętrznych są identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Usuń identyczne linki"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Twój opis powinien zawierać wystarczająco zwykłego tekstu lub tekstu alternatywnego obrazów, aby był przystępny dla osób korzystających z czytników ekranu lub mających wolne połączenie z internetem."
@@ -146,6 +152,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Wybierz język"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Wybierz licencję, pod którą Twój {type} jest dystrybuowany."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Wybierz licencję"
   },
@@ -202,6 +211,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Przynajmniej jeden z obrazów w galerii musi pokazywać zawartość {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "paczki zasobów, z wyjątkiem paczek zasobów z dźwiękami bądź tłumaczeniami. Jeżeli opisuje to Twoją paczkę zasobów, wybierz odpowiedni tag"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Prześlij obraz do galerii"

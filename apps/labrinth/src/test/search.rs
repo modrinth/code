@@ -214,12 +214,31 @@ pub async fn setup_search_projects(
             USER_USER_PAT,
         )
         .await;
+    let project_1 = api
+        .get_project_deserialized_common(
+            &format!("{test_name}-searchable-project-1"),
+            USER_USER_PAT,
+        )
+        .await;
+    let modify_json = serde_json::from_value(json!([
+        {
+            "op": "add",
+            "path": "/dependencies",
+            "value": [
+                {
+                    "project_id": project_1.id,
+                    "dependency_type": "required"
+                }
+            ]
+        }
+    ]))
+    .unwrap();
     api.add_public_version(
         project_7.id,
         "1.0.0",
         TestFile::build_random_jar(),
         None,
-        None,
+        Some(modify_json),
         USER_USER_PAT,
     )
     .await;

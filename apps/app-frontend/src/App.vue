@@ -12,7 +12,6 @@ import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
 	CompassIcon,
-	DownloadIcon,
 	ExternalIcon,
 	HomeIcon,
 	LeftArrowIcon,
@@ -45,7 +44,6 @@ import {
 	NotificationPanel,
 	OverflowMenu,
 	PopupNotificationPanel,
-	ProgressSpinner,
 	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
@@ -113,6 +111,16 @@ import {
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import i18n from '@/i18n.config'
+import {
+	appUpdateState,
+	downloadAvailableAppUpdate,
+	getNextAppUpdatePopupTime,
+	installAvailableAppUpdate,
+	markAppUpdateActionable,
+	markAppUpdatePopupShown,
+	openAppUpdateChangelog,
+	setAppUpdateActions,
+} from '@/providers/app-update.ts'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
 	provideAppUpdateDownloadProgress,
@@ -297,6 +305,7 @@ onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 	unsubscribeSidebarToggle()
+	clearDelayedUpdatePopup()
 
 	await unlistenUpdateDownload?.()
 })
@@ -312,18 +321,6 @@ const messages = defineMessages({
 	updateInstalledToastText: {
 		id: 'app.update.complete-toast.text',
 		defaultMessage: 'Click here to view the changelog.',
-	},
-	reloadToUpdate: {
-		id: 'app.update.reload-to-update',
-		defaultMessage: 'Reload to install update',
-	},
-	downloadUpdate: {
-		id: 'app.update.download-update',
-		defaultMessage: 'Download update',
-	},
-	downloadingUpdate: {
-		id: 'app.update.downloading-update',
-		defaultMessage: 'Downloading update ({percent}%)',
 	},
 	authUnreachableHeader: {
 		id: 'app.auth-servers.unreachable.header',
@@ -882,20 +879,21 @@ async function handleCommand(e) {
 }
 
 const appUpdateDownload = {
-	progress: ref(0),
+	progress: appUpdateState.progress,
 	version: ref(),
 }
 let unlistenUpdateDownload
 
-const downloadProgress = computed(() => appUpdateDownload.progress.value)
-const downloadPercent = computed(() => Math.trunc(appUpdateDownload.progress.value * 100))
-
-const metered = ref(true)
-const finishedDownloading = ref(false)
-const restarting = ref(false)
-const availableUpdate = ref(null)
-const updateSize = ref(null)
-const updatesEnabled = ref(true)
+const {
+	metered,
+	finishedDownloading,
+	downloading,
+	restarting,
+	availableUpdate,
+	updateSize,
+	updatesEnabled,
+} = appUpdateState
+let delayedUpdatePopupTimeout = null
 
 const updatePopupMessages = defineMessages({
 	updateAvailable: {
@@ -905,11 +903,6 @@ const updatePopupMessages = defineMessages({
 	downloadComplete: {
 		id: 'app.update-popup.download-complete',
 		defaultMessage: 'Download complete',
-	},
-	body: {
-		id: 'app.update-popup.body',
-		defaultMessage:
-			'Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App.',
 	},
 	meteredBody: {
 		id: 'app.update-popup.body.metered',
@@ -926,7 +919,7 @@ const updatePopupMessages = defineMessages({
 	},
 	reload: {
 		id: 'app.update-popup.reload',
-		defaultMessage: 'Reload',
+		defaultMessage: 'Reload to update',
 	},
 	download: {
 		id: 'app.update-popup.download',
@@ -937,6 +930,106 @@ const updatePopupMessages = defineMessages({
 		defaultMessage: 'Changelog',
 	},
 })
+
+function clearDelayedUpdatePopup() {
+	if (delayedUpdatePopupTimeout !== null) {
+		clearTimeout(delayedUpdatePopupTimeout)
+		delayedUpdatePopupTimeout = null
+	}
+}
+
+function getCurrentUpdatePromptStage() {
+	return finishedDownloading.value ? 'downloaded' : 'available'
+}
+
+function scheduleDelayedUpdatePopup() {
+	clearDelayedUpdatePopup()
+
+	const version = availableUpdate.value?.version
+	if (!version) {
+		return
+	}
+
+	const nextPopupTime = getNextAppUpdatePopupTime(version, getCurrentUpdatePromptStage())
+	if (nextPopupTime === null) {
+		return
+	}
+
+	const delay = nextPopupTime - Date.now()
+	if (delay <= 0) {
+		showDelayedUpdatePopup()
+		return
+	}
+
+	delayedUpdatePopupTimeout = setTimeout(showDelayedUpdatePopup, Math.min(delay, 2_147_483_647))
+}
+
+function showDelayedUpdatePopup() {
+	const update = availableUpdate.value
+	if (!update) {
+		return
+	}
+
+	const stage = getCurrentUpdatePromptStage()
+	const nextPopupTime = getNextAppUpdatePopupTime(update.version, stage)
+	if (nextPopupTime === null) {
+		return
+	}
+
+	if (Date.now() < nextPopupTime) {
+		scheduleDelayedUpdatePopup()
+		return
+	}
+
+	if (metered.value && !finishedDownloading.value) {
+		addPopupNotification({
+			title: formatMessage(updatePopupMessages.updateAvailable),
+			text: formatMessage(updatePopupMessages.meteredBody, { version: update.version }),
+			type: 'info',
+			autoCloseMs: null,
+			buttons: [
+				{
+					label: formatMessage(updatePopupMessages.download, {
+						size: formatBytes(updateSize.value ?? 0),
+					}),
+					action: () => downloadAvailableAppUpdate(),
+					color: 'brand',
+				},
+				{
+					label: formatMessage(updatePopupMessages.changelog),
+					action: () => openAppUpdateChangelog(),
+					keepOpen: true,
+				},
+			],
+		})
+	} else if (finishedDownloading.value) {
+		addPopupNotification({
+			title: formatMessage(updatePopupMessages.downloadComplete),
+			text: formatMessage(updatePopupMessages.downloadedBody, {
+				version: update.version,
+			}),
+			type: 'success',
+			autoCloseMs: null,
+			buttons: [
+				{
+					label: formatMessage(updatePopupMessages.reload),
+					action: () => installAvailableAppUpdate(),
+					color: 'brand',
+				},
+				{
+					label: formatMessage(updatePopupMessages.changelog),
+					action: () => openAppUpdateChangelog(),
+					keepOpen: true,
+				},
+			],
+		})
+	} else {
+		scheduleDelayedUpdatePopup()
+		return
+	}
+
+	markAppUpdatePopupShown(update.version, stage)
+}
 
 async function checkUpdates() {
 	if (!(await areUpdatesEnabled())) {
@@ -961,11 +1054,15 @@ async function checkUpdates() {
 
 		if (isExistingUpdate) {
 			console.log('Update is already known')
+			scheduleDelayedUpdatePopup()
 			return
 		}
 
 		appUpdateDownload.progress.value = 0
 		finishedDownloading.value = false
+		downloading.value = false
+		updateSize.value = null
+		availableUpdate.value = update
 
 		console.log(`Update ${update.version} is available.`)
 
@@ -975,34 +1072,11 @@ async function checkUpdates() {
 			downloadUpdate(update)
 		} else {
 			console.log(`Metered connection detected, not auto-downloading update.`)
-			getUpdateSize(update.rid).then((size) => {
-				updateSize.value = size
-				addPopupNotification({
-					title: formatMessage(updatePopupMessages.updateAvailable),
-					text: formatMessage(updatePopupMessages.meteredBody, { version: update.version }),
-					type: 'info',
-					autoCloseMs: null,
-					buttons: [
-						{
-							label: formatMessage(updatePopupMessages.download, {
-								size: formatBytes(updateSize.value ?? 0),
-							}),
-							action: () => downloadAvailableUpdate(),
-							color: 'brand',
-						},
-						{
-							label: formatMessage(updatePopupMessages.changelog),
-							action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
-							keepOpen: true,
-						},
-					],
-				})
-			})
+			markAppUpdateActionable(update.version)
+			scheduleDelayedUpdatePopup()
 		}
 
 		getUpdateSize(update.rid).then((size) => (updateSize.value = size))
-
-		availableUpdate.value = update
 	}
 
 	await performCheck()
@@ -1024,12 +1098,17 @@ async function checkLinuxUpdates() {
 		const latestVersion = updates?.version
 
 		if (latestVersion && latestVersion !== currentVersion) {
-			addPopupNotification({
-				title: formatMessage(updatePopupMessages.updateAvailable),
-				text: formatMessage(updatePopupMessages.linuxBody, { version: latestVersion }),
-				type: 'info',
-				autoCloseMs: null,
-			})
+			markAppUpdateActionable(latestVersion)
+			const nextPopupTime = getNextAppUpdatePopupTime(latestVersion)
+			if (nextPopupTime !== null && Date.now() >= nextPopupTime) {
+				addPopupNotification({
+					title: formatMessage(updatePopupMessages.updateAvailable),
+					text: formatMessage(updatePopupMessages.linuxBody, { version: latestVersion }),
+					type: 'info',
+					autoCloseMs: null,
+				})
+				markAppUpdatePopupShown(latestVersion)
+			}
 		}
 	} catch (e) {
 		console.error('Failed to check for updates:', e)
@@ -1043,55 +1122,48 @@ async function downloadAvailableUpdate() {
 async function downloadUpdate(versionToDownload) {
 	if (!versionToDownload) {
 		handleError(`Failed to download update: no version available`)
+		return
 	}
 
-	if (appUpdateDownload.progress.value !== 0) {
+	if (downloading.value || appUpdateDownload.progress.value !== 0) {
 		console.error(`Update ${versionToDownload.version} already downloading`)
 		return
 	}
 
 	console.log(`Downloading update ${versionToDownload.version}`)
+	downloading.value = true
 
 	try {
-		enqueueUpdateForInstallation(versionToDownload.rid).then(() => {
-			finishedDownloading.value = true
-			unlistenUpdateDownload?.().then(() => {
-				unlistenUpdateDownload = null
+		enqueueUpdateForInstallation(versionToDownload.rid)
+			.then(() => {
+				downloading.value = false
+				finishedDownloading.value = true
+				unlistenUpdateDownload?.().then(() => {
+					unlistenUpdateDownload = null
+				})
+				console.log('Finished downloading!')
+				markAppUpdateActionable(versionToDownload.version, 'downloaded')
+				scheduleDelayedUpdatePopup()
 			})
-			console.log('Finished downloading!')
-
-			addPopupNotification({
-				title: formatMessage(updatePopupMessages.downloadComplete),
-				text: formatMessage(updatePopupMessages.downloadedBody, {
-					version: versionToDownload.version,
-				}),
-				type: 'success',
-				autoCloseMs: null,
-				buttons: [
-					{
-						label: formatMessage(updatePopupMessages.reload),
-						action: () => installUpdate(),
-						color: 'brand',
-					},
-					{
-						label: formatMessage(updatePopupMessages.changelog),
-						action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
-						keepOpen: true,
-					},
-				],
+			.catch((e) => {
+				downloading.value = false
+				appUpdateDownload.progress.value = 0
+				handleError(e)
 			})
-		})
 		unlistenUpdateDownload = await subscribeToDownloadProgress(
 			appUpdateDownload,
 			versionToDownload.version,
 		)
 	} catch (e) {
+		downloading.value = false
+		appUpdateDownload.progress.value = 0
 		handleError(e)
 	}
 }
 
 async function installUpdate() {
 	restarting.value = true
+
 	try {
 		await setRestartAfterPendingUpdate(true)
 	} catch (e) {
@@ -1103,6 +1175,12 @@ async function installUpdate() {
 		await handleClose()
 	}, 250)
 }
+
+setAppUpdateActions({
+	download: downloadAvailableUpdate,
+	install: installUpdate,
+	changelog: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+})
 
 async function openModrinthProjectLinkInApp(parsed) {
 	const { slug, pathSuffix, url } = parsed
@@ -1373,33 +1451,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<PlusIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
-			<Transition name="nav-button-animated">
-				<div v-if="availableUpdate && !restarting && (finishedDownloading || metered)">
-					<NavButton
-						v-tooltip.right="
-							formatMessage(
-								finishedDownloading
-									? messages.reloadToUpdate
-									: downloadProgress === 0
-										? messages.downloadUpdate
-										: messages.downloadingUpdate,
-								{
-									percent: downloadPercent,
-								},
-							)
-						"
-						:to="finishedDownloading ? installUpdate : downloadAvailableUpdate"
-					>
-						<ProgressSpinner
-							v-if="downloadProgress > 0 && downloadProgress < 1"
-							class="text-brand"
-							:progress="downloadProgress"
-						/>
-						<RefreshCwIcon v-else-if="finishedDownloading" class="text-brand" />
-						<DownloadIcon v-else class="text-brand" />
-					</NavButton>
-				</div>
-			</Transition>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => $refs.settingsModal.show()"

@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "你沒有權限。"
+  },
   "affiliate.create.button": {
     "defaultMessage": "建立聯盟連結"
   },
@@ -3004,6 +3007,9 @@
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "原版"
+  },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "備份"
   },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "背景工作執行中"

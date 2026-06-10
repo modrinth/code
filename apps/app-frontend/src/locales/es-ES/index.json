@@ -9,7 +9,7 @@
     "message": "Ocultar más instancias en ejecución"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Hacer instancia principal"
+    "message": "Establecer como instancia principal"
   },
   "app.action-bar.no-instances-running": {
     "message": "Ninguna instancia en ejecución"
@@ -24,16 +24,16 @@
     "message": "Mostrar más instancias en ejecución"
   },
   "app.action-bar.stop-instance": {
-    "message": "Finalizar instancia"
+    "message": "Detener instancia"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Mostrar descargas activas"
   },
   "app.action-bar.view-instance": {
-    "message": "Mostrar instancia"
+    "message": "Ver instancia"
   },
   "app.action-bar.view-logs": {
-    "message": "Mostrar registros"
+    "message": "Ver registros"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Habilita el renderizado avanzado, como los efectos de desenfoque, que pueden causar problemas de rendimiento sin renderizado acelerado por hardware."
@@ -42,49 +42,55 @@
     "message": "Renderizado avanzado"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Seleccione su tema de color preferido para Modrinth en este dispositivo."
+    "message": "Selecciona tu tema de color preferido para la Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema de color"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Cambia la página en la que el lanzador inicia."
+    "message": "Cambia la página que se abre al iniciar el lanzador."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Inicio"
   },
   "app.appearance-settings.default-landing-page.library": {
-    "message": "Librería"
+    "message": "Biblioteca"
   },
   "app.appearance-settings.default-landing-page.title": {
-    "message": "Página predeterminada"
+    "message": "Página de inicio predeterminada"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Desactiva la etiqueta arriba de tu personaje en la página de skins."
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "Ocultar etiqueta"
+    "message": "Ocultar etiqueta de nombre"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Incluye los mundos más recientes en la sección \"Vuelve a jugar tus mundos\" en la página de inicio."
+    "message": "Incluye los mundos recientes en la sección \"Volver a jugar\" de la página de inicio."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Vuelve a jugar tus mundos"
+    "message": "Volver a jugar en tus mundos"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiza el lanzador cuando un proceso de Minecraft empieza."
+    "message": "Minimiza el lanzador cuando se inicia un proceso de Minecraft."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimiza el lanzador"
+    "message": "Minimizar lanzador"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Usa los sistemas de marco de Windows (se requiere resetear la aplicación)."
+    "message": "Usa el marco de ventana del sistema (requiere reiniciar la aplicación)."
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Decoraciones nativas"
   },
   "app.appearance-settings.select-option": {
     "message": "Selecciona una opción"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Muestra cuánto tiempo has estado jugando en una instancia."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Mostrar tiempo de juego"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Activa la posibilidad de alternar la barra lateral."
@@ -96,7 +102,7 @@
     "message": "Si intentas instalar un archivo de paquete de Modrinth (.mrpack) que no esté alojado en Modrinth, debes comprender los riesgos que esto conlleva antes de instalarlo."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Advertir antes de instalarme paquetes de mods desconocidos"
+    "message": "Adviérteme antes de instalarme modpacks desconocidos"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Los servidores de autenticación de Minecraft pueden no estar funcionando en este momento. Verifica tu conexión a internet e inténtalo de nuevo más tarde."
@@ -105,7 +111,7 @@
     "message": "No se puede conectar con los servidores de autenticación"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Añadir servidor a instancia"
+    "message": "Añadiendo servidor a la instancia"
   },
   "app.browse.add-to-an-instance": {
     "message": "Añadir a una instancia"
@@ -135,7 +141,7 @@
     "message": "Ocultar servidores ya añadidos"
   },
   "app.browse.project-type.modpacks": {
-    "message": "Paquetes de Mods"
+    "message": "Modpacks"
   },
   "app.browse.server-instance-content-warning": {
     "message": "Añadir contenido puede comprometer la compatibilidad a la hora de unirse a un servidor. Cualquier contenido añadido se perderá cuando actualices la instancia del servidor."
@@ -143,11 +149,14 @@
   "app.browse.server.installing": {
     "message": "Instalando"
   },
+  "app.content-install.no-compatible-versions": {
+    "message": "No hay versiones disponibles que coincidan con {compatibilityLabel}. Selecciona una versión para instalarla de todas formas. Las dependencias no se instalarán automáticamente."
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },
   "app.creation-modal.installing-modpack.title": {
-    "message": "Instalando el modpack..."
+    "message": "Instalando modpack..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Escribe la descripción del modpack..."
@@ -341,8 +350,137 @@
   "app.skins.apply-button": {
     "message": "Aplicar"
   },
-  "app.update-popup.body": {
-    "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
+  "app.skins.delete-button": {
+    "message": "Borrar skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Esto borrará permanentemente la skin seleccionada. Esta acción no se puede deshacer."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "¿Estás seguro/a de que quieres eliminar está skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Error al leer el archivo arrastrado."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Error al procesar el archivo"
+  },
+  "app.skins.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Añadir skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Añadiendo una skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Estilo de brazo"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Delgado"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Ancho"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Capa"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Capa"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Editando skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "¡Modifica la skin primero!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Sin capa"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Nada"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Reemplazar textura"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Guardar skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Guardando..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textura"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "¡Primero sube una skin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Editar skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Previsualizando"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Estuviste cambiando tu skin demasiado rápido. Los servidores de Mojang han bloqueado temporalmente tus futuras solicitaciones. Por favor, espere un momento antes de intentar de nuevo."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "¡Cálmate!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders y Biomas"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Persigue los cielos"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Skins por defecto"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Orgullo Modrinth"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Has recibido estas skins por donar a la fundación Orgullo Modrinth durante el Mes del Orgullo."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Monturas del Caos"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Skins guardadas"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "La Edad de Cobre"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "El Jardín Despierta"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Pequeña Invasión"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Iniciar Sesión"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Por favor, inicia sesión con tu cuenta de Minecraft para usar las funciones del administrador de Skins de la app de Modrinth."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Modrinth Bot emocionado"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Por favor, inicia sesión"
+  },
+  "app.skins.title": {
+    "message": "Selector de Skin"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} se ha descargado. Actualiza la página ahora o espera a que se actualice automáticamente al cerrar Modrinth App."
@@ -373,15 +511,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "¡La versión {version} se ha instalado correctamente!"
-  },
-  "app.update.download-update": {
-    "message": "Descarga actualización"
-  },
-  "app.update.downloading-update": {
-    "message": "Descargando actualización ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Recarga para instalar la actualización"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "ejemplo.modrinth.gg"

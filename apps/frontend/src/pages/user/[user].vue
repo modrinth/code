@@ -264,6 +264,15 @@
 										shown: auth.user && isStaff(auth.user),
 									},
 									{
+										id: 'open-analytics',
+										action: () =>
+											navigateTo({
+												path: '/dashboard/analytics',
+												query: { user: user.username || user.id },
+											}),
+										shown: auth.user && isAdmin(auth.user),
+									},
+									{
 										id: 'edit-role',
 										action: () => openRoleEditModal(),
 										shown: auth.user && isAdmin(auth.user),
@@ -296,6 +305,10 @@
 								<template #open-info>
 									<InfoIcon aria-hidden="true" />
 									{{ formatMessage(messages.infoButton) }}
+								</template>
+								<template #open-analytics>
+									<ChartIcon aria-hidden="true" />
+									{{ formatMessage(messages.analyticsButton) }}
 								</template>
 								<template #toggle-affiliate>
 									<AffiliateIcon aria-hidden="true" />
@@ -500,6 +513,7 @@ import {
 	BadgeCheckIcon,
 	BoxIcon,
 	CalendarIcon,
+	ChartIcon,
 	CheckIcon,
 	ClipboardCopyIcon,
 	CurrencyIcon,
@@ -691,6 +705,10 @@ const messages = defineMessages({
 	infoButton: {
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
+	},
+	analyticsButton: {
+		id: 'profile.button.analytics',
+		defaultMessage: 'View user analytics',
 	},
 	setAffiliateButton: {
 		id: 'profile.button.set-affiliate',
