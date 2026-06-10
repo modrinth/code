@@ -142,9 +142,9 @@ export async function remove_custom_skin(skin: Skin): Promise<void> {
 	})
 }
 
-export async function reorder_custom_skins(skins: Skin[]): Promise<void> {
-	await invoke('plugin:minecraft-skins|reorder_custom_skins', {
-		skins,
+export async function set_custom_skin_order(textureKeys: string[]): Promise<void> {
+	await invoke('plugin:minecraft-skins|set_custom_skin_order', {
+		textureKeys,
 	})
 }
 

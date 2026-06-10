@@ -445,6 +445,7 @@ pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
         });
     }
 
+    custom_skins.sort_by(|a, b| a.texture.as_str().cmp(b.texture.as_str()));
     available_skins.extend(custom_skins);
 
     for default_skin in assets::DEFAULT_SKINS.iter() {
@@ -796,55 +797,6 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
         &skin,
     )
     .await;
-
-    Ok(())
-}
-
-/// Reorders saved skins for the currently selected Minecraft profile.
-#[tracing::instrument(skip(skins))]
-pub async fn reorder_custom_skins(skins: Vec<Skin>) -> crate::Result<()> {
-    let state = State::get().await?;
-
-    let selected_credentials = Credentials::get_default_credential(&state.pool)
-        .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
-    let profile_id = selected_credentials.offline_profile.id;
-
-    for skin in &skins {
-        if !matches!(skin.source, SkinSource::CustomExternal) {
-            continue;
-        }
-
-        let texture_blob = png_util::url_to_data_stream(&skin.texture)
-            .await?
-            .try_fold(Vec::new(), |mut texture, chunk| async move {
-                texture.extend_from_slice(&chunk);
-                Ok(texture)
-            })
-            .await?;
-
-        CustomMinecraftSkin::add(
-            profile_id,
-            &skin.texture_key,
-            &texture_blob,
-            skin.variant,
-            skin.cape_id,
-            &state.pool,
-        )
-        .await?;
-    }
-
-    let texture_keys = skins
-        .iter()
-        .map(|skin| skin.texture_key.to_string())
-        .collect::<Vec<_>>();
-
-    CustomMinecraftSkin::reorder(
-        profile_id,
-        &texture_keys,
-        &state.pool,
-    )
-    .await?;
 
     Ok(())
 }

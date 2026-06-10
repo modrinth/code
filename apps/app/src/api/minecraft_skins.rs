@@ -13,7 +13,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             add_and_equip_custom_skin,
             equip_skin,
             remove_custom_skin,
-            reorder_custom_skins,
             save_custom_skin,
             unequip_skin,
             flush_pending_skin_change,
@@ -69,14 +68,6 @@ pub async fn equip_skin(skin: Skin) -> Result<()> {
 #[tauri::command]
 pub async fn remove_custom_skin(skin: Skin) -> Result<()> {
     Ok(minecraft_skins::remove_custom_skin(skin).await?)
-}
-
-/// `invoke('plugin:minecraft-skins|reorder_custom_skins', skins)`
-///
-/// See also: [minecraft_skins::reorder_custom_skins]
-#[tauri::command]
-pub async fn reorder_custom_skins(skins: Vec<Skin>) -> Result<()> {
-    Ok(minecraft_skins::reorder_custom_skins(skins).await?)
 }
 
 /// `invoke('plugin:minecraft-skins|save_custom_skin', skin, texture_blob, variant, cape, replace_texture)`

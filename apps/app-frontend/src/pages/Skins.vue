@@ -46,7 +46,7 @@ import {
 	get_normalized_skin_texture,
 	normalize_skin_texture,
 	remove_custom_skin,
-	reorder_custom_skins,
+	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
 import { handleSevereError } from '@/store/error'
@@ -516,7 +516,7 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 	generateSkinPreviews(skins.value, capes.value)
 
 	try {
-		await reorder_custom_skins(nextSavedSkins)
+		await set_custom_skin_order(nextSavedSkins.map((skin) => skin.texture_key))
 	} catch (error) {
 		skins.value = previousSkins
 		generateSkinPreviews(skins.value, capes.value)

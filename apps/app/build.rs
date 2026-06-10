@@ -116,7 +116,6 @@ fn main() {
                         "add_and_equip_custom_skin",
                         "equip_skin",
                         "remove_custom_skin",
-                        "reorder_custom_skins",
                         "save_custom_skin",
                         "unequip_skin",
                         "flush_pending_skin_change",
