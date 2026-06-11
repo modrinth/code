@@ -196,6 +196,7 @@ pub enum SearchField {
     MinecraftJavaServerContentSupportedGameVersions,
     MinecraftJavaServerPingData,
     DependencyProjectIds,
+    CompatibleDependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -252,6 +253,8 @@ pub struct UploadSearchProject {
     #[serde(default)]
     pub dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
@@ -267,6 +270,7 @@ pub struct UploadSearchProject {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SearchProjectDependency {
     pub project_id: String,
+    pub dependency_type: String,
     pub name: String,
     pub slug: Option<String>,
     pub icon_url: Option<String>,
@@ -311,6 +315,8 @@ pub struct ResultSearchProject {
     #[serde(default)]
     pub dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
@@ -350,6 +356,8 @@ impl From<UploadSearchProject> for ResultSearchProject {
             featured_gallery: source.featured_gallery,
             color: source.color,
             dependency_project_ids: source.dependency_project_ids,
+            compatible_dependency_project_ids: source
+                .compatible_dependency_project_ids,
             dependencies: source.dependencies,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,

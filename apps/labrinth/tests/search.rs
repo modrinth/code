@@ -95,6 +95,12 @@ async fn search_projects() {
                     )]]),
                     vec![7],
                 ),
+                (
+                    json!([[format!(
+                        "compatible_dependency_project_ids:{dependency_project_id}"
+                    )]]),
+                    vec![7],
+                ),
             ];
             // TODO: versions, game versions
             // Untested:
@@ -151,10 +157,22 @@ async fn search_projects() {
                 projects.hits[0].dependency_project_ids[0],
                 dependency_project_id
             );
+            assert_eq!(
+                projects.hits[0].compatible_dependency_project_ids.len(),
+                1
+            );
+            assert_eq!(
+                projects.hits[0].compatible_dependency_project_ids[0],
+                dependency_project_id
+            );
             assert_eq!(projects.hits[0].dependencies.len(), 1);
             assert_eq!(
                 projects.hits[0].dependencies[0].project_id,
                 dependency_project_id
+            );
+            assert_eq!(
+                projects.hits[0].dependencies[0].dependency_type,
+                "required"
             );
             assert!(
                 projects.hits[0].dependencies[0]
