@@ -6,11 +6,12 @@ use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::models::{DBUser, DBUserId};
+use crate::database::models::{DBPasskey, DBPasskeyId, DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::error::ApiError as ApiErrorResponse;
+use crate::models::ids::PasskeyId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
@@ -45,7 +46,9 @@ use std::sync::Arc;
 use thiserror::Error;
 use tracing::{error, info};
 use url::Url;
+use uuid::Uuid;
 use validator::Validate;
+use webauthn_rs::prelude::*;
 use zxcvbn::Score;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
@@ -68,7 +71,14 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
             .service(set_email)
             .service(verify_email)
             .service(subscribe_newsletter)
-            .service(get_newsletter_subscription_status),
+            .service(get_newsletter_subscription_status)
+            .service(register_passkey_start)
+            .service(register_passkey_finish)
+            .service(authenticate_passkey_start)
+            .service(authenticate_passkey_finish)
+            .service(list_passkeys)
+            .service(rename_passkey)
+            .service(delete_passkey),
     );
 }
 
@@ -2980,4 +2990,467 @@ pub async fn get_newsletter_subscription_status(
     Ok(HttpResponse::Ok().json(serde_json::json!({
         "subscribed": is_subscribed
     })))
+}
+
+const MAX_PASSKEYS_PER_USER: usize = 20;
+
+#[utoipa::path(
+    post,
+    operation_id = "registerPasskeyStart",
+    responses(
+        (status = 200, description = "Passkey registration challenge created"),
+        (status = 401, description = "Invalid credentials")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[post("/passkey/register/start")]
+pub async fn register_passkey_start(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+    webauthn: Data<Webauthn>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_AUTH_WRITE,
+    )
+    .await?
+    .1;
+
+    // Get currently registered credentials, so an authenticator knows not to register
+    // duplicate credentials
+    let excluded_credentials = DBPasskey::get_for_user(user.id.into(), &**pool)
+        .await
+        .wrap_internal_err("failed to fetch passkeys for user")?
+        .into_iter()
+        .map(|cred| CredentialID::from(cred.credential_id))
+        .collect::<Vec<_>>();
+
+    if excluded_credentials.len() >= MAX_PASSKEYS_PER_USER {
+        return Err(ApiError::Request(eyre!(
+            "maximum of {MAX_PASSKEYS_PER_USER} passkeys per user reached"
+        )));
+    }
+
+    // Doesn't have to be a real UUID as long as it's unique
+    let user_uuid = Uuid::from_u128(user.id.0 as u128);
+    // Confusingly named in library and specs, but since we already use the username as the display
+    // name, using the email as normal name is better, the Webauthn specs state:
+    // "It is intended only for display, i.e., aiding the user in determining the difference
+    // between user accounts with similar displayNames."
+    let name = user.email.as_deref().unwrap_or(&user.username);
+    let (mut ccr, reg_state) = webauthn
+        .start_passkey_registration(
+            user_uuid,
+            name,
+            &user.username,
+            Some(excluded_credentials),
+        )
+        .wrap_internal_err("failed to start passkey registration")?;
+
+    // This is not ideal, but webauthn-rs doesn't expose anything that allows us to force a resident
+    // key. And since we are implementing a one-click login flow without input of a username,
+    // we have to require a resident key, since this is a prerequisite for a discoverable
+    // credential. The default of this library is "discouraged", which does not match our use case.
+    // In the future this can be set to "preferred" if 2FA using a security key is implemented.
+    if let Some(ref mut auth_sel) = ccr.public_key.authenticator_selection {
+        auth_sel.resident_key =
+            Some(webauthn_rs_proto::ResidentKeyRequirement::Required);
+        auth_sel.require_resident_key = true;
+    }
+
+    let flow = DBFlow::RegisterPasskey {
+        user_id: user.id.into(),
+        state: reg_state,
+    }
+    .insert(Duration::minutes(30), &redis)
+    .await
+    .wrap_internal_err("failed to store passkey registration flow")?;
+
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "options": ccr,
+        "flow": flow,
+    })))
+}
+
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
+pub struct RegisterPasskeyFinish {
+    pub flow: String,
+    #[validate(length(min = 1, max = 255))]
+    pub name: String,
+    #[schema(value_type = Object)]
+    pub credential: RegisterPublicKeyCredential,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct PasskeyResponse {
+    pub id: PasskeyId,
+    pub name: String,
+    pub created_at: chrono::DateTime<Utc>,
+    pub last_used: Option<chrono::DateTime<Utc>>,
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "registerPasskeyFinish",
+    responses(
+        (status = 201, description = "Passkey registered", body = PasskeyResponse),
+        (status = 400, description = "Invalid input"),
+        (status = 401, description = "Invalid credentials")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[post("/passkey/register/finish")]
+pub async fn register_passkey_finish(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+    webauthn: Data<Webauthn>,
+    response: web::Json<RegisterPasskeyFinish>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_AUTH_WRITE,
+    )
+    .await?
+    .1;
+
+    response.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
+
+    let db_user_id: DBUserId = user.id.into();
+    let flow = DBFlow::take_if(
+        &response.flow,
+        |f| matches!(f, DBFlow::RegisterPasskey { user_id, .. } if *user_id == db_user_id),
+        &redis,
+    )
+    .await?;
+    if let Some(DBFlow::RegisterPasskey { user_id, state }) = flow {
+        if user_id != db_user_id {
+            return Err(ApiError::Authentication(
+                AuthenticationError::InvalidCredentials,
+            ));
+        }
+
+        let result = webauthn
+            .finish_passkey_registration(&response.credential, &state)
+            .wrap_request_err("failed to finish passkey registration")?;
+
+        let mut transaction = pool.begin().await?;
+        let passkey_id =
+            crate::database::models::generate_passkey_id(&mut transaction)
+                .await
+                .wrap_internal_err("failed to generate passkey id")?;
+
+        let passkey = DBPasskey {
+            id: passkey_id,
+            user_id: db_user_id,
+            name: response.name.clone(),
+            credential_id: result.cred_id().to_vec(),
+            passkey: result,
+            created_at: Utc::now(),
+            last_used: None,
+        };
+        passkey
+            .insert(&mut transaction)
+            .await
+            .wrap_internal_err("Failed to create passkey object")?;
+
+        transaction.commit().await?;
+        Ok(HttpResponse::Created().json(PasskeyResponse {
+            id: passkey.id.into(),
+            name: passkey.name,
+            created_at: passkey.created_at,
+            last_used: passkey.last_used,
+        }))
+    } else {
+        Err(ApiError::Request(eyre!(
+            "flow does not exist. try restarting the passkey registration process"
+        )))
+    }
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "authenticatePasskeyStart",
+    responses(
+        (status = 200, description = "Passkey authentication challenge created")
+    )
+)]
+#[post("/passkey/start")]
+pub async fn authenticate_passkey_start(
+    redis: Data<RedisPool>,
+    webauthn: Data<Webauthn>,
+) -> Result<HttpResponse, ApiError> {
+    let (mut ccr, auth_state) = webauthn
+        .start_discoverable_authentication()
+        .wrap_internal_err("failed to start passkey authentication")?;
+
+    // Webauthn-rs implements discoverable credentials as if they will only ever be used with
+    // conditional UI, but as their own documentation says this has poor UX due to browser and OS
+    // implementation. So we use a button, but that means mediation must be set to "required".
+    // We use none since the enum only supports conditional, and the default is required.
+    ccr.mediation = None;
+
+    let flow = DBFlow::AuthenticatePasskey { state: auth_state }
+        .insert(Duration::minutes(30), &redis)
+        .await
+        .wrap_internal_err("failed to store passkey authentication flow")?;
+
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "options": ccr,
+        "flow": flow,
+    })))
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+pub struct AuthenticatePasskeyFinish {
+    pub flow: String,
+    #[schema(value_type = Object)]
+    pub credential: PublicKeyCredential,
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "authenticatePasskeyFinish",
+    responses(
+        (status = 200, description = "Passkey authentication successful"),
+        (status = 400, description = "Invalid input")
+    )
+)]
+#[post("/passkey/finish")]
+pub async fn authenticate_passkey_finish(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    webauthn: Data<Webauthn>,
+    response: web::Json<AuthenticatePasskeyFinish>,
+) -> Result<HttpResponse, ApiError> {
+    let flow = DBFlow::take_if(
+        &response.flow,
+        |f| matches!(f, DBFlow::AuthenticatePasskey { .. }),
+        &redis,
+    )
+    .await?;
+
+    if let Some(DBFlow::AuthenticatePasskey { state }) = flow {
+        let credential_id = response.credential.get_credential_id();
+        let db_passkey =
+            DBPasskey::get_by_credential_id(credential_id, &**pool)
+                .await
+                .wrap_internal_err("failed to fetch passkey")?
+                .ok_or_else(|| ApiError::Request(eyre!("passkey not found")))?;
+
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("failed to begin transaction")?;
+
+        let auth_result = match webauthn.finish_discoverable_authentication(
+            &response.credential,
+            state,
+            &[DiscoverableKey::from(&db_passkey.passkey)],
+        ) {
+            Ok(r) => r,
+            Err(WebauthnError::CredentialPossibleCompromise) => {
+                DBPasskey::remove(db_passkey.id, &mut transaction)
+                    .await
+                    .wrap_internal_err(
+                        "failed to remove compromised passkey",
+                    )?;
+                transaction.commit().await?;
+                return Err(ApiError::Request(eyre!(
+                    "passkey counter did not advance; the credential may be cloned and has been invalidated"
+                )));
+            }
+            Err(e) => return Err(ApiError::Request(eyre::Report::from(e))),
+        };
+
+        let mut updated_passkey = db_passkey.passkey;
+        updated_passkey.update_credential(&auth_result);
+
+        let updated = DBPasskey::update_after_auth(
+            db_passkey.id,
+            updated_passkey,
+            &mut transaction,
+        )
+        .await
+        .wrap_internal_err("failed to update passkey")?;
+        if !updated {
+            return Err(ApiError::Internal(eyre!(
+                "failed to update passkey information"
+            )));
+        }
+
+        let session = issue_session(
+            req,
+            db_passkey.user_id,
+            &mut transaction,
+            &redis,
+            None,
+        )
+        .await?;
+        let res = crate::models::sessions::Session::from(session, true, None);
+
+        transaction.commit().await?;
+        Ok(HttpResponse::Ok().json(res))
+    } else {
+        Err(ApiError::Request(eyre!(
+            "flow does not exist. try restarting the passkey authentication process"
+        )))
+    }
+}
+
+#[utoipa::path(
+    get,
+    operation_id = "listPasskeys",
+    responses(
+        (status = 200, description = "List of passkeys", body = [PasskeyResponse]),
+        (status = 401, description = "Invalid credentials")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[get("/passkey")]
+pub async fn list_passkeys(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_AUTH_WRITE,
+    )
+    .await?
+    .1;
+
+    let passkeys = DBPasskey::get_for_user(user.id.into(), &**pool)
+        .await
+        .wrap_internal_err("failed to fetch passkeys")?
+        .into_iter()
+        .map(|p| PasskeyResponse {
+            id: p.id.into(),
+            name: p.name,
+            created_at: p.created_at,
+            last_used: p.last_used,
+        })
+        .collect::<Vec<_>>();
+
+    Ok(HttpResponse::Ok().json(passkeys))
+}
+
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
+pub struct RenamePasskey {
+    #[validate(length(min = 1, max = 255))]
+    pub name: String,
+}
+
+#[utoipa::path(
+    patch,
+    operation_id = "renamePasskey",
+    responses(
+        (status = 204, description = "Passkey renamed"),
+        (status = 400, description = "Invalid input"),
+        (status = 401, description = "Invalid credentials")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[patch("/passkey/{id}")]
+pub async fn rename_passkey(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+    info: web::Path<(String,)>,
+    body: web::Json<RenamePasskey>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_AUTH_WRITE,
+    )
+    .await?
+    .1;
+
+    body.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
+
+    let id = DBPasskeyId(
+        parse_base62(&info.into_inner().0)
+            .wrap_request_err("invalid passkey id")? as i64,
+    );
+
+    let mut transaction = pool.begin().await?;
+
+    let found =
+        DBPasskey::rename(id, user.id.into(), &body.name, &mut transaction)
+            .await
+            .wrap_internal_err("failed to rename passkey")?;
+    if !found {
+        return Err(ApiError::NotFound);
+    }
+
+    transaction.commit().await?;
+    Ok(HttpResponse::NoContent().finish())
+}
+
+#[utoipa::path(
+    delete,
+    operation_id = "deletePasskey",
+    responses(
+        (status = 204, description = "Passkey deleted"),
+        (status = 401, description = "Invalid credentials")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[delete("/passkey/{id}")]
+pub async fn delete_passkey(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+    info: web::Path<(String,)>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_AUTH_WRITE,
+    )
+    .await?
+    .1;
+
+    let id = DBPasskeyId(
+        parse_base62(&info.into_inner().0)
+            .wrap_request_err("invalid passkey id")? as i64,
+    );
+
+    let mut transaction = pool.begin().await?;
+
+    let found =
+        DBPasskey::remove_for_user(id, user.id.into(), &mut transaction)
+            .await
+            .wrap_internal_err("failed to delete passkey")?;
+    if !found {
+        return Err(ApiError::NotFound);
+    }
+
+    transaction.commit().await?;
+    Ok(HttpResponse::NoContent().finish())
 }
