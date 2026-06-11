@@ -358,8 +358,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
-import { useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { useAuth } from '~/composables/auth.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')
 const { withdrawData, maxWithdrawAmount, availableMethods, paymentOptions, calculateFees } =
