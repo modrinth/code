@@ -79,6 +79,16 @@ pub async fn search_users_escapes_wildcards_and_limits_results() {
                 .unwrap();
             }
 
+            sqlx::query(
+                "
+                INSERT INTO users (id, username, email, role)
+                VALUES (2100, 'prefix_under_score', 'prefix_under_score@modrinth.com', 'developer')
+                ",
+            )
+            .execute(&*test_env.db.pool)
+            .await
+            .unwrap();
+
             let req = test::TestRequest::get()
                 .uri("/v3/users/search?query=prefix")
                 .to_request();
@@ -103,6 +113,17 @@ pub async fn search_users_escapes_wildcards_and_limits_results() {
             let users: Vec<serde_json::Value> =
                 test::read_body_json(resp).await;
             assert!(users.is_empty());
+
+            let req = test::TestRequest::get()
+                .uri("/v3/users/search?query=prefix_")
+                .to_request();
+            let resp = test_env.call(req).await;
+            assert_status!(&resp, actix_http::StatusCode::OK);
+
+            let users: Vec<serde_json::Value> =
+                test::read_body_json(resp).await;
+            assert_eq!(users.len(), 1);
+            assert_eq!(users[0]["username"], "prefix_under_score");
 
             let req = test::TestRequest::get()
                 .uri("/v3/users/search?query=%20%20")
