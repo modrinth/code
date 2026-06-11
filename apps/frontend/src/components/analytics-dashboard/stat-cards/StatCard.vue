@@ -38,7 +38,8 @@
 
 		<div class="flex flex-col gap-2.5">
 			<div
-				class="text-2xl font-semibold leading-none md:text-4xl"
+				v-tooltip="!disabled ? statTooltip : undefined"
+				class="w-fit text-2xl font-semibold leading-none md:text-4xl"
 				:class="{
 					'text-primary': disabled,
 					'text-contrast': !disabled,
@@ -114,6 +115,7 @@ import { analyticsStatCardMessages } from '../analytics-messages'
 const props = defineProps<{
 	label: string
 	statLabel: string
+	statTooltip?: string
 	vsPrevPeriodPercent: string | null
 	icon: string
 	active?: boolean

@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "选择一个选项"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "显示你在每个实例中游玩的时间。"
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "显示总游玩时间"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "启用切换侧边栏的功能。"
   },
@@ -120,7 +126,7 @@
     "message": "已添加"
   },
   "app.browse.already-added": {
-    "message": "已添加过"
+    "message": "已经添加"
   },
   "app.browse.back-to-instance": {
     "message": "返回实例"
@@ -142,6 +148,9 @@
   },
   "app.browse.server.installing": {
     "message": "安装中"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "没有与 {compatibilityLabel} 匹配的可用版本。如果仍要安装，请选择一个版本。依赖项将不会自动安装。"
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -411,7 +420,7 @@
     "message": "建造者与生物群系"
   },
   "app.skins.section.chase-the-skies": {
-    "message": "追逐苍穹"
+    "message": "追逐天空"
   },
   "app.skins.section.default-skins": {
     "message": "默认皮肤"
@@ -422,23 +431,29 @@
   "app.skins.section.modrinth": {
     "message": "Modrinth"
   },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth 精选"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "你在骄傲月期间为 Modrinth 的骄傲月筹款活动捐款，因此获得了这些皮肤。"
+  },
   "app.skins.section.mounts-of-mayhem": {
-    "message": "暴乱坐骑"
+    "message": "群骑纷争"
   },
   "app.skins.section.saved-skins": {
     "message": "已保存皮肤"
   },
   "app.skins.section.striding-hero": {
-    "message": "阔步英雄"
+    "message": "Striding Hero"
   },
   "app.skins.section.the-copper-age": {
     "message": "铜器时代"
   },
   "app.skins.section.the-garden-awakens": {
-    "message": "花园苏醒"
+    "message": "苍园觉醒"
   },
   "app.skins.section.tiny-takeover": {
-    "message": "微小占领"
+    "message": "小鬼当家"
   },
   "app.skins.sign-in.button": {
     "message": "登录"
@@ -454,9 +469,6 @@
   },
   "app.skins.title": {
     "message": "皮肤选择器"
-  },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
@@ -487,15 +499,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安装！"
-  },
-  "app.update.download-update": {
-    "message": "下载更新"
-  },
-  "app.update.downloading-update": {
-    "message": "下载更新中（{percent}%）"
-  },
-  "app.update.reload-to-update": {
-    "message": "重启以安装更新"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

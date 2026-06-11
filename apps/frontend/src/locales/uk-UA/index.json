@@ -14,17 +14,35 @@
   "analytics.action.cancel": {
     "message": "Скасувати"
   },
+  "analytics.action.refresh": {
+    "message": "Оновити"
+  },
   "analytics.action.reset": {
     "message": "Скинути"
   },
   "analytics.breakdown.country": {
     "message": "Країна"
   },
+  "analytics.breakdown.download-reason": {
+    "message": "Причина завантаження"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Джерело завантаження"
+  },
   "analytics.breakdown.game-version": {
     "message": "Версія гри"
   },
+  "analytics.breakdown.generic": {
+    "message": "Розбивка"
+  },
   "analytics.breakdown.loader": {
     "message": "Завантажувач"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Монетизація"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Без розбивки"
   },
   "analytics.breakdown.project": {
     "message": "Проєкт"
@@ -34,6 +52,201 @@
   },
   "analytics.breakdown.project-version": {
     "message": "Версія проєкту"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Розбивка через {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Показати всі"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Обмежений показ"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Показати топ-8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} год"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} активно"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Примітки"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Настройки відображення графіку, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Настройки"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Настройки відображення графіку"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Перегляд"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Події Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Нема жодних подій Modrinth в графіку."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Нема жодних подій проєкту в графіку."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Попередній період"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Події проєкту"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Співвідношення"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Виберіть елементи з таблиці знизу щоб відобразити ваші дані."
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Переглянути оголошення"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Переглянути аналітичні деталі про монетизацію"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Тільки перегляди й завантаження через Modrinth враховуються в монетизації, а зарахування завантажень вимагають від користувачів щоб вони були авторизовані."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Деталі монетизованої аналітики"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Поп.)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "Показування всіх вибраних ліній з таблиці може знизити продуктивність."
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Закріплено"
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Динаміка завантажень"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Динаміка ігрового часу"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Динаміка доходу"
+  },
+  "analytics.graph.title.views": {
+    "message": "Динаміка переглядів"
+  },
+  "analytics.group-by.1h": {
+    "message": "1 год"
+  },
+  "analytics.group-by.6h": {
+    "message": "6 год"
+  },
+  "analytics.group-by.date": {
+    "message": "Дата"
+  },
+  "analytics.group-by.day": {
+    "message": "День"
+  },
+  "analytics.group-by.month": {
+    "message": "Місяць"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Групування за днем"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Групування за годиною"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Групування за місяцем"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Групування за 6-годинам"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Групування за тижнем"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Групування за роком"
+  },
+  "analytics.group-by.week": {
+    "message": "Тиждень"
+  },
+  "analytics.group-by.year": {
+    "message": "Рік"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Отримання результатів…"
+  },
+  "analytics.options.loading": {
+    "message": "Завантаження…"
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Проєкт затверджено"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Проєкт приватний"
+  },
+  "analytics.project-status.approved": {
+    "message": "Затверджений"
+  },
+  "analytics.project-status.archived": {
+    "message": "Архівований"
+  },
+  "analytics.project-status.draft": {
+    "message": "Чернетка"
+  },
+  "analytics.project-status.other": {
+    "message": "Інший"
+  },
+  "analytics.project-status.private": {
+    "message": "Приватний"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Відхилений"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Прихований"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Утриманий"
+  },
+  "analytics.project.all": {
+    "message": "Усі проєкти"
+  },
+  "analytics.project.icon-alt": {
+    "message": "Значок {name}"
+  },
+  "analytics.project.select": {
+    "message": "Обрати проєкти"
+  },
+  "analytics.query.filter.add": {
+    "message": "Додати фільтр"
+  },
+  "analytics.query.label.project": {
+    "message": "Проєкт:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Завантаження"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Дізнатися більше"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Як працює монетизація?"
+  },
+  "analytics.stat.playtime": {
+    "message": "Ігровий час"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} год"
   },
   "app-marketing.download.description": {
     "message": "Наш застосунок доступний на всіх платформах, виберіть бажану вами версію."
@@ -148,6 +361,9 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ МБ"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ МБ"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 МБ"
@@ -1466,9 +1682,6 @@
   "frog.title": {
     "message": "Жаба"
   },
-  "hosting-marketing.available-locations": {
-    "message": "Доступні в Північній Америці, Європі та Південно-Східній Азії для ширшого покриття."
-  },
   "hosting-marketing.billing.monthly": {
     "message": "Щомісячна плата"
   },
@@ -1528,9 +1741,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Де розташовані сервери Modrinth Hosting? Чи зможу я вибрати регіон?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Наразі ми маємо сервери в Північній Америці, Європі та Південно-Східній Азії — ви зможете вибрати одну з цих локацій під час покупки. У майбутньому з’являться й інші регіони! Якщо ви хочете змінити регіон — зверніться до підтримки."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Які версії Minecraft і завантажувачі модів можна використовувати?"
@@ -2888,6 +3098,9 @@
   "report.already-reported": {
     "message": "Ви вже повідомляли про «{title}»"
   },
+  "report.back-to-item": {
+    "message": "Повернутися до {item}"
+  },
   "report.body.description": {
     "message": "За можливости додавайте посилання і зображення, якщо це доречно. Порожні або недостатні скарги буде закрито й проігноровано."
   },
@@ -3424,6 +3637,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Додайте додатковий рівень захисту для свого облікового запису під час входу."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Вимкнути двофакторну автентифікацію"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Установити двофакторну автентифікацію"
   },
   "settings.account.security.two-factor.title": {
     "message": "Двофакторна автентифікація"

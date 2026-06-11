@@ -29,6 +29,7 @@ pub struct Download {
     pub reason: String,
     pub game_version: String,
     pub loader: String,
+    pub dependent_on_version_id: u64,
 }
 
 /// Why a project was downloaded.

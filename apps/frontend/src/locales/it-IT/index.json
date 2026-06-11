@@ -240,7 +240,7 @@
     "message": "Download nel tempo"
   },
   "analytics.graph.title.playtime": {
-    "message": "Tempo di gioco nel tempo"
+    "message": "Ore di gioco nel tempo"
   },
   "analytics.graph.title.revenue": {
     "message": "Guadagni nel tempo"
@@ -365,8 +365,17 @@
   "analytics.stat.downloads": {
     "message": "Download"
   },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Ai fini della monetizzazione, sono considerate solo le visualizzazioni e i download da Modrinth che superano i controlli antifrode. I download dalla Modrinth App richiedono anche l'accesso dell'utente. Poiché tutti i progetti presentano una percentuale simile di download monetizzati, sommando tutti i download i ricavi non subirebbero variazioni significative."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Scopri di più"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Come funziona la monetizzazione?"
+  },
   "analytics.stat.playtime": {
-    "message": "Tempo di gioco"
+    "message": "Ore di gioco"
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} ore"
@@ -393,13 +402,13 @@
     "message": "Visualizzazioni"
   },
   "analytics.table.csv.date-range": {
-    "message": "dal {start} al {end}"
+    "message": "{start} al {end}"
   },
   "analytics.table.csv.filename": {
-    "message": "Analitiche di Modrinth per {breakdown} - {dateRange}"
+    "message": "Scomposizione analitica per {breakdown} - {dateRange}"
   },
   "analytics.table.csv.header.playtime-seconds": {
-    "message": "Tempo di gioco (in secondi)"
+    "message": "Secondi di gioco"
   },
   "analytics.table.csv.selected-range": {
     "message": "Intervallo selezionato"
@@ -1929,7 +1938,7 @@
     "message": "Rana"
   },
   "hosting-marketing.available-locations": {
-    "message": "Disponibile in Nord America, in Europa e nel Sud-est asiatico per ampia copertura."
+    "message": "Disponibile in Nord America, in Europa, nel Sud-est asiatico e in Australia per ampia copertura."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Paga mensilmente"
@@ -1992,7 +2001,7 @@
     "message": "Dove sono situati i server di Modrinth Hosting? Posso scegliere la regione?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Al momento abbiamo server disponibili in Nord America, in Europa e nel Sud-est asiatico che puoi scegliere al momento dell'acquisto. Altre regioni arriveranno in futuro! Se desideri cambiare regione, contatta l'assistenza."
+    "message": "Al momento abbiamo server disponibili in Nord America, in Europa, nel Sud-est asiatico e in Australia che puoi scegliere al momento dell'acquisto. Altre regioni arriveranno in futuro! Se desideri cambiare regione, contatta l'assistenza."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Quali versioni di Minecraft e dei loader posso usare?"

@@ -122,6 +122,48 @@
   "analytics.chart.legend.monetization-details.description": {
     "message": "Csak a Modrinthon keresztül történő megtekintések és letöltések számítanak bele a bevételszerzésbe, és a letöltéshez a felhasználóknak be kell jelentkezniük."
   },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "A bevételszerző statisztika részletei"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Előző)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "A táblázat összes kijelölt sorának megjelenítése ronthatja az oldal teljesítményét."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Megjelenítse a grafikonon mind a {count} sort?"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "{name} elrejtése a grafikonon"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "A diagram eszköztippje kitűzve"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Kitűzve"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(előző)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "{name} megjelenítése a grafikonon"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Összesen"
+  },
+  "analytics.chart.view.area": {
+    "message": "Terület"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Oszlop"
+  },
+  "analytics.chart.view.line": {
+    "message": "Vonal"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Függőség"
+  },
   "analytics.download-reason.modpack": {
     "message": "Modcsomag"
   },
@@ -134,6 +176,9 @@
   "analytics.download-source.website": {
     "message": "A Modrinth weboldala"
   },
+  "analytics.downloads.suffix": {
+    "message": "letöltés"
+  },
   "analytics.empty.no-data": {
     "message": "Nincs elérhető adat"
   },
@@ -145,6 +190,9 @@
   },
   "analytics.empty.no-projects-for-analytics": {
     "message": "Nincs elérhető projekt a statisztikához"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Játékverzió típusa"
   },
   "analytics.filter.game-version-type.all": {
     "message": "Összes"
@@ -164,11 +212,140 @@
   "analytics.filter.search.versions": {
     "message": "Verziók keresése..."
   },
+  "analytics.graph.title.downloads": {
+    "message": "Letöltések az idő függvényében"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Játékidő alakulása"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Bevétel alakulása"
+  },
+  "analytics.graph.title.views": {
+    "message": "Megtekintések alakulása"
+  },
+  "analytics.group-by.1h": {
+    "message": "1ó"
+  },
+  "analytics.group-by.6h": {
+    "message": "6ó"
+  },
+  "analytics.group-by.date": {
+    "message": "Dátum"
+  },
+  "analytics.group-by.day": {
+    "message": "Nap"
+  },
+  "analytics.group-by.month": {
+    "message": "Hónap"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Naponkénti csoportosítás"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Óránkénti csoportosítás"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Hónaponkénti csoportosítás"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "6 óránkénti csoportosítás"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Hetek szerinti csoportosítás"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Évenkénti csoportosítás"
+  },
+  "analytics.group-by.week": {
+    "message": "Hét"
+  },
+  "analytics.group-by.year": {
+    "message": "Év"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Eredmények lekérése…"
+  },
+  "analytics.options.loading": {
+    "message": "Betöltés..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projekt jóváhagyva"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Projekt privátra állítva"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Projekt állapota megváltozott"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projekt nem listázottra állítva"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} verzió kiadva"
+  },
   "analytics.project-event.version-uploaded": {
     "message": "Verzió feltöltve"
   },
+  "analytics.project-status.approved": {
+    "message": "Jóváhagyva"
+  },
+  "analytics.project-status.archived": {
+    "message": "Archiválva"
+  },
+  "analytics.project-status.draft": {
+    "message": "Vázlat"
+  },
+  "analytics.project-status.other": {
+    "message": "Egyéb"
+  },
+  "analytics.project-status.private": {
+    "message": "Privát"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Elutasított"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Nem listázott"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Visszatartott"
+  },
+  "analytics.project.all": {
+    "message": "Összes projekt"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name} ikon"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Csoportosítás"
+  },
+  "analytics.query.label.project": {
+    "message": "Projekt:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Időkeret:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Letöltések"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Csak a Modrinthon keresztül történő megtekintések és letöltések jogosultak bevételszerzésre, és át kell menniük a csalásmegelőző szűrésen. A Modrinth App letöltéséhez a felhasználónak be kell jelentkeznie. Mivel az összes projekt esetében hasonló azoknak a letöltéseknek az aránya, amelyek bevételt generálnak, a bevételed nem változna jelentősen, ha az összes letöltést figyelembe vennénk."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Tudj meg többet"
+  },
+  "analytics.stat.playtime": {
+    "message": "Játékidő"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} óra"
+  },
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Játékidő (másodpercben)"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Keresés..."
   },
   "app-marketing.download.description": {
     "message": "Asztali alkalmazásunk minden platformon elérhető, válaszd ki a kívánt verziót."
@@ -347,9 +524,6 @@
   "app-marketing.hero.download-modrinth-app": {
     "message": "Modrinth App letöltése"
   },
-  "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Modrinth App letöltése {os} rendszerre"
-  },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon profil főmenüjének képernyőképe."
   },
@@ -501,7 +675,7 @@
     "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
-    "message": "Üdvözlünk a Modrinth-onl!"
+    "message": "Üdvözlünk a Modrinthon!"
   },
   "auth.welcome.title": {
     "message": "Üdvözlünk"
@@ -1269,7 +1443,7 @@
     "message": "Felvéve"
   },
   "dashboard.revenue.tos": {
-    "message": "A projektek Modrinth-ra való feltöltésével és a számládról történő pénzfelvétellel elfogadod a <terms-link>jutalomprogram feltételeit</terms-link>. Tudj meg többet a <info-link>jutalomprogramról</info-link>."
+    "message": "A projektek Modrinthra való feltöltésével és a számládról történő pénzfelvétellel elfogadod a <terms-link>jutalomprogram feltételeit</terms-link>. Tudj meg többet a <info-link>jutalomprogramról</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Letöltés CSV formátumban"
@@ -1452,7 +1626,7 @@
     "message": "Ez a gyűjtemény lehet hogy privát."
   },
   "error.collection.404.list_item.3": {
-    "message": "Gyűjteményt a Modrinth moderációs csapata eltávolíthatta, mert megsértette a <tou-link>Felhasználási feltételeinket</tou-link>."
+    "message": "A gyűjteményt a Modrinth moderációs csapata eltávolította, mert megsértette a <tou-link>Felhasználási feltételeinket</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Miért?"
@@ -1546,9 +1720,6 @@
   },
   "frog.title": {
     "message": "Béka"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "Észak-Amerikában, Európában és Délkelet-Ázsiában érhető el széles körű lefedettség mellett."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Havi fizetés"
@@ -1815,7 +1986,7 @@
     "message": "Találd meg gyorsan és egyszerűen, amit keresel"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Egy hely a Minecraft {content}"
+    "message": "A hely a Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "adatcsomagoknak"
@@ -2774,6 +2945,9 @@
   "project.moderation.admonition.approved.body.private": {
     "message": "A projekted privát, vagyis csak te és az általad meghívott személyek férhetnek hozzá."
   },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "A projekt láthatóságát a projekt <visibility-settings-link>láthatósági beállításaiban</visibility-settings-link> módosíthatod."
+  },
   "project.moderation.admonition.approved.header": {
     "message": "Projekt jóváhagyva"
   },
@@ -3427,6 +3601,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Biztosíts további védelmet a fiókodnak."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "A kétlépcsős hitelesítés kikapcsolása"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "A kétlépcsős hitelesítés beállítása"
   },
   "settings.account.security.two-factor.title": {
     "message": "Kétlépcsős hitelesítés"

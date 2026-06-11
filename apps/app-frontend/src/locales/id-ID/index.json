@@ -470,9 +470,6 @@
   "app.skins.title": {
     "message": "Pemilih rupa"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} siap dipasang! Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
   },
@@ -502,15 +499,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versi {version} berhasil dipasang!"
-  },
-  "app.update.download-update": {
-    "message": "Unduh pembaruan"
-  },
-  "app.update.downloading-update": {
-    "message": "Mengunduh pembaruan ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Muat ulang untuk memasang pembaruan"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

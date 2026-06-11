@@ -52,17 +52,30 @@ export const Clearable: Story = {
 	render: () => ({
 		components: { DatePicker },
 		setup() {
-			const value = ref('2026-04-27')
-			return { value }
+			const emptyValue = ref(null)
+			const selectedValue = ref('2026-04-27')
+			return { emptyValue, selectedValue }
 		},
 		template: /* html */ `
-			<div class="flex max-w-sm flex-col gap-2">
-				<DatePicker
-					v-model="value"
-					wrapperClass="w-[300px]"
-					placeholder="Select a date..."
-				/>
-				<p class="text-sm text-secondary">Selected value: {{ value || 'None' }}</p>
+			<div class="flex max-w-sm flex-col gap-5">
+				<div class="flex flex-col gap-2">
+					<DatePicker
+						v-model="emptyValue"
+						wrapperClass="w-[300px]"
+						clearable
+						placeholder="Button hidden while empty..."
+					/>
+					<p class="text-sm text-secondary">Empty value: {{ emptyValue || 'None' }}</p>
+				</div>
+				<div class="flex flex-col gap-2">
+					<DatePicker
+						v-model="selectedValue"
+						wrapperClass="w-[300px]"
+						clearable
+						placeholder="Select a date..."
+					/>
+					<p class="text-sm text-secondary">Selected value: {{ selectedValue || 'None' }}</p>
+				</div>
 			</div>
 		`,
 	}),

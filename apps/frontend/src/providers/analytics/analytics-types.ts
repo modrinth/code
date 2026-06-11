@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { LocationQueryValueRaw } from 'vue-router'
 
-import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter'
+import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter-utils'
 
 export type AnalyticsQueryFilterCategory =
 	| 'project'
@@ -94,6 +94,7 @@ export type MutableRouteQuery = Record<
 export type ProjectTypeMetadata = {
 	project_type?: string | null
 	project_types?: readonly string[] | null
+	projectTypes?: readonly string[] | null
 }
 
 export type AnalyticsProjectFetchRequest = Labrinth.Analytics.v3.FetchRequest & {
@@ -123,6 +124,7 @@ export interface AnalyticsDashboardProject {
 	downloads: number
 	status: ProjectStatusFilterValue
 	publishedAt?: string
+	projectTypes: string[]
 }
 
 export interface AnalyticsDashboardProjectGroup {

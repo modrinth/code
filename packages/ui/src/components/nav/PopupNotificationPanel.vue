@@ -3,7 +3,9 @@
 		class="popup-notification-group"
 		:class="{
 			'has-sidebar': hasSidebar,
+			'has-modal': hasModalActive,
 		}"
+		:style="notificationGroupStyle"
 	>
 		<transition-group name="popup-notifs">
 			<div
@@ -155,6 +157,7 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
+import { useModalStack } from '../../composables/modal-stack'
 import {
 	injectPopupNotificationManager,
 	type PopupNotification,
@@ -169,6 +172,11 @@ const popupNotificationManager = injectPopupNotificationManager()
 const notifications = computed<PopupNotification[]>(() =>
 	popupNotificationManager.getNotifications(),
 )
+const { stackCount } = useModalStack()
+const hasModalActive = computed(() => stackCount.value > 0)
+const notificationGroupStyle = computed(() => ({
+	zIndex: hasModalActive.value ? 100 + stackCount.value * 10 + 8 : 200,
+}))
 
 const stopTimer = (n: PopupNotification) => popupNotificationManager.stopNotificationTimer(n)
 const setNotificationTimer = (n: PopupNotification) =>
@@ -252,10 +260,19 @@ withDefaults(
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
+	transition:
+		opacity 0.2s ease-in-out,
+		transform 0.2s ease-in-out;
 }
 
 .popup-notification-group.has-sidebar {
 	right: calc(var(--right-bar-width, 0px) + 1.5rem);
+}
+
+.popup-notification-group.has-modal {
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(-0.5rem);
 }
 
 @media screen and (max-width: 500px) {

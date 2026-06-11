@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+let systemThemeMq: MediaQueryList | null = null
+
 export const DEFAULT_FEATURE_FLAGS = {
 	project_background: false,
 	page_path: false,
@@ -53,21 +55,22 @@ export const useTheming = defineStore('themeStore', {
 			this.setThemeClass()
 		},
 		setThemeClass() {
+			const html = document.getElementsByTagName('html')[0]
 			for (const theme of THEME_OPTIONS) {
-				document.getElementsByTagName('html')[0].classList.remove(`${theme}-mode`)
+				html.classList.remove(`${theme}-mode`)
 			}
+
+			systemThemeMq?.removeEventListener('change', this.setThemeClass)
+			systemThemeMq = null
 
 			let theme = this.selectedTheme
 			if (this.selectedTheme === 'system') {
-				const darkThemeMq = window.matchMedia('(prefers-color-scheme: dark)')
-				if (darkThemeMq.matches) {
-					theme = 'dark'
-				} else {
-					theme = 'light'
-				}
+				systemThemeMq = window.matchMedia('(prefers-color-scheme: dark)')
+				systemThemeMq.addEventListener('change', this.setThemeClass)
+				theme = systemThemeMq.matches ? 'dark' : 'light'
 			}
 
-			document.getElementsByTagName('html')[0].classList.add(`${theme}-mode`)
+			html.classList.add(`${theme}-mode`)
 		},
 		getFeatureFlag(key: FeatureFlag) {
 			return this.featureFlags[key] ?? DEFAULT_FEATURE_FLAGS[key]

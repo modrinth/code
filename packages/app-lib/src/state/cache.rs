@@ -259,7 +259,75 @@ pub struct CachedFileUpdate {
     pub hash: String,
     pub game_version: String,
     pub loaders: Vec<String>,
+    pub channel_policy: String,
     pub update_version_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ReleaseChannel {
+    Release,
+    Beta,
+    Alpha,
+}
+
+impl ReleaseChannel {
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::Release => "release",
+            Self::Beta => "beta",
+            Self::Alpha => "alpha",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Self {
+        match key {
+            "alpha" => Self::Alpha,
+            "all" => Self::Alpha,
+            "beta" => Self::Beta,
+            _ => Self::Release,
+        }
+    }
+
+    pub fn from_version_type(version_type: &str) -> Self {
+        match version_type {
+            "alpha" => Self::Alpha,
+            "beta" => Self::Beta,
+            _ => Self::Release,
+        }
+    }
+
+    pub fn least_stable(self, other: Self) -> Self {
+        if self.instability_rank() >= other.instability_rank() {
+            self
+        } else {
+            other
+        }
+    }
+
+    fn instability_rank(self) -> u8 {
+        match self {
+            Self::Release => 0,
+            Self::Beta => 1,
+            Self::Alpha => 2,
+        }
+    }
+
+    pub fn version_type_fallbacks(self) -> Vec<Vec<&'static str>> {
+        match self {
+            Self::Release => {
+                vec![vec!["release"], vec!["beta"], vec!["alpha"]]
+            }
+            Self::Beta => {
+                vec![vec!["release", "beta"], vec!["alpha"]]
+            }
+            Self::Alpha => vec![vec!["release", "beta", "alpha"]],
+        }
+    }
+}
+
+fn default_file_update_channel_policy() -> String {
+    ReleaseChannel::Alpha.key().to_string()
 }
 
 /// Migrates old cache entries that stored `"loader": "forge"` (singular string)
@@ -278,6 +346,8 @@ impl<'de> serde::Deserialize<'de> for CachedFileUpdate {
             loaders: Option<Vec<String>>,
             #[serde(default)]
             loader: Option<String>,
+            #[serde(default = "default_file_update_channel_policy")]
+            channel_policy: String,
             update_version_id: String,
         }
 
@@ -290,6 +360,7 @@ impl<'de> serde::Deserialize<'de> for CachedFileUpdate {
             hash: helper.hash,
             game_version: helper.game_version,
             loaders,
+            channel_policy: helper.channel_policy,
             update_version_id: helper.update_version_id,
         })
     }
@@ -599,9 +670,10 @@ impl CacheValue {
             }
             CacheValue::FileUpdate(hash) => {
                 format!(
-                    "{}-{}-{}",
+                    "{}-{}-{}-{}",
                     hash.hash,
                     hash.loaders.join("+"),
+                    hash.channel_policy,
                     hash.game_version
                 )
             }
@@ -1453,20 +1525,46 @@ impl CachedEntry {
                 let mut vals = Vec::new();
 
                 // TODO: switch to update individual once back-end route exists
-                let mut filtered_keys: Vec<((String, String), Vec<String>)> =
-                    Vec::new();
+                let mut filtered_keys: Vec<(
+                    (String, String, String),
+                    Vec<String>,
+                )> = Vec::new();
                 keys.iter().for_each(|x| {
                     let string = x.key().to_string();
-                    let key = string.splitn(3, '-').collect::<Vec<_>>();
+                    let key = string.splitn(4, '-').collect::<Vec<_>>();
 
-                    if key.len() == 3 {
-                        let hash = key[0];
-                        let loaders_key = key[1];
-                        let game_version = key[2];
+                    let parsed_key = if key.len() == 4
+                        && matches!(
+                            key[2],
+                            "release" | "beta" | "alpha" | "all"
+                        ) {
+                        Some((key[0], key[1], key[2], key[3]))
+                    } else {
+                        let key = string.splitn(3, '-').collect::<Vec<_>>();
+                        if key.len() == 3 {
+                            Some((
+                                key[0],
+                                key[1],
+                                ReleaseChannel::Alpha.key(),
+                                key[2],
+                            ))
+                        } else {
+                            None
+                        }
+                    };
 
+                    if let Some((
+                        hash,
+                        loaders_key,
+                        channel_policy_key,
+                        game_version,
+                    )) = parsed_key
+                    {
                         if let Some(values) =
                             filtered_keys.iter_mut().find(|x| {
-                                x.0.0 == loaders_key && x.0.1 == game_version
+                                x.0.0 == loaders_key
+                                    && x.0.1 == channel_policy_key
+                                    && x.0.2 == game_version
                             })
                         {
                             values.1.push(hash.to_string());
@@ -1474,6 +1572,7 @@ impl CachedEntry {
                             filtered_keys.push((
                                 (
                                     loaders_key.to_string(),
+                                    channel_policy_key.to_string(),
                                     game_version.to_string(),
                                 ),
                                 vec![hash.to_string()],
@@ -1489,19 +1588,56 @@ impl CachedEntry {
 
                 let variations =
                     futures::future::try_join_all(filtered_keys.iter().map(
-                        |((loaders_key, game_version), hashes)| {
-                            fetch_json::<HashMap<String, Vec<Version>>>(
-                                Method::POST,
-                                concat!(env!("MODRINTH_API_URL"), "version_files/update_many"),
-                                None,
-                                Some(serde_json::json!({
-                                    "algorithm": "sha1",
-                                    "hashes": hashes,
-                                    "loaders": loaders_key.split('+').collect::<Vec<_>>(),
-                                    "game_versions": [game_version]
-                                })),
-                                fetch_semaphore,
-                                pool,
+                        |((loaders_key, channel_policy_key, game_version), hashes)| async move {
+                            let channel_policy =
+                                ReleaseChannel::from_key(channel_policy_key);
+                            let mut remaining_hashes = hashes.clone();
+                            let mut found_versions = HashMap::new();
+
+                            for version_types in
+                                channel_policy.version_type_fallbacks()
+                            {
+                                if remaining_hashes.is_empty() {
+                                    break;
+                                }
+
+                                let variation = fetch_json::<
+                                    HashMap<String, Vec<Version>>,
+                                >(
+                                    Method::POST,
+                                    concat!(
+                                        env!("MODRINTH_API_URL"),
+                                        "version_files/update_many"
+                                    ),
+                                    None,
+                                    Some(serde_json::json!({
+                                        "algorithm": "sha1",
+                                        "hashes": remaining_hashes.clone(),
+                                        "loaders": loaders_key.split('+').collect::<Vec<_>>(),
+                                        "game_versions": [game_version],
+                                        "version_types": version_types
+                                    })),
+                                    fetch_semaphore,
+                                    pool,
+                                )
+                                .await?;
+
+                                for (hash, versions) in variation {
+                                    found_versions.insert(hash, versions);
+                                }
+
+                                remaining_hashes = hashes
+                                    .iter()
+                                    .filter(|hash| {
+                                        !found_versions
+                                            .contains_key(hash.as_str())
+                                    })
+                                    .cloned()
+                                    .collect();
+                            }
+
+                            Ok::<HashMap<String, Vec<Version>>, crate::Error>(
+                                found_versions,
                             )
                         },
                     ))
@@ -1509,9 +1645,10 @@ impl CachedEntry {
 
                 for (index, mut variation) in variations.into_iter().enumerate()
                 {
-                    let ((loaders_key, game_version), hashes) =
-                        &filtered_keys[index];
-
+                    let (
+                        (loaders_key, channel_policy_key, game_version),
+                        hashes,
+                    ) = &filtered_keys[index];
                     for hash in hashes {
                         let versions = variation.remove(hash);
 
@@ -1531,6 +1668,8 @@ impl CachedEntry {
                                             .split('+')
                                             .map(|x| x.to_string())
                                             .collect(),
+                                        channel_policy: channel_policy_key
+                                            .to_string(),
                                         update_version_id: version_id,
                                     })
                                     .get_entry(),
@@ -1541,7 +1680,7 @@ impl CachedEntry {
                             vals.push((
                                 CacheValueType::FileUpdate.get_empty_entry(
                                     format!(
-                                        "{hash}-{loaders_key}-{game_version}"
+                                        "{hash}-{loaders_key}-{channel_policy_key}-{game_version}"
                                     ),
                                 ),
                                 true,

@@ -648,6 +648,10 @@ export namespace Labrinth {
 			export type SubscriptionStatus = {
 				subscribed: boolean
 			}
+
+			export type DiscordCommunityLinkResponse = {
+				url: string
+			}
 		}
 
 		export namespace v2 {

@@ -307,6 +307,11 @@ fn main() {
                         }
 
                         set_changelog_toast(Some(update.version.clone()));
+                        let update = if should_restart {
+                            (**update).clone()
+                        } else {
+                            (**update).clone().restart_after_install(false)
+                        };
                         match update.install(data) {
                             Ok(()) => {
                                 if should_restart {

@@ -251,8 +251,15 @@ pub async fn profile_add_project_from_version(
     path: &str,
     version_id: &str,
     reason: DownloadReason,
+    dependent_on_version_id: Option<String>,
 ) -> Result<String> {
-    Ok(profile::add_project_from_version(path, version_id, reason).await?)
+    Ok(profile::add_project_from_version(
+        path,
+        version_id,
+        reason,
+        dependent_on_version_id,
+    )
+    .await?)
 }
 
 // Adds a project to a profile from a path
@@ -385,6 +392,7 @@ pub struct EditProfile {
         with = "serde_with::rust::double_option"
     )]
     pub linked_data: Option<Option<LinkedData>>,
+    pub preferred_update_channel: Option<ReleaseChannel>,
 
     #[serde(
         default,
@@ -448,6 +456,11 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
         }
         if let Some(linked_data) = edit_profile.linked_data.clone() {
             prof.linked_data = linked_data;
+        }
+        if let Some(preferred_update_channel) =
+            edit_profile.preferred_update_channel
+        {
+            prof.preferred_update_channel = preferred_update_channel;
         }
         if let Some(groups) = edit_profile.groups.clone() {
             prof.groups = groups;

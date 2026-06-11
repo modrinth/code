@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Downloading Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Downloading update"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primary instance"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Reload to update"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Show more running instances"
   },
   "app.action-bar.stop-instance": {
     "message": "Stop instance"
+  },
+  "app.action-bar.update": {
+    "message": "Update"
   },
   "app.action-bar.view-active-downloads": {
     "message": "View active downloads"
@@ -428,6 +437,12 @@
   "app.skins.rate-limit.title": {
     "message": "Slow down!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Your skin order could not be saved."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Failed to reorder skins"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -482,9 +497,6 @@
   "app.skins.title": {
     "message": "Skin selector"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
@@ -504,7 +516,7 @@
     "message": "Download complete"
   },
   "app.update-popup.reload": {
-    "message": "Reload"
+    "message": "Reload to update"
   },
   "app.update-popup.title": {
     "message": "Update available"
@@ -514,15 +526,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} was successfully installed!"
-  },
-  "app.update.download-update": {
-    "message": "Download update"
-  },
-  "app.update.downloading-update": {
-    "message": "Downloading update ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Reload to install update"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -712,6 +715,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Name"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Update channel"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release, beta, and alpha versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release and beta versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Release"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Only release versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Select update channel"
   },
   "instance.settings.tabs.hooks": {
     "message": "Launch hooks"

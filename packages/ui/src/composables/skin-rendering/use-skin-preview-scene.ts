@@ -32,7 +32,7 @@ function configureSkinPreviewMesh(mesh: THREE.Mesh) {
 	materials.forEach((material) => {
 		if (!(material instanceof THREE.MeshStandardMaterial) || material.name === 'cape') return
 
-		material.transparent = false
+		material.transparent = isSkinLayer
 		material.alphaTest = 0.1
 		material.depthTest = true
 		material.depthWrite = true
