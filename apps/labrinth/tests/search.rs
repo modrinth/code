@@ -9,6 +9,7 @@ use common::environment::TestEnvironment;
 use common::environment::with_test_environment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
+use labrinth::models::projects::DependencyType;
 use serde_json::json;
 
 use crate::common::api_common::Api;
@@ -172,7 +173,7 @@ async fn search_projects() {
             );
             assert_eq!(
                 projects.hits[0].dependencies[0].dependency_type,
-                "required"
+                DependencyType::Required
             );
             assert!(
                 projects.hits[0].dependencies[0]

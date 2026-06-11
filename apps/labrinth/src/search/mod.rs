@@ -2,6 +2,7 @@ use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::projects::DependencyType;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
@@ -270,7 +271,7 @@ pub struct UploadSearchProject {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SearchProjectDependency {
     pub project_id: String,
-    pub dependency_type: String,
+    pub dependency_type: DependencyType,
     pub name: String,
     pub slug: Option<String>,
     pub icon_url: Option<String>,

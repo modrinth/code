@@ -21,7 +21,7 @@ use crate::database::models::{
 use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
-use crate::models::projects::from_duplicate_version_fields;
+use crate::models::projects::{DependencyType, from_duplicate_version_fields};
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::{SearchProjectDependency, UploadSearchProject};
@@ -154,7 +154,9 @@ pub async fn index_local(
                                 dependency_project_id,
                             ))
                             .to_string(),
-                            dependency_type: m.dependency_type,
+                            dependency_type: DependencyType::from_string(
+                                &m.dependency_type,
+                            ),
                             name: m.dependency_name,
                             slug: m.dependency_slug,
                             icon_url: m.dependency_icon_url,
@@ -407,8 +409,10 @@ pub async fn index_local(
             .iter()
             .filter(|dependency| {
                 matches!(
-                    dependency.dependency_type.as_str(),
-                    "required" | "optional"
+                    dependency.dependency_type,
+                    DependencyType::Required
+                        | DependencyType::Optional
+                        | DependencyType::Embedded
                 )
             })
             .map(|dependency| dependency.project_id.clone())
