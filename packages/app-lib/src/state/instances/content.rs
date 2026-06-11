@@ -17,6 +17,8 @@
 //! immutable), so re-download is only needed if cache was cleared or
 //! profile predates this caching mechanism.
 
+// TODO: migrate to new system
+
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::profiles::{Profile, ProfileFile, ProjectType};
 use crate::state::{CacheBehaviour, CachedEntry, ReleaseChannel};
