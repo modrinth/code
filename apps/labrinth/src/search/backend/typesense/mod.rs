@@ -485,6 +485,13 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
+            SearchField::CompatibleDependencyProjectIds => TypesenseFieldSpec {
+                path: "compatible_dependency_project_ids",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
         }
     }
 }
