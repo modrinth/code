@@ -437,6 +437,12 @@
   "app.skins.rate-limit.title": {
     "message": "Slow down!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Your skin order could not be saved."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Failed to reorder skins"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
