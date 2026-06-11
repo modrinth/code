@@ -46,6 +46,7 @@ import {
 	get_normalized_skin_texture,
 	normalize_skin_texture,
 	remove_custom_skin,
+	save_custom_skin,
 	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
@@ -399,6 +400,14 @@ function skinsMatch(a?: Skin | null, b?: Skin | null) {
 	)
 }
 
+function skinsMatchIgnoringSource(a?: Skin | null, b?: Skin | null) {
+	return (
+		a?.texture_key === b?.texture_key &&
+		a?.variant === b?.variant &&
+		(a?.cape_id ?? null) === (b?.cape_id ?? null)
+	)
+}
+
 function isSkinSelected(skin: Skin) {
 	return skinsMatch(selectedSkin.value, skin)
 }
@@ -572,6 +581,8 @@ function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin)
 
 async function reorderSavedSkins(orderedSkins: Skin[]) {
 	const previousSkins = skins.value
+	const previousSelectedSkin = selectedSkin.value
+	const previousOriginalSelectedSkin = originalSelectedSkin.value
 	const orderedTextureKeys = orderedSkins.map((skin) => skin.texture_key)
 	const orderedTextureKeySet = new Set(orderedTextureKeys)
 	const remainingSavedSkins = previousSkins.filter(
@@ -584,11 +595,22 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 	generateSkinPreviews(skins.value, capes.value)
 
 	try {
+		const persistedSavedSkins = await preserveExternalSkins(nextSavedSkins)
+
+		if (persistedSavedSkins.some((skin, index) => skin !== nextSavedSkins[index])) {
+			skins.value = [...persistedSavedSkins, ...defaultSkins]
+			generateSkinPreviews(skins.value, capes.value)
+		}
+
 		await set_custom_skin_order(
-			nextSavedSkins.filter((skin) => skin.source === 'custom').map((skin) => skin.texture_key),
+			persistedSavedSkins
+				.filter((skin) => skin.source === 'custom')
+				.map((skin) => skin.texture_key),
 		)
 	} catch (error) {
 		skins.value = previousSkins
+		selectedSkin.value = previousSelectedSkin
+		originalSelectedSkin.value = previousOriginalSelectedSkin
 		generateSkinPreviews(skins.value, capes.value)
 		addNotification({
 			type: 'error',
@@ -597,6 +619,39 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 		})
 		await loadSkins()
 	}
+}
+
+async function preserveExternalSkins(skinsToPersist: Skin[]) {
+	const preservedSkins: Skin[] = []
+
+	for (const skin of skinsToPersist) {
+		if (skin.source !== 'custom_external') {
+			preservedSkins.push(skin)
+			continue
+		}
+
+		const textureBlob = await normalize_skin_texture(skin.texture)
+		const capeId = skin.cape_id ? capes.value.find((cape) => cape.id === skin.cape_id) : undefined
+		const savedSkin = await save_custom_skin(skin, textureBlob, skin.variant, capeId, false)
+		const preservedSkin: Skin = {
+			...savedSkin,
+			source: 'custom',
+			is_equipped: skin.is_equipped,
+		}
+
+		if (skinsMatchIgnoringSource(selectedSkin.value, skin)) {
+			selectedSkin.value = preservedSkin
+		}
+
+		if (skinsMatchIgnoringSource(originalSelectedSkin.value, skin)) {
+			originalSelectedSkin.value = preservedSkin
+			void accountsCard.value?.setEquippedSkin(preservedSkin)
+		}
+
+		preservedSkins.push(preservedSkin)
+	}
+
+	return preservedSkins
 }
 
 function schedulePendingSkinRefresh() {

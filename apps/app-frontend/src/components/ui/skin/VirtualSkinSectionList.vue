@@ -159,9 +159,7 @@ const sections = computed<SkinSection[]>(() => [
 const draggableSavedSkins = ref<Skin[]>([])
 const isDraggingSavedSkin = ref(false)
 const canReorderSavedSkins = computed(() => draggableSavedSkins.value.length > 1)
-const fixedSavedSkins = computed(() =>
-	props.savedSkins.filter((skin) => !canPersistSkinOrder(skin)),
-)
+const fixedSavedSkins = computed(() => props.savedSkins.filter((skin) => !canDragSavedSkin(skin)))
 
 const sectionLayouts = computed(() => {
 	const layouts: Array<{ section: SkinSection; top: number; height: number; index: number }> = []
@@ -226,7 +224,7 @@ watch(
 			return
 		}
 
-		draggableSavedSkins.value = nextSkins.filter(canPersistSkinOrder)
+		draggableSavedSkins.value = nextSkins.filter(canDragSavedSkin)
 	},
 	{ immediate: true },
 )
@@ -283,17 +281,17 @@ function savedSkinKey(skin: Skin) {
 	return skinKey(skin, 'saved-skin')
 }
 
-function canPersistSkinOrder(skin: Skin) {
-	return skin.source === 'custom'
+function canDragSavedSkin(skin: Skin) {
+	return skin.source === 'custom' || skin.source === 'custom_external'
 }
 
 function doSkinOrdersMatch(firstSkins: Skin[], secondSkins: Skin[]) {
-	const persistedSecondSkins = secondSkins.filter(canPersistSkinOrder)
+	const draggableSecondSkins = secondSkins.filter(canDragSavedSkin)
 
 	return (
-		firstSkins.length === persistedSecondSkins.length &&
+		firstSkins.length === draggableSecondSkins.length &&
 		firstSkins.every(
-			(skin, index) => savedSkinKey(skin) === savedSkinKey(persistedSecondSkins[index]),
+			(skin, index) => savedSkinKey(skin) === savedSkinKey(draggableSecondSkins[index]),
 		)
 	)
 }
@@ -306,7 +304,7 @@ function onSavedSkinDragEnd() {
 	isDraggingSavedSkin.value = false
 
 	if (doSkinOrdersMatch(draggableSavedSkins.value, props.savedSkins)) {
-		draggableSavedSkins.value = props.savedSkins.filter(canPersistSkinOrder)
+		draggableSavedSkins.value = props.savedSkins.filter(canDragSavedSkin)
 		return
 	}
 
