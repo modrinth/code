@@ -76,7 +76,7 @@ const props = withDefaults(
 		loader: null,
 		loaderVersion: null,
 		lastActive: null,
-		fallbackName: 'World',
+		fallbackName: 'Instance',
 		headerClass: '',
 		actions: () => [],
 	},

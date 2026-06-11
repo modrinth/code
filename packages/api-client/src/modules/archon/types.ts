@@ -681,8 +681,6 @@ export namespace Archon {
 				token: string // JWT token for filesystem access
 			}
 
-			export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
-
 			export type ReinstallLoaderRequest = {
 				loader: string
 				loader_version?: string
@@ -715,6 +713,13 @@ export namespace Archon {
 		}
 
 		export namespace v1 {
+			export type WorldPowerAction = 'start' | 'stop' | 'restart' | 'kill'
+
+			export type WorldPowerActionRequest = {
+				action: WorldPowerAction
+				shutdown_strategy?: string | null
+			}
+
 			export type ServerFull = {
 				id: string
 				name: string

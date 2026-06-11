@@ -1,11 +1,11 @@
 import { PlayIcon, SettingsIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import WorldManageHeader from '../../components/servers/server-header/WorldManageHeader.vue'
+import ServerInstanceManageHeader from '../../components/servers/server-header/ServerInstanceManageHeader.vue'
 
 const meta = {
-	title: 'Servers/WorldManageHeader',
-	component: WorldManageHeader,
+	title: 'Servers/ServerInstanceManageHeader',
+	component: ServerInstanceManageHeader,
 	parameters: {
 		layout: 'padded',
 	},
@@ -15,7 +15,7 @@ const meta = {
 			template: '<div style="max-width: 920px;"><story /></div>',
 		}),
 	],
-} satisfies Meta<typeof WorldManageHeader>
+} satisfies Meta<typeof ServerInstanceManageHeader>
 
 export default meta
 type Story = StoryObj<typeof meta>
