@@ -323,9 +323,6 @@
   "app.settings.tabs.resource-management": {
     "message": "Bronnenbeheer"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} is klaar om geïnstalleerd te worden! Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
@@ -355,15 +352,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versie {version} is succesvol geïnstalleerd!"
-  },
-  "app.update.download-update": {
-    "message": "Download update"
-  },
-  "app.update.downloading-update": {
-    "message": "Update downloaden ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Herlaad om de update te installeren"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "voorbeeld.modrinth.gg"

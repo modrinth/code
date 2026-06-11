@@ -573,6 +573,7 @@ export const categoryMessages = defineMessages({
 })
 
 export const DEFAULT_MOD_LOADERS: string[] = ['fabric', 'forge', 'neoforge']
+export const DEFAULT_PLUGIN_LOADERS: string[] = ['paper', 'spigot']
 export const DEFAULT_SHADER_LOADERS: string[] = ['iris', 'optifine', 'vanilla']
 
 const DEFAULT_LOADER_NAMES = new Set([...DEFAULT_MOD_LOADERS, ...DEFAULT_SHADER_LOADERS])

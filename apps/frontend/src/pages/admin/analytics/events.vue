@@ -73,6 +73,7 @@
 					placeholder="Select start..."
 					input-class="w-full"
 					wrapper-class="w-full"
+					clearable
 					show-today
 				/>
 			</div>
@@ -89,6 +90,7 @@
 					placeholder="Select end..."
 					input-class="w-full"
 					wrapper-class="w-full"
+					clearable
 					show-today
 				/>
 			</div>
@@ -214,7 +216,11 @@
 
 				<template #empty-state>
 					<div class="flex h-64 items-center justify-center text-secondary">
-						{{ isLoadingEvents ? 'Loading analytics events...' : 'No results.' }}
+						<div v-if="isFetchingEvents" class="flex items-center gap-2">
+							<SpinnerIcon class="size-5 animate-spin" aria-hidden="true" />
+							Loading
+						</div>
+						<template v-else>No results.</template>
 					</div>
 				</template>
 			</Table>
@@ -224,7 +230,15 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { EditIcon, ExternalIcon, PlusIcon, SaveIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
+import {
+	EditIcon,
+	ExternalIcon,
+	PlusIcon,
+	SaveIcon,
+	SearchIcon,
+	SpinnerIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import {
 	ButtonStyled,
 	ConfirmModal,
@@ -322,7 +336,7 @@ let resetFormTimeout: ReturnType<typeof setTimeout> | null = null
 const {
 	data: analyticsEvents,
 	error: eventsError,
-	isLoading: isLoadingEvents,
+	isFetching: isFetchingEvents,
 } = useQuery({
 	queryKey: analyticsEventsQueryKey,
 	queryFn: () => client.labrinth.analytics_v3.getEvents(),
@@ -439,7 +453,7 @@ function openEditModal(event: Labrinth.Analytics.v3.AnalyticsEvent) {
 		title: event.title,
 		announcementUrl: event.announcement_url ?? '',
 		startsAt: getDateTimeInputValue(event.starts),
-		endsAt: getDateTimeInputValue(event.ends),
+		endsAt: isEventDateRange(event) ? getDateTimeInputValue(event.ends) : '',
 		metricKinds: event.for_metric_kind?.length ? [...event.for_metric_kind] : [...allMetricKinds],
 	}
 	committedAnnouncementUrl.value = event.announcement_url ?? ''

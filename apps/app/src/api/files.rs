@@ -11,6 +11,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             file_extract_zip,
             file_save_as,
+            file_read_dragged_file,
         ])
         .build()
 }
@@ -19,6 +20,19 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
 pub struct ExtractDryRunResult {
     modpack_name: Option<String>,
     conflicting_files: Vec<String>,
+}
+
+#[tauri::command]
+pub async fn file_read_dragged_file(path: String) -> Result<Vec<u8>> {
+    let metadata = tokio::fs::metadata(&path).await?;
+    if !metadata.is_file() {
+        return Err(theseus::Error::from(theseus::ErrorKind::OtherError(
+            "Dropped path is not a file".to_string(),
+        ))
+        .into());
+    }
+
+    Ok(tokio::fs::read(path).await?)
 }
 
 #[tauri::command]

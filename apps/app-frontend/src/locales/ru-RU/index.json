@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "Выберите вариант"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Показывать время, проведённое в сборке."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Время игры"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Показывать кнопку скрытия боковой панели."
   },
@@ -142,6 +148,9 @@
   },
   "app.browse.server.installing": {
     "message": "Установка"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Не найдено доступных версий, совместимых с {compatibilityLabel}. Выберите версию для установки вручную. Зависимости не будут установлены автоматически."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -396,7 +405,7 @@
     "message": "Предпросмотр"
   },
   "app.skins.rate-limit.text": {
-    "message": "Слишком частая смена скина. Серверы Mojang временно заблокировали дальнейшие запросы. Подождите немного, прежде чем попробовать снова."
+    "message": "Вы слишком часто меняете скин. Серверы Mojang временно заблокировали дальнейшие запросы. Подождите немного, прежде чем попробовать снова."
   },
   "app.skins.rate-limit.title": {
     "message": "Не так быстро!"
@@ -415,6 +424,12 @@
   },
   "app.skins.section.modrinth": {
     "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Эти скины получены за участие в сборе средств Modrinth Pride в месяц гордости."
   },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
@@ -438,7 +453,7 @@
     "message": "Войти"
   },
   "app.skins.sign-in.description": {
-    "message": "Чтобы использовать функции управления скинами Modrinth App, войдите в свою учётную запись Minecraft."
+    "message": "Пожалуйста, войдите в свой аккаунт Minecraft, чтобы воспользоваться функциями управления скинами в приложении Modrinth."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Восторженный Modrinth Bot"
@@ -448,9 +463,6 @@
   },
   "app.skins.title": {
     "message": "Выбор скина"
-  },
-  "app.update-popup.body": {
-    "message": "Версия Modrinth App {version} готова к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
   "app.update-popup.body.download-complete": {
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
@@ -481,15 +493,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Версия {version} успешно установлена!"
-  },
-  "app.update.download-update": {
-    "message": "Скачать обновление"
-  },
-  "app.update.downloading-update": {
-    "message": "Скачивание обновления ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Перезапустить и обновить"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

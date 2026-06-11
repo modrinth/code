@@ -350,6 +350,12 @@
   "analytics.project.select": {
     "message": "Select projects"
   },
+  "analytics.project.user": {
+    "message": "{username}'s projects"
+  },
+  "analytics.project.your": {
+    "message": "Your projects"
+  },
   "analytics.query.filter.add": {
     "message": "Add filter"
   },
@@ -1460,6 +1466,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "You've used up your <b>{withdrawLimit}</b> withdrawal limit. You must complete a tax form to withdraw more."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "You're eligible for {roles}. Link your Discord account through Modrinth and we'll sync them automatically."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Link Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Claim your Discord roles"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creator"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Dashboard"
   },
@@ -2291,6 +2315,9 @@
   "landing.subheading": {
     "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
   },
+  "layout.action.analytics-events": {
+    "message": "Analytics events"
+  },
   "layout.action.change-theme": {
     "message": "Change theme"
   },
@@ -2845,6 +2872,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "A Modrinth user."
+  },
+  "profile.button.analytics": {
+    "message": "View user analytics"
   },
   "profile.button.billing": {
     "message": "Manage user billing"

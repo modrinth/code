@@ -146,6 +146,7 @@ const QUERY_KEY_TABLE_SORT = 'a_table_sort'
 const QUERY_KEY_TABLE_SORT_DIRECTION = 'a_table_sort_direction'
 const QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER = 'a_top_breakdown'
 const QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
+const PROJECT_SELECTION_ALL_QUERY_VALUE = 'all'
 
 const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] = [
 	'project_status',
@@ -405,9 +406,10 @@ export function buildDefaultAnalyticsGraphState(
 
 export function buildDefaultAnalyticsQueryBuilderState(
 	availableProjectIds: string[],
+	defaultProjectIds: string[] = availableProjectIds,
 ): AnalyticsQueryBuilderState {
 	return {
-		selectedProjectIds: [...availableProjectIds],
+		selectedProjectIds: [...defaultProjectIds],
 		selectedTimeframeMode: DEFAULT_TIMEFRAME_MODE,
 		selectedTimeframe: DEFAULT_TIMEFRAME_PRESET,
 		selectedLastTimeframeAmount: DEFAULT_LAST_TIMEFRAME_AMOUNT,
@@ -415,7 +417,7 @@ export function buildDefaultAnalyticsQueryBuilderState(
 		selectedCustomTimeframeStartDate: getDefaultCustomStartDate(),
 		selectedCustomTimeframeEndDate: getDefaultCustomEndDate(),
 		selectedGroupBy: DEFAULT_GROUP_BY_PRESET,
-		selectedBreakdowns: getDefaultAnalyticsBreakdownPresets(availableProjectIds),
+		selectedBreakdowns: getDefaultAnalyticsBreakdownPresets(defaultProjectIds),
 		selectedFilters: buildEmptySelectedFilters(),
 	}
 }
@@ -475,12 +477,16 @@ export function getAnalyticsBreakdownPresetForProjectSelection(
 export function isAnalyticsQueryBuilderStateDefault(
 	state: AnalyticsQueryBuilderState,
 	availableProjectIds: string[],
+	defaultProjectIds: string[] = availableProjectIds,
 ): boolean {
-	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds)
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(
+		availableProjectIds,
+		defaultProjectIds,
+	)
 	const areDefaultProjectsSelected =
-		availableProjectIds.length === 0
+		defaultProjectIds.length === 0
 			? state.selectedProjectIds.length === 0
-			: areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
+			: areAllProjectsSelected(state.selectedProjectIds, defaultProjectIds)
 
 	return (
 		areDefaultProjectsSelected &&
@@ -666,13 +672,19 @@ export function readAnalyticsTableSortState(
 export function readAnalyticsQueryBuilderState(
 	query: LocationQuery,
 	availableProjectIds: string[],
+	defaultProjectIds: string[] = availableProjectIds,
 ): AnalyticsQueryBuilderState {
-	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds)
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(
+		availableProjectIds,
+		defaultProjectIds,
+	)
 	const selectedProjectIdsFromQuery = parseListQueryValue(query[QUERY_KEY_PROJECT_IDS])
-	const selectedProjectIds =
-		selectedProjectIdsFromQuery.length > 0
-			? selectedProjectIdsFromQuery
-			: defaultState.selectedProjectIds
+	let selectedProjectIds = defaultState.selectedProjectIds
+	if (selectedProjectIdsFromQuery.includes(PROJECT_SELECTION_ALL_QUERY_VALUE)) {
+		selectedProjectIds = [...availableProjectIds]
+	} else if (selectedProjectIdsFromQuery.length > 0) {
+		selectedProjectIds = selectedProjectIdsFromQuery
+	}
 
 	const selectedFilters = buildEmptySelectedFilters()
 	for (const category of URL_FILTER_CATEGORIES) {
@@ -779,14 +791,17 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	state: AnalyticsQueryBuilderState,
 	availableProjectIds: string[],
 	graphState?: AnalyticsGraphState,
+	defaultProjectIds: string[] = availableProjectIds,
 ): MutableRouteQuery {
 	const nextRouteQuery = {
 		...currentRouteQuery,
 	} as MutableRouteQuery
 
-	const projectIdsQueryValue = areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
+	const projectIdsQueryValue = areAllProjectsSelected(state.selectedProjectIds, defaultProjectIds)
 		? undefined
-		: serializeListQueryValue(state.selectedProjectIds)
+		: areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
+			? PROJECT_SELECTION_ALL_QUERY_VALUE
+			: serializeListQueryValue(state.selectedProjectIds)
 	const isCustomTimeframeMode =
 		state.selectedTimeframeMode === 'custom_range' ||
 		state.selectedTimeframeMode === 'custom_datetime_range'

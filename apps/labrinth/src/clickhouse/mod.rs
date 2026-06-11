@@ -247,7 +247,8 @@ pub async fn init_client_with_database(
             ALTER TABLE {database}.{DOWNLOADS} {cluster_line}
             ADD COLUMN IF NOT EXISTS reason String,
             ADD COLUMN IF NOT EXISTS game_version String,
-            ADD COLUMN IF NOT EXISTS loader String
+            ADD COLUMN IF NOT EXISTS loader String,
+            ADD COLUMN IF NOT EXISTS dependent_on_version_id UInt64
             "
         ))
         .execute()

@@ -197,11 +197,13 @@ export async function add_project_from_version(
 	path: string,
 	versionId: string,
 	reason: DownloadReason,
+	dependentOnVersionId?: string,
 ): Promise<string> {
 	return await invoke('plugin:profile|profile_add_project_from_version', {
 		path,
 		versionId,
 		reason,
+		dependentOnVersionId,
 	})
 }
 

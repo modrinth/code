@@ -8,6 +8,69 @@
   "admin.billing.error.not-found": {
     "message": "Uživatel nebyl nalezen"
   },
+  "analytics.action.add": {
+    "message": "Přidat"
+  },
+  "analytics.action.cancel": {
+    "message": "Zrušit"
+  },
+  "analytics.action.refresh": {
+    "message": "Obnovit"
+  },
+  "analytics.action.reset": {
+    "message": "Obnovit"
+  },
+  "analytics.breakdown.country": {
+    "message": "Země"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Důvod stažení"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Zdroj stažení"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Verze hry"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Rozpis"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Načítač"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetizace"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projekt"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Stav projektu"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Verze projektu"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Rozpis {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Ukázat vše"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Zobrazit limitovaný"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Zobrazit top 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktivní"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Anotace"
+  },
   "app-marketing.download.description": {
     "message": "Naše aplikace je dostupná pro všechny počítačové platformy, vyberte si požadovanou verzi."
   },
