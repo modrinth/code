@@ -3257,9 +3257,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Yardıma ihtiyacınız varsa veya ek sorularınız varsa, lütfen <help-center-link>Modrinth Yardım Merkezi'ni</help-center-link> ziyaret edin ve destekle iletişime geçmek için mavi baloncuğa tıklayın."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Üye kullanıcı arayüzünü göster"
-  },
   "project.moderation.thread.private-description": {
     "message": "Bu, Modrinth moderatörleri ile özel bir konuşma başlığıdır. Bu projeyle ilgili konularda size mesaj gönderebilirler."
   },
@@ -3388,9 +3385,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Bu sürüm} other {Bu sürümler}} şu anda gizlenmiş durumda ve herkese açık olarak listelenmiyor. Lütfen {count, plural, one {sürüm} other {sürümler}} mod paketine dahil edilen belirli dosyaları yeniden dağıtma izniniz olduğuna dair kanıt sunun."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Çöz"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Sürüm {version_name}} other {Sürümler}} bilinmeyen gömülü içerik nedeniyle gizlendi"

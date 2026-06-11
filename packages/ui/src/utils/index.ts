@@ -1,3 +1,4 @@
+export { createAttributionGroupTitle } from '../components/external_files/external-project-utils'
 export * from './auto-icons'
 export * from './common-messages'
 export * from './events'

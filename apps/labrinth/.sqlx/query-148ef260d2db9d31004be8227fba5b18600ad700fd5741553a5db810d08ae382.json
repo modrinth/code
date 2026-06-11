@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        select distinct f.version_id as \"version_id: DBVersionId\", f.id as \"file_id: DBFileId\",\n            pag.flame_project\n        from files f\n        inner join attribution_enforced_versions aev on aev.id = f.version_id\n        inner join override_file_sources ofs on ofs.file_id = f.id\n        inner join project_attribution_files paf on paf.sha1 = ofs.sha1\n        inner join project_attribution_groups pag on pag.id = paf.group_id\n        where f.version_id = ANY($1)\n          and (\n            pag.attribution is null\n            or pag.attribution->>'kind' = 'no_permission'\n            or coalesce(\n              pag.attribution->'moderation_status'->>'kind',\n              'approved'\n            ) != 'approved'\n          )\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_id: DBFileId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "flame_project",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "148ef260d2db9d31004be8227fba5b18600ad700fd5741553a5db810d08ae382"
+}

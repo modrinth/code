@@ -123,7 +123,11 @@
 						<slot> You just lost the game.</slot>
 					</div>
 
-					<div v-if="$slots.actions" class="p-4 pt-0">
+					<div
+						v-if="$slots.actions"
+						:class="{ 'pt-4 border-0 border-t border-solid border-surface-5': actionsDivider }"
+						class="p-4 pt-0"
+					>
 						<slot name="actions" />
 					</div>
 				</div>
@@ -178,6 +182,7 @@ const props = withDefaults(
 		width?: string
 		/** Disables all close actions (close button, ESC key, click outside). */
 		disableClose?: boolean
+		actionsDivider?: boolean
 	}>(),
 	{
 		type: true,
@@ -200,6 +205,7 @@ const props = withDefaults(
 		maxWidth: undefined,
 		width: undefined,
 		disableClose: false,
+		actionsDivider: false,
 	},
 )
 

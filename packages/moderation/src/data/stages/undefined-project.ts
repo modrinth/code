@@ -18,7 +18,8 @@ const undefinedProjectStage: Stage = {
 			weight: -100,
 			suggestedStatus: 'rejected',
 			message: async () =>
-				(await import('../messages/undefined-project/no_versions.md?raw')).default,
+				(await import('../messages/checklist-messages/undefined-project/no_versions.md?raw'))
+					.default,
 		},
 	],
 }

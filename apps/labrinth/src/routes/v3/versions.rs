@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::auth::checks::{
-    filter_visible_versions, is_visible_project, is_visible_version,
+    enrich_dependency_attributions, filter_visible_versions,
+    is_visible_project, is_visible_version,
 };
 use crate::auth::get_user_from_headers;
 use crate::database;
@@ -24,6 +25,7 @@ use crate::models::projects::{
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
+use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
 use crate::search::SearchBackend;
@@ -109,12 +111,42 @@ pub async fn version_project_get_helper(
                 || x.inner.version_number == id.1
         });
 
-        if let Some(version) = version
+        if let Some(mut version) = version
             && is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await?
         {
-            return Ok(HttpResponse::Ok()
-                .json(models::projects::Version::from(version)));
+            let version_id = version.inner.id;
+            enrich_dependency_attributions(
+                std::slice::from_mut(&mut version),
+                &**pool,
+            )
+            .await;
+            let mut v = models::projects::Version::from(version);
+            let missing = get_files_missing_attribution(&**pool, &[version_id])
+                .await
+                .unwrap_or_default();
+            v.files_missing_attribution = missing
+                 .get(&version_id)
+                 .map(|entries| {
+                     entries
+                         .iter()
+                         .map(|(id, fp)| models::projects::MissingAttributionFile {
+                             id: models::ids::FileId(id.0 as u64),
+                             override_source: fp
+                                 .as_ref()
+                                 .map(|p| models::projects::OverrideSource::Flame {
+                                     id: p.id,
+                                     title: p.title.clone(),
+                                     url: p.url.clone(),
+                                     icon_url: p.icon_url.clone(),
+                                 })
+                                 .or(Some(models::projects::OverrideSource::Unknown)),
+                         })
+                         .collect()
+                 })
+                 .unwrap_or_default();
+
+            return Ok(HttpResponse::Ok().json(v));
         }
     }
 
@@ -204,10 +236,43 @@ pub async fn version_get_helper(
     .map(|x| x.1)
     .ok();
 
-    if let Some(data) = version_data
+    if let Some(mut data) = version_data
         && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
     {
-        return Ok(web::Json(models::projects::Version::from(data)));
+        let version_id = data.inner.id;
+        enrich_dependency_attributions(
+            std::slice::from_mut(&mut data),
+            &**pool,
+        )
+        .await;
+        let mut version = models::projects::Version::from(data);
+        let missing = get_files_missing_attribution(&**pool, &[version_id])
+            .await
+            .unwrap_or_default();
+        version.files_missing_attribution = missing
+            .get(&version_id)
+            .map(|entries| {
+                entries
+                    .iter()
+                    .map(|(id, fp)| models::projects::MissingAttributionFile {
+                        id: models::ids::FileId(id.0 as u64),
+                        override_source: fp
+                            .as_ref()
+                            .map(|p| models::projects::OverrideSource::Flame {
+                                id: p.id,
+                                title: p.title.clone(),
+                                url: p.url.clone(),
+                                icon_url: p.icon_url.clone(),
+                            })
+                            .or(Some(
+                                models::projects::OverrideSource::Unknown,
+                            )),
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        return Ok(web::Json(version));
     }
 
     Err(ApiError::NotFound)

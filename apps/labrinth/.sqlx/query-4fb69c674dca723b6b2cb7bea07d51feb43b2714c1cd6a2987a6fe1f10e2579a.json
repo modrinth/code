@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tupdate project_attribution_files\n\t\tset group_id = $1\n\t\twhere sha1 = $2\n\t\tand group_id in (\n\t\t\tselect id from project_attribution_groups where project_id = $3\n\t\t)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Bytea",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4fb69c674dca723b6b2cb7bea07d51feb43b2714c1cd6a2987a6fe1f10e2579a"
+}
