@@ -3203,9 +3203,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Nếu bạn cần trợ giúp hoặc có thắc mắc, vui lòng vào <help-center-link>trung tâm trợ giúp</help-center-link> và bấm vào nút tin nhắn màu xanh để liên hệ hỗ trợ."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Hiển thị giao diện thành viên"
-  },
   "project.moderation.thread.private-description": {
     "message": "Đây là nơi hội thoại riêng tư với bên kiểm duyệt của Modrinth. Họ có thể nhắn cho bạn về những vấn đề trong dự án này."
   },
@@ -3322,9 +3319,6 @@
   },
   "project.versions.title": {
     "message": "Phiên bản"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Khắc phục"
   },
   "report.already-reported": {
     "message": "Bạn đã báo cáo {title}"

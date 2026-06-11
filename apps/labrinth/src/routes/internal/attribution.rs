@@ -278,8 +278,8 @@ async fn list(
             serde_json::from_value::<AttributionResolution>(v).ok()
         });
         if let Some(moderation_status) = attribution
-                .as_mut()
-                .and_then(|a| a.moderation_status.as_mut())
+            .as_mut()
+            .and_then(|a| a.moderation_status.as_mut())
             && !requester_is_mod
         {
             moderation_status.moderated_by = None;
