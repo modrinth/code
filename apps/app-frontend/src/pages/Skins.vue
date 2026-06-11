@@ -46,6 +46,7 @@ import {
 	get_normalized_skin_texture,
 	normalize_skin_texture,
 	remove_custom_skin,
+	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
 import { handleSevereError } from '@/store/error'
@@ -128,6 +129,14 @@ const messages = defineMessages({
 	droppedFileErrorText: {
 		id: 'app.skins.dropped-file-error.text',
 		defaultMessage: 'Failed to read the dropped file.',
+	},
+	reorderSkinErrorTitle: {
+		id: 'app.skins.reorder-error.title',
+		defaultMessage: 'Failed to reorder skins',
+	},
+	reorderSkinErrorText: {
+		id: 'app.skins.reorder-error.text',
+		defaultMessage: 'Your skin order could not be saved.',
 	},
 	deleteSkinTitle: {
 		id: 'app.skins.delete-modal.title',
@@ -491,6 +500,19 @@ function setLocallyEquippedSkin(skinToApply: Skin) {
 	void accountsCard.value?.setEquippedSkin(originalSelectedSkin.value)
 }
 
+function insertLocalSkin(savedSkin: Skin) {
+	const firstNonCustomSkinIndex = skins.value.findIndex((skin) => skin.source !== 'custom')
+
+	if (firstNonCustomSkinIndex === -1) {
+		skins.value = [...skins.value, savedSkin]
+		return
+	}
+
+	const nextSkins = [...skins.value]
+	nextSkins.splice(firstNonCustomSkinIndex, 0, savedSkin)
+	skins.value = nextSkins
+}
+
 function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin) {
 	let foundSkin = false
 	const replacesSelectedSkin =
@@ -519,7 +541,7 @@ function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin)
 	})
 
 	if (!foundSkin) {
-		skins.value.unshift({
+		insertLocalSkin({
 			...savedSkin,
 			is_equipped: applied || savedSkin.is_equipped,
 		})
@@ -546,6 +568,35 @@ function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin)
 	}
 
 	generateSkinPreviews(skins.value, capes.value)
+}
+
+async function reorderSavedSkins(orderedSkins: Skin[]) {
+	const previousSkins = skins.value
+	const orderedTextureKeys = orderedSkins.map((skin) => skin.texture_key)
+	const orderedTextureKeySet = new Set(orderedTextureKeys)
+	const remainingSavedSkins = previousSkins.filter(
+		(skin) => skin.source !== 'default' && !orderedTextureKeySet.has(skin.texture_key),
+	)
+	const defaultSkins = previousSkins.filter((skin) => skin.source === 'default')
+	const nextSavedSkins = [...orderedSkins, ...remainingSavedSkins]
+
+	skins.value = [...nextSavedSkins, ...defaultSkins]
+	generateSkinPreviews(skins.value, capes.value)
+
+	try {
+		await set_custom_skin_order(
+			nextSavedSkins.filter((skin) => skin.source === 'custom').map((skin) => skin.texture_key),
+		)
+	} catch (error) {
+		skins.value = previousSkins
+		generateSkinPreviews(skins.value, capes.value)
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.reorderSkinErrorTitle),
+			text: error instanceof Error ? error.message : formatMessage(messages.reorderSkinErrorText),
+		})
+		await loadSkins()
+	}
 }
 
 function schedulePendingSkinRefresh() {
@@ -985,6 +1036,7 @@ await loadSkins()
 				@select="changeSkin"
 				@edit="(skin, event) => editSkinModal?.show(event, skin)"
 				@delete="confirmDeleteSkin"
+				@reorder-saved-skins="reorderSavedSkins"
 				@add-skin="openAddSkinFileBrowser"
 				@add-skin-dragenter="onAddSkinDragOver"
 				@add-skin-dragover="onAddSkinDragOver"
