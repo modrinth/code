@@ -119,6 +119,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, CurrencyIcon } from '@modrinth/assets'
 import { ButtonStyled, useFormatDateTime, useFormatPrice, useRelativeTime } from '@modrinth/ui'
 import dayjs from 'dayjs'
+
 import { products } from '~/generated/state.json'
 
 const props = defineProps<{

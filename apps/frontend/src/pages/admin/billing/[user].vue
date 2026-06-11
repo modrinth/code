@@ -244,8 +244,8 @@ import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
-import AdminBillingChargeCard from '~/components/ui/admin/AdminBillingChargeCard.vue'
 import ModrinthServersIcon from '~/components/brand/ModrinthServersIcon.vue'
+import AdminBillingChargeCard from '~/components/ui/admin/AdminBillingChargeCard.vue'
 
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
