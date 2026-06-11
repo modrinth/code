@@ -431,7 +431,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { STALE_TIME } from '~/composables/queries/project'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'

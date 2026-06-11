@@ -8,7 +8,9 @@ useSeoMeta({
 })
 </script>
 <template>
-	<NuxtPage class="auth-container universal-card" />
+	<div class="grid min-h-[calc(100vh-4.5rem)] place-items-center pb-20">
+		<NuxtPage />
+	</div>
 </template>
 
 <style>
@@ -31,19 +33,17 @@ useSeoMeta({
 	margin: 0;
 }
 
-.auth-container .btn-wrapper :is(a, button) {
+.auth-container .btn {
 	font-weight: 700;
 	min-height: 2.5rem;
 	text-decoration: none;
 }
 
-.centered-btn :is(a, button),
-.centered-btn:is(a, button) {
+.centered-btn {
 	margin-inline: auto;
 }
 
-.continue-btn :is(a, button) svg,
-.continue-btn:is(a, button) svg {
+.btn.continue-btn svg {
 	margin: 0 0 0 0.5rem;
 }
 
@@ -54,19 +54,19 @@ useSeoMeta({
 	width: 100%;
 }
 
-.third-party a {
+.third-party .btn {
 	width: 100%;
 	vertical-align: middle;
 }
 
-.third-party a svg {
+.third-party .btn svg {
 	margin-right: var(--gap-sm);
 	width: 1.25rem;
 	height: 1.25rem;
 }
 
 @media screen and (max-width: 25.5rem) {
-	.third-party a {
+	.third-party .btn {
 		grid-column: 1 / 3;
 	}
 }
