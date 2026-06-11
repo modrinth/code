@@ -159,9 +159,7 @@ const sections = computed<SkinSection[]>(() => [
 const draggableSavedSkins = ref<Skin[]>([])
 const isDraggingSavedSkin = ref(false)
 const canReorderSavedSkins = computed(() => draggableSavedSkins.value.length > 1)
-const fixedSavedSkins = computed(() =>
-	props.savedSkins.filter((skin) => !canDragSavedSkin(skin)),
-)
+const fixedSavedSkins = computed(() => props.savedSkins.filter((skin) => !canDragSavedSkin(skin)))
 
 const sectionLayouts = computed(() => {
 	const layouts: Array<{ section: SkinSection; top: number; height: number; index: number }> = []
