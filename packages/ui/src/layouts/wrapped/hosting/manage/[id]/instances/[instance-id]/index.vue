@@ -1,6 +1,6 @@
 <template>
 	<div class="flex min-h-[36rem] flex-col gap-4 text-primary">
-		<WorldManageHeader
+		<ServerInstanceManageHeader
 			:name="worldName"
 			:game-version="gameVersion"
 			:loader="loader"
@@ -38,7 +38,7 @@ import { useRouter } from 'vue-router'
 
 import type { JoinedButtonAction } from '#ui/components/base/JoinedButtons.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
-import { WorldManageHeader } from '#ui/components/servers/server-header'
+import { ServerInstanceManageHeader } from '#ui/components/servers/server-header'
 import { useServerPowerAction } from '#ui/components/servers/server-header/use-server-power-action'
 import { useRelativeTime } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -179,12 +179,11 @@ const restartSplitActions = computed<JoinedButtonAction[]>(() => [
 		icon: UpdatedIcon,
 		action: () => initiateAction('Restart'),
 	},
-	// TODO: Implement world scoping when Archon/Kyros support target worlds in power requests.
 	...restartableWorlds.value.map((world) => ({
 		id: `restart-${world.id}`,
 		label: `Restart with ${world.name}`,
 		icon: GlobeIcon,
-		action: () => initiateAction('Restart'),
+		action: () => initiateAction('Restart', world.id),
 	})),
 ])
 const powerActions = computed(() => {

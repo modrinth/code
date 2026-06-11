@@ -389,8 +389,8 @@ onMounted(async () => {
 
 // Restart
 async function restartServer() {
-	if (!canUsePowerActions.value) return
-	await client.archon.servers_v0.power(serverId, 'Restart')
+	if (!canUsePowerActions.value || !worldId.value) return
+	await client.archon.servers_v1.powerWorld(serverId, worldId.value, { action: 'restart' })
 }
 
 function getSessionUploadFilename(fileName: string) {

@@ -92,6 +92,23 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Run a power action for a specific world
+	 * POST /v1/servers/:id/worlds/:wid/power
+	 */
+	public async powerWorld(
+		serverId: string,
+		worldId: string,
+		request: Archon.Servers.v1.WorldPowerActionRequest,
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}/power`, {
+			api: 'archon',
+			version: 1,
+			method: 'POST',
+			body: request,
+		})
+	}
+
+	/**
 	 * Reset a world to onboarding
 	 * POST /v1/servers/:id/worlds/:wid/onboard
 	 */

@@ -9,12 +9,19 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 
-export type PowerAction = Archon.Servers.v0.PowerAction
+export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
+
+const powerActionMap = {
+	Start: 'start',
+	Stop: 'stop',
+	Restart: 'restart',
+	Kill: 'kill',
+} as const satisfies Record<PowerAction, Archon.Servers.v1.WorldPowerAction>
 
 export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { formatMessage } = useVIntl()
 	const client = injectModrinthClient()
-	const { serverId, server, powerState, isSyncingContent, busyReasons } =
+	const { serverId, worldId, server, powerState, isSyncingContent, busyReasons } =
 		injectModrinthServerContext()
 	const { addNotification } = injectNotificationManager()
 	const { canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
@@ -46,16 +53,18 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 
 	const busyTooltip = computed(() => {
 		if (!canUsePowerActions.value) return permissionDeniedMessage.value
+		if (!worldId.value) return 'Your server instance is loading'
 		if (isStarting.value) return 'Your server is starting'
 		return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
 	})
 
 	const canTakeAction = computed(
-		() => !isTransitioning.value && !isBlockedByPropsBusyOrPermission.value,
+		() => !!worldId.value && !isTransitioning.value && !isBlockedByPropsBusyOrPermission.value,
 	)
 
 	const canKill = computed(
 		() =>
+			!!worldId.value &&
 			!isBlockedByPropsBusyOrPermission.value &&
 			(isStopping.value || isRunning.value || isStarting.value),
 	)
@@ -72,9 +81,13 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 		}
 	})
 
-	async function sendPowerAction(action: PowerAction) {
+	async function sendPowerAction(action: PowerAction, targetWorldId = worldId.value) {
+		if (!targetWorldId) return
+
 		try {
-			await client.archon.servers_v0.power(serverId, action)
+			await client.archon.servers_v1.powerWorld(serverId, targetWorldId, {
+				action: powerActionMap[action],
+			})
 		} catch (error) {
 			console.error(`Error performing ${action} on server:`, error)
 			addNotification({
@@ -85,13 +98,13 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 		}
 	}
 
-	function initiateAction(action: PowerAction) {
+	function initiateAction(action: PowerAction, targetWorldId = worldId.value) {
 		if (action === 'Kill') {
 			if (!canKill.value) return
 		} else {
 			if (!canTakeAction.value) return
 		}
-		void sendPowerAction(action)
+		void sendPowerAction(action, targetWorldId)
 	}
 
 	function handlePrimaryAction() {
