@@ -286,13 +286,13 @@ impl DBUser {
         let escaped_query = format!("{}%", escape_like(&lowercase_query));
 
         let users = sqlx::query!(
-            "
+            r#"
             SELECT id, username, avatar_url
             FROM users
             WHERE LOWER(username) LIKE $1 ESCAPE '\'
             ORDER BY LOWER(username) = $2 DESC, LOWER(username), username
             LIMIT 25
-            ",
+            "#,
             escaped_query,
             lowercase_query
         )

@@ -2,6 +2,7 @@ use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::projects::DependencyType;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
@@ -195,6 +196,8 @@ pub enum SearchField {
     MinecraftJavaServerContentKind,
     MinecraftJavaServerContentSupportedGameVersions,
     MinecraftJavaServerPingData,
+    DependencyProjectIds,
+    CompatibleDependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -248,6 +251,12 @@ pub struct UploadSearchProject {
     pub version_published_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
+    #[serde(default)]
+    pub dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -257,6 +266,15 @@ pub struct UploadSearchProject {
     pub components: exp::ProjectQuery,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SearchProjectDependency {
+    pub project_id: String,
+    pub dependency_type: DependencyType,
+    pub name: String,
+    pub slug: Option<String>,
+    pub icon_url: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -295,6 +313,12 @@ pub struct ResultSearchProject {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+    #[serde(default)]
+    pub dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
@@ -332,6 +356,10 @@ impl From<UploadSearchProject> for ResultSearchProject {
             gallery: source.gallery,
             featured_gallery: source.featured_gallery,
             color: source.color,
+            dependency_project_ids: source.dependency_project_ids,
+            compatible_dependency_project_ids: source
+                .compatible_dependency_project_ids,
+            dependencies: source.dependencies,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,
             components: source.components,

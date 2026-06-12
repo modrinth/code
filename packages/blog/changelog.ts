@@ -11,6 +11,31 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-11T19:05:19+00:00`,
+		product: 'app',
+		version: '0.14.6',
+		body: `## Added
+- Added the ability to reorder saved skins in the skin selector by dragging and dropping them.
+- Added recovery steps for more Microsoft sign-in and Xbox authentication errors.
+
+## Changed
+- Adding a skin to the skin selector will no longer automatically apply it to your Minecraft account.
+
+## Fixed
+- Fixed issue where the theme would not change automatically if set to "System theme" and the system theme changes.
+- Fixed rate limit issue when adding a skin in the skin selector.
+- Fixed issue with the Skin selector appearing in a broken state when the Minecraft api is unavailable. Now it appears in a read only state, showing the last selected skin or the default skin if it is unable to determine the last selected skin.
+- Fixed issue where skins which had translucency in the outer layer did not correctly render.
+- Fixed issue in Skin selector where the Edit button was not available on skins included within Modrinth App - meaning you could not change the cape of the skin without first applying it.
+- Fixed loading state incorrectly showing briefly in the Skins selector when a saved skin is deleted.`,
+	},
+	{
+		date: `2026-06-11T19:05:19+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Datepicker dropdown can overflow and get cut off by page since it shows below instead of above the input.`,
+	},
+	{
 		date: `2026-06-08T22:54:32+00:00`,
 		product: 'web',
 		body: `## Changed

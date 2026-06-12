@@ -157,6 +157,7 @@ export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): voi
 	model.traverse((child) => {
 		if ((child as THREE.Mesh).isMesh) {
 			const mesh = child as THREE.Mesh
+			const isSkinLayer = mesh.name.endsWith('_Layer')
 			const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
 
 			materials.forEach((mat: THREE.Material) => {
@@ -168,7 +169,7 @@ export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): voi
 							flatShading: true,
 							side: THREE.FrontSide,
 							toneMapped: false,
-							transparent: false,
+							transparent: isSkinLayer,
 						})
 
 						setCommonMaterialProperties(mat)

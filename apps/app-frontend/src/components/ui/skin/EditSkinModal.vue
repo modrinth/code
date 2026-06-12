@@ -148,7 +148,6 @@ import { arrayBufferToBase64 } from '@modrinth/utils'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import {
-	add_and_equip_custom_skin,
 	type Cape,
 	determineModelType,
 	equip_skin,
@@ -440,9 +439,22 @@ async function save() {
 		const bytes: Uint8Array = new Uint8Array(await (await fetch(textureUrl)).arrayBuffer())
 
 		if (mode.value === 'new') {
-			const addedSkin = await add_and_equip_custom_skin(bytes, variant.value, selectedCape.value)
+			const addedSkin = await save_custom_skin(
+				{
+					texture_key: '',
+					variant: variant.value,
+					cape_id: selectedCape.value?.id,
+					texture: textureUrl,
+					source: 'custom',
+					is_equipped: false,
+				},
+				bytes,
+				variant.value,
+				selectedCape.value,
+				true,
+			)
 			emit('saved', {
-				applied: true,
+				applied: false,
 				skin: addedSkin,
 			})
 		} else {

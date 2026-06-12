@@ -21,10 +21,10 @@ use crate::database::models::{
 use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
-use crate::models::projects::from_duplicate_version_fields;
+use crate::models::projects::{DependencyType, from_duplicate_version_fields};
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
-use crate::search::UploadSearchProject;
+use crate::search::{SearchProjectDependency, UploadSearchProject};
 use crate::util::error::Context;
 
 fn normalize_for_search(s: &str) -> String {
@@ -65,6 +65,12 @@ pub async fn index_local(
         components: exp::ProjectSerial,
     }
 
+    let searchable_statuses =
+        crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_searchable())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>();
+
     let db_projects = sqlx::query!(
         r#"
         SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
@@ -76,10 +82,7 @@ pub async fn index_local(
         ORDER BY m.id ASC
         LIMIT $2;
         "#,
-        &*crate::models::projects::ProjectStatus::iterator()
-        .filter(|x| x.is_searchable())
-        .map(|x| x.to_string())
-        .collect::<Vec<String>>(),
+        &searchable_statuses,
         limit,
         cursor,
     )
@@ -117,6 +120,54 @@ pub async fn index_local(
     let Some(largest) = project_ids.iter().max() else {
         return Ok((vec![], i64::MAX));
     };
+
+    info!("Indexing local dependencies!");
+
+    let dependencies: DashMap<DBProjectId, Vec<SearchProjectDependency>> =
+        sqlx::query!(
+            "
+            SELECT DISTINCT v.mod_id dependent_project_id,
+                d.mod_dependency_id dependency_project_id,
+                d.dependency_type dependency_type,
+                m.name dependency_name,
+                m.slug dependency_slug,
+                m.icon_url dependency_icon_url
+            FROM versions v
+            INNER JOIN dependencies d ON d.dependent_id = v.id
+            INNER JOIN mods m ON m.id = d.mod_dependency_id
+            WHERE v.mod_id = ANY($1)
+                AND d.mod_dependency_id IS NOT NULL
+                AND m.status = ANY($2)
+            ",
+            &project_ids,
+            &searchable_statuses,
+        )
+        .fetch(pool)
+        .try_fold(
+            DashMap::new(),
+            |acc: DashMap<DBProjectId, Vec<SearchProjectDependency>>, m| {
+                if let Some(dependency_project_id) = m.dependency_project_id {
+                    acc.entry(DBProjectId(m.dependent_project_id))
+                        .or_default()
+                        .push(SearchProjectDependency {
+                            project_id: ProjectId::from(DBProjectId(
+                                dependency_project_id,
+                            ))
+                            .to_string(),
+                            dependency_type: DependencyType::from_string(
+                                &m.dependency_type,
+                            ),
+                            name: m.dependency_name,
+                            slug: m.dependency_slug,
+                            icon_url: m.dependency_icon_url,
+                        });
+                }
+
+                async move { Ok(acc) }
+            },
+        )
+        .await
+        .wrap_err("failed to fetch project dependencies")?;
 
     struct PartialGallery {
         url: String,
@@ -346,6 +397,26 @@ pub async fn index_local(
             } else {
                 (vec![], vec![])
             };
+        let dependencies = dependencies
+            .get(&project.id)
+            .map(|x| x.clone())
+            .unwrap_or_default();
+        let dependency_project_ids = dependencies
+            .iter()
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
+        let compatible_dependency_project_ids = dependencies
+            .iter()
+            .filter(|dependency| {
+                matches!(
+                    dependency.dependency_type,
+                    DependencyType::Required
+                        | DependencyType::Optional
+                        | DependencyType::Embedded
+                )
+            })
+            .map(|dependency| dependency.project_id.clone())
+            .collect::<Vec<_>>();
 
         if let Some(versions) = versions.remove(&project.id) {
             // Aggregated project loader fields
@@ -486,6 +557,10 @@ pub async fn index_local(
                     featured_gallery: featured_gallery.clone(),
                     open_source,
                     color: project.color.map(|x| x as u32),
+                    dependency_project_ids: dependency_project_ids.clone(),
+                    compatible_dependency_project_ids:
+                        compatible_dependency_project_ids.clone(),
+                    dependencies: dependencies.clone(),
                     loader_fields,
                     project_loader_fields: project_loader_fields.clone(),
                     // 'loaders' is aggregate of all versions' loaders
