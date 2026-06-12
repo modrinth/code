@@ -695,7 +695,7 @@ mod tests {
                 Some(Utc::now() + TimeDelta::seconds(61));
             inner.insert("/long", FenceInner::new());
             inner.get_mut("/long").unwrap().block_until =
-                Some(Utc::now() + TimeDelta::seconds(121));
+                Some(Utc::now() + TimeDelta::seconds(140));
         }
 
         assert_eq!(fence.latest_block_minutes(), 3);
