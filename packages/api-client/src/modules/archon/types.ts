@@ -732,6 +732,10 @@ export namespace Archon {
 				worlds: WorldFull[]
 			}
 
+			export type ServerOnboardResponse = {
+				archived_worlds: string[]
+			}
+
 			export type ServerResources = {
 				cpu: number
 				memory_mb: number

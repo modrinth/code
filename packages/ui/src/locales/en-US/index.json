@@ -3641,6 +3641,24 @@
   "server.instance-settings.general.support-zone.label": {
     "defaultMessage": "Support zone"
   },
+  "server.settings.general.reset-to-onboarding.description": {
+    "defaultMessage": "Send this server back into onboarding so setup can be completed again."
+  },
+  "server.settings.general.reset-to-onboarding.error": {
+    "defaultMessage": "Failed to reset server to onboarding"
+  },
+  "server.settings.general.reset-to-onboarding.modal.description": {
+    "defaultMessage": "This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?"
+  },
+  "server.settings.general.reset-to-onboarding.success.description": {
+    "defaultMessage": "The server has been returned to the onboarding flow."
+  },
+  "server.settings.general.reset-to-onboarding.success.title": {
+    "defaultMessage": "Server reset to onboarding"
+  },
+  "server.settings.general.support-zone.label": {
+    "defaultMessage": "Support zone"
+  },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Backups"
   },

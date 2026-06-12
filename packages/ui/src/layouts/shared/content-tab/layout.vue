@@ -18,7 +18,7 @@ import {
 	TextCursorInputIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
@@ -389,10 +389,11 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 	showDeletionConfirmation(event)
 }
 
-function showDeletionConfirmation(event?: MouseEvent) {
+async function showDeletionConfirmation(event?: MouseEvent) {
 	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
 		confirmDelete()
 	} else {
+		await nextTick()
 		confirmDeletionModal.value?.show()
 	}
 }
