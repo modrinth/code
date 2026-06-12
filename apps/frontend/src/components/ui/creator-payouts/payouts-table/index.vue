@@ -69,7 +69,7 @@
 			<button
 				v-if="row.rowKind === 'period'"
 				type="button"
-				class="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left font-medium text-contrast"
+				class="flex h-full w-full cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left font-medium text-contrast"
 				:class="{ 'opacity-50': isDim(row) }"
 				:aria-expanded="row.isExpanded"
 				@click="toggleExpanded(row.payouts_date)"
