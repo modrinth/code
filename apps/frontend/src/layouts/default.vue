@@ -383,6 +383,12 @@
 								action: (event) => $refs.modal_batch_credit.show(event),
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'analytics-events',
+								color: 'primary',
+								link: '/admin/analytics/events',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -416,6 +422,9 @@
 						</template>
 						<template #servers-nodes>
 							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
+						<template #analytics-events>
+							<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -467,7 +476,7 @@
 				<OverflowMenu
 					v-if="auth.user"
 					:dropdown-id="`${basePopoutId}-user`"
-					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1 pr-1"
 					:options="userMenuOptions"
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
@@ -761,9 +770,13 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonSettingsMessages,
+	createHostingIntercomIdentityKey,
 	defineMessages,
 	injectModrinthClient,
+	injectPageContext,
 	OverflowMenu,
+	providePageContext,
+	useHostingIntercom,
 	useVIntl,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
@@ -789,6 +802,7 @@ import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const generatedState = useGeneratedState()
 
@@ -808,6 +822,25 @@ const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
+const pageContext = injectPageContext()
+const hostingIntercomActive = computed(() => route.path.startsWith('/hosting') && !!auth.value.user)
+const hostingIntercomServerId = computed(() => {
+	const rawId = route.params.id
+	return Array.isArray(rawId) ? rawId[0] : rawId
+})
+const hostingIntercom = useHostingIntercom({
+	enabled: hostingIntercomActive,
+	appId: computed(() => config.public.intercomAppId),
+	fetchToken: fetchIntercomToken,
+	identityKey: computed(() =>
+		createHostingIntercomIdentityKey(auth.value.user, hostingIntercomServerId.value),
+	),
+})
+
+providePageContext({
+	...pageContext,
+	intercomBubble: hostingIntercom.intercomBubble,
+})
 
 const { data: payoutBalance } = useQuery({
 	queryKey: ['payout', 'balance'],
@@ -835,6 +868,12 @@ const showTinMismatchBanner = computed(() => {
 })
 
 const basePopoutId = useId()
+
+async function fetchIntercomToken() {
+	return $fetch('/api/intercom/messenger-jwt', {
+		query: hostingIntercomServerId.value ? { server_id: hostingIntercomServerId.value } : {},
+	})
+}
 
 const navMenuMessages = defineMessages({
 	home: {
@@ -923,6 +962,10 @@ const messages = defineMessages({
 	manageAffiliates: {
 		id: 'layout.action.manage-affiliates',
 		defaultMessage: 'Manage affiliate links',
+	},
+	analyticsEvents: {
+		id: 'layout.action.analytics-events',
+		defaultMessage: 'Analytics events',
 	},
 	newProject: {
 		id: 'layout.action.new-project',
@@ -1067,7 +1110,7 @@ const userMenuOptions = computed(() => {
 			id: 'plus',
 			link: '/plus',
 			color: 'purple',
-			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(user.badges, 1 << 0),
+			shown: !flags.value.hidePlusPromoInUserMenu && !hasActiveMidas(user),
 		},
 		{
 			id: 'servers',
@@ -1148,7 +1191,7 @@ const isDiscovering = computed(
 )
 
 const isDiscoveringSubpage = computed(
-	() => route.name && route.name.startsWith('type-id') && !route.query.sid,
+	() => route.name && route.name.startsWith('type-project') && !route.query.sid,
 )
 
 const isRussia = computed(() => country.value === 'ru')
@@ -1227,6 +1270,10 @@ async function logoutUser() {
 }
 
 function runAnalytics() {
+	if (import.meta.dev) {
+		return
+	}
+
 	const config = useRuntimeConfig()
 	const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
 
@@ -1357,7 +1404,11 @@ const { cycle: changeTheme } = useTheme()
 
 		&-mobile {
 			.account-container {
+				opacity: 0;
 				padding-bottom: 0;
+				pointer-events: none;
+				transition: opacity 0.15s ease-in-out;
+				visibility: hidden;
 
 				.account-button {
 					padding: var(--spacing-card-md);
@@ -1380,6 +1431,12 @@ const { cycle: changeTheme } = useTheme()
 			&.expanded {
 				transform: translateY(0);
 				box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
+
+				.account-container {
+					opacity: 1;
+					pointer-events: auto;
+					visibility: visible;
+				}
 			}
 		}
 	}

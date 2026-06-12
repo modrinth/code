@@ -270,10 +270,20 @@ fn main() {
         Ok(app) => {
             app.run(|app, event| {
                 #[cfg(not(any(feature = "updater", target_os = "macos")))]
-                drop((app, event));
+                let _ = app;
+
+                if matches!(&event, tauri::RunEvent::ExitRequested { .. })
+                    && let Err(error) = tauri::async_runtime::block_on(
+                        theseus::minecraft_skins::flush_pending_skin_change(),
+                    )
+                {
+                    tracing::warn!(
+                        "Failed to flush pending Minecraft skin change before exit: {error}"
+                    );
+                }
 
                 #[cfg(feature = "updater")]
-                if matches!(event, tauri::RunEvent::Exit) {
+                if matches!(&event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
                     let should_restart = State::get_if_initialized()
                         .map(|s| {
@@ -297,6 +307,11 @@ fn main() {
                         }
 
                         set_changelog_toast(Some(update.version.clone()));
+                        let update = if should_restart {
+                            (**update).clone()
+                        } else {
+                            (**update).clone().restart_after_install(false)
+                        };
                         match update.install(data) {
                             Ok(()) => {
                                 if should_restart {

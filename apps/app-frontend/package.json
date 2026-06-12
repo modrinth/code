@@ -10,10 +10,10 @@
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"src/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore node_modules --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
+		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope apps/app-frontend",
 		"test": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@intercom/messenger-js-sdk": "^0.0.14",
 		"@modrinth/api-client": "workspace:^",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",
@@ -44,7 +44,8 @@
 		"vue": "^3.5.13",
 		"vue-i18n": "^10.0.0",
 		"vue-router": "^4.6.0",
-		"vue-virtual-scroller": "v2.0.0-beta.8"
+		"vue-virtual-scroller": "v2.0.0-beta.8",
+		"vuedraggable": "^4.1.0"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.1.1",

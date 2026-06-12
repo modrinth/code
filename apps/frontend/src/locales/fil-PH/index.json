@@ -8,6 +8,126 @@
   "admin.billing.error.not-found": {
     "message": "Hindi mahanap na tagagamit"
   },
+  "analytics.action.add": {
+    "message": "Magdagdag"
+  },
+  "analytics.action.cancel": {
+    "message": "Kanselahin"
+  },
+  "analytics.action.refresh": {
+    "message": "I-refresh"
+  },
+  "analytics.action.reset": {
+    "message": "I-reset"
+  },
+  "analytics.breakdown.country": {
+    "message": "Bansa"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Rason ng pag-download"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Pinanggalingan ng pag-download"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Bersiyon ng laro"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Pag-iisa-isa"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Loader"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetisasyon"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Walang pag-iisa-isa"
+  },
+  "analytics.breakdown.project": {
+    "message": "Proyekto"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Estado ng proyekto"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Bersiyon ng proyekto"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Pag-iisa-isa ng {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Ipakita ang lahat"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Ipakta nang may-takda"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Ipakita ang unang 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} oras"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktibo"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Mga anotasyon"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Display"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Ratio"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Kabuoan"
+  },
+  "analytics.chart.view.area": {
+    "message": "Area"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Bar"
+  },
+  "analytics.chart.view.line": {
+    "message": "Line"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Lahat"
+  },
+  "analytics.group-by.1h": {
+    "message": "1oras"
+  },
+  "analytics.group-by.6h": {
+    "message": "6oras"
+  },
+  "analytics.group-by.date": {
+    "message": "Petsa"
+  },
+  "analytics.group-by.day": {
+    "message": "Araw"
+  },
+  "analytics.group-by.month": {
+    "message": "Buwan"
+  },
+  "analytics.group-by.week": {
+    "message": "Linggo"
+  },
+  "analytics.group-by.year": {
+    "message": "Taon"
+  },
+  "analytics.project-status.draft": {
+    "message": "Burador"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "Pagtingin"
+  },
+  "analytics.value.none": {
+    "message": "Wala"
+  },
   "app-marketing.download.description": {
     "message": "Magagamit ang aming desktop app sa iba’t-ibang plataporma, piliin ang iyong gugustohing bersiyon."
   },
@@ -121,9 +241,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -406,6 +523,12 @@
   },
   "collection.title": {
     "message": "{name} - Koleksiyon"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Tugunan"
+  },
+  "conversation-thread.action.send": {
+    "message": "Ipadala"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ang mga supplementary file ay para sa mga resource na pangsuporta katulad ng source code, hindi para sa ibang bersiyon or baryante."
@@ -875,35 +998,11 @@
   "dashboard.head-title": {
     "message": "Dashboard"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "Tratuhing binasa na"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "Tingnan ang kasaysayan"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "Wala kang di-nababasang notipikasyon."
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "Error sa paglo-load ng mga notipikasyon:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "Kasaysayan"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "Kasaysayan ng notipikasyon"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "Tingnan lahat"
   },
   "dashboard.notifications.link.view-history": {
     "message": "Tingnan ang kasaysayan ng notipikasyon"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
-  },
-  "dashboard.notifications.loading": {
-    "message": "Naglo-load ang mga notipikasyon..."
   },
   "dashboard.organizations.button.create": {
     "message": "Lumikha ng organisasyon"
@@ -925,6 +1024,30 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Pakisuri sa metadata sa environment"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Pangalan"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Uri"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Ikono"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Pangalan"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Estado"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Uri"
   },
   "dashboard.reports.active-title": {
     "message": "Aktibong sumbong"
@@ -1193,9 +1316,6 @@
   "frog.title": {
     "message": "Palaka"
   },
-  "hosting-marketing.available-locations": {
-    "message": "Magagamit sa Hilagang Amerika, Yuropa, at Timog-Silangang Asya para sa malawakang abot."
-  },
   "hosting-marketing.billing.monthly": {
     "message": "Buwanang pagbayad"
   },
@@ -1255,9 +1375,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Nasaan ang mga server ng Modrinth Hosting? Makapipili ba ako ng rehiyon?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "Mayroon kaming mga server na magagamit sa Hilagang Amerika, Yuropa, at Timog-silangang Asya sa kasalukuyang sandali na maaari mong piliin pagkatapos bumili. Dadating ang higit pang rehiyon sa hinaharap! Kung nais mong magpalit ng rehiyon, mangyaring abutin ang suporta."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Ano bang bersiyon ng Minecraft at loader ang magagamit?"
@@ -1591,9 +1708,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Error sa pagbubuo ng estado galing sa API habang nagpapatayo."
-  },
-  "layout.banner.preview.description": {
-    "message": "Kung ibig mong maakses ang opisyal na website ng Modrinth, bisitahin ang <link>https://modrinth.com</link>. Ito ay isang pinakalat na pasilip na ginagamit lamang ng kawani ng Modrinth sa pagsusubok nito. Ito ay pinatayo gamit ang <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Ito ay isang pinakalat na pasilip ng website ng Modrinth."
@@ -2492,12 +2606,6 @@
   "project.settings.visit-dashboard": {
     "message": "Bisitahin ang dashboard ng mga proyekto"
   },
-  "project.stats.downloads-label": {
-    "message": "download {count, plural, one {} other {}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {} other {na }}follower"
-  },
   "project.status.archived.message": {
     "message": "Inarkibo ang {title}. Ang {title} ay hindi na tatanggap ng mga update maliban kung iwawala nila ang pagkaarkibo ng proyekto."
   },
@@ -2507,23 +2615,11 @@
   "report.already-reported": {
     "message": "Nasumbong mo na ang {title}"
   },
-  "report.already-reported-description": {
-    "message": "Ikaw ay mayroon nang bukas na sumbong para sa {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito. Ikaw ay maaaring magdagdag ng detalye sa iyong sumbong kapag mayroong impormasyong kang maisasama pa."
-  },
-  "report.back-to-item": {
-    "message": "Bumalik sa {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
-  },
   "report.body.description": {
     "message": "Maglagay ng mga link at imahe kung makakaya at matumpak. Ang mga sumbong na kumulang o walang laman ay agarang sininasara at binabalewala."
   },
   "report.body.title": {
     "message": "Mangyaring magbigay ng karagdagang konteksto ukol sa iyong sumbong"
-  },
-  "report.checking": {
-    "message": "Tinitignan ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}..."
-  },
-  "report.could-not-find": {
-    "message": "Hindi mahanap ang {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}"
   },
   "report.for.violation": {
     "message": "Paglabag sa <rules-link>Mga Patakaran</rules-link> o <terms-link>Mga Tuntunin sa Paggamit</terms-link> ng Modrinth"
@@ -2564,14 +2660,8 @@
   "report.please-report": {
     "message": "Pakisumbong:"
   },
-  "report.question.content-id": {
-    "message": "Ano ang ID ng {item, select, project {proyekto} version {bersiyon} user {tagagamit} other {kontento}}?"
-  },
   "report.question.content-type": {
     "message": "Anong uri ng kontento ang iyong isusumbong?"
-  },
-  "report.question.report-reason": {
-    "message": "Aling sa mga tuntunin ng Modrinth ang nilabag ng {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito?"
   },
   "report.report-content": {
     "message": "Isumbong ang kontento sa mga moderator"
@@ -2684,26 +2774,14 @@
   "scopes.organizationWrite.label": {
     "message": "Pagsulat sa organisasyon"
   },
-  "scopes.patCreate.description": {
-    "message": "Paglikha ng mga personal API token"
-  },
   "scopes.patCreate.label": {
     "message": "Paglikha ng PAT"
-  },
-  "scopes.patDelete.description": {
-    "message": "Pagtanggal ng iyong mga personal API token"
   },
   "scopes.patDelete.label": {
     "message": "Pagtanggal ng PAT"
   },
-  "scopes.patRead.description": {
-    "message": "Pagtingin sa mga linikhang API token"
-  },
   "scopes.patRead.label": {
     "message": "Pagbasa ng PAT"
-  },
-  "scopes.patWrite.description": {
-    "message": "Pagbago ng mga personal API token"
   },
   "scopes.patWrite.label": {
     "message": "Pagsulat sa PAT"
@@ -3059,20 +3137,11 @@
   "settings.billing.interval.month": {
     "message": "buwan"
   },
-  "settings.billing.interval.monthly": {
-    "message": "buwanan"
-  },
   "settings.billing.interval.quarter": {
     "message": "tatlong buwan"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "taluhang-buwan"
-  },
   "settings.billing.interval.year": {
     "message": "taon"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "taunan"
   },
   "settings.billing.midas.benefits.title": {
     "message": "Mga pakinabang"
@@ -3118,9 +3187,6 @@
   },
   "settings.billing.payment_method.title": {
     "message": "Mga paraan ng pagbabayad"
-  },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
   },
   "settings.billing.pyro.resubscribe.error.text": {
     "message": "Isang error ang naganap habang pagre-resubscribe sa iyong Modrinth server."

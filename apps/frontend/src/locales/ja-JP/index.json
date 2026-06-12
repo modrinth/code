@@ -8,6 +8,141 @@
   "admin.billing.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
   },
+  "analytics.action.add": {
+    "message": "追加"
+  },
+  "analytics.action.cancel": {
+    "message": "キャンセル"
+  },
+  "analytics.action.refresh": {
+    "message": "更新"
+  },
+  "analytics.action.reset": {
+    "message": "リセット"
+  },
+  "analytics.breakdown.country": {
+    "message": "国"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "理由"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "流入元"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "マインクラフト"
+  },
+  "analytics.breakdown.generic": {
+    "message": "内訳"
+  },
+  "analytics.breakdown.loader": {
+    "message": "ローダー"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "収益化"
+  },
+  "analytics.breakdown.project": {
+    "message": "プロジェクト"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "ステータス"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "バージョン"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "すべて表示"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "上位8件を表示"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours}時間"
+  },
+  "analytics.chart.view.area": {
+    "message": "エリア"
+  },
+  "analytics.chart.view.bar": {
+    "message": "バー"
+  },
+  "analytics.chart.view.line": {
+    "message": "ライン"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "依存関係"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modパック"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "新規"
+  },
+  "analytics.download-reason.update": {
+    "message": "更新"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth Web"
+  },
+  "analytics.filter.search.countries": {
+    "message": "国を検索..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "ダウンロード回数の推移"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "収益の推移"
+  },
+  "analytics.project-event.project-approved": {
+    "message": "承認完了"
+  },
+  "analytics.project-status.approved": {
+    "message": "承認済み"
+  },
+  "analytics.stat.downloads": {
+    "message": "ダウンロード回数"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "もっと詳しく"
+  },
+  "analytics.stat.playtime": {
+    "message": "プレイ時間"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours}時間"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "前期比"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "前期比"
+  },
+  "analytics.stat.revenue": {
+    "message": "収益"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "表示回数"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "検索..."
+  },
+  "analytics.title": {
+    "message": "アナリティクス"
+  },
+  "analytics.value.monetized": {
+    "message": "設定済み"
+  },
+  "analytics.value.unmonetized": {
+    "message": "未設定"
+  },
   "app-marketing.download.description": {
     "message": "我々のデスクトップアプリはすべてのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"
   },
@@ -121,9 +256,6 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -407,11 +539,17 @@
   "collection.title": {
     "message": "{name} - コレクション"
   },
+  "conversation-thread.action.approve": {
+    "message": "承認"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "送信して承認"
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "メッセージを送る..."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補足ファイルはソースコードなどの支援用リソースのためのものであり、別バージョンや派生版を配布するためのものではありません。"
-  },
-  "create.collection.collection-info": {
-    "message": "新しいコレクションは、{count, plural, =0 {空の} other {#個のプロジェクトを含む}}公開コレクションとして作成されます。"
   },
   "create.collection.create-collection": {
     "message": "コレクションを作成"
@@ -574,9 +712,6 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "アフィリエイトリンクを検索…"
-  },
-  "dashboard.analytics.from-projects": {
-    "message": "{count} 件のプロジェクトから"
   },
   "dashboard.analytics.total-downloads": {
     "message": "総ダウンロード数"
@@ -875,35 +1010,11 @@
   "dashboard.head-title": {
     "message": "ダッシュボード"
   },
-  "dashboard.notifications.button.mark-all-as-read": {
-    "message": "全て既読にする"
-  },
-  "dashboard.notifications.button.view-history": {
-    "message": "履歴を表示"
-  },
-  "dashboard.notifications.empty.no-unread": {
-    "message": "未読の通知はありません"
-  },
-  "dashboard.notifications.error.loading": {
-    "message": "通知の読み込み中にエラーが発生しました:"
-  },
-  "dashboard.notifications.history.label": {
-    "message": "履歴"
-  },
-  "dashboard.notifications.history.title": {
-    "message": "通知履歴"
-  },
   "dashboard.notifications.link.see-all": {
     "message": "すべて見る"
   },
   "dashboard.notifications.link.view-history": {
     "message": "通知履歴を表示"
-  },
-  "dashboard.notifications.link.view-more": {
-    "message": "{extraNotifs} 件の通知をさらに表示"
-  },
-  "dashboard.notifications.loading": {
-    "message": "通知を読み込み中..."
   },
   "dashboard.organizations.button.create": {
     "message": "組織を作成"
@@ -913,9 +1024,6 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "組織の取得に失敗しました"
-  },
-  "dashboard.organizations.member-count": {
-    "message": "{count} 人のメンバー"
   },
   "dashboard.organizations.title": {
     "message": "組織"
@@ -940,9 +1048,6 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "リンクを編集"
-  },
-  "dashboard.projects.links.changes-applied": {
-    "message": "変更は <strong>{count}</strong> 件のプロジェクトに適用されます"
   },
   "dashboard.projects.links.description": {
     "message": "下記に入力したリンクは、選択した各プロジェクトに上書きされます。空欄のままにしたリンクは無視されます。ゴミ箱ボタンを使用すると、選択したすべてのプロジェクトからリンクを削除できます。"
@@ -976,9 +1081,6 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "ソースコード"
-  },
-  "dashboard.projects.links.wiki-page.description": {
-    "message": "プロジェクトに関する情報、ドキュメント、ヘルプが掲載されているページ"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "ウィキページ"
@@ -1331,9 +1433,6 @@
   "frog.title": {
     "message": "カエル"
   },
-  "hosting-marketing.available-locations": {
-    "message": "北米、ヨーロッパ、東南アジアで利用可能で、幅広い地域をカバーしています。"
-  },
   "hosting-marketing.billing.monthly": {
     "message": "毎月で払う"
   },
@@ -1393,9 +1492,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Modrinthでホストするサーバーはどこにありますか？地域を選択できますか？"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "現時点では、北アメリカ、ヨーロッパ、東南アジアのサーバーを購入時に選択できます。今後、より多くの地域に対応予定です！地域を変更したい場合はサポートまでお問い合わせください。"
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "どのMinecraftのバージョンとローダーが使えますか？"
@@ -1477,9 +1573,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "必要なものが正確にわかっていますか？"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "5日間無料で3GBのMedal提供のサーバーをお試しください"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "もっと詳しく知る"
@@ -1732,9 +1825,6 @@
   },
   "layout.banner.build-fail.title": {
     "message": "ビルド時にAPIからステートを生成できませんでした。"
-  },
-  "layout.banner.preview.description": {
-    "message": "公式のModrinthウェブサイトにアクセスしたい場合は、<link>https://modrinth.com</link> をご覧ください。このプレビュー環境はModrinthスタッフによるテスト目的で使用されています。<branch-link>{owner}/{branch}</branch-link> @ {commit} を基に構築されています。"
   },
   "layout.banner.preview.title": {
     "message": "これはModrinthウェブサイトのプレビューデプロイです。"
@@ -2270,9 +2360,6 @@
   "profile.label.collection": {
     "message": "コレクション"
   },
-  "profile.label.downloads": {
-    "message": "{count}件のダウンロード"
-  },
   "profile.label.joined": {
     "message": "参加: "
   },
@@ -2302,9 +2389,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Modrinthで{username}のプロジェクトをダウンロードする"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count}件のプロジェクトフォロワー"
   },
   "profile.user-id": {
     "message": "ユーザーID: {id}"
@@ -2564,6 +2648,12 @@
   "project.license.title": {
     "message": "ライセンス"
   },
+  "project.moderation.admonition.approved.header": {
+    "message": "プロジェクトが承認されました"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "これは下書きです。\nModrinthのモデレーターによって審査、承認されるまで、他のユーザーには表示されません。"
+  },
   "project.moderation.title": {
     "message": "管理"
   },
@@ -2633,12 +2723,6 @@
   "project.settings.visit-dashboard": {
     "message": "プロジェクトダッシュボードを見る"
   },
-  "project.stats.downloads-label": {
-    "message": "件のダウンロード"
-  },
-  "project.stats.followers-label": {
-    "message": "人のフォロワー"
-  },
   "project.status.archived.message": {
     "message": "{title} はアーカイブされました。作者がプロジェクトのアーカイブを解除しない限り、今後 {title} に更新はありません。"
   },
@@ -2648,23 +2732,11 @@
   "report.already-reported": {
     "message": "既に {title} をレポートしています"
   },
-  "report.already-reported-description": {
-    "message": "この{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}に関するあなたの報告はすでに投稿されています。追記がある場合は、報告に詳細を追加できます。"
-  },
-  "report.back-to-item": {
-    "message": "{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}に戻る"
-  },
   "report.body.description": {
     "message": "可能で関連性がある場合は、リンクと画像を追加してください。空または不十分な報告は閉じられ、無視されます。"
   },
   "report.body.title": {
     "message": "報告に関する追加情報をご提供ください"
-  },
-  "report.checking": {
-    "message": "{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}を確認中…"
-  },
-  "report.could-not-find": {
-    "message": "{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}が見つかりませんでした"
   },
   "report.for.violation": {
     "message": "Modrinthの<rules-link>ルール</rules-link>または<terms-link>利用規約</terms-link>に違反している"
@@ -2705,14 +2777,8 @@
   "report.please-report": {
     "message": "是非報告ください："
   },
-  "report.question.content-id": {
-    "message": "{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}のIDは何ですか？"
-  },
   "report.question.content-type": {
     "message": "どの種類のコンテンツに関する報告ですか？"
-  },
-  "report.question.report-reason": {
-    "message": "この{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}は、Modrinthのどのルールに違反していますか？"
   },
   "report.report-content": {
     "message": "コンテンツをモデレーターに報告する"
@@ -2825,26 +2891,14 @@
   "scopes.organizationWrite.label": {
     "message": "組織の書き込み"
   },
-  "scopes.patCreate.description": {
-    "message": "個人用APIトークンを作成する"
-  },
   "scopes.patCreate.label": {
     "message": "PATを作成する"
-  },
-  "scopes.patDelete.description": {
-    "message": "個人用APIトークンを削除する"
   },
   "scopes.patDelete.label": {
     "message": "PATを削除する"
   },
-  "scopes.patRead.description": {
-    "message": "作成したAPIトークンを表示する"
-  },
   "scopes.patRead.label": {
     "message": "PATを読み取る"
-  },
-  "scopes.patWrite.description": {
-    "message": "個人用APIトークンを編集する"
   },
   "scopes.patWrite.label": {
     "message": "PATの書き込み"
@@ -3389,20 +3443,11 @@
   "settings.billing.interval.month": {
     "message": "月"
   },
-  "settings.billing.interval.monthly": {
-    "message": "月間"
-  },
   "settings.billing.interval.quarter": {
     "message": "四半期"
   },
-  "settings.billing.interval.quarterly.adjective": {
-    "message": "3ヶ月ごと"
-  },
   "settings.billing.interval.year": {
     "message": "年"
-  },
-  "settings.billing.interval.yearly": {
-    "message": "年間"
   },
   "settings.billing.midas.benefits.ad-free": {
     "message": "modrinth.comとModrinth Appを広告なしでブラウジング"
@@ -3488,9 +3533,6 @@
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
-  "settings.billing.price.slash-interval": {
-    "message": "/{interval}"
-  },
   "settings.billing.pyro.cpu": {
     "message": "{shared}個の共有されたCPU ({bursts}個のCPUに増加)"
   },
@@ -3557,17 +3599,8 @@
   "settings.billing.subscription.title": {
     "message": "サブスクリプション"
   },
-  "settings.billing.switch.switching-to-interval": {
-    "message": "{interval} に変更中"
-  },
-  "settings.billing.switch.to-interval": {
-    "message": "{interval} に変更"
-  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "月払いの場合年間で {amount} 高くなります"
-  },
-  "settings.billing.switches-to-billing-on": {
-    "message": "{date}に {interval} 払いに変更されます"
   },
   "settings.billing.update-method": {
     "message": "支払い方法を更新"

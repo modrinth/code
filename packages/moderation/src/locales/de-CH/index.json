@@ -66,7 +66,7 @@
     "defaultMessage": "Gallerie-Seite besuchen"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Dein{type, select, mod {e Mod} plugin { Plugin} other { Projekt}} verwendet eine Lizenz, welche es verlangt, den Quellcode verfügbar zu machen. Bitte gib einen Link zum Quellcode an, stelle Quelldateien für jede zusätzliche Version bereit, oder verwende eine andere Lizenz."
+    "defaultMessage": "Dein(e) {type} verwendet eine Lizenz, die es erfordert, dass der Quellcode verfügbar ist. Bitte gib für jede weitere Version einen Quellcode-Link oder eine Quelldatei an, oder ziehe in Betracht, eine andere Lizenz zu verwenden."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
@@ -75,7 +75,7 @@
     "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem richtigen Linktyp eingegeben werden."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Identische Links"
+    "defaultMessage": "Identische Links bereinigen"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Deine Beschreibung sollte genügend normalen Text und Alt-Text für Bilder enthalten, damit es für Benutzer mit Bildschirmleseprogrammen oder langsamem Internet verfügbar ist."
@@ -159,7 +159,7 @@
     "defaultMessage": "Wähle eine Sprache aus"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Wähle die Lizenz, unter welcher dein{type, select, mod {e Mod} modpack { Modpaket} resourcepack { Resourcenpaket} shader { Shader} plugin { Plugin} other { Projekt}} vertrieben wird."
+    "defaultMessage": "Wähle die Lizenz aus, unter der dein(e) {type} verbreitet wird."
   },
   "nags.select-license.title": {
     "defaultMessage": "Wähle eine Lizenz aus"
@@ -225,7 +225,10 @@
     "defaultMessage": "Wähle akkurate Tags aus"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Mindestens ein Galeriebild ist erforderlich, um den Inhalt deines {type, select,\nresourcepack {Ressourcenpakets zu präsentieren, außer bei Audio- oder Sprachpaketen. Wenn dies auf dein Paket zutrifft, wähle bitte das entsprechende Tag aus} shader {Shaders zu zeigen} other {Projekts zu zeigen}}."
+    "defaultMessage": "Es wird mindestens ein Galeriebild benötigt, um den Inhalt deines/deiner {type} zu präsentieren."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "Resource Pack, ausgenommen Audio- oder Lokalisierungs-Packs. Wenn dies auf dein Pack zutrifft, wähle bitte das entsprechende Tag aus"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Lade ein Galeriebild hoch"

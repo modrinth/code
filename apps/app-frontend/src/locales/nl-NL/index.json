@@ -189,7 +189,7 @@
     "message": "Verwijder instantie"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Deze modpakket is al in de <bold>{instanceName}<bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
+    "message": "Deze modpakket is al in de <bold>{instanceName}</bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Maak"
@@ -224,9 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Zoek servers"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "{name} Zal **permanent verwijderd** worden en kan niet hersteld worden."
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "Weet je zeker dat je deze wereld definitief wilt verwijderen?"
   },
@@ -256,9 +253,6 @@
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Ben je zeker dat je {name} wil verwijderen?"
-  },
-  "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Zoek werelden"
   },
   "app.instance.worlds.this-server": {
     "message": "deze server"
@@ -302,9 +296,6 @@
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
   },
-  "app.project.install-context.back-to-browse": {
-    "message": "Terug naar browsen"
-  },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installeer content naar instantie"
   },
@@ -331,9 +322,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Bronnenbeheer"
-  },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} is klaar om geïnstalleerd te worden! Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
@@ -364,15 +352,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versie {version} is succesvol geïnstalleerd!"
-  },
-  "app.update.download-update": {
-    "message": "Download update"
-  },
-  "app.update.downloading-update": {
-    "message": "Update downloaden ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Herlaad om de update te installeren"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "voorbeeld.modrinth.gg"

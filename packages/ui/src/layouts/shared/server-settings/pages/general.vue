@@ -13,8 +13,10 @@
 								<StyledInput
 									id="server-name-field"
 									v-model="serverName"
+									v-tooltip="advancedActionTooltip"
 									wrapper-class="w-full"
 									:maxlength="48"
+									:disabled="!canUseAdvancedSettings"
 									@keyup.enter="!serverName && saveGeneral"
 								/>
 								<span>This name is only visible on Modrinth.</span>
@@ -39,9 +41,11 @@
 										>
 										<input
 											id="server-subdomain"
+											v-tooltip="advancedActionTooltip"
 											:value="serverSubdomain"
 											placeholder="Enter subdomain..."
 											:maxlength="32"
+											:disabled="!canUseAdvancedSettings"
 											class="absolute left-px inset-0 bg-transparent !p-0 text-base font-medium text-primary !shadow-none transition-colors placeholder:text-secondary focus:text-contrast"
 											autocomplete="off"
 											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
@@ -68,7 +72,11 @@
 						</div>
 					</div>
 
-					<EditServerIcon v-if="!data.is_medal" />
+					<EditServerIcon
+						v-if="!data.is_medal"
+						:can-edit="canWriteFiles"
+						:permission-denied-message="permissionDeniedMessage"
+					/>
 				</div>
 
 				<!-- preferences -->
@@ -145,6 +153,7 @@ import { computed, ref, watch } from 'vue'
 import { CopyCode, StyledInput, Toggle } from '#ui/components'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -157,6 +166,10 @@ const client = injectModrinthClient()
 const { server: data, serverId, busyReasons } = injectModrinthServerContext()
 const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
+const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
+const advancedActionTooltip = computed(() =>
+	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
+)
 
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
@@ -175,12 +188,6 @@ const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidC
 
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
-
-watch(serverName, (newValue, oldValue) => {
-	if (!(newValue?.length ?? 0)) {
-		serverName.value = oldValue
-	}
-})
 
 // Preferences
 const preferences = {
@@ -334,15 +341,21 @@ const infoProperties = computed<InfoProperty[]>(() => [
 ])
 
 // Unsaved changes tracking (API fields + preferences)
-const hasUnsavedChanges = computed(
+const hasServerSettingsChanges = computed(
 	() =>
 		(serverName.value && serverName.value !== data.value?.name) ||
-		serverSubdomain.value !== data.value?.net?.domain ||
-		JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value),
+		serverSubdomain.value !== data.value?.net?.domain,
+)
+const hasPreferenceChanges = computed(
+	() => JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value),
+)
+const hasUnsavedChanges = computed(
+	() => hasServerSettingsChanges.value || hasPreferenceChanges.value,
 )
 
 const saveGeneral = async () => {
 	if (!isValidServerName.value || !isValidSubdomain.value) return
+	if (hasServerSettingsChanges.value && !canUseAdvancedSettings.value) return
 
 	try {
 		isUpdating.value = true

@@ -69,6 +69,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 	)
 
 	const createdBackupId = ref<string | null>(null)
+	const createdOperationId = ref<number | null>(null)
 	const pendingCreate = ref(false)
 	const backupFailed = ref(false)
 	const backupComplete = ref(false)
@@ -102,6 +103,16 @@ export function useInlineBackup(backupName: string | (() => string)) {
 		{ immediate: true },
 	)
 
+	watch(
+		myActiveOp,
+		(op) => {
+			if (op?.operation_id != null) {
+				createdOperationId.value = op.operation_id
+			}
+		},
+		{ immediate: true },
+	)
+
 	async function startBackup() {
 		if (!worldId.value) return
 
@@ -112,6 +123,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 		backupCancelled.value = false
 		isCancelling.value = false
 		createdBackupId.value = null
+		createdOperationId.value = null
 		pendingCreate.value = true
 
 		try {
@@ -137,7 +149,18 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 		isCancelling.value = true
 		try {
-			await client.archon.backups_v1.delete(serverId, worldId.value, createdBackupId.value)
+			let operationId = createdOperationId.value ?? myActiveOp.value?.operation_id ?? null
+			if (operationId == null) {
+				const queue = await client.archon.backups_queue_v1.list(serverId, worldId.value)
+				const operation = queue.active_operations.find(
+					(op) => op.backup_id === createdBackupId.value && op.operation_type === 'create',
+				)
+				operationId = operation?.operation_id ?? null
+			}
+			if (operationId == null) {
+				throw new Error('Could not find the backup creation operation to cancel.')
+			}
+			await client.archon.backups_queue_v1.cancelCreate(serverId, worldId.value, operationId)
 			backupCancelled.value = true
 			isCancelling.value = false
 			await invalidate()

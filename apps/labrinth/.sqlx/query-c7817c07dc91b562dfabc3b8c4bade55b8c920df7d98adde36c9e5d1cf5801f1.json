@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT id, meta AS \"meta: Json<AnalyticsEventMeta>\", starts, ends\n\t\t\tFROM analytics_events\n\t\t\tORDER BY starts DESC\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "meta: Json<AnalyticsEventMeta>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 2,
+        "name": "starts",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "ends",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "c7817c07dc91b562dfabc3b8c4bade55b8c920df7d98adde36c9e5d1cf5801f1"
+}

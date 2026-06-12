@@ -182,15 +182,10 @@ const messages = defineMessages({
 		id: 'billing.resubscribe-modal.resubscribe',
 		defaultMessage: 'Resubscribe',
 	},
-	intervalMonthly: { id: 'billing.resubscribe-modal.interval.monthly', defaultMessage: '/month' },
-	intervalQuarterly: {
-		id: 'billing.resubscribe-modal.interval.quarterly',
-		defaultMessage: '/quarter',
-	},
-	intervalYearly: { id: 'billing.resubscribe-modal.interval.yearly', defaultMessage: '/year' },
-	intervalFiveDays: {
-		id: 'billing.resubscribe-modal.interval.five-days',
-		defaultMessage: '/5 days',
+	interval: {
+		id: 'billing.resubscribe-modal.interval',
+		defaultMessage:
+			'{intervalOption, select, fiveDays {/5 days} monthly {/month} quarterly {/quarter} yearly {/year} other {{interval}}}',
 	},
 	errorTitle: { id: 'billing.resubscribe-modal.error.title', defaultMessage: 'Error' },
 	errorText: {
@@ -202,18 +197,13 @@ const messages = defineMessages({
 const canResubscribe = computed(() => !!modalData.value?.subscriptionId)
 
 const intervalLabel = computed(() => {
-	switch (modalData.value?.interval) {
-		case 'monthly':
-			return formatMessage(messages.intervalMonthly)
-		case 'quarterly':
-			return formatMessage(messages.intervalQuarterly)
-		case 'yearly':
-			return formatMessage(messages.intervalYearly)
-		case 'five-days':
-			return formatMessage(messages.intervalFiveDays)
-		default:
-			return null
-	}
+	const { interval } = modalData.value ?? {}
+	if (!interval) return null
+
+	return formatMessage(messages.interval, {
+		interval,
+		intervalOption: interval === 'five-days' ? 'fiveDays' : interval,
+	})
 })
 
 const formattedPrice = computed(() => {

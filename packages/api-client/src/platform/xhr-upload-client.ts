@@ -18,9 +18,9 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 	upload<T = void>(path: string, options: UploadRequestOptions): UploadHandle<T> {
 		let baseUrl: string
 		if (options.api === 'labrinth') {
-			baseUrl = this.config.labrinthBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
-			baseUrl = this.config.archonBaseUrl!
+			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
 		} else {
 			baseUrl = options.api
 		}
@@ -122,6 +122,11 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 
 			xhr.addEventListener('error', () => reject(new ModrinthApiError('Upload failed')))
 			xhr.addEventListener('abort', () => reject(new ModrinthApiError('Upload cancelled')))
+			xhr.addEventListener('timeout', () => reject(new ModrinthApiError('Upload timed out')))
+
+			if (context.options.timeout !== undefined) {
+				xhr.timeout = context.options.timeout
+			}
 
 			// build URL with params (unlike $fetch, XHR doesn't handle params automatically)
 			let url = context.url

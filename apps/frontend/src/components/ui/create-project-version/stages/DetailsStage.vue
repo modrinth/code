@@ -46,7 +46,7 @@
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast"> Version changlog </span>
+			<span class="font-semibold text-contrast"> Version changelog </span>
 
 			<div class="w-full">
 				<MarkdownEditor

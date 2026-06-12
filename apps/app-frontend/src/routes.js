@@ -73,6 +73,14 @@ export default new createRouter({
 						breadcrumb: [{ name: '?Server' }],
 					},
 				},
+				{
+					path: 'access',
+					name: 'ServerManageAccess',
+					component: Hosting.Access,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
+				},
 			],
 		},
 		{
@@ -86,10 +94,10 @@ export default new createRouter({
 		},
 		{
 			path: '/skins',
-			name: 'Skins',
+			name: 'Skin selector',
 			component: Pages.Skins,
 			meta: {
-				breadcrumb: [{ name: 'Skins' }],
+				breadcrumb: [{ name: 'Skin selector' }],
 			},
 		},
 		{
@@ -240,7 +248,6 @@ export default new createRouter({
 					component: Instance.Logs,
 					meta: {
 						useRootContext: true,
-						// renderMode: 'fixed',
 						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Logs' }],
 					},
 				},

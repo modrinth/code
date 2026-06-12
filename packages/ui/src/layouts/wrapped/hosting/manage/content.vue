@@ -2,11 +2,14 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIntervalFn } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
+import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -21,6 +24,7 @@ import {
 	readPendingServerContentInstalls,
 	removePendingServerContentInstall,
 } from '#ui/utils/server-content-installing'
+import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import {
 	flushStoredServerAddonInstallQueue,
@@ -111,8 +115,16 @@ const messages = defineMessages({
 const client = injectModrinthClient()
 const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
 	injectModrinthServerContext()
+const contentUploadSession = useUploadSessionUpload({
+	client,
+	scope: 'content',
+	worldId,
+	uploadState,
+	cancelUpload,
+})
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
+const { canSetup, permissionDeniedMessage } = useServerPermissions()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -126,6 +138,7 @@ const type = computed(() => {
 })
 
 const queryKey = computed(() => ['content', 'list', 'v1', serverId])
+const modpackContentQueryKey = computed(() => ['content', 'list', 'v1', serverId, 'modpack'])
 
 function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
 	const ownerId = owner.type === 'user' ? owner.name || owner.id : owner.id
@@ -138,6 +151,44 @@ const contentQuery = useQuery({
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 0,
+})
+
+const isModpackContentModalOpen = ref(false)
+const modpackContentQuery = useQuery({
+	queryKey: modpackContentQueryKey,
+	queryFn: () =>
+		client.archon.content_v1.getAddons(serverId, worldId.value!, {
+			from_modpack: true,
+		}),
+	enabled: computed(() => isModpackContentModalOpen.value && worldId.value !== null),
+	staleTime: 0,
+})
+
+const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
+const setupActionBusyMessage = computed(() => {
+	if (!canSetup.value) return permissionDeniedMessage.value
+
+	const bannerCoversInstalling =
+		server.value?.status === 'installing' ||
+		isSyncingContent.value ||
+		busyReasons.value.some(
+			(r) =>
+				r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content',
+		)
+	const filteredReasons = busyReasons.value.filter((r) => {
+		if (
+			bannerCoversInstalling &&
+			(r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content')
+		)
+			return false
+		if (
+			r.reason.id === 'servers.busy.backup-creating' ||
+			r.reason.id === 'servers.busy.backup-restoring'
+		)
+			return false
+		return true
+	})
+	return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
 })
 
 const modpackProjectId = computed(() => {
@@ -158,6 +209,44 @@ const projectQuery = useQuery({
 	queryKey: computed(() => ['labrinth', 'project', modpackProjectId.value]),
 	queryFn: () => client.labrinth.projects_v2.get(modpackProjectId.value!),
 	enabled: computed(() => !!modpackProjectId.value),
+})
+
+function getVersionTime(version: Labrinth.Versions.v2.Version) {
+	return new Date(version.date_published).getTime()
+}
+
+function sortVersionsByPublishedDate(versions: Labrinth.Versions.v2.Version[]) {
+	return [...versions].sort((a, b) => getVersionTime(b) - getVersionTime(a))
+}
+
+const currentModpackVersionId = computed(() => {
+	const spec = contentQuery.data.value?.modpack?.spec
+	return spec?.platform === 'modrinth' ? spec.version_id : null
+})
+
+const newestModpackUpdateVersion = computed(() => {
+	const currentVersionId = currentModpackVersionId.value
+	if (!currentVersionId) return null
+
+	const versions = sortVersionsByPublishedDate(modpackVersionsQuery.data.value ?? [])
+	const currentVersion = versions.find((version) => version.id === currentVersionId)
+	const installedPublishedAt = contentQuery.data.value?.modpack?.date_published
+	const storedCurrentTime = installedPublishedAt
+		? new Date(installedPublishedAt).getTime()
+		: Number.NaN
+	const currentVersionTime = Number.isNaN(storedCurrentTime)
+		? currentVersion
+			? getVersionTime(currentVersion)
+			: Number.NaN
+		: storedCurrentTime
+
+	return (
+		versions.find((version) => {
+			if (version.id === currentVersionId) return false
+			if (Number.isNaN(currentVersionTime)) return true
+			return getVersionTime(version) > currentVersionTime
+		}) ?? null
+	)
 })
 
 const modpack = computed<ContentModpackData | null>(() => {
@@ -207,7 +296,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 			project_type: 'modpack',
 			header: 'categories',
 		})) as ContentModpackCardCategory[],
-		hasUpdate: !!mp.has_update,
+		hasUpdate: !!mp.has_update || !!newestModpackUpdateVersion.value,
 	}
 })
 
@@ -237,6 +326,14 @@ const lastStableContentKeys = ref<Set<string>>(new Set())
 const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
 const isFlushingStoredServerInstalls = ref(false)
+const { pause: pausePendingInstallPoll, resume: resumePendingInstallPoll } = useIntervalFn(
+	() => {
+		if (pendingServerContentInstalls.value.length === 0 || contentQuery.isFetching.value) return
+		void contentQuery.refetch()
+	},
+	5000,
+	{ immediate: false },
+)
 
 function syncPendingServerContentInstalls() {
 	pendingServerContentInstalls.value = readPendingServerContentInstalls(serverId, worldId.value)
@@ -260,6 +357,27 @@ function getAddonInstallKeys(addons: Archon.Content.v1.Addon[]) {
 		keys.add(getAddonInstallKey(addon))
 	}
 	return keys
+}
+
+function addonMatchesPendingInstall(
+	addon: Archon.Content.v1.Addon,
+	pendingInstall: PendingServerContentInstall,
+) {
+	return (
+		addon.project_id === pendingInstall.projectId ||
+		addon.version?.id === pendingInstall.versionId ||
+		(!!pendingInstall.fileName && addon.filename === pendingInstall.fileName)
+	)
+}
+
+function removeResolvedPendingServerContentInstalls(addons: Archon.Content.v1.Addon[]) {
+	if (addons.length === 0 || pendingServerContentInstalls.value.length === 0) return
+
+	for (const pendingInstall of pendingServerContentInstalls.value) {
+		if (addons.some((addon) => addonMatchesPendingInstall(addon, pendingInstall))) {
+			removePendingServerContentInstall(serverId, worldId.value, pendingInstall.projectId)
+		}
+	}
 }
 
 function syncContentInstallKeys(
@@ -373,17 +491,32 @@ const rawContentItems = computed<ContentItem[]>(() => {
 	const pendingInstallByProjectId = new Map(
 		pendingServerContentInstalls.value.map((item) => [item.projectId, item]),
 	)
+	const pendingInstallByVersionId = new Map(
+		pendingServerContentInstalls.value.map((item) => [item.versionId, item]),
+	)
+	const pendingInstallByFileName = new Map<string, PendingServerContentInstall>()
+	for (const item of pendingServerContentInstalls.value) {
+		if (item.fileName) {
+			pendingInstallByFileName.set(item.fileName, item)
+		}
+	}
 	const installingContentKeys = new Set([...pendingProjectIds, ...contentInstallAddedKeys.value])
-	const installedProjectIds = new Set(
-		addons.map((addon) => addon.project_id).filter((id): id is string => !!id),
+	const resolvedPendingProjectIds = new Set(
+		pendingServerContentInstalls.value
+			.filter((item) => addons.some((addon) => addonMatchesPendingInstall(addon, item)))
+			.map((item) => item.projectId),
 	)
 	const pendingItems = pendingServerContentInstalls.value
-		.filter((item) => !installedProjectIds.has(item.projectId))
+		.filter((item) => !resolvedPendingProjectIds.has(item.projectId))
 		.map(pendingInstallToContentItem)
 	const addonItems = addons.map((addon) => {
 		const contentItem = addonToContentItem(addon)
-		const installing = installingContentKeys.has(getAddonInstallKey(addon))
-		const pendingItem = addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null
+		const pendingItem =
+			(addon.project_id ? pendingInstallByProjectId.get(addon.project_id) : null) ??
+			(addon.version?.id ? pendingInstallByVersionId.get(addon.version.id) : null) ??
+			pendingInstallByFileName.get(addon.filename) ??
+			null
+		const installing = !!pendingItem || installingContentKeys.has(getAddonInstallKey(addon))
 
 		if (!installing || !pendingItem) {
 			return {
@@ -434,6 +567,10 @@ function getContentItemDisplayKey(item: ContentItem) {
 	return item.project?.id ?? item.file_name ?? item.id
 }
 
+function getContentItemId(item: ContentItem) {
+	return item.file_name ?? item.id
+}
+
 function mergeFragileContentItems(items: ContentItem[]) {
 	const nextItems = new Map(items.map((item) => [getContentItemDisplayKey(item), item]))
 	const mergedItems = displayedContentItems.value.map((item) => {
@@ -479,6 +616,26 @@ watch(
 )
 
 watch(
+	[() => contentQuery.data.value?.addons, pendingServerContentInstalls],
+	([addons]) => {
+		removeResolvedPendingServerContentInstalls(addons ?? [])
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(
+	() => pendingServerContentInstalls.value.length > 0,
+	(hasPendingInstalls) => {
+		if (hasPendingInstalls) {
+			resumePendingInstallPoll()
+		} else {
+			pausePendingInstallPoll()
+		}
+	},
+	{ immediate: true },
+)
+
+watch(
 	worldId,
 	() => {
 		syncPendingServerContentInstalls()
@@ -498,6 +655,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+	pausePendingInstallPoll()
 	window.removeEventListener(
 		pendingServerContentInstallsEvent,
 		handlePendingServerContentInstallsChanged,
@@ -571,12 +729,14 @@ const toggleMutation = useMutation({
 })
 
 async function handleToggleEnabled(item: ContentItem) {
+	if (setupActionDisabled.value) return
 	const addon = addonLookup.value.get(item.file_name)
 	if (!addon) return
 	await toggleMutation.mutateAsync({ addon })
 }
 
 async function handleDeleteItem(item: ContentItem) {
+	if (setupActionDisabled.value) return
 	const addon = addonLookup.value.get(item.file_name)
 	if (!addon) return
 	await deleteMutation.mutateAsync({ addon })
@@ -591,6 +751,7 @@ function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAdd
 }
 
 async function handleBulkDelete(items: ContentItem[]) {
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 	try {
@@ -606,6 +767,7 @@ async function handleBulkDelete(items: ContentItem[]) {
 }
 
 async function handleBulkEnable(items: ContentItem[]) {
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 	try {
@@ -621,6 +783,7 @@ async function handleBulkEnable(items: ContentItem[]) {
 }
 
 async function handleBulkDisable(items: ContentItem[]) {
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 	try {
@@ -643,6 +806,15 @@ const updatingProject = ref<ContentItem | null>(null)
 const updatingModpack = ref(false)
 const loadingChangelog = ref(false)
 
+watch(
+	() => modpackContentQuery.data.value?.addons,
+	(addons) => {
+		if (!isModpackContentModalOpen.value || !addons) return
+		modpackAddons.value = addons
+		modpackContentModal.value?.setItems(addons.map(addonToContentItem))
+	},
+)
+
 const updatingProjectId = computed(() => updatingProject.value?.project?.id ?? null)
 
 const projectVersionsQuery = useQuery({
@@ -659,9 +831,7 @@ const updatingProjectVersions = computed(() => {
 		? modpackVersionsQuery.data.value
 		: projectVersionsQuery.data.value
 	if (!source) return []
-	return [...source].sort(
-		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-	)
+	return sortVersionsByPublishedDate(source)
 })
 
 const loadingVersions = computed(() =>
@@ -674,10 +844,15 @@ const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isModpackUpdateDowngrade = ref(false)
 
-const currentGameVersion = computed(() => contentQuery.data.value?.game_version ?? '')
-const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
+const currentGameVersion = computed(
+	() => contentQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
+)
+const currentLoader = computed(
+	() => contentQuery.data.value?.modloader ?? server.value?.loader ?? '',
+)
 
 function handleBrowseContent() {
+	if (setupActionDisabled.value) return
 	const contentType = type.value
 	if (browseServerContent && ['mod', 'plugin', 'datapack'].includes(contentType)) {
 		browseServerContent({
@@ -695,6 +870,7 @@ function handleBrowseContent() {
 }
 
 function handleUploadFiles() {
+	if (setupActionDisabled.value) return
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.multiple = true
@@ -705,47 +881,17 @@ function handleUploadFiles() {
 		const wid = worldId.value
 		if (!wid) return
 
-		uploadState.value = {
-			isUploading: true,
-			currentFileName: null,
-			currentFileProgress: 0,
-			uploadedBytes: 0,
-			totalBytes: files.reduce((sum, f) => sum + f.size, 0),
-			completedFiles: 0,
-			totalFiles: files.length,
-		}
-
-		const handle = client.kyros.content_v1.uploadAddonFile(wid, files, {
-			onProgress: (p) => {
-				uploadState.value.currentFileProgress = p.progress
-				uploadState.value.uploadedBytes = p.loaded
-				uploadState.value.totalBytes = p.total
-			},
-		})
-		cancelUpload.value = () => handle.cancel()
-
 		try {
-			await handle.promise
-			uploadState.value.completedFiles = files.length
-			await contentQuery.refetch()
+			const result = await contentUploadSession.uploadFiles(
+				files.map((file) => ({ file, filename: file.name })),
+			)
+			if (result === 'completed') await contentQuery.refetch()
 		} catch (err) {
-			if (err instanceof Error && err.message === 'Upload cancelled') return
 			addNotification({
 				type: 'error',
 				title: formatMessage(messages.failedToUpload),
 				text: err instanceof Error ? err.message : undefined,
 			})
-		} finally {
-			cancelUpload.value = null
-			uploadState.value = {
-				isUploading: false,
-				currentFileName: null,
-				currentFileProgress: 0,
-				uploadedBytes: 0,
-				totalBytes: 0,
-				completedFiles: 0,
-				totalFiles: 0,
-			}
 		}
 	}
 	input.click()
@@ -787,15 +933,16 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 }
 
 async function handleViewModpackContent() {
+	isModpackContentModalOpen.value = true
 	modpackContentModal.value?.showLoading()
 	try {
-		const data = await client.archon.content_v1.getAddons(serverId, worldId.value!, {
-			from_modpack: true,
-		})
+		const { data } = await modpackContentQuery.refetch()
+		if (!data) throw new Error('Failed to load modpack content')
 		modpackAddons.value = data.addons ?? []
 		const items = (data.addons ?? []).map(addonToContentItem)
 		modpackContentModal.value?.show(items)
 	} catch (err) {
+		isModpackContentModalOpen.value = false
 		modpackContentModal.value?.hide()
 		addNotification({
 			type: 'error',
@@ -806,6 +953,7 @@ async function handleViewModpackContent() {
 }
 
 async function handleModpackContentToggle(item: ContentItem) {
+	if (setupActionDisabled.value) return
 	const addon = addonLookup.value.get(item.file_name)
 	if (!addon) return
 	modpackContentModal.value?.updateItem(item.file_name, { disabled: true })
@@ -813,6 +961,18 @@ async function handleModpackContentToggle(item: ContentItem) {
 		await toggleMutation.mutateAsync({ addon })
 		modpackAddons.value = modpackAddons.value.map((a) =>
 			a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
+		)
+		queryClient.setQueryData(
+			modpackContentQueryKey.value,
+			(oldData: Archon.Content.v1.Addons | undefined) =>
+				oldData
+					? {
+							...oldData,
+							addons: (oldData.addons ?? []).map((a) =>
+								a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
+							),
+						}
+					: oldData,
 		)
 		modpackContentModal.value?.updateItem(item.file_name, {
 			enabled: !item.enabled,
@@ -824,6 +984,7 @@ async function handleModpackContentToggle(item: ContentItem) {
 }
 
 async function handleModpackBulkToggle(items: ContentItem[], enable: boolean) {
+	if (setupActionDisabled.value) return
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
 
@@ -841,6 +1002,20 @@ async function handleModpackBulkToggle(items: ContentItem[], enable: boolean) {
 		} else {
 			await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
 		}
+		queryClient.setQueryData(
+			modpackContentQueryKey.value,
+			(oldData: Archon.Content.v1.Addons | undefined) =>
+				oldData
+					? {
+							...oldData,
+							addons: (oldData.addons ?? []).map((addon) =>
+								items.some((item) => item.file_name === addon.filename)
+									? { ...addon, disabled: !enable }
+									: addon,
+							),
+						}
+					: oldData,
+		)
 		await queryClient.invalidateQueries({ queryKey: queryKey.value })
 	} catch (err) {
 		for (const item of items) {
@@ -862,6 +1037,7 @@ function handleModpackUnlink() {
 }
 
 async function handleModpackUnlinkConfirm() {
+	if (setupActionDisabled.value) return
 	try {
 		await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
 		await contentQuery.refetch()
@@ -875,6 +1051,7 @@ async function handleModpackUnlinkConfirm() {
 }
 
 async function handleBulkUpdate(items: ContentItem[]) {
+	if (setupActionDisabled.value) return
 	const addons = items
 		.filter((item) => item.has_update)
 		.map((item) => ({
@@ -895,7 +1072,7 @@ async function handleBulkUpdate(items: ContentItem[]) {
 }
 
 async function handleUpdateItem(id: string) {
-	const item = contentItems.value.find((i) => i.id === id)
+	const item = contentItems.value.find((i) => getContentItemId(i) === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	updatingModpack.value = false
@@ -929,7 +1106,9 @@ async function handleModpackUpdate() {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(mp.has_update ?? undefined)
+	contentUpdaterModal.value?.show(
+		newestModpackUpdateVersion.value?.id ?? mp.has_update ?? undefined,
+	)
 }
 
 function spliceVersionInCache(fullVersion: Labrinth.Versions.v2.Version) {
@@ -972,18 +1151,23 @@ function resetUpdateState() {
 }
 
 function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?: MouseEvent) {
+	if (setupActionDisabled.value) return
 	if (updatingModpack.value) {
-		if (event?.shiftKey) {
-			pendingModpackUpdateVersion.value = selectedVersion
+		pendingModpackUpdateVersion.value = selectedVersion
+
+		const mpSpec = contentQuery.data.value?.modpack?.spec
+		const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
+		const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+		isModpackUpdateDowngrade.value = currentVersion
+			? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
+			: false
+		const shouldShowWarning =
+			isModpackUpdateDowngrade.value ||
+			versionChangesGameVersion(selectedVersion, currentGameVersion.value)
+
+		if (event?.shiftKey || !shouldShowWarning) {
 			handleModpackUpdateConfirm()
 		} else {
-			const mpSpec = contentQuery.data.value?.modpack?.spec
-			const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
-			const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
-			isModpackUpdateDowngrade.value = currentVersion
-				? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
-				: false
-			pendingModpackUpdateVersion.value = selectedVersion
 			modpackUpdateModal.value?.show()
 		}
 		return
@@ -1005,6 +1189,7 @@ function setAddonInstalling(filename: string, installing: boolean) {
 }
 
 async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+	if (setupActionDisabled.value) return
 	const item = updatingProject.value
 	if (item) {
 		setAddonInstalling(item.file_name, true)
@@ -1047,7 +1232,9 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 }
 
 function handleModpackUpdateConfirm() {
+	if (setupActionDisabled.value) return
 	if (pendingModpackUpdateVersion.value) {
+		contentUpdaterModal.value?.hide()
 		performUpdate(pendingModpackUpdateVersion.value)
 		pendingModpackUpdateVersion.value = null
 	}
@@ -1081,32 +1268,10 @@ provideContentManager({
 	error: computed(() => contentQuery.error.value ?? null),
 	modpack,
 	isPackLocked: ref(false),
-	isBusy: computed(() => busyReasons.value.length > 0),
-	busyMessage: computed(() => {
-		const bannerCoversInstalling =
-			server.value?.status === 'installing' ||
-			isSyncingContent.value ||
-			busyReasons.value.some(
-				(r) =>
-					r.reason.id === 'servers.busy.installing' ||
-					r.reason.id === 'servers.busy.syncing-content',
-			)
-		const filteredReasons = busyReasons.value.filter((r) => {
-			if (
-				bannerCoversInstalling &&
-				(r.reason.id === 'servers.busy.installing' ||
-					r.reason.id === 'servers.busy.syncing-content')
-			)
-				return false
-			if (
-				r.reason.id === 'servers.busy.backup-creating' ||
-				r.reason.id === 'servers.busy.backup-restoring'
-			)
-				return false
-			return true
-		})
-		return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
-	}),
+	isBusy: setupActionDisabled,
+	busyMessage: setupActionBusyMessage,
+	disableAddContent: computed(() => !canSetup.value),
+	disableAddContentTooltip: permissionDeniedMessage.value,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	deleteItem: handleDeleteItem,
@@ -1128,13 +1293,14 @@ provideContentManager({
 	openSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
+	getItemId: getContentItemId,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		const addon = addonLookup.value.get(item.file_name)
 		const hasModrinthProject = !!addon?.project_id || (!!item.installing && !!item.project?.id)
 		const projectSlugOrId = item.project.slug ?? item.project.id
 		return {
-			id: item.id,
+			id: getContentItemId(item),
 			project: item.project,
 			projectLink: hasModrinthProject ? `/${projectType}/${projectSlugOrId}` : undefined,
 			version: item.version,
@@ -1156,15 +1322,24 @@ provideContentManager({
 	<ReadyTransition :pending="contentReadyPending">
 		<ContentPageLayout :bottom-padding="false">
 			<template #modals>
-				<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
+				<ConfirmUnlinkModal
+					ref="modpackUnlinkModal"
+					server
+					:action-disabled="setupActionDisabled"
+					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
+					@unlink="handleModpackUnlinkConfirm"
+				/>
 				<ModpackContentModal
 					ref="modpackContentModal"
 					:modpack-name="modpack?.project.title"
 					:modpack-icon-url="modpack?.project.icon_url"
 					enable-toggle
+					:action-disabled="setupActionDisabled"
+					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="handleModpackBulkToggle($event, true)"
 					@bulk:disable="handleModpackBulkToggle($event, false)"
+					@hide="isModpackContentModalOpen = false"
 				/>
 				<ContentUpdaterModal
 					v-if="updatingProject || updatingModpack"
@@ -1191,6 +1366,8 @@ provideContentManager({
 					"
 					:loading="loadingVersions"
 					:loading-changelog="loadingChangelog"
+					:action-disabled="setupActionDisabled"
+					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
 					@update="handleModalUpdate"
 					@cancel="resetUpdateState"
 					@version-select="handleVersionSelect"
@@ -1208,6 +1385,8 @@ provideContentManager({
 				.join(' ')
 		"
 		server
+		:action-disabled="setupActionDisabled"
+		:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
 	/>

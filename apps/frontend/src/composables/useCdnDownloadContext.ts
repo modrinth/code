@@ -17,7 +17,6 @@ export type FilterSelection = {
 const cookieDefaults = {
 	maxAge: TEN_MINUTES,
 	sameSite: 'lax' as const,
-	secure: true,
 	path: '/',
 	httpOnly: false,
 }
@@ -52,18 +51,28 @@ function newFilterSelection(
 }
 
 export function useCdnDownloadContext() {
-	const filterGameVersionCookie = useCookie<string | null>('mr_download_filter_game_version', {
+	const config = useRuntimeConfig()
+	const cookieOptions = {
 		...cookieDefaults,
+		secure: config.public.cookieSecure,
+	}
+
+	const filterGameVersionCookie = useCookie<string | null>('mr_download_filter_game_version', {
+		...cookieOptions,
 		default: () => null,
 	})
 
 	const filterLoaderCookie = useCookie<string | null>('mr_download_filter_loader', {
-		...cookieDefaults,
+		...cookieOptions,
 		default: () => null,
 	})
 
 	function createProjectDownloadUrl(originalUrl: string, context?: DownloadContext): string {
-		if (!originalUrl.startsWith('https://cdn.modrinth.com')) {
+		if (
+			typeof originalUrl !== 'string' ||
+			!originalUrl ||
+			!originalUrl.startsWith('https://cdn.modrinth.com')
+		) {
 			return originalUrl
 		}
 

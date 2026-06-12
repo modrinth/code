@@ -3,13 +3,12 @@
 //! ## Data Flow
 //!
 //! 1. Frontend calls `get_content_items(profile_path)`
-//! 2. Backend fetches all installed files via `Profile::get_projects()`
-//! 3. If profile is linked to a modpack:
+//! 2. If profile is linked to a modpack:
 //!    - Fetch modpack file hashes from cache (populated during installation)
 //!    - Fallback: re-download .mrpack if cache miss (cleared/expired)
-//!    - Filter out files that belong to the modpack
-//! 4. For remaining files, fetch project/version/owner metadata in parallel
-//! 5. Return sorted `ContentItem` list
+//!    - Filter out files that belong to the modpack before update lookup
+//! 3. For remaining files, fetch project/version/owner metadata in parallel
+//! 4. Return sorted `ContentItem` list
 //!
 //! ## Caching
 //!
@@ -20,7 +19,7 @@
 
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::profiles::{Profile, ProfileFile, ProjectType};
-use crate::state::{CacheBehaviour, CachedEntry};
+use crate::state::{CacheBehaviour, CachedEntry, ReleaseChannel};
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
 };
@@ -34,12 +33,12 @@ use std::io::Cursor;
 /// Content item with rich metadata for frontend display
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ContentItem {
-    /// Unique identifier (the file name)
+    /// Display file name.
     pub file_name: String,
     /// Relative path to the file within the profile
     pub file_path: String,
-    /// Stable frontend identifier (SHA1 hash of file content, survives renames).
-    /// Not a project or version ID.
+    /// SHA1 hash of file content. Stable across renames, but not unique when
+    /// duplicate files have identical contents.
     pub id: String,
     /// File size in bytes
     pub size: u64,
@@ -228,10 +227,10 @@ pub async fn get_linked_modpack_info(
 
     // Check for updates
     let (has_update, update_version_id, update_version) = check_modpack_update(
-        profile,
         &linked_data.version_id,
         &version,
         all_versions,
+        profile.preferred_update_channel,
     );
 
     Ok(Some(LinkedModpackInfo {
@@ -244,56 +243,48 @@ pub async fn get_linked_modpack_info(
     }))
 }
 
-/// Check if a newer compatible version exists for the linked modpack.
+/// Check if a newer version exists for the linked modpack.
 /// Returns (has_update, update_version_id, update_version).
 fn check_modpack_update(
-    profile: &Profile,
     installed_version_id: &str,
     installed_version: &Version,
     all_versions: Option<Vec<Version>>,
+    preferred_update_channel: ReleaseChannel,
 ) -> (bool, Option<String>, Option<Version>) {
     let Some(versions) = all_versions else {
         return (false, None, None);
     };
 
-    // Get the loader as a string for comparison
-    let loader_str = profile.loader.as_str().to_lowercase();
-    let game_version = &profile.game_version;
+    let installed_channel =
+        ReleaseChannel::from_version_type(&installed_version.version_type);
+    let effective_channel =
+        preferred_update_channel.least_stable(installed_channel);
 
-    // Filter to compatible versions
-    let mut compatible_versions: Vec<&Version> = versions
-        .iter()
-        .filter(|v| {
-            // Must support the profile's game version
-            let supports_game = v.game_versions.contains(game_version);
-
-            // Must support the profile's loader
-            // The v2 API replaces "mrpack" with actual loaders from mrpack_loaders,
-            // but if mrpack_loaders is missing, loaders may be just ["mrpack"].
-            // In that case we can't filter by loader, so accept the version.
-            let real_loaders: Vec<_> = v
-                .loaders
-                .iter()
-                .filter(|l| l.to_lowercase() != "mrpack")
-                .collect();
-            let supports_loader = real_loaders.is_empty()
-                || real_loaders.iter().any(|l| l.to_lowercase() == loader_str);
-
-            supports_game && supports_loader
-        })
-        .collect();
-
-    // Sort by date_published descending (newest first)
-    compatible_versions.sort_by_key(|b| Reverse(b.date_published));
-
-    // Find the newest compatible version
-    if let Some(newest) = compatible_versions.first() {
-        // Check if the newest version is different and newer than installed
-        if newest.id != installed_version_id
-            && newest.date_published > installed_version.date_published
+    for version_types in effective_channel.version_type_fallbacks() {
+        if !versions
+            .iter()
+            .any(|v| version_types.contains(&v.version_type.as_str()))
         {
+            continue;
+        }
+
+        let mut newer_versions: Vec<&Version> = versions
+            .iter()
+            .filter(|v| {
+                v.id != installed_version_id
+                    && v.date_published > installed_version.date_published
+                    && version_types.contains(&v.version_type.as_str())
+            })
+            .collect();
+
+        // Sort by date_published descending (newest first)
+        newer_versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+
+        if let Some(newest) = newer_versions.first() {
             return (true, Some(newest.id.clone()), Some((*newest).clone()));
         }
+
+        return (false, None, None);
     }
 
     (false, None, None)
@@ -307,10 +298,6 @@ pub async fn get_content_items(
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<Vec<ContentItem>> {
-    let all_files = profile
-        .get_projects(cache_behaviour, pool, fetch_semaphore)
-        .await?;
-
     let modpack_ids = if let Some(ref linked_data) = profile.linked_data {
         if linked_data.version_id.is_empty() {
             None
@@ -351,23 +338,35 @@ pub async fn get_content_items(
         None
     };
 
-    let user_files: Vec<(String, ProfileFile)> = all_files
-        .into_iter()
-        .filter(|(_, file)| {
-            modpack_ids
-                .as_ref()
-                .is_none_or(|ids| !ids.is_modpack_file(file))
-        })
-        .collect();
+    let user_files: Vec<(String, ProfileFile)> = if let Some(ids) = &modpack_ids
+    {
+        let filtered_files = profile
+            .get_projects_excluding_modpack_files(
+                &ids.hashes,
+                &ids.project_ids,
+                cache_behaviour,
+                pool,
+                fetch_semaphore,
+            )
+            .await?;
+        filtered_files.into_iter().collect()
+    } else {
+        let all_files = profile
+            .get_projects(cache_behaviour, pool, fetch_semaphore)
+            .await?;
+        all_files.into_iter().collect()
+    };
 
-    profile_files_to_content_items(
+    let content_items = profile_files_to_content_items(
         &profile.path,
         &user_files,
         cache_behaviour,
         pool,
         fetch_semaphore,
     )
-    .await
+    .await?;
+
+    Ok(content_items)
 }
 
 /// Pre-fetched metadata for projects, versions, teams, and organizations.
@@ -890,6 +889,7 @@ async fn get_modpack_identifiers(
         reason: DownloadReason::Modpack,
         game_version: profile.game_version.clone(),
         loader: profile.loader.as_str().to_string(),
+        dependent_on: Some(version_id.to_string()),
     };
 
     let mrpack_bytes = fetch_mirrors(

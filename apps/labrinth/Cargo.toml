@@ -45,7 +45,6 @@ deadpool-redis.workspace = true
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
-elasticsearch = { workspace = true, features = ["experimental-apis"] }
 eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }

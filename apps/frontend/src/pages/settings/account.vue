@@ -173,7 +173,13 @@
 		<NewModal
 			ref="manageTwoFactorModal"
 			width="500px"
-			:header="`${auth.user.has_totp && twoFactorStep === 0 ? formatMessage(messages.twoFactorRemoveButton) : formatMessage(messages.twoFactorSetupButton)}`"
+			:header="
+				formatMessage(
+					auth.user.has_totp && twoFactorStep === 0
+						? messages.twoFactorRemoveModalHeader
+						: messages.twoFactorSetupModalHeader,
+				)
+			"
 		>
 			<div class="flex flex-col gap-6">
 				<template v-if="auth.user.has_totp && twoFactorStep === 0">
@@ -674,6 +680,10 @@ const messages = defineMessages({
 		id: 'settings.account.security.two-factor.action.setup',
 		defaultMessage: 'Setup 2FA',
 	},
+	twoFactorSetupModalHeader: {
+		id: 'settings.account.security.two-factor.modal.setup.header',
+		defaultMessage: 'Setup 2FA',
+	},
 	twoFactorEnterCodeLabel: {
 		id: 'settings.account.two-factor.field.code.label',
 		defaultMessage: 'Enter two-factor code',
@@ -692,6 +702,10 @@ const messages = defineMessages({
 	},
 	twoFactorRemoveButton: {
 		id: 'settings.account.security.two-factor.action.remove',
+		defaultMessage: 'Remove 2FA',
+	},
+	twoFactorRemoveModalHeader: {
+		id: 'settings.account.security.two-factor.modal.remove.header',
 		defaultMessage: 'Remove 2FA',
 	},
 	twoFactorSetupIntro: {

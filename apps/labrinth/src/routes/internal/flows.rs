@@ -34,13 +34,18 @@ use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use ariadne::ids::random_base62_rng;
 use base64::Engine;
+use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use chrono::{Duration, Utc};
 use eyre::eyre;
+use hmac::{Hmac, Mac};
 use lettre::message::Mailbox;
+use rand::Rng;
+use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
+use sha2::Sha256;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -76,6 +81,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
             .service(verify_email)
             .service(subscribe_newsletter)
             .service(get_newsletter_subscription_status)
+            .service(discord_community_link)
             .service(register_passkey_start)
             .service(register_passkey_finish)
             .service(authenticate_passkey_start)
@@ -242,6 +248,7 @@ impl TempUser {
             created: Utc::now(),
             role: Role::Developer.to_string(),
             badges: Badges::default(),
+            campaign_pride_26: None,
             allow_friend_requests: true,
             is_subscribed_to_newsletter: sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
@@ -1116,7 +1123,14 @@ pub async fn init(
     }
 
     let user_id = if let Some(token) = info.token {
-        let (_, user) = get_user_record_from_bearer_token(
+        // Linking a new auth provider changes how the account can be accessed,
+        // so only first-party session tokens may authorize this flow. OAuth and
+        // PAT tokens can be delegated or stored outside an interactive login.
+        if !token.starts_with("mra_") {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
+
+        let (scopes, user) = get_user_record_from_bearer_token(
             &req,
             Some(&token),
             &**client,
@@ -1126,6 +1140,10 @@ pub async fn init(
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+        if !scopes.contains(Scopes::USER_AUTH_WRITE) {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
 
         Some(user.id)
     } else {
@@ -1490,6 +1508,97 @@ pub struct DeleteAuthProvider {
     pub provider: AuthProvider,
 }
 
+type HmacSha256 = Hmac<Sha256>;
+
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct DiscordCommunityLinkResponse {
+    pub url: String,
+}
+
+#[derive(Serialize)]
+struct DiscordCommunityHandoffPayload {
+    v: u8,
+    modrinth_user_id: String,
+    discord_user_id: String,
+    iat: i64,
+    exp: i64,
+    nonce: String,
+}
+
+#[utoipa::path(
+    operation_id = "discordCommunityLink",
+    responses(
+        (status = 200, description = "Discord community bot handoff URL", body = DiscordCommunityLinkResponse),
+        (status = 400, description = "Discord provider not linked"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["SESSION_ACCESS"]))
+)]
+#[post("/discord-community-link")]
+pub async fn discord_community_link(
+    req: HttpRequest,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+) -> Result<web::Json<DiscordCommunityLinkResponse>, ApiError> {
+    if ENV.DISCORD_COMMUNITY_LINK_SECRET.is_empty()
+        || ENV.DISCORD_COMMUNITY_BOT_HANDOFF_URL.is_empty()
+    {
+        return Err(ApiError::Internal(eyre!(
+            "discord community linking is not configured"
+        )));
+    }
+
+    let db_user = get_full_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await?
+    .1;
+
+    let Some(discord_id) = db_user.discord_id else {
+        return Err(ApiError::Request(eyre!("discord account is not linked")));
+    };
+
+    let now = Utc::now().timestamp();
+    let nonce = ChaCha20Rng::from_entropy()
+        .sample_iter(&Alphanumeric)
+        .take(32)
+        .map(char::from)
+        .collect::<String>();
+
+    let payload = DiscordCommunityHandoffPayload {
+        v: 1,
+        modrinth_user_id: ariadne::ids::UserId::from(db_user.id).to_string(),
+        discord_user_id: discord_id.to_string(),
+        iat: now,
+        exp: now + 600,
+        nonce,
+    };
+
+    let payload_json = serde_json::to_vec(&payload).wrap_internal_err(
+        "failed to serialize discord community handoff payload",
+    )?;
+    let payload_b64 = URL_SAFE_NO_PAD.encode(payload_json);
+
+    let mut mac = HmacSha256::new_from_slice(
+        ENV.DISCORD_COMMUNITY_LINK_SECRET.as_bytes(),
+    )
+    .wrap_internal_err("failed to initialize discord community link hmac")?;
+    mac.update(payload_b64.as_bytes());
+    let sig = URL_SAFE_NO_PAD.encode(mac.finalize().into_bytes());
+
+    let url = format!(
+        "{}?payload={}&sig={}",
+        ENV.DISCORD_COMMUNITY_BOT_HANDOFF_URL, payload_b64, sig,
+    );
+
+    Ok(web::Json(DiscordCommunityLinkResponse { url }))
+}
+
 #[utoipa::path(
     delete,
     operation_id = "deleteAuthProvider",
@@ -1774,6 +1883,7 @@ impl ReadyAccountRegisterFlow {
             created: Utc::now(),
             role: Role::Developer.to_string(),
             badges: Badges::default(),
+            campaign_pride_26: None,
             allow_friend_requests: true,
             is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),

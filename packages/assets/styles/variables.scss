@@ -199,8 +199,8 @@ html {
 	--radius-xl: 1.25rem;
 	--radius-max: 999999999px;
 
-	--color-tooltip-text: var(--dark-color-contrast);
-	--color-tooltip-bg: #000;
+	--color-tooltip-text: var(--color-contrast);
+	--color-tooltip-bg: var(--surface-3);
 
 	--color-ad: rgba(125, 75, 162, 0.2);
 	--color-ad-raised: rgba(190, 140, 243, 0.5);

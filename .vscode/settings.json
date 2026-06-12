@@ -1,7 +1,12 @@
 {
 	"prettier.endOfLine": "lf",
 	"editor.formatOnSave": true,
-	"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+	"eslint.validate": [
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact"
+	],
 	"editor.detectIndentation": false,
 	"editor.insertSpaces": false,
 	"files.eol": "\n",
@@ -9,7 +14,7 @@
 	"files.insertFinalNewline": true,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
-		"source.organizeImports": "always"
+		"source.organizeImports": "never"
 	},
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"[vue]": {
@@ -31,5 +36,15 @@
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
 	"css.lint.unknownAtRules": "ignore",
-	"scss.lint.unknownAtRules": "ignore"
+	"scss.lint.unknownAtRules": "ignore",
+	"i18n-ally.localesPaths": [
+		"packages/ui/src/locales",
+		"apps/frontend/src/locales",
+		"packages/moderation/src/locales"
+	],
+	"i18n-ally.pathMatcher": "{locale}/index.{ext}",
+	"i18n-ally.keystyle": "flat",
+	"i18n-ally.sourceLanguage": "en-US",
+	"i18n-ally.namespace": false,
+	"i18n-ally.includeSubfolders": true
 }

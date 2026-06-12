@@ -7,6 +7,7 @@ import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-ro
 import { defineMessage, useVIntl } from '../composables/i18n'
 import {
 	DEFAULT_MOD_LOADERS,
+	DEFAULT_PLUGIN_LOADERS,
 	DEFAULT_SHADER_LOADERS,
 	formatCategory,
 	formatCategoryHeader,
@@ -311,7 +312,8 @@ export function useSearch(
 					}),
 				),
 				supported_project_types: ['plugin'],
-				display: 'all',
+				display: 'expandable',
+				default_values: DEFAULT_PLUGIN_LOADERS,
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,

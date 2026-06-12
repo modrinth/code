@@ -1,0 +1,17 @@
+html {
+	min-height: 100%;
+	overflow: auto;
+}
+
+body {
+	position: static !important;
+	width: auto !important;
+	min-height: 100vh;
+	height: auto !important;
+	overflow: auto !important;
+}
+
+#storybook-root {
+	min-height: 100vh;
+	height: auto;
+}

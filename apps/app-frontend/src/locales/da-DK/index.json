@@ -35,6 +35,9 @@
   "app.action-bar.view-logs": {
     "message": "Vis logs"
   },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Aktiverer avanceret gengivelse som sløringseffekter, der kan forårsage ydelsesproblemer uden hardwareaccelereret gengivelse."
+  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Avanceret rendering"
   },
@@ -77,6 +80,18 @@
   "app.appearance-settings.select-option": {
     "message": "Vælg en mulighed"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Vis hvor meget tid du har brugt på at spille en instance."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Vis tid spillet"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Aktivere muligheden for at slå sidepanelet til og fra."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Slå sidepanel til og fra"
+  },
   "app.appearance-settings.unknown-pack-warning.description": {
     "message": "Hvis du prøver at installere en Modrinth Pack fil (.mrpack) som ikke er hosted på Modrinth, så skal vi nok sikre os du forstår riskoen før du installere den."
   },
@@ -89,6 +104,15 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "Tilføjet server til instance"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Tilføj til en instance"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Tilføj til instance"
+  },
   "app.browse.add-to-instance-name": {
     "message": "Tilføjet til {instanceName}"
   },
@@ -98,11 +122,32 @@
   "app.browse.already-added": {
     "message": "Allerede tilføjet"
   },
+  "app.browse.back-to-instance": {
+    "message": "Tilbage til instance"
+  },
   "app.browse.discover-content": {
     "message": "Opdag indhold"
   },
   "app.browse.discover-servers": {
     "message": "Opdag servere"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Gem allerede tilføjet til servere"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Ved at tilføje indhold kan der opstå kompatibilitetsproblemer, når du tilslutter dig serveren. Alt tilføjet indhold går desuden tabt, når du opdaterer indholdet på din server instance."
+  },
+  "app.browse.server.installing": {
+    "message": "Installere"
+  },
+  "app.creation-modal.installing-modpack.description": {
+    "message": "{fileName}"
+  },
+  "app.creation-modal.installing-modpack.title": {
+    "message": "Installere modpack..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
@@ -113,11 +158,17 @@
   "app.export-modal.header": {
     "message": "Eksporter modpack"
   },
+  "app.export-modal.include-file-accessibility-label": {
+    "message": "Inkludere \"{file}\"?"
+  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpack Navn"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack navn"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Konfigurer hvilke filer inkludere i denne eksport"
   },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
@@ -143,6 +194,12 @@
   "app.instance.modpack-already-installed.create": {
     "message": "Opret"
   },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack allerede installeret"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instance"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
@@ -160,6 +217,42 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uploadet"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Tilføj server"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Søg servere"
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Er du sikker på din vil slette denne verden permanent?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Moddet"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Tilføj en server, eller søg efter en for at komme i gang"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Ingen servere eller verdener tilføjet"
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Er du sikker på din vil fjerne {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Søg {count} verdener..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "denne server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Indhold krævet"
@@ -197,6 +290,15 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "En opdatering er krævet for at spille {name}. Venligst opdater til den seneste version for at køre spillet."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Dette projekt er allerede installeret"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Tilbage til udforsk"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Installer indhold til instance"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Udvikler-tilstand aktiveret."
   },
@@ -221,8 +323,137 @@
   "app.settings.tabs.resource-management": {
     "message": "Ressourcestyring"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} er klar til at blive installeret! Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
+  "app.skins.add-button": {
+    "message": "Tilføj skin"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Træk og slip"
+  },
+  "app.skins.apply-button": {
+    "message": "Brug"
+  },
+  "app.skins.delete-button": {
+    "message": "Slet skin"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Dette vil permanent slette det valgte skin. Dette vil ikke kunne blive fortydes."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Er du sikker på, at du vil slette dette skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Fejl ved læsning af den afleverede fil."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Fejl under behandling af fil"
+  },
+  "app.skins.edit-button": {
+    "message": "Rediger skin"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Tilføj skin"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Tilføjer et skin"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Slank"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Bred"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Kappe"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Kappe"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Rediger skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Rediger skinnet først!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Ingen kappe"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Ingen"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Gem skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Gemmer..."
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Upload et skin først!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Rediger skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Forhåndsvisning"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Du skifter dit skin for ofte. Mojang's servere har midlertidigt blokeret fremtidige anmodninger. Vent venligst et øjeblik for du prøver igen."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Ro på!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Standard skins"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Du modtog disse skins for at donere til en Modrinth Pride indsamling imens der er Pride Month."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Gemte skins"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Log Ind"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Venligst log ind til din Minecraft konto for at kunne funktionerne til at administrere dit skin i Modrinth appen."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Overrasket Modrinth Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Venligst log ind"
+  },
+  "app.skins.title": {
+    "message": "Skin vælger"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
@@ -254,14 +485,23 @@
   "app.update.complete-toast.title": {
     "message": "Version {version} var installeret med succes!"
   },
-  "app.update.download-update": {
-    "message": "Download opdatering"
+  "app.world.server-modal.placeholder-address": {
+    "message": "eksemple.modrinth.gg"
   },
-  "app.update.downloading-update": {
-    "message": "Downloader opdatering ({percent}%)"
+  "app.world.server-modal.select-an-option": {
+    "message": "Vælg en mulighed"
   },
-  "app.update.reload-to-update": {
-    "message": "Genindlæs for at installere opdatering"
+  "app.world.world-item.incompatible-version": {
+    "message": "Ikke kompatibel version {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ikke spillet endnu"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Tilføj en ven"
@@ -361,6 +601,12 @@
   },
   "instance.edit-world.title": {
     "message": "Rediger verden"
+  },
+  "instance.files.adding-files": {
+    "message": "Tilføjer filer ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Gem som..."
   },
   "instance.server-modal.address": {
     "message": "Adresse"
@@ -476,6 +722,9 @@
   "instance.settings.tabs.java": {
     "message": "Java og hukommelse"
   },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Indskriv Java argumenter..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Omgivelses variabler"
   },
@@ -490,6 +739,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Allokeret hukommelse"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/vej/til/java"
   },
   "instance.settings.tabs.window": {
     "message": "Vindue"
@@ -563,6 +815,24 @@
   "instance.worlds.world_in_use": {
     "message": "Verden er i brug"
   },
+  "minecraft-account.add-account": {
+    "message": "Tilføj konto"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft konto"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Ikke logged ind"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Fjern konto"
+  },
+  "minecraft-account.select-account": {
+    "message": "Vælg konto"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Log ind på Minecraft"
+  },
   "search.filter.locked.instance": {
     "message": "Givet af instanceen"
   },
@@ -586,5 +856,20 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader er givet af serveren"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "En fil behandles kun, hvis den uploades til Modrinth, uanset filformat (herunder .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Vis ikke denne advarsel igen"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Bekræft installation"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Installer alligevel"
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Ukendt fil advarsel"
   }
 }

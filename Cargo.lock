@@ -3144,29 +3144,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "elasticsearch"
-version = "9.1.0-alpha.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12bb303aa6e1d28c0c86b6fbfe484fd0fd3f512629aeed1ac4f6b85f81d9834a"
-dependencies = [
- "base64 0.22.1",
- "bytes",
- "dyn-clone",
- "flate2",
- "lazy_static",
- "parking_lot",
- "percent-encoding",
- "reqwest 0.12.24",
- "rustc_version",
- "serde",
- "serde_json",
- "serde_with",
- "tokio",
- "url",
- "void",
-]
-
-[[package]]
 name = "elliptic-curve"
 version = "0.13.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4944,7 +4921,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4b0f83760fb341a774ed326568e19f5a863af4a952def8c39f9ab92fd95b88e5"
 dependencies = [
  "equivalent",
- "hashbrown 0.16.0",
+ "hashbrown 0.15.5",
  "serde",
  "serde_core",
 ]
@@ -5379,7 +5356,6 @@ dependencies = [
  "dotenv-build",
  "dotenvy",
  "either",
- "elasticsearch",
  "eyre",
  "futures",
  "futures-util",
@@ -8332,15 +8308,20 @@ dependencies = [
  "http-body 1.0.1",
  "http-body-util",
  "hyper 1.7.0",
+ "hyper-rustls 0.27.7",
  "hyper-util",
  "js-sys",
  "log",
  "percent-encoding",
  "pin-project-lite",
+ "rustls 0.23.32",
+ "rustls-pki-types",
+ "rustls-platform-verifier",
  "serde",
  "serde_json",
  "sync_wrapper",
  "tokio",
+ "tokio-rustls 0.26.4",
  "tokio-util",
  "tower",
  "tower-http",
@@ -8690,6 +8671,33 @@ dependencies = [
  "web-time",
  "zeroize",
 ]
+
+[[package]]
+name = "rustls-platform-verifier"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d99feebc72bae7ab76ba994bb5e121b8d83d910ca40b36e0921f53becc41784"
+dependencies = [
+ "core-foundation 0.10.1",
+ "core-foundation-sys",
+ "jni",
+ "log",
+ "once_cell",
+ "rustls 0.23.32",
+ "rustls-native-certs 0.8.1",
+ "rustls-platform-verifier-android",
+ "rustls-webpki 0.103.7",
+ "security-framework 3.5.1",
+ "security-framework-sys",
+ "webpki-root-certs",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "rustls-platform-verifier-android"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f87165f0995f63a9fbeea62b64d10b4d9d8e78ec6d7d51fb2125fda7bb36788f"
 
 [[package]]
 name = "rustls-webpki"
@@ -10455,9 +10463,8 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-updater"
-version = "2.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27cbc31740f4d507712550694749572ec0e43bdd66992db7599b89fbfd6b167b"
+version = "2.10.1"
+source = "git+https://github.com/modrinth/plugins-workspace?rev=0d30f2aa28ec668ce187d527da1c475da3c01cbc#0d30f2aa28ec668ce187d527da1c475da3c01cbc"
 dependencies = [
  "base64 0.22.1",
  "dirs",
@@ -10469,7 +10476,8 @@ dependencies = [
  "minisign-verify",
  "osakit",
  "percent-encoding",
- "reqwest 0.12.24",
+ "reqwest 0.13.2",
+ "rustls 0.23.32",
  "semver",
  "serde",
  "serde_json",
@@ -10705,6 +10713,7 @@ dependencies = [
  "flate2",
  "fs4",
  "futures",
+ "futures-lite 2.6.1",
  "heck 0.5.0",
  "hickory-resolver 0.25.2",
  "indicatif",
@@ -10756,6 +10765,8 @@ version = "1.0.0-local"
 dependencies = [
  "async_zip",
  "chrono",
+ "core-foundation 0.10.1",
+ "core-graphics",
  "daedalus",
  "dashmap",
  "either",
@@ -10763,6 +10774,7 @@ dependencies = [
  "hyper 1.7.0",
  "hyper-util",
  "native-dialog",
+ "objc2-app-kit",
  "paste",
  "path-util",
  "serde",
@@ -10788,6 +10800,7 @@ dependencies = [
  "urlencoding",
  "uuid 1.23.3",
  "webview2-com",
+ "windows",
  "windows-core 0.61.2",
 ]
 
@@ -12252,6 +12265,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c071456adef4aca59bf6a583c46b90ff5eb0b4f758fc347cea81290288f37ce1"
 dependencies = [
  "libwebp-sys",
+]
+
+[[package]]
+name = "webpki-root-certs"
+version = "1.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f31141ce3fc3e300ae89b78c0dd67f9708061d1d2eda54b8209346fd6be9a92c"
+dependencies = [
+ "rustls-pki-types",
 ]
 
 [[package]]

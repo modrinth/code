@@ -147,9 +147,16 @@ export async function get_mod_full_path(path: string, projectPath: string): Prom
 	return await invoke('plugin:profile|profile_get_mod_full_path', { path, projectPath })
 }
 
+export interface JavaVersion {
+	parsed_version: number
+	version: string
+	architecture: string
+	path: string
+}
+
 // Get optimal java version from profile
 // Returns a java version
-export async function get_optimal_jre_key(path: string): Promise<string | null> {
+export async function get_optimal_jre_key(path: string): Promise<JavaVersion | null> {
 	return await invoke('plugin:profile|profile_get_optimal_jre_key', { path })
 }
 
@@ -190,11 +197,13 @@ export async function add_project_from_version(
 	path: string,
 	versionId: string,
 	reason: DownloadReason,
+	dependentOnVersionId?: string,
 ): Promise<string> {
 	return await invoke('plugin:profile|profile_add_project_from_version', {
 		path,
 		versionId,
 		reason,
+		dependentOnVersionId,
 	})
 }
 

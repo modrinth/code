@@ -104,6 +104,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
   },
+  "app.browse.add-servers-to-instance": {
+    "message": "Idinaragdag ang server sa instansiya"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Idagdag sa instansiya"
+  },
   "app.browse.add-to-instance": {
     "message": "Idagdag sa instansiya"
   },
@@ -116,6 +122,9 @@
   "app.browse.already-added": {
     "message": "Nadagdag na"
   },
+  "app.browse.back-to-instance": {
+    "message": "Bumalik sa instansiya"
+  },
   "app.browse.discover-content": {
     "message": "Tumuklas ng kontento"
   },
@@ -127,6 +136,9 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Maaaring makasisira sa pagkakatugma sa pagsasali ng server ang pagdaragdag ng kontento. Ang anumang kontento ay mawawala sa pag-update ng kontento ng instansiyang pang-server."
   },
   "app.browse.server.installing": {
     "message": "Ini-install"
@@ -287,6 +299,12 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Kailangang mag-update upang malaro ang {name}. Mangyaring mag-update sa pinakabagong bersiyon upang ma-launch ang laro."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Naka-install na ang proyektong ito"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Bumalik sa pagtutuklas"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Binuksan ang moda ng nagdi-develop."
   },
@@ -311,8 +329,35 @@
   "app.settings.tabs.resource-management": {
     "message": "Pamamahala ng paglalaan"
   },
-  "app.update-popup.body": {
-    "message": "Ang Modrinth App v{version} ay handa nang ma-install. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
+  "app.skins.apply-button": {
+    "message": "Ilapat"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Payat"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Malapad"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Kapa"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Kapa"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Walang kapa"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Wala"
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Texture"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
   },
   "app.update-popup.body.download-complete": {
     "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
@@ -343,15 +388,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Tagumpay na na-install ang bersiyong {version}!"
-  },
-  "app.update.download-update": {
-    "message": "I-download ang update"
-  },
-  "app.update.downloading-update": {
-    "message": "Nagdadownload ng update ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Handang ma-install ang update"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -729,7 +765,7 @@
     "message": "Kumpirmahin ang installation"
   },
   "unknown-pack-warning-modal.install-anyway": {
-    "message": "I-install parin"
+    "message": "I-install pa rin"
   },
   "unknown-pack-warning-modal.malware-statement": {
     "message": "Ang malware ay madalas naidadala sa mga modpack files sa pamamagitan ng pag-bigay ng mga ito sa mga platforms kagaya ng Discord."

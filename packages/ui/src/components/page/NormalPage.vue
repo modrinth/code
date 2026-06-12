@@ -52,7 +52,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 			'header header'
 			'sidebar content'
 			'sidebar dummy'
-			/ 20rem 1fr;
+			/ 300px 1fr;
 	}
 
 	.ui-normal-page--sidebar-right {
@@ -60,7 +60,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 			'header header'
 			'content sidebar'
 			'dummy sidebar'
-			/ 1fr 20rem;
+			/ 1fr 300px;
 	}
 }
 

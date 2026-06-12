@@ -19,7 +19,7 @@
 			>
 				{{
 					formatMessage(messages.alreadyReportedDescription, {
-						item: reportItem || 'content',
+						item: formatReportItemType(formatMessage, reportItem),
 					})
 				}}
 				<div class="flex gap-2">
@@ -28,7 +28,7 @@
 							<LeftArrowIcon />
 							{{
 								formatMessage(messages.backToItem, {
-									item: reportItem || 'content',
+									item: formatReportItemType(formatMessage, reportItem),
 								})
 							}}
 						</nuxt-link>
@@ -131,7 +131,7 @@
 							<span class="text-lg font-bold text-contrast">
 								{{
 									formatMessage(messages.whatContentId, {
-										item: reportItem || 'content',
+										item: formatReportItemType(formatMessage, reportItem),
 									})
 								}}
 							</span>
@@ -154,7 +154,11 @@
 								<div v-if="checkingId || checkedId" class="flex items-center gap-1">
 									<template v-if="checkingId">
 										<SpinnerIcon class="animate-spin" />
-										{{ formatMessage(messages.checking, { item: reportItem }) }}...
+										{{
+											formatMessage(messages.checking, {
+												item: formatReportItemType(formatMessage, reportItem),
+											})
+										}}
 									</template>
 									<template v-else-if="checkedId && itemName">
 										<AutoLink
@@ -178,7 +182,7 @@
 										<IssuesIcon />
 										{{
 											formatMessage(messages.couldNotFind, {
-												item: reportItem,
+												item: formatReportItemType(formatMessage, reportItem),
 											})
 										}}
 									</span>
@@ -189,7 +193,7 @@
 					<template v-if="existingReport">
 						{{
 							formatMessage(messages.alreadyReportedDescription, {
-								item: reportItem || 'content',
+								item: formatReportItemType(formatMessage, reportItem),
 							})
 						}}
 						<ButtonStyled color="brand">
@@ -203,7 +207,7 @@
 							<span class="text-lg font-bold text-contrast">
 								{{
 									formatMessage(messages.whatReportReason, {
-										item: reportItem || 'content',
+										item: formatReportItemType(formatMessage, reportItem),
 									})
 								}}
 							</span>
@@ -286,6 +290,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	defineMessages,
+	formatReportItemType,
 	injectNotificationManager,
 	IntlFormatted,
 	MarkdownEditor,
@@ -559,12 +564,11 @@ const messages = defineMessages({
 	alreadyReportedDescription: {
 		id: 'report.already-reported-description',
 		defaultMessage:
-			'You have an open report for this {item, select, project {project} version {version} user {user} other {content}} already. You can add more details to your report if you have more information to add.',
+			'You have an open report for this {item} already. You can add more details to your report if you have more information to add.',
 	},
 	backToItem: {
 		id: 'report.back-to-item',
-		defaultMessage:
-			'Back to {item, select, project {project} version {version} user {user} other {content}}',
+		defaultMessage: 'Back to {item}',
 	},
 	goToReport: {
 		id: 'report.go-to-report',
@@ -610,23 +614,19 @@ const messages = defineMessages({
 	},
 	whatContentId: {
 		id: 'report.question.content-id',
-		defaultMessage:
-			'What is the ID of the {item, select, project {project} version {version} user {user} other {content}}?',
+		defaultMessage: 'What is the ID of the {item}?',
 	},
 	whatReportReason: {
 		id: 'report.question.report-reason',
-		defaultMessage:
-			"Which of Modrinth's rules is this {item, select, project {project} version {version} user {user} other {content}} violating?",
+		defaultMessage: "Which of Modrinth's rules is this {item} violating?",
 	},
 	checking: {
 		id: 'report.checking',
-		defaultMessage:
-			'Checking {item, select, project {project} version {version} user {user} other {content}}...',
+		defaultMessage: 'Checking {item}...',
 	},
 	couldNotFind: {
 		id: 'report.could-not-find',
-		defaultMessage:
-			'Could not find {item, select, project {project} version {version} user {user} other {content}}',
+		defaultMessage: 'Could not find {item}',
 	},
 	reportBodyTitle: {
 		id: 'report.body.title',

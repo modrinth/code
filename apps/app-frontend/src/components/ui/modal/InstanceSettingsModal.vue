@@ -45,12 +45,19 @@ const isMinecraftServer = ref(false)
 const handleUnlinked = () => emit('unlinked')
 
 const instanceRef = computed(() => props.instance)
+const queryClient = useQueryClient()
+const tabbedModal = ref<InstanceType<typeof TabbedModal> | null>(null)
+
+function hide() {
+	tabbedModal.value?.hide()
+}
 
 provideInstanceSettings({
 	instance: instanceRef,
 	offline: props.offline,
 	isMinecraftServer,
 	onUnlinked: handleUnlinked,
+	closeModal: hide,
 })
 
 watch(
@@ -113,9 +120,6 @@ const tabs = computed<TabbedModalTab[]>(() => [
 	},
 ])
 
-const queryClient = useQueryClient()
-const tabbedModal = ref<InstanceType<typeof TabbedModal> | null>(null)
-
 function show(tabIndex?: number) {
 	if (props.instance.linked_data?.project_id) {
 		queryClient.prefetchQuery({
@@ -129,7 +133,7 @@ function show(tabIndex?: number) {
 	}
 }
 
-defineExpose({ show })
+defineExpose({ show, hide })
 </script>
 <template>
 	<TabbedModal

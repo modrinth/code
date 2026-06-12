@@ -84,6 +84,7 @@
 
 						<div
 							ref="scrollContainer"
+							data-modal-content
 							:class="[
 								'flex-1 min-h-0',
 								props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
@@ -112,7 +113,9 @@
 
 					<div
 						v-else
+						data-modal-content
 						:class="[
+							'min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6',
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
@@ -261,7 +264,9 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
-	if (props.disableClose) return
+	if (props.disableClose) {
+		return
+	}
 	props.onHide?.()
 	visible.value = false
 	popModal()
@@ -433,11 +438,12 @@ defineOptions({
 	visibility: hidden;
 	pointer-events: none;
 	transform: translate(v-bind(mouseXOffset), v-bind(mouseYOffset));
-	transition: all 0.2s ease-out;
+	transition: none;
 
 	&.shown {
 		visibility: visible;
 		transform: translate(0, 0);
+		transition: all 0.2s ease-out;
 
 		> .modal-body {
 			opacity: 1;

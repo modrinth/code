@@ -86,6 +86,12 @@
   "app.appearance-settings.select-option": {
     "message": "選擇選項"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "顯示您在該實例的遊玩時間"
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "顯示遊玩時間"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "啟用切換側邊欄的功能。"
   },
@@ -147,10 +153,10 @@
     "message": "{fileName}"
   },
   "app.creation-modal.installing-modpack.title": {
-    "message": "正在安裝模組包..."
+    "message": "正在安裝模組包……"
   },
   "app.export-modal.description-placeholder": {
-    "message": "輸入模組包描述..."
+    "message": "輸入模組包描述……"
   },
   "app.export-modal.export-button": {
     "message": "匯出"
@@ -224,9 +230,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "瀏覽伺服器"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "「{name}」將**永久刪除**，且無法還原。"
-  },
   "app.instance.worlds.delete-world-title": {
     "message": "確定要永久刪除這個世界嗎？"
   },
@@ -248,17 +251,11 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未新增任何伺服器或世界"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "「{name}」將從你的清單中移除（包含遊戲內），且無法還原。"
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "「{name}」({address}) 將從你的清單中移除（包含遊戲內），且無法還原。"
-  },
   "app.instance.worlds.remove-server-title": {
     "message": "確定要移除「{name}」嗎？"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "搜尋 {count} 個世界..."
+    "message": "搜尋 {count} 個世界……"
   },
   "app.instance.worlds.this-server": {
     "message": "這個伺服器"
@@ -271,9 +268,6 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "安裝"
-  },
-  "app.modal.install-to-play.mod-count": {
-    "message": "{count} 個模組"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "所需模組包"
@@ -303,7 +297,7 @@
     "message": "這個專案已安裝"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "回到瀏覽頁面"
+    "message": "返回瀏覽"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "將內容安裝至實例"
@@ -332,8 +326,83 @@
   "app.settings.tabs.resource-management": {
     "message": "資源管理"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} 已準備好安裝！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
+  "app.skins.add-button": {
+    "message": "新增皮膚"
+  },
+  "app.skins.apply-button": {
+    "message": "確認"
+  },
+  "app.skins.delete-button": {
+    "message": "刪除皮膚"
+  },
+  "app.skins.delete-modal.title": {
+    "message": "你確定要刪除這個皮膚嗎"
+  },
+  "app.skins.edit-button": {
+    "message": "編輯皮膚"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "新增皮膚"
+  },
+  "app.skins.modal.add-title": {
+    "message": "正在新增皮膚"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "披風"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "披風"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "編輯皮膚"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "無披風"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "無"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "覆蓋材質包"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "儲存皮膚"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "正在儲存"
+  },
+  "app.skins.modal.texture-section": {
+    "message": "材質包"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "馬上新增一個皮膚"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "編輯皮膚"
+  },
+  "app.skins.previewing-badge": {
+    "message": "正在預覽"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "慢一點"
+  },
+  "app.skins.section.default-skins": {
+    "message": "預設皮膚"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "皮膚已儲存"
+  },
+  "app.skins.sign-in.button": {
+    "message": "登入"
+  },
+  "app.skins.sign-in.title": {
+    "message": "請登入"
+  },
+  "app.skins.title": {
+    "message": "皮膚選擇"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
@@ -365,15 +434,6 @@
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安裝！"
   },
-  "app.update.download-update": {
-    "message": "下載更新"
-  },
-  "app.update.downloading-update": {
-    "message": "正在下載更新 ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "重新載入即可安裝更新"
-  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -394,9 +454,6 @@
   },
   "friends.action.add-friend": {
     "message": "新增好友"
-  },
-  "friends.action.view-friend-requests": {
-    "message": "{count} 個好友邀請"
   },
   "friends.add-friend.submit": {
     "message": "送出好友邀請"
@@ -611,6 +668,24 @@
   "instance.settings.tabs.java": {
     "message": "Java 和記憶體"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "自訂環境變數"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "自訂 Java 參數"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "自訂 Java 安裝"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "自訂記憶體分配"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "輸入環境變數……"
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "輸入 Java 參數……"
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "環境變數"
   },
@@ -625,6 +700,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "記憶體配置"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
   },
   "instance.settings.tabs.window": {
     "message": "視窗"
