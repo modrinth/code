@@ -80,6 +80,18 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Delete a world
+	 * DELETE /v1/servers/:id/worlds/:wid
+	 */
+	public async deleteWorld(serverId: string, worldId: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}`, {
+			api: 'archon',
+			version: 1,
+			method: 'DELETE',
+		})
+	}
+
+	/**
 	 * End the intro flow for a server
 	 * DELETE /v1/servers/:id/flows/intro
 	 */
@@ -109,14 +121,19 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
-	 * Reset a world to onboarding
-	 * POST /v1/servers/:id/worlds/:wid/onboard
+	 * Reset a server to onboarding
+	 * POST /v1/servers/:id/onboard
 	 */
-	public async resetToOnboarding(serverId: string, worldId: string): Promise<void> {
-		await this.client.request(`/servers/${serverId}/worlds/${worldId}/onboard`, {
-			api: 'archon',
-			version: 1,
-			method: 'POST',
-		})
+	public async resetToOnboarding(
+		serverId: string,
+	): Promise<Archon.Servers.v1.ServerOnboardResponse> {
+		return this.client.request<Archon.Servers.v1.ServerOnboardResponse>(
+			`/servers/${serverId}/onboard`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+			},
+		)
 	}
 }

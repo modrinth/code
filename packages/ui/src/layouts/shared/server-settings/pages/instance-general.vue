@@ -10,11 +10,11 @@
 					@proceed="resetWorldFiles"
 				/>
 				<ConfirmModal
-					ref="resetToOnboardingModal"
-					:title="formatMessage(messages.resetToOnboardingModalTitle)"
-					:description="formatMessage(messages.resetToOnboardingModalDescription)"
-					:proceed-label="formatMessage(messages.resetToOnboardingButton)"
-					@proceed="confirmResetToOnboarding"
+					ref="deleteInstanceModal"
+					:title="formatMessage(messages.deleteInstanceModalTitle)"
+					:description="formatMessage(messages.deleteInstanceModalDescription)"
+					:proceed-label="formatMessage(messages.deleteInstanceButton)"
+					@proceed="deleteInstance"
 				/>
 				<ServerSetupModal
 					ref="setupModal"
@@ -71,28 +71,21 @@
 						{{ formatMessage(messages.resetEverythingDescription) }}
 					</span>
 				</div>
-			</div>
-		</div>
 
-		<div v-if="isSiteAdmin" class="flex flex-col gap-2.5">
-			<span class="font-semibold text-contrast">
-				{{ formatMessage(messages.supportZoneLabel) }}
-			</span>
-			<div class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 p-4">
 				<div class="flex flex-col items-start gap-2.5">
-					<ButtonStyled color="blue">
+					<ButtonStyled color="red">
 						<button
-							v-tooltip="supportResetToOnboardingTooltip"
+							v-tooltip="deleteInstanceDisabledTooltip"
 							class="!shadow-none"
-							:disabled="supportResetToOnboardingDisabled"
-							@click="showResetToOnboardingModal"
+							:disabled="isDeleteInstanceDisabled"
+							@click="showDeleteInstanceModal"
 						>
-							<RotateCounterClockwiseIcon class="size-5" />
-							{{ formatMessage(messages.resetToOnboardingButton) }}
+							<TrashIcon class="size-5" />
+							{{ formatMessage(messages.deleteInstanceButton) }}
 						</button>
 					</ButtonStyled>
 					<span class="text-primary">
-						{{ formatMessage(messages.resetToOnboardingDescription) }}
+						{{ formatMessage(messages.deleteInstanceDescription) }}
 					</span>
 				</div>
 			</div>
@@ -114,6 +107,7 @@
 import { RotateCounterClockwiseIcon, TrashIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { ButtonStyled, ConfirmModal, StyledInput } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
@@ -136,10 +130,12 @@ const serverSettings = injectServerSettings()
 const queryClient = useQueryClient()
 const modrinthServersConsole = useModrinthServersConsole()
 const { canUseAdvancedSettings, canResetServer, permissionDeniedMessage } = useServerPermissions()
+const route = useRoute()
+const router = useRouter()
 
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
 const resetWorldFilesModal = ref<InstanceType<typeof ConfirmModal>>()
-const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
+const deleteInstanceModal = ref<InstanceType<typeof ConfirmModal>>()
 const editingInstanceName = ref('')
 
 const messages = defineMessages({
@@ -171,10 +167,6 @@ const messages = defineMessages({
 		id: 'server.instance-settings.general.danger-zone.label',
 		defaultMessage: 'Danger zone',
 	},
-	supportZoneLabel: {
-		id: 'server.instance-settings.general.support-zone.label',
-		defaultMessage: 'Support zone',
-	},
 	resetWorldFilesButton: {
 		id: 'server.instance-settings.general.reset-world-files.button',
 		defaultMessage: 'Reset world data',
@@ -205,35 +197,6 @@ const messages = defineMessages({
 		id: 'server.instance-settings.general.reset-world-files.error',
 		defaultMessage: 'Failed to reset world data',
 	},
-	resetToOnboardingButton: {
-		id: 'hosting.loader.reset-to-onboarding-button',
-		defaultMessage: 'Reset to onboarding',
-	},
-	resetToOnboardingDescription: {
-		id: 'hosting.loader.reset-to-onboarding-description',
-		defaultMessage: 'Send this instance back into onboarding so setup can be completed again.',
-	},
-	resetToOnboardingModalTitle: {
-		id: 'hosting.loader.reset-to-onboarding-modal-title',
-		defaultMessage: 'Reset to onboarding',
-	},
-	resetToOnboardingModalDescription: {
-		id: 'hosting.loader.reset-to-onboarding-modal-description',
-		defaultMessage:
-			'This will send the instance back into onboarding so setup can be completed again. Are you sure you want to continue?',
-	},
-	resetToOnboardingSuccessTitle: {
-		id: 'hosting.loader.reset-to-onboarding-success-title',
-		defaultMessage: 'Instance reset to onboarding',
-	},
-	resetToOnboardingSuccessDescription: {
-		id: 'hosting.loader.reset-to-onboarding-success-description',
-		defaultMessage: 'The instance has been returned to the onboarding flow.',
-	},
-	failedToResetToOnboarding: {
-		id: 'hosting.loader.failed-to-reset-to-onboarding',
-		defaultMessage: 'Failed to reset instance to onboarding',
-	},
 	resetEverythingButton: {
 		id: 'server.instance-settings.general.reset-everything.button',
 		defaultMessage: 'Reset everything',
@@ -243,7 +206,46 @@ const messages = defineMessages({
 		defaultMessage:
 			'Reset your instance completely. This removes world data, content, and any configuration. A backup of the previous instance will remain available.',
 	},
+	deleteInstanceButton: {
+		id: 'server.instance-settings.general.delete-instance.button',
+		defaultMessage: 'Delete instance',
+	},
+	deleteInstanceDescription: {
+		id: 'server.instance-settings.general.delete-instance.description',
+		defaultMessage:
+			'Permanently delete this instance, including its content, files, settings, and backups.',
+	},
+	deleteInstanceModalTitle: {
+		id: 'server.instance-settings.general.delete-instance.modal.title',
+		defaultMessage: 'Delete instance',
+	},
+	deleteInstanceModalDescription: {
+		id: 'server.instance-settings.general.delete-instance.modal.description',
+		defaultMessage:
+			'This deletes the instance, including its content, files, settings, and backups. This cannot be undone.',
+	},
+	deleteInstanceSuccessTitle: {
+		id: 'server.instance-settings.general.delete-instance.success.title',
+		defaultMessage: 'Instance deleted',
+	},
+	deleteInstanceSuccessDescription: {
+		id: 'server.instance-settings.general.delete-instance.success.description',
+		defaultMessage: 'The instance has been deleted.',
+	},
+	deleteInstanceError: {
+		id: 'server.instance-settings.general.delete-instance.error',
+		defaultMessage: 'Failed to delete instance',
+	},
 })
+
+type WorldSummaryCacheItem = {
+	id: string
+}
+
+type DeleteInstanceOptimisticState = {
+	serverFull: Archon.Servers.v1.ServerFull | undefined
+	worldSummary: WorldSummaryCacheItem[] | undefined
+}
 
 const serverFullQuery = useQuery({
 	queryKey: ['servers', 'v1', 'detail', serverId],
@@ -306,9 +308,87 @@ const resetWorldMutation = useMutation({
 	},
 })
 
+const deleteWorldMutation = useMutation({
+	mutationFn: (deletedWorldId: string) =>
+		client.archon.servers_v1.deleteWorld(serverId, deletedWorldId),
+	onMutate: async (deletedWorldId): Promise<DeleteInstanceOptimisticState> => {
+		const serverFullKey = ['servers', 'v1', 'detail', serverId] as const
+		const worldSummaryKey = ['servers', 'worlds', 'summary', 'v1', serverId] as const
+
+		await Promise.all([
+			queryClient.cancelQueries({ queryKey: serverFullKey }),
+			queryClient.cancelQueries({ queryKey: worldSummaryKey }),
+		])
+
+		const previousServerFull = queryClient.getQueryData<Archon.Servers.v1.ServerFull>(
+			serverFullKey,
+		)
+		const previousWorldSummary = queryClient.getQueryData<WorldSummaryCacheItem[]>(
+			worldSummaryKey,
+		)
+
+		queryClient.setQueryData<Archon.Servers.v1.ServerFull | undefined>(
+			serverFullKey,
+			(previous) =>
+				previous
+					? {
+							...previous,
+							worlds: previous.worlds.filter((world) => world.id !== deletedWorldId),
+						}
+					: previous,
+		)
+		queryClient.setQueryData<WorldSummaryCacheItem[] | undefined>(
+			worldSummaryKey,
+			(previous) => previous?.filter((world) => world.id !== deletedWorldId),
+		)
+		queryClient.removeQueries({ queryKey: ['content', 'list', 'v1', serverId, deletedWorldId] })
+		queryClient.removeQueries({
+			queryKey: ['servers', 'properties', 'v1', serverId, deletedWorldId],
+		})
+		queryClient.removeQueries({
+			queryKey: ['servers', 'startup', 'v1', serverId, deletedWorldId],
+		})
+
+		serverSettings.closeModal?.()
+		if (route.path !== instancesPath.value) {
+			void router.push(instancesPath.value)
+		}
+
+		return {
+			serverFull: previousServerFull,
+			worldSummary: previousWorldSummary,
+		}
+	},
+	onSuccess: () => {
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.deleteInstanceSuccessTitle),
+			text: formatMessage(messages.deleteInstanceSuccessDescription),
+		})
+	},
+	onError: (error, _deletedWorldId, context) => {
+		if (context?.serverFull) {
+			queryClient.setQueryData(['servers', 'v1', 'detail', serverId], context.serverFull)
+		}
+
+		if (context?.worldSummary) {
+			queryClient.setQueryData(
+				['servers', 'worlds', 'summary', 'v1', serverId],
+				context.worldSummary,
+			)
+		}
+
+		addNotification({
+			type: 'error',
+			text: error instanceof Error ? error.message : formatMessage(messages.deleteInstanceError),
+		})
+	},
+	onSettled: (_data, _error, deletedWorldId) => {
+		void invalidateServerState(deletedWorldId)
+	},
+})
+
 const isUpdatingName = computed(() => patchWorldMutation.isPending.value)
-const isSiteAdmin = computed(() => serverSettings.currentUserRole.value === 'admin')
-const isResettingToOnboarding = ref(false)
 const isNameSaveDisabled = computed(
 	() => !worldId.value || isUpdatingName.value || !canUseAdvancedSettings.value,
 )
@@ -323,12 +403,13 @@ const isResetWorldFilesDisabled = computed(
 const resetWorldFilesDisabledTooltip = computed(() =>
 	canResetServer.value ? undefined : permissionDeniedMessage.value,
 )
-const supportResetToOnboardingDisabled = computed(
-	() => !worldId.value || isResettingToOnboarding.value || !canResetServer.value,
+const isDeleteInstanceDisabled = computed(
+	() => isResetDisabled.value || deleteWorldMutation.isPending.value || !canResetServer.value,
 )
-const supportResetToOnboardingTooltip = computed(() =>
-	!canResetServer.value ? permissionDeniedMessage.value : undefined,
+const deleteInstanceDisabledTooltip = computed(() =>
+	canResetServer.value ? undefined : permissionDeniedMessage.value,
 )
+const instancesPath = computed(() => `/hosting/manage/${encodeURIComponent(serverId)}/instances`)
 
 watch(
 	instanceName,
@@ -359,42 +440,19 @@ function resetWorldFiles() {
 	resetWorldMutation.mutate()
 }
 
-function showResetToOnboardingModal() {
-	if (supportResetToOnboardingDisabled.value) return
-	resetToOnboardingModal.value?.show()
+function showDeleteInstanceModal() {
+	if (isDeleteInstanceDisabled.value) return
+	deleteInstanceModal.value?.show()
 }
 
-async function confirmResetToOnboarding() {
-	if (supportResetToOnboardingDisabled.value || !worldId.value) return
+function deleteInstance() {
+	const deletedWorldId = worldId.value
+	if (isDeleteInstanceDisabled.value || !deletedWorldId) return
 
-	try {
-		isResettingToOnboarding.value = true
-		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
-		modrinthServersConsole.clear()
-		try {
-			await client.kyros.logs_v1.clear()
-		} catch (error) {
-			console.error('Failed to clear server logs:', error)
-		}
-		server.value.flows = { intro: true }
-		await invalidateServerState()
-		addNotification({
-			type: 'success',
-			title: formatMessage(messages.resetToOnboardingSuccessTitle),
-			text: formatMessage(messages.resetToOnboardingSuccessDescription),
-		})
-		serverSettings.closeModal?.()
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
-		})
-	} finally {
-		isResettingToOnboarding.value = false
-	}
+	deleteWorldMutation.mutate(deletedWorldId)
 }
 
-function invalidateServerState() {
+function invalidateServerState(targetWorldId = worldId.value) {
 	return Promise.all([
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 		queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
@@ -402,9 +460,19 @@ function invalidateServerState() {
 			queryKey: ['servers', 'worlds', 'summary', 'v1', serverId],
 		}),
 		queryClient.invalidateQueries({ queryKey: ['files', serverId] }),
-		worldId.value
+		targetWorldId
 			? queryClient.invalidateQueries({
-					queryKey: ['content', 'list', 'v1', serverId, worldId.value],
+					queryKey: ['content', 'list', 'v1', serverId, targetWorldId],
+				})
+			: Promise.resolve(),
+		targetWorldId
+			? queryClient.invalidateQueries({
+					queryKey: ['servers', 'properties', 'v1', serverId, targetWorldId],
+				})
+			: Promise.resolve(),
+		targetWorldId
+			? queryClient.invalidateQueries({
+					queryKey: ['servers', 'startup', 'v1', serverId, targetWorldId],
 				})
 			: Promise.resolve(),
 	])
