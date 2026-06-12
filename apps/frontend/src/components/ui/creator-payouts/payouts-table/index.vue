@@ -18,13 +18,22 @@
 		<template #header-fees="{ column }">
 			<span class="inline-flex items-center gap-1 text-sm font-normal">
 				{{ column.label }}
-				<InfoIcon class="size-4" aria-hidden="true" />
+				<span v-tooltip="feesTooltip" class="inline-flex" tabindex="0" :aria-label="feesTooltip">
+					<InfoIcon class="size-4" aria-hidden="true" />
+				</span>
 			</span>
 		</template>
 		<template #header-variance="{ column }">
 			<span class="inline-flex items-center gap-1 text-sm font-normal">
 				{{ column.label }}
-				<InfoIcon class="size-4" aria-hidden="true" />
+				<span
+					v-tooltip="varianceTooltip"
+					class="inline-flex"
+					tabindex="0"
+					:aria-label="varianceTooltip"
+				>
+					<InfoIcon class="size-4" aria-hidden="true" />
+				</span>
 			</span>
 		</template>
 		<template #header-netEstimated="{ column }">
@@ -36,7 +45,14 @@
 		<template #header-external="{ column }">
 			<span class="inline-flex items-center gap-1 text-sm font-normal">
 				{{ column.label }}
-				<InfoIcon class="size-4" aria-hidden="true" />
+				<span
+					v-tooltip="externalTooltip"
+					class="inline-flex"
+					tabindex="0"
+					:aria-label="externalTooltip"
+				>
+					<InfoIcon class="size-4" aria-hidden="true" />
+				</span>
 			</span>
 		</template>
 		<template #header-netActual="{ column }">
@@ -168,6 +184,10 @@ const props = defineProps<{
 
 const emptyValue = '—'
 const emptyValueClass = 'text-primary opacity-60'
+const feesTooltip = 'Deduction to cover Clean.io fees'
+const varianceTooltip = 'Deduction to account for variance between estimated and actual revenue.'
+const externalTooltip =
+	'Manual adjustments for direct campaigns, overreported revenue, or other corrections.'
 const expandedPayoutDates = ref<Set<string>>(new Set())
 
 const columns: TableColumn<PayoutColumnKey>[] = [
@@ -181,7 +201,7 @@ const columns: TableColumn<PayoutColumnKey>[] = [
 	{ key: 'external', label: 'External Adj', align: 'right', width: '12%' },
 	{ key: 'netActual', label: 'Net Actual Rev', align: 'right', width: '13%' },
 	{ key: 'creator', label: 'Creator (75%)', align: 'right', width: '12%' },
-	{ key: 'modrinth', label: 'Modrinth (25%)', align: 'right', width: '12%' },
+	{ key: 'modrinth', label: 'Modrinth (25%)', align: 'right', width: '14%' },
 ]
 
 const rows = computed<PayoutRow[]>(() => {
