@@ -6,6 +6,7 @@ use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::session_item::DBSession;
 use crate::database::models::{DBPasskey, DBPasskeyId, DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
@@ -48,7 +49,10 @@ use tracing::{error, info};
 use url::Url;
 use uuid::Uuid;
 use validator::Validate;
-use webauthn_rs::prelude::*;
+use webauthn_rs::prelude::{
+    CredentialID, DiscoverableKey, PublicKeyCredential,
+    RegisterPublicKeyCredential, Webauthn, WebauthnError,
+};
 use zxcvbn::Score;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
@@ -3267,9 +3271,32 @@ pub async fn authenticate_passkey_finish(
                     .wrap_internal_err(
                         "failed to remove compromised passkey",
                     )?;
+
+                // Log out all sessions
+                let sessions = DBSession::remove_all_for_user(
+                    db_passkey.user_id,
+                    &mut transaction,
+                )
+                .await
+                .wrap_internal_err("failed to invalidate user sessions")?;
                 transaction.commit().await?;
+                DBSession::clear_cache(
+                    sessions
+                        .into_iter()
+                        .map(|(id, session)| (Some(id), Some(session), None))
+                        .chain(std::iter::once((
+                            None,
+                            None,
+                            Some(db_passkey.user_id),
+                        )))
+                        .collect(),
+                    &redis,
+                )
+                .await
+                .wrap_internal_err("failed to clear user session cache")?;
+
                 return Err(ApiError::Request(eyre!(
-                    "passkey counter did not advance; the credential may be cloned and has been invalidated"
+                    "the credential may have been compromised and has been invalidated, please try another login method"
                 )));
             }
             Err(e) => return Err(ApiError::Request(eyre::Report::from(e))),
