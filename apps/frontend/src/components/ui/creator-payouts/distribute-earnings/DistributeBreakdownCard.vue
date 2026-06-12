@@ -9,13 +9,13 @@
 			/>
 			<DistributeBreakdownRow
 				label="Clean.io Fee"
-				:value="formatSignedCurrency(-Math.abs(payout.fees_deducted_usd))"
-				negative
+				:value="formatSignedCurrencyWithCents(-Math.abs(payout.fees_deducted_usd))"
+				:tone="getAmountTone(-Math.abs(payout.fees_deducted_usd))"
 			/>
 			<DistributeBreakdownRow
 				label="Variance Deduction"
-				:value="formatSignedCurrency(payout.variance_adjustment_usd)"
-				negative
+				:value="formatSignedCurrencyWithCents(payout.variance_adjustment_usd)"
+				:tone="getAmountTone(payout.variance_adjustment_usd)"
 			/>
 		</div>
 
@@ -29,7 +29,19 @@
 
 		<div class="mt-4 border-0 border-t border-dashed border-surface-4 pt-4">
 			<DistributeBreakdownRow label="Actual Revenue" :value="actualRevenueLabel" />
-			<DistributeBreakdownRow label="Variance Resolution" :value="varianceResolutionLabel" />
+			<DistributeBreakdownRow
+				label="Variance Resolution"
+				:value="varianceResolutionLabel"
+				:description="varianceResolutionDescription"
+				:tone="getAmountTone(varianceResolution)"
+			/>
+			<DistributeBreakdownRow
+				v-for="(adjustment, index) in adjustments"
+				:key="`${index}-${adjustment.description}`"
+				:label="adjustment.description"
+				:value="formatSignedCurrencyWithCents(adjustment.amount)"
+				:tone="getAmountTone(adjustment.amount)"
+			/>
 		</div>
 
 		<div class="mt-4 border-0 border-t border-solid border-surface-4 pt-4">
@@ -49,11 +61,10 @@ import { computed } from 'vue'
 
 import {
 	formatCurrency,
-	formatSignedCurrency,
 	getCreatorShare,
 	getModrinthShare,
 	getNetActualRevenue,
-	getTotalAdjustments,
+	roundCurrency,
 	type DistributionAdjustment,
 } from '../utils'
 import DistributeBreakdownRow from './DistributeBreakdownRow.vue'
@@ -71,13 +82,41 @@ const estimatedRevenue = computed(() =>
 )
 const hasActualAmount = computed(() => (props.amountReceived ?? 0) > 0)
 const actualRevenue = computed(() => props.amountReceived ?? 0)
-const totalAdjustments = computed(() => getTotalAdjustments(props.adjustments))
 const netActualRevenue = computed(() => getNetActualRevenue(actualRevenue.value, props.adjustments))
+const varianceResolution = computed(() =>
+	roundCurrency(actualRevenue.value - props.payout.net_estimated_revenue_usd),
+)
+const varianceDeduction = computed(() => Math.abs(props.payout.variance_adjustment_usd))
+const returnedVariance = computed(() =>
+	Math.min(Math.max(varianceResolution.value, 0), varianceDeduction.value),
+)
 const actualRevenueLabel = computed(() =>
 	hasActualAmount.value ? formatCurrency(actualRevenue.value, { cents: true }) : emptyValue,
 )
 const varianceResolutionLabel = computed(() =>
-	hasActualAmount.value ? formatSignedCurrency(totalAdjustments.value) : emptyValue,
+	hasActualAmount.value ? formatSignedCurrencyWithCents(varianceResolution.value) : emptyValue,
+)
+const varianceResolutionDescription = computed(() => {
+	if (!hasActualAmount.value) {
+		return undefined
+	}
+
+	if (varianceResolution.value < 0) {
+		return `Variance consumed + ${formatCurrency(Math.abs(varianceResolution.value), { cents: true })} additional shortfall`
+	}
+
+	if (varianceDeduction.value === 0) {
+		return undefined
+	}
+
+	if (varianceResolution.value >= varianceDeduction.value) {
+		return 'Variance deduction fully returned'
+	}
+
+	return `${formatCurrency(returnedVariance.value, { cents: true })} of ${formatCurrency(varianceDeduction.value, { cents: true })} returned`
+})
+const adjustments = computed(() =>
+	props.adjustments.filter((adjustment) => adjustment.description || adjustment.amount !== 0),
 )
 const netActualLabel = computed(() =>
 	hasActualAmount.value ? formatCurrency(netActualRevenue.value, { cents: true }) : emptyValue,
@@ -92,4 +131,30 @@ const modrinthRevenueLabel = computed(() =>
 		? formatCurrency(getModrinthShare(netActualRevenue.value), { cents: true })
 		: emptyValue,
 )
+
+function formatSignedCurrencyWithCents(amount: number): string {
+	const formatted = formatCurrency(Math.abs(amount), { cents: true })
+
+	if (amount < 0) {
+		return `-${formatted}`
+	}
+
+	if (amount > 0) {
+		return `+${formatted}`
+	}
+
+	return formatted
+}
+
+function getAmountTone(amount: number): 'positive' | 'negative' | 'neutral' {
+	if (amount > 0) {
+		return 'positive'
+	}
+
+	if (amount < 0) {
+		return 'negative'
+	}
+
+	return 'neutral'
+}
 </script>
