@@ -10582,6 +10582,7 @@ dependencies = [
  "tracing-error",
  "tracing-subscriber",
  "url",
+ "urlencoding",
  "uuid 1.18.1",
  "whoami",
  "windows",
