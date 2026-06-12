@@ -23,10 +23,10 @@ import { Admonition, ButtonStyled } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import {
+	type DistributionRun,
 	formatCurrency,
 	formatMonthYear,
 	getDistributionCreatorAmount,
-	type DistributionRun,
 } from '../utils'
 
 const props = defineProps<{

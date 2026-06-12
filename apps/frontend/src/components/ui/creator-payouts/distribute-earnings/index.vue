@@ -65,11 +65,11 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import {
+	type DistributionAdjustment,
 	formatCurrency,
 	getCreatorShare,
 	getNetActualRevenue,
 	roundCurrency,
-	type DistributionAdjustment,
 } from '../utils'
 import AdjustmentsCard from './AdjustmentsCard.vue'
 import DistributeBreakdownCard from './DistributeBreakdownCard.vue'

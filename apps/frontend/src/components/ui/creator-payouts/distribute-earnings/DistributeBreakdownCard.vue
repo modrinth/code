@@ -60,12 +60,12 @@ import type { Labrinth } from '@modrinth/api-client'
 import { computed } from 'vue'
 
 import {
+	type DistributionAdjustment,
 	formatCurrency,
 	getCreatorShare,
 	getModrinthShare,
 	getNetActualRevenue,
 	roundCurrency,
-	type DistributionAdjustment,
 } from '../utils'
 import DistributeBreakdownRow from './DistributeBreakdownRow.vue'
 
