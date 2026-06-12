@@ -88,6 +88,7 @@ pub async fn download_version_info(
             &version.url,
             None,
             None,
+            None,
             &st.api_semaphore,
             &st.pool,
         )
@@ -97,6 +98,7 @@ pub async fn download_version_info(
             let partial: d::modded::PartialVersionInfo = fetch_json(
                 Method::GET,
                 &loader.url,
+                None,
                 None,
                 None,
                 &st.api_semaphore,
@@ -149,6 +151,7 @@ pub async fn download_client(
             &client_download.url,
             Some(&client_download.sha1),
             None,
+            None,
             &st.fetch_semaphore,
             &st.pool,
         )
@@ -187,6 +190,7 @@ pub async fn download_assets_index(
         let index = fetch_json(
             Method::GET,
             &version.asset_index.url,
+            None,
             None,
             None,
             &st.fetch_semaphore,
@@ -239,7 +243,7 @@ pub async fn download_assets(
                     async {
                         if !resource_path.exists() || force {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), None, &st.fetch_semaphore, &st.pool))
+                                .get_or_try_init(|| fetch(&url, Some(hash), None, None, &st.fetch_semaphore, &st.pool))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched asset with hash {hash}");
@@ -253,7 +257,7 @@ pub async fn download_assets(
 
                         if with_legacy && !resource_path.exists() || force {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), None, &st.fetch_semaphore, &st.pool))
+                                .get_or_try_init(|| fetch(&url, Some(hash), None, None, &st.fetch_semaphore, &st.pool))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched legacy asset with hash {hash}");
@@ -328,6 +332,7 @@ pub async fn download_libraries(
                         &native.url,
                         Some(&native.sha1),
                         None,
+                        None,
                         &st.fetch_semaphore,
                         &st.pool,
                     )
@@ -373,6 +378,7 @@ pub async fn download_libraries(
                         &artifact.url,
                         Some(&artifact.sha1),
                         None,
+                        None,
                         &st.fetch_semaphore,
                         &st.pool,
                     )
@@ -409,7 +415,7 @@ pub async fn download_libraries(
                     // failed download here is not a fatal condition.
                     //
                     // See DEV-479.
-                    match fetch(&url, None, None, &st.fetch_semaphore, &st.pool)
+                    match fetch(&url, None, None, None, &st.fetch_semaphore, &st.pool)
                         .await
                     {
                         Ok(bytes) => {
@@ -469,6 +475,7 @@ pub async fn download_log_config(
         let bytes = fetch(
             &log_download.url,
             Some(&log_download.sha1),
+            None,
             None,
             &st.fetch_semaphore,
             &st.pool,

@@ -326,6 +326,7 @@ pub async fn generate_pack_from_version_id(
         None,
         Some(&download_meta),
         Some((&loading_bar, 70.0)),
+        None,
         &state.fetch_semaphore,
         &state.pool,
     )
@@ -354,6 +355,7 @@ pub async fn generate_pack_from_version_id(
             let state = State::get().await?;
             let icon_bytes = fetch(
                 &icon_url,
+                None,
                 None,
                 None,
                 &state.fetch_semaphore,
