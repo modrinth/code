@@ -1694,6 +1694,61 @@ export namespace Labrinth {
 	}
 
 	export namespace Payouts {
+		export namespace Internal {
+			export type YearMonth = string
+
+			export type PayoutStatus = 'open' | 'pending' | 'review' | 'paid'
+
+			export type RevenueDay = {
+				estimated_revenue_usd: number | null
+			}
+
+			export type DetailedExternalAdjustment = {
+				description: string
+				amount_usd: number
+			}
+
+			export type HistoryItem = {
+				payouts_date: YearMonth
+				days: RevenueDay[]
+				status: PayoutStatus
+				fees_deducted_usd: number
+				variance_adjustment_usd: number
+				net_estimated_revenue_usd: number
+				creator_net_estimated_revenue_usd: number
+				modrinth_net_estimated_revenue_usd: number
+				actual_revenue_usd?: number
+				total_external_adjustment_usd?: number
+				net_actual_revenue_usd?: number
+				creator_net_actual_revenue_usd?: number
+				modrinth_net_actual_revenue_usd?: number
+				started_at: string | null
+				started_by: string | null
+				detailed_external_adjustments: DetailedExternalAdjustment[] | null
+			}
+
+			export type DistributionAdjustment = {
+				description: string
+				amount: number
+			}
+
+			export type StartDistributionRequest = {
+				payouts_date: YearMonth
+				totp_code: string
+				amount_received: number
+				adjustments: DistributionAdjustment[]
+			}
+
+			export type DistributionRun = {
+				payouts_date: YearMonth
+				amount_received: number
+				adjustments: DistributionAdjustment[]
+				started_at: string
+				started_by: string
+				distributes_at: string
+			}
+		}
+
 		export namespace v3 {
 			export type RevenueData = {
 				time: number

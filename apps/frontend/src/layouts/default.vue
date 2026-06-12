@@ -389,6 +389,12 @@
 								link: '/admin/analytics/events',
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'creator-payouts',
+								color: 'primary',
+								link: '/admin/creator-payouts',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -422,6 +428,9 @@
 						</template>
 						<template #servers-nodes>
 							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
+						<template #creator-payouts>
+							<BadgeDollarSignIcon aria-hidden="true" /> Creator payouts
 						</template>
 						<template #analytics-events>
 							<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
@@ -725,6 +734,7 @@
 import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
+	BadgeDollarSignIcon,
 	BellIcon,
 	BoxIcon,
 	BracesIcon,
