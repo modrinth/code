@@ -192,7 +192,7 @@ const expandedPayoutDates = ref<Set<string>>(new Set())
 
 const columns: TableColumn<PayoutColumnKey>[] = [
 	{ key: 'period', label: 'Period', width: '16%' },
-	{ key: 'status', label: 'Status', width: '8.5%' },
+	{ key: 'status', label: 'Status', width: '8.75%' },
 	{ key: 'estimated', label: 'Est Rev', align: 'right', width: '10%' },
 	{ key: 'fees', label: 'Fees', align: 'right', width: '10%' },
 	{ key: 'variance', label: 'Variance Adj', align: 'right', width: '12%' },

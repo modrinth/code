@@ -16,7 +16,7 @@
 			<label class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">
 					Enter
-					{{ formatCurrency(creatorAmount, { cents: true }) }}
+					{{ creatorAmount }}
 					to confirm
 				</span>
 				<StyledInput

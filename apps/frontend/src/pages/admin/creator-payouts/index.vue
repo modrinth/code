@@ -10,8 +10,8 @@
 				@cancel="cancelDistribution"
 			/>
 
-			<div v-if="!activeDistribution" class="grid gap-5 empty:hidden lg:grid-cols-3">
-				<DistributeMonthCard v-if="reviewPayout" :payout="reviewPayout" />
+			<div class="grid gap-5 empty:hidden lg:grid-cols-3">
+				<DistributeMonthCard v-if="reviewPayout && !activeDistribution" :payout="reviewPayout" />
 				<DistributeMonthCard
 					v-for="payout in pendingPayouts"
 					:key="payout.payouts_date"
