@@ -27,7 +27,7 @@
 			/>
 		</div>
 
-		<div class="mt-4 border-0 border-t border-dashed border-surface-4 pt-4">
+		<div class="mt-4 border-0 border-t border-solid border-surface-4 pt-4">
 			<DistributeBreakdownRow label="Actual Revenue" :value="actualRevenueLabel" />
 			<DistributeBreakdownRow
 				label="Variance Resolution"
