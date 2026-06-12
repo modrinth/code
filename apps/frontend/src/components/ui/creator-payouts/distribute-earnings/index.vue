@@ -75,7 +75,7 @@ import AdjustmentsCard from './AdjustmentsCard.vue'
 import DistributeBreakdownCard from './DistributeBreakdownCard.vue'
 import VerifyPayoutModal from './VerifyPayoutModal.vue'
 
-const props = defineProps<{
+defineProps<{
 	payout: Labrinth.Payouts.Internal.HistoryItem
 }>()
 
