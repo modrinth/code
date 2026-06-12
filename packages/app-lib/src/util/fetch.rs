@@ -54,45 +54,45 @@ struct FetchFence {
 }
 
 impl FetchFence {
-	pub fn is_blocked(&self, key: &'static str) -> bool {
-		self.inner
-			.lock()
-			.entry(key)
-			.or_insert_with(FenceInner::new)
-			.is_blocked()
-	}
+    pub fn is_blocked(&self, key: &'static str) -> bool {
+        self.inner
+            .lock()
+            .entry(key)
+            .or_insert_with(FenceInner::new)
+            .is_blocked()
+    }
 
-	pub fn record_ok(&self, key: &'static str) {
-		self.inner
-			.lock()
-			.entry(key)
-			.or_insert_with(FenceInner::new)
-			.record_ok()
-	}
+    pub fn record_ok(&self, key: &'static str) {
+        self.inner
+            .lock()
+            .entry(key)
+            .or_insert_with(FenceInner::new)
+            .record_ok()
+    }
 
-	pub fn record_fail(&self, key: &'static str) {
-		self.inner
-			.lock()
-			.entry(key)
-			.or_insert_with(FenceInner::new)
-			.record_fail()
-	}
+    pub fn record_fail(&self, key: &'static str) {
+        self.inner
+            .lock()
+            .entry(key)
+            .or_insert_with(FenceInner::new)
+            .record_fail()
+    }
 
-	pub fn latest_block_minutes(&self) -> u32 {
-		let now = Utc::now();
+    pub fn latest_block_minutes(&self) -> u32 {
+        let now = Utc::now();
 
-		self.inner
-			.lock()
-			.values()
-			.filter_map(|fence| fence.block_until)
-			.filter(|until| *until > now)
-			.max()
-			.map(|until| {
-				let seconds = until.signed_duration_since(now).num_seconds();
-				(seconds.max(0) as u32).div_ceil(60).max(1)
-			})
-			.unwrap_or(1)
-	}
+        self.inner
+            .lock()
+            .values()
+            .filter_map(|fence| fence.block_until)
+            .filter(|until| *until > now)
+            .max()
+            .map(|until| {
+                let seconds = until.signed_duration_since(now).num_seconds();
+                (seconds.max(0) as u32).div_ceil(60).max(1)
+            })
+            .unwrap_or(1)
+    }
 }
 
 struct FenceInner {
