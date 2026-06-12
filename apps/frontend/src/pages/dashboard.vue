@@ -61,6 +61,7 @@
 					{{
 						formatMessage(messages.discordRoleBannerBody, {
 							roles: eligibleDiscordRolesLabel,
+							count: eligibleDiscordRoles.length,
 						})
 					}}
 				</div>
@@ -162,7 +163,7 @@ const messages = defineMessages({
 	discordRoleBannerBody: {
 		id: 'dashboard.discord-roles.banner.body',
 		defaultMessage:
-			"You're eligible for {roles}. Link your Discord account through Modrinth and we'll sync them automatically.",
+			"You're eligible for the {roles} creator {count, plural, one {role} other {roles}} on Discord. Link your Discord account through Modrinth and we'll sync {count, plural, one {it} other {them}} automatically.",
 	},
 	discordRoleBannerCta: {
 		id: 'dashboard.discord-roles.banner.cta',
@@ -192,6 +193,10 @@ useSeoMeta({
 
 const route = useNativeRoute()
 
+const hasLinkedDiscordAccount = computed(
+	() => auth.value.user?.auth_providers?.includes('discord') === true,
+)
+
 const { data: projects } = useQuery({
 	queryKey: computed(() => ['dashboard-discord-role-eligibility', auth.value.user?.id, 'projects']),
 	queryFn: () => {
@@ -200,7 +205,7 @@ const { data: projects } = useQuery({
 
 		return client.labrinth.users_v2.getProjects(userId)
 	},
-	enabled: computed(() => !!auth.value.user?.id),
+	enabled: computed(() => !!auth.value.user?.id && !hasLinkedDiscordAccount.value),
 })
 
 const totalProjectDownloads = computed(() =>
@@ -238,7 +243,10 @@ const hasDismissedDiscordRoleBanner = computed(() =>
 	dismissedDiscordRoleBannerUsers.value.includes(auth.value.user?.id ?? ''),
 )
 const showDiscordRoleBanner = computed(
-	() => eligibleDiscordRoles.value.length > 0 && !hasDismissedDiscordRoleBanner.value,
+	() =>
+		eligibleDiscordRoles.value.length > 0 &&
+		!hasLinkedDiscordAccount.value &&
+		!hasDismissedDiscordRoleBanner.value,
 )
 
 function dismissDiscordRoleBanner() {
