@@ -332,6 +332,9 @@
   "auth.sign-in.continue-with-email": {
     "message": "Continue with Email"
   },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Continue with passkey"
+  },
   "auth.sign-in.create-account": {
     "message": "Sign up"
   },
@@ -3517,6 +3520,48 @@
   },
   "settings.account.security.email.title": {
     "message": "Email"
+  },
+  "settings.account.security.passkey.add": {
+    "message": "Add passkey"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Make sure to pick something memorable, so you can identify this passkey later."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Name"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "My passkey"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Manage your registered passkeys, or add a new one."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Added {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Last used {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Loading passkeys…"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Never used"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "You have no passkeys registered yet."
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "This will permanently remove the passkey \"{name}\". You will no longer be able to sign in with it."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Are you sure you want to remove this passkey?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Rename passkey"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Manage passkeys"
   },
   "settings.account.security.password.action.add": {
     "message": "Add password"

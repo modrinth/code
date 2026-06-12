@@ -153,6 +153,25 @@
 							</span>
 						</a>
 					</ButtonStyled>
+					<ButtonStyled>
+						<a
+							class="oauth-provider-link !shadow-none"
+							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'passkey' }"
+							role="button"
+							tabindex="0"
+							@click="onPasskeySignIn"
+							@keydown.enter="onPasskeySignIn"
+						>
+							<UserKeyIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithPasskey) }}</span>
+							<span
+								v-if="lastSignInProvider === 'passkey'"
+								class="oauth-provider-last-sign-in-badge"
+							>
+								{{ formatMessage(messages.lastSignInLabel) }}
+							</span>
+						</a>
+					</ButtonStyled>
 				</section>
 
 				<div class="h-px w-full bg-surface-5"></div>
@@ -235,6 +254,7 @@ import {
 	MicrosoftColorIcon,
 	RightArrowIcon,
 	SteamColorIcon,
+	UserKeyIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
@@ -248,7 +268,7 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 } from '@/composables/auth.ts'
 
-type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
+type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft' | 'passkey'
 
 interface AuthGlobals {
 	captcha_enabled?: boolean
@@ -263,6 +283,7 @@ interface Props {
 	globals?: AuthGlobals | null
 	onPasswordSignIn?: () => void
 	onTwoFactorSignIn?: () => void
+	onPasskeySignIn?: () => void
 	onSetCaptchaRef?: ((captchaRef: unknown) => void) | undefined
 }
 
@@ -274,6 +295,7 @@ const {
 	globals = null,
 	onPasswordSignIn = () => {},
 	onTwoFactorSignIn = () => {},
+	onPasskeySignIn = () => {},
 	onSetCaptchaRef = undefined,
 } = defineProps<Props>()
 
@@ -342,6 +364,10 @@ const messages = defineMessages({
 	lastSignInLabel: {
 		id: 'auth.sign-in.last-sign-in',
 		defaultMessage: 'Last sign in',
+	},
+	continueWithPasskey: {
+		id: 'auth.sign-in.continue-with-passkey',
+		defaultMessage: 'Continue with passkey',
 	},
 })
 </script>
