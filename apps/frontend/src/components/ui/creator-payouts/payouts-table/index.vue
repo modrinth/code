@@ -89,8 +89,11 @@
 		<template #cell-status="{ row }">
 			<span
 				v-if="row.rowKind === 'period'"
+				v-tooltip="statusTooltip(row.status)"
 				class="inline-flex rounded-full border border-solid px-3 py-0.5 text-sm font-medium"
 				:class="statusClass(row.status)"
+				tabindex="0"
+				:aria-label="statusTooltip(row.status)"
 			>
 				{{ statusLabel(row.status) }}
 			</span>
@@ -123,10 +126,24 @@
 			</span>
 		</template>
 		<template #cell-creator="{ row }">
-			<span :class="valueClass(row.creator)">{{ row.creator }}</span>
+			<span
+				v-tooltip="row.creatorIsEstimated ? pendingEstimatedRevenueTooltip : undefined"
+				:class="valueClass(row.creator)"
+				:tabindex="row.creatorIsEstimated ? 0 : undefined"
+				:aria-label="row.creatorIsEstimated ? pendingEstimatedRevenueTooltip : undefined"
+			>
+				{{ row.creator }}
+			</span>
 		</template>
 		<template #cell-modrinth="{ row }">
-			<span :class="valueClass(row.modrinth)">{{ row.modrinth }}</span>
+			<span
+				v-tooltip="row.modrinthIsEstimated ? pendingEstimatedRevenueTooltip : undefined"
+				:class="valueClass(row.modrinth)"
+				:tabindex="row.modrinthIsEstimated ? 0 : undefined"
+				:aria-label="row.modrinthIsEstimated ? pendingEstimatedRevenueTooltip : undefined"
+			>
+				{{ row.modrinth }}
+			</span>
 		</template>
 	</Table>
 </template>
@@ -165,6 +182,8 @@ type PayoutRowBase = Record<string, unknown> &
 		payouts_date: string
 		isDimmed: boolean
 		isExpanded: boolean
+		creatorIsEstimated: boolean
+		modrinthIsEstimated: boolean
 	}
 
 type PeriodRow = PayoutRowBase & {
@@ -188,6 +207,7 @@ const feesTooltip = 'Deduction to cover Clean.io fees'
 const varianceTooltip = 'Deduction to account for variance between estimated and actual revenue.'
 const externalTooltip =
 	'Manual adjustments for direct campaigns, overreported revenue, or other corrections.'
+const pendingEstimatedRevenueTooltip = 'Pending estimated revenue'
 const expandedPayoutDates = ref<Set<string>>(new Set())
 
 const columns: TableColumn<PayoutColumnKey>[] = [
@@ -227,12 +247,16 @@ const rows = computed<PayoutRow[]>(() => {
 			actual: formatCurrency(payout.actual_revenue_usd),
 			external: formatCurrency(payout.total_external_adjustment_usd),
 			netActual: formatCurrency(payout.net_actual_revenue_usd),
-			creator: formatCurrency(
-				payout.creator_net_actual_revenue_usd ?? payout.creator_net_estimated_revenue_usd,
+			creator: formatPayoutSplitCurrency(
+				payout.creator_net_actual_revenue_usd,
+				payout.creator_net_estimated_revenue_usd,
 			),
-			modrinth: formatCurrency(
-				payout.modrinth_net_actual_revenue_usd ?? payout.modrinth_net_estimated_revenue_usd,
+			modrinth: formatPayoutSplitCurrency(
+				payout.modrinth_net_actual_revenue_usd,
+				payout.modrinth_net_estimated_revenue_usd,
 			),
+			creatorIsEstimated: payout.creator_net_actual_revenue_usd === undefined,
+			modrinthIsEstimated: payout.modrinth_net_actual_revenue_usd === undefined,
 		})
 
 		if (isExpanded) {
@@ -243,6 +267,8 @@ const rows = computed<PayoutRow[]>(() => {
 					dailyEstimatedRevenue,
 					dailyFeesDeducted,
 				)
+				const dailyCreatorRevenue = getDailyCreatorRevenue(dailyNetEstimatedRevenue)
+				const dailyModrinthRevenue = getDailyModrinthRevenue(dailyNetEstimatedRevenue)
 
 				tableRows.push({
 					rowKey: `day-${payout.payouts_date}-${dayIndex}`,
@@ -259,8 +285,10 @@ const rows = computed<PayoutRow[]>(() => {
 					actual: emptyValue,
 					external: emptyValue,
 					netActual: emptyValue,
-					creator: formatCurrency(getDailyCreatorRevenue(dailyNetEstimatedRevenue)),
-					modrinth: formatCurrency(getDailyModrinthRevenue(dailyNetEstimatedRevenue)),
+					creator: formatEstimatedCurrency(dailyCreatorRevenue),
+					modrinth: formatEstimatedCurrency(dailyModrinthRevenue),
+					creatorIsEstimated: dailyCreatorRevenue !== undefined,
+					modrinthIsEstimated: dailyModrinthRevenue !== undefined,
 				})
 			})
 		}
@@ -310,6 +338,22 @@ function getDailyModrinthRevenue(netEstimatedRevenue: number | undefined): numbe
 	return netEstimatedRevenue === undefined ? undefined : getModrinthShare(netEstimatedRevenue)
 }
 
+function formatPayoutSplitCurrency(
+	actualRevenue: number | undefined,
+	estimatedRevenue: number | undefined,
+): string {
+	if (actualRevenue !== undefined) {
+		return formatCurrency(actualRevenue)
+	}
+
+	return formatEstimatedCurrency(estimatedRevenue)
+}
+
+function formatEstimatedCurrency(amount: number | undefined): string {
+	const formattedAmount = formatCurrency(amount)
+	return formattedAmount === emptyValue ? formattedAmount : `~${formattedAmount}`
+}
+
 function getEstimatedRevenue(payout: Labrinth.Payouts.Internal.HistoryItem): number | undefined {
 	const total = payout.days.reduce((sum, day) => sum + (day.estimated_revenue_usd ?? 0), 0)
 	if (total !== 0) {
@@ -335,6 +379,19 @@ function statusClass(status: Labrinth.Payouts.Internal.PayoutStatus): string {
 			return 'border-green bg-green-highlight text-green'
 		case 'paid':
 			return 'border-surface-4 bg-surface-3 text-secondary'
+	}
+}
+
+function statusTooltip(status: Labrinth.Payouts.Internal.PayoutStatus): string {
+	switch (status) {
+		case 'open':
+			return 'Revenue is still being earned for this month.'
+		case 'pending':
+			return 'Month closed. Awaiting payout from ad provider on its NET 60 schedule (~60 days after month-end).'
+		case 'review':
+			return 'Distribution of this month is in review, awaiting finalization.'
+		case 'paid':
+			return 'Revenue paid and distributed.'
 	}
 }
 

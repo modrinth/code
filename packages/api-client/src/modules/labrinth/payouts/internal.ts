@@ -206,7 +206,7 @@ function createMockRevenueDays(
 	payoutsDate: Labrinth.Payouts.Internal.YearMonth,
 	totalRevenue: number,
 ): Labrinth.Payouts.Internal.RevenueDay[] {
-	const daysInMonth = getDaysInMonth(payoutsDate)
+	const daysInMonth = getMockRevenueDayCount(payoutsDate)
 	const weights = Array.from({ length: daysInMonth }, (_, index) => {
 		const weekdayLift = index % 7 === 4 || index % 7 === 5 ? 0.16 : 0
 		return 1 + ((index * 7) % 11) / 20 + weekdayLift
@@ -223,6 +223,17 @@ function createMockRevenueDays(
 
 		return { estimated_revenue_usd: estimatedRevenue }
 	})
+}
+
+function getMockRevenueDayCount(payoutsDate: Labrinth.Payouts.Internal.YearMonth): number {
+	const [year, month] = payoutsDate.split('-').map(Number)
+	const today = new Date()
+
+	if (today.getFullYear() === year && today.getMonth() === month - 1) {
+		return today.getDate()
+	}
+
+	return getDaysInMonth(payoutsDate)
 }
 
 function getDaysInMonth(payoutsDate: Labrinth.Payouts.Internal.YearMonth): number {
