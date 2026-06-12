@@ -570,7 +570,7 @@ impl AutomatedModerationQueue {
                                             Vec::new()
                                         } else {
                                             let res = client
-                                                .post(format!("{}v1/mods", ENV.FLAME_ANVIL_URL))
+                                                .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
                                             .json(&serde_json::json!({
                                                 "modIds": flame_files.iter().map(|x| x.1).collect::<Vec<_>>()
                                             }))
@@ -579,7 +579,7 @@ impl AutomatedModerationQueue {
                                             .text()
                                             .await?;
 
-                                        serde_json::from_str::<FlameResponse<Vec<FlameProject>>>(&res)?.data
+                                        serde_json::from_str::<FlameResponse<Vec<FlameProjectResponse>>>(&res)?.data
                                     };
 
                                     let mut missing_metadata = MissingMetadata {
@@ -823,7 +823,7 @@ pub enum ApprovalType {
 }
 
 impl ApprovalType {
-    fn approved(&self) -> bool {
+    pub fn approved(&self) -> bool {
         match self {
             ApprovalType::Yes => true,
             ApprovalType::WithAttributionAndSource => true,
@@ -896,11 +896,18 @@ pub struct FlameFileHash {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct FlameProject {
+pub struct FlameProjectResponse {
     pub id: u32,
     pub name: String,
     pub slug: String,
     pub links: FlameLinks,
+    pub logo: FlameLogo,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FlameLogo {
+    pub thumbnail_url: String,
 }
 
 #[derive(Deserialize, Serialize)]

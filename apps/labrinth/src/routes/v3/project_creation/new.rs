@@ -16,6 +16,7 @@ use crate::{
         },
         redis::RedisPool,
     },
+    file_hosting::FileHost,
     models::{
         exp::{self, ProjectComponentKind, component::ComponentRelationError},
         ids::ProjectId,
@@ -117,6 +118,7 @@ pub async fn create(
     req: HttpRequest,
     db: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
     web::Json(create): web::Json<ProjectCreate>,
@@ -305,13 +307,13 @@ pub async fn create(
     };
 
     project_builder
-        .insert(&mut txn, &http)
+        .insert(&mut txn, &redis, &**file_host, &http)
         .await
         .wrap_internal_err("failed to insert project")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
-            .insert(&mut txn, &http)
+            .insert(&mut txn, &redis, &**file_host, &http)
             .await
             .wrap_internal_err("failed to insert initial version")?;
     }

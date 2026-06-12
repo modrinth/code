@@ -21,7 +21,6 @@ use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
-use std::sync::Arc;
 use validator::Validate;
 
 pub fn default_requested_status() -> VersionStatus {
@@ -99,7 +98,7 @@ pub async fn version_create(
     payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     moderation_queue: Data<AutomatedModerationQueue>,
     http: Data<HttpClient>,
@@ -327,7 +326,7 @@ pub async fn upload_file_to_version(
     payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {

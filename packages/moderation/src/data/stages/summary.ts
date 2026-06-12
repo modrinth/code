@@ -19,7 +19,8 @@ const summary: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			disablesActions: ['summary_repeat_title'],
-			message: async () => (await import('../messages/summary/insufficient.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/summary/insufficient.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'summary_repeat_title',
@@ -29,7 +30,8 @@ const summary: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			disablesActions: ['summary_insufficient'],
-			message: async () => (await import('../messages/summary/repeat-title.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/summary/repeat-title.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'summary_formatting',
@@ -38,7 +40,8 @@ const summary: Stage = {
 			weight: 301,
 			suggestedStatus: 'flagged',
 			severity: 'low',
-			message: async () => (await import('../messages/summary/formatting.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/summary/formatting.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'summary_non_english',
@@ -47,7 +50,8 @@ const summary: Stage = {
 			weight: 302,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/summary/non-english.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/summary/non-english.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'summary_repeat_ip',
@@ -57,7 +61,8 @@ const summary: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
-			message: async () => (await import('../messages/summary/repeat-ip.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/summary/repeat-ip.md?raw')).default,
 		},
 	],
 }

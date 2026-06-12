@@ -289,13 +289,13 @@ async fn get_report(
                 'flag_reason', 'delphi',
                 'download_url', f.url,
                 -- TODO: replace with `json_array` in Postgres 16
-                'issues', (
-                    SELECT json_agg(
-                        to_jsonb(dri)
-                        || jsonb_build_object(
-                            -- TODO: replace with `json_array` in Postgres 16
-                            'details', (
-                                SELECT coalesce(jsonb_agg(
+				'issues', (
+					SELECT coalesce(json_agg(
+						to_jsonb(dri)
+						|| jsonb_build_object(
+							-- TODO: replace with `json_array` in Postgres 16
+							'details', (
+								SELECT coalesce(jsonb_agg(
                                     jsonb_build_object(
                                         'id', didws.id,
                                         'issue_id', didws.issue_id,
@@ -310,11 +310,11 @@ async fn get_report(
                                 FROM delphi_issue_details_with_statuses didws
                                 WHERE didws.issue_id = dri.id
                             )
-                        )
-                    )
-                    FROM delphi_report_issues dri
-                    WHERE
-                        dri.report_id = dr.id
+						)
+					), '[]'::json)
+					FROM delphi_report_issues dri
+					WHERE
+						dri.report_id = dr.id
                         -- see delphi.rs todo comment
                         AND dri.issue_type != '__dummy'
                 )

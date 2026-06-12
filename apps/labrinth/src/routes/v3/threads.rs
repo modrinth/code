@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
@@ -599,7 +597,7 @@ pub async fn message_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,

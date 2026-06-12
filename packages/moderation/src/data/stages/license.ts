@@ -39,7 +39,8 @@ const licenseStage: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			shouldShow: (project) => Boolean(project.license.url),
-			message: async () => (await import('../messages/license/invalid_link.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/license/invalid_link.md?raw')).default,
 			enablesActions: [
 				{
 					id: 'license_invalid_link-custom_license',
@@ -49,7 +50,9 @@ const licenseStage: Stage = {
 					suggestedStatus: 'flagged',
 					severity: 'medium',
 					message: async () =>
-						(await import('../messages/license/invalid_link-custom_license.md?raw')).default,
+						(
+							await import('../messages/checklist-messages/license/invalid_link-custom_license.md?raw')
+						).default,
 				},
 			],
 		},
@@ -66,7 +69,8 @@ const licenseStage: Stage = {
 						excludedActions: ['license_no_source-fork'],
 					},
 					weight: 602,
-					message: async () => (await import('../messages/license/no_source.md?raw')).default,
+					message: async () =>
+						(await import('../messages/checklist-messages/license/no_source.md?raw')).default,
 				},
 			],
 			fallbackWeight: 602,
@@ -79,7 +83,8 @@ const licenseStage: Stage = {
 					weight: 602,
 					suggestedStatus: 'rejected',
 					severity: 'high',
-					message: async () => (await import('../messages/license/no_source-fork.md?raw')).default,
+					message: async () =>
+						(await import('../messages/checklist-messages/license/no_source-fork.md?raw')).default,
 				},
 			],
 		},

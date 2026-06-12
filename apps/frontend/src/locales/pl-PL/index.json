@@ -3131,9 +3131,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Jeżeli potrzebujesz pomocy lub masz więcej pytań, odwiedź <help-center-link>centrum pomocy Modrinth</help-center-link> i kliknij w niebieskie kółko, by skontaktować się z obsługą."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Pokaż UI członków"
-  },
   "project.moderation.thread.private-description": {
     "message": "Prywatny wątek konwersacji z moderatorami Modrinth. Mogą skontaktować się z Tobą w razie problemów z Twoim projektem."
   },
@@ -3259,9 +3256,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Ta wersja jest} other {Te wersje są}} obecnie wstrzymane i nie widnieją na publicznej liście. Proszę o przesłanie potwierdzenia posiadania zgody na redystrybucję określonych plików zawartych w {count, plural, one {tej wersji} other {tych wersjach}} modpacka."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Rozwiąż"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Wersja {version_name}} other {Wersje}} wstrzymane ze względu na nieznaną osadzoną zawartość"

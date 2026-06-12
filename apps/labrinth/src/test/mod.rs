@@ -1,10 +1,14 @@
+use std::sync::Arc;
+
+use actix_web::web;
+
 use crate::env::ENV;
+use crate::file_hosting::FileHost;
 use crate::queue::email::EmailQueue;
 use crate::util::anrok;
 use crate::util::gotenberg::GotenbergClient;
 use crate::{LabrinthConfig, file_hosting};
 use crate::{clickhouse, env};
-use std::sync::Arc;
 
 pub mod api_common;
 pub mod api_v2;
@@ -31,8 +35,8 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     let ro_pool = db.ro_pool.clone();
     let redis_pool = db.redis_pool.clone();
     let search_backend = db.search_backend.clone();
-    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
-        Arc::new(file_hosting::MockHost::new());
+    let file_host: Arc<dyn FileHost> = Arc::new(file_hosting::MockHost::new());
+    let file_host = web::Data::<dyn FileHost>::from(file_host);
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
     let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
