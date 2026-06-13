@@ -429,6 +429,7 @@ async function flushStoredServerInstalls() {
 					plans.map((plan) => ({
 						project_id: plan.projectId,
 						version_id: plan.versionId,
+						kind: plan.contentType as Archon.Content.v1.AddonKind,
 					})),
 				),
 		})
@@ -1359,7 +1360,7 @@ provideContentManager({
 							: (updatingProject?.version?.id ?? '')
 					"
 					:is-app="false"
-					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
+					:project-type="updatingModpack ? 'modpack' : type"
 					:project-icon-url="
 						updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
 					"

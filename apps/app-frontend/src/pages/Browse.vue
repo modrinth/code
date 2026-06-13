@@ -24,6 +24,8 @@ import {
 	provideBrowseManager,
 	requestInstall,
 	SelectedProjectsFloatingBar,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useBrowseSearch,
 	useStickyObserver,
 	useVIntl,
@@ -474,7 +476,13 @@ watch(
 
 		router.replace({
 			path: `/browse/${targetProjectType}`,
-			query: route.query,
+			query: {
+				sid: route.query.sid,
+				wid: route.query.wid,
+				shi: route.query.shi,
+				from: route.query.from,
+				q: route.query.q,
+			},
 		})
 	},
 	{ immediate: true },
@@ -685,7 +693,6 @@ async function chooseInstanceInstallVersion(
 	const selectedVersion = getLatestMatchingInstallVersion(
 		await getInstallProjectVersions(project.project_id),
 		selectedPreferences,
-		projectTypeValue,
 	)
 
 	if (!selectedVersion) {
@@ -767,11 +774,15 @@ function getCardActions(
 							project: projectResult,
 							contentType,
 							mode: isModpack ? 'immediate' : 'queue',
-							selectedFilters: isModpack ? [] : searchState.currentFilters.value,
+							selectedFilters: isModpack
+								? []
+								: stripServerRuntimeInstallFilters(searchState.currentFilters.value),
 							providedFilters: isModpack ? [] : combinedProvidedFilters.value,
 							overriddenProvidedFilterTypes: isModpack
 								? []
-								: searchState.overriddenProvidedFilterTypes.value,
+								: stripServerRuntimeInstallOverrides(
+										searchState.overriddenProvidedFilterTypes.value,
+									),
 							targetPreferences: getServerInstallTargetPreferences(contentType),
 							getProjectVersions: getInstallProjectVersions,
 							queue: serverInstallQueue,
