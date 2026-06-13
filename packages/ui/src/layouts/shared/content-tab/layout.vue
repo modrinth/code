@@ -18,7 +18,7 @@ import {
 	TextCursorInputIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
@@ -320,23 +320,25 @@ const hasOutdatedProjects = computed(() => {
 const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 
-function handleDeleteById(id: string, event?: MouseEvent) {
+async function handleDeleteById(id: string, event?: MouseEvent) {
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (item) {
 		pendingDeletionItems.value = [item]
 		if (event?.shiftKey && !ctx.isBusy.value) {
 			confirmDelete()
 		} else {
+			await nextTick()
 			confirmDeletionModal.value?.show()
 		}
 	}
 }
 
-function showBulkDeleteModal(event?: MouseEvent) {
+async function showBulkDeleteModal(event?: MouseEvent) {
 	pendingDeletionItems.value = [...selectedItems.value]
 	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmDelete()
 	} else {
+		await nextTick()
 		confirmDeletionModal.value?.show()
 	}
 }
@@ -877,6 +879,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			:target-type="ctx.deletionContext ?? 'instance'"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
@@ -886,6 +889,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:server="ctx.deletionContext === 'server'"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			:target-type="ctx.deletionContext ?? 'instance'"
 			@update="confirmBulkUpdate"
 		/>
 		<ConfirmUnlinkModal
@@ -895,6 +899,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:backup-tip="ctx.modpack.value?.project.title"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			:target-type="ctx.deletionContext ?? 'instance'"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

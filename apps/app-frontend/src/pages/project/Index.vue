@@ -47,9 +47,9 @@
 		<div class="flex flex-col gap-4 p-6">
 			<div
 				v-if="projectInstallContext"
-				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
+				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid border-divider bg-surface-1 px-6 pt-6"
 			>
-				<BrowseInstallHeader :install-context="projectInstallContext" />
+				<BrowseInstallHeader :install-context="projectInstallContext" bottom-padding />
 			</div>
 			<InstanceIndicator v-if="instance && !projectInstallContext" :instance="instance" />
 			<template v-if="data">
@@ -64,121 +64,9 @@
 					:project="data"
 					:project-v3="projectV3"
 					:ping="serverPing"
+					:actions="projectHeaderActions"
 					@contextmenu.prevent.stop="handleRightClick"
-				>
-					<template v-if="isServerProject" #actions>
-						<ButtonStyled v-if="serverPlaying" size="large" color="red">
-							<button @click="handleStopServer">
-								<StopCircleIcon />
-								{{ formatMessage(commonMessages.stopButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else size="large" color="brand">
-							<button
-								:disabled="data && installingServerProjects.includes(data.id)"
-								@click="handleClickPlay"
-							>
-								<PlayIcon />
-								{{
-									data && installingServerProjects.includes(data.id)
-										? formatMessage(commonMessages.installingLabel)
-										: formatMessage(commonMessages.playButton)
-								}}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular>
-							<button
-								v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
-								@click="handleAddServerToInstance"
-							>
-								<PlusIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="`More options`"
-								:options="[
-									{
-										id: 'open-in-browser',
-										link: `https://modrinth.com/project/${data.slug}`,
-										external: true,
-									},
-									{
-										divider: true,
-									},
-									{
-										id: 'report',
-										color: 'red',
-										hoverFilled: true,
-										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-									},
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
-								<template #report> <ReportIcon /> Report </template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-					<template v-else #actions>
-						<ButtonStyled size="large" color="brand">
-							<button
-								v-tooltip="installButtonTooltip"
-								:disabled="installButtonDisabled"
-								@click="install(null)"
-							>
-								<SpinnerIcon
-									v-if="installButtonLoading && !installButtonInstalled"
-									class="animate-spin"
-								/>
-								<DownloadIcon v-else-if="!installButtonInstalled && !serverProjectSelected" />
-								<CheckIcon v-else />
-								{{ installButtonLabel }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="`More options`"
-								:options="[
-									{
-										id: 'follow',
-										disabled: true,
-										tooltip: 'Coming soon',
-										action: () => {},
-									},
-									{
-										id: 'save',
-										disabled: true,
-										tooltip: 'Coming soon',
-										action: () => {},
-									},
-									{
-										id: 'open-in-browser',
-										link: `https://modrinth.com/${data.project_type}/${data.slug}`,
-										external: true,
-									},
-									{
-										divider: true,
-									},
-									{
-										id: 'report',
-										color: 'red',
-										hoverFilled: true,
-										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-									},
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
-								<template #follow> <HeartIcon /> Follow </template>
-								<template #save> <BookmarkIcon /> Save </template>
-								<template #report> <ReportIcon /> Report </template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ProjectHeader>
+				/>
 				<NavTabs
 					:links="[
 						{
@@ -266,14 +154,12 @@ import {
 } from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
-	ButtonStyled,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	getTargetInstallPreferences,
 	injectNotificationManager,
 	NavTabs,
-	OverflowMenu,
 	ProjectBackgroundGradient,
 	ProjectHeader,
 	ProjectSidebarCompatibility,
@@ -286,6 +172,7 @@ import {
 	SelectedProjectsFloatingBar,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -295,6 +182,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import {
 	get_organization,
 	get_project,
@@ -313,7 +204,6 @@ import {
 	list as listInstances,
 } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
@@ -327,6 +217,7 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+const queryClient = useQueryClient()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
@@ -339,6 +230,10 @@ const messages = defineMessages({
 	installContentToInstance: {
 		id: 'app.project.install-context.install-content-to-instance',
 		defaultMessage: 'Install content to instance',
+	},
+	worldFallbackName: {
+		id: 'app.project.install-context.world-fallback-name',
+		defaultMessage: 'Instance',
 	},
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
@@ -370,7 +265,10 @@ const serverStatusOnline = ref(false)
 const serverInstancePath = ref(null)
 const serverPlaying = ref(false)
 const serverSetupModalRef = ref(null)
-const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = createServerInstallContent({
+	serverSetupModalRef,
+	isRouteInContext: (targetRoute) => targetRoute.path.startsWith('/project/'),
+})
 
 serverInstallContent.watchServerContextChanges()
 await serverInstallContent.initServerContext()
@@ -423,7 +321,9 @@ const projectInstallContext = computed(() => {
 	const serverData = serverInstallContent.serverContextServerData.value
 	if (serverData) {
 		return {
-			name: serverData.name,
+			name:
+				serverInstallContent.serverContextWorldName.value ??
+				formatMessage(messages.worldFallbackName),
 			loader: serverData.loader ?? '',
 			gameVersion: serverData.mc_version ?? '',
 			serverId: serverInstallContent.serverIdQuery.value,
@@ -499,6 +399,131 @@ const installButtonLabel = computed(() => {
 const installButtonTooltip = computed(() => {
 	if (installButtonInstalled.value) return formatMessage(messages.alreadyInstalled)
 	return null
+})
+
+const projectHeaderActions = computed(() => {
+	if (!data.value) return []
+
+	if (isServerProject.value) {
+		return [
+			serverPlaying.value
+				? {
+						id: 'stop',
+						label: formatMessage(commonMessages.stopButton),
+						icon: StopCircleIcon,
+						color: 'red',
+						onClick: handleStopServer,
+					}
+				: {
+						id: 'play',
+						label:
+							data.value && installingServerProjects.value.includes(data.value.id)
+								? formatMessage(commonMessages.installingLabel)
+								: formatMessage(commonMessages.playButton),
+						icon: PlayIcon,
+						color: 'brand',
+						disabled: data.value && installingServerProjects.value.includes(data.value.id),
+						onClick: handleClickPlay,
+					},
+			{
+				id: 'add-server-to-instance',
+				label: formatMessage(commonMessages.addServerToInstanceButton),
+				icon: PlusIcon,
+				labelHidden: true,
+				tooltip: formatMessage(commonMessages.addServerToInstanceButton),
+				onClick: handleAddServerToInstance,
+			},
+			{
+				id: 'more',
+				label: 'More options',
+				icon: MoreVerticalIcon,
+				labelHidden: true,
+				type: 'transparent',
+				tooltip: 'More options',
+				menuActions: [
+					{
+						id: 'open-in-browser',
+						label: 'Open in browser',
+						icon: ExternalIcon,
+						action: () => openUrl(`https://modrinth.com/project/${data.value.slug}`),
+					},
+					{
+						divider: true,
+					},
+					{
+						id: 'report',
+						label: 'Report',
+						icon: ReportIcon,
+						color: 'red',
+						action: () =>
+							openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`),
+					},
+				],
+			},
+		]
+	}
+
+	return [
+		{
+			id: 'install',
+			label: installButtonLabel.value,
+			icon:
+				installButtonLoading.value && !installButtonInstalled.value
+					? SpinnerIcon
+					: !installButtonInstalled.value && !serverProjectSelected.value
+						? DownloadIcon
+						: CheckIcon,
+			iconClass:
+				installButtonLoading.value && !installButtonInstalled.value ? 'animate-spin' : undefined,
+			color: 'brand',
+			tooltip: installButtonTooltip.value,
+			disabled: installButtonDisabled.value,
+			onClick: () => install(null),
+		},
+		{
+			id: 'more',
+			label: 'More options',
+			icon: MoreVerticalIcon,
+			labelHidden: true,
+			type: 'transparent',
+			tooltip: 'More options',
+			menuActions: [
+				{
+					id: 'follow',
+					label: 'Follow',
+					icon: HeartIcon,
+					disabled: true,
+					tooltip: 'Coming soon',
+					action: () => {},
+				},
+				{
+					id: 'save',
+					label: 'Save',
+					icon: BookmarkIcon,
+					disabled: true,
+					tooltip: 'Coming soon',
+					action: () => {},
+				},
+				{
+					id: 'open-in-browser',
+					label: 'Open in browser',
+					icon: ExternalIcon,
+					action: () =>
+						openUrl(`https://modrinth.com/${data.value.project_type}/${data.value.slug}`),
+				},
+				{
+					divider: true,
+				},
+				{
+					id: 'report',
+					label: 'Report',
+					icon: ReportIcon,
+					color: 'red',
+					action: () => openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`),
+				},
+			],
+		},
+	]
 })
 
 const [allLoaders, allGameVersions] = await Promise.all([
@@ -587,10 +612,19 @@ async function fetchProjectData() {
 function fetchDeferredServerData(project) {
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
 	if (serverAddress) {
-		serverPing.value = undefined
-		getServerLatency(serverAddress)
-			.then((latency) => {
-				serverPing.value = latency
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			serverPing.value = cachedStatus.ping
+			serverStatusOnline.value = true
+		} else {
+			serverPing.value = undefined
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
+			.then((status) => {
+				if (projectV3.value?.minecraft_java_server?.address !== serverAddress) return
+				serverPing.value = status.ping
+				serverStatusOnline.value = true
 			})
 			.catch((error) => {
 				console.error(`Failed to ping server ${serverAddress}:`, error)

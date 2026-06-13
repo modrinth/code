@@ -5,7 +5,13 @@
 				<Admonition :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
 					<div class="flex flex-col gap-2">
 						<span>{{ description }}</span>
-						<span v-if="hasUnknownContent">{{ formatMessage(messages.unknownContentBody) }}</span>
+						<span v-if="hasUnknownContent">
+							{{
+								formatMessage(messages.unknownContentBody, {
+									type: targetType ?? 'server',
+								})
+							}}
+						</span>
 					</div>
 				</Admonition>
 
@@ -73,6 +79,7 @@
 				<InlineBackupCreator
 					ref="backupCreator"
 					backup-name="Before version change"
+					:target-type="targetType"
 					hide-shift-click-hint
 					@update:buttons-disabled="buttonsDisabled = $event"
 				/>
@@ -131,6 +138,7 @@ const props = defineProps<{
 	confirmIcon?: Component
 	showReportButton?: boolean
 	showBackupCreator?: boolean
+	targetType?: 'server' | 'instance'
 	removedLabel?: string
 }>()
 
@@ -191,7 +199,7 @@ const messages = defineMessages({
 	unknownContentBody: {
 		id: 'content.diff-modal.unknown-content-body',
 		defaultMessage:
-			'Some content on your server could not be analyzed and may be affected by this change.',
+			'Some content on your {type, select, server {server} other {instance}} could not be analyzed and may be affected by this change.',
 	},
 })
 

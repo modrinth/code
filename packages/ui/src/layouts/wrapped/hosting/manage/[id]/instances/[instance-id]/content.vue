@@ -4,12 +4,29 @@ import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntervalFn } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import {
+	flushStoredServerAddonInstallQueue,
+	getStoredServerAddonInstallQueue,
+} from '#ui/layouts/shared/browse-tab/composables/install-logic'
+import ConfirmModpackUpdateModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
+import ConfirmUnlinkModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
+import ContentUpdaterModal from '#ui/layouts/shared/content-tab/components/modals/ContentUpdaterModal.vue'
+import ModpackContentModal from '#ui/layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
+import ContentPageLayout from '#ui/layouts/shared/content-tab/layout.vue'
+import type { ContentModpackData } from '#ui/layouts/shared/content-tab/providers/content-manager'
+import { provideContentManager } from '#ui/layouts/shared/content-tab/providers/content-manager'
+import type {
+	ContentItem,
+	ContentModpackCardCategory,
+	ContentModpackCardProject,
+	ContentModpackCardVersion,
+} from '#ui/layouts/shared/content-tab/types'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -25,24 +42,6 @@ import {
 	removePendingServerContentInstall,
 } from '#ui/utils/server-content-installing'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
-
-import {
-	flushStoredServerAddonInstallQueue,
-	getStoredServerAddonInstallQueue,
-} from '../../../shared/browse-tab/composables/install-logic'
-import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
-import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
-import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
-import ContentPageLayout from '../../../shared/content-tab/layout.vue'
-import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
-import { provideContentManager } from '../../../shared/content-tab/providers/content-manager'
-import type {
-	ContentItem,
-	ContentModpackCardCategory,
-	ContentModpackCardProject,
-	ContentModpackCardVersion,
-} from '../../../shared/content-tab/types'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 type ContentOwnerAvatarSource = {
@@ -113,7 +112,7 @@ const messages = defineMessages({
 })
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
+const { server, serverId, worldId, busyReasons, isSyncingContent, uploadState, cancelUpload } =
 	injectModrinthServerContext()
 const contentUploadSession = useUploadSessionUpload({
 	client,
@@ -123,22 +122,20 @@ const contentUploadSession = useUploadSessionUpload({
 	cancelUpload,
 })
 const { addNotification } = injectNotificationManager()
-const { openServerSettings, browseServerContent } = injectServerSettingsModal()
+const { openServerInstanceSettings, browseServerContent } = injectServerSettingsModal()
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
-const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
-const serverId = route.params.id as string
 
-const type = computed(() => {
-	const loader = server.value?.loader?.toLowerCase()
-	if (loader === 'paper' || loader === 'purpur') return 'plugin'
-	if (loader === 'vanilla') return 'datapack'
-	return 'mod'
-})
-
-const queryKey = computed(() => ['content', 'list', 'v1', serverId])
-const modpackContentQueryKey = computed(() => ['content', 'list', 'v1', serverId, 'modpack'])
+const queryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
+const modpackContentQueryKey = computed(() => [
+	'content',
+	'list',
+	'v1',
+	serverId,
+	worldId.value,
+	'modpack',
+])
 
 function getContentOwnerAvatarUrl(owner: ContentOwnerAvatarSource) {
 	const ownerId = owner.type === 'user' ? owner.name || owner.id : owner.id
@@ -151,6 +148,13 @@ const contentQuery = useQuery({
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 0,
+})
+
+const type = computed(() => {
+	const loader = (contentQuery.data.value?.modloader ?? server.value?.loader)?.toLowerCase()
+	if (loader === 'paper' || loader === 'purpur') return 'plugin'
+	if (loader === 'vanilla') return 'datapack'
+	return 'mod'
 })
 
 const isModpackContentModalOpen = ref(false)
@@ -425,6 +429,7 @@ async function flushStoredServerInstalls() {
 					plans.map((plan) => ({
 						project_id: plan.projectId,
 						version_id: plan.versionId,
+						kind: plan.contentType as Archon.Content.v1.AddonKind,
 					})),
 				),
 		})
@@ -1283,14 +1288,14 @@ provideContentManager({
 	},
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
-	deletionContext: 'server',
+	deletionContext: 'instance',
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
 	bulkUpdateItems: handleBulkUpdate,
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	openSettings: () => openServerSettings({ tabId: 'installation' }),
+	openSettings: () => openServerInstanceSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	getItemId: getContentItemId,
@@ -1324,9 +1329,9 @@ provideContentManager({
 			<template #modals>
 				<ConfirmUnlinkModal
 					ref="modpackUnlinkModal"
-					server
 					:action-disabled="setupActionDisabled"
 					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
+					target-type="instance"
 					@unlink="handleModpackUnlinkConfirm"
 				/>
 				<ModpackContentModal
@@ -1355,7 +1360,7 @@ provideContentManager({
 							: (updatingProject?.version?.id ?? '')
 					"
 					:is-app="false"
-					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
+					:project-type="updatingModpack ? 'modpack' : type"
 					:project-icon-url="
 						updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
 					"
@@ -1368,6 +1373,7 @@ provideContentManager({
 					:loading-changelog="loadingChangelog"
 					:action-disabled="setupActionDisabled"
 					:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
+					target-type="instance"
 					@update="handleModalUpdate"
 					@cancel="resetUpdateState"
 					@version-select="handleVersionSelect"
@@ -1384,9 +1390,9 @@ provideContentManager({
 				.filter(Boolean)
 				.join(' ')
 		"
-		server
 		:action-disabled="setupActionDisabled"
 		:action-disabled-tooltip="setupActionBusyMessage ?? undefined"
+		target-type="instance"
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
 	/>

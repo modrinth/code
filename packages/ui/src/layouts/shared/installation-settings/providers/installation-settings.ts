@@ -61,6 +61,12 @@ export interface InstallationSettingsContext {
 	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
 	isLocalFile?: boolean | ComputedRef<boolean>
 
+	/** Controls whether destructive installation changes offer inline backups. Defaults to isServer. */
+	showBackupCreator?: boolean | ComputedRef<boolean>
+
+	/** Controls repair description copy separately from the title target. */
+	repairDescriptionKind?: 'server' | 'server-instance' | 'app-instance'
+
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>
 

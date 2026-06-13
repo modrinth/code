@@ -245,9 +245,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Idiin ang Shift habang pumipindot upang laktawan ang kumpirmasyon."
   },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "mundo"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Karagdagang kontento"
   },
@@ -592,9 +589,6 @@
   },
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Di-magkatugmang kontentong ininstall"
-  },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Sa pagpapalit ng loader, ang lahat ng na-install na kontento ay mapapatay. Sa halip, inimumungkahi namin na i-reset ang iyong server."
   },
   "installation-settings.removed-incompatible": {
     "defaultMessage": "Tinanggal (di-magkatugma)"
@@ -2724,4 +2718,3 @@
     "defaultMessage": "Koponan ng Modrinth"
   }
 }
-

@@ -9,16 +9,14 @@ import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import type { EditingFile, FileItem } from '#ui/layouts/shared/files-tab/index.ts'
+import { FilePageLayout, provideFileManager } from '#ui/layouts/shared/files-tab/index.ts'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
-
-import FilePageLayout from '../../../shared/files-tab/layout.vue'
-import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
-import type { EditingFile, FileItem } from '../../../shared/files-tab/types'
 
 const props = defineProps<{
 	showDebugInfo?: boolean
@@ -391,8 +389,8 @@ onMounted(async () => {
 
 // Restart
 async function restartServer() {
-	if (!canUsePowerActions.value) return
-	await client.archon.servers_v0.power(serverId, 'Restart')
+	if (!canUsePowerActions.value || !worldId.value) return
+	await client.archon.servers_v1.powerWorld(serverId, worldId.value, { action: 'restart' })
 }
 
 function getSessionUploadFilename(fileName: string) {

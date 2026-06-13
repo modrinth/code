@@ -284,10 +284,10 @@ import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.
 import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
-import { useBackupsSelection } from '#ui/composables/hosting/backups-selection'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useBackupsSelection } from '#ui/composables/servers/backups-selection'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
 	injectModrinthClient,
@@ -362,7 +362,7 @@ const filterPillOptions = computed<FilterPillOption[]>(() => [
 ])
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, worldId, busyReasons } = injectModrinthServerContext()
+const { server, serverId, worldId, busyReasons } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
@@ -371,9 +371,7 @@ const props = defineProps<{
 }>()
 
 const route = useRoute()
-const serverId = route.params.id as string
 const BACKUP_HIGHLIGHT_DURATION_MS = 5_000
-
 defineEmits(['onDownload'])
 
 const { backups, invalidate, activeOperationByBackupId, hasActiveCreate, hasActiveRestore, query } =
@@ -388,7 +386,7 @@ const error = computed(() => {
 })
 const refetch = () => query.refetch()
 
-/** Until world exists we cannot fetch; `isLoading` is false while the query is disabled, which would flash empty state. */
+/** Until the instance exists we cannot fetch; `isLoading` is false while the query is disabled, which would flash empty state. */
 const backupsReadyPending = computed(
 	() => !worldId.value || (query.data.value === undefined && !query.error.value),
 )

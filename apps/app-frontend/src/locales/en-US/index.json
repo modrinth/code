@@ -158,6 +158,9 @@
   "app.browse.server.installing": {
     "message": "Installing"
   },
+  "app.browse.server.world-fallback-name": {
+    "message": "Instance"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
@@ -325,6 +328,9 @@
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Install content to instance"
+  },
+  "app.project.install-context.world-fallback-name": {
+    "message": "Instance"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."

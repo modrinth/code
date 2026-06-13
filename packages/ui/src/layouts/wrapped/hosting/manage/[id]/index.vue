@@ -22,8 +22,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="We're getting your server ready"
-			description="Your server's hardware is being prepared and will be available shortly!"
+			:title="formatMessage(messages.serverPreparingTitle)"
+			:description="formatMessage(messages.serverPreparingDescription)"
 			:icon="TransferIcon"
 			icon-color="blue"
 			:action="generalErrorAction"
@@ -34,8 +34,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server upgrading"
-			description="Your server's hardware is currently being upgraded and will be back online shortly!"
+			:title="formatMessage(messages.serverUpgradingTitle)"
+			:description="formatMessage(messages.serverUpgradingDescription)"
 			:icon="TransferIcon"
 			icon-color="blue"
 			:action="generalErrorAction"
@@ -46,7 +46,7 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server suspended"
+			:title="formatMessage(messages.serverSuspendedTitle)"
 			:description="suspendedDescription"
 			:icon="LockIcon"
 			icon-color="orange"
@@ -58,8 +58,8 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="An error occured."
-			description="Please contact Modrinth Support."
+			:title="formatMessage(messages.generalErrorTitle)"
+			:description="formatMessage(messages.contactSupportDescription)"
 			:icon="TransferIcon"
 			icon-color="orange"
 			:error-details="generalErrorDetails"
@@ -71,7 +71,7 @@
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
-			title="Server Node Unavailable"
+			:title="formatMessage(messages.nodeUnavailableTitle)"
 			:icon="TriangleAlertIcon"
 			icon-color="red"
 			:action="nodeUnavailableAction"
@@ -80,22 +80,29 @@
 			<template #description>
 				<div class="text-md space-y-4">
 					<p class="leading-[170%] text-secondary">
-						Your server's node, where your Modrinth Server is physically hosted, is not accessible
-						at the moment. We are working to resolve the issue as quickly as possible.
+						{{ formatMessage(messages.nodeUnavailableDescription) }}
 					</p>
 					<p class="leading-[170%] text-secondary">
-						Your data is safe and will not be lost, and your server will be back online as soon as
-						the issue is resolved.
+						{{ formatMessage(messages.nodeUnavailableDataDescription) }}
 					</p>
 					<p class="leading-[170%] text-secondary">
-						If reloading does not work initially, please contact Modrinth Support via the chat
-						bubble in the bottom right corner and we'll be happy to help.
+						{{ formatMessage(messages.nodeUnavailableSupportDescription) }}
 					</p>
 				</div>
 			</template>
 		</ErrorInformationCard>
 	</div>
-	<!-- SERVER START -->
+	<div
+		v-else-if="serverData && isInstanceDetailRoute"
+		data-pyro-instance-manager-root
+		class="experimental-styles-within relative mx-auto box-border flex w-full min-w-0 flex-col px-6 transition-all duration-300"
+		:class="[
+			'server-panel-' + revealState,
+			isNuxt ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
+		]"
+	>
+		<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
+	</div>
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
@@ -118,61 +125,18 @@
 				:server="serverData"
 				:server-image="serverImage"
 				:server-project="serverProject"
+				:active-world-name="activeWorldName"
 				:uptime-seconds="showUptime ? uptimeSeconds : undefined"
-			>
-				<template #actions>
-					<div class="flex gap-2">
-						<PanelServerActionButton :disabled="!!installError" />
-						<Tooltip
-							theme="dismissable-prompt"
-							:triggers="[]"
-							:shown="showSettingsHint"
-							:auto-hide="false"
-							placement="bottom-end"
-						>
-							<ButtonStyled circular size="large">
-								<button
-									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
-									@click="
-										() => {
-											openServerSettingsModal()
-											dismissSettingsHint()
-										}
-									"
-								>
-									<SettingsIcon />
-								</button>
-							</ButtonStyled>
-							<template #popper>
-								<div class="grid grid-cols-[min-content] gap-1">
-									<div class="flex min-w-48 items-center justify-between gap-8">
-										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
-											{{ formatMessage(settingsHintMessages.title) }}
-										</h3>
-										<ButtonStyled size="small" circular>
-											<button
-												v-tooltip="formatMessage(settingsHintMessages.dismiss)"
-												@click="dismissSettingsHint"
-											>
-												<XIcon aria-hidden="true" />
-											</button>
-										</ButtonStyled>
-									</div>
-									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-										{{ formatMessage(settingsHintMessages.description) }}
-									</p>
-								</div>
-							</template>
-						</Tooltip>
-						<PanelServerOverflowMenu
-							:disabled="!!installError"
-							:uptime-seconds="uptimeSeconds"
-							:show-copy-id-action="showCopyIdAction"
-							:show-debug-info="showAdvancedDebugInfo"
-						/>
-					</div>
-				</template>
-			</ServerManageHeader>
+				:worlds="serverFull?.worlds ?? []"
+				:power-disabled="!!installError"
+				:settings-label="formatMessage(messages.serverSettings)"
+				:show-settings-hint="showSettingsHint"
+				:settings-hint-title="formatMessage(settingsHintMessages.title)"
+				:settings-hint-description="formatMessage(settingsHintMessages.description)"
+				:settings-hint-dismiss-label="formatMessage(settingsHintMessages.dismiss)"
+				@open-settings="openServerSettingsModal()"
+				@dismiss-settings-hint="dismissSettingsHint"
+			/>
 
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
 
@@ -199,79 +163,68 @@
 							<div class="flex flex-col gap-2 leading-[150%]">
 								<div class="flex items-center gap-3">
 									<IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
-									<div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
+									<div class="flex gap-2 text-2xl font-bold">{{ errorTitleLabel }}</div>
 								</div>
 
-								<div
-									v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
-									class="font-normal"
-								>
+								<div v-if="errorTitle === 'installation'" class="font-normal">
 									<div
 										v-if="
 											errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
 										"
 									>
-										An invalid loader or Minecraft version was specified and could not be installed.
+										{{ formatMessage(messages.installInvalidVersionDescription) }}
 										<ul class="m-0 mt-4 p-0 pl-4">
 											<li>
-												If this version of Minecraft was released recently, please check if Modrinth
-												Hosting supports it.
+												{{ formatMessage(messages.installRecentMinecraftVersionNotice) }}
 											</li>
 											<li>
-												If you've installed a modpack, it may have been packaged incorrectly or may
-												not be compatible with the loader.
+												{{ formatMessage(messages.installModpackCompatibilityNotice) }}
 											</li>
 											<li>
-												Your server may need to be reinstalled with a valid mod loader and version.
-												You can change the loader by clicking the "Change Loader" button.
+												{{ formatMessage(messages.installChangeLoaderNotice) }}
 											</li>
 											<li>
-												If you're stuck, please contact Modrinth Support with the information below:
+												{{ formatMessage(messages.installSupportNotice) }}
 											</li>
 										</ul>
 										<ButtonStyled>
 											<button class="mt-2" @click="copyServerDebugInfo">
 												<CopyIcon v-if="!copied" />
 												<CheckIcon v-else />
-												Copy Debug Info
+												{{ formatMessage(messages.copyDebugInfo) }}
 											</button>
 										</ButtonStyled>
 									</div>
 									<div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
-										An internal error occurred while installing your server. Don't fret — try
-										reinstalling your server, and if the problem persists, please contact Modrinth
-										support with your server's debug information.
+										{{ formatMessage(messages.installInternalErrorDescription) }}
 									</div>
 									<div
 										v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
 									>
-										An error occurred while installing your server because Modrinth Hosting does not
-										support the version of Minecraft or the loader you specified. Try reinstalling
-										your server with a different version or loader, and if the problem persists,
-										please contact Modrinth Support with your server's debug information.
+										{{ formatMessage(messages.installUnsupportedVersionDescription) }}
 									</div>
 
-									<div
-										v-if="errorTitle === 'Installation error'"
-										class="mt-2 flex flex-col gap-4 sm:flex-row"
-									>
+									<div class="mt-2 flex flex-col gap-4 sm:flex-row">
 										<ButtonStyled v-if="errorLog">
-											<button @click="openInstallLog"><FileIcon />Open Installation Log</button>
+											<button @click="openInstallLog">
+												<FileIcon />
+												{{ formatMessage(messages.openInstallationLog) }}
+											</button>
 										</ButtonStyled>
 										<ButtonStyled>
 											<button @click="copyServerDebugInfo">
 												<CopyIcon v-if="!copied" />
 												<CheckIcon v-else />
-												Copy Debug Info
+												{{ formatMessage(messages.copyDebugInfo) }}
 											</button>
 										</ButtonStyled>
 										<ButtonStyled color="red" type="standard">
 											<button
 												class="whitespace-pre"
-												@click="openServerSettingsModal('installation')"
+												@click="openServerInstanceSettingsModal('installation')"
 											>
 												<RightArrowIcon />
-												Change Loader
+												{{ formatMessage(messages.changeLoader) }}
 											</button>
 										</ButtonStyled>
 									</div>
@@ -295,7 +248,7 @@
 						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
 					>
 						<IssuesIcon class="size-5 text-red" />
-						Something went wrong...
+						{{ formatMessage(messages.websocketError) }}
 					</div>
 
 					<div
@@ -304,7 +257,7 @@
 						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
 					>
 						<LoaderCircleIcon class="h-5 w-5 animate-spin" />
-						Hang on, we're reconnecting to your server.
+						{{ formatMessage(messages.websocketReconnecting) }}
 					</div>
 
 					<ServerPanelAdmonitions
@@ -319,10 +272,12 @@
 		</template>
 	</div>
 	<div
-		v-if="showAdvancedDebugInfo"
-		class="relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
+		v-if="showAdvancedDebugInfo && !isInstanceDetailRoute"
+		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
-		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
+		<h2 class="m-0 text-lg font-extrabold text-contrast">
+			{{ formatMessage(messages.serverDataTitle) }}
+		</h2>
 		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
 			safeStringify(serverData)
 		}}</pre>
@@ -330,6 +285,13 @@
 	<Suspense>
 		<ServerSettingsModal
 			ref="serverSettingsModal"
+			:resolve-viewer="resolveViewer"
+			:browse-modpacks="handleBrowseModpacks"
+		/>
+	</Suspense>
+	<Suspense>
+		<ServerInstanceSettingsModal
+			ref="serverInstanceSettingsModal"
 			:resolve-viewer="resolveViewer"
 			:browse-modpacks="handleBrowseModpacks"
 		/>
@@ -344,29 +306,24 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError } from '@modrinth/api-client'
+import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
-	BoxesIcon,
 	CheckIcon,
 	CopyIcon,
-	DatabaseBackupIcon,
 	FileIcon,
-	FolderOpenIcon,
+	GlobeIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
 	LoaderCircleIcon,
 	LockIcon,
 	RightArrowIcon,
-	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
 	UsersIcon,
-	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
-import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
@@ -377,11 +334,8 @@ import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
-import {
-	PanelServerActionButton,
-	PanelServerOverflowMenu,
-	ServerManageHeader,
-} from '#ui/components/servers/server-header'
+import { ServerManageHeader } from '#ui/components/servers/server-header'
+import ServerInstanceSettingsModal from '#ui/components/servers/ServerInstanceSettingsModal.vue'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	hasServerPermission,
@@ -393,11 +347,14 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
-import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
+import { useServerManageCoreRuntime } from '#ui/composables/servers/server-manage-core-runtime.ts'
 import type { LogLine } from '#ui/layouts/shared/console'
-import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
+import type {
+	ServerInstanceSettingsTabId,
+	ServerSettingsTabId,
+} from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectNotificationManager,
@@ -412,13 +369,21 @@ import {
 	writePendingServerContentInstalls,
 } from '#ui/utils/server-content-installing'
 
-import ServerOnboardingPanelPage from './[id]/onboarding.vue'
+import ServerOnboardingPanelPage from './onboarding.vue'
 
 interface Tab {
 	label: string
 	href: string
 	icon?: object
 	subpages?: string[]
+	prompt?: {
+		title: string
+		description: string
+		dismissLabel?: string
+		shown?: boolean
+		placement?: string
+		onDismiss?: () => void
+	}
 }
 
 const props = withDefaults(
@@ -426,7 +391,6 @@ const props = withDefaults(
 		serverId: string
 		reloadPage: () => void
 		resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
-		showCopyIdAction?: boolean
 		showAdvancedDebugInfo?: boolean
 		showUptime?: boolean
 		additionalTabs?: Tab[]
@@ -449,7 +413,6 @@ const props = withDefaults(
 		constrainWidth?: boolean
 	}>(),
 	{
-		showCopyIdAction: false,
 		showAdvancedDebugInfo: false,
 		showUptime: true,
 		additionalTabs: () => [],
@@ -493,11 +456,236 @@ const settingsHintMessages = defineMessages({
 	},
 })
 
+const instancesHintMessages = defineMessages({
+	title: {
+		id: 'servers.manage.instances-hint.title',
+		defaultMessage: 'New: Server Instances!',
+	},
+	description: {
+		id: 'servers.manage.instances-hint.description',
+		defaultMessage: 'Your server state has been converted into an instance.',
+	},
+	dismiss: {
+		id: 'servers.manage.instances-hint.dismiss',
+		defaultMessage: "Don't show again",
+	},
+})
+
+const messages = defineMessages({
+	serverPreparingTitle: {
+		id: 'servers.manage.status.preparing.title',
+		defaultMessage: "We're getting your server ready",
+	},
+	serverPreparingDescription: {
+		id: 'servers.manage.status.preparing.description',
+		defaultMessage: "Your server's hardware is being prepared and will be available shortly!",
+	},
+	serverUpgradingTitle: {
+		id: 'servers.manage.status.upgrading.title',
+		defaultMessage: 'Server upgrading',
+	},
+	serverUpgradingDescription: {
+		id: 'servers.manage.status.upgrading.description',
+		defaultMessage:
+			"Your server's hardware is currently being upgraded and will be back online shortly!",
+	},
+	serverSuspendedTitle: {
+		id: 'servers.manage.status.suspended.title',
+		defaultMessage: 'Server suspended',
+	},
+	suspendedCancelledDescription: {
+		id: 'servers.manage.status.suspended.cancelled-description',
+		defaultMessage:
+			'Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.',
+	},
+	suspendedReasonDescription: {
+		id: 'servers.manage.status.suspended.reason-description',
+		defaultMessage:
+			'Your server has been suspended: {reason}\nContact Modrinth Support if you believe this is an error.',
+	},
+	suspendedDescription: {
+		id: 'servers.manage.status.suspended.description',
+		defaultMessage:
+			'Your server has been suspended.\nContact Modrinth Support if you believe this is an error.',
+	},
+	generalErrorTitle: {
+		id: 'servers.manage.error.general.title',
+		defaultMessage: 'An error occurred.',
+	},
+	genericErrorMessage: {
+		id: 'servers.manage.error.general.message',
+		defaultMessage: 'An unexpected error occurred.',
+	},
+	contactSupportDescription: {
+		id: 'servers.manage.error.contact-support',
+		defaultMessage: 'Please contact Modrinth Support.',
+	},
+	nodeUnavailableTitle: {
+		id: 'servers.manage.error.node-unavailable.title',
+		defaultMessage: 'Server Node Unavailable',
+	},
+	nodeUnavailableDescription: {
+		id: 'servers.manage.error.node-unavailable.description',
+		defaultMessage:
+			"Your server's node, where your Modrinth Server is physically hosted, is not accessible at the moment. We are working to resolve the issue as quickly as possible.",
+	},
+	nodeUnavailableDataDescription: {
+		id: 'servers.manage.error.node-unavailable.data-description',
+		defaultMessage:
+			'Your data is safe and will not be lost, and your server will be back online as soon as the issue is resolved.',
+	},
+	nodeUnavailableSupportDescription: {
+		id: 'servers.manage.error.node-unavailable.support-description',
+		defaultMessage:
+			"If reloading does not work initially, please contact Modrinth Support via the chat bubble in the bottom right corner and we'll be happy to help.",
+	},
+	installInvalidVersionDescription: {
+		id: 'servers.manage.error.install.invalid-version.description',
+		defaultMessage:
+			'An invalid loader or Minecraft version was specified and could not be installed.',
+	},
+	installRecentMinecraftVersionNotice: {
+		id: 'servers.manage.error.install.invalid-version.recent-minecraft',
+		defaultMessage:
+			'If this version of Minecraft was released recently, please check if Modrinth Hosting supports it.',
+	},
+	installModpackCompatibilityNotice: {
+		id: 'servers.manage.error.install.invalid-version.modpack-compatibility',
+		defaultMessage:
+			"If you've installed a modpack, it may have been packaged incorrectly or may not be compatible with the loader.",
+	},
+	installChangeLoaderNotice: {
+		id: 'servers.manage.error.install.invalid-version.change-loader',
+		defaultMessage:
+			'Your server may need to be reinstalled with a valid mod loader and version. You can change the loader by clicking the "Change Loader" button.',
+	},
+	installSupportNotice: {
+		id: 'servers.manage.error.install.invalid-version.support',
+		defaultMessage: "If you're stuck, please contact Modrinth Support with the information below:",
+	},
+	installInternalErrorDescription: {
+		id: 'servers.manage.error.install.internal.description',
+		defaultMessage:
+			"An internal error occurred while installing your server. Don't fret - try reinstalling your server, and if the problem persists, please contact Modrinth support with your server's debug information.",
+	},
+	installUnsupportedVersionDescription: {
+		id: 'servers.manage.error.install.unsupported-version.description',
+		defaultMessage:
+			"An error occurred while installing your server because Modrinth Hosting does not support the version of Minecraft or the loader you specified. Try reinstalling your server with a different version or loader, and if the problem persists, please contact Modrinth Support with your server's debug information.",
+	},
+	installationErrorTitle: {
+		id: 'servers.manage.error.install.title',
+		defaultMessage: 'Installation error',
+	},
+	unknownError: {
+		id: 'servers.manage.error.unknown',
+		defaultMessage: 'Unknown error',
+	},
+	copyDebugInfo: {
+		id: 'servers.manage.error.copy-debug-info',
+		defaultMessage: 'Copy Debug Info',
+	},
+	openInstallationLog: {
+		id: 'servers.manage.error.open-installation-log',
+		defaultMessage: 'Open Installation Log',
+	},
+	changeLoader: {
+		id: 'servers.manage.error.change-loader',
+		defaultMessage: 'Change Loader',
+	},
+	websocketError: {
+		id: 'servers.manage.websocket.error',
+		defaultMessage: 'Something went wrong...',
+	},
+	websocketReconnecting: {
+		id: 'servers.manage.websocket.reconnecting',
+		defaultMessage: "Hang on, we're reconnecting to your server.",
+	},
+	serverDataTitle: {
+		id: 'servers.manage.debug.server-data',
+		defaultMessage: 'Server data',
+	},
+	serverSettings: {
+		id: 'servers.manage.server-settings',
+		defaultMessage: 'Server settings',
+	},
+	overviewNav: {
+		id: 'servers.manage.nav.overview',
+		defaultMessage: 'Overview',
+	},
+	instancesNav: {
+		id: 'servers.manage.nav.instances',
+		defaultMessage: 'Instances',
+	},
+	errorDismissingNotice: {
+		id: 'servers.manage.notice.dismiss-error',
+		defaultMessage: 'Error dismissing notice',
+	},
+	failedToRetryInstallation: {
+		id: 'servers.manage.install.retry-error',
+		defaultMessage: 'Failed to retry installation',
+	},
+	serverIdLabel: {
+		id: 'servers.manage.error-details.server-id',
+		defaultMessage: 'Server ID',
+	},
+	nodeLabel: {
+		id: 'servers.manage.error-details.node',
+		defaultMessage: 'Node',
+	},
+	errorMessageLabel: {
+		id: 'servers.manage.error-details.error-message',
+		defaultMessage: 'Error message',
+	},
+	timestampLabel: {
+		id: 'servers.manage.error-details.timestamp',
+		defaultMessage: 'Timestamp',
+	},
+	errorNameLabel: {
+		id: 'servers.manage.error-details.error-name',
+		defaultMessage: 'Error Name',
+	},
+	originalErrorLabel: {
+		id: 'servers.manage.error-details.original-error',
+		defaultMessage: 'Original Error',
+	},
+	stackTraceLabel: {
+		id: 'servers.manage.error-details.stack-trace',
+		defaultMessage: 'Stack Trace',
+	},
+	unknownLabel: {
+		id: 'servers.manage.error-details.unknown',
+		defaultMessage: 'Unknown',
+	},
+	nodePingFailed: {
+		id: 'servers.manage.error.node-ping-failed',
+		defaultMessage: 'Unable to reach node. Ping test failed.',
+	},
+	goToBillingSettings: {
+		id: 'servers.manage.action.go-to-billing-settings',
+		defaultMessage: 'Go to billing settings',
+	},
+	goBackToAllServers: {
+		id: 'servers.manage.action.go-back-to-all-servers',
+		defaultMessage: 'Go back to all servers',
+	},
+	reload: {
+		id: 'servers.manage.action.reload',
+		defaultMessage: 'Reload',
+	},
+	debugInfo: {
+		id: 'servers.manage.error.debug-info',
+		defaultMessage:
+			'Server ID: {serverId}\nError: {error}\nKind: {kind}\nProject ID: {projectId}\nVersion ID: {versionId}\nLog: {log}',
+	},
+})
+
 // disabled, keeping the animation logic cos it's really nice and we might want to re-enable in future
 const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
+const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const constrainWidth = computed(() => props.constrainWidth)
 const queryClient = useQueryClient()
 const route = useRoute()
@@ -509,8 +697,14 @@ const isLoading = ref(true)
 const isMounted = ref(true)
 const copied = ref(false)
 const installError = ref<Error | null>(null)
-const errorTitle = ref('Error')
-const errorMessage = ref('An unexpected error occurred.')
+type InstallErrorTitle = 'generic' | 'installation'
+const errorTitle = ref<InstallErrorTitle>('generic')
+const errorTitleLabel = computed(() =>
+	errorTitle.value === 'installation'
+		? formatMessage(messages.installationErrorTitle)
+		: formatMessage(messages.generalErrorTitle),
+)
+const errorMessage = ref(formatMessage(messages.genericErrorMessage))
 const errorLog = ref('')
 const errorLogFile = ref('')
 const isOnboarding = computed(() => serverData.value?.flows?.intro)
@@ -523,7 +717,18 @@ function dismissSettingsHint() {
 	settingsHintDismissed.value = true
 }
 
+const INSTANCES_HINT_KEY = 'server-panel-instances-hint-dismissed'
+const instancesHintDismissed = useStorage(INSTANCES_HINT_KEY, false)
+const showInstancesHint = ref(!instancesHintDismissed.value)
+function dismissInstancesHint() {
+	showInstancesHint.value = false
+	instancesHintDismissed.value = true
+}
+
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
+const serverInstanceSettingsModal = ref<InstanceType<typeof ServerInstanceSettingsModal> | null>(
+	null,
+)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 
 const {
@@ -556,11 +761,46 @@ const { data: serverFull } = useQuery({
 	queryFn: () => client.archon.servers_v1.get(props.serverId),
 })
 
+const routeInstanceId = ref<string | null>(getRouteParam(route.params.instance_id))
+
+watch(
+	() => [route.path, route.params.id, route.params.instance_id, props.serverId] as const,
+	() => {
+		if (!isRouteForManagedServer()) return
+		routeInstanceId.value = getRouteParam(route.params.instance_id)
+	},
+	{ immediate: true },
+)
+
 const worldId = computed(() => {
+	if (routeInstanceId.value) return routeInstanceId.value
 	if (!serverFull.value) return null
 	const activeWorld = serverFull.value.worlds.find((w) => w.is_active)
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
+
+const isInstanceDetailRoute = computed(() => !!routeInstanceId.value)
+const activeWorldName = computed(() => {
+	if (!serverFull.value) return null
+	const activeWorld = serverFull.value.worlds.find((world) => world.is_active)
+	return activeWorld?.name ?? serverFull.value.worlds[0]?.name ?? null
+})
+
+function isRouteForManagedServer() {
+	const routeServerId = getRouteParam(route.params.id)
+	if (!routeServerId || routeServerId !== props.serverId) return false
+	const basePath = `/hosting/manage/${encodeURIComponent(routeServerId)}`
+	return route.path === basePath || route.path.startsWith(`${basePath}/`)
+}
+
+function getRouteParam(param: string | string[] | undefined): string | null {
+	if (Array.isArray(param)) return param[0] ?? null
+	return param ?? null
+}
+
+function getWorldPath(targetWorldId: string) {
+	return `/hosting/manage/${encodeURIComponent(props.serverId)}/instances/${encodeURIComponent(targetWorldId)}`
+}
 
 const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
 	computed(() => props.serverId),
@@ -815,32 +1055,28 @@ watch(serverData, (data) => {
 
 const navLinks = computed<Tab[]>(() => [
 	{
-		label: 'Overview',
-		href: `/hosting/manage/${props.serverId}`,
+		label: formatMessage(messages.overviewNav),
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}`,
 		icon: LayoutTemplateIcon,
 		subpages: [],
 	},
 	{
-		label: 'Content',
-		href: `/hosting/manage/${props.serverId}/content`,
-		icon: BoxesIcon,
-		subpages: ['mods', 'datapacks'],
-	},
-	{
-		label: 'Files',
-		href: `/hosting/manage/${props.serverId}/files`,
-		icon: FolderOpenIcon,
+		label: formatMessage(messages.instancesNav),
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`,
+		icon: GlobeIcon,
 		subpages: [],
-	},
-	{
-		label: 'Backups',
-		href: `/hosting/manage/${props.serverId}/backups`,
-		icon: DatabaseBackupIcon,
-		subpages: [],
+		prompt: {
+			title: formatMessage(instancesHintMessages.title),
+			description: formatMessage(instancesHintMessages.description),
+			dismissLabel: formatMessage(instancesHintMessages.dismiss),
+			shown: showInstancesHint.value,
+			placement: 'bottom',
+			onDismiss: dismissInstancesHint,
+		},
 	},
 	{
 		label: 'Access',
-		href: `/hosting/manage/${props.serverId}/access`,
+		href: `/hosting/manage/${encodeURIComponent(props.serverId)}/access`,
 		icon: UsersIcon,
 		subpages: [],
 	},
@@ -855,7 +1091,7 @@ const surveyNotice = computed(() => serverData.value?.notices?.find((n) => n.lev
 async function dismissNotice(noticeId: number) {
 	await client.archon.servers_v0.dismissNotice(props.serverId, noticeId).catch((err) => {
 		addNotification({
-			title: 'Error dismissing notice',
+			title: formatMessage(messages.errorDismissingNotice),
 			text: err,
 			type: 'error',
 		})
@@ -966,7 +1202,7 @@ async function handleContentRetry() {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to retry installation',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToRetryInstallation),
 		})
 	}
 }
@@ -997,7 +1233,7 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 }
 
 const handleNewMod = () => {
-	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 }
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
@@ -1016,9 +1252,9 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 		case 'err': {
 			console.log('failed to install')
 			console.log(data)
-			errorTitle.value = 'Installation error'
-			errorMessage.value = data.reason ?? 'Unknown error'
-			installError.value = new Error(data.reason ?? 'Unknown error')
+			errorTitle.value = 'installation'
+			errorMessage.value = data.reason ?? formatMessage(messages.unknownError)
+			installError.value = new Error(errorMessage.value)
 
 			try {
 				let files = await client.kyros.files_v0.listDirectory('/', 1, 100)
@@ -1076,14 +1312,14 @@ const onReinstall = async (
 	}
 
 	installError.value = null
-	errorTitle.value = 'Error'
-	errorMessage.value = 'An unexpected error occurred.'
+	errorTitle.value = 'generic'
+	errorMessage.value = formatMessage(messages.genericErrorMessage)
 
 	modrinthServersConsole.clear()
 
 	debug('[root.vue] onReinstall: triggering immediate invalidation')
 	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
-	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+	queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 }
 
 const onReinstallFailed = () => {
@@ -1132,7 +1368,7 @@ async function invalidateAfterInstall() {
 				queryClient.invalidateQueries({
 					queryKey: ['servers', 'startup', 'v1', props.serverId],
 				}),
-				queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
+				queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] }),
 			])
 		} catch (err: unknown) {
 			console.error('Error refreshing data after installation:', err)
@@ -1146,62 +1382,64 @@ const nodeAccessible = ref(true)
 
 const nodeUnavailableDetails = computed(() => [
 	{
-		label: 'Server ID',
+		label: formatMessage(messages.serverIdLabel),
 		value: props.serverId,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Node',
+		label: formatMessage(messages.nodeLabel),
 		value:
 			(serverError.value?.responseData as { hostname?: string } | undefined)?.hostname ??
 			serverData.value?.datacenter ??
-			'Unknown',
+			formatMessage(messages.unknownLabel),
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error message',
+		label: formatMessage(messages.errorMessageLabel),
 		value: nodeAccessible.value
-			? (serverError.value?.message ?? 'Unknown')
-			: 'Unable to reach node. Ping test failed.',
+			? (serverError.value?.message ?? formatMessage(messages.unknownLabel))
+			: formatMessage(messages.nodePingFailed),
 		type: 'block' as const,
 	},
 ])
 
 const suspendedDescription = computed(() => {
 	if (serverData.value?.suspension_reason === 'cancelled') {
-		return 'Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error.'
+		return formatMessage(messages.suspendedCancelledDescription)
 	}
 	if (serverData.value?.suspension_reason) {
-		return `Your server has been suspended: ${serverData.value.suspension_reason}\nContact Modrinth Support if you believe this is an error.`
+		return formatMessage(messages.suspendedReasonDescription, {
+			reason: serverData.value.suspension_reason,
+		})
 	}
-	return 'Your server has been suspended.\nContact Modrinth Support if you believe this is an error.'
+	return formatMessage(messages.suspendedDescription)
 })
 
 const generalErrorDetails = computed(() => [
 	{
-		label: 'Server ID',
+		label: formatMessage(messages.serverIdLabel),
 		value: props.serverId,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Timestamp',
+		label: formatMessage(messages.timestampLabel),
 		value: String(new Date().toISOString()),
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error Name',
+		label: formatMessage(messages.errorNameLabel),
 		value: serverError.value?.name,
 		type: 'inline' as const,
 	},
 	{
-		label: 'Error Message',
+		label: formatMessage(messages.errorMessageLabel),
 		value: serverError.value?.message,
 		type: 'block' as const,
 	},
 	...(serverError.value?.originalError
 		? [
 				{
-					label: 'Original Error',
+					label: formatMessage(messages.originalErrorLabel),
 					value: String(serverError.value.originalError),
 					type: 'hidden' as const,
 				},
@@ -1210,7 +1448,7 @@ const generalErrorDetails = computed(() => [
 	...(serverError.value?.stack
 		? [
 				{
-					label: 'Stack Trace',
+					label: formatMessage(messages.stackTraceLabel),
 					value: serverError.value.stack,
 					type: 'hidden' as const,
 				},
@@ -1219,26 +1457,33 @@ const generalErrorDetails = computed(() => [
 ])
 
 const suspendedAction = computed(() => ({
-	label: 'Go to billing settings',
+	label: formatMessage(messages.goToBillingSettings),
 	onClick: () => props.navigateToBilling?.(),
 	color: 'brand' as const,
 }))
 
 const generalErrorAction = computed(() => ({
-	label: 'Go back to all servers',
+	label: formatMessage(messages.goBackToAllServers),
 	onClick: () => props.navigateToServers?.(),
 	color: 'brand' as const,
 }))
 
 const nodeUnavailableAction = computed(() => ({
-	label: 'Reload',
+	label: formatMessage(messages.reload),
 	onClick: () => props.reloadPage(),
 	color: 'brand' as const,
 	disabled: false,
 }))
 
 const copyServerDebugInfo = () => {
-	const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`
+	const debugInfo = formatMessage(messages.debugInfo, {
+		serverId: serverData.value?.server_id ?? '',
+		error: errorMessage.value,
+		kind: serverData.value?.upstream?.kind ?? '',
+		projectId: serverData.value?.upstream?.project_id ?? '',
+		versionId: serverData.value?.upstream?.version_id ?? '',
+		log: errorLog.value,
+	})
 	navigator.clipboard.writeText(debugInfo)
 	copied.value = true
 	setTimeout(() => {
@@ -1247,7 +1492,10 @@ const copyServerDebugInfo = () => {
 }
 
 const openInstallLog = () => {
-	const url = `/hosting/manage/${props.serverId}/files?editing=${encodeURIComponent(errorLogFile.value)}`
+	const filesPath = worldId.value
+		? `${getWorldPath(worldId.value)}/files`
+		: `/hosting/manage/${encodeURIComponent(props.serverId)}/instances`
+	const url = `${filesPath}?editing=${encodeURIComponent(errorLogFile.value)}`
 	window.history.pushState({}, '', url)
 	window.dispatchEvent(new PopStateEvent('popstate'))
 }
@@ -1255,6 +1503,18 @@ const openInstallLog = () => {
 function openServerSettingsModal(tabId?: ServerSettingsTabId) {
 	if (!props.serverId) return
 	serverSettingsModal.value?.show({ serverId: props.serverId, tabId })
+}
+
+function openServerInstanceSettingsModal(
+	tabId?: ServerInstanceSettingsTabId,
+	targetWorldId?: string | null,
+) {
+	if (!props.serverId) return
+	serverInstanceSettingsModal.value?.show({
+		serverId: props.serverId,
+		tabId,
+		worldId: targetWorldId,
+	})
 }
 
 function handleBrowseModpacks(args: {
@@ -1275,6 +1535,8 @@ function handleBrowseContent(args: {
 
 provideServerSettingsModal({
 	openServerSettings: (options) => openServerSettingsModal(options?.tabId),
+	openServerInstanceSettings: (options) =>
+		openServerInstanceSettingsModal(options?.tabId, options?.worldId),
 	browseServerContent: (args) => handleBrowseContent(args),
 })
 
@@ -1436,12 +1698,23 @@ onMounted(() => {
 	}
 
 	if (route.query.openSettings) {
-		const tabId = route.query.openSettings as ServerSettingsTabId
+		const tabId =
+			typeof route.query.openSettings === 'string' ? route.query.openSettings : undefined
 		router.replace({ query: { ...route.query, openSettings: undefined } })
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
 		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
 		queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', props.serverId] })
-		nextTick(() => openServerSettingsModal(tabId))
+		if (tabId === 'installation' || tabId === 'properties') {
+			nextTick(() => openServerInstanceSettingsModal(tabId))
+		} else if (
+			tabId === 'general' ||
+			tabId === 'network' ||
+			tabId === 'advanced' ||
+			tabId === 'billing' ||
+			tabId === 'admin-billing'
+		) {
+			nextTick(() => openServerSettingsModal(tabId))
+		}
 	}
 })
 

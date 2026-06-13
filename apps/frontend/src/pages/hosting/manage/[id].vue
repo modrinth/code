@@ -3,7 +3,6 @@
 		:server-id="serverId"
 		:reload-page="() => reloadNuxtApp({ path: route.path })"
 		:resolve-viewer="resolveViewer"
-		:show-copy-id-action="flags.developerMode"
 		:show-advanced-debug-info="flags.advancedDebugInfo"
 		:stripe-publishable-key="config.public.stripePublishableKey as string"
 		:site-url="config.public.siteUrl as string"
@@ -52,15 +51,18 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 if (serverId) {
-	try {
-		await queryClient.ensureQueryData({
+	await Promise.allSettled([
+		queryClient.ensureQueryData({
 			queryKey: ['servers', 'detail', serverId],
 			queryFn: () => client.archon.servers_v0.get(serverId)!,
 			staleTime: 30_000,
-		})
-	} catch {
-		// Let mounted layouts' useQuery surface errors; do not fail route setup.
-	}
+		}),
+		queryClient.ensureQueryData({
+			queryKey: ['servers', 'v1', 'detail', serverId],
+			queryFn: () => client.archon.servers_v1.get(serverId),
+			staleTime: 30_000,
+		}),
+	])
 }
 
 const auth = (await useAuth()) as unknown as {

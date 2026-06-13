@@ -13,202 +13,57 @@
 				@unlinked="fetchInstance"
 			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<ContentPageHeader>
-				<template #icon>
-					<Avatar
-						:src="icon ? icon : undefined"
-						:alt="instance.name"
-						size="64px"
-						:tint-by="instance.path"
-					/>
-				</template>
-				<template #title>
-					{{ instance.name }}
-				</template>
-				<template #stats>
+			<PageHeader
+				:header="instance.name"
+				:leading="instanceHeaderLeading"
+				:metadata="instanceHeaderMetadata"
+				:actions="instanceHeaderActions"
+			>
+				<template #metadata-server-details>
 					<div class="flex items-center flex-wrap gap-2">
-						<template v-if="!isServerInstance">
-							<div class="flex items-center gap-2 capitalize font-medium">
-								{{ instance.loader }} {{ instance.game_version }}
-							</div>
-
-							<template v-if="showInstancePlayTime">
-								<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
-								<div class="flex items-center gap-2 font-medium">
-									<template v-if="timePlayed > 0">
-										{{ timePlayedHumanized }}
-									</template>
-									<template v-else> Never played </template>
-								</div>
-							</template>
-						</template>
-
-						<template v-else>
-							<template v-if="loadingServerPing">
-								<ServerOnlinePlayers
-									v-if="playersOnline !== undefined"
-									:online="playersOnline"
-									:status-online="statusOnline"
-									hide-label
-								/>
-								<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
-								<div
-									v-if="
-										(playersOnline !== undefined || recentPlays !== undefined) &&
-										(minecraftServer?.region || ping)
-									"
-									class="w-1.5 h-1.5 rounded-full bg-surface-5"
-								></div>
-								<ServerPing v-if="ping" :ping="ping" />
-							</template>
-
-							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
-
+						<template v-if="loadingServerPing">
+							<ServerOnlinePlayers
+								v-if="playersOnline !== undefined"
+								:online="playersOnline"
+								:status-online="statusOnline"
+								hide-label
+							/>
+							<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
 							<div
-								v-if="minecraftServer?.region || ping"
+								v-if="
+									(playersOnline !== undefined || recentPlays !== undefined) &&
+									(minecraftServer?.region || ping)
+								"
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
-
-							<div
-								v-if="linkedProjectV3"
-								class="flex gap-1.5 items-center font-medium text-primary"
-							>
-								Linked to
-								<Avatar
-									:src="linkedProjectV3.icon_url"
-									:alt="linkedProjectV3.name"
-									:tint-by="instance.path"
-									size="24px"
-								/>
-								<router-link
-									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary truncate"
-								>
-									{{ linkedProjectV3.name }}
-								</router-link>
-							</div>
+							<ServerPing v-if="ping" :ping="ping" />
 						</template>
-					</div>
-				</template>
-				<template #actions>
-					<div class="flex gap-2">
-						<ButtonStyled
-							v-if="
-								[
-									'installing',
-									'pack_installing',
-									'pack_installed',
-									'not_installed',
-									'minecraft_installing',
-								].includes(instance.install_stage)
-							"
-							color="brand"
-							size="large"
-						>
-							<button disabled>Installing...</button>
-						</ButtonStyled>
-						<ButtonStyled
-							v-else-if="instance.install_stage !== 'installed'"
-							color="brand"
-							size="large"
-						>
-							<button @click="repairInstance()">
-								<DownloadIcon />
-								Repair
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else-if="playing === true" color="red" size="large">
-							<button :disabled="stopping" @click="stopInstance('InstancePage')">
-								<StopCircleIcon />
-								{{ stopping ? 'Stopping...' : 'Stop' }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled
-							v-else-if="playing === false && loading === false && !isServerInstance"
-							color="brand"
-							size="large"
-						>
-							<button @click="startInstance('InstancePage')">
-								<PlayIcon />
-								Play
-							</button>
-						</ButtonStyled>
-						<div
-							v-else-if="playing === false && loading === false && isServerInstance"
-							class="joined-buttons"
-						>
-							<ButtonStyled color="brand" size="large">
-								<button @click="handlePlayServer()">
-									<PlayIcon />
-									Play
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand" size="large">
-								<OverflowMenu
-									:options="[
-										{
-											id: 'join_server',
-											action: () => handlePlayServer(),
-										},
-										{
-											id: 'launch_instance',
-											action: () => startInstance('InstancePage'),
-										},
-									]"
-								>
-									<div class="w-0 text-xl relative top-0.5 right-2.5">
-										<DropdownIcon />
-									</div>
 
-									<template #join_server>
-										<PlayIcon />
-										Join server
-									</template>
-									<template #launch_instance>
-										<PlayIcon />
-										Launch instance
-									</template>
-								</OverflowMenu>
-							</ButtonStyled>
-						</div>
-						<ButtonStyled
-							v-else-if="loading === true && playing === false"
-							color="brand"
-							size="large"
-						>
-							<button disabled>Starting...</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large">
-							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled type="transparent" circular size="large">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'open-folder',
-										action: () => {
-											if (instance) showProfileInFolder(instance.path)
-										},
-									},
-									{
-										id: 'export-mrpack',
-										action: () => exportModal?.show(),
-									},
-								]"
+						<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
+
+						<div
+							v-if="minecraftServer?.region || ping"
+							class="w-1.5 h-1.5 rounded-full bg-surface-5"
+						></div>
+
+						<div v-if="linkedProjectV3" class="flex gap-1.5 items-center font-medium text-primary">
+							Linked to
+							<Avatar
+								:src="linkedProjectV3.icon_url"
+								:alt="linkedProjectV3.name"
+								:tint-by="instance.path"
+								size="24px"
+							/>
+							<router-link
+								:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
+								class="hover:underline text-primary truncate"
 							>
-								<MoreVerticalIcon />
-								<template #share-instance> <UserPlusIcon /> Share instance </template>
-								<template #host-a-server> <ServerIcon /> Create a server </template>
-								<template #open-folder> <FolderOpenIcon /> Open folder </template>
-								<template #export-mrpack> <PackageIcon /> Export modpack </template>
-							</OverflowMenu>
-						</ButtonStyled>
+								{{ linkedProjectV3.name }}
+							</router-link>
+						</div>
 					</div>
 				</template>
-			</ContentPageHeader>
+			</PageHeader>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
@@ -272,7 +127,6 @@ import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
-	DropdownIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
@@ -283,39 +137,44 @@ import {
 	PackageIcon,
 	PlayIcon,
 	PlusIcon,
-	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
+	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TerminalSquareIcon,
+	TimerIcon,
 	UpdatedIcon,
-	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
-	ContentPageHeader,
+	formatLoaderLabel,
 	injectNotificationManager,
+	LoaderIcon as ServerLoaderIcon,
 	NavTabs,
-	OverflowMenu,
+	PageHeader,
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRecentPlays,
 	ServerRegion,
 	useLoadingBarToken,
 } from '@modrinth/ui'
+import type { Loaders } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, onUnmounted, ref } from 'vue'
+import { type LocationQuery, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
@@ -325,7 +184,7 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { get_server_status, refreshWorlds } from '@/helpers/worlds'
+import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
@@ -369,32 +228,79 @@ const selected = ref<unknown[]>([])
 
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
-const statusOnline = computed(() => !!javaServerPingData.value)
+const liveServerStatusOnline = ref(false)
+const statusOnline = computed(() => liveServerStatusOnline.value || !!javaServerPingData.value)
 const recentPlays = computed(
 	() => linkedProjectV3.value?.minecraft_java_server?.verified_plays_2w ?? undefined,
 )
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
+const activeProfilePath = ref<string>()
+let fetchInstanceRequestId = 0
 
-function isContentSubpageRoute(routeName = route.name) {
+type InstanceRouteContext = {
+	name: unknown
+	path: string
+	query: LocationQuery
+}
+
+type InstancePageData = {
+	profilePath: string
+	instance?: GameInstance
+	linkedProjectV3?: Labrinth.Projects.v3.Project
+	isServerInstance: boolean
+	preloadedContent: InstanceContentData | null
+}
+
+function applyServerStatus(status: ServerStatus) {
+	playersOnline.value = status.players?.online
+	ping.value = status.ping
+	liveServerStatusOnline.value = true
+	loadingServerPing.value = true
+}
+
+function isContentSubpageRoute(routeName: unknown = route.name) {
 	return typeof routeName === 'string' && contentSubpageRouteNames.has(routeName)
 }
 
-async function fetchInstance() {
-	isServerInstance.value = false
-	linkedProjectV3.value = undefined
-	preloadedContent.value = null
+function resetServerStatus() {
 	ping.value = undefined
 	playersOnline.value = undefined
+	liveServerStatusOnline.value = false
 	loadingServerPing.value = false
+}
 
-	const nextInstance = await get(route.params.id as string).catch(handleError)
+function isCurrentInstanceRequest(requestId: number, profilePath: string) {
+	return (
+		requestId === fetchInstanceRequestId &&
+		route.path.startsWith('/instance') &&
+		route.params.id === profilePath
+	)
+}
+
+function setInstanceBreadcrumbs(nextInstance: GameInstance, routeContext: InstanceRouteContext) {
+	breadcrumbs.setName(
+		'Instance',
+		nextInstance.name.length > 40 ? nextInstance.name.substring(0, 40) + '...' : nextInstance.name,
+	)
+	breadcrumbs.setContext({
+		name: nextInstance.name,
+		link: routeContext.path,
+		query: routeContext.query,
+	})
+}
+
+async function loadInstancePageData(
+	profilePath: string,
+	routeName: unknown = route.name,
+): Promise<InstancePageData> {
+	const nextInstance = await get(profilePath).catch(handleError)
 	let nextLinkedProjectV3: Labrinth.Projects.v3.Project | undefined
 	let nextIsServerInstance = false
 
 	const contentPreloadPromise =
-		nextInstance && isContentSubpageRoute()
+		nextInstance && isContentSubpageRoute(routeName)
 			? loadInstanceContentData(nextInstance.path, undefined, handleError)
 			: Promise.resolve(null)
 
@@ -415,59 +321,112 @@ async function fetchInstance() {
 
 	const nextPreloadedContent = await contentPreloadPromise
 
-	instance.value = nextInstance ?? undefined
-	linkedProjectV3.value = nextLinkedProjectV3
-	isServerInstance.value = nextIsServerInstance
-	preloadedContent.value = nextPreloadedContent
+	return {
+		profilePath,
+		instance: nextInstance ?? undefined,
+		linkedProjectV3: nextLinkedProjectV3,
+		isServerInstance: nextIsServerInstance,
+		preloadedContent: nextPreloadedContent,
+	}
+}
 
-	fetchDeferredData()
+function applyInstancePageData(data: InstancePageData, routeContext: InstanceRouteContext) {
+	activeProfilePath.value = data.profilePath
+	resetServerStatus()
+	playing.value = false
 
-	if (nextInstance) {
+	instance.value = data.instance
+	linkedProjectV3.value = data.linkedProjectV3
+	isServerInstance.value = data.isServerInstance
+	preloadedContent.value = data.preloadedContent
+
+	if (data.instance) {
+		setInstanceBreadcrumbs(data.instance, routeContext)
+	}
+
+	fetchDeferredData(data.profilePath)
+
+	if (data.instance) {
 		queryClient.prefetchQuery({
-			queryKey: ['worlds', nextInstance.path],
-			queryFn: () => refreshWorlds(nextInstance.path),
+			queryKey: ['worlds', data.instance.path],
+			queryFn: () => refreshWorlds(data.instance!.path),
 			staleTime: 30_000,
 		})
 	}
 }
 
-function fetchDeferredData() {
+async function fetchInstance(profilePath = route.params.id as string) {
+	const requestId = ++fetchInstanceRequestId
+	const data = await loadInstancePageData(profilePath)
+	if (!isCurrentInstanceRequest(requestId, profilePath)) return
+
+	applyInstancePageData(data, {
+		name: route.name,
+		path: route.path,
+		query: route.query,
+	})
+}
+
+function fetchDeferredData(profilePath: string) {
 	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
 	if (isServerInstance.value && serverAddress) {
-		get_server_status(serverAddress)
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			applyServerStatus(cachedStatus)
+		} else {
+			playersOnline.value = undefined
+			ping.value = undefined
+			loadingServerPing.value = false
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
 			.then((status) => {
-				playersOnline.value = status.players?.online
-				ping.value = status.ping
+				if (
+					activeProfilePath.value !== profilePath ||
+					linkedProjectV3.value?.minecraft_java_server?.address !== serverAddress
+				)
+					return
+				applyServerStatus(status)
 			})
 			.catch((error) => {
 				console.error(`Failed to fetch server status for ${serverAddress}:`, error)
 			})
 			.finally(() => {
+				if (activeProfilePath.value !== profilePath) return
 				loadingServerPing.value = true
 			})
 	} else {
 		loadingServerPing.value = true
 	}
 
-	updatePlayState()
+	updatePlayState(profilePath)
 }
 
-async function updatePlayState() {
-	if (!route.params.id) return
-	const runningProcesses = await get_by_profile_path(route.params.id as string).catch(handleError)
+async function updatePlayState(profilePath = route.params.id as string) {
+	if (!profilePath) return
+	const runningProcesses = await get_by_profile_path(profilePath).catch(handleError)
+	if (activeProfilePath.value !== profilePath) return
 
 	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
 }
 
-await fetchInstance()
-watch(
-	() => route.params.id,
-	async () => {
-		if (route.params.id && route.path.startsWith('/instance')) {
-			await fetchInstance()
-		}
-	},
-)
+await fetchInstance(route.params.id as string)
+
+onBeforeRouteUpdate(async (to) => {
+	if (!to.path.startsWith('/instance')) return
+	const profilePath = Array.isArray(to.params.id) ? to.params.id[0] : to.params.id
+	if (typeof profilePath !== 'string') return false
+
+	const requestId = ++fetchInstanceRequestId
+	const data = await loadInstancePageData(profilePath, to.name)
+	if (requestId !== fetchInstanceRequestId) return false
+
+	applyInstancePageData(data, {
+		name: to.name,
+		path: to.path,
+		query: to.query,
+	})
+})
 
 const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
 
@@ -509,20 +468,6 @@ const tabs = computed(() => [
 		icon: TerminalSquareIcon,
 	},
 ])
-
-if (instance.value) {
-	breadcrumbs.setName(
-		'Instance',
-		instance.value.name.length > 40
-			? instance.value.name.substring(0, 40) + '...'
-			: instance.value.name,
-	)
-	breadcrumbs.setContext({
-		name: instance.value.name,
-		link: route.path,
-		query: route.query,
-	})
-}
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
@@ -683,6 +628,16 @@ const timePlayed = computed(() => {
 		: 0
 })
 
+const loaderDisplayName = computed(() =>
+	instance.value ? (formatLoaderLabel(instance.value.loader) as Loaders) : null,
+)
+
+const loaderLabel = computed(() =>
+	instance.value && loaderDisplayName.value
+		? [loaderDisplayName.value, instance.value.loader_version].filter(Boolean).join(' ')
+		: '',
+)
+
 const timePlayedHumanized = computed(() => {
 	const duration = dayjs.duration(timePlayed.value, 'seconds')
 	const hours = Math.floor(duration.asHours())
@@ -698,6 +653,187 @@ const timePlayedHumanized = computed(() => {
 	const seconds = Math.floor(duration.asSeconds())
 	return seconds + ' second' + (seconds > 1 ? 's' : '')
 })
+
+const playtimeLabel = computed(() =>
+	timePlayed.value > 0 ? timePlayedHumanized.value : 'Never played',
+)
+
+const instanceHeaderLeading = computed(() => ({
+	type: 'avatar' as const,
+	src: icon.value ? icon.value : undefined,
+	alt: instance.value?.name,
+	avatarSize: '64px',
+	tintBy: instance.value?.path,
+}))
+
+const instanceHeaderMetadata = computed(() => {
+	if (!instance.value) return []
+	if (isServerInstance.value) {
+		return [
+			{
+				id: 'server-details',
+				type: 'custom' as const,
+				class: 'contents',
+			},
+		]
+	}
+
+	return [
+		{
+			id: 'game-version',
+			label: instance.value.game_version,
+			icon: Gamepad2Icon,
+		},
+		{
+			id: 'loader',
+			label: loaderLabel.value,
+			icon: ServerLoaderIcon,
+			iconProps: {
+				loader: loaderDisplayName.value,
+			},
+		},
+		...(showInstancePlayTime.value
+			? [
+					{
+						id: 'playtime',
+						label: playtimeLabel.value,
+						icon: TimerIcon,
+					},
+				]
+			: []),
+	]
+})
+
+const installingStages = [
+	'installing',
+	'pack_installing',
+	'pack_installed',
+	'not_installed',
+	'minecraft_installing',
+]
+
+const primaryInstanceAction = computed(() => {
+	if (!instance.value) return null
+
+	if (installingStages.includes(instance.value.install_stage)) {
+		return {
+			id: 'installing',
+			label: 'Installing...',
+			color: 'brand' as const,
+			disabled: true,
+		}
+	}
+
+	if (instance.value.install_stage !== 'installed') {
+		return {
+			id: 'repair',
+			label: 'Repair',
+			icon: DownloadIcon,
+			color: 'brand' as const,
+			onClick: () => {
+				void repairInstance()
+			},
+		}
+	}
+
+	if (playing.value === true) {
+		return {
+			id: 'stop',
+			label: stopping.value ? 'Stopping...' : 'Stop',
+			icon: StopCircleIcon,
+			color: 'red' as const,
+			disabled: stopping.value,
+			onClick: () => {
+				void stopInstance('InstancePage')
+			},
+		}
+	}
+
+	if (playing.value === false && loading.value === false && !isServerInstance.value) {
+		return {
+			id: 'play',
+			label: 'Play',
+			icon: PlayIcon,
+			color: 'brand' as const,
+			onClick: () => {
+				void startInstance('InstancePage')
+			},
+		}
+	}
+
+	if (playing.value === false && loading.value === false && isServerInstance.value) {
+		return {
+			id: 'play',
+			label: 'Play',
+			color: 'brand' as const,
+			joinedActions: [
+				{
+					id: 'join_server',
+					label: 'Play',
+					icon: PlayIcon,
+					action: () => {
+						void handlePlayServer()
+					},
+				},
+				{
+					id: 'launch_instance',
+					label: 'Launch instance',
+					icon: PlayIcon,
+					action: () => {
+						void startInstance('InstancePage')
+					},
+				},
+			],
+		}
+	}
+
+	if (loading.value === true && playing.value === false) {
+		return {
+			id: 'starting',
+			label: 'Starting...',
+			color: 'brand' as const,
+			disabled: true,
+		}
+	}
+
+	return null
+})
+
+const instanceHeaderActions = computed(() => [
+	...(primaryInstanceAction.value ? [primaryInstanceAction.value] : []),
+	{
+		id: 'settings',
+		label: 'Instance settings',
+		icon: SettingsIcon,
+		labelHidden: true,
+		tooltip: 'Instance settings',
+		onClick: () => settingsModal.value?.show(),
+	},
+	{
+		id: 'more',
+		label: 'More actions',
+		icon: MoreVerticalIcon,
+		labelHidden: true,
+		type: 'transparent' as const,
+		tooltip: 'More actions',
+		menuActions: [
+			{
+				id: 'open-folder',
+				label: 'Open folder',
+				icon: FolderOpenIcon,
+				action: () => {
+					if (instance.value) void showProfileInFolder(instance.value.path)
+				},
+			},
+			{
+				id: 'export-mrpack',
+				label: 'Export modpack',
+				icon: PackageIcon,
+				action: () => exportModal.value?.show(),
+			},
+		],
+	},
+])
 
 onUnmounted(() => {
 	unlistenProcesses()

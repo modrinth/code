@@ -10,6 +10,7 @@ import {
 } from '@modrinth/assets'
 import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
+	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
 	commonMessages,
@@ -22,8 +23,11 @@ import {
 	preferencesDiffer,
 	provideBrowseManager,
 	requestInstall,
+	SelectedProjectsFloatingBar,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useBrowseSearch,
-	useDebugLogger,
+	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -56,18 +60,25 @@ import {
 } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
+defineOptions({
+	name: 'Browse',
+})
+
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
 	injectServerInstall()
 const { install: installVersion } = injectContentInstall()
 const queryClient = useQueryClient()
-const debugLog = useDebugLogger('Browse')
 
 const router = useRouter()
 const route = useRoute()
+const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
-const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = createServerInstallContent({
+	serverSetupModalRef,
+	isRouteInContext: (targetRoute) => targetRoute.path.startsWith('/browse/'),
+})
 provideServerInstallContent(serverInstallContent)
 const {
 	serverIdQuery,
@@ -77,6 +88,10 @@ const {
 	isSetupServerContext,
 	effectiveServerWorldId,
 	serverContextServerData,
+	serverContextWorldName,
+	serverContextWorldGameVersion,
+	serverContextWorldLoader,
+	serverContextWorldLoaderVersion,
 	serverContentProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
@@ -103,8 +118,6 @@ const {
 	handleServerModpackFlowCreate,
 	markServerProjectInstalled,
 } = serverInstallContent
-
-debugLog('fetching tags (categories, loaders, gameVersions)')
 const [categories, loaders, availableGameVersions] = await Promise.all([
 	get_categories()
 		.catch(handleError)
@@ -182,22 +195,10 @@ watchServerContextChanges()
 await initInstanceContext()
 
 async function initInstanceContext() {
-	debugLog('initInstanceContext', {
-		queryI: route.query.i,
-		queryAi: route.query.ai,
-		querySid: route.query.sid,
-		queryWid: route.query.wid,
-		queryFrom: route.query.from,
-	})
 	await initServerContext()
 
 	if (route.query.i) {
 		instance.value = (await getInstance(route.query.i as string).catch(handleError)) ?? null
-		debugLog('instance loaded', {
-			name: instance.value?.name,
-			loader: instance.value?.loader,
-			gameVersion: instance.value?.game_version,
-		})
 
 		if (route.query.from === 'worlds') {
 			get_profile_worlds(route.query.i as string)
@@ -205,34 +206,29 @@ async function initInstanceContext() {
 					const serverProjectIds = worlds
 						.filter((w) => w.type === 'server' && 'project_id' in w && w.project_id)
 						.map((w) => (w as { project_id: string }).project_id)
-					debugLog('installedServerProjectIds loaded', { count: serverProjectIds.length })
 					installedProjectIds.value = serverProjectIds
 				})
 				.catch(handleError)
 		} else {
 			getInstalledProjectIds(route.query.i as string)
 				.then((ids) => {
-					debugLog('installedProjectIds loaded', { count: ids?.length })
 					installedProjectIds.value = ids
 				})
 				.catch(handleError)
 		}
 
 		if (instance.value?.linked_data?.project_id) {
-			debugLog('checking linked project for server status', instance.value.linked_data.project_id)
 			const projectV3 = await get_project_v3(
 				instance.value.linked_data.project_id,
 				'must_revalidate',
 			).catch(handleError)
 			if (projectV3?.minecraft_server != null) {
-				debugLog('instance is a server instance')
 				isServerInstance.value = true
 			}
 		}
 	}
 
 	if (route.query.ai && !(route.params.projectType === 'modpack')) {
-		debugLog('setting instanceHideInstalled from query', route.query.ai)
 		instanceHideInstalled.value = route.query.ai === 'true'
 	}
 }
@@ -283,7 +279,7 @@ function syncHiddenServerContentProjectIds() {
 watch(
 	serverContentProjectIds,
 	() => {
-		if (!hiddenServerContentProjectIdsInitialized.value) {
+		if (!hiddenServerContentProjectIdsInitialized.value || serverHideInstalled.value) {
 			syncHiddenServerContentProjectIds()
 		}
 	},
@@ -296,10 +292,10 @@ const serverContextFilters = computed(() => {
 	const pt = projectType.value
 
 	if (pt !== 'modpack') {
-		const gameVersion = serverContextServerData.value.mc_version
+		const gameVersion = serverContextWorldGameVersion.value
 		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
 
-		const platform = serverContextServerData.value.loader?.toLowerCase()
+		const platform = serverContextWorldLoader.value?.toLowerCase().replaceAll('_', '')
 		if (platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
 			filters.push({ type: 'mod_loader', option: platform })
 		if (platform && ['paper', 'purpur'].includes(platform))
@@ -334,6 +330,14 @@ const combinedProvidedFilters = computed(() =>
 	isServerContext.value ? serverContextFilters.value : instanceFilters.value,
 )
 
+const serverContentProjectType = computed<ProjectType | null>(() => {
+	const loader = serverContextWorldLoader.value?.toLowerCase()
+	if (!loader) return null
+	if (loader === 'paper' || loader === 'purpur') return 'plugin'
+	if (loader === 'vanilla') return 'datapack'
+	return 'mod'
+})
+
 const {
 	serverPings,
 	contextMenuRef,
@@ -356,11 +360,9 @@ const {
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
-	debugLog('went offline')
 	offline.value = true
 })
 window.addEventListener('online', () => {
-	debugLog('went online')
 	offline.value = false
 })
 
@@ -404,6 +406,10 @@ const messages = defineMessages({
 	backToInstance: {
 		id: 'app.browse.back-to-instance',
 		defaultMessage: 'Back to instance',
+	},
+	worldFallbackName: {
+		id: 'app.browse.server.world-fallback-name',
+		defaultMessage: 'Instance',
 	},
 	serverInstanceContentWarning: {
 		id: 'app.browse.server-instance-content-warning',
@@ -462,8 +468,32 @@ onBeforeRouteLeave(() => {
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
 
 watch(
+	[isServerContext, isSetupServerContext, projectType, serverContentProjectType],
+	([serverContext, setupServerContext, currentProjectType, targetProjectType]) => {
+		if (!serverContext || setupServerContext || !targetProjectType) return
+		if (!['mod', 'plugin', 'datapack'].includes(currentProjectType)) return
+		if (currentProjectType === targetProjectType) return
+
+		router.replace({
+			path: `/browse/${targetProjectType}`,
+			query: {
+				sid: route.query.sid,
+				wid: route.query.wid,
+				shi: route.query.shi,
+				from: route.query.from,
+				q: route.query.q,
+			},
+		})
+	},
+	{ immediate: true },
+)
+
+watch(
 	() => route.params.projectType as ProjectType,
 	async (newType) => {
+		if (!browseRouteActive.value) {
+			return
+		}
 		if (isSetupServerContext.value) {
 			enforceSetupModpackRoute(newType)
 			if (newType !== 'modpack') return
@@ -471,11 +501,9 @@ watch(
 
 		if (!newType || newType === projectType.value) return
 
-		debugLog('projectType route param changed', { from: projectType.value, to: newType })
 		projectType.value = newType
 
 		if (!route.query.i && instance.value) {
-			debugLog('instance context removed, resetting')
 			instance.value = null
 			installedProjectIds.value = null
 			instanceHideInstalled.value = false
@@ -545,9 +573,10 @@ const selectableProjectTypes = computed(() => {
 const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
-			name: serverContextServerData.value.name,
-			loader: serverContextServerData.value.loader ?? '',
-			gameVersion: serverContextServerData.value.mc_version ?? '',
+			name: serverContextWorldName.value ?? formatMessage(messages.worldFallbackName),
+			loader: serverContextWorldLoader.value ?? '',
+			loaderVersion: serverContextWorldLoaderVersion.value ?? '',
+			gameVersion: serverContextWorldGameVersion.value ?? '',
 			serverId: serverIdQuery.value,
 			upstream: serverContextServerData.value.upstream,
 			iconSrc: null as string | null,
@@ -586,6 +615,12 @@ const installContext = computed(() => {
 	return null
 })
 
+const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'BrowseInstallHeader',
+)
+
 const installingProjectIds = ref<Set<string>>(new Set())
 
 function setProjectInstalling(projectId: string, installing: boolean) {
@@ -615,8 +650,8 @@ function getCurrentSelectedInstallPreferences(projectTypeValue: string) {
 function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
 	return getTargetInstallPreferences(
 		{
-			gameVersion: serverContextServerData.value?.mc_version,
-			loader: serverContextServerData.value?.loader,
+			gameVersion: serverContextWorldGameVersion.value,
+			loader: serverContextWorldLoader.value,
 		},
 		contentType,
 	)
@@ -658,7 +693,6 @@ async function chooseInstanceInstallVersion(
 	const selectedVersion = getLatestMatchingInstallVersion(
 		await getInstallProjectVersions(project.project_id),
 		selectedPreferences,
-		projectTypeValue,
 	)
 
 	if (!selectedVersion) {
@@ -682,11 +716,10 @@ function getCardActions(
 		installed?: boolean
 		installing?: boolean
 	}
-	const isInstalled =
-		projectResult.installed ||
-		allInstalledIds.value.has(projectResult.project_id || '') ||
-		serverContentProjectIds.value.has(projectResult.project_id || '') ||
-		serverContextServerData.value?.upstream?.project_id === projectResult.project_id
+	const isInstalled = isServerContext.value
+		? serverContentProjectIds.value.has(projectResult.project_id || '') ||
+			serverContextServerData.value?.upstream?.project_id === projectResult.project_id
+		: projectResult.installed || allInstalledIds.value.has(projectResult.project_id || '')
 	const isInstalling = installingProjectIds.value.has(projectResult.project_id)
 
 	if (
@@ -741,11 +774,15 @@ function getCardActions(
 							project: projectResult,
 							contentType,
 							mode: isModpack ? 'immediate' : 'queue',
-							selectedFilters: isModpack ? [] : searchState.currentFilters.value,
+							selectedFilters: isModpack
+								? []
+								: stripServerRuntimeInstallFilters(searchState.currentFilters.value),
 							providedFilters: isModpack ? [] : combinedProvidedFilters.value,
 							overriddenProvidedFilterTypes: isModpack
 								? []
-								: searchState.overriddenProvidedFilterTypes.value,
+								: stripServerRuntimeInstallOverrides(
+										searchState.overriddenProvidedFilterTypes.value,
+									),
 							targetPreferences: getServerInstallTargetPreferences(contentType),
 							getProjectVersions: getInstallProjectVersions,
 							queue: serverInstallQueue,
@@ -838,7 +875,6 @@ function onSearchResultInstalled(id: string) {
 }
 
 async function search(requestParams: string) {
-	debugLog('searching v3', requestParams)
 	const isServer = projectType.value === 'server'
 
 	const rawResults = await queryClient.fetchQuery({
@@ -920,6 +956,7 @@ const lockedFilterMessages = computed(() => ({
 const searchState = useBrowseSearch({
 	projectType,
 	tags,
+	active: browseRouteActive,
 	providedFilters: combinedProvidedFilters,
 	search,
 	persistentQueryParams: ['i', 'ai', 'shi', 'sid', 'wid', 'from'],
@@ -967,7 +1004,12 @@ if (instance.value?.game_version) {
 await searchState.refreshSearch()
 
 function getProjectBrowseQuery() {
-	if (!installContext.value) return undefined
+	if (!browseRouteActive.value) {
+		return undefined
+	}
+	if (!installContext.value) {
+		return undefined
+	}
 	return {
 		...route.query,
 		b: route.fullPath,
@@ -1031,6 +1073,17 @@ provideBrowseManager({
 
 <template>
 	<div class="flex flex-col gap-3 p-6">
+		<div
+			v-if="installContext"
+			ref="stickyInstallHeaderRef"
+			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid border-divider bg-surface-1 px-6 pt-6"
+			:class="[isInstallHeaderStuck ? 'border-t' : '']"
+		>
+			<BrowseInstallHeader bottom-padding />
+		</div>
+
+		<SelectedProjectsFloatingBar v-if="installContext" />
+
 		<BrowsePageLayout>
 			<template #after>
 				<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
@@ -1057,7 +1110,8 @@ provideBrowseManager({
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>
-		<Teleport to="#sidebar-teleport-target">
+
+		<Teleport v-if="browseRouteActive" to="#sidebar-teleport-target">
 			<BrowseSidebar />
 		</Teleport>
 	</div>

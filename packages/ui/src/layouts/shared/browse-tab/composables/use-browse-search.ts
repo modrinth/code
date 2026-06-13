@@ -3,7 +3,6 @@ import type { ComputedRef, Ref, ShallowRef } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useDebugLogger } from '#ui/composables/debug-logger'
 import type { FilterType, FilterValue, ProjectType, SortType } from '#ui/utils/search'
 import { LOADER_FILTER_TYPES, useSearch } from '#ui/utils/search'
 import { useServerSearch } from '#ui/utils/server-search'
@@ -18,6 +17,7 @@ export interface UseBrowseSearchOptions {
 		categories: Labrinth.Tags.v2.Category[]
 	}>
 	providedFilters?: ComputedRef<FilterValue[]>
+	active?: ComputedRef<boolean>
 	search: (params: string) => Promise<BrowseSearchResponse>
 	persistentQueryParams: string[]
 	getExtraQueryParams?: () => Record<string, string | undefined>
@@ -61,12 +61,10 @@ export interface BrowseSearchState {
 }
 
 export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchState {
-	const debug = useDebugLogger('BrowseSearch')
 	const route = useRoute()
 	const router = useRouter()
 
-	debug('init, projectType:', options.projectType.value)
-
+	const active = computed(() => options.active?.value ?? true)
 	const projectTypes = computed(() => [options.projectType.value] as ProjectType[])
 	const isServerType = computed(() => options.projectType.value === 'server')
 
@@ -172,6 +170,13 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	let searchVersion = 0
 	let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
+	function clearSearchDebounce() {
+		if (searchDebounceTimer) {
+			clearTimeout(searchDebounceTimer)
+			searchDebounceTimer = null
+		}
+	}
+
 	const providedFiltersOrEmpty = computed(() => options.providedFilters?.value ?? [])
 
 	watch(
@@ -192,24 +197,29 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		{ deep: true },
 	)
 
-	watch(effectiveRequestParams, (newVal, oldVal) => {
-		debug('effectiveRequestParams changed', {
-			from: oldVal?.substring(0, 80),
-			to: newVal?.substring(0, 80),
-		})
-		if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+	watch(effectiveRequestParams, () => {
+		clearSearchDebounce()
+		if (!active.value) {
+			return
+		}
 		searchDebounceTimer = setTimeout(() => {
 			refreshSearch()
 		}, 200)
 	})
 
+	watch(active, (isActive, wasActive) => {
+		clearSearchDebounce()
+		if (isActive && wasActive === false) {
+			void refreshSearch()
+		}
+	})
+
 	async function refreshSearch() {
+		if (!active.value) {
+			return
+		}
+
 		const version = ++searchVersion
-		debug('refreshSearch start', {
-			version,
-			projectType: options.projectType.value,
-			params: effectiveRequestParams.value.substring(0, 100),
-		})
 
 		const currentHitsEmpty = isServerType.value
 			? serverHits.value.length === 0
@@ -221,8 +231,11 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		try {
 			const response = await options.search(effectiveRequestParams.value)
 
+			if (!active.value) {
+				return
+			}
+
 			if (version !== searchVersion) {
-				debug('refreshSearch stale, discarding', { version, current: searchVersion })
 				return
 			}
 
@@ -232,17 +245,10 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 				projectHits.value = response.projectHits
 			}
 			totalHits.value = response.total_hits
-			debug('refreshSearch complete', {
-				version,
-				hits: response.total_hits,
-				projectHits: response.projectHits.length,
-				serverHits: response.serverHits.length,
-			})
 
 			updateUrlParams()
 			loading.value = false
 		} catch (err) {
-			debug('refreshSearch error', err)
 			console.error('Browse search error:', err)
 			if (version === searchVersion) {
 				loading.value = false
@@ -251,7 +257,9 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	}
 
 	function updateUrlParams() {
-		debug('updateUrlParams', { path: route.path })
+		if (!active.value) {
+			return
+		}
 		const persistentParams: Record<string, string | (string | null)[] | null | undefined> = {}
 
 		for (const [key, value] of Object.entries(route.query)) {
@@ -292,8 +300,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 	watch(
 		() => options.projectType.value,
-		(newType, oldType) => {
-			debug('projectType changed', { from: oldType, to: newType })
+		() => {
 			effectiveCurrentSortType.value =
 				effectiveSortTypes.value.find((sortType) => sortType.name === 'relevance') ??
 				effectiveSortTypes.value[0]

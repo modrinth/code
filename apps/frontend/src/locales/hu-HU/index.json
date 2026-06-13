@@ -1610,9 +1610,6 @@
   "discover.install.back-to-server": {
     "message": "Vissza a szerverhez"
   },
-  "discover.install.back-to-setup": {
-    "message": "Vissza a beállításhoz"
-  },
   "discover.install.cancel-reset": {
     "message": "Visszaállítás visszavonása"
   },

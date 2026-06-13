@@ -1823,9 +1823,6 @@
   "discover.install.back-to-server": {
     "message": "Voltar ao servidor"
   },
-  "discover.install.back-to-setup": {
-    "message": "Voltar à configuração"
-  },
   "discover.install.cancel-reset": {
     "message": "Cancelar redefinição"
   },

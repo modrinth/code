@@ -21,6 +21,8 @@ import {
 	readStoredServerInstallQueue,
 	removePendingServerContentInstall,
 	requestInstall,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useVIntl,
 	writePendingServerContentInstallBaseline,
 	writeStoredServerInstallQueue,
@@ -65,11 +67,11 @@ const messages = defineMessages({
 	},
 	noServerWorld: {
 		id: 'discover.install.error.no-server-world',
-		defaultMessage: 'No server world is available for install.',
+		defaultMessage: 'No server instance is available for install.',
 	},
-	backToSetup: {
-		id: 'discover.install.back-to-setup',
-		defaultMessage: 'Back to setup',
+	backToCreateInstance: {
+		id: 'discover.install.back-to-create-instance',
+		defaultMessage: 'Back to create instance',
 	},
 	cancelReset: {
 		id: 'discover.install.cancel-reset',
@@ -82,6 +84,18 @@ const messages = defineMessages({
 	resetModpackHeading: {
 		id: 'discover.install.heading.reset-modpack',
 		defaultMessage: 'Selecting modpack to install after reset',
+	},
+	createInstanceModpackHeading: {
+		id: 'discover.install.heading.create-instance-modpack',
+		defaultMessage: 'Selecting modpack base',
+	},
+	createInstanceName: {
+		id: 'discover.install.create-instance-name',
+		defaultMessage: 'Create instance',
+	},
+	worldFallbackName: {
+		id: 'discover.install.world-fallback-name',
+		defaultMessage: 'Instance',
 	},
 })
 
@@ -145,6 +159,11 @@ export function useServerInstallContent({
 			return enabled
 		}),
 	})
+	const { data: serverFullData } = useQuery({
+		queryKey: computed(() => ['servers', 'v1', 'detail', currentServerId.value ?? ''] as const),
+		queryFn: () => client.archon.servers_v1.get(currentServerId.value!),
+		enabled: computed(() => !!currentServerId.value),
+	})
 
 	watch(serverData, (val) =>
 		debug('serverData changed:', val?.server_id, val?.name, val?.loader, val?.mc_version),
@@ -187,12 +206,53 @@ export function useServerInstallContent({
 		},
 	}
 
-	const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
+	const contentQueryKey = computed(
+		() =>
+			['content', 'list', 'v1', currentServerId.value ?? '', currentWorldId.value ?? null] as const,
+	)
 	const { data: serverContentData, error: serverContentError } = useQuery({
 		queryKey: contentQueryKey,
 		queryFn: () =>
-			client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value!),
+			client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value!, {
+				from_modpack: false,
+			}),
 		enabled: computed(() => !!currentServerId.value && !!currentWorldId.value),
+	})
+
+	const currentWorld = computed(() => {
+		if (fromContext.value === 'create-instance') return null
+
+		const full = serverFullData.value
+		if (!full) return null
+
+		const worldId = currentWorldId.value
+		if (worldId) {
+			return full.worlds.find((world) => world.id === worldId) ?? null
+		}
+
+		return full.worlds.find((world) => world.is_active) ?? full.worlds[0] ?? null
+	})
+	const serverContextWorldGameVersion = computed(() => {
+		const worldGameVersion = currentWorld.value?.content?.game_version
+		if (currentWorldId.value) return worldGameVersion ?? null
+		return worldGameVersion ?? serverData.value?.mc_version ?? null
+	})
+	const serverContextWorldLoader = computed(() => {
+		const worldLoader = currentWorld.value?.content?.modloader
+		if (currentWorldId.value) return worldLoader ?? null
+		return worldLoader ?? serverData.value?.loader ?? null
+	})
+	const serverContextWorldLoaderVersion = computed(() => {
+		const worldLoaderVersion = currentWorld.value?.content?.modloader_version
+		if (currentWorldId.value) return worldLoaderVersion ?? null
+		return worldLoaderVersion ?? serverData.value?.loader_version ?? null
+	})
+	const serverContentProjectType = computed(() => {
+		const loader = serverContextWorldLoader.value?.toLowerCase()
+		if (!loader) return null
+		if (loader === 'paper' || loader === 'purpur') return 'plugin'
+		if (loader === 'vanilla') return 'datapack'
+		return 'mod'
 	})
 
 	function setBrowseSearchState(state: ServerInstallBrowseSearchState) {
@@ -331,12 +391,12 @@ export function useServerInstallContent({
 		)
 		const filters: FilterValue[] = []
 		if (serverData.value && projectType.value?.id !== 'modpack') {
-			const gameVersion = serverData.value.mc_version
+			const gameVersion = serverContextWorldGameVersion.value
 			if (gameVersion) {
 				filters.push({ type: 'game_version', option: gameVersion })
 			}
 
-			const platform = serverData.value.loader?.toLowerCase()
+			const platform = serverContextWorldLoader.value?.toLowerCase().replaceAll('_', '')
 
 			const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 			if (platform && modLoaders.includes(platform)) {
@@ -394,8 +454,8 @@ export function useServerInstallContent({
 	function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
 		return getTargetInstallPreferences(
 			{
-				gameVersion: serverData.value?.mc_version,
-				loader: serverData.value?.loader,
+				gameVersion: serverContextWorldGameVersion.value,
+				loader: serverContextWorldLoader.value,
 			},
 			contentType,
 		)
@@ -451,6 +511,7 @@ export function useServerInstallContent({
 						plans.map((plan) => ({
 							project_id: plan.projectId,
 							version_id: plan.versionId,
+							kind: plan.contentType as Archon.Content.v1.AddonKind,
 						})),
 					),
 				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
@@ -523,11 +584,6 @@ export function useServerInstallContent({
 	}
 
 	async function serverInstall(project: ServerInstallSearchResult) {
-		if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
-			handleError(new Error('No server to install to.'))
-			return
-		}
-
 		if (!browseSearchState) {
 			handleError(new Error('Search state is not ready.'))
 			return
@@ -535,6 +591,17 @@ export function useServerInstallContent({
 
 		const contentType = getCurrentServerInstallType()
 		const isModpack = contentType === 'modpack'
+		const isCreateInstanceFlow =
+			fromContext.value === 'create-instance' || fromContext.value === 'onboarding'
+
+		if (
+			!serverData.value ||
+			!currentServerId.value ||
+			(!currentWorldId.value && (!isCreateInstanceFlow || !isModpack))
+		) {
+			handleError(new Error('No server to install to.'))
+			return
+		}
 
 		try {
 			if (!isModpack && queuedServerInstallProjectIds.value.has(project.project_id)) {
@@ -550,11 +617,15 @@ export function useServerInstallContent({
 				project,
 				contentType,
 				mode: isModpack ? 'immediate' : 'queue',
-				selectedFilters: isModpack ? [] : browseSearchState.currentFilters.value,
+				selectedFilters: isModpack
+					? []
+					: stripServerRuntimeInstallFilters(browseSearchState.currentFilters.value),
 				providedFilters: isModpack ? [] : serverFilters.value,
 				overriddenProvidedFilterTypes: isModpack
 					? []
-					: browseSearchState.overriddenProvidedFilterTypes.value,
+					: stripServerRuntimeInstallOverrides(
+							browseSearchState.overriddenProvidedFilterTypes.value,
+						),
 				targetPreferences: getServerInstallTargetPreferences(contentType),
 				getProjectVersions: getInstallProjectVersions,
 				queue: serverInstallQueue,
@@ -608,9 +679,41 @@ export function useServerInstallContent({
 	}
 
 	async function onModpackFlowCreate(config: CreationFlowContextValue) {
-		if (!currentServerId.value || !currentWorldId.value || !config.modpackSelection.value) return
+		if (!currentServerId.value || !config.modpackSelection.value) return
 
 		try {
+			if (fromContext.value === 'create-instance' || fromContext.value === 'onboarding') {
+				const createdWorld = await client.archon.servers_v1.createWorld(currentServerId.value, {
+					name: config.worldName.value.trim(),
+					properties: config.buildProperties(),
+					content: {
+						content_variant: 'modpack',
+						spec: {
+							platform: 'modrinth',
+							project_id: config.modpackSelection.value.projectId,
+							version_id: config.modpackSelection.value.versionId,
+						},
+					},
+				} satisfies Archon.Servers.v1.CreateWorld)
+
+				if (fromContext.value === 'onboarding') {
+					await client.archon.servers_v1.endIntro(currentServerId.value)
+				}
+				await Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: ['servers', 'worlds', 'summary', 'v1', currentServerId.value],
+					}),
+					queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] }),
+					queryClient.invalidateQueries({
+						queryKey: ['servers', 'v1', 'detail', currentServerId.value],
+					}),
+				])
+				navigateTo(getServerInstanceContentPath(currentServerId.value, createdWorld.id))
+				return
+			}
+
+			if (!currentWorldId.value) return
+
 			await client.archon.content_v1.installContent(currentServerId.value, currentWorldId.value, {
 				content_variant: 'modpack',
 				spec: {
@@ -622,13 +725,7 @@ export function useServerInstallContent({
 				properties: config.buildProperties(),
 			} satisfies Archon.Content.v1.InstallWorldContent)
 
-			if (fromContext.value === 'onboarding') {
-				await client.archon.servers_v1.endIntro(currentServerId.value)
-				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
-				navigateTo(`/hosting/manage/${currentServerId.value}/content`)
-			} else {
-				navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
-			}
+			navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 		} catch (e) {
 			handleError(new Error(`Error installing modpack: ${e}`))
 			config.loading.value = false
@@ -638,14 +735,22 @@ export function useServerInstallContent({
 	const serverBackUrl = computed(() => {
 		if (!serverData.value) return ''
 		const id = serverData.value.server_id
+		if (fromContext.value === 'create-instance')
+			return `/hosting/manage/${id}/instances?resumeModal=create-instance`
 		if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
 		if (fromContext.value === 'reset-server')
 			return `/hosting/manage/${id}?openSettings=installation`
-		return `/hosting/manage/${id}/content`
+		return getServerInstanceContentPath(id, currentWorldId.value)
 	})
 
+	function getServerInstanceContentPath(serverId: string, worldId: string | null) {
+		const base = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
+		return worldId ? `${base}/${encodeURIComponent(worldId)}` : base
+	}
+
 	const serverBackLabel = computed(() => {
-		if (fromContext.value === 'onboarding') return formatMessage(messages.backToSetup)
+		if (fromContext.value === 'create-instance') return formatMessage(messages.backToCreateInstance)
+		if (fromContext.value === 'onboarding') return formatMessage(messages.backToCreateInstance)
 		if (fromContext.value === 'reset-server') return formatMessage(messages.cancelReset)
 		return formatMessage(messages.backToServer)
 	})
@@ -653,15 +758,20 @@ export function useServerInstallContent({
 	const serverBrowseHeading = computed(() =>
 		fromContext.value === 'reset-server'
 			? formatMessage(messages.resetModpackHeading)
-			: formatMessage(commonMessages.installingContentLabel),
+			: fromContext.value === 'create-instance' || fromContext.value === 'onboarding'
+				? formatMessage(messages.createInstanceModpackHeading)
+				: formatMessage(commonMessages.installingContentLabel),
 	)
-
 	const installContext = computed(() => {
 		if (!serverData.value) return null
 		return {
-			name: serverData.value.name,
-			loader: serverData.value.loader ?? '',
-			gameVersion: serverData.value.mc_version ?? '',
+			name:
+				fromContext.value === 'create-instance'
+					? formatMessage(messages.createInstanceName)
+					: (currentWorld.value?.name ?? formatMessage(messages.worldFallbackName)),
+			loader: serverContextWorldLoader.value ?? '',
+			loaderVersion: serverContextWorldLoaderVersion.value ?? '',
+			gameVersion: serverContextWorldGameVersion.value ?? '',
 			serverId: currentServerId.value,
 			upstream: serverData.value.upstream,
 			iconSrc: serverIcon.value,
@@ -675,7 +785,7 @@ export function useServerInstallContent({
 			installProgress: queuedInstallProgress.value,
 			clearQueued: clearQueuedServerInstalls,
 			clearSelected: clearQueuedServerInstalls,
-			onBack: flushQueuedServerInstalls,
+			onBack: fromContext.value === 'create-instance' ? undefined : flushQueuedServerInstalls,
 			discardSelectedAndBack: discardQueuedServerInstallsAndBack,
 			installSelected: installQueuedServerInstallsAndBack,
 		}
@@ -727,6 +837,7 @@ export function useServerInstallContent({
 		currentWorldId,
 		serverData,
 		serverContentData,
+		serverContentProjectType,
 		serverFilters,
 		serverHideInstalled,
 		hideSelectedServerInstalls,

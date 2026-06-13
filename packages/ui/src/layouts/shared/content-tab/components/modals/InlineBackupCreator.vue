@@ -1,11 +1,7 @@
 <template>
 	<div class="flex flex-col gap-3">
 		<span class="text-primary">
-			{{
-				formatMessage(messages.warningBody, {
-					type: formatMessage(backup.isServer ? messages.worldLabel : messages.instanceLabel),
-				})
-			}}
+			{{ formatMessage(messages.warningBody, { type: backupTargetType }) }}
 		</span>
 
 		<div v-if="backup.available" class="flex items-center gap-2">
@@ -47,7 +43,7 @@
 
 			<TriangleAlertIcon
 				v-if="backup.isServer"
-				v-tooltip="formatMessage(messages.backupTakesAWhile)"
+				v-tooltip="formatMessage(messages.backupTakesAWhile, { type: backupTargetType })"
 				class="size-5 shrink-0 text-brand-orange hover:brightness-110"
 			/>
 		</div>
@@ -71,6 +67,7 @@ import { useInlineBackup } from '../../composables/use-inline-backup'
 
 const props = defineProps<{
 	backupName: string
+	targetType?: 'server' | 'instance'
 	hideShiftClickHint?: boolean
 	shiftClickHintOverride?: string
 }>()
@@ -87,6 +84,7 @@ const canManageBackups = computed(
 const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 const backup = useInlineBackup(() => props.backupName)
+const backupTargetType = computed(() => props.targetType ?? 'instance')
 
 function startBackup() {
 	if (
@@ -115,15 +113,7 @@ const messages = defineMessages({
 	warningBody: {
 		id: 'content.inline-backup.warning-body',
 		defaultMessage:
-			'We recommend creating a backup before proceeding so you can restore your {type} if anything breaks.',
-	},
-	worldLabel: {
-		id: 'content.inline-backup.world-label',
-		defaultMessage: 'world',
-	},
-	instanceLabel: {
-		id: 'content.inline-backup.instance-label',
-		defaultMessage: 'instance',
+			'We recommend creating a backup before proceeding so you can restore your {type, select, server {server} other {instance}} if anything breaks.',
 	},
 	createBackup: {
 		id: 'content.inline-backup.create-backup',
@@ -144,7 +134,7 @@ const messages = defineMessages({
 	backupTakesAWhile: {
 		id: 'content.inline-backup.backup-takes-a-while',
 		defaultMessage:
-			'Creating a backup may take several minutes depending on the size of your server.',
+			'Creating a backup may take several minutes depending on the size of your {type, select, server {server} other {instance}}.',
 	},
 	backupInProgress: {
 		id: 'content.inline-backup.backup-in-progress',

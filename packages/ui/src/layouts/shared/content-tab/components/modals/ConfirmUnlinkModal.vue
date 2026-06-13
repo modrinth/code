@@ -13,6 +13,7 @@
 			<InlineBackupCreator
 				ref="backupCreator"
 				:backup-name="props.backupTip ? `Before unlink (${props.backupTip})` : 'Before unlink'"
+				:target-type="props.targetType"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -58,6 +59,7 @@ const props = defineProps<{
 	backupTip?: string
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string
+	targetType?: 'server' | 'instance'
 }>()
 
 const { formatMessage } = useVIntl()

@@ -18,7 +18,18 @@ import {
 	writeStoredServerInstallQueue,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
+import {
+	computed,
+	type ComputedRef,
+	nextTick,
+	onActivated,
+	onDeactivated,
+	type Ref,
+	ref,
+	shallowRef,
+	watch,
+} from 'vue'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
 type ServerFlowFrom = 'onboarding' | 'reset-server'
@@ -53,6 +64,10 @@ export interface ServerInstallContentContext {
 	isSetupServerContext: ComputedRef<boolean>
 	effectiveServerWorldId: ComputedRef<string | null>
 	serverContextServerData: Ref<Archon.Servers.v0.Server | null>
+	serverContextWorldName: ComputedRef<string | null>
+	serverContextWorldGameVersion: ComputedRef<string | null>
+	serverContextWorldLoader: ComputedRef<string | null>
+	serverContextWorldLoaderVersion: ComputedRef<string | null>
 	serverContentProjectIds: Ref<Set<string>>
 	queuedServerInstallProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallCount: ComputedRef<number>
@@ -203,6 +218,7 @@ async function getQueuedInstallPlaceholders(
 
 export function createServerInstallContent(opts: {
 	serverSetupModalRef: Ref<ServerSetupModalHandle | null>
+	isRouteInContext?: (route: RouteLocationNormalizedLoaded) => boolean
 }) {
 	const { serverSetupModalRef } = opts
 	const route = useRoute()
@@ -211,9 +227,22 @@ export function createServerInstallContent(opts: {
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
 
-	const serverIdQuery = computed(() => readQueryString(route.query.sid))
-	const worldIdQuery = computed(() => readQueryString(route.query.wid))
-	const browseFrom = computed(() => readQueryString(route.query.from))
+	const routeInContext = computed(() => opts.isRouteInContext?.(route) ?? true)
+	const contextQuery = shallowRef(route.query)
+
+	watch(
+		[() => route.fullPath, routeInContext],
+		() => {
+			if (routeInContext.value) {
+				contextQuery.value = route.query
+			}
+		},
+		{ immediate: true },
+	)
+
+	const serverIdQuery = computed(() => readQueryString(contextQuery.value.sid))
+	const worldIdQuery = computed(() => readQueryString(contextQuery.value.wid))
+	const browseFrom = computed(() => readQueryString(contextQuery.value.from))
 	const serverFlowFrom = computed<ServerFlowFrom | null>(() =>
 		browseFrom.value === 'onboarding' || browseFrom.value === 'reset-server'
 			? browseFrom.value
@@ -226,11 +255,13 @@ export function createServerInstallContent(opts: {
 
 	const serverContextWorldId = ref<string | null>(worldIdQuery.value)
 	const serverContextServerData = ref<Archon.Servers.v0.Server | null>(null)
+	const serverContextServerFull = ref<Archon.Servers.v1.ServerFull | null>(null)
 	const serverContentProjectIds = ref<Set<string>>(new Set())
 	const serverContentInstallKeys = ref<Set<string>>(new Set())
 	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(
 		new Map(),
 	)
+	const componentActive = ref(true)
 	const queuedServerInstallProjectIds = computed(() => new Set(queuedServerInstalls.value.keys()))
 	const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
 	const selectedServerInstallProjects = computed<BrowseSelectedProject[]>(() =>
@@ -243,6 +274,33 @@ export function createServerInstallContent(opts: {
 	const isInstallingQueuedServerInstalls = ref(false)
 	const queuedInstallProgress = ref({ completed: 0, total: 0 })
 	const effectiveServerWorldId = computed(() => worldIdQuery.value ?? serverContextWorldId.value)
+	const serverContextWorld = computed(() => {
+		const serverFull = serverContextServerFull.value
+		if (!serverFull) return null
+
+		const worldId = effectiveServerWorldId.value
+		if (worldId) {
+			return serverFull.worlds.find((world) => world.id === worldId) ?? null
+		}
+
+		return serverFull.worlds.find((world) => world.is_active) ?? serverFull.worlds[0] ?? null
+	})
+	const serverContextWorldName = computed(() => serverContextWorld.value?.name ?? null)
+	const serverContextWorldGameVersion = computed(() => {
+		const worldGameVersion = serverContextWorld.value?.content?.game_version
+		if (worldIdQuery.value) return worldGameVersion ?? null
+		return worldGameVersion ?? serverContextServerData.value?.mc_version ?? null
+	})
+	const serverContextWorldLoader = computed(() => {
+		const worldLoader = serverContextWorld.value?.content?.modloader
+		if (worldIdQuery.value) return worldLoader ?? null
+		return worldLoader ?? serverContextServerData.value?.loader ?? null
+	})
+	const serverContextWorldLoaderVersion = computed(() => {
+		const worldLoaderVersion = serverContextWorld.value?.content?.modloader_version
+		if (worldIdQuery.value) return worldLoaderVersion ?? null
+		return worldLoaderVersion ?? serverContextServerData.value?.loader_version ?? null
+	})
 	const serverBackUrl = computed(() => {
 		const sid = serverIdQuery.value
 		if (!sid) return '/hosting/manage'
@@ -252,7 +310,7 @@ export function createServerInstallContent(opts: {
 		if (serverFlowFrom.value === 'reset-server') {
 			return `/hosting/manage/${sid}?openSettings=installation`
 		}
-		return `/hosting/manage/${sid}/content`
+		return getServerInstanceContentPath(sid, effectiveServerWorldId.value)
 	})
 	const serverBackLabel = computed(() => {
 		if (serverFlowFrom.value === 'onboarding') return 'Back to setup'
@@ -266,9 +324,27 @@ export function createServerInstallContent(opts: {
 		return 'Installing content'
 	})
 
+	onActivated(() => {
+		componentActive.value = true
+	})
+
+	onDeactivated(() => {
+		componentActive.value = false
+	})
+
+	async function getServerContextServerFull(serverId: string) {
+		if (serverContextServerFull.value?.id === serverId) {
+			return serverContextServerFull.value
+		}
+
+		const server = await client.archon.servers_v1.get(serverId)
+		serverContextServerFull.value = server
+		return server
+	}
+
 	async function resolveServerContextWorldId(serverId: string) {
 		try {
-			const server = await client.archon.servers_v1.get(serverId)
+			const server = await getServerContextServerFull(serverId)
 			const activeWorld = server.worlds.find((world) => world.is_active)
 			return activeWorld?.id ?? server.worlds[0]?.id ?? null
 		} catch (err) {
@@ -304,6 +380,11 @@ export function createServerInstallContent(opts: {
 		} catch (err) {
 			handleError(err as Error)
 		}
+		try {
+			await getServerContextServerFull(sid)
+		} catch (err) {
+			handleError(err as Error)
+		}
 
 		let resolvedWorldId = effectiveServerWorldId.value
 		if (!resolvedWorldId) {
@@ -320,41 +401,79 @@ export function createServerInstallContent(opts: {
 	}
 
 	function watchServerContextChanges() {
-		watch([serverIdQuery, effectiveServerWorldId], async ([sid, wid], [prevSid, prevWid]) => {
-			if (!sid) {
-				serverContextServerData.value = null
-				serverContentProjectIds.value = new Set()
-				serverContentInstallKeys.value = new Set()
-				setQueuedServerInstallPlans(new Map())
-				return
-			}
+		watch(
+			[componentActive, routeInContext, serverIdQuery, effectiveServerWorldId],
+			async ([active, inContext, sid, wid], [prevActive, prevInContext, prevSid, prevWid]) => {
+				if (!active || !inContext) return
 
-			if (sid !== prevSid) {
-				serverContentProjectIds.value = new Set()
-				serverContentInstallKeys.value = new Set()
-				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
-				try {
-					serverContextServerData.value = await client.archon.servers_v0.get(sid)
-				} catch (err) {
-					handleError(err as Error)
+				if (!sid) {
+					serverContextServerData.value = null
+					serverContextServerFull.value = null
+					serverContentProjectIds.value = new Set()
+					serverContentInstallKeys.value = new Set()
+					setQueuedServerInstallPlans(new Map())
+					return
 				}
-			}
 
-			if (wid !== prevWid) {
-				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
-			}
+				const hasServerDataForRoute = serverContextServerData.value?.server_id === sid
+				const hasServerFullForRoute = serverContextServerFull.value?.id === sid
+				const didEnterContext = !prevActive || !prevInContext
+				const shouldReloadRouteContext =
+					didEnterContext ||
+					sid !== prevSid ||
+					wid !== prevWid ||
+					!hasServerDataForRoute ||
+					!hasServerFullForRoute
 
-			if (wid && (sid !== prevSid || wid !== prevWid)) {
-				await refreshServerInstalledContent(sid, wid)
-			}
-		})
+				if (!hasServerDataForRoute || !hasServerFullForRoute) {
+					serverContextWorldId.value = worldIdQuery.value
+					if (!hasServerDataForRoute) {
+						serverContextServerData.value = null
+					}
+					if (!hasServerFullForRoute) {
+						serverContextServerFull.value = null
+					}
+					serverContentProjectIds.value = new Set()
+					serverContentInstallKeys.value = new Set()
+				}
+
+				if (!hasServerDataForRoute) {
+					try {
+						serverContextServerData.value = await client.archon.servers_v0.get(sid)
+					} catch (err) {
+						handleError(err as Error)
+					}
+				}
+
+				if (!hasServerFullForRoute) {
+					try {
+						const serverFull = await getServerContextServerFull(sid)
+						if (!worldIdQuery.value) {
+							const activeWorld = serverFull.worlds.find((world) => world.is_active)
+							serverContextWorldId.value = activeWorld?.id ?? serverFull.worlds[0]?.id ?? null
+						}
+					} catch (err) {
+						handleError(err as Error)
+					}
+				}
+
+				if (shouldReloadRouteContext) {
+					queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
+				}
+
+				if (wid && shouldReloadRouteContext) {
+					await refreshServerInstalledContent(sid, wid)
+				}
+			},
+		)
 	}
 
 	function enforceSetupModpackRoute(currentProjectType: string | undefined) {
-		if (!isSetupServerContext.value || currentProjectType === 'modpack') return
+		if (!routeInContext.value || !isSetupServerContext.value || currentProjectType === 'modpack')
+			return
 		router.replace({
 			path: '/browse/modpack',
-			query: route.query,
+			query: contextQuery.value,
 		})
 	}
 
@@ -424,7 +543,7 @@ export function createServerInstallContent(opts: {
 		if (isInstallingQueuedServerInstalls.value) return false
 
 		if (!serverId || !worldId) {
-			handleError(new Error('No server world is available for install.'))
+			handleError(new Error('No server instance is available for install.'))
 			return false
 		}
 
@@ -448,6 +567,7 @@ export function createServerInstallContent(opts: {
 						plans.map((plan) => ({
 							project_id: plan.projectId,
 							version_id: plan.versionId,
+							kind: plan.contentType as Archon.Content.v1.AddonKind,
 						})),
 					),
 				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
@@ -556,7 +676,7 @@ export function createServerInstallContent(opts: {
 
 			if (serverFlowFrom.value === 'onboarding') {
 				await client.archon.servers_v1.endIntro(sid)
-				await router.push(`/hosting/manage/${sid}/content`)
+				await router.push(getServerInstanceContentPath(sid, wid))
 				return
 			}
 
@@ -571,6 +691,11 @@ export function createServerInstallContent(opts: {
 		serverContentProjectIds.value = new Set([...serverContentProjectIds.value, id])
 	}
 
+	function getServerInstanceContentPath(serverId: string, worldId: string | null) {
+		const base = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
+		return worldId ? `${base}/${encodeURIComponent(worldId)}` : base
+	}
+
 	return {
 		serverIdQuery,
 		worldIdQuery,
@@ -581,6 +706,10 @@ export function createServerInstallContent(opts: {
 		isSetupServerContext,
 		effectiveServerWorldId,
 		serverContextServerData,
+		serverContextWorldName,
+		serverContextWorldGameVersion,
+		serverContextWorldLoader,
+		serverContextWorldLoaderVersion,
 		serverContentProjectIds,
 		queuedServerInstallProjectIds,
 		queuedServerInstallCount,

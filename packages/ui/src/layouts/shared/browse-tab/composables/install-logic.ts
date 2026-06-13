@@ -384,7 +384,24 @@ export function getLoaderFilterTypes(contentType: string) {
 	if (contentType === 'plugin') return ['plugin_loader', 'plugin_platform']
 	if (contentType === 'modpack') return ['modpack_loader']
 	if (contentType === 'shader') return ['shader_loader']
+	if (contentType === 'datapack') return ['datapack_loader']
 	return []
+}
+
+const SERVER_RUNTIME_INSTALL_FILTER_TYPES = new Set([
+	'game_version',
+	'mod_loader',
+	'plugin_loader',
+	'plugin_platform',
+	'datapack_loader',
+])
+
+export function stripServerRuntimeInstallFilters(filters: readonly FilterValue[]) {
+	return filters.filter((filter) => !SERVER_RUNTIME_INSTALL_FILTER_TYPES.has(filter.type))
+}
+
+export function stripServerRuntimeInstallOverrides(filterTypes: readonly string[]) {
+	return filterTypes.filter((type) => !SERVER_RUNTIME_INSTALL_FILTER_TYPES.has(type))
 }
 
 /**
@@ -454,7 +471,12 @@ export function getTargetInstallPreferences(
 
 	return normalizeInstallPreferences({
 		gameVersions: gameVersion && shouldUseTargetRuntime ? [gameVersion] : undefined,
-		loaders: loader && shouldUseTargetRuntime ? [loader] : undefined,
+		loaders:
+			contentType === 'datapack'
+				? ['datapack']
+				: loader && shouldUseTargetRuntime
+					? [loader]
+					: undefined,
 	})
 }
 
@@ -515,10 +537,9 @@ export function mergeInstallPreferences(
 export function getLatestMatchingInstallVersion(
 	versions: readonly Labrinth.Versions.v2.Version[],
 	preferences: BrowseInstallPreferences,
-	contentType: string,
 ) {
 	return [...versions]
-		.filter((version) => versionMatchesPreferences(version, preferences, contentType))
+		.filter((version) => versionMatchesPreferences(version, preferences))
 		.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime())[0]
 }
 
@@ -543,11 +564,7 @@ export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 	let lastError: Error | null = null
 
 	for (const candidate of candidates) {
-		const version = getLatestMatchingInstallVersion(
-			versions,
-			candidate.preferences,
-			options.contentType,
-		)
+		const version = getLatestMatchingInstallVersion(versions, candidate.preferences)
 
 		if (version) {
 			const fileName =
@@ -747,13 +764,11 @@ function hasPreferences(preferences: BrowseInstallPreferences) {
 function versionMatchesPreferences(
 	version: Labrinth.Versions.v2.Version,
 	preferences: BrowseInstallPreferences,
-	contentType: string,
 ) {
 	const gameVersionMatches =
 		!preferences.gameVersions?.length ||
 		version.game_versions.some((gameVersion) => preferences.gameVersions?.includes(gameVersion))
 	if (!gameVersionMatches) return false
-	if (contentType === 'datapack') return true
 	if (!preferences.loaders?.length) return true
 
 	const compatibleLoaders = getCompatibleLoaderAliasSet(preferences.loaders)

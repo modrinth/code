@@ -35,6 +35,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "View analytics"
   },
+  "app.server-instance-settings.failed-to-load-server": {
+    "defaultMessage": "Failed to load instance settings"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Failed to load server settings"
   },
@@ -342,7 +345,7 @@
     "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again."
+    "defaultMessage": "Deleting a mod can permanently affect your instance and may cause missing content or unexpected issues when it starts again."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Deletion warning"
@@ -393,7 +396,7 @@
     "defaultMessage": "{count} removed"
   },
   "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
+    "defaultMessage": "Some content on your {type, select, server {server} other {instance}} could not be analyzed and may be affected by this change."
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
@@ -423,22 +426,16 @@
     "defaultMessage": "A backup is in progress, it's recommended to wait for it to finish before performing this action."
   },
   "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Creating a backup may take several minutes depending on the size of your server."
+    "defaultMessage": "Creating a backup may take several minutes depending on the size of your {type, select, server {server} other {instance}}."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Create backup"
-  },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "instance"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Hold Shift while clicking to skip confirmation."
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type} if anything breaks."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "world"
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {server} other {instance}} if anything breaks."
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Your modpack's content can now be found here!"
@@ -558,7 +555,7 @@
     "defaultMessage": "Create instance"
   },
   "creation-flow.button.create-world": {
-    "defaultMessage": "Create world"
+    "defaultMessage": "Create instance"
   },
   "creation-flow.button.finish": {
     "defaultMessage": "Finish"
@@ -570,7 +567,7 @@
     "defaultMessage": "Import {count, plural, one {# instance} other {# instances}}"
   },
   "creation-flow.button.setup-server": {
-    "defaultMessage": "Setup server"
+    "defaultMessage": "Create instance"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Build number"
@@ -630,7 +627,7 @@
     "defaultMessage": "Additional settings"
   },
   "creation-flow.modal.final-config.backup.before-reset-server.name": {
-    "defaultMessage": "Before reset server"
+    "defaultMessage": "Before reset instance"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "Easy"
@@ -690,10 +687,10 @@
     "defaultMessage": "Select generator settings"
   },
   "creation-flow.modal.final-config.world-name.label": {
-    "defaultMessage": "World name"
+    "defaultMessage": "Instance name"
   },
   "creation-flow.modal.final-config.world-name.placeholder": {
-    "defaultMessage": "Enter world name"
+    "defaultMessage": "Enter instance name"
   },
   "creation-flow.modal.final-config.world-seed.description": {
     "defaultMessage": "Leave blank for a random seed."
@@ -786,10 +783,10 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Browse modpacks on Modrinth or import one from a file."
+    "defaultMessage": "Use a popular modpack as your starting point."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Install modpack"
+    "defaultMessage": "Modpack base"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Classic Minecraft with no mods or plugins."
@@ -804,7 +801,7 @@
     "defaultMessage": "Choose instance type"
   },
   "creation-flow.modal.setup-type.title.world": {
-    "defaultMessage": "Select world type"
+    "defaultMessage": "Select instance type"
   },
   "creation-flow.title.choose-modpack": {
     "defaultMessage": "Choose modpack"
@@ -813,16 +810,16 @@
     "defaultMessage": "Create instance"
   },
   "creation-flow.title.create-world": {
-    "defaultMessage": "Create world"
+    "defaultMessage": "Create instance"
   },
   "creation-flow.title.import-instance": {
     "defaultMessage": "Import instance"
   },
   "creation-flow.title.reset-server": {
-    "defaultMessage": "Reset server"
+    "defaultMessage": "Reset instance"
   },
   "creation-flow.title.set-up-server": {
-    "defaultMessage": "Set up server"
+    "defaultMessage": "Create instance"
   },
   "external-project-license-status.no": {
     "defaultMessage": "No"
@@ -1383,10 +1380,7 @@
     "defaultMessage": "Failed to reinstall modpack"
   },
   "hosting.loader.failed-to-repair": {
-    "defaultMessage": "Failed to repair server"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Failed to reset server to onboarding"
+    "defaultMessage": "Failed to repair instance"
   },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Failed to save installation settings"
@@ -1398,34 +1392,16 @@
     "defaultMessage": "{loader, select, null {Loader} other {{loader}}} version"
   },
   "hosting.loader.repair-started-text": {
-    "defaultMessage": "Your server installation has been repaired."
+    "defaultMessage": "Your instance installation has been repaired."
   },
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Repair completed"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Reset server"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reset to onboarding"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Reset to onboarding"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "The server has been returned to the onboarding flow."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Server reset to onboarding"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Support options"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -1485,7 +1461,7 @@
     "defaultMessage": "Confirm"
   },
   "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Changing to {gameVersion} will modify the following content on your server."
+    "defaultMessage": "Changing to {gameVersion} will modify the following content on your {type, select, server {server} other {instance}}."
   },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Review content changes"
@@ -1518,10 +1494,13 @@
     "defaultMessage": "Incompatible content installed"
   },
   "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "When changing the loader, all installed content will be disabled. We recommend resetting your server instead."
+    "defaultMessage": "When changing the loader, all installed content will be disabled. We recommend resetting your {type, select, server {server} other {instance}} instead."
   },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Changing loaders is destructive"
+  },
+  "installation-settings.incompatible-content.reset-button": {
+    "defaultMessage": "Reset {type, select, server {server} other {instance}}"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Linked {projectType}"
@@ -1536,7 +1515,7 @@
     "defaultMessage": "{loader} version"
   },
   "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "You will need to reset your server to switch loader."
+    "defaultMessage": "You will need to reset your {type, select, server {server} other {instance}} to switch loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added."
@@ -1558,6 +1537,9 @@
   },
   "installation-settings.repair.server-description": {
     "defaultMessage": "Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly."
+  },
+  "installation-settings.repair.server-instance-description": {
+    "defaultMessage": "Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if this instance is not starting correctly."
   },
   "installation-settings.repair.server-title": {
     "defaultMessage": "Repair server"
@@ -1766,11 +1748,8 @@
   "instances.updater-modal.update-to": {
     "defaultMessage": "Update to {version}"
   },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Updating can break your instance. Review version changelogs and back up first."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Updating can break your world. Review version changelogs and back up first."
+  "instances.updater-modal.warning": {
+    "defaultMessage": "Updating can break your {type, select, server {server} other {instance}}. Review version changelogs and back up first."
   },
   "label.actions": {
     "defaultMessage": "Actions"
@@ -3275,6 +3254,93 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "server.instance-settings.general.danger-zone.label": {
+    "defaultMessage": "Danger zone"
+  },
+  "server.instance-settings.general.delete-instance.button": {
+    "defaultMessage": "Delete instance"
+  },
+  "server.instance-settings.general.delete-instance.description": {
+    "defaultMessage": "Permanently delete this instance, including its content, files, settings, and backups."
+  },
+  "server.instance-settings.general.delete-instance.error": {
+    "defaultMessage": "Failed to delete instance"
+  },
+  "server.instance-settings.general.delete-instance.modal.description": {
+    "defaultMessage": "This deletes the instance, including its content, files, settings, and backups. This cannot be undone."
+  },
+  "server.instance-settings.general.delete-instance.modal.title": {
+    "defaultMessage": "Delete instance"
+  },
+  "server.instance-settings.general.delete-instance.success.description": {
+    "defaultMessage": "The instance has been deleted."
+  },
+  "server.instance-settings.general.delete-instance.success.title": {
+    "defaultMessage": "Instance deleted"
+  },
+  "server.instance-settings.general.instance-name.description": {
+    "defaultMessage": "This name is only visible on Modrinth."
+  },
+  "server.instance-settings.general.instance-name.error": {
+    "defaultMessage": "Failed to update instance name"
+  },
+  "server.instance-settings.general.instance-name.fallback": {
+    "defaultMessage": "Instance"
+  },
+  "server.instance-settings.general.instance-name.label": {
+    "defaultMessage": "Instance name"
+  },
+  "server.instance-settings.general.instance-name.saved.description": {
+    "defaultMessage": "The instance name has been updated."
+  },
+  "server.instance-settings.general.instance-name.saved.title": {
+    "defaultMessage": "Instance renamed"
+  },
+  "server.instance-settings.general.reset-everything.button": {
+    "defaultMessage": "Reset everything"
+  },
+  "server.instance-settings.general.reset-everything.description": {
+    "defaultMessage": "Reset your instance completely. This removes world data, content, and any configuration. A backup of the previous instance will remain available."
+  },
+  "server.instance-settings.general.reset-world-files.button": {
+    "defaultMessage": "Reset world data"
+  },
+  "server.instance-settings.general.reset-world-files.description": {
+    "defaultMessage": "Delete the current world data and generate a new one. Your content and files will stay the same."
+  },
+  "server.instance-settings.general.reset-world-files.error": {
+    "defaultMessage": "Failed to reset world data"
+  },
+  "server.instance-settings.general.reset-world-files.modal.description": {
+    "defaultMessage": "This deletes the world directory for this instance. Installed content and settings will stay the same."
+  },
+  "server.instance-settings.general.reset-world-files.modal.title": {
+    "defaultMessage": "Reset world data"
+  },
+  "server.instance-settings.general.reset-world-files.started.description": {
+    "defaultMessage": "The world directory is being reset."
+  },
+  "server.instance-settings.general.reset-world-files.started.title": {
+    "defaultMessage": "World data reset started"
+  },
+  "server.settings.general.reset-to-onboarding.description": {
+    "defaultMessage": "Send this server back into onboarding so setup can be completed again."
+  },
+  "server.settings.general.reset-to-onboarding.error": {
+    "defaultMessage": "Failed to reset server to onboarding"
+  },
+  "server.settings.general.reset-to-onboarding.modal.description": {
+    "defaultMessage": "This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?"
+  },
+  "server.settings.general.reset-to-onboarding.success.description": {
+    "defaultMessage": "The server has been returned to the onboarding flow."
+  },
+  "server.settings.general.reset-to-onboarding.success.title": {
+    "defaultMessage": "Server reset to onboarding"
+  },
+  "server.settings.general.support-zone.label": {
+    "defaultMessage": "Support zone"
+  },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Backups"
   },
@@ -3858,7 +3924,7 @@
     "defaultMessage": "Backup timed out"
   },
   "servers.backups.admonition.creating-backup.description": {
-    "defaultMessage": "Saving world data and server configuration for {backupName}. This can take a few minutes."
+    "defaultMessage": "Saving instance data and server configuration for {backupName}. This can take a few minutes."
   },
   "servers.backups.admonition.creating-backup.title": {
     "defaultMessage": "Creating backup"
@@ -4202,6 +4268,15 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Using {projectTitle}"
   },
+  "servers.manage.action.go-back-to-all-servers": {
+    "defaultMessage": "Go back to all servers"
+  },
+  "servers.manage.action.go-to-billing-settings": {
+    "defaultMessage": "Go to billing settings"
+  },
+  "servers.manage.action.reload": {
+    "defaultMessage": "Reload"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Checking for new servers..."
   },
@@ -4214,14 +4289,101 @@
   "servers.manage.contact-support-button": {
     "defaultMessage": "Contact Modrinth Support"
   },
+  "servers.manage.debug.server-data": {
+    "defaultMessage": "Server data"
+  },
+  "servers.manage.error-details.error-message": {
+    "defaultMessage": "Error message"
+  },
+  "servers.manage.error-details.error-name": {
+    "defaultMessage": "Error Name"
+  },
+  "servers.manage.error-details.node": {
+    "defaultMessage": "Node"
+  },
+  "servers.manage.error-details.original-error": {
+    "defaultMessage": "Original Error"
+  },
+  "servers.manage.error-details.server-id": {
+    "defaultMessage": "Server ID"
+  },
+  "servers.manage.error-details.stack-trace": {
+    "defaultMessage": "Stack Trace"
+  },
+  "servers.manage.error-details.timestamp": {
+    "defaultMessage": "Timestamp"
+  },
+  "servers.manage.error-details.unknown": {
+    "defaultMessage": "Unknown"
+  },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Our systems automatically alert our team when there's an issue. We are already working on getting them back online."
+  },
+  "servers.manage.error.change-loader": {
+    "defaultMessage": "Change Loader"
+  },
+  "servers.manage.error.contact-support": {
+    "defaultMessage": "Please contact Modrinth Support."
+  },
+  "servers.manage.error.copy-debug-info": {
+    "defaultMessage": "Copy Debug Info"
+  },
+  "servers.manage.error.debug-info": {
+    "defaultMessage": "Server ID: {serverId}\nError: {error}\nKind: {kind}\nProject ID: {projectId}\nVersion ID: {versionId}\nLog: {log}"
   },
   "servers.manage.error.description": {
     "defaultMessage": "We may have temporary issues with our servers."
   },
   "servers.manage.error.details": {
     "defaultMessage": "Error details:"
+  },
+  "servers.manage.error.general.message": {
+    "defaultMessage": "An unexpected error occurred."
+  },
+  "servers.manage.error.general.title": {
+    "defaultMessage": "An error occurred."
+  },
+  "servers.manage.error.install.internal.description": {
+    "defaultMessage": "An internal error occurred while installing your server. Don't fret - try reinstalling your server, and if the problem persists, please contact Modrinth support with your server's debug information."
+  },
+  "servers.manage.error.install.invalid-version.change-loader": {
+    "defaultMessage": "Your server may need to be reinstalled with a valid mod loader and version. You can change the loader by clicking the \"Change Loader\" button."
+  },
+  "servers.manage.error.install.invalid-version.description": {
+    "defaultMessage": "An invalid loader or Minecraft version was specified and could not be installed."
+  },
+  "servers.manage.error.install.invalid-version.modpack-compatibility": {
+    "defaultMessage": "If you've installed a modpack, it may have been packaged incorrectly or may not be compatible with the loader."
+  },
+  "servers.manage.error.install.invalid-version.recent-minecraft": {
+    "defaultMessage": "If this version of Minecraft was released recently, please check if Modrinth Hosting supports it."
+  },
+  "servers.manage.error.install.invalid-version.support": {
+    "defaultMessage": "If you're stuck, please contact Modrinth Support with the information below:"
+  },
+  "servers.manage.error.install.title": {
+    "defaultMessage": "Installation error"
+  },
+  "servers.manage.error.install.unsupported-version.description": {
+    "defaultMessage": "An error occurred while installing your server because Modrinth Hosting does not support the version of Minecraft or the loader you specified. Try reinstalling your server with a different version or loader, and if the problem persists, please contact Modrinth Support with your server's debug information."
+  },
+  "servers.manage.error.node-ping-failed": {
+    "defaultMessage": "Unable to reach node. Ping test failed."
+  },
+  "servers.manage.error.node-unavailable.data-description": {
+    "defaultMessage": "Your data is safe and will not be lost, and your server will be back online as soon as the issue is resolved."
+  },
+  "servers.manage.error.node-unavailable.description": {
+    "defaultMessage": "Your server's node, where your Modrinth Server is physically hosted, is not accessible at the moment. We are working to resolve the issue as quickly as possible."
+  },
+  "servers.manage.error.node-unavailable.support-description": {
+    "defaultMessage": "If reloading does not work initially, please contact Modrinth Support via the chat bubble in the bottom right corner and we'll be happy to help."
+  },
+  "servers.manage.error.node-unavailable.title": {
+    "defaultMessage": "Server Node Unavailable"
+  },
+  "servers.manage.error.open-installation-log": {
+    "defaultMessage": "Open Installation Log"
   },
   "servers.manage.error.queue-notice": {
     "defaultMessage": "If you recently purchased your Modrinth Hosting server, it is currently in a queue and will appear here as soon as it's ready. <warning>Do not attempt to purchase a new server.</warning>"
@@ -4232,8 +4394,98 @@
   "servers.manage.error.title": {
     "defaultMessage": "Servers could not be loaded"
   },
+  "servers.manage.error.unknown": {
+    "defaultMessage": "Unknown error"
+  },
   "servers.manage.handle-error.title": {
     "defaultMessage": "An error occurred"
+  },
+  "servers.manage.install.retry-error": {
+    "defaultMessage": "Failed to retry installation"
+  },
+  "servers.manage.instance.all-instances": {
+    "defaultMessage": "All instances"
+  },
+  "servers.manage.instance.fallback-name": {
+    "defaultMessage": "Instance"
+  },
+  "servers.manage.instance.last-active": {
+    "defaultMessage": "Last active {time}"
+  },
+  "servers.manage.instance.settings": {
+    "defaultMessage": "Instance settings"
+  },
+  "servers.manage.instances-hint.description": {
+    "defaultMessage": "Your server state has been converted into an instance."
+  },
+  "servers.manage.instances-hint.dismiss": {
+    "defaultMessage": "Don't show again"
+  },
+  "servers.manage.instances-hint.title": {
+    "defaultMessage": "New: Server Instances!"
+  },
+  "servers.manage.instances.card.active": {
+    "defaultMessage": "Active"
+  },
+  "servers.manage.instances.card.create": {
+    "defaultMessage": "Create instance"
+  },
+  "servers.manage.instances.card.created": {
+    "defaultMessage": "Created"
+  },
+  "servers.manage.instances.card.edit": {
+    "defaultMessage": "Edit instance"
+  },
+  "servers.manage.instances.card.empty-description": {
+    "defaultMessage": "New instance"
+  },
+  "servers.manage.instances.card.installed-content": {
+    "defaultMessage": "Installed content"
+  },
+  "servers.manage.instances.card.last-active": {
+    "defaultMessage": "Last active"
+  },
+  "servers.manage.instances.card.no-modpack": {
+    "defaultMessage": "—"
+  },
+  "servers.manage.instances.card.not-tracked-yet": {
+    "defaultMessage": "Not tracked yet"
+  },
+  "servers.manage.instances.card.settings": {
+    "defaultMessage": "Instance settings"
+  },
+  "servers.manage.instances.create.error": {
+    "defaultMessage": "Failed to create instance"
+  },
+  "servers.manage.instances.create.success.text": {
+    "defaultMessage": "{instance} is ready to configure."
+  },
+  "servers.manage.instances.create.success.title": {
+    "defaultMessage": "Instance created"
+  },
+  "servers.manage.instances.info.body": {
+    "defaultMessage": "An instance is a separate setup of your server with its own content, files, worlds, and settings. You can switch which instance your server runs at any time."
+  },
+  "servers.manage.instances.info.header": {
+    "defaultMessage": "What is a server instance?"
+  },
+  "servers.manage.instances.slot-name": {
+    "defaultMessage": "Instance #{index}"
+  },
+  "servers.manage.nav.backups": {
+    "defaultMessage": "Backups"
+  },
+  "servers.manage.nav.content": {
+    "defaultMessage": "Content"
+  },
+  "servers.manage.nav.files": {
+    "defaultMessage": "Files"
+  },
+  "servers.manage.nav.instances": {
+    "defaultMessage": "Instances"
+  },
+  "servers.manage.nav.overview": {
+    "defaultMessage": "Overview"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
@@ -4246,6 +4498,9 @@
   },
   "servers.manage.no-shared-servers-found": {
     "defaultMessage": "No shared servers match your search."
+  },
+  "servers.manage.notice.dismiss-error": {
+    "defaultMessage": "Error dismissing notice"
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Payment information is still loading. Opening checkout as soon as it is ready."
@@ -4277,6 +4532,9 @@
   "servers.manage.search-placeholder": {
     "defaultMessage": "Search {count} {count, plural, one {server} other {servers}}..."
   },
+  "servers.manage.server-settings": {
+    "defaultMessage": "Server settings"
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4291,6 +4549,36 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Shared servers"
+  },
+  "servers.manage.status.preparing.description": {
+    "defaultMessage": "Your server's hardware is being prepared and will be available shortly!"
+  },
+  "servers.manage.status.preparing.title": {
+    "defaultMessage": "We're getting your server ready"
+  },
+  "servers.manage.status.suspended.cancelled-description": {
+    "defaultMessage": "Your subscription has been cancelled.\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.status.suspended.description": {
+    "defaultMessage": "Your server has been suspended.\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.status.suspended.reason-description": {
+    "defaultMessage": "Your server has been suspended: {reason}\nContact Modrinth Support if you believe this is an error."
+  },
+  "servers.manage.status.suspended.title": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.manage.status.upgrading.description": {
+    "defaultMessage": "Your server's hardware is currently being upgraded and will be back online shortly!"
+  },
+  "servers.manage.status.upgrading.title": {
+    "defaultMessage": "Server upgrading"
+  },
+  "servers.manage.websocket.error": {
+    "defaultMessage": "Something went wrong..."
+  },
+  "servers.manage.websocket.reconnecting": {
+    "defaultMessage": "Hang on, we're reconnecting to your server."
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Your servers"
@@ -4515,7 +4803,7 @@
     "defaultMessage": "Modpack upload failed"
   },
   "servers.setup.onboarding.setup-server.button": {
-    "defaultMessage": "Setup server"
+    "defaultMessage": "Create instance"
   },
   "servers.setup.onboarding.step.choose.description": {
     "defaultMessage": "Pick your favorite modpack from Modrinth, or choose a loader and add the mods you want."
@@ -4523,11 +4811,11 @@
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Choose what to play"
   },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Set up your world just like singleplayer. Choose your gamemode and world seed."
+  "servers.setup.onboarding.step.configure-instance.description": {
+    "defaultMessage": "Set up your instance just like singleplayer. Choose your gamemode and world seed."
   },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Configure your world"
+  "servers.setup.onboarding.step.configure-instance.title": {
+    "defaultMessage": "Configure your instance"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Share your server with friends by copying the address and letting them know which mods they'll need to join."
@@ -4536,7 +4824,7 @@
     "defaultMessage": "Invite your friends"
   },
   "servers.setup.onboarding.steps.heading": {
-    "defaultMessage": "Setup your server (~2mins)"
+    "defaultMessage": "Create instance (~2 mins)"
   },
   "servers.setup.onboarding.uploading.progress": {
     "defaultMessage": "Uploading ({percent, number}%)"
@@ -4551,7 +4839,7 @@
     "defaultMessage": "You are being rate limited. Please try again later."
   },
   "servers.setup.rate-limit.title": {
-    "defaultMessage": "Cannot reinstall server"
+    "defaultMessage": "Cannot reinstall instance"
   },
   "servers.setup.reinstall-failed.text": {
     "defaultMessage": "An unexpected error occurred while reinstalling. Please try again later."

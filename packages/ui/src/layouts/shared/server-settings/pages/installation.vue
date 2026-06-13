@@ -1,45 +1,9 @@
 <template>
 	<div class="flex flex-col gap-6">
-		<Teleport to="body">
-			<div class="relative z-[100]">
-				<ConfirmModal
-					ref="resetToOnboardingModal"
-					:title="formatMessage(messages.resetToOnboardingModalTitle)"
-					:description="formatMessage(messages.resetToOnboardingModalDescription)"
-					:proceed-label="formatMessage(messages.resetToOnboardingButton)"
-					@proceed="confirmResetToOnboarding"
-				/>
-			</div>
-		</Teleport>
-
 		<InstallationSettingsLayout
 			ref="installationSettingsLayout"
 			@reset-server="showResetServerModal"
 		>
-			<template #extra>
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">{{
-						formatMessage(messages.resetServerTitle)
-					}}</span>
-					<div>
-						<ButtonStyled color="red">
-							<button
-								v-tooltip="resetServerDisabledTooltip"
-								class="!shadow-none"
-								:disabled="resetServerDisabled"
-								@click="showResetServerModal"
-							>
-								<RotateCounterClockwiseIcon class="size-5" />
-								{{ formatMessage(commonMessages.resetServerButton) }}
-							</button>
-						</ButtonStyled>
-					</div>
-					<span class="text-primary">
-						{{ formatMessage(messages.resetServerDescription) }}
-					</span>
-				</div>
-			</template>
-
 			<template #extra-modals>
 				<Teleport to="body">
 					<div class="relative z-[100]">
@@ -53,35 +17,13 @@
 				</Teleport>
 			</template>
 		</InstallationSettingsLayout>
-
-		<div v-if="isSiteAdmin" class="flex flex-col gap-2.5">
-			<span class="text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.supportOptionsTitle) }}
-			</span>
-			<div>
-				<ButtonStyled color="red">
-					<button
-						v-tooltip="supportResetToOnboardingTooltip"
-						class="!shadow-none"
-						:disabled="supportResetToOnboardingDisabled"
-						@click="showResetToOnboardingModal"
-					>
-						<RotateCounterClockwiseIcon class="size-5" />
-						{{ formatMessage(messages.resetToOnboardingButton) }}
-					</button>
-				</ButtonStyled>
-			</div>
-		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
-	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
 	type GameVersionOption,
@@ -121,15 +63,6 @@ const uploadProgressModal =
 	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 const messages = defineMessages({
-	resetServerTitle: {
-		id: 'hosting.loader.reset-server',
-		defaultMessage: 'Reset server',
-	},
-	resetServerDescription: {
-		id: 'hosting.loader.reset-server-description',
-		defaultMessage:
-			'Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored.',
-	},
 	loaderVersionLabel: {
 		id: 'hosting.loader.loader-version',
 		defaultMessage: '{loader, select, null {Loader} other {{loader}}} version',
@@ -152,11 +85,11 @@ const messages = defineMessages({
 	},
 	repairStartedText: {
 		id: 'hosting.loader.repair-started-text',
-		defaultMessage: 'Your server installation has been repaired.',
+		defaultMessage: 'Your instance installation has been repaired.',
 	},
 	failedToRepair: {
 		id: 'hosting.loader.failed-to-repair',
-		defaultMessage: 'Failed to repair server',
+		defaultMessage: 'Failed to repair instance',
 	},
 	failedToReinstall: {
 		id: 'hosting.loader.failed-to-reinstall',
@@ -165,35 +98,6 @@ const messages = defineMessages({
 	failedToUnlink: {
 		id: 'hosting.loader.failed-to-unlink',
 		defaultMessage: 'Failed to unlink modpack',
-	},
-	supportOptionsTitle: {
-		id: 'hosting.loader.support-options-title',
-		defaultMessage: 'Support options',
-	},
-	resetToOnboardingButton: {
-		id: 'hosting.loader.reset-to-onboarding-button',
-		defaultMessage: 'Reset to onboarding',
-	},
-	resetToOnboardingModalTitle: {
-		id: 'hosting.loader.reset-to-onboarding-modal-title',
-		defaultMessage: 'Reset to onboarding',
-	},
-	resetToOnboardingModalDescription: {
-		id: 'hosting.loader.reset-to-onboarding-modal-description',
-		defaultMessage:
-			'This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?',
-	},
-	resetToOnboardingSuccessTitle: {
-		id: 'hosting.loader.reset-to-onboarding-success-title',
-		defaultMessage: 'Server reset to onboarding',
-	},
-	resetToOnboardingSuccessDescription: {
-		id: 'hosting.loader.reset-to-onboarding-success-description',
-		defaultMessage: 'The server has been returned to the onboarding flow.',
-	},
-	failedToResetToOnboarding: {
-		id: 'hosting.loader.failed-to-reset-to-onboarding',
-		defaultMessage: 'Failed to reset server to onboarding',
 	},
 })
 
@@ -221,12 +125,9 @@ const setupActionDisabledMessage = computed(() => {
 	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : null
 })
 const resetServerDisabled = computed(() => !canResetServer.value || isInstalling.value)
-const resetServerDisabledTooltip = computed(() => {
-	if (!canResetServer.value) return permissionDeniedMessage.value
-	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
-})
 const installationSettingsLayout = ref<InstanceType<typeof InstallationSettingsLayout>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
+const contentListQueryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
 
 function showResetServerModal() {
 	if (resetServerDisabled.value) return
@@ -237,13 +138,13 @@ async function invalidateServerState() {
 	debug('invalidateServerState: starting')
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+		queryClient.invalidateQueries({ queryKey: contentListQueryKey.value }),
 	])
 	debug('invalidateServerState: complete')
 }
 
 const addonsQuery = useQuery({
-	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
+	queryKey: contentListQueryKey,
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
@@ -265,23 +166,24 @@ const modpackVersionsQuery = useQuery({
 	enabled: computed(() => !!modpackProjectId.value),
 })
 
-const isSiteAdmin = computed(() => serverSettings.currentUserRole.value === 'admin')
-
-const editingPlatform = ref(server.value?.loader?.toLowerCase() ?? 'vanilla')
-const editingGameVersion = ref(server.value?.mc_version ?? '')
-const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
-const isResettingToOnboarding = ref(false)
-const supportResetToOnboardingDisabled = computed(
-	() => !worldId.value || isResettingToOnboarding.value || !canResetServer.value,
-)
-const supportResetToOnboardingTooltip = computed(() =>
-	!canResetServer.value ? permissionDeniedMessage.value : undefined,
-)
-
-function showResetToOnboardingModal() {
-	if (supportResetToOnboardingDisabled.value) return
-	resetToOnboardingModal.value?.show()
+function normalizeLoader(loader?: string | null) {
+	const normalized = loader?.toLowerCase()
+	if (!normalized) return 'vanilla'
+	if (normalized === 'neo_forge') return 'neoforge'
+	return normalized
 }
+
+const currentPlatform = computed(() =>
+	normalizeLoader(addonsQuery.data.value?.modloader ?? server.value?.loader),
+)
+const currentGameVersion = computed(
+	() => addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
+)
+const currentLoaderVersion = computed(
+	() => addonsQuery.data.value?.modloader_version ?? server.value?.loader_version ?? '',
+)
+const editingPlatform = ref(currentPlatform.value)
+const editingGameVersion = ref(currentGameVersion.value)
 
 const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
@@ -455,9 +357,9 @@ provideInstallationSettings({
 				: undefined,
 		}
 	}),
-	currentPlatform: computed(() => server.value?.loader?.toLowerCase() ?? 'vanilla'),
-	currentGameVersion: computed(() => server.value?.mc_version ?? ''),
-	currentLoaderVersion: computed(() => server.value?.loader_version ?? ''),
+	currentPlatform,
+	currentGameVersion,
+	currentLoaderVersion,
 	availablePlatforms: ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur'],
 
 	editingPlatformRef: editingPlatform,
@@ -539,11 +441,10 @@ provideInstallationSettings({
 	async save(platform, gameVersion, loaderVersionId) {
 		if (setupActionDisabled.value) return
 		debug('save: called with', { platform, gameVersion, loaderVersionId })
-		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
-		const platformChanged = platform !== currentPlatform
-		const gameVersionChanged = gameVersion !== (server.value?.mc_version ?? '')
+		const platformChanged = platform !== currentPlatform.value
+		const gameVersionChanged = gameVersion !== currentGameVersion.value
 		const loaderVersionChanged =
-			loaderVersionId !== null && loaderVersionId !== (server.value?.loader_version ?? '')
+			loaderVersionId !== null && loaderVersionId !== currentLoaderVersion.value
 
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -670,7 +571,7 @@ provideInstallationSettings({
 		const previousData = addonsQuery.data.value
 		if (previousData) {
 			debug('unlinkModpack: optimistically removing modpack from cache')
-			queryClient.setQueryData(['content', 'list', 'v1', serverId], {
+			queryClient.setQueryData(contentListQueryKey.value, {
 				...previousData,
 				modpack: null,
 			})
@@ -682,7 +583,7 @@ provideInstallationSettings({
 		} catch (err) {
 			debug('unlinkModpack: failed, reverting cache', err)
 			if (previousData) {
-				queryClient.setQueryData(['content', 'list', 'v1', serverId], previousData)
+				queryClient.setQueryData(contentListQueryKey.value, previousData)
 			}
 			addNotification({
 				type: 'error',
@@ -695,7 +596,7 @@ provideInstallationSettings({
 					queryKey: ['servers', 'detail', serverId],
 				}),
 				queryClient.invalidateQueries({
-					queryKey: ['content', 'list', 'v1', serverId],
+					queryKey: contentListQueryKey.value,
 				}),
 			])
 			debug('unlinkModpack: invalidation complete')
@@ -775,10 +676,12 @@ provideInstallationSettings({
 		currentLoader: addonsQuery.data.value?.modloader ?? server.value?.loader ?? '',
 	})),
 
-	isServer: true,
+	isServer: false,
 	isApp: serverSettings.isApp.value,
 	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
 	isLocalFile: computed(() => modpack.value?.spec.platform === 'local_file'),
+	showBackupCreator: true,
+	repairDescriptionKind: 'server-instance',
 
 	lockPlatform: false,
 	hideLoaderVersion: false,
@@ -895,8 +798,18 @@ watch(
 		})
 		if (oldStatus === 'installing' && newStatus === 'available') {
 			debug('status installing->available, resetting editing refs')
-			editingPlatform.value = server.value?.loader?.toLowerCase() ?? 'vanilla'
-			editingGameVersion.value = server.value?.mc_version ?? ''
+			editingPlatform.value = currentPlatform.value
+			editingGameVersion.value = currentGameVersion.value
+		}
+	},
+)
+
+watch(
+	[worldId, currentPlatform, currentGameVersion],
+	([, newPlatform, newGameVersion], [, oldPlatform, oldGameVersion]) => {
+		if (editingPlatform.value === oldPlatform && editingGameVersion.value === oldGameVersion) {
+			editingPlatform.value = newPlatform
+			editingGameVersion.value = newGameVersion
 		}
 	},
 )
@@ -918,38 +831,5 @@ function onBrowseModpacks() {
 		worldId: worldId.value,
 		from: 'reset-server',
 	})
-}
-
-async function confirmResetToOnboarding() {
-	if (supportResetToOnboardingDisabled.value || !worldId.value) return
-
-	try {
-		isResettingToOnboarding.value = true
-		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
-		modrinthServersConsole.clear()
-		try {
-			await client.kyros.logs_v1.clear()
-		} catch (error) {
-			console.error('Failed to clear server logs:', error)
-		}
-		server.value.flows = { intro: true }
-		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
-		])
-		addNotification({
-			type: 'success',
-			title: formatMessage(messages.resetToOnboardingSuccessTitle),
-			text: formatMessage(messages.resetToOnboardingSuccessDescription),
-		})
-		serverSettings.closeModal?.()
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
-		})
-	} finally {
-		isResettingToOnboarding.value = false
-	}
 }
 </script>

@@ -302,9 +302,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} borttagna"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Något innehåll på din server kunde inte analyseras och kommer kanske påverkas av denna ändring."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} uppdaterade"
   },
@@ -319,9 +316,6 @@
   },
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "En säkerhetskopia skapas just nu, det är rekommenderat att vänta tills det är klart innan du gör detta."
-  },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Att skapa en säkerhetskopia kan ta flera minuter beroende på storleken av din server."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Skapa säkerhetskopia"
@@ -815,9 +809,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Bekräfta"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Om du byter till {gameVersion} kommer detta innehållet på din server ändras."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Kontrollera innehållsändringar"
   },
@@ -832,9 +823,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} version"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Du kommer att behöva ställa om din server för att ändra loader."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Ominstallera modpaket"
@@ -1006,12 +994,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Uppdatera till {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Att uppdatera kan förstöra din instans. Kontrollera versionernas ändringsloggar och säkerhetskopiera först."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Att uppdatera kan förstöra din värld. Kontrollera versionernas ändringsloggar och säkerhetskopiera först."
   },
   "label.actions": {
     "defaultMessage": "Åtgärder"
