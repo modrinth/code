@@ -65,6 +65,9 @@ export interface ServerInstallContentContext {
 	effectiveServerWorldId: ComputedRef<string | null>
 	serverContextServerData: Ref<Archon.Servers.v0.Server | null>
 	serverContextWorldName: ComputedRef<string | null>
+	serverContextWorldGameVersion: ComputedRef<string | null>
+	serverContextWorldLoader: ComputedRef<string | null>
+	serverContextWorldLoaderVersion: ComputedRef<string | null>
 	serverContentProjectIds: Ref<Set<string>>
 	queuedServerInstallProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallCount: ComputedRef<number>
@@ -283,6 +286,21 @@ export function createServerInstallContent(opts: {
 		return serverFull.worlds.find((world) => world.is_active) ?? serverFull.worlds[0] ?? null
 	})
 	const serverContextWorldName = computed(() => serverContextWorld.value?.name ?? null)
+	const serverContextWorldGameVersion = computed(() => {
+		const worldGameVersion = serverContextWorld.value?.content?.game_version
+		if (worldIdQuery.value) return worldGameVersion ?? null
+		return worldGameVersion ?? serverContextServerData.value?.mc_version ?? null
+	})
+	const serverContextWorldLoader = computed(() => {
+		const worldLoader = serverContextWorld.value?.content?.modloader
+		if (worldIdQuery.value) return worldLoader ?? null
+		return worldLoader ?? serverContextServerData.value?.loader ?? null
+	})
+	const serverContextWorldLoaderVersion = computed(() => {
+		const worldLoaderVersion = serverContextWorld.value?.content?.modloader_version
+		if (worldIdQuery.value) return worldLoaderVersion ?? null
+		return worldLoaderVersion ?? serverContextServerData.value?.loader_version ?? null
+	})
 	const serverBackUrl = computed(() => {
 		const sid = serverIdQuery.value
 		if (!sid) return '/hosting/manage'
@@ -688,6 +706,9 @@ export function createServerInstallContent(opts: {
 		effectiveServerWorldId,
 		serverContextServerData,
 		serverContextWorldName,
+		serverContextWorldGameVersion,
+		serverContextWorldLoader,
+		serverContextWorldLoaderVersion,
 		serverContentProjectIds,
 		queuedServerInstallProjectIds,
 		queuedServerInstallCount,

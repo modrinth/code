@@ -90,6 +90,9 @@ const {
 	effectiveServerWorldId,
 	serverContextServerData,
 	serverContextWorldName,
+	serverContextWorldGameVersion,
+	serverContextWorldLoader,
+	serverContextWorldLoaderVersion,
 	serverContentProjectIds,
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
@@ -296,10 +299,10 @@ const serverContextFilters = computed(() => {
 	const pt = projectType.value
 
 	if (pt !== 'modpack') {
-		const gameVersion = serverContextServerData.value.mc_version
+		const gameVersion = serverContextWorldGameVersion.value
 		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
 
-		const platform = serverContextServerData.value.loader?.toLowerCase()
+		const platform = serverContextWorldLoader.value?.toLowerCase().replaceAll('_', '')
 		if (platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
 			filters.push({ type: 'mod_loader', option: platform })
 		if (platform && ['paper', 'purpur'].includes(platform))
@@ -333,6 +336,14 @@ const serverContextFilters = computed(() => {
 const combinedProvidedFilters = computed(() =>
 	isServerContext.value ? serverContextFilters.value : instanceFilters.value,
 )
+
+const serverContentProjectType = computed<ProjectType | null>(() => {
+	const loader = serverContextWorldLoader.value?.toLowerCase()
+	if (!loader) return null
+	if (loader === 'paper' || loader === 'purpur') return 'plugin'
+	if (loader === 'vanilla') return 'datapack'
+	return 'mod'
+})
 
 const {
 	serverPings,
@@ -478,6 +489,21 @@ function resetInstanceContext() {
 }
 
 watch(
+	[isServerContext, isSetupServerContext, projectType, serverContentProjectType],
+	([serverContext, setupServerContext, currentProjectType, targetProjectType]) => {
+		if (!serverContext || setupServerContext || !targetProjectType) return
+		if (!['mod', 'plugin', 'datapack'].includes(currentProjectType)) return
+		if (currentProjectType === targetProjectType) return
+
+		router.replace({
+			path: `/browse/${targetProjectType}`,
+			query: route.query,
+		})
+	},
+	{ immediate: true },
+)
+
+watch(
 	() => route.params.projectType as ProjectType,
 	async (newType) => {
 		if (!browseRouteActive.value) {
@@ -562,9 +588,9 @@ const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
 			name: serverContextWorldName.value ?? formatMessage(messages.worldFallbackName),
-			loader: serverContextServerData.value.loader ?? '',
-			loaderVersion: serverContextServerData.value.loader_version ?? '',
-			gameVersion: serverContextServerData.value.mc_version ?? '',
+			loader: serverContextWorldLoader.value ?? '',
+			loaderVersion: serverContextWorldLoaderVersion.value ?? '',
+			gameVersion: serverContextWorldGameVersion.value ?? '',
 			serverId: serverIdQuery.value,
 			upstream: serverContextServerData.value.upstream,
 			iconSrc: null as string | null,
@@ -639,8 +665,8 @@ function getCurrentSelectedInstallPreferences(projectTypeValue: string) {
 function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
 	return getTargetInstallPreferences(
 		{
-			gameVersion: serverContextServerData.value?.mc_version,
-			loader: serverContextServerData.value?.loader,
+			gameVersion: serverContextWorldGameVersion.value,
+			loader: serverContextWorldLoader.value,
 		},
 		contentType,
 	)
