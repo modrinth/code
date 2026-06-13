@@ -127,13 +127,6 @@ const { canSetup, permissionDeniedMessage } = useServerPermissions()
 const router = useRouter()
 const queryClient = useQueryClient()
 
-const type = computed(() => {
-	const loader = server.value?.loader?.toLowerCase()
-	if (loader === 'paper' || loader === 'purpur') return 'plugin'
-	if (loader === 'vanilla') return 'datapack'
-	return 'mod'
-})
-
 const queryKey = computed(() => ['content', 'list', 'v1', serverId, worldId.value])
 const modpackContentQueryKey = computed(() => [
 	'content',
@@ -155,6 +148,13 @@ const contentQuery = useQuery({
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 0,
+})
+
+const type = computed(() => {
+	const loader = (contentQuery.data.value?.modloader ?? server.value?.loader)?.toLowerCase()
+	if (loader === 'paper' || loader === 'purpur') return 'plugin'
+	if (loader === 'vanilla') return 'datapack'
+	return 'mod'
 })
 
 const isModpackContentModalOpen = ref(false)
