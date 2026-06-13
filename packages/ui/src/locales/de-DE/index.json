@@ -1370,9 +1370,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Server konnte nicht repariert werden"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Server konnte nicht in den Onboarding-Zustand zurückgesetzt werden"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Installationseinstellungen konnten nicht gespeichert werden"
   },
@@ -1391,17 +1388,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Auf Onboarding zurücksetzen"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Dadurch wird der Server in den Onboarding-Zustand zurückgesetzt, sodass die Einrichtung erneut abgeschlossen werden kann. Möchtest du wirklich fortfahren?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Auf Onboarding zurücksetzen"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Der Server wurde in den Onboarding-Ablauf zurückgesetzt."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Server auf Onboarding zurückgesetzt"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Spitzenlasten von bis zu {cpus} CPUs"

@@ -869,9 +869,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Nu s-a putut repara server-ul"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Nu s-a putut reseta server-ul la îmbarcare"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Nu s-a putut salva setările de instalare"
   },

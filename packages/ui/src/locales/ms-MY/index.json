@@ -1304,9 +1304,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Gagal membaiki pelayan"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Gagal menetapkan semula pelayan kepada proses penetapan awal"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Gagal menyimpan tetapan pemasangan"
   },
@@ -1325,17 +1322,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Pilihan ini akan mengembalikan pelayan ke proses penetapan awal supaya penetapan boleh diselesaikan semula. Adakah anda pasti mahu meneruskan?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Pelayan telah dikembalikan ke aliran penetapan awal."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Pelayan ditetapkan semula ke proses penetapan awal"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"

@@ -1319,9 +1319,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "無法修復伺服器"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "無法將伺服器重設為初始設定狀態"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "無法儲存安裝設定"
   },
@@ -1340,17 +1337,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "重設為初始設定"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "此操作將使伺服器回到初始設定流程，以便重新完成設定。您確定要繼續嗎？"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "重設為初始設定"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "伺服器已回到初始設定流程。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "伺服器已重設為初始設定狀態"
   },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"

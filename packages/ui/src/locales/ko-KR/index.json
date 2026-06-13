@@ -1346,9 +1346,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "서버 복구 실패"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "서버 온보딩 상태로 재설정 실패"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "설치 설정 저장 실패"
   },
@@ -1367,17 +1364,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "온보딩 상태로 재설정"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "서버가 다시 온보딩 단계로 돌아가 설정을 다시 완료할 수 있습니다. 계속하시겠습니까?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "온보딩 상태로 재설정"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "서버가 온보딩 상태로 되돌아갔습니다."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "온보딩 상태로 서버 재설정"
   },
   "hosting.specs.burst": {
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"

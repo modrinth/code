@@ -1340,9 +1340,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Không thể khắc phục máy chủ"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Không thể tải lại máy chủ vào trạng thái khởi đầu"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Không thể lưu cài đặt"
   },
@@ -1361,17 +1358,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Cài lại về sự khởi đầu"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Điều này sẽ đưa máy chủ trở lại từ đầu để quá trình cài đặt sẽ được thực hiên lần nữa. Bạn chắc chắn sẽ tiếp tục chứ?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Cài lại từ đầu"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Máy chủ này đã được đưa về trạng thái khởi đầu."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Đã cài lại máy chủ"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"

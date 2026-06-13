@@ -1364,9 +1364,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "No se pudo reparar el servidor"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Error al volver a la configuración inicial"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "No se pudo guardar la configuración de instalación"
   },
@@ -1385,17 +1382,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Volver a la configuración inicial"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Esto hará que el servidor vuelva al proceso de configuración inicial para que se pueda completar de nuevo. ¿Estás seguro de que quieres continuar?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Volver a la configuración inicial"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "El servidor ha vuelto al proceso de configuración inicial."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Servidor restablecido a la configuración inicial"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Aumenta hasta {cpus} CPUs"

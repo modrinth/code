@@ -1334,9 +1334,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Nie udało się naprawić serwera"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Nie udało się zresetować serwera do trybu onboardingu"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Nie udało się zapisać ustawień instalacji"
   },
@@ -1355,17 +1352,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Resetuj do trybu onboardingu"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "To przywróci serwer do trybu onboardingu, skąd będzie można ustawić go od nowa. Czy na pewno chesz kontynuować?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Resetuj do trybu onboardingu"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Serwer został przywrócony do trybu onboardingu."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Serwer zresetowany do trybu onboardingu"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"

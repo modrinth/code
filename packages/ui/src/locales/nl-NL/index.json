@@ -992,9 +992,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Kon de server niet herstellen"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Het is niet gelukt om de server opnieuw in te stellen voor onboarding"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Het opslaan van de installatie-instellingen is mislukt"
   },
@@ -1013,17 +1010,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Terug naar de introductie"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Hierdoor wordt de server opnieuw in de onboarding fase gezet, zodat de installatie opnieuw kan worden voltooid. Weet u zeker dat u door wilt gaan?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Terug naar de introductie"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "De server is teruggezet naar het onboardingproces."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Server opnieuw ingesteld voor onboarding"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"

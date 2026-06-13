@@ -1361,9 +1361,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Sunucu tamir edilemedi"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Sunucu başlangıç ayarlarına sıfırlanamadı"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Kurulum ayarları kaydedilemedi"
   },
@@ -1382,17 +1379,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Bu sunucuyu kurulum aşamasına geri gönderecek. Devam etmek istediğinizden emin misiniz?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Sunucu ilk katılım akışına geri döndürüldü."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"

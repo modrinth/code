@@ -1346,9 +1346,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "修复服务器失败"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "将服务器重置为初始设置失败"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "保存安装设置失败"
   },
@@ -1367,17 +1364,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "重置为初始设置"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "这会让服务器重新进入初始化流程，以便你再次完成配置。你确定要继续吗？"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "重置为初始设置"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "服务器已回到初始化流程。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "服务器已重置为初始设置"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst 时最高 {cpus} CPU"

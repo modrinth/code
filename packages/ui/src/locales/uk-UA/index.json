@@ -1307,9 +1307,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Не вдалося полагодити сервер"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Не вдалося скинути до початкового стану"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Не вдалося зберегти налаштування інсталяції"
   },
@@ -1328,17 +1325,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Скинути до початкового стану"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Це призведе до повернення сервера в початковий стан, щоб можна було повторно виконати процес налаштування. Ви впевнені, що хочете продовжити?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Скинути до початкового стану"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Сервер повернуто до початкового стану для налаштування."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Сервер скинуто до початкового стану"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"

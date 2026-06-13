@@ -1340,9 +1340,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Impossibile riparare il server"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Impossibile reinizializzare il server"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Impossibile salvare le impostazioni"
   },
@@ -1361,17 +1358,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reinizializza"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Il server verrà ripristinato alla configurazione iniziale così da poterlo riconfigurare. Vuoi davvero continuare?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Reinizializza"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Il server è stato ripristinato alla configurazione iniziale."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Server reinizializzato"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"

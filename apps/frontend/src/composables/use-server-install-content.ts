@@ -770,8 +770,7 @@ export function useServerInstallContent({
 					? formatMessage(messages.createInstanceName)
 					: (currentWorld.value?.name ?? formatMessage(messages.worldFallbackName)),
 			loader: serverContextWorldLoader.value ?? '',
-			loaderVersion:
-				serverContextWorldLoaderVersion.value ?? '',
+			loaderVersion: serverContextWorldLoaderVersion.value ?? '',
 			gameVersion: serverContextWorldGameVersion.value ?? '',
 			serverId: currentServerId.value,
 			upstream: serverData.value.upstream,

@@ -1271,9 +1271,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Не удалось исправить сервер"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Не удалось сбросить сервер до первого запуска"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Не удалось сохранить параметры установки"
   },
@@ -1292,17 +1289,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Сбросить до первого запуска"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Это вернёт сервер к этапу первоначальной настройки, чтобы вы могли пройти её заново. Вы уверены, что хотите продолжить?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Сброс до первого запуска"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Сервер возвращён к процессу настройки до первого запуска."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Сервер сброшен до первого запуска"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Рост до {cpus} CPU"

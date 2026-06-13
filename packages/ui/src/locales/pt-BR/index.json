@@ -1364,9 +1364,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Falha ao reparar o servidor"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Falha ao redefinir o servidor para a integração"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Falha ao salvar as configurações de instalação"
   },
@@ -1385,17 +1382,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Redefinir para a integração"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Isso enviará o servidor de volta para a integração, para que a configuração possa ser concluída novamente. Tem certeza de que deseja continuar?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Redefinir para a integração"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "O servidor foi retornado ao fluxo de integração."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Servidor redefinido para a integração"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Picos de até {cpus} CPUs"

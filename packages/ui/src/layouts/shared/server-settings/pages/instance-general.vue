@@ -104,6 +104,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon, TrashIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
@@ -320,26 +321,19 @@ const deleteWorldMutation = useMutation({
 			queryClient.cancelQueries({ queryKey: worldSummaryKey }),
 		])
 
-		const previousServerFull = queryClient.getQueryData<Archon.Servers.v1.ServerFull>(
-			serverFullKey,
-		)
-		const previousWorldSummary = queryClient.getQueryData<WorldSummaryCacheItem[]>(
-			worldSummaryKey,
-		)
+		const previousServerFull = queryClient.getQueryData<Archon.Servers.v1.ServerFull>(serverFullKey)
+		const previousWorldSummary = queryClient.getQueryData<WorldSummaryCacheItem[]>(worldSummaryKey)
 
-		queryClient.setQueryData<Archon.Servers.v1.ServerFull | undefined>(
-			serverFullKey,
-			(previous) =>
-				previous
-					? {
-							...previous,
-							worlds: previous.worlds.filter((world) => world.id !== deletedWorldId),
-						}
-					: previous,
+		queryClient.setQueryData<Archon.Servers.v1.ServerFull | undefined>(serverFullKey, (previous) =>
+			previous
+				? {
+						...previous,
+						worlds: previous.worlds.filter((world) => world.id !== deletedWorldId),
+					}
+				: previous,
 		)
-		queryClient.setQueryData<WorldSummaryCacheItem[] | undefined>(
-			worldSummaryKey,
-			(previous) => previous?.filter((world) => world.id !== deletedWorldId),
+		queryClient.setQueryData<WorldSummaryCacheItem[] | undefined>(worldSummaryKey, (previous) =>
+			previous?.filter((world) => world.id !== deletedWorldId),
 		)
 		queryClient.removeQueries({ queryKey: ['content', 'list', 'v1', serverId, deletedWorldId] })
 		queryClient.removeQueries({

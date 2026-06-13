@@ -1322,9 +1322,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "サーバーの修復に失敗しました"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "サーバーをオンボーディング状態にリセットできませんでした"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "インストール設定の保存に失敗しました"
   },
@@ -1343,17 +1340,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "オンボーディング画面にリセット"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "これによりサーバーはオンボーディングモードに戻り、セットアップを再度完了できるようになります。本当に続行しますか？"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "オンボーディング画面にリセット"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "サーバーはオンボーディングフローに戻りました。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "サーバーがオンボーディングにリセットされました"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus}個のCPUに増加"
