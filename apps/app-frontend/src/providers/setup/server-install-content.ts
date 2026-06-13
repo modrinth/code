@@ -567,6 +567,7 @@ export function createServerInstallContent(opts: {
 						plans.map((plan) => ({
 							project_id: plan.projectId,
 							version_id: plan.versionId,
+							kind: plan.contentType as Archon.Content.v1.AddonKind,
 						})),
 					),
 				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),

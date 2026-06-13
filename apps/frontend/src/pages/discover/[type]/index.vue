@@ -115,6 +115,7 @@ debug('initial route.params.type:', route.params.type, '→ currentType:', curre
 const isServerType = computed(() => currentType.value === 'server')
 
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
+const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 watch(
 	() => projectType.value?.id,
@@ -162,6 +163,7 @@ const {
 	queuedServerInstallProjectIds,
 	queuedServerInstallCount,
 	isInstallingQueuedServerInstalls,
+	serverContentProjectType,
 	installContext,
 	setBrowseSearchState,
 	syncHiddenInstalledProjectIds,
@@ -174,6 +176,28 @@ const {
 	onboardingModalRef,
 	debug,
 })
+
+watch(
+	[currentServerId, fromContext, projectTypeId, serverContentProjectType],
+	([serverId, from, currentProjectType, targetProjectType]) => {
+		if (!serverId || from || !targetProjectType) return
+		if (!['mod', 'plugin', 'datapack'].includes(currentProjectType)) return
+		if (currentProjectType === targetProjectType) return
+
+		navigateTo({
+			path: `/discover/${targetProjectType}s`,
+			query: {
+				sid: route.query.sid,
+				wid: route.query.wid,
+				shi: route.query.shi,
+				from: route.query.from,
+				q: route.query.q,
+			},
+		})
+	},
+	{ immediate: true },
+)
+
 const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
 const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	stickyInstallHeaderRef,
@@ -410,8 +434,6 @@ const messages = defineMessages({
 			'Shader packs for older versions most likely work on newer versions with only minor issues.',
 	},
 })
-
-const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 debug('projectTypeId:', projectTypeId.value)
 watch(projectTypeId, (val) => debug('projectTypeId changed:', val))

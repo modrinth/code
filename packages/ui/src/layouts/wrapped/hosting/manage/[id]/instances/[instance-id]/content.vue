@@ -384,7 +384,11 @@ function toResolvePreferences(
 
 async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
 	const existingProjectIds = getInstalledProjectIds()
-	const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
+	const resolvedAddons: Array<{
+		project_id: string
+		version_id: string
+		kind: Archon.Content.v1.AddonKind
+	}> = []
 
 	for (const plan of plans) {
 		const target = getTargetInstallPreferences(
@@ -409,6 +413,7 @@ async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
 			resolvedAddons.push({
 				project_id: item.project_id,
 				version_id: item.version_id,
+				kind: plan.contentType as Archon.Content.v1.AddonKind,
 			})
 		}
 	}
@@ -1417,7 +1422,7 @@ provideContentManager({
 							: (updatingProject?.version?.id ?? '')
 					"
 					:is-app="false"
-					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
+					:project-type="updatingModpack ? 'modpack' : type"
 					:project-icon-url="
 						updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
 					"

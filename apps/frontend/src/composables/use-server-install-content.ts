@@ -21,6 +21,8 @@ import {
 	readStoredServerInstallQueue,
 	removePendingServerContentInstall,
 	requestInstall,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useVIntl,
 	writePendingServerContentInstallBaseline,
 	writeStoredServerInstallQueue,
@@ -217,6 +219,42 @@ export function useServerInstallContent({
 		enabled: computed(() => !!currentServerId.value && !!currentWorldId.value),
 	})
 
+	const currentWorld = computed(() => {
+		if (fromContext.value === 'create-instance') return null
+
+		const full = serverFullData.value
+		if (!full) return null
+
+		const worldId = currentWorldId.value
+		if (worldId) {
+			return full.worlds.find((world) => world.id === worldId) ?? null
+		}
+
+		return full.worlds.find((world) => world.is_active) ?? full.worlds[0] ?? null
+	})
+	const serverContextWorldGameVersion = computed(() => {
+		const worldGameVersion = currentWorld.value?.content?.game_version
+		if (currentWorldId.value) return worldGameVersion ?? null
+		return worldGameVersion ?? serverData.value?.mc_version ?? null
+	})
+	const serverContextWorldLoader = computed(() => {
+		const worldLoader = currentWorld.value?.content?.modloader
+		if (currentWorldId.value) return worldLoader ?? null
+		return worldLoader ?? serverData.value?.loader ?? null
+	})
+	const serverContextWorldLoaderVersion = computed(() => {
+		const worldLoaderVersion = currentWorld.value?.content?.modloader_version
+		if (currentWorldId.value) return worldLoaderVersion ?? null
+		return worldLoaderVersion ?? serverData.value?.loader_version ?? null
+	})
+	const serverContentProjectType = computed(() => {
+		const loader = serverContextWorldLoader.value?.toLowerCase()
+		if (!loader) return null
+		if (loader === 'paper' || loader === 'purpur') return 'plugin'
+		if (loader === 'vanilla') return 'datapack'
+		return 'mod'
+	})
+
 	function setBrowseSearchState(state: ServerInstallBrowseSearchState) {
 		browseSearchState = state
 	}
@@ -353,12 +391,12 @@ export function useServerInstallContent({
 		)
 		const filters: FilterValue[] = []
 		if (serverData.value && projectType.value?.id !== 'modpack') {
-			const gameVersion = serverData.value.mc_version
+			const gameVersion = serverContextWorldGameVersion.value
 			if (gameVersion) {
 				filters.push({ type: 'game_version', option: gameVersion })
 			}
 
-			const platform = serverData.value.loader?.toLowerCase()
+			const platform = serverContextWorldLoader.value?.toLowerCase().replaceAll('_', '')
 
 			const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 			if (platform && modLoaders.includes(platform)) {
@@ -416,8 +454,8 @@ export function useServerInstallContent({
 	function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
 		return getTargetInstallPreferences(
 			{
-				gameVersion: serverData.value?.mc_version,
-				loader: serverData.value?.loader,
+				gameVersion: serverContextWorldGameVersion.value,
+				loader: serverContextWorldLoader.value,
 			},
 			contentType,
 		)
@@ -434,7 +472,11 @@ export function useServerInstallContent({
 
 	async function resolveQueuedAddonPlans(plans: BrowseInstallPlan<ServerInstallSearchResult>[]) {
 		const existingProjectIds = getServerInstalledProjectIds()
-		const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
+		const resolvedAddons: Array<{
+			project_id: string
+			version_id: string
+			kind: Archon.Content.v1.AddonKind
+		}> = []
 
 		for (const plan of plans) {
 			const resolved = await client.labrinth.content_v3.resolve({
@@ -453,6 +495,7 @@ export function useServerInstallContent({
 				resolvedAddons.push({
 					project_id: item.project_id,
 					version_id: item.version_id,
+					kind: plan.contentType as Archon.Content.v1.AddonKind,
 				})
 			}
 		}
@@ -612,11 +655,15 @@ export function useServerInstallContent({
 				project,
 				contentType,
 				mode: isModpack ? 'immediate' : 'queue',
-				selectedFilters: isModpack ? [] : browseSearchState.currentFilters.value,
+				selectedFilters: isModpack
+					? []
+					: stripServerRuntimeInstallFilters(browseSearchState.currentFilters.value),
 				providedFilters: isModpack ? [] : serverFilters.value,
 				overriddenProvidedFilterTypes: isModpack
 					? []
-					: browseSearchState.overriddenProvidedFilterTypes.value,
+					: stripServerRuntimeInstallOverrides(
+							browseSearchState.overriddenProvidedFilterTypes.value,
+						),
 				targetPreferences: getServerInstallTargetPreferences(contentType),
 				getProjectVersions: getInstallProjectVersions,
 				queue: serverInstallQueue,
@@ -753,20 +800,6 @@ export function useServerInstallContent({
 				? formatMessage(messages.createInstanceModpackHeading)
 				: formatMessage(commonMessages.installingContentLabel),
 	)
-	const currentWorld = computed(() => {
-		if (fromContext.value === 'create-instance') return null
-
-		const full = serverFullData.value
-		if (!full) return null
-
-		const worldId = currentWorldId.value
-		if (worldId) {
-			return full.worlds.find((world) => world.id === worldId) ?? null
-		}
-
-		return full.worlds.find((world) => world.is_active) ?? full.worlds[0] ?? null
-	})
-
 	const installContext = computed(() => {
 		if (!serverData.value) return null
 		return {
@@ -774,10 +807,10 @@ export function useServerInstallContent({
 				fromContext.value === 'create-instance'
 					? formatMessage(messages.createInstanceName)
 					: (currentWorld.value?.name ?? formatMessage(messages.worldFallbackName)),
-			loader: currentWorld.value?.content?.modloader ?? serverData.value.loader ?? '',
+			loader: serverContextWorldLoader.value ?? '',
 			loaderVersion:
-				currentWorld.value?.content?.modloader_version ?? serverData.value.loader_version ?? '',
-			gameVersion: currentWorld.value?.content?.game_version ?? serverData.value.mc_version ?? '',
+				serverContextWorldLoaderVersion.value ?? '',
+			gameVersion: serverContextWorldGameVersion.value ?? '',
 			serverId: currentServerId.value,
 			upstream: serverData.value.upstream,
 			iconSrc: serverIcon.value,
@@ -843,6 +876,7 @@ export function useServerInstallContent({
 		currentWorldId,
 		serverData,
 		serverContentData,
+		serverContentProjectType,
 		serverFilters,
 		serverHideInstalled,
 		hideSelectedServerInstalls,
