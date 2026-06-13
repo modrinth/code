@@ -11,6 +11,7 @@
 		:globals="globals"
 		:on-password-sign-in="beginPasswordSignIn"
 		:on-two-factor-sign-in="begin2FASignIn"
+		:on-passkey-sign-in="beginPasskeySignin"
 		:on-set-captcha-ref="setCaptchaRef"
 	/>
 </template>
@@ -34,8 +35,9 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	promotePendingSignInOAuthProvider,
 } from '@/composables/auth.ts'
+import { getPasskeyCredential } from '@/helpers/passkey.ts'
 
-type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
+type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft' | 'passkey'
 
 interface AuthGlobalsResponse {
 	captcha_enabled?: boolean
@@ -189,6 +191,30 @@ async function begin2FASignIn() {
 			type: 'error',
 		})
 		captcha.value?.reset?.()
+	}
+	stopLoading()
+}
+
+async function beginPasskeySignin() {
+	startLoading()
+	try {
+		const start = await client.labrinth.auth_v2.authenticatePasskeyStart()
+
+		const credential = await getPasskeyCredential(start.options.publicKey)
+
+		const result = await client.labrinth.auth_v2.authenticatePasskeyFinish({
+			flow: start.flow,
+			credential,
+		})
+
+		pendingSignInOAuthProvider.value = 'passkey'
+		await finishSignIn(result.session)
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: getErrorMessage(err),
+			type: 'error',
+		})
 	}
 	stopLoading()
 }

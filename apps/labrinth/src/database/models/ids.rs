@@ -4,9 +4,10 @@ use crate::models::ids::{
     AffiliateCodeId, AnalyticsEventId, CampaignDonationId, ChargeId,
     CollectionId, FileId, ImageId, NotificationId, OAuthAccessTokenId,
     OAuthClientAuthorizationId, OAuthClientId, OAuthRedirectUriId,
-    OrganizationId, PatId, PayoutId, ProductId, ProductPriceId, ProjectId,
-    ReportId, SessionId, SharedInstanceId, SharedInstanceVersionId, TeamId,
-    TeamMemberId, ThreadId, ThreadMessageId, UserSubscriptionId, VersionId,
+    OrganizationId, PasskeyId, PatId, PayoutId, ProductId, ProductPriceId,
+    ProjectId, ReportId, SessionId, SharedInstanceId, SharedInstanceVersionId,
+    TeamId, TeamMemberId, ThreadId, ThreadMessageId, UserSubscriptionId,
+    VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -276,6 +277,10 @@ db_id_interface!(
 db_id_interface!(
     AnalyticsEventId,
     generator: generate_analytics_event_id @ "analytics_events",
+);
+db_id_interface!(
+    PasskeyId,
+    generator: generate_passkey_id @ "user_passkeys",
 );
 
 id_type!(CategoryId as i32);

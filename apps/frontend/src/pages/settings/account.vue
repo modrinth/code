@@ -440,6 +440,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
+			<PasskeySettings />
 		</section>
 
 		<section id="data-export" class="universal-card">
@@ -513,6 +514,7 @@ import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
 import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
+import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
 
 definePageMeta({

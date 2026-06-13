@@ -11,6 +11,7 @@ use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use serde::{Deserialize, Serialize};
 use url::Url;
+use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 
 const FLOWS_NAMESPACE: &str = "flows";
 
@@ -57,6 +58,13 @@ pub enum DBFlow {
         authorization_id: DBOAuthClientAuthorizationId,
         scopes: Scopes,
         original_redirect_uri: Option<String>, // Needed for https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
+    },
+    RegisterPasskey {
+        user_id: DBUserId,
+        state: PasskeyRegistration,
+    },
+    AuthenticatePasskey {
+        state: DiscoverableAuthentication,
     },
 }
 

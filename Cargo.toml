@@ -219,6 +219,8 @@ utoipa-actix-web = { version = "0.1.2" }
 utoipa-scalar = { version = "0.3.0", default-features = false }
 uuid = "1.18.1"
 validator = "0.20.0"
+webauthn-rs = "0.5.5"
+webauthn-rs-proto = "0.5.5"
 webp = { version = "0.3.1", default-features = false }
 webview2-com = "0.38.0"  # Should be updated in lockstep with wry
 whoami = "1.6.1"
