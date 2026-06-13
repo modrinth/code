@@ -95,6 +95,8 @@ import type { CreationFlowContextValue } from '#ui/components'
 import { CreationFlowModal } from '#ui/components'
 import { injectModrinthServerContext } from '#ui/providers'
 
+const WORLD_PREPARED_FALLBACK_MS = 120_000
+
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -267,16 +269,67 @@ onMounted(async () => {
 })
 
 async function finalizeSetup(createdWorldId: string) {
-	modalRef.value?.hide()
-	server.value.flows = { intro: false }
+	const worldPrepared = await waitForWorldPrepared(createdWorldId)
 	await client.archon.servers_v1.endIntro(serverId)
+	await router.push(getPostSetupPath(createdWorldId, worldPrepared))
+	server.value.flows = { intro: false }
+	modalRef.value?.hide()
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 		queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
 		queryClient.invalidateQueries({ queryKey: ['servers', 'worlds', 'summary', 'v1', serverId] }),
 	])
-	await router.push(
-		`/hosting/manage/${encodeURIComponent(serverId)}/instances/${encodeURIComponent(createdWorldId)}`,
+}
+
+function waitForWorldPrepared(worldId: string) {
+	return new Promise<boolean>((resolve) => {
+		let settled = false
+		let unsubscribe: (() => void) | undefined
+
+		const timeout = setTimeout(() => {
+			finish(false)
+		}, WORLD_PREPARED_FALLBACK_MS)
+
+		function finish(prepared: boolean) {
+			if (settled) return
+			settled = true
+			clearTimeout(timeout)
+			unsubscribe?.()
+			resolve(prepared)
+		}
+
+		async function checkWorldPrepared() {
+			const serverFull = await client.archon.servers_v1.get(serverId)
+			queryClient.setQueryData(['servers', 'v1', 'detail', serverId], serverFull)
+
+			const world = serverFull.worlds.find((world) => world.id === worldId)
+			if (world?.readiness.data_synchronized_fetched) {
+				finish(true)
+			}
+		}
+
+		unsubscribe = client.archon.sync.onAny(serverId, (event) => {
+			if (!syncEventTargetsWorld(event, worldId)) return
+			void checkWorldPrepared().catch(() => {})
+		})
+
+		void checkWorldPrepared().catch(() => {})
+	})
+}
+
+function getPostSetupPath(worldId: string, worldPrepared: boolean) {
+	const basePath = `/hosting/manage/${encodeURIComponent(serverId)}`
+	if (!worldPrepared) return basePath
+	return `${basePath}/instances/${encodeURIComponent(worldId)}`
+}
+
+function syncEventTargetsWorld(event: Archon.Sync.v1.SyncEvent, worldId: string) {
+	return (
+		(event.type === 'world.patch' ||
+			event.type === 'world.startup.patch' ||
+			event.type === 'world.content.base.update' ||
+			event.type === 'world.content.addon.patch') &&
+		event.world_id === worldId
 	)
 }
 
@@ -300,7 +353,6 @@ const onCreate = async (config: CreationFlowContextValue) => {
 				properties,
 				content: createBareWorldContent(config),
 			})
-			modalRef.value?.hide()
 			uploading.value = true
 			uploadedBytes.value = 0
 			totalBytes.value = config.modpackFile.value.size
