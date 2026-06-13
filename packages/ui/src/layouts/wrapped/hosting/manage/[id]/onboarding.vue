@@ -284,7 +284,6 @@ async function finalizeSetup(createdWorldId: string) {
 function waitForWorldPrepared(worldId: string) {
 	return new Promise<boolean>((resolve) => {
 		let settled = false
-		let unsubscribe: (() => void) | undefined
 
 		const timeout = setTimeout(() => {
 			finish(false)
@@ -308,7 +307,7 @@ function waitForWorldPrepared(worldId: string) {
 			}
 		}
 
-		unsubscribe = client.archon.sync.onAny(serverId, (event) => {
+		const unsubscribe = client.archon.sync.onAny(serverId, (event) => {
 			if (!syncEventTargetsWorld(event, worldId)) return
 			void checkWorldPrepared().catch(() => {})
 		})

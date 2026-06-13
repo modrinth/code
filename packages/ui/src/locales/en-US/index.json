@@ -1691,9 +1691,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Failed to repair instance"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Failed to reset instance to onboarding"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Failed to save installation settings"
   },
@@ -1712,20 +1709,8 @@
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reset to onboarding"
   },
-  "hosting.loader.reset-to-onboarding-description": {
-    "defaultMessage": "Send this instance back into onboarding so setup can be completed again."
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "This will send the instance back into onboarding so setup can be completed again. Are you sure you want to continue?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Reset to onboarding"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "The instance has been returned to the onboarding flow."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Instance reset to onboarding"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -3593,6 +3578,27 @@
   "server.instance-settings.general.danger-zone.label": {
     "defaultMessage": "Danger zone"
   },
+  "server.instance-settings.general.delete-instance.button": {
+    "defaultMessage": "Delete instance"
+  },
+  "server.instance-settings.general.delete-instance.description": {
+    "defaultMessage": "Permanently delete this instance, including its content, files, settings, and backups."
+  },
+  "server.instance-settings.general.delete-instance.error": {
+    "defaultMessage": "Failed to delete instance"
+  },
+  "server.instance-settings.general.delete-instance.modal.description": {
+    "defaultMessage": "This deletes the instance, including its content, files, settings, and backups. This cannot be undone."
+  },
+  "server.instance-settings.general.delete-instance.modal.title": {
+    "defaultMessage": "Delete instance"
+  },
+  "server.instance-settings.general.delete-instance.success.description": {
+    "defaultMessage": "The instance has been deleted."
+  },
+  "server.instance-settings.general.delete-instance.success.title": {
+    "defaultMessage": "Instance deleted"
+  },
   "server.instance-settings.general.instance-name.description": {
     "defaultMessage": "This name is only visible on Modrinth."
   },
@@ -3637,9 +3643,6 @@
   },
   "server.instance-settings.general.reset-world-files.started.title": {
     "defaultMessage": "World data reset started"
-  },
-  "server.instance-settings.general.support-zone.label": {
-    "defaultMessage": "Support zone"
   },
   "server.settings.general.reset-to-onboarding.description": {
     "defaultMessage": "Send this server back into onboarding so setup can be completed again."
