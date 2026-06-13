@@ -171,6 +171,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 	let searchVersion = 0
 	let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+	let hasInitialized = false
 
 	const providedFiltersOrEmpty = computed(() => options.providedFilters?.value ?? [])
 
@@ -187,6 +188,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 			providedFiltersOrEmpty,
 		],
 		() => {
+			if (!hasInitialized) return
 			currentPage.value = 1
 		},
 		{ deep: true },
@@ -247,6 +249,8 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 			if (version === searchVersion) {
 				loading.value = false
 			}
+		} finally {
+			hasInitialized = true
 		}
 	}
 
