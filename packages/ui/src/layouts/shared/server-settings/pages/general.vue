@@ -121,7 +121,7 @@
 				</div>
 
 				<!-- Info -->
-				<div class="flex flex-col gap-2.5 pb-10">
+				<div class="flex flex-col gap-2.5">
 					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
 					<div class="flex flex-col gap-2.5 rounded-xl bg-surface-2 p-4">
 						<div
@@ -145,7 +145,7 @@
 				</div>
 
 				<div v-if="isSiteAdmin" class="flex flex-col gap-2.5">
-					<span class="font-semibold text-contrast">
+					<span class="text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.supportZoneLabel) }}
 					</span>
 					<div class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 p-4">
@@ -157,7 +157,11 @@
 									:disabled="supportResetToOnboardingDisabled"
 									@click="showResetToOnboardingModal"
 								>
-									<RotateCounterClockwiseIcon class="size-5" />
+									<SpinnerIcon
+										v-if="resetToOnboardingMutation.isPending.value"
+										class="size-5 animate-spin"
+									/>
+									<RotateCounterClockwiseIcon v-else class="size-5" />
 									{{ formatMessage(messages.resetToOnboardingButton) }}
 								</button>
 							</ButtonStyled>
@@ -182,8 +186,8 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon } from '@modrinth/assets'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { RotateCounterClockwiseIcon, SpinnerIcon } from '@modrinth/assets'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -218,7 +222,6 @@ const advancedActionTooltip = computed(() =>
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
 const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
-const isResettingToOnboarding = ref(false)
 
 const messages = defineMessages({
 	supportZoneLabel: {
@@ -271,12 +274,6 @@ const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidC
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 const isSiteAdmin = computed(() => serverSettings.currentUserRole.value === 'admin')
-const supportResetToOnboardingDisabled = computed(
-	() => isResettingToOnboarding.value || !canResetServer.value,
-)
-const supportResetToOnboardingTooltip = computed(() =>
-	!canResetServer.value ? permissionDeniedMessage.value : undefined,
-)
 
 // Preferences
 const preferences = {
@@ -513,19 +510,20 @@ function showResetToOnboardingModal() {
 	resetToOnboardingModal.value?.show()
 }
 
-async function confirmResetToOnboarding() {
-	if (supportResetToOnboardingDisabled.value) return
-
-	try {
-		isResettingToOnboarding.value = true
+const resetToOnboardingMutation = useMutation({
+	mutationFn: async () => {
 		await client.archon.servers_v1.resetToOnboarding(serverId)
-		modrinthServersConsole.clear()
 		try {
 			await client.kyros.logs_v1.clear()
 		} catch (error) {
 			console.error('Failed to clear server logs:', error)
 		}
-		data.value.flows = { intro: true }
+	},
+	onSuccess: async () => {
+		modrinthServersConsole.clear()
+		if (data.value) {
+			data.value.flows = { ...data.value.flows, intro: true }
+		}
 		await invalidateServerState()
 		addNotification({
 			type: 'success',
@@ -533,14 +531,27 @@ async function confirmResetToOnboarding() {
 			text: formatMessage(messages.resetToOnboardingSuccessDescription),
 		})
 		serverSettings.closeModal?.()
-	} catch (err) {
+	},
+	onError: (error) => {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
+			text:
+				error instanceof Error ? error.message : formatMessage(messages.failedToResetToOnboarding),
 		})
-	} finally {
-		isResettingToOnboarding.value = false
-	}
+	},
+})
+
+const supportResetToOnboardingDisabled = computed(
+	() => resetToOnboardingMutation.isPending.value || !canResetServer.value,
+)
+const supportResetToOnboardingTooltip = computed(() =>
+	!canResetServer.value ? permissionDeniedMessage.value : undefined,
+)
+
+function confirmResetToOnboarding() {
+	if (supportResetToOnboardingDisabled.value) return
+
+	resetToOnboardingMutation.mutate()
 }
 
 function invalidateServerState() {
