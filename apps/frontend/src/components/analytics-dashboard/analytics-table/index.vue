@@ -70,6 +70,9 @@
 			<template #cell-breakdown_download_reason="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
+			<template #cell-breakdown_dependent_project_download="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
 			<template #cell-breakdown_version_id="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
@@ -80,6 +83,9 @@
 				<span class="text-primary">{{ value }}</span>
 			</template>
 			<template #cell-project="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
+			<template #cell-dependent_on="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
 			<template #cell-views="{ row }">
@@ -222,6 +228,8 @@ const {
 	isLoading,
 	versionNumbersById,
 	versionProjectNamesById,
+	projectNamesById,
+	dependentProjectTypesById,
 	getVersionDisplayName,
 	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
@@ -269,6 +277,11 @@ const showProjectVersionProjectColumn = computed(
 		!selectedBreakdownSet.value.has('project') &&
 		selectedProjectIdSet.value.size > 1,
 )
+const showDependentOnProjectColumn = computed(
+	() =>
+		selectedBreakdownSet.value.has('dependent_project_download') &&
+		selectedProjectIdSet.value.size > 1,
+)
 const includeDateColumn = computed(
 	() =>
 		selectedBreakdowns.value.length === 0 ||
@@ -314,9 +327,6 @@ const csvExportOptions = computed<OverflowMenuOption[]>(() => {
 		},
 	]
 })
-const projectNamesById = computed(
-	() => new Map(projects.value.map((project) => [project.id, project.name])),
-)
 const hasAvailableProjects = computed(() => projects.value.length > 0)
 const analyticsPointCount = computed(() =>
 	timeSlices.value.reduce((sum, slice) => sum + slice.length, 0),
@@ -360,6 +370,9 @@ function buildTableRows(mode: AnalyticsTableMode) {
 		timeSlices: timeSlices.value,
 		selectedBreakdowns: selectedBreakdowns.value,
 		selectedProjectIds: selectedProjectIdSet.value,
+		selectedFilters: selectedFilters.value,
+		dependentProjectTypesById: dependentProjectTypesById.value,
+		showDependentOnProjectColumn: showDependentOnProjectColumn.value,
 		relevantStats: relevantStats.value,
 		projectNamesById: projectNamesById.value,
 		getVersionDisplayName,
@@ -379,6 +392,7 @@ function buildColumns(includeDate: boolean) {
 		selectedBreakdowns: selectedBreakdowns.value,
 		selectedFilters: selectedFilters.value,
 		showBreakdownColumn: showBreakdownColumn.value,
+		showDependentOnProjectColumn: showDependentOnProjectColumn.value,
 		showProjectVersionProjectColumn: showProjectVersionProjectColumn.value,
 		formatMessage,
 		getRelevantAnalyticsDashboardStats,
@@ -445,6 +459,8 @@ watch(
 		selectedBreakdowns,
 		selectedFilters,
 		projects,
+		dependentProjectTypesById,
+		projectNamesById,
 		versionNumbersById,
 		versionProjectNamesById,
 	],

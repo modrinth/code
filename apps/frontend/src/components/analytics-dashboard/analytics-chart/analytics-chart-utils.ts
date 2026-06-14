@@ -1,12 +1,16 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type {
-	AnalyticsBreakdownPreset,
-	AnalyticsDashboardProject,
-	AnalyticsDashboardStat,
-	AnalyticsGroupByPreset,
+import {
+	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardProject,
+	type AnalyticsDashboardStat,
+	type AnalyticsGroupByPreset,
+	type AnalyticsSelectedFilters,
+	doesAnalyticsPointMatchNormalizedFilters,
+	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
+import type { FormatMessage } from '../analytics-messages'
 import {
 	analyticsChartMessages,
 	analyticsMessages,
@@ -14,7 +18,6 @@ import {
 	formatAnalyticsDownloadReasonLabel,
 	formatAnalyticsLoaderLabel,
 	formatAnalyticsMonetizationLabel,
-	type FormatMessage,
 } from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
@@ -159,6 +162,9 @@ export function formatBreakdownLabel(
 	}
 	if (selectedBreakdown === 'download_reason') {
 		return formatAnalyticsDownloadReasonLabel(normalizedLowercaseValue, formatMessage)
+	}
+	if (selectedBreakdown === 'dependent_project_download') {
+		return breakdownValue
 	}
 	if (selectedBreakdown === 'version_id') {
 		return getVersionDisplayName?.(breakdownValue) ?? breakdownValue
@@ -320,6 +326,9 @@ export function buildChartDatasets(
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	selectedFilters: AnalyticsSelectedFilters,
+	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>,
+	projectNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
@@ -332,13 +341,13 @@ export function buildChartDatasets(
 
 	const dataLength = Math.max(sliceCount, timeSlices.length)
 	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
-	const projectNamesById = new Map(selectedProjects.map((project) => [project.id, project.name]))
+	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 
 	function formatChartBreakdownLabels(breakdownValues: readonly string[]): string {
 		return collapseRepeatedUnknownBreakdownLabels(
 			normalizedBreakdowns.map((breakdown, index) => {
 				const breakdownValue = breakdownValues[index] ?? ''
-				if (breakdown === 'project') {
+				if (breakdown === 'project' || breakdown === 'dependent_project_download') {
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
 				}
 
@@ -359,6 +368,15 @@ export function buildChartDatasets(
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
+				if (
+					!doesAnalyticsPointMatchNormalizedFilters(
+						point,
+						normalizedFilters,
+						dependentProjectTypesById,
+					)
+				) {
+					continue
+				}
 
 				const breakdownValues = getAnalyticsBreakdownValues(
 					point,
@@ -432,6 +450,15 @@ export function buildChartDatasets(
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
+				if (
+					!doesAnalyticsPointMatchNormalizedFilters(
+						point,
+						normalizedFilters,
+						dependentProjectTypesById,
+					)
+				) {
+					continue
+				}
 
 				if (point.metric_kind === 'downloads') {
 					downloadTotal += getMetricValue(point, 'downloads')
@@ -481,6 +508,15 @@ export function buildChartDatasets(
 	timeSlices.forEach((slice, sliceIndex) => {
 		for (const point of slice) {
 			if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
+			if (
+				!doesAnalyticsPointMatchNormalizedFilters(
+					point,
+					normalizedFilters,
+					dependentProjectTypesById,
+				)
+			) {
+				continue
+			}
 
 			const breakdownValues = getAnalyticsBreakdownValues(
 				point,

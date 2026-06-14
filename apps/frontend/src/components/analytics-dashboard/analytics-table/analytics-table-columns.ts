@@ -7,6 +7,7 @@ import type {
 } from '~/providers/analytics/analytics'
 
 import {
+	analyticsBreakdownMessages,
 	analyticsGroupByMessages,
 	formatAnalyticsBreakdownLabel,
 	formatAnalyticsStatLabel,
@@ -23,6 +24,7 @@ type BuildAnalyticsTableColumnsOptions = {
 	selectedBreakdowns: readonly AnalyticsTableBreakdownPreset[]
 	selectedFilters: AnalyticsSelectedFilters
 	showBreakdownColumn: boolean
+	showDependentOnProjectColumn: boolean
 	showProjectVersionProjectColumn: boolean
 	formatMessage: FormatMessage
 	getRelevantAnalyticsDashboardStats: (
@@ -43,6 +45,7 @@ export function buildAnalyticsTableColumns({
 	selectedBreakdowns,
 	selectedFilters,
 	showBreakdownColumn,
+	showDependentOnProjectColumn,
 	showProjectVersionProjectColumn,
 	formatMessage,
 	getRelevantAnalyticsDashboardStats,
@@ -69,6 +72,15 @@ export function buildAnalyticsTableColumns({
 				width: breakdown === 'project' ? '25%' : undefined,
 			})
 		}
+	}
+
+	if (showDependentOnProjectColumn) {
+		nextColumns.push({
+			key: 'dependent_on',
+			label: formatMessage(analyticsBreakdownMessages.dependentOn),
+			enableSorting: true,
+			width: '25%',
+		})
 	}
 
 	if (showProjectVersionProjectColumn) {

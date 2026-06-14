@@ -189,6 +189,7 @@ import {
 	type TabsValue,
 	useVIntl,
 } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import {
@@ -577,6 +578,14 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			label: formatMessage(analyticsBreakdownMessages.loader),
 			options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
 		},
+		{
+			key: 'dependent_project_type',
+			label: formatMessage(analyticsBreakdownMessages.dependentProjectType),
+			options: withSelectedOptions(
+				'dependent_project_type',
+				dependentProjectTypeFilterOptions.value,
+			),
+		},
 	)
 
 	return categories.filter((category) =>
@@ -668,6 +677,16 @@ const loaderTypeFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
 
+const dependentProjectTypeFilterOptions = computed<DropdownFilterBarOption[]>(() =>
+	filterOptions.value.dependentProjectTypes
+		.map((projectType) => ({
+			value: projectType,
+			label: getProjectTypeFilterOptionLabel(projectType),
+			searchTerms: [projectType],
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label)),
+)
+
 function isAnalyticsFilterValueCategory(
 	categoryKey: string,
 ): categoryKey is AnalyticsFilterValueCategory {
@@ -703,6 +722,9 @@ function getMissingSelectedOptionLabel(
 	if (categoryKey === 'loader_type') {
 		return getLoaderTypeFilterOptionLabel
 	}
+	if (categoryKey === 'dependent_project_type') {
+		return getProjectTypeFilterOptionLabel
+	}
 	return undefined
 }
 
@@ -729,6 +751,10 @@ function getProjectStatusFilterOptionLabel(status: string): string {
 
 function getLoaderTypeFilterOptionLabel(loaderType: string): string {
 	return formatAnalyticsLoaderLabel(loaderType, formatMessage)
+}
+
+function getProjectTypeFilterOptionLabel(projectType: string): string {
+	return formatProjectType(projectType)
 }
 
 function getDownloadReasonFilterOptionLabel(reason: string): string {

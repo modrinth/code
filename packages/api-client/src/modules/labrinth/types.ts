@@ -313,6 +313,7 @@ export namespace Labrinth {
 			export type ProjectDownloadsField =
 				| 'project_id'
 				| 'version_id'
+				| 'dependent_project_id'
 				| 'user_agent'
 				| 'domain'
 				| 'country'
@@ -347,6 +348,7 @@ export namespace Labrinth {
 
 			export type ProjectDownloadsFilters = {
 				version_id?: string[]
+				dependent_project_id?: string[]
 				domain?: string[]
 				user_agent?: string[]
 				monetized?: boolean[]
@@ -379,6 +381,7 @@ export namespace Labrinth {
 
 			export type FetchResponse = {
 				metrics: TimeSlice[]
+				projects: Record<string, Projects.v3.Project>
 				project_events: ProjectAnalyticsEvent[]
 			}
 
@@ -462,6 +465,7 @@ export namespace Labrinth {
 				user_agent?: string
 				domain?: string
 				version_id?: string
+				dependent_project_id?: string
 				country?: string
 				monetized?: boolean
 				reason?: DownloadReason

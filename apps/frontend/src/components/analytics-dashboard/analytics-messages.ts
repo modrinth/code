@@ -351,6 +351,18 @@ export const analyticsBreakdownMessages = defineMessages({
 		id: 'analytics.breakdown.download-reason',
 		defaultMessage: 'Download reason',
 	},
+	dependentProjectDownload: {
+		id: 'analytics.breakdown.dependent-project-download',
+		defaultMessage: 'Dependent project',
+	},
+	dependentProjectType: {
+		id: 'analytics.breakdown.dependent-project-type',
+		defaultMessage: 'Dependent project type',
+	},
+	dependentOn: {
+		id: 'analytics.breakdown.dependent-on',
+		defaultMessage: 'Dependent on',
+	},
 	versionId: {
 		id: 'analytics.breakdown.project-version',
 		defaultMessage: 'Project version',
@@ -781,6 +793,8 @@ export function formatAnalyticsBreakdownLabel(
 			return formatMessage(analyticsBreakdownMessages.userAgent)
 		case 'download_reason':
 			return formatMessage(analyticsBreakdownMessages.downloadReason)
+		case 'dependent_project_download':
+			return formatMessage(analyticsBreakdownMessages.dependentProjectDownload)
 		case 'version_id':
 			return formatMessage(analyticsBreakdownMessages.versionId)
 		case 'loader':
@@ -810,6 +824,8 @@ export function getAnalyticsBreakdownItemType(
 			return 'downloadSource'
 		case 'download_reason':
 			return 'downloadReason'
+		case 'dependent_project_download':
+			return 'project'
 		case 'version_id':
 			return 'projectVersion'
 		case 'loader':

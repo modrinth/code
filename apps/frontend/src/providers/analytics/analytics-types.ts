@@ -13,6 +13,7 @@ export type AnalyticsQueryFilterCategory =
 	| 'version_id'
 	| 'game_version'
 	| 'loader_type'
+	| 'dependent_project_type'
 
 export type AnalyticsTimeframePreset =
 	| 'today'
@@ -40,6 +41,7 @@ export type AnalyticsBreakdownPreset =
 	| 'version_id'
 	| 'loader'
 	| 'game_version'
+	| 'dependent_project_download'
 
 export type AnalyticsSelectedBreakdowns = Exclude<AnalyticsBreakdownPreset, 'none'>[]
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
@@ -47,6 +49,7 @@ export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
 export type AnalyticsTableSortColumn =
 	| 'date'
 	| 'project'
+	| 'dependent_on'
 	| 'breakdown'
 	| `breakdown_${Exclude<AnalyticsBreakdownPreset, 'none'>}`
 	| 'views'
@@ -153,6 +156,7 @@ export interface AnalyticsDashboardFilterOptions {
 	downloadReasons: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
+	dependentProjectTypes: string[]
 	versionIds: string[]
 }
 
@@ -164,6 +168,7 @@ export interface NormalizedAnalyticsSelectedFilters {
 	versionId: ReadonlySet<string>
 	gameVersion: ReadonlySet<string>
 	loaderType: ReadonlySet<string>
+	dependentProjectType: ReadonlySet<string>
 }
 
 export interface AnalyticsFacetsFilterOptionSummary {
@@ -172,6 +177,7 @@ export interface AnalyticsFacetsFilterOptionSummary {
 	downloadReasons: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
+	dependentProjectTypes: string[]
 	versionIds: string[]
 	projectDownloadsById: Map<string, number>
 	projectVersionDownloadsById: Map<string, number>
@@ -202,5 +208,6 @@ export type AnalyticsTimeSliceSplit = {
 
 export type AnalyticsFetchData = {
 	metrics: Labrinth.Analytics.v3.TimeSlice[]
+	projects: Record<string, Labrinth.Projects.v3.Project>
 	project_events: Labrinth.Analytics.v3.ProjectAnalyticsEvent[]
 }
