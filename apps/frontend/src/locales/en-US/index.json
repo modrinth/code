@@ -26,6 +26,9 @@
   "analytics.breakdown.dependent-project-download": {
     "message": "Dependent project"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Dependent on"
+  },
   "analytics.breakdown.dependent-project-type": {
     "message": "Dependent project type"
   },

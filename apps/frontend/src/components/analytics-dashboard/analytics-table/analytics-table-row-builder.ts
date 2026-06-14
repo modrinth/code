@@ -1,11 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 
 import {
-	doesAnalyticsPointMatchNormalizedFilters,
-	normalizeAnalyticsSelectedFilters,
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
 	type AnalyticsSelectedFilters,
+	doesAnalyticsPointMatchNormalizedFilters,
+	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
 import {
@@ -41,6 +41,7 @@ type BuildAnalyticsTableRowsOptions = {
 	selectedProjectIds: ReadonlySet<string>
 	selectedFilters: AnalyticsSelectedFilters
 	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>
+	showDependentOnProjectColumn: boolean
 	relevantStats: ReadonlySet<AnalyticsDashboardStat>
 	projectNamesById: ReadonlyMap<string, string>
 	getVersionDisplayName: (versionId: string) => string
@@ -58,6 +59,7 @@ export function buildAnalyticsTableRows({
 	selectedProjectIds,
 	selectedFilters,
 	dependentProjectTypesById,
+	showDependentOnProjectColumn,
 	relevantStats,
 	projectNamesById,
 	getVersionDisplayName,
@@ -165,6 +167,7 @@ export function buildAnalyticsTableRows({
 	function createRow(
 		rowId: string,
 		breakdownValues: readonly string[],
+		dependentOnProjectId?: string,
 		bucketLabel?: { date: string; dateMs: number },
 	) {
 		const breakdownKey =
@@ -177,6 +180,9 @@ export function buildAnalyticsTableRows({
 			date: bucketLabel?.date ?? '',
 			dateMs: bucketLabel?.dateMs ?? 0,
 			project: getProjectDisplayValueForBreakdownValues(breakdownValues),
+			dependent_on: dependentOnProjectId
+				? (projectNamesById.get(dependentOnProjectId) ?? dependentOnProjectId)
+				: '',
 			breakdown: breakdownKey,
 			breakdownValues: Object.fromEntries(
 				selectedBreakdowns.map((breakdown, index) => [breakdown, breakdownValues[index] ?? '']),
@@ -243,12 +249,18 @@ export function buildAnalyticsTableRows({
 			}
 
 			const nextBucketLabel = includeDate ? (bucketLabel ?? getBucketLabel(sliceIndex)) : undefined
+			const dependentOnProjectId = showDependentOnProjectColumn ? point.source_project : undefined
 			const breakdownKey =
 				breakdownValues.length === 0
 					? ALL_PROJECTS_BREAKDOWN_VALUE
 					: getAnalyticsBreakdownKey(breakdownValues)
-			const rowId = includeDate ? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}` : breakdownKey
-			const row = nextRows.get(rowId) ?? createRow(rowId, breakdownValues, nextBucketLabel)
+			const dependentOnKey = dependentOnProjectId ? `::${dependentOnProjectId}` : ''
+			const rowId = includeDate
+				? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}${dependentOnKey}`
+				: `${breakdownKey}${dependentOnKey}`
+			const row =
+				nextRows.get(rowId) ??
+				createRow(rowId, breakdownValues, dependentOnProjectId, nextBucketLabel)
 			addAnalyticsMetricToTableRow(row, point)
 		}
 	})

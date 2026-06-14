@@ -23,6 +23,7 @@ export type AnalyticsTableRow = {
 	date: string
 	dateMs: number
 	project: string
+	dependent_on: string
 	breakdown: string
 	breakdownValues: AnalyticsTableBreakdownDisplayValues
 	breakdownDisplays: AnalyticsTableBreakdownDisplayValues

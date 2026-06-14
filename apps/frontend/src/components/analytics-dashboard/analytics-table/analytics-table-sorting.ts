@@ -129,6 +129,15 @@ function getAnalyticsTableRowComparator(
 					directionFactor,
 					sortCollator,
 				)
+		case 'dependent_on':
+			return (left, right) =>
+				compareAnalyticsTableRows(
+					left,
+					right,
+					sortCollator.compare(left.dependent_on, right.dependent_on),
+					directionFactor,
+					sortCollator,
+				)
 		case 'breakdown':
 			return (left, right) =>
 				compareAnalyticsTableRows(

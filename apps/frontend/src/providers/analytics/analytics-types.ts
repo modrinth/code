@@ -49,6 +49,7 @@ export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
 export type AnalyticsTableSortColumn =
 	| 'date'
 	| 'project'
+	| 'dependent_on'
 	| 'breakdown'
 	| `breakdown_${Exclude<AnalyticsBreakdownPreset, 'none'>}`
 	| 'views'

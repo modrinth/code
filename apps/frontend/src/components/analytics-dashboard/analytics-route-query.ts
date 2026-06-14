@@ -90,6 +90,7 @@ const ANALYTICS_GRAPH_VIEW_MODE_VALUES: AnalyticsGraphViewMode[] = ['line', 'are
 const ANALYTICS_TABLE_SORT_COLUMN_VALUES: AnalyticsTableSortColumn[] = [
 	'date',
 	'project',
+	'dependent_on',
 	'breakdown',
 	'breakdown_project',
 	'breakdown_country',

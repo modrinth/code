@@ -359,6 +359,10 @@ export const analyticsBreakdownMessages = defineMessages({
 		id: 'analytics.breakdown.dependent-project-type',
 		defaultMessage: 'Dependent project type',
 	},
+	dependentOn: {
+		id: 'analytics.breakdown.dependent-on',
+		defaultMessage: 'Dependent on',
+	},
 	versionId: {
 		id: 'analytics.breakdown.project-version',
 		defaultMessage: 'Project version',

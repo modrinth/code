@@ -67,6 +67,8 @@ function getAnalyticsTableCsvCellValue(
 			return row.date
 		case 'project':
 			return row.project
+		case 'dependent_on':
+			return row.dependent_on
 		case 'breakdown':
 			return row.breakdownDisplay
 		case 'views':
