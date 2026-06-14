@@ -14,6 +14,7 @@ export type AnalyticsDashboardDimension =
 	| 'user_agent'
 	| 'download_reason'
 	| 'dependent_project_download'
+	| 'dependent_project_type'
 	| 'game_version'
 	| 'loader_type'
 
@@ -27,6 +28,7 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 	'version_id',
 	'game_version',
 	'loader_type',
+	'dependent_project_type',
 ]
 
 const ANALYTICS_DASHBOARD_STAT_ORDER: AnalyticsDashboardStat[] = [
@@ -47,6 +49,7 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 	user_agent: ['downloads'],
 	download_reason: ['downloads'],
 	dependent_project_download: ['downloads'],
+	dependent_project_type: ['downloads'],
 	game_version: ['downloads', 'playtime'],
 	loader_type: ['downloads', 'playtime'],
 	project_status: ANALYTICS_DASHBOARD_STAT_ORDER,
@@ -80,6 +83,7 @@ const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
 	version_id: 'version_id',
 	game_version: 'game_version',
 	loader_type: 'loader_type',
+	dependent_project_type: 'dependent_project_type',
 }
 
 const ANALYTICS_FILTER_CATEGORY_BY_BREAKDOWN: Record<
@@ -335,12 +339,20 @@ export function getVisibleAnalyticsFilterCategoriesForState(
 	breakdowns: AnalyticsBreakdownInput,
 	filters: AnalyticsSelectedFilters,
 ): readonly Exclude<AnalyticsQueryFilterCategory, 'project'>[] {
-	return FILTER_VALUE_CATEGORIES.filter((category) =>
-		haveAnalyticsStatOverlap(
+	const normalizedBreakdowns = normalizeAnalyticsBreakdowns(breakdowns)
+	return FILTER_VALUE_CATEGORIES.filter((category) => {
+		if (
+			category === 'dependent_project_type' &&
+			!normalizedBreakdowns.includes('dependent_project_download')
+		) {
+			return false
+		}
+
+		return haveAnalyticsStatOverlap(
 			getAnalyticsStatsForFilterScope(breakdowns, filters, category),
 			getAnalyticsStatsForFilterCategory(category),
-		),
-	)
+		)
+	})
 }
 
 export function sanitizeAnalyticsSelectedFilters(
@@ -349,6 +361,7 @@ export function sanitizeAnalyticsSelectedFilters(
 ): AnalyticsSelectedFilters {
 	const nextFilters = cloneSelectedFilters(filters)
 	let availableStats = [...getAnalyticsStatsForBreakdowns(breakdowns)]
+	const normalizedBreakdowns = normalizeAnalyticsBreakdowns(breakdowns)
 
 	for (const category of FILTER_VALUE_CATEGORIES) {
 		if (filters[category].length === 0) {
@@ -356,7 +369,11 @@ export function sanitizeAnalyticsSelectedFilters(
 		}
 
 		const categoryStats = getAnalyticsStatsForFilterCategory(category)
-		if (!haveAnalyticsStatOverlap(availableStats, categoryStats)) {
+		if (
+			!haveAnalyticsStatOverlap(availableStats, categoryStats) ||
+			(category === 'dependent_project_type' &&
+				!normalizedBreakdowns.includes('dependent_project_download'))
+		) {
 			nextFilters[category] = []
 			continue
 		}
@@ -378,6 +395,7 @@ export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): Analyti
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],
+		dependent_project_type: [...filters.dependent_project_type],
 	}
 }
 
@@ -460,7 +478,7 @@ export function normalizeSelectedValues(
 			.map((value) => value.trim().toLowerCase())
 			.filter(isProjectStatusFilterValue)
 	}
-	if (categoryKey === 'loader_type') {
+	if (categoryKey === 'loader_type' || categoryKey === 'dependent_project_type') {
 		return Array.from(
 			new Set(
 				selectedValues

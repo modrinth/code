@@ -9,6 +9,7 @@ import type {
 	AnalyticsDashboardContextValue,
 	AnalyticsDashboardProject,
 	AnalyticsDashboardStat,
+	AnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
 import {
@@ -49,6 +50,7 @@ export function useAnalyticsChartDatasets(
 		| 'displayedPreviousTimeSlices'
 		| 'displayedSelectedGroupBy'
 		| 'displayedSelectedBreakdowns'
+		| 'displayedSelectedFilters'
 		| 'hiddenGraphDatasetIds'
 		| 'hasExplicitGraphDatasetSelection'
 		| 'isGraphDatasetSelectionActive'
@@ -56,6 +58,7 @@ export function useAnalyticsChartDatasets(
 		| 'defaultGraphDatasetIds'
 		| 'topGraphDatasetIds'
 		| 'projectNamesById'
+		| 'dependentProjectTypesById'
 		| 'getVersionDisplayName'
 		| 'getVersionProjectName'
 	>,
@@ -163,6 +166,8 @@ export function useAnalyticsChartDatasets(
 			selectedProjects.value,
 			legendPalette.value,
 			context.displayedSelectedBreakdowns.value,
+			context.displayedSelectedFilters.value,
+			context.dependentProjectTypesById.value,
 			context.projectNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
@@ -176,6 +181,8 @@ export function useAnalyticsChartDatasets(
 			selectedProjects.value,
 			legendPalette.value,
 			context.displayedSelectedBreakdowns.value,
+			context.displayedSelectedFilters.value,
+			context.dependentProjectTypesById.value,
 			context.projectNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
@@ -366,6 +373,8 @@ function buildDatasetsByStat(
 	selectedProjects: AnalyticsDashboardProject[],
 	palette: string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	selectedFilters: AnalyticsSelectedFilters,
+	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>,
 	projectNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: (versionId: string) => string,
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
@@ -380,6 +389,8 @@ function buildDatasetsByStat(
 			stat,
 			palette,
 			selectedBreakdowns,
+			selectedFilters,
+			dependentProjectTypesById,
 			projectNamesById,
 			getVersionDisplayName,
 			getVersionProjectName,

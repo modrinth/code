@@ -1,8 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type {
-	AnalyticsBreakdownPreset,
-	AnalyticsDashboardStat,
+import {
+	doesAnalyticsPointMatchNormalizedFilters,
+	normalizeAnalyticsSelectedFilters,
+	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardStat,
+	type AnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
 import {
@@ -36,6 +39,8 @@ type BuildAnalyticsTableRowsOptions = {
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[]
 	selectedBreakdowns: readonly AnalyticsTableBreakdownPreset[]
 	selectedProjectIds: ReadonlySet<string>
+	selectedFilters: AnalyticsSelectedFilters
+	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>
 	relevantStats: ReadonlySet<AnalyticsDashboardStat>
 	projectNamesById: ReadonlyMap<string, string>
 	getVersionDisplayName: (versionId: string) => string
@@ -51,6 +56,8 @@ export function buildAnalyticsTableRows({
 	timeSlices,
 	selectedBreakdowns,
 	selectedProjectIds,
+	selectedFilters,
+	dependentProjectTypesById,
 	relevantStats,
 	projectNamesById,
 	getVersionDisplayName,
@@ -72,6 +79,7 @@ export function buildAnalyticsTableRows({
 	const projectDisplayValues = new Map<string, string>()
 	const nextRows = new Map<string, AnalyticsTableRow>()
 	const bucketLabelsBySliceIndex = new Map<number, { date: string; dateMs: number }>()
+	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 
 	function getBreakdownDisplayValue(
 		breakdownValue: string,
@@ -209,6 +217,15 @@ export function buildAnalyticsTableRows({
 			}
 
 			if (!selectedProjectIds.has(point.source_project)) {
+				continue
+			}
+			if (
+				!doesAnalyticsPointMatchNormalizedFilters(
+					point,
+					normalizedFilters,
+					dependentProjectTypesById,
+				)
+			) {
 				continue
 			}
 

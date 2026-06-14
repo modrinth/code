@@ -2,6 +2,10 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter-utils'
 
+import {
+	doesAnalyticsPointMatchNormalizedFilters,
+	normalizeAnalyticsSelectedFilters,
+} from './analytics-filter-utils'
 import { getProjectIdsMatchingStatusFilter } from './analytics-project-utils'
 import type {
 	AnalyticsDashboardTotals,
@@ -448,6 +452,7 @@ export function computeTotals(
 	availableProjectIds: Set<string>,
 	projectStatusById: Map<string, ProjectStatusFilterValue>,
 	filters: AnalyticsSelectedFilters,
+	dependentProjectTypesById?: ReadonlyMap<string, readonly string[]>,
 ): AnalyticsDashboardTotals {
 	const totals: AnalyticsDashboardTotals = {
 		views: 0,
@@ -467,6 +472,7 @@ export function computeTotals(
 	if (filteredProjectIds.size === 0) {
 		return totals
 	}
+	const normalizedFilters = normalizeAnalyticsSelectedFilters(filters)
 
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
@@ -475,6 +481,15 @@ export function computeTotals(
 			}
 
 			if (!filteredProjectIds.has(dataPoint.source_project)) {
+				continue
+			}
+			if (
+				!doesAnalyticsPointMatchNormalizedFilters(
+					dataPoint,
+					normalizedFilters,
+					dependentProjectTypesById,
+				)
+			) {
 				continue
 			}
 

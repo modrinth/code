@@ -71,6 +71,7 @@ import {
 import {
 	getProjectIdsMatchingStatusFilter,
 	getProjectOrganizationId,
+	getProjectTypes,
 	getSingleQueryValue,
 	getUniqueAnalyticsDashboardProjects,
 	isAnalyticsEligibleProject,
@@ -203,6 +204,7 @@ export interface AnalyticsDashboardContextValue {
 	versionProjectNamesById: ComputedRef<Map<string, string>>
 	versionProjectIconUrlsById: ComputedRef<Map<string, string>>
 	projectNamesById: ComputedRef<Map<string, string>>
+	dependentProjectTypesById: ComputedRef<Map<string, string[]>>
 	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
 	availableProjectStatuses: ComputedRef<ProjectStatusFilterValue[]>
 	availableProjectDownloadsById: ComputedRef<Map<string, number>>
@@ -1306,6 +1308,43 @@ export function createAnalyticsDashboardContext(
 	const projectVersionFilterOptionSummary = computed(() =>
 		getProjectVersionFilterOptionSummary(filterOptionProjectVersions.value ?? []),
 	)
+	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const analyticsProjects = shallowRef<Record<string, Labrinth.Projects.v3.Project>>({})
+	const dependentProjectTypesById = computed(() => {
+		const projectTypesById = new Map<string, string[]>()
+		for (const project of projects.value) {
+			projectTypesById.set(project.id, project.projectTypes)
+		}
+		for (const [projectId, project] of Object.entries(analyticsProjects.value)) {
+			projectTypesById.set(projectId, getProjectTypes(project))
+		}
+		return projectTypesById
+	})
+	const dependentProjectTypeFilterOptions = computed(() => {
+		const projectTypes = new Set<string>()
+		const dependentProjectIds = new Set<string>()
+		for (const timeSlice of [...timeSlices.value, ...previousTimeSlices.value]) {
+			for (const dataPoint of timeSlice) {
+				const dependentProjectId =
+					'dependent_project_id' in dataPoint ? dataPoint.dependent_project_id?.trim() : undefined
+				if (dependentProjectId) {
+					dependentProjectIds.add(dependentProjectId)
+				}
+			}
+		}
+
+		for (const projectId of dependentProjectIds) {
+			const types = dependentProjectTypesById.value.get(projectId) ?? []
+			for (const type of types) {
+				const normalizedType = type.trim().toLowerCase()
+				if (normalizedType.length > 0) {
+					projectTypes.add(normalizedType)
+				}
+			}
+		}
+		return sortStringValues([...projectTypes])
+	})
 	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() => ({
 		countries: analyticsFacetsFilterOptionSummary.value.countries,
 		downloadSources: analyticsFacetsFilterOptionSummary.value.downloadSources,
@@ -1322,6 +1361,7 @@ export function createAnalyticsDashboardContext(
 				...analyticsFacetsFilterOptionSummary.value.loaderTypes,
 			]),
 		]),
+		dependentProjectTypes: dependentProjectTypeFilterOptions.value,
 		versionIds: sortStringValues([
 			...new Set([
 				...projectVersionFilterOptionSummary.value.versionIds,
@@ -1361,9 +1401,6 @@ export function createAnalyticsDashboardContext(
 		{ deep: true },
 	)
 
-	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
-	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
-	const analyticsProjects = shallowRef<Record<string, Labrinth.Projects.v3.Project>>({})
 	const projectEvents = shallowRef<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>([])
 	const displayedSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 	const displayedSelectedGroupBy = ref<AnalyticsGroupByPreset>(selectedGroupBy.value)
@@ -1549,6 +1586,7 @@ export function createAnalyticsDashboardContext(
 			availableProjectIdSet.value,
 			projectStatusById.value,
 			selectedFilters.value,
+			dependentProjectTypesById.value,
 		),
 	)
 	const previousTotals = computed<AnalyticsDashboardTotals>(() =>
@@ -1558,6 +1596,7 @@ export function createAnalyticsDashboardContext(
 			availableProjectIdSet.value,
 			projectStatusById.value,
 			selectedFilters.value,
+			dependentProjectTypesById.value,
 		),
 	)
 
@@ -1722,6 +1761,7 @@ export function createAnalyticsDashboardContext(
 		versionProjectNamesById,
 		versionProjectIconUrlsById,
 		projectNamesById,
+		dependentProjectTypesById,
 		projectStatusById,
 		availableProjectStatuses,
 		availableProjectDownloadsById,

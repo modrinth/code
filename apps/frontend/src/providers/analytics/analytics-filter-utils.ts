@@ -143,6 +143,7 @@ export function cloneAnalyticsSelectedFilters(
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],
+		dependent_project_type: [...filters.dependent_project_type],
 	}
 }
 
@@ -155,6 +156,7 @@ export function cloneAnalyticsFilterOptions(
 		downloadReasons: [...filterOptions.downloadReasons],
 		gameVersions: [...filterOptions.gameVersions],
 		loaderTypes: [...filterOptions.loaderTypes],
+		dependentProjectTypes: [...filterOptions.dependentProjectTypes],
 		versionIds: [...filterOptions.versionIds],
 	}
 }
@@ -166,6 +168,7 @@ function getEmptyAnalyticsFacetsFilterOptionSummary(): AnalyticsFacetsFilterOpti
 		downloadReasons: [],
 		gameVersions: [],
 		loaderTypes: [],
+		dependentProjectTypes: [],
 		versionIds: [],
 		projectDownloadsById: new Map(),
 		projectVersionDownloadsById: new Map(),
@@ -221,6 +224,7 @@ export function getAnalyticsFacetsFilterOptionSummary(
 				.filter((gameVersion) => gameVersion.length > 0),
 		),
 		loaderTypes: sortStringValues([...loaderTypes]),
+		dependentProjectTypes: [],
 		versionIds: sortStringValues([...new Set([...downloadVersionIds, ...playtimeVersionIds])]),
 		projectDownloadsById: new Map(),
 		projectVersionDownloadsById: new Map(),
@@ -232,10 +236,12 @@ export function getAnalyticsFacetsFilterOptionSummary(
 export function doesAnalyticsPointMatchFilters(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 	filters: AnalyticsSelectedFilters,
+	dependentProjectTypesById?: ReadonlyMap<string, readonly string[]>,
 ): boolean {
 	return doesAnalyticsPointMatchNormalizedFilters(
 		dataPoint,
 		normalizeAnalyticsSelectedFilters(filters),
+		dependentProjectTypesById,
 	)
 }
 
@@ -250,6 +256,7 @@ export function normalizeAnalyticsSelectedFilters(
 		versionId: normalizeAnalyticsFilterValues(filters.version_id),
 		gameVersion: normalizeAnalyticsFilterValues(filters.game_version),
 		loaderType: normalizeAnalyticsFilterValues(filters.loader_type),
+		dependentProjectType: normalizeAnalyticsFilterValues(filters.dependent_project_type),
 	}
 }
 
@@ -267,6 +274,7 @@ function normalizeAnalyticsFilterValues(values: string[]): ReadonlySet<string> {
 export function doesAnalyticsPointMatchNormalizedFilters(
 	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
 	filters: NormalizedAnalyticsSelectedFilters,
+	dependentProjectTypesById?: ReadonlyMap<string, readonly string[]>,
 ): boolean {
 	switch (dataPoint.metric_kind) {
 		case 'views':
@@ -314,7 +322,16 @@ export function doesAnalyticsPointMatchNormalizedFilters(
 					filters.gameVersion,
 					getGameVersionFilterValue,
 				) &&
-				doesAnalyticsPointMatchNormalizedFilter(dataPoint, filters.loaderType, getLoaderFilterValue)
+				doesAnalyticsPointMatchNormalizedFilter(
+					dataPoint,
+					filters.loaderType,
+					getLoaderFilterValue,
+				) &&
+				doesAnalyticsDownloadPointMatchDependentProjectTypeFilter(
+					dataPoint,
+					filters.dependentProjectType,
+					dependentProjectTypesById,
+				)
 			)
 		case 'playtime':
 			return (
@@ -361,6 +378,28 @@ function doesAnalyticsPointMatchNormalizedFilter(
 
 	const normalizedPointValue = pointValue.trim().toLowerCase()
 	return filterValues.has(normalizedPointValue)
+}
+
+function doesAnalyticsDownloadPointMatchDependentProjectTypeFilter(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+	filterValues: ReadonlySet<string>,
+	dependentProjectTypesById: ReadonlyMap<string, readonly string[]> | undefined,
+): boolean {
+	if (filterValues.size === 0) {
+		return true
+	}
+	if (dataPoint.metric_kind !== 'downloads') {
+		return true
+	}
+
+	const dependentProjectId =
+		'dependent_project_id' in dataPoint ? dataPoint.dependent_project_id?.trim() : undefined
+	if (!dependentProjectId) {
+		return false
+	}
+
+	const projectTypes = dependentProjectTypesById?.get(dependentProjectId) ?? []
+	return projectTypes.some((projectType) => filterValues.has(projectType.trim().toLowerCase()))
 }
 
 function getCountryFilterValue(

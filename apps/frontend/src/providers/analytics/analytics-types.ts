@@ -13,6 +13,7 @@ export type AnalyticsQueryFilterCategory =
 	| 'version_id'
 	| 'game_version'
 	| 'loader_type'
+	| 'dependent_project_type'
 
 export type AnalyticsTimeframePreset =
 	| 'today'
@@ -154,6 +155,7 @@ export interface AnalyticsDashboardFilterOptions {
 	downloadReasons: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
+	dependentProjectTypes: string[]
 	versionIds: string[]
 }
 
@@ -165,6 +167,7 @@ export interface NormalizedAnalyticsSelectedFilters {
 	versionId: ReadonlySet<string>
 	gameVersion: ReadonlySet<string>
 	loaderType: ReadonlySet<string>
+	dependentProjectType: ReadonlySet<string>
 }
 
 export interface AnalyticsFacetsFilterOptionSummary {
@@ -173,6 +176,7 @@ export interface AnalyticsFacetsFilterOptionSummary {
 	downloadReasons: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
+	dependentProjectTypes: string[]
 	versionIds: string[]
 	projectDownloadsById: Map<string, number>
 	projectVersionDownloadsById: Map<string, number>
