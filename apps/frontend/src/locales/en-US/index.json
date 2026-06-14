@@ -23,6 +23,9 @@
   "analytics.breakdown.country": {
     "message": "Country"
   },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Dependent project"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Download reason"
   },

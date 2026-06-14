@@ -13,6 +13,7 @@ export type AnalyticsDashboardDimension =
 	| 'monetization'
 	| 'user_agent'
 	| 'download_reason'
+	| 'dependent_project_download'
 	| 'game_version'
 	| 'loader_type'
 
@@ -45,6 +46,7 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 	monetization: ['views', 'downloads'],
 	user_agent: ['downloads'],
 	download_reason: ['downloads'],
+	dependent_project_download: ['downloads'],
 	game_version: ['downloads', 'playtime'],
 	loader_type: ['downloads', 'playtime'],
 	project_status: ANALYTICS_DASHBOARD_STAT_ORDER,
@@ -60,6 +62,7 @@ const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
 	monetization: 'monetization',
 	user_agent: 'user_agent',
 	download_reason: 'download_reason',
+	dependent_project_download: 'dependent_project_download',
 	version_id: 'version_id',
 	loader: 'loader_type',
 	game_version: 'game_version',
@@ -89,6 +92,7 @@ const ANALYTICS_FILTER_CATEGORY_BY_BREAKDOWN: Record<
 	monetization: 'monetization',
 	user_agent: 'user_agent',
 	download_reason: 'download_reason',
+	dependent_project_download: null,
 	version_id: 'version_id',
 	loader: 'loader_type',
 	game_version: 'game_version',

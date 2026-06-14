@@ -160,6 +160,9 @@ export function formatBreakdownLabel(
 	if (selectedBreakdown === 'download_reason') {
 		return formatAnalyticsDownloadReasonLabel(normalizedLowercaseValue, formatMessage)
 	}
+	if (selectedBreakdown === 'dependent_project_download') {
+		return breakdownValue
+	}
 	if (selectedBreakdown === 'version_id') {
 		return getVersionDisplayName?.(breakdownValue) ?? breakdownValue
 	}
@@ -320,6 +323,7 @@ export function buildChartDatasets(
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	projectNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
@@ -332,13 +336,12 @@ export function buildChartDatasets(
 
 	const dataLength = Math.max(sliceCount, timeSlices.length)
 	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
-	const projectNamesById = new Map(selectedProjects.map((project) => [project.id, project.name]))
 
 	function formatChartBreakdownLabels(breakdownValues: readonly string[]): string {
 		return collapseRepeatedUnknownBreakdownLabels(
 			normalizedBreakdowns.map((breakdown, index) => {
 				const breakdownValue = breakdownValues[index] ?? ''
-				if (breakdown === 'project') {
+				if (breakdown === 'project' || breakdown === 'dependent_project_download') {
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
 				}
 

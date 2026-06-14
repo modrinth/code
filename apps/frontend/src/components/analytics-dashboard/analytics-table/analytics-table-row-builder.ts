@@ -295,7 +295,7 @@ function formatAnalyticsTableBreakdownDisplayValue(
 	getVersionDisplayName: (versionId: string) => string,
 	formatMessage: FormatMessage,
 ): string {
-	if (breakdown === 'project') {
+	if (breakdown === 'project' || breakdown === 'dependent_project_download') {
 		return projectNamesById.get(value) ?? value
 	}
 	return formatBreakdownLabel(value, breakdown, getVersionDisplayName, formatMessage)

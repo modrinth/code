@@ -1,9 +1,11 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { useVIntl } from '@modrinth/ui'
 import { computed, type ComputedRef, ref, watch } from 'vue'
 
 import { useTheme } from '~/composables/nuxt-accessors'
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
+	AnalyticsBreakdownPreset,
 	AnalyticsDashboardContextValue,
 	AnalyticsDashboardProject,
 	AnalyticsDashboardStat,
@@ -53,6 +55,7 @@ export function useAnalyticsChartDatasets(
 		| 'selectedGraphDatasetIds'
 		| 'defaultGraphDatasetIds'
 		| 'topGraphDatasetIds'
+		| 'projectNamesById'
 		| 'getVersionDisplayName'
 		| 'getVersionProjectName'
 	>,
@@ -160,6 +163,7 @@ export function useAnalyticsChartDatasets(
 			selectedProjects.value,
 			legendPalette.value,
 			context.displayedSelectedBreakdowns.value,
+			context.projectNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
@@ -172,6 +176,7 @@ export function useAnalyticsChartDatasets(
 			selectedProjects.value,
 			legendPalette.value,
 			context.displayedSelectedBreakdowns.value,
+			context.projectNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
@@ -357,12 +362,13 @@ export function useAnalyticsChartDatasets(
 }
 
 function buildDatasetsByStat(
-	timeSlices: Parameters<typeof buildChartDatasets>[0],
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	selectedProjects: AnalyticsDashboardProject[],
 	palette: string[],
-	selectedBreakdowns: Parameters<typeof buildChartDatasets>[4],
-	getVersionDisplayName: Parameters<typeof buildChartDatasets>[5],
-	getVersionProjectName: Parameters<typeof buildChartDatasets>[6],
+	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	projectNamesById: ReadonlyMap<string, string>,
+	getVersionDisplayName: (versionId: string) => string,
+	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
 	sliceCount: number,
 ) {
@@ -374,6 +380,7 @@ function buildDatasetsByStat(
 			stat,
 			palette,
 			selectedBreakdowns,
+			projectNamesById,
 			getVersionDisplayName,
 			getVersionProjectName,
 			formatMessage,

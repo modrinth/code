@@ -202,6 +202,7 @@ export interface AnalyticsDashboardContextValue {
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
 	versionProjectNamesById: ComputedRef<Map<string, string>>
 	versionProjectIconUrlsById: ComputedRef<Map<string, string>>
+	projectNamesById: ComputedRef<Map<string, string>>
 	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
 	availableProjectStatuses: ComputedRef<ProjectStatusFilterValue[]>
 	availableProjectDownloadsById: ComputedRef<Map<string, number>>
@@ -564,9 +565,6 @@ export function createAnalyticsDashboardContext(
 		dashboardOrganizationProjectIds.value.length > 0 && dashboardUserProjectIds.value.length > 0
 			? dashboardUserProjectIds.value
 			: availableProjectIds.value,
-	)
-	const projectNamesById = computed(
-		() => new Map(projects.value.map((project) => [project.id, project.name])),
 	)
 	const projectIconUrlsById = computed(
 		() =>
@@ -1056,6 +1054,7 @@ export function createAnalyticsDashboardContext(
 			if (!isAnalyticsFetchRequestReady(nextFetchRequest)) {
 				return {
 					metrics: [],
+					projects: {},
 					project_events: [],
 				}
 			}
@@ -1364,6 +1363,7 @@ export function createAnalyticsDashboardContext(
 
 	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
+	const analyticsProjects = shallowRef<Record<string, Labrinth.Projects.v3.Project>>({})
 	const projectEvents = shallowRef<Labrinth.Analytics.v3.ProjectAnalyticsEvent[]>([])
 	const displayedSelectedProjectIds = ref<string[]>([...selectedProjectIds.value])
 	const displayedSelectedGroupBy = ref<AnalyticsGroupByPreset>(selectedGroupBy.value)
@@ -1408,6 +1408,7 @@ export function createAnalyticsDashboardContext(
 			)
 			timeSlices.value = splitTimeSlices.currentTimeSlices
 			previousTimeSlices.value = splitTimeSlices.previousTimeSlices
+			analyticsProjects.value = nextAnalyticsData.projects
 			projectEvents.value = getAnalyticsProjectEventsInTimeRange(
 				nextAnalyticsData.project_events,
 				fetchRequest.value,
@@ -1423,7 +1424,16 @@ export function createAnalyticsDashboardContext(
 		}
 		timeSlices.value = []
 		previousTimeSlices.value = []
+		analyticsProjects.value = {}
 		projectEvents.value = []
+	})
+
+	const projectNamesById = computed(() => {
+		const projectNames = new Map(projects.value.map((project) => [project.id, project.name]))
+		for (const [projectId, project] of Object.entries(analyticsProjects.value)) {
+			projectNames.set(projectId, project.name ?? projectNames.get(projectId) ?? projectId)
+		}
+		return projectNames
 	})
 
 	const analyticsVersionIds = computed(() => {
@@ -1711,6 +1721,7 @@ export function createAnalyticsDashboardContext(
 		versionPublishedDatesById,
 		versionProjectNamesById,
 		versionProjectIconUrlsById,
+		projectNamesById,
 		projectStatusById,
 		availableProjectStatuses,
 		availableProjectDownloadsById,

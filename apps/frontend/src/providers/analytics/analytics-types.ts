@@ -40,6 +40,7 @@ export type AnalyticsBreakdownPreset =
 	| 'version_id'
 	| 'loader'
 	| 'game_version'
+	| 'dependent_project_download'
 
 export type AnalyticsSelectedBreakdowns = Exclude<AnalyticsBreakdownPreset, 'none'>[]
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
@@ -202,5 +203,6 @@ export type AnalyticsTimeSliceSplit = {
 
 export type AnalyticsFetchData = {
 	metrics: Labrinth.Analytics.v3.TimeSlice[]
+	projects: Record<string, Labrinth.Projects.v3.Project>
 	project_events: Labrinth.Analytics.v3.ProjectAnalyticsEvent[]
 }

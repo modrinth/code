@@ -70,6 +70,9 @@
 			<template #cell-breakdown_download_reason="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
+			<template #cell-breakdown_dependent_project_download="{ value }">
+				<span class="text-primary">{{ value }}</span>
+			</template>
 			<template #cell-breakdown_version_id="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
@@ -222,6 +225,7 @@ const {
 	isLoading,
 	versionNumbersById,
 	versionProjectNamesById,
+	projectNamesById,
 	getVersionDisplayName,
 	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
@@ -314,9 +318,6 @@ const csvExportOptions = computed<OverflowMenuOption[]>(() => {
 		},
 	]
 })
-const projectNamesById = computed(
-	() => new Map(projects.value.map((project) => [project.id, project.name])),
-)
 const hasAvailableProjects = computed(() => projects.value.length > 0)
 const analyticsPointCount = computed(() =>
 	timeSlices.value.reduce((sum, slice) => sum + slice.length, 0),

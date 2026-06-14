@@ -76,6 +76,7 @@ const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'version_id',
 	'loader',
 	'game_version',
+	'dependent_project_download',
 ]
 
 const ANALYTICS_DASHBOARD_STAT_VALUES: AnalyticsDashboardStat[] = [
@@ -98,6 +99,7 @@ const ANALYTICS_TABLE_SORT_COLUMN_VALUES: AnalyticsTableSortColumn[] = [
 	'breakdown_version_id',
 	'breakdown_loader',
 	'breakdown_game_version',
+	'breakdown_dependent_project_download',
 	'views',
 	'downloads',
 	'revenue',

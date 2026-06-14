@@ -203,6 +203,18 @@ function mergeAnalyticsProjectEvents(
 	})
 }
 
+function mergeAnalyticsProjects(
+	projectGroups: Record<string, Labrinth.Projects.v3.Project>[],
+): Record<string, Labrinth.Projects.v3.Project> {
+	const projects: Record<string, Labrinth.Projects.v3.Project> = {}
+
+	for (const projectGroup of projectGroups) {
+		Object.assign(projects, projectGroup)
+	}
+
+	return projects
+}
+
 function waitForAnalyticsFetchBatchDelay(): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS))
 }
@@ -215,6 +227,7 @@ export async function fetchAnalyticsData(
 ): Promise<AnalyticsFetchData> {
 	const fetchRequests = buildAnalyticsFetchRequestBatches(fetchRequest)
 	const timeSliceGroups: Labrinth.Analytics.v3.TimeSlice[][] = []
+	const projectGroups: Record<string, Labrinth.Projects.v3.Project>[] = []
 	const projectEventGroups: Labrinth.Analytics.v3.ProjectAnalyticsEvent[][] = []
 
 	for (let index = 0; index < fetchRequests.length; index++) {
@@ -224,11 +237,13 @@ export async function fetchAnalyticsData(
 
 		const response = await fetchAnalytics(fetchRequests[index])
 		timeSliceGroups.push(response.metrics)
+		projectGroups.push(response.projects ?? {})
 		projectEventGroups.push(response.project_events ?? [])
 	}
 
 	return {
 		metrics: mergeAnalyticsTimeSlices(timeSliceGroups),
+		projects: mergeAnalyticsProjects(projectGroups),
 		project_events: mergeAnalyticsProjectEvents(projectEventGroups),
 	}
 }

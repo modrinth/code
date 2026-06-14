@@ -499,7 +499,7 @@ import {
 import TimeFramePicker from './TimeframePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
-const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
+const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '14rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
 const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
@@ -1008,6 +1008,10 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 				value: 'game_version',
 				label: formatAnalyticsBreakdownLabel('game_version', formatMessage),
 			},
+			{
+				value: 'dependent_project_download',
+				label: formatAnalyticsBreakdownLabel('dependent_project_download', formatMessage),
+			},
 		)
 
 		return options.map((option) => ({
@@ -1134,6 +1138,11 @@ function withBreakdownFields(
 			case 'download_reason':
 				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
 					downloads.push('reason')
+				}
+				break
+			case 'dependent_project_download':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('dependent_project_id')
 				}
 				break
 			case 'version_id':

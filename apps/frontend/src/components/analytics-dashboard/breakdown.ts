@@ -41,6 +41,10 @@ export function getAnalyticsBreakdownValue(
 				'reason' in point ? point.reason : undefined,
 				UNKNOWN_BREAKDOWN_VALUE,
 			)
+		case 'dependent_project_download':
+			return normalizeBreakdownValue(
+				'dependent_project_id' in point ? point.dependent_project_id : undefined,
+			)
 		case 'version_id':
 			return normalizeBreakdownValue('version_id' in point ? point.version_id : undefined)
 		case 'loader':
