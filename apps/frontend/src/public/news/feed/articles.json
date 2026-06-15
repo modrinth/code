@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Modrinth joins Spark Universe",
+			"summary": "The next chapter. What it means and why we think it’s right for Modrinth.",
+			"thumbnail": "https://modrinth.com/news/article/joining-spark-universe/thumbnail.webp",
+			"date": "2026-06-15T14:00:00.000Z",
+			"link": "https://modrinth.com/news/article/joining-spark-universe"
+		},
+		{
 			"title": "Manage servers together",
 			"summary": "Add other users to your server, assign roles, and track what’s changed.",
 			"thumbnail": "https://modrinth.com/news/article/server-access/thumbnail.webp",
