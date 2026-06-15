@@ -145,9 +145,8 @@ export function createLoaderParsers(
 			const loaders: string[] = []
 
 			// Detect Beta 1.7.3 -> Babric
-			const hasBabricVersion = mcDependencies.some(
-				(version: string | undefined) =>
-					version?.includes('b1.7.3') || version?.includes('1.0.0-beta.7.3'),
+			const hasBabricVersion = mcDependencies.some((version: string | undefined) =>
+				version?.includes('1.0.0-beta.7.3'),
 			)
 
 			// Detect 1.3-1.13 -> legacy-fabric
