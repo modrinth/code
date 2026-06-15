@@ -71,6 +71,9 @@
   "analytics.chart.controls.annotations": {
     "message": "Anotace"
   },
+  "analytics.chart.controls.button": {
+    "message": "Ovládání"
+  },
   "app-marketing.download.description": {
     "message": "Naše aplikace je dostupná pro všechny počítačové platformy, vyberte si požadovanou verzi."
   },

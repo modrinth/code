@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Stahování Javy {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Stahování aktualizace"
+  },
   "app.action-bar.downloads": {
     "message": "Stažené Soubory"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primární instance"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Obnovit pro aktualizaci"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Zobrazit další spuštěné instance"
   },
   "app.action-bar.stop-instance": {
     "message": "Ukončit instanci"
+  },
+  "app.action-bar.update": {
+    "message": "Aktualizace"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Zobrazit probíhající stahování"
@@ -332,6 +341,9 @@
   "app.skins.add-button": {
     "message": "Přidat skin"
   },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Vem a drž"
+  },
   "app.skins.apply-button": {
     "message": "Použít"
   },
@@ -344,8 +356,17 @@
   "app.skins.modal.add-skin-button": {
     "message": "Přidat skin"
   },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Ukládání..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textura"
+  },
   "app.skins.preview.edit-button": {
     "message": "Upravit skin"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Zpomal!"
   },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
@@ -376,9 +397,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "Stahování bylo dokončeno"
-  },
-  "app.update-popup.reload": {
-    "message": "Načíst znovu"
   },
   "app.update-popup.title": {
     "message": "Je k dispozici aktualizace"
@@ -574,6 +592,12 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Název"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
   },
   "instance.settings.tabs.hooks": {
     "message": "Spouštěcí hooky"

@@ -455,9 +455,6 @@
   "app.update-popup.download-complete": {
     "message": "Muat turun selesai"
   },
-  "app.update-popup.reload": {
-    "message": "Muat semula"
-  },
   "app.update-popup.title": {
     "message": "Kemas kini tersedia"
   },

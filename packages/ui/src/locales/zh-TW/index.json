@@ -68,6 +68,9 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "無法載入訂閱詳細資訊。"
   },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/ 5 天} monthly {/ 月} quarterly {/ 季} yearly {/ 年} other {{interval}}}"
+  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "下一次扣款日期為 <charge-date>{date}</charge-date>。"
   },
@@ -95,11 +98,20 @@
   "browse.offline": {
     "defaultMessage": "你目前處於離線狀態，請連線至網路以瀏覽 Modrinth！"
   },
+  "browse.search.placeholder": {
+    "defaultMessage": "搜尋{projectType}..."
+  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "已選取專案"
   },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "你選取的專案尚未安裝"
+  },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "捨棄"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "你選取的專案尚未安裝"
   },
   "browse.view-prefix": {
     "defaultMessage": "檢視模式："
@@ -317,6 +329,12 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "刪除警告"
   },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "刪除 {count, number} 個{itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "刪除{itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {降級} other {更新}}可能會導致相容性問題。你額外新增至模組包的模組或內容將保留，但可能與新版本不相容。"
   },
@@ -507,13 +525,13 @@
     "defaultMessage": "正在啟用{contentType}..."
   },
   "content.selection-bar.bulk.updating": {
-    "defaultMessage": "正在上傳 {progress}/{total} {contentType}..."
+    "defaultMessage": "正在更新 {progress}/{total} {contentType}..."
   },
   "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "正在上傳{contentType}..."
+    "defaultMessage": "正在更新{contentType}..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count, number} {contentType} 已選擇"
+    "defaultMessage": "已選取 {count, number} 個{contentType}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "已選取 {count, number} 個項目"
@@ -986,6 +1004,9 @@
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "例如：/my-folder"
   },
+  "files.move-modal.header": {
+    "defaultMessage": "移動{type}"
+  },
   "files.navbar.back-to-home": {
     "defaultMessage": "回到首頁"
   },
@@ -1052,9 +1073,6 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "新名稱"
   },
-  "files.row.item-count": {
-    "defaultMessage": "{count, plural, one {# 個項目} other {# 個項目}}"
-  },
   "files.table-header.created": {
     "defaultMessage": "建立時間"
   },
@@ -1105,6 +1123,9 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": "剩餘 {count} 個"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "將{type}拖曳至此處上傳"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "名稱只能包含英數字、破折號、底線或空格"
@@ -1301,6 +1322,9 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "無法更新內容"
   },
+  "hosting.content.failed-to-install": {
+    "defaultMessage": "無法安裝內容"
+  },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "無法載入模組包內容"
   },
@@ -1471,6 +1495,9 @@
   },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "變更載入器具有破壞性"
+  },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "已連接{projectType}"
   },
   "installation-settings.linked.modpack": {
     "defaultMessage": "模組包"
@@ -1646,6 +1673,9 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "隱藏不相容項目"
   },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "選擇版本"
+  },
   "instances.updater-modal.incompatible-update.description": {
     "defaultMessage": "{version} 與此實例不相容。它可能無法啟動或運行異常。"
   },
@@ -1654,6 +1684,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "更新"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "仍要安裝"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "正在載入更新日誌..."
@@ -1845,7 +1878,7 @@
     "defaultMessage": "平臺"
   },
   "label.played": {
-    "defaultMessage": "遊玩時長：{ago}"
+    "defaultMessage": "上次遊玩：{ago}"
   },
   "label.project": {
     "defaultMessage": "專案"
@@ -2039,8 +2072,11 @@
   "markdown-editor.error-label": {
     "defaultMessage": "錯誤"
   },
+  "markdown-editor.image-modal.description-field.description": {
+    "defaultMessage": "請盡可能詳細描述這張圖片，如同對一位看不見這張圖片的人說明一般。"
+  },
   "markdown-editor.image-modal.description-field.placeholder": {
-    "defaultMessage": "描述這張圖片……"
+    "defaultMessage": "描述這張圖片..."
   },
   "markdown-editor.image-modal.description-field.title": {
     "defaultMessage": "描述 (替代文字)"
@@ -2048,8 +2084,128 @@
   "markdown-editor.image-modal.header": {
     "defaultMessage": "插入圖片"
   },
+  "markdown-editor.image-modal.upload-mode.label": {
+    "defaultMessage": "圖片來源"
+  },
   "markdown-editor.image-modal.upload-mode.link": {
     "defaultMessage": "連結"
+  },
+  "markdown-editor.image-modal.upload-mode.upload": {
+    "defaultMessage": "上傳"
+  },
+  "markdown-editor.image-modal.upload.prompt": {
+    "defaultMessage": "拖曳檔案以上傳或點擊選擇檔案"
+  },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "輸入圖片網址..."
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "插入"
+  },
+  "markdown-editor.link-modal.header": {
+    "defaultMessage": "插入連結"
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "輸入標籤..."
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "標籤..."
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "輸入連結網址..."
+  },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "這個編輯器支援 <markdown-link>Markdown 格式</markdown-link>。"
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "長度限制："
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "無限制"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "預覽"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "預覽"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "粗體"
+  },
+  "markdown-editor.toolbar.bulleted-list": {
+    "defaultMessage": "項目符號清單"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "程式碼"
+  },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "標題 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "標題 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "標題 3"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "圖片"
+  },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "斜體"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "連結"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "排序清單"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "引用"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "暴雷內容"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "刪除線"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "影片"
+  },
+  "markdown-editor.upload-error.no-file": {
+    "defaultMessage": "未提供檔案"
+  },
+  "markdown-editor.upload-error.no-handler": {
+    "defaultMessage": "未提供圖片上傳處理常式"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "網址"
+  },
+  "markdown-editor.url-validation-error.blocked-domain": {
+    "defaultMessage": "無效的網址。不允許這個網域。"
+  },
+  "markdown-editor.url-validation-error.malformed": {
+    "defaultMessage": "無效的網址。請確保網址格式正確。"
+  },
+  "markdown-editor.url-validation-error.unsupported-protocol": {
+    "defaultMessage": "不支援的協定。請使用 http 或 https。"
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "YouTube 影片播放器"
+  },
+  "markdown-editor.video-modal.header": {
+    "defaultMessage": "插入 YouTube 影片"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "請輸入有效的 YouTube 影片連結。"
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "輸入 YouTube 影片網址"
+  },
+  "markdown-editor.video-modal.url-field.title": {
+    "defaultMessage": "YouTube 影片網址"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "新增付款方式"
@@ -2227,6 +2383,9 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.label.badges": {
+    "defaultMessage": "徽章"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "發布時間：{date}"
@@ -3011,8 +3170,470 @@
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "備份"
   },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "內容與模組包"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "檔案與 SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "電源與主控臺"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "伺服器"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "設定與執行環境"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "使用者與邀請"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "動作"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "搜尋動作..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "已新增內容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "已刪除內容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "已停用內容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "已啟用內容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "已更新內容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "已上傳內容"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "已建立備份"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "已刪除備份"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "已重新命名備份"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "已從備份還原"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "已變更伺服器名稱"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "已變更伺服器子域名"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "已清除主控臺"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "已執行主控臺指令"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "已刪除檔案"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "已編輯檔案"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "已重新命名檔案"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "已上傳檔案"
+  },
+  "servers.access-page.activity-log-filter.action.game-version-edited": {
+    "defaultMessage": "已變更 Minecraft 版本"
+  },
+  "servers.access-page.activity-log-filter.action.java-runtime-modified": {
+    "defaultMessage": "已變更 Java 執行環境"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "已變更 Java 版本"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "已變更載入器版本"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "已變更模組包"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "已取消連結模組包"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "已建立伺服器"
+  },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "已變更方案"
+  },
+  "servers.access-page.activity-log-filter.action.server-properties-modified": {
+    "defaultMessage": "已修改伺服器設定檔"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "已修復伺服器"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "已重設伺服器"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "已重新啟動伺服器"
+  },
+  "servers.access-page.activity-log-filter.action.server-started": {
+    "defaultMessage": "已啟動伺服器"
+  },
+  "servers.access-page.activity-log-filter.action.server-stopped": {
+    "defaultMessage": "已停止伺服器"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-login": {
+    "defaultMessage": "已透過 SFTP 登入"
+  },
+  "servers.access-page.activity-log-filter.action.startup-command-modified": {
+    "defaultMessage": "已變更啟動指令"
+  },
+  "servers.access-page.activity-log-filter.action.user-invite-revoked": {
+    "defaultMessage": "已撤銷使用者邀請"
+  },
+  "servers.access-page.activity-log-filter.action.user-invited": {
+    "defaultMessage": "已邀請使用者"
+  },
+  "servers.access-page.activity-log-filter.action.user-permission-modified": {
+    "defaultMessage": "已變更使用者權限"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "已撤銷存取權"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "新增篩選條件"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "清除篩選條件"
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "實例"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "伺服器"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "客服"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "使用者"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "新增使用者"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "無法傳送好友邀請"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "已撤銷傳送給 {target} 的邀請。"
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "已撤銷邀請"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "無法傳送邀請"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "已再次傳送邀請給 {target}。"
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "已重新傳送邀請"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "邀請 {target} 成為{role}。"
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "已傳送邀請"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "已撤銷 {target} 的存取權。"
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "已撤銷存取權"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "無法移除存取權"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "無法更新身分"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "全部"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "身分：{role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "編輯者"
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "編輯者"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "撤銷邀請"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "撤銷存取權"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "重新傳送邀請"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "{seconds} 秒後可重新傳送"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "操作"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "加入時間"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "身分"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "使用者"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "背景工作執行中"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "客服"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "操作"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "時間"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "使用者"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "實例"
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "即將推出！"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "已新增內容 <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "已變更內容 <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "已刪除內容 <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "已刪除內容"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "已停用內容 <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "已啟用內容 <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "已更新內容 <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "已上傳 <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "已變更備份 <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "已變更備份"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "已建立備份 <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "已建立備份"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "已刪除備份 <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "已刪除備份"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "已重新命名備份 <from></from> 為 <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "已重新命名備份"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "已從備份 <backup></backup> 還原"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "已從備份還原"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "已變更伺服器組態"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "已清除主控臺"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "已執行主控臺指令 <command></command>"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "已變更檔案 <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "已刪除檔案 <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "已編輯檔案 <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "已重新命名 <from></from> 為 <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "已上傳檔案 <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "已將 Minecraft 版本變更為 <version></version>"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "已將 Java 執行環境變更為 <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "已將 Java 版本變更為 <java-version></java-version>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "已將載入器變更為 <loader></loader> <version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "已將載入器變更為 <loader></loader>"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "已將載入器版本變更為 <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "已清除載入器版本"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "已變更模組包"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "已將模組包變更為 <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "已將模組包版本變更為 <version></version>"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "已取消連結模組包"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "已取消連結模組包 <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "已取消連結模組包版本 <version></version>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "已建立伺服器"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "已變更伺服器詮釋資料"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "已將伺服器名稱變更為 <name></name>"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "已變更方案為 <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "新方案"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} GB 記憶體"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB 記憶體"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB 儲存空間"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB 儲存空間"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "已修改伺服器設定檔 <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "已修改伺服器設定檔"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "已修復伺服器"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "已重設伺服器"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "已重新啟動伺服器"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "已啟動伺服器"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "已停止伺服器"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "已將伺服器子域名變更為 <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "已透過 SFTP 登入"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "已變更啟動指令為 <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "未知事件"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "已記錄伺服器活動"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "已撤銷對 <target-user></target-user> 的邀請"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "已邀請 <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "已邀請 <target-user></target-user>，權限為 <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "已變更 <target-user></target-user> 的權限"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "已將 <target-user></target-user> 的權限變更為 <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "已撤銷 <target-user></target-user> 的存取權"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "伺服器"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "已取消備份「{backupName}」。"
@@ -3122,6 +3743,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "備份排程"
   },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "客服"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "手動備份"
   },
@@ -3157,6 +3784,39 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "正在同步內容"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "新增使用者"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "邀請"
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "編輯者"
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "選擇身分"
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "請勿輸入 Minecraft 使用者名稱。"
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Modrinth 使用者名稱"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "沒有找到使用者。"
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "輸入 Modrinth 使用者名稱"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "搜尋中..."
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "無法安裝"
@@ -3248,6 +3908,9 @@
   "servers.listing.notice.moderated": {
     "defaultMessage": "由於違反管理規範，你的伺服器已遭停權。"
   },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "你的伺服器將於<date>{formattedDate}</date>{verb, select, downgrade {降級} other {升級}}為{planSize}方案。"
+  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "我們正在為你設定伺服器，請稍候。這可能需要長達 10 分鐘。"
   },
@@ -3274,6 +3937,9 @@
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "你的伺服器硬體目前正在升級中，稍後將恢復上線。"
+  },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
   },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "重新訂閱"
@@ -3365,6 +4031,12 @@
   "servers.manage.settings-hint.title": {
     "defaultMessage": "你的伺服器設定已移動位置"
   },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "共享伺服器"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "你的伺服器"
+  },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "新伺服器"
   },
@@ -3379,6 +4051,9 @@
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "你的伺服器硬體目前正在升級中，稍後將恢復上線。"
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "伺服器圖示"
@@ -3431,6 +4106,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "付款方式"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "按{interval, select, monthly {月} quarterly {季} yearly {年} other {{interval}}}計費"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "服務範圍遍及北美、歐洲與東南亞。"
   },
@@ -3479,6 +4157,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "再次確認"
   },
+  "servers.region.australia": {
+    "defaultMessage": "澳洲"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "中歐"
   },
@@ -3487,6 +4168,15 @@
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "記憶體"
+  },
+  "servers.region.north-america-central": {
+    "defaultMessage": "北美中部"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "北美東部"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "北美西部"
   },
   "servers.region.prompt": {
     "defaultMessage": "你希望伺服器部署在何處？"
@@ -3499,6 +4189,51 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "西歐"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "新增時間：{time}"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "撤銷邀請"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "他不會被加進這個伺服器"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "你可以稍後再發送一次邀請"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "撤銷邀請"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "如果你撤銷了這份邀請，{username} 會需要新的邀請才能加入這個伺服器。"
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "撤銷存取權"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "邀請時間：{time}"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "撤銷存取權"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "他會立即失去對伺服器控制面板的存取權，並且無法編輯內容"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "他仍可以加入伺服器並遊玩（除非你另外做出調整）"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "新增日期不詳"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "如果你撤銷了某位使用者對伺服器的存取權，你需要重新邀請他才能恢復他的存取權。"
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "會發生什麼事？"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "安裝時發生非預期的錯誤。請稍後再試。"
@@ -3789,7 +4524,7 @@
     "defaultMessage": "保留物品欄"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "水槽"
+    "defaultMessage": "大雜燴"
   },
   "tag.category.kitpvp": {
     "defaultMessage": "Kit PvP"
@@ -3936,7 +4671,7 @@
     "defaultMessage": "社交"
   },
   "tag.category.storage": {
-    "defaultMessage": "儲存"
+    "defaultMessage": "儲物管理"
   },
   "tag.category.survival-mode": {
     "defaultMessage": "生存模式"
@@ -4067,6 +4802,90 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "套用"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "取消"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "清除"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "自訂日期範圍..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "減少時間範圍時長"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "未選取日期範圍。"
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "結束日期"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "增加時間範圍時長"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "在過去"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "所有時間"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "過去 14 天"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "過去 180 天"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "過去 30 天"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "過去 7 天"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "過去 90 天"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "今天"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "今年迄今"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "昨天"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "選取時間範圍"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "選取範圍："
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "選取中："
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "開始日期"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "時間範圍時長"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "時間範圍單位"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "天"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "小時"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "月"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "週"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "你的變更尚未儲存。"
   },
@@ -4087,5 +4906,101 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "忽略全部"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "這個使用者自 Modrinth Alpha 時期便已加入，早在該版本於2020年11月結束之前。"
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Alpha 測試者"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "這個使用者自 Modrinth Beta 時期便已加入，早在該版本於2022年2月結束之前。"
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "按這裡了解 Modrinth Beta 推出的相關資訊。"
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Beta 測試者"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "這個使用者的專案總計獲得 {download_sum} 次下載。"
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} 次下載"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "這個使用者曾協助我們測試 Modrinth 的資料包專案，早在該功能於2023年1月正式推出之前。"
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "資料包搶先體驗者"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "這個使用者曾協助我們測試 Modrinth 的模組包專案，早在該功能於2022年5月正式推出之前。"
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "模組包搶先體驗者"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "這個使用者曾協助我們測試 Modrinth 的插件專案，早在該功能於2022年8月正式推出之前。"
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "插件搶先體驗者"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "這個使用者曾協助我們測試 Modrinth 的資源包專案，早在該功能於2022年8月正式推出之前。"
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "資源包搶先體驗者"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "這個使用者曾協助我們測試 Modrinth 的伺服器專案，早在該功能於2026年3月正式推出之前。"
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "伺服器搶先體驗者"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "這個使用者曾協助我們測試 Modrinth 的光影包專案，早在該功能於2023年1月正式推出之前。"
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "光影包搶先體驗者"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "這個使用者曾參與 Modrinth Hosting 的 Alpha 封閉測試，早在 Modrinth Hosting Beta 版於2024年11月推出之前。"
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "Modrinth Hosting Alpha 測試者"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "這個使用者在 Modrinth 擔任內容管理員。"
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Modrinth 的內容管理員負責審查專案、處理檢舉，並維護 Modrinth 平臺的安全。"
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "內容管理員"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "這個使用者盡其所能支持了 Modrinth 以及平臺上的創作者。"
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "按這裡了解如何成為會員。"
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Modrinth+ 會員"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "這個使用者參與了至少一場 Modrinth 為 LGBTQ+ 社群舉辦的驕傲月籌款活動。"
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "按這裡前往我們最新的驕傲月籌款活動。"
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "驕傲月籌款活動捐款者"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "這個使用者任職於 Modrinth。"
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth 團隊"
   }
 }

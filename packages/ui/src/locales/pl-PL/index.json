@@ -1,6 +1,6 @@
 {
   "action.no-permission": {
-    "defaultMessage": "Brak uprawnień."
+    "defaultMessage": "Nie posiadasz uprawnień."
   },
   "affiliate.create.button": {
     "defaultMessage": "Utwórz link afiliacyjny"
@@ -348,7 +348,7 @@
     "defaultMessage": "{action, select, downgrade {Degraduj} other {Zaktualizuj}} paczkę modów"
   },
   "content.confirm-unlink.admonition-body": {
-    "defaultMessage": "Mody i treści zostaną połączone z tym, co zostało dodane spoza paczki modów i przestanie ona otrzymywać aktualizacje."
+    "defaultMessage": "Mody i zawartość zostaną połączone z tym, co zostało dodane spoza paczki modów i przestanie ona otrzymywać aktualizacje."
   },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Rozłączanie od paczki modów"
@@ -375,7 +375,7 @@
     "defaultMessage": "Usunięto {count}"
   },
   "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Niektóre treści na Twoim serwerze nie mogły zostać przeanalizowane i mogą być objęte tą zmianą."
+    "defaultMessage": "Zawartość na Twoim serwerze nie mogła zostać przeanalizowana i może być objęta tą zmianą."
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "Zaktualizowano {count}"
@@ -423,16 +423,16 @@
     "defaultMessage": "Twój świat"
   },
   "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Treści Twojej paczki modów teraz możesz znaleźć tutaj!"
+    "defaultMessage": "Informacje o zawartości Twojej paczki modów teraz możesz znaleźć tutaj!"
   },
   "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Treści paczek modów zostały przeniesione"
+    "defaultMessage": "Zawartość paczek modów została przeniesiona"
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Nie pokazuj ponownie"
   },
   "content.page-layout.additional-content": {
-    "defaultMessage": "Dodatkowe treści"
+    "defaultMessage": "Dodatkowa zawartość"
   },
   "content.page-layout.browse-content": {
     "defaultMessage": "Przeglądaj zawartość"
@@ -1479,7 +1479,7 @@
     "defaultMessage": "Ostrzeżenie o niekompatybilności"
   },
   "installation-settings.incompatible-content.header": {
-    "defaultMessage": "Zainstalowano niekompatybilne treści"
+    "defaultMessage": "Zainstalowano niekompatybilną zawartość"
   },
   "installation-settings.incompatible-content.loader-change-body": {
     "defaultMessage": "Przy zmianie loadera wszystkie zainstalowane treści zostaną wyłączone. Zamiast tego zalecamy resetowanie serwera."
@@ -1515,13 +1515,13 @@
     "defaultMessage": "Usunięto (niekompatybilny)"
   },
   "installation-settings.repair.instance-description": {
-    "defaultMessage": "Ponownie instaluje zależności Minecrafta i sprawdza, czy nie są zkoruptowane. To może naprawić problemy, jeśli twoja gra nie uruchamia się poprawnie."
+    "defaultMessage": "Ponownie instaluje zależności gry i sprawdza, czy nie są uszkodzone. To może naprawić problemy, jeśli twoja gra nie uruchamia się poprawnie."
   },
   "installation-settings.repair.instance-title": {
     "defaultMessage": "Napraw instancję"
   },
   "installation-settings.repair.server-description": {
-    "defaultMessage": "Instaluje ponownie silnik, oraz zależności Minecrafta, bez usuwania twoich zasobów. To może naprawić problemy, jeśli twój serwer nie uruchamia się poprawnie."
+    "defaultMessage": "Instaluje ponownie silnik oraz zależności gry bez usuwania zasobów. To może naprawić problemy, jeśli twój serwer nie uruchamia się poprawnie."
   },
   "installation-settings.repair.server-title": {
     "defaultMessage": "Napraw serwer"
@@ -1531,6 +1531,12 @@
   },
   "installation-settings.search-game-version": {
     "defaultMessage": "Szukaj wersję gry..."
+  },
+  "installation-settings.type.instance": {
+    "defaultMessage": "instancja"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "instancji"
   },
   "installation-settings.type.server": {
     "defaultMessage": "serwer"
@@ -2220,7 +2226,7 @@
     "defaultMessage": "Dodawanie metody płatności"
   },
   "modal.open-in-app.benefit.install": {
-    "defaultMessage": "Automatycznie pobierz wymagane treści"
+    "defaultMessage": "Automatycznie pobierz wymaganą zawartość"
   },
   "modal.open-in-app.benefit.launch": {
     "defaultMessage": "Włącz grę i automatycznie połącz się z serwerem"
@@ -3275,6 +3281,12 @@
   "servers.access-page.activity-log-filter.action.modpack-unlinked": {
     "defaultMessage": "Odłączono paczkę modów"
   },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "Dodano port"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "Usunięto port"
+  },
   "servers.access-page.activity-log-filter.action.server-created": {
     "defaultMessage": "Utworzono serwer"
   },
@@ -3443,6 +3455,9 @@
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Przetwarzanie w tle"
   },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Wsparcie"
+  },
   "servers.audit-log.column.event": {
     "defaultMessage": "Akcje"
   },
@@ -3451,6 +3466,9 @@
   },
   "servers.audit-log.column.world": {
     "defaultMessage": "Instancja"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Instancje serwerów to odosobnione środowiska z własną zainstalowaną zawartością i plikami światów."
   },
   "servers.audit-log.column.world.tooltip-title": {
     "defaultMessage": "Już wkrótce!"
@@ -3581,6 +3599,12 @@
   "servers.audit-log.event.modpack-unlinked-version": {
     "defaultMessage": "Odłączono wersję <version></version> paczki modów"
   },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "Dodano port <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Usunięto port <port></port>"
+  },
   "servers.audit-log.event.server-created": {
     "defaultMessage": "Utworzono serwer"
   },
@@ -3610,6 +3634,12 @@
   },
   "servers.audit-log.event.server-plan.storage-mb": {
     "defaultMessage": "{amount, number} MB miejsca na dysku"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Zmieniono właściwości serwera: <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Zmieniono właściwości serwera"
   },
   "servers.audit-log.event.server-repaired": {
     "defaultMessage": "Naprawiono serwer"
@@ -3772,6 +3802,9 @@
   },
   "servers.backups.item.creator-avatar-alt": {
     "defaultMessage": "Awatar użytkownika {username}"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Obsługa Modrinth"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Ręczne kopie zapasowe"
@@ -4005,7 +4038,7 @@
     "defaultMessage": "Ikona serwera"
   },
   "servers.listing.support-label": {
-    "defaultMessage": "Wsparcie"
+    "defaultMessage": "Obsługa Modrinth"
   },
   "servers.listing.using-project-label": {
     "defaultMessage": "Używa {projectTitle}"
@@ -4614,7 +4647,7 @@
     "defaultMessage": "Moby"
   },
   "tag.category.modded": {
-    "defaultMessage": "Zmodyfikowany"
+    "defaultMessage": "Dla modów"
   },
   "tag.category.models": {
     "defaultMessage": "Modele"
@@ -4677,7 +4710,7 @@
     "defaultMessage": "Wyścigi"
   },
   "tag.category.realistic": {
-    "defaultMessage": "Realistyczny"
+    "defaultMessage": "Realistyczne"
   },
   "tag.category.recording-smp": {
     "defaultMessage": "Nagrywane SMP"

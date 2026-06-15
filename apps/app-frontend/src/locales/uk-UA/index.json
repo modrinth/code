@@ -149,6 +149,9 @@
   "app.browse.server.installing": {
     "message": "Установлення"
   },
+  "app.content-install.no-compatible-versions": {
+    "message": "Жодна доступна версія не сумісна з {compatibilityLabel}. Виберіть версію, щоб усе одно її встановити. Залежності не встановлюватимуться автоматично."
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },
@@ -195,7 +198,7 @@
     "message": "Видалити профіль"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Ця збірка вже встановлена в профілі <bold>«{instanceName}»</bold>. Ви впевнені, що хочете її скопіювати?"
+    "message": "Ця збірка вже встановлена в профілі <bold>«{instanceName}»</bold>. Дійсно бажаєте її клонувати?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Створити"
@@ -285,13 +288,13 @@
     "message": "Дивитися вміст"
   },
   "app.modal.update-to-play.header": {
-    "message": "Оновлення перед грою"
+    "message": "Оновлення для гри"
   },
   "app.modal.update-to-play.update-required": {
     "message": "Необхідне оновлення"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "«{name}» потребує оновлення, щоб грати. Будь ласка, оновіть гру до останньої версії, щоб запустити її."
+    "message": "«{name}» потребує оновлення, щоб грати. Будь ласка, оновіть до останньої версії, щоб запустити гру."
   },
   "app.project.install-button.already-installed": {
     "message": "Проєкт уже встановлено"
@@ -330,7 +333,7 @@
     "message": "Додати скін"
   },
   "app.skins.add-button.drag-and-drop": {
-    "message": "Перетягніть і вставте"
+    "message": "Перетягніть сюди"
   },
   "app.skins.apply-button": {
     "message": "Застосувати"
@@ -342,7 +345,7 @@
     "message": "Це видалить вибраний скін назавжди. Ця дія не може бути скасована."
   },
   "app.skins.delete-modal.title": {
-    "message": "Чи ви впевнені що хочете видалити цей скін?"
+    "message": "Ви дійсно бажаєте видалити цей скін?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Неможливо відкрити вибраний файл."
@@ -378,19 +381,19 @@
     "message": "Редагування скіна"
   },
   "app.skins.modal.make-edit-first-tooltip": {
-    "message": "Відредагуйте скін для початку!"
+    "message": "Спершу відредагуйте скін!"
   },
   "app.skins.modal.no-cape-tooltip": {
     "message": "Без плаща"
   },
   "app.skins.modal.none-cape-option": {
-    "message": "Без"
+    "message": "Немає"
   },
   "app.skins.modal.replace-texture-button": {
     "message": "Замінити текстуру"
   },
   "app.skins.modal.save-skin-button": {
-    "message": "Зберегти вигляд"
+    "message": "Зберегти скін"
   },
   "app.skins.modal.saving-tooltip": {
     "message": "Збереження…"
@@ -399,7 +402,7 @@
     "message": "Текстура"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "Завантажте скін для початку!"
+    "message": "Спершу завантажте скін!"
   },
   "app.skins.preview.edit-button": {
     "message": "Редагувати скін"
@@ -408,10 +411,10 @@
     "message": "Попередній перегляд"
   },
   "app.skins.rate-limit.text": {
-    "message": "Ви змінюєте свій скін дуже часто. Сервери Mojang тимчасово заблокували подальші запити. Зачекайте трохи перш ніж спробувати знову."
+    "message": "Ви змінюєте скін занадто часто. Сервери Mojang тимчасово заблокували подальші запити. Зачекайте трохи, перш ніж спробувати знову."
   },
   "app.skins.rate-limit.title": {
-    "message": "Шановний!"
+    "message": "Повільніше!"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
@@ -468,13 +471,13 @@
     "message": "Вибір скіну"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} завантажено. Перезапустіть зараз, щоб оновити його, або це відбудеться автоматично після закриття Modrinth App."
+    "message": "Modrinth App v{version} завантажено. Перезапустіть, щоб оновити зараз, або це відбудеться автоматично після закриття застосунку."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} вже доступно. Скористайтеся вашим менеджером пакетів, щоб отримати найновіші функції та виправлення!"
+    "message": "Modrinth App v{version} вже доступно. Скористайтеся менеджером пакетів, щоб отримати найновіші функції та виправлення!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth App v{version} доступний для завантаження! Оскільки ви на лімітному з’єднанні, ми не завантажили його автоматично."
+    "message": "Modrinth App v{version} вже доступно! Оскільки ви використовуєте лімітне підключення, ми не завантажили його автоматично."
   },
   "app.update-popup.changelog": {
     "message": "Журнал змін"
@@ -484,9 +487,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "Завантаження завершено"
-  },
-  "app.update-popup.reload": {
-    "message": "Перезавантажити"
   },
   "app.update-popup.title": {
     "message": "Доступне оновлення"
@@ -510,7 +510,7 @@
     "message": "Ще не зіграно"
   },
   "app.world.world-item.offline": {
-    "message": "Поза мережею"
+    "message": "Не в мережі"
   },
   "app.world.world-item.players-online": {
     "message": "{count} у мережі"

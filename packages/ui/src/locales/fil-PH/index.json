@@ -281,6 +281,15 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
   },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Tapusin"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "I-angkat"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Iba pa"
+  },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Pangalan"
   },
@@ -970,6 +979,9 @@
   },
   "markdown-editor.image-modal.upload-mode.link": {
     "defaultMessage": "Link"
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Label"
   },
   "markdown-editor.toolbar.bold": {
     "defaultMessage": "Bold"
@@ -1987,6 +1999,12 @@
   },
   "servers.access-page.role-filter.all": {
     "defaultMessage": "Lahat"
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "May-ari"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "May-ari"
   },
   "servers.access-table.column.role": {
     "defaultMessage": "Tungkulin"

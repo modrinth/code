@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "A descarregar a versão do java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "A transferir atualização"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instância principal"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Recarregar para atualizar"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Mostrar mais instâncias a correr"
   },
   "app.action-bar.stop-instance": {
     "message": "Para instância"
+  },
+  "app.action-bar.update": {
+    "message": "Atualizar"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Ver instâncias ativas"
@@ -34,6 +43,9 @@
   },
   "app.action-bar.view-logs": {
     "message": "Ver logs"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Ativa a renderização avançada, como efeitos de desfoque, que podem causar problemas de desempenho sem o uso de renderização acelerada por hardware."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Renderização avançada"
@@ -55,6 +67,12 @@
   },
   "app.appearance-settings.default-landing-page.title": {
     "message": "Página de carregamento principal"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimizar launcher"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Seleciona uma opção"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Os servidores de autenticação do Minecraft poderão estar em baixo de momento. Verifica a tua ligação à internet e tenta novamente mais tarde."
@@ -79,6 +97,9 @@
   },
   "app.browse.discover-servers": {
     "message": "Descobrir servidores"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpacks"
   },
   "app.export-modal.description-placeholder": {
     "message": "Insere a descrição do modpack..."
@@ -239,6 +260,15 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestão de recursos"
   },
+  "app.skins.delete-modal.title": {
+    "message": "Tens a certeza que queres apagar esta skin?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Não foi possível ler o ficheiro largado."
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
   },
@@ -256,9 +286,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "Transferência concluída"
-  },
-  "app.update-popup.reload": {
-    "message": "Recarregar"
   },
   "app.update-popup.title": {
     "message": "Atualização disponível"

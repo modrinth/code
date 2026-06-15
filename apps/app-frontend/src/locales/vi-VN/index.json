@@ -494,9 +494,6 @@
   "app.update-popup.download-complete": {
     "message": "Cài đặt thành công"
   },
-  "app.update-popup.reload": {
-    "message": "Khởi động lại"
-  },
   "app.update-popup.title": {
     "message": "Cập nhật mới hiện đang khả dụng"
   },

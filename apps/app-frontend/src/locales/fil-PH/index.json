@@ -26,6 +26,9 @@
   "app.action-bar.stop-instance": {
     "message": "Itigil ang instansiya"
   },
+  "app.action-bar.update": {
+    "message": "Mag-update"
+  },
   "app.action-bar.view-active-downloads": {
     "message": "Tignan ang mga active downloads"
   },
@@ -377,9 +380,6 @@
   "app.update-popup.download-complete": {
     "message": "Nakumpleto ang pagdownload"
   },
-  "app.update-popup.reload": {
-    "message": "Mag-reload"
-  },
   "app.update-popup.title": {
     "message": "May bagong update"
   },
@@ -577,6 +577,12 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Pangalan"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
   },
   "instance.settings.tabs.hooks": {
     "message": "Mga launch hook"
