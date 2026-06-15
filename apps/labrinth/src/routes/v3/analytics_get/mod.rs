@@ -18,6 +18,7 @@ use std::{
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, post, web};
+use ariadne::ids::UserId;
 use chrono::{DateTime, TimeDelta, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
@@ -43,7 +44,7 @@ use crate::{
         projects::ProjectStatus,
         teams::ProjectPermissions,
         threads::MessageBody,
-        v3::{analytics::DownloadReason, projects::Project},
+        v3::{analytics::DownloadReason, projects::Project, users::User},
     },
     queue::session::AuthQueue,
     routes::ApiError,
@@ -131,6 +132,9 @@ pub struct GetResponse {
     /// Project metadata for projects referenced in the response metrics.
     #[serde(default)]
     pub projects: HashMap<ProjectId, Project>,
+    /// User metadata for users referenced in the response metrics.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub users: HashMap<UserId, User>,
     /// List of events associated with projects that were requested.
     pub project_events: Vec<ProjectAnalyticsEvent>,
 }
@@ -355,7 +359,7 @@ pub async fn fetch_analytics(
             .await?;
     }
 
-    if req.return_metrics.project_revenue.is_some() {
+    if let Some(metrics) = &req.return_metrics.project_revenue {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
@@ -366,6 +370,7 @@ pub async fn fetch_analytics(
             &req,
             num_time_slices,
             &project_id_values,
+            metrics,
         )
         .await?;
     }
@@ -400,10 +405,12 @@ pub async fn fetch_analytics(
 
     let projects =
         fetch_response_projects(&mut time_slices, &user, &pool, &redis).await?;
+    let users = fetch_response_users(&time_slices, &pool, &redis).await?;
 
     Ok(web::Json(GetResponse {
         metrics: time_slices,
         projects,
+        users,
         project_events,
     }))
 }
@@ -519,6 +526,43 @@ async fn fetch_response_projects(
         .map(|project| {
             let project_id = project.inner.id.into();
             (project_id, Project::from(project))
+        })
+        .collect())
+}
+
+async fn fetch_response_users(
+    time_slices: &[TimeSlice],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<HashMap<UserId, User>, ApiError> {
+    let mut user_ids = HashSet::<database::models::DBUserId>::new();
+
+    for time_slice in time_slices {
+        for data in &time_slice.0 {
+            let AnalyticsData::Project(project) = data else {
+                continue;
+            };
+
+            if let ProjectMetrics::Revenue(revenue) = &project.metrics
+                && let Some(user_id) = revenue.user_id
+            {
+                user_ids.insert(user_id.into());
+            }
+        }
+    }
+
+    let user_ids = user_ids.into_iter().collect::<Vec<_>>();
+    if user_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    let users = DBUser::get_many_ids(&user_ids, pool, redis).await?;
+
+    Ok(users
+        .into_iter()
+        .map(|user| {
+            let user_id = UserId::from(user.id);
+            (user_id, User::from(user))
         })
         .collect())
 }
@@ -847,6 +891,7 @@ async fn filter_allowed_project_ids(
 
 #[cfg(test)]
 mod tests {
+    use crate::models::v3::users::{Badges, Role, UserCampaigns};
     use rust_decimal::Decimal;
     use serde_json::json;
 
@@ -965,11 +1010,13 @@ mod tests {
                 TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
                     source_project: test_project_3,
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        user_id: None,
                         revenue: Decimal::new(20000, 2),
                     }),
                 })]),
             ],
             projects: HashMap::new(),
+            users: HashMap::new(),
             project_events: vec![],
         };
         let target = json!({
@@ -997,6 +1044,92 @@ mod tests {
                 ]
             ],
             "projects": {},
+            "project_events": []
+        });
+
+        assert_eq!(serde_json::to_value(src).unwrap(), target);
+    }
+
+    #[test]
+    fn response_format_with_revenue_user() {
+        let test_project = ProjectId(123);
+        let test_user = UserId(456);
+        let created = DateTime::parse_from_rfc3339("2026-01-01T00:00:00Z")
+            .unwrap()
+            .with_timezone(&Utc);
+        let user = User {
+            id: test_user,
+            username: "revenue-user".into(),
+            avatar_url: None,
+            bio: None,
+            created,
+            role: Role::Developer,
+            badges: Badges::empty(),
+            campaigns: UserCampaigns { pride_26: None },
+            auth_providers: None,
+            email: None,
+            email_verified: None,
+            has_password: None,
+            has_totp: None,
+            payout_data: None,
+            stripe_customer_id: None,
+            allow_friend_requests: None,
+            moderation_notes: None,
+            github_id: None,
+        };
+
+        let src = GetResponse {
+            metrics: vec![TimeSlice(vec![AnalyticsData::Project(
+                ProjectAnalytics {
+                    source_project: test_project,
+                    metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        user_id: Some(test_user),
+                        revenue: Decimal::new(1234, 2),
+                    }),
+                },
+            )])],
+            projects: HashMap::new(),
+            users: HashMap::from([(test_user, user)]),
+            project_events: vec![],
+        };
+        let mut target_users = serde_json::Map::new();
+        target_users.insert(
+            test_user.to_string(),
+            json!({
+                "id": test_user.to_string(),
+                "username": "revenue-user",
+                "avatar_url": null,
+                "bio": null,
+                "created": "2026-01-01T00:00:00Z",
+                "role": "developer",
+                "badges": 0,
+                "campaigns": {
+                    "pride_26": null
+                },
+                "auth_providers": null,
+                "email": null,
+                "email_verified": null,
+                "has_password": null,
+                "has_totp": null,
+                "payout_data": null,
+                "stripe_customer_id": null,
+                "allow_friend_requests": null,
+                "github_id": null
+            }),
+        );
+        let target = json!({
+            "metrics": [
+                [
+                    {
+                        "source_project": test_project.to_string(),
+                        "metric_kind": "revenue",
+                        "user_id": test_user.to_string(),
+                        "revenue": "12.34",
+                    }
+                ]
+            ],
+            "projects": {},
+            "users": target_users,
             "project_events": []
         });
 
