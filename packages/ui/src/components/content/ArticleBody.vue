@@ -45,7 +45,12 @@ const parts = computed(() => parseArticleHtml(props.html))
 </script>
 
 <template>
-	<div class="markdown-body">
+	<div
+		v-if="parts.length === 1 && parts[0].type === 'html'"
+		class="markdown-body"
+		v-html="parts[0]?.content"
+	/>
+	<div v-else class="markdown-body">
 		<template v-for="(part, index) in parts" :key="index">
 			<div v-if="part.type === 'html'" v-html="part.content" />
 			<component :is="ARTICLE_WIDGETS[part.id]" v-else />
