@@ -33,6 +33,7 @@ export type ChartDataset = {
 	projectId: string
 	label: string
 	projectName?: string
+	tooltip?: string
 	data: number[]
 	borderColor: string
 	backgroundColor: string
@@ -264,6 +265,33 @@ type PaletteRankEntry = {
 	total: number
 }
 
+function formatDatasetTooltip(projectName: string | undefined): string | undefined {
+	return projectName
+}
+
+function formatDependentProjectDatasetTooltip(
+	versionName: string | undefined,
+	dependentProjectName: string | undefined,
+	dependencyProjectNames: readonly string[],
+	formatMessage: FormatMessage,
+): string | undefined {
+	if (dependencyProjectNames.length === 0) {
+		return undefined
+	}
+
+	if (versionName && dependentProjectName) {
+		return formatMessage(analyticsChartMessages.dependentProjectVersionTooltip, {
+			dependentProject: dependentProjectName,
+			dependencyProject: dependencyProjectNames.join(', '),
+			version: versionName,
+		})
+	}
+
+	return formatMessage(analyticsChartMessages.dependentOnProjectTooltip, {
+		project: dependencyProjectNames.join(', '),
+	})
+}
+
 function getPaletteColorForIndex(index: number, palette: string[]): string {
 	if (palette.length === 0) return ''
 
@@ -361,9 +389,16 @@ export function buildChartDatasets(
 		normalizedBreakdowns.length > 0 &&
 		!(normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'project')
 	) {
+		const hasVersionBreakdown = normalizedBreakdowns.includes('version_id')
+		const hasDependentProjectBreakdown = normalizedBreakdowns.includes(
+			'dependent_project_download',
+		)
+		const shouldShowDependentProjectTooltip =
+			hasDependentProjectBreakdown && (selectedProjects.length > 1 || hasVersionBreakdown)
 		const dataByBreakdown = new Map<string, number[]>()
 		const breakdownValuesByKey = new Map<string, string[]>()
 		const downloadTotalsByBreakdown = new Map<string, number>()
+		const dependentOnProjectIdsByBreakdown = new Map<string, Set<string>>()
 
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
@@ -391,6 +426,12 @@ export function buildChartDatasets(
 				if (!dataByBreakdown.has(breakdownKey)) {
 					dataByBreakdown.set(breakdownKey, new Array(dataLength).fill(0))
 					breakdownValuesByKey.set(breakdownKey, breakdownValues)
+				}
+				if (shouldShowDependentProjectTooltip && point.metric_kind === 'downloads') {
+					const projectIds =
+						dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? new Set<string>()
+					projectIds.add(point.source_project)
+					dependentOnProjectIdsByBreakdown.set(breakdownKey, projectIds)
 				}
 
 				if (point.metric_kind === 'downloads') {
@@ -420,6 +461,30 @@ export function buildChartDatasets(
 		return Array.from(dataByBreakdown.entries()).map(([breakdownKey, data]) => {
 			const breakdownValues = breakdownValuesByKey.get(breakdownKey) ?? []
 			const fallbackColor = colorsByBreakdown.get(breakdownKey) ?? ''
+			const versionBreakdownIndex = normalizedBreakdowns.indexOf('version_id')
+			const dependentProjectBreakdownIndex = normalizedBreakdowns.indexOf(
+				'dependent_project_download',
+			)
+			const versionName =
+				hasVersionBreakdown && versionBreakdownIndex !== -1
+					? getVersionDisplayName?.(breakdownValues[versionBreakdownIndex] ?? '')
+					: undefined
+			const dependentProjectId =
+				dependentProjectBreakdownIndex !== -1
+					? breakdownValues[dependentProjectBreakdownIndex]
+					: undefined
+			const dependentProjectName = dependentProjectId
+				? (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
+				: undefined
+			const versionProjectName =
+				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
+					? getVersionProjectName?.(breakdownValues[0] ?? '')
+					: undefined
+			const dependencyProjectNames = [
+				...(dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? []),
+			]
+				.map((projectId) => projectNamesById.get(projectId) ?? projectId)
+				.sort((left, right) => left.localeCompare(right))
 			const color =
 				normalizedBreakdowns.length === 1
 					? getBreakdownColor(
@@ -432,10 +497,15 @@ export function buildChartDatasets(
 			return {
 				projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
 				label: formatChartBreakdownLabels(breakdownValues),
-				projectName:
-					normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
-						? getVersionProjectName?.(breakdownValues[0] ?? '')
-						: undefined,
+				projectName: versionProjectName,
+				tooltip:
+					formatDependentProjectDatasetTooltip(
+						versionName,
+						dependentProjectName,
+						dependencyProjectNames,
+						formatMessage,
+					) ??
+					formatDatasetTooltip(versionProjectName),
 				data,
 				borderColor: color,
 				backgroundColor: color,
@@ -562,6 +632,10 @@ export function buildChartDatasets(
 	return Array.from(dataByProjectBreakdown.entries()).map(([breakdownKey, data]) => {
 		const breakdownValues = breakdownValuesByKey.get(breakdownKey) ?? []
 		const fallbackColor = colorsByBreakdown.get(breakdownKey) ?? ''
+		const versionProjectName =
+			normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
+				? getVersionProjectName?.(breakdownValues[0] ?? '')
+				: undefined
 		const color =
 			normalizedBreakdowns.length === 1
 				? getBreakdownColor(
@@ -574,10 +648,8 @@ export function buildChartDatasets(
 		return {
 			projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
 			label: formatChartBreakdownLabels(breakdownValues),
-			projectName:
-				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
-					? getVersionProjectName?.(breakdownValues[0] ?? '')
-					: undefined,
+			projectName: versionProjectName,
+			tooltip: formatDatasetTooltip(versionProjectName),
 			data,
 			borderColor: color,
 			backgroundColor: color,

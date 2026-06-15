@@ -529,6 +529,14 @@ export const analyticsChartMessages = defineMessages({
 		id: 'analytics.chart.action.show-top-eight',
 		defaultMessage: 'Show top 8',
 	},
+	dependentOnProjectTooltip: {
+		id: 'analytics.chart.tooltip.dependent-on-project',
+		defaultMessage: 'Dependent on {project}',
+	},
+	dependentProjectVersionTooltip: {
+		id: 'analytics.chart.tooltip.dependent-project-version',
+		defaultMessage: '{dependentProject} dependent on {dependencyProject}, {version}',
+	},
 	tableSelectionLimited: {
 		id: 'analytics.chart.table-selection.limited',
 		defaultMessage:
