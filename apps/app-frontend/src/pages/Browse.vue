@@ -805,10 +805,10 @@ function getCardActions(
 						selectedInstall.versionId,
 						instance.value ? instance.value.path : null,
 						'SearchCard',
-						(versionId) => {
+						(versionId, installedProjectIds) => {
 							setProjectInstalling(projectResult.project_id, false)
 							if (versionId) {
-								onSearchResultInstalled(projectResult.project_id)
+								onSearchResultsInstalled(installedProjectIds ?? [projectResult.project_id])
 							}
 						},
 						(profile) => {
@@ -834,7 +834,19 @@ function onSearchResultInstalled(id: string) {
 		markServerProjectInstalled(id)
 		return
 	}
-	newlyInstalled.value.push(id)
+	if (!newlyInstalled.value.includes(id)) {
+		newlyInstalled.value = [...newlyInstalled.value, id]
+	}
+}
+
+function onSearchResultsInstalled(ids: string[]) {
+	if (isServerContext.value) {
+		for (const id of ids) {
+			markServerProjectInstalled(id)
+		}
+		return
+	}
+	newlyInstalled.value = Array.from(new Set([...newlyInstalled.value, ...ids]))
 }
 
 async function search(requestParams: string) {

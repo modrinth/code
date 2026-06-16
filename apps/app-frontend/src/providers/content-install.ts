@@ -42,6 +42,8 @@ interface ModpackAlreadyInstalledModalRef {
 	show: (instanceName: string, instancePath: string) => void
 }
 
+export type ContentInstallCallback = (versionId?: string, installedProjectIds?: string[]) => void
+
 const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
 const SUPPORTED_LOADERS: Set<string> = new Set(['vanilla', 'forge', 'fabric', 'quilt', 'neoforge'])
 const VANILLA_COMPATIBLE_LOADERS: Set<string> = new Set(['minecraft', 'datapack'])
@@ -102,7 +104,7 @@ export interface ContentInstallContext {
 		versionId?: string | null,
 		instancePath?: string | null,
 		source?: string,
-		callback?: (versionId?: string) => void,
+		callback?: ContentInstallCallback,
 		createInstanceCallback?: (profile: string) => void,
 		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) => Promise<void>
@@ -256,25 +258,25 @@ export function createContentInstall(opts: {
 	let incompatibilityWarningModalRef: ModalRef | null = null
 	let currentProject: Labrinth.Projects.v2.Project | null = null
 	let currentVersions: Labrinth.Versions.v2.Version[] = []
-	let currentCallback: (versionId?: string) => void = () => {}
+	let currentCallback: ContentInstallCallback = () => {}
 	let profileMap: Record<string, GameInstance> = {}
 	let incompatibilityWarningInstance: GameInstance | null = null
 	let incompatibilityWarningProject: Labrinth.Projects.v2.Project | null = null
-	let incompatibilityWarningCallback: (versionId?: string) => void = () => {}
+	let incompatibilityWarningCallback: ContentInstallCallback = () => {}
 	let incompatibilityWarningInstalled = false
 
 	let pendingModpackInstall: {
 		project: Labrinth.Projects.v2.Project
 		version: string
 		source: string
-		callback: (versionId?: string) => void
+		callback: ContentInstallCallback
 		createInstanceCallback: (profile: string) => void
 	} | null = null
 
 	async function showModInstallModal(
 		project: Labrinth.Projects.v2.Project,
 		versions: Labrinth.Versions.v2.Version[],
-		onInstall: (versionId?: string) => void,
+		onInstall: ContentInstallCallback,
 		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) {
 		currentProject = project
@@ -440,7 +442,10 @@ export function createContentInstall(opts: {
 					if (versionId && storeInstance) {
 						storeInstance.installed = true
 					}
-					currentCallback(versionId)
+					currentCallback(
+						versionId,
+						versionId && currentProject ? [currentProject.id] : undefined,
+					)
 				}
 				await showIncompatibilityWarning(
 					profile,
@@ -487,7 +492,7 @@ export function createContentInstall(opts: {
 				title: currentProject!.title,
 				source: 'ProjectInstallModal',
 			})
-			currentCallback(version.id)
+			currentCallback(version.id, installedProjectIds)
 		} catch (err) {
 			if (storeInstance) storeInstance.installing = false
 			opts.handleError(err)
@@ -501,7 +506,7 @@ export function createContentInstall(opts: {
 		project: Labrinth.Projects.v2.Project,
 		versions: Labrinth.Versions.v2.Version[],
 		version: Labrinth.Versions.v2.Version,
-		callback: (versionId?: string) => void,
+		callback: ContentInstallCallback,
 	) {
 		incompatibilityWarningInstance = instance
 		incompatibilityWarningProject = project
@@ -542,7 +547,7 @@ export function createContentInstall(opts: {
 
 		incompatibilityWarningInstalling.value = false
 		incompatibilityWarningInstalled = true
-		incompatibilityWarningCallback(version.id)
+		incompatibilityWarningCallback(version.id, [incompatibilityWarningProject.id])
 		incompatibilityWarningModalRef?.hide()
 
 		trackEvent('ProjectInstall', {
@@ -630,7 +635,7 @@ export function createContentInstall(opts: {
 		versionId?: string | null,
 		instancePath?: string | null,
 		source: string = 'unknown',
-		callback: (versionId?: string) => void = () => {},
+		callback: ContentInstallCallback = () => {},
 		createInstanceCallback: (profile: string) => void = () => {},
 		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) {
@@ -714,7 +719,7 @@ export function createContentInstall(opts: {
 						title: project.title,
 						source,
 					})
-					callback(version.id)
+					callback(version.id, installedProjectIds)
 				} finally {
 					removeInstallingItems(instancePath, installedProjectIds)
 				}
