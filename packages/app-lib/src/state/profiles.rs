@@ -1588,6 +1588,7 @@ impl Profile {
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
             Some(&download_meta),
+            None,
             fetch_semaphore,
             pool,
         )
