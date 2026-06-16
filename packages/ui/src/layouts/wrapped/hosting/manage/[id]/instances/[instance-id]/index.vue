@@ -14,6 +14,8 @@
 
 		<NavTabs :links="worldTabLinks" replace />
 
+		<ServerPanelAdmonitions />
+
 		<slot />
 	</div>
 </template>
@@ -38,6 +40,7 @@ import { useRouter } from 'vue-router'
 
 import type { JoinedButtonAction } from '#ui/components/base/JoinedButtons.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
+import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import { ServerInstanceManageHeader } from '#ui/components/servers/server-header'
 import { useServerPowerAction } from '#ui/components/servers/server-header/use-server-power-action'
 import { useRelativeTime } from '#ui/composables'
