@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -113,7 +113,8 @@ const buttonsDisabled = ref(false)
 const visibleCount = ref(props.count)
 const visibleItemType = ref(props.itemType)
 
-function show() {
+async function show() {
+	await nextTick()
 	visibleCount.value = props.count
 	visibleItemType.value = props.itemType
 	modal.value?.show()
