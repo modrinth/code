@@ -192,8 +192,15 @@ export const InstanceDependency: Story = {
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"
-					:item="fabricApiItem"
-					:dependents="[sodiumItem, irisItem, continuityItem, lithiumItem, capeProviderItem]"
+					:items="[fabricApiItem]"
+					item-type="project"
+					:dependents="[
+						{ item: sodiumItem, dependencies: [fabricApiItem] },
+						{ item: irisItem, dependencies: [fabricApiItem] },
+						{ item: continuityItem, dependencies: [fabricApiItem] },
+						{ item: lithiumItem, dependencies: [fabricApiItem] },
+						{ item: capeProviderItem, dependencies: [fabricApiItem] },
+					]"
 					@delete="handleDelete"
 				/>
 			</div>
@@ -226,9 +233,54 @@ export const ServerDependency: Story = {
 				<p v-if="deleted" class="m-0 text-sm text-secondary">Server dependency deletion confirmed</p>
 				<ContentDependencyWarningModal
 					ref="modalRef"
-					:item="lithiumItem"
-					:dependents="[sodiumItem]"
+					:items="[lithiumItem]"
+					item-type="project"
+					:dependents="[{ item: sodiumItem, dependencies: [lithiumItem] }]"
 					variant="server"
+					@delete="handleDelete"
+				/>
+			</div>
+		`,
+	}),
+}
+
+export const BulkDependencies: Story = {
+	render: () => ({
+		components: { ButtonStyled, ContentDependencyWarningModal },
+		setup() {
+			const modalRef = ref<InstanceType<typeof ContentDependencyWarningModal> | null>(null)
+			const deleted = ref(false)
+			function handleDelete() {
+				deleted.value = true
+			}
+			return {
+				modalRef,
+				deleted,
+				handleDelete,
+				fabricApiItem,
+				lithiumItem,
+				sodiumItem,
+				irisItem,
+				continuityItem,
+				capeProviderItem,
+			}
+		},
+		template: /* html */ `
+			<div class="flex flex-col items-center gap-4">
+				<ButtonStyled color="orange">
+					<button @click="modalRef?.show()">Delete selected dependencies</button>
+				</ButtonStyled>
+				<p v-if="deleted" class="m-0 text-sm text-secondary">Bulk dependency deletion confirmed</p>
+				<ContentDependencyWarningModal
+					ref="modalRef"
+					:items="[fabricApiItem, lithiumItem]"
+					item-type="project"
+					:dependents="[
+						{ item: sodiumItem, dependencies: [fabricApiItem, lithiumItem] },
+						{ item: irisItem, dependencies: [fabricApiItem] },
+						{ item: continuityItem, dependencies: [fabricApiItem] },
+						{ item: capeProviderItem, dependencies: [lithiumItem] },
+					]"
 					@delete="handleDelete"
 				/>
 			</div>

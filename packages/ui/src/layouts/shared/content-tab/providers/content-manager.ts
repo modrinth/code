@@ -26,8 +26,11 @@ export interface ContentModpackData {
 }
 
 export interface ContentDependencyWarning {
-	item: ContentItem
-	dependents: ContentItem[]
+	items: ContentItem[]
+	dependents: Array<{
+		item: ContentItem
+		dependencies: ContentItem[]
+	}>
 }
 
 export interface ContentManagerContext {

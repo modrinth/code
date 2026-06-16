@@ -484,22 +484,28 @@ async function getDeleteDependencyWarning(items: ContentItem[]) {
 
 	const versionsById = new Map(versions.map((version) => [version.id, version]))
 
-	for (const item of items) {
-		if (!item.project?.id && !item.version?.id) continue
-
-		const dependents = remainingItems.filter((candidate) => {
+	const dependents = remainingItems
+		.map((candidate) => {
 			const version = candidate.version?.id ? versionsById.get(candidate.version.id) : null
-			return version?.dependencies?.some(
-				(dependency) => isBreakingDependency(dependency) && dependencyTargetsItem(dependency, item),
-			)
+			if (!version) return null
+
+			const dependencies = items.filter((item) => {
+				if (!item.project?.id && !item.version?.id) return false
+
+				return version.dependencies?.some(
+					(dependency) =>
+						isBreakingDependency(dependency) && dependencyTargetsItem(dependency, item),
+				)
+			})
+
+			return dependencies.length > 0 ? { item: candidate, dependencies } : null
 		})
+		.filter(
+			(dependent): dependent is { item: ContentItem; dependencies: ContentItem[] } =>
+				dependent !== null,
+		)
 
-		if (dependents.length > 0) {
-			return { item, dependents }
-		}
-	}
-
-	return null
+	return dependents.length > 0 ? { items, dependents } : null
 }
 
 async function updateProject(mod: ContentItem) {

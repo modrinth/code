@@ -90,6 +90,7 @@ const selected = defineModel<boolean>('selected')
 
 const emit = defineEmits<{
 	'update:enabled': [value: boolean]
+	select: [value: boolean, event?: MouseEvent]
 	delete: [event: MouseEvent]
 	update: []
 	switchVersion: []
@@ -145,7 +146,7 @@ const deleteHovered = ref(false)
 				:model-value="selected ?? false"
 				:aria-label="formatMessage(messages.selectProject, { project: project.title })"
 				class="shrink-0"
-				@update:model-value="selected = $event"
+				@update:model-value="(value, event) => emit('select', value, event)"
 			/>
 
 			<div
@@ -184,6 +185,7 @@ const deleteHovered = ref(false)
 						>
 							{{ project.title }}
 						</AutoLink>
+						<slot name="title-badges" />
 						<Tooltip
 							v-if="isClientOnly"
 							theme="dismissable-prompt"

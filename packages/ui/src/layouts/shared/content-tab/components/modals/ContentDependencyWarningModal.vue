@@ -1,34 +1,26 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="warning" max-width="560px">
-		<div class="flex flex-col gap-4">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.header)"
+		fade="danger"
+		max-width="560px"
+		:on-hide="() => backupCreator?.cancelBackup()"
+	>
+		<div class="flex flex-col gap-6">
+			<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
 				{{
-					formatMessage(messages.admonitionBody, {
-						project: visibleItem?.project.title ?? formatMessage(commonMessages.unknownLabel),
-						context: contextLabel,
-					})
+					visibleItems.length === 1
+						? formatMessage(messages.singleAdmonitionBody, {
+								project:
+									visibleItems[0]?.project.title ?? formatMessage(commonMessages.unknownLabel),
+								context: contextLabel,
+							})
+						: formatMessage(messages.bulkAdmonitionBody, { context: contextLabel })
 				}}
 			</Admonition>
 
-			<div v-if="visibleItem" class="flex flex-col gap-2">
+			<div v-if="visibleItems.length > 0" class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.deletingLabel) }}</span>
-				<div :class="modalContentCardClasses">
-					<ContentCardItem
-						:project="visibleItem.project"
-						:project-link="visibleItem.projectLink"
-						:version="visibleItem.version"
-						:version-link="visibleItem.versionLink"
-						:owner="visibleItem.owner"
-						hide-actions
-						inline
-					/>
-				</div>
-			</div>
-
-			<div v-if="visibleDependents.length > 0" class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">{{
-					formatMessage(messages.requiredByLabel, { count: visibleDependents.length })
-				}}</span>
 				<div class="relative">
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
@@ -39,26 +31,22 @@
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
-							v-if="showTopFade"
+							v-if="showDeletingTopFade"
 							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-b from-bg-raised to-transparent"
 						/>
 					</Transition>
 					<div
-						ref="dependentListRef"
-						class="flex max-h-[232px] flex-col gap-2 overflow-y-auto"
-						@scroll="checkScrollState"
+						ref="deletingListRef"
+						class="flex flex-col gap-2 overflow-y-auto max-h-[212px]"
+						@scroll="checkDeletingScrollState"
 					>
-						<div
-							v-for="dependent in visibleDependents"
-							:key="dependent.id"
-							:class="modalContentCardClasses"
-						>
+						<div v-for="item in visibleItems" :key="item.id" :class="modalContentCardClasses">
 							<ContentCardItem
-								:project="dependent.project"
-								:project-link="dependent.projectLink"
-								:version="dependent.version"
-								:version-link="dependent.versionLink"
-								:owner="dependent.owner"
+								:project="item.project"
+								:project-link="item.projectLink"
+								:version="item.version"
+								:version-link="item.versionLink"
+								:owner="item.owner"
 								hide-actions
 								inline
 							/>
@@ -73,30 +61,107 @@
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
-							v-if="showBottomFade"
+							v-if="showDeletingBottomFade"
 							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-2 bg-gradient-to-t from-bg-raised to-transparent"
 						/>
 					</Transition>
 				</div>
 			</div>
 
-			<div class="flex flex-col gap-2">
+			<div v-if="visibleDependents.length > 0" class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{
-					formatMessage(messages.whatHappensLabel)
+					formatMessage(messages.affectedDependentsLabel, { count: visibleDependents.length })
 				}}</span>
-				<ul class="m-0 list-disc pl-6 text-primary">
-					<li class="leading-6 marker:text-secondary">
-						{{ formatMessage(messages.effectDependentContent) }}
-					</li>
-					<li class="leading-6 marker:text-secondary">
-						{{ formatMessage(messages.effectInstance, { context: contextLabel }) }}
-					</li>
-				</ul>
-				<Checkbox
-					v-model="disableDependentsAfterDeleting"
-					:label="formatMessage(messages.disableDependentsLabel)"
-					label-class="font-medium text-primary"
-					class="mt-1"
+				<div class="relative">
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-2"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-2"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showDependentTopFade"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-b from-bg-raised to-transparent"
+						/>
+					</Transition>
+					<div
+						ref="dependentListRef"
+						class="flex max-h-[212px] flex-col gap-2 overflow-y-auto"
+						@scroll="checkDependentScrollState"
+					>
+						<div
+							v-for="dependent in visibleDependents"
+							:key="dependent.item.id"
+							:class="modalContentCardClasses"
+						>
+							<ContentCardItem
+								:project="dependent.item.project"
+								:project-link="dependent.item.projectLink"
+								:version="dependent.item.version"
+								:version-link="dependent.item.versionLink"
+								:owner="dependent.item.owner"
+								hide-actions
+								inline
+							>
+								<template #title-badges>
+									<span class="flex min-w-0 flex-wrap items-center gap-1">
+										<span
+											v-for="dependency in dependent.dependencies"
+											:key="dependency.id"
+											:title="dependency.project.title"
+										>
+											<span class="truncate text-xs text-secondary mr-0.5"
+												>({{ dependency.project.title }})</span
+											>
+										</span>
+									</span>
+								</template>
+							</ContentCardItem>
+						</div>
+					</div>
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-2"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-2"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showDependentBottomFade"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-2 bg-gradient-to-t from-bg-raised to-transparent"
+						/>
+					</Transition>
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<span class="font-semibold text-contrast">{{
+						formatMessage(messages.whatHappensLabel)
+					}}</span>
+					<ul class="m-0 list-disc pl-6 text-primary">
+						<li class="leading-6 marker:text-secondary">
+							{{ formatMessage(messages.effectDependentContent) }}
+						</li>
+						<li class="leading-6 marker:text-secondary">
+							{{ formatMessage(messages.effectInstance, { context: contextLabel }) }}
+						</li>
+					</ul>
+					<Checkbox
+						v-model="disableDependentsAfterDeleting"
+						:label="formatMessage(messages.disableDependentsLabel)"
+						label-class="font-medium text-primary"
+						class="mt-1"
+					/>
+				</div>
+				<InlineBackupCreator
+					ref="backupCreator"
+					:backup-name="backupName"
+					hide-shift-click-hint
+					@update:buttons-disabled="buttonsDisabled = $event"
 				/>
 			</div>
 		</div>
@@ -109,14 +174,14 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="orange">
+				<ButtonStyled color="red">
 					<button
 						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
-						:disabled="props.actionDisabled"
+						:disabled="buttonsDisabled || props.actionDisabled"
 						@click="confirm"
 					>
 						<TrashIcon aria-hidden="true" />
-						{{ formatMessage(messages.deleteAnywayButton) }}
+						{{ deleteButtonLabel }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -134,22 +199,32 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useScrollIndicator } from '#ui/composables/scroll-indicator'
-import { commonMessages } from '#ui/utils/common-messages'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import type { ContentCardTableItem } from '../../types'
 import ContentCardItem from '../ContentCardItem.vue'
+import InlineBackupCreator from './InlineBackupCreator.vue'
+
+export interface ContentDependencyWarningDependent {
+	item: ContentCardTableItem
+	dependencies: ContentCardTableItem[]
+}
 
 const props = withDefaults(
 	defineProps<{
-		item: ContentCardTableItem | null
-		dependents?: ContentCardTableItem[]
+		items?: ContentCardTableItem[]
+		dependents?: ContentDependencyWarningDependent[]
+		itemType: string
 		variant?: 'instance' | 'server'
+		backupTip?: string
 		actionDisabled?: boolean
 		actionDisabledTooltip?: string
 	}>(),
 	{
+		items: () => [],
 		dependents: () => [],
 		variant: 'instance',
+		backupTip: undefined,
 		actionDisabled: false,
 		actionDisabledTooltip: undefined,
 	},
@@ -170,18 +245,23 @@ const messages = defineMessages({
 		id: 'content.dependency-warning.admonition-header',
 		defaultMessage: 'This content is required by other content',
 	},
-	admonitionBody: {
-		id: 'content.dependency-warning.admonition-body',
+	singleAdmonitionBody: {
+		id: 'content.dependency-warning.single-admonition-body',
 		defaultMessage:
 			'{project} is installed as a dependency. Deleting it may break your {context} or stop dependent content from loading correctly.',
+	},
+	bulkAdmonitionBody: {
+		id: 'content.dependency-warning.bulk-admonition-body',
+		defaultMessage:
+			'Some selected projects are installed as dependencies. Deleting them may break your {context} or stop dependent content from loading correctly.',
 	},
 	deletingLabel: {
 		id: 'content.dependency-warning.deleting-label',
 		defaultMessage: 'Deleting',
 	},
-	requiredByLabel: {
-		id: 'content.dependency-warning.required-by-label',
-		defaultMessage: 'Required by {count, plural, one {# project} other {# projects}}',
+	affectedDependentsLabel: {
+		id: 'content.dependency-warning.affected-dependents-label',
+		defaultMessage: 'Affected {count, plural, one {project} other {projects}}',
 	},
 	whatHappensLabel: {
 		id: 'content.dependency-warning.what-happens-label',
@@ -199,6 +279,10 @@ const messages = defineMessages({
 		id: 'content.dependency-warning.delete-anyway-button',
 		defaultMessage: 'Delete anyway',
 	},
+	deleteManyAnywayButton: {
+		id: 'content.dependency-warning.delete-many-anyway-button',
+		defaultMessage: 'Delete {count, number} {itemType} anyway',
+	},
 	disableDependentsLabel: {
 		id: 'content.dependency-warning.disable-dependents-label',
 		defaultMessage: 'Disable dependents after deleting',
@@ -214,26 +298,60 @@ const messages = defineMessages({
 })
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
+const deletingListRef = ref<HTMLElement | null>(null)
 const dependentListRef = ref<HTMLElement | null>(null)
-const visibleItem = ref<ContentCardTableItem | null>(props.item)
-const visibleDependents = ref<ContentCardTableItem[]>(props.dependents)
+const visibleItems = ref<ContentCardTableItem[]>(props.items)
+const visibleDependents = ref<ContentDependencyWarningDependent[]>(props.dependents)
+const visibleItemType = ref(props.itemType)
 const disableDependentsAfterDeleting = ref(false)
-const modalContentCardClasses = 'rounded-xl border border-solid border-surface-5 p-3 !bg-surface-2'
-const { showTopFade, showBottomFade, checkScrollState, forceCheck } =
-	useScrollIndicator(dependentListRef)
+const buttonsDisabled = ref(false)
+const modalContentCardClasses = 'rounded-xl border border-solid border-surface-5 p-4 !bg-surface-2'
+const {
+	showTopFade: showDeletingTopFade,
+	showBottomFade: showDeletingBottomFade,
+	checkScrollState: checkDeletingScrollState,
+	forceCheck: forceCheckDeletingScroll,
+} = useScrollIndicator(deletingListRef)
+const {
+	showTopFade: showDependentTopFade,
+	showBottomFade: showDependentBottomFade,
+	checkScrollState: checkDependentScrollState,
+	forceCheck: forceCheckDependentScroll,
+} = useScrollIndicator(dependentListRef)
 
 const contextLabel = computed(() =>
 	formatMessage(props.variant === 'server' ? messages.serverContext : messages.instanceContext),
 )
 
+const backupName = computed(() =>
+	props.backupTip ? `Before deletion (${props.backupTip})` : 'Before deletion',
+)
+
+const deleteButtonLabel = computed(() => {
+	if (visibleItems.value.length <= 1) return formatMessage(messages.deleteAnywayButton)
+
+	return formatMessage(messages.deleteManyAnywayButton, {
+		count: visibleItems.value.length,
+		itemType: formatContentTypeSentence(
+			formatMessage,
+			visibleItemType.value,
+			visibleItems.value.length,
+		),
+	})
+})
+
 async function show() {
 	await nextTick()
-	visibleItem.value = props.item
+	visibleItems.value = props.items
 	visibleDependents.value = props.dependents
+	visibleItemType.value = props.itemType
 	disableDependentsAfterDeleting.value = false
+	buttonsDisabled.value = false
 	modal.value?.show()
 	await nextTick()
-	forceCheck()
+	forceCheckDeletingScroll()
+	forceCheckDependentScroll()
 }
 
 function hide() {
@@ -241,7 +359,7 @@ function hide() {
 }
 
 function confirm() {
-	if (props.actionDisabled) return
+	if (props.actionDisabled || buttonsDisabled.value) return
 	modal.value?.hide()
 	emit('delete', disableDependentsAfterDeleting.value)
 }
