@@ -50,4 +50,5 @@ export {
 	parseSyncEventData,
 	SseParser,
 } from './utils/sse'
+export { getNodeWebSocketUrl } from './utils/node-url'
 export type { Override, RawDecimal } from './utils/types'
