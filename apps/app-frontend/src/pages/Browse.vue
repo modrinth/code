@@ -29,7 +29,7 @@ import {
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
@@ -41,6 +41,7 @@ import {
 	get_search_results_v3,
 	get_version_many,
 } from '@/helpers/cache.js'
+import { profile_listener } from '@/helpers/events.js'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import {
 	get as getInstance,
@@ -181,6 +182,28 @@ watchServerContextChanges()
 
 await initInstanceContext()
 
+async function refreshInstalledProjectIds() {
+	if (!route.query.i) return
+
+	if (route.query.from === 'worlds') {
+		const worlds = await get_profile_worlds(route.query.i as string).catch(handleError)
+		if (!worlds) return
+
+		const serverProjectIds = worlds
+			.filter((w) => w.type === 'server' && 'project_id' in w && w.project_id)
+			.map((w) => (w as { project_id: string }).project_id)
+		debugLog('installedServerProjectIds loaded', { count: serverProjectIds.length })
+		installedProjectIds.value = serverProjectIds
+		return
+	}
+
+	const ids = await getInstalledProjectIds(route.query.i as string).catch(handleError)
+	if (!ids) return
+
+	debugLog('installedProjectIds loaded', { count: ids.length })
+	installedProjectIds.value = ids
+}
+
 async function initInstanceContext() {
 	debugLog('initInstanceContext', {
 		queryI: route.query.i,
@@ -199,24 +222,7 @@ async function initInstanceContext() {
 			gameVersion: instance.value?.game_version,
 		})
 
-		if (route.query.from === 'worlds') {
-			get_profile_worlds(route.query.i as string)
-				.then((worlds) => {
-					const serverProjectIds = worlds
-						.filter((w) => w.type === 'server' && 'project_id' in w && w.project_id)
-						.map((w) => (w as { project_id: string }).project_id)
-					debugLog('installedServerProjectIds loaded', { count: serverProjectIds.length })
-					installedProjectIds.value = serverProjectIds
-				})
-				.catch(handleError)
-		} else {
-			getInstalledProjectIds(route.query.i as string)
-				.then((ids) => {
-					debugLog('installedProjectIds loaded', { count: ids?.length })
-					installedProjectIds.value = ids
-				})
-				.catch(handleError)
-		}
+		await refreshInstalledProjectIds()
 
 		if (instance.value?.linked_data?.project_id) {
 			debugLog('checking linked project for server status', instance.value.linked_data.project_id)
@@ -977,6 +983,38 @@ if (instance.value?.game_version) {
 }
 
 await searchState.refreshSearch()
+
+type UnlistenFn = () => void
+
+let isUnmounted = false
+let unlistenProfiles: UnlistenFn | null = null
+
+onMounted(() => {
+	profile_listener(async (event: { event: string; profile_path_id: string }) => {
+		if (
+			instance.value &&
+			event.profile_path_id === instance.value.path &&
+			event.event === 'synced'
+		) {
+			await refreshInstalledProjectIds()
+			await searchState.refreshSearch()
+		}
+	})
+		.then((unlisten) => {
+			if (isUnmounted) {
+				unlisten()
+				return
+			}
+
+			unlistenProfiles = unlisten
+		})
+		.catch(handleError)
+})
+
+onUnmounted(() => {
+	isUnmounted = true
+	unlistenProfiles?.()
+})
 
 function getProjectBrowseQuery() {
 	if (!installContext.value) return undefined
