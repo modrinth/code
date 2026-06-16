@@ -538,6 +538,7 @@ async function updateProject(mod: ContentItem) {
 		})
 	} catch (err) {
 		handleError(err as Error)
+		throw err
 	} finally {
 		await refreshContentState('must_revalidate')
 		finishContentOperation(mod, operation)
@@ -942,13 +943,15 @@ async function handleModalUpdate(
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
 
-		if (mod.has_update && mod.update_version_id === selectedVersion.id) {
-			await updateProject(mod)
-		} else {
-			await switchProjectVersion(mod, selectedVersion)
+		try {
+			if (mod.has_update && mod.update_version_id === selectedVersion.id) {
+				await updateProject(mod)
+			} else {
+				await switchProjectVersion(mod, selectedVersion)
+			}
+		} finally {
+			resetUpdateState()
 		}
-
-		resetUpdateState()
 	}
 }
 

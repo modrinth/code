@@ -2,8 +2,8 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash, ReleaseChannel,
-    cache_file_hash,
+    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash, KnownModrinthFile,
+    ReleaseChannel, Version, cache_file_hash,
 };
 use crate::util;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
@@ -1022,6 +1022,16 @@ impl Profile {
                     .into_iter()
                     .map(|f| (f.hash.clone(), f))
                     .collect();
+                let file_info_by_hash = Self::resolve_installed_file_metadata(
+                    &file_hashes,
+                    &keys,
+                    file_info_by_hash,
+                    self,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
 
                 let file_hashes = file_hashes
                     .into_iter()
@@ -1080,6 +1090,16 @@ impl Profile {
                     .into_iter()
                     .map(|f| (f.hash.clone(), f))
                     .collect();
+                let file_info_by_hash = Self::resolve_installed_file_metadata(
+                    &file_hashes,
+                    &keys,
+                    file_info_by_hash,
+                    self,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
 
                 let installed_channels = Self::get_installed_update_channels(
                     &file_info_by_hash,
@@ -1331,6 +1351,192 @@ impl Profile {
         )
     }
 
+    async fn resolve_installed_file_metadata(
+        file_hashes: &[CachedFileHash],
+        scan_files: &[InitialScanFile],
+        mut file_info_by_hash: HashMap<String, CachedFile>,
+        profile: &Profile,
+        cache_behaviour: Option<CacheBehaviour>,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<HashMap<String, CachedFile>> {
+        let scan_files_by_path: HashMap<&str, &InitialScanFile> = scan_files
+            .iter()
+            .map(|file| (file.path.as_str(), file))
+            .collect();
+        struct MetadataCandidate {
+            hash: String,
+            project_id: String,
+            version_id: String,
+            file_name: String,
+            project_type: ProjectType,
+        }
+
+        let mut candidates = Vec::new();
+        let mut version_ids = HashSet::new();
+
+        for file_hash in file_hashes {
+            if let (Some(project_id), Some(version_id)) =
+                (&file_hash.project_id, &file_hash.version_id)
+            {
+                file_info_by_hash.insert(
+                    file_hash.hash.clone(),
+                    CachedFile {
+                        hash: file_hash.hash.clone(),
+                        project_id: project_id.clone(),
+                        version_id: version_id.clone(),
+                    },
+                );
+                continue;
+            }
+
+            let Some(file_info) = file_info_by_hash.get(&file_hash.hash) else {
+                continue;
+            };
+
+            let Some(scan_file) = scan_files_by_path
+                .get(file_hash.path.trim_end_matches(".disabled"))
+            else {
+                continue;
+            };
+
+            version_ids.insert(file_info.version_id.clone());
+            candidates.push(MetadataCandidate {
+                hash: file_hash.hash.clone(),
+                project_id: file_info.project_id.clone(),
+                version_id: file_info.version_id.clone(),
+                file_name: scan_file.file_name.clone(),
+                project_type: scan_file.project_type,
+            });
+        }
+
+        let version_ids_ref =
+            version_ids.iter().map(|id| id.as_str()).collect::<Vec<_>>();
+        let versions_by_id: HashMap<String, Version> =
+            CachedEntry::get_version_many(
+                &version_ids_ref,
+                None,
+                pool,
+                fetch_semaphore,
+            )
+            .await?
+            .into_iter()
+            .map(|version| (version.id.clone(), version))
+            .collect();
+
+        let mut project_versions_by_id: HashMap<String, Option<Vec<Version>>> =
+            HashMap::new();
+
+        for candidate in candidates {
+            if versions_by_id.get(&candidate.version_id).is_some_and(
+                |version| {
+                    Self::version_matches_file(
+                        version,
+                        &candidate.hash,
+                        &candidate.file_name,
+                        candidate.project_type,
+                        profile,
+                    )
+                },
+            ) {
+                continue;
+            }
+
+            if !project_versions_by_id.contains_key(&candidate.project_id) {
+                let versions = CachedEntry::get_project_versions(
+                    &candidate.project_id,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                )
+                .await?;
+                project_versions_by_id
+                    .insert(candidate.project_id.clone(), versions);
+            }
+
+            let Some(Some(versions)) =
+                project_versions_by_id.get(&candidate.project_id)
+            else {
+                continue;
+            };
+
+            if let Some(version) = Self::find_matching_file_version(
+                versions,
+                &candidate.hash,
+                &candidate.file_name,
+                candidate.project_type,
+                profile,
+            ) {
+                file_info_by_hash.insert(
+                    candidate.hash.clone(),
+                    CachedFile {
+                        hash: candidate.hash,
+                        project_id: version.project_id.clone(),
+                        version_id: version.id.clone(),
+                    },
+                );
+            }
+        }
+
+        Ok(file_info_by_hash)
+    }
+
+    fn find_matching_file_version<'a>(
+        versions: &'a [Version],
+        hash: &str,
+        file_name: &str,
+        project_type: ProjectType,
+        profile: &Profile,
+    ) -> Option<&'a Version> {
+        versions.iter().find(|version| {
+            Self::version_matches_file(
+                version,
+                hash,
+                file_name,
+                project_type,
+                profile,
+            )
+        })
+    }
+
+    fn version_matches_file(
+        version: &Version,
+        hash: &str,
+        file_name: &str,
+        project_type: ProjectType,
+        profile: &Profile,
+    ) -> bool {
+        version.game_versions.contains(&profile.game_version)
+            && Self::version_loaders_match_profile(
+                version,
+                project_type,
+                profile,
+            )
+            && version.files.iter().any(|file| {
+                file.hashes.get("sha1").is_some_and(|sha1| sha1 == hash)
+                    && (file.primary
+                        || file.filename
+                            == file_name.trim_end_matches(".disabled"))
+            })
+    }
+
+    fn version_loaders_match_profile(
+        version: &Version,
+        project_type: ProjectType,
+        profile: &Profile,
+    ) -> bool {
+        if project_type == ProjectType::Mod {
+            version
+                .loaders
+                .iter()
+                .any(|loader| loader == profile.loader.as_str())
+        } else {
+            version.loaders.iter().any(|loader| {
+                project_type.get_loaders().contains(&loader.as_str())
+            })
+        }
+    }
+
     #[tracing::instrument(skip(pool))]
     pub async fn add_project_version(
         profile_path: &str,
@@ -1393,6 +1599,10 @@ impl Profile {
             bytes,
             file.hashes.get("sha1").map(|x| &**x),
             ProjectType::get_from_loaders(version.loaders.clone()),
+            Some(KnownModrinthFile {
+                project_id: &version.project_id,
+                version_id: &version.id,
+            }),
             io_semaphore,
             pool,
         )
@@ -1408,6 +1618,7 @@ impl Profile {
         bytes: bytes::Bytes,
         hash: Option<&str>,
         project_type: Option<ProjectType>,
+        known_modrinth_file: Option<KnownModrinthFile<'_>>,
         io_semaphore: &IoSemaphore,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<String> {
@@ -1455,6 +1666,7 @@ impl Profile {
             &project_path,
             hash,
             Some(project_type),
+            known_modrinth_file,
             exec,
         )
         .await?;

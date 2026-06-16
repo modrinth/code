@@ -372,6 +372,16 @@ pub struct CachedFileHash {
     pub size: u64,
     pub hash: String,
     pub project_type: Option<ProjectType>,
+    #[serde(default)]
+    pub project_id: Option<String>,
+    #[serde(default)]
+    pub version_id: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct KnownModrinthFile<'a> {
+    pub project_id: &'a str,
+    pub version_id: &'a str,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -1503,6 +1513,8 @@ impl CachedEntry {
                             project_type: ProjectType::get_from_parent_folder(
                                 &full_path,
                             ),
+                            project_id: None,
+                            version_id: None,
                         })
                         .get_entry(),
                         true,
@@ -1653,13 +1665,32 @@ impl CachedEntry {
                         let versions = variation.remove(hash);
 
                         if let Some(versions) = versions {
+                            let mut emitted_update = false;
+
                             for version in versions {
                                 let version_id = version.id.clone();
+                                let target_hash = version
+                                    .files
+                                    .iter()
+                                    .find(|file| file.primary)
+                                    .or_else(|| version.files.first())
+                                    .and_then(|file| file.hashes.get("sha1"))
+                                    .map(String::as_str);
+
+                                // Some update responses point at a different version ID for the exact installed file.
+                                let same_file =
+                                    target_hash == Some(hash.as_str());
+
                                 vals.push((
                                     CacheValue::Version(version).get_entry(),
                                     false,
                                 ));
 
+                                if same_file {
+                                    continue;
+                                }
+
+                                emitted_update = true;
                                 vals.push((
                                     CacheValue::FileUpdate(CachedFileUpdate {
                                         hash: hash.clone(),
@@ -1673,6 +1704,16 @@ impl CachedEntry {
                                         update_version_id: version_id,
                                     })
                                     .get_entry(),
+                                    true,
+                                ));
+                            }
+
+                            if !emitted_update {
+                                vals.push((
+                                    CacheValueType::FileUpdate
+                                        .get_empty_entry(format!(
+                                            "{hash}-{loaders_key}-{channel_policy_key}-{game_version}"
+                                        )),
                                     true,
                                 ));
                             }
@@ -2061,6 +2102,7 @@ pub async fn cache_file_hash(
     path: &str,
     known_hash: Option<&str>,
     project_type: Option<ProjectType>,
+    known_modrinth_file: Option<KnownModrinthFile<'_>>,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<()> {
     let size = bytes.len();
@@ -2077,6 +2119,7 @@ pub async fn cache_file_hash(
         size as u64,
         hash,
         project_type,
+        known_modrinth_file,
         exec,
     )
     .await
@@ -2088,8 +2131,17 @@ pub async fn cache_file_hash_metadata(
     size: u64,
     hash: String,
     project_type: Option<ProjectType>,
+    known_modrinth_file: Option<KnownModrinthFile<'_>>,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<()> {
+    let (project_id, version_id) =
+        known_modrinth_file.map_or((None, None), |metadata| {
+            (
+                Some(metadata.project_id.to_string()),
+                Some(metadata.version_id.to_string()),
+            )
+        });
+
     // Streamed extraction already computed these values, so avoid buffering the file just to cache them.
     CachedEntry::upsert_many(
         &[CacheValue::FileHash(CachedFileHash {
@@ -2097,6 +2149,8 @@ pub async fn cache_file_hash_metadata(
             size,
             hash,
             project_type,
+            project_id,
+            version_id,
         })
         .get_entry()],
         exec,

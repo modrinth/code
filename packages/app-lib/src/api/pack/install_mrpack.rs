@@ -456,6 +456,7 @@ pub async fn install_zipped_mrpack_files(
                     project.path.as_str(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
                     ProjectType::get_from_parent_folder(&path),
+                    None,
                     &state.pool,
                 )
                 .await?;
@@ -514,6 +515,7 @@ pub async fn install_zipped_mrpack_files(
             ProjectType::get_from_parent_folder(
                 relative_override_file_path.as_str(),
             ),
+            None,
             &state.pool,
         )
         .await?;
