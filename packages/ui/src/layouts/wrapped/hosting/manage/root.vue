@@ -344,7 +344,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError } from '@modrinth/api-client'
+import { getNodeWebSocketUrl, ModrinthApiError } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -1299,7 +1299,7 @@ async function testNodeReachability(): Promise<boolean> {
 	const nodeInstance = serverData.value?.node?.instance
 	if (!nodeInstance) return false
 
-	const wsUrl = `wss://${nodeInstance}/pingtest`
+	const wsUrl = getNodeWebSocketUrl(`${nodeInstance}/pingtest`)
 
 	try {
 		return await new Promise((resolve) => {
