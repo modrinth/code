@@ -407,9 +407,8 @@ async function showBulkDeleteModal(event?: MouseEvent) {
 
 async function confirmDependencyWarningDelete(disableDependentsAfterDeleting: boolean) {
 	if (disableDependentsAfterDeleting) {
-		pendingDependencyWarningDisableTargets.value = pendingDependencyWarningDisableTargets.value.filter(
-			(item) => item.enabled,
-		)
+		pendingDependencyWarningDisableTargets.value =
+			pendingDependencyWarningDisableTargets.value.filter((item) => item.enabled)
 	} else {
 		pendingDependencyWarningDisableTargets.value = []
 	}

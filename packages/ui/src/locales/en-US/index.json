@@ -377,11 +377,14 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Unlink"
   },
-  "content.dependency-warning.admonition-body": {
-    "defaultMessage": "{project} is installed as a dependency. Deleting it may break your {context} or stop dependent content from loading correctly."
-  },
   "content.dependency-warning.admonition-header": {
     "defaultMessage": "This content is required by other content"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "Affected {count, plural, one {project} other {projects}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Some selected projects are installed as dependencies. Deleting them may break your {context} or stop dependent content from loading correctly."
   },
   "content.dependency-warning.context.instance": {
     "defaultMessage": "instance"
@@ -391,6 +394,9 @@
   },
   "content.dependency-warning.delete-anyway-button": {
     "defaultMessage": "Delete anyway"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Delete {count, number} {itemType} anyway"
   },
   "content.dependency-warning.deleting-label": {
     "defaultMessage": "Deleting"
@@ -407,8 +413,8 @@
   "content.dependency-warning.header": {
     "defaultMessage": "Dependency warning"
   },
-  "content.dependency-warning.required-by-label": {
-    "defaultMessage": "Required by {count, plural, one {# project} other {# projects}}"
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} is installed as a dependency. Deleting it may break your {context} or stop dependent content from loading correctly."
   },
   "content.dependency-warning.what-happens-label": {
     "defaultMessage": "What happens?"
