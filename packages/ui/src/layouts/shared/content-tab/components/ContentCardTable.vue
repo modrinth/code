@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, getCurrentInstance, onMounted, onUnmounted, ref, toRef } from 'vue'
+import { computed, getCurrentInstance, ref, toRef } from 'vue'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useVIntl } from '#ui/composables/i18n'
@@ -119,26 +119,14 @@ function toggleSelectAll() {
 }
 
 const lastSelectedIndex = ref<number | null>(null)
-const shiftHeld = ref(false)
 
-function onKeyDown(e: KeyboardEvent) {
-	if (e.key === 'Shift') shiftHeld.value = true
-}
-function onKeyUp(e: KeyboardEvent) {
-	if (e.key === 'Shift') shiftHeld.value = false
-}
-
-onMounted(() => {
-	window.addEventListener('keydown', onKeyDown)
-	window.addEventListener('keyup', onKeyUp)
-})
-onUnmounted(() => {
-	window.removeEventListener('keydown', onKeyDown)
-	window.removeEventListener('keyup', onKeyUp)
-})
-
-function toggleItemSelection(itemId: string, selected: boolean, index?: number) {
-	if (selected && shiftHeld.value && lastSelectedIndex.value !== null && index !== undefined) {
+function toggleItemSelection(
+	itemId: string,
+	selected: boolean,
+	index?: number,
+	event?: MouseEvent,
+) {
+	if (selected && event?.shiftKey && lastSelectedIndex.value !== null && index !== undefined) {
 		const start = Math.min(lastSelectedIndex.value, index)
 		const end = Math.max(lastSelectedIndex.value, index)
 		const rangeIds = props.items.slice(start, end + 1).map((item) => item.id)
@@ -297,8 +285,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 						'border-0 border-t border-solid border-surface-4',
 						visibleRange.start + idx === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 					]"
-					@update:selected="
-						(val) => toggleItemSelection(item.id, val ?? false, visibleRange.start + idx)
+					@select="
+						(val, event) =>
+							toggleItemSelection(item.id, val ?? false, visibleRange.start + idx, event)
 					"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
 					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
@@ -355,7 +344,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					'border-0 border-t border-solid border-surface-4',
 					index === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 				]"
-				@update:selected="(val) => toggleItemSelection(item.id, val ?? false, index)"
+				@select="(val, event) => toggleItemSelection(item.id, val ?? false, index, event)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
 				@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 				@update="emit('update', item.id)"
