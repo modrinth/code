@@ -442,10 +442,7 @@ export function createContentInstall(opts: {
 					if (versionId && storeInstance) {
 						storeInstance.installed = true
 					}
-					currentCallback(
-						versionId,
-						versionId && currentProject ? [currentProject.id] : undefined,
-					)
+					currentCallback(versionId, versionId && currentProject ? [currentProject.id] : undefined)
 				}
 				await showIncompatibilityWarning(
 					profile,
