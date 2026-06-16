@@ -1299,9 +1299,12 @@ async function testNodeReachability(): Promise<boolean> {
 	const nodeInstance = serverData.value?.node?.instance
 	if (!nodeInstance) return false
 
-	const wsUrl = getNodeWebSocketUrl(`${nodeInstance}/pingtest`)
-
 	try {
+		const auth = await client.archon.servers_v0.getWebSocketAuth(props.serverId)
+		const authUrl = getNodeWebSocketUrl(auth.url)
+		const protocol = authUrl.toLowerCase().startsWith('ws://') ? 'ws' : 'wss'
+		const wsUrl = getNodeWebSocketUrl(`${nodeInstance}/pingtest`).replace(/^wss?:\/\//i, `${protocol}://`)
+
 		return await new Promise((resolve) => {
 			const socket = new WebSocket(wsUrl)
 			const timeout = setTimeout(() => {
@@ -1326,7 +1329,7 @@ async function testNodeReachability(): Promise<boolean> {
 			}
 		})
 	} catch (error) {
-		console.error(`Failed to ping node ${wsUrl}:`, error)
+		console.error(`Failed to ping node ${nodeInstance}:`, error)
 		return false
 	}
 }
