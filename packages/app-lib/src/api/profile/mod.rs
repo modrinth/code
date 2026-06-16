@@ -547,6 +547,7 @@ pub async fn add_project_from_path(
         bytes::Bytes::from(file),
         None,
         project_type,
+        None,
         &state.io_semaphore,
         &state.pool,
     )
