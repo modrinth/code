@@ -309,7 +309,7 @@ const startSplitActions = computed<JoinedButtonAction[]>(() => [
 		id: `start-${world.id}`,
 		label: `Start with ${world.name}`,
 		icon: GlobeIcon,
-		action: handlePrimaryAction,
+		action: () => initiateAction('Start', world.id),
 	})),
 ])
 

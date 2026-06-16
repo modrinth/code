@@ -71,6 +71,7 @@ const internalExpanded = ref(false)
 const isHovered = ref(false)
 const prefersReducedMotion = ref(false)
 const initialMeasurementSettled = ref(false)
+const itemEntrancesEnabled = ref(false)
 const enteringItemIds = ref<Set<string>>(new Set())
 const actionBarHeight = ref(0)
 
@@ -105,6 +106,7 @@ function scheduleHeightFlush() {
 				initialMeasurementHandle = requestAnimationFrame(() => {
 					initialMeasurementHandle = null
 					initialMeasurementSettled.value = true
+					itemEntrancesEnabled.value = true
 				})
 			}
 		}
@@ -240,7 +242,7 @@ function contentOpacity(index: number) {
 // Newly inserted cards need an explicit two-frame enter target because Motion's
 // initial state is disabled to avoid animating from zero-height on first mount.
 function markEntering(ids: string[]) {
-	if (!initialMeasurementSettled.value || prefersReducedMotion.value || ids.length === 0) return
+	if (!itemEntrancesEnabled.value || prefersReducedMotion.value || ids.length === 0) return
 
 	const next = new Set(enteringItemIds.value)
 	for (const id of ids) next.add(id)
@@ -361,7 +363,12 @@ function onCardClick(e: MouseEvent) {
 watch(
 	() => props.items.length,
 	(n, previousLength) => {
-		if (previousLength === 0 && n === 1 && !prefersReducedMotion.value) {
+		if (
+			previousLength === 0 &&
+			n === 1 &&
+			itemEntrancesEnabled.value &&
+			!prefersReducedMotion.value
+		) {
 			singleItemEntrance.value = true
 		} else if (n !== 1) {
 			singleItemEntrance.value = false
@@ -386,7 +393,11 @@ watch(isExpanded, (expanded, previousExpanded) => {
 watch(containerHeight, (height, previousHeight) => {
 	if (height !== previousHeight) {
 		const openingSingleItem =
-			previousHeight === 0 && height > 0 && props.items.length === 1 && !prefersReducedMotion.value
+			previousHeight === 0 &&
+			height > 0 &&
+			props.items.length === 1 &&
+			itemEntrancesEnabled.value &&
+			!prefersReducedMotion.value
 
 		if (openingSingleItem) {
 			singleItemEntrance.value = true

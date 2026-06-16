@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
@@ -51,18 +52,30 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 if (serverId) {
-	await Promise.allSettled([
-		queryClient.ensureQueryData({
-			queryKey: ['servers', 'detail', serverId],
-			queryFn: () => client.archon.servers_v0.get(serverId)!,
-			staleTime: 30_000,
-		}),
-		queryClient.ensureQueryData({
-			queryKey: ['servers', 'v1', 'detail', serverId],
-			queryFn: () => client.archon.servers_v1.get(serverId),
-			staleTime: 30_000,
-		}),
-	])
+	const serverDetailPromise = queryClient.ensureQueryData({
+		queryKey: ['servers', 'detail', serverId],
+		queryFn: () => client.archon.servers_v0.get(serverId)!,
+		staleTime: 30_000,
+	})
+	const serverFullPromise = queryClient.ensureQueryData({
+		queryKey: ['servers', 'v1', 'detail', serverId],
+		queryFn: () => client.archon.servers_v1.get(serverId),
+		staleTime: 30_000,
+	})
+	const [, serverFullResult] = await Promise.allSettled([serverDetailPromise, serverFullPromise])
+
+	if (serverFullResult.status === 'fulfilled') {
+		const worldId = resolveWorldId(route.params.instance_id, serverFullResult.value)
+		if (worldId) {
+			await Promise.allSettled([
+				queryClient.ensureQueryData({
+					queryKey: ['backups', 'queue', serverId, worldId],
+					queryFn: () => client.archon.backups_queue_v1.list(serverId, worldId),
+					staleTime: 30_000,
+				}),
+			])
+		}
+	}
 }
 
 const auth = (await useAuth()) as unknown as {
@@ -83,6 +96,21 @@ async function resolveViewer(): Promise<{ userId: string | null; userRole: strin
 		userId: auth.value?.user?.id ?? null,
 		userRole: (auth.value?.user as any)?.role ?? null,
 	}
+}
+
+function resolveWorldId(
+	routeInstanceId: string | string[] | undefined,
+	serverFull: Archon.Servers.v1.ServerFull,
+) {
+	const instanceId = getRouteParam(routeInstanceId)
+	if (instanceId) return instanceId
+	const activeWorld = serverFull.worlds.find((world) => world.is_active)
+	return activeWorld?.id ?? serverFull.worlds[0]?.id ?? null
+}
+
+function getRouteParam(param: string | string[] | undefined): string | null {
+	if (Array.isArray(param)) return param[0] ?? null
+	return param ?? null
 }
 
 definePageMeta({
