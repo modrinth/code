@@ -61,6 +61,7 @@ interface Props {
 	showCheckbox?: boolean
 	hideDelete?: boolean
 	hideActions?: boolean
+	inline?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -82,6 +83,7 @@ const props = withDefaults(defineProps<Props>(), {
 	showCheckbox: false,
 	hideDelete: false,
 	hideActions: false,
+	inline: false,
 })
 
 const selected = defineModel<boolean>('selected')
@@ -124,8 +126,10 @@ const deleteHovered = ref(false)
 <template>
 	<div
 		role="row"
-		class="flex h-[74px] items-center justify-between gap-4 px-3"
+		class="flex items-center justify-between"
 		:class="{
+			'h-[74px] gap-4 px-3': !inline,
+			'gap-3': inline,
 			'opacity-50 grayscale': disabled && !installing,
 			'opacity-50': installing,
 		}"
@@ -150,7 +154,7 @@ const deleteHovered = ref(false)
 			>
 				<div
 					v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined"
-					class="relative shrink-0"
+					class="relative flex shrink-0 items-center"
 				>
 					<Avatar
 						:src="project.icon_url"

@@ -34,6 +34,7 @@ import ContentSelectionBar from './components/ContentSelectionBar.vue'
 import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.vue'
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
+import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
 import {
 	getClientWarningType,
 	isClientOnlyEnvironment,
@@ -319,24 +320,60 @@ const hasOutdatedProjects = computed(() => {
 //  Deletion
 const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
+const contentDependencyWarningModal = ref<InstanceType<typeof ContentDependencyWarningModal>>()
+const pendingDependencyWarningItem = ref<ContentCardTableItem | null>(null)
+const pendingDependencyWarningDependents = ref<ContentCardTableItem[]>([])
+const dependencyWarningSkipConfirmation = ref(false)
 
-function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item) {
-		pendingDeletionItems.value = [item]
-		if (event?.shiftKey && !ctx.isBusy.value) {
-			confirmDelete()
-		} else {
-			confirmDeletionModal.value?.show()
-		}
+async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
+	if (items.length === 0) return
+	pendingDeletionItems.value = items
+	pendingDependencyWarningItem.value = null
+	pendingDependencyWarningDependents.value = []
+	dependencyWarningSkipConfirmation.value = !!event?.shiftKey && !ctx.isBusy.value
+
+	const warning = ctx.getDeleteDependencyWarning
+		? await Promise.resolve()
+				.then(() => ctx.getDeleteDependencyWarning!(items))
+				.catch(() => null)
+		: null
+	if (warning && warning.dependents.length > 0) {
+		pendingDependencyWarningItem.value = ctx.mapToTableItem(warning.item)
+		pendingDependencyWarningDependents.value = warning.dependents.map(ctx.mapToTableItem)
+		contentDependencyWarningModal.value?.show()
+		return
 	}
+
+	showDeletionConfirmation(event)
 }
 
-function showBulkDeleteModal(event?: MouseEvent) {
-	pendingDeletionItems.value = [...selectedItems.value]
+function showDeletionConfirmation(event?: MouseEvent) {
 	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmDelete()
 	} else {
+		confirmDeletionModal.value?.show()
+	}
+}
+
+async function handleDeleteById(id: string, event?: MouseEvent) {
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
+	if (item) {
+		await promptDeleteItems([item], event)
+	}
+}
+
+async function showBulkDeleteModal(event?: MouseEvent) {
+	await promptDeleteItems([...selectedItems.value], event)
+}
+
+function continueAfterDependencyWarning() {
+	pendingDependencyWarningItem.value = null
+	pendingDependencyWarningDependents.value = []
+	if (dependencyWarningSkipConfirmation.value) {
+		dependencyWarningSkipConfirmation.value = false
+		confirmDelete()
+	} else {
+		dependencyWarningSkipConfirmation.value = false
 		confirmDeletionModal.value?.show()
 	}
 }
@@ -878,6 +915,15 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@delete="confirmDelete"
+		/>
+		<ContentDependencyWarningModal
+			ref="contentDependencyWarningModal"
+			:item="pendingDependencyWarningItem"
+			:dependents="pendingDependencyWarningDependents"
+			:variant="ctx.deletionContext ?? 'instance'"
+			:action-disabled="ctx.isBusy.value"
+			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			@delete="continueAfterDependencyWarning"
 		/>
 		<ConfirmBulkUpdateModal
 			v-if="hasBulkUpdateSupport"
