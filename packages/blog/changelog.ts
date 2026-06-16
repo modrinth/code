@@ -11,6 +11,31 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-16T18:58:45+00:00`,
+		product: 'app',
+		version: '0.14.7',
+		body: `## Added
+- Warning modal before deleting content that other content in the instance depends on.
+
+## Changed
+- Improved folder filtering when exporting a modpack from an instance.
+- Improved error messages when parts of the Modrinth API are unavailable.
+
+## Fixed
+- Fixed the Content tab showing updates for installed content when the recommended version used the same file as installed.
+- Fixed automatically installed dependencies not appearing as installed when installing content from the Discover page.
+- Fixed the search filter for older game versions.
+- Fixed bulk action content modals sometimes saying no projects were selected.
+- Fixed the Content tab multi-select bar shifting when modals were opened.`,
+	},
+	{
+		date: `2026-06-16T18:58:45+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed Babric project versions being detected as Fabric versions.
+- Fixed the search filter for older game versions.`,
+	},
+	{
 		date: `2026-06-11T19:05:19+00:00`,
 		product: 'app',
 		version: '0.14.6',
