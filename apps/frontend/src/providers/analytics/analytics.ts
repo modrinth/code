@@ -203,7 +203,10 @@ export interface AnalyticsDashboardContextValue {
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
 	versionProjectNamesById: ComputedRef<Map<string, string>>
 	versionProjectIconUrlsById: ComputedRef<Map<string, string>>
+	versionProjectOrganizationNamesById: ComputedRef<Map<string, string>>
 	projectNamesById: ComputedRef<Map<string, string>>
+	projectIconUrlsById: ComputedRef<Map<string, string>>
+	projectOrganizationNamesById: ComputedRef<Map<string, string>>
 	dependentProjectTypesById: ComputedRef<Map<string, string[]>>
 	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
 	availableProjectStatuses: ComputedRef<ProjectStatusFilterValue[]>
@@ -253,6 +256,7 @@ export interface AnalyticsDashboardContextValue {
 	getVersionPublishedDate: (versionId: string) => string | undefined
 	getVersionProjectName: (versionId: string) => string | undefined
 	getVersionProjectIconUrl: (versionId: string) => string | undefined
+	getVersionProjectOrganizationName: (versionId: string) => string | undefined
 	setFetchRequest: (fetchRequest: Labrinth.Analytics.v3.FetchRequest) => void
 	setActiveStat: (stat: AnalyticsDashboardStat) => void
 }
@@ -567,14 +571,6 @@ export function createAnalyticsDashboardContext(
 		dashboardOrganizationProjectIds.value.length > 0 && dashboardUserProjectIds.value.length > 0
 			? dashboardUserProjectIds.value
 			: availableProjectIds.value,
-	)
-	const projectIconUrlsById = computed(
-		() =>
-			new Map(
-				projects.value
-					.filter((project) => project.iconUrl)
-					.map((project) => [project.id, project.iconUrl as string]),
-			),
 	)
 	const projectStatusById = computed(
 		() => new Map(projects.value.map((project) => [project.id, project.status])),
@@ -1311,6 +1307,98 @@ export function createAnalyticsDashboardContext(
 	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const analyticsProjects = shallowRef<Record<string, Labrinth.Projects.v3.Project>>({})
+	const baseOrganizationNamesById = computed(() => {
+		const organizationNames = new Map<string, string>()
+		const organization = options.organizationContext?.organization.value
+		if (organization) {
+			organizationNames.set(organization.id, organization.name)
+		}
+
+		for (const [organizationId, organization] of Object.entries(
+			dashboardAllProjects.value?.organizations ?? {},
+		)) {
+			organizationNames.set(organizationId, organization.name)
+		}
+
+		return organizationNames
+	})
+	const missingOrganizationIds = computed(() => {
+		const knownOrganizationNames = baseOrganizationNamesById.value
+		const organizationIds = new Set<string>()
+
+		for (const project of projects.value) {
+			if (project.organizationId && !knownOrganizationNames.has(project.organizationId)) {
+				organizationIds.add(project.organizationId)
+			}
+		}
+		for (const project of Object.values(analyticsProjects.value)) {
+			const organizationId = getProjectOrganizationId(project)
+			if (organizationId && !knownOrganizationNames.has(organizationId)) {
+				organizationIds.add(organizationId)
+			}
+		}
+
+		return sortStringValues([...organizationIds])
+	})
+	const { data: missingOrganizations } = useQuery({
+		queryKey: computed(() => [
+			'analytics',
+			'dashboard',
+			'missing-organizations',
+			missingOrganizationIds.value,
+		]),
+		queryFn: () => client.labrinth.organizations_v3.getMultiple(missingOrganizationIds.value),
+		enabled: computed(() => missingOrganizationIds.value.length > 0),
+		placeholderData: [],
+		refetchOnWindowFocus: false,
+	})
+	const organizationNamesById = computed(() => {
+		const organizationNames = new Map(baseOrganizationNamesById.value)
+		for (const organization of missingOrganizations.value ?? []) {
+			organizationNames.set(organization.id, organization.name)
+		}
+		return organizationNames
+	})
+	const projectIconUrlsById = computed(() => {
+		const projectIconUrls = new Map(
+			projects.value
+				.filter((project) => project.iconUrl)
+				.map((project) => [project.id, project.iconUrl as string]),
+		)
+		for (const [projectId, project] of Object.entries(analyticsProjects.value)) {
+			if (project.icon_url) {
+				projectIconUrls.set(projectId, project.icon_url)
+			}
+		}
+		return projectIconUrls
+	})
+	const projectOrganizationNamesById = computed(() => {
+		const organizationNames = organizationNamesById.value
+		const contextOrganizationName = hasOrganizationContext.value
+			? options.organizationContext?.organization.value?.name
+			: undefined
+		const projectOrganizationNames = new Map<string, string>()
+		for (const project of projects.value) {
+			if (project.organizationId) {
+				const organizationName = organizationNames.get(project.organizationId)
+				if (organizationName) {
+					projectOrganizationNames.set(project.id, organizationName)
+				}
+			} else if (contextOrganizationName) {
+				projectOrganizationNames.set(project.id, contextOrganizationName)
+			}
+		}
+		for (const [projectId, project] of Object.entries(analyticsProjects.value)) {
+			const organizationId = getProjectOrganizationId(project)
+			if (organizationId) {
+				const organizationName = organizationNames.get(organizationId)
+				if (organizationName) {
+					projectOrganizationNames.set(projectId, organizationName)
+				}
+			}
+		}
+		return projectOrganizationNames
+	})
 	const dependentProjectTypesById = computed(() => {
 		const projectTypesById = new Map<string, string[]>()
 		for (const project of projects.value) {
@@ -1556,6 +1644,17 @@ export function createAnalyticsDashboardContext(
 		}
 		return versionProjectIconUrls
 	})
+	const versionProjectOrganizationNamesById = computed(() => {
+		const projectOrganizationNames = projectOrganizationNamesById.value
+		const versionProjectOrganizationNames = new Map<string, string>()
+		for (const version of allVersionMetadata.value) {
+			const organizationName = projectOrganizationNames.get(version.projectId)
+			if (organizationName) {
+				versionProjectOrganizationNames.set(version.id, organizationName)
+			}
+		}
+		return versionProjectOrganizationNames
+	})
 	const downloadCountTimeSlices = computed(() => {
 		const countTimeSlices = analyticsDownloadCountTimeSlices.value ?? []
 		return countTimeSlices.length > 0 ? countTimeSlices : timeSlices.value
@@ -1714,6 +1813,10 @@ export function createAnalyticsDashboardContext(
 		return versionProjectIconUrlsById.value.get(versionId)
 	}
 
+	function getVersionProjectOrganizationName(versionId: string): string | undefined {
+		return versionProjectOrganizationNamesById.value.get(versionId)
+	}
+
 	function setActiveStat(nextStat: AnalyticsDashboardStat) {
 		if (
 			!isAnalyticsDashboardStatRelevant(nextStat, selectedBreakdowns.value, selectedFilters.value)
@@ -1760,7 +1863,10 @@ export function createAnalyticsDashboardContext(
 		versionPublishedDatesById,
 		versionProjectNamesById,
 		versionProjectIconUrlsById,
+		versionProjectOrganizationNamesById,
 		projectNamesById,
+		projectIconUrlsById,
+		projectOrganizationNamesById,
 		dependentProjectTypesById,
 		projectStatusById,
 		availableProjectStatuses,
@@ -1803,6 +1909,7 @@ export function createAnalyticsDashboardContext(
 		getVersionPublishedDate,
 		getVersionProjectName,
 		getVersionProjectIconUrl,
+		getVersionProjectOrganizationName,
 		setFetchRequest,
 		setActiveStat,
 	}

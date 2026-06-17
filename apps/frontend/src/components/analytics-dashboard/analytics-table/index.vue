@@ -55,8 +55,12 @@
 			<template #cell-date="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
-			<template #cell-breakdown_project="{ value }">
-				<span class="text-primary">{{ value }}</span>
+			<template #cell-breakdown_project="{ row, value }">
+				<ProjectCell
+					:label="getProjectCellLabel(value)"
+					:icon-url="getProjectIconUrl(row.breakdownValues.project)"
+					:organization-name="getProjectOrganizationName(row.breakdownValues.project)"
+				/>
 			</template>
 			<template #cell-breakdown_country="{ value }">
 				<span class="text-primary">{{ value }}</span>
@@ -70,8 +74,14 @@
 			<template #cell-breakdown_download_reason="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
-			<template #cell-breakdown_dependent_project_download="{ value }">
-				<span class="text-primary">{{ value }}</span>
+			<template #cell-breakdown_dependent_project_download="{ row, value }">
+				<ProjectCell
+					:label="getProjectCellLabel(value)"
+					:icon-url="getProjectIconUrl(row.breakdownValues.dependent_project_download)"
+					:organization-name="
+						getProjectOrganizationName(row.breakdownValues.dependent_project_download)
+					"
+				/>
 			</template>
 			<template #cell-breakdown_version_id="{ value }">
 				<span class="text-primary">{{ value }}</span>
@@ -82,11 +92,19 @@
 			<template #cell-breakdown_game_version="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
-			<template #cell-project="{ value }">
-				<span class="text-primary">{{ value }}</span>
+			<template #cell-project="{ row, value }">
+				<ProjectCell
+					:label="getProjectCellLabel(value)"
+					:icon-url="getVersionProjectIconUrl(row.projectVersionId)"
+					:organization-name="getVersionProjectOrganizationName(row.projectVersionId)"
+				/>
 			</template>
-			<template #cell-dependent_on="{ value }">
-				<span class="text-primary">{{ value }}</span>
+			<template #cell-dependent_on="{ row, value }">
+				<ProjectCell
+					:label="getProjectCellLabel(value)"
+					:icon-url="getProjectIconUrl(row.dependentOnProjectId)"
+					:organization-name="getProjectOrganizationName(row.dependentOnProjectId)"
+				/>
 			</template>
 			<template #cell-views="{ row }">
 				<span>{{ formatInteger(row.views) }}</span>
@@ -202,6 +220,7 @@ import type {
 	AnalyticsTableMode,
 	AnalyticsTableSortDirectionValue,
 } from './analytics-table-types.ts'
+import ProjectCell from './ProjectCell.vue'
 import { useAnalyticsTableGraphSelection } from './use-analytics-table-graph-selection.ts'
 import { useAnalyticsTablePagination } from './use-analytics-table-pagination.ts'
 import { useAnalyticsTableRowCache } from './use-analytics-table-row-cache.ts'
@@ -229,9 +248,13 @@ const {
 	versionNumbersById,
 	versionProjectNamesById,
 	projectNamesById,
+	projectIconUrlsById,
+	projectOrganizationNamesById,
 	dependentProjectTypesById,
 	getVersionDisplayName,
 	getVersionProjectName,
+	getVersionProjectIconUrl,
+	getVersionProjectOrganizationName,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const { formatMessage } = useVIntl()
@@ -398,6 +421,18 @@ function buildColumns(includeDate: boolean) {
 		formatMessage,
 		getRelevantAnalyticsDashboardStats,
 	})
+}
+
+function getProjectIconUrl(projectId: string | undefined) {
+	return projectId ? projectIconUrlsById.value.get(projectId) : undefined
+}
+
+function getProjectOrganizationName(projectId: string | undefined) {
+	return projectId ? projectOrganizationNamesById.value.get(projectId) : undefined
+}
+
+function getProjectCellLabel(value: unknown) {
+	return typeof value === 'string' ? value : String(value ?? '')
 }
 
 watch(

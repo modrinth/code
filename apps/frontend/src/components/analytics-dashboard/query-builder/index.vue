@@ -79,7 +79,7 @@
 							@keydown.enter.stop
 							@keydown.space.stop
 						>
-							<LayersIcon
+							<UserIcon
 								class="h-5 w-5 shrink-0 text-primary"
 								:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 							/>
@@ -290,7 +290,7 @@
 									@keydown.enter.stop
 									@keydown.space.stop
 								>
-									<LayersIcon
+									<UserIcon
 										class="h-5 w-5 shrink-0 text-primary"
 										:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 									/>
@@ -449,6 +449,7 @@ import {
 	ClockIcon,
 	FolderOpenIcon,
 	LayersIcon,
+	UserIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,

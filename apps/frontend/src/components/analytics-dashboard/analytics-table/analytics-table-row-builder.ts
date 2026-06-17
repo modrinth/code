@@ -121,6 +121,20 @@ export function buildAnalyticsTableRows({
 		return displayValue
 	}
 
+	function getProjectIdForBreakdownValues(breakdownValues: readonly string[]) {
+		const projectBreakdownIndex = selectedBreakdowns.indexOf('project')
+		return projectBreakdownIndex === -1 ? '' : (breakdownValues[projectBreakdownIndex] ?? '')
+	}
+
+	function getProjectVersionIdForBreakdownValues(breakdownValues: readonly string[]) {
+		const versionBreakdownIndex = selectedBreakdowns.indexOf('version_id')
+		if (versionBreakdownIndex === -1) {
+			return ''
+		}
+
+		return breakdownValues[versionBreakdownIndex] ?? ''
+	}
+
 	function getBreakdownDisplays(breakdownValues: readonly string[]) {
 		const displays: AnalyticsTableBreakdownDisplayValues = {}
 
@@ -180,9 +194,12 @@ export function buildAnalyticsTableRows({
 			date: bucketLabel?.date ?? '',
 			dateMs: bucketLabel?.dateMs ?? 0,
 			project: getProjectDisplayValueForBreakdownValues(breakdownValues),
+			projectId: getProjectIdForBreakdownValues(breakdownValues),
+			projectVersionId: getProjectVersionIdForBreakdownValues(breakdownValues),
 			dependent_on: dependentOnProjectId
 				? (projectNamesById.get(dependentOnProjectId) ?? dependentOnProjectId)
 				: '',
+			dependentOnProjectId: dependentOnProjectId ?? '',
 			breakdown: breakdownKey,
 			breakdownValues: Object.fromEntries(
 				selectedBreakdowns.map((breakdown, index) => [breakdown, breakdownValues[index] ?? '']),

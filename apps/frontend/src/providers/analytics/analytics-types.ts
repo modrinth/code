@@ -125,6 +125,7 @@ export interface AnalyticsDashboardProject {
 	id: string
 	name: string
 	iconUrl?: string
+	organizationId?: string
 	downloads: number
 	status: ProjectStatusFilterValue
 	publishedAt?: string
