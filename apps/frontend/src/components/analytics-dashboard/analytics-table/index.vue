@@ -280,6 +280,7 @@ const showProjectVersionProjectColumn = computed(
 const showDependentOnProjectColumn = computed(
 	() =>
 		selectedBreakdownSet.value.has('dependent_project_download') &&
+		!selectedBreakdownSet.value.has('project') &&
 		selectedProjectIdSet.value.size > 1,
 )
 const includeDateColumn = computed(
