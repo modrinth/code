@@ -25,10 +25,11 @@
 
 		<template #option="{ category, option, selected }">
 			<div class="flex min-w-0 flex-1 items-center gap-2">
-				<template v-if="category.key === 'version_id'">
+				<template
+					v-for="metadata in getFilterOptionProjectMetadata(category.key, option.value)"
+					:key="`${category.key}-${option.value}-${metadata.name}`"
+				>
 					<span
-						v-for="metadata in getProjectVersionOptionProjectMetadata(option.value)"
-						:key="`${option.value}-${metadata.name}`"
 						v-tooltip="metadata.name"
 						class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
 					>
@@ -42,6 +43,8 @@
 					</span>
 				</template>
 				<span
+					:ref="(element) => setFilterOptionLabelRef(category.key, option.value, element)"
+					v-tooltip="getFilterOptionLabelTooltip(category.key, option.value, option.label)"
 					class="min-w-0 truncate font-semibold leading-tight"
 					:class="selected ? 'text-contrast' : 'text-primary'"
 				>
@@ -191,10 +194,12 @@ import {
 	Tabs,
 	type TabsTab,
 	type TabsValue,
+	truncatedTooltip,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
+import type { ComponentPublicInstance } from 'vue'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import {
@@ -361,6 +366,8 @@ let selectedFiltersCommitRequestId = 0
 let projectVersionFilterOptionsCacheKey = ''
 let projectVersionFilterOptionProjectMetadataCacheKey = ''
 let dependentProjectSearchDebounceTimeout: ReturnType<typeof setTimeout> | null = null
+const filterOptionLabelElements = new Map<string, HTMLElement>()
+const filterOptionLabelRefUpdateToken = ref(0)
 
 const dependentProjectSearchFilters = computed(() =>
 	buildDependentsSearchFilters(
@@ -374,6 +381,12 @@ const dependentProjectSearchResultLimit = computed(() =>
 		? dependentProjectQuerySearchLimit
 		: dependentProjectInitialSearchLimit,
 )
+const selectedDependentProjectIds = computed(() => [
+	...new Set([
+		...selectedFilters.value.dependent_project_id,
+		...draftSelectedFilters.value.dependent_project_id,
+	]),
+])
 const { data: dependentProjectSearchResults, error: dependentProjectSearchError } = useQuery({
 	queryKey: computed(() => [
 		'analytics',
@@ -396,6 +409,18 @@ const { data: dependentProjectSearchResults, error: dependentProjectSearchError 
 			dependentProjectSearchFilters.value.length > 0,
 	),
 	placeholderData: (previousData) => previousData,
+	refetchOnWindowFocus: false,
+})
+const { data: selectedDependentProjects } = useQuery({
+	queryKey: computed(() => [
+		'analytics',
+		'query-filter',
+		'selected-dependent-projects',
+		selectedDependentProjectIds.value,
+	]),
+	queryFn: () => client.labrinth.projects_v2.getMultiple(selectedDependentProjectIds.value),
+	enabled: computed(() => selectedDependentProjectIds.value.length > 0),
+	placeholderData: [],
 	refetchOnWindowFocus: false,
 })
 
@@ -676,8 +701,9 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
 			onSearchQueryChange: setDependentProjectSearchInput,
 			options: withSelectedOptions('dependent_project_id', dependentProjectFilterOptions.value),
-			submenuClass: 'w-fit',
+			submenuClass: 'w-fit min-w-[18rem]',
 			previewDropdownWidth: 'fit-content',
+			previewDropdownMinWidth: '18rem',
 		},
 		{
 			key: 'dependent_project_type',
@@ -787,6 +813,9 @@ const dependentProjectSearchResultsById = computed(
 			]),
 		),
 )
+const selectedDependentProjectsById = computed(
+	() => new Map((selectedDependentProjects.value ?? []).map((project) => [project.id, project])),
+)
 
 const dependentProjectFilterOptions = computed<DropdownFilterBarOption[]>(() => {
 	const optionsById = new Map<string, DropdownFilterBarOption>()
@@ -858,12 +887,79 @@ function getMissingSelectedOptionLabel(
 	return undefined
 }
 
+function setFilterOptionLabelRef(
+	categoryKey: string,
+	optionValue: string,
+	element: Element | ComponentPublicInstance | null,
+) {
+	const key = getFilterOptionLabelElementKey(categoryKey, optionValue)
+	if (element instanceof HTMLElement) {
+		if (filterOptionLabelElements.get(key) === element) {
+			return
+		}
+
+		filterOptionLabelElements.set(key, element)
+		filterOptionLabelRefUpdateToken.value++
+		return
+	}
+
+	if (filterOptionLabelElements.delete(key)) {
+		filterOptionLabelRefUpdateToken.value++
+	}
+}
+
+function getFilterOptionLabelTooltip(
+	categoryKey: string,
+	optionValue: string,
+	label: string,
+): string | undefined {
+	void filterOptionLabelRefUpdateToken.value
+
+	return truncatedTooltip(
+		filterOptionLabelElements.get(getFilterOptionLabelElementKey(categoryKey, optionValue)),
+		label,
+	)
+}
+
+function getFilterOptionLabelElementKey(categoryKey: string, optionValue: string) {
+	return `${categoryKey}\x1f${optionValue}`
+}
+
+function getFilterOptionProjectMetadata(categoryKey: string, optionValue: string) {
+	if (categoryKey === 'version_id') {
+		return getProjectVersionOptionProjectMetadata(optionValue)
+	}
+	if (categoryKey === 'dependent_project_id') {
+		return getDependentProjectOptionProjectMetadata(optionValue)
+	}
+
+	return []
+}
+
 function getProjectVersionOptionProjectMetadata(versionId: string) {
 	if (!showProjectVersionProjectIcons.value) {
 		return []
 	}
 
 	return projectVersionFilterOptionProjectMetadataById.value.get(versionId) ?? []
+}
+
+function getDependentProjectOptionProjectMetadata(projectId: string) {
+	const searchResult = dependentProjectSearchResultsById.value.get(projectId)
+	const selectedProject = selectedDependentProjectsById.value.get(projectId)
+	const name =
+		searchResult?.title ??
+		selectedProject?.title ??
+		projectNamesById.value.get(projectId) ??
+		projectId
+	const iconUrl = searchResult?.icon_url ?? selectedProject?.icon_url
+
+	return [
+		{
+			name,
+			...(iconUrl ? { iconUrl } : {}),
+		},
+	]
 }
 
 function getCountryFilterOptionLabel(countryCode: string): string {
@@ -890,6 +986,7 @@ function getProjectTypeFilterOptionLabel(projectType: string): string {
 function getDependentProjectFilterOptionLabel(projectId: string): string {
 	return (
 		dependentProjectSearchResultsById.value.get(projectId)?.title ??
+		selectedDependentProjectsById.value.get(projectId)?.title ??
 		projectNamesById.value.get(projectId) ??
 		projectId
 	)
