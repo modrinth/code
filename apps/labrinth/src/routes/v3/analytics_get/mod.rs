@@ -16,7 +16,7 @@ use std::{
     num::NonZeroU64,
 };
 
-use crate::database::PgPool;
+use crate::database::{PgPool, models::DBUserId};
 use actix_web::{HttpRequest, post, web};
 use chrono::{DateTime, TimeDelta, Utc};
 use eyre::eyre;
@@ -360,14 +360,33 @@ pub async fn fetch_analytics(
             return Err(AuthenticationError::InvalidCredentials.into());
         }
 
+        let user_id_bucket_project_ids = sqlx::query!(
+            "
+            SELECT m.id
+            FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id
+            WHERE
+                m.id = ANY($1)
+                AND tm.user_id = $2
+                AND tm.accepted
+            ",
+            &project_id_values,
+            DBUserId::from(user.id).0,
+        )
+        .fetch_all(&**pool)
+        .await?
+        .into_iter()
+        .map(|row| row.id)
+        .collect::<Vec<_>>();
+
         metrics::fetch_project_revenue(
             &pool,
             &mut time_slices,
             &req,
             num_time_slices,
             &project_id_values,
-            user.id.into(),
-            user.role.is_admin(),
+            &user_id_bucket_project_ids,
+            user.role.is_mod(),
             metrics,
         )
         .await?;

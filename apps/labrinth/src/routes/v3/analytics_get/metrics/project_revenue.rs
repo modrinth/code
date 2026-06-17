@@ -27,8 +27,8 @@ pub enum ProjectRevenueField {
     ProjectId,
     /// User ID.
     ///
-    /// If you bucket revenue by this field, and are not an admin, you will only
-    /// get revenue metrics for your own user.
+    /// If you bucket revenue by this field, the user ID is only exposed for
+    /// projects you are a member of, unless you are a moderator or admin.
     UserId,
 }
 
@@ -52,8 +52,8 @@ pub(crate) async fn fetch(
     req: &super::super::GetRequest,
     num_time_slices: usize,
     project_id_values: &[i64],
-    current_user_id: DBUserId,
-    is_admin: bool,
+    user_id_bucket_project_ids: &[i64],
+    can_view_all_revenue_splits: bool,
     metrics: &Metrics<ProjectRevenueField, ProjectRevenueFilters>,
 ) -> Result<(), ApiError> {
     let bucket_by_user_id =
@@ -69,7 +69,10 @@ pub(crate) async fn fetch(
                 $3::integer
             ) AS "bucket?",
             mod_id AS "mod_id?",
-            CASE WHEN $5 THEN user_id ELSE 0 END AS "user_id?",
+            CASE
+                WHEN $5 AND ($6 OR mod_id = ANY($7)) THEN user_id
+                ELSE 0
+            END AS "user_id?",
             SUM(amount) AS "amount_sum?"
         FROM payouts_values
         WHERE
@@ -79,7 +82,6 @@ pub(crate) async fn fetch(
             AND payouts_values.mod_id = ANY($4)
             AND created >= $1
             AND created < $2
-            AND (NOT $5 OR $6 OR user_id = $7)
         GROUP BY 1, 2, 3
         "#,
         req.time_range.start,
@@ -87,8 +89,8 @@ pub(crate) async fn fetch(
         num_time_slices as i64,
         project_id_values,
         bucket_by_user_id,
-        is_admin,
-        current_user_id as DBUserId,
+        can_view_all_revenue_splits,
+        user_id_bucket_project_ids,
     )
     .fetch(pool);
     while let Some(row) = rows.next().await.transpose()? {
@@ -113,7 +115,7 @@ pub(crate) async fn fetch(
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
                         user_id: row
                             .user_id
-                            .filter(|_| bucket_by_user_id)
+                            .filter(|id| bucket_by_user_id && *id != 0)
                             .map(DBUserId)
                             .map(UserId::from),
                         revenue,
