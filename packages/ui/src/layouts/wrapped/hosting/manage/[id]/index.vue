@@ -264,6 +264,7 @@
 						class="mb-4"
 						:sync-progress="syncProgress"
 						:content-error="contentError"
+						:show-instance-info="showInstanceInfoAdmonition"
 						@content-retry="handleContentRetry"
 					/>
 					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
@@ -332,6 +333,7 @@ import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
+import { provideServerPanelAdmonitionsContext } from '#ui/components/servers/admonitions/context'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { ServerManageHeader } from '#ui/components/servers/server-header'
@@ -695,6 +697,7 @@ const debug = useDebugLogger('ServerManage')
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
+const showInstanceInfoAdmonition = ref(false)
 const copied = ref(false)
 const installError = ref<Error | null>(null)
 type InstallErrorTitle = 'generic' | 'installation'
@@ -1538,6 +1541,9 @@ provideServerSettingsModal({
 	openServerInstanceSettings: (options) =>
 		openServerInstanceSettingsModal(options?.tabId, options?.worldId),
 	browseServerContent: (args) => handleBrowseContent(args),
+})
+provideServerPanelAdmonitionsContext({
+	showInstanceInfo: showInstanceInfoAdmonition,
 })
 
 function safeStringify(obj: unknown, indent = ' '): string {

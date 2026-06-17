@@ -23,6 +23,7 @@ import UploadAdmonition from './UploadAdmonition.vue'
 const props = defineProps<{
 	syncProgress?: SyncProgress | null
 	contentError?: ContentError | null
+	showInstanceInfo?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -119,6 +120,7 @@ const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed
 const instanceCount = computed(() => ctx.serverFull.value?.worlds.length ?? null)
 const showInstanceInfoAdmonition = computed(
 	() =>
+		props.showInstanceInfo &&
 		isOnInstancesList.value &&
 		instanceInfoAdmonitionStorageLoaded.value &&
 		!instanceInfoAdmonitionDismissed.value &&
@@ -457,6 +459,7 @@ function onInstanceInfoDismiss() {
 	<StackedAdmonitions
 		:items="stackItems"
 		:dismiss-all-enabled="hasBulkDismissableItems"
+		:animate-single-item="false"
 		class="w-full"
 		@dismiss-all="onDismissAll"
 	>

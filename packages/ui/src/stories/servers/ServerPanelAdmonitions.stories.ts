@@ -138,6 +138,9 @@ type Story = StoryObj<typeof meta>
 export const WithUploadFileOpAndBusy: Story = {}
 
 export const InstanceInfo: Story = {
+	args: {
+		showInstanceInfo: true,
+	},
 	parameters: {
 		routePath: '/hosting/manage/demo-server/instances',
 		resetInstanceInfoAdmonition: true,

@@ -121,6 +121,35 @@ export const SingleItem: Story = {
 	}),
 }
 
+export const SingleItemWithoutAnimation: Story = {
+	render: () => ({
+		components: { StackedAdmonitions, Admonition },
+		setup() {
+			const items = ref<DemoItem[]>([])
+			function toggle() {
+				items.value = items.value.length === 0 ? [completedBackupItem] : []
+			}
+			return { items, toggle }
+		},
+		template: /* html */ `
+			<div>
+				<button
+					type="button"
+					style="margin-bottom: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 0.5rem; background: var(--color-button-bg); color: var(--color-contrast);"
+					@click="toggle"
+				>
+					Toggle item
+				</button>
+				<StackedAdmonitions :items="items" :animate-single-item="false">
+					<template #item="{ item }">
+						<Admonition :type="item.type" :header="item.header" :body="item.body" />
+					</template>
+				</StackedAdmonitions>
+			</div>
+		`,
+	}),
+}
+
 export const TwoItems: Story = {
 	render: () => ({
 		components: { StackedAdmonitions, Admonition },

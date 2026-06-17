@@ -31,6 +31,7 @@ const props = withDefaults(
 		maxVisibleBehind?: number
 		dismissAllEnabled?: boolean
 		expanded?: boolean
+		animateSingleItem?: boolean
 	}>(),
 	{
 		peek: 8,
@@ -41,6 +42,7 @@ const props = withDefaults(
 		maxVisibleBehind: 2,
 		dismissAllEnabled: true,
 		expanded: undefined,
+		animateSingleItem: true,
 	},
 )
 
@@ -128,6 +130,12 @@ const phase = ref<StackPhase>(isExpanded.value ? 'expanded' : 'collapsed')
 const isSettledCollapsed = computed(() => phase.value === 'collapsed')
 const containerHeightSettled = ref(true)
 const singleItemEntrance = ref(false)
+const singleItemAnimationDisabled = computed(
+	() => !props.animateSingleItem && props.items.length <= 1,
+)
+const instantSingleItem = computed(() =>
+	!props.animateSingleItem && props.items.length === 1 ? props.items[0]! : null,
+)
 
 // Behind cards morph between a collapsed placeholder and real content. The shell
 // height owns that morph so mixed-height cards do not swap DOM midway through motion.
@@ -183,20 +191,30 @@ const containerOverflow = computed(() => {
 })
 
 const springTransition = computed(() =>
-	prefersReducedMotion.value || !initialMeasurementSettled.value
+	prefersReducedMotion.value ||
+	!initialMeasurementSettled.value ||
+	singleItemAnimationDisabled.value
 		? { duration: 0 }
 		: { type: 'spring' as const, stiffness: 260, damping: 32 },
 )
 const heightTransition = computed(() =>
-	singleItemEntrance.value ? { duration: 0.12, ease: 'easeOut' as const } : springTransition.value,
+	singleItemAnimationDisabled.value
+		? { duration: 0 }
+		: singleItemEntrance.value
+			? { duration: 0.12, ease: 'easeOut' as const }
+			: springTransition.value,
 )
 
 const exitTransition = computed(() =>
-	prefersReducedMotion.value ? { duration: 0 } : { duration: 0.18 },
+	prefersReducedMotion.value || singleItemAnimationDisabled.value
+		? { duration: 0 }
+		: { duration: 0.18 },
 )
 
 const shellExitTransition = computed(() =>
-	prefersReducedMotion.value ? { duration: 0 } : { duration: 0.16 },
+	prefersReducedMotion.value || singleItemAnimationDisabled.value
+		? { duration: 0 }
+		: { duration: 0.16 },
 )
 
 function collapsedCardPosition(index: number) {
@@ -219,7 +237,7 @@ function expandedCardPosition(index: number) {
 function cardPosition(index: number) {
 	const position = isExpanded.value ? expandedCardPosition(index) : collapsedCardPosition(index)
 	const item = props.items[index]
-	if (index === 0 && singleItemEntrance.value) {
+	if (index === 0 && singleItemEntrance.value && !singleItemAnimationDisabled.value) {
 		return {
 			...position,
 			opacity: 0,
@@ -242,7 +260,13 @@ function contentOpacity(index: number) {
 // Newly inserted cards need an explicit two-frame enter target because Motion's
 // initial state is disabled to avoid animating from zero-height on first mount.
 function markEntering(ids: string[]) {
-	if (!itemEntrancesEnabled.value || prefersReducedMotion.value || ids.length === 0) return
+	if (
+		!itemEntrancesEnabled.value ||
+		prefersReducedMotion.value ||
+		singleItemAnimationDisabled.value ||
+		ids.length === 0
+	)
+		return
 
 	const next = new Set(enteringItemIds.value)
 	for (const id of ids) next.add(id)
@@ -367,10 +391,11 @@ watch(
 			previousLength === 0 &&
 			n === 1 &&
 			itemEntrancesEnabled.value &&
-			!prefersReducedMotion.value
+			!prefersReducedMotion.value &&
+			props.animateSingleItem
 		) {
 			singleItemEntrance.value = true
-		} else if (n !== 1) {
+		} else if (n !== 1 || !props.animateSingleItem) {
 			singleItemEntrance.value = false
 		}
 
@@ -397,16 +422,19 @@ watch(containerHeight, (height, previousHeight) => {
 			height > 0 &&
 			props.items.length === 1 &&
 			itemEntrancesEnabled.value &&
-			!prefersReducedMotion.value
+			!prefersReducedMotion.value &&
+			props.animateSingleItem
 
 		if (openingSingleItem) {
 			singleItemEntrance.value = true
-		} else if (height === 0 || props.items.length !== 1) {
+		} else if (height === 0 || props.items.length !== 1 || !props.animateSingleItem) {
 			singleItemEntrance.value = false
 		}
 
 		containerHeightSettled.value =
-			prefersReducedMotion.value || (!initialMeasurementSettled.value && !openingSingleItem)
+			prefersReducedMotion.value ||
+			singleItemAnimationDisabled.value ||
+			(!initialMeasurementSettled.value && !openingSingleItem)
 	}
 })
 
@@ -476,7 +504,17 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<AnimatePresence :initial="false">
+	<div v-if="instantSingleItem" v-bind="attrs" class="relative">
+		<slot
+			name="item"
+			:item="instantSingleItem"
+			:index="0"
+			:is-front="true"
+			:expanded="false"
+			:dismissible="itemDismissible(instantSingleItem)"
+		/>
+	</div>
+	<AnimatePresence v-else :initial="false">
 		<Motion
 			v-if="items.length > 0"
 			v-bind="attrs"

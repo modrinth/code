@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div ref="instancesPage" class="flex flex-col gap-4">
 		<div
 			v-if="worldsPending"
 			class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,20.25rem),1fr))] gap-6"
@@ -41,7 +41,8 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import { useElementVisibility } from '@vueuse/core'
+import { computed, onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import {
@@ -49,6 +50,7 @@ import {
 	CreationFlowModal,
 	UploadProgressModal,
 } from '#ui/components'
+import { injectServerPanelAdmonitionsContext } from '#ui/components/servers/admonitions/context'
 import InstanceCard from '#ui/components/servers/instances/InstanceCard.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -117,6 +119,7 @@ const SERVER_LOADERS = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'pape
 
 const client = injectModrinthClient()
 const { serverId, server, isServerRunning } = injectModrinthServerContext()
+const panelAdmonitions = injectServerPanelAdmonitionsContext(null)
 const { openServerInstanceSettings } = injectServerSettingsModal()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -124,6 +127,7 @@ const router = useRouter()
 const route = useRoute()
 const queryClient = useQueryClient()
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
+const instancesPage = useTemplateRef<HTMLElement>('instancesPage')
 const createWorldModalRef =
 	useTemplateRef<InstanceType<typeof CreationFlowModal>>('createWorldModalRef')
 const uploadProgressModal =
@@ -137,6 +141,17 @@ const worldsQuery = useQuery({
 
 const worldsPending = computed(() => worldsQuery.isLoading.value && !worldsQuery.data.value)
 const worldSlots = computed(() => worldsQuery.data.value ?? [])
+const instancesPageVisible = useElementVisibility(instancesPage)
+
+watch(
+	instancesPageVisible,
+	(visible) => {
+		if (panelAdmonitions) {
+			panelAdmonitions.showInstanceInfo.value = visible
+		}
+	},
+	{ immediate: true },
+)
 
 onMounted(() => {
 	if (route.query.resumeModal !== 'create-instance') return
@@ -144,7 +159,12 @@ onMounted(() => {
 	createWorldModalRef.value?.show()
 })
 
-onBeforeUnmount(() => createWorldModalRef.value?.hide())
+onBeforeUnmount(() => {
+	createWorldModalRef.value?.hide()
+	if (panelAdmonitions) {
+		panelAdmonitions.showInstanceInfo.value = false
+	}
+})
 
 async function searchModpacks(query: string, limit: number = 10) {
 	return client.labrinth.projects_v2.search({
