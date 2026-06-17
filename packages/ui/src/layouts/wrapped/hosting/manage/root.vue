@@ -1303,7 +1303,10 @@ async function testNodeReachability(): Promise<boolean> {
 		const auth = await client.archon.servers_v0.getWebSocketAuth(props.serverId)
 		const authUrl = getNodeWebSocketUrl(auth.url)
 		const protocol = authUrl.toLowerCase().startsWith('ws://') ? 'ws' : 'wss'
-		const wsUrl = getNodeWebSocketUrl(`${nodeInstance}/pingtest`).replace(/^wss?:\/\//i, `${protocol}://`)
+		const wsUrl = getNodeWebSocketUrl(`${nodeInstance}/pingtest`).replace(
+			/^wss?:\/\//i,
+			`${protocol}://`,
+		)
 
 		return await new Promise((resolve) => {
 			const socket = new WebSocket(wsUrl)
