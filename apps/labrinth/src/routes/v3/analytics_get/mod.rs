@@ -355,7 +355,7 @@ pub async fn fetch_analytics(
             .await?;
     }
 
-    if req.return_metrics.project_revenue.is_some() {
+    if let Some(metrics) = &req.return_metrics.project_revenue {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
@@ -366,6 +366,9 @@ pub async fn fetch_analytics(
             &req,
             num_time_slices,
             &project_id_values,
+            user.id.into(),
+            user.role.is_admin(),
+            metrics,
         )
         .await?;
     }
@@ -965,6 +968,7 @@ mod tests {
                 TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
                     source_project: test_project_3,
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        user_id: None,
                         revenue: Decimal::new(20000, 2),
                     }),
                 })]),
