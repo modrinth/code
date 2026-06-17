@@ -1,6 +1,5 @@
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
-use sqlx::Row;
 
 use crate::{
     database::{
@@ -59,16 +58,17 @@ pub(crate) async fn fetch(
         .iter()
         .map(|id| DBAffiliateCodeId::from(*id).0)
         .collect::<Vec<_>>();
-    let mut rows = sqlx::query(
-        "SELECT
+    let mut rows = sqlx::query!(
+        r#"
+        SELECT
             WIDTH_BUCKET(
                 EXTRACT(EPOCH FROM usa.created_at)::bigint,
                 EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 $3::integer
-            ) AS bucket,
-            CASE WHEN $5 THEN affiliate_code ELSE 0 END AS affiliate_code,
-            COUNT(*) AS conversions
+            ) AS "bucket?",
+            CASE WHEN $5 THEN affiliate_code ELSE 0 END AS "affiliate_code?",
+            COUNT(*) AS "conversions?"
         FROM users_subscriptions_affiliations usa
         INNER JOIN affiliate_codes ac ON ac.id = usa.affiliate_code
         INNER JOIN users_subscriptions us ON us.id = usa.subscription_id
@@ -79,22 +79,21 @@ pub(crate) async fn fetch(
             AND usa.created_at < $2
             AND c.status = 'succeeded'
             AND (cardinality($6::bigint[]) = 0 OR affiliate_code = ANY($6))
-        GROUP BY bucket, affiliate_code",
-    )
-    .bind(req.time_range.start)
-    .bind(req.time_range.end)
-    .bind(num_time_slices as i64)
-    .bind(user_id as DBUserId)
-    .bind(
+        GROUP BY 1, 2
+        "#,
+        req.time_range.start,
+        req.time_range.end,
+        num_time_slices as i64,
+        user_id as DBUserId,
         metrics
             .bucket_by
             .contains(&AffiliateCodeConversionsField::AffiliateCodeId),
+        &filter_affiliate_code_ids,
     )
-    .bind(&filter_affiliate_code_ids)
     .fetch(pool);
     while let Some(row) = rows.next().await.transpose()? {
         let bucket = row
-            .try_get::<Option<i32>, _>("bucket")?
+            .bucket
             .wrap_internal_err("bucket should be non-null - query bug!")?;
         let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
             eyre::eyre!(
@@ -102,12 +101,10 @@ pub(crate) async fn fetch(
             )
         })?;
 
-        let affiliate_code = row.try_get::<Option<i64>, _>("affiliate_code")?;
-        let conversion_count = row.try_get::<Option<i64>, _>("conversions")?;
         let source_affiliate_code = AffiliateCodeId::from(DBAffiliateCodeId(
-            affiliate_code.unwrap_or_default(),
+            row.affiliate_code.unwrap_or_default(),
         ));
-        let conversions = u64::try_from(conversion_count.unwrap_or_default())
+        let conversions = u64::try_from(row.conversions.unwrap_or_default())
             .unwrap_or(u64::MAX);
 
         add_to_time_slice(
