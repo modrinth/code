@@ -143,6 +143,7 @@ export function cloneAnalyticsSelectedFilters(
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],
+		dependent_project_id: [...filters.dependent_project_id],
 		dependent_project_type: [...filters.dependent_project_type],
 	}
 }
@@ -256,6 +257,7 @@ export function normalizeAnalyticsSelectedFilters(
 		versionId: normalizeAnalyticsFilterValues(filters.version_id),
 		gameVersion: normalizeAnalyticsFilterValues(filters.game_version),
 		loaderType: normalizeAnalyticsFilterValues(filters.loader_type),
+		dependentProjectId: normalizeAnalyticsFilterValues(filters.dependent_project_id),
 		dependentProjectType: normalizeAnalyticsFilterValues(filters.dependent_project_type),
 	}
 }
@@ -326,6 +328,11 @@ export function doesAnalyticsPointMatchNormalizedFilters(
 					dataPoint,
 					filters.loaderType,
 					getLoaderFilterValue,
+				) &&
+				doesAnalyticsPointMatchNormalizedFilter(
+					dataPoint,
+					filters.dependentProjectId,
+					getDependentProjectIdFilterValue,
 				) &&
 				doesAnalyticsDownloadPointMatchDependentProjectTypeFilter(
 					dataPoint,
@@ -427,6 +434,16 @@ function getMonetizationFilterValue(
 	}
 
 	return dataPoint.monetized ? 'monetized' : 'unmonetized'
+}
+
+function getDependentProjectIdFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'downloads') {
+		return undefined
+	}
+
+	return 'dependent_project_id' in dataPoint ? (dataPoint.dependent_project_id ?? null) : undefined
 }
 
 function getDownloadSourceFilterValue(

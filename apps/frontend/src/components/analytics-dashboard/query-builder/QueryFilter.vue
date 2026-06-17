@@ -181,15 +181,20 @@
 <script setup lang="ts">
 import { BoxIcon } from '@modrinth/assets'
 import {
+	buildDependentsSearchFilters,
 	DropdownFilterBar,
 	type DropdownFilterBarCategory,
 	type DropdownFilterBarOption,
+	injectModrinthClient,
+	injectNotificationManager,
+	type ProjectType,
 	Tabs,
 	type TabsTab,
 	type TabsValue,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import {
@@ -259,6 +264,8 @@ const props = withDefaults(
 )
 
 const { formatMessage } = useVIntl()
+const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const {
 	hasProjectContext,
 	projects,
@@ -278,6 +285,7 @@ const {
 	versionPublishedDatesById,
 	versionProjectNamesById,
 	versionProjectIconUrlsById,
+	projectNamesById,
 	getVersionDisplayName,
 } = injectAnalyticsDashboardContext()
 const formattedCountries = useFormattedCountries()
@@ -291,6 +299,17 @@ const gameVersionTypeTabs = computed<TabsTab[]>(() => [
 	{ value: 'release', label: formatMessage(analyticsMessages.releaseTab) },
 	{ value: 'all', label: formatMessage(analyticsMessages.allTab) },
 ])
+const dependentProjectSearchProjectTypes: readonly ProjectType[] = [
+	'mod',
+	'modpack',
+	'resourcepack',
+	'shader',
+	'datapack',
+	'plugin',
+]
+const dependentProjectInitialSearchLimit = 100
+const dependentProjectQuerySearchLimit = 500
+const dependentProjectSearchDebounceMs = 250
 const resolvedAddLabel = computed(
 	() => props.addLabel ?? formatMessage(analyticsMessages.addButton),
 )
@@ -307,14 +326,16 @@ const projectStatusFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	})),
 )
 const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))
-const effectiveSelectedProjectCount = computed(
-	() =>
-		projects.value.filter(
+const effectiveSelectedProjectIds = computed(() =>
+	projects.value
+		.filter(
 			(project) =>
 				selectedProjectIdSet.value.has(project.id) &&
 				doesProjectStatusMatchFilters(project.status, selectedFilters.value),
-		).length,
+		)
+		.map((project) => project.id),
 )
+const effectiveSelectedProjectCount = computed(() => effectiveSelectedProjectIds.value.length)
 const showProjectVersionProjectIcons = computed(() => effectiveSelectedProjectCount.value > 1)
 const defaultSelectedBreakdown = computed(() =>
 	getDefaultAnalyticsBreakdownPresets(selectedProjectIds.value),
@@ -331,12 +352,52 @@ const projectVersionFilterOptions = shallowRef<ProjectVersionFilterOption[]>([])
 const projectVersionFilterOptionProjectMetadataById = shallowRef(
 	new Map<string, ProjectVersionFilterOptionProjectMetadata[]>(),
 )
+const dependentProjectSearchInput = ref('')
+const dependentProjectSearchQuery = ref('')
 const draftSelectedFilters = ref<AnalyticsSelectedFilters>(
 	cloneSelectedFilters(selectedFilters.value),
 )
 let selectedFiltersCommitRequestId = 0
 let projectVersionFilterOptionsCacheKey = ''
 let projectVersionFilterOptionProjectMetadataCacheKey = ''
+let dependentProjectSearchDebounceTimeout: ReturnType<typeof setTimeout> | null = null
+
+const dependentProjectSearchFilters = computed(() =>
+	buildDependentsSearchFilters(
+		dependentProjectSearchProjectTypes,
+		effectiveSelectedProjectIds.value,
+	),
+)
+const dependentProjectSearchQueryValue = computed(() => dependentProjectSearchQuery.value.trim())
+const dependentProjectSearchResultLimit = computed(() =>
+	dependentProjectSearchQueryValue.value.length > 0
+		? dependentProjectQuerySearchLimit
+		: dependentProjectInitialSearchLimit,
+)
+const { data: dependentProjectSearchResults, error: dependentProjectSearchError } = useQuery({
+	queryKey: computed(() => [
+		'analytics',
+		'query-filter',
+		'dependent-project-search',
+		dependentProjectSearchFilters.value,
+		dependentProjectSearchQueryValue.value,
+		dependentProjectSearchResultLimit.value,
+	]),
+	queryFn: () =>
+		client.labrinth.projects_v2.search({
+			query: dependentProjectSearchQueryValue.value || undefined,
+			new_filters: dependentProjectSearchFilters.value,
+			limit: dependentProjectSearchResultLimit.value,
+			index: 'downloads',
+		}),
+	enabled: computed(
+		() =>
+			effectiveSelectedProjectIds.value.length > 0 &&
+			dependentProjectSearchFilters.value.length > 0,
+	),
+	placeholderData: (previousData) => previousData,
+	refetchOnWindowFocus: false,
+})
 
 const selectedFilterValue = computed<Record<string, string[]>>({
 	get: () => getSelectedFilterBarValue(),
@@ -373,6 +434,27 @@ watch(queryResetToken, () => {
 	selectedFiltersCommitRequestId++
 	draftSelectedFilters.value = cloneSelectedFilters(selectedFilters.value)
 	clearDownloadsThresholds()
+})
+
+watch(dependentProjectSearchInput, (query) => {
+	if (dependentProjectSearchDebounceTimeout) {
+		clearTimeout(dependentProjectSearchDebounceTimeout)
+	}
+
+	dependentProjectSearchDebounceTimeout = setTimeout(() => {
+		dependentProjectSearchQuery.value = query.trim()
+		dependentProjectSearchDebounceTimeout = null
+	}, dependentProjectSearchDebounceMs)
+})
+
+watch(dependentProjectSearchError, (error) => {
+	if (!error) return
+
+	addNotification({
+		title: 'Dependent projects failed to load',
+		text: getDependentProjectSearchErrorMessage(error),
+		type: 'error',
+	})
 })
 
 watch(
@@ -475,6 +557,12 @@ watch(
 	},
 	{ immediate: true },
 )
+
+onBeforeUnmount(() => {
+	if (dependentProjectSearchDebounceTimeout) {
+		clearTimeout(dependentProjectSearchDebounceTimeout)
+	}
+})
 
 async function scheduleSelectedFiltersCommit() {
 	const requestId = ++selectedFiltersCommitRequestId
@@ -579,6 +667,19 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 			options: withSelectedOptions('loader_type', loaderTypeFilterOptions.value),
 		},
 		{
+			key: 'dependent_project_id',
+			label: formatMessage(analyticsBreakdownMessages.dependentProjectDownload),
+			searchable: true,
+			disableLocalOptionsFilter: true,
+			searchPlaceholder: formatMessage(analyticsMessages.searchDependentProjectsPlaceholder),
+			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
+			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
+			onSearchQueryChange: setDependentProjectSearchInput,
+			options: withSelectedOptions('dependent_project_id', dependentProjectFilterOptions.value),
+			submenuClass: 'w-fit',
+			previewDropdownWidth: 'fit-content',
+		},
+		{
 			key: 'dependent_project_type',
 			label: formatMessage(analyticsBreakdownMessages.dependentProjectType),
 			options: withSelectedOptions(
@@ -677,6 +778,32 @@ const loaderTypeFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 		.sort((left, right) => left.label.localeCompare(right.label)),
 )
 
+const dependentProjectSearchResultsById = computed(
+	() =>
+		new Map(
+			(dependentProjectSearchResults.value?.hits ?? []).map((project) => [
+				project.project_id,
+				project,
+			]),
+		),
+)
+
+const dependentProjectFilterOptions = computed<DropdownFilterBarOption[]>(() => {
+	const optionsById = new Map<string, DropdownFilterBarOption>()
+
+	for (const project of dependentProjectSearchResults.value?.hits ?? []) {
+		optionsById.set(project.project_id, {
+			value: project.project_id,
+			label: project.title,
+			searchTerms: [project.project_id, project.slug, project.author].filter(
+				(term): term is string => Boolean(term),
+			),
+		})
+	}
+
+	return [...optionsById.values()]
+})
+
 const dependentProjectTypeFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 	filterOptions.value.dependentProjectTypes
 		.map((projectType) => ({
@@ -722,6 +849,9 @@ function getMissingSelectedOptionLabel(
 	if (categoryKey === 'loader_type') {
 		return getLoaderTypeFilterOptionLabel
 	}
+	if (categoryKey === 'dependent_project_id') {
+		return getDependentProjectFilterOptionLabel
+	}
 	if (categoryKey === 'dependent_project_type') {
 		return getProjectTypeFilterOptionLabel
 	}
@@ -757,8 +887,40 @@ function getProjectTypeFilterOptionLabel(projectType: string): string {
 	return formatProjectType(projectType)
 }
 
+function getDependentProjectFilterOptionLabel(projectId: string): string {
+	return (
+		dependentProjectSearchResultsById.value.get(projectId)?.title ??
+		projectNamesById.value.get(projectId) ??
+		projectId
+	)
+}
+
 function getDownloadReasonFilterOptionLabel(reason: string): string {
 	return formatAnalyticsDownloadReasonLabel(reason, formatMessage)
+}
+
+function setDependentProjectSearchInput(query: string) {
+	dependentProjectSearchInput.value = query
+}
+
+function getDependentProjectSearchErrorMessage(error: unknown): string {
+	if (error && typeof error === 'object') {
+		const dataDescription = (error as { data?: { description?: unknown } }).data?.description
+		if (typeof dataDescription === 'string' && dataDescription.length > 0) {
+			return dataDescription
+		}
+
+		const message = (error as { message?: unknown }).message
+		if (typeof message === 'string' && message.length > 0) {
+			return message
+		}
+	}
+
+	if (typeof error === 'string' && error.length > 0) {
+		return error
+	}
+
+	return 'Please try searching again or changing the selected projects.'
 }
 
 function getDateTimestamp(date: string | undefined): number | undefined {

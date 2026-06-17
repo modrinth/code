@@ -14,6 +14,7 @@ export type AnalyticsDashboardDimension =
 	| 'user_agent'
 	| 'download_reason'
 	| 'dependent_project_download'
+	| 'dependent_project_id'
 	| 'dependent_project_type'
 	| 'game_version'
 	| 'loader_type'
@@ -28,6 +29,7 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 	'version_id',
 	'game_version',
 	'loader_type',
+	'dependent_project_id',
 	'dependent_project_type',
 ]
 
@@ -52,6 +54,7 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 	dependent_project_type: ['downloads'],
 	game_version: ['downloads', 'playtime'],
 	loader_type: ['downloads', 'playtime'],
+	dependent_project_id: ['downloads'],
 	project_status: ANALYTICS_DASHBOARD_STAT_ORDER,
 }
 
@@ -83,6 +86,7 @@ const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
 	version_id: 'version_id',
 	game_version: 'game_version',
 	loader_type: 'loader_type',
+	dependent_project_id: 'dependent_project_id',
 	dependent_project_type: 'dependent_project_type',
 }
 
@@ -395,6 +399,7 @@ export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): Analyti
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],
+		dependent_project_id: [...filters.dependent_project_id],
 		dependent_project_type: [...filters.dependent_project_type],
 	}
 }

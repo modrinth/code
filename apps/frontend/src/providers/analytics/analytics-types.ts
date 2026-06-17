@@ -13,6 +13,7 @@ export type AnalyticsQueryFilterCategory =
 	| 'version_id'
 	| 'game_version'
 	| 'loader_type'
+	| 'dependent_project_id'
 	| 'dependent_project_type'
 
 export type AnalyticsTimeframePreset =
@@ -168,6 +169,7 @@ export interface NormalizedAnalyticsSelectedFilters {
 	versionId: ReadonlySet<string>
 	gameVersion: ReadonlySet<string>
 	loaderType: ReadonlySet<string>
+	dependentProjectId: ReadonlySet<string>
 	dependentProjectType: ReadonlySet<string>
 }
 

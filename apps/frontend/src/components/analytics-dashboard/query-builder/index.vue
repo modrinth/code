@@ -1273,6 +1273,12 @@ function buildMetricFilters(
 				filters.game_version,
 			),
 			loader: getFilterValuesForStat('loader_type', 'downloads', enabledStats, filters.loader_type),
+			dependent_project_id: getFilterValuesForStat(
+				'dependent_project_id',
+				'downloads',
+				enabledStats,
+				filters.dependent_project_id,
+			),
 		},
 		playtime: {
 			country: getFilterValuesForStat('country', 'playtime', enabledStats, filters.country),

@@ -137,6 +137,7 @@ const QUERY_KEY_FILTER_DOWNLOAD_REASON = 'a_download_reason'
 const QUERY_KEY_FILTER_VERSION_ID = 'a_version_id'
 const QUERY_KEY_FILTER_GAME_VERSION = 'a_game_version'
 const QUERY_KEY_FILTER_LOADER_TYPE = 'a_loader_type'
+const QUERY_KEY_FILTER_DEPENDENT_PROJECT_ID = 'a_dependent_project_id'
 const QUERY_KEY_FILTER_DEPENDENT_PROJECT_TYPE = 'a_dependent_project_type'
 const QUERY_KEY_STAT = 'a_stat'
 const QUERY_KEY_GRAPH_VIEW_MODE = 'a_chart'
@@ -161,6 +162,7 @@ const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] 
 	'version_id',
 	'game_version',
 	'loader_type',
+	'dependent_project_id',
 	'dependent_project_type',
 ]
 
@@ -176,6 +178,7 @@ const FILTER_QUERY_KEY_BY_CATEGORY: Record<
 	version_id: QUERY_KEY_FILTER_VERSION_ID,
 	game_version: QUERY_KEY_FILTER_GAME_VERSION,
 	loader_type: QUERY_KEY_FILTER_LOADER_TYPE,
+	dependent_project_id: QUERY_KEY_FILTER_DEPENDENT_PROJECT_ID,
 	dependent_project_type: QUERY_KEY_FILTER_DEPENDENT_PROJECT_TYPE,
 }
 
@@ -198,6 +201,7 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_FILTER_VERSION_ID,
 	QUERY_KEY_FILTER_GAME_VERSION,
 	QUERY_KEY_FILTER_LOADER_TYPE,
+	QUERY_KEY_FILTER_DEPENDENT_PROJECT_ID,
 	QUERY_KEY_FILTER_DEPENDENT_PROJECT_TYPE,
 	QUERY_KEY_STAT,
 	QUERY_KEY_GRAPH_VIEW_MODE,
@@ -222,6 +226,7 @@ export function buildEmptySelectedFilters(): AnalyticsSelectedFilters {
 		version_id: [],
 		game_version: [],
 		loader_type: [],
+		dependent_project_id: [],
 		dependent_project_type: [],
 	}
 }

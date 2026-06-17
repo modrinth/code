@@ -175,6 +175,10 @@ export const analyticsMessages = defineMessages({
 		id: 'analytics.filter.search.project-versions',
 		defaultMessage: 'Search project versions...',
 	},
+	searchDependentProjectsPlaceholder: {
+		id: 'analytics.filter.search.dependent-projects',
+		defaultMessage: 'Search projects...',
+	},
 	searchVersionsPlaceholder: {
 		id: 'analytics.filter.search.versions',
 		defaultMessage: 'Search versions...',
