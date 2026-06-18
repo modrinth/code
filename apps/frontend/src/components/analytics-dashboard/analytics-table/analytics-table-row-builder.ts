@@ -41,7 +41,7 @@ type BuildAnalyticsTableRowsOptions = {
 	selectedProjectIds: ReadonlySet<string>
 	selectedFilters: AnalyticsSelectedFilters
 	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>
-	showDependentOnProjectColumn: boolean
+	includeDependentProjectTooltipContext: boolean
 	relevantStats: ReadonlySet<AnalyticsDashboardStat>
 	projectNamesById: ReadonlyMap<string, string>
 	getVersionDisplayName: (versionId: string) => string
@@ -59,7 +59,7 @@ export function buildAnalyticsTableRows({
 	selectedProjectIds,
 	selectedFilters,
 	dependentProjectTypesById,
-	showDependentOnProjectColumn,
+	includeDependentProjectTooltipContext,
 	relevantStats,
 	projectNamesById,
 	getVersionDisplayName,
@@ -119,11 +119,6 @@ export function buildAnalyticsTableRows({
 			projectDisplayValues.set(versionId, displayValue)
 		}
 		return displayValue
-	}
-
-	function getProjectIdForBreakdownValues(breakdownValues: readonly string[]) {
-		const projectBreakdownIndex = selectedBreakdowns.indexOf('project')
-		return projectBreakdownIndex === -1 ? '' : (breakdownValues[projectBreakdownIndex] ?? '')
 	}
 
 	function getProjectVersionIdForBreakdownValues(breakdownValues: readonly string[]) {
@@ -194,7 +189,6 @@ export function buildAnalyticsTableRows({
 			date: bucketLabel?.date ?? '',
 			dateMs: bucketLabel?.dateMs ?? 0,
 			project: getProjectDisplayValueForBreakdownValues(breakdownValues),
-			projectId: getProjectIdForBreakdownValues(breakdownValues),
 			projectVersionId: getProjectVersionIdForBreakdownValues(breakdownValues),
 			dependent_on: dependentOnProjectId
 				? (projectNamesById.get(dependentOnProjectId) ?? dependentOnProjectId)
@@ -266,7 +260,9 @@ export function buildAnalyticsTableRows({
 			}
 
 			const nextBucketLabel = includeDate ? (bucketLabel ?? getBucketLabel(sliceIndex)) : undefined
-			const dependentOnProjectId = showDependentOnProjectColumn ? point.source_project : undefined
+			const dependentOnProjectId = includeDependentProjectTooltipContext
+				? point.source_project
+				: undefined
 			const breakdownKey =
 				breakdownValues.length === 0
 					? ALL_PROJECTS_BREAKDOWN_VALUE

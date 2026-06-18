@@ -7,7 +7,6 @@ import type {
 } from '~/providers/analytics/analytics'
 
 import {
-	analyticsBreakdownMessages,
 	analyticsGroupByMessages,
 	formatAnalyticsBreakdownLabel,
 	formatAnalyticsStatLabel,
@@ -24,8 +23,6 @@ type BuildAnalyticsTableColumnsOptions = {
 	selectedBreakdowns: readonly AnalyticsTableBreakdownPreset[]
 	selectedFilters: AnalyticsSelectedFilters
 	showBreakdownColumn: boolean
-	showDependentOnProjectColumn: boolean
-	showProjectVersionProjectColumn: boolean
 	formatMessage: FormatMessage
 	getRelevantAnalyticsDashboardStats: (
 		breakdowns: readonly AnalyticsBreakdownPreset[],
@@ -45,8 +42,6 @@ export function buildAnalyticsTableColumns({
 	selectedBreakdowns,
 	selectedFilters,
 	showBreakdownColumn,
-	showDependentOnProjectColumn,
-	showProjectVersionProjectColumn,
 	formatMessage,
 	getRelevantAnalyticsDashboardStats,
 }: BuildAnalyticsTableColumnsOptions): TableColumn<AnalyticsTableColumnKey>[] {
@@ -69,27 +64,9 @@ export function buildAnalyticsTableColumns({
 				key: getAnalyticsTableBreakdownColumnKey(breakdown),
 				label: getAnalyticsTableBreakdownColumnLabel(breakdown, formatMessage),
 				enableSorting: true,
-				width: breakdown === 'project' ? '25%' : undefined,
+				// width: breakdown === 'project' ? '25%' : breakdown === 'country' ? '20%' : undefined,
 			})
 		}
-	}
-
-	if (showDependentOnProjectColumn) {
-		nextColumns.push({
-			key: 'dependent_on',
-			label: formatMessage(analyticsBreakdownMessages.dependentOn),
-			enableSorting: true,
-			width: '25%',
-		})
-	}
-
-	if (showProjectVersionProjectColumn) {
-		nextColumns.push({
-			key: 'project',
-			label: formatAnalyticsBreakdownLabel('project', formatMessage),
-			enableSorting: true,
-			width: '25%',
-		})
 	}
 
 	for (const stat of stats) {
@@ -114,6 +91,7 @@ export function getAnalyticsTableMetricColumn(
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',
+				width: '20%',
 			}
 		case 'downloads':
 			return {
@@ -122,6 +100,7 @@ export function getAnalyticsTableMetricColumn(
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',
+				width: '20%',
 			}
 		case 'revenue':
 			return {
@@ -130,6 +109,7 @@ export function getAnalyticsTableMetricColumn(
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',
+				width: '20%',
 			}
 		case 'playtime':
 			return {
@@ -138,6 +118,7 @@ export function getAnalyticsTableMetricColumn(
 				enableSorting: true,
 				defaultSortDirection: 'desc',
 				align: 'right',
+				width: '20%',
 			}
 		default:
 			return null

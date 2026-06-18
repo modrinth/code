@@ -59,52 +59,43 @@
 				<ProjectCell
 					:label="getProjectCellLabel(value)"
 					:icon-url="getProjectIconUrl(row.breakdownValues.project)"
-					:organization-name="getProjectOrganizationName(row.breakdownValues.project)"
+					:icon-tooltip="getProjectCellLabel(value)"
+					:organization-tooltip="getProjectOrganizationName(row.breakdownValues.project)"
 				/>
 			</template>
 			<template #cell-breakdown_country="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_monetization="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_user_agent="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_download_reason="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_dependent_project_download="{ row, value }">
 				<ProjectCell
 					:label="getProjectCellLabel(value)"
 					:icon-url="getProjectIconUrl(row.breakdownValues.dependent_project_download)"
-					:organization-name="
+					:icon-tooltip="getProjectCellLabel(value)"
+					:organization-tooltip="
 						getProjectOrganizationName(row.breakdownValues.dependent_project_download)
 					"
+					:label-tooltip="getDependentProjectTooltip(row)"
 				/>
 			</template>
-			<template #cell-breakdown_version_id="{ value }">
-				<span class="text-primary">{{ value }}</span>
+			<template #cell-breakdown_version_id="{ row, value }">
+				<span v-tooltip="getVersionProjectName(row.projectVersionId)" class="mr-2.5 text-primary">
+					{{ value }}
+				</span>
 			</template>
 			<template #cell-breakdown_loader="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_game_version="{ value }">
-				<span class="text-primary">{{ value }}</span>
-			</template>
-			<template #cell-project="{ row, value }">
-				<ProjectCell
-					:label="getProjectCellLabel(value)"
-					:icon-url="getVersionProjectIconUrl(row.projectVersionId)"
-					:organization-name="getVersionProjectOrganizationName(row.projectVersionId)"
-				/>
-			</template>
-			<template #cell-dependent_on="{ row, value }">
-				<ProjectCell
-					:label="getProjectCellLabel(value)"
-					:icon-url="getProjectIconUrl(row.dependentOnProjectId)"
-					:organization-name="getProjectOrganizationName(row.dependentOnProjectId)"
-				/>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-views="{ row }">
 				<span>{{ formatInteger(row.views) }}</span>
@@ -218,6 +209,7 @@ import { sortAnalyticsTableRows } from './analytics-table-sorting.ts'
 import type {
 	AnalyticsTableColumnKey,
 	AnalyticsTableMode,
+	AnalyticsTableRow,
 	AnalyticsTableSortDirectionValue,
 } from './analytics-table-types.ts'
 import ProjectCell from './ProjectCell.vue'
@@ -253,8 +245,6 @@ const {
 	dependentProjectTypesById,
 	getVersionDisplayName,
 	getVersionProjectName,
-	getVersionProjectIconUrl,
-	getVersionProjectOrganizationName,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
 const { formatMessage } = useVIntl()
@@ -294,17 +284,10 @@ const showGraphDatasetSelection = computed(() =>
 		? selectedProjectIdSet.value.size > 1
 		: selectedBreakdowns.value.length > 0,
 )
-const showProjectVersionProjectColumn = computed(
-	() =>
-		selectedBreakdownSet.value.has('version_id') &&
-		!selectedBreakdownSet.value.has('project') &&
-		selectedProjectIdSet.value.size > 1,
-)
-const showDependentOnProjectColumn = computed(
+const includeDependentProjectTooltipContext = computed(
 	() =>
 		selectedBreakdownSet.value.has('dependent_project_download') &&
-		!selectedBreakdownSet.value.has('project') &&
-		selectedProjectIdSet.value.size > 1,
+		!selectedBreakdownSet.value.has('project'),
 )
 const includeDateColumn = computed(
 	() =>
@@ -396,7 +379,7 @@ function buildTableRows(mode: AnalyticsTableMode) {
 		selectedProjectIds: selectedProjectIdSet.value,
 		selectedFilters: selectedFilters.value,
 		dependentProjectTypesById: dependentProjectTypesById.value,
-		showDependentOnProjectColumn: showDependentOnProjectColumn.value,
+		includeDependentProjectTooltipContext: includeDependentProjectTooltipContext.value,
 		relevantStats: relevantStats.value,
 		projectNamesById: projectNamesById.value,
 		getVersionDisplayName,
@@ -416,8 +399,6 @@ function buildColumns(includeDate: boolean) {
 		selectedBreakdowns: selectedBreakdowns.value,
 		selectedFilters: selectedFilters.value,
 		showBreakdownColumn: showBreakdownColumn.value,
-		showDependentOnProjectColumn: showDependentOnProjectColumn.value,
-		showProjectVersionProjectColumn: showProjectVersionProjectColumn.value,
 		formatMessage,
 		getRelevantAnalyticsDashboardStats,
 	})
@@ -433,6 +414,15 @@ function getProjectOrganizationName(projectId: string | undefined) {
 
 function getProjectCellLabel(value: unknown) {
 	return typeof value === 'string' ? value : String(value ?? '')
+}
+
+function getDependentProjectTooltip(row: AnalyticsTableRow) {
+	const dependencyProjectId = row.breakdownValues.project ?? row.dependentOnProjectId
+	const dependencyProject = dependencyProjectId
+		? (projectNamesById.value.get(dependencyProjectId) ?? dependencyProjectId)
+		: undefined
+
+	return dependencyProject ? `Dependent on ${dependencyProject}` : undefined
 }
 
 watch(
