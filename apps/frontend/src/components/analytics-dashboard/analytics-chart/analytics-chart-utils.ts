@@ -390,9 +390,7 @@ export function buildChartDatasets(
 		!(normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'project')
 	) {
 		const hasVersionBreakdown = normalizedBreakdowns.includes('version_id')
-		const hasDependentProjectBreakdown = normalizedBreakdowns.includes(
-			'dependent_project_download',
-		)
+		const hasDependentProjectBreakdown = normalizedBreakdowns.includes('dependent_project_download')
 		const shouldShowDependentProjectTooltip =
 			hasDependentProjectBreakdown && (selectedProjects.length > 1 || hasVersionBreakdown)
 		const dataByBreakdown = new Map<string, number[]>()
@@ -428,8 +426,7 @@ export function buildChartDatasets(
 					breakdownValuesByKey.set(breakdownKey, breakdownValues)
 				}
 				if (shouldShowDependentProjectTooltip && point.metric_kind === 'downloads') {
-					const projectIds =
-						dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? new Set<string>()
+					const projectIds = dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? new Set<string>()
 					projectIds.add(point.source_project)
 					dependentOnProjectIdsByBreakdown.set(breakdownKey, projectIds)
 				}
@@ -480,9 +477,7 @@ export function buildChartDatasets(
 				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
 					? getVersionProjectName?.(breakdownValues[0] ?? '')
 					: undefined
-			const dependencyProjectNames = [
-				...(dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? []),
-			]
+			const dependencyProjectNames = [...(dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? [])]
 				.map((projectId) => projectNamesById.get(projectId) ?? projectId)
 				.sort((left, right) => left.localeCompare(right))
 			const color =
@@ -504,8 +499,7 @@ export function buildChartDatasets(
 						dependentProjectName,
 						dependencyProjectNames,
 						formatMessage,
-					) ??
-					formatDatasetTooltip(versionProjectName),
+					) ?? formatDatasetTooltip(versionProjectName),
 				data,
 				borderColor: color,
 				backgroundColor: color,

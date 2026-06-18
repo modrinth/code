@@ -3,11 +3,7 @@ import type { TableColumn } from '@modrinth/ui'
 import { isAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
 import type { AnalyticsTableColumnKey, AnalyticsTableRow } from './analytics-table-types'
 
-const SEARCHABLE_COLUMN_KEYS = new Set<AnalyticsTableColumnKey>([
-	'date',
-	'project',
-	'dependent_on',
-])
+const SEARCHABLE_COLUMN_KEYS = new Set<AnalyticsTableColumnKey>(['date', 'project', 'dependent_on'])
 
 export function getAnalyticsTableSearchableColumns(
 	columns: TableColumn<AnalyticsTableColumnKey>[],
