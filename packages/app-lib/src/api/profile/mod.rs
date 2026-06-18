@@ -63,7 +63,9 @@ pub async fn remove(path: &str) -> crate::Result<()> {
 #[tracing::instrument]
 pub async fn get(path: &str) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
-    let profile = Profile::get(path, &state.pool).await?;
+    let profile =
+        crate::state::get_profile_projection_by_path(path, &state.pool)
+            .await?;
 
     Ok(profile)
 }
@@ -71,7 +73,9 @@ pub async fn get(path: &str) -> crate::Result<Option<Profile>> {
 #[tracing::instrument]
 pub async fn get_many(paths: &[&str]) -> crate::Result<Vec<Profile>> {
     let state = State::get().await?;
-    let profiles = Profile::get_many(paths, &state.pool).await?;
+    let profiles =
+        crate::state::get_profile_projections_by_paths(paths, &state.pool)
+            .await?;
     Ok(profiles)
 }
 
@@ -240,7 +244,7 @@ where
 
     if let Some(mut profile) = get(path).await? {
         action(&mut profile).await?;
-        profile.upsert(&state.pool).await?;
+        profile.upsert_with_instance_metadata(&state.pool).await?;
 
         emit_profile(path, ProfilePayloadType::Edited).await?;
 
@@ -274,7 +278,7 @@ pub async fn edit_icon(
             profile.icon_path = None;
         }
 
-        profile.upsert(&state.pool).await?;
+        profile.upsert_with_instance_metadata(&state.pool).await?;
 
         emit_profile(path, ProfilePayloadType::Edited).await?;
 
@@ -336,7 +340,7 @@ pub async fn get_optimal_jre_key(
 #[tracing::instrument]
 pub async fn list() -> crate::Result<Vec<Profile>> {
     let state = State::get().await?;
-    let profiles = Profile::get_all(&state.pool).await?;
+    let profiles = crate::state::list_profile_projections(&state.pool).await?;
     Ok(profiles)
 }
 

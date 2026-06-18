@@ -615,6 +615,16 @@ impl Profile {
         Ok(())
     }
 
+    pub async fn upsert_with_instance_metadata(
+        &self,
+        pool: &SqlitePool,
+    ) -> crate::Result<()> {
+        self.upsert(pool).await?;
+        super::instances::legacy::sync_profile_metadata(self, pool).await?;
+
+        Ok(())
+    }
+
     pub async fn remove(
         profile_path: &str,
         pool: &SqlitePool,
@@ -627,6 +637,12 @@ impl Profile {
             profile_path
         )
         .execute(pool)
+        .await?;
+
+        super::instances::legacy::delete_profile_metadata_by_path(
+            profile_path,
+            pool,
+        )
         .await?;
 
         if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
@@ -698,12 +714,16 @@ impl Profile {
             if profile.install_stage == ProfileInstallStage::MinecraftInstalling
             {
                 profile.install_stage = ProfileInstallStage::PackInstalled;
-                profile.upsert(&state.pool).await?;
+                profile
+                    .upsert_with_instance_metadata(&state.pool)
+                    .await?;
             } else if profile.install_stage
                 == ProfileInstallStage::PackInstalling
             {
                 profile.install_stage = ProfileInstallStage::NotInstalled;
-                profile.upsert(&state.pool).await?;
+                profile
+                    .upsert_with_instance_metadata(&state.pool)
+                    .await?;
             }
 
             if profile.launcher_feature_version
@@ -729,7 +749,7 @@ impl Profile {
                                 tracing::error!("Failed to migrate instance '{}': {}", profile.path, err);
                                 return;
                             }
-                            if let Err(err) = profile.upsert(&state.pool).await {
+                            if let Err(err) = profile.upsert_with_instance_metadata(&state.pool).await {
                                 tracing::error!("Failed to update instance '{}' migration state: {}", profile.path, err);
                                 return;
                             }

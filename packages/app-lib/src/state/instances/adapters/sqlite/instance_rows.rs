@@ -1,15 +1,17 @@
 #![allow(dead_code)]
 
 use crate::state::instances::{
-    Instance, InstanceLaunchOverrides, InstanceLink, InstanceRef,
+    ContentSetStatus, ContentSourceKind, Instance, InstanceLaunchOverrides,
+    InstanceLink, InstanceRef, legacy_default_content_set_id,
+    legacy_instance_id,
 };
 use crate::state::{
-    Hooks, LauncherFeatureVersion, MemorySettings, ProfileInstallStage,
-    ReleaseChannel, WindowSize,
+    Hooks, LauncherFeatureVersion, MemorySettings, Profile,
+    ProfileInstallStage, ReleaseChannel, WindowSize,
 };
 use chrono::{DateTime, TimeZone, Utc};
 use serde::de::DeserializeOwned;
-use sqlx::{Executor, Sqlite};
+use sqlx::{Executor, Sqlite, SqlitePool};
 use uuid::Uuid;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -241,6 +243,21 @@ where
     row.map(TryInto::try_into).transpose()
 }
 
+pub(crate) async fn list_instances(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<Instance>> {
+    let rows = sqlx::query_as::<_, InstanceRow>(
+        "
+		SELECT *
+		FROM instances
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    rows.into_iter().map(TryInto::try_into).collect()
+}
+
 pub(crate) async fn resolve_instance<'e, E>(
     instance: InstanceRef<'_>,
     exec: E,
@@ -343,6 +360,271 @@ where
     row.map(TryInto::try_into).transpose()
 }
 
+pub(crate) async fn upsert_instance_from_profile(
+    profile: &Profile,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let mut tx = pool.begin().await?;
+
+    let instance_id = legacy_instance_id(&profile.path);
+    let content_set_id = legacy_default_content_set_id(&profile.path);
+    let icon_path = profile.icon_path.as_deref();
+    let loader_version = profile.loader_version.as_deref();
+
+    let install_stage = profile.install_stage.as_str();
+    let launcher_feature_version = profile.launcher_feature_version.as_str();
+    let update_channel = profile.preferred_update_channel.key();
+    let created = profile.created.timestamp();
+    let modified = profile.modified.timestamp();
+    let last_played = profile.last_played.map(|value| value.timestamp());
+    let submitted_time_played = profile.submitted_time_played as i64;
+    let recent_time_played = profile.recent_time_played as i64;
+
+    sqlx::query(
+        "
+		INSERT INTO instances (
+			id,
+			path,
+			applied_content_set_id,
+			install_stage,
+			launcher_feature_version,
+			update_channel,
+			name,
+			icon_path,
+			created,
+			modified,
+			last_played,
+			submitted_time_played,
+			recent_time_played
+		)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		ON CONFLICT (id) DO UPDATE SET
+			path = excluded.path,
+			applied_content_set_id = excluded.applied_content_set_id,
+			install_stage = excluded.install_stage,
+			launcher_feature_version = excluded.launcher_feature_version,
+			update_channel = excluded.update_channel,
+			name = excluded.name,
+			icon_path = excluded.icon_path,
+			created = excluded.created,
+			modified = excluded.modified,
+			last_played = excluded.last_played,
+			submitted_time_played = excluded.submitted_time_played,
+			recent_time_played = excluded.recent_time_played
+		",
+    )
+    .bind(&instance_id)
+    .bind(profile.path.as_str())
+    .bind(&content_set_id)
+    .bind(install_stage)
+    .bind(launcher_feature_version)
+    .bind(update_channel)
+    .bind(profile.name.as_str())
+    .bind(icon_path)
+    .bind(created)
+    .bind(modified)
+    .bind(last_played)
+    .bind(submitted_time_played)
+    .bind(recent_time_played)
+    .execute(&mut *tx)
+    .await?;
+
+    let source_kind = profile_content_source_kind(profile).as_str();
+    let content_set_status = ContentSetStatus::Available.as_str();
+    let loader = profile.loader.as_str();
+    let protocol_version = profile.protocol_version.map(|value| value as i64);
+
+    sqlx::query(
+        "
+		INSERT INTO instance_content_sets (
+			id,
+			instance_id,
+			name,
+			source_kind,
+			status,
+			game_version,
+			protocol_version,
+			loader,
+			loader_version,
+			created,
+			modified
+		)
+		VALUES (?, ?, 'Default', ?, ?, ?, ?, ?, ?, ?, ?)
+		ON CONFLICT (id) DO UPDATE SET
+			instance_id = excluded.instance_id,
+			source_kind = excluded.source_kind,
+			status = excluded.status,
+			game_version = excluded.game_version,
+			protocol_version = excluded.protocol_version,
+			loader = excluded.loader,
+			loader_version = excluded.loader_version,
+			modified = excluded.modified
+		",
+    )
+    .bind(&content_set_id)
+    .bind(&instance_id)
+    .bind(source_kind)
+    .bind(content_set_status)
+    .bind(profile.game_version.as_str())
+    .bind(protocol_version)
+    .bind(loader)
+    .bind(loader_version)
+    .bind(created)
+    .bind(modified)
+    .execute(&mut *tx)
+    .await?;
+
+    let (
+        link_kind,
+        modrinth_project_id,
+        modrinth_version_id,
+        server_project_id,
+    ) = profile_link_columns(profile);
+
+    sqlx::query(
+        "
+		INSERT INTO instance_links (
+			instance_id,
+			link_kind,
+			modrinth_project_id,
+			modrinth_version_id,
+			server_project_id,
+			content_project_id,
+			content_version_id,
+			hosting_server_id,
+			hosting_instance_ids,
+			hosting_active_instance_id,
+			shared_instance_id
+		)
+		VALUES (?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL)
+		ON CONFLICT (instance_id) DO UPDATE SET
+			link_kind = excluded.link_kind,
+			modrinth_project_id = excluded.modrinth_project_id,
+			modrinth_version_id = excluded.modrinth_version_id,
+			server_project_id = excluded.server_project_id,
+			content_project_id = excluded.content_project_id,
+			content_version_id = excluded.content_version_id,
+			hosting_server_id = excluded.hosting_server_id,
+			hosting_instance_ids = excluded.hosting_instance_ids,
+			hosting_active_instance_id = excluded.hosting_active_instance_id,
+			shared_instance_id = excluded.shared_instance_id
+		",
+    )
+    .bind(&instance_id)
+    .bind(link_kind)
+    .bind(modrinth_project_id)
+    .bind(modrinth_version_id)
+    .bind(server_project_id)
+    .execute(&mut *tx)
+    .await?;
+
+    sqlx::query(
+        "
+		DELETE FROM instance_groups
+		WHERE instance_id = ?
+		",
+    )
+    .bind(&instance_id)
+    .execute(&mut *tx)
+    .await?;
+
+    for group in &profile.groups {
+        sqlx::query(
+            "
+			INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
+			VALUES (?, ?)
+			",
+        )
+        .bind(&instance_id)
+        .bind(group.as_str())
+        .execute(&mut *tx)
+        .await?;
+    }
+
+    let extra_launch_args = profile
+        .extra_launch_args
+        .as_ref()
+        .map(serde_json::to_string)
+        .transpose()?;
+    let custom_env_vars = profile
+        .custom_env_vars
+        .as_ref()
+        .map(serde_json::to_string)
+        .transpose()?;
+    let memory = profile.memory.map(|value| value.maximum as i64);
+    let force_fullscreen = profile
+        .force_fullscreen
+        .map(|value| if value { 1_i64 } else { 0_i64 });
+    let game_resolution_x =
+        profile.game_resolution.map(|value| value.0 as i64);
+    let game_resolution_y =
+        profile.game_resolution.map(|value| value.1 as i64);
+
+    sqlx::query(
+        "
+		INSERT INTO instance_launch_overrides (
+			instance_id,
+			java_path,
+			extra_launch_args,
+			custom_env_vars,
+			memory,
+			force_fullscreen,
+			game_resolution_x,
+			game_resolution_y,
+			hook_pre_launch,
+			hook_wrapper,
+			hook_post_exit
+		)
+		VALUES (?, ?, jsonb(?), jsonb(?), ?, ?, ?, ?, ?, ?, ?)
+		ON CONFLICT (instance_id) DO UPDATE SET
+			java_path = excluded.java_path,
+			extra_launch_args = excluded.extra_launch_args,
+			custom_env_vars = excluded.custom_env_vars,
+			memory = excluded.memory,
+			force_fullscreen = excluded.force_fullscreen,
+			game_resolution_x = excluded.game_resolution_x,
+			game_resolution_y = excluded.game_resolution_y,
+			hook_pre_launch = excluded.hook_pre_launch,
+			hook_wrapper = excluded.hook_wrapper,
+			hook_post_exit = excluded.hook_post_exit
+		",
+    )
+    .bind(&instance_id)
+    .bind(profile.java_path.as_deref())
+    .bind(extra_launch_args)
+    .bind(custom_env_vars)
+    .bind(memory)
+    .bind(force_fullscreen)
+    .bind(game_resolution_x)
+    .bind(game_resolution_y)
+    .bind(profile.hooks.pre_launch.as_deref())
+    .bind(profile.hooks.wrapper.as_deref())
+    .bind(profile.hooks.post_exit.as_deref())
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    Ok(())
+}
+
+pub(crate) async fn delete_instance_by_path(
+    path: &str,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    sqlx::query(
+        "
+		DELETE FROM instances
+		WHERE path = ?
+		",
+    )
+    .bind(path)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
 fn required(value: Option<String>, column: &str) -> crate::Result<String> {
     value.ok_or_else(|| {
         crate::ErrorKind::InputError(format!(
@@ -416,4 +698,39 @@ fn unsigned(value: i64, column: &str) -> crate::Result<u64> {
     }
 
     Ok(value as u64)
+}
+
+fn profile_content_source_kind(profile: &Profile) -> ContentSourceKind {
+    match &profile.linked_data {
+        Some(linked_data) if linked_data.version_id.is_empty() => {
+            ContentSourceKind::ServerProject
+        }
+        Some(_) => ContentSourceKind::ModrinthModpack,
+        None => ContentSourceKind::Local,
+    }
+}
+
+fn profile_link_columns(
+    profile: &Profile,
+) -> (
+    &'static str,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+) {
+    match &profile.linked_data {
+        Some(linked_data) if linked_data.version_id.is_empty() => (
+            "server_project",
+            None,
+            None,
+            Some(linked_data.project_id.clone()),
+        ),
+        Some(linked_data) => (
+            "modrinth_modpack",
+            Some(linked_data.project_id.clone()),
+            Some(linked_data.version_id.clone()),
+            None,
+        ),
+        None => ("unmanaged", None, None, None),
+    }
 }

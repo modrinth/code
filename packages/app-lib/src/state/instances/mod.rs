@@ -10,4 +10,4 @@ pub use self::model::*;
 mod adapters;
 mod commands;
 mod domain;
-mod legacy;
+pub(crate) mod legacy;

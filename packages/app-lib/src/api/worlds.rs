@@ -195,7 +195,8 @@ pub async fn get_recent_worlds(
     let state = State::get().await?;
     let profiles_dir = state.directories.profiles_dir();
 
-    let mut profiles = Profile::get_all(&state.pool).await?;
+    let mut profiles = crate::state::list_profile_projections(&state.pool)
+        .await?;
     profiles.sort_by_key(|x| Reverse(x.last_played));
 
     let mut result = Vec::with_capacity(limit);
@@ -921,7 +922,7 @@ pub async fn get_profile_protocol_version(
     let version = launcher::read_protocol_version_from_jar(client_path).await?;
     if version.is_some() {
         profile.protocol_version = version;
-        profile.upsert(&state.pool).await?;
+        profile.upsert_with_instance_metadata(&state.pool).await?;
     }
     Ok(version.map(ProtocolVersion::modern))
 }
