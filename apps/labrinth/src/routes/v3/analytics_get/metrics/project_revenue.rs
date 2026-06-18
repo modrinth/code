@@ -27,8 +27,10 @@ pub enum ProjectRevenueField {
     ProjectId,
     /// User ID.
     ///
-    /// If you bucket revenue by this field, the user ID is only exposed for
-    /// projects you are a member of, unless you are a moderator or admin.
+    /// You can only bucket by user if you are a member on the project.
+    /// If you are a member of the parent organization (and have view analytics
+    /// permissions), but not a member of the project, you cannot bucket by
+    /// user.
     UserId,
 }
 
