@@ -57,6 +57,7 @@ pub struct Profile {
     pub force_fullscreen: Option<bool>,
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
+    pub auto_update_modpack: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
@@ -315,6 +316,7 @@ struct ProfileQueryResult {
     override_hook_post_exit: Option<String>,
     protocol_version: Option<i64>,
     launcher_feature_version: String,
+    auto_update_modpack: Option<i64>,
 }
 
 impl TryFrom<ProfileQueryResult> for Profile {
@@ -387,6 +389,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
                 wrapper: x.override_hook_wrapper,
                 post_exit: x.override_hook_post_exit,
             },
+            auto_update_modpack: x.auto_update_modpack.map(|x| x == 1),
         })
     }
 }
@@ -406,7 +409,8 @@ macro_rules! select_profiles_with_predicate {
                 override_java_path,
                 json(override_extra_launch_args) as "override_extra_launch_args!: serde_json::Value", json(override_custom_env_vars) as "override_custom_env_vars!: serde_json::Value",
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
-                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
+                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
+                auto_update_modpack
             FROM profiles
             "#
                 + $predicate,
@@ -527,7 +531,8 @@ impl Profile {
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
                 override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
-                protocol_version, launcher_feature_version
+                protocol_version, launcher_feature_version,
+                auto_update_modpack
             )
             VALUES (
                 $1, $2, $3, $4,
@@ -539,7 +544,8 @@ impl Profile {
                 $18, jsonb($19), jsonb($20),
                 $21, $22, $23, $24,
                 $25, $26, $27,
-                $28, $29
+                $28, $29,
+                $30
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -577,7 +583,8 @@ impl Profile {
                 override_hook_post_exit = $27,
 
                 protocol_version = $28,
-                launcher_feature_version = $29
+                launcher_feature_version = $29,
+                auto_update_modpack = $30
             ",
             self.path,
             install_stage,
@@ -607,7 +614,8 @@ impl Profile {
             self.hooks.wrapper,
             self.hooks.post_exit,
             self.protocol_version,
-            launcher_feature_version
+            launcher_feature_version,
+            self.auto_update_modpack
         )
             .execute(exec)
             .await?;

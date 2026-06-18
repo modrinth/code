@@ -31,6 +31,7 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+	auto_update_modpack?: boolean
 }
 
 type InstallStage =

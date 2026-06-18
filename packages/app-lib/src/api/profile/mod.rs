@@ -819,6 +819,37 @@ async fn run_credentials(
         ))
     })?;
 
+    // Auto-update modpack if enabled and an update is available
+    if profile.auto_update_modpack == Some(true)
+        && profile.linked_data.is_some()
+        && let Ok(Some(info)) = crate::state::get_linked_modpack_info(
+            &profile,
+            None,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await
+        && info.has_update
+        && let Some(update_version_id) = &info.update_version_id
+    {
+        tracing::info!(
+            "Auto-updating modpack '{}' to version {}",
+            profile.name,
+            update_version_id,
+        );
+        if let Err(e) = update::update_managed_modrinth_version(
+            &profile.path,
+            update_version_id,
+        )
+        .await
+        {
+            tracing::warn!(
+                "Auto-update of modpack '{}' failed: {e}",
+                profile.name,
+            );
+        }
+    }
+
     let pre_launch_hooks = profile
         .hooks
         .pre_launch
@@ -1175,6 +1206,117 @@ pub async fn add_all_recursive_folder_paths(
             path_list.push(path);
         }
     }
+    Ok(())
+}
+
+/// Check for a modpack update for a single profile and apply it if auto-update is enabled.
+/// Returns `true` if an update was applied.
+#[tracing::instrument]
+pub async fn auto_update_modpack_if_needed(path: &str) -> crate::Result<bool> {
+    let state = State::get().await?;
+
+    let Some(profile) = get(path).await? else {
+        return Ok(false);
+    };
+
+    if profile.auto_update_modpack != Some(true)
+        || profile.linked_data.is_none()
+    {
+        return Ok(false);
+    }
+
+    let Some(info) = crate::state::get_linked_modpack_info(
+        &profile,
+        None,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    else {
+        return Ok(false);
+    };
+
+    if info.has_update
+        && let Some(update_version_id) = &info.update_version_id
+    {
+        tracing::info!(
+            "Auto-updating modpack '{}' to version {}",
+            profile.name,
+            update_version_id,
+        );
+        update::update_managed_modrinth_version(
+            &profile.path,
+            update_version_id,
+        )
+        .await?;
+        return Ok(true);
+    }
+
+    Ok(false)
+}
+
+/// Check all profiles for modpack updates and apply them automatically
+/// where `auto_update_modpack` is enabled.
+#[tracing::instrument]
+pub async fn auto_update_all_modpacks() -> crate::Result<()> {
+    let state = State::get().await?;
+    let profiles = Profile::get_all(&state.pool).await?;
+
+    for profile in &profiles {
+        if profile.auto_update_modpack != Some(true)
+            || profile.linked_data.is_none()
+        {
+            continue;
+        }
+
+        // Skip if the profile is currently running
+        let is_running = state
+            .process_manager
+            .get_all()
+            .iter()
+            .any(|p| p.profile_path == profile.path);
+
+        if is_running {
+            tracing::debug!(
+                "Skipping auto-update for '{}' — profile is running",
+                profile.name,
+            );
+            continue;
+        }
+
+        let Ok(Some(info)) = crate::state::get_linked_modpack_info(
+            profile,
+            None,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await
+        else {
+            continue;
+        };
+
+        if info.has_update
+            && let Some(update_version_id) = &info.update_version_id
+        {
+            tracing::info!(
+                "Background auto-updating modpack '{}' to version {}",
+                profile.name,
+                update_version_id,
+            );
+            if let Err(e) = update::update_managed_modrinth_version(
+                &profile.path,
+                update_version_id,
+            )
+            .await
+            {
+                tracing::warn!(
+                    "Background auto-update of modpack '{}' failed: {e}",
+                    profile.name,
+                );
+            }
+        }
+    }
+
     Ok(())
 }
 

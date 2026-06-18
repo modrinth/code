@@ -43,6 +43,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_edit_icon,
             profile_export_mrpack,
             profile_get_pack_export_candidates,
+            profile_auto_update_all_modpacks,
         ])
         .build()
 }
@@ -432,6 +433,20 @@ pub struct EditProfile {
     )]
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
+
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub auto_update_modpack: Option<Option<bool>>,
+}
+
+// Auto-update all modpacks with auto_update_modpack enabled
+// invoke('plugin:profile|profile_auto_update_all_modpacks')
+#[tauri::command]
+pub async fn profile_auto_update_all_modpacks() -> Result<()> {
+    Ok(profile::auto_update_all_modpacks().await?)
 }
 
 // Edits a profile
@@ -479,6 +494,9 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
         }
         if let Some(hooks) = edit_profile.hooks.clone() {
             prof.hooks = hooks;
+        }
+        if let Some(auto_update_modpack) = edit_profile.auto_update_modpack {
+            prof.auto_update_modpack = auto_update_modpack;
         }
 
         prof.modified = chrono::Utc::now();
