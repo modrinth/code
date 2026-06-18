@@ -547,6 +547,7 @@ pub async fn add_project_from_path(
         bytes::Bytes::from(file),
         None,
         project_type,
+        None,
         &state.io_semaphore,
         &state.pool,
     )
@@ -666,7 +667,7 @@ pub async fn export_mrpack(
         }
 
         // File is not in the config file, add it to the .mrpack zip
-        if path.is_file() {
+        if path.is_file() && is_path_exportable(&relative_path) {
             let mut file = File::open(&path)
                 .await
                 .map_err(|e| IOError::with_path(e, &path))?;
@@ -693,6 +694,30 @@ pub async fn export_mrpack(
     writer.close().await?;
 
     Ok(())
+}
+
+fn is_path_exportable(relative_path: &SafeRelativeUtf8UnixPathBuf) -> bool {
+    if relative_path.ends_with(".DS_Store") {
+        return false;
+    }
+
+    if relative_path.starts_with("mods/.connector/")
+        || relative_path.starts_with(".sable/natives/")
+        || relative_path.starts_with("local/crash_assistant/")
+        || relative_path.starts_with("mods/mcef-libraries/")
+        || relative_path.starts_with("mods/mcef-cache/")
+        || relative_path.starts_with("config/super_resolution/libraries/")
+        || relative_path.starts_with("config/Veinminer/update/")
+        || relative_path.starts_with("config/epicfight/native/")
+        || relative_path.starts_with("essential/")
+        || relative_path.starts_with(".mixin.out/")
+        || relative_path.starts_with(".fabric/")
+        || relative_path.starts_with("__MACOSX/")
+    {
+        return false;
+    }
+
+    true
 }
 
 // Given a folder path, populate a Vec of all the subfolders and files, at most 2 layers deep
@@ -726,14 +751,20 @@ pub async fn get_pack_export_candidates(
                 .await
                 .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
-                path_list.push(pack_get_relative_path(
-                    &profile_base_dir,
-                    &entry.path(),
-                )?);
+                let relative =
+                    pack_get_relative_path(&profile_base_dir, &entry.path())?;
+                if !is_path_exportable(&relative) {
+                    continue;
+                }
+                path_list.push(relative);
             }
         } else {
             // One layer of files/folders if its a file
-            path_list.push(pack_get_relative_path(&profile_base_dir, &path)?);
+            let relative = pack_get_relative_path(&profile_base_dir, &path)?;
+            if !is_path_exportable(&relative) {
+                continue;
+            }
+            path_list.push(relative);
         }
     }
     Ok(path_list)

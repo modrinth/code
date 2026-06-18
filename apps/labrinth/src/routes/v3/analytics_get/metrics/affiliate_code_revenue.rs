@@ -1,7 +1,6 @@
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::Row;
 
 use crate::{
     database::{
@@ -57,16 +56,17 @@ pub(crate) async fn fetch(
         .iter()
         .map(|id| DBAffiliateCodeId::from(*id).0)
         .collect::<Vec<_>>();
-    let mut rows = sqlx::query(
-        "SELECT
+    let mut rows = sqlx::query!(
+        r#"
+        SELECT
             WIDTH_BUCKET(
                 EXTRACT(EPOCH FROM created)::bigint,
                 EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 $3::integer
-            ) AS bucket,
-            CASE WHEN $5 THEN affiliate_code_source ELSE 0 END AS affiliate_code_source,
-            SUM(amount) amount_sum
+            ) AS "bucket?",
+            CASE WHEN $5 THEN affiliate_code_source ELSE 0 END AS "affiliate_code_source?",
+            SUM(amount) AS "amount_sum?"
         FROM payouts_values
         WHERE
             user_id = $4
@@ -74,22 +74,21 @@ pub(crate) async fn fetch(
             AND created >= $1
             AND created < $2
             AND (cardinality($6::bigint[]) = 0 OR affiliate_code_source = ANY($6))
-        GROUP BY bucket, affiliate_code_source",
-    )
-    .bind(req.time_range.start)
-    .bind(req.time_range.end)
-    .bind(num_time_slices as i64)
-    .bind(user_id as DBUserId)
-    .bind(
+        GROUP BY 1, 2
+        "#,
+        req.time_range.start,
+        req.time_range.end,
+        num_time_slices as i64,
+        user_id as DBUserId,
         metrics
             .bucket_by
             .contains(&AffiliateCodeRevenueField::AffiliateCodeId),
+        &filter_affiliate_code_ids,
     )
-    .bind(&filter_affiliate_code_ids)
     .fetch(pool);
     while let Some(row) = rows.next().await.transpose()? {
         let bucket = row
-            .try_get::<Option<i32>, _>("bucket")?
+            .bucket
             .wrap_internal_err("bucket should be non-null - query bug!")?;
         let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
             eyre::eyre!(
@@ -97,14 +96,10 @@ pub(crate) async fn fetch(
             )
         })?;
 
-        let affiliate_code_source =
-            row.try_get::<Option<i64>, _>("affiliate_code_source")?;
         let source_affiliate_code = AffiliateCodeId::from(DBAffiliateCodeId(
-            affiliate_code_source.unwrap_or_default(),
+            row.affiliate_code_source.unwrap_or_default(),
         ));
-        let revenue = row
-            .try_get::<Option<Decimal>, _>("amount_sum")?
-            .unwrap_or_default();
+        let revenue = row.amount_sum.unwrap_or_default();
 
         add_to_time_slice(
             time_slices,

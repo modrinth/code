@@ -732,9 +732,9 @@ pub async fn organization_delete(
     // Handle projects- every project that is in this organization needs to have its owner changed the organization owner
     // Now, no project should have an owner if it is in an organization, and also
     // the owner of an organization should not be a team member in any project
-    let organization_project_teams = sqlx::query!(
+    let organization_projects = sqlx::query!(
         "
-        SELECT t.id FROM organizations o
+        SELECT t.id team_id, m.id project_id FROM organizations o
         INNER JOIN mods m ON m.organization_id = o.id
         INNER JOIN teams t ON t.id = m.team_id
         WHERE o.id = $1 AND $1 IS NOT NULL
@@ -742,9 +742,22 @@ pub async fn organization_delete(
         organization.id as database::models::ids::DBOrganizationId
     )
     .fetch(&mut transaction)
-    .map_ok(|c| database::models::DBTeamId(c.id))
+    .map_ok(|c| {
+        (
+            database::models::DBTeamId(c.team_id),
+            database::models::DBProjectId(c.project_id),
+        )
+    })
     .try_collect::<Vec<_>>()
     .await?;
+    let organization_project_teams = organization_projects
+        .iter()
+        .map(|(team_id, _)| *team_id)
+        .collect::<Vec<_>>();
+    let organization_project_ids = organization_projects
+        .iter()
+        .map(|(_, project_id)| *project_id)
+        .collect::<Vec<_>>();
 
     for organization_project_team in &organization_project_teams {
         let new_id = crate::database::models::ids::generate_team_member_id(
@@ -784,6 +797,13 @@ pub async fn organization_delete(
 
     for team_id in &organization_project_teams {
         database::models::DBTeamMember::clear_cache(*team_id, &redis).await?;
+    }
+
+    for project_id in organization_project_ids {
+        database::models::DBProject::clear_cache(
+            project_id, None, None, &redis,
+        )
+        .await?;
     }
 
     if !organization_project_teams.is_empty() {

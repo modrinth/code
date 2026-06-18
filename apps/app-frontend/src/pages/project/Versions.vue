@@ -5,7 +5,7 @@
 			:game-versions="gameVersions"
 			:versions="versions"
 			:project="project"
-			:version-link="(version) => `/project/${project.id}/version/${version.id}`"
+			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
@@ -73,6 +73,7 @@ import {
 	ProjectPageVersions,
 } from '@modrinth/ui'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
@@ -109,6 +110,20 @@ defineProps({
 })
 
 const { handleError } = injectNotificationManager()
+const route = useRoute()
+
+function buildProjectHref(path) {
+	const params = new URLSearchParams()
+	for (const [key, val] of Object.entries(route.query)) {
+		if (Array.isArray(val)) {
+			for (const v of val) params.append(key, v)
+		} else if (val) {
+			params.append(key, String(val))
+		}
+	}
+	const qs = params.toString()
+	return qs ? `${path}?${qs}` : path
+}
 
 const [loaders, gameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),
