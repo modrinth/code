@@ -9,6 +9,7 @@ import {
 	injectNotificationManager,
 	OverflowMenu,
 	StyledInput,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -42,6 +43,21 @@ const savingReleaseChannel = ref(false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.preferred_update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 	savingReleaseChannel.value ? [...releaseChannelOptions] : [],
+)
+
+const autoUpdateModpack = ref(instance.value.auto_update_modpack ?? false)
+
+const hasLinkedModpack = computed(() => !!instance.value.linked_data)
+
+watch(autoUpdateModpack, async (value) => {
+	await edit(instance.value.path, { auto_update_modpack: value }).catch(handleError)
+})
+
+watch(
+	() => instance.value.auto_update_modpack,
+	(val) => {
+		autoUpdateModpack.value = val ?? false
+	},
 )
 
 const newCategoryInput = ref('')
@@ -263,6 +279,15 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.general.update-channel.select',
 		defaultMessage: 'Select update channel',
 	},
+	autoUpdateModpack: {
+		id: 'instance.settings.tabs.general.auto-update-modpack',
+		defaultMessage: 'Auto-update modpack',
+	},
+	autoUpdateModpackDescription: {
+		id: 'instance.settings.tabs.general.auto-update-modpack.description',
+		defaultMessage:
+			'Automatically update this modpack to the latest version. Updates are checked before launching and periodically in the background.',
+	},
 	deleteInstance: {
 		id: 'instance.settings.tabs.general.delete',
 		defaultMessage: 'Delete instance',
@@ -407,6 +432,18 @@ const messages = defineMessages({
 			<p class="m-0">
 				{{ formatReleaseChannelDescription(selectedReleaseChannel) }}
 			</p>
+		</div>
+
+		<div v-if="hasLinkedModpack" class="flex items-center justify-between gap-4 mt-6">
+			<div>
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.autoUpdateModpack) }}
+				</h2>
+				<p class="m-0 mt-1 text-sm">
+					{{ formatMessage(messages.autoUpdateModpackDescription) }}
+				</p>
+			</div>
+			<Toggle id="auto-update-modpack" v-model="autoUpdateModpack" />
 		</div>
 
 		<div class="flex flex-col gap-2.5 mt-6">

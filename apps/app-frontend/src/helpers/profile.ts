@@ -242,6 +242,11 @@ export async function update_managed_modrinth_version(
 	})
 }
 
+// Auto-update all modpacks with auto_update_modpack enabled
+export async function auto_update_all_modpacks(): Promise<void> {
+	return await invoke('plugin:profile|profile_auto_update_all_modpacks')
+}
+
 // Repair a managed Modrinth profile
 export async function update_repair_modrinth(path: string): Promise<void> {
 	return await invoke('plugin:profile|profile_repair_managed_modrinth', { path })

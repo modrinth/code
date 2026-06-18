@@ -665,6 +665,12 @@
   "instance.settings.tabs.general": {
     "message": "General"
   },
+  "instance.settings.tabs.general.auto-update-modpack": {
+    "message": "Auto-update modpack"
+  },
+  "instance.settings.tabs.general.auto-update-modpack.description": {
+    "message": "Automatically update this modpack to the latest version. Updates are checked before launching and periodically in the background."
+  },
   "instance.settings.tabs.general.delete": {
     "message": "Delete instance"
   },

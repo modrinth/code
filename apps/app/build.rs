@@ -196,6 +196,7 @@ fn main() {
                         "profile_edit_icon",
                         "profile_export_mrpack",
                         "profile_get_pack_export_candidates",
+                        "profile_auto_update_all_modpacks",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
