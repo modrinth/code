@@ -1,1 +1,2 @@
-//! TODO: folder used to migrate profiles to v2
+mod profile_projection;
+pub(crate) use self::profile_projection::*;

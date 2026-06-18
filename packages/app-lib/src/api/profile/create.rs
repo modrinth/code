@@ -143,7 +143,7 @@ pub async fn profile_create(
         )
         .await;
 
-        profile.upsert(&state.pool).await?;
+        profile.upsert_with_instance_metadata(&state.pool).await?;
 
         emit_profile(&profile.path, ProfilePayloadType::Created).await?;
 

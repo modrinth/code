@@ -16,6 +16,10 @@ pub use self::profiles::*;
 
 mod instances;
 pub use self::instances::*;
+pub(crate) use self::instances::legacy::{
+    get_profile_projection_by_path, get_profile_projections_by_paths,
+    list_profile_projections,
+};
 
 mod settings;
 pub use self::settings::*;

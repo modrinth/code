@@ -19,3 +19,11 @@ pub enum InstanceRef<'a> {
     Id(&'a str),
     Path(&'a str),
 }
+
+pub(crate) fn legacy_instance_id(path: &str) -> String {
+    format!("legacy:{path}")
+}
+
+pub(crate) fn legacy_default_content_set_id(path: &str) -> String {
+    format!("{}:default", legacy_instance_id(path))
+}
