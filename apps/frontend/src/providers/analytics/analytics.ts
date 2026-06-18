@@ -804,6 +804,7 @@ export function createAnalyticsDashboardContext(
 		},
 		availableProjectIds,
 		defaultProjectIds,
+		areProjectsLoaded,
 		sanitizeSelectedFilters: sanitizeAnalyticsSelectedFiltersForContext,
 	})
 
@@ -992,6 +993,7 @@ export function createAnalyticsDashboardContext(
 			selectedFilters,
 			availableProjectIds,
 			defaultProjectIds,
+			areProjectsLoaded,
 		],
 		() => {
 			syncQueryBuilderRouteQuery()
