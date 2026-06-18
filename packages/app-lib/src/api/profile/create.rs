@@ -102,6 +102,7 @@ pub async fn profile_create(
             wrapper: None,
             post_exit: None,
         },
+        auto_update_modpack: None,
     };
 
     let result = async {

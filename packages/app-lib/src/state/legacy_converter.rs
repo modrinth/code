@@ -376,6 +376,7 @@ where
                             .and_then(|x| x.wrapper.clone()),
                         post_exit: profile.hooks.and_then(|x| x.post_exit),
                     },
+                    auto_update_modpack: None,
                 }
                 .upsert(exec)
                 .await?;

@@ -226,6 +226,19 @@ fn main() {
                 tracing::warn!("Failed to set window shadow: {e}");
             }
 
+            // Background task: auto-update modpacks every 60 minutes
+            tauri::async_runtime::spawn(async move {
+                // Wait for state to initialize before first check
+                tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                loop {
+                    tracing::debug!("Running background modpack auto-update check");
+                    if let Err(e) = theseus::profile::auto_update_all_modpacks().await {
+                        tracing::warn!("Background modpack auto-update failed: {e}");
+                    }
+                    tokio::time::sleep(std::time::Duration::from_secs(3600)).await;
+                }
+            });
+
             Ok(())
         });
 
