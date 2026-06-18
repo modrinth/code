@@ -119,6 +119,7 @@ export function sanitizeAnalyticsSelectedFiltersForAvailableOptions(
 			filters.download_reason,
 			filterOptions.downloadReasons,
 		),
+		user_id: retainAvailableSelectedFilterValues(filters.user_id, filterOptions.userIds),
 		game_version: retainAvailableSelectedFilterValues(
 			filters.game_version,
 			filterOptions.gameVersions,
@@ -140,6 +141,7 @@ export function cloneAnalyticsSelectedFilters(
 		monetization: [...filters.monetization],
 		user_agent: [...filters.user_agent],
 		download_reason: [...filters.download_reason],
+		user_id: [...filters.user_id],
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],
@@ -155,6 +157,7 @@ export function cloneAnalyticsFilterOptions(
 		countries: [...filterOptions.countries],
 		downloadSources: [...filterOptions.downloadSources],
 		downloadReasons: [...filterOptions.downloadReasons],
+		userIds: [...filterOptions.userIds],
 		gameVersions: [...filterOptions.gameVersions],
 		loaderTypes: [...filterOptions.loaderTypes],
 		dependentProjectTypes: [...filterOptions.dependentProjectTypes],
@@ -167,6 +170,7 @@ function getEmptyAnalyticsFacetsFilterOptionSummary(): AnalyticsFacetsFilterOpti
 		countries: [],
 		downloadSources: [],
 		downloadReasons: [],
+		userIds: [],
 		gameVersions: [],
 		loaderTypes: [],
 		dependentProjectTypes: [],
@@ -219,6 +223,7 @@ export function getAnalyticsFacetsFilterOptionSummary(
 		),
 		downloadSources: sortStringValues(getAnalyticsFacetValues(projectDownloadFacets?.user_agent)),
 		downloadReasons: sortStringValues(getAnalyticsFacetValues(projectDownloadFacets?.reason)),
+		userIds: [],
 		gameVersions: sortStringValues(
 			[...gameVersions]
 				.map((gameVersion) => gameVersion.trim())
@@ -254,6 +259,7 @@ export function normalizeAnalyticsSelectedFilters(
 		monetization: normalizeAnalyticsFilterValues(filters.monetization),
 		userAgent: normalizeAnalyticsFilterValues(filters.user_agent),
 		downloadReason: normalizeAnalyticsFilterValues(filters.download_reason),
+		userId: normalizeAnalyticsFilterValues(filters.user_id),
 		versionId: normalizeAnalyticsFilterValues(filters.version_id),
 		gameVersion: normalizeAnalyticsFilterValues(filters.game_version),
 		loaderType: normalizeAnalyticsFilterValues(filters.loader_type),
@@ -360,7 +366,11 @@ export function doesAnalyticsPointMatchNormalizedFilters(
 				doesAnalyticsPointMatchNormalizedFilter(dataPoint, filters.loaderType, getLoaderFilterValue)
 			)
 		case 'revenue':
-			return true
+			return doesAnalyticsPointMatchNormalizedFilter(
+				dataPoint,
+				filters.userId,
+				getUserIdFilterValue,
+			)
 		default:
 			return true
 	}
@@ -464,6 +474,16 @@ function getDownloadReasonFilterValue(
 	}
 
 	return dataPoint.reason ?? null
+}
+
+function getUserIdFilterValue(
+	dataPoint: Labrinth.Analytics.v3.ProjectAnalytics,
+): string | null | undefined {
+	if (dataPoint.metric_kind !== 'revenue') {
+		return undefined
+	}
+
+	return dataPoint.user_id ?? null
 }
 
 function getVersionFilterValue(

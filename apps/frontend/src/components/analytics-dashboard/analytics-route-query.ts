@@ -73,6 +73,7 @@ const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'monetization',
 	'user_agent',
 	'download_reason',
+	'user_id',
 	'version_id',
 	'loader',
 	'game_version',
@@ -97,6 +98,7 @@ const ANALYTICS_TABLE_SORT_COLUMN_VALUES: AnalyticsTableSortColumn[] = [
 	'breakdown_monetization',
 	'breakdown_user_agent',
 	'breakdown_download_reason',
+	'breakdown_user_id',
 	'breakdown_version_id',
 	'breakdown_loader',
 	'breakdown_game_version',
@@ -134,6 +136,7 @@ const QUERY_KEY_FILTER_MONETIZATION = 'a_monetization'
 const QUERY_KEY_FILTER_USER_AGENT = 'a_user_agent'
 const QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE = 'a_download_source'
 const QUERY_KEY_FILTER_DOWNLOAD_REASON = 'a_download_reason'
+const QUERY_KEY_FILTER_USER_ID = 'a_user_id'
 const QUERY_KEY_FILTER_VERSION_ID = 'a_version_id'
 const QUERY_KEY_FILTER_GAME_VERSION = 'a_game_version'
 const QUERY_KEY_FILTER_LOADER_TYPE = 'a_loader_type'
@@ -159,6 +162,7 @@ const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] 
 	'monetization',
 	'user_agent',
 	'download_reason',
+	'user_id',
 	'version_id',
 	'game_version',
 	'loader_type',
@@ -175,6 +179,7 @@ const FILTER_QUERY_KEY_BY_CATEGORY: Record<
 	monetization: QUERY_KEY_FILTER_MONETIZATION,
 	user_agent: QUERY_KEY_FILTER_USER_AGENT,
 	download_reason: QUERY_KEY_FILTER_DOWNLOAD_REASON,
+	user_id: QUERY_KEY_FILTER_USER_ID,
 	version_id: QUERY_KEY_FILTER_VERSION_ID,
 	game_version: QUERY_KEY_FILTER_GAME_VERSION,
 	loader_type: QUERY_KEY_FILTER_LOADER_TYPE,
@@ -198,6 +203,7 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_FILTER_USER_AGENT,
 	QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE,
 	QUERY_KEY_FILTER_DOWNLOAD_REASON,
+	QUERY_KEY_FILTER_USER_ID,
 	QUERY_KEY_FILTER_VERSION_ID,
 	QUERY_KEY_FILTER_GAME_VERSION,
 	QUERY_KEY_FILTER_LOADER_TYPE,
@@ -223,6 +229,7 @@ export function buildEmptySelectedFilters(): AnalyticsSelectedFilters {
 		monetization: [],
 		user_agent: [],
 		download_reason: [],
+		user_id: [],
 		version_id: [],
 		game_version: [],
 		loader_type: [],
@@ -790,7 +797,9 @@ export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean
 }
 
 export function hasAnalyticsAllProjectSelectionQuery(query: LocationQuery): boolean {
-	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).includes(PROJECT_SELECTION_ALL_QUERY_VALUE)
+	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).includes(
+		PROJECT_SELECTION_ALL_QUERY_VALUE,
+	)
 }
 
 export function hasAnalyticsGraphProjectEventsVisibilityQuery(query: LocationQuery): boolean {

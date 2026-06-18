@@ -140,6 +140,7 @@ export function formatBreakdownLabel(
 	breakdownValue: string,
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
+	userNamesById: ReadonlyMap<string, string> | undefined,
 	formatMessage: FormatMessage,
 ): string {
 	const normalizedValue = breakdownValue.trim()
@@ -167,6 +168,9 @@ export function formatBreakdownLabel(
 	if (selectedBreakdown === 'dependent_project_download') {
 		return breakdownValue
 	}
+	if (selectedBreakdown === 'user_id') {
+		return userNamesById?.get(breakdownValue) ?? breakdownValue
+	}
 	if (selectedBreakdown === 'version_id') {
 		return getVersionDisplayName?.(breakdownValue) ?? breakdownValue
 	}
@@ -181,6 +185,7 @@ export function formatBreakdownLabels(
 	breakdownValues: readonly string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
+	userNamesById: ReadonlyMap<string, string> | undefined,
 	formatMessage: FormatMessage,
 ): string {
 	return collapseRepeatedUnknownBreakdownLabels(
@@ -191,6 +196,7 @@ export function formatBreakdownLabels(
 					breakdownValues[index] ?? '',
 					breakdown,
 					getVersionDisplayName,
+					userNamesById,
 					formatMessage,
 				),
 			),
@@ -357,6 +363,7 @@ export function buildChartDatasets(
 	selectedFilters: AnalyticsSelectedFilters,
 	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>,
 	projectNamesById: ReadonlyMap<string, string>,
+	userNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
@@ -379,7 +386,13 @@ export function buildChartDatasets(
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
 				}
 
-				return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName, formatMessage)
+				return formatBreakdownLabel(
+					breakdownValue,
+					breakdown,
+					getVersionDisplayName,
+					userNamesById,
+					formatMessage,
+				)
 			}),
 			formatMessage,
 		).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)

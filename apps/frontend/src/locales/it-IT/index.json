@@ -131,18 +131,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Mostrare tutte le {count} linee nel grafico?"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "Mostrando {itemType, select, project {{count, plural, one {il progetto} other {tutti i progetti}}} country {{count, plural, one {il paese} other {tutti i paesi}}} monetization {{count, plural, one {il valore di monetizzazione} other {tutti i valori di monetizzazione}}} downloadSource {{count, plural, one {la fonte} other {tutte le fonti}}} downloadReason {{count, plural, one {il motivo} other {tutti i motivi}}} projectVersion {{count, plural, one {la versione del progetto} other {tutte le versioni del progetto}}} loader {{count, plural, one {il loader} other {tutti i loader}}} gameVersion {{count, plural, one {la versione di gioco} other {tutte le versioni di gioco}}} other {{count, plural, one {l'elemento} other {tutti gli elementi}}}} dalla tabella"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Mostrando {count} {itemType, select, project {{count, plural, one {progetto} other {progetti}}} country {{count, plural, one {paese} other {paesi}}} monetization {{count, plural, one {valore di monetizzazione} other {valori di monetizzazione}}} downloadSource {{count, plural, one {fonte} other {fonti}}} downloadReason {{count, plural, one {motivo} other {motivi}}} projectVersion {{count, plural, one {versione del progetto} other {versioni del progetto}}} loader {loader} gameVersion {{count, plural, one {versione di gioco} other {versioni di gioco}}} other {{count, plural, one {elemento} other {elementi}}}} dalla tabella"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Mostrando {limit} {itemType, select, project {{limit, plural, one {progetto} other {progetti}}} country {{limit, plural, one {paese} other {paesi}}} monetization {{limit, plural, one {valore di monetizzazione} other {valori di monetizzazione}}} downloadSource {{limit, plural, one {fonte} other {fonti}}} downloadReason {{limit, plural, one {motivo} other {motivi}}} projectVersion {{limit, plural, one {versione del progetto} other {versioni del progetto}}} loader {loader} gameVersion {{limit, plural, one {versione di gioco} other {versioni di gioco}}} other {{limit, plural, one {elemento} other {elementi}}}} dalla tabella"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Mostrando {itemType, select, project {{count, plural, one {il primo progetto} other {i primi # progetti}}} country {{count, plural, one {il primo paese} other {i primi # paesi}}} monetization {{count, plural, one {il primo valore di monetizzazione} other {i primi # valori di monetizzazione}}} downloadSource {{count, plural, one {la prima fonte} other {le prime # fonti}}} downloadReason {{count, plural, one {il primo motivo} other {i primi # motivi}}} projectVersion {{count, plural, one {la prima versione del progetto} other {le prime # versioni del progetto}}} loader {{count, plural, one {il primo loader} other {i primi # loader}}} gameVersion {{count, plural, one {la prima versione di gioco} other {le prime # versioni di gioco}}} other {{count, plural, one {il primo elemento} other {i primi {count} elementi}}}} dalla tabella"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# giorno} other {# giorni}}"
   },

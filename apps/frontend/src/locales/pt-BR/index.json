@@ -134,18 +134,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Exibir todas as {count} linhas no gráfico?"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "Exibindo {itemType, select,project {{count, plural, one {todo o projeto} other {todos os projetos}}}country {{count, plural, one {todo o país} other {todos os países}}}monetization {{count, plural, one {todo o valor de monetização} other {todos os valores de monetização}}}downloadSource {{count, plural, one {toda a fonte de download} other {todas as fontes de download}}} downloadReason {{count, plural, one {todo o motivo de download} other {todos os motivos de download}}} projectVersion {{count, plural, one {toda a versão do projeto} other {todas as versões do projeto}}} loader {{count, plural, one {todo o carregador} other {todos os carregadores}}} gameVersion {{count, plural, one {toda a versão do jogo} other {todas as versões do jogo}}} other {{count, plural, one {todo o item} other {todos os itens}}}\n} da tabela"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Exibindo {count} {itemType, select, project {{count, plural, one {projeto} other {projetos}}} country {{count, plural, one {país} other {países}}} monetization {{count, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{count, plural, one {fonte de download} other {fontes de download}}} downloadReason {{count, plural, one {motivo de download} other {motivos de download}}} projectVersion {{count, plural, one {versão do projeto} other {versões do projeto}}} loader {{count, plural, one {carregador} other {carregadores}}} gameVersion {{count, plural, one {versão do jogo} other {versões do jogo}}} other {{count, plural, one {item} other {itens}}}} da tabela"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Exibindo {limit} {itemType, select, project {{limit, plural, one {projeto} other {projetos}}} country {{limit, plural, one {país} other {países}}} monetization {{limit, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{limit, plural, one {fonte de download} other {fontes de download}}} downloadReason {{limit, plural, one {motivo de download} other {motivos de download}}} projectVersion {{limit, plural, one {versão do projeto} other {versões do projeto}}} loader {{limit, plural, one {carregador} other {carregadores}}} gameVersion {{limit, plural, one {versão do jogo} other {versões do jogo}}} other {{limit, plural, one {item} other {itens}}}} da tabela"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Exibindo os {count} {itemType, select,\nproject {{count, plural, one {projeto principal} other {principais projetos}}}\ncountry {{count, plural, one {país principal} other {principais países}}}\nmonetization {{count, plural, one {valor de monetização principal} other {principais valores de monetização}}}\ndownloadSource {{count, plural, one {fonte de download principal} other {principais fontes de download}}}\ndownloadReason {{count, plural, one {motivo de download principal} other {principais motivos de download}}}\nprojectVersion {{count, plural, one {versão principal do projeto} other {principais versões do projeto}}}\nloader {{count, plural, one {carregador principal} other {principais carregadores}}}\ngameVersion {{count, plural, one {versão principal do jogo} other {principais versões do jogo}}}\nother {{count, plural, one {item principal} other {principais itens}}}\n} da tabela"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dia} other {# dias}}"
   },

@@ -10,6 +10,7 @@ export type AnalyticsQueryFilterCategory =
 	| 'monetization'
 	| 'user_agent'
 	| 'download_reason'
+	| 'user_id'
 	| 'version_id'
 	| 'game_version'
 	| 'loader_type'
@@ -39,6 +40,7 @@ export type AnalyticsBreakdownPreset =
 	| 'monetization'
 	| 'user_agent'
 	| 'download_reason'
+	| 'user_id'
 	| 'version_id'
 	| 'loader'
 	| 'game_version'
@@ -156,6 +158,7 @@ export interface AnalyticsDashboardFilterOptions {
 	countries: string[]
 	downloadSources: string[]
 	downloadReasons: string[]
+	userIds: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
 	dependentProjectTypes: string[]
@@ -167,6 +170,7 @@ export interface NormalizedAnalyticsSelectedFilters {
 	monetization: ReadonlySet<string>
 	userAgent: ReadonlySet<string>
 	downloadReason: ReadonlySet<string>
+	userId: ReadonlySet<string>
 	versionId: ReadonlySet<string>
 	gameVersion: ReadonlySet<string>
 	loaderType: ReadonlySet<string>
@@ -178,6 +182,7 @@ export interface AnalyticsFacetsFilterOptionSummary {
 	countries: string[]
 	downloadSources: string[]
 	downloadReasons: string[]
+	userIds: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
 	dependentProjectTypes: string[]
@@ -213,4 +218,5 @@ export type AnalyticsFetchData = {
 	metrics: Labrinth.Analytics.v3.TimeSlice[]
 	projects: Record<string, Labrinth.Projects.v3.Project>
 	project_events: Labrinth.Analytics.v3.ProjectAnalyticsEvent[]
+	users: Record<string, Labrinth.Users.v3.User>
 }

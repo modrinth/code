@@ -832,9 +832,9 @@ export function buildDependentsSearchFilters(
 	const mappedProjectTypes = projectTypes.map(mapProjectTypeToSearch)
 
 	if (mappedProjectTypes.length === 1) {
-		parts.push(`project_types = ${enquoteNonBools(mappedProjectTypes[0])}`)
+		parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
 	} else if (mappedProjectTypes.length > 1) {
-		const quoted = mappedProjectTypes.map(enquoteNonBools).join(', ')
+		const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
 		parts.push(`project_types IN [${quoted}]`)
 	}
 
@@ -842,9 +842,9 @@ export function buildDependentsSearchFilters(
 		new Set(dependencyProjectIds.map((projectId) => projectId.trim()).filter(Boolean)),
 	)
 	if (normalizedProjectIds.length === 1) {
-		parts.push(`dependency_project_ids = ${enquoteNonBools(normalizedProjectIds[0])}`)
+		parts.push(`dependency_project_ids = ${formatSearchFilterValue(normalizedProjectIds[0])}`)
 	} else if (normalizedProjectIds.length > 1) {
-		const quoted = normalizedProjectIds.map(enquoteNonBools).join(', ')
+		const quoted = normalizedProjectIds.map(formatSearchFilterValue).join(', ')
 		parts.push(`dependency_project_ids IN [${quoted}]`)
 	}
 

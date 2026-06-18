@@ -207,6 +207,8 @@ export interface AnalyticsDashboardContextValue {
 	projectNamesById: ComputedRef<Map<string, string>>
 	projectIconUrlsById: ComputedRef<Map<string, string>>
 	projectOrganizationNamesById: ComputedRef<Map<string, string>>
+	userNamesById: ComputedRef<Map<string, string>>
+	userAvatarUrlsById: ComputedRef<Map<string, string>>
 	dependentProjectTypesById: ComputedRef<Map<string, string[]>>
 	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
 	availableProjectStatuses: ComputedRef<ProjectStatusFilterValue[]>
@@ -1055,6 +1057,7 @@ export function createAnalyticsDashboardContext(
 				return {
 					metrics: [],
 					projects: {},
+					users: {},
 					project_events: [],
 				}
 			}
@@ -1309,6 +1312,7 @@ export function createAnalyticsDashboardContext(
 	const timeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const previousTimeSlices = shallowRef<Labrinth.Analytics.v3.TimeSlice[]>([])
 	const analyticsProjects = shallowRef<Record<string, Labrinth.Projects.v3.Project>>({})
+	const analyticsUsers = shallowRef<Record<string, Labrinth.Users.v3.User>>({})
 	const baseOrganizationNamesById = computed(() => {
 		const organizationNames = new Map<string, string>()
 		const organization = options.organizationContext?.organization.value
@@ -1435,10 +1439,35 @@ export function createAnalyticsDashboardContext(
 		}
 		return sortStringValues([...projectTypes])
 	})
+	const userIdFilterOptions = computed(() => {
+		const userIds = new Set<string>()
+		for (const userId of selectedFilters.value.user_id) {
+			const normalizedUserId = userId.trim()
+			if (normalizedUserId.length > 0) {
+				userIds.add(normalizedUserId)
+			}
+		}
+		for (const userId of Object.keys(analyticsUsers.value)) {
+			userIds.add(userId)
+		}
+		for (const timeSlice of timeSlices.value) {
+			for (const dataPoint of timeSlice) {
+				const userId =
+					dataPoint.metric_kind === 'revenue' && 'user_id' in dataPoint
+						? dataPoint.user_id?.trim()
+						: undefined
+				if (userId) {
+					userIds.add(userId)
+				}
+			}
+		}
+		return sortStringValues([...userIds])
+	})
 	const filterOptions = computed<AnalyticsDashboardFilterOptions>(() => ({
 		countries: analyticsFacetsFilterOptionSummary.value.countries,
 		downloadSources: analyticsFacetsFilterOptionSummary.value.downloadSources,
 		downloadReasons: analyticsFacetsFilterOptionSummary.value.downloadReasons,
+		userIds: userIdFilterOptions.value,
 		gameVersions: sortStringValues([
 			...new Set([
 				...projectVersionFilterOptionSummary.value.gameVersions,
@@ -1536,6 +1565,7 @@ export function createAnalyticsDashboardContext(
 			timeSlices.value = splitTimeSlices.currentTimeSlices
 			previousTimeSlices.value = splitTimeSlices.previousTimeSlices
 			analyticsProjects.value = nextAnalyticsData.projects
+			analyticsUsers.value = nextAnalyticsData.users
 			projectEvents.value = getAnalyticsProjectEventsInTimeRange(
 				nextAnalyticsData.project_events,
 				fetchRequest.value,
@@ -1552,6 +1582,7 @@ export function createAnalyticsDashboardContext(
 		timeSlices.value = []
 		previousTimeSlices.value = []
 		analyticsProjects.value = {}
+		analyticsUsers.value = {}
 		projectEvents.value = []
 	})
 
@@ -1562,6 +1593,25 @@ export function createAnalyticsDashboardContext(
 		}
 		return projectNames
 	})
+	const userNamesById = computed(
+		() =>
+			new Map(
+				Object.entries(analyticsUsers.value).map(([userId, user]) => [
+					userId,
+					user.username ?? userId,
+				]),
+			),
+	)
+	const userAvatarUrlsById = computed(
+		() =>
+			new Map(
+				Object.entries(analyticsUsers.value)
+					.filter((entry): entry is [string, Labrinth.Users.v3.User & { avatar_url: string }] =>
+						Boolean(entry[1].avatar_url),
+					)
+					.map(([userId, user]) => [userId, user.avatar_url]),
+			),
+	)
 
 	const analyticsVersionIds = computed(() => {
 		const versionIds = new Set<string>()
@@ -1869,6 +1919,8 @@ export function createAnalyticsDashboardContext(
 		projectNamesById,
 		projectIconUrlsById,
 		projectOrganizationNamesById,
+		userNamesById,
+		userAvatarUrlsById,
 		dependentProjectTypesById,
 		projectStatusById,
 		availableProjectStatuses,

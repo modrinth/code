@@ -25,6 +25,20 @@
 
 		<template #option="{ category, option, selected }">
 			<div class="flex min-w-0 flex-1 items-center gap-2">
+				<span
+					v-if="category.key === 'user_id'"
+					v-tooltip="option.label"
+					class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-primary"
+					:class="selected ? 'text-contrast' : 'text-primary'"
+				>
+					<img
+						v-if="getUserAvatarUrl(option.value)"
+						:src="getUserAvatarUrl(option.value)"
+						:alt="option.label"
+						class="h-6 w-6 rounded-full object-cover"
+					/>
+					<UserIcon v-else class="h-full w-full" />
+				</span>
 				<template
 					v-for="metadata in getFilterOptionProjectMetadata(category.key, option.value)"
 					:key="`${category.key}-${option.value}-${metadata.name}`"
@@ -182,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import { BoxIcon } from '@modrinth/assets'
+import { BoxIcon, UserIcon } from '@modrinth/assets'
 import {
 	buildDependentsSearchFilters,
 	DropdownFilterBar,
@@ -291,6 +305,8 @@ const {
 	versionProjectNamesById,
 	versionProjectIconUrlsById,
 	projectNamesById,
+	userNamesById,
+	userAvatarUrlsById,
 	getVersionDisplayName,
 } = injectAnalyticsDashboardContext()
 const formattedCountries = useFormattedCountries()
@@ -713,6 +729,18 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => {
 				dependentProjectTypeFilterOptions.value,
 			),
 		},
+		{
+			key: 'user_id',
+			label: formatMessage(analyticsBreakdownMessages.members),
+			searchable: memberFilterOptions.value.length > 6,
+			searchPlaceholder: formatMessage(analyticsMessages.searchMembersPlaceholder),
+			emptyOptionsLabel: analyticsFilterOptionsEmptyLabel.value,
+			emptySearchLabel: analyticsFilterOptionsEmptyLabel.value,
+			options: withSelectedOptions('user_id', memberFilterOptions.value),
+			submenuClass: 'w-fit min-w-[14rem]',
+			previewDropdownWidth: 'fit-content',
+			previewDropdownMinWidth: '14rem',
+		},
 	)
 
 	return categories.filter((category) =>
@@ -770,6 +798,16 @@ const downloadReasonFilterOptions = computed<DropdownFilterBarOption[]>(() =>
 		value: downloadReason,
 		label: getDownloadReasonFilterOptionLabel(downloadReason),
 	})),
+)
+
+const memberFilterOptions = computed<DropdownFilterBarOption[]>(() =>
+	filterOptions.value.userIds
+		.map((userId) => ({
+			value: userId,
+			label: getUserFilterOptionLabel(userId),
+			searchTerms: [userId],
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label)),
 )
 
 const gameVersionFilterOptions = computed<DropdownFilterBarOption[]>(() =>
@@ -872,6 +910,9 @@ function getMissingSelectedOptionLabel(
 	if (categoryKey === 'download_reason') {
 		return getDownloadReasonFilterOptionLabel
 	}
+	if (categoryKey === 'user_id') {
+		return getUserFilterOptionLabel
+	}
 	if (categoryKey === 'user_agent') {
 		return (value) => getDownloadSourceLabel(value, formatMessage)
 	}
@@ -885,6 +926,10 @@ function getMissingSelectedOptionLabel(
 		return getProjectTypeFilterOptionLabel
 	}
 	return undefined
+}
+
+function getUserAvatarUrl(userId: string): string | undefined {
+	return userAvatarUrlsById.value.get(userId)
 }
 
 function setFilterOptionLabelRef(
@@ -994,6 +1039,10 @@ function getDependentProjectFilterOptionLabel(projectId: string): string {
 
 function getDownloadReasonFilterOptionLabel(reason: string): string {
 	return formatAnalyticsDownloadReasonLabel(reason, formatMessage)
+}
+
+function getUserFilterOptionLabel(userId: string): string {
+	return userNamesById.value.get(userId) ?? userId
 }
 
 function setDependentProjectSearchInput(query: string) {
