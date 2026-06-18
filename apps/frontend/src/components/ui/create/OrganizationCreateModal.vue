@@ -89,6 +89,8 @@ import {
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
+import { generateUrlSlug } from '~/utils/slugs'
+
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 const router = useNativeRouter()
@@ -148,7 +150,7 @@ async function createOrganization(): Promise<void> {
 		const value = {
 			name: name.value.trim(),
 			description: description.value.trim(),
-			slug: slug.value.trim().replace(/ +/g, ''),
+			slug: slug.value.trim(),
 		}
 
 		const result: any = await useBaseFetch('organization', {
@@ -183,12 +185,7 @@ function hide(): void {
 
 function updateSlug(): void {
 	if (!manualSlug.value) {
-		slug.value = name.value
-			.trim()
-			.toLowerCase()
-			.replaceAll(' ', '-')
-			.replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-			.replaceAll(/--+/gm, '-')
+		slug.value = generateUrlSlug(name.value)
 	}
 }
 
