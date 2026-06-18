@@ -581,6 +581,7 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
             (r"nothub/mrpack-install", P::Named("mrpack-install")),
             (r"^(packwiz-installer|packwiz/)", P::Named("Packwiz")),
             (r"^mrpack4server", P::Named("mrpack4server")),
+            (r"^DawnLauncher/", P::Named("Dawn Launcher")),
             (
                 r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
                 P::Website,
