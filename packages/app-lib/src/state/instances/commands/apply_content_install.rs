@@ -2,7 +2,9 @@ use crate::state::instances::{
     ContentRequirement, ContentSourceKind, Instance, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
 };
-use crate::state::{CachedEntry, ProjectType, State, cache_file_hash};
+use crate::state::{
+    CachedEntry, KnownModrinthFile, ProjectType, State, cache_file_hash,
+};
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
 use bytes::Bytes;
@@ -95,6 +97,7 @@ pub(crate) async fn add_project_from_version(
         &file.url,
         file.hashes.get("sha1").map(|hash| hash.as_str()),
         Some(&download_meta),
+        None,
         &state.fetch_semaphore,
         &state.pool,
     )
@@ -173,10 +176,16 @@ pub(crate) async fn add_project_bytes(
 
     cache_file_hash(
         bytes.clone(),
-        &scope.instance.path,
+        &scope.instance.id,
         &relative_path,
         Some(&sha1),
         Some(project_type),
+        project_id.zip(version_id).map(|(project_id, version_id)| {
+            KnownModrinthFile {
+                project_id,
+                version_id,
+            }
+        }),
         &state.pool,
     )
     .await?;
