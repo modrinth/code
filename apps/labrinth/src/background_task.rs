@@ -29,6 +29,7 @@ pub enum BackgroundTask {
     SyncPayoutStatuses,
     IndexBilling,
     IndexSubscriptions,
+    IncrementalIndexSearch,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -87,6 +88,9 @@ impl BackgroundTask {
                 )
                 .await;
                 Ok(())
+            }
+            IncrementalIndexSearch => {
+                crate::search::incremental::consume::run().await
             }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
