@@ -359,6 +359,7 @@ pub struct TypesenseFieldSpec {
     pub facet: bool,
     pub sort: bool,
     pub optional: bool,
+    pub token_separators: Option<&'static [&'static str]>,
 }
 
 impl SearchField {
@@ -370,6 +371,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::Name => TypesenseFieldSpec {
                 path: "name",
@@ -377,6 +379,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: false,
+                token_separators: None,
             },
             SearchField::Author => TypesenseFieldSpec {
                 path: "author",
@@ -384,6 +387,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: false,
+                token_separators: None,
             },
             SearchField::License => TypesenseFieldSpec {
                 path: "license",
@@ -391,6 +395,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::ProjectTypes => TypesenseFieldSpec {
                 path: "project_types",
@@ -398,6 +403,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::ProjectId => TypesenseFieldSpec {
                 path: "project_id",
@@ -405,6 +411,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: false,
+                token_separators: None,
             },
             SearchField::OpenSource => TypesenseFieldSpec {
                 path: "open_source",
@@ -412,6 +419,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::Environment => TypesenseFieldSpec {
                 path: "environment",
@@ -419,6 +427,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::GameVersions => TypesenseFieldSpec {
                 path: "game_versions",
@@ -426,6 +435,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: Some(&["-", "."]),
             },
             SearchField::ClientSide => TypesenseFieldSpec {
                 path: "client_side",
@@ -433,6 +443,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::ServerSide => TypesenseFieldSpec {
                 path: "server_side",
@@ -440,6 +451,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftServerRegion => TypesenseFieldSpec {
                 path: "minecraft_server.region",
@@ -447,6 +459,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftServerLanguages => TypesenseFieldSpec {
                 path: "minecraft_server.languages",
@@ -454,6 +467,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftJavaServerContentKind => TypesenseFieldSpec {
                 path: "minecraft_java_server.content.kind",
@@ -461,6 +475,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftJavaServerContentSupportedGameVersions => {
                 TypesenseFieldSpec {
@@ -469,6 +484,7 @@ impl SearchField {
                     facet: true,
                     sort: false,
                     optional: true,
+                    token_separators: Some(&["-", "."]),
                 }
             }
             SearchField::MinecraftJavaServerPingData => TypesenseFieldSpec {
@@ -477,6 +493,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::DependencyProjectIds => TypesenseFieldSpec {
                 path: "dependency_project_ids",
@@ -484,6 +501,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::CompatibleDependencyProjectIds => TypesenseFieldSpec {
                 path: "compatible_dependency_project_ids",
@@ -491,6 +509,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
         }
     }
@@ -514,6 +533,19 @@ static TYPESENSE_SEARCH_FIELDS: LazyLock<Vec<Value>> = LazyLock::new(|| {
             }
             if spec.optional {
                 obj.insert("optional".to_string(), Value::Bool(true));
+            }
+            if let Some(token_separators) = spec.token_separators {
+                obj.insert(
+                    "token_separators".to_string(),
+                    Value::Array(
+                        token_separators
+                            .iter()
+                            .map(|separator| {
+                                Value::String((*separator).to_string())
+                            })
+                            .collect(),
+                    ),
+                );
             }
             Value::Object(obj)
         })
@@ -547,7 +579,6 @@ impl Typesense {
         json!({
             "name": name,
             "enable_nested_fields": true,
-            "token_separators": ["-"],
             "fields": fields,
             "default_sorting_field": "log_downloads"
         })
