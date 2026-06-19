@@ -16,6 +16,7 @@ import {
 	type TabbedModalTab,
 	useVIntl,
 } from '@modrinth/ui'
+import type { PlatformTag } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, nextTick, ref, watch } from 'vue'
@@ -122,7 +123,7 @@ const tabs = computed<TabbedModalTab[]>(() => [
 ])
 
 function getSupportedModpackLoaders() {
-	return get_loaders().then((value) =>
+	return get_loaders().then((value: PlatformTag[]) =>
 		value
 			.filter((item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla')
 			.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
