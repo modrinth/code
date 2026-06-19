@@ -97,9 +97,9 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 
 	async function handleStopServerProject(projectId: string) {
 		debugLog('handleStopServerProject', projectId)
-		const instancePath = runningServerProjects.value[projectId]
-		if (!instancePath) return
-		await kill(instancePath).catch(() => {})
+		const instanceId = runningServerProjects.value[projectId]
+		if (!instanceId) return
+		await kill(instanceId).catch(() => {})
 		const { [projectId]: _, ...rest } = runningServerProjects.value
 		runningServerProjects.value = rest
 	}

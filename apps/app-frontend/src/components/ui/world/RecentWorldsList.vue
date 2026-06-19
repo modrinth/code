@@ -115,23 +115,23 @@ async function populateJumpBackIn() {
 		})
 
 		const servers: {
-			instancePath: string
+			instanceId: string
 			address: string
 		}[] = worldItems
 			.filter((item) => item.world.type === 'server' && item.instance)
 			.map((item) => ({
-				instancePath: item.instance.id,
+				instanceId: item.instance.id,
 				address: (item.world as ServerWorld).address,
 			}))
 
 		// fetch protocol versions for all unique MC versions with server worlds
-		const uniqueServerInstances = new Set<string>(servers.map((x) => x.instancePath))
+		const uniqueServerInstances = new Set<string>(servers.map((x) => x.instanceId))
 		await Promise.all(
-			[...uniqueServerInstances].map((path) =>
-				get_instance_protocol_version(path)
-					.then((protoVer) => (protocolVersions.value[path] = protoVer))
+			[...uniqueServerInstances].map((instanceId) =>
+				get_instance_protocol_version(instanceId)
+					.then((protoVer) => (protocolVersions.value[instanceId] = protoVer))
 					.catch(() => {
-						console.error(`Failed to get instance protocol for: ${path} `)
+						console.error(`Failed to get instance protocol for: ${instanceId} `)
 					}),
 			),
 		)
@@ -145,8 +145,8 @@ async function populateJumpBackIn() {
 			}
 		})
 
-		servers.forEach(({ instancePath, address }) =>
-			refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
+		servers.forEach(({ instanceId, address }) =>
+			refreshServerData(serverData.value[address], protocolVersions.value[instanceId], address),
 		)
 	}
 
@@ -171,8 +171,8 @@ async function populateJumpBackIn() {
 		.slice(0, MAX_JUMP_BACK_IN)
 }
 
-function refreshServer(address: string, instancePath: string) {
-	refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
+function refreshServer(address: string, instanceId: string) {
+	refreshServerData(serverData.value[address], protocolVersions.value[instanceId], address)
 }
 
 async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
@@ -310,7 +310,7 @@ onUnmounted(() => {
 					:game-mode="
 						item.world.type === 'singleplayer' ? GAME_MODES[item.world.game_mode] : undefined
 					"
-					:instance-path="item.instance.id"
+					:instance-id="item.instance.id"
 					:instance-name="item.instance.name"
 					:instance-icon="item.instance.icon_path"
 					@refresh="

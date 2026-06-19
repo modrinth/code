@@ -534,10 +534,10 @@ async function updateProject(mod: ContentItem) {
 			const versionData = await get_version(updateVersionId, 'must_revalidate').catch(handleError)
 
 			if (versionData) {
-				const profile = await get(props.instance.id).catch(handleError)
+				const instance = await get(props.instance.id).catch(handleError)
 
-				if (profile) {
-					await installVersionDependencies(profile, versionData, 'update').catch(handleError)
+				if (instance) {
+					await installVersionDependencies(instance, versionData, 'update').catch(handleError)
 				}
 			}
 		}
@@ -576,9 +576,9 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 			newPath = await toggle_disable_project(props.instance.id, newPath)
 		}
 
-		const profile = await get(props.instance.id).catch(handleError)
-		if (profile) {
-			await installVersionDependencies(profile, version, 'update').catch(handleError)
+		const instance = await get(props.instance.id).catch(handleError)
+		if (instance) {
+			await installVersionDependencies(instance, version, 'update').catch(handleError)
 		}
 
 		shouldRemoveNewOnError = false

@@ -204,22 +204,22 @@ pub async fn get_server_status(
 
 #[tauri::command]
 pub async fn start_join_singleplayer_world(
-    path: &str,
+    instance_id: &str,
     world: String,
 ) -> Result<ProcessMetadata> {
     let process =
-        instance::run(path, QuickPlayType::Singleplayer(world)).await?;
+        instance::run(instance_id, QuickPlayType::Singleplayer(world)).await?;
 
     Ok(process)
 }
 
 #[tauri::command]
 pub async fn start_join_server(
-    path: &str,
+    instance_id: &str,
     address: &str,
 ) -> Result<ProcessMetadata> {
     let process = instance::run(
-        path,
+        instance_id,
         QuickPlayType::Server(ServerAddress::Unresolved(address.to_owned())),
     )
     .await?;
