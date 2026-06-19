@@ -1,10 +1,13 @@
-use std::{ops::Deref, sync::Mutex};
+use std::{ops::Deref, time::Duration};
 
 use crate::{env::ENV, util::error::Context};
+use chrono::{DateTime, Utc};
 use kafka::client::KafkaClient;
+use serde::Serialize;
+use tokio::sync::Mutex;
+use uuid::Uuid;
 
-pub const SEARCH_PROJECT_INDEX_QUEUE_TOPIC: &str =
-    "public.labrinth.search_project_index_queue.v1";
+pub const KAFKA_OPERATION_INTERVAL: Duration = Duration::from_secs(5);
 
 #[derive(Debug)]
 pub struct KafkaClientState {
@@ -17,7 +20,9 @@ impl KafkaClientState {
             KafkaClient::new(ENV.KAFKA_BOOTSTRAP_SERVERS.0.clone());
         client.set_client_id(ENV.KAFKA_CLIENT_ID.clone());
         client
-            .load_metadata(&[SEARCH_PROJECT_INDEX_QUEUE_TOPIC])
+            .load_metadata(&[
+                crate::search::incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
+            ])
             .wrap_err("failed to load Kafka metadata")?;
 
         let topic_names = client
@@ -47,3 +52,55 @@ impl Deref for KafkaClientState {
         &self.client
     }
 }
+
+#[derive(Debug, Serialize)]
+pub struct KafkaEvent<T> {
+    pub event_type: &'static str,
+    pub event_metadata: EventMetadata,
+    #[serde(flatten)]
+    pub data: T,
+}
+
+impl<T> KafkaEvent<T> {
+    pub fn new(event_type: &'static str, data: T) -> Self {
+        Self {
+            event_type,
+            event_metadata: EventMetadata::new(),
+            data,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct EventMetadata {
+    pub event_id: Uuid,
+    pub event_time: DateTime<Utc>,
+    pub service: &'static ServiceMetadata,
+}
+
+impl EventMetadata {
+    pub fn new() -> Self {
+        Self {
+            event_id: Uuid::now_v7(),
+            event_time: Utc::now(),
+            service: &SERVICE_METADATA,
+        }
+    }
+}
+
+impl Default for EventMetadata {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct ServiceMetadata {
+    pub service_name: &'static str,
+    pub service_version: &'static str,
+}
+
+pub static SERVICE_METADATA: ServiceMetadata = ServiceMetadata {
+    service_name: "labrinth",
+    service_version: env!("CARGO_PKG_VERSION"),
+};

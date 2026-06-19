@@ -14,7 +14,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
-use crate::search::{SearchBackend, SearchRequest};
+use crate::search::{SearchBackend, SearchRequest, SearchState};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -532,11 +532,11 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_backend: web::Data<dyn SearchBackend>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let v2_new_project = new_project.into_inner();
     let client_side = v2_new_project.client_side;
@@ -646,11 +646,11 @@ pub async fn project_edit(
         req.clone(),
         info,
         pool.clone(),
-        search_backend,
         web::Json(new_project),
         redis.clone(),
         session_queue.clone(),
         moderation_queue,
+        search_state.clone(),
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -694,6 +694,7 @@ pub async fn project_edit(
                     ..Default::default()
                 },
                 session_queue.clone(),
+                search_state.clone(),
             )
             .await?;
         }
@@ -794,6 +795,7 @@ pub async fn projects_edit(
     bulk_edit_project: web::Json<BulkEditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let bulk_edit_project = bulk_edit_project.into_inner();
 
@@ -878,6 +880,7 @@ pub async fn projects_edit(
         }),
         redis,
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -927,6 +930,7 @@ pub async fn project_icon_edit(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::project_icon_edit_internal(
@@ -938,6 +942,7 @@ pub async fn project_icon_edit(
         file_host,
         payload,
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -966,6 +971,7 @@ pub async fn delete_project_icon(
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::delete_project_icon_internal(
@@ -975,6 +981,7 @@ pub async fn delete_project_icon(
         redis,
         file_host,
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1058,6 +1065,7 @@ pub async fn add_gallery_item(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::add_gallery_item_internal(
@@ -1075,6 +1083,7 @@ pub async fn add_gallery_item(
         file_host,
         payload,
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1150,6 +1159,7 @@ pub async fn edit_gallery_item(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::edit_gallery_item_internal(
@@ -1164,6 +1174,7 @@ pub async fn edit_gallery_item(
         pool,
         redis,
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1200,6 +1211,7 @@ pub async fn delete_gallery_item(
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::delete_gallery_item_internal(
@@ -1209,6 +1221,7 @@ pub async fn delete_gallery_item(
         redis,
         file_host,
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1235,8 +1248,8 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::project_delete_internal(
@@ -1244,8 +1257,8 @@ pub async fn project_delete(
         info,
         pool,
         redis,
-        search_backend,
         session_queue,
+        search_state,
     )
     .await
     .map(|()| HttpResponse::NoContent().body(""))

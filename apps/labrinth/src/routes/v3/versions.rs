@@ -26,7 +26,7 @@ use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
-use crate::search::SearchBackend;
+use crate::search::{SearchBackend, SearchState};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
@@ -267,6 +267,7 @@ pub async fn version_edit(
     redis: web::Data<RedisPool>,
     new_version: web::Json<serde_json::Value>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let new_version: EditVersion =
         serde_json::from_value(new_version.into_inner())?;
@@ -277,6 +278,7 @@ pub async fn version_edit(
         redis,
         new_version,
         session_queue,
+        search_state,
     )
     .await
 }
@@ -287,6 +289,7 @@ pub async fn version_edit_helper(
     redis: web::Data<RedisPool>,
     new_version: EditVersion,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -535,14 +538,6 @@ pub async fn version_edit_helper(
                 }
                 DBLoaderVersion::insert_many(loader_versions, &mut transaction)
                     .await?;
-
-                crate::database::models::DBProject::clear_cache(
-                    version_item.inner.project_id,
-                    None,
-                    None,
-                    &redis,
-                )
-                .await?;
             }
 
             if let Some(featured) = &new_version.featured {
@@ -696,11 +691,12 @@ pub async fn version_edit_helper(
             transaction.commit().await?;
             database::models::DBVersion::clear_cache(&version_item, &redis)
                 .await?;
-            database::models::DBProject::clear_cache(
+            super::projects::clear_project_cache_and_queue_search(
+                &redis,
+                &search_state,
                 version_item.inner.project_id,
                 None,
                 Some(true),
-                &redis,
             )
             .await?;
             Ok(HttpResponse::NoContent().body(""))
@@ -920,6 +916,7 @@ pub async fn version_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_backend: web::Data<dyn SearchBackend>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1019,11 +1016,12 @@ pub async fn version_delete(
 
     transaction.commit().await?;
 
-    database::models::DBProject::clear_cache(
+    super::projects::clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
         version.inner.project_id,
         None,
         Some(true),
-        &redis,
     )
     .await?;
     search_backend

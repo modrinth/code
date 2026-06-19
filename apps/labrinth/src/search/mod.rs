@@ -11,12 +11,19 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, sync::Arc};
 use thiserror::Error;
 use utoipa::ToSchema;
 
 pub mod backend;
+pub mod incremental;
 pub mod indexing;
+
+#[derive(Clone)]
+pub struct SearchState {
+    pub backend: Arc<dyn SearchBackend>,
+    pub queue: incremental::IncrementalSearchQueue,
+}
 
 /// Search parameters which can fit in a URL query string.
 ///
