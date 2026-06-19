@@ -258,6 +258,10 @@ function hasContentOperation(item: ContentItem) {
 	return keys.some((key) => activeContentOperationKeys.value.has(key))
 }
 
+function canUpdateProject(item: ContentItem) {
+	return !!item.file_path && !!item.has_update && !!item.update_version_id
+}
+
 function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
 	item.installing = busy
 	modpackContentModal.value?.updateItem(originalFileName, {
@@ -522,12 +526,12 @@ async function getDeleteDependencyWarning(items: ContentItem[]) {
 }
 
 async function updateProject(mod: ContentItem) {
-	if (!mod.file_path) return
+	if (!canUpdateProject(mod)) return
 	const operation = beginContentOperation(mod)
 	if (!operation) return
 
 	try {
-		const updateVersionId = mod.update_version_id
+		const updateVersionId = mod.update_version_id!
 		await update_project(props.instance.id, mod.file_path)
 
 		if (updateVersionId) {
@@ -606,7 +610,7 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 
 async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => getContentItemId(p) === id)
-	if (!item?.has_update || !item.project?.id || !item.version?.id) return
+	if (!item || !canUpdateProject(item) || !item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
 	const itemId = getContentItemId(item)
@@ -1059,7 +1063,10 @@ function applyContentData(contentData: InstanceContentData) {
 		return true
 	}
 
-	projects.value = contentData.contentItems
+	projects.value = contentData.contentItems.map((item) => ({
+		...item,
+		has_update: canUpdateProject(item),
+	}))
 
 	if (contentData.modpack) {
 		linkedModpackProject.value = contentData.modpack.project
@@ -1163,6 +1170,8 @@ provideContentManager({
 	hasUpdateSupport: true,
 	updateItem: handleUpdate,
 	bulkUpdateItem: updateProject,
+	bulkUpdateItems: (items: ContentItem[]) =>
+		Promise.all(items.filter(canUpdateProject).map((item) => updateProject(item))).then(() => {}),
 	updateModpack: props.isServerInstance ? undefined : handleModpackUpdate,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairInstance,
