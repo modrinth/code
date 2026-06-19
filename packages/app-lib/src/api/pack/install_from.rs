@@ -102,12 +102,12 @@ pub enum CreatePackLocation {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePackInstance {
-    pub name: String, // the name of the profile, and relative path
-    pub game_version: String, // the game version of the profile
+    pub name: String, // the name of the instance and relative path
+    pub game_version: String, // the game version of the instance
     pub modloader: ModLoader, // the modloader to use
     pub loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
-    pub icon: Option<PathBuf>,          // the icon for the profile
-    pub icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
+    pub icon: Option<PathBuf>,          // the icon for the instance
+    pub icon_url: Option<String>, // the URL icon for an instance during import
     pub link: Option<InstanceLink>,
     pub unknown_file: bool, // true when pack file isn't found on Modrinth via hash lookup
     pub skip_install_profile: Option<bool>,
