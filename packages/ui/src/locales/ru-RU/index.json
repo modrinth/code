@@ -3486,7 +3486,7 @@
     "defaultMessage": "Очищена консоль"
   },
   "servers.audit-log.event.console-command-executed": {
-    "defaultMessage": "Запущена консольная команда <command></command>"
+    "defaultMessage": "Выполнена консольная команда <command></command>"
   },
   "servers.audit-log.event.entity-list.hidden-count": {
     "defaultMessage": "+{count, number}"
@@ -4713,7 +4713,7 @@
     "defaultMessage": "Реализм"
   },
   "tag.category.recording-smp": {
-    "defaultMessage": "Выживание со съёмкой"
+    "defaultMessage": "Выживание на запись"
   },
   "tag.category.reflections": {
     "defaultMessage": "Отражения"

@@ -326,9 +326,6 @@
   "app.update-popup.download-complete": {
     "message": "การดาวน์โหลดเสร็จสมบูรณ์"
   },
-  "app.update-popup.reload": {
-    "message": "โหลดใหม่"
-  },
   "app.update-popup.title": {
     "message": "มีการอัปเดตใหม่"
   },

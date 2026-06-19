@@ -207,7 +207,7 @@
     "defaultMessage": "Expandir el resumen"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el cargador se muestra automáticamente junto a tu proyecto."
+    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el loader se muestra automáticamente junto a tu proyecto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpiar el nombre"

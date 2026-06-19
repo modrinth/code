@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Téléchargement de Java {version} en cours"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Téléchargement de la mise à jour"
+  },
   "app.action-bar.downloads": {
     "message": "Téléchargements"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instance première"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Recharger pour mettre à jour"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Montrer plus d'instances en exécution"
   },
   "app.action-bar.stop-instance": {
     "message": "Arrêter l'instance"
+  },
+  "app.action-bar.update": {
+    "message": "Mettre à jour"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Voir les téléchargements actifs"
@@ -93,7 +102,7 @@
     "message": "Afficher le temps de jeu"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Permet d'ouvrir de fermer la barre latérale."
+    "message": "Permet d’afficher ou de masquer la barre latérale."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Tiroir latéral"
@@ -419,6 +428,12 @@
   "app.skins.rate-limit.title": {
     "message": "Du calme !"
   },
+  "app.skins.reorder-error.text": {
+    "message": "L'ordre des skins n'a pas pu être sauvegardé."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Impossible de réorganiser les skins"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -492,7 +507,7 @@
     "message": "Téléchargement terminé"
   },
   "app.update-popup.reload": {
-    "message": "Recharger"
+    "message": "Recharger pour mettre à jour"
   },
   "app.update-popup.title": {
     "message": "Mise à jour disponible"
@@ -688,6 +703,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Nom"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Canal de mise à jour"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Les versions stables, bêta et alpha seront affichées comme mises à jour disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Bêta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Les versions stables et bêta seront affichées comme mises à jour disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Stable"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Seules les versions stables seront affichées comme mises à jour disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Sélectionner le canal de mise à jour"
   },
   "instance.settings.tabs.hooks": {
     "message": "Crochets de lancement"

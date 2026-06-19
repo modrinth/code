@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "正在下載 Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "正在下載更新"
+  },
   "app.action-bar.downloads": {
     "message": "下載"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "主要實例"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "重新載入即可更新"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "顯示更多執行中的實例"
   },
   "app.action-bar.stop-instance": {
     "message": "停止實例"
+  },
+  "app.action-bar.update": {
+    "message": "更新"
   },
   "app.action-bar.view-active-downloads": {
     "message": "查看正在下載的項目"
@@ -33,10 +42,10 @@
     "message": "查看實例"
   },
   "app.action-bar.view-logs": {
-    "message": "查看紀錄檔"
+    "message": "查看紀錄"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "啟用進階繪製（如模糊效果）；若無硬體加速可能會導致效能問題。"
+    "message": "啟用進階繪製（如模糊效果），若無硬體加速可能會導致效能問題。"
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "進階繪製"
@@ -78,16 +87,16 @@
     "message": "最小化啟動器"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "使用系統視窗外框（需要重新啟動應用程式）。"
+    "message": "使用系統內建的視窗外框（需要重啟應用程式）。"
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "原生裝飾"
+    "message": "原生視窗"
   },
   "app.appearance-settings.select-option": {
     "message": "選擇選項"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "顯示您在該實例的遊玩時間"
+    "message": "顯示你在該實例的遊玩時間。"
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "顯示遊玩時間"
@@ -149,14 +158,17 @@
   "app.browse.server.installing": {
     "message": "安裝中"
   },
+  "app.content-install.no-compatible-versions": {
+    "message": "沒有符合 {compatibilityLabel} 的可用版本。請選擇一個版本強制安裝。不會自動安裝相依模組。"
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },
   "app.creation-modal.installing-modpack.title": {
-    "message": "正在安裝模組包……"
+    "message": "正在安裝模組包..."
   },
   "app.export-modal.description-placeholder": {
-    "message": "輸入模組包描述……"
+    "message": "輸入模組包描述..."
   },
   "app.export-modal.export-button": {
     "message": "匯出"
@@ -255,7 +267,7 @@
     "message": "確定要移除「{name}」嗎？"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "搜尋 {count} 個世界……"
+    "message": "搜尋 {count} 個世界..."
   },
   "app.instance.worlds.this-server": {
     "message": "這個伺服器"
@@ -327,25 +339,46 @@
     "message": "資源管理"
   },
   "app.skins.add-button": {
-    "message": "新增皮膚"
+    "message": "新增外觀"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "拖曳"
   },
   "app.skins.apply-button": {
-    "message": "確認"
+    "message": "套用"
   },
   "app.skins.delete-button": {
-    "message": "刪除皮膚"
+    "message": "刪除外觀"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "這會永久刪除所選的外觀，這個動作無法復原。"
   },
   "app.skins.delete-modal.title": {
-    "message": "你確定要刪除這個皮膚嗎"
+    "message": "你確定要刪除這個外觀嗎？"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "無法讀取拖曳的檔案。"
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "處理檔案時發生錯誤"
   },
   "app.skins.edit-button": {
-    "message": "編輯皮膚"
+    "message": "編輯外觀"
   },
   "app.skins.modal.add-skin-button": {
-    "message": "新增皮膚"
+    "message": "新增外觀"
   },
   "app.skins.modal.add-title": {
-    "message": "正在新增皮膚"
+    "message": "新增外觀"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "手臂身形"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "苗條"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "寬"
   },
   "app.skins.modal.cape-fallback-name": {
     "message": "披風"
@@ -354,7 +387,10 @@
     "message": "披風"
   },
   "app.skins.modal.edit-title": {
-    "message": "編輯皮膚"
+    "message": "編輯外觀"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "請先對外觀進行編輯！"
   },
   "app.skins.modal.no-cape-tooltip": {
     "message": "無披風"
@@ -363,46 +399,91 @@
     "message": "無"
   },
   "app.skins.modal.replace-texture-button": {
-    "message": "覆蓋材質包"
+    "message": "取代材質"
   },
   "app.skins.modal.save-skin-button": {
-    "message": "儲存皮膚"
+    "message": "儲存外觀"
   },
   "app.skins.modal.saving-tooltip": {
-    "message": "正在儲存"
+    "message": "正在儲存..."
   },
   "app.skins.modal.texture-section": {
-    "message": "材質包"
+    "message": "材質"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "馬上新增一個皮膚"
+    "message": "請先上傳外觀檔案！"
   },
   "app.skins.preview.edit-button": {
-    "message": "編輯皮膚"
+    "message": "編輯外觀"
   },
   "app.skins.previewing-badge": {
-    "message": "正在預覽"
+    "message": "預覽"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "你變更外觀的頻率太過頻繁。Mojang 伺服器已暫時封鎖後續請求，請稍等片刻，然後再試一次。"
   },
   "app.skins.rate-limit.title": {
-    "message": "慢一點"
+    "message": "慢一點！"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "無法儲存你的外觀排序。"
+  },
+  "app.skins.reorder-error.title": {
+    "message": "重新排序外觀失敗"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "建造者＆生態域"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "追逐天空"
   },
   "app.skins.section.default-skins": {
-    "message": "預設皮膚"
+    "message": "預設外觀"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
   },
   "app.skins.section.modrinth": {
     "message": "Modrinth"
   },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth 驕傲"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "這些外觀是你在驕傲月期間捐款給 Modrinth 驕傲月籌款活動所獲得的。"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "群騎紛爭"
+  },
   "app.skins.section.saved-skins": {
-    "message": "皮膚已儲存"
+    "message": "已儲存外觀"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "銅器時代"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "蒼園覺醒"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "小鬼當家"
   },
   "app.skins.sign-in.button": {
     "message": "登入"
+  },
+  "app.skins.sign-in.description": {
+    "message": "請登入你的 Minecraft 帳號以使用 Modrinth App 的外觀管理功能。"
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "興奮的 Modrinth 機器人"
   },
   "app.skins.sign-in.title": {
     "message": "請登入"
   },
   "app.skins.title": {
-    "message": "皮膚選擇"
+    "message": "外觀選擇"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
@@ -423,7 +504,7 @@
     "message": "下載完成"
   },
   "app.update-popup.reload": {
-    "message": "重新載入"
+    "message": "重新載入即可更新"
   },
   "app.update-popup.title": {
     "message": "有可用的更新"
@@ -619,6 +700,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "名稱"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "更新通道"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha 版"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "相容的正式版、Beta 版和 Alpha 版本都會顯示在可用更新中。"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta 版"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "相容的正式版和 Beta 版本都會顯示在可用更新中。"
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "正式版"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "僅有正式版會顯示在可用更新中。"
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "選擇更新通道"
   },
   "instance.settings.tabs.hooks": {
     "message": "啟動掛勾"

@@ -1,4 +1,10 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "מוריד את ‏ Java ‏{version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "מוריד עדכון"
+  },
   "app.action-bar.downloads": {
     "message": "הורדות"
   },
@@ -10,6 +16,9 @@
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "מאפשר עיבוד מתקדם כגון אפקטים טשטוש העלולים לגרום לבעיות ביצועים ללא עיבוד מואץ לחומרה."
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "חזרה לעולמות"
   },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
@@ -220,9 +229,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "הורדה הושלמה"
-  },
-  "app.update-popup.reload": {
-    "message": "רענן"
   },
   "app.update-popup.title": {
     "message": "עדכון זמין"

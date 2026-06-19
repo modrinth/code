@@ -32,11 +32,17 @@
   "analytics.breakdown.game-version": {
     "message": "Wersja gry"
   },
+  "analytics.breakdown.generic": {
+    "message": "Rozkład"
+  },
   "analytics.breakdown.loader": {
     "message": "Loader"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetyzacja"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Brak rozkładu"
   },
   "analytics.breakdown.project": {
     "message": "Projekt"
@@ -46,6 +52,9 @@
   },
   "analytics.breakdown.project-version": {
     "message": "Wersja projektu"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Rozkład wg.: {breakdown}"
   },
   "analytics.chart.action.show-all": {
     "message": "Pokaż wszystko"
@@ -58,6 +67,21 @@
   },
   "analytics.chart.axis.playtime-hours": {
     "message": "{hours} godz"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "Aktywnych: {count}"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Adnotacje"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Opcje grafu, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Opcje"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Opcje grafu"
   },
   "analytics.chart.controls.display": {
     "message": "Wyświetlanie"
@@ -77,6 +101,12 @@
   "analytics.chart.controls.project-events": {
     "message": "Wydarzenia projektów"
   },
+  "analytics.chart.controls.ratio": {
+    "message": "Proporcjonalnie"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Wybierz coś w tabeli poniżej, by wizualizować dane."
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
@@ -85,6 +115,9 @@
   },
   "analytics.chart.legend.monetization-details.description": {
     "message": "Tylko wyświetlenia i pobrania z Modrinth liczą się do monetyzacji, gdzie pobrania wymagają, że użytkownik jest zalogowany."
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (poprz.)"
   },
   "analytics.chart.render-limit.description": {
     "message": "Pokazanie wszystkich wybranych linii z tabeli może wpłynąć negatywnie na wydajność strony."
@@ -103,6 +136,9 @@
   },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Przypięte"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(poprz.)"
   },
   "analytics.chart.tooltip.show-entry": {
     "message": "Pokaż {name} na wykresie"
@@ -215,6 +251,9 @@
   "analytics.group-by.year": {
     "message": "Rok"
   },
+  "analytics.loading.fetching-results": {
+    "message": "Pobieranie wyników..."
+  },
   "analytics.options.loading": {
     "message": "Ładowanie..."
   },
@@ -269,8 +308,17 @@
   "analytics.project.select": {
     "message": "Wybierz projekty"
   },
+  "analytics.project.user": {
+    "message": "Projekty {username}"
+  },
+  "analytics.project.your": {
+    "message": "Twoje projekty"
+  },
   "analytics.query.filter.add": {
     "message": "Dodaj filtr"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Rozkład:"
   },
   "analytics.query.label.grouped-by": {
     "message": "Grupowane wg."
@@ -301,6 +349,15 @@
   },
   "analytics.stat.revenue": {
     "message": "Przychód"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "Nie dotyczy"
+  },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "Statystyka niedostępna dla tego zapytania"
   },
   "analytics.stat.views": {
     "message": "Wyświetlenia"
@@ -1346,6 +1403,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Przekroczono limit wypłat (<b>{withdrawLimit}</b>). Musisz wypełnić formularz podatkowy, by wypłacić więcej."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Możesz otrzymać role: {roles}. Połącz swoje konto Discord poprzez Modrinth, a my automatycznie Ci je damy."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Połącz z Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Odbierz role na Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ pobrań"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Twórca"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Miesiąc dumy 2026"
+  },
   "dashboard.head-title": {
     "message": "Kokpit"
   },
@@ -1717,6 +1792,9 @@
   },
   "discover.install.heading.reset-modpack": {
     "message": "Wybieranie paczki modów do zainstalowania po zresetowaniu"
+  },
+  "discover.seo.description": {
+    "message": "Przeglądaj {projectType} Minecraft na Modrinth z natychmiastowymi, trafnymi wynikami wyszukiwania. Nasze filtry pomogą Ci znaleźć najlepsze {projectType} Minecraft."
   },
   "discover.seo.title": {
     "message": "Szukaj {projectType}"
@@ -2719,6 +2797,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Użytkownik Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Pokaż dane analityczne użytkownika"
   },
   "profile.button.billing": {
     "message": "Zarządzaj rozliczaniem użytkownika"

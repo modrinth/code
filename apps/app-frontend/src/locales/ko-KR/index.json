@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Java {version} 다운로드 중"
   },
+  "app.action-bar.downloading-update": {
+    "message": "업데이트 다운로드중"
+  },
   "app.action-bar.downloads": {
     "message": "다운로드"
   },
@@ -499,9 +502,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "다운로드 완료"
-  },
-  "app.update-popup.reload": {
-    "message": "새로고침"
   },
   "app.update-popup.title": {
     "message": "업데이트 가능"

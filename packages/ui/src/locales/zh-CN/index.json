@@ -1131,10 +1131,10 @@
     "defaultMessage": "把{type}拖到此处上传"
   },
   "files.validation.name-invalid-directory": {
-    "defaultMessage": "名称只能包含字母、数字、连字符（-）、下划线（_）或空格。"
+    "defaultMessage": "名称只能包含字母、数字、连字符、下划线或空格。"
   },
   "files.validation.name-invalid-file": {
-    "defaultMessage": "名称只能包含字母、数字、连字符（-）、下划线（_）、点（.）或空格。"
+    "defaultMessage": "名称只能包含字母、数字、连字符、下划线或空格。"
   },
   "files.validation.name-label": {
     "defaultMessage": "名称"
@@ -1185,7 +1185,7 @@
     "defaultMessage": "找到整合包"
   },
   "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "进入“文件（Files）”标签页并选择要安装的版本。"
+    "defaultMessage": "进入“文件”标签页并选择要安装的版本。"
   },
   "files.zip-url-modal.step-select-title": {
     "defaultMessage": "选择一个版本"
@@ -5091,7 +5091,7 @@
     "defaultMessage": "该用户的项目总共获得了{download_sum}次下载。"
   },
   "user.profile.badge.downloads.name": {
-    "defaultMessage": "{download_sum}次下载"
+    "defaultMessage": "{download_sum} 次下载"
   },
   "user.profile.badge.early-datapack-adopter.about.1": {
     "defaultMessage": "该用户在数据包功能于 2023 年 1 月正式上线前，协助我们在 Modrinth 平台完成了数据包项目的测试工作。"

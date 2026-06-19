@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Недостатньо прав."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Створити партнерське посилання"
   },
@@ -93,7 +96,7 @@
     "defaultMessage": "Не знайдено результатів за вашим запитом!"
   },
   "browse.offline": {
-    "defaultMessage": "Ви наразі не в мережі. Під'єднайтеся до Інтернету, аби шукати на Modrinth!"
+    "defaultMessage": "Ви наразі не в мережі. Під'єднайтеся до інтернету, щоб шукати на Modrinth!"
   },
   "browse.search.placeholder": {
     "defaultMessage": "Шукати {projectType}…"
@@ -1580,6 +1583,9 @@
   "instances.content-install.header": {
     "defaultMessage": "Установити проєкт"
   },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "Цей профіль використовує інший завантажувач або версію гри, ніж вимагає цей проєкт."
+  },
   "instances.content-install.install-button": {
     "defaultMessage": "Установити"
   },
@@ -1652,6 +1658,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Приховати несумісні"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "Вибрана версія не позначена як сумісна з цим профілем. Залежності не будуть встановлені автоматично."
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "Виберіть версію"
+  },
   "instances.updater-modal.incompatible-update.description": {
     "defaultMessage": "{version} не позначено як сумісну з цією інсталяцією. Вона може не запускатися або поводитися несподівано."
   },
@@ -1660,6 +1672,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "Усе одно оновитися"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Усе одно встановити"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Завантаження журналу змін…"
@@ -3137,6 +3152,63 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Ванільний"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Резервні копії"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Уміст і збірка"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Файли та SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Живлення та консоль"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Сервер"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Налаштування та середовище"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Користувачі та запрошення"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Дії"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "Пошук дій..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "Доданий уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Видалений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "Вимкнений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "Увімкнутий уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Оновлений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Завантажений уміст"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Створена резервна копія"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Видалена резервна копія"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Перейменована резервна копія"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "Відновлена резервна копія"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Запуск завдання в тлі"
   },
@@ -4011,7 +4083,7 @@
     "defaultMessage": "Мережа"
   },
   "tag.category.offline-mode": {
-    "defaultMessage": "Поза мережею"
+    "defaultMessage": "Режим «не в мережі»"
   },
   "tag.category.oneblock": {
     "defaultMessage": "One Block"
