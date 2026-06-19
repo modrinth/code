@@ -23,6 +23,16 @@ struct TiltifyState {
     rate_limit_backoff: Duration,
 }
 
+impl TiltifyState {
+    fn set_fetch_backoff(&mut self) {
+        self.rate_limited_until = Instant::now() + self.rate_limit_backoff;
+        self.rate_limit_backoff = self
+            .rate_limit_backoff
+            .saturating_mul(2)
+            .min(TILTIFY_MAX_RATE_LIMIT_BACKOFF);
+    }
+}
+
 #[derive(Debug)]
 struct TiltifyAccessToken {
     access_token: String,
@@ -82,17 +92,16 @@ impl TiltifyClient {
             }))
             .send()
             .await
+            .map_err(|error| {
+                state.set_fetch_backoff();
+                error
+            })
             .wrap_err("fetching OAuth token")?;
 
         let response = match response.error_for_status() {
             Ok(response) => response,
             Err(error) => {
-                state.rate_limited_until =
-                    Instant::now() + state.rate_limit_backoff;
-                state.rate_limit_backoff = state
-                    .rate_limit_backoff
-                    .saturating_mul(2)
-                    .min(TILTIFY_MAX_RATE_LIMIT_BACKOFF);
+                state.set_fetch_backoff();
                 return Err(error).wrap_err("fetching OAuth token");
             }
         };
