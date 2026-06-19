@@ -73,13 +73,16 @@ export async function pingWebSocketUrl(
 				}, i * intervalMs)
 			}
 
-			setTrackedTimeout(() => {
-				const ping =
-					samples.length > 0
-						? Math.round([...samples].sort((a, b) => a - b)[Math.floor(samples.length / 2)])
-						: -1
-				finish(ping)
-			}, count * intervalMs + settleDelayMs)
+			setTrackedTimeout(
+				() => {
+					const ping =
+						samples.length > 0
+							? Math.round([...samples].sort((a, b) => a - b)[Math.floor(samples.length / 2)])
+							: -1
+					finish(ping)
+				},
+				count * intervalMs + settleDelayMs,
+			)
 		}
 
 		socket.onmessage = (event) => {

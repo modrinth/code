@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { pingWebSocketUrl, type Archon, type Labrinth } from '@modrinth/api-client'
+import { type Archon, type Labrinth, pingWebSocketUrl } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ChevronRightIcon,
@@ -198,11 +198,7 @@ function ensureRegionPings() {
 	startRegionPings()
 }
 
-async function runRegionPing(
-	region: Archon.Servers.v1.Region,
-	index: number,
-	signal: AbortSignal,
-) {
+async function runRegionPing(region: Archon.Servers.v1.Region, index: number, signal: AbortSignal) {
 	if (signal.aborted) return
 
 	const ping = await pingWebSocketUrl(`wss://${region.shortcode}${index}.${region.zone}/pingtest`, {
