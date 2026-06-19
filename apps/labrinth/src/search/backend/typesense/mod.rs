@@ -501,6 +501,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::CompatibleDependencyProjectIds => TypesenseFieldSpec {
                 path: "compatible_dependency_project_ids",
@@ -508,6 +509,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
         }
     }
