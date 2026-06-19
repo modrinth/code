@@ -133,7 +133,7 @@ pub struct GetResponse {
     #[serde(default)]
     pub projects: HashMap<ProjectId, Project>,
     /// User metadata for users referenced in the response metrics.
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    #[serde(default)]
     pub users: HashMap<UserId, User>,
     /// List of events associated with projects that were requested.
     pub project_events: Vec<ProjectAnalyticsEvent>,
