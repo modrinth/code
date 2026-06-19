@@ -19,8 +19,9 @@
 			:href="labelHref"
 			:target="labelHref ? '_blank' : undefined"
 			:rel="labelHref ? 'noopener noreferrer' : undefined"
-			class="min-w-0 truncate font-semibold leading-tight text-primary"
+			class="line-clamp-2 min-w-0 truncate text-wrap font-semibold leading-tight text-primary"
 			:class="{ 'hover:underline': labelHref }"
+			:title="label"
 		>
 			{{ label }}
 		</component>

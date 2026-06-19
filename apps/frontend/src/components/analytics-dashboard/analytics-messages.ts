@@ -85,11 +85,11 @@ export const analyticsMessages = defineMessages({
 	},
 	noDependent: {
 		id: 'analytics.value.no-dependent',
-		defaultMessage: 'No dependent',
+		defaultMessage: 'No dependent / unknown',
 	},
 	noDependentTooltip: {
 		id: 'analytics.value.no-dependent-tooltip',
-		defaultMessage: 'Downloaded for other reasons than being a dependency',
+		defaultMessage: 'Downloaded for reasons other than being a dependency',
 	},
 	other: {
 		id: 'analytics.value.other',

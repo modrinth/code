@@ -94,16 +94,6 @@
 							? undefined
 							: getProjectPageHref(row.breakdownValues.dependent_project_download)
 					"
-					:organization-href="
-						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
-							? undefined
-							: getProjectOrganizationPageHref(row.breakdownValues.dependent_project_download)
-					"
-					:organization-tooltip="
-						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
-							? undefined
-							: getProjectOrganizationName(row.breakdownValues.dependent_project_download)
-					"
 					:label-tooltip="getDependentProjectTooltip(row)"
 				/>
 			</template>
