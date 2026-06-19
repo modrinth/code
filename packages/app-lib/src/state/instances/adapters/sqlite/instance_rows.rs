@@ -1,17 +1,15 @@
 #![allow(dead_code)]
 
 use crate::state::instances::{
-    ContentSetStatus, ContentSourceKind, Instance, InstanceLaunchOverrides,
-    InstanceLink, InstanceRef, legacy_default_content_set_id,
-    legacy_instance_id,
+    Instance, InstanceLaunchOverrides, InstanceLink,
 };
 use crate::state::{
-    Hooks, LauncherFeatureVersion, MemorySettings, Profile,
-    ProfileInstallStage, ReleaseChannel, WindowSize,
+    Hooks, LauncherFeatureVersion, MemorySettings, InstanceInstallStage,
+    ReleaseChannel, WindowSize,
 };
 use chrono::{DateTime, TimeZone, Utc};
 use serde::de::DeserializeOwned;
-use sqlx::{Executor, Sqlite, SqlitePool};
+use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
 use uuid::Uuid;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -39,7 +37,7 @@ impl TryFrom<InstanceRow> for Instance {
             id: row.id,
             path: row.path,
             applied_content_set_id: row.applied_content_set_id,
-            install_stage: ProfileInstallStage::from_str(&row.install_stage),
+            install_stage: InstanceInstallStage::from_str(&row.install_stage),
             launcher_feature_version: LauncherFeatureVersion::from_str(
                 &row.launcher_feature_version,
             ),
@@ -258,19 +256,6 @@ pub(crate) async fn list_instances(
     rows.into_iter().map(TryInto::try_into).collect()
 }
 
-pub(crate) async fn resolve_instance<'e, E>(
-    instance: InstanceRef<'_>,
-    exec: E,
-) -> crate::Result<Option<Instance>>
-where
-    E: Executor<'e, Database = Sqlite>,
-{
-    match instance {
-        InstanceRef::Id(id) => get_instance_by_id(id, exec).await,
-        InstanceRef::Path(path) => get_instance_by_path(path, exec).await,
-    }
-}
-
 pub(crate) async fn get_instance_link<'e, E>(
     instance_id: &str,
     exec: E,
@@ -360,28 +345,12 @@ where
     row.map(TryInto::try_into).transpose()
 }
 
-pub(crate) async fn upsert_instance_from_profile(
-    profile: &Profile,
-    pool: &SqlitePool,
+pub(crate) async fn insert_instance(
+	instance: &Instance,
+	tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    let mut tx = pool.begin().await?;
-
-    let instance_id = legacy_instance_id(&profile.path);
-    let content_set_id = legacy_default_content_set_id(&profile.path);
-    let icon_path = profile.icon_path.as_deref();
-    let loader_version = profile.loader_version.as_deref();
-
-    let install_stage = profile.install_stage.as_str();
-    let launcher_feature_version = profile.launcher_feature_version.as_str();
-    let update_channel = profile.preferred_update_channel.key();
-    let created = profile.created.timestamp();
-    let modified = profile.modified.timestamp();
-    let last_played = profile.last_played.map(|value| value.timestamp());
-    let submitted_time_played = profile.submitted_time_played as i64;
-    let recent_time_played = profile.recent_time_played as i64;
-
-    sqlx::query(
-        "
+	sqlx::query(
+		"
 		INSERT INTO instances (
 			id,
 			path,
@@ -398,91 +367,76 @@ pub(crate) async fn upsert_instance_from_profile(
 			recent_time_played
 		)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT (id) DO UPDATE SET
-			path = excluded.path,
-			applied_content_set_id = excluded.applied_content_set_id,
-			install_stage = excluded.install_stage,
-			launcher_feature_version = excluded.launcher_feature_version,
-			update_channel = excluded.update_channel,
-			name = excluded.name,
-			icon_path = excluded.icon_path,
-			created = excluded.created,
-			modified = excluded.modified,
-			last_played = excluded.last_played,
-			submitted_time_played = excluded.submitted_time_played,
-			recent_time_played = excluded.recent_time_played
 		",
-    )
-    .bind(&instance_id)
-    .bind(profile.path.as_str())
-    .bind(&content_set_id)
-    .bind(install_stage)
-    .bind(launcher_feature_version)
-    .bind(update_channel)
-    .bind(profile.name.as_str())
-    .bind(icon_path)
-    .bind(created)
-    .bind(modified)
-    .bind(last_played)
-    .bind(submitted_time_played)
-    .bind(recent_time_played)
-    .execute(&mut *tx)
-    .await?;
+	)
+	.bind(instance.id.as_str())
+	.bind(instance.path.as_str())
+	.bind(instance.applied_content_set_id.as_deref())
+	.bind(instance.install_stage.as_str())
+	.bind(instance.launcher_feature_version.as_str())
+	.bind(instance.update_channel.key())
+	.bind(instance.name.as_str())
+	.bind(instance.icon_path.as_deref())
+	.bind(instance.created.timestamp())
+	.bind(instance.modified.timestamp())
+	.bind(instance.last_played.map(|value| value.timestamp()))
+	.bind(instance.submitted_time_played as i64)
+	.bind(instance.recent_time_played as i64)
+	.execute(&mut **tx)
+	.await?;
 
-    let source_kind = profile_content_source_kind(profile).as_str();
-    let content_set_status = ContentSetStatus::Available.as_str();
-    let loader = profile.loader.as_str();
-    let protocol_version = profile.protocol_version.map(|value| value as i64);
+	Ok(())
+}
 
-    sqlx::query(
-        "
-		INSERT INTO instance_content_sets (
-			id,
-			instance_id,
-			name,
-			source_kind,
-			status,
-			game_version,
-			protocol_version,
-			loader,
-			loader_version,
-			created,
-			modified
-		)
-		VALUES (?, ?, 'Default', ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT (id) DO UPDATE SET
-			instance_id = excluded.instance_id,
-			source_kind = excluded.source_kind,
-			status = excluded.status,
-			game_version = excluded.game_version,
-			protocol_version = excluded.protocol_version,
-			loader = excluded.loader,
-			loader_version = excluded.loader_version,
-			modified = excluded.modified
+pub(crate) async fn update_instance(
+	instance: &Instance,
+	tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+	sqlx::query(
+		"
+		UPDATE instances
+		SET
+			path = ?,
+			applied_content_set_id = ?,
+			install_stage = ?,
+			launcher_feature_version = ?,
+			update_channel = ?,
+			name = ?,
+			icon_path = ?,
+			modified = ?,
+			last_played = ?,
+			submitted_time_played = ?,
+			recent_time_played = ?
+		WHERE id = ?
 		",
-    )
-    .bind(&content_set_id)
-    .bind(&instance_id)
-    .bind(source_kind)
-    .bind(content_set_status)
-    .bind(profile.game_version.as_str())
-    .bind(protocol_version)
-    .bind(loader)
-    .bind(loader_version)
-    .bind(created)
-    .bind(modified)
-    .execute(&mut *tx)
-    .await?;
+	)
+	.bind(instance.path.as_str())
+	.bind(instance.applied_content_set_id.as_deref())
+	.bind(instance.install_stage.as_str())
+	.bind(instance.launcher_feature_version.as_str())
+	.bind(instance.update_channel.key())
+	.bind(instance.name.as_str())
+	.bind(instance.icon_path.as_deref())
+	.bind(instance.modified.timestamp())
+	.bind(instance.last_played.map(|value| value.timestamp()))
+	.bind(instance.submitted_time_played as i64)
+	.bind(instance.recent_time_played as i64)
+	.bind(instance.id.as_str())
+	.execute(&mut **tx)
+	.await?;
 
-    let (
-        link_kind,
-        modrinth_project_id,
-        modrinth_version_id,
-        server_project_id,
-    ) = profile_link_columns(profile);
+	Ok(())
+}
 
-    sqlx::query(
-        "
+pub(crate) async fn upsert_instance_link(
+	instance_id: &str,
+	link: &InstanceLink,
+	tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+	let columns = instance_link_columns(link)?;
+
+	sqlx::query(
+		"
 		INSERT INTO instance_links (
 			instance_id,
 			link_kind,
@@ -496,7 +450,7 @@ pub(crate) async fn upsert_instance_from_profile(
 			hosting_active_instance_id,
 			shared_instance_id
 		)
-		VALUES (?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, jsonb(?), ?, ?)
 		ON CONFLICT (instance_id) DO UPDATE SET
 			link_kind = excluded.link_kind,
 			modrinth_project_id = excluded.modrinth_project_id,
@@ -509,59 +463,80 @@ pub(crate) async fn upsert_instance_from_profile(
 			hosting_active_instance_id = excluded.hosting_active_instance_id,
 			shared_instance_id = excluded.shared_instance_id
 		",
-    )
-    .bind(&instance_id)
-    .bind(link_kind)
-    .bind(modrinth_project_id)
-    .bind(modrinth_version_id)
-    .bind(server_project_id)
-    .execute(&mut *tx)
-    .await?;
+	)
+	.bind(instance_id)
+	.bind(columns.link_kind)
+	.bind(columns.modrinth_project_id.as_deref())
+	.bind(columns.modrinth_version_id.as_deref())
+	.bind(columns.server_project_id.as_deref())
+	.bind(columns.content_project_id.as_deref())
+	.bind(columns.content_version_id.as_deref())
+	.bind(columns.hosting_server_id.as_deref())
+	.bind(columns.hosting_instance_ids.as_deref())
+	.bind(columns.hosting_active_instance_id.as_deref())
+	.bind(columns.shared_instance_id.as_deref())
+	.execute(&mut **tx)
+	.await?;
 
-    sqlx::query(
-        "
+	Ok(())
+}
+
+pub(crate) async fn replace_instance_groups(
+	instance_id: &str,
+	groups: &[String],
+	tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+	sqlx::query(
+		"
 		DELETE FROM instance_groups
 		WHERE instance_id = ?
 		",
-    )
-    .bind(&instance_id)
-    .execute(&mut *tx)
-    .await?;
+	)
+	.bind(instance_id)
+	.execute(&mut **tx)
+	.await?;
 
-    for group in &profile.groups {
-        sqlx::query(
-            "
+	for group in groups {
+		sqlx::query(
+			"
 			INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
 			VALUES (?, ?)
 			",
-        )
-        .bind(&instance_id)
-        .bind(group.as_str())
-        .execute(&mut *tx)
-        .await?;
-    }
+		)
+		.bind(instance_id)
+		.bind(group.as_str())
+		.execute(&mut **tx)
+		.await?;
+	}
 
-    let extra_launch_args = profile
-        .extra_launch_args
-        .as_ref()
-        .map(serde_json::to_string)
-        .transpose()?;
-    let custom_env_vars = profile
-        .custom_env_vars
-        .as_ref()
-        .map(serde_json::to_string)
-        .transpose()?;
-    let memory = profile.memory.map(|value| value.maximum as i64);
-    let force_fullscreen = profile
-        .force_fullscreen
-        .map(|value| if value { 1_i64 } else { 0_i64 });
-    let game_resolution_x =
-        profile.game_resolution.map(|value| value.0 as i64);
-    let game_resolution_y =
-        profile.game_resolution.map(|value| value.1 as i64);
+	Ok(())
+}
 
-    sqlx::query(
-        "
+pub(crate) async fn upsert_instance_launch_overrides(
+	overrides: &InstanceLaunchOverrides,
+	tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+	let extra_launch_args = overrides
+		.extra_launch_args
+		.as_ref()
+		.map(serde_json::to_string)
+		.transpose()?;
+	let custom_env_vars = overrides
+		.custom_env_vars
+		.as_ref()
+		.map(serde_json::to_string)
+		.transpose()?;
+	let memory = overrides.memory.map(|value| value.maximum as i64);
+	let force_fullscreen = overrides
+		.force_fullscreen
+		.map(i64::from);
+	let game_resolution_x =
+		overrides.game_resolution.map(|value| value.0 as i64);
+	let game_resolution_y =
+		overrides.game_resolution.map(|value| value.1 as i64);
+
+	sqlx::query(
+		"
 		INSERT INTO instance_launch_overrides (
 			instance_id,
 			java_path,
@@ -588,41 +563,162 @@ pub(crate) async fn upsert_instance_from_profile(
 			hook_wrapper = excluded.hook_wrapper,
 			hook_post_exit = excluded.hook_post_exit
 		",
-    )
-    .bind(&instance_id)
-    .bind(profile.java_path.as_deref())
-    .bind(extra_launch_args)
-    .bind(custom_env_vars)
-    .bind(memory)
-    .bind(force_fullscreen)
-    .bind(game_resolution_x)
-    .bind(game_resolution_y)
-    .bind(profile.hooks.pre_launch.as_deref())
-    .bind(profile.hooks.wrapper.as_deref())
-    .bind(profile.hooks.post_exit.as_deref())
-    .execute(&mut *tx)
-    .await?;
+	)
+	.bind(overrides.instance_id.as_str())
+	.bind(overrides.java_path.as_deref())
+	.bind(extra_launch_args)
+	.bind(custom_env_vars)
+	.bind(memory)
+	.bind(force_fullscreen)
+	.bind(game_resolution_x)
+	.bind(game_resolution_y)
+	.bind(overrides.hooks.pre_launch.as_deref())
+	.bind(overrides.hooks.wrapper.as_deref())
+	.bind(overrides.hooks.post_exit.as_deref())
+	.execute(&mut **tx)
+	.await?;
 
-    tx.commit().await?;
-
-    Ok(())
+	Ok(())
 }
 
-pub(crate) async fn delete_instance_by_path(
-    path: &str,
-    pool: &SqlitePool,
+pub(crate) async fn delete_instance_by_id(
+	instance_id: &str,
+	pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
-        "
+	sqlx::query(
+		"
 		DELETE FROM instances
-		WHERE path = ?
+		WHERE id = ?
 		",
-    )
-    .bind(path)
-    .execute(pool)
-    .await?;
+	)
+	.bind(instance_id)
+	.execute(pool)
+	.await?;
 
-    Ok(())
+	Ok(())
+}
+
+struct InstanceLinkColumns {
+	link_kind: &'static str,
+	modrinth_project_id: Option<String>,
+	modrinth_version_id: Option<String>,
+	server_project_id: Option<String>,
+	content_project_id: Option<String>,
+	content_version_id: Option<String>,
+	hosting_server_id: Option<String>,
+	hosting_instance_ids: Option<String>,
+	hosting_active_instance_id: Option<String>,
+	shared_instance_id: Option<String>,
+}
+
+fn instance_link_columns(
+	link: &InstanceLink,
+) -> crate::Result<InstanceLinkColumns> {
+	match link {
+		InstanceLink::Unmanaged => Ok(InstanceLinkColumns {
+			link_kind: "unmanaged",
+			modrinth_project_id: None,
+			modrinth_version_id: None,
+			server_project_id: None,
+			content_project_id: None,
+			content_version_id: None,
+			hosting_server_id: None,
+			hosting_instance_ids: None,
+			hosting_active_instance_id: None,
+			shared_instance_id: None,
+		}),
+		InstanceLink::ModrinthModpack {
+			project_id,
+			version_id,
+		} => Ok(InstanceLinkColumns {
+			link_kind: "modrinth_modpack",
+			modrinth_project_id: Some(project_id.clone()),
+			modrinth_version_id: Some(version_id.clone()),
+			server_project_id: None,
+			content_project_id: None,
+			content_version_id: None,
+			hosting_server_id: None,
+			hosting_instance_ids: None,
+			hosting_active_instance_id: None,
+			shared_instance_id: None,
+		}),
+		InstanceLink::ServerProject { project_id } => {
+			Ok(InstanceLinkColumns {
+				link_kind: "server_project",
+				modrinth_project_id: None,
+				modrinth_version_id: None,
+				server_project_id: Some(project_id.clone()),
+				content_project_id: None,
+				content_version_id: None,
+				hosting_server_id: None,
+				hosting_instance_ids: None,
+				hosting_active_instance_id: None,
+				shared_instance_id: None,
+			})
+		}
+		InstanceLink::ServerProjectModpack {
+			server_project_id,
+			content_project_id,
+			content_version_id,
+		} => Ok(InstanceLinkColumns {
+			link_kind: "server_project_modpack",
+			modrinth_project_id: None,
+			modrinth_version_id: None,
+			server_project_id: Some(server_project_id.clone()),
+			content_project_id: Some(content_project_id.clone()),
+			content_version_id: Some(content_version_id.clone()),
+			hosting_server_id: None,
+			hosting_instance_ids: None,
+			hosting_active_instance_id: None,
+			shared_instance_id: None,
+		}),
+		InstanceLink::ModrinthHosting {
+			server_id,
+			instance_ids,
+			active_instance_id,
+		} => Ok(InstanceLinkColumns {
+			link_kind: "modrinth_hosting",
+			modrinth_project_id: None,
+			modrinth_version_id: None,
+			server_project_id: None,
+			content_project_id: None,
+			content_version_id: None,
+			hosting_server_id: Some(server_id.to_string()),
+			hosting_instance_ids: Some(serde_json::to_string(instance_ids)?),
+			hosting_active_instance_id: active_instance_id
+				.map(|value| value.to_string()),
+			shared_instance_id: None,
+		}),
+		InstanceLink::ImportedModpack {
+			project_id,
+			version_id,
+		} => Ok(InstanceLinkColumns {
+			link_kind: "imported_modpack",
+			modrinth_project_id: project_id.clone(),
+			modrinth_version_id: version_id.clone(),
+			server_project_id: None,
+			content_project_id: None,
+			content_version_id: None,
+			hosting_server_id: None,
+			hosting_instance_ids: None,
+			hosting_active_instance_id: None,
+			shared_instance_id: None,
+		}),
+		InstanceLink::SharedInstance { shared_instance_id } => {
+			Ok(InstanceLinkColumns {
+				link_kind: "shared_instance",
+				modrinth_project_id: None,
+				modrinth_version_id: None,
+				server_project_id: None,
+				content_project_id: None,
+				content_version_id: None,
+				hosting_server_id: None,
+				hosting_instance_ids: None,
+				hosting_active_instance_id: None,
+				shared_instance_id: Some(shared_instance_id.to_string()),
+			})
+		}
+	}
 }
 
 fn required(value: Option<String>, column: &str) -> crate::Result<String> {
@@ -698,39 +794,4 @@ fn unsigned(value: i64, column: &str) -> crate::Result<u64> {
     }
 
     Ok(value as u64)
-}
-
-fn profile_content_source_kind(profile: &Profile) -> ContentSourceKind {
-    match &profile.linked_data {
-        Some(linked_data) if linked_data.version_id.is_empty() => {
-            ContentSourceKind::ServerProject
-        }
-        Some(_) => ContentSourceKind::ModrinthModpack,
-        None => ContentSourceKind::Local,
-    }
-}
-
-fn profile_link_columns(
-    profile: &Profile,
-) -> (
-    &'static str,
-    Option<String>,
-    Option<String>,
-    Option<String>,
-) {
-    match &profile.linked_data {
-        Some(linked_data) if linked_data.version_id.is_empty() => (
-            "server_project",
-            None,
-            None,
-            Some(linked_data.project_id.clone()),
-        ),
-        Some(linked_data) => (
-            "modrinth_modpack",
-            Some(linked_data.project_id.clone()),
-            Some(linked_data.version_id.clone()),
-            None,
-        ),
-        None => ("unmanaged", None, None, None),
-    }
 }

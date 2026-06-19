@@ -1,5 +1,5 @@
 use crate::state::{
-    LauncherFeatureVersion, ProfileInstallStage, ReleaseChannel,
+    LauncherFeatureVersion, InstanceInstallStage, ReleaseChannel,
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -9,7 +9,7 @@ pub struct Instance {
     pub id: String,
     pub path: String,
     pub applied_content_set_id: Option<String>,
-    pub install_stage: ProfileInstallStage,
+    pub install_stage: InstanceInstallStage,
     pub launcher_feature_version: LauncherFeatureVersion,
     pub update_channel: ReleaseChannel,
     pub name: String,

@@ -8,7 +8,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
-import { edit } from '@/helpers/profile'
+import { edit } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
@@ -28,21 +28,21 @@ const overrideHooks = ref(
 )
 const hooks = ref(instance.value.hooks ?? globalSettings.hooks)
 
-const editProfileObject = computed(() => {
-	const editProfile: {
+const editInstanceObject = computed(() => {
+	const editInstancePatch: {
 		hooks?: Hooks
 	} = {}
 
 	// When hooks are not overridden per-instance, we want to clear them
-	editProfile.hooks = overrideHooks.value ? hooks.value : {}
+	editInstancePatch.hooks = overrideHooks.value ? hooks.value : {}
 
-	return editProfile
+	return editInstancePatch
 })
 
 watch(
 	[overrideHooks, hooks],
 	async () => {
-		await edit(instance.value.path, editProfileObject.value)
+		await edit(instance.value.id, editInstanceObject.value)
 	},
 	{ deep: true },
 )

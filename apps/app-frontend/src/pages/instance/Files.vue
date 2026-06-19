@@ -24,8 +24,8 @@ import {
 } from '@tauri-apps/plugin-fs'
 import { onUnmounted, ref, watch } from 'vue'
 
-import { profile_listener } from '@/helpers/events'
-import { get_full_path } from '@/helpers/profile'
+import { instance_listener } from '@/helpers/events'
+import { get_full_path } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { highlightInFolder } from '@/helpers/utils'
 
@@ -62,9 +62,9 @@ const error = ref<Error | null>(null)
 const currentPath = ref('')
 const editingFile = ref<EditingFile | null>(null)
 
-debug('setup: start, instance.path =', props.instance.path)
+debug('setup: start, instance.id =', props.instance.id)
 
-instanceRoot.value = await get_full_path(props.instance.path)
+instanceRoot.value = await get_full_path(props.instance.id)
 debug('setup: instanceRoot =', instanceRoot.value)
 await refresh()
 debug('setup: refresh complete, items =', items.value.length, 'error =', error.value)
@@ -221,7 +221,7 @@ async function handleWriteFile(path: string, content: string) {
 
 async function handleDownloadFile(path: string, _fileName: string) {
 	await invoke('plugin:files|file_save_as', {
-		instancePath: props.instance.path,
+		instancePath: props.instance.id,
 		filePath: path,
 	})
 }
@@ -275,7 +275,7 @@ async function handleUploadFiles(files: File[]) {
 async function handleExtractFile(path: string, override: boolean, dry: boolean) {
 	try {
 		return await invoke('plugin:files|file_extract_zip', {
-			instancePath: props.instance.path,
+			instancePath: props.instance.id,
 			filePath: path,
 			overrideConflicts: override,
 			dryRun: dry,
@@ -289,28 +289,28 @@ async function handleExtractFile(path: string, override: boolean, dry: boolean) 
 	}
 }
 
-debug('setup: registering profile_listener')
-const unlistenProfiles = await profile_listener(
-	async (event: { event: string; profile_path_id: string }) => {
-		debug('profile_listener: event =', event.event, 'path =', event.profile_path_id)
-		if (event.profile_path_id === props.instance.path && event.event === 'synced') {
-			debug('profile_listener: synced event matched, calling refresh')
+debug('setup: registering instance_listener')
+const unlistenInstances = await instance_listener(
+	async (event: { event: string; instance_id: string }) => {
+		debug('instance_listener: event =', event.event, 'path =', event.instance_id)
+		if (event.instance_id === props.instance.id && event.event === 'synced') {
+			debug('instance_listener: synced event matched, calling refresh')
 			await refresh()
 		}
 	},
 )
-debug('setup: profile_listener registered')
+debug('setup: instance_listener registered')
 
 onUnmounted(() => {
-	unlistenProfiles()
+	unlistenInstances()
 })
 
 watch(
-	() => props.instance.path,
+	() => props.instance.id,
 	async () => {
-		debug('watch instance.path: changed to', props.instance.path)
+		debug('watch instance.id: changed to', props.instance.id)
 		firstPaintPending.value = true
-		instanceRoot.value = await get_full_path(props.instance.path)
+		instanceRoot.value = await get_full_path(props.instance.id)
 		currentPath.value = ''
 		await refresh()
 	},

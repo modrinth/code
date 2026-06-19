@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     State,
     prelude::ModLoader,
-    state::ProfileInstallStage,
+    state::{AppliedContentSetPatch, EditInstance, InstanceInstallStage},
     util::{
         fetch::{fetch, write_cached_icon},
         io,
@@ -49,7 +49,7 @@ pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
 
 pub async fn import_curseforge(
     curseforge_instance_folder: PathBuf, // instance's folder
-    profile_path: &str,                  // path to profile
+    instance_id: &str,
 ) -> crate::Result<()> {
     // Load minecraftinstance.json
     let minecraft_instance = serde_json::from_str::<MinecraftInstance>(
@@ -134,57 +134,68 @@ pub async fn import_curseforge(
             None
         };
 
-        // Set profile data to created default profile
-        crate::api::profile::edit(profile_path, |prof| {
-            prof.name = override_title
-                .clone()
-                .unwrap_or_else(|| backup_name.to_string());
-            prof.install_stage = ProfileInstallStage::PackInstalling;
-            prof.icon_path =
-                icon.clone().map(|x| x.to_string_lossy().to_string());
-            prof.game_version.clone_from(&game_version);
-            prof.loader_version = loader_version.clone().map(|x| x.id);
-            prof.loader = mod_loader;
-
-            async { Ok(()) }
-        })
+        crate::api::instance::edit(
+            instance_id,
+            EditInstance {
+                install_stage: Some(InstanceInstallStage::PackInstalling),
+                name: Some(
+                    override_title
+                        .clone()
+                        .unwrap_or_else(|| backup_name.to_string()),
+                ),
+                icon_path: Some(
+                    icon.clone().map(|x| x.to_string_lossy().to_string()),
+                ),
+                content_set_patch: Some(AppliedContentSetPatch {
+                    game_version: Some(game_version.clone()),
+                    protocol_version: Some(None),
+                    loader: Some(mod_loader),
+                    loader_version: Some(loader_version.clone().map(|x| x.id)),
+                }),
+                ..EditInstance::default()
+            },
+        )
         .await?;
     } else {
-        // create a vanilla profile
-        crate::api::profile::edit(profile_path, |prof| {
-            prof.name = override_title
-                .clone()
-                .unwrap_or_else(|| backup_name.to_string());
-            prof.icon_path =
-                icon.clone().map(|x| x.to_string_lossy().to_string());
-            prof.game_version
-                .clone_from(&minecraft_instance.game_version);
-            prof.loader_version = None;
-            prof.loader = ModLoader::Vanilla;
-
-            async { Ok(()) }
-        })
+        crate::api::instance::edit(
+            instance_id,
+            EditInstance {
+                name: Some(
+                    override_title
+                        .clone()
+                        .unwrap_or_else(|| backup_name.to_string()),
+                ),
+                icon_path: Some(
+                    icon.clone().map(|x| x.to_string_lossy().to_string()),
+                ),
+                content_set_patch: Some(AppliedContentSetPatch {
+                    game_version: Some(minecraft_instance.game_version.clone()),
+                    protocol_version: Some(None),
+                    loader: Some(ModLoader::Vanilla),
+                    loader_version: Some(None),
+                }),
+                ..EditInstance::default()
+            },
+        )
         .await?;
     }
 
     // Copy in contained folders as overrides
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
-        profile_path,
+        instance_id,
         curseforge_instance_folder,
         &state.io_semaphore,
         None,
     )
     .await?;
 
-    if let Some(profile_val) = crate::api::profile::get(profile_path).await? {
-        crate::launcher::install_minecraft(
-            &profile_val,
-            Some(loading_bar),
-            false,
-        )
-        .await?;
-    }
+    crate::launcher::install_minecraft_for_instance_id(
+        instance_id,
+        Some(loading_bar),
+        false,
+    )
+    .await?;
 
     Ok(())
 }

@@ -47,28 +47,28 @@
 				<div class="text-contrast flex items-center gap-2">
 					<router-link
 						v-tooltip="formatMessage(messages.viewInstance)"
-						:to="`/instance/${encodeURIComponent(selectedProcess.profile.path)}`"
+						:to="`/instance/${encodeURIComponent(selectedProcess.instance.id)}`"
 						class="hover:underline"
 					>
-						{{ selectedProcess.profile.name }}
+						{{ selectedProcess.instance.name }}
 					</router-link>
 					<Dropdown
 						v-if="currentProcesses.length > 1"
 						placement="bottom"
 						:triggers="['click']"
 						:hide-triggers="['click']"
-						@show="showProfiles = true"
-						@hide="showProfiles = false"
+						@show="showInstances = true"
+						@hide="showInstances = false"
 					>
 						<ButtonStyled type="transparent" circular size="small">
 							<button
 								v-tooltip="
-									showProfiles
+									showInstances
 										? formatMessage(messages.hideMoreRunningInstances)
 										: formatMessage(messages.showMoreRunningInstances)
 								"
 							>
-								<DropdownIcon :class="{ 'rotate-180': !!showProfiles }" />
+								<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
 							</button>
 						</ButtonStyled>
 						<template #popper>
@@ -93,7 +93,7 @@
 									>
 										<OnlineIndicatorIcon />
 										<span class="mr-auto text-contrast flex items-center gap-2">
-											{{ process.profile.name }}
+											{{ process.instance.name }}
 											<StarIcon v-if="process.uuid === selectedProcess.uuid" class="text-orange" />
 										</span>
 									</button>
@@ -107,7 +107,7 @@
 									<button
 										v-tooltip="formatMessage(messages.viewLogs)"
 										class="active:scale-95 flex"
-										@click.stop="goToTerminal(process.profile.path)"
+										@click.stop="goToTerminal(process.instance.id)"
 									>
 										<TerminalSquareIcon class="text-secondary size-5" />
 									</button>
@@ -166,8 +166,8 @@ import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
 import { loading_listener, process_listener } from '@/helpers/events'
+import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
-import { get_many as getInstances } from '@/helpers/profile.js'
 import type { LoadingBar } from '@/helpers/state'
 import { progress_bars_list } from '@/helpers/state'
 import type { GameInstance } from '@/helpers/types'
@@ -183,12 +183,12 @@ const { formatMessage } = useVIntl()
 
 const router = useRouter()
 
-const showProfiles = ref(false)
+const showInstances = ref(false)
 
 interface RunningProcess {
 	uuid: string
-	profile_path: string
-	profile: GameInstance
+	instance_id: string
+	instance: GameInstance
 }
 
 const messages = defineMessages({
@@ -337,22 +337,22 @@ const refresh = async () => {
 	const processes = ((await getRunningProcesses().catch((error) => {
 		handleError(error)
 		return []
-	})) ?? []) as Array<{ uuid: string; profile_path: string }>
-	const paths = processes.map((process) => process.profile_path)
-	const profiles: GameInstance[] = await getInstances(paths).catch((error) => {
+	})) ?? []) as Array<{ uuid: string; instance_id: string }>
+	const instanceIds = processes.map((process) => process.instance_id)
+	const instances: GameInstance[] = await getInstances(instanceIds).catch((error) => {
 		handleError(error)
 		return []
 	})
 
 	currentProcesses.value = processes
 		.map((process) => {
-			const profile = profiles.find((item) => process.profile_path === item.path)
-			if (!profile) {
+			const instance = instances.find((item) => process.instance_id === item.id)
+			if (!instance) {
 				return null
 			}
 			return {
 				...process,
-				profile,
+				instance,
 			}
 		})
 		.filter((process): process is RunningProcess => process !== null)
@@ -385,8 +385,8 @@ const stop = async (process: RunningProcess) => {
 		await killProcess(process.uuid).catch(handleError)
 
 		trackEvent('InstanceStop', {
-			loader: process.profile.loader,
-			game_version: process.profile.game_version,
+			loader: process.instance.loader,
+			game_version: process.instance.game_version,
 			source: 'AppBar',
 		})
 	} catch (e) {
@@ -396,7 +396,7 @@ const stop = async (process: RunningProcess) => {
 }
 
 function goToTerminal(path?: string) {
-	const selectedPath = path ?? selectedProcess.value?.profile.path
+	const selectedPath = path ?? selectedProcess.value?.instance.id
 	if (!selectedPath) {
 		return
 	}
@@ -513,8 +513,8 @@ function formatLoadingBars(loadingBar: LoadingBar): LoadingBar {
 			version: formatted.bar_type.version,
 		})
 	}
-	if (formatted.bar_type?.profile_path) {
-		formatted.title = formatted.bar_type.profile_path
+	if (formatted.bar_type?.instance_id) {
+		formatted.title = formatted.bar_type.instance_id
 	}
 	if (formatted.bar_type?.pack_name) {
 		formatted.title = formatted.bar_type.pack_name
@@ -532,29 +532,29 @@ async function refreshLoadingBars() {
 		.map(formatLoadingBars)
 		.filter((bar) => bar?.bar_type?.type !== 'launcher_update')
 
-	const profilePaths = Array.from(
+	const instanceIds = Array.from(
 		new Set(
 			currentLoadingBars.value
-				.map((bar) => bar.bar_type?.profile_path)
-				.filter((path): path is string => !!path),
+				.map((bar) => bar.bar_type?.instance_id)
+				.filter((instanceId): instanceId is string => !!instanceId),
 		),
 	)
-	const profiles = profilePaths.length
-		? await getInstances(profilePaths).catch((error) => {
+	const instances = instanceIds.length
+		? await getInstances(instanceIds).catch((error) => {
 				handleError(error)
 				return []
 			})
 		: []
-	const profileIconUrls = new Map(
-		profiles.map((profile) => [profile.path, getDisplayIconUrl(profile.icon_path)]),
+	const instanceIconUrls = new Map(
+		instances.map((instance) => [instance.id, getDisplayIconUrl(instance.icon_path)]),
 	)
 	currentLoadingBarIconUrls.value = Object.fromEntries(
 		currentLoadingBars.value.map((bar) => {
 			const barIconUrl = getDisplayIconUrl(bar.bar_type?.icon)
-			const profileIconUrl = bar.bar_type?.profile_path
-				? profileIconUrls.get(bar.bar_type.profile_path)
+			const instanceIconUrl = bar.bar_type?.instance_id
+				? instanceIconUrls.get(bar.bar_type.instance_id)
 				: null
-			return [getLoadingBarKey(bar), barIconUrl ?? profileIconUrl ?? null]
+			return [getLoadingBarKey(bar), barIconUrl ?? instanceIconUrl ?? null]
 		}),
 	)
 

@@ -21,9 +21,9 @@ import Instance from '@/components/ui/Instance.vue'
 import LegacyProjectCard from '@/components/ui/LegacyProjectCard.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_by_profile_path } from '@/helpers/process.js'
-import { duplicate, kill, remove, run } from '@/helpers/profile.js'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import { duplicate, kill, remove, run } from '@/helpers/instance'
+import { get_by_instance_id } from '@/helpers/process.js'
+import { showInstanceInFolder } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
 import { handleSevereError } from '@/store/error.js'
 
@@ -60,13 +60,13 @@ const deleteConfirmModal = ref(null)
 
 const currentDeleteInstance = ref(null)
 
-async function deleteProfile() {
+async function deleteInstance() {
 	if (currentDeleteInstance.value) {
 		await remove(currentDeleteInstance.value).catch(handleError)
 	}
 }
 
-async function duplicateProfile(p) {
+async function duplicateInstance(p) {
 	await duplicate(p).catch(handleError)
 }
 
@@ -85,7 +85,7 @@ const handleInstanceRightClick = async (event, passedInstance) => {
 		},
 	]
 
-	const runningProcesses = await get_by_profile_path(passedInstance.path).catch(handleError)
+	const runningProcesses = await get_by_instance_id(passedInstance.id).catch(handleError)
 
 	const options =
 		runningProcesses.length > 0
@@ -126,16 +126,14 @@ const handleProjectClick = (event, passedInstance) => {
 const handleOptionsClick = async (args) => {
 	switch (args.option) {
 		case 'play':
-			await run(args.item.path).catch((err) =>
-				handleSevereError(err, { profilePath: args.item.path }),
-			)
+			await run(args.item.id).catch((err) => handleSevereError(err, { instanceId: args.item.id }))
 			trackEvent('InstanceStart', {
 				loader: args.item.loader,
 				game_version: args.item.game_version,
 			})
 			break
 		case 'stop':
-			await kill(args.item.path).catch(handleError)
+			await kill(args.item.id).catch(handleError)
 			trackEvent('InstanceStop', {
 				loader: args.item.loader,
 				game_version: args.item.game_version,
@@ -144,26 +142,26 @@ const handleOptionsClick = async (args) => {
 		case 'add_content':
 			await router.push({
 				path: `/browse/${args.item.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-				query: { i: args.item.path },
+				query: { i: args.item.id },
 			})
 			break
 		case 'edit':
 			await router.push({
-				path: `/instance/${encodeURIComponent(args.item.path)}`,
+				path: `/instance/${encodeURIComponent(args.item.id)}`,
 			})
 			break
 		case 'duplicate':
-			if (args.item.install_stage == 'installed') await duplicateProfile(args.item.path)
+			if (args.item.install_stage == 'installed') await duplicateInstance(args.item.id)
 			break
 		case 'delete':
-			currentDeleteInstance.value = args.item.path
+			currentDeleteInstance.value = args.item.id
 			deleteConfirmModal.value.show()
 			break
 		case 'open_folder':
-			await showProfileInFolder(args.item.path)
+			await showInstanceInFolder(args.item.id)
 			break
 		case 'copy_path':
-			await navigator.clipboard.writeText(args.item.path)
+			await navigator.clipboard.writeText(args.item.id)
 			break
 		case 'install': {
 			await installVersion(
@@ -239,7 +237,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="deleteProfile" />
+	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="deleteInstance" />
 	<div ref="rowContainer" class="flex flex-col gap-4">
 		<div v-for="row in actualInstances" ref="rows" :key="row.label" class="row">
 			<HeadingLink class="mt-1" :to="row.route">
@@ -256,7 +254,7 @@ onUnmounted(() => {
 						0,
 						row.compact ? maxInstancesPerCompactRow : maxInstancesPerRow,
 					)"
-					:key="row.label + instance.path"
+					:key="row.label + instance.id"
 					:instance="instance"
 					:compact="row.compact"
 					:first="instanceIndex === 0"

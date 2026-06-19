@@ -82,6 +82,32 @@ struct CompactedLog {
     stats: LogCompactionStats,
 }
 
+async fn resolve_instance_path(
+    instance: &str,
+    state: &State,
+) -> crate::Result<String> {
+    sqlx::query_scalar::<_, String>(
+        "
+        SELECT path
+        FROM instances
+        WHERE id = ? OR path = ?
+        ORDER BY CASE WHEN id = ? THEN 0 ELSE 1 END
+        LIMIT 1
+        ",
+    )
+    .bind(instance)
+    .bind(instance)
+    .bind(instance)
+    .fetch_optional(&state.pool)
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Unknown instance id or path: {instance}"
+        ))
+        .as_error()
+    })
+}
+
 fn split_line_ending(line: &str) -> (&str, &str) {
     if let Some(line) = line.strip_suffix("\r\n") {
         (line, "\r\n")
@@ -211,7 +237,7 @@ impl Logs {
     async fn build(
         log_type: LogType,
         age: SystemTime,
-        profile_subpath: &str,
+        instance_path: &str,
         filename: String,
         clear_contents: Option<bool>,
     ) -> crate::Result<Self> {
@@ -226,7 +252,7 @@ impl Logs {
             } else {
                 Some(
                     get_output_by_filename(
-                        profile_subpath,
+                        instance_path,
                         log_type,
                         &filename,
                     )
@@ -240,17 +266,18 @@ impl Logs {
 
 #[tracing::instrument]
 pub async fn get_logs_from_type(
-    profile_path: &str,
+    instance_id: &str,
     log_type: LogType,
     clear_contents: Option<bool>,
     logs: &mut Vec<crate::Result<Logs>>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
+    let instance_path = resolve_instance_path(instance_id, &state).await?;
 
     let logs_folder = match log_type {
-        LogType::InfoLog => state.directories.profile_logs_dir(profile_path),
+        LogType::InfoLog => state.directories.instance_logs_dir(&instance_path),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_path)
+            state.directories.crash_reports_dir(&instance_path)
         }
     };
 
@@ -274,7 +301,7 @@ pub async fn get_logs_from_type(
                     Logs::build(
                         log_type,
                         age,
-                        profile_path,
+                        &instance_path,
                         file_name,
                         clear_contents,
                     )
@@ -288,19 +315,19 @@ pub async fn get_logs_from_type(
 
 #[tracing::instrument]
 pub async fn get_logs(
-    profile_path_id: &str,
+    instance_id: &str,
     clear_contents: Option<bool>,
 ) -> crate::Result<Vec<Logs>> {
     let mut logs = Vec::new();
     get_logs_from_type(
-        profile_path_id,
+        instance_id,
         LogType::InfoLog,
         clear_contents,
         &mut logs,
     )
     .await?;
     get_logs_from_type(
-        profile_path_id,
+        instance_id,
         LogType::CrashReport,
         clear_contents,
         &mut logs,
@@ -314,16 +341,17 @@ pub async fn get_logs(
 
 #[tracing::instrument]
 pub async fn get_logs_by_filename(
-    profile_path: &str,
+    instance_id: &str,
     log_type: LogType,
     filename: String,
 ) -> crate::Result<Logs> {
     let state = State::get().await?;
+    let instance_path = resolve_instance_path(instance_id, &state).await?;
 
     let path = match log_type {
-        LogType::InfoLog => state.directories.profile_logs_dir(profile_path),
+        LogType::InfoLog => state.directories.instance_logs_dir(&instance_path),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_path)
+            state.directories.crash_reports_dir(&instance_path)
         }
     }
     .join(&filename);
@@ -331,21 +359,21 @@ pub async fn get_logs_by_filename(
     let metadata = std::fs::metadata(&path)?;
     let age = metadata.created().unwrap_or(SystemTime::UNIX_EPOCH);
 
-    Logs::build(log_type, age, profile_path, filename, Some(true)).await
+    Logs::build(log_type, age, &instance_path, filename, Some(true)).await
 }
 
 #[tracing::instrument]
 pub async fn get_output_by_filename(
-    profile_subpath: &str,
+    instance_path: &str,
     log_type: LogType,
     file_name: &str,
 ) -> crate::Result<CensoredString> {
     let state = State::get().await?;
 
     let logs_folder = match log_type {
-        LogType::InfoLog => state.directories.profile_logs_dir(profile_subpath),
+        LogType::InfoLog => state.directories.instance_logs_dir(instance_path),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_subpath)
+            state.directories.crash_reports_dir(instance_path)
         }
     };
 
@@ -386,10 +414,11 @@ pub async fn get_output_by_filename(
 }
 
 #[tracing::instrument]
-pub async fn delete_logs(profile_path_id: &str) -> crate::Result<()> {
+pub async fn delete_logs(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
+    let instance_path = resolve_instance_path(instance_id, &state).await?;
 
-    let logs_folder = state.directories.profile_logs_dir(profile_path_id);
+    let logs_folder = state.directories.instance_logs_dir(&instance_path);
     for entry in std::fs::read_dir(&logs_folder)
         .map_err(|e| IOError::with_path(e, &logs_folder))?
     {
@@ -404,16 +433,17 @@ pub async fn delete_logs(profile_path_id: &str) -> crate::Result<()> {
 
 #[tracing::instrument]
 pub async fn delete_logs_by_filename(
-    profile_path_id: &str,
+    instance_id: &str,
     log_type: LogType,
     filename: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
+    let instance_path = resolve_instance_path(instance_id, &state).await?;
 
     let logs_folder = match log_type {
-        LogType::InfoLog => state.directories.profile_logs_dir(profile_path_id),
+        LogType::InfoLog => state.directories.instance_logs_dir(&instance_path),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_path_id)
+            state.directories.crash_reports_dir(&instance_path)
         }
     };
 
@@ -424,10 +454,10 @@ pub async fn delete_logs_by_filename(
 
 #[tracing::instrument]
 pub async fn get_live_log_buffer(
-    profile_path: &str,
+    instance_id: &str,
 ) -> crate::Result<CensoredString> {
     let state = State::get().await?;
-    let lines = crate::state::get_log_buffer(profile_path);
+    let lines = crate::state::get_log_buffer(instance_id);
     let joined = lines.join("\n");
     let compacted = compact_duplicate_lines(&joined);
 
@@ -440,26 +470,27 @@ pub async fn get_live_log_buffer(
     Ok(CensoredString::censor(compacted.output, &credentials))
 }
 
-pub fn clear_live_log_buffer(profile_path: &str) {
-    crate::state::remove_log_buffer(profile_path);
+pub fn clear_live_log_buffer(instance_id: &str) {
+    crate::state::remove_log_buffer(instance_id);
 }
 
 #[tracing::instrument]
 pub async fn get_latest_log_cursor(
-    profile_path: &str,
+    instance_id: &str,
     cursor: u64, // 0 to start at beginning of file
 ) -> crate::Result<LatestLogCursor> {
-    get_generic_live_log_cursor(profile_path, "launcher_log.txt", cursor).await
+    get_generic_live_log_cursor(instance_id, "launcher_log.txt", cursor).await
 }
 
 #[tracing::instrument]
 pub async fn get_generic_live_log_cursor(
-    profile_path_id: &str,
+    instance_id: &str,
     log_file_name: &str,
     mut cursor: u64, // 0 to start at beginning of file
 ) -> crate::Result<LatestLogCursor> {
     let state = State::get().await?;
-    let logs_folder = state.directories.profile_logs_dir(profile_path_id);
+    let instance_path = resolve_instance_path(instance_id, &state).await?;
+    let logs_folder = state.directories.instance_logs_dir(&instance_path);
     let path = logs_folder.join(log_file_name);
     if !path.exists() {
         // Allow silent failure if latest.log doesn't exist (as the instance may have been launched, but not yet created the file)

@@ -27,52 +27,52 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .build()
 }
 
-/// Get all Logs for a profile, sorted by filename
+/// Get all logs for an instance, sorted by filename.
 #[tauri::command]
 pub async fn logs_get_logs(
-    profile_path: &str,
+    instance_id: &str,
     clear_contents: Option<bool>,
 ) -> Result<Vec<Logs>> {
-    let val = logs::get_logs(profile_path, clear_contents).await?;
+    let val = logs::get_logs(instance_id, clear_contents).await?;
 
     Ok(val)
 }
 
-/// Get a Log struct for a profile by profile id and filename string
+/// Get a log struct for an instance by filename.
 #[tauri::command]
 pub async fn logs_get_logs_by_filename(
-    profile_path: &str,
+    instance_id: &str,
     log_type: LogType,
     filename: String,
 ) -> Result<Logs> {
-    Ok(logs::get_logs_by_filename(profile_path, log_type, filename).await?)
+    Ok(logs::get_logs_by_filename(instance_id, log_type, filename).await?)
 }
 
-/// Get the stdout for a profile by profile id and filename string
+/// Get the output for an instance by filename.
 #[tauri::command]
 pub async fn logs_get_output_by_filename(
-    profile_path: &str,
+    instance_id: &str,
     log_type: LogType,
     filename: String,
 ) -> Result<CensoredString> {
-    Ok(logs::get_output_by_filename(profile_path, log_type, &filename).await?)
+    Ok(logs::get_output_by_filename(instance_id, log_type, &filename).await?)
 }
 
-/// Delete all logs for a profile by profile id
+/// Delete all logs for an instance.
 #[tauri::command]
-pub async fn logs_delete_logs(profile_path: &str) -> Result<()> {
-    Ok(logs::delete_logs(profile_path).await?)
+pub async fn logs_delete_logs(instance_id: &str) -> Result<()> {
+    Ok(logs::delete_logs(instance_id).await?)
 }
 
-/// Delete a log for a profile by profile id and filename string
+/// Delete a log for an instance by filename.
 #[tauri::command]
 pub async fn logs_delete_logs_by_filename(
-    profile_path: &str,
+    instance_id: &str,
     log_type: LogType,
     filename: String,
 ) -> Result<()> {
     Ok(
-        logs::delete_logs_by_filename(profile_path, log_type, &filename)
+        logs::delete_logs_by_filename(instance_id, log_type, &filename)
             .await?,
     )
 }
@@ -80,23 +80,23 @@ pub async fn logs_delete_logs_by_filename(
 /// Get live log from a cursor
 #[tauri::command]
 pub async fn logs_get_latest_log_cursor(
-    profile_path: &str,
+    instance_id: &str,
     cursor: u64, // 0 to start at beginning of file
 ) -> Result<LatestLogCursor> {
-    Ok(logs::get_latest_log_cursor(profile_path, cursor).await?)
+    Ok(logs::get_latest_log_cursor(instance_id, cursor).await?)
 }
 
-/// Get all buffered live log lines for a profile
+/// Get all buffered live log lines for an instance.
 #[tauri::command]
 pub async fn logs_get_live_log_buffer(
-    profile_path: &str,
+    instance_id: &str,
 ) -> Result<CensoredString> {
-    Ok(logs::get_live_log_buffer(profile_path).await?)
+    Ok(logs::get_live_log_buffer(instance_id).await?)
 }
 
-/// Clear the live log buffer for a profile
+/// Clear the live log buffer for an instance.
 #[tauri::command]
-pub async fn logs_clear_live_log_buffer(profile_path: &str) -> Result<()> {
-    logs::clear_live_log_buffer(profile_path);
+pub async fn logs_clear_live_log_buffer(instance_id: &str) -> Result<()> {
+    logs::clear_live_log_buffer(instance_id);
     Ok(())
 }

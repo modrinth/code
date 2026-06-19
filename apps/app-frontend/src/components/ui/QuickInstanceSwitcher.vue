@@ -6,16 +6,16 @@ import dayjs from 'dayjs'
 import { onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
-import { profile_listener } from '@/helpers/events.js'
-import { list } from '@/helpers/profile'
+import { instance_listener } from '@/helpers/events.js'
+import { list } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
 
 const recentInstances = ref([])
 const getInstances = async () => {
-	const profiles = await list().catch(handleError)
+	const instances = await list().catch(handleError)
 
-	recentInstances.value = profiles
+	recentInstances.value = instances
 		.sort((a, b) => {
 			const dateACreated = dayjs(a.created)
 			const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
@@ -37,24 +37,24 @@ const getInstances = async () => {
 
 await getInstances()
 
-const unlistenProfile = await profile_listener(async (event) => {
+const unlistenInstance = await instance_listener(async (event) => {
 	if (event.event !== 'synced') {
 		await getInstances()
 	}
 })
 
 onUnmounted(() => {
-	unlistenProfile()
+	unlistenInstance()
 })
 </script>
 
 <template>
 	<div v-for="instance in recentInstances" :key="instance.id" v-tooltip.right="instance.name">
-		<NavButton :to="`/instance/${encodeURIComponent(instance.path)}`" class="relative">
+		<NavButton :to="`/instance/${encodeURIComponent(instance.id)}`" class="relative">
 			<Avatar
 				:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
 				size="28px"
-				:tint-by="instance.path"
+				:tint-by="instance.id"
 				:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
 			/>
 			<div
@@ -66,7 +66,7 @@ onUnmounted(() => {
 		</NavButton>
 	</div>
 	<div
-		v-if="instances && recentInstances.length > 0"
+		v-if="recentInstances.length > 0"
 		class="h-px w-6 mx-auto my-2 bg-divider"
 	></div>
 </template>

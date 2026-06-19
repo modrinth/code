@@ -1,11 +1,10 @@
 use crate::State;
-use crate::api::profile;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
-    CacheBehaviour, CachedEntry, LinkedData, Profile, ProfileInstallStage,
-    SideType,
+    AppliedContentSetPatch, CacheBehaviour, CachedEntry, EditInstance,
+    InstanceLink, InstanceInstallStage, SideType,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, fetch, fetch_advanced, sha1_file_async,
@@ -102,30 +101,30 @@ pub enum CreatePackLocation {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CreatePackProfile {
+pub struct CreatePackInstance {
     pub name: String, // the name of the profile, and relative path
     pub game_version: String, // the game version of the profile
     pub modloader: ModLoader, // the modloader to use
     pub loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
     pub icon: Option<PathBuf>,          // the icon for the profile
     pub icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
-    pub linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
+    pub link: Option<InstanceLink>,
     pub unknown_file: bool, // true when pack file isn't found on Modrinth via hash lookup
     pub skip_install_profile: Option<bool>,
     pub no_watch: Option<bool>,
 }
 
 // default
-impl Default for CreatePackProfile {
+impl Default for CreatePackInstance {
     fn default() -> Self {
-        CreatePackProfile {
+        CreatePackInstance {
             name: "Untitled".to_string(),
             game_version: "1.19.4".to_string(),
             modloader: ModLoader::Vanilla,
             loader_version: None,
             icon: None,
             icon_url: None,
-            linked_data: None,
+            link: None,
             unknown_file: false,
             skip_install_profile: Some(true),
             no_watch: Some(false),
@@ -156,25 +155,24 @@ pub struct CreatePackDescription {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
     pub existing_loading_bar: Option<LoadingBarId>,
-    pub profile_path: String,
+    pub instance_id: String,
 }
 
-pub async fn get_profile_from_pack(
+pub async fn get_instance_from_pack(
     location: CreatePackLocation,
-) -> crate::Result<CreatePackProfile> {
+) -> crate::Result<CreatePackInstance> {
     match location {
         CreatePackLocation::FromVersionId {
             project_id,
             version_id,
             title,
             icon_url,
-        } => Ok(CreatePackProfile {
+        } => Ok(CreatePackInstance {
             name: title,
             icon_url,
-            linked_data: Some(LinkedData {
+            link: Some(InstanceLink::ModrinthModpack {
                 project_id,
                 version_id,
-                locked: true,
             }),
             ..Default::default()
         }),
@@ -212,7 +210,7 @@ pub async fn get_profile_from_pack(
                 false
             };
 
-            Ok(CreatePackProfile {
+            Ok(CreatePackInstance {
                 name: file_name,
                 unknown_file: !is_known_file,
                 ..Default::default()
@@ -228,7 +226,7 @@ pub async fn generate_pack_from_version_id(
     version_id: String,
     title: String,
     icon_url: Option<String>,
-    profile_path: String,
+    instance_id: String,
 
     initialized_loading_bar: Option<LoadingBarId>,
     reason: DownloadReason,
@@ -242,7 +240,7 @@ pub async fn generate_pack_from_version_id(
     } else {
         init_loading(
             LoadingBarType::PackFileDownload {
-                profile_path: profile_path.clone(),
+                instance_id: instance_id.clone(),
                 pack_name: title.clone(),
                 icon: icon_url,
                 pack_version: version_id.clone(),
@@ -268,7 +266,7 @@ pub async fn generate_pack_from_version_id(
     })?;
     emit_loading(&loading_bar, 10.0, None)?;
 
-    // Update profile with correct loader and game version from the API version metadata,
+    // Update instance with correct loader and game version from the API version metadata,
     // so the UI shows accurate info while the pack file is still downloading.
     if let Some(game_version) = version.game_versions.first() {
         let loader = version
@@ -277,12 +275,18 @@ pub async fn generate_pack_from_version_id(
             .map(|l| ModLoader::from_string(l))
             .unwrap_or(ModLoader::Vanilla);
         let game_version = game_version.clone();
-        let profile_path_clone = profile_path.clone();
-        profile::edit(&profile_path_clone, |prof| {
-            prof.game_version.clone_from(&game_version);
-            prof.loader = loader;
-            async { Ok(()) }
-        })
+        crate::api::instance::edit(
+            &instance_id,
+            EditInstance {
+                content_set_patch: Some(AppliedContentSetPatch {
+                    game_version: Some(game_version),
+                    protocol_version: Some(None),
+                    loader: Some(loader),
+                    loader_version: None,
+                }),
+                ..EditInstance::default()
+            },
+        )
         .await?;
     }
 
@@ -301,20 +305,18 @@ pub async fn generate_pack_from_version_id(
             )
         })?;
 
-    let profile =
-        Profile::get(&profile_path, &state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::UnmanagedProfileError(
-                    profile_path.to_string(),
-                )
-                .as_error()
-            })?;
+    let metadata = crate::api::instance::get(&instance_id)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(format!(
+                "Unknown instance {instance_id}"
+            ))
+        })?;
 
     let download_meta = DownloadMeta {
         reason,
-        game_version: profile.game_version.clone(),
-        loader: profile.loader.as_str().to_string(),
+        game_version: metadata.applied_content_set.game_version.clone(),
+        loader: metadata.applied_content_set.loader.as_str().to_string(),
         dependent_on: Some(version_id.clone()),
     };
 
@@ -390,8 +392,11 @@ pub async fn generate_pack_from_version_id(
 
     // Set the icon immediately so the UI shows it during download.
     if let Some(ref icon_path) = icon {
-        let _ =
-            profile::edit_icon(&profile_path, Some(icon_path.as_path())).await;
+        let _ = crate::api::instance::edit_icon(
+            &instance_id,
+            Some(icon_path.as_path()),
+        )
+        .await;
     }
 
     Ok(CreatePack {
@@ -402,7 +407,7 @@ pub async fn generate_pack_from_version_id(
             project_id: Some(project_id),
             version_id: Some(version_id),
             existing_loading_bar: Some(loading_bar),
-            profile_path,
+            instance_id,
         },
     })
 }
@@ -411,7 +416,7 @@ pub async fn generate_pack_from_version_id(
 
 pub async fn generate_pack_from_file(
     path: PathBuf,
-    profile_path: String,
+    instance_id: String,
 ) -> crate::Result<CreatePack> {
     Ok(CreatePack {
         file: CreatePackFile::Path(path),
@@ -421,19 +426,19 @@ pub async fn generate_pack_from_file(
             project_id: None,
             version_id: None,
             existing_loading_bar: None,
-            profile_path,
+            instance_id,
         },
     })
 }
 
-/// Sets generated profile attributes to the pack ones (using profile::edit)
+/// Sets generated instance attributes to the pack ones.
 /// This includes the pack name, icon, game version, loader version, and loader
-pub async fn set_profile_information(
-    profile_path: String,
+pub async fn set_instance_information(
+    instance_id: String,
     description: &CreatePackDescription,
     backup_name: &str,
     dependencies: &HashMap<PackDependency, String>,
-    ignore_lock: bool, // do not change locked status
+    _ignore_lock: bool,
 ) -> crate::Result<()> {
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
@@ -479,40 +484,39 @@ pub async fn set_profile_information(
     } else {
         None
     };
-    // Sets values in profile
-    crate::api::profile::edit(&profile_path, |prof| {
-        prof.name = description
-            .override_title
-            .clone()
-            .unwrap_or_else(|| backup_name.to_string());
-        prof.install_stage = ProfileInstallStage::PackInstalling;
-
-        if let Some(ref project_id) = description.project_id
-            && let Some(ref version_id) = description.version_id
-        {
-            prof.linked_data = Some(LinkedData {
+    let link = match (&description.project_id, &description.version_id) {
+        (Some(project_id), Some(version_id)) => {
+            Some(InstanceLink::ModrinthModpack {
                 project_id: project_id.clone(),
                 version_id: version_id.clone(),
-                locked: if !ignore_lock {
-                    true
-                } else {
-                    prof.linked_data.as_ref().is_none_or(|x| x.locked)
-                },
             })
         }
-
-        // Only update the icon if the pack provides one.
-        // When installing to an existing profile, icon is None
-        // and we preserve the profile's existing icon.
-        if let Some(ref icon) = description.icon {
-            prof.icon_path = Some(icon.to_string_lossy().to_string());
-        }
-        prof.game_version.clone_from(game_version);
-        prof.loader_version = loader_version.clone().map(|x| x.id);
-        prof.loader = mod_loader;
-
-        async { Ok(()) }
-    })
+        _ => None,
+    };
+    crate::api::instance::edit(
+        &instance_id,
+        EditInstance {
+            install_stage: Some(InstanceInstallStage::PackInstalling),
+            name: Some(
+                description
+                    .override_title
+                    .clone()
+                    .unwrap_or_else(|| backup_name.to_string()),
+            ),
+            icon_path: description
+                .icon
+                .as_ref()
+                .map(|icon| Some(icon.to_string_lossy().to_string())),
+            link,
+            content_set_patch: Some(AppliedContentSetPatch {
+                game_version: Some(game_version.clone()),
+                protocol_version: Some(None),
+                loader: Some(mod_loader),
+                loader_version: Some(loader_version.clone().map(|x| x.id)),
+            }),
+            ..EditInstance::default()
+        },
+    )
     .await?;
     Ok(())
 }

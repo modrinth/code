@@ -22,8 +22,8 @@ interface InstanceConsoleEntry {
 
 const instances = new Map<string, InstanceConsoleEntry>()
 
-function getOrCreate(profilePathId: string): InstanceConsoleEntry {
-	let entry = instances.get(profilePathId)
+function getOrCreate(instanceId: string): InstanceConsoleEntry {
+	let entry = instances.get(instanceId)
 	if (entry) return entry
 
 	entry = {
@@ -32,22 +32,22 @@ function getOrCreate(profilePathId: string): InstanceConsoleEntry {
 		historicalCache: new Map(),
 		logList: null,
 	}
-	instances.set(profilePathId, entry)
+	instances.set(instanceId, entry)
 	return entry
 }
 
-async function hydrate(profilePathId: string): Promise<void> {
-	const entry = getOrCreate(profilePathId)
+async function hydrate(instanceId: string): Promise<void> {
+	const entry = getOrCreate(instanceId)
 	if (entry.liveConsole.output.value.length > 0) return
 
-	const buffer = await get_live_log_buffer(profilePathId)
+	const buffer = await get_live_log_buffer(instanceId)
 	if (buffer) {
 		entry.liveConsole.addLegacyLog(buffer)
 	}
 }
 
-async function getHistoricalLogs(profilePathId: string, instancePath: string): Promise<LogEntry[]> {
-	const entry = getOrCreate(profilePathId)
+async function getHistoricalLogs(instanceId: string, instancePath: string): Promise<LogEntry[]> {
+	const entry = getOrCreate(instanceId)
 	if (entry.logList) return entry.logList
 
 	const logs: LogEntry[] = await get_logs(instancePath, true)
@@ -62,38 +62,38 @@ async function getHistoricalLogs(profilePathId: string, instancePath: string): P
 	return logs
 }
 
-function getHistoricalContent(profilePathId: string, filename: string): string | undefined {
-	return instances.get(profilePathId)?.historicalCache.get(filename)
+function getHistoricalContent(instanceId: string, filename: string): string | undefined {
+	return instances.get(instanceId)?.historicalCache.get(filename)
 }
 
-function invalidate(profilePathId: string): void {
-	const entry = instances.get(profilePathId)
+function invalidate(instanceId: string): void {
+	const entry = instances.get(instanceId)
 	if (!entry) return
 	entry.historicalCache.clear()
 	entry.logList = null
 }
 
-async function clearLive(profilePathId: string): Promise<void> {
-	const entry = getOrCreate(profilePathId)
+async function clearLive(instanceId: string): Promise<void> {
+	const entry = getOrCreate(instanceId)
 	entry.liveConsole.clear()
-	await clear_log_buffer(profilePathId).catch(() => {})
+	await clear_log_buffer(instanceId).catch(() => {})
 }
 
-async function destroy(profilePathId: string): Promise<void> {
-	instances.delete(profilePathId)
-	await clear_log_buffer(profilePathId).catch(() => {})
+async function destroy(instanceId: string): Promise<void> {
+	instances.delete(instanceId)
+	await clear_log_buffer(instanceId).catch(() => {})
 }
 
-export function useInstanceConsole(profilePathId: string) {
-	const entry = getOrCreate(profilePathId)
+export function useInstanceConsole(instanceId: string) {
+	const entry = getOrCreate(instanceId)
 	return {
 		liveConsole: entry.liveConsole,
 		historicalConsole: entry.historicalConsole,
-		hydrate: () => hydrate(profilePathId),
-		getHistoricalLogs: (instancePath: string) => getHistoricalLogs(profilePathId, instancePath),
-		getHistoricalContent: (filename: string) => getHistoricalContent(profilePathId, filename),
-		invalidate: () => invalidate(profilePathId),
-		clearLive: () => clearLive(profilePathId),
-		destroy: () => destroy(profilePathId),
+		hydrate: () => hydrate(instanceId),
+		getHistoricalLogs: (instancePath: string) => getHistoricalLogs(instanceId, instancePath),
+		getHistoricalContent: (filename: string) => getHistoricalContent(instanceId, filename),
+		invalidate: () => invalidate(instanceId),
+		clearLive: () => clearLive(instanceId),
+		destroy: () => destroy(instanceId),
 	}
 }

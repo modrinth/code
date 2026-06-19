@@ -1,20 +1,23 @@
 import type { ModrinthId } from '@modrinth/utils'
 
 export type GameInstance = {
+	id: string
 	path: string
 	install_stage: InstallStage
+	launcher_feature_version: string
 
 	name: string
 	icon_path?: string
 
 	game_version: string
+	protocol_version?: number
 	loader: InstanceLoader
 	loader_version?: string
 
 	groups: string[]
 
-	linked_data?: LinkedData
-	preferred_update_channel: ReleaseChannel
+	link?: InstanceLink | null
+	update_channel: ReleaseChannel
 
 	created: Date
 	modified: Date
@@ -40,12 +43,51 @@ type InstallStage =
 	| 'pack_installing'
 	| 'not_installed'
 
-type LinkedData = {
-	project_id: ModrinthId
-	version_id: ModrinthId
-
-	locked: boolean
+type InstanceLinkIdentity = {
+	project_id?: ModrinthId | null
+	version_id?: ModrinthId | null
+	server_project_id?: ModrinthId | null
+	content_project_id?: ModrinthId | null
+	content_version_id?: ModrinthId | null
 }
+
+export type InstanceLink = InstanceLinkIdentity &
+	(
+		| {
+				type: 'modrinth_modpack'
+				project_id: ModrinthId
+				version_id: ModrinthId
+		  }
+		| {
+				type: 'server_project'
+				project_id: ModrinthId
+		  }
+		| {
+				type: 'server_project_modpack'
+				server_project_id: ModrinthId
+				content_project_id?: ModrinthId | null
+				content_version_id: ModrinthId
+				project_id?: ModrinthId
+				version_id?: ModrinthId
+		  }
+		| {
+				type: 'imported_modpack'
+				project_id?: ModrinthId | null
+				version_id?: ModrinthId | null
+		  }
+		| {
+				type: 'modrinth_hosting'
+				server_id: string
+				instance_ids: string[]
+				active_instance_id?: string | null
+		  }
+		| {
+				type: 'shared_instance'
+				shared_instance_id: string
+		  }
+	)
+
+export type Instance = GameInstance
 
 type ReleaseChannel = 'release' | 'beta' | 'alpha'
 

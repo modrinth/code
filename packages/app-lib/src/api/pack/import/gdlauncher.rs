@@ -2,7 +2,12 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{State, prelude::ModLoader, state::ProfileInstallStage, util::io};
+use crate::{
+    State,
+    prelude::ModLoader,
+    state::{AppliedContentSetPatch, EditInstance, InstanceInstallStage},
+    util::io,
+};
 
 use super::{copy_dotminecraft, recache_icon};
 
@@ -36,7 +41,7 @@ pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
 
 pub async fn import_gdlauncher(
     gdlauncher_instance_folder: PathBuf, // instance's folder
-    profile_path: &str,                  // path to profile
+    instance_id: &str,
 ) -> crate::Result<()> {
     // Load config.json
     let config = serde_json::from_str::<GDLauncherConfig>(
@@ -81,39 +86,43 @@ pub async fn import_gdlauncher(
         None
     };
 
-    // Set profile data to created default profile
-    crate::api::profile::edit(profile_path, |prof| {
-        prof.name = override_title
-            .clone()
-            .unwrap_or_else(|| backup_name.to_string());
-        prof.install_stage = ProfileInstallStage::PackInstalling;
-        prof.icon_path = icon.clone().map(|x| x.to_string_lossy().to_string());
-        prof.game_version.clone_from(&game_version);
-        prof.loader_version = loader_version.clone().map(|x| x.id);
-        prof.loader = mod_loader;
-
-        async { Ok(()) }
-    })
+    crate::api::instance::edit(
+        instance_id,
+        EditInstance {
+            install_stage: Some(InstanceInstallStage::PackInstalling),
+            name: Some(
+                override_title
+                    .clone()
+                    .unwrap_or_else(|| backup_name.to_string()),
+            ),
+            icon_path: Some(icon.clone().map(|x| x.to_string_lossy().to_string())),
+            content_set_patch: Some(AppliedContentSetPatch {
+                game_version: Some(game_version.clone()),
+                protocol_version: Some(None),
+                loader: Some(mod_loader),
+                loader_version: Some(loader_version.clone().map(|x| x.id)),
+            }),
+            ..EditInstance::default()
+        },
+    )
     .await?;
 
     // Copy in contained folders as overrides
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
-        profile_path,
+        instance_id,
         gdlauncher_instance_folder,
         &state.io_semaphore,
         None,
     )
     .await?;
 
-    if let Some(profile_val) = crate::api::profile::get(profile_path).await? {
-        crate::launcher::install_minecraft(
-            &profile_val,
-            Some(loading_bar),
-            false,
-        )
-        .await?;
-    }
+    crate::launcher::install_minecraft_for_instance_id(
+        instance_id,
+        Some(loading_bar),
+        false,
+    )
+    .await?;
 
     Ok(())
 }

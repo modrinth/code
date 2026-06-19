@@ -19,7 +19,7 @@ import { useRouter } from 'vue-router'
 
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
+import { duplicate, edit, edit_icon, list, remove } from '@/helpers/instance'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
 import type { GameInstance } from '../../../helpers/types'
@@ -32,14 +32,14 @@ const queryClient = useQueryClient()
 const deleteConfirmModal = ref()
 
 const { instance } = injectInstanceSettings()
-type ReleaseChannel = GameInstance['preferred_update_channel']
+type ReleaseChannel = GameInstance['update_channel']
 const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
 const groups = ref([...instance.value.groups])
 const savingReleaseChannel = ref(false)
-const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.preferred_update_channel)
+const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 	savingReleaseChannel.value ? [...releaseChannelOptions] : [],
 )
@@ -48,8 +48,8 @@ const newCategoryInput = ref('')
 
 const installing = computed(() => instance.value.install_stage !== 'installed')
 
-async function duplicateProfile() {
-	await duplicate(instance.value.path).catch(handleError)
+async function duplicateInstance() {
+	await duplicate(instance.value.id).catch(handleError)
 	trackEvent('InstanceDuplicate', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
@@ -84,22 +84,22 @@ function formatReleaseChannelDescription(channel: ReleaseChannel) {
 }
 
 watch(
-	() => [instance.value.path, instance.value.preferred_update_channel] as const,
+	() => [instance.value.id, instance.value.update_channel] as const,
 	() => {
 		if (!savingReleaseChannel.value) {
-			selectedReleaseChannel.value = instance.value.preferred_update_channel
+			selectedReleaseChannel.value = instance.value.update_channel
 		}
 	},
 )
 
 watch(selectedReleaseChannel, async (channel, previousChannel) => {
-	const previousReleaseChannel = previousChannel ?? instance.value.preferred_update_channel
-	if (channel === instance.value.preferred_update_channel) return
+	const previousReleaseChannel = previousChannel ?? instance.value.update_channel
+	if (channel === instance.value.update_channel) return
 
 	savingReleaseChannel.value = true
-	const profilePath = instance.value.path
-	await edit(profilePath, { preferred_update_channel: channel })
-		.then(() => queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', profilePath] }))
+	const instanceId = instance.value.id
+	await edit(instanceId, { update_channel: channel })
+		.then(() => queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instanceId] }))
 		.catch((error) => {
 			selectedReleaseChannel.value = previousReleaseChannel
 			handleError(error)
@@ -109,7 +109,7 @@ watch(selectedReleaseChannel, async (channel, previousChannel) => {
 
 async function resetIcon() {
 	icon.value = undefined
-	await edit_icon(instance.value.path, null).catch(handleError)
+	await edit_icon(instance.value.id, null).catch(handleError)
 	trackEvent('InstanceRemoveIcon')
 }
 
@@ -127,12 +127,12 @@ async function setIcon() {
 	if (!value) return
 
 	icon.value = value
-	await edit_icon(instance.value.path, icon.value).catch(handleError)
+	await edit_icon(instance.value.id, icon.value).catch(handleError)
 
 	trackEvent('InstanceSetIcon')
 }
 
-const editProfileObject = computed(() => ({
+const editInstanceObject = computed(() => ({
 	name: title.value.trim().substring(0, 32) ?? 'Instance',
 	groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
 }))
@@ -158,15 +158,15 @@ watch(
 	[title, groups, groups],
 	async () => {
 		if (removing.value) return
-		await edit(instance.value.path, editProfileObject.value).catch(handleError)
+		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
 
 const removing = ref(false)
-async function removeProfile() {
+async function removeInstance() {
 	removing.value = true
-	const path = instance.value.path
+	const path = instance.value.id
 
 	trackEvent('InstanceRemove', {
 		loader: instance.value.loader,
@@ -284,7 +284,7 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeProfile" />
+	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeInstance" />
 	<div class="block">
 		<div class="float-end ml-10 relative group w-fit">
 			<div class="flex flex-col gap-1">
@@ -310,7 +310,7 @@ const messages = defineMessages({
 							:src="icon ? convertFileSrc(icon) : icon"
 							size="108px"
 							class="transition-[filter] group-hover:brightness-75"
-							:tint-by="instance.path"
+							:tint-by="instance.id"
 							no-shadow
 						/>
 						<div
@@ -350,7 +350,7 @@ const messages = defineMessages({
 						aria-labelledby="duplicate-instance-label"
 						:disabled="installing"
 						class="w-max !shadow-none"
-						@click="duplicateProfile"
+						@click="duplicateInstance"
 					>
 						<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
 					</button>

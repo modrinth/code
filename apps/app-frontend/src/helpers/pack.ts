@@ -1,9 +1,9 @@
 import { invoke } from '@tauri-apps/api/core'
 
-import { create } from './profile'
+import { create } from './instance'
 import type { InstanceLoader } from './types'
 
-interface PackProfileCreator {
+interface PackInstanceCreator {
 	name: string
 	gameVersion: string
 	modloader: InstanceLoader
@@ -24,12 +24,12 @@ interface PackLocationFile {
 	path: string
 }
 
-export async function create_profile_and_install(
+export async function create_instance_and_install(
 	projectId: string,
 	versionId: string,
 	packTitle: string,
 	iconUrl?: string,
-	createInstanceCallback: (profile: string) => void = () => {},
+	createInstanceCallback: (instanceId: string) => void = () => {},
 ): Promise<void> {
 	const location: PackLocationVersionId = {
 		type: 'fromVersionId',
@@ -38,28 +38,33 @@ export async function create_profile_and_install(
 		title: packTitle,
 		icon_url: iconUrl,
 	}
-	const profile_creator = await invoke<PackProfileCreator>(
-		'plugin:pack|pack_get_profile_from_pack',
+	const instanceCreator = await invoke<PackInstanceCreator>(
+		'plugin:pack|pack_get_instance_from_pack',
 		{ location },
 	)
-	const profile = await create(
-		profile_creator.name,
-		profile_creator.gameVersion,
-		profile_creator.modloader,
-		profile_creator.loaderVersion,
+	const instanceId = await create(
+		instanceCreator.name,
+		instanceCreator.gameVersion,
+		instanceCreator.modloader,
+		instanceCreator.loaderVersion,
 		null,
 		true,
+		{
+			type: 'modrinth_modpack',
+			project_id: projectId,
+			version_id: versionId,
+		},
 	)
-	createInstanceCallback(profile)
+	createInstanceCallback(instanceId)
 
-	return await invoke('plugin:pack|pack_install', { location, profile })
+	return await invoke('plugin:pack|pack_install', { location, instanceId })
 }
 
-export async function install_to_existing_profile(
+export async function install_to_existing_instance(
 	projectId: string,
 	versionId: string,
 	title: string,
-	profilePath: string,
+	instanceId: string,
 ): Promise<void> {
 	const location: PackLocationVersionId = {
 		type: 'fromVersionId',
@@ -67,39 +72,39 @@ export async function install_to_existing_profile(
 		version_id: versionId,
 		title,
 	}
-	return await invoke('plugin:pack|pack_install', { location, profile: profilePath })
+	return await invoke('plugin:pack|pack_install', { location, instanceId })
 }
 
-export async function create_profile_and_install_from_file(
+export async function create_instance_and_install_from_file(
 	path: string,
-	showUnknownPackWarningModal?: (createProfile: () => Promise<void>, fileName: string) => void,
+	showUnknownPackWarningModal?: (createInstance: () => Promise<void>, fileName: string) => void,
 ): Promise<void> {
 	const location: PackLocationFile = {
 		type: 'fromFile',
 		path,
 	}
-	const profile_creator = await invoke<PackProfileCreator>(
-		'plugin:pack|pack_get_profile_from_pack',
+	const instanceCreator = await invoke<PackInstanceCreator>(
+		'plugin:pack|pack_get_instance_from_pack',
 		{ location },
 	)
 
-	const createProfile = async () => {
-		const profile = await create(
-			profile_creator.name,
-			profile_creator.gameVersion,
-			profile_creator.modloader,
-			profile_creator.loaderVersion,
+	const createInstance = async () => {
+		const instanceId = await create(
+			instanceCreator.name,
+			instanceCreator.gameVersion,
+			instanceCreator.modloader,
+			instanceCreator.loaderVersion,
 			null,
 			true,
 		)
-		await invoke('plugin:pack|pack_install', { location, profile })
+		await invoke('plugin:pack|pack_install', { location, instanceId })
 	}
 
-	if (profile_creator.unknownFile && showUnknownPackWarningModal) {
+	if (instanceCreator.unknownFile && showUnknownPackWarningModal) {
 		const splitPath = path.split(/[\\/]/)
 		const fileName = splitPath ? splitPath[splitPath.length - 1] : path
-		showUnknownPackWarningModal(createProfile, fileName)
+		showUnknownPackWarningModal(createInstance, fileName)
 	} else {
-		await createProfile()
+		await createInstance()
 	}
 }
