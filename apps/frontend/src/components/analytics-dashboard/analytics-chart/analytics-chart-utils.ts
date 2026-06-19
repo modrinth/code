@@ -26,6 +26,7 @@ import {
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	isNoDependentAnalyticsBreakdownValue,
 	isUnknownAnalyticsBreakdownValue,
 	UNKNOWN_BREAKDOWN_VALUE,
 } from '../breakdown'
@@ -167,6 +168,9 @@ export function formatBreakdownLabel(
 		return formatAnalyticsDownloadReasonLabel(normalizedLowercaseValue, formatMessage)
 	}
 	if (selectedBreakdown === 'dependent_project_download') {
+		if (isNoDependentAnalyticsBreakdownValue(breakdownValue)) {
+			return formatMessage(analyticsMessages.noDependent)
+		}
 		return breakdownValue
 	}
 	if (selectedBreakdown === 'version_id') {
@@ -390,10 +394,16 @@ export function buildChartDatasets(
 				if (breakdown === 'project' || breakdown === 'dependent_project_download') {
 					if (
 						breakdown === 'dependent_project_download' &&
+						isNoDependentAnalyticsBreakdownValue(breakdownValue)
+					) {
+						return formatMessage(analyticsMessages.noDependent)
+					}
+					if (
+						breakdown === 'dependent_project_download' &&
 						isUnknownAnalyticsBreakdownValue(breakdownValue)
 					) {
 						return downloadReasonBreakdownIndex === -1
-							? formatMessage(analyticsMessages.noDependent)
+							? formatMessage(analyticsMessages.unknown)
 							: formatAnalyticsDependentProjectFallbackLabel(
 									breakdownValues[downloadReasonBreakdownIndex],
 									formatMessage,
@@ -495,7 +505,7 @@ export function buildChartDatasets(
 					? breakdownValues[dependentProjectBreakdownIndex]
 					: undefined
 			const dependentProjectName = dependentProjectId
-				? isUnknownAnalyticsBreakdownValue(dependentProjectId)
+				? isMissingDependentProjectValue(dependentProjectId)
 					? undefined
 					: (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
 				: undefined
@@ -507,14 +517,16 @@ export function buildChartDatasets(
 				.map((projectId) => projectNamesById.get(projectId) ?? projectId)
 				.sort((left, right) => left.localeCompare(right))
 			const dependentProjectTooltip = dependentProjectId
-				? isUnknownAnalyticsBreakdownValue(dependentProjectId)
+				? isNoDependentAnalyticsBreakdownValue(dependentProjectId)
 					? formatMessage(analyticsMessages.noDependentTooltip)
-					: formatDependentProjectDatasetTooltip(
-							versionName,
-							dependentProjectName,
-							dependencyProjectNames,
-							formatMessage,
-						)
+					: isUnknownAnalyticsBreakdownValue(dependentProjectId)
+						? formatMessage(analyticsMessages.unknown)
+						: formatDependentProjectDatasetTooltip(
+								versionName,
+								dependentProjectName,
+								dependencyProjectNames,
+								formatMessage,
+							)
 				: undefined
 			const color =
 				normalizedBreakdowns.length === 1
@@ -679,6 +691,10 @@ export function buildChartDatasets(
 			backgroundColor: color,
 		}
 	})
+}
+
+function isMissingDependentProjectValue(value: string | undefined): boolean {
+	return isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value)
 }
 
 export function getSliceCount(

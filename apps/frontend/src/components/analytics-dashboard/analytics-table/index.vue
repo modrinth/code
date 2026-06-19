@@ -81,16 +81,16 @@
 				<ProjectCell
 					:label="getProjectCellLabel(value)"
 					:icon-url="
-						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
 							? undefined
 							: getProjectIconUrl(row.breakdownValues.dependent_project_download)
 					"
 					:icon-tooltip="getProjectCellLabel(value)"
 					:hide-icon="
-						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
 					"
 					:label-href="
-						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
 							? undefined
 							: getProjectPageHref(row.breakdownValues.dependent_project_download)
 					"
@@ -197,7 +197,10 @@ import {
 	analyticsTableMessages,
 } from '../analytics-messages.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
-import { isUnknownAnalyticsBreakdownValue } from '../breakdown.ts'
+import {
+	isNoDependentAnalyticsBreakdownValue,
+	isUnknownAnalyticsBreakdownValue,
+} from '../breakdown.ts'
 import {
 	buildAnalyticsTableColumns,
 	getAnalyticsTableBreakdownColumnLabel,
@@ -458,9 +461,16 @@ function getVersionPageHref(versionId: string | undefined) {
 	return `/project/${encodeURIComponent(projectId)}/version/${encodeURIComponent(versionId)}`
 }
 
+function isMissingDependentProjectValue(value: string | undefined) {
+	return isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value)
+}
+
 function getDependentProjectTooltip(row: AnalyticsTableRow) {
-	if (isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
+	if (isNoDependentAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
 		return formatMessage(analyticsMessages.noDependentTooltip)
+	}
+	if (isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
+		return formatMessage(analyticsMessages.unknown)
 	}
 
 	const dependencyProjectIds = new Set(row.dependentOnProjectIds)

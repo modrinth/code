@@ -25,6 +25,7 @@ import {
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	isNoDependentAnalyticsBreakdownValue,
 	isUnknownAnalyticsBreakdownValue,
 } from '../breakdown'
 import { getAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
@@ -369,8 +370,13 @@ function formatAnalyticsTableBreakdownDisplayValue(
 	formatMessage: FormatMessage,
 ): string {
 	if (breakdown === 'project' || breakdown === 'dependent_project_download') {
-		if (breakdown === 'dependent_project_download' && isUnknownAnalyticsBreakdownValue(value)) {
-			return formatMessage(analyticsMessages.noDependent)
+		if (breakdown === 'dependent_project_download') {
+			if (isNoDependentAnalyticsBreakdownValue(value)) {
+				return formatMessage(analyticsMessages.noDependent)
+			}
+			if (isUnknownAnalyticsBreakdownValue(value)) {
+				return formatMessage(analyticsMessages.unknown)
+			}
 		}
 
 		return projectNamesById.get(value) ?? value

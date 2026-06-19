@@ -85,7 +85,7 @@ export const analyticsMessages = defineMessages({
 	},
 	noDependent: {
 		id: 'analytics.value.no-dependent',
-		defaultMessage: 'No dependent',
+		defaultMessage: 'No dependents',
 	},
 	noDependentTooltip: {
 		id: 'analytics.value.no-dependent-tooltip',
@@ -893,7 +893,8 @@ export function formatAnalyticsDependentProjectFallbackLabel(
 	downloadReason: string | undefined,
 	formatMessage: FormatMessage,
 ): string {
-	if (downloadReason?.trim().toLowerCase() === 'standalone') {
+	const normalizedReason = downloadReason?.trim().toLowerCase()
+	if (normalizedReason === 'standalone' || normalizedReason === 'update') {
 		return formatMessage(analyticsMessages.noDependent)
 	}
 

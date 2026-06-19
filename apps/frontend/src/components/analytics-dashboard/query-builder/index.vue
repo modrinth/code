@@ -1144,6 +1144,7 @@ function withBreakdownFields(
 			case 'dependent_project_download':
 				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
 					downloads.push('dependent_project_id')
+					downloads.push('reason')
 				}
 				break
 			case 'version_id':
