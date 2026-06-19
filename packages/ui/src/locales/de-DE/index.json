@@ -2283,7 +2283,7 @@
     "defaultMessage": "Die Modrinth App wird sich automatisch öffnen..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Öffne Modrinth App"
+    "defaultMessage": "Modrinth App wird geöffnet"
   },
   "modal.open-in-app.why-use": {
     "defaultMessage": "Warum die Modrinth App nutzen"
@@ -2725,6 +2725,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Unbekannte Umgebung"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {Follower} other {Follower}}"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
@@ -4270,6 +4273,9 @@
   },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Erfolg"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Durchsuche {count} {count, plural, one {Server} other {Server}}..."
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"

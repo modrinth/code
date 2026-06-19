@@ -113,6 +113,7 @@ pub async fn profile_create(
                     icon,
                     None,
                     None,
+                    None,
                     &state.fetch_semaphore,
                     &state.pool,
                 )

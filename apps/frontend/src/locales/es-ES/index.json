@@ -36,7 +36,7 @@
     "message": "Desglose"
   },
   "analytics.breakdown.loader": {
-    "message": "Cargador"
+    "message": "Loader"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetización"
@@ -346,6 +346,12 @@
   },
   "analytics.project.select": {
     "message": "Seleccionar proyectos"
+  },
+  "analytics.project.user": {
+    "message": "Proyectos de {username}"
+  },
+  "analytics.project.your": {
+    "message": "Tus proyectos"
   },
   "analytics.query.filter.add": {
     "message": "Añadir filtro"
@@ -1454,6 +1460,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Has agotado tu límite de retiro de <b>{withdrawLimit}</b>. Debes completar un formulario de impuestos para retirar más."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Cumples los requisitos para los roles {roles}. Vincula tu cuenta de Discord a través de Modrinth y los sincronizaremos automáticamente."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Vincular Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Reclama tus roles de Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "+1 M de descargas"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creador"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Orgullo 2026"
+  },
   "dashboard.head-title": {
     "message": "Panel de control"
   },
@@ -1632,7 +1656,7 @@
     "message": "Haz clic para aprender como Modrinth gestiona tus ingresos."
   },
   "dashboard.revenue.estimated-with-date": {
-    "message": "{date} estimada"
+    "message": "Fecha estimada: {date}"
   },
   "dashboard.revenue.processing": {
     "message": "Procesando"
@@ -2282,6 +2306,9 @@
   "landing.subheading": {
     "message": "Descubre, juega y comparte contenido de Minecraft a través de nuestra plataforma de código abierto creada para la comunidad."
   },
+  "layout.action.analytics-events": {
+    "message": "Eventos de analítica"
+  },
   "layout.action.change-theme": {
     "message": "Cambiar tema"
   },
@@ -2836,6 +2863,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Usuario de Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Ver analíticas de usuario"
   },
   "profile.button.billing": {
     "message": "Gestionar la facturación de los usuarios"
@@ -3759,7 +3789,7 @@
     "message": "La versión del juego es proporcionada por el servidor"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "El cargador es proporcionado por el servidor"
+    "message": "Loader proporcionado por el servidor"
   },
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"

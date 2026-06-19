@@ -99,7 +99,7 @@ import { useRouter } from 'vue-router'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_versions, get_version } from '@/helpers/cache.js'
+import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import {
@@ -451,6 +451,63 @@ async function removeMod(mod: ContentItem) {
 	}
 }
 
+function isBreakingDependency(dependency: Labrinth.Versions.v2.Dependency) {
+	return dependency.dependency_type === 'required' || dependency.dependency_type === 'embedded'
+}
+
+function dependencyTargetsItem(dependency: Labrinth.Versions.v2.Dependency, item: ContentItem) {
+	return (
+		(!!dependency.project_id && dependency.project_id === item.project?.id) ||
+		('version_id' in dependency &&
+			!!dependency.version_id &&
+			dependency.version_id === item.version?.id)
+	)
+}
+
+async function getDeleteDependencyWarning(items: ContentItem[]) {
+	if (props.isServerInstance) return null
+
+	const deletingIds = new Set(items.map(getContentItemId))
+	const remainingItems = projects.value.filter((item) => !deletingIds.has(getContentItemId(item)))
+	const versionIds = [
+		...new Set(remainingItems.map((item) => item.version?.id).filter((id): id is string => !!id)),
+	]
+
+	if (versionIds.length === 0) return null
+
+	const versions = (await get_version_many(versionIds).catch((err) => {
+		handleError(err as Error)
+		return null
+	})) as Labrinth.Versions.v2.Version[] | null
+
+	if (!versions) return null
+
+	const versionsById = new Map(versions.map((version) => [version.id, version]))
+
+	const dependents = remainingItems
+		.map((candidate) => {
+			const version = candidate.version?.id ? versionsById.get(candidate.version.id) : null
+			if (!version) return null
+
+			const dependencies = items.filter((item) => {
+				if (!item.project?.id && !item.version?.id) return false
+
+				return version.dependencies?.some(
+					(dependency) =>
+						isBreakingDependency(dependency) && dependencyTargetsItem(dependency, item),
+				)
+			})
+
+			return dependencies.length > 0 ? { item: candidate, dependencies } : null
+		})
+		.filter(
+			(dependent): dependent is { item: ContentItem; dependencies: ContentItem[] } =>
+				dependent !== null,
+		)
+
+	return dependents.length > 0 ? { items, dependents } : null
+}
+
 async function updateProject(mod: ContentItem) {
 	if (!mod.file_path) return
 	const operation = beginContentOperation(mod)
@@ -481,6 +538,7 @@ async function updateProject(mod: ContentItem) {
 		})
 	} catch (err) {
 		handleError(err as Error)
+		throw err
 	} finally {
 		await refreshContentState('must_revalidate')
 		finishContentOperation(mod, operation)
@@ -885,13 +943,15 @@ async function handleModalUpdate(
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
 
-		if (mod.has_update && mod.update_version_id === selectedVersion.id) {
-			await updateProject(mod)
-		} else {
-			await switchProjectVersion(mod, selectedVersion)
+		try {
+			if (mod.has_update && mod.update_version_id === selectedVersion.id) {
+				await updateProject(mod)
+			} else {
+				await switchProjectVersion(mod, selectedVersion)
+			}
+		} finally {
+			resetUpdateState()
 		}
-
-		resetUpdateState()
 	}
 }
 
@@ -1081,6 +1141,7 @@ provideContentManager({
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
 		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,

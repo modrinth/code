@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Descargando Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Descargando actualización"
+  },
   "app.action-bar.downloads": {
     "message": "Descargas"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instancia principal"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Reinicia para actualizar"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Mostrar más instancias en ejecución"
   },
   "app.action-bar.stop-instance": {
     "message": "Detener instancia"
+  },
+  "app.action-bar.update": {
+    "message": "Actualizar"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Ver descargas en curso"
@@ -303,7 +312,7 @@
     "message": "Este proyecto ya está instalado"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Volver a descubrir contenido"
+    "message": "Volver al explorador"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Instalar contenido a la instancia"
@@ -336,7 +345,7 @@
     "message": "Añadir skin"
   },
   "app.skins.add-button.drag-and-drop": {
-    "message": "Arrastrar y soltar"
+    "message": "Arrastra y suelta"
   },
   "app.skins.apply-button": {
     "message": "Aplicar"
@@ -345,10 +354,10 @@
     "message": "Eliminar skin"
   },
   "app.skins.delete-modal.description": {
-    "message": "Esto eliminará permanentemente el skin seleccionado. Esta acción no se puede deshacer."
+    "message": "Esto eliminará permanentemente la skin seleccionada. Esta acción no se puede deshacer."
   },
   "app.skins.delete-modal.title": {
-    "message": "¿Estás seguro de que quieres eliminar este skin?"
+    "message": "¿Estás seguro de que quieres eliminar esta skin?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Error al leer el archivo arrastrado."
@@ -363,7 +372,7 @@
     "message": "Añadir skin"
   },
   "app.skins.modal.add-title": {
-    "message": "Añadiendo un skin"
+    "message": "Añadiendo una skin"
   },
   "app.skins.modal.arm-style-section": {
     "message": "Estilo de brazo"
@@ -405,7 +414,7 @@
     "message": "Textura"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "¡Primero carga un skin!"
+    "message": "¡Primero carga una skin!"
   },
   "app.skins.preview.edit-button": {
     "message": "Editar skin"
@@ -418,6 +427,12 @@
   },
   "app.skins.rate-limit.title": {
     "message": "¡Más despacio!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "No se ha podido guardar el orden de las skins."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Error al reordenar las skins"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Constructores y Biomas"
@@ -444,7 +459,7 @@
     "message": "Monturas del Caos"
   },
   "app.skins.section.saved-skins": {
-    "message": "Skins guardados"
+    "message": "Skins guardadas"
   },
   "app.skins.section.striding-hero": {
     "message": "Striding Hero"
@@ -492,7 +507,7 @@
     "message": "Descarga completada"
   },
   "app.update-popup.reload": {
-    "message": "Recargar"
+    "message": "Reinicia para actualizar"
   },
   "app.update-popup.title": {
     "message": "Actualización disponible"
@@ -692,6 +707,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Nombre"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Canal de actualizaciones"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Las versiones estables, beta y alpha se mostrarán como actualizaciones disponibles. "
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Las versiones estables y beta serán mostradas como actualizaciones disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Estable"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Sólo las versiones estables serán mostradas como actualizaciones disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Selecciona el canal de actualizaciones"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Hooks de inicio"
   },
@@ -882,7 +921,7 @@
     "message": "Proporcionado por el servidor"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "Solo se puede añadir mods que sean del lado del cliente a la instancia del servidor"
+    "message": "Solo se pueden añadir mods que sean del lado del cliente a la instancia del servidor"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "La versión del juego es proporcionada por el servidor"

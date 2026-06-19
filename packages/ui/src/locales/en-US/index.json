@@ -380,6 +380,48 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Unlink"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "This content is required by other content"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "Affected {count, plural, one {project} other {projects}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Some selected projects are installed as dependencies. Deleting them may break your {context} or stop dependent content from loading correctly."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instance"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "server"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Delete anyway"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Delete {count, number} {itemType} anyway"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Deleting"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Disable dependents after deleting"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Dependent content may fail to load or may disable itself"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Your {context} may crash, refuse to start, or behave unexpectedly"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Dependency warning"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} is installed as a dependency. Deleting it may break your {context} or stop dependent content from loading correctly."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "What happens?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} added"
   },

@@ -32,9 +32,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "您的描述目前長度為 {length, plural, one {# 個可閱讀字元} other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, one {# 個字元} other {# 個字元}}，以建立清晰且資訊完整的描述。"
-  },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
   },
@@ -62,11 +59,17 @@
   "nags.gallery.title": {
     "defaultMessage": "前往圖庫頁面"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "你的{type}使用的授權條款要求必須提供原始碼。請為每個額外版本提供原始碼連結或原始碼檔案，或是考慮使用不同的授權條款。"
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
   "nags.identical-links.description": {
     "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應輸入一次，並選擇正確的連結類型。"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "清理重複連結"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
@@ -146,6 +149,9 @@
   "nags.select-language.title": {
     "defaultMessage": "選擇語言"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "請選擇你的{type}採用的授權條款。"
+  },
   "nags.select-license.title": {
     "defaultMessage": "選擇授權條款"
   },
@@ -202,6 +208,9 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "你的{type}至少需要一張圖庫圖片，以展示其內容。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"

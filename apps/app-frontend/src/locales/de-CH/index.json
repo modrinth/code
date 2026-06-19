@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Java {version} wird heruntergeladen"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Update wird heruntergeladen"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primäre Instanz"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Zum Aktualisieren neu laden"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Weitere laufende Instanzen anzeigen"
   },
   "app.action-bar.stop-instance": {
     "message": "Instanz stoppen"
+  },
+  "app.action-bar.update": {
+    "message": "Aktualisieren"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Aktive Downloads anzeigen"
@@ -419,6 +428,12 @@
   "app.skins.rate-limit.title": {
     "message": "Nicht so schnell!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Die Anordnung deiner Skins konnte nicht gespeichert werden."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Skins konnten nicht neu angeordnet werden"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -492,7 +507,7 @@
     "message": "Download abgeschlossen"
   },
   "app.update-popup.reload": {
-    "message": "Neu Laden"
+    "message": "Zum Aktualisieren neu laden"
   },
   "app.update-popup.title": {
     "message": "Aktualisierung verfügbar"
@@ -691,6 +706,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Name"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Aktualisierungskanal"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Voll, Beta- und Alpha-Versionen werden als verfügbare Aktualisierungen angezeigt."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Voll- und Beta-Versionen werden als verfügbare Aktualisierungen angezeigt."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Vollversion"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Nur Vollversionen werden als verfügbare Aktualisierungen angezeigt."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Aktualisierungskanal auswählen"
   },
   "instance.settings.tabs.hooks": {
     "message": "Start Hooks"

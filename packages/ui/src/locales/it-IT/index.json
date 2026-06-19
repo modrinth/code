@@ -98,9 +98,6 @@
   "browse.offline": {
     "defaultMessage": "Al momento sembri offline. Connettiti a Internet per usare Modrinth!"
   },
-  "browse.search.placeholder": {
-    "defaultMessage": "Cerca {projectType}..."
-  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Progetti selezionati"
   },
@@ -2109,7 +2106,7 @@
     "defaultMessage": "Carica"
   },
   "markdown-editor.image-modal.upload.prompt": {
-    "defaultMessage": "Trascina e rilascia per caricare o clicca per selezionare"
+    "defaultMessage": "Trascina per caricare o clicca per selezionare"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
     "defaultMessage": "Inserisci l'URL dell'immagine..."
@@ -3845,8 +3842,8 @@
   "servers.backups.delete-modal.backups-label": {
     "defaultMessage": "Backup{count, plural, one {} other { ({count})}}"
   },
-  "servers.backups.delete-modal.confirm": {
-    "defaultMessage": "Elimina{count, plural, one {} other { #}} backup"
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "Elimina {count, plural, one {backup} other {i backup}}"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Prova a creare il tuo primo backup!"
@@ -4072,6 +4069,9 @@
   },
   "servers.listing.notice.moderated": {
     "defaultMessage": "Il server è stato sospeso dal team di moderazione."
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Il server {verb, select, downgrade {retrocederà} other {si aggiornerà}} al piano {planSize} il <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Attendi mentre prepariamo il tuo server. Potrebbe richiedere fino a 10 minuti."
@@ -4533,7 +4533,7 @@
     "defaultMessage": "Cerca una lingua..."
   },
   "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural, =0 {Nessuna lingua trovata} one {Una lingua trovata} other {# lingue trovate}}."
+    "defaultMessage": "{matches, plural, =0 {Nessuna lingua trovata} one {# lingua trovata} other {# lingue trovate}}."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Nessuna lingua trovata."

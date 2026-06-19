@@ -441,7 +441,7 @@
     "defaultMessage": "{contentType}を検索またはアップロードしてみましょう"
   },
   "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "このModパックの一番上にコンテンツを追加する"
+    "defaultMessage": "このModパックに追加コンテンツを導入できます"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "コンテンツがインストールされていません"

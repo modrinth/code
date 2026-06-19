@@ -25,6 +25,14 @@ export interface ContentModpackData {
 	disabledText?: string
 }
 
+export interface ContentDependencyWarning {
+	items: ContentItem[]
+	dependents: Array<{
+		item: ContentItem
+		dependencies: ContentItem[]
+	}>
+}
+
 export interface ContentManagerContext {
 	// Data
 	items: Ref<ContentItem[]> | ComputedRef<ContentItem[]>
@@ -55,6 +63,9 @@ export interface ContentManagerContext {
 	bulkDeleteItems?: (items: ContentItem[]) => Promise<void>
 	bulkEnableItems?: (items: ContentItem[]) => Promise<void>
 	bulkDisableItems?: (items: ContentItem[]) => Promise<void>
+	getDeleteDependencyWarning?: (
+		items: ContentItem[],
+	) => ContentDependencyWarning | null | Promise<ContentDependencyWarning | null>
 
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean

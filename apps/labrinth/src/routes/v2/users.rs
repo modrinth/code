@@ -183,14 +183,14 @@ pub async fn projects_list(
 
 #[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(length(min = 1, max = 64), regex(path = *crate::util::validate::RE_USERNAME))]
+    #[validate(length(min = 1, max = 64), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub name: Option<Option<String>>,
     #[serde(
         default,

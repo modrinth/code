@@ -225,6 +225,10 @@ where
                                         ProjectType::get_from_parent_folder(
                                             &full_path,
                                         ),
+                                    project_id: Some(
+                                        version.project_id.clone(),
+                                    ),
+                                    version_id: Some(version.id.clone()),
                                 },
                             ));
                         }

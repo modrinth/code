@@ -213,7 +213,7 @@
     "message": "Динамика скачиваний"
   },
   "analytics.graph.title.playtime": {
-    "message": "Динамика игрового времени"
+    "message": "Динамика времени игры"
   },
   "analytics.graph.title.revenue": {
     "message": "Динамика дохода"
@@ -316,6 +316,12 @@
   },
   "analytics.project.select": {
     "message": "Выберите проекты"
+  },
+  "analytics.project.user": {
+    "message": "Проекты {username}"
+  },
+  "analytics.project.your": {
+    "message": "Ваши проекты"
   },
   "analytics.query.filter.add": {
     "message": "Добавить фильтр"
@@ -1409,6 +1415,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Достигнут лимит вывода в <b>{withdrawLimit}</b>. Для снятия лимита заполните налоговую форму."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Привяжите ваш аккаунт Discord через Modrinth для синхронизации следующих ролей: {roles}."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Привязать Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Получите ваши роли Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": ">1 млн скачиваний"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Автор"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Панель управления"
   },
@@ -2234,6 +2258,9 @@
   "landing.subheading": {
     "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым кодом, созданной для сообщества."
   },
+  "layout.action.analytics-events": {
+    "message": "События аналитики"
+  },
   "layout.action.change-theme": {
     "message": "Изменить тему"
   },
@@ -2788,6 +2815,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Пользователь Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Посмотреть аналитику"
   },
   "profile.button.billing": {
     "message": "Управление платежами"
