@@ -41,14 +41,14 @@ import {
 	get_search_results_v3,
 	get_version_many,
 } from '@/helpers/cache.js'
-import { profile_listener } from '@/helpers/events.js'
-import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
+import { instance_listener } from '@/helpers/events.js'
 import {
 	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
-} from '@/helpers/profile.js'
+} from '@/helpers/instance'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { get_profile_worlds } from '@/helpers/worlds'
+import { get_instance_worlds } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {
@@ -131,10 +131,10 @@ type Instance = {
 	install_stage: string
 	icon_path?: string
 	name: string
-	linked_data?: {
+	link?: {
+		type: string
 		project_id: string
 		version_id: string
-		locked: boolean
 	}
 }
 
@@ -186,7 +186,7 @@ async function refreshInstalledProjectIds() {
 	if (!route.query.i) return
 
 	if (route.query.from === 'worlds') {
-		const worlds = await get_profile_worlds(route.query.i as string).catch(handleError)
+		const worlds = await get_instance_worlds(route.query.i as string).catch(handleError)
 		if (!worlds) return
 
 		const serverProjectIds = worlds
@@ -224,10 +224,10 @@ async function initInstanceContext() {
 
 		await refreshInstalledProjectIds()
 
-		if (instance.value?.linked_data?.project_id) {
-			debugLog('checking linked project for server status', instance.value.linked_data.project_id)
+		if (instance.value?.link?.project_id) {
+			debugLog('checking linked project for server status', instance.value.link.project_id)
 			const projectV3 = await get_project_v3(
-				instance.value.linked_data.project_id,
+				instance.value.link.project_id,
 				'must_revalidate',
 			).catch(handleError)
 			if (projectV3?.minecraft_server != null) {
@@ -448,7 +448,7 @@ const browseTitle = computed(() =>
 )
 breadcrumbs.setName('BrowseTitle', browseTitle.value)
 if (instance.value) {
-	const instanceLink = `/instance/${encodeURIComponent(instance.value.path)}`
+	const instanceLink = `/instance/${encodeURIComponent(instance.value.id)}`
 	breadcrumbs.setContext({
 		name: instance.value.name,
 		link: isFromWorlds.value ? `${instanceLink}/worlds` : instanceLink,
@@ -578,7 +578,7 @@ const installContext = computed(() => {
 			loader: instance.value.loader,
 			gameVersion: instance.value.game_version,
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
-			backUrl: `/instance/${encodeURIComponent(instance.value.path)}${isFromWorlds.value ? '/worlds' : ''}`,
+			backUrl: `/instance/${encodeURIComponent(instance.value.id)}${isFromWorlds.value ? '/worlds' : ''}`,
 			backLabel: formatMessage(messages.backToInstance),
 			heading: formatMessage(
 				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
@@ -809,7 +809,7 @@ function getCardActions(
 					await installVersion(
 						projectResult.project_id,
 						selectedInstall.versionId,
-						instance.value ? instance.value.path : null,
+						instance.value ? instance.value.id : null,
 						'SearchCard',
 						(versionId, installedProjectIds) => {
 							setProjectInstalling(projectResult.project_id, false)
@@ -987,15 +987,11 @@ await searchState.refreshSearch()
 type UnlistenFn = () => void
 
 let isUnmounted = false
-let unlistenProfiles: UnlistenFn | null = null
+let unlistenInstances: UnlistenFn | null = null
 
 onMounted(() => {
-	profile_listener(async (event: { event: string; profile_path_id: string }) => {
-		if (
-			instance.value &&
-			event.profile_path_id === instance.value.path &&
-			event.event === 'synced'
-		) {
+	instance_listener(async (event: { event: string; instance_id: string }) => {
+		if (instance.value && event.instance_id === instance.value.id && event.event === 'synced') {
 			await refreshInstalledProjectIds()
 			await searchState.refreshSearch()
 		}
@@ -1006,14 +1002,14 @@ onMounted(() => {
 				return
 			}
 
-			unlistenProfiles = unlisten
+			unlistenInstances = unlisten
 		})
 		.catch(handleError)
 })
 
 onUnmounted(() => {
 	isUnmounted = true
-	unlistenProfiles?.()
+	unlistenInstances?.()
 })
 
 function getProjectBrowseQuery() {

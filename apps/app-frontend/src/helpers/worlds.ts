@@ -3,7 +3,7 @@ import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 
-import { get_full_path } from '@/helpers/profile'
+import { get_full_path } from '@/helpers/instance'
 import { openPath } from '@/helpers/utils'
 
 type BaseWorld = {
@@ -36,8 +36,8 @@ export type ServerWorld = BaseWorld & {
 
 export type World = SingleplayerWorld | ServerWorld
 
-export type WorldWithProfile = {
-	profile: string
+export type WorldWithInstance = {
+	instance_id: string
 } & World
 
 export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
@@ -88,12 +88,12 @@ export type ProtocolVersion = {
 export async function get_recent_worlds(
 	limit: number,
 	displayStatuses?: DisplayStatus[],
-): Promise<WorldWithProfile[]> {
+): Promise<WorldWithInstance[]> {
 	return await invoke('plugin:worlds|get_recent_worlds', { limit, displayStatuses })
 }
 
-export async function get_profile_worlds(path: string): Promise<World[]> {
-	return await invoke('plugin:worlds|get_profile_worlds', { path })
+export async function get_instance_worlds(instanceId: string): Promise<World[]> {
+	return await invoke('plugin:worlds|get_instance_worlds', { instanceId })
 }
 
 export async function get_singleplayer_world(
@@ -137,16 +137,16 @@ export async function delete_world(instance: string, world: string): Promise<voi
 	return await invoke('plugin:worlds|delete_world', { instance, world })
 }
 
-export async function add_server_to_profile(
-	path: string,
+export async function add_server_to_instance(
+	instanceId: string,
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
 	projectId?: string,
 	contentKind?: string,
 ): Promise<number> {
-	return await invoke('plugin:worlds|add_server_to_profile', {
-		path,
+	return await invoke('plugin:worlds|add_server_to_instance', {
+		instanceId,
 		name,
 		address,
 		packStatus,
@@ -155,15 +155,15 @@ export async function add_server_to_profile(
 	})
 }
 
-export async function edit_server_in_profile(
-	path: string,
+export async function edit_server_in_instance(
+	instanceId: string,
 	index: number,
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
 ): Promise<void> {
-	return await invoke('plugin:worlds|edit_server_in_profile', {
-		path,
+	return await invoke('plugin:worlds|edit_server_in_instance', {
+		instanceId,
 		index,
 		name,
 		address,
@@ -171,12 +171,17 @@ export async function edit_server_in_profile(
 	})
 }
 
-export async function remove_server_from_profile(path: string, index: number): Promise<void> {
-	return await invoke('plugin:worlds|remove_server_from_profile', { path, index })
+export async function remove_server_from_instance(
+	instanceId: string,
+	index: number,
+): Promise<void> {
+	return await invoke('plugin:worlds|remove_server_from_instance', { instanceId, index })
 }
 
-export async function get_profile_protocol_version(path: string): Promise<ProtocolVersion | null> {
-	return await invoke('plugin:worlds|get_profile_protocol_version', { path })
+export async function get_instance_protocol_version(
+	instanceId: string,
+): Promise<ProtocolVersion | null> {
+	return await invoke('plugin:worlds|get_instance_protocol_version', { instanceId })
 }
 
 export async function get_server_status(
@@ -432,10 +437,10 @@ export async function refreshWorld(worlds: World[], instancePath: string, worldP
 	sortWorlds(worlds)
 }
 
-export async function handleDefaultProfileUpdateEvent(
+export async function handleDefaultInstanceUpdateEvent(
 	worlds: World[],
 	instancePath: string,
-	e: ProfileEvent,
+	e: InstanceEvent,
 ) {
 	if (e.event === 'world_updated') {
 		await refreshWorld(worlds, instancePath, e.world)
@@ -457,7 +462,7 @@ export async function handleDefaultProfileUpdateEvent(
 }
 
 export async function refreshWorlds(instancePath: string): Promise<World[]> {
-	const worlds = await get_profile_worlds(instancePath).catch((err) => {
+	const worlds = await get_instance_worlds(instancePath).catch((err) => {
 		console.error(`Error refreshing worlds for instance: ${instancePath}`, err)
 	})
 	if (worlds) {
@@ -489,7 +494,7 @@ export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVer
 	return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 }
 
-export type ProfileEvent = { profile_path_id: string } & (
+export type InstanceEvent = { instance_id: string } & (
 	| {
 			event: 'servers_updated'
 	  }

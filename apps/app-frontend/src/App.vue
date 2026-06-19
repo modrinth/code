@@ -94,9 +94,9 @@ import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
+import { list } from '@/helpers/instance'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
-import { create_profile_and_install_from_file } from '@/helpers/pack'
-import { list } from '@/helpers/profile.js'
+import { create_instance_and_install_from_file } from '@/helpers/pack'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -852,8 +852,8 @@ async function handleCommand(e) {
 	if (e.event === 'RunMRPack') {
 		// RunMRPack should directly install a local mrpack given a path
 		if (e.path.endsWith('.mrpack')) {
-			await create_profile_and_install_from_file(e.path, (createProfile, fileName) =>
-				unknownPackWarningModal.value?.show(createProfile, fileName),
+			await create_instance_and_install_from_file(e.path, (createInstance, fileName) =>
+				unknownPackWarningModal.value?.show(createInstance, fileName),
 			).catch(handleError)
 			trackEvent('InstanceCreate', {
 				source: 'CreationModalFileDrop',

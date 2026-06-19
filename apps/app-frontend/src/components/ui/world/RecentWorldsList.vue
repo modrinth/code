@@ -10,13 +10,13 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { process_listener, profile_listener } from '@/helpers/events'
+import { instance_listener, process_listener } from '@/helpers/events'
+import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
-import { kill, run } from '@/helpers/profile'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import {
-	get_profile_protocol_version,
+	get_instance_protocol_version,
 	get_recent_worlds,
 	getWorldIdentifier,
 	hasServerQuickPlaySupport,
@@ -27,7 +27,7 @@ import {
 	type ServerWorld,
 	start_join_server,
 	start_join_singleplayer_world,
-	type WorldWithProfile,
+	type WorldWithInstance,
 } from '@/helpers/worlds.ts'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/theme.ts'
@@ -66,7 +66,7 @@ type InstanceJumpBackInItem = BaseJumpBackInItem & {
 
 type WorldJumpBackInItem = BaseJumpBackInItem & {
 	type: 'world'
-	world: WorldWithProfile
+	world: WorldWithInstance
 }
 
 type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
@@ -100,7 +100,7 @@ async function populateJumpBackIn() {
 		const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN, ['normal', 'favorite'])
 
 		worlds.forEach((world) => {
-			const instance = props.recentInstances.find((instance) => instance.path === world.profile)
+			const instance = props.recentInstances.find((instance) => instance.id === world.instance_id)
 
 			if (!instance || !world.last_played) {
 				return
@@ -120,7 +120,7 @@ async function populateJumpBackIn() {
 		}[] = worldItems
 			.filter((item) => item.world.type === 'server' && item.instance)
 			.map((item) => ({
-				instancePath: item.instance.path,
+				instancePath: item.instance.id,
 				address: (item.world as ServerWorld).address,
 			}))
 
@@ -128,10 +128,10 @@ async function populateJumpBackIn() {
 		const uniqueServerInstances = new Set<string>(servers.map((x) => x.instancePath))
 		await Promise.all(
 			[...uniqueServerInstances].map((path) =>
-				get_profile_protocol_version(path)
+				get_instance_protocol_version(path)
 					.then((protoVer) => (protocolVersions.value[path] = protoVer))
 					.catch(() => {
-						console.error(`Failed to get profile protocol for: ${path} `)
+						console.error(`Failed to get instance protocol for: ${path} `)
 					}),
 			),
 		)
@@ -152,7 +152,7 @@ async function populateJumpBackIn() {
 
 	const instanceItems: InstanceJumpBackInItem[] = []
 	for (const instance of props.recentInstances) {
-		const worldItem = worldItems.find((item) => item.instance.path === instance.path)
+		const worldItem = worldItems.find((item) => item.instance.id === instance.id)
 		if ((worldItem && worldItem.last_played.isAfter(TWO_WEEKS_AGO)) || !instance.last_played) {
 			continue
 		}
@@ -175,10 +175,10 @@ function refreshServer(address: string, instancePath: string) {
 	refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
 }
 
-async function joinWorld(world: WorldWithProfile, instance?: GameInstance) {
+async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 	console.log(`Joining world ${getWorldIdentifier(world)}`)
 	if (world.type === 'server') {
-		await start_join_server(world.profile, world.address).catch(handleError)
+		await start_join_server(world.instance_id, world.address).catch(handleError)
 		if (instance) {
 			trackEvent('InstanceStart', {
 				loader: instance.loader,
@@ -187,13 +187,13 @@ async function joinWorld(world: WorldWithProfile, instance?: GameInstance) {
 			})
 		}
 	} else if (world.type === 'singleplayer') {
-		await start_join_singleplayer_world(world.profile, world.path).catch(handleError)
+		await start_join_singleplayer_world(world.instance_id, world.path).catch(handleError)
 	}
 }
 
 async function playInstance(instance: GameInstance) {
-	await run(instance.path)
-		.catch((err) => handleSevereError(err, { profilePath: instance.path }))
+	await run(instance.id)
+		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
 		.finally(() => {
 			trackEvent('InstanceStart', {
 				loader: instance.loader,
@@ -210,14 +210,14 @@ async function stopInstance(path: string) {
 	})
 }
 
-const currentProfile = ref<string>()
+const currentInstance = ref<string>()
 const currentWorld = ref<string>()
 
 const unlistenProcesses = await process_listener(async () => {
 	await checkProcesses()
 })
 
-const unlistenProfiles = await profile_listener(async () => {
+const unlistenInstances = await instance_listener(async () => {
 	await populateJumpBackIn().catch(() => {
 		console.error('Failed to populate jump back in')
 	})
@@ -227,18 +227,18 @@ const runningInstances = ref<string[]>([])
 
 type ProcessMetadata = {
 	uuid: string
-	profile_path: string
+	instance_id: string
 	start_time: string
 }
 
 const checkProcesses = async () => {
 	const runningProcesses: ProcessMetadata[] = await get_all().catch(handleError)
 
-	const runningPaths = runningProcesses.map((x) => x.profile_path)
+	const runningPaths = runningProcesses.map((x) => x.instance_id)
 
 	const stoppedInstances = runningInstances.value.filter((x) => !runningPaths.includes(x))
-	if (currentProfile.value && stoppedInstances.includes(currentProfile.value)) {
-		currentProfile.value = undefined
+	if (currentInstance.value && stoppedInstances.includes(currentInstance.value)) {
+		currentInstance.value = undefined
 		currentWorld.value = undefined
 	}
 
@@ -252,7 +252,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	unlistenProcesses()
-	unlistenProfiles()
+	unlistenInstances()
 })
 </script>
 
@@ -278,14 +278,14 @@ onUnmounted(() => {
 		<div class="grid-when-huge flex flex-col w-full gap-2">
 			<template
 				v-for="item in jumpBackInItems"
-				:key="`${item.instance.path}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
+				:key="`${item.instance.id}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
 			>
 				<WorldItem
 					v-if="item.type === 'world'"
 					:world="item.world"
-					:playing-instance="runningInstances.includes(item.instance.path)"
+					:playing-instance="runningInstances.includes(item.instance.id)"
 					:playing-world="
-						currentProfile === item.instance.path && currentWorld === getWorldIdentifier(item.world)
+						currentInstance === item.instance.id && currentWorld === getWorldIdentifier(item.world)
 					"
 					:refreshing="
 						item.world.type === 'server'
@@ -306,34 +306,34 @@ onUnmounted(() => {
 					:rendered-motd="
 						item.world.type === 'server' ? serverData[item.world.address].renderedMotd : undefined
 					"
-					:current-protocol="protocolVersions[item.instance.path]"
+					:current-protocol="protocolVersions[item.instance.id]"
 					:game-mode="
 						item.world.type === 'singleplayer' ? GAME_MODES[item.world.game_mode] : undefined
 					"
-					:instance-path="item.instance.path"
+					:instance-path="item.instance.id"
 					:instance-name="item.instance.name"
 					:instance-icon="item.instance.icon_path"
 					@refresh="
 						() =>
 							item.world.type === 'server'
-								? refreshServer(item.world.address, item.instance.path)
+								? refreshServer(item.world.address, item.instance.id)
 								: {}
 					"
 					@update="() => populateJumpBackIn()"
 					@play="
 						() => {
-							currentProfile = item.instance.path
+							currentInstance = item.instance.id
 							currentWorld = getWorldIdentifier(item.world)
 							joinWorld(item.world, item.instance)
 						}
 					"
 					@play-instance="
 						() => {
-							currentProfile = item.instance.path
+							currentInstance = item.instance.id
 							playInstance(item.instance)
 						}
 					"
-					@stop="() => stopInstance(item.instance.path)"
+					@stop="() => stopInstance(item.instance.id)"
 				/>
 				<InstanceItem v-else :instance="item.instance" :last_played="item.last_played" />
 			</template>

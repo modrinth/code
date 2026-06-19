@@ -3,7 +3,7 @@ use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
-use crate::state::{ProcessManager, Profile, TunnelSocket};
+use crate::state::{ProcessManager, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
@@ -101,13 +101,9 @@ impl FriendsSocket {
                     }
 
                     if let Some(process) = process_manager.get_all().first() {
-                        let profile =
-                            Profile::get(&process.profile_path, exec).await?;
-
-                        if let Some(profile) = profile {
-                            let _ =
-                                self.update_status(Some(profile.name)).await;
-                        }
+                        let _ = self
+                            .update_status(Some(process.instance_name.clone()))
+                            .await;
                     }
 
                     let write_handle = self.write.clone();
@@ -312,11 +308,13 @@ impl FriendsSocket {
     #[tracing::instrument(skip(self))]
     pub async fn update_status(
         &self,
-        profile_name: Option<String>,
+        instance_name: Option<String>,
     ) -> crate::Result<()> {
         Self::send_message(
             &self.write,
-            ClientToServerMessage::StatusUpdate { profile_name },
+            ClientToServerMessage::StatusUpdate {
+                profile_name: instance_name,
+            },
         )
         .await
     }

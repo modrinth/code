@@ -38,7 +38,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir().join("icons"), true)?;
     app.fs_scope()
-        .allow_directory(state.directories.profiles_dir(), true)?;
+        .allow_directory(state.directories.instances_dir(), true)?;
 
     Ok(())
 }
@@ -233,14 +233,13 @@ fn main() {
         .plugin(api::auth::init())
         .plugin(api::mr_auth::init())
         .plugin(api::import::init())
+        .plugin(api::instance::init())
         .plugin(api::logs::init())
         .plugin(api::jre::init())
         .plugin(api::metadata::init())
         .plugin(api::minecraft_skins::init())
         .plugin(api::pack::init())
         .plugin(api::process::init())
-        .plugin(api::profile::init())
-        .plugin(api::profile_create::init())
         .plugin(api::settings::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())

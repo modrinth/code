@@ -55,7 +55,7 @@ const props = defineProps({
 	},
 })
 
-const profilePathId = computed(() => route.params.id)
+const instanceId = computed(() => route.params.id)
 const {
 	liveConsole,
 	historicalConsole,
@@ -64,7 +64,7 @@ const {
 	getHistoricalContent,
 	invalidate,
 	clearLive,
-} = useInstanceConsole(profilePathId.value)
+} = useInstanceConsole(instanceId.value)
 
 await hydrate()
 
@@ -89,7 +89,7 @@ function buildLogList(rawLogs) {
 
 const logs = ref(buildLogList([]))
 
-void getHistoricalLogs(props.instance.path)
+void getHistoricalLogs(props.instance.id)
 	.then((allLogs) => {
 		logs.value = buildLogList(allLogs)
 	})
@@ -146,9 +146,9 @@ const deleteDisabled = computed(() => {
 async function deleteSelectedLog() {
 	const log = selectedLog.value
 	if (!log || log.live) return
-	await delete_logs_by_filename(props.instance.path, log.log_type, log.filename)
+	await delete_logs_by_filename(props.instance.id, log.log_type, log.filename)
 	invalidate()
-	const freshLogs = await getHistoricalLogs(props.instance.path)
+	const freshLogs = await getHistoricalLogs(props.instance.id)
 	logs.value = buildLogList(freshLogs)
 	selectedLogIndex.value = 0
 }
@@ -186,11 +186,9 @@ watch(selectedLogIndex, async (newIndex) => {
 		return
 	}
 
-	const output = await get_output_by_filename(
-		props.instance.path,
-		log.log_type,
-		log.filename,
-	).catch(handleError)
+	const output = await get_output_by_filename(props.instance.id, log.log_type, log.filename).catch(
+		handleError,
+	)
 	if (output) {
 		historicalConsole.clear()
 		historicalConsole.addLegacyLog(output)
@@ -204,7 +202,7 @@ if (!props.playing) {
 }
 
 const unlistenLog = await log_listener((payload) => {
-	if (payload.profile_path_id !== profilePathId.value) return
+	if (payload.instance_id !== instanceId.value) return
 
 	if (payload.type === 'log4j') {
 		liveConsole.addLog4jEvent(payload)
@@ -214,7 +212,7 @@ const unlistenLog = await log_listener((payload) => {
 })
 
 const unlistenProcesses = await process_listener(async (e) => {
-	if (e.profile_path_id !== profilePathId.value) return
+	if (e.instance_id !== instanceId.value) return
 	if (e.event === 'launched') {
 		liveConsole.clear()
 		invalidate()
@@ -222,7 +220,7 @@ const unlistenProcesses = await process_listener(async (e) => {
 	}
 	if (e.event === 'finished') {
 		invalidate()
-		const freshLogs = await getHistoricalLogs(props.instance.path)
+		const freshLogs = await getHistoricalLogs(props.instance.id)
 		logs.value = buildLogList(freshLogs)
 		void analyseForCrash()
 	}

@@ -31,8 +31,8 @@ import { listen } from '@tauri-apps/api/event'
           pack_name: name of the pack
           pack_id, optional, the id of the modpack
           pack_version, optional, the version of the modpack
-          profile_name: name of the profile
-          profile_uuid: unique identification of the profile
+          instance_name: name of the instance
+          instance_id: unique identification of the instance
 
         }
         loader_uuid: unique identification of the loading bar
@@ -57,18 +57,15 @@ export async function process_listener(callback) {
 	return await listen('process', (event) => callback(event.payload))
 }
 
-/// Payload for the 'profile' event
+/// Payload for the 'instance' event
 /*
-    ProfilePayload {
-        uuid: unique identification of the process in the state (currently identified by path, but that will change)
-        name: name of the profile
-        profile_path: relative path toprofile_listener profile (used for path identification)
-        path: path to profile (used for opening the profile in the OS file explorer)
+    InstancePayload {
+        instance_id: unique identification of the instance
         event: event type ("Created", "Added", "Edited", "Removed")
     }
 */
-export async function profile_listener(callback) {
-	return await listen('profile', (event) => callback(event.payload))
+export async function instance_listener(callback) {
+	return await listen('instance', (event) => callback(event.payload))
 }
 
 /// Payload for the 'command' event
@@ -105,7 +102,7 @@ export async function notification_listener(callback) {
 /// Payload for the 'log' event
 /*
     LogPayload {
-        profile_path_id: string,
+        instance_id: string,
         type: "log4j" | "legacy",
         // log4j fields (when type === "log4j"):
         timestamp_millis?: number,

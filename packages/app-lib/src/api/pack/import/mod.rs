@@ -119,7 +119,7 @@ pub async fn get_importable_instances(
 
 // #[tracing::instrument]
 pub async fn import_instance(
-    profile_path: &str, // This should be a blank profile
+    instance_id: &str,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
@@ -130,7 +130,7 @@ pub async fn import_instance(
             mmc::import_mmc(
                 base_path,       // path to base mmc folder
                 instance_folder, // instance folder in mmc_base_path
-                profile_path,    // path to profile
+                instance_id,
             )
             .await
         }
@@ -138,21 +138,21 @@ pub async fn import_instance(
             atlauncher::import_atlauncher(
                 base_path,       // path to atlauncher folder
                 instance_folder, // instance folder in atlauncher
-                profile_path,    // path to profile
+                instance_id,
             )
             .await
         }
         ImportLauncherType::GDLauncher => {
             gdlauncher::import_gdlauncher(
                 base_path.join("instances").join(instance_folder), // path to gdlauncher folder
-                profile_path, // path to profile
+                instance_id,
             )
             .await
         }
         ImportLauncherType::Curseforge => {
             curseforge::import_curseforge(
                 base_path.join("Instances").join(instance_folder), // path to curseforge folder
-                profile_path, // path to profile
+                instance_id,
             )
             .await
         }
@@ -173,7 +173,7 @@ pub async fn import_instance(
                 {
                     matched = true;
                     Box::pin(import_instance(
-                        profile_path,
+                        instance_id,
                         lt,
                         base_path,
                         instance_folder,
@@ -198,7 +198,7 @@ pub async fn import_instance(
         Ok(_) => {}
         Err(e) => {
             tracing::warn!("Import failed: {:?}", e);
-            let _ = crate::api::profile::remove(profile_path).await;
+            let _ = crate::api::instance::remove(instance_id).await;
             return Err(e);
         }
     }
@@ -340,14 +340,12 @@ pub async fn recache_icon(
 }
 
 pub async fn copy_dotminecraft(
-    profile_path_id: &str,
+    instance_id: &str,
     dotminecraft: PathBuf,
     io_semaphore: &IoSemaphore,
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<LoadingBarId> {
-    // Get full path to profile
-    let profile_path =
-        crate::api::profile::get_full_path(profile_path_id).await?;
+    let instance_path = crate::api::instance::get_full_path(instance_id).await?;
 
     // Gets all subfiles recursively in src
     let subfiles = get_all_subfiles(&dotminecraft, false).await?;
@@ -355,12 +353,12 @@ pub async fn copy_dotminecraft(
 
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
-        crate::LoadingBarType::CopyProfile {
+        crate::LoadingBarType::CopyInstance {
             import_location: dotminecraft.clone(),
-            profile_name: profile_path_id.to_string(),
+            instance_name: instance_id.to_string(),
         },
         total_subfiles as f64,
-        "Copying files in profile",
+        "Copying files in instance",
     )
     .await?;
 
@@ -373,7 +371,7 @@ pub async fn copy_dotminecraft(
                     &src_child.display()
                 ))
             })?;
-        let dst_child = profile_path.join(dst_child);
+        let dst_child = instance_path.join(dst_child);
 
         // sleep for cpu for 1 millisecond
         tokio::time::sleep(std::time::Duration::from_millis(1)).await;

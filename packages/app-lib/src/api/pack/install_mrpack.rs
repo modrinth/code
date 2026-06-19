@@ -3,15 +3,15 @@ use crate::event::emit::{
     emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
 };
 use crate::pack::install_from::{
-    EnvType, PackFile, PackFileHash, set_profile_information,
+    EnvType, PackFile, PackFileHash, set_instance_information,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Profile, ProfileInstallStage, SideType,
-    cache_file_hash,
+    CachedEntry, EditInstance, InstanceInstallStage, SideType, cache_file_hash,
 };
+use crate::state::instances::ContentSourceKind;
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors, write};
 use crate::util::io;
-use crate::{State, profile};
+use crate::State;
 use async_zip::base::read::seek::ZipFileReader as SeekZipFileReader;
 use async_zip::base::read::{WithEntry, ZipEntryReader};
 use async_zip::tokio::read::fs::ZipFileReader as FsZipFileReader;
@@ -222,7 +222,7 @@ where
 /// Install a modpack from a mrpack file (a modrinth .zip format)
 pub async fn install_zipped_mrpack(
     location: CreatePackLocation,
-    profile_path: String,
+    instance_id: String,
 ) -> crate::Result<String> {
     // Get file from description
     let create_pack: CreatePack = match location {
@@ -237,18 +237,18 @@ pub async fn install_zipped_mrpack(
                 version_id,
                 title,
                 icon_url,
-                profile_path.clone(),
+                instance_id.clone(),
                 None,
                 DownloadReason::Modpack,
             )
             .await?
         }
         CreatePackLocation::FromFile { path } => {
-            generate_pack_from_file(path, profile_path.clone()).await?
+            generate_pack_from_file(path, instance_id.clone()).await?
         }
     };
 
-    // Install pack files, and if it fails, fail safely by removing the profile
+    // Install pack files, and if it fails, fail safely by removing the instance.
     let result = install_zipped_mrpack_files(
         create_pack,
         false,
@@ -257,9 +257,9 @@ pub async fn install_zipped_mrpack(
     .await;
 
     match result {
-        Ok(profile) => Ok(profile),
+        Ok(instance_id) => Ok(instance_id),
         Err(err) => {
-            let _ = crate::api::profile::remove(&profile_path).await;
+            let _ = crate::api::instance::remove(&instance_id).await;
 
             Err(err)
         }
@@ -276,12 +276,12 @@ pub async fn install_zipped_mrpack_files(
     let state = &State::get().await?;
 
     let file = create_pack.file;
-    let description = create_pack.description.clone(); // make a copy for profile edit function
+    let description = create_pack.description.clone();
     let icon = create_pack.description.icon;
     let project_id = create_pack.description.project_id;
     let version_id = create_pack.description.version_id;
     let existing_loading_bar = create_pack.description.existing_loading_bar;
-    let profile_path = create_pack.description.profile_path;
+    let instance_id = create_pack.description.instance_id;
     let icon_exists = icon.is_some();
 
     let mut zip_reader = MrpackZipReader::new(&file).await?;
@@ -370,9 +370,8 @@ pub async fn install_zipped_mrpack_files(
         );
     }
 
-    // Sets generated profile attributes to the pack ones (using profile::edit)
-    set_profile_information(
-        profile_path.clone(),
+    set_instance_information(
+        instance_id.clone(),
         &description,
         &pack.name,
         &pack.dependencies,
@@ -380,11 +379,17 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
-    let profile_path = profile_path.clone();
+    let metadata = crate::api::instance::get(&instance_id)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(format!("Unknown instance {instance_id}"))
+        })?;
+    let instance_path = metadata.instance.path.clone();
+    let instance_full_path = crate::api::instance::get_full_path(&instance_id).await?;
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
         LoadingBarType::PackDownload {
-            profile_path: profile_path.clone(),
+            instance_id: instance_id.clone(),
             pack_name: pack.name.clone(),
             icon,
             pack_id: project_id.clone(),
@@ -395,20 +400,10 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
-    let profile =
-        Profile::get(&profile_path, &state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::UnmanagedProfileError(
-                    profile_path.to_string(),
-                )
-                .as_error()
-            })?;
-
     let download_meta = DownloadMeta {
         reason,
-        game_version: profile.game_version.clone(),
-        loader: profile.loader.as_str().to_string(),
+        game_version: metadata.applied_content_set.game_version.clone(),
+        loader: metadata.applied_content_set.loader.as_str().to_string(),
         dependent_on: version_id.clone(),
     };
 
@@ -421,8 +416,11 @@ pub async fn install_zipped_mrpack_files(
         num_files,
         None,
         |project| {
-            let profile_path = profile_path.clone();
+            let instance_id = instance_id.clone();
+            let instance_path = instance_path.clone();
+            let instance_full_path = instance_full_path.clone();
             let download_meta = download_meta.clone();
+            let pack_version_id = version_id.clone();
             async move {
                 //TODO: Future update: prompt user for optional files in a modpack
                 if let Some(env) = project.env
@@ -447,13 +445,11 @@ pub async fn install_zipped_mrpack_files(
                 )
                 .await?;
 
-                let path = profile::get_full_path(&profile_path)
-                    .await?
-                    .join(project.path.as_str());
+                let path = instance_full_path.join(project.path.as_str());
 
                 cache_file_hash(
                     file.clone(),
-                    &profile_path,
+                    &instance_path,
                     project.path.as_str(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
                     ProjectType::get_from_parent_folder(&path),
@@ -463,6 +459,40 @@ pub async fn install_zipped_mrpack_files(
                 .await?;
 
                 write(&path, &file, &state.io_semaphore).await?;
+
+                if let Some(project_type) =
+                    ProjectType::get_from_parent_folder(project.path.as_str())
+                {
+                    let hash =
+                        project.hashes.get(&PackFileHash::Sha1).map(|x| &**x);
+                    let file_info = if let Some(hash) = hash {
+                        CachedEntry::get_file_many(
+                            &[hash],
+                            None,
+                            &state.pool,
+                            &state.api_semaphore,
+                        )
+                        .await?
+                        .into_iter()
+                        .next()
+                    } else {
+                        None
+                    };
+                    if let Some(hash) = hash {
+                        crate::state::instances::commands::record_project_file(
+                            &instance_id,
+                            project.path.as_str(),
+                            hash,
+                            project.file_size as u64,
+                            project_type,
+                            modpack_source_kind(pack_version_id.as_deref()),
+                            file_info.as_ref().map(|file| file.project_id.as_str()),
+                            file_info.as_ref().map(|file| file.version_id.as_str()),
+                            state,
+                        )
+                        .await?;
+                    }
+                }
 
                 Ok(())
             }
@@ -501,18 +531,16 @@ pub async fn install_zipped_mrpack_files(
                 ))
             })?;
 
-        let path = profile::get_full_path(&profile_path)
-            .await?
-            .join(relative_override_file_path.as_str());
+        let path = instance_full_path.join(relative_override_file_path.as_str());
         let (size, hash) = zip_reader
             .extract_entry(index, &path, &state.io_semaphore)
             .await?;
 
         crate::state::cache_file_hash_metadata(
-            &profile_path,
+            &instance_path,
             relative_override_file_path.as_str(),
             size,
-            hash,
+            hash.clone(),
             ProjectType::get_from_parent_folder(
                 relative_override_file_path.as_str(),
             ),
@@ -520,6 +548,23 @@ pub async fn install_zipped_mrpack_files(
             &state.pool,
         )
         .await?;
+
+        if let Some(project_type) =
+            ProjectType::get_from_parent_folder(relative_override_file_path.as_str())
+        {
+            crate::state::instances::commands::record_project_file(
+                &instance_id,
+                relative_override_file_path.as_str(),
+                &hash,
+                size,
+                project_type,
+                modpack_source_kind(version_id.as_deref()),
+                None,
+                None,
+                state,
+            )
+            .await?;
+        }
 
         emit_loading(
             &loading_bar,
@@ -533,29 +578,33 @@ pub async fn install_zipped_mrpack_files(
 
     // If the icon doesn't exist, we expect icon.png to be a potential icon.
     // If it doesn't exist, and an override to icon.png exists, cache and use that
-    let potential_icon = profile::get_full_path(&profile_path)
-        .await?
-        .join("icon.png");
+    let potential_icon = instance_full_path.join("icon.png");
     if !icon_exists && potential_icon.exists() {
-        profile::edit_icon(&profile_path, Some(&potential_icon)).await?;
+        crate::api::instance::edit_icon(&instance_id, Some(&potential_icon)).await?;
     }
 
-    if let Some(profile_val) = profile::get(&profile_path).await? {
-        crate::launcher::install_minecraft(
-            &profile_val,
-            Some(loading_bar),
-            false,
-        )
-        .await?;
-    }
+    crate::launcher::install_minecraft_for_instance_id(
+        &instance_id,
+        Some(loading_bar),
+        false,
+    )
+    .await?;
 
-    Ok::<String, crate::Error>(profile_path.clone())
+    Ok::<String, crate::Error>(instance_id.clone())
+}
+
+fn modpack_source_kind(version_id: Option<&str>) -> ContentSourceKind {
+    if version_id.is_some() {
+        ContentSourceKind::ModrinthModpack
+    } else {
+        ContentSourceKind::ImportedModpack
+    }
 }
 
 #[tracing::instrument(skip(mrpack_file))]
 
 pub async fn remove_all_related_files(
-    profile_path: String,
+    instance_id: String,
     mrpack_file: CreatePackFile,
 ) -> crate::Result<()> {
     // Updates can remove files from a locally imported or downloaded pack, so share the same reader path.
@@ -581,17 +630,25 @@ pub async fn remove_all_related_files(
         .into());
     }
 
-    // Set install stage to installing, and do not change it back (as files are being removed and are not being reinstalled here)
-    crate::api::profile::edit(&profile_path, |prof| {
-        prof.install_stage = ProfileInstallStage::PackInstalling;
-        async { Ok(()) }
-    })
+    crate::api::instance::edit(
+        &instance_id,
+        EditInstance {
+            install_stage: Some(InstanceInstallStage::PackInstalling),
+            ..EditInstance::default()
+        },
+    )
     .await?;
 
     // First, remove all modrinth projects by their version hashes
     // Remove all modrinth projects by their version hashes
     // We need to do a fetch to get the project ids from Modrinth
     let state = State::get().await?;
+    let metadata = crate::api::instance::get(&instance_id)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(format!("Unknown instance {instance_id}"))
+        })?;
+    let instance_full_path = crate::api::instance::get_full_path(&instance_id).await?;
     let all_hashes = pack
         .files
         .iter()
@@ -612,34 +669,28 @@ pub async fn remove_all_related_files(
         .map(|p| p.project_id)
         .collect::<Vec<_>>();
 
-    let profile = profile::get(&profile_path).await?.ok_or_else(|| {
-        crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-    })?;
-    let profile_full_path = profile::get_full_path(&profile_path).await?;
-
-    for (file_path, project) in profile
-        .get_projects(
-            Some(CacheBehaviour::MustRevalidate),
-            &state.pool,
-            &state.api_semaphore,
-        )
-        .await?
+    for file in crate::state::instances::commands::list_project_files(
+        &metadata.instance.id,
+        &state,
+    )
+    .await?
     {
-        if let Some(metadata) = &project.metadata
-            && to_remove.contains(&metadata.project_id)
+        if let Some(project_id) = &file.project_id
+            && to_remove.contains(project_id)
         {
-            match io::remove_file(profile_full_path.join(file_path)).await {
-                Ok(_) => (),
-                Err(err) if err.kind() == ErrorKind::NotFound => (),
-                Err(err) => return Err(err.into()),
-            }
+            crate::state::instances::commands::remove_project(
+                &metadata.instance.id,
+                &file.relative_path,
+                &state,
+            )
+            .await?;
         }
     }
 
     // Iterate over all Modrinth project file paths in the json, and remove them
     // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
     for file in pack.files {
-        match io::remove_file(profile_full_path.join(file.path.as_str())).await
+        match io::remove_file(instance_full_path.join(file.path.as_str())).await
         {
             Ok(_) => (),
             Err(err) if err.kind() == ErrorKind::NotFound => (),
@@ -672,9 +723,7 @@ pub async fn remove_all_related_files(
 
         // Remove this file if a corresponding one exists in the filesystem
         match io::remove_file(
-            profile::get_full_path(&profile_path)
-                .await?
-                .join(relative_override_file_path.as_str()),
+            instance_full_path.join(relative_override_file_path.as_str()),
         )
         .await
         {

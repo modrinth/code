@@ -10,7 +10,10 @@ use crate::{
         install_from::CreatePackDescription,
     },
     prelude::ModLoader,
-    state::{LinkedData, ProfileInstallStage},
+    state::{
+        AppliedContentSetPatch, EditInstance, InstanceLink,
+        InstanceInstallStage,
+    },
     util::io,
 };
 
@@ -123,7 +126,7 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
 pub async fn import_atlauncher(
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
-    profile_path: &str,            // path to profile
+    instance_id: &str,
 ) -> crate::Result<()> {
     let atlauncher_instance_path = atlauncher_base_path
         .join("instances")
@@ -165,14 +168,14 @@ pub async fn import_atlauncher(
         project_id: None,
         version_id: None,
         existing_loading_bar: None,
-        profile_path: profile_path.to_string(),
+        instance_id: instance_id.to_string(),
     };
 
     let backup_name = format!("ATLauncher-{instance_folder}");
     let minecraft_folder = atlauncher_instance_path;
 
     import_atlauncher_unmanaged(
-        profile_path,
+        instance_id,
         minecraft_folder,
         backup_name,
         description,
@@ -183,7 +186,7 @@ pub async fn import_atlauncher(
 }
 
 async fn import_atlauncher_unmanaged(
-    profile_path: &str,
+    instance_id: &str,
     minecraft_folder: PathBuf,
     backup_name: String,
     description: CreatePackDescription,
@@ -213,53 +216,58 @@ async fn import_atlauncher_unmanaged(
         None
     };
 
-    // Set profile data to created default profile
-    crate::api::profile::edit(profile_path, |prof| {
-        prof.name = description
-            .override_title
-            .clone()
-            .unwrap_or_else(|| backup_name.to_string());
-        prof.install_stage = ProfileInstallStage::PackInstalling;
-
-        if let Some(ref project_id) = description.project_id
-            && let Some(ref version_id) = description.version_id
-        {
-            prof.linked_data = Some(LinkedData {
+    let link = match (&description.project_id, &description.version_id) {
+        (Some(project_id), Some(version_id)) => {
+            Some(InstanceLink::ModrinthModpack {
                 project_id: project_id.clone(),
                 version_id: version_id.clone(),
-                locked: true,
             })
         }
-
-        prof.icon_path = description
-            .icon
-            .clone()
-            .map(|x| x.to_string_lossy().to_string());
-        prof.game_version.clone_from(&game_version);
-        prof.loader_version = loader_version.clone().map(|x| x.id);
-        prof.loader = mod_loader;
-
-        async { Ok(()) }
-    })
+        _ => None,
+    };
+    crate::api::instance::edit(
+        instance_id,
+        EditInstance {
+            install_stage: Some(InstanceInstallStage::PackInstalling),
+            name: Some(
+                description
+                    .override_title
+                    .clone()
+                    .unwrap_or_else(|| backup_name.to_string()),
+            ),
+            icon_path: Some(
+                description
+                    .icon
+                    .clone()
+                    .map(|x| x.to_string_lossy().to_string()),
+            ),
+            link,
+            content_set_patch: Some(AppliedContentSetPatch {
+                game_version: Some(game_version.clone()),
+                protocol_version: Some(None),
+                loader: Some(mod_loader),
+                loader_version: Some(loader_version.clone().map(|x| x.id)),
+            }),
+            ..EditInstance::default()
+        },
+    )
     .await?;
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
-        profile_path,
+        instance_id,
         minecraft_folder,
         &state.io_semaphore,
         None,
     )
     .await?;
 
-    if let Some(profile_val) = crate::api::profile::get(profile_path).await? {
-        crate::launcher::install_minecraft(
-            &profile_val,
-            Some(loading_bar),
-            false,
-        )
-        .await?;
-    }
+    crate::launcher::install_minecraft_for_instance_id(
+        instance_id,
+        Some(loading_bar),
+        false,
+    )
+    .await?;
     Ok(())
 }

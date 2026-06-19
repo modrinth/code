@@ -6,7 +6,7 @@
 		>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal
-				:key="instance.path"
+				:key="instance.id"
 				ref="settingsModal"
 				:instance="instance"
 				:offline="offline"
@@ -19,7 +19,7 @@
 						:src="icon ? icon : undefined"
 						:alt="instance.name"
 						size="64px"
-						:tint-by="instance.path"
+						:tint-by="instance.id"
 					/>
 				</template>
 				<template #title>
@@ -78,7 +78,7 @@
 								<Avatar
 									:src="linkedProjectV3.icon_url"
 									:alt="linkedProjectV3.name"
-									:tint-by="instance.path"
+									:tint-by="instance.id"
 									size="24px"
 								/>
 								<router-link
@@ -190,7 +190,7 @@
 									{
 										id: 'open-folder',
 										action: () => {
-											if (instance) showProfileInFolder(instance.path)
+											if (instance) showInstanceInFolder(instance.id)
 										},
 									},
 									{
@@ -217,11 +217,11 @@
 			<RouterView
 				v-if="route.path.startsWith('/instance')"
 				v-slot="{ Component }"
-				:key="instance.path"
+				:key="instance.id"
 			>
 				<template v-if="Component">
 					<Suspense
-						:key="instance.path"
+						:key="instance.id"
 						@pending="subpagePending = true"
 						@resolve="subpagePending = false"
 					>
@@ -319,12 +319,12 @@ import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
-import { process_listener, profile_listener } from '@/helpers/events'
+import { instance_listener, process_listener } from '@/helpers/events'
+import { finish_install, get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
-import { get_by_profile_path } from '@/helpers/process'
-import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
+import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import { showInstanceInFolder } from '@/helpers/utils.js'
 import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
@@ -398,12 +398,9 @@ async function fetchInstance() {
 			? loadInstanceContentData(nextInstance.path, undefined, handleError)
 			: Promise.resolve(null)
 
-	if (!offline.value && nextInstance?.linked_data && nextInstance.linked_data.project_id) {
+	if (!offline.value && nextInstance?.link && nextInstance.link.project_id) {
 		try {
-			nextLinkedProjectV3 = await get_project_v3(
-				nextInstance.linked_data.project_id,
-				'must_revalidate',
-			)
+			nextLinkedProjectV3 = await get_project_v3(nextInstance.link.project_id, 'must_revalidate')
 
 			if (nextLinkedProjectV3?.minecraft_server != null) {
 				nextIsServerInstance = true
@@ -454,7 +451,7 @@ function fetchDeferredData() {
 
 async function updatePlayState() {
 	if (!route.params.id) return
-	const runningProcesses = await get_by_profile_path(route.params.id as string).catch(handleError)
+	const runningProcesses = await get_by_instance_id(route.params.id as string).catch(handleError)
 
 	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
 }
@@ -538,7 +535,7 @@ const startInstance = async (context: string) => {
 		await run(route.params.id as string)
 		playing.value = true
 	} catch (err) {
-		handleSevereError(err, { profilePath: route.params.id as string })
+		handleSevereError(err, { instanceId: route.params.id as string })
 	}
 	loading.value = false
 
@@ -564,10 +561,10 @@ const stopInstance = async (context: string) => {
 }
 
 const handlePlayServer = async () => {
-	if (!instance.value?.linked_data?.project_id) return
+	if (!instance.value?.link?.project_id) return
 	loading.value = true
 	try {
-		await playServerProject(instance.value.linked_data.project_id)
+		await playServerProject(instance.value.link.project_id)
 	} finally {
 		await updatePlayState()
 		loading.value = false
@@ -628,7 +625,7 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 			})
 			break
 		case 'open_folder':
-			if (instance.value) await showProfileInFolder(instance.value.path)
+			if (instance.value) await showInstanceInFolder(instance.value.id)
 			break
 		case 'copy_path': {
 			if (instance.value) {
@@ -640,9 +637,9 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 	}
 }
 
-const unlistenProfiles = await profile_listener(
-	async (event: { profile_path_id: string; event: string }) => {
-		if (event.profile_path_id !== route.params.id) return
+const unlistenInstances = await instance_listener(
+	async (event: { instance_id: string; event: string }) => {
+		if (event.instance_id !== route.params.id) return
 		if (event.event === 'removed' || route.path === '/') {
 			if (route.path !== '/') {
 				await router.push({ path: '/' })
@@ -656,20 +653,18 @@ const unlistenProfiles = await profile_listener(
 			}
 			return handleError(err)
 		})
-		if (!instance.value?.linked_data?.project_id) {
+		if (!instance.value?.link?.project_id) {
 			linkedProjectV3.value = undefined
 			isServerInstance.value = false
 		}
 	},
 )
 
-const unlistenProcesses = await process_listener(
-	(e: { event: string; profile_path_id: string }) => {
-		if (e.event === 'finished' && e.profile_path_id === route.params.id) {
-			playing.value = false
-		}
-	},
-)
+const unlistenProcesses = await process_listener((e: { event: string; instance_id: string }) => {
+	if (e.event === 'finished' && e.instance_id === route.params.id) {
+		playing.value = false
+	}
+})
 
 const icon = computed(() =>
 	instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : null,
@@ -701,10 +696,10 @@ const timePlayedHumanized = computed(() => {
 
 onUnmounted(() => {
 	unlistenProcesses()
-	unlistenProfiles()
-	const profilePath = route.params.id
-	if (profilePath) {
-		const { destroy } = useInstanceConsole(profilePath)
+	unlistenInstances()
+	const instanceId = route.params.id
+	if (instanceId) {
+		const { destroy } = useInstanceConsole(instanceId)
 		destroy()
 	}
 })

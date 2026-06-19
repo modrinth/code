@@ -3,10 +3,10 @@
 import dayjs from 'dayjs'
 
 import { get_project, get_version, get_version_many } from '@/helpers/cache.js'
-import { add_project_from_version, check_installed } from '@/helpers/profile.js'
+import { add_project_from_version, check_installed } from '@/helpers/instance'
 import {
-	add_server_to_profile,
-	get_profile_worlds,
+	add_server_to_instance,
+	get_instance_worlds,
 	resolveManagedServerWorld,
 } from '@/helpers/worlds.ts'
 
@@ -48,7 +48,7 @@ export const isVersionCompatible = (version, project, instance) => {
 	)
 }
 
-export const installVersionDependencies = async (profile, version, reason, onDepInstalling) => {
+export const installVersionDependencies = async (instance, version, reason, onDepInstalling) => {
 	const projectNames = new Map()
 	const storeProjectName = (p) => {
 		if (p?.id && p.title) projectNames.set(p.id, p.title)
@@ -66,7 +66,7 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 		if (installedProjectCache.has(projectId)) {
 			return installedProjectCache.get(projectId)
 		}
-		const installed = await check_installed(profile.path, projectId)
+		const installed = await check_installed(instance.id, projectId)
 		installedProjectCache.set(projectId, installed)
 		return installed
 	}
@@ -134,7 +134,7 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 			depVersion = findPreferredVersion(
 				depVersions.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published)),
 				dep,
-				profile,
+				instance,
 			)
 			if (!depVersion) return null
 
@@ -157,7 +157,7 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 
 		for (const dep of inputVersion.dependencies ?? []) {
 			if (dep.dependency_type !== 'required') continue
-			if (dep.project_id === 'P7dR8mSH' && profile.loader === 'quilt') continue
+			if (dep.project_id === 'P7dR8mSH' && instance.loader === 'quilt') continue
 
 			const resolved = await resolveDependency(dep, inputVersion)
 			if (!resolved) continue
@@ -181,7 +181,7 @@ export const installVersionDependencies = async (profile, version, reason, onDep
 		const batch = queuedInstalls.slice(i, i + batchSize)
 		await Promise.all(
 			batch.map(async ({ versionId, dependentOnVersionId }) => {
-				await add_project_from_version(profile.path, versionId, reason, dependentOnVersionId)
+				await add_project_from_version(instance.id, versionId, reason, dependentOnVersionId)
 			}),
 		)
 	}
@@ -193,13 +193,13 @@ export const getServerAddress = (javaServer) => {
 	return address
 }
 
-export const ensureManagedServerWorldExists = async (profilePath, serverName, serverAddress) => {
-	if (!profilePath || !serverAddress) return
+export const ensureManagedServerWorldExists = async (instanceId, serverName, serverAddress) => {
+	if (!instanceId || !serverAddress) return
 	try {
-		const worlds = await get_profile_worlds(profilePath)
+		const worlds = await get_instance_worlds(instanceId)
 		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
 		if (!managedWorld) {
-			await add_server_to_profile(profilePath, serverName, serverAddress, 'prompt')
+			await add_server_to_instance(instanceId, serverName, serverAddress, 'prompt')
 		}
 	} catch (err) {
 		console.error('Failed to ensure managed server world exists:', err)

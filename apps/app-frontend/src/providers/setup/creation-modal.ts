@@ -14,9 +14,9 @@ import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlre
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
+import { create, list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
-import { create_profile_and_install, create_profile_and_install_from_file } from '@/helpers/pack'
-import { create, list } from '@/helpers/profile.js'
+import { create_instance_and_install, create_instance_and_install_from_file } from '@/helpers/pack'
 import type { InstanceLoader } from '@/helpers/types'
 
 export function setupCreationModal(
@@ -65,7 +65,7 @@ export function setupCreationModal(
 		name: string,
 		iconUrl?: string,
 	) {
-		await create_profile_and_install(projectId, versionId, name, iconUrl).catch(handleError)
+		await create_instance_and_install(projectId, versionId, name, iconUrl).catch(handleError)
 		trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
 	}
 
@@ -75,7 +75,7 @@ export function setupCreationModal(
 				const { projectId, versionId, name, iconUrl } = config.modpackSelection.value
 
 				const instances = await list().catch(handleError)
-				const existingInstance = instances?.find((i) => i.linked_data?.project_id === projectId)
+				const existingInstance = instances?.find((i) => i.link?.project_id === projectId)
 
 				if (existingInstance) {
 					pendingModpackCreation.value = { projectId, versionId, name, iconUrl }
@@ -118,11 +118,11 @@ export function setupCreationModal(
 					waiting: true,
 				})
 
-				await create_profile_and_install_from_file(
+				await create_instance_and_install_from_file(
 					config.modpackFilePath.value,
-					(createProfile, fileName) => {
+					(createInstance, fileName) => {
 						popupNotificationManager.removeNotification(waitingNotification.id)
-						unknownPackWarningModal.value?.show(createProfile, fileName)
+						unknownPackWarningModal.value?.show(createInstance, fileName)
 					},
 				).catch(handleError)
 				popupNotificationManager.removeNotification(waitingNotification.id)

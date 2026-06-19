@@ -144,7 +144,7 @@ fn main() {
             .plugin(
                 "pack",
                 InlinedPlugin::new()
-                    .commands(&["pack_install", "pack_get_profile_from_pack"])
+                    .commands(&["pack_install", "pack_get_instance_from_pack"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
@@ -154,7 +154,7 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "process_get_all",
-                        "process_get_by_profile_path",
+                        "process_get_by_instance_id",
                         "process_kill",
                         "process_wait_for",
                     ])
@@ -163,48 +163,43 @@ fn main() {
                     ),
             )
             .plugin(
-                "profile",
+                "instance",
                 InlinedPlugin::new()
                     .commands(&[
-                        "profile_remove",
-                        "profile_get",
-                        "profile_get_many",
-                        "profile_get_projects",
-                        "profile_get_installed_project_ids",
-                        "profile_get_content_items",
-                        "profile_get_dependencies_as_content_items",
-                        "profile_get_linked_modpack_info",
-                        "profile_get_linked_modpack_content",
-                        "profile_get_optimal_jre_key",
-                        "profile_get_full_path",
-                        "profile_get_mod_full_path",
-                        "profile_list",
-                        "profile_check_installed",
-                        "profile_check_installed_batch",
-                        "profile_install",
-                        "profile_update_all",
-                        "profile_update_project",
-                        "profile_add_project_from_version",
-                        "profile_add_project_from_path",
-                        "profile_toggle_disable_project",
-                        "profile_remove_project",
-                        "profile_update_managed_modrinth_version",
-                        "profile_repair_managed_modrinth",
-                        "profile_run",
-                        "profile_kill",
-                        "profile_edit",
-                        "profile_edit_icon",
-                        "profile_export_mrpack",
-                        "profile_get_pack_export_candidates",
+                        "instance_remove",
+                        "instance_get",
+                        "instance_get_many",
+                        "instance_get_projects",
+                        "instance_get_installed_project_ids",
+                        "instance_content",
+                        "instance_get_content_items",
+                        "instance_get_dependencies_as_content_items",
+                        "instance_get_linked_modpack_info",
+                        "instance_get_linked_modpack_content",
+                        "instance_get_optimal_jre_key",
+                        "instance_get_full_path",
+                        "instance_get_mod_full_path",
+                        "instance_list",
+                        "instance_check_installed",
+                        "instance_check_installed_batch",
+                        "instance_install",
+                        "instance_update_all",
+                        "instance_update_project",
+                        "instance_add_project_from_version",
+                        "instance_add_project_from_path",
+                        "instance_toggle_disable_project",
+                        "instance_remove_project",
+                        "instance_update_managed_modrinth_version",
+                        "instance_repair_managed_modrinth",
+                        "instance_run",
+                        "instance_kill",
+                        "instance_edit",
+                        "instance_edit_icon",
+                        "instance_export_mrpack",
+                        "instance_get_pack_export_candidates",
+                        "instance_create",
+                        "instance_duplicate",
                     ])
-                    .default_permission(
-                        DefaultPermissionRule::AllowAllCommands,
-                    ),
-            )
-            .plugin(
-                "profile-create",
-                InlinedPlugin::new()
-                    .commands(&["profile_create", "profile_duplicate"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
@@ -298,17 +293,17 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_recent_worlds",
-                        "get_profile_worlds",
+                        "get_instance_worlds",
                         "get_singleplayer_world",
                         "set_world_display_status",
                         "rename_world",
                         "reset_world_icon",
                         "backup_world",
                         "delete_world",
-                        "add_server_to_profile",
-                        "edit_server_in_profile",
-                        "remove_server_from_profile",
-                        "get_profile_protocol_version",
+                        "add_server_to_instance",
+                        "edit_server_in_instance",
+                        "remove_server_from_instance",
+                        "get_instance_protocol_version",
                         "get_server_status",
                         "start_join_singleplayer_world",
                         "start_join_server",

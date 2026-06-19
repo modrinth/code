@@ -24,7 +24,7 @@ import { computed, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
-import { duplicate, remove } from '@/helpers/profile.js'
+import { duplicate, remove } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
 
@@ -48,21 +48,21 @@ const instanceComponents = ref(null)
 const currentDeleteInstance = ref(null)
 const confirmModal = ref(null)
 
-async function deleteProfile() {
+async function deleteInstance() {
 	if (currentDeleteInstance.value) {
 		instanceComponents.value = instanceComponents.value.filter(
-			(x) => x.instance.path !== currentDeleteInstance.value,
+			(x) => x.instance.id !== currentDeleteInstance.value,
 		)
 		await remove(currentDeleteInstance.value).catch(handleError)
 	}
 }
 
-async function duplicateProfile(p) {
+async function duplicateInstance(p) {
 	await duplicate(p).catch(handleError)
 }
 
-const handleRightClick = (event, profilePathId) => {
-	const item = instanceComponents.value.find((x) => x.instance.path === profilePathId)
+const handleRightClick = (event, instanceId) => {
+	const item = instanceComponents.value.find((x) => x.instance.id === instanceId)
 	const baseOptions = [
 		{ name: 'add_content' },
 		{ type: 'divider' },
@@ -114,16 +114,16 @@ const handleOptionsClick = async (args) => {
 			break
 		case 'duplicate':
 			if (args.item.instance.install_stage == 'installed')
-				await duplicateProfile(args.item.instance.path)
+				await duplicateInstance(args.item.instance.id)
 			break
 		case 'open':
 			await args.item.openFolder()
 			break
 		case 'copy':
-			await navigator.clipboard.writeText(args.item.instance.path)
+			await navigator.clipboard.writeText(args.item.instance.id)
 			break
 		case 'delete':
-			currentDeleteInstance.value = args.item.instance.path
+			currentDeleteInstance.value = args.item.instance.id
 			confirmModal.value.show()
 			break
 	}
@@ -321,13 +321,13 @@ const filteredResults = computed(() => {
 			<Instance
 				v-for="instance in instanceSection.value"
 				ref="instanceComponents"
-				:key="instance.path + instance.install_stage"
+				:key="instance.id + instance.install_stage"
 				:instance="instance"
-				@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
+				@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.id)"
 			/>
 		</section>
 	</Accordion>
-	<ConfirmDeleteInstanceModal ref="confirmModal" @delete="deleteProfile" />
+	<ConfirmDeleteInstanceModal ref="confirmModal" @delete="deleteInstance" />
 	<ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
 		<template #play> <PlayIcon /> Play </template>
 		<template #stop> <StopCircleIcon /> Stop </template>

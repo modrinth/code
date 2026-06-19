@@ -6,8 +6,8 @@ import type { Router } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
-import { install_to_existing_profile } from '@/helpers/pack.js'
-import { create, edit, edit_icon, get, install as installProfile, list } from '@/helpers/profile.js'
+import { create, edit, edit_icon, get, install as installInstance, list } from '@/helpers/instance'
+import { install_to_existing_instance } from '@/helpers/pack.js'
 import type { GameInstance } from '@/helpers/types'
 import { start_join_server } from '@/helpers/worlds.ts'
 import { handleSevereError } from '@/store/error.js'
@@ -99,14 +99,14 @@ export function createServerInstall(opts: {
 		return installingServerProjects.value.includes(projectId)
 	}
 
-	async function joinServer(profilePath: string, serverAddress: string | null) {
+	async function joinServer(instanceId: string, serverAddress: string | null) {
 		if (!serverAddress) return
-		await start_join_server(profilePath, serverAddress)
+		await start_join_server(instanceId, serverAddress)
 	}
 
 	async function findInstalledInstance(projectId: string) {
 		const packs = await list()
-		return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
+		return packs.find((pack) => pack.link?.project_id === projectId) ?? null
 	}
 
 	async function createVanillaInstance(
@@ -114,7 +114,7 @@ export function createServerInstall(opts: {
 		gameVersion: string,
 		serverAddress: string | null,
 	) {
-		const profilePath = await create(
+		const instanceId = await create(
 			project.title,
 			gameVersion,
 			'vanilla',
@@ -122,22 +122,21 @@ export function createServerInstall(opts: {
 			project.icon_url ?? null,
 			false,
 			{
+				type: 'server_project',
 				project_id: project.id,
-				version_id: '',
-				locked: true,
 			},
 		)
 
-		await ensureManagedServerWorldExists(profilePath, project.title, serverAddress)
+		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 
-		return profilePath
+		return instanceId
 	}
 
 	async function updateVanillaGameVersion(instance: GameInstance, targetGameVersion: string) {
 		if (instance.game_version === targetGameVersion) return
 
-		await edit(instance.path, { game_version: targetGameVersion })
-		await installProfile(instance.path, false)
+		await edit(instance.id, { game_version: targetGameVersion })
+		await installInstance(instance.id, false)
 	}
 
 	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
@@ -152,14 +151,14 @@ export function createServerInstall(opts: {
 								label: 'Launch game',
 								action: async () => {
 									try {
-										await joinServer(project.path, serverAddress)
+										await joinServer(project.id, serverAddress)
 										trackEvent('InstanceStart', {
 											loader: project.loader,
 											game_version: project.game_version,
 											source: 'ServerProject',
 										})
 									} catch (err) {
-										handleSevereError(err, { profilePath: project.path })
+										handleSevereError(err, { instanceId: project.id })
 									}
 								},
 								color: 'brand' as const,
@@ -168,7 +167,7 @@ export function createServerInstall(opts: {
 					: []),
 				{
 					label: 'Instance',
-					action: () => opts.router.push(`/instance/${encodeURIComponent(project.path)}`),
+					action: () => opts.router.push(`/instance/${encodeURIComponent(project.id)}`),
 				},
 			],
 			autoCloseMs: null,
@@ -187,14 +186,14 @@ export function createServerInstall(opts: {
 								label: 'Launch game',
 								action: async () => {
 									try {
-										if (serverAddress) await start_join_server(instance.path, serverAddress)
+										if (serverAddress) await start_join_server(instance.id, serverAddress)
 										trackEvent('InstanceStart', {
 											loader: instance.loader,
 											game_version: instance.game_version,
 											source: 'ServerProject',
 										})
 									} catch (err) {
-										handleSevereError(err, { profilePath: instance.path })
+										handleSevereError(err, { instanceId: instance.id })
 									}
 								},
 								color: 'brand' as const,
@@ -203,7 +202,7 @@ export function createServerInstall(opts: {
 					: []),
 				{
 					label: 'Instance',
-					action: () => opts.router.push(`/instance/${encodeURIComponent(instance.path)}`),
+					action: () => opts.router.push(`/instance/${encodeURIComponent(instance.id)}`),
 				},
 			],
 			autoCloseMs: null,
@@ -211,8 +210,8 @@ export function createServerInstall(opts: {
 	}
 
 	/**
-	 * Server projects that use modpack content have linked_data.project_id as
-	 * the server project id and linked_data.version_id as the modpack content version id.
+	 * Server projects that use modpack content have link.project_id as
+	 * the server project id and link.version_id as the modpack content version id.
 	 * The modpack content version can be of the same server project, or from a different project.
 	 */
 	async function installServerProject(serverProjectId: string) {
@@ -231,7 +230,7 @@ export function createServerInstall(opts: {
 		const contentProjectId = contentVersion.project_id
 		const gameVersion = contentVersion.game_versions?.[0] ?? ''
 
-		const profilePath = await create(
+		const instanceId = await create(
 			project.title,
 			gameVersion,
 			'vanilla',
@@ -239,36 +238,42 @@ export function createServerInstall(opts: {
 			project.icon_url,
 			true,
 			{
+				type: 'server_project_modpack',
+				server_project_id: serverProjectId,
+				content_project_id: contentProjectId,
+				content_version_id: contentVersionId,
 				project_id: serverProjectId,
 				version_id: contentVersionId,
-				locked: true,
 			},
 		)
 
 		// Save the icon path before pack install overwrites it
-		const profileBeforeInstall = await get(profilePath)
-		const originalIconPath = profileBeforeInstall?.icon_path ?? null
+		const instanceBeforeInstall = await get(instanceId)
+		const originalIconPath = instanceBeforeInstall?.icon_path ?? null
 
-		await install_to_existing_profile(
+		await install_to_existing_instance(
 			contentProjectId,
 			contentVersionId,
 			project.title,
-			profilePath,
+			instanceId,
 		)
 
-		// Pack install overwrites name, icon, and linked_data with the content project's values.
+		// Pack install overwrites name, icon, and link with the content project's values.
 		// Restore them to point to the server project.
-		await edit(profilePath, {
+		await edit(instanceId, {
 			name: project.title,
-			linked_data: {
+			link: {
+				type: 'server_project_modpack',
+				server_project_id: serverProjectId,
+				content_project_id: contentProjectId,
+				content_version_id: contentVersionId,
 				project_id: serverProjectId,
 				version_id: contentVersionId,
-				locked: true,
 			},
 		})
-		await edit_icon(profilePath, originalIconPath)
+		await edit_icon(instanceId, originalIconPath)
 
-		await ensureManagedServerWorldExists(profilePath, project.title, serverAddress)
+		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 	}
 
 	/**
@@ -303,9 +308,9 @@ export function createServerInstall(opts: {
 			if (installingServerProjects.value.includes(projectId)) return
 			startInstallingServer(projectId)
 			try {
-				const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
-				if (path) {
-					instance = await get(path)
+				const instanceId = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
+				if (instanceId) {
+					instance = await get(instanceId)
 					if (instance) showModpackInstallSuccess(instance, serverAddress)
 				}
 			} finally {
@@ -324,10 +329,10 @@ export function createServerInstall(opts: {
 
 		if (!instance) return
 
-		await ensureManagedServerWorldExists(instance.path, project.title, serverAddress)
+		await ensureManagedServerWorldExists(instance.id, project.title, serverAddress)
 
 		// Update existing instance if needed
-		if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
+		if (isModpack && instance.link?.version_id !== modpackVersionId) {
 			updateToPlayModalRef?.show(instance, modpackVersionId, () => {
 				showUpdateSuccess(instance, serverAddress)
 			})
@@ -347,14 +352,14 @@ export function createServerInstall(opts: {
 
 		// Join server
 		try {
-			await joinServer(instance.path, serverAddress)
+			await joinServer(instance.id, serverAddress)
 			trackEvent('InstanceStart', {
 				loader: instance.loader,
 				game_version: instance.game_version,
 				source: 'ServerProject',
 			})
 		} catch (err) {
-			handleSevereError(err, { profilePath: instance.path })
+			handleSevereError(err, { instanceId: instance.id })
 		}
 	}
 

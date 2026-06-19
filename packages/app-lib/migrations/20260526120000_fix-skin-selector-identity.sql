@@ -1,3 +1,6 @@
+DROP TRIGGER IF EXISTS default_minecraft_capes_user_uuid_insert_check;
+DROP TRIGGER IF EXISTS default_minecraft_capes_user_uuid_update_check;
+DROP TRIGGER IF EXISTS default_minecraft_capes_user_uuid_update_cascade;
 DROP TABLE IF EXISTS default_minecraft_capes;
 
 -- Keep only one saved skin per Minecraft account and texture.

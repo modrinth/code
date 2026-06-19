@@ -9,7 +9,7 @@ import {
 } from '@modrinth/ui'
 import { computed, type Ref, ref, watch } from 'vue'
 
-import { edit } from '@/helpers/profile'
+import { edit } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
@@ -32,7 +32,7 @@ const fullscreenSetting: Ref<boolean> = ref(
 	instance.value.force_fullscreen ?? globalSettings.force_fullscreen,
 )
 
-const editProfileObject = computed(() => {
+const editInstanceObject = computed(() => {
 	if (!overrideWindowSettings.value) {
 		return {
 			force_fullscreen: null,
@@ -48,7 +48,7 @@ const editProfileObject = computed(() => {
 watch(
 	[overrideWindowSettings, resolution, fullscreenSetting],
 	async () => {
-		await edit(instance.value.path, editProfileObject.value)
+		await edit(instance.value.id, editInstanceObject.value)
 	},
 	{ deep: true },
 )

@@ -2,6 +2,7 @@
 pub mod cache;
 pub mod friends;
 pub mod handler;
+pub mod instance;
 pub mod jre;
 pub mod logs;
 pub mod metadata;
@@ -10,7 +11,6 @@ pub mod minecraft_skins;
 pub mod mr_auth;
 pub mod pack;
 pub mod process;
-pub mod profile;
 pub mod server_address;
 pub mod settings;
 pub mod tags;
@@ -20,11 +20,13 @@ pub mod data {
     pub use crate::state::{
         CacheBehaviour, CacheValueType, ContentItem, ContentItemOwner,
         ContentItemProject, ContentItemVersion, Credentials, Dependency,
-        DirectoryInfo, Hooks, JavaVersion, LinkedData, LinkedModpackInfo,
-        MemorySettings, ModLoader, ModrinthCredentials, Organization,
-        OwnerType, ProcessMetadata, ProfileFile, Project, ProjectType,
-        ProjectV3, SearchResult, SearchResults, SearchResultsV3, Settings,
-        TeamMember, Theme, User, UserFriend, Version, WindowSize,
+        AppliedContentSetPatch, CreateInstance, DirectoryInfo, EditInstance,
+        Hooks, InstanceLaunchOverridesPatch, InstanceLink, InstanceMetadata,
+        JavaVersion, LinkedModpackInfo, MemorySettings, ModLoader,
+        ModrinthCredentials, Organization, OwnerType, ProcessMetadata,
+        ContentFile, Project, ProjectType, ProjectV3, SearchResult,
+        SearchResults, SearchResultsV3, Settings, TeamMember, Theme, User,
+        UserFriend, Version, WindowSize,
     };
     pub use ariadne::users::UserStatus;
 }
@@ -34,8 +36,7 @@ pub mod prelude {
         State,
         data::*,
         event::CommandPayload,
-        jre, metadata, minecraft_auth, mr_auth, pack, process,
-        profile::{self, Profile, create},
+        instance, jre, metadata, minecraft_auth, mr_auth, pack, process,
         settings,
         state::ReleaseChannel,
         util::{

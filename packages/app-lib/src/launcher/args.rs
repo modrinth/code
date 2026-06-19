@@ -1,7 +1,7 @@
 //! Minecraft CLI argument logic
 use crate::launcher::quick_play_version::QuickPlayServerVersion;
 use crate::launcher::{QuickPlayVersion, parse_rules};
-use crate::profile::QuickPlayType;
+use crate::instance::QuickPlayType;
 use crate::state::Credentials;
 use crate::{
     state::{MemorySettings, WindowSize},

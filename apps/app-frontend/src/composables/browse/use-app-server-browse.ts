@@ -8,10 +8,10 @@ import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
 import { process_listener } from '@/helpers/events'
-import { get_by_profile_path } from '@/helpers/process'
-import { kill, list as listInstances } from '@/helpers/profile.js'
+import { kill, list as listInstances } from '@/helpers/instance'
+import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { add_server_to_profile, getServerLatency } from '@/helpers/worlds'
+import { add_server_to_instance, getServerLatency } from '@/helpers/worlds'
 import { getServerAddress } from '@/store/install.js'
 
 interface BrowseServerInstance {
@@ -83,13 +83,11 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		})
 		const newRunning: Record<string, string> = {}
 		for (const hit of hits) {
-			const inst = packs.find(
-				(pack: GameInstance) => pack.linked_data?.project_id === hit.project_id,
-			)
+			const inst = packs.find((pack: GameInstance) => pack.link?.project_id === hit.project_id)
 			if (inst) {
-				const processes = await get_by_profile_path(inst.path).catch(() => [])
+				const processes = await get_by_instance_id(inst.id).catch(() => [])
 				if (Array.isArray(processes) && processes.length > 0) {
-					newRunning[hit.project_id] = inst.path
+					newRunning[hit.project_id] = inst.id
 				}
 			}
 		}
@@ -119,8 +117,8 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 
 		if (options.instance.value) {
 			try {
-				await add_server_to_profile(
-					options.instance.value.path,
+				await add_server_to_instance(
+					options.instance.value.id,
 					project.name,
 					address,
 					'prompt',
@@ -289,11 +287,11 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		}
 	}
 
-	process_listener((event: { event: string; profile_path_id: string }) => {
+	process_listener((event: { event: string; instance_id: string }) => {
 		debugLog('process event', event)
 		if (event.event === 'finished') {
 			const projectId = Object.entries(runningServerProjects.value).find(
-				([, path]) => path === event.profile_path_id,
+				([, path]) => path === event.instance_id,
 			)?.[0]
 			if (projectId) {
 				const { [projectId]: _, ...rest } = runningServerProjects.value

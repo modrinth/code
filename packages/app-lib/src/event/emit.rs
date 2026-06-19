@@ -1,11 +1,11 @@
 use super::{FriendPayload, LoadingBarId};
 use crate::event::{
     CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
-    ProfilePayloadType,
+    InstancePayloadType,
 };
 #[cfg(feature = "tauri")]
 use crate::event::{
-    LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
+    LoadingPayload, ProcessPayload, InstancePayload, WarningPayload,
 };
 use futures::prelude::*;
 use serde_json::Value;
@@ -243,7 +243,7 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
 // emit_process(uuid, pid, event, message)
 #[allow(unused_variables)]
 pub async fn emit_process(
-    profile_path: &str,
+    instance_id: &str,
     uuid: Uuid,
     event: ProcessPayloadType,
     message: &str,
@@ -256,7 +256,7 @@ pub async fn emit_process(
             .emit(
                 "process",
                 ProcessPayload {
-                    profile_path_id: profile_path.to_string(),
+                    instance_id: instance_id.to_string(),
                     uuid,
                     event,
                     message: message.to_string(),
@@ -267,11 +267,11 @@ pub async fn emit_process(
     Ok(())
 }
 
-// emit_profile(path, event)
+// emit_instance(path, event)
 #[allow(unused_variables)]
-pub async fn emit_profile(
-    profile_path_id: &str,
-    event: ProfilePayloadType,
+pub async fn emit_instance(
+    instance_id: &str,
+    event: InstancePayloadType,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
@@ -279,9 +279,9 @@ pub async fn emit_profile(
         event_state
             .app
             .emit(
-                "profile",
-                ProfilePayload {
-                    profile_path_id: profile_path_id.to_string(),
+                "instance",
+                InstancePayload {
+                    instance_id: instance_id.to_string(),
                     event,
                 },
             )

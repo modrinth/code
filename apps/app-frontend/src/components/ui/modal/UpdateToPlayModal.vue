@@ -31,7 +31,7 @@ import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
-import { update_managed_modrinth_version } from '@/helpers/profile'
+import { update_managed_modrinth_version } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { injectServerInstall } from '@/providers/server-install'
 
@@ -202,15 +202,15 @@ async function computeDependencyDiffs(
 }
 
 async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
-	if (!inst.linked_data) return null
-	if (!modpackVersionId.value || !inst.linked_data.version_id) return null
+	if (!inst.link) return null
+	if (!modpackVersionId.value || !inst.link.version_id) return null
 
 	try {
-		// For server projects, linked_data.project_id is the server project but
-		// linked_data.version_id references a content modpack version from a different project.
-		// Detect this by comparing the version's project_id with linked_data.project_id.
+		// For server projects, link.project_id is the server project but
+		// link.version_id references a content modpack version from a different project.
+		// Detect this by comparing the version's project_id with link.project_id.
 		modpackVersion.value = await get_version(modpackVersionId.value, 'bypass')
-		const instanceModpackVersion = await get_version(inst.linked_data.version_id, 'bypass')
+		const instanceModpackVersion = await get_version(inst.link.version_id, 'bypass')
 
 		// Compute dependency diffs between current and latest version
 		if (instanceModpackVersion && modpackVersion.value) {
@@ -238,11 +238,11 @@ watch(
 
 async function handleUpdate() {
 	hide()
-	const serverProjectId = instance.value?.linked_data?.project_id
+	const serverProjectId = instance.value?.link?.project_id
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
 		if (modpackVersionId.value && instance.value) {
-			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
+			await update_managed_modrinth_version(instance.value.id, modpackVersionId.value)
 			await onUpdateComplete.value()
 		}
 	} catch (error) {
@@ -253,10 +253,8 @@ async function handleUpdate() {
 }
 
 function handleReport() {
-	if (instance.value?.linked_data?.project_id) {
-		openUrl(
-			`https://modrinth.com/report?item=project&itemID=${instance.value.linked_data.project_id}`,
-		)
+	if (instance.value?.link?.project_id) {
+		openUrl(`https://modrinth.com/report?item=project&itemID=${instance.value.link.project_id}`)
 	}
 }
 
@@ -297,11 +295,8 @@ const messages = defineMessages({
 })
 
 const hasUpdate = computed(() => {
-	if (!instance.value?.linked_data) return false
-	return (
-		modpackVersionId.value != null &&
-		modpackVersionId.value !== instance.value.linked_data.version_id
-	)
+	if (!instance.value?.link) return false
+	return modpackVersionId.value != null && modpackVersionId.value !== instance.value.link.version_id
 })
 
 defineExpose({ show, hide, hasUpdate })
