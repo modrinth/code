@@ -15,7 +15,10 @@ import {
 	getSliceCount,
 } from '../analytics-chart/analytics-chart-utils'
 import type { FormatMessage } from '../analytics-messages'
-import { analyticsMessages } from '../analytics-messages'
+import {
+	analyticsMessages,
+	formatAnalyticsDependentProjectFallbackLabel,
+} from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
 	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
@@ -137,6 +140,19 @@ export function buildAnalyticsTableRows({
 		selectedBreakdowns.forEach((breakdown, index) => {
 			displays[breakdown] = getBreakdownDisplayValue(breakdownValues[index] ?? '', breakdown)
 		})
+
+		const dependentProjectBreakdownIndex = selectedBreakdowns.indexOf('dependent_project_download')
+		const downloadReasonBreakdownIndex = selectedBreakdowns.indexOf('download_reason')
+		if (
+			dependentProjectBreakdownIndex !== -1 &&
+			downloadReasonBreakdownIndex !== -1 &&
+			isUnknownAnalyticsBreakdownValue(breakdownValues[dependentProjectBreakdownIndex])
+		) {
+			displays.dependent_project_download = formatAnalyticsDependentProjectFallbackLabel(
+				breakdownValues[downloadReasonBreakdownIndex],
+				formatMessage,
+			)
+		}
 
 		return displays
 	}

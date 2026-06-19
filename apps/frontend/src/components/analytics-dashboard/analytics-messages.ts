@@ -85,7 +85,7 @@ export const analyticsMessages = defineMessages({
 	},
 	noDependent: {
 		id: 'analytics.value.no-dependent',
-		defaultMessage: 'No dependent / unknown',
+		defaultMessage: 'No dependent',
 	},
 	noDependentTooltip: {
 		id: 'analytics.value.no-dependent-tooltip',
@@ -887,6 +887,17 @@ export function formatAnalyticsDownloadReasonLabel(
 		default:
 			return reason
 	}
+}
+
+export function formatAnalyticsDependentProjectFallbackLabel(
+	downloadReason: string | undefined,
+	formatMessage: FormatMessage,
+): string {
+	if (downloadReason?.trim().toLowerCase() === 'standalone') {
+		return formatMessage(analyticsMessages.noDependent)
+	}
+
+	return formatMessage(analyticsMessages.unknown)
 }
 
 export function formatAnalyticsDownloadSourceLabel(

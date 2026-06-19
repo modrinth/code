@@ -498,7 +498,7 @@
     "message": "Monetized"
   },
   "analytics.value.no-dependent": {
-    "message": "No dependent / unknown"
+    "message": "No dependent"
   },
   "analytics.value.no-dependent-tooltip": {
     "message": "Downloaded for reasons other than being a dependency"

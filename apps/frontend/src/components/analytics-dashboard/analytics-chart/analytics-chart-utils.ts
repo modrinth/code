@@ -15,6 +15,7 @@ import {
 	analyticsChartMessages,
 	analyticsMessages,
 	analyticsStatCardMessages,
+	formatAnalyticsDependentProjectFallbackLabel,
 	formatAnalyticsDownloadReasonLabel,
 	formatAnalyticsLoaderLabel,
 	formatAnalyticsMonetizationLabel,
@@ -184,17 +185,25 @@ export function formatBreakdownLabels(
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
 	formatMessage: FormatMessage,
 ): string {
+	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
+	const downloadReasonBreakdownIndex = normalizedBreakdowns.indexOf('download_reason')
+
 	return collapseRepeatedUnknownBreakdownLabels(
-		selectedBreakdowns
-			.filter((breakdown) => breakdown !== 'none')
-			.map((breakdown, index) =>
-				formatBreakdownLabel(
-					breakdownValues[index] ?? '',
-					breakdown,
-					getVersionDisplayName,
+		normalizedBreakdowns.map((breakdown, index) => {
+			const breakdownValue = breakdownValues[index] ?? ''
+			if (
+				breakdown === 'dependent_project_download' &&
+				downloadReasonBreakdownIndex !== -1 &&
+				isUnknownAnalyticsBreakdownValue(breakdownValue)
+			) {
+				return formatAnalyticsDependentProjectFallbackLabel(
+					breakdownValues[downloadReasonBreakdownIndex],
 					formatMessage,
-				),
-			),
+				)
+			}
+
+			return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName, formatMessage)
+		}),
 		formatMessage,
 	).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 }
@@ -373,6 +382,8 @@ export function buildChartDatasets(
 	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 
 	function formatChartBreakdownLabels(breakdownValues: readonly string[]): string {
+		const downloadReasonBreakdownIndex = normalizedBreakdowns.indexOf('download_reason')
+
 		return collapseRepeatedUnknownBreakdownLabels(
 			normalizedBreakdowns.map((breakdown, index) => {
 				const breakdownValue = breakdownValues[index] ?? ''
@@ -381,7 +392,12 @@ export function buildChartDatasets(
 						breakdown === 'dependent_project_download' &&
 						isUnknownAnalyticsBreakdownValue(breakdownValue)
 					) {
-						return formatMessage(analyticsMessages.noDependent)
+						return downloadReasonBreakdownIndex === -1
+							? formatMessage(analyticsMessages.noDependent)
+							: formatAnalyticsDependentProjectFallbackLabel(
+									breakdownValues[downloadReasonBreakdownIndex],
+									formatMessage,
+								)
 					}
 
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
