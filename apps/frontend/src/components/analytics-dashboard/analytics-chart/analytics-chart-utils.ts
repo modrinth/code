@@ -25,6 +25,7 @@ import {
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	isUnknownAnalyticsBreakdownValue,
 	UNKNOWN_BREAKDOWN_VALUE,
 } from '../breakdown'
 import { PREVIOUS_PERIOD_DATASET_ID_PREFIX } from './analytics-chart-constants'
@@ -376,6 +377,13 @@ export function buildChartDatasets(
 			normalizedBreakdowns.map((breakdown, index) => {
 				const breakdownValue = breakdownValues[index] ?? ''
 				if (breakdown === 'project' || breakdown === 'dependent_project_download') {
+					if (
+						breakdown === 'dependent_project_download' &&
+						isUnknownAnalyticsBreakdownValue(breakdownValue)
+					) {
+						return formatMessage(analyticsMessages.noDependent)
+					}
+
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
 				}
 
@@ -471,7 +479,9 @@ export function buildChartDatasets(
 					? breakdownValues[dependentProjectBreakdownIndex]
 					: undefined
 			const dependentProjectName = dependentProjectId
-				? (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
+				? isUnknownAnalyticsBreakdownValue(dependentProjectId)
+					? undefined
+					: (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
 				: undefined
 			const versionProjectName =
 				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
@@ -480,6 +490,16 @@ export function buildChartDatasets(
 			const dependencyProjectNames = [...(dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? [])]
 				.map((projectId) => projectNamesById.get(projectId) ?? projectId)
 				.sort((left, right) => left.localeCompare(right))
+			const dependentProjectTooltip = dependentProjectId
+				? isUnknownAnalyticsBreakdownValue(dependentProjectId)
+					? formatMessage(analyticsMessages.noDependentTooltip)
+					: formatDependentProjectDatasetTooltip(
+							versionName,
+							dependentProjectName,
+							dependencyProjectNames,
+							formatMessage,
+						)
+				: undefined
 			const color =
 				normalizedBreakdowns.length === 1
 					? getBreakdownColor(
@@ -493,13 +513,7 @@ export function buildChartDatasets(
 				projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
 				label: formatChartBreakdownLabels(breakdownValues),
 				projectName: versionProjectName,
-				tooltip:
-					formatDependentProjectDatasetTooltip(
-						versionName,
-						dependentProjectName,
-						dependencyProjectNames,
-						formatMessage,
-					) ?? formatDatasetTooltip(versionProjectName),
+				tooltip: dependentProjectTooltip ?? formatDatasetTooltip(versionProjectName),
 				data,
 				borderColor: color,
 				backgroundColor: color,

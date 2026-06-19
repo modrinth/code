@@ -22,6 +22,7 @@ import {
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	isUnknownAnalyticsBreakdownValue,
 } from '../breakdown'
 import { getAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
 import type {
@@ -194,6 +195,7 @@ export function buildAnalyticsTableRows({
 				? (projectNamesById.get(dependentOnProjectId) ?? dependentOnProjectId)
 				: '',
 			dependentOnProjectId: dependentOnProjectId ?? '',
+			dependentOnProjectIds: dependentOnProjectId ? [dependentOnProjectId] : [],
 			breakdown: breakdownKey,
 			breakdownValues: Object.fromEntries(
 				selectedBreakdowns.map((breakdown, index) => [breakdown, breakdownValues[index] ?? '']),
@@ -213,6 +215,18 @@ export function buildAnalyticsTableRows({
 
 		nextRows.set(rowId, row)
 		return row
+	}
+
+	function addDependentOnProjectIdToRow(row: AnalyticsTableRow, projectId: string | undefined) {
+		if (!projectId || row.dependentOnProjectIds.includes(projectId)) {
+			return
+		}
+
+		row.dependentOnProjectIds.push(projectId)
+		if (!row.dependentOnProjectId) {
+			row.dependentOnProjectId = projectId
+			row.dependent_on = projectNamesById.get(projectId) ?? projectId
+		}
 	}
 
 	if (!includeDate && selectedBreakdowns.length === 0) {
@@ -263,17 +277,20 @@ export function buildAnalyticsTableRows({
 			const dependentOnProjectId = includeDependentProjectTooltipContext
 				? point.source_project
 				: undefined
+			const dependentTooltipProjectId = selectedBreakdowns.includes('dependent_project_download')
+				? point.source_project
+				: undefined
 			const breakdownKey =
 				breakdownValues.length === 0
 					? ALL_PROJECTS_BREAKDOWN_VALUE
 					: getAnalyticsBreakdownKey(breakdownValues)
-			const dependentOnKey = dependentOnProjectId ? `::${dependentOnProjectId}` : ''
 			const rowId = includeDate
-				? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}${dependentOnKey}`
-				: `${breakdownKey}${dependentOnKey}`
+				? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}`
+				: breakdownKey
 			const row =
 				nextRows.get(rowId) ??
 				createRow(rowId, breakdownValues, dependentOnProjectId, nextBucketLabel)
+			addDependentOnProjectIdToRow(row, dependentTooltipProjectId)
 			addAnalyticsMetricToTableRow(row, point)
 		}
 	})
@@ -338,6 +355,13 @@ function formatAnalyticsTableBreakdownDisplayValue(
 	formatMessage: FormatMessage,
 ): string {
 	if (breakdown === 'project' || breakdown === 'dependent_project_download') {
+		if (
+			breakdown === 'dependent_project_download' &&
+			isUnknownAnalyticsBreakdownValue(value)
+		) {
+			return formatMessage(analyticsMessages.noDependent)
+		}
+
 		return projectNamesById.get(value) ?? value
 	}
 	return formatBreakdownLabel(value, breakdown, getVersionDisplayName, formatMessage)

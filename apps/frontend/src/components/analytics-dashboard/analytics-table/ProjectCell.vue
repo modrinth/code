@@ -1,6 +1,7 @@
 <template>
 	<div class="mr-2.5 flex min-w-0 items-center gap-2">
 		<span
+			v-if="!hideIcon"
 			v-tooltip="iconTooltip"
 			class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
 		>
@@ -49,6 +50,7 @@ defineProps<{
 	label: string
 	iconUrl?: string
 	iconTooltip?: string
+	hideIcon?: boolean
 	labelHref?: string
 	labelTooltip?: string
 	organizationHref?: string

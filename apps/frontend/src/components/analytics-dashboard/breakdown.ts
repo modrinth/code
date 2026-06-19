@@ -44,6 +44,7 @@ export function getAnalyticsBreakdownValue(
 		case 'dependent_project_download':
 			return normalizeBreakdownValue(
 				'dependent_project_id' in point ? point.dependent_project_id : undefined,
+				UNKNOWN_BREAKDOWN_VALUE,
 			)
 		case 'version_id':
 			return normalizeBreakdownValue('version_id' in point ? point.version_id : undefined)
@@ -98,16 +99,26 @@ export function getDownloadSourceLabel(value: string, formatMessage: FormatMessa
 	return formatAnalyticsDownloadSourceLabel(value, formatMessage)
 }
 
+export function isUnknownAnalyticsBreakdownValue(value: string | null | undefined): boolean {
+	const normalized = value?.trim()
+	if (!normalized) {
+		return false
+	}
+
+	const normalizedLowercase = normalized.toLowerCase()
+	return (
+		normalized === UNKNOWN_BREAKDOWN_VALUE ||
+		normalizedLowercase === 'unknown' ||
+		normalizedLowercase === 'other'
+	)
+}
+
 function normalizeBreakdownValue(
 	value: string | undefined,
 	fallback = ALL_BREAKDOWN_VALUE,
 ): string {
 	const normalized = value?.trim()
-	const normalizedLowercase = normalized?.toLowerCase()
-	if (
-		fallback === UNKNOWN_BREAKDOWN_VALUE &&
-		(normalizedLowercase === 'unknown' || normalizedLowercase === 'other')
-	) {
+	if (fallback === UNKNOWN_BREAKDOWN_VALUE && isUnknownAnalyticsBreakdownValue(normalized)) {
 		return fallback
 	}
 	return normalized && normalized.length > 0 ? normalized : fallback

@@ -80,14 +80,29 @@
 			<template #cell-breakdown_dependent_project_download="{ row, value }">
 				<ProjectCell
 					:label="getProjectCellLabel(value)"
-					:icon-url="getProjectIconUrl(row.breakdownValues.dependent_project_download)"
+					:icon-url="
+						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectIconUrl(row.breakdownValues.dependent_project_download)
+					"
 					:icon-tooltip="getProjectCellLabel(value)"
-					:label-href="getProjectPageHref(row.breakdownValues.dependent_project_download)"
+					:hide-icon="
+						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+					"
+					:label-href="
+						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectPageHref(row.breakdownValues.dependent_project_download)
+					"
 					:organization-href="
-						getProjectOrganizationPageHref(row.breakdownValues.dependent_project_download)
+						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectOrganizationPageHref(row.breakdownValues.dependent_project_download)
 					"
 					:organization-tooltip="
-						getProjectOrganizationName(row.breakdownValues.dependent_project_download)
+						isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectOrganizationName(row.breakdownValues.dependent_project_download)
 					"
 					:label-tooltip="getDependentProjectTooltip(row)"
 				/>
@@ -191,6 +206,7 @@ import {
 	analyticsMessages,
 	analyticsTableMessages,
 } from '../analytics-messages.ts'
+import { isUnknownAnalyticsBreakdownValue } from '../breakdown.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
 	buildAnalyticsTableColumns,
@@ -453,12 +469,22 @@ function getVersionPageHref(versionId: string | undefined) {
 }
 
 function getDependentProjectTooltip(row: AnalyticsTableRow) {
-	const dependencyProjectId = row.breakdownValues.project ?? row.dependentOnProjectId
-	const dependencyProject = dependencyProjectId
-		? (projectNamesById.value.get(dependencyProjectId) ?? dependencyProjectId)
-		: undefined
+	if (isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
+		return formatMessage(analyticsMessages.noDependentTooltip)
+	}
 
-	return dependencyProject ? `Dependent on ${dependencyProject}` : undefined
+	const dependencyProjectIds = new Set(row.dependentOnProjectIds)
+	if (row.dependentOnProjectId) {
+		dependencyProjectIds.add(row.dependentOnProjectId)
+	}
+
+	const dependencyProjectNames = [...dependencyProjectIds]
+		.map((projectId) => projectNamesById.value.get(projectId) ?? projectId)
+		.sort((left, right) => left.localeCompare(right))
+
+	return dependencyProjectNames.length > 0
+		? `Dependent on ${dependencyProjectNames.join(', ')}`
+		: undefined
 }
 
 watch(
