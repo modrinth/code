@@ -201,11 +201,13 @@ export interface AnalyticsDashboardContextValue {
 	isAnalyticsFilterOptionsLoading: ComputedRef<boolean>
 	versionNumbersById: ComputedRef<Map<string, string>>
 	versionPublishedDatesById: ComputedRef<Map<string, string>>
+	versionProjectIdsById: ComputedRef<Map<string, string>>
 	versionProjectNamesById: ComputedRef<Map<string, string>>
 	versionProjectIconUrlsById: ComputedRef<Map<string, string>>
 	versionProjectOrganizationNamesById: ComputedRef<Map<string, string>>
 	projectNamesById: ComputedRef<Map<string, string>>
 	projectIconUrlsById: ComputedRef<Map<string, string>>
+	projectOrganizationIdsById: ComputedRef<Map<string, string>>
 	projectOrganizationNamesById: ComputedRef<Map<string, string>>
 	dependentProjectTypesById: ComputedRef<Map<string, string[]>>
 	projectStatusById: ComputedRef<Map<string, ProjectStatusFilterValue>>
@@ -1374,6 +1376,26 @@ export function createAnalyticsDashboardContext(
 		}
 		return projectIconUrls
 	})
+	const projectOrganizationIdsById = computed(() => {
+		const contextOrganizationId = hasOrganizationContext.value
+			? options.organizationContext?.organization.value?.id
+			: undefined
+		const projectOrganizationIds = new Map<string, string>()
+		for (const project of projects.value) {
+			if (project.organizationId) {
+				projectOrganizationIds.set(project.id, project.organizationId)
+			} else if (contextOrganizationId) {
+				projectOrganizationIds.set(project.id, contextOrganizationId)
+			}
+		}
+		for (const [projectId, project] of Object.entries(analyticsProjects.value)) {
+			const organizationId = getProjectOrganizationId(project)
+			if (organizationId) {
+				projectOrganizationIds.set(projectId, organizationId)
+			}
+		}
+		return projectOrganizationIds
+	})
 	const projectOrganizationNamesById = computed(() => {
 		const organizationNames = organizationNamesById.value
 		const contextOrganizationName = hasOrganizationContext.value
@@ -1618,6 +1640,26 @@ export function createAnalyticsDashboardContext(
 	const versionPublishedDatesById = computed(
 		() => new Map(allVersionMetadata.value.map((version) => [version.id, version.datePublished])),
 	)
+	const versionProjectIdsById = computed(() => {
+		const versionProjectIds = new Map(
+			allVersionMetadata.value.map((version) => [version.id, version.projectId]),
+		)
+		for (const timeSlice of [...timeSlices.value, ...previousTimeSlices.value]) {
+			for (const dataPoint of timeSlice) {
+				if (
+					'source_project' in dataPoint &&
+					(dataPoint.metric_kind === 'downloads' || dataPoint.metric_kind === 'playtime') &&
+					dataPoint.version_id
+				) {
+					const versionId = dataPoint.version_id.trim()
+					if (versionId.length > 0 && !versionProjectIds.has(versionId)) {
+						versionProjectIds.set(versionId, dataPoint.source_project)
+					}
+				}
+			}
+		}
+		return versionProjectIds
+	})
 	const versionProjectNamesById = computed(() => {
 		const projectNames = projectNamesById.value
 		const versionProjectNames = new Map<string, string>()
@@ -1863,11 +1905,13 @@ export function createAnalyticsDashboardContext(
 		isAnalyticsFilterOptionsLoading,
 		versionNumbersById,
 		versionPublishedDatesById,
+		versionProjectIdsById,
 		versionProjectNamesById,
 		versionProjectIconUrlsById,
 		versionProjectOrganizationNamesById,
 		projectNamesById,
 		projectIconUrlsById,
+		projectOrganizationIdsById,
 		projectOrganizationNamesById,
 		dependentProjectTypesById,
 		projectStatusById,

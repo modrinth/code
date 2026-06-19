@@ -60,6 +60,8 @@
 					:label="getProjectCellLabel(value)"
 					:icon-url="getProjectIconUrl(row.breakdownValues.project)"
 					:icon-tooltip="getProjectCellLabel(value)"
+					:label-href="getProjectPageHref(row.breakdownValues.project)"
+					:organization-href="getProjectOrganizationPageHref(row.breakdownValues.project)"
 					:organization-tooltip="getProjectOrganizationName(row.breakdownValues.project)"
 				/>
 			</template>
@@ -80,6 +82,10 @@
 					:label="getProjectCellLabel(value)"
 					:icon-url="getProjectIconUrl(row.breakdownValues.dependent_project_download)"
 					:icon-tooltip="getProjectCellLabel(value)"
+					:label-href="getProjectPageHref(row.breakdownValues.dependent_project_download)"
+					:organization-href="
+						getProjectOrganizationPageHref(row.breakdownValues.dependent_project_download)
+					"
 					:organization-tooltip="
 						getProjectOrganizationName(row.breakdownValues.dependent_project_download)
 					"
@@ -87,9 +93,17 @@
 				/>
 			</template>
 			<template #cell-breakdown_version_id="{ row, value }">
-				<span v-tooltip="getVersionProjectName(row.projectVersionId)" class="mr-2.5 text-primary">
+				<component
+					:is="getVersionPageHref(row.projectVersionId) ? 'a' : 'span'"
+					v-tooltip="getVersionProjectName(row.projectVersionId)"
+					:href="getVersionPageHref(row.projectVersionId)"
+					:target="getVersionPageHref(row.projectVersionId) ? '_blank' : undefined"
+					:rel="getVersionPageHref(row.projectVersionId) ? 'noopener noreferrer' : undefined"
+					class="mr-2.5 text-primary"
+					:class="{ 'hover:underline': getVersionPageHref(row.projectVersionId) }"
+				>
 					{{ value }}
-				</span>
+				</component>
 			</template>
 			<template #cell-breakdown_loader="{ value }">
 				<span class="mr-2.5 text-primary">{{ value }}</span>
@@ -238,9 +252,11 @@ const {
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	versionNumbersById,
+	versionProjectIdsById,
 	versionProjectNamesById,
 	projectNamesById,
 	projectIconUrlsById,
+	projectOrganizationIdsById,
 	projectOrganizationNamesById,
 	dependentProjectTypesById,
 	getVersionDisplayName,
@@ -414,6 +430,26 @@ function getProjectOrganizationName(projectId: string | undefined) {
 
 function getProjectCellLabel(value: unknown) {
 	return typeof value === 'string' ? value : String(value ?? '')
+}
+
+function getProjectPageHref(projectId: string | undefined) {
+	return projectId ? `/project/${encodeURIComponent(projectId)}` : undefined
+}
+
+function getProjectOrganizationPageHref(projectId: string | undefined) {
+	if (!projectId) return undefined
+	const organizationId = projectOrganizationIdsById.value.get(projectId)
+	if (!organizationId) return undefined
+
+	return `/organization/${encodeURIComponent(organizationId)}`
+}
+
+function getVersionPageHref(versionId: string | undefined) {
+	if (!versionId) return undefined
+	const projectId = versionProjectIdsById.value.get(versionId)
+	if (!projectId) return undefined
+
+	return `/project/${encodeURIComponent(projectId)}/version/${encodeURIComponent(versionId)}`
 }
 
 function getDependentProjectTooltip(row: AnalyticsTableRow) {
