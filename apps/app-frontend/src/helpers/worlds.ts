@@ -191,16 +191,19 @@ export async function get_server_status(
 	return await invoke('plugin:worlds|get_server_status', { address, protocolVersion })
 }
 
-export async function start_join_singleplayer_world(path: string, world: string): Promise<unknown> {
-	return await invoke('plugin:worlds|start_join_singleplayer_world', { path, world })
+export async function start_join_singleplayer_world(
+	instanceId: string,
+	world: string,
+): Promise<unknown> {
+	return await invoke('plugin:worlds|start_join_singleplayer_world', { instanceId, world })
 }
 
-export async function start_join_server(path: string, address: string): Promise<unknown> {
-	return await invoke('plugin:worlds|start_join_server', { path, address })
+export async function start_join_server(instanceId: string, address: string): Promise<unknown> {
+	return await invoke('plugin:worlds|start_join_server', { instanceId, address })
 }
 
-export async function showWorldInFolder(instancePath: string, worldPath: string) {
-	const fullPath = await get_full_path(instancePath)
+export async function showWorldInFolder(instanceId: string, worldPath: string) {
+	const fullPath = await get_full_path(instanceId)
 	return await openPath(fullPath + '/saves/' + worldPath)
 }
 
@@ -425,9 +428,9 @@ export function refreshServers(
 	)
 }
 
-export async function refreshWorld(worlds: World[], instancePath: string, worldPath: string) {
+export async function refreshWorld(worlds: World[], instanceId: string, worldPath: string) {
 	const index = worlds.findIndex((w) => w.type === 'singleplayer' && w.path === worldPath)
-	const newWorld = await get_singleplayer_world(instancePath, worldPath)
+	const newWorld = await get_singleplayer_world(instanceId, worldPath)
 	if (index !== -1) {
 		worlds[index] = newWorld
 	} else {
@@ -439,11 +442,11 @@ export async function refreshWorld(worlds: World[], instancePath: string, worldP
 
 export async function handleDefaultInstanceUpdateEvent(
 	worlds: World[],
-	instancePath: string,
+	instanceId: string,
 	e: InstanceEvent,
 ) {
 	if (e.event === 'world_updated') {
-		await refreshWorld(worlds, instancePath, e.world)
+		await refreshWorld(worlds, instanceId, e.world)
 	}
 
 	if (e.event === 'server_joined') {
@@ -461,9 +464,9 @@ export async function handleDefaultInstanceUpdateEvent(
 	}
 }
 
-export async function refreshWorlds(instancePath: string): Promise<World[]> {
-	const worlds = await get_instance_worlds(instancePath).catch((err) => {
-		console.error(`Error refreshing worlds for instance: ${instancePath}`, err)
+export async function refreshWorlds(instanceId: string): Promise<World[]> {
+	const worlds = await get_instance_worlds(instanceId).catch((err) => {
+		console.error(`Error refreshing worlds for instance: ${instanceId}`, err)
 	})
 	if (worlds) {
 		sortWorlds(worlds)

@@ -395,7 +395,7 @@ async function fetchInstance() {
 
 	const contentPreloadPromise =
 		nextInstance && isContentSubpageRoute()
-			? loadInstanceContentData(nextInstance.path, undefined, handleError)
+			? loadInstanceContentData(nextInstance.id, undefined, handleError)
 			: Promise.resolve(null)
 
 	if (!offline.value && nextInstance?.link && nextInstance.link.project_id) {
@@ -421,8 +421,8 @@ async function fetchInstance() {
 
 	if (nextInstance) {
 		queryClient.prefetchQuery({
-			queryKey: ['worlds', nextInstance.path],
-			queryFn: () => refreshWorlds(nextInstance.path),
+			queryKey: ['worlds', nextInstance.id],
+			queryFn: () => refreshWorlds(nextInstance.id),
 			staleTime: 30_000,
 		})
 	}

@@ -65,10 +65,7 @@ onUnmounted(() => {
 			</div>
 		</NavButton>
 	</div>
-	<div
-		v-if="recentInstances.length > 0"
-		class="h-px w-6 mx-auto my-2 bg-divider"
-	></div>
+	<div v-if="recentInstances.length > 0" class="h-px w-6 mx-auto my-2 bg-divider"></div>
 </template>
 
 <style scoped lang="scss"></style>

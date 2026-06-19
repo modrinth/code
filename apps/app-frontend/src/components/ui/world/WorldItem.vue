@@ -91,7 +91,7 @@ const props = withDefaults(
 		managed?: boolean
 
 		// Instance
-		instancePath?: string
+		instanceId?: string
 		instanceName?: string
 		instanceIcon?: string
 	}>(),
@@ -110,7 +110,7 @@ const props = withDefaults(
 		gameMode: undefined,
 		managed: false,
 
-		instancePath: undefined,
+		instanceId: undefined,
 		instanceName: undefined,
 		instanceIcon: undefined,
 	},
@@ -209,10 +209,10 @@ const messages = defineMessages({
 </script>
 <template>
 	<SmartClickable>
-		<template v-if="instancePath" #clickable>
+		<template v-if="instanceId" #clickable>
 			<router-link
 				class="no-click-animation"
-				:to="`/instance/${encodeURIComponent(instancePath)}/worlds?highlight=${encodeURIComponent(getWorldIdentifier(world))}`"
+				:to="`/instance/${encodeURIComponent(instanceId)}/worlds?highlight=${encodeURIComponent(getWorldIdentifier(world))}`"
 			/>
 		</template>
 		<div
@@ -324,16 +324,16 @@ const messages = defineMessages({
 						</template>
 						<template v-else> {{ formatMessage(messages.notPlayedYet) }} </template>
 					</div>
-					<template v-if="instancePath">
+					<template v-if="instanceId">
 						•
 						<router-link
 							class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
-							:to="`/instance/${instancePath}`"
+							:to="`/instance/${instanceId}`"
 						>
 							<Avatar
 								:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
 								size="16px"
-								:tint-by="instancePath"
+								:tint-by="instanceId"
 								class="shrink-0"
 							/>
 							<span class="truncate">{{ instanceName }}</span>
@@ -420,14 +420,14 @@ const messages = defineMessages({
 						:options="[
 							{
 								id: 'play-instance',
-								shown: !!instancePath,
+								shown: !!instanceId,
 								disabled: playingInstance,
 								action: () => emit('play-instance'),
 							},
 							{
 								id: 'open-instance',
-								shown: !!instancePath,
-								action: () => router.push(encodeURI(`/instance/${instancePath}`)),
+								shown: !!instanceId,
+								action: () => router.push(`/instance/${encodeURIComponent(instanceId)}`),
 							},
 							{
 								id: 'refresh',
@@ -442,7 +442,7 @@ const messages = defineMessages({
 							{
 								id: 'edit',
 								action: () => emit('edit'),
-								shown: !instancePath,
+								shown: !instanceId,
 								disabled: locked || managed,
 								tooltip: locked
 									? formatMessage(messages.worldInUse)
@@ -457,14 +457,14 @@ const messages = defineMessages({
 							},
 							{
 								divider: true,
-								shown: !!instancePath,
+								shown: !!instanceId,
 							},
 							{
 								id: 'dont-show-on-home',
-								shown: !!instancePath,
+								shown: !!instanceId,
 								action: () => {
 									set_world_display_status(
-										instancePath,
+										instanceId,
 										world.type,
 										getWorldIdentifier(world),
 										'hidden',
@@ -475,14 +475,14 @@ const messages = defineMessages({
 							},
 							{
 								divider: true,
-								shown: !instancePath,
+								shown: !instanceId,
 							},
 							{
 								id: 'delete',
 								color: 'red',
 								hoverFilled: true,
 								action: () => emit('delete'),
-								shown: !instancePath,
+								shown: !instanceId,
 								disabled: locked || managed,
 								tooltip: locked
 									? formatMessage(messages.worldInUse)

@@ -308,7 +308,11 @@ export function createServerInstall(opts: {
 			if (installingServerProjects.value.includes(projectId)) return
 			startInstallingServer(projectId)
 			try {
-				const instanceId = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
+				const instanceId = await createVanillaInstance(
+					project,
+					recommendedGameVersion,
+					serverAddress,
+				)
 				if (instanceId) {
 					instance = await get(instanceId)
 					if (instance) showModpackInstallSuccess(instance, serverAddress)

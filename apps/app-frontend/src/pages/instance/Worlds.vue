@@ -441,7 +441,7 @@ async function refreshManagedServerMetadata() {
 		managedServerAddress.value = serverAddress
 	} catch (err) {
 		console.error(
-			`Failed to resolve managed server metadata for profile: ${instance.value.id}`,
+			`Failed to resolve managed server metadata for instance: ${instance.value.id}`,
 			err,
 		)
 		managedServerName.value = null
@@ -465,7 +465,7 @@ async function initWorldsTab() {
 		instance_listener(async (e: InstanceEvent) => {
 			if (e.instance_id !== instance.value.id) return
 
-			console.info(`Handling profile event '${e.event}' for profile: ${e.instance_id}`)
+			console.info(`Handling instance event '${e.event}' for instance: ${e.instance_id}`)
 
 			if (e.event === 'servers_updated') {
 				if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return

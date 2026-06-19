@@ -80,7 +80,7 @@ export function setupCreationModal(
 				if (existingInstance) {
 					pendingModpackCreation.value = { projectId, versionId, name, iconUrl }
 					installationModal.value?.hide()
-					modpackAlreadyInstalledModal.value?.show(existingInstance.name, existingInstance.path)
+					modpackAlreadyInstalledModal.value?.show(existingInstance.name, existingInstance.id)
 					return
 				}
 			}
@@ -171,9 +171,9 @@ export function setupCreationModal(
 		await proceedWithModpackCreation(projectId, versionId, name, iconUrl)
 	}
 
-	function handleModpackDuplicateGoToInstance(instancePath: string) {
+	function handleModpackDuplicateGoToInstance(instanceId: string) {
 		pendingModpackCreation.value = null
-		router.push(`/instance/${encodeURIComponent(instancePath)}/`)
+		router.push(`/instance/${encodeURIComponent(instanceId)}/`)
 	}
 
 	function handleBrowseModpacks() {
