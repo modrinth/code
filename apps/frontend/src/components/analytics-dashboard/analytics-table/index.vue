@@ -206,8 +206,8 @@ import {
 	analyticsMessages,
 	analyticsTableMessages,
 } from '../analytics-messages.ts'
-import { isUnknownAnalyticsBreakdownValue } from '../breakdown.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
+import { isUnknownAnalyticsBreakdownValue } from '../breakdown.ts'
 import {
 	buildAnalyticsTableColumns,
 	getAnalyticsTableBreakdownColumnLabel,

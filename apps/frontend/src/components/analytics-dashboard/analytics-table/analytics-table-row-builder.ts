@@ -284,9 +284,7 @@ export function buildAnalyticsTableRows({
 				breakdownValues.length === 0
 					? ALL_PROJECTS_BREAKDOWN_VALUE
 					: getAnalyticsBreakdownKey(breakdownValues)
-			const rowId = includeDate
-				? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}`
-				: breakdownKey
+			const rowId = includeDate ? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}` : breakdownKey
 			const row =
 				nextRows.get(rowId) ??
 				createRow(rowId, breakdownValues, dependentOnProjectId, nextBucketLabel)
@@ -355,10 +353,7 @@ function formatAnalyticsTableBreakdownDisplayValue(
 	formatMessage: FormatMessage,
 ): string {
 	if (breakdown === 'project' || breakdown === 'dependent_project_download') {
-		if (
-			breakdown === 'dependent_project_download' &&
-			isUnknownAnalyticsBreakdownValue(value)
-		) {
+		if (breakdown === 'dependent_project_download' && isUnknownAnalyticsBreakdownValue(value)) {
 			return formatMessage(analyticsMessages.noDependent)
 		}
 
