@@ -790,7 +790,9 @@ export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean
 }
 
 export function hasAnalyticsAllProjectSelectionQuery(query: LocationQuery): boolean {
-	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).includes(PROJECT_SELECTION_ALL_QUERY_VALUE)
+	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).includes(
+		PROJECT_SELECTION_ALL_QUERY_VALUE,
+	)
 }
 
 export function hasAnalyticsGraphProjectEventsVisibilityQuery(query: LocationQuery): boolean {
