@@ -176,9 +176,15 @@ async fn resolve_icon_path(
     let (bytes, file_name) = if icon.starts_with("https://")
         || icon.starts_with("http://")
     {
-        let fetched =
-            fetch::fetch(icon, None, None, &state.fetch_semaphore, &state.pool)
-                .await?;
+        let fetched = fetch::fetch(
+            icon,
+            None,
+            None,
+            None,
+            &state.fetch_semaphore,
+            &state.pool,
+        )
+        .await?;
         let name = icon.rsplit('/').next().unwrap_or("icon").to_string();
         (fetched, name)
     } else {

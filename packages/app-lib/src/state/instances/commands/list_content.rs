@@ -1056,6 +1056,7 @@ async fn get_modpack_identifiers(
         &[&primary_file.url],
         primary_file.hashes.get("sha1").map(String::as_str),
         Some(&download_meta),
+        None,
         fetch_semaphore,
         pool,
     )
