@@ -345,7 +345,8 @@ pub async fn copy_dotminecraft(
     io_semaphore: &IoSemaphore,
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<LoadingBarId> {
-    let instance_path = crate::api::instance::get_full_path(instance_id).await?;
+    let instance_path =
+        crate::api::instance::get_full_path(instance_id).await?;
 
     // Gets all subfiles recursively in src
     let subfiles = get_all_subfiles(&dotminecraft, false).await?;

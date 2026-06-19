@@ -1,5 +1,5 @@
 use crate::state::{
-    LauncherFeatureVersion, InstanceInstallStage, ReleaseChannel,
+    InstanceInstallStage, LauncherFeatureVersion, ReleaseChannel,
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

@@ -3,22 +3,22 @@ pub use self::create_instance::CreateInstance;
 pub(crate) use self::create_instance::create_instance;
 
 mod edit_instance;
-pub use self::edit_instance::{
-	AppliedContentSetPatch, EditInstance, InstanceLaunchOverridesPatch,
-};
 pub(crate) use self::edit_instance::edit_instance;
+pub use self::edit_instance::{
+    AppliedContentSetPatch, EditInstance, InstanceLaunchOverridesPatch,
+};
 
 mod get_instance;
 pub use self::get_instance::InstanceMetadata;
 pub(crate) use self::get_instance::{
-	get_instance, get_instance_metadata, list_instances,
+    get_instance, get_instance_metadata, list_instances,
 };
 
 mod list_content;
 pub(crate) use self::list_content::{
-	dependencies_to_content_items, get_content_projects,
-	get_installed_project_ids_for_instance, get_linked_modpack_info,
-	list_content, list_content_sets, list_linked_modpack_content,
+    dependencies_to_content_items, get_content_projects,
+    get_installed_project_ids_for_instance, get_linked_modpack_info,
+    list_content, list_content_sets, list_linked_modpack_content,
 };
 
 mod remove_instance;

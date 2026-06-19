@@ -1,7 +1,7 @@
 //! Downloader for Minecraft data
 
-use crate::launcher::parse_rules;
 use crate::instance::QuickPlayType;
+use crate::launcher::parse_rules;
 use crate::{
     event::{
         LoadingBarId,

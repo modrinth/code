@@ -4,7 +4,7 @@ use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
     AppliedContentSetPatch, CacheBehaviour, CachedEntry, EditInstance,
-    InstanceLink, InstanceInstallStage, SideType,
+    InstanceInstallStage, InstanceLink, SideType,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, fetch, fetch_advanced, sha1_file_async,
@@ -305,13 +305,14 @@ pub async fn generate_pack_from_version_id(
             )
         })?;
 
-    let metadata = crate::api::instance::get(&instance_id)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Unknown instance {instance_id}"
-            ))
-        })?;
+    let metadata =
+        crate::api::instance::get(&instance_id)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Unknown instance {instance_id}"
+                ))
+            })?;
 
     let download_meta = DownloadMeta {
         reason,

@@ -251,12 +251,8 @@ impl Logs {
                 None
             } else {
                 Some(
-                    get_output_by_filename(
-                        instance_path,
-                        log_type,
-                        &filename,
-                    )
-                    .await?,
+                    get_output_by_filename(instance_path, log_type, &filename)
+                        .await?,
                 )
             },
             filename,

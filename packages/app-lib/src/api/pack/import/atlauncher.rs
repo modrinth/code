@@ -11,8 +11,8 @@ use crate::{
     },
     prelude::ModLoader,
     state::{
-        AppliedContentSetPatch, EditInstance, InstanceLink,
-        InstanceInstallStage,
+        AppliedContentSetPatch, EditInstance, InstanceInstallStage,
+        InstanceLink,
     },
     util::io,
 };

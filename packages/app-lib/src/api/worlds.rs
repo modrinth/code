@@ -250,58 +250,58 @@ pub async fn get_recent_worlds(
 }
 
 pub async fn get_instance_worlds(instance_id: &str) -> Result<Vec<World>> {
-	get_all_worlds_in_instance(instance_id, &get_full_path(instance_id).await?)
-		.await
+    get_all_worlds_in_instance(instance_id, &get_full_path(instance_id).await?)
+        .await
 }
 
 async fn resolve_instance_id(instance: &str, state: &State) -> Result<String> {
-	resolve_instance_identity(instance, state)
-		.await
-		.map(|(instance_id, _)| instance_id)
+    resolve_instance_identity(instance, state)
+        .await
+        .map(|(instance_id, _)| instance_id)
 }
 
 async fn resolve_instance_identity(
-	instance: &str,
-	state: &State,
+    instance: &str,
+    state: &State,
 ) -> Result<(String, String)> {
-	sqlx::query_as::<_, (String, String)>(
-		"
+    sqlx::query_as::<_, (String, String)>(
+        "
 		SELECT id, path
 		FROM instances
 		WHERE id = ? OR path = ?
 		ORDER BY CASE WHEN id = ? THEN 0 ELSE 1 END
 		LIMIT 1
 		",
-	)
-	.bind(instance)
-	.bind(instance)
-	.bind(instance)
-	.fetch_optional(&state.pool)
-	.await?
-	.ok_or_else(|| {
-		ErrorKind::InputError(format!(
-			"Unknown instance id or path: {instance}"
-		))
-		.as_error()
-	})
+    )
+    .bind(instance)
+    .bind(instance)
+    .bind(instance)
+    .fetch_optional(&state.pool)
+    .await?
+    .ok_or_else(|| {
+        ErrorKind::InputError(format!(
+            "Unknown instance id or path: {instance}"
+        ))
+        .as_error()
+    })
 }
 
 async fn get_all_worlds_in_instance(
-	instance_id: &str,
-	instance_dir: &Path,
+    instance_id: &str,
+    instance_dir: &Path,
 ) -> Result<Vec<World>> {
-	let mut worlds = vec![];
-	get_singleplayer_worlds_in_instance(instance_dir, &mut worlds).await?;
-	let state = State::get().await?;
+    let mut worlds = vec![];
+    get_singleplayer_worlds_in_instance(instance_dir, &mut worlds).await?;
+    let state = State::get().await?;
 
-	get_server_worlds_in_instance(instance_id, instance_dir, &mut worlds)
-		.await?;
+    get_server_worlds_in_instance(instance_id, instance_dir, &mut worlds)
+        .await?;
 
-	let attached_data =
-		AttachedWorldData::get_all_for_instance(instance_id, &state.pool)
-			.await?;
-	if !attached_data.is_empty() {
-		for world in &mut worlds {
+    let attached_data =
+        AttachedWorldData::get_all_for_instance(instance_id, &state.pool)
+            .await?;
+    if !attached_data.is_empty() {
+        for world in &mut worlds {
             if let Some(data) = attached_data
                 .get(&(world.world_type(), world.world_id().to_owned()))
             {
@@ -346,21 +346,21 @@ async fn get_singleplayer_worlds_in_instance(
 }
 
 pub async fn get_singleplayer_world(
-	instance: &str,
-	world: &str,
+    instance: &str,
+    world: &str,
 ) -> Result<World> {
-	let state = State::get().await?;
-	let (instance_id, instance_path) =
-		resolve_instance_identity(instance, &state).await?;
-	let instance_dir = state.directories.instances_dir().join(instance_path);
-	let mut world =
-		read_singleplayer_world(get_world_dir(&instance_dir, world)).await?;
+    let state = State::get().await?;
+    let (instance_id, instance_path) =
+        resolve_instance_identity(instance, &state).await?;
+    let instance_dir = state.directories.instances_dir().join(instance_path);
+    let mut world =
+        read_singleplayer_world(get_world_dir(&instance_dir, world)).await?;
 
-	if let Some(data) = AttachedWorldData::get_for_world(
-		&instance_id,
-		world.world_type(),
-		world.world_id(),
-		&state.pool,
+    if let Some(data) = AttachedWorldData::get_for_world(
+        &instance_id,
+        world.world_type(),
+        world.world_id(),
+        &state.pool,
     )
     .await?
     {
@@ -437,19 +437,19 @@ async fn read_singleplayer_world_maybe_locked(
 }
 
 async fn get_server_worlds_in_instance(
-	instance_id: &str,
-	instance_dir: &Path,
-	worlds: &mut Vec<World>,
+    instance_id: &str,
+    instance_dir: &Path,
+    worlds: &mut Vec<World>,
 ) -> Result<()> {
     let servers = servers_data::read(instance_dir).await?;
     if servers.is_empty() {
         return Ok(());
     }
 
-	let state = State::get().await?;
-	let join_log = server_join_log::get_joins(instance_id, &state.pool)
-		.await
-		.ok();
+    let state = State::get().await?;
+    let join_log = server_join_log::get_joins(instance_id, &state.pool)
+        .await
+        .ok();
 
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
@@ -504,13 +504,13 @@ pub async fn set_world_display_status(
     world_id: &str,
     display_status: DisplayStatus,
 ) -> Result<()> {
-	let state = State::get().await?;
-	let instance_id = resolve_instance_id(instance, &state).await?;
-	attached_world_data::set_display_status(
-		&instance_id,
-		world_type,
-		world_id,
-		display_status,
+    let state = State::get().await?;
+    let instance_id = resolve_instance_id(instance, &state).await?;
+    attached_world_data::set_display_status(
+        &instance_id,
+        world_type,
+        world_id,
+        display_status,
         &state.pool,
     )
     .await?;
@@ -755,10 +755,10 @@ pub async fn add_server_to_instance(
     project_id: Option<String>,
     content_kind: Option<String>,
 ) -> Result<usize> {
-	let state = State::get().await?;
-	let (instance_id, instance_path) =
-		resolve_instance_identity(instance_id, &state).await?;
-	let instance_dir = state.directories.instances_dir().join(instance_path);
+    let state = State::get().await?;
+    let (instance_id, instance_path) =
+        resolve_instance_identity(instance_id, &state).await?;
+    let instance_dir = state.directories.instances_dir().join(instance_path);
     let mut servers = servers_data::read(&instance_dir).await?;
     let insert_index = servers
         .iter()
@@ -776,23 +776,23 @@ pub async fn add_server_to_instance(
     );
     servers_data::write(&instance_dir, &servers).await?;
 
-	if project_id.is_some() || content_kind.is_some() {
-		if let Some(project_id) = &project_id {
-			attached_world_data::set_project_id(
-				&instance_id,
-				WorldType::Server,
-				&address,
-				project_id,
+    if project_id.is_some() || content_kind.is_some() {
+        if let Some(project_id) = &project_id {
+            attached_world_data::set_project_id(
+                &instance_id,
+                WorldType::Server,
+                &address,
+                project_id,
                 &state.pool,
             )
             .await?;
-		}
-		if let Some(content_kind) = &content_kind {
-			attached_world_data::set_content_kind(
-				&instance_id,
-				WorldType::Server,
-				&address,
-				content_kind,
+        }
+        if let Some(content_kind) = &content_kind {
+            attached_world_data::set_content_kind(
+                &instance_id,
+                WorldType::Server,
+                &address,
+                content_kind,
                 &state.pool,
             )
             .await?;
@@ -809,10 +809,10 @@ pub async fn edit_server_in_instance(
     address: String,
     pack_status: ServerPackStatus,
 ) -> Result<()> {
-	let state = State::get().await?;
-	let (_, instance_path) =
-		resolve_instance_identity(instance_id, &state).await?;
-	let instance_dir = state.directories.instances_dir().join(instance_path);
+    let state = State::get().await?;
+    let (_, instance_path) =
+        resolve_instance_identity(instance_id, &state).await?;
+    let instance_dir = state.directories.instances_dir().join(instance_path);
     let mut servers = servers_data::read(&instance_dir).await?;
     let server =
         servers
@@ -835,10 +835,10 @@ pub async fn remove_server_from_instance(
     instance_id: &str,
     index: usize,
 ) -> Result<()> {
-	let state = State::get().await?;
-	let (_, instance_path) =
-		resolve_instance_identity(instance_id, &state).await?;
-	let instance_dir = state.directories.instances_dir().join(instance_path);
+    let state = State::get().await?;
+    let (_, instance_path) =
+        resolve_instance_identity(instance_id, &state).await?;
+    let instance_dir = state.directories.instances_dir().join(instance_path);
     let mut servers = servers_data::read(&instance_dir).await?;
     if servers.get(index).as_ref().is_none_or(|x| x.hidden) {
         return Err(ErrorKind::InputError(format!(
@@ -915,11 +915,14 @@ mod servers_data {
 pub async fn get_instance_protocol_version(
     instance_id: &str,
 ) -> Result<Option<ProtocolVersion>> {
-    let metadata = crate::api::instance::get(instance_id).await?.ok_or_else(|| {
-        ErrorKind::InputError(format!(
-            "Could not find instance {instance_id}"
-        ))
-    })?;
+    let metadata =
+        crate::api::instance::get(instance_id)
+            .await?
+            .ok_or_else(|| {
+                ErrorKind::InputError(format!(
+                    "Could not find instance {instance_id}"
+                ))
+            })?;
     if metadata.instance.install_stage != InstanceInstallStage::Installed {
         return Ok(None);
     }

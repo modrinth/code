@@ -71,10 +71,7 @@ pub async fn logs_delete_logs_by_filename(
     log_type: LogType,
     filename: String,
 ) -> Result<()> {
-    Ok(
-        logs::delete_logs_by_filename(instance_id, log_type, &filename)
-            .await?,
-    )
+    Ok(logs::delete_logs_by_filename(instance_id, log_type, &filename).await?)
 }
 
 /// Get live log from a cursor
