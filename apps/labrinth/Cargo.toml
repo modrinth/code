@@ -84,6 +84,7 @@ quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
+kafka = { workspace = true }
 regex = { workspace = true }
 reqwest = { workspace = true, features = [
   "http2",

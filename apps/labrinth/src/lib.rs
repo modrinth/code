@@ -75,6 +75,7 @@ pub struct LabrinthConfig {
     pub gotenberg_client: GotenbergClient,
     pub http_client: web::Data<HttpClient>,
     pub tiltify_client: web::Data<TiltifyClient>,
+    pub kafka_client: web::Data<util::kafka::KafkaClientState>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -89,6 +90,7 @@ pub fn app_setup(
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
     gotenberg_client: GotenbergClient,
+    kafka_client: web::Data<util::kafka::KafkaClientState>,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!("Starting labrinth on {}", &ENV.BIND_ADDR);
@@ -317,6 +319,7 @@ pub fn app_setup(
         gotenberg_client,
         http_client,
         tiltify_client,
+        kafka_client,
         archon_client: web::Data::new(
             ArchonClient::from_env()
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
@@ -361,6 +364,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
+    .app_data(labrinth_config.kafka_client.clone())
     .configure(routes::v3::config)
     .configure(routes::internal::config)
     .configure(routes::root_config)
