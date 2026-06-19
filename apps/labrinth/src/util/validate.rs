@@ -7,9 +7,12 @@ use validator::{ValidationErrors, ValidationErrorsKind};
 use crate::models::pats::Scopes;
 
 pub static RE_URL_SAFE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap());
-pub static RE_USERNAME: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9_-]*$"#).unwrap());
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9._-]+$"#).unwrap());
+
+// only used for versions
+// TODO: percent-encode version names in URLs instead of treating them as slugs
+pub static RE_URL_SAFE_RELAXED: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]+$"#).unwrap());
 
 //TODO: In order to ensure readability, only the first error is printed, this may need to be expanded on in the future!
 pub fn validation_errors_to_string(
@@ -158,5 +161,71 @@ mod tests {
     fn validate_name_with_invalid_input_returns_error() {
         let result = validate_name("  ");
         assert!(result.is_err());
+    }
+
+    fn assert_url_safe_regex(
+        regex: &LazyLock<Regex>,
+        value: &str,
+        expected_valid: bool,
+    ) {
+        assert_eq!(
+            regex.is_match(value),
+            expected_valid,
+            "unexpected URL-safe validation result for `{value}`"
+        );
+    }
+
+    fn assert_url_safe_slug(slug: &str, expected_valid: bool) {
+        assert_url_safe_regex(&RE_URL_SAFE, slug, expected_valid);
+    }
+
+    fn assert_url_safe_version(version: &str, expected_valid: bool) {
+        assert_url_safe_regex(&RE_URL_SAFE_RELAXED, version, expected_valid);
+    }
+
+    #[test]
+    fn url_safe_regex_accepts_allowed_slug_punctuation() {
+        for slug in ["valid-slug", "valid_slug", "valid.slug", "valid123"] {
+            assert_url_safe_slug(slug, true);
+        }
+    }
+
+    #[test]
+    fn url_safe_regex_rejects_unsafe_slug_punctuation() {
+        for slug in [
+            "invalid/slug",
+            "../invalid",
+            r#"invalid"slug"#,
+            "invalid$slug",
+            "invalid slug",
+            "invalid#slug",
+        ] {
+            assert_url_safe_slug(slug, false);
+        }
+    }
+
+    #[test]
+    fn url_safe_relaxed_regex_accepts_legacy_version_punctuation() {
+        for version in [
+            "1.0.0",
+            "1.0.0+build",
+            "version$beta",
+            r#"version"quoted"#,
+            "version!@$()`.+,_-",
+        ] {
+            assert_url_safe_version(version, true);
+        }
+    }
+
+    #[test]
+    fn url_safe_relaxed_regex_rejects_non_version_safe_punctuation() {
+        for version in [
+            "invalid/version",
+            "../invalid",
+            "invalid space",
+            "invalid#version",
+        ] {
+            assert_url_safe_version(version, false);
+        }
     }
 }
