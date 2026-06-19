@@ -95,6 +95,7 @@ export interface ModpackContentModalState {
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const scrollContainer = ref<HTMLElement | null>(null)
+const isOpen = ref(false)
 const items = ref<ContentItem[]>([])
 const disabledIds = ref(new Set<string>())
 const loading = ref(false)
@@ -318,6 +319,7 @@ function show(contentItems: ContentItem[]) {
 	selectedIds.value = []
 	disabledIds.value = new Set()
 	loading.value = false
+	showModal()
 }
 
 function showLoading() {
@@ -326,14 +328,22 @@ function showLoading() {
 	selectedFilters.value = []
 	selectedIds.value = []
 	loading.value = true
-	modal.value?.show()
+	showModal()
+}
+
+function showModal() {
+	if (isOpen.value || !modal.value) return
+	isOpen.value = true
+	modal.value.show()
 }
 
 function hide() {
+	isOpen.value = false
 	modal.value?.hide()
 }
 
 function handleHide() {
+	isOpen.value = false
 	emit('hide')
 }
 
@@ -352,7 +362,7 @@ async function restore(state: ModpackContentModalState) {
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
 	loading.value = false
-	modal.value?.show()
+	showModal()
 	await nextTick()
 	if (scrollContainer.value) {
 		scrollContainer.value.scrollTop = state.scrollTop
