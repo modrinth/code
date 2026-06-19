@@ -5,11 +5,11 @@ use tauri::{AppHandle, Manager, Runtime};
 use theseus::instance::{self, QuickPlayType, get_full_path};
 use theseus::prelude::ProcessMetadata;
 use theseus::server_address::ServerAddress;
+use theseus::worlds;
 use theseus::worlds::{
     DisplayStatus, ProtocolVersion, ServerPackStatus, ServerStatus, World,
     WorldType, WorldWithInstance,
 };
-use theseus::worlds;
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
@@ -173,8 +173,14 @@ pub async fn edit_server_in_instance(
     address: String,
     pack_status: ServerPackStatus,
 ) -> Result<()> {
-    worlds::edit_server_in_instance(instance_id, index, name, address, pack_status)
-        .await?;
+    worlds::edit_server_in_instance(
+        instance_id,
+        index,
+        name,
+        address,
+        pack_status,
+    )
+    .await?;
     Ok(())
 }
 

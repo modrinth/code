@@ -1,11 +1,11 @@
 use super::{FriendPayload, LoadingBarId};
 use crate::event::{
-    CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
-    InstancePayloadType,
+    CommandPayload, EventError, InstancePayloadType, LoadingBar,
+    LoadingBarType, ProcessPayloadType,
 };
 #[cfg(feature = "tauri")]
 use crate::event::{
-    LoadingPayload, ProcessPayload, InstancePayload, WarningPayload,
+    InstancePayload, LoadingPayload, ProcessPayload, WarningPayload,
 };
 use futures::prelude::*;
 use serde_json::Value;

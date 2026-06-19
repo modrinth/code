@@ -1,7 +1,7 @@
-use crate::event::emit::{emit_process, emit_instance};
+use crate::event::emit::{emit_instance, emit_process};
+use crate::event::{InstancePayloadType, ProcessPayloadType};
 #[cfg(feature = "tauri")]
 use crate::event::{LogEvent, LogPayload};
-use crate::event::{ProcessPayloadType, InstancePayloadType};
 use crate::util::io::IOError;
 use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
@@ -98,15 +98,15 @@ impl ProcessManager {
         }
     }
 
-	#[allow(clippy::too_many_arguments)]
-	pub async fn insert_new_process(
-		&self,
-		instance_id: &str,
-		instance_path: &str,
-		instance_name: &str,
-		mut mc_command: Command,
-		post_exit_command: Option<String>,
-		logs_folder: PathBuf,
+    #[allow(clippy::too_many_arguments)]
+    pub async fn insert_new_process(
+        &self,
+        instance_id: &str,
+        instance_path: &str,
+        instance_name: &str,
+        mut mc_command: Command,
+        post_exit_command: Option<String>,
+        logs_folder: PathBuf,
         xml_logging: bool,
         main_class_keep_alive: TempDir,
         rpc_server: RpcServer,
@@ -125,14 +125,14 @@ impl ProcessManager {
         let stderr = mc_proc.stderr.take();
 
         let mut process = Process {
-			metadata: ProcessMetadata {
-				uuid: Uuid::new_v4(),
-				start_time: Utc::now(),
-				instance_id: instance_id.to_string(),
-				instance_path: instance_path.to_string(),
-				instance_name: instance_name.to_string(),
-			},
-			child: mc_proc,
+            metadata: ProcessMetadata {
+                uuid: Uuid::new_v4(),
+                start_time: Utc::now(),
+                instance_id: instance_id.to_string(),
+                instance_path: instance_path.to_string(),
+                instance_name: instance_name.to_string(),
+            },
+            child: mc_proc,
             rpc_server,
             _main_class_keep_alive: main_class_keep_alive,
         };
@@ -178,34 +178,34 @@ impl ProcessManager {
             writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
         }
 
-		if let Some(stdout) = stdout {
-			let log_path_clone = log_path.clone();
+        if let Some(stdout) = stdout {
+            let log_path_clone = log_path.clone();
 
-			let instance_id = metadata.instance_id.clone();
-			let instance_path = metadata.instance_path.clone();
-			tokio::spawn(async move {
-				Process::process_output(
-					&instance_id,
-					&instance_path,
-					stdout,
-					log_path_clone,
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stdout,
+                    log_path_clone,
                     xml_logging,
                 )
                 .await;
             });
         }
 
-		if let Some(stderr) = stderr {
-			let log_path_clone = log_path.clone();
+        if let Some(stderr) = stderr {
+            let log_path_clone = log_path.clone();
 
-			let instance_id = metadata.instance_id.clone();
-			let instance_path = metadata.instance_path.clone();
-			tokio::spawn(async move {
-				Process::process_output(
-					&instance_id,
-					&instance_path,
-					stderr,
-					log_path_clone,
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stderr,
+                    log_path_clone,
                     xml_logging,
                 )
                 .await;
@@ -280,11 +280,11 @@ impl ProcessManager {
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ProcessMetadata {
-	pub uuid: Uuid,
-	pub instance_id: String,
-	pub instance_path: String,
-	pub instance_name: String,
-	pub start_time: DateTime<Utc>,
+    pub uuid: Uuid,
+    pub instance_id: String,
+    pub instance_path: String,
+    pub instance_name: String,
+    pub start_time: DateTime<Utc>,
 }
 
 #[derive(Debug)]
@@ -306,11 +306,11 @@ pub struct Log4jEvent {
 }
 
 impl Process {
-	async fn process_output<R>(
-		instance_id: &str,
-		_instance_path: &str,
-		reader: R,
-		log_path: impl AsRef<Path>,
+    async fn process_output<R>(
+        instance_id: &str,
+        _instance_path: &str,
+        reader: R,
+        log_path: impl AsRef<Path>,
         xml_logging: bool,
     ) where
         R: tokio::io::AsyncRead + Unpin,
@@ -468,7 +468,7 @@ impl Process {
                                             .as_deref()
                                             .unwrap_or("")
                                             .trim();
-										if let Err(e) = Self::maybe_handle_server_join_logging(
+                                        if let Err(e) = Self::maybe_handle_server_join_logging(
 											instance_id,
 											&timestamp,
 											message,
@@ -533,10 +533,10 @@ impl Process {
                         tracing::warn!("Failed to write to log file: {}", e);
                     }
                     Self::emit_legacy_log(instance_id, line.trim_ascii_end());
-					if let Err(e) = Self::maybe_handle_old_server_join_logging(
-						instance_id,
-						line.trim_ascii_end(),
-					)
+                    if let Err(e) = Self::maybe_handle_old_server_join_logging(
+                        instance_id,
+                        line.trim_ascii_end(),
+                    )
                     .await
                     {
                         tracing::error!(
@@ -653,10 +653,10 @@ impl Process {
         Ok(())
     }
 
-	async fn maybe_handle_server_join_logging(
-		instance_id: &str,
-		timestamp: &str,
-		message: &str,
+    async fn maybe_handle_server_join_logging(
+        instance_id: &str,
+        timestamp: &str,
+        message: &str,
     ) -> crate::Result<()> {
         let timestamp = timestamp
             .parse::<i64>()
@@ -673,18 +673,14 @@ impl Process {
                     )
                 })
             })?;
-		Self::parse_and_insert_server_join(
-			instance_id,
-			message,
-			timestamp,
-		)
-		.await
-	}
+        Self::parse_and_insert_server_join(instance_id, message, timestamp)
+            .await
+    }
 
-	async fn maybe_handle_old_server_join_logging(
-		instance_id: &str,
-		line: &str,
-	) -> crate::Result<()> {
+    async fn maybe_handle_old_server_join_logging(
+        instance_id: &str,
+        line: &str,
+    ) -> crate::Result<()> {
         if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ")
         {
             let timestamp =
@@ -693,26 +689,18 @@ impl Process {
                     .map(|x| x.to_utc())
                     .single()
                     .unwrap_or_else(Utc::now);
-			Self::parse_and_insert_server_join(
-				instance_id,
-				message,
-				timestamp,
-			)
-			.await
-		} else {
-			Self::parse_and_insert_server_join(
-				instance_id,
-				line,
-				Utc::now(),
-			)
-			.await
-		}
-	}
+            Self::parse_and_insert_server_join(instance_id, message, timestamp)
+                .await
+        } else {
+            Self::parse_and_insert_server_join(instance_id, line, Utc::now())
+                .await
+        }
+    }
 
-	async fn parse_and_insert_server_join(
-		instance_id: &str,
-		message: &str,
-		timestamp: DateTime<Utc>,
+    async fn parse_and_insert_server_join(
+        instance_id: &str,
+        message: &str,
+        timestamp: DateTime<Utc>,
     ) -> crate::Result<()> {
         let Some(host_port_string) = message.strip_prefix("Connecting to ")
         else {
@@ -726,12 +714,12 @@ impl Process {
             return Ok(());
         };
 
-		let state = crate::State::get().await?;
-		crate::state::server_join_log::JoinLogEntry {
-			instance_id: instance_id.to_owned(),
-			host: host.to_string(),
-			port,
-			join_time: timestamp,
+        let state = crate::State::get().await?;
+        crate::state::server_join_log::JoinLogEntry {
+            instance_id: instance_id.to_owned(),
+            host: host.to_string(),
+            port,
+            join_time: timestamp,
         }
         .upsert(&state.pool)
         .await?;

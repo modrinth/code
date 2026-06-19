@@ -2,7 +2,7 @@ use crate::api::Result;
 
 use theseus::{
     pack::{
-        install_from::{CreatePackLocation, CreatePackInstance},
+        install_from::{CreatePackInstance, CreatePackLocation},
         install_mrpack::install_zipped_mrpack,
     },
     prelude::*,

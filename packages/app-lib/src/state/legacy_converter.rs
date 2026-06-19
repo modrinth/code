@@ -5,9 +5,9 @@ use crate::state;
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
-    DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion,
-    MemorySettings, ModrinthCredentials, InstanceInstallStage, ReleaseChannel,
-    TeamMember, Theme, VersionFile, WindowSize,
+    DeviceTokenPair, FileType, Hooks, InstanceInstallStage,
+    LauncherFeatureVersion, MemorySettings, ModrinthCredentials,
+    ReleaseChannel, TeamMember, Theme, VersionFile, WindowSize,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
@@ -175,12 +175,11 @@ where
 
                 let legacy_config_path = entry.path().join("profile.json");
 
-                let Ok(profile) =
-                    read_json::<LegacyInstanceConfig>(
-                        &legacy_config_path,
-                        &io_semaphore,
-                    )
-                        .await
+                let Ok(profile) = read_json::<LegacyInstanceConfig>(
+                    &legacy_config_path,
+                    &io_semaphore,
+                )
+                .await
                 else {
                     continue;
                 };
@@ -464,16 +463,26 @@ where
     .execute(exec)
     .await?;
 
-    let (source_kind, link_kind, modrinth_project_id, modrinth_version_id, server_project_id) =
-        match input.linked_data {
-            Some(linked_data) => match (linked_data.project_id, linked_data.version_id) {
-                (Some(project_id), Some(version_id)) if version_id.is_empty() => (
-                    "server_project",
-                    "server_project",
-                    None,
-                    None,
-                    Some(project_id),
-                ),
+    let (
+        source_kind,
+        link_kind,
+        modrinth_project_id,
+        modrinth_version_id,
+        server_project_id,
+    ) = match input.linked_data {
+        Some(linked_data) => {
+            match (linked_data.project_id, linked_data.version_id) {
+                (Some(project_id), Some(version_id))
+                    if version_id.is_empty() =>
+                {
+                    (
+                        "server_project",
+                        "server_project",
+                        None,
+                        None,
+                        Some(project_id),
+                    )
+                }
                 (Some(project_id), Some(version_id)) => (
                     "modrinth_modpack",
                     "modrinth_modpack",
@@ -482,9 +491,10 @@ where
                     None,
                 ),
                 _ => ("local", "unmanaged", None, None, None),
-            },
-            None => ("local", "unmanaged", None, None, None),
-        };
+            }
+        }
+        None => ("local", "unmanaged", None, None, None),
+    };
 
     sqlx::query(
         "

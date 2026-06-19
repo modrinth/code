@@ -10,86 +10,102 @@ pub struct AttachedWorldData {
 }
 
 impl AttachedWorldData {
-	pub async fn get_for_world(
-		instance_id: &str,
-		world_type: WorldType,
-		world_id: &str,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    pub async fn get_for_world(
+        instance_id: &str,
+        world_type: WorldType,
+        world_id: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<Option<Self>> {
         let world_type = world_type.as_str();
 
-		let attached_data = sqlx::query_as::<_, (String, Option<String>, Option<String>)>(
-			"
+        let attached_data =
+            sqlx::query_as::<_, (String, Option<String>, Option<String>)>(
+                "
 			SELECT display_status, project_id, content_kind
 			FROM attached_world_data
 			WHERE instance_id = ? and world_type = ? and world_id = ?
 			",
-		)
-		.bind(instance_id)
-		.bind(world_type)
-		.bind(world_id)
-		.fetch_optional(exec)
-		.await?;
+            )
+            .bind(instance_id)
+            .bind(world_type)
+            .bind(world_id)
+            .fetch_optional(exec)
+            .await?;
 
-		Ok(attached_data.map(|(display_status, project_id, content_kind)| AttachedWorldData {
-			display_status: DisplayStatus::from_string(&display_status),
-			project_id,
-			content_kind,
-		}))
-	}
+        Ok(
+            attached_data.map(|(display_status, project_id, content_kind)| {
+                AttachedWorldData {
+                    display_status: DisplayStatus::from_string(&display_status),
+                    project_id,
+                    content_kind,
+                }
+            }),
+        )
+    }
 
-	pub async fn get_all_for_instance(
-		instance_id: &str,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-	) -> crate::Result<HashMap<(WorldType, String), Self>> {
-		let attached_data = sqlx::query_as::<_, (String, String, String, Option<String>, Option<String>)>(
-			"
+    pub async fn get_all_for_instance(
+        instance_id: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<HashMap<(WorldType, String), Self>> {
+        let attached_data = sqlx::query_as::<
+            _,
+            (String, String, String, Option<String>, Option<String>),
+        >(
+            "
 			SELECT world_type, world_id, display_status, project_id, content_kind
 			FROM attached_world_data
 			WHERE instance_id = ?
 			",
-		)
-		.bind(instance_id)
-		.fetch_all(exec)
-		.await?;
+        )
+        .bind(instance_id)
+        .fetch_all(exec)
+        .await?;
 
-		Ok(attached_data
-			.into_iter()
-			.map(|(world_type, world_id, display_status, project_id, content_kind)| {
-				let world_type = WorldType::from_string(&world_type);
-				let display_status =
-					DisplayStatus::from_string(&display_status);
-				(
-					(world_type, world_id),
-					AttachedWorldData {
-						display_status,
-						project_id,
-						content_kind,
-					},
-				)
-			})
+        Ok(attached_data
+            .into_iter()
+            .map(
+                |(
+                    world_type,
+                    world_id,
+                    display_status,
+                    project_id,
+                    content_kind,
+                )| {
+                    let world_type = WorldType::from_string(&world_type);
+                    let display_status =
+                        DisplayStatus::from_string(&display_status);
+                    (
+                        (world_type, world_id),
+                        AttachedWorldData {
+                            display_status,
+                            project_id,
+                            content_kind,
+                        },
+                    )
+                },
+            )
             .collect())
     }
 
-	pub async fn remove_for_world(
-		instance_id: &str,
-		world_type: WorldType,
-		world_id: &str,
-		exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    pub async fn remove_for_world(
+        instance_id: &str,
+        world_type: WorldType,
+        world_id: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let world_type = world_type.as_str();
 
-		sqlx::query(
-			"
+        sqlx::query(
+            "
 			DELETE FROM attached_world_data
 			WHERE instance_id = ? and world_type = ? and world_id = ?
 			",
-		)
-		.bind(instance_id)
-		.bind(world_type)
-		.bind(world_id)
-		.execute(exec)
-		.await?;
+        )
+        .bind(instance_id)
+        .bind(world_type)
+        .bind(world_id)
+        .execute(exec)
+        .await?;
 
         Ok(())
     }

@@ -1,3 +1,4 @@
+use crate::State;
 use crate::event::LoadingBarType;
 use crate::event::emit::{
     emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
@@ -5,13 +6,12 @@ use crate::event::emit::{
 use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_instance_information,
 };
+use crate::state::instances::ContentSourceKind;
 use crate::state::{
     CachedEntry, EditInstance, InstanceInstallStage, SideType, cache_file_hash,
 };
-use crate::state::instances::ContentSourceKind;
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors, write};
 use crate::util::io;
-use crate::State;
 use async_zip::base::read::seek::ZipFileReader as SeekZipFileReader;
 use async_zip::base::read::{WithEntry, ZipEntryReader};
 use async_zip::tokio::read::fs::ZipFileReader as FsZipFileReader;
@@ -379,13 +379,17 @@ pub async fn install_zipped_mrpack_files(
     )
     .await?;
 
-    let metadata = crate::api::instance::get(&instance_id)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!("Unknown instance {instance_id}"))
-        })?;
+    let metadata =
+        crate::api::instance::get(&instance_id)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Unknown instance {instance_id}"
+                ))
+            })?;
     let instance_path = metadata.instance.path.clone();
-    let instance_full_path = crate::api::instance::get_full_path(&instance_id).await?;
+    let instance_full_path =
+        crate::api::instance::get_full_path(&instance_id).await?;
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
         LoadingBarType::PackDownload {
@@ -486,8 +490,12 @@ pub async fn install_zipped_mrpack_files(
                             project.file_size as u64,
                             project_type,
                             modpack_source_kind(pack_version_id.as_deref()),
-                            file_info.as_ref().map(|file| file.project_id.as_str()),
-                            file_info.as_ref().map(|file| file.version_id.as_str()),
+                            file_info
+                                .as_ref()
+                                .map(|file| file.project_id.as_str()),
+                            file_info
+                                .as_ref()
+                                .map(|file| file.version_id.as_str()),
                             state,
                         )
                         .await?;
@@ -531,7 +539,8 @@ pub async fn install_zipped_mrpack_files(
                 ))
             })?;
 
-        let path = instance_full_path.join(relative_override_file_path.as_str());
+        let path =
+            instance_full_path.join(relative_override_file_path.as_str());
         let (size, hash) = zip_reader
             .extract_entry(index, &path, &state.io_semaphore)
             .await?;
@@ -549,9 +558,9 @@ pub async fn install_zipped_mrpack_files(
         )
         .await?;
 
-        if let Some(project_type) =
-            ProjectType::get_from_parent_folder(relative_override_file_path.as_str())
-        {
+        if let Some(project_type) = ProjectType::get_from_parent_folder(
+            relative_override_file_path.as_str(),
+        ) {
             crate::state::instances::commands::record_project_file(
                 &instance_id,
                 relative_override_file_path.as_str(),
@@ -580,7 +589,8 @@ pub async fn install_zipped_mrpack_files(
     // If it doesn't exist, and an override to icon.png exists, cache and use that
     let potential_icon = instance_full_path.join("icon.png");
     if !icon_exists && potential_icon.exists() {
-        crate::api::instance::edit_icon(&instance_id, Some(&potential_icon)).await?;
+        crate::api::instance::edit_icon(&instance_id, Some(&potential_icon))
+            .await?;
     }
 
     crate::launcher::install_minecraft_for_instance_id(
@@ -643,12 +653,16 @@ pub async fn remove_all_related_files(
     // Remove all modrinth projects by their version hashes
     // We need to do a fetch to get the project ids from Modrinth
     let state = State::get().await?;
-    let metadata = crate::api::instance::get(&instance_id)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!("Unknown instance {instance_id}"))
-        })?;
-    let instance_full_path = crate::api::instance::get_full_path(&instance_id).await?;
+    let metadata =
+        crate::api::instance::get(&instance_id)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Unknown instance {instance_id}"
+                ))
+            })?;
+    let instance_full_path =
+        crate::api::instance::get_full_path(&instance_id).await?;
     let all_hashes = pack
         .files
         .iter()

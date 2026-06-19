@@ -95,7 +95,9 @@ pub async fn import_gdlauncher(
                     .clone()
                     .unwrap_or_else(|| backup_name.to_string()),
             ),
-            icon_path: Some(icon.clone().map(|x| x.to_string_lossy().to_string())),
+            icon_path: Some(
+                icon.clone().map(|x| x.to_string_lossy().to_string()),
+            ),
             content_set_patch: Some(AppliedContentSetPatch {
                 game_version: Some(game_version.clone()),
                 protocol_version: Some(None),

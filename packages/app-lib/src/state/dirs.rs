@@ -163,7 +163,9 @@ impl DirectoryInfo {
     /// Gets the crash reports dir for a given instance path
     #[inline]
     pub fn crash_reports_dir(&self, instance_path: &str) -> PathBuf {
-        self.instances_dir().join(instance_path).join("crash-reports")
+        self.instances_dir()
+            .join(instance_path)
+            .join("crash-reports")
     }
 
     #[inline]

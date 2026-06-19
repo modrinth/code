@@ -2,17 +2,17 @@
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
+use crate::instance::QuickPlayType;
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
 use crate::launcher::quick_play_version::{
     QuickPlayServerVersion, QuickPlayVersion,
 };
-use crate::instance::QuickPlayType;
 use crate::server_address::{ServerAddress, parse_server_address};
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    Credentials, InstanceLaunchContext, InstanceLink, JavaVersion,
-    MemorySettings, ProcessMetadata, InstanceInstallStage, WindowSize,
+    Credentials, InstanceInstallStage, InstanceLaunchContext, InstanceLink,
+    JavaVersion, MemorySettings, ProcessMetadata, WindowSize,
 };
 use crate::util::io;
 use crate::util::rpc::RpcServerBuilder;
@@ -232,10 +232,10 @@ pub async fn resolve_minecraft_manifest(
 }
 
 async fn get_instance_full_path(instance_path: &str) -> crate::Result<PathBuf> {
-	let state = State::get().await?;
-	let instances_dir = state.directories.instances_dir();
-	let full_path = io::canonicalize(instances_dir.join(instance_path))?;
-	Ok(full_path)
+    let state = State::get().await?;
+    let instances_dir = state.directories.instances_dir();
+    let full_path = io::canonicalize(instances_dir.join(instance_path))?;
+    Ok(full_path)
 }
 
 pub async fn install_minecraft(
@@ -631,13 +631,14 @@ pub async fn launch_minecraft(
 
     download_log_config(&state, &version_info, None, false).await?;
 
-    let java_version = get_java_version_from_launch_context(context, &version_info)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(
-                "Missing correct java installation".to_string(),
-            )
-        })?;
+    let java_version =
+        get_java_version_from_launch_context(context, &version_info)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::LauncherError(
+                    "Missing correct java installation".to_string(),
+                )
+            })?;
 
     // Test jre version
     let java_version =
@@ -674,8 +675,7 @@ pub async fn launch_minecraft(
 
     // Check if instance has a running process, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
-    let existing_processes =
-        process::get_by_instance_id(&instance.id).await?;
+    let existing_processes = process::get_by_instance_id(&instance.id).await?;
     if let Some(process) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running as process {}",
@@ -709,13 +709,13 @@ pub async fn launch_minecraft(
                 original_port,
                 ..
             } => Some((original_host.clone(), *original_port)),
-		};
-		if let Some((host, port)) = original
-			&& let Err(e) = (JoinLogEntry {
-				instance_id: instance.id.clone(),
-				host,
-				port,
-				join_time: Utc::now(),
+        };
+        if let Some((host, port)) = original
+            && let Err(e) = (JoinLogEntry {
+                instance_id: instance.id.clone(),
+                host,
+                port,
+                join_time: Utc::now(),
             })
             .upsert(&state.pool)
             .await
@@ -906,7 +906,10 @@ pub async fn launch_minecraft(
                     ("modrinth.profile.icon", instance.icon_path.as_ref()),
                     ("modrinth.profile.link.project", link_project_id),
                     ("modrinth.profile.link.version", link_version_id),
-                    ("modrinth.profile.modified", Some(&instance_modified_time)),
+                    (
+                        "modrinth.profile.modified",
+                        Some(&instance_modified_time),
+                    ),
                     ("modrinth.profile.name", Some(&instance.name)),
                 ];
                 for (key, value) in system_properties {
