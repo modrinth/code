@@ -92,7 +92,7 @@ impl TiltifyClient {
             }))
             .send()
             .await
-            .inspect_err(|error| state.set_fetch_backoff())
+            .inspect_err(|_| state.set_fetch_backoff())
             .wrap_err("fetching OAuth token")?;
 
         let response = match response.error_for_status() {
