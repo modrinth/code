@@ -13,7 +13,7 @@ import {
 } from '@modrinth/ui'
 import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
@@ -46,55 +46,62 @@ debug('metadata load: start', {
 	installStage: instance.value.install_stage,
 })
 
-const [
-	fabric_versions,
-	forge_versions,
-	quilt_versions,
-	neoforge_versions,
-	all_game_versions,
-	loaders,
-] = await Promise.all([
-	get_loader_versions('fabric')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_loader_versions('forge')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_loader_versions('quilt')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_loader_versions('neo')
-		.then((manifest: Manifest) => shallowRef(manifest))
-		.catch(handleError),
-	get_game_versions()
-		.then((gameVersions: GameVersionTag[]) => shallowRef(gameVersions))
-		.catch(handleError),
-	get_loaders()
-		.then((value: PlatformTag[]) =>
-			value
-				.filter(
-					(item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla',
-				)
-				.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
-		)
-		.then((loader: PlatformTag[]) => ref(loader))
-		.catch(handleError),
-])
+function getSupportedModpackLoaders() {
+	return get_loaders().then((value: PlatformTag[]) =>
+		value
+			.filter((item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla')
+			.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
+	)
+}
 
-debug('metadata load: done', {
-	hasFabricManifest: !!fabric_versions?.value,
-	hasForgeManifest: !!forge_versions?.value,
-	hasQuiltManifest: !!quilt_versions?.value,
-	hasNeoforgeManifest: !!neoforge_versions?.value,
-	gameVersions: all_game_versions?.value?.length ?? 0,
-	availablePlatforms: loaders?.value?.map((loader) => loader.name) ?? [],
+const fabricVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'fabric'],
+	queryFn: () => get_loader_versions('fabric') as Promise<Manifest>,
+})
+const forgeVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'forge'],
+	queryFn: () => get_loader_versions('forge') as Promise<Manifest>,
+})
+const quiltVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'quilt'],
+	queryFn: () => get_loader_versions('quilt') as Promise<Manifest>,
+})
+const neoforgeVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'neo'],
+	queryFn: () => get_loader_versions('neo') as Promise<Manifest>,
+})
+const gameVersionsQuery = useQuery({
+	queryKey: ['instance-settings', 'game-versions'],
+	queryFn: () => get_game_versions() as Promise<GameVersionTag[]>,
+})
+const loadersQuery = useQuery({
+	queryKey: ['instance-settings', 'loaders', 'modpack'],
+	queryFn: getSupportedModpackLoaders,
 })
 
-const { data: modpackInfo } = useQuery({
+const metadataLoading = computed(() =>
+	[
+		fabricVersionsQuery,
+		forgeVersionsQuery,
+		quiltVersionsQuery,
+		neoforgeVersionsQuery,
+		gameVersionsQuery,
+		loadersQuery,
+	].some((query) => query.isLoading.value),
+)
+
+debug('metadata queries configured', {
+	instancePath: instance.value.path,
+	loader: instance.value.loader,
+	gameVersion: instance.value.game_version,
+})
+
+const modpackInfoQuery = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.path]),
 	queryFn: () => get_linked_modpack_info(instance.value.path, 'must_revalidate'),
 	enabled: computed(() => !!instance.value.linked_data?.project_id && !offline),
 })
+const modpackInfo = modpackInfoQuery.data
 
 const repairing = ref(false)
 const reinstalling = ref(false)
@@ -107,17 +114,17 @@ const messages = defineMessages({
 })
 
 function getManifest(loader: string) {
-	const map: Record<string, typeof fabric_versions> = {
-		fabric: fabric_versions,
-		forge: forge_versions,
-		quilt: quilt_versions,
-		neoforge: neoforge_versions,
+	const map: Record<string, Manifest | undefined> = {
+		fabric: fabricVersionsQuery.data.value,
+		forge: forgeVersionsQuery.data.value,
+		quilt: quiltVersionsQuery.data.value,
+		neoforge: neoforgeVersionsQuery.data.value,
 	}
 	const manifest = map[loader]
 	debug('getManifest:', {
 		loader,
-		hasManifest: !!manifest?.value,
-		gameVersions: manifest?.value?.gameVersions?.length ?? 0,
+		hasManifest: !!manifest,
+		gameVersions: manifest?.gameVersions?.length ?? 0,
 	})
 	return manifest
 }
@@ -143,7 +150,7 @@ provideAppBackup({
 
 provideInstallationSettings({
 	closeSettings: closeModal,
-	loading: ref(false),
+	loading: computed(() => metadataLoading.value || modpackInfoQuery.isLoading.value),
 	installationInfo: computed(() => {
 		const rows = [
 			{
@@ -185,14 +192,14 @@ provideInstallationSettings({
 	currentPlatform: computed(() => instance.value.loader),
 	currentGameVersion: computed(() => instance.value.game_version),
 	currentLoaderVersion: computed(() => instance.value.loader_version ?? ''),
-	availablePlatforms: loaders?.value?.map((x) => x.name) ?? [],
+	availablePlatforms: computed(() => loadersQuery.data.value?.map((x) => x.name) ?? []),
 
 	resolveGameVersions(loader, showSnapshots) {
-		const versions = all_game_versions?.value ?? []
+		const versions = gameVersionsQuery.data.value ?? []
 		const filtered = versions.filter((item) => {
 			if (loader === 'vanilla') return true
 			const manifest = getManifest(loader)
-			return !!manifest?.value?.gameVersions?.some((x) => item.version === x.id)
+			return !!manifest?.gameVersions?.some((x) => item.version === x.id)
 		})
 		const result = (
 			showSnapshots ? filtered : filtered.filter((x) => x.version_type === 'release')
@@ -213,12 +220,12 @@ provideInstallationSettings({
 			return []
 		}
 		const manifest = getManifest(loader)
-		if (!manifest?.value) {
+		if (!manifest) {
 			debug('resolveLoaderVersions: no manifest', { loader, gameVersion })
 			return []
 		}
 		if (loader === 'fabric' || loader === 'quilt') {
-			const result = manifest.value.gameVersions[0]?.loaders ?? []
+			const result = manifest.gameVersions[0]?.loaders ?? []
 			debug('resolveLoaderVersions: fabric/quilt result', {
 				loader,
 				gameVersion,
@@ -226,14 +233,13 @@ provideInstallationSettings({
 			})
 			return result
 		}
-		const result =
-			manifest.value.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
+		const result = manifest.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
 		debug('resolveLoaderVersions: result', { loader, gameVersion, count: result.length })
 		return result
 	},
 
 	resolveHasSnapshots(loader) {
-		const versions = all_game_versions?.value ?? []
+		const versions = gameVersionsQuery.data.value ?? []
 		if (loader === 'vanilla') {
 			const result = versions.some((x) => x.version_type !== 'release')
 			debug('resolveHasSnapshots: vanilla', { loader, result })
@@ -241,7 +247,7 @@ provideInstallationSettings({
 		}
 		const manifest = getManifest(loader)
 		const supported = versions.filter(
-			(item) => !!manifest?.value?.gameVersions?.some((x) => item.version === x.id),
+			(item) => !!manifest?.gameVersions?.some((x) => item.version === x.id),
 		)
 		const result = supported.some((x) => x.version_type !== 'release')
 		debug('resolveHasSnapshots:', {
