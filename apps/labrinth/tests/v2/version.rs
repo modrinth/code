@@ -6,7 +6,7 @@ use actix_web::test;
 use futures::StreamExt;
 use labrinth::models::ids::VersionId;
 use labrinth::{
-    models::projects::{Loader, VersionStatus, VersionType},
+    models::projects::{LegacySideType, Loader, VersionStatus, VersionType},
     routes::v2::version_file::FileUpdateData,
 };
 use serde_json::json;
@@ -510,6 +510,84 @@ async fn add_version_project_types_v2() {
             // When we get the project as v3, it should display 'modpack' as the project_type, and 'mrpack' as the loader
 
             // The project should be a modpack project
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn add_version_accepts_environment_v2() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV2>| async move {
+            let api = &test_env.api;
+
+            let (test_project, test_versions) = api
+                .add_public_project(
+                    "test-version-environment",
+                    None,
+                    None,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_eq!(test_versions.len(), 0);
+
+            let patch = json!([{
+                "op": "add",
+                "path": "/environment",
+                "value": "server_only_client_optional"
+            }]);
+
+            let resp = api
+                .add_public_version(
+                    test_project.id,
+                    "1.0.0",
+                    TestFile::build_random_jar(),
+                    None,
+                    Some(serde_json::from_value(patch).unwrap()),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::OK);
+
+            let project = api
+                .get_project_deserialized(
+                    &test_project.slug.unwrap(),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_eq!(project.client_side, LegacySideType::Optional);
+            assert_eq!(project.server_side, LegacySideType::Required);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn create_project_initial_version_accepts_environment_v2() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV2>| async move {
+            let api = &test_env.api;
+            let slug = "test-project-version-environment";
+            let patch = json!([{
+                "op": "add",
+                "path": "/initial_versions/0/environment",
+                "value": "client_only_server_optional"
+            }]);
+            let creation_data = get_public_project_creation_data(
+                slug,
+                Some(TestFile::build_random_jar()),
+                Some(serde_json::from_value(patch).unwrap()),
+            );
+
+            let resp = api.create_project(creation_data, USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+
+            let project =
+                api.get_project_deserialized(slug, USER_USER_PAT).await;
+            assert_eq!(project.client_side, LegacySideType::Required);
+            assert_eq!(project.server_side, LegacySideType::Optional);
         },
     )
     .await;

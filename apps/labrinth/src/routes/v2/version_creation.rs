@@ -55,6 +55,7 @@ pub struct InitialVersionData {
     pub dependencies: Vec<Dependency>,
     #[validate(length(min = 1))]
     pub game_versions: Vec<String>,
+    pub environment: Option<String>,
     #[serde(alias = "version_type")]
     pub release_channel: VersionType,
     #[validate(length(min = 1))]
@@ -160,22 +161,25 @@ pub async fn version_create(
                     .iter()
                     .any(|field| field == "environment")
                 {
-                    // If so, we get the field of an example version of the project, and set the side types to match.
-                    fields.insert(
-                        "environment".into(),
-                        get_example_version_fields(
-                            legacy_create.project_id,
-                            client,
-                            &redis,
-                        )
-                        .await?
-                        .into_iter()
-                        .flatten()
-                        .find(|f| f.field_name == "environment")
-                        .map_or(json!("unknown"), |f| {
-                            f.value.serialize_internal()
-                        }),
-                    );
+                    let environment =
+                        if let Some(environment) = legacy_create.environment {
+                            json!(environment)
+                        } else {
+                            get_example_version_fields(
+                                legacy_create.project_id,
+                                client,
+                                &redis,
+                            )
+                            .await?
+                            .into_iter()
+                            .flatten()
+                            .find(|f| f.field_name == "environment")
+                            .map_or(json!("unknown"), |f| {
+                                f.value.serialize_internal()
+                            })
+                        };
+
+                    fields.insert("environment".into(), environment);
                 }
                 // Handle project type via file extension prediction
                 let mut project_type = None;
