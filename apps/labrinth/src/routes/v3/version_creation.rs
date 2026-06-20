@@ -555,6 +555,7 @@ pub async fn upload_file_to_version(
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -566,7 +567,7 @@ pub async fn upload_file_to_version(
         &mut payload,
         client,
         &mut transaction,
-        redis,
+        redis.clone(),
         &***file_host,
         &mut uploaded_files,
         version_id,
@@ -587,11 +588,19 @@ pub async fn upload_file_to_version(
         if let Err(e) = rollback_result {
             return Err(e.into());
         }
-    } else {
+    } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            *project_id,
+            None,
+            Some(true),
+        )
+        .await?;
     }
 
-    result
+    result.map(|(response, _)| response)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -606,7 +615,7 @@ async fn upload_file_to_version_inner(
     version_id: models::DBVersionId,
     session_queue: &AuthQueue,
     http: &reqwest::Client,
-) -> Result<HttpResponse, CreateError> {
+) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
 
@@ -699,6 +708,7 @@ async fn upload_file_to_version_inner(
     }
 
     let project_id = ProjectId(version.inner.project_id.0 as u64);
+    let db_project_id = version.inner.project_id;
     let mut error = None;
     while let Some(item) = payload.next().await {
         let mut field: Field = item?;
@@ -796,7 +806,7 @@ async fn upload_file_to_version_inner(
     // Clear version cache
     models::DBVersion::clear_cache(&version, &redis).await?;
 
-    Ok(HttpResponse::NoContent().body(""))
+    Ok((HttpResponse::NoContent().body(""), db_project_id))
 }
 
 // This function is used for adding a file to a version, uploading the initial
