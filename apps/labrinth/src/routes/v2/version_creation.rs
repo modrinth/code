@@ -13,6 +13,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
+use crate::search::SearchState;
 use crate::util::http::HttpClient;
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
@@ -103,6 +104,7 @@ pub async fn version_create(
     session_queue: Data<AuthQueue>,
     moderation_queue: Data<AutomatedModerationQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let payload = v2_reroute::alter_actix_multipart(
         payload,
@@ -258,6 +260,7 @@ pub async fn version_create(
         session_queue,
         moderation_queue,
         http,
+        search_state,
     )
     .await?;
 

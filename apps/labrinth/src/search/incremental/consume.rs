@@ -1,8 +1,10 @@
 use actix_web::web;
 use eyre::WrapErr;
-use kafka::client::{FetchOffset, FetchPartition, KafkaClient};
+use rdkafka::{
+    ClientConfig, Message,
+    consumer::{CommitMode, Consumer, StreamConsumer},
+};
 use serde::Deserialize;
-use std::collections::HashMap;
 
 use crate::{
     database::{PgPool, redis::RedisPool},
@@ -39,23 +41,18 @@ async fn consume(
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
 ) -> eyre::Result<()> {
-    let mut client = KafkaClient::new(ENV.KAFKA_BOOTSTRAP_SERVERS.0.clone());
-    client.set_client_id(ENV.KAFKA_CLIENT_ID.clone());
-    client
-        .load_metadata(&[SEARCH_PROJECT_INDEX_QUEUE_TOPIC])
-        .wrap_err("failed to load Kafka metadata")?;
-
-    let mut offsets = client
-        .fetch_topic_offsets(
-            SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-            FetchOffset::Earliest,
-        )
-        .wrap_err("failed to fetch Kafka topic offsets")?
-        .into_iter()
-        .map(|partition_offset| {
-            (partition_offset.partition, partition_offset.offset)
-        })
-        .collect::<HashMap<_, _>>();
+    let consumer: StreamConsumer = ClientConfig::new()
+        .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
+        .set("client.id", &ENV.KAFKA_CLIENT_ID)
+        .set("group.id", INCREMENTAL_INDEX_SEARCH_TASK)
+        .set("enable.auto.commit", "false")
+        .set("auto.offset.reset", "earliest")
+        .set("broker.address.family", "v4")
+        .create()
+        .wrap_err("failed to create Kafka consumer")?;
+    consumer
+        .subscribe(&[SEARCH_PROJECT_INDEX_QUEUE_TOPIC])
+        .wrap_err("failed to subscribe to Kafka topic")?;
 
     tracing::info!(
         kafka.bootstrap_servers = ?ENV.KAFKA_BOOTSTRAP_SERVERS.0,
@@ -66,71 +63,48 @@ async fn consume(
     );
 
     loop {
-        let fetch_partitions = offsets
-            .iter()
-            .map(|(partition, offset)| {
-                FetchPartition::new(
-                    SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-                    *partition,
-                    *offset,
-                )
-            })
-            .collect::<Vec<_>>();
-
-        let responses = client
-            .fetch_messages(fetch_partitions.iter())
-            .wrap_err("failed to fetch Kafka messages")?;
-        let mut consumed_any = false;
-
-        for response in responses {
-            for topic in response.topics() {
-                for partition in topic.partitions() {
-                    let data = partition.data().wrap_err_with(|| {
-                        format!(
-                            "failed to fetch Kafka partition {}:{}",
-                            topic.topic(),
-                            partition.partition()
-                        )
-                    })?;
-
-                    for message in data.messages() {
-                        let event = serde_json::from_slice::<
-                            SearchProjectIndexQueueEvent,
-                        >(message.value)?;
-
-                        tracing::info!(
-                            kafka.topic = topic.topic(),
-                            kafka.partition = partition.partition(),
-                            kafka.offset = message.offset,
-                            project_id = %event.project_id,
-                            "Consumed incremental search index event"
-                        );
-
-                        reindex_project(
-                            ro_pool,
-                            redis_pool,
-                            search_backend,
-                            event.project_id,
-                        )
-                        .await
-                        .wrap_err_with(|| {
-                            format!(
-                                "failed to reindex project {}",
-                                event.project_id
-                            )
-                        })?;
-
-                        offsets
-                            .insert(partition.partition(), message.offset + 1);
-                        consumed_any = true;
-                    }
-                }
+        let message = consumer
+            .recv()
+            .await
+            .wrap_err("failed to receive Kafka message")?;
+        let payload = message.payload().ok_or_else(|| {
+            eyre::eyre!("Kafka message did not have a payload")
+        })?;
+        let event = match serde_json::from_slice::<SearchProjectIndexQueueEvent>(
+            payload,
+        ) {
+            Ok(event) => event,
+            Err(err) => {
+                tracing::error!(
+                    kafka.topic = message.topic(),
+                    kafka.partition = message.partition(),
+                    kafka.offset = message.offset(),
+                    "Skipping malformed incremental search index event: {err:?}"
+                );
+                consumer
+                    .commit_message(&message, CommitMode::Async)
+                    .wrap_err("failed to commit malformed Kafka message")?;
+                continue;
             }
-        }
+        };
 
-        if !consumed_any {
-            tokio::time::sleep(KAFKA_OPERATION_INTERVAL).await;
-        }
+        tracing::info!(
+            kafka.topic = message.topic(),
+            kafka.partition = message.partition(),
+            kafka.offset = message.offset(),
+            project_id = %event.project_id,
+            "Consumed incremental search index event"
+        );
+
+        reindex_project(ro_pool, redis_pool, search_backend, event.project_id)
+            .await
+            .wrap_err_with(|| {
+                format!("failed to reindex project {}", event.project_id)
+            })?;
+
+        consumer
+            .commit_message(&message, CommitMode::Async)
+            .wrap_err("failed to commit Kafka message")?;
     }
 }
 
