@@ -165,6 +165,7 @@ pub async fn version_create(
                         if let Some(environment) = legacy_create.environment {
                             json!(environment)
                         } else {
+                            // If so, we get the field of an example version of the project, and set the side types to match.
                             get_example_version_fields(
                                 legacy_create.project_id,
                                 client,

@@ -4,9 +4,10 @@ use crate::common::api_v2::ApiV2;
 use actix_http::StatusCode;
 use actix_web::test;
 use futures::StreamExt;
-use labrinth::models::ids::VersionId;
 use labrinth::{
-    models::projects::{LegacySideType, Loader, VersionStatus, VersionType},
+    models::ids::VersionId,
+    models::projects::{Loader, VersionStatus, VersionType},
+    models::v2::projects::LegacySideType,
     routes::v2::version_file::FileUpdateData,
 };
 use serde_json::json;
