@@ -90,7 +90,12 @@ impl BackgroundTask {
                 Ok(())
             }
             IncrementalIndexSearch => {
-                crate::search::incremental::consume::run().await
+                crate::search::incremental::consume::run(
+                    ro_pool,
+                    redis_pool,
+                    search_backend,
+                )
+                .await
             }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {

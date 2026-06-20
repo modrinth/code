@@ -111,6 +111,16 @@ pub trait SearchBackend: Send + Sync {
         redis: RedisPool,
     ) -> eyre::Result<()>;
 
+    async fn index_documents(
+        &self,
+        documents: &[UploadSearchProject],
+    ) -> eyre::Result<()>;
+
+    async fn remove_project_documents(
+        &self,
+        ids: &[ProjectId],
+    ) -> eyre::Result<()>;
+
     async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;
 
     async fn tasks(&self) -> eyre::Result<Value>;

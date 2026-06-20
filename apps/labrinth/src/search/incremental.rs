@@ -1,3 +1,5 @@
+pub mod consume;
+
 use std::{mem, sync::Arc};
 
 use kafka::client::{ProduceMessage, RequiredAcks};
