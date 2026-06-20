@@ -108,7 +108,7 @@ async fn consume(
     }
 }
 
-async fn reindex_project(
+pub async fn reindex_project(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
