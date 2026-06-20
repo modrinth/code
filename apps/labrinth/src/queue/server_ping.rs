@@ -5,10 +5,12 @@ use crate::env::ENV;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
 use crate::models::projects::ProjectStatus;
+use crate::search::incremental::IncrementalSearchQueue;
 use crate::{database::PgPool, util::error::Context};
 use async_minecraft_ping::ServerDescription;
 use chrono::{TimeDelta, Utc};
 use clickhouse::{Client, Row};
+use futures::future::join;
 use serde::Serialize;
 use sqlx::types::Json;
 use std::sync::Arc;
@@ -21,6 +23,7 @@ pub struct ServerPingQueue {
     pub db: PgPool,
     pub redis: RedisPool,
     pub clickhouse: Client,
+    pub incremental_search_queue: IncrementalSearchQueue,
 }
 
 pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
@@ -28,11 +31,17 @@ pub const REDIS_FAILURE_NAMESPACE: &str = "minecraft_java_server_ping_failures";
 pub const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
 
 impl ServerPingQueue {
-    pub fn new(db: PgPool, redis: RedisPool, clickhouse: Client) -> Self {
+    pub fn new(
+        db: PgPool,
+        redis: RedisPool,
+        clickhouse: Client,
+        incremental_search_queue: IncrementalSearchQueue,
+    ) -> Self {
         Self {
             db,
             redis,
             clickhouse,
+            incremental_search_queue,
         }
     }
 
@@ -166,17 +175,23 @@ impl ServerPingQueue {
                 }
 
                 if updated_project {
-                    DBProject::clear_cache(
+                    let clear_cache = DBProject::clear_cache(
                         (*project_id).into(),
                         None,
                         None,
                         &self.redis,
-                    )
-                    .await
-                    .inspect_err(|err| {
-                        warn!("failed to clear project cache: {err:#}")
-                    })
-                    .ok();
+                    );
+                    let queue_search = self
+                        .incremental_search_queue
+                        .push((*project_id).into());
+
+                    let (clear_cache_result, _) =
+                        join(clear_cache, queue_search).await;
+                    clear_cache_result
+                        .inspect_err(|err| {
+                            warn!("failed to clear project cache: {err:#}")
+                        })
+                        .ok();
                 }
             }
 

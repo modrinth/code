@@ -47,7 +47,7 @@ impl IncrementalSearchQueue {
         }
     }
 
-    async fn drain(&self) -> eyre::Result<()> {
+    pub async fn drain(&self) -> eyre::Result<()> {
         let operations = {
             let mut operations = self.operations.lock().await;
             mem::take(&mut *operations)
