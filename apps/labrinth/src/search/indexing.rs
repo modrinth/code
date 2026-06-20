@@ -5,7 +5,6 @@ use futures::TryStreamExt;
 use heck::ToKebabCase;
 use itertools::Itertools;
 use regex::Regex;
-use sqlx::Row;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 use tracing::{info, warn};
@@ -127,45 +126,37 @@ pub async fn index_project_documents(
     let searchable_statuses = searchable_statuses();
     let project_ids = vec![DBProjectId::from(project_id).0];
 
-    let db_projects = sqlx::query(
-		r#"
+    let db_projects = sqlx::query!(
+        r#"
 		SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
 		m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
-		m.components components
+		m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
 		FROM mods m
 		WHERE m.status = ANY($1) AND m.id = ANY($2)
 		GROUP BY m.id
 		ORDER BY m.id ASC;
 		"#,
-	)
-	.bind(&searchable_statuses)
-	.bind(&project_ids)
-	.fetch(pool)
-	.map_ok(|m| {
-		let approved = m
-			.get::<Option<DateTime<Utc>>, _>("approved")
-			.unwrap_or_else(|| m.get("published"));
-
-		PartialProject {
-			id: DBProjectId(m.get("id")),
-			name: m.get("name"),
-			summary: m.get("summary"),
-			downloads: m.get("downloads"),
-			follows: m.get("follows"),
-			icon_url: m.get("icon_url"),
-			updated: m.get("updated"),
-			approved,
-			slug: m.get("slug"),
-			color: m.get("color"),
-			license: m.get("license"),
-			components: m
-				.get::<sqlx::types::Json<exp::ProjectSerial>, _>("components")
-				.0,
-		}
-	})
-	.try_collect::<Vec<PartialProject>>()
-	.await
-	.wrap_err("failed to fetch project")?;
+        &searchable_statuses,
+        &project_ids,
+    )
+    .fetch(pool)
+    .map_ok(|m| PartialProject {
+        id: DBProjectId(m.id),
+        name: m.name,
+        summary: m.summary,
+        downloads: m.downloads,
+        follows: m.follows,
+        icon_url: m.icon_url,
+        updated: m.updated,
+        approved: m.approved.unwrap_or(m.published),
+        slug: m.slug,
+        color: m.color,
+        license: m.license,
+        components: m.components.0,
+    })
+    .try_collect::<Vec<PartialProject>>()
+    .await
+    .wrap_err("failed to fetch project")?;
 
     build_search_documents(pool, redis, db_projects).await
 }

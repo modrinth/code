@@ -1,55 +1,32 @@
-use std::{ops::Deref, time::Duration};
+use std::time::Duration;
 
-use crate::{env::ENV, util::error::Context};
+use crate::env::ENV;
 use chrono::{DateTime, Utc};
-use kafka::client::KafkaClient;
+use rdkafka::{ClientConfig, producer::FutureProducer};
 use serde::Serialize;
-use tokio::sync::Mutex;
 use uuid::Uuid;
 
 pub const KAFKA_OPERATION_INTERVAL: Duration = Duration::from_secs(5);
 
-#[derive(Debug)]
 pub struct KafkaClientState {
-    client: Mutex<KafkaClient>,
+    pub client: FutureProducer,
 }
 
 impl KafkaClientState {
     pub fn new() -> eyre::Result<Self> {
-        let mut client =
-            KafkaClient::new(ENV.KAFKA_BOOTSTRAP_SERVERS.0.clone());
-        client.set_client_id(ENV.KAFKA_CLIENT_ID.clone());
-        client
-            .load_metadata(&[
-                crate::search::incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-            ])
-            .wrap_err("failed to load Kafka metadata")?;
-
-        let topic_names = client
-            .topics()
-            .names()
-            .map(str::to_string)
-            .collect::<Vec<_>>();
+        let client = ClientConfig::new()
+            .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
+            .set("client.id", &ENV.KAFKA_CLIENT_ID)
+            .set("broker.address.family", "v4")
+            .create()?;
 
         tracing::info!(
-            kafka.bootstrap_servers = ?client.hosts(),
-            kafka.client_id = %client.client_id(),
-            kafka.topic_count = topic_names.len(),
-            kafka.topics = ?topic_names,
+            kafka.bootstrap_servers = ?ENV.KAFKA_BOOTSTRAP_SERVERS.0,
+            kafka.client_id = %ENV.KAFKA_CLIENT_ID,
             "Connected to Kafka"
         );
 
-        Ok(Self {
-            client: Mutex::new(client),
-        })
-    }
-}
-
-impl Deref for KafkaClientState {
-    type Target = Mutex<KafkaClient>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.client
+        Ok(Self { client })
     }
 }
 
