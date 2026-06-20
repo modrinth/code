@@ -184,6 +184,12 @@ pub async fn project_create(
                             server_side,
                         ),
                     );
+                    if let Some(environment) = v.environment {
+                        fields.insert(
+                            "environment".to_string(),
+                            json!(environment),
+                        );
+                    }
                     fields.insert(
                         "game_versions".to_string(),
                         json!(v.game_versions),
