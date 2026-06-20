@@ -181,9 +181,8 @@ impl ServerPingQueue {
                         None,
                         &self.redis,
                     );
-                    let queue_search = self
-                        .incremental_search_queue
-                        .push((*project_id).into());
+                    let queue_search =
+                        self.incremental_search_queue.push(*project_id);
 
                     let (clear_cache_result, _) =
                         join(clear_cache, queue_search).await;
