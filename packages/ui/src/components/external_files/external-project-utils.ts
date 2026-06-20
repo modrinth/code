@@ -22,7 +22,23 @@ export type ProjectPermissionField =
 
 export type AttributionProofRequirement = 'explanation_or_images' | 'images' | null
 
-export const PERMISSION_REASONS = {
+type PermissionReasonConfig = {
+	label: MessageDescriptor
+	description: MessageDescriptor
+	notesLabel: MessageDescriptor | null
+	notesDescription: MessageDescriptor | null
+	notesShowsOptional: boolean
+	proofImagesDescription: MessageDescriptor | null
+	proofRequirement: AttributionProofRequirement
+	proofValidationError?: MessageDescriptor
+	automaticDescription?: MessageDescriptor
+	fields: ProjectPermissionField[]
+}
+
+export const PERMISSION_REASONS: Record<
+	Labrinth.Attribution.Internal.AttributionResolutionKind,
+	PermissionReasonConfig
+> = {
 	license: {
 		label: defineMessage({
 			id: 'external-files.permissions-card.reason.license',
@@ -84,7 +100,11 @@ export const PERMISSION_REASONS = {
 		notesDescription: null,
 		notesShowsOptional: true,
 		proofImagesDescription: null,
-		proofRequirement: 'images',
+		proofRequirement: 'explanation_or_images',
+		proofValidationError: defineMessage({
+			id: 'external-files.permissions-card.error.notes-or-images-required',
+			defaultMessage: 'Please provide a note or upload at least one proof image.',
+		}),
 		fields: ['link_to_work', 'notes', 'image_urls'] as const,
 	},
 	no_permission: {
@@ -101,6 +121,11 @@ export const PERMISSION_REASONS = {
 		notesShowsOptional: true,
 		proofImagesDescription: null,
 		proofRequirement: null,
+		automaticDescription: defineMessage({
+			id: 'external-files.permissions-card.reason.no-permission.automatic.description',
+			defaultMessage:
+				"We've seen this file before and its license does not normally allow redistribution.",
+		}),
 		fields: ['notes'] as const,
 	},
 	globally_allowed: {
@@ -120,19 +145,7 @@ export const PERMISSION_REASONS = {
 		proofRequirement: null,
 		fields: ['link_to_work'] as const,
 	},
-} satisfies Record<
-	Labrinth.Attribution.Internal.AttributionResolutionKind,
-	{
-		label: MessageDescriptor
-		description: MessageDescriptor
-		notesLabel: MessageDescriptor | null
-		notesDescription: MessageDescriptor | null
-		notesShowsOptional: boolean
-		proofImagesDescription: MessageDescriptor | null
-		proofRequirement: AttributionProofRequirement
-		fields: ProjectPermissionField[]
-	}
->
+}
 
 export function isAttributionProofValid(
 	requirement: AttributionProofRequirement,
@@ -153,9 +166,13 @@ export function attributionProofValidationError(
 	requirement: AttributionProofRequirement,
 	notes: string,
 	imageUrls: readonly string[],
+	validationError?: MessageDescriptor,
 ): MessageDescriptor | null {
 	if (isAttributionProofValid(requirement, notes, imageUrls)) {
 		return null
+	}
+	if (validationError) {
+		return validationError
 	}
 	switch (requirement) {
 		case 'explanation_or_images':
@@ -206,16 +223,29 @@ export function parseAttributionLicense(
 	return { spdx: license, custom: '' }
 }
 
+export function isAutomaticNoPermissionAttribution(
+	attribution: Labrinth.Attribution.Internal.AttributionResolution | null | undefined,
+	attributedBy: string | null | undefined,
+): boolean {
+	return attribution?.kind === 'no_permission' && attributedBy == null
+}
+
 export function attributionLinkToWork(
 	attribution: Labrinth.Attribution.Internal.AttributionResolution | null | undefined,
 ): string | undefined {
 	if (!attribution) {
 		return undefined
 	}
-	if (PERMISSION_REASONS[attribution.kind].fields.includes('link_to_work')) {
-		return attribution.link_to_work
+	switch (attribution.kind) {
+		case 'license':
+		case 'special_permissions':
+		case 'globally_allowed':
+			return attribution.link_to_work
+		case 'no_permission':
+			return attribution.link_to_work
+		default:
+			return undefined
 	}
-	return undefined
 }
 
 export function parseInitialAttribution(

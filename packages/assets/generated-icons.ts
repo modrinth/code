@@ -207,6 +207,7 @@ import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackagePlusIcon from './icons/package-plus.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
+import _PauseIcon from './icons/pause.svg?component'
 import _PencilIcon from './icons/pencil.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PinIcon from './icons/pin.svg?component'
@@ -636,6 +637,7 @@ export const PackageOpenIcon = _PackageOpenIcon
 export const PackagePlusIcon = _PackagePlusIcon
 export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
+export const PauseIcon = _PauseIcon
 export const PencilIcon = _PencilIcon
 export const PickaxeIcon = _PickaxeIcon
 export const PinIcon = _PinIcon

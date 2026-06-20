@@ -3134,9 +3134,6 @@
   "project.moderation.admonition.withheld.header": {
     "message": "由工作人員設為不公開"
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "顯示成員 UI"
-  },
   "project.moderation.thread.title": {
     "message": "審核訊息"
   },

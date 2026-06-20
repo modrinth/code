@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckCircleIcon, UserRoundIcon } from '@modrinth/assets'
+import { CheckCircleIcon, ScaleIcon, UserRoundIcon, XCircleIcon } from '@modrinth/assets'
 import { builtinLicenses } from '@modrinth/utils'
 import { computed } from 'vue'
 
@@ -9,20 +9,29 @@ import { AutoLink, Avatar } from '#ui/components/base'
 
 import { useFormatDateTime } from '../../composables/format-date-time'
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
+import type { ProjectPermissionField } from './external-project-utils'
 import {
 	attributionLinkToWork,
+	isAutomaticNoPermissionAttribution,
 	isCustomAttributionLicense,
 	isHttpUrl,
 	PERMISSION_REASONS,
 } from './external-project-utils'
 
-const props = defineProps<{
-	attribution: Labrinth.Attribution.Internal.AttributionResolution
-	attributedAt?: string | null
-	attributorHref: string | null
-	attributorLabel: string
-	attributorAvatarUrl?: string | null
-}>()
+const props = withDefaults(
+	defineProps<{
+		attribution: Labrinth.Attribution.Internal.AttributionResolution
+		attributedAt?: string | null
+		attributedBy?: string | null
+		attributorHref: string | null
+		attributorLabel: string
+		attributorAvatarUrl?: string | null
+		moderator?: boolean
+	}>(),
+	{
+		moderator: false,
+	},
+)
 
 const { formatMessage } = useVIntl()
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
@@ -30,11 +39,11 @@ const formatDate = useFormatDateTime({ dateStyle: 'long' })
 const messages = defineMessages({
 	linkLabel: {
 		id: 'external-files.permissions-card.link-label',
-		defaultMessage: 'Link to work',
+		defaultMessage: 'Link to work:',
 	},
 	notesLabel: {
 		id: 'external-files.permissions-card.notes-label',
-		defaultMessage: 'Notes',
+		defaultMessage: 'Notes:',
 	},
 	licensedAs: {
 		id: 'external-files.permissions-card.licensed-as',
@@ -46,11 +55,15 @@ const messages = defineMessages({
 	},
 	proofImagesLabel: {
 		id: 'external-files.permissions-card.proof-images-label',
-		defaultMessage: 'Proof images',
+		defaultMessage: 'Proof images:',
 	},
 	proofImageThumbnailAlt: {
 		id: 'external-files.permissions-card.proof-image-alt',
 		defaultMessage: 'Proof screenshot {n}',
+	},
+	updatedByModerator: {
+		id: 'external-files.permissions-card.updated-by-moderator',
+		defaultMessage: 'Moderator',
 	},
 })
 
@@ -64,7 +77,26 @@ const notesNoneMessage = defineMessage({
 	defaultMessage: 'None',
 })
 
-const readViewFields = computed(() => PERMISSION_REASONS[props.attribution.kind]?.fields ?? [])
+const automaticNoPermission = computed(() =>
+	isAutomaticNoPermissionAttribution(props.attribution, props.attributedBy),
+)
+
+const readViewFields = computed(() => {
+	if (automaticNoPermission.value) {
+		return ['link_to_work'] as ProjectPermissionField[]
+	}
+	return PERMISSION_REASONS[props.attribution.kind]?.fields ?? []
+})
+
+const automaticAttributionDescription = computed(() => {
+	if (props.attribution.kind === 'globally_allowed') {
+		return PERMISSION_REASONS.globally_allowed.description
+	}
+	if (automaticNoPermission.value) {
+		return PERMISSION_REASONS.no_permission.automaticDescription ?? null
+	}
+	return null
+})
 
 const licenseReadDisplay = computed(() => {
 	const attr = props.attribution
@@ -100,15 +132,19 @@ const linkToWork = computed(() => attributionLinkToWork(props.attribution))
 								v-if="attribution.kind === 'globally_allowed'"
 								class="text-green size-5"
 							/>
+							<XCircleIcon v-else-if="automaticNoPermission" class="text-red size-5" />
 							{{ formatMessage(PERMISSION_REASONS[attribution.kind].label) }}
 						</span>
 					</div>
-					<template v-if="attribution.kind === 'globally_allowed'">
+					<template v-if="automaticAttributionDescription">
 						<p class="m-0">
-							{{ formatMessage(PERMISSION_REASONS[attribution.kind].description) }}
+							{{ formatMessage(automaticAttributionDescription) }}
 						</p>
 					</template>
-					<div class="flex flex-col gap-3">
+					<div
+						v-if="!(readViewFields.includes('link_to_work') && !linkToWork)"
+						class="flex flex-col gap-3"
+					>
 						<div class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 items-baseline">
 							<template v-if="attribution.kind === 'license' || attribution.kind === 'my_project'">
 								<span class="text-secondary font-medium">
@@ -185,7 +221,15 @@ const linkToWork = computed(() => attributionLinkToWork(props.attribution))
 					:values="{ date: formatDate(attributedAt) }"
 				>
 					<template #user>
+						<span
+							v-if="!moderator && attribution.updated_by_moderator"
+							class="text-orange flex items-center gap-1"
+						>
+							<ScaleIcon class="size-4 shrink-0" />
+							{{ formatMessage(messages.updatedByModerator) }}
+						</span>
 						<AutoLink
+							v-if="attributedBy && moderator"
 							:to="attributorHref"
 							class="inline-flex items-center gap-1.5 text-primary font-medium hover:underline max-w-full min-w-0"
 						>

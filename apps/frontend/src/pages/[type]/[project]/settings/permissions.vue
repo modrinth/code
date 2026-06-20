@@ -5,9 +5,12 @@ import {
 	ArrowDownWideNarrowIcon,
 	ClockArrowDownIcon,
 	FoldVerticalIcon,
+	PauseIcon,
 	RightArrowIcon,
+	ScaleIcon,
 	SearchIcon,
 	UnfoldVerticalIcon,
+	XCircleIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
@@ -119,6 +122,14 @@ function isNoPermission(group: Labrinth.Attribution.Internal.AttributionGroup): 
 function isModerationRejected(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
 	const kind = group.attribution?.moderation_status?.kind
 	return kind === 'bad_proof' || kind === 'not_allowed'
+}
+
+function needsModerationApproval(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	const attribution = group.attribution
+	if (!attribution || attribution.kind === 'globally_allowed') {
+		return false
+	}
+	return !attribution.moderation_status
 }
 
 function rejectedSortRank(group: Labrinth.Attribution.Internal.AttributionGroup): number {
@@ -240,6 +251,21 @@ const stats = computed(() => {
 	return { total: groups.length, attributed, pending, noPermission }
 })
 
+const pendingApprovalCount = computed(() => {
+	const groups = attributionData.value ?? []
+	return groups.filter(needsModerationApproval).length
+})
+
+const noPermissionCount = computed(() => {
+	const groups = attributionData.value ?? []
+	return groups.filter((group) => group.attribution?.kind === 'no_permission').length
+})
+
+const pendingCount = computed(() => {
+	const groups = attributionData.value ?? []
+	return groups.filter((group) => !group.attribution || isModerationRejected(group)).length
+})
+
 const projectIsApproved = computed(() => project.value.status === 'approved')
 
 const messages = defineMessages({
@@ -307,6 +333,11 @@ const messages = defineMessages({
 	expandAll: {
 		id: 'project.settings.permissions.expand-all',
 		defaultMessage: 'Expand all',
+	},
+	pendingApprovalCount: {
+		id: 'project.settings.permissions.pending-approval-count',
+		defaultMessage:
+			'{count, plural, =0 {No attributions need approval} one {# attribution needs approval} other {# attributions need approval}}',
 	},
 })
 
@@ -417,60 +448,82 @@ function dismissInfoBanner() {
 				"
 			/>
 		</template>
-		<div class="grid grid-cols-[1fr_auto_auto] gap-2">
-			<StyledInput
-				v-model="searchQuery"
-				type="text"
-				autocomplete="off"
-				clearable
-				:placeholder="
-					formatMessage(messages.searchPlaceholder, {
-						count: totalGroups,
-					})
-				"
-				:icon="SearchIcon"
-				input-class="h-[40px]"
-			/>
-			<div>
-				<Combobox
-					v-model="currentSortType"
-					class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0 [&>span]:h-[40px]"
-					:options="sortTypes"
-					:placeholder="formatMessage(commonMessages.sortByLabel)"
-				>
-					<template #selected>
-						<span class="flex flex-row gap-2 align-middle font-semibold">
-							<ArrowDownWideNarrowIcon
-								v-if="currentSortType === 'status'"
-								class="size-5 flex-shrink-0 text-secondary"
-							/>
-							<ArrowDown10Icon
-								v-else-if="currentSortType === 'most_files'"
-								class="size-5 flex-shrink-0 text-secondary"
-							/>
-							<ClockArrowDownIcon
-								v-else-if="currentSortType === 'recently_edited'"
-								class="size-5 flex-shrink-0 text-secondary"
-							/>
-							<ArrowDownWideNarrowIcon
-								v-else-if="currentSortType === 'rejected'"
-								class="size-5 flex-shrink-0 text-secondary"
-							/>
-							<span class="truncate text-contrast">{{ currentSortLabel }}</span>
-						</span>
-					</template>
-				</Combobox>
+		<div class="flex flex-col gap-2">
+			<div class="grid grid-cols-[1fr_auto_auto] gap-2">
+				<StyledInput
+					v-model="searchQuery"
+					type="text"
+					autocomplete="off"
+					clearable
+					:placeholder="
+						formatMessage(messages.searchPlaceholder, {
+							count: totalGroups,
+						})
+					"
+					:icon="SearchIcon"
+					input-class="h-[40px]"
+				/>
+				<div>
+					<Combobox
+						v-model="currentSortType"
+						class="!w-full flex-grow sm:!w-[220px] sm:flex-grow-0 [&>span]:h-[40px]"
+						:options="sortTypes"
+						:placeholder="formatMessage(commonMessages.sortByLabel)"
+					>
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<ArrowDownWideNarrowIcon
+									v-if="currentSortType === 'status'"
+									class="size-5 flex-shrink-0 text-secondary"
+								/>
+								<ArrowDown10Icon
+									v-else-if="currentSortType === 'most_files'"
+									class="size-5 flex-shrink-0 text-secondary"
+								/>
+								<ClockArrowDownIcon
+									v-else-if="currentSortType === 'recently_edited'"
+									class="size-5 flex-shrink-0 text-secondary"
+								/>
+								<ArrowDownWideNarrowIcon
+									v-else-if="currentSortType === 'rejected'"
+									class="size-5 flex-shrink-0 text-secondary"
+								/>
+								<span class="truncate text-contrast">{{ currentSortLabel }}</span>
+							</span>
+						</template>
+					</Combobox>
+				</div>
+				<ButtonStyled>
+					<button type="button" class="!h-[40px]" @click="toggleAllCardsCollapsed">
+						<UnfoldVerticalIcon
+							v-if="allCardsCollapsed"
+							class="size-5 flex-shrink-0 text-secondary"
+						/>
+						<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+						{{ expandCollapseAllLabel }}
+					</button>
+				</ButtonStyled>
 			</div>
-			<ButtonStyled>
-				<button type="button" class="!h-[40px]" @click="toggleAllCardsCollapsed">
-					<UnfoldVerticalIcon
-						v-if="allCardsCollapsed"
-						class="size-5 flex-shrink-0 text-secondary"
-					/>
-					<FoldVerticalIcon v-else class="size-5 flex-shrink-0 text-secondary" />
-					{{ expandCollapseAllLabel }}
-				</button>
-			</ButtonStyled>
+		</div>
+		<div v-if="isModerator" class="mt-4 flex flex-wrap items-center gap-3">
+			<template v-if="noPermissionCount > 0">
+				<span class="flex items-center gap-1 text-red">
+					<XCircleIcon class="size-4 shrink-0" /> {{ noPermissionCount }} with no permission
+				</span>
+				<span class="text-surface-5">•</span>
+			</template>
+			<template v-if="pendingCount > 0">
+				<span class="flex items-center gap-1 text-orange">
+					<PauseIcon class="size-4 shrink-0" /> {{ pendingCount }} need user action
+				</span>
+				<span class="text-surface-5">•</span>
+			</template>
+			<span v-if="pendingApprovalCount > 0" class="flex items-center gap-1 text-contrast">
+				<ScaleIcon class="size-4 shrink-0" /> {{ pendingApprovalCount }} awaiting review
+			</span>
+			<span v-else class="flex items-center gap-1 text-secondary">
+				<ScaleIcon class="size-4 shrink-0" /> None awaiting review
+			</span>
 		</div>
 		<div class="mt-4 flex flex-col gap-3">
 			<TransitionGroup name="list">

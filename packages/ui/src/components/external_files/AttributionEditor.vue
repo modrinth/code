@@ -57,93 +57,101 @@ const isAttributed = computed(() => initialAttribution.value !== null)
 
 const messages = defineMessages({
 	typeLabel: {
-		id: 'external-files.permissions-card.type-label',
+		id: 'external-files.permissions-card.editor.type-label',
 		defaultMessage: 'Permission reason',
 	},
 	licenseLabel: {
-		id: 'external-files.permissions-card.license-label',
+		id: 'external-files.permissions-card.editor.license-label',
 		defaultMessage: 'License',
 	},
 	selectLicenseLabel: {
-		id: 'external-files.permissions-card.select-license-label',
+		id: 'external-files.permissions-card.editor.select-license-label',
 		defaultMessage: 'Select a license...',
 	},
 	linkLabel: {
-		id: 'external-files.permissions-card.link-label',
+		id: 'external-files.permissions-card.editor.link-label',
 		defaultMessage: 'Link to work',
 	},
 	linkToWorkUrlPlaceholder: {
-		id: 'external-files.permissions-card.link-to-work-url-placeholder',
+		id: 'external-files.permissions-card.editor.link-to-work-url-placeholder',
 		defaultMessage: 'link-to-work',
 	},
 	notesLabel: {
-		id: 'external-files.permissions-card.notes-label',
+		id: 'external-files.permissions-card.editor.notes-label',
 		defaultMessage: 'Notes',
 	},
 	optional: {
-		id: 'external-files.permissions-card.input-optional',
+		id: 'external-files.permissions-card.editor.input-optional',
 		defaultMessage: '(optional)',
 	},
 	notesPlaceholder: {
-		id: 'external-files.permissions-card.notes-placeholder',
+		id: 'external-files.permissions-card.editor.notes-placeholder',
 		defaultMessage: 'Write something here...',
 	},
 	proofWarningTitle: {
-		id: 'external-files.permissions-card.proof-warning.title',
+		id: 'external-files.permissions-card.editor.proof-warning.title',
 		defaultMessage: 'Modrinth staff may verify submitted proof',
 	},
 	proofWarningBody: {
-		id: 'external-files.permissions-card.proof-warning.body',
+		id: 'external-files.permissions-card.editor.proof-warning.body',
 		defaultMessage:
 			'If you are found to have lied or manipulated the images uploaded, your project and account may be terminated.',
 	},
 	saveAttribution: {
-		id: 'external-files.permissions-card.save',
+		id: 'external-files.permissions-card.editor.save',
 		defaultMessage: 'Save attribution',
 	},
 	addAttribution: {
-		id: 'external-files.permissions-card.add',
+		id: 'external-files.permissions-card.editor.add',
 		defaultMessage: 'Add attribution',
 	},
 	licenseRequired: {
-		id: 'external-files.permissions-card.error.license-required',
+		id: 'external-files.permissions-card.editor.error.license-required',
 		defaultMessage: 'Please select a license.',
 	},
 	customLicenseLabel: {
-		id: 'external-files.permissions-card.custom-license-label',
+		id: 'external-files.permissions-card.editor.custom-license-label',
 		defaultMessage: 'Link to license',
 	},
+	customLicenseMyProjectLabel: {
+		id: 'external-files.permissions-card.editor.custom-license-my-project-label',
+		defaultMessage: 'License name, preferably a SPDX identifier',
+	},
 	linkToLicenseUrlPlaceholder: {
-		id: 'external-files.permissions-card.link-to-license-url-placeholder',
+		id: 'external-files.permissions-card.editor.link-to-license-url-placeholder',
 		defaultMessage: 'link-to-license',
 	},
 	linkInvalidUrl: {
-		id: 'external-files.permissions-card.error.link-invalid-url',
+		id: 'external-files.permissions-card.editor.error.link-invalid-url',
 		defaultMessage: 'Link must be a valid URL.',
 	},
 	proofImagesLabel: {
-		id: 'external-files.permissions-card.proof-images-label',
+		id: 'external-files.permissions-card.editor.proof-images-label',
 		defaultMessage: 'Proof images',
 	},
 	proofImagesUploadPrompt: {
-		id: 'external-files.permissions-card.proof-images-upload-prompt',
+		id: 'external-files.permissions-card.editor.proof-images-upload-prompt',
 		defaultMessage: 'Drag and drop to upload or click to select an image',
 	},
 	proofImageThumbnailAlt: {
-		id: 'external-files.permissions-card.proof-image-alt',
+		id: 'external-files.permissions-card.editor.proof-image-alt',
 		defaultMessage: 'Proof screenshot {n}',
 	},
 	proofImageRemove: {
-		id: 'external-files.permissions-card.proof-image-remove',
+		id: 'external-files.permissions-card.editor.proof-image-remove',
 		defaultMessage: 'Remove image',
 	},
 	modrinthLinkToWork: {
-		id: 'external-files.permissions-card.modrinth-link-to-work',
+		id: 'external-files.permissions-card.editor.modrinth-link-to-work',
 		defaultMessage: `This appears to be a Modrinth link. If this content is available on Modrinth, your pack was likely exported incorrectly. If you downloaded it from another site, try downloading the Modrinth version instead; sometimes they are not identical files.`,
 	},
 	arrLabel: {
-		id: 'external-files.permissions-card.all-rights-reserved',
+		id: 'external-files.permissions-card.editor.all-rights-reserved',
 		defaultMessage: `All Rights Reserved/No license`,
+	},
+	exampleSpdxLicense: {
+		id: 'external-files.permissions-card.editor.example-spdx-license',
+		defaultMessage: 'e.g. MPL-1.1',
 	},
 })
 
@@ -235,9 +243,13 @@ const notesAfterProofImages = computed(() => selectedKind.value === 'special_per
 
 const notesInputRows = computed(() => (notesAfterProofImages.value ? 2 : 3))
 
-const proofImagesShowOptional = computed(
-	() => selectedPermissionReason.value.proofRequirement === null,
-)
+const proofImagesShowOptional = computed(() => {
+	const reason = selectedPermissionReason.value
+	return (
+		reason.proofRequirement === null ||
+		(reason.proofRequirement === 'explanation_or_images' && reason.notesShowsOptional)
+	)
+})
 
 const attributionFieldSections = computed(() => {
 	const fields = permissionReasonFields.value
@@ -302,10 +314,16 @@ function buildEditedData(): Labrinth.Attribution.Internal.AttributionResolution 
 		selectedPermissionReason.value.proofRequirement,
 		notes,
 		image_urls,
+		selectedPermissionReason.value.proofValidationError,
 	)
 	if (proofError) {
 		inputError.value = formatMessage(proofError)
 		return null
+	}
+	const base = {
+		notes,
+		image_urls,
+		updated_by_moderator: false,
 	}
 	switch (selectedKind.value) {
 		case 'license': {
@@ -328,11 +346,10 @@ function buildEditedData(): Labrinth.Attribution.Internal.AttributionResolution 
 				return null
 			}
 			return {
+				...base,
 				kind: 'license',
 				license,
 				link_to_work: linkRaw,
-				notes,
-				image_urls,
 			}
 		}
 		case 'my_project': {
@@ -341,10 +358,9 @@ function buildEditedData(): Labrinth.Attribution.Internal.AttributionResolution 
 				return null
 			}
 			return {
+				...base,
 				kind: 'my_project',
 				license,
-				notes,
-				image_urls,
 			}
 		}
 		case 'special_permissions': {
@@ -363,17 +379,15 @@ function buildEditedData(): Labrinth.Attribution.Internal.AttributionResolution 
 				return null
 			}
 			return {
+				...base,
 				kind: 'special_permissions',
 				link_to_work: linkRaw,
-				notes,
-				image_urls,
 			}
 		}
 		case 'no_permission':
 			return {
+				...base,
 				kind: 'no_permission',
-				notes,
-				image_urls,
 			}
 	}
 	return null
@@ -493,13 +507,23 @@ function cancelEditing() {
 			class="flex flex-col gap-2"
 		>
 			<span class="text-contrast font-semibold mt-1">
-				{{ formatMessage(messages.customLicenseLabel) }}
+				{{
+					formatMessage(
+						selectedKind === 'my_project'
+							? messages.customLicenseMyProjectLabel
+							: messages.customLicenseLabel,
+					)
+				}}
 			</span>
 			<StyledInput
 				v-model="customLicenseInput"
 				type="text"
 				class="max-w-[40rem]"
-				:placeholder="`https://example.com/${formatMessage(messages.linkToLicenseUrlPlaceholder)}`"
+				:placeholder="
+					selectedKind === 'my_project'
+						? formatMessage(messages.exampleSpdxLicense)
+						: `https://example.com/${formatMessage(messages.linkToLicenseUrlPlaceholder)}`
+				"
 			/>
 		</div>
 		<div class="flex flex-col gap-3">
@@ -573,7 +597,7 @@ function cancelEditing() {
 								should-always-reset
 								:max-size="MAX_PROOF_IMAGE_BYTES"
 								:disabled="uploadProofImageMutation.isPending.value || saveMutation.isPending.value"
-								class="!bg-surface-3"
+								class="!bg-surface-3 !border-surface-5"
 								@change="handleProofImagesSelected"
 							>
 								<UploadIcon class="size-5 shrink-0" />

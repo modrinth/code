@@ -573,9 +573,11 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 					v-if="!isEditingAttribution && initialAttribution"
 					:attribution="initialAttribution"
 					:attributed-at="group.attributed_at"
+					:attributed-by="group.attributed_by"
 					:attributor-href="attributorLink"
 					:attributor-label="attributorLabel"
 					:attributor-avatar-url="attributorMember?.user.avatar_url"
+					:moderator="isModerator"
 				>
 					<template v-if="group.attribution?.kind !== 'globally_allowed'" #actions>
 						<ButtonStyled>

@@ -26,7 +26,7 @@ const badge = computed(() => {
 				style: { '--_bg-color': 'var(--color-orange-bg)', '--_color': 'var(--color-orange)' },
 				message: defineMessage({
 					id: 'external-files.permissions-card.badge.proof-rejected',
-					defaultMessage: 'Attribution rejected',
+					defaultMessage: 'Information rejected',
 				}),
 			}
 		case 'attributed':
@@ -34,7 +34,7 @@ const badge = computed(() => {
 				style: { '--_bg-color': 'var(--color-green-bg)', '--_color': 'var(--color-green)' },
 				message: defineMessage({
 					id: 'external-files.permissions-card.badge.attributed',
-					defaultMessage: 'Attributed',
+					defaultMessage: 'Completed',
 				}),
 			}
 		default:

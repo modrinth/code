@@ -51,7 +51,7 @@
 		</NewModal>
 		<div class="flex flex-col">
 			<nuxt-link
-				class="mb-4 flex w-fit items-center gap-2 rounded-lg p-2 pl-0 text-link"
+				class="mb-4 flex w-fit items-center gap-2 rounded-lg px-2 py-0.5 pl-0 text-link"
 				:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
 			>
 				<ChevronLeftIcon class="shrink-0" /> {{ formatMessage(messages.allVersions) }}
@@ -82,6 +82,8 @@
 				<VersionPage
 					:version="version"
 					:enrichment="enrichment"
+					:members="members"
+					:user-link-creator="(user) => (moderator ? `/user/${user.id}` : undefined)"
 					:dependency-link-creator="createDependencyLink"
 					class="mb-4"
 				>
@@ -110,8 +112,6 @@
 										x.file_type === 'optional-resource-pack'),
 							)"
 							:key="`promoted-file-${file.hashes.sha1}`"
-							color="brand"
-							color-fill="text"
 						>
 							<a
 								v-tooltip="file.filename + ' (' + formatBytes(file.size) + ')'"
@@ -191,15 +191,24 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</template>
-						<ButtonStyled v-else color="red" color-fill="text">
-							<nuxt-link v-if="!auth.user" :to="signInRouteObj">
-								<ReportIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.reportButton) }}
-							</nuxt-link>
-							<button v-else @click="() => reportVersion(version!.id)">
-								<ReportIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.reportButton) }}
-							</button>
+						<ButtonStyled v-else type="outlined" circular>
+							<OverflowMenu
+								v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
+								:options="[
+									{
+										id: 'report',
+										color: 'red',
+										action: () =>
+											auth.user ? reportVersion(version!.id) : navigateTo(signInRouteObj),
+									},
+								]"
+							>
+								<MoreVerticalIcon />
+								<template #report>
+									<ReportIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.reportButton) }}
+								</template>
+							</OverflowMenu>
 						</ButtonStyled>
 					</template>
 					<template #supplementaryResourceActions="{ file }">
@@ -428,6 +437,7 @@ import {
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
@@ -904,4 +914,6 @@ dependencies {
     modImplementation "${coordinatesSnippet.value}"
 }`,
 )
+
+const moderator = computed(() => isStaff(auth.value?.user))
 </script>

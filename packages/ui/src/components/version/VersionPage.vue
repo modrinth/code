@@ -2,6 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, FileIcon, SearchIcon } from '@modrinth/assets'
 import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import { useFormatBytes } from '#ui/composables/format-bytes.ts'
@@ -9,6 +10,7 @@ import { useFormatDateTime } from '#ui/composables/format-date-time.ts'
 import { useCompactNumber, useFormatNumber } from '#ui/composables/format-number.ts'
 import { useRelativeTime } from '#ui/composables/how-ago.ts'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n.ts'
+import { injectModrinthClient } from '#ui/providers/api-client.ts'
 import {
 	commonMessages,
 	fileTypeMessages,
@@ -40,7 +42,11 @@ const props = defineProps<{
 	version: Labrinth.Versions.v3.Version
 	enrichment?: Labrinth.Projects.v2.DependencyInfo
 	dependencyLinkCreator: (context: DependencyContext) => string | undefined
+	members?: Labrinth.Projects.v3.TeamMember[]
+	userLinkCreator?: (user: Labrinth.Users.v3.User) => string | undefined
 }>()
+
+const api = injectModrinthClient()
 
 const versionNumber = computed(() => props.version.version_number)
 const versionSubtitle = computed(() => props.version.name)
@@ -225,6 +231,20 @@ const contentSearchQuery = ref('')
 
 const formattedDownloads = computed(() => formatNumber(props.version.downloads))
 const compactDownloads = computed(() => formatCompactNumber(props.version.downloads))
+
+const authorMember = computed(
+	() => props.members?.find((member) => member.user.id === props.version.author_id)?.user,
+)
+const { data: externalAuthor, isLoading: loadingAuthor } = useQuery({
+	queryKey: ['user', props.version.author_id],
+	queryFn: () => api.labrinth.users_v3.get(props.version.author_id),
+	enabled: computed(() => !authorMember.value),
+})
+
+const author = computed(() => authorMember.value ?? externalAuthor.value)
+const authorLink = computed(() =>
+	author.value ? props.userLinkCreator?.(author.value) : undefined,
+)
 </script>
 <template>
 	<div class="flex flex-col gap-4">
@@ -253,9 +273,28 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 									: undefined
 							"
 							class="flex items-center gap-1"
-							><DownloadIcon class="size-5" /> {{ compactDownloads }}</span
 						>
+							<DownloadIcon class="size-5" /> {{ compactDownloads }}
+						</span>
 					</span>
+				</div>
+				<div
+					v-if="(author && authorLink) || loadingAuthor"
+					class="flex items-center gap-1 text-secondary"
+				>
+					Uploaded by
+					<AutoLink
+						v-if="author && authorLink"
+						:to="authorLink"
+						class="flex items-center gap-1 hover:underline"
+					>
+						<Avatar :src="author?.avatar_url" size="1.5rem" circle />
+						{{ author?.username }}
+					</AutoLink>
+					<div
+						v-else-if="loadingAuthor"
+						class="w-32 h-6 bg-surface-3 rounded-md animate-pulse flex"
+					></div>
 				</div>
 			</div>
 			<div class="flex gap-2 flex-wrap items-center">
@@ -266,7 +305,7 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 				/>
 			</div>
 		</div>
-		<hr class="w-full border-surface-4 m-0" />
+		<hr class="w-full border-none h-[1px] bg-surface-4 m-0" />
 		<section v-if="requiredContent.length > 0" id="dependencies">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.required) }}</h3>
 			<div class="grid md:grid-cols-2 gap-4">
@@ -404,7 +443,8 @@ const compactDownloads = computed(() => formatCompactNumber(props.version.downlo
 				<template #cell-name="{ row }">
 					<AutoLink
 						:to="row.link"
-						class="hover:underline hover:text-contrast flex w-fit"
+						class="flex w-fit"
+						link-class="hover:underline hover:text-contrast"
 						target="_blank"
 					>
 						{{ row.name }}
