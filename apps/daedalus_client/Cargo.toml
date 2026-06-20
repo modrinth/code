@@ -4,17 +4,14 @@ version = "0.2.2"
 edition.workspace = true
 
 [dependencies]
-async_zip = {
-  workspace = true,
-  features = [
-    "bzip2",
-    "chrono",
-    "deflate",
-    "deflate64",
-    "tokio-fs",
-    "zstd",
-  ]
-}
+async_zip = { workspace = true, features = [
+  "bzip2",
+  "chrono",
+  "deflate",
+  "deflate64",
+  "tokio-fs",
+  "zstd",
+] }
 bytes = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 daedalus = { workspace = true }
@@ -23,14 +20,11 @@ dotenvy = { workspace = true }
 futures = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 itertools = { workspace = true }
-reqwest = {
-  workspace = true,
-  features = [
-    "json",
-    "rustls-tls-native-roots",
-    "stream",
-  ]
-}
+reqwest = { workspace = true, features = [
+  "json",
+  "rustls-tls-native-roots",
+  "stream",
+] }
 rust-s3 = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
