@@ -9,6 +9,7 @@ use crate::database::models::version_item::{
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
+use crate::models::projects::FileType;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
@@ -251,15 +252,27 @@ fn find_file<'a>(
     }
 
     if let Some((file_name, desired_file_ext)) = file.rsplit_once('.') {
-        if file_name
-            .eq_ignore_ascii_case(&format!("{}-{}", &project_id, &vcoords))
-        {
-            return version
-                .files
-                .iter()
-                .filter(|x| x.filename.ends_with(desired_file_ext))
+        let formatted_name = format!("{}-{}", &project_id, &vcoords);
+        let mut filtered_files = version
+            .files
+            .iter()
+            .filter(|x| x.filename.ends_with(desired_file_ext));
+
+        if file_name.eq_ignore_ascii_case(&formatted_name) {
+            return filtered_files
                 .find(|x| x.primary)
-                .or_else(|| version.files.iter().last());
+                .or_else(|| filtered_files.next_back());
+        } else if file_name.len() > formatted_name.len()
+            && file_name.as_bytes()[..formatted_name.len()]
+                .eq_ignore_ascii_case(formatted_name.as_bytes())
+        {
+            let desired_file_type = FileType::from_string(&format!(
+                "{}-{}",
+                &file_name[formatted_name.len()..].trim_start_matches('-'),
+                desired_file_ext
+            ));
+            return filtered_files
+                .find(|x| x.file_type == Some(desired_file_type));
         }
     };
 
