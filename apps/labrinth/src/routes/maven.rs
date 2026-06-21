@@ -250,29 +250,19 @@ fn find_file<'a>(
         return Some(selected_file);
     }
 
-    // Minecraft mods are not going to be both a mod and a modpack, so this minecraft-specific handling is fine
-    // As there can be multiple project types, returns the first allowable match
-    let mut fileexts = vec![];
-    for project_type in &version.project_types {
-        match project_type.as_str() {
-            "mod" => fileexts.push("jar"),
-            "modpack" => fileexts.push("mrpack"),
-            _ => (),
-        }
-    }
-
-    for fileext in fileexts {
-        if file.eq_ignore_ascii_case(&format!(
-            "{}-{}.{}",
-            &project_id, &vcoords, fileext
-        )) {
+    if let Some((file_name, desired_file_ext)) = file.rsplit_once('.') {
+        if file_name
+            .eq_ignore_ascii_case(&format!("{}-{}", &project_id, &vcoords))
+        {
             return version
                 .files
                 .iter()
+                .filter(|x| x.filename.ends_with(desired_file_ext))
                 .find(|x| x.primary)
                 .or_else(|| version.files.iter().last());
         }
-    }
+    };
+
     None
 }
 
