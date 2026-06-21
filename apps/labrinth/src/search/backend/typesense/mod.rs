@@ -12,7 +12,7 @@ use tracing::{info, warn};
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::models::ids::VersionId;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::routes::ApiError;
 use crate::search::backend::{
     SearchIndex, SearchIndexName, combined_search_filters, parse_search_index,
@@ -986,6 +986,75 @@ impl SearchBackend for Typesense {
         }
 
         info!("indexing complete");
+        Ok(())
+    }
+
+    async fn index_documents(
+        &self,
+        documents: &[UploadSearchProject],
+    ) -> eyre::Result<()> {
+        if documents.is_empty() {
+            return Ok(());
+        }
+
+        let jsonl = documents_to_jsonl(documents)?;
+        for alias in [
+            self.config.get_alias_name("projects"),
+            self.config.get_alias_name("projects_filtered"),
+        ] {
+            let live = self.client.get_alias(&alias).await?;
+            let shadow_alt = self.config.get_next_collection_name(&alias, true);
+            let shadow_current =
+                self.config.get_next_collection_name(&alias, false);
+
+            for collection in
+                live.into_iter().chain([shadow_alt, shadow_current])
+            {
+                if self.client.collection_exists(&collection).await? {
+                    self.client
+                        .import_documents(&collection, jsonl.clone())
+                        .await?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn remove_project_documents(
+        &self,
+        ids: &[ProjectId],
+    ) -> eyre::Result<()> {
+        if ids.is_empty() {
+            return Ok(());
+        }
+
+        let id_list = ids
+            .iter()
+            .map(|id| to_base62(id.0))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let filter = format!("project_id:[{id_list}]");
+
+        for alias in [
+            self.config.get_alias_name("projects"),
+            self.config.get_alias_name("projects_filtered"),
+        ] {
+            let live = self.client.get_alias(&alias).await?;
+            let shadow_alt = self.config.get_next_collection_name(&alias, true);
+            let shadow_current =
+                self.config.get_next_collection_name(&alias, false);
+
+            for collection in
+                live.into_iter().chain([shadow_alt, shadow_current])
+            {
+                if self.client.collection_exists(&collection).await? {
+                    self.client
+                        .delete_documents_by_filter(&collection, &filter)
+                        .await?;
+                }
+            }
+        }
         Ok(())
     }
 

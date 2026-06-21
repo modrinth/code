@@ -101,7 +101,7 @@ impl DBModerationLock {
         moderator_id: DBUserId,
         pool: &PgPool,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        sqlx::query!(
             r#"
             INSERT INTO moderation_locks (project_id, moderator_id, locked_at)
             VALUES ($1, $2, NOW())
@@ -109,9 +109,9 @@ impl DBModerationLock {
                 moderator_id = EXCLUDED.moderator_id,
                 locked_at = EXCLUDED.locked_at
             "#,
+            project_id as DBProjectId,
+            moderator_id as DBUserId,
         )
-        .bind(project_id)
-        .bind(moderator_id)
         .execute(pool)
         .await?;
 

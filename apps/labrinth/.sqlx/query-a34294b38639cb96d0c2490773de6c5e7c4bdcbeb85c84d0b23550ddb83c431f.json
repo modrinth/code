@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO moderation_locks (project_id, moderator_id, locked_at)\n            VALUES ($1, $2, NOW())\n            ON CONFLICT (project_id) DO UPDATE SET\n                moderator_id = EXCLUDED.moderator_id,\n                locked_at = EXCLUDED.locked_at\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a34294b38639cb96d0c2490773de6c5e7c4bdcbeb85c84d0b23550ddb83c431f"
+}

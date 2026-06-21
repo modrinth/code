@@ -106,6 +106,34 @@ services:
       # Gotenberg must send a message on a webhook to our backend,
       # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
+  redpanda:
+    image: redpandadata/redpanda:v26.1.10
+    container_name: labrinth-redpanda
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+    ports:
+      - '127.0.0.1:18081:18081'
+      - '127.0.0.1:18082:18082'
+      - '127.0.0.1:19092:19092'
+      - '127.0.0.1:19644:9644'
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+    healthcheck:
+      test: ['CMD', 'rpk', 'cluster', 'info', '-X', 'brokers=localhost:9092']
+      interval: 10s
+      timeout: 15s
+      retries: 10
   labrinth:
     profiles:
       - with-labrinth
@@ -130,6 +158,8 @@ services:
       elasticsearch2:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      redpanda:
         condition: service_healthy
       clickhouse:
         condition: service_healthy
@@ -204,8 +234,6 @@ services:
 networks:
   meilisearch-mesh:
     driver: bridge
-  elasticsearch-mesh:
-    driver: bridge
 volumes:
   typesense-data:
   meilisearch-data:
@@ -216,4 +244,5 @@ volumes:
   elasticsearch-certs:
   db-data:
   redis-data:
+  redpanda-data:
   labrinth-cdn-data:
