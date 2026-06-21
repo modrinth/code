@@ -12,7 +12,7 @@ use crate::{
 };
 
 pub const SEARCH_PROJECT_INDEX_QUEUE_TOPIC: &str =
-    "public.labrinth.search_project_index_queue.v1";
+    "public.labrinth.search-project-index-queue.v1";
 
 #[derive(Clone)]
 pub struct IncrementalSearchQueue {
