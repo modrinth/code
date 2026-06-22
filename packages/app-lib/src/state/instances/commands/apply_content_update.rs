@@ -1,11 +1,9 @@
 use crate::state::instances::{
-    BulkUpdatePreview, ContentDiffItem, ContentEntry, ContentSet,
-    ContentSourceKind, InstanceFile,
+    ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Dependency, DependencyType, Project, State,
-    Version,
+    CacheBehaviour, CachedEntry, Dependency, DependencyType, State, Version,
 };
 use crate::util::fetch::DownloadReason;
 use futures::future::try_join_all;
@@ -21,7 +19,6 @@ use super::check_content_updates::{ContentUpdate, check_content_updates};
 struct BulkUpdatePlan {
     project_updates: Vec<PlannedProjectUpdate>,
     dependency_additions: Vec<PlannedDependencyInstall>,
-    disable_candidates: Vec<PlannedDisableCandidate>,
 }
 
 #[derive(Clone, Debug)]
@@ -38,17 +35,8 @@ struct PlannedDependencyInstall {
 }
 
 #[derive(Clone, Debug)]
-struct PlannedDisableCandidate {
-    relative_path: String,
-    file_name: String,
-    project_id: Option<String>,
-    version_id: Option<String>,
-}
-
-#[derive(Clone, Debug)]
 struct InstalledProject {
     relative_path: String,
-    file_name: String,
     project_id: Option<String>,
     version_id: Option<String>,
     enabled: bool,
@@ -59,14 +47,6 @@ struct ResolvedDependency {
     project_id: String,
     version_id: String,
     parent_version_id: String,
-}
-
-pub(crate) async fn preview_update_all_projects(
-    instance_id: &str,
-    state: &State,
-) -> crate::Result<BulkUpdatePreview> {
-    let plan = plan_bulk_update(instance_id, state).await?;
-    build_preview(&plan, state).await
 }
 
 pub(crate) async fn update_project(
@@ -186,19 +166,6 @@ pub(crate) async fn update_all_projects(
         .await?;
     }
 
-    for candidate in plan.disable_candidates {
-        let path = changed
-            .get(&candidate.relative_path)
-            .cloned()
-            .unwrap_or(candidate.relative_path);
-
-        if !path.ends_with(".disabled") {
-            let disabled_path =
-                toggle_disable_project(instance_id, &path, state).await?;
-            changed.insert(path, disabled_path);
-        }
-    }
-
     Ok(changed)
 }
 
@@ -265,13 +232,6 @@ async fn plan_bulk_update(
         .into_iter()
         .map(|version| (version.id.clone(), version))
         .collect::<HashMap<_, _>>();
-    let current_versions = installed
-        .iter()
-        .filter(|project| project.enabled)
-        .filter_map(|project| {
-            versions_by_id.get(project.version_id.as_ref()?).cloned()
-        })
-        .collect::<Vec<_>>();
     let planned_versions = installed
         .iter()
         .filter(|project| project.enabled)
@@ -284,8 +244,6 @@ async fn plan_bulk_update(
             versions_by_id.get(target_version_id).cloned()
         })
         .collect::<Vec<_>>();
-    let current_dependencies =
-        dependency_closure(current_versions, &content_set, state).await?;
     let planned_dependencies =
         dependency_closure(planned_versions, &content_set, state).await?;
     let dependency_additions = planned_dependencies
@@ -298,25 +256,8 @@ async fn plan_bulk_update(
             parent_version_id: dependency.parent_version_id.clone(),
         })
         .collect::<Vec<_>>();
-    let disable_candidates = current_dependencies
-        .keys()
-        .filter(|project_id| !planned_dependencies.contains_key(*project_id))
-        .filter_map(|project_id| installed_by_project.get(project_id))
-        .filter(|project| project.enabled)
-        .map(|project| PlannedDisableCandidate {
-            relative_path: project.relative_path.clone(),
-            file_name: project.file_name.clone(),
-            project_id: project.project_id.clone(),
-            version_id: project.version_id.clone(),
-        })
-        .collect::<Vec<_>>();
-    let disable_paths = disable_candidates
-        .iter()
-        .map(|candidate| candidate.relative_path.as_str())
-        .collect::<HashSet<_>>();
     let project_updates = updates
         .into_iter()
-        .filter(|update| !disable_paths.contains(update.relative_path.as_str()))
         .map(|update| PlannedProjectUpdate {
             relative_path: update.relative_path,
             current_version_id: update.current_version_id,
@@ -327,7 +268,6 @@ async fn plan_bulk_update(
     Ok(BulkUpdatePlan {
         project_updates,
         dependency_additions,
-        disable_candidates,
     })
 }
 
@@ -371,7 +311,6 @@ fn installed_project_from_row(
 
     Some(InstalledProject {
         relative_path: file.relative_path.clone(),
-        file_name: file.file_name.clone(),
         project_id: entry.project_id.clone(),
         version_id: entry.version_id.clone(),
         enabled: entry.enabled && file.enabled,
@@ -533,72 +472,4 @@ fn is_dependency_version_compatible(
             .iter()
             .any(|loader| loader == content_set.loader.as_str())
             || version.loaders.iter().any(|loader| loader == "datapack"))
-}
-
-async fn build_preview(
-    plan: &BulkUpdatePlan,
-    state: &State,
-) -> crate::Result<BulkUpdatePreview> {
-    let project_ids = plan
-        .disable_candidates
-        .iter()
-        .filter_map(|candidate| candidate.project_id.as_deref())
-        .collect::<HashSet<_>>();
-    let version_ids = plan
-        .disable_candidates
-        .iter()
-        .filter_map(|candidate| candidate.version_id.as_deref())
-        .collect::<HashSet<_>>();
-    let project_id_refs = project_ids.iter().copied().collect::<Vec<_>>();
-    let version_id_refs = version_ids.iter().copied().collect::<Vec<_>>();
-    let projects = CachedEntry::get_project_many(
-        &project_id_refs,
-        None,
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await
-    .unwrap_or_default();
-    let versions = CachedEntry::get_version_many(
-        &version_id_refs,
-        None,
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await
-    .unwrap_or_default();
-    let project_names = projects
-        .into_iter()
-        .map(|project: Project| (project.id, project.title))
-        .collect::<HashMap<_, _>>();
-    let version_names = versions
-        .into_iter()
-        .map(|version| (version.id, version.version_number))
-        .collect::<HashMap<_, _>>();
-    let disable_candidates =
-        plan.disable_candidates
-            .iter()
-            .map(|candidate| ContentDiffItem {
-                type_: "removed".to_string(),
-                project_name: candidate.project_id.as_ref().and_then(
-                    |project_id| project_names.get(project_id).cloned(),
-                ),
-                file_name: Some(candidate.file_name.clone()),
-                current_version_name: candidate.version_id.as_ref().and_then(
-                    |version_id| version_names.get(version_id).cloned(),
-                ),
-                new_version_name: None,
-            })
-            .collect::<Vec<_>>();
-    let disable_paths = plan
-        .disable_candidates
-        .iter()
-        .map(|candidate| candidate.relative_path.clone())
-        .collect::<Vec<_>>();
-
-    Ok(BulkUpdatePreview {
-        requires_confirmation: !disable_paths.is_empty(),
-        disable_candidates,
-        disable_paths,
-    })
 }

@@ -1,7 +1,7 @@
 //! Logic for launching Minecraft
 use crate::data::ModLoader;
-use crate::event::emit::{emit_loading, init_or_edit_loading};
-use crate::event::{LoadingBarId, LoadingBarType};
+use crate::event::emit::{emit_instance, emit_loading, init_or_edit_loading};
+use crate::event::{InstancePayloadType, LoadingBarId, LoadingBarType};
 use crate::instance::QuickPlayType;
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
@@ -265,6 +265,7 @@ pub async fn install_minecraft(
         &state.pool,
     )
     .await?;
+    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     let instance_path = get_instance_full_path(&instance.path).await?;
     let (minecraft, version_index) =
@@ -454,6 +455,7 @@ pub async fn install_minecraft(
         &state.pool,
     )
     .await?;
+    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
     crate::state::instances::commands::set_applied_content_set_protocol_version(
         &instance.id,
         protocol_version,

@@ -60,20 +60,6 @@
 					@version-select="handleVersionSelect"
 					@version-hover="handleVersionHover"
 				/>
-				<ContentDiffModal
-					v-if="pendingBulkUpdatePreview"
-					ref="bulkUpdateDiffModal"
-					:header="formatMessage(messages.bulkUpdateDisableHeader)"
-					:admonition-header="formatMessage(messages.bulkUpdateDisableHeader)"
-					:description="formatMessage(messages.bulkUpdateDisableDescription)"
-					:diffs="pendingBulkUpdatePreview.disableCandidates"
-					:removed-label="formatMessage(messages.bulkUpdateDisabledLabel)"
-					:confirm-label="formatMessage(messages.bulkUpdateDisableConfirm)"
-					:confirm-icon="DownloadIcon"
-					disable-close
-					@confirm="confirmBulkUpdateAll"
-					@cancel="cancelBulkUpdateAll"
-				/>
 			</template>
 		</ContentPageLayout>
 	</ReadyTransition>
@@ -81,12 +67,11 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, DownloadIcon, FolderOpenIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	ConfirmModpackUpdateModal,
 	ContentCardLayout as ContentPageLayout,
-	ContentDiffModal,
 	type ContentItem,
 	type ContentModpackCardCategory,
 	type ContentModpackCardProject,
@@ -125,13 +110,11 @@ import {
 	get,
 	get_linked_modpack_content,
 	list,
-	preview_update_all,
 	remove_project,
 	toggle_disable_project,
 	update_all,
 	update_managed_modrinth_version,
 	update_project,
-	type BulkUpdatePreview,
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
@@ -163,23 +146,6 @@ const messages = defineMessages({
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
 		defaultMessage: 'project',
-	},
-	bulkUpdateDisableHeader: {
-		id: 'app.instance.mods.bulk-update-disable-header',
-		defaultMessage: 'Update all projects',
-	},
-	bulkUpdateDisableDescription: {
-		id: 'app.instance.mods.bulk-update-disable-description',
-		defaultMessage:
-			'Some dependencies are no longer required after this update and will be disabled.',
-	},
-	bulkUpdateDisableConfirm: {
-		id: 'app.instance.mods.bulk-update-disable-confirm',
-		defaultMessage: 'Update and disable unused',
-	},
-	bulkUpdateDisabledLabel: {
-		id: 'app.instance.mods.bulk-update-disabled-label',
-		defaultMessage: 'Disabled',
 	},
 })
 
@@ -252,9 +218,6 @@ const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
 const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
-const bulkUpdateDiffModal = ref<InstanceType<typeof ContentDiffModal> | null>()
-const pendingBulkUpdatePreview = ref<BulkUpdatePreview | null>(null)
-let resolvePendingBulkUpdate: ((confirmed: boolean) => void) | null = null
 
 const modpackContentQueryKey = computed(() => ['linkedModpackContent', props.instance.id])
 const modpackContentQuery = useQuery({
@@ -563,40 +526,8 @@ async function getDeleteDependencyWarning(items: ContentItem[]) {
 	return dependents.length > 0 ? { items, dependents } : null
 }
 
-async function showBulkUpdateDiff(preview: BulkUpdatePreview) {
-	pendingBulkUpdatePreview.value = preview
-	await nextTick()
-	bulkUpdateDiffModal.value?.show()
-
-	return await new Promise<boolean>((resolve) => {
-		resolvePendingBulkUpdate = resolve
-	})
-}
-
-function resolveBulkUpdateDiff(confirmed: boolean) {
-	const resolve = resolvePendingBulkUpdate
-	resolvePendingBulkUpdate = null
-	pendingBulkUpdatePreview.value = null
-	resolve?.(confirmed)
-}
-
-function confirmBulkUpdateAll() {
-	resolveBulkUpdateDiff(true)
-}
-
-function cancelBulkUpdateAll() {
-	resolveBulkUpdateDiff(false)
-}
-
 async function bulkUpdateAllProjects() {
 	try {
-		const preview = await preview_update_all(props.instance.id)
-
-		if (preview.disablePaths.length > 0) {
-			const confirmed = await showBulkUpdateDiff(preview)
-			if (!confirmed) return
-		}
-
 		await update_all(props.instance.id)
 		await refreshContentState('must_revalidate')
 	} catch (err) {
