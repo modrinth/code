@@ -764,6 +764,27 @@ async fn resolve_overrides(
                 Vec::new()
             }
         };
+        let mut flame_project_metadata = HashMap::new();
+        for project in flame_projects {
+            if flame_project_url_is_not_found(&project.links.website_url).await
+            {
+                info!(
+                    "Flame project {} at {:?} returned 404, ignoring",
+                    project.id, project.links.website_url,
+                );
+                continue;
+            }
+
+            flame_project_metadata.insert(
+                project.id,
+                FlameProject {
+                    id: project.id,
+                    title: project.name,
+                    url: project.links.website_url,
+                    icon_url: project.logo.thumbnail_url,
+                },
+            );
+        }
 
         let mut insert_hashes = Vec::new();
         let mut insert_filenames = Vec::new();
@@ -774,20 +795,8 @@ async fn resolve_overrides(
                 remaining.iter().position(|i| overrides[*i].sha1 == *sha1)
             {
                 let idx = remaining.remove(remaining_pos);
-                let project =
-                    flame_projects.iter().find(|p| p.id == *flame_project_id);
-                let flame_project = FlameProject {
-                    id: *flame_project_id,
-                    title: project.map(|p| p.name.clone()).unwrap_or_else(
-                        || format!("Flame project {flame_project_id}"),
-                    ),
-                    url: project
-                        .map(|p| p.links.website_url.clone())
-                        .unwrap_or_default(),
-                    icon_url: project
-                        .map(|p| p.logo.thumbnail_url.clone())
-                        .unwrap_or_default(),
-                };
+                let flame_project =
+                    flame_project_metadata.get(flame_project_id).cloned();
 
                 if let Some((id, status, link)) =
                     direct_external_licenses.remove(&overrides[idx].sha1)
@@ -798,7 +807,7 @@ async fn resolve_overrides(
                             id,
                             status,
                             link,
-                            flame_project: Some(flame_project),
+                            flame_project,
                         },
                     );
                 } else if let Some((id, status, link)) =
@@ -810,14 +819,14 @@ async fn resolve_overrides(
                             id: *id,
                             status: *status,
                             link: link.clone(),
-                            flame_project: Some(flame_project),
+                            flame_project,
                         },
                     );
 
                     insert_hashes.push(overrides[idx].sha1.as_bytes().to_vec());
                     insert_filenames.push(Some(overrides[idx].path.clone()));
                     insert_ids.push(*id);
-                } else {
+                } else if let Some(flame_project) = flame_project {
                     results.insert(
                         overrides[idx].sha1.clone(),
                         OverrideResolution::Flame(flame_project),
@@ -864,6 +873,16 @@ async fn resolve_overrides(
     }
 
     Ok(results)
+}
+
+async fn flame_project_url_is_not_found(url: &str) -> bool {
+    match HTTP_CLIENT.get(url).send().await {
+        Ok(response) => response.status() == reqwest::StatusCode::NOT_FOUND,
+        Err(err) => {
+            warn!("Flame project URL check failed for {url}: {err}");
+            false
+        }
+    }
 }
 
 fn hash_flame_murmur32(input: Vec<u8>) -> u32 {

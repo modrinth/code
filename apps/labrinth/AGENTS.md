@@ -29,3 +29,5 @@
 - You can force a search reindex by:
   - Running `cd apps/labrinth && cargo run -p labrinth -- --run-background-task index-search` (prefer this if backend is running locally)
   - Hitting the force reindex admin endpoint
+- To seed the database locally: `psql postgresql://labrinth:labrinth@localhost/labrinth -f apps/labrinth/fixtures/labrinth-seed-data-202508052143.sql
+`
