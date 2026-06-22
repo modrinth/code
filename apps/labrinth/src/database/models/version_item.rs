@@ -196,12 +196,18 @@ impl VersionFileBuilder {
             .await?;
         }
 
-        sqlx::query!(
+        let attribution_scan = sqlx::query!(
             "
             INSERT INTO file_scans (file_id)
-            VALUES ($1)
+            SELECT $1
+            WHERE EXISTS (
+                SELECT 1
+                FROM attribution_enforced_versions
+                WHERE id = $2
+            )
             ",
             file_id as DBFileId,
+            version_id as DBVersionId,
         )
         .execute(&mut *transaction)
         .await?;
@@ -218,15 +224,16 @@ impl VersionFileBuilder {
             error!("Error submitting new file to Delphi: {err:?}");
         }
 
-        if let Err(err) = scan_file(
-            &mut *transaction,
-            redis,
-            file_host,
-            project_id,
-            file_id,
-            &self.url,
-        )
-        .await
+        if attribution_scan.rows_affected() > 0
+            && let Err(err) = scan_file(
+                &mut *transaction,
+                redis,
+                file_host,
+                project_id,
+                file_id,
+                &self.url,
+            )
+            .await
         {
             error!("Error scanning new file {file_id:?}: {err:?}");
         }

@@ -29,16 +29,16 @@ use crate::queue::moderation::{
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 
-/// Attribution enforcement is version-scoped, not file-hash-scoped.
+/// Attribution enforcement is version/project-scoped, not file-hash-scoped.
 ///
-/// Versions listed in `version_attribution_exemptions` are legacy public
-/// versions that predate this attribution system. They are not scanned for
-/// attribution requirements and must not cause missing-attribution withholding.
-/// A later non-exempt version can still contain the same override SHA1 and
-/// create attribution groups/files for that SHA1. Because of that, reverse
-/// lookups from override SHA1s to versions must go through the
-/// `attribution_enforced_versions` view so grandfathered versions are ignored
-/// without making the SHA1 itself exempt.
+/// Versions or projects listed in `attributions_exemptions` predate this
+/// attribution system. They are not scanned for attribution requirements and
+/// must not cause missing-attribution withholding. A later non-exempt version
+/// can still contain the same override SHA1 and create attribution groups/files
+/// for that SHA1. Because of that, reverse lookups from override SHA1s to
+/// versions must go through the `attribution_enforced_versions` view so
+/// grandfathered versions and projects are ignored without making the SHA1
+/// itself exempt.
 pub async fn scan_all_files(
     db: &PgPool,
     redis: &RedisPool,
@@ -54,6 +54,7 @@ pub async fn scan_all_files(
             v.mod_id as "project_id: DBProjectId"
         from file_scans fa
         inner join files f on f.id = fa.file_id
+        inner join attribution_enforced_versions aev on aev.id = f.version_id
         inner join versions v on v.id = f.version_id
         where fa.attributions_scanned_at is null
         "#
