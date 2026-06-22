@@ -95,6 +95,7 @@ impl BackgroundTask {
                     ro_pool,
                     redis_pool,
                     search_backend,
+                    kafka_client,
                 )
                 .await
             }
