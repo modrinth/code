@@ -134,7 +134,8 @@ pub async fn install_project_with_dependencies(
                     );
                 }
                 if let Err(error) =
-                    emit_instance(&instance_id, InstancePayloadType::Edited).await
+                    emit_instance(&instance_id, InstancePayloadType::Edited)
+                        .await
                 {
                     tracing::error!(
                         "Failed to emit instance edited event after content install: {error}"

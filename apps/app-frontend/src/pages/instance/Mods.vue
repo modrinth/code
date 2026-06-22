@@ -1345,9 +1345,7 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.project?.id
-			? { path: `/project/${item.project.id}` }
-			: undefined,
+		projectLink: item.project?.id ? { path: `/project/${item.project.id}` } : undefined,
 		version: item.version ?? {
 			id: item.file_name,
 			version_number: formatMessage(commonMessages.unknownLabel),
