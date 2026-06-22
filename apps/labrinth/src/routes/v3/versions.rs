@@ -118,7 +118,7 @@ pub async fn version_project_get_helper(
             let version_id = version.inner.id;
             enrich_dependency_attributions(
                 std::slice::from_mut(&mut version),
-                &**pool,
+                &pool,
             )
             .await;
             let mut v = models::projects::Version::from(version);
@@ -240,11 +240,8 @@ pub async fn version_get_helper(
         && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
     {
         let version_id = data.inner.id;
-        enrich_dependency_attributions(
-            std::slice::from_mut(&mut data),
-            &**pool,
-        )
-        .await;
+        enrich_dependency_attributions(std::slice::from_mut(&mut data), &pool)
+            .await;
         let mut version = models::projects::Version::from(data);
         let missing = get_files_missing_attribution(&**pool, &[version_id])
             .await
