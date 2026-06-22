@@ -917,10 +917,12 @@ where
             pag.flame_project
         from files f
         inner join attribution_enforced_versions aev on aev.id = f.version_id
+        inner join versions v on v.id = f.version_id
         inner join override_file_sources ofs on ofs.file_id = f.id
         inner join project_attribution_files paf on paf.sha1 = ofs.sha1
         inner join project_attribution_groups pag on pag.id = paf.group_id
         where f.version_id = ANY($1)
+          and pag.project_id = v.mod_id
           and (
             pag.attribution is null
             or pag.attribution->>'kind' = 'no_permission'
@@ -977,10 +979,12 @@ where
         from dependencies d
         inner join files f on f.version_id = d.dependent_id
         inner join attribution_enforced_versions aev on aev.id = f.version_id
+        inner join versions v on v.id = f.version_id
         inner join override_file_sources ofs on ofs.file_id = f.id
         inner join project_attribution_files paf on paf.sha1 = ofs.sha1
         inner join project_attribution_groups pag on pag.id = paf.group_id
         where d.dependent_id = ANY($1)
+          and pag.project_id = v.mod_id
           and d.dependency_file_name is not null
           and (
             pag.flame_project is not null
