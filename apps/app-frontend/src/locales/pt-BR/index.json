@@ -479,6 +479,9 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
+  },
   "app.skins.sign-in.button": {
     "message": "Iniciar sessão"
   },
