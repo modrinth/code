@@ -25,75 +25,66 @@
 				</div>
 
 				<div class="flex-1 overflow-y-auto px-4" :class="isModpack ? 'pb-4' : 'pb-16'">
-					<Transition name="content-updater-fade" mode="out-in">
-						<div
-							v-if="loading"
-							key="versions-loading"
-							class="flex flex-col items-center justify-center h-full gap-2"
-						>
-							<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
-							<span class="text-sm text-secondary">{{
-								formatMessage(messages.loadingVersions)
-							}}</span>
-						</div>
-						<div v-else key="versions-ready" class="min-h-full">
-							<div class="flex flex-col gap-1.5" role="listbox">
-								<button
-									v-for="version in filteredVersions"
-									:key="version.id"
-									role="option"
-									:aria-selected="selectedVersion?.id === version.id"
-									class="flex items-center h-10 px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
-									:class="[
-										selectedVersion?.id === version.id
-											? 'bg-brand-highlight'
-											: 'bg-transparent hover:bg-button-bg',
-									]"
-									@mouseenter="handleVersionMouseEnter(version)"
-									@mouseleave="handleVersionMouseLeave"
-									@focus="emit('versionHover', version)"
-									@click="handleVersionSelect(version)"
-								>
-									<div class="flex items-center justify-between w-full gap-2">
-										<div class="flex items-center gap-2 min-w-0">
-											<VersionChannelIndicator
-												:channel="version.version_type"
-												size="sm"
-												class="shrink-0"
-											/>
-											<span
-												v-tooltip="version.version_number"
-												class="font-semibold text-contrast truncate"
-											>
-												{{ version.version_number }}
-											</span>
-										</div>
+					<div v-if="loading" class="flex flex-col items-center justify-center h-full gap-2">
+						<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
+						<span class="text-sm text-secondary">{{
+							formatMessage(messages.loadingVersions)
+						}}</span>
+					</div>
+					<div v-else class="min-h-full">
+						<div class="flex flex-col gap-1.5" role="listbox">
+							<button
+								v-for="version in filteredVersions"
+								:key="version.id"
+								role="option"
+								:aria-selected="selectedVersion?.id === version.id"
+								class="flex items-center h-10 px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
+								:class="[
+									selectedVersion?.id === version.id
+										? 'bg-brand-highlight'
+										: 'bg-transparent hover:bg-button-bg',
+								]"
+								@mouseenter="handleVersionMouseEnter(version)"
+								@mouseleave="handleVersionMouseLeave"
+								@focus="emit('versionHover', version)"
+								@click="handleVersionSelect(version)"
+							>
+								<div class="flex items-center justify-between w-full gap-2">
+									<div class="flex items-center gap-2 min-w-0">
+										<VersionChannelIndicator
+											:channel="version.version_type"
+											size="sm"
+											class="shrink-0"
+										/>
 										<span
-											v-if="shouldShowBadge(version)"
-											class="rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
-											:class="[
-												getBadgeClasses(version),
-												shouldShowIncompatibleBadge(version) ? 'p-1' : 'px-2.5 py-0.5',
-											]"
+											v-tooltip="version.version_number"
+											class="font-semibold text-contrast truncate"
 										>
-											<CircleAlertIcon
-												v-if="shouldShowIncompatibleBadge(version)"
-												v-tooltip="formatMessage(messages.incompatibleBadge)"
-												class="size-4"
-											/>
-											<template v-else>{{ getBadgeLabel(version) }}</template>
+											{{ version.version_number }}
 										</span>
 									</div>
-								</button>
-							</div>
-							<div
-								v-if="filteredVersions.length === 0"
-								class="p-4 text-center text-secondary text-sm"
-							>
-								{{ formatMessage(messages.noVersionsFound) }}
-							</div>
+									<span
+										v-if="shouldShowBadge(version)"
+										class="rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
+										:class="[
+											getBadgeClasses(version),
+											shouldShowIncompatibleBadge(version) ? 'p-1' : 'px-2.5 py-0.5',
+										]"
+									>
+										<CircleAlertIcon
+											v-if="shouldShowIncompatibleBadge(version)"
+											v-tooltip="formatMessage(messages.incompatibleBadge)"
+											class="size-4"
+										/>
+										<template v-else>{{ getBadgeLabel(version) }}</template>
+									</span>
+								</div>
+							</button>
 						</div>
-					</Transition>
+						<div v-if="filteredVersions.length === 0" class="p-4 text-center text-secondary text-sm">
+							{{ formatMessage(messages.noVersionsFound) }}
+						</div>
+					</div>
 				</div>
 
 				<div
@@ -126,92 +117,74 @@
 
 			<div class="w-px bg-divider" />
 
-			<div class="flex-1 flex flex-col min-w-0 relative bg-surface-1" aria-live="polite">
-				<Transition name="content-updater-fade" mode="out-in">
-					<div
-						v-if="selectedVersion"
-						key="changelog-selected"
-						class="flex-1 flex flex-col min-w-0 relative"
-					>
-						<div class="bg-bg p-4">
-							<div class="flex flex-col gap-1.5">
-								<div class="flex items-center justify-between">
-									<div class="flex items-center gap-2">
-										<span class="font-semibold text-xl text-contrast">
-											{{ selectedVersion.version_number }}
-										</span>
-										<span
-											class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
-											:class="getVersionTypeBadgeClasses(selectedVersion)"
-										>
-											{{ capitalizeString(selectedVersion.version_type) }}
-										</span>
-									</div>
-									<span class="font-medium text-primary">
-										{{ formatLongDate(selectedVersion.date_published) }}
-									</span>
-								</div>
+			<div class="flex-1 flex flex-col min-w-0 min-h-0 relative bg-surface-1" aria-live="polite">
+				<div v-if="selectedVersion" class="flex-1 flex flex-col min-w-0 min-h-0 relative">
+					<div class="bg-bg p-4">
+						<div class="flex flex-col gap-1.5">
+							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
-									<div class="flex items-center gap-2 rounded-xl">
-										<FileTextIcon class="h-6 w-6 text-primary" />
-										<span class="font-medium text-primary">{{
-											formatMessage(commonMessages.changelogLabel)
-										}}</span>
-									</div>
-									<span class="w-1.5 h-1.5 rounded-full bg-divider" />
-									<span class="font-medium text-primary">
-										{{ formatLoaderGameVersion(selectedVersion) }}
+									<span class="font-semibold text-xl text-contrast">
+										{{ selectedVersion.version_number }}
+									</span>
+									<span
+										class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
+										:class="getVersionTypeBadgeClasses(selectedVersion)"
+									>
+										{{ capitalizeString(selectedVersion.version_type) }}
 									</span>
 								</div>
+								<span class="font-medium text-primary">
+									{{ formatLongDate(selectedVersion.date_published) }}
+								</span>
 							</div>
-						</div>
-
-						<div class="h-px bg-divider" />
-
-						<div class="flex-1 bg-bg p-4 overflow-y-auto">
-							<Transition name="content-updater-fade" mode="out-in">
-								<div
-									v-if="loadingChangelog"
-									key="changelog-loading"
-									class="flex flex-col items-center justify-center h-full gap-2"
-								>
-									<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
-									<span class="text-sm text-secondary">{{
-										formatMessage(messages.loadingChangelog)
+							<div class="flex items-center gap-2">
+								<div class="flex items-center gap-2 rounded-xl">
+									<FileTextIcon class="h-6 w-6 text-primary" />
+									<span class="font-medium text-primary">{{
+										formatMessage(commonMessages.changelogLabel)
 									}}</span>
 								</div>
-								<div
-									v-else-if="selectedVersion.changelog"
-									key="changelog-ready"
-									class="markdown [&_img]:max-w-full [&_img]:h-auto"
-									v-html="renderHighlightedString(selectedVersion.changelog)"
-								/>
-								<div v-else key="changelog-empty" class="text-secondary italic">
-									{{ formatMessage(messages.noChangelog) }}
-								</div>
-							</Transition>
+								<span class="w-1.5 h-1.5 rounded-full bg-divider" />
+								<span class="font-medium text-primary">
+									{{ formatLoaderGameVersion(selectedVersion) }}
+								</span>
+							</div>
 						</div>
+					</div>
 
+					<div class="h-px bg-divider" />
+
+					<div class="flex-1 min-h-0 bg-bg p-4 overflow-y-auto">
+						<div v-if="loadingChangelog" class="flex flex-col items-center justify-center h-full gap-2">
+							<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
+							<span class="text-sm text-secondary">{{
+								formatMessage(messages.loadingChangelog)
+							}}</span>
+						</div>
 						<div
-							class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-bg to-transparent pointer-events-none"
+							v-else-if="selectedVersion.changelog"
+							class="markdown [&_img]:max-w-full [&_img]:h-auto"
+							v-html="renderHighlightedString(selectedVersion.changelog)"
 						/>
+						<div v-else class="text-secondary italic">
+							{{ formatMessage(messages.noChangelog) }}
+						</div>
 					</div>
+
 					<div
-						v-else-if="loading || loadingChangelog || props.versions.length > 0"
-						key="changelog-loading-empty"
-						class="flex-1 flex flex-col items-center justify-center h-full gap-2 text-secondary bg-bg"
-					>
-						<SpinnerIcon class="h-6 w-6 animate-spin" />
-						<span class="text-sm">{{ formatMessage(messages.loadingChangelog) }}</span>
-					</div>
-					<div
-						v-else
-						key="changelog-empty-selection"
-						class="flex-1 flex items-center justify-center text-secondary bg-bg"
-					>
-						{{ formatMessage(messages.selectVersionPrompt) }}
-					</div>
-				</Transition>
+						class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-bg to-transparent pointer-events-none"
+					/>
+				</div>
+				<div
+					v-else-if="loading || loadingChangelog || props.versions.length > 0"
+					class="flex-1 flex flex-col items-center justify-center h-full gap-2 text-secondary bg-bg"
+				>
+					<SpinnerIcon class="h-6 w-6 animate-spin" />
+					<span class="text-sm">{{ formatMessage(messages.loadingChangelog) }}</span>
+				</div>
+				<div v-else class="flex-1 flex items-center justify-center text-secondary bg-bg">
+					{{ formatMessage(messages.selectVersionPrompt) }}
+				</div>
 			</div>
 		</div>
 
@@ -775,18 +748,3 @@ function hide() {
 
 defineExpose({ show, hide })
 </script>
-
-<style scoped>
-.content-updater-fade-enter-active,
-.content-updater-fade-leave-active {
-	transition:
-		opacity 160ms ease,
-		transform 160ms ease;
-}
-
-.content-updater-fade-enter-from,
-.content-updater-fade-leave-to {
-	opacity: 0;
-	transform: translateY(3px);
-}
-</style>
