@@ -199,13 +199,11 @@ pub(crate) async fn resolve_install_plan(
         .map_err(resolver_error)
 }
 
-pub(crate) async fn install_project_with_dependencies(
+pub(crate) async fn install_resolved_content_plan(
     instance_id: &str,
-    request: InstanceInstallProjectRequest,
+    plan: &ResolveContentPlan,
     state: &State,
-) -> crate::Result<ResolveContentPlan> {
-    let plan = resolve_install_plan(instance_id, request, state).await?;
-
+) -> crate::Result<()> {
     add_resolved_content(
         instance_id,
         &plan.primary,
@@ -223,7 +221,7 @@ pub(crate) async fn install_project_with_dependencies(
         .await?;
     }
 
-    Ok(plan)
+    Ok(())
 }
 
 pub(crate) async fn switch_project_version_with_dependencies(

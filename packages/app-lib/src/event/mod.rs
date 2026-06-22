@@ -274,6 +274,13 @@ pub enum InstancePayloadType {
         timestamp: DateTime<Utc>,
     },
     Edited,
+    ContentInstallFinished {
+        project_ids: Vec<String>,
+    },
+    ContentInstallFailed {
+        project_ids: Vec<String>,
+        message: String,
+    },
     Removed,
 }
 

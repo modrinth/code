@@ -8,7 +8,15 @@ import { nextTick, type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_organization, get_project, get_team, get_version_many } from '@/helpers/cache.js'
+import {
+	get_organization,
+	get_project,
+	get_project_many,
+	get_project_v3_many,
+	get_team,
+	get_version_many,
+} from '@/helpers/cache.js'
+import { instance_listener } from '@/helpers/events.js'
 import {
 	install_create_instance,
 	install_create_modpack_instance,
@@ -22,6 +30,7 @@ import {
 	install_project_with_dependencies,
 	list,
 	remove_project,
+	type ResolveContentPlan,
 } from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
@@ -35,6 +44,23 @@ interface ModpackAlreadyInstalledModalRef {
 }
 
 export type ContentInstallCallback = (versionId?: string, installedProjectIds?: string[]) => void
+type InstallingProjectDisplay = {
+	id?: string
+	slug?: string | null
+	title?: string
+	name?: string
+	icon_url?: string | null
+	project_type?: string
+	type?: string
+	organization?: string | null
+	team?: string
+}
+type ContentInstallInstanceEvent = {
+	event: string
+	instance_id: string
+	project_ids?: string[]
+	message?: string
+}
 
 const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
 const SUPPORTED_LOADERS: Set<string> = new Set(['vanilla', 'forge', 'fabric', 'quilt', 'neoforge'])
@@ -148,6 +174,8 @@ export interface ContentInstallContext {
 		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) => Promise<void>
 	installingItems: Ref<Map<string, ContentItem[]>>
+	installRevisionByInstance: Ref<Map<string, number>>
+	installFailureRevisionByInstance: Ref<Map<string, number>>
 }
 
 export const [injectContentInstall, provideContentInstall] = createContext<ContentInstallContext>(
@@ -171,6 +199,8 @@ export function createContentInstall(opts: {
 
 	const projectInfo = ref<ContentInstallProjectInfo | null>(null)
 	const installingItems = ref<Map<string, ContentItem[]>>(new Map())
+	const installRevisionByInstance = ref<Map<string, number>>(new Map())
+	const installFailureRevisionByInstance = ref<Map<string, number>>(new Map())
 	const incompatibilityWarningVersions = ref<Labrinth.Versions.v2.Version[]>([])
 	const incompatibilityWarningCurrentGameVersion = ref('')
 	const incompatibilityWarningCurrentLoader = ref('')
@@ -291,6 +321,84 @@ export function createContentInstall(opts: {
 			installingItems.value = next
 		}
 	}
+
+	function resolvedProjectIds(plan: ResolveContentPlan) {
+		return [
+			plan.primary.project_id,
+			...plan.dependencies.map((dependency) => dependency.project_id),
+		]
+	}
+
+	async function addInstallingItemsForPlan(
+		instanceId: string,
+		plan: ResolveContentPlan,
+		primaryProject: Labrinth.Projects.v2.Project,
+		primaryVersion: Labrinth.Versions.v2.Version,
+	) {
+		const entries = [plan.primary, ...plan.dependencies]
+		const projectIds = [...new Set(entries.map((entry) => entry.project_id))]
+		const versionIds = [...new Set(entries.map((entry) => entry.version_id))]
+		const projectMap = new Map<string, InstallingProjectDisplay>([
+			[primaryProject.id, primaryProject],
+		])
+		const versionMap = new Map<string, Labrinth.Versions.v2.Version>([
+			[primaryVersion.id, primaryVersion],
+		])
+
+		const [projects, versions] = await Promise.all([
+			get_project_many(projectIds, 'bypass').catch(() => []),
+			get_version_many(versionIds, 'bypass').catch(() => []),
+		])
+
+		for (const project of projects as InstallingProjectDisplay[]) {
+			if (project?.id) projectMap.set(project.id, project)
+		}
+		for (const version of versions as Labrinth.Versions.v2.Version[]) {
+			if (version?.id) versionMap.set(version.id, version)
+		}
+
+		for (const entry of entries) {
+			const project = projectMap.get(entry.project_id)
+			const version = versionMap.get(entry.version_id)
+			addInstallingItem(
+				instanceId,
+				{
+					id: entry.project_id,
+					slug: project?.slug ?? entry.project_id,
+					title: project?.title ?? project?.name ?? entry.project_id,
+					icon_url: project?.icon_url ?? null,
+					project_type: project?.project_type ?? project?.type ?? primaryProject.project_type,
+					organization: project?.organization ?? null,
+					team: project?.team,
+				},
+				version,
+			)
+		}
+	}
+
+	function markInstanceContentChanged(instanceId: string) {
+		const next = new Map(installRevisionByInstance.value)
+		next.set(instanceId, (next.get(instanceId) ?? 0) + 1)
+		installRevisionByInstance.value = next
+	}
+
+	function markInstanceContentInstallFailed(instanceId: string) {
+		const next = new Map(installFailureRevisionByInstance.value)
+		next.set(instanceId, (next.get(instanceId) ?? 0) + 1)
+		installFailureRevisionByInstance.value = next
+	}
+
+	void instance_listener((event: ContentInstallInstanceEvent) => {
+		if (event.event === 'content_install_finished') {
+			markInstanceContentChanged(event.instance_id)
+			removeInstallingItems(event.instance_id, event.project_ids ?? [])
+		} else if (event.event === 'content_install_failed') {
+			removeInstallingItems(event.instance_id, event.project_ids ?? [])
+			markInstanceContentInstallFailed(event.instance_id)
+			markInstanceContentChanged(event.instance_id)
+			opts.handleError(event.message ?? 'Failed to install content')
+		}
+	}).catch(opts.handleError)
 
 	let modalRef: ModalRef | null = null
 	let modpackAlreadyInstalledModalRef: ModpackAlreadyInstalledModalRef | null = null
@@ -503,18 +611,19 @@ export function createContentInstall(opts: {
 
 		if (storeInstance) storeInstance.installing = true
 
-		const installedProjectIds: string[] = []
-		if (currentProject) {
-			addInstallingItem(instance.id, currentProject, version)
-			installedProjectIds.push(currentProject.id)
-		}
+		const installedProjectIds: string[] = [currentProject.id]
+		let plannedProjectIds: string[] = [currentProject.id]
+		addInstallingItem(instance.id, currentProject, version)
 
 		try {
-			const plan = await install_project_with_dependencies(instance.id, {
+			const request = {
 				project_id: currentProject.id,
 				version_id: version.id,
 				content_type: resolveContentType(currentProject.project_type),
-			})
+			}
+			const plan = await install_project_with_dependencies(instance.id, request)
+			plannedProjectIds = resolvedProjectIds(plan)
+			await addInstallingItemsForPlan(instance.id, plan, currentProject, version)
 			installedProjectIds.splice(
 				0,
 				installedProjectIds.length,
@@ -537,9 +646,9 @@ export function createContentInstall(opts: {
 			currentCallback(version.id, installedProjectIds)
 		} catch (err) {
 			if (storeInstance) storeInstance.installing = false
+			removeInstallingItems(instance.id, plannedProjectIds)
+			markInstanceContentInstallFailed(instance.id)
 			opts.handleError(err)
-		} finally {
-			removeInstallingItems(instance.id, installedProjectIds)
 		}
 	}
 
@@ -579,18 +688,23 @@ export function createContentInstall(opts: {
 		if (!incompatibilityWarningInstance || !incompatibilityWarningProject) return
 
 		incompatibilityWarningInstalling.value = true
+		addInstallingItem(incompatibilityWarningInstance.id, incompatibilityWarningProject, version)
 		try {
 			await add_project_from_version(incompatibilityWarningInstance.id, version.id, 'standalone')
 		} catch (err) {
 			opts.handleError(err)
 			incompatibilityWarningInstalling.value = false
+			removeInstallingItems(incompatibilityWarningInstance.id, [incompatibilityWarningProject.id])
+			markInstanceContentInstallFailed(incompatibilityWarningInstance.id)
 			return
 		}
 
 		incompatibilityWarningInstalling.value = false
 		incompatibilityWarningInstalled = true
 		incompatibilityWarningCallback(version.id, [incompatibilityWarningProject.id])
+		markInstanceContentChanged(incompatibilityWarningInstance.id)
 		incompatibilityWarningModalRef?.hide()
+		removeInstallingItems(incompatibilityWarningInstance.id, [incompatibilityWarningProject.id])
 
 		trackEvent('ProjectInstall', {
 			loader: incompatibilityWarningInstance.loader,
@@ -626,6 +740,7 @@ export function createContentInstall(opts: {
 					loaderCandidates.some((l) => v.loaders.includes(l)),
 			) ?? currentVersions[0]
 
+		let createdInstanceId: string | null = null
 		try {
 			const job = await install_create_instance({
 				name: data.name,
@@ -636,12 +751,15 @@ export function createContentInstall(opts: {
 			})
 			const id = installJobInstanceId(job)
 			if (!id) return
+			createdInstanceId = id
+			addInstallingItem(id, currentProject!, version)
 
-			await install_project_with_dependencies(id, {
+			const plan = await install_project_with_dependencies(id, {
 				project_id: currentProject!.id,
 				version_id: version.id,
 				content_type: resolveContentType(currentProject!.project_type),
 			})
+			await addInstallingItemsForPlan(id, plan, currentProject!, version)
 			await opts.router.push(`/instance/${encodeURIComponent(id)}`)
 
 			trackEvent('InstanceCreate', {
@@ -657,9 +775,13 @@ export function createContentInstall(opts: {
 				source: 'ProjectInstallModal',
 			})
 
-			currentCallback(version.id)
+			currentCallback(version.id, resolvedProjectIds(plan))
 			modalRef?.hide()
 		} catch (err) {
+			if (createdInstanceId && currentProject) {
+				removeInstallingItems(createdInstanceId, [currentProject.id])
+				markInstanceContentInstallFailed(createdInstanceId)
+			}
 			opts.handleError(err)
 		}
 	}
@@ -741,13 +863,17 @@ export function createContentInstall(opts: {
 				}
 
 				const installedProjectIds: string[] = [project.id]
+				let plannedProjectIds: string[] = [project.id]
 				addInstallingItem(instanceId, project, version)
 				try {
-					const plan = await install_project_with_dependencies(instance.id, {
+					const request = {
 						project_id: project.id,
 						version_id: version.id,
 						content_type: resolveContentType(project.project_type),
-					})
+					}
+					const plan = await install_project_with_dependencies(instance.id, request)
+					plannedProjectIds = resolvedProjectIds(plan)
+					await addInstallingItemsForPlan(instanceId, plan, project, version)
 					installedProjectIds.splice(
 						0,
 						installedProjectIds.length,
@@ -765,8 +891,10 @@ export function createContentInstall(opts: {
 						source,
 					})
 					callback(version.id, installedProjectIds)
-				} finally {
-					removeInstallingItems(instanceId, installedProjectIds)
+				} catch (err) {
+					removeInstallingItems(instanceId, plannedProjectIds)
+					markInstanceContentInstallFailed(instanceId)
+					throw err
 				}
 			} else {
 				await showIncompatibilityWarning(instance, project, projectVersions, version, callback)
@@ -842,5 +970,7 @@ export function createContentInstall(opts: {
 		handleIncompatibilityWarningCancel,
 		install,
 		installingItems,
+		installRevisionByInstance,
+		installFailureRevisionByInstance,
 	}
 }
