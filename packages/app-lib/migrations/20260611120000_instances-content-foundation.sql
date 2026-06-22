@@ -71,19 +71,7 @@ CREATE INDEX instance_groups_group_name ON instance_groups(group_name);
 
 CREATE TABLE instance_launch_overrides (
 	instance_id TEXT NOT NULL,
-
-	java_path TEXT NULL,
-	extra_launch_args JSONB NULL,
-	custom_env_vars JSONB NULL,
-
-	memory INTEGER NULL,
-	force_fullscreen INTEGER NULL,
-	game_resolution_x INTEGER NULL,
-	game_resolution_y INTEGER NULL,
-
-	hook_pre_launch TEXT NULL,
-	hook_wrapper TEXT NULL,
-	hook_post_exit TEXT NULL,
+	overrides JSONB NOT NULL,
 
 	PRIMARY KEY (instance_id),
 	FOREIGN KEY (instance_id) REFERENCES instances(id) ON DELETE CASCADE
@@ -347,33 +335,42 @@ FROM profiles, json_each(profiles.groups);
 
 INSERT INTO instance_launch_overrides (
 	instance_id,
-	java_path,
-	extra_launch_args,
-	custom_env_vars,
-	memory,
-	force_fullscreen,
-	game_resolution_x,
-	game_resolution_y,
-	hook_pre_launch,
-	hook_wrapper,
-	hook_post_exit
+	overrides
 )
 SELECT
 	'legacy:' || path,
-	override_java_path,
-	CASE
-		WHEN json_type(override_extra_launch_args) = 'null' THEN NULL
-		ELSE override_extra_launch_args
-	END,
-	CASE
-		WHEN json_type(override_custom_env_vars) = 'null' THEN NULL
-		ELSE override_custom_env_vars
-	END,
-	override_mc_memory_max,
-	override_mc_force_fullscreen,
-	override_mc_game_resolution_x,
-	override_mc_game_resolution_y,
-	override_hook_pre_launch,
-	override_hook_wrapper,
-	override_hook_post_exit
+	jsonb(json_object(
+		'java_path', override_java_path,
+		'extra_launch_args', json(CASE
+			WHEN json_type(override_extra_launch_args) = 'null' THEN 'null'
+			ELSE json(override_extra_launch_args)
+		END),
+		'custom_env_vars', json(CASE
+			WHEN json_type(override_custom_env_vars) = 'null' THEN 'null'
+			ELSE json(override_custom_env_vars)
+		END),
+		'memory', json(CASE
+			WHEN override_mc_memory_max IS NULL THEN 'null'
+			ELSE json_object('maximum', override_mc_memory_max)
+		END),
+		'force_fullscreen', json(CASE
+			WHEN override_mc_force_fullscreen IS NULL THEN 'null'
+			WHEN override_mc_force_fullscreen = 0 THEN 'false'
+			ELSE 'true'
+		END),
+		'game_resolution', json(CASE
+			WHEN override_mc_game_resolution_x IS NULL
+				OR override_mc_game_resolution_y IS NULL
+				THEN 'null'
+			ELSE json_array(
+				override_mc_game_resolution_x,
+				override_mc_game_resolution_y
+			)
+		END),
+		'hooks', json_object(
+			'pre_launch', COALESCE(override_hook_pre_launch, ''),
+			'wrapper', COALESCE(override_hook_wrapper, ''),
+			'post_exit', COALESCE(override_hook_post_exit, '')
+		)
+	))
 FROM profiles;

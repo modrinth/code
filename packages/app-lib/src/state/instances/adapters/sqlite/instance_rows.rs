@@ -1,12 +1,10 @@
 #![allow(dead_code)]
 
 use crate::state::instances::{
-    Instance, InstanceLaunchOverrides, InstanceLink,
+    Instance, InstanceLaunchOverrides, InstanceLaunchOverridesData,
+    InstanceLink,
 };
-use crate::state::{
-    Hooks, InstanceInstallStage, LauncherFeatureVersion, MemorySettings,
-    ReleaseChannel, WindowSize,
-};
+use crate::state::{InstanceInstallStage, LauncherFeatureVersion, ReleaseChannel};
 use chrono::{DateTime, TimeZone, Utc};
 use serde::de::DeserializeOwned;
 use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
@@ -146,56 +144,23 @@ impl TryFrom<InstanceLinkRow> for InstanceLink {
 #[derive(Debug, sqlx::FromRow)]
 pub(crate) struct InstanceLaunchOverridesRow {
     pub instance_id: String,
-    pub java_path: Option<String>,
-    pub extra_launch_args: Option<String>,
-    pub custom_env_vars: Option<String>,
-    pub memory: Option<i64>,
-    pub force_fullscreen: Option<i64>,
-    pub game_resolution_x: Option<i64>,
-    pub game_resolution_y: Option<i64>,
-    pub hook_pre_launch: Option<String>,
-    pub hook_wrapper: Option<String>,
-    pub hook_post_exit: Option<String>,
+    pub overrides: String,
 }
 
 impl TryFrom<InstanceLaunchOverridesRow> for InstanceLaunchOverrides {
     type Error = crate::Error;
 
     fn try_from(row: InstanceLaunchOverridesRow) -> crate::Result<Self> {
-        Ok(Self {
-            instance_id: row.instance_id,
-            java_path: row.java_path,
-            extra_launch_args: parse_optional_json(
-                row.extra_launch_args,
-                "extra_launch_args",
-            )?,
-            custom_env_vars: parse_optional_json(
-                row.custom_env_vars,
-                "custom_env_vars",
-            )?,
-            memory: match row.memory {
-                Some(maximum) => Some(MemorySettings {
-                    maximum: unsigned(maximum, "memory")? as u32,
-                }),
-                None => None,
-            },
-            force_fullscreen: row.force_fullscreen.map(|value| value == 1),
-            game_resolution: match (
-                row.game_resolution_x,
-                row.game_resolution_y,
-            ) {
-                (Some(x), Some(y)) => Some(WindowSize(
-                    unsigned(x, "game_resolution_x")? as u16,
-                    unsigned(y, "game_resolution_y")? as u16,
-                )),
-                _ => None,
-            },
-            hooks: Hooks {
-                pre_launch: row.hook_pre_launch,
-                wrapper: row.hook_wrapper,
-                post_exit: row.hook_post_exit,
-            },
-        })
+        let data =
+            serde_json::from_str::<InstanceLaunchOverridesData>(&row.overrides)
+                .map_err(|err| {
+                    crate::ErrorKind::InputError(format!(
+                        "Invalid launch overrides JSON: {err}"
+                    ))
+                    .as_error()
+                })?;
+
+        Ok(data.into_launch_overrides(row.instance_id))
     }
 }
 
@@ -324,16 +289,7 @@ where
         "
 		SELECT
 			instance_id,
-			java_path,
-			json(extra_launch_args) AS extra_launch_args,
-			json(custom_env_vars) AS custom_env_vars,
-			memory,
-			force_fullscreen,
-			game_resolution_x,
-			game_resolution_y,
-			hook_pre_launch,
-			hook_wrapper,
-			hook_post_exit
+			json(overrides) AS overrides
 		FROM instance_launch_overrides
 		WHERE instance_id = ?
 		",
@@ -516,63 +472,22 @@ pub(crate) async fn upsert_instance_launch_overrides(
     overrides: &InstanceLaunchOverrides,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    let extra_launch_args = overrides
-        .extra_launch_args
-        .as_ref()
-        .map(serde_json::to_string)
-        .transpose()?;
-    let custom_env_vars = overrides
-        .custom_env_vars
-        .as_ref()
-        .map(serde_json::to_string)
-        .transpose()?;
-    let memory = overrides.memory.map(|value| value.maximum as i64);
-    let force_fullscreen = overrides.force_fullscreen.map(i64::from);
-    let game_resolution_x =
-        overrides.game_resolution.map(|value| value.0 as i64);
-    let game_resolution_y =
-        overrides.game_resolution.map(|value| value.1 as i64);
+    let overrides_data =
+        serde_json::to_string(&InstanceLaunchOverridesData::from(overrides))?;
 
     sqlx::query(
         "
 		INSERT INTO instance_launch_overrides (
 			instance_id,
-			java_path,
-			extra_launch_args,
-			custom_env_vars,
-			memory,
-			force_fullscreen,
-			game_resolution_x,
-			game_resolution_y,
-			hook_pre_launch,
-			hook_wrapper,
-			hook_post_exit
+			overrides
 		)
-		VALUES (?, ?, jsonb(?), jsonb(?), ?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, jsonb(?))
 		ON CONFLICT (instance_id) DO UPDATE SET
-			java_path = excluded.java_path,
-			extra_launch_args = excluded.extra_launch_args,
-			custom_env_vars = excluded.custom_env_vars,
-			memory = excluded.memory,
-			force_fullscreen = excluded.force_fullscreen,
-			game_resolution_x = excluded.game_resolution_x,
-			game_resolution_y = excluded.game_resolution_y,
-			hook_pre_launch = excluded.hook_pre_launch,
-			hook_wrapper = excluded.hook_wrapper,
-			hook_post_exit = excluded.hook_post_exit
+			overrides = excluded.overrides
 		",
     )
     .bind(overrides.instance_id.as_str())
-    .bind(overrides.java_path.as_deref())
-    .bind(extra_launch_args)
-    .bind(custom_env_vars)
-    .bind(memory)
-    .bind(force_fullscreen)
-    .bind(game_resolution_x)
-    .bind(game_resolution_y)
-    .bind(overrides.hooks.pre_launch.as_deref())
-    .bind(overrides.hooks.wrapper.as_deref())
-    .bind(overrides.hooks.post_exit.as_deref())
+    .bind(overrides_data)
     .execute(&mut **tx)
     .await?;
 
