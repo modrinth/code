@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-22T18:12:52+00:00`,
+		product: 'web',
+		body: `## Added
+- Added dependents project breakdown and filter to download analytics, handling for case when there are multiple projects selected.
+- Added project icons to table for project columns in analytics.
+- Added members breakdown/filter to revenue analytics.
+
+## Changed
+- Removed project version's project column when there were multiple projects selected with project version breakdown as it's redundant when project breakdown can be added.
+
+## Fixed
+- Fixed all project selection geting unselected when reload page in analytics.`,
+	},
+	{
 		date: `2026-06-19T20:29:45+00:00`,
 		product: 'app',
 		version: '0.14.8',
