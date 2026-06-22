@@ -17,7 +17,7 @@ import { edit, get, list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { start_join_server } from '@/helpers/worlds.ts'
 import { handleSevereError } from '@/store/error.js'
-import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install.js'
+import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface ModalRef<TShow extends (...args: any[]) => void = () => void> {

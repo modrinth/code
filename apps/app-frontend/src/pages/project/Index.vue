@@ -318,7 +318,7 @@ import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
+import { getServerAddress } from '@/helpers/worlds'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)

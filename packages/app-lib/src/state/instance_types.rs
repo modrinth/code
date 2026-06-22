@@ -214,3 +214,14 @@ impl ProjectType {
         .copied()
     }
 }
+
+impl From<ProjectType> for modrinth_content_management::ContentType {
+    fn from(project_type: ProjectType) -> Self {
+        match project_type {
+            ProjectType::Mod => Self::Mod,
+            ProjectType::DataPack => Self::DataPack,
+            ProjectType::ResourcePack => Self::ResourcePack,
+            ProjectType::ShaderPack => Self::Shader,
+        }
+    }
+}

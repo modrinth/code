@@ -356,6 +356,28 @@ export function resolveManagedServerWorld(
 	)
 }
 
+export function getServerAddress(javaServer?: { address?: string | null } | null) {
+	if (!javaServer) return null
+	return javaServer.address ?? null
+}
+
+export async function ensureManagedServerWorldExists(
+	instanceId: string,
+	serverName: string,
+	serverAddress: string | null,
+) {
+	if (!instanceId || !serverAddress) return
+	try {
+		const worlds = await get_instance_worlds(instanceId)
+		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
+		if (!managedWorld) {
+			await add_server_to_instance(instanceId, serverName, serverAddress, 'prompt')
+		}
+	} catch (err) {
+		console.error('Failed to ensure managed server world exists:', err)
+	}
+}
+
 export async function getServerLatency(
 	address: string,
 	protocolVersion: ProtocolVersion | null = null,

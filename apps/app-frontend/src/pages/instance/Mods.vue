@@ -111,22 +111,20 @@ import {
 import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
 import {
 	add_project_from_path,
-	add_project_from_version,
 	edit,
 	get,
 	get_linked_modpack_content,
 	list,
 	remove_project,
+	switch_project_version_with_dependencies,
 	toggle_disable_project,
 	update_all,
 	update_managed_modrinth_version,
-	update_project,
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
-import { installVersionDependencies } from '@/store/install'
 
 const messages = defineMessages({
 	shareTitle: {
@@ -675,19 +673,11 @@ async function updateProject(mod: ContentItem) {
 
 	try {
 		const updateVersionId = mod.update_version_id!
-		await update_project(props.instance.id, mod.file_path)
-
-		if (updateVersionId) {
-			const versionData = await get_version(updateVersionId, 'must_revalidate').catch(handleError)
-
-			if (versionData) {
-				const instance = await get(props.instance.id).catch(handleError)
-
-				if (instance) {
-					await installVersionDependencies(instance, versionData, 'update').catch(handleError)
-				}
-			}
-		}
+		await switch_project_version_with_dependencies(
+			props.instance.id,
+			mod.file_path,
+			updateVersionId,
+		)
 
 		trackEvent('InstanceProjectUpdate', {
 			loader: props.instance.loader,
@@ -711,27 +701,9 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 	if (!operation) return
 
 	const oldPath = mod.file_path
-	const wasDisabled = mod.enabled === false || oldPath.endsWith('.disabled')
-	let newPath: string | null = null
-	let shouldRemoveNewOnError = false
 
 	try {
-		newPath = await add_project_from_version(props.instance.id, version.id, 'update')
-		shouldRemoveNewOnError = newPath !== oldPath
-
-		if (wasDisabled) {
-			newPath = await toggle_disable_project(props.instance.id, newPath, false)
-		}
-
-		const instance = await get(props.instance.id).catch(handleError)
-		if (instance) {
-			await installVersionDependencies(instance, version, 'update').catch(handleError)
-		}
-
-		shouldRemoveNewOnError = false
-		if (newPath !== oldPath) {
-			await remove_project(props.instance.id, oldPath)
-		}
+		await switch_project_version_with_dependencies(props.instance.id, oldPath, version.id)
 
 		trackEvent('InstanceProjectUpdate', {
 			loader: props.instance.loader,
@@ -741,9 +713,6 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 			project_type: mod.project_type,
 		})
 	} catch (err) {
-		if (shouldRemoveNewOnError && newPath && newPath !== oldPath) {
-			await remove_project(props.instance.id, newPath).catch(() => {})
-		}
 		handleError(err as Error)
 	} finally {
 		await refreshContentState('must_revalidate')

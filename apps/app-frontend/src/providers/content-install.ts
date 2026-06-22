@@ -19,17 +19,12 @@ import {
 	get,
 	get_install_candidates,
 	get_projects,
+	install_project_with_dependencies,
 	list,
 	remove_project,
 } from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
-import {
-	findPreferredVersion,
-	installVersionDependencies,
-	isVersionCompatible,
-} from '@/store/install.js'
-
 interface ModalRef {
 	show: (initialVersionId?: string) => void
 	hide: () => void
@@ -49,6 +44,48 @@ const noCompatibleVersionsMessage = defineMessage({
 	defaultMessage:
 		'No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically.',
 })
+
+const RESOLVABLE_PROJECT_TYPES = new Set<Labrinth.Content.v3.ContentType>([
+	'mod',
+	'plugin',
+	'datapack',
+	'resourcepack',
+	'shader',
+	'modpack',
+])
+
+function resolveContentType(projectType?: Labrinth.Projects.v2.ProjectType) {
+	return projectType && RESOLVABLE_PROJECT_TYPES.has(projectType) ? projectType : 'mod'
+}
+
+function isVersionCompatible(
+	version: Labrinth.Versions.v2.Version,
+	project: Labrinth.Projects.v2.Project,
+	instance: GameInstance,
+) {
+	return (
+		version.game_versions.includes(instance.game_version) &&
+		(project.project_type === 'mod'
+			? version.loaders.includes(instance.loader) || version.loaders.includes('datapack')
+			: true)
+	)
+}
+
+function findPreferredVersion(
+	versions: Labrinth.Versions.v2.Version[],
+	project: Labrinth.Projects.v2.Project,
+	instance: GameInstance,
+) {
+	const projectType = project.project_type ?? 'mod'
+
+	return (
+		versions.find(
+			(v) =>
+				v.game_versions.includes(instance.game_version) &&
+				(projectType === 'mod' ? v.loaders.includes(instance.loader) : true),
+		) ?? versions.find((v) => isVersionCompatible(v, project, instance))
+	)
+}
 
 function sortLoaders(loaders: string[]): string[] {
 	return loaders.slice().sort((a, b) => {
@@ -473,15 +510,16 @@ export function createContentInstall(opts: {
 		}
 
 		try {
-			await add_project_from_version(instance.id, version.id, 'standalone')
-			await installVersionDependencies(
-				selectedInstance,
-				version,
-				'dependency',
-				(depProject: Labrinth.Projects.v2.Project, depVersion?: Labrinth.Versions.v2.Version) => {
-					addInstallingItem(instance.id, depProject, depVersion)
-					installedProjectIds.push(depProject.id)
-				},
+			const plan = await install_project_with_dependencies(instance.id, {
+				project_id: currentProject.id,
+				version_id: version.id,
+				content_type: resolveContentType(currentProject.project_type),
+			})
+			installedProjectIds.splice(
+				0,
+				installedProjectIds.length,
+				plan.primary.project_id,
+				...plan.dependencies.map((dependency) => dependency.project_id),
 			)
 			if (storeInstance) {
 				storeInstance.installed = true
@@ -599,11 +637,12 @@ export function createContentInstall(opts: {
 			const id = installJobInstanceId(job)
 			if (!id) return
 
-			await add_project_from_version(id, version.id, 'standalone')
+			await install_project_with_dependencies(id, {
+				project_id: currentProject!.id,
+				version_id: version.id,
+				content_type: resolveContentType(currentProject!.project_type),
+			})
 			await opts.router.push(`/instance/${encodeURIComponent(id)}`)
-
-			const instance = await get(id)
-			await installVersionDependencies(instance, version, 'dependency')
 
 			trackEvent('InstanceCreate', {
 				source: 'ProjectInstallModal',
@@ -704,18 +743,16 @@ export function createContentInstall(opts: {
 				const installedProjectIds: string[] = [project.id]
 				addInstallingItem(instanceId, project, version)
 				try {
-					await add_project_from_version(instance.id, version.id, 'standalone')
-					await installVersionDependencies(
-						instance,
-						version,
-						'dependency',
-						(
-							depProject: Labrinth.Projects.v2.Project,
-							depVersion?: Labrinth.Versions.v2.Version,
-						) => {
-							addInstallingItem(instanceId, depProject, depVersion)
-							installedProjectIds.push(depProject.id)
-						},
+					const plan = await install_project_with_dependencies(instance.id, {
+						project_id: project.id,
+						version_id: version.id,
+						content_type: resolveContentType(project.project_type),
+					})
+					installedProjectIds.splice(
+						0,
+						installedProjectIds.length,
+						plan.primary.project_id,
+						...plan.dependencies.map((dependency) => dependency.project_id),
 					)
 
 					trackEvent('ProjectInstall', {

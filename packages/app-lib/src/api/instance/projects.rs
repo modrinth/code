@@ -3,8 +3,20 @@ use crate::event::{InstancePayloadType, LoadingBarType};
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{ProjectType, State};
 use crate::util::fetch;
+use modrinth_content_management::{
+    ContentType, ResolutionPreferences, ResolveContentPlan,
+};
 use std::collections::HashMap;
 use std::path::Path;
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+pub struct InstallProjectWithDependenciesRequest {
+    pub project_id: String,
+    pub version_id: Option<String>,
+    pub content_type: ContentType,
+    #[serde(default)]
+    pub selected: ResolutionPreferences,
+}
 
 #[tracing::instrument]
 pub async fn update_all_projects(
@@ -74,6 +86,55 @@ pub async fn add_project_from_version(
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(project_path)
+}
+
+#[tracing::instrument]
+pub async fn install_project_with_dependencies(
+    instance_id: &str,
+    request: InstallProjectWithDependenciesRequest,
+) -> crate::Result<ResolveContentPlan> {
+    let state = State::get().await?;
+    let metadata = get(instance_id).await?.ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let plan =
+        crate::state::instances::commands::install_project_with_dependencies(
+            instance_id,
+            crate::state::instances::commands::InstanceInstallProjectRequest {
+                project_id: request.project_id,
+                version_id: request.version_id,
+                content_type: request.content_type,
+                selected: request.selected,
+            },
+            &state,
+        )
+        .await?;
+    emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
+
+    Ok(plan)
+}
+
+#[tracing::instrument]
+pub async fn switch_project_version_with_dependencies(
+    instance_id: &str,
+    project_path: &str,
+    version_id: &str,
+) -> crate::Result<String> {
+    let state = State::get().await?;
+    let metadata = get(instance_id).await?.ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let path =
+        crate::state::instances::commands::switch_project_version_with_dependencies(
+            instance_id,
+            project_path,
+            version_id,
+            &state,
+        )
+        .await?;
+    emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
+
+    Ok(path)
 }
 
 #[tracing::instrument]

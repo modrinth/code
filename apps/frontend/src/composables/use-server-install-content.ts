@@ -401,6 +401,45 @@ export function useServerInstallContent({
 		)
 	}
 
+	function toResolvePreferences(
+		preferences?: BrowseInstallPlan<ServerInstallSearchResult>['preferences'],
+	): Labrinth.Content.v3.ResolutionPreferences {
+		return {
+			game_versions: preferences?.gameVersions,
+			loaders: preferences?.loaders,
+		}
+	}
+
+	async function resolveQueuedAddonPlans(
+		plans: BrowseInstallPlan<ServerInstallSearchResult>[],
+	) {
+		const existingProjectIds = getServerInstalledProjectIds()
+		const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
+
+		for (const plan of plans) {
+			const resolved = await client.labrinth.content_v3.resolve({
+				project_id: plan.projectId,
+				version_id: plan.versionId,
+				content_type: plan.contentType as Labrinth.Content.v3.ContentType,
+				selected: toResolvePreferences(plan.preferences),
+				target: toResolvePreferences(getServerInstallTargetPreferences(plan.contentType)),
+				existing_project_ids: Array.from(existingProjectIds),
+			})
+			const content = [resolved.primary, ...resolved.dependencies]
+
+			for (const item of content) {
+				if (existingProjectIds.has(item.project_id)) continue
+				existingProjectIds.add(item.project_id)
+				resolvedAddons.push({
+					project_id: item.project_id,
+					version_id: item.version_id,
+				})
+			}
+		}
+
+		return resolvedAddons
+	}
+
 	function getInstallProjectVersions(projectId: string) {
 		return client.labrinth.versions_v2.getProjectVersions(projectId, {
 			include_changelog: false,
@@ -444,15 +483,12 @@ export function useServerInstallContent({
 			const result = await flushStoredServerAddonInstallQueue({
 				serverId,
 				worldId,
-				install: (plans) =>
-					client.archon.content_v1.addAddons(
-						serverId,
-						worldId,
-						plans.map((plan) => ({
-							project_id: plan.projectId,
-							version_id: plan.versionId,
-						})),
-					),
+				install: async (plans) => {
+					const addons = await resolveQueuedAddonPlans(plans)
+					if (addons.length > 0) {
+						await client.archon.content_v1.addAddons(serverId, worldId, addons)
+					}
+				},
 				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
 			})
 

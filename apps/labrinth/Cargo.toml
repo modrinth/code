@@ -75,6 +75,7 @@ json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
+modrinth-content-management = { workspace = true }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
