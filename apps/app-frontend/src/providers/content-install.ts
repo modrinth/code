@@ -638,6 +638,11 @@ export function createContentInstall(opts: {
 	) {
 		const project: Labrinth.Projects.v2.Project = await get_project(projectId, 'must_revalidate')
 
+		if (!project) {
+			opts.handleError(`Project not found: '${projectId}'`)
+			return
+		}
+
 		if (project.project_type === 'modpack') {
 			const version = versionId ?? project.versions[project.versions.length - 1]
 			const packs = await list()
