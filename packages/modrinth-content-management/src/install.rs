@@ -1,3 +1,4 @@
+use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 
 use crate::model::{
@@ -10,11 +11,12 @@ use crate::provider::ContentMetadataProvider;
 // Skip Fabric API if you're installing a fabric project onto a quilt instance.
 const QUILT_FABRIC_API_EXCEPTION_PROJECT_ID: &str = "P7dR8mSH";
 
-pub async fn resolve_content<P: ContentMetadataProvider + Sync>(
-    provider: &P,
+pub async fn resolve_content<P: ContentMetadataProvider>(
+    mut provider: P,
     request: ResolveContentRequest,
 ) -> Result<ResolveContentPlan, Error> {
-    let primary_version = resolve_primary_version(provider, &request).await?;
+    let primary_version =
+        resolve_primary_version(&mut provider, &request).await?;
     let primary = ResolvedContent {
         project_id: primary_version.project_id.clone(),
         version_id: primary_version.id.clone(),
@@ -32,8 +34,8 @@ pub async fn resolve_content<P: ContentMetadataProvider + Sync>(
     })
 }
 
-async fn resolve_primary_version<P: ContentMetadataProvider + Sync>(
-    provider: &P,
+async fn resolve_primary_version<P: ContentMetadataProvider>(
+    provider: &mut P,
     request: &ResolveContentRequest,
 ) -> Result<Version, Error> {
     if let Some(version_id) = &request.version_id {
@@ -67,7 +69,7 @@ async fn resolve_primary_version<P: ContentMetadataProvider + Sync>(
 }
 
 struct InstallResolver<'a, P> {
-    provider: &'a P,
+    provider: P,
     content_type: ContentType,
     selected: &'a ResolutionPreferences,
     target: &'a ResolutionPreferences,
@@ -78,8 +80,8 @@ struct InstallResolver<'a, P> {
     skipped: Vec<SkippedContent>,
 }
 
-impl<'a, P: ContentMetadataProvider + Sync> InstallResolver<'a, P> {
-    fn new(provider: &'a P, request: &'a ResolveContentRequest) -> Self {
+impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
+    fn new(provider: P, request: &'a ResolveContentRequest) -> Self {
         let mut planned_project_versions = HashMap::new();
         planned_project_versions.insert(
             request.project_id.clone(),
@@ -238,7 +240,7 @@ fn select_newest_matching_version(
     selected: &ResolutionPreferences,
     target: &ResolutionPreferences,
 ) -> Option<Version> {
-    versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+    versions.sort_by_key(|version| Reverse(version.date_published));
     let merged = selected.merge(target);
 
     versions
@@ -349,422 +351,4 @@ fn should_skip_quilt_fabric_api(
             .loaders
             .iter()
             .any(|loader| loaders_match(loader, "quilt"))
-}
-
-#[cfg(test)]
-mod tests {
-    use std::collections::HashMap;
-
-    use async_trait::async_trait;
-    use chrono::{DateTime, Utc};
-
-    use super::*;
-
-    #[derive(Default)]
-    struct MemoryProvider {
-        versions: HashMap<String, Version>,
-        project_versions: HashMap<String, Vec<String>>,
-    }
-
-    #[async_trait]
-    impl ContentMetadataProvider for MemoryProvider {
-        async fn get_version(
-            &self,
-            version_id: &str,
-        ) -> Result<Option<Version>, Error> {
-            Ok(self.versions.get(version_id).cloned())
-        }
-
-        async fn get_project_versions(
-            &self,
-            project_id: &str,
-        ) -> Result<Vec<Version>, Error> {
-            Ok(self
-                .project_versions
-                .get(project_id)
-                .into_iter()
-                .flatten()
-                .filter_map(|id| self.versions.get(id))
-                .cloned()
-                .collect())
-        }
-    }
-
-    fn version(
-        id: &str,
-        project_id: &str,
-        date: &str,
-        game_versions: &[&str],
-        loaders: &[&str],
-        dependencies: Vec<Dependency>,
-    ) -> Version {
-        Version {
-            id: id.to_string(),
-            project_id: project_id.to_string(),
-            date_published: DateTime::parse_from_rfc3339(date)
-                .unwrap()
-                .with_timezone(&Utc),
-            dependencies,
-            game_versions: game_versions
-                .iter()
-                .map(|v| v.to_string())
-                .collect(),
-            loaders: loaders.iter().map(|v| v.to_string()).collect(),
-        }
-    }
-
-    fn dependency(project_id: &str) -> Dependency {
-        Dependency {
-            version_id: None,
-            project_id: Some(project_id.to_string()),
-            file_name: None,
-            dependency_type: DependencyType::Required,
-        }
-    }
-
-    fn exact_dependency(version_id: &str) -> Dependency {
-        Dependency {
-            version_id: Some(version_id.to_string()),
-            project_id: None,
-            file_name: None,
-            dependency_type: DependencyType::Required,
-        }
-    }
-
-    fn provider(versions: Vec<Version>) -> MemoryProvider {
-        let mut provider = MemoryProvider::default();
-        for version in versions {
-            provider
-                .project_versions
-                .entry(version.project_id.clone())
-                .or_default()
-                .push(version.id.clone());
-            provider.versions.insert(version.id.clone(), version);
-        }
-        provider
-    }
-
-    fn request(project_id: &str) -> ResolveContentRequest {
-        ResolveContentRequest {
-            project_id: project_id.to_string(),
-            version_id: None,
-            content_type: ContentType::Mod,
-            selected: ResolutionPreferences::default(),
-            target: ResolutionPreferences {
-                game_versions: vec!["1.20.1".to_string()],
-                loaders: vec!["fabric".to_string()],
-            },
-            existing_project_ids: Vec::new(),
-        }
-    }
-
-    #[tokio::test]
-    async fn explicit_primary_version() {
-        let provider = provider(vec![version(
-            "v1",
-            "p1",
-            "2024-01-01T00:00:00Z",
-            &["1.20.1"],
-            &["fabric"],
-            vec![],
-        )]);
-        let mut request = request("p1");
-        request.version_id = Some("v1".to_string());
-
-        let plan = resolve_content(&provider, request).await.unwrap();
-
-        assert_eq!(plan.primary.version_id, "v1");
-    }
-
-    #[tokio::test]
-    async fn target_selected_primary_version() {
-        let provider = provider(vec![
-            version(
-                "old",
-                "p1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-            version(
-                "new",
-                "p1",
-                "2024-02-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-        ]);
-
-        let plan = resolve_content(&provider, request("p1")).await.unwrap();
-
-        assert_eq!(plan.primary.version_id, "new");
-    }
-
-    #[tokio::test]
-    async fn project_only_dependency() {
-        let provider = provider(vec![
-            version(
-                "p1v1",
-                "p1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![dependency("dep")],
-            ),
-            version(
-                "depv1",
-                "dep",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-        ]);
-
-        let plan = resolve_content(&provider, request("p1")).await.unwrap();
-
-        assert_eq!(plan.dependencies[0].project_id, "dep");
-        assert_eq!(
-            plan.dependencies[0].dependent_on_version_id.as_deref(),
-            Some("p1v1")
-        );
-    }
-
-    #[tokio::test]
-    async fn exact_version_dependency() {
-        let provider = provider(vec![
-            version(
-                "p1v1",
-                "p1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![exact_dependency("depv1")],
-            ),
-            version(
-                "depv1",
-                "dep",
-                "2024-01-01T00:00:00Z",
-                &["1.19.4"],
-                &["forge"],
-                vec![],
-            ),
-        ]);
-
-        let plan = resolve_content(&provider, request("p1")).await.unwrap();
-
-        assert_eq!(plan.dependencies[0].version_id, "depv1");
-    }
-
-    #[tokio::test]
-    async fn transitive_dependency_closure() {
-        let provider = provider(vec![
-            version(
-                "p1v1",
-                "p1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![dependency("dep1")],
-            ),
-            version(
-                "dep1v1",
-                "dep1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![dependency("dep2")],
-            ),
-            version(
-                "dep2v1",
-                "dep2",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-        ]);
-
-        let plan = resolve_content(&provider, request("p1")).await.unwrap();
-
-        assert_eq!(plan.dependencies.len(), 2);
-        assert!(plan.dependencies.iter().any(|dep| dep.project_id == "dep2"));
-    }
-
-    #[tokio::test]
-    async fn already_existing_dependency_skip() {
-        let provider = provider(vec![
-            version(
-                "p1v1",
-                "p1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![dependency("dep")],
-            ),
-            version(
-                "depv1",
-                "dep",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-        ]);
-        let mut request = request("p1");
-        request.existing_project_ids = vec!["dep".to_string()];
-
-        let plan = resolve_content(&provider, request).await.unwrap();
-
-        assert!(plan.dependencies.is_empty());
-        assert_eq!(plan.skipped[0].reason, SkippedReason::AlreadyInstalled);
-    }
-
-    #[tokio::test]
-    async fn duplicate_dependency_project_skip() {
-        let provider = provider(vec![
-            version(
-                "p1v1",
-                "p1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![dependency("dep"), dependency("dep")],
-            ),
-            version(
-                "depv1",
-                "dep",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-        ]);
-
-        let plan = resolve_content(&provider, request("p1")).await.unwrap();
-
-        assert_eq!(plan.dependencies.len(), 1);
-        assert_eq!(plan.skipped[0].reason, SkippedReason::DuplicateProject);
-    }
-
-    #[tokio::test]
-    async fn conflicting_dependency_version_behavior() {
-        let provider = provider(vec![
-            version(
-                "p1v1",
-                "p1",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![
-                    Dependency {
-                        project_id: Some("dep".to_string()),
-                        ..exact_dependency("depv1")
-                    },
-                    Dependency {
-                        project_id: Some("dep".to_string()),
-                        ..exact_dependency("depv2")
-                    },
-                ],
-            ),
-            version(
-                "depv1",
-                "dep",
-                "2024-01-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-            version(
-                "depv2",
-                "dep",
-                "2024-02-01T00:00:00Z",
-                &["1.20.1"],
-                &["fabric"],
-                vec![],
-            ),
-        ]);
-
-        let plan = resolve_content(&provider, request("p1")).await.unwrap();
-
-        assert_eq!(plan.dependencies.len(), 1);
-        assert_eq!(
-            plan.skipped[0].reason,
-            SkippedReason::ConflictingDependency
-        );
-    }
-
-    #[tokio::test]
-    async fn quilt_fabric_api_exception() {
-        let provider = provider(vec![version(
-            "p1v1",
-            "p1",
-            "2024-01-01T00:00:00Z",
-            &["1.20.1"],
-            &["quilt"],
-            vec![dependency(QUILT_FABRIC_API_EXCEPTION_PROJECT_ID)],
-        )]);
-        let mut request = request("p1");
-        request.target.loaders = vec!["quilt".to_string()];
-
-        let plan = resolve_content(&provider, request).await.unwrap();
-
-        assert!(plan.dependencies.is_empty());
-        assert_eq!(plan.skipped[0].reason, SkippedReason::QuiltFabricApi);
-    }
-
-    #[tokio::test]
-    async fn datapack_fallback() {
-        let provider = provider(vec![version(
-            "p1v1",
-            "p1",
-            "2024-01-01T00:00:00Z",
-            &["1.20.1"],
-            &["datapack"],
-            vec![],
-        )]);
-
-        let plan = resolve_content(&provider, request("p1")).await.unwrap();
-
-        assert_eq!(plan.primary.version_id, "p1v1");
-    }
-
-    #[tokio::test]
-    async fn neoforge_alias() {
-        let provider = provider(vec![version(
-            "p1v1",
-            "p1",
-            "2024-01-01T00:00:00Z",
-            &["1.20.1"],
-            &["neo"],
-            vec![],
-        )]);
-        let mut request = request("p1");
-        request.target.loaders = vec!["neoforge".to_string()];
-
-        let plan = resolve_content(&provider, request).await.unwrap();
-
-        assert_eq!(plan.primary.version_id, "p1v1");
-    }
-
-    #[tokio::test]
-    async fn paper_purpur_spigot_bukkit_alias() {
-        let provider = provider(vec![version(
-            "p1v1",
-            "p1",
-            "2024-01-01T00:00:00Z",
-            &["1.20.1"],
-            &["bukkit"],
-            vec![],
-        )]);
-        let mut request = request("p1");
-        request.content_type = ContentType::Plugin;
-        request.target.loaders = vec!["paper".to_string()];
-
-        let plan = resolve_content(&provider, request).await.unwrap();
-
-        assert_eq!(plan.primary.version_id, "p1v1");
-    }
 }

@@ -52,7 +52,7 @@ struct CachedEntryContentProvider<'a> {
 #[async_trait]
 impl ContentMetadataProvider for CachedEntryContentProvider<'_> {
     async fn get_version(
-        &self,
+        &mut self,
         version_id: &str,
     ) -> Result<Option<modrinth_content_management::Version>, ResolveError>
     {
@@ -69,7 +69,7 @@ impl ContentMetadataProvider for CachedEntryContentProvider<'_> {
     }
 
     async fn get_project_versions(
-        &self,
+        &mut self,
         project_id: &str,
     ) -> Result<Vec<modrinth_content_management::Version>, ResolveError> {
         let versions = CachedEntry::get_project_versions(
@@ -194,7 +194,7 @@ pub(crate) async fn resolve_install_plan(
         existing_project_ids,
     };
 
-    modrinth_content_management::resolve_content(&provider, request)
+    modrinth_content_management::resolve_content(provider, request)
         .await
         .map_err(resolver_error)
 }

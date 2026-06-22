@@ -5842,7 +5842,6 @@ version = "0.0.0"
 dependencies = [
  "async-trait",
  "chrono",
- "reqwest 0.12.24",
  "serde",
  "thiserror 2.0.17",
  "tokio",

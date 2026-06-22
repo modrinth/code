@@ -21,7 +21,6 @@ use modrinth_content_management::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
-use std::sync::Mutex;
 
 const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve";
 const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat";
@@ -51,28 +50,29 @@ async fn resolve_content(
     .map(|x| x.1)
     .ok();
     let cache_public_result = user_option.is_none();
-    let provider = LabrinthContentProvider {
-        pool,
-        redis,
-        user_option,
-        trace: Mutex::new(ResolveContentTrace::default()),
+    let mut provider = LabrinthContentProvider {
+        pool: pool.get_ref(),
+        redis: redis.get_ref(),
+        user_option: &user_option,
+        trace: ResolveContentTrace::default(),
     };
     let request = request.into_inner();
     let plan = if cache_public_result {
-        resolve_content_with_cache(&provider, request).await
+        resolve_content_with_cache(&mut provider, request).await
     } else {
-        modrinth_content_management::resolve_content(&provider, request).await
+        modrinth_content_management::resolve_content(&mut provider, request)
+            .await
     }
     .map_err(resolve_error_to_api)?;
 
     Ok(web::Json(plan))
 }
 
-struct LabrinthContentProvider {
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    user_option: Option<User>,
-    trace: Mutex<ResolveContentTrace>,
+struct LabrinthContentProvider<'a> {
+    pool: &'a PgPool,
+    redis: &'a RedisPool,
+    user_option: &'a Option<User>,
+    trace: ResolveContentTrace,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -113,16 +113,16 @@ struct ResolveContentHeatKey<'a> {
 }
 
 #[async_trait]
-impl ContentMetadataProvider for LabrinthContentProvider {
+impl ContentMetadataProvider for &mut LabrinthContentProvider<'_> {
     async fn get_version(
-        &self,
+        &mut self,
         version_id: &str,
     ) -> Result<Option<modrinth_content_management::Version>, ResolveError>
     {
         let Some(db_version_id) = parse_version_id(version_id) else {
             return Ok(None);
         };
-        let version = DBVersion::get(db_version_id, &**self.pool, &self.redis)
+        let version = DBVersion::get(db_version_id, self.pool, self.redis)
             .await
             .map_err(resolve_provider_error)?;
 
@@ -133,9 +133,9 @@ impl ContentMetadataProvider for LabrinthContentProvider {
 
         if !is_visible_version(
             &version.inner,
-            &self.user_option,
-            &self.pool,
-            &self.redis,
+            self.user_option,
+            self.pool,
+            self.redis,
         )
         .await
         .map_err(resolve_provider_error)?
@@ -151,10 +151,10 @@ impl ContentMetadataProvider for LabrinthContentProvider {
     }
 
     async fn get_project_versions(
-        &self,
+        &mut self,
         project_id: &str,
     ) -> Result<Vec<modrinth_content_management::Version>, ResolveError> {
-        let project = DBProject::get(project_id, &**self.pool, &self.redis)
+        let project = DBProject::get(project_id, self.pool, self.redis)
             .await
             .map_err(resolve_provider_error)?;
         let Some(project) = project else {
@@ -164,8 +164,8 @@ impl ContentMetadataProvider for LabrinthContentProvider {
 
         if !is_visible_project(
             &project.inner,
-            &self.user_option,
-            &self.pool,
+            self.user_option,
+            self.pool,
             false,
         )
         .await
@@ -176,17 +176,13 @@ impl ContentMetadataProvider for LabrinthContentProvider {
         }
 
         let versions =
-            DBVersion::get_many(&project.versions, &**self.pool, &self.redis)
+            DBVersion::get_many(&project.versions, self.pool, self.redis)
                 .await
                 .map_err(resolve_provider_error)?;
-        let versions = visible_versions(
-            versions,
-            &self.user_option,
-            &self.pool,
-            &self.redis,
-        )
-        .await
-        .map_err(resolve_provider_error)?;
+        let versions =
+            visible_versions(versions, self.user_option, self.pool, self.redis)
+                .await
+                .map_err(resolve_provider_error)?;
 
         let versions = versions
             .into_iter()
@@ -198,48 +194,38 @@ impl ContentMetadataProvider for LabrinthContentProvider {
     }
 }
 
-impl LabrinthContentProvider {
+impl LabrinthContentProvider<'_> {
     fn record_version(
-        &self,
+        &mut self,
         version_id: &str,
         version: Option<&modrinth_content_management::Version>,
     ) {
-        if let Ok(mut trace) = self.trace.lock() {
-            trace
-                .versions
-                .insert(version_id.to_string(), hash_optional_version(version));
-        }
+        self.trace
+            .versions
+            .insert(version_id.to_string(), hash_optional_version(version));
     }
 
     fn record_project_versions(
-        &self,
+        &mut self,
         project_id: &str,
         versions: &[modrinth_content_management::Version],
     ) {
-        if let Ok(mut trace) = self.trace.lock() {
-            trace.project_versions.insert(
-                project_id.to_string(),
-                hash_project_versions(versions),
-            );
-        }
+        self.trace
+            .project_versions
+            .insert(project_id.to_string(), hash_project_versions(versions));
     }
 
-    fn reset_trace(&self) {
-        if let Ok(mut trace) = self.trace.lock() {
-            *trace = ResolveContentTrace::default();
-        }
+    fn reset_trace(&mut self) {
+        self.trace = ResolveContentTrace::default();
     }
 
     fn trace(&self) -> ResolveContentTrace {
-        self.trace
-            .lock()
-            .map(|trace| trace.clone())
-            .unwrap_or_default()
+        self.trace.clone()
     }
 }
 
 async fn resolve_content_with_cache(
-    provider: &LabrinthContentProvider,
+    provider: &mut LabrinthContentProvider<'_>,
     request: ResolveContentRequest,
 ) -> Result<ResolveContentPlan, ResolveError> {
     let cache_key = content_resolve_cache_key(&request);
@@ -265,7 +251,8 @@ async fn resolve_content_with_cache(
 
     provider.reset_trace();
     let plan =
-        modrinth_content_management::resolve_content(provider, request).await?;
+        modrinth_content_management::resolve_content(&mut *provider, request)
+            .await?;
     let trace = provider.trace();
     set_cached_resolve_content_plan(
         &provider.redis,
@@ -380,7 +367,7 @@ async fn set_cached_resolve_content_plan(
 }
 
 async fn validate_cached_trace(
-    provider: &LabrinthContentProvider,
+    provider: &mut LabrinthContentProvider<'_>,
     trace: &ResolveContentTrace,
 ) -> Result<bool, ResolveError> {
     provider.reset_trace();
@@ -390,16 +377,16 @@ async fn validate_cached_trace(
             return Ok(false);
         };
         let version =
-            DBVersion::get(db_version_id, &**provider.pool, &provider.redis)
+            DBVersion::get(db_version_id, provider.pool, provider.redis)
                 .await
                 .map_err(resolve_provider_error)?;
 
         let version = if let Some(version) = version {
             if is_visible_version(
                 &version.inner,
-                &provider.user_option,
-                &provider.pool,
-                &provider.redis,
+                provider.user_option,
+                provider.pool,
+                provider.redis,
             )
             .await
             .map_err(resolve_provider_error)?
@@ -418,7 +405,8 @@ async fn validate_cached_trace(
     }
 
     for (project_id, expected_hash) in &trace.project_versions {
-        let versions = provider.get_project_versions(project_id).await?;
+        let versions =
+            (&mut *provider).get_project_versions(project_id).await?;
 
         if &hash_project_versions(&versions) != expected_hash {
             return Ok(false);
@@ -586,8 +574,8 @@ fn version_to_resolver(
                 ),
             })
             .collect(),
-        game_versions: version.game_versions,
-        loaders: version.loaders,
+        game_versions: version.games,
+        loaders: version.loaders.into_iter().map(|loader| loader.0).collect(),
     }
 }
 
