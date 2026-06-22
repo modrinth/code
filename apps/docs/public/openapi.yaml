@@ -433,21 +433,18 @@ components:
               type: string
               description: The multipart field name of the primary file
             environment:
-              # Its an anyOf because openapi spec does not have a concept of a non-exhaustive enum.
-              anyOf:
-                - type: string
-                  enum:
-                    - client_and_server
-                    - client_only
-                    - client_only_server_optional
-                    - singleplayer_only
-                    - server_only
-                    - server_only_client_optional
-                    - dedicated_server_only
-                    - client_or_server
-                    - client_or_server_prefers_both
-                    - unknown
-                - type: string
+              type: string
+              enum:
+                - client_and_server
+                - client_only
+                - client_only_server_optional
+                - singleplayer_only
+                - server_only
+                - server_only_client_optional
+                - dedicated_server_only
+                - client_or_server
+                - client_or_server_prefers_both
+                - unknown
               description: The environment that this version is for.
           required:
             - file_parts
