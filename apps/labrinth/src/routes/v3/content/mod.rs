@@ -153,8 +153,7 @@ impl ContentMetadataProvider for LabrinthContentProvider {
     async fn get_project_versions(
         &self,
         project_id: &str,
-    ) -> Result<Vec<modrinth_content_management::Version>, ResolveError>
-    {
+    ) -> Result<Vec<modrinth_content_management::Version>, ResolveError> {
         let project = DBProject::get(project_id, &**self.pool, &self.redis)
             .await
             .map_err(resolve_provider_error)?;
@@ -163,25 +162,31 @@ impl ContentMetadataProvider for LabrinthContentProvider {
             return Ok(Vec::new());
         };
 
-        if !is_visible_project(&project.inner, &self.user_option, &self.pool, false)
-            .await
-            .map_err(resolve_provider_error)?
+        if !is_visible_project(
+            &project.inner,
+            &self.user_option,
+            &self.pool,
+            false,
+        )
+        .await
+        .map_err(resolve_provider_error)?
         {
             self.record_project_versions(project_id, &[]);
             return Ok(Vec::new());
         }
 
-        let versions = DBVersion::get_many(
-            &project.versions,
-            &**self.pool,
+        let versions =
+            DBVersion::get_many(&project.versions, &**self.pool, &self.redis)
+                .await
+                .map_err(resolve_provider_error)?;
+        let versions = visible_versions(
+            versions,
+            &self.user_option,
+            &self.pool,
             &self.redis,
         )
         .await
         .map_err(resolve_provider_error)?;
-        let versions =
-            visible_versions(versions, &self.user_option, &self.pool, &self.redis)
-                .await
-                .map_err(resolve_provider_error)?;
 
         let versions = versions
             .into_iter()
@@ -212,9 +217,10 @@ impl LabrinthContentProvider {
         versions: &[modrinth_content_management::Version],
     ) {
         if let Ok(mut trace) = self.trace.lock() {
-            trace
-                .project_versions
-                .insert(project_id.to_string(), hash_project_versions(versions));
+            trace.project_versions.insert(
+                project_id.to_string(),
+                hash_project_versions(versions),
+            );
         }
     }
 
@@ -225,7 +231,10 @@ impl LabrinthContentProvider {
     }
 
     fn trace(&self) -> ResolveContentTrace {
-        self.trace.lock().map(|trace| trace.clone()).unwrap_or_default()
+        self.trace
+            .lock()
+            .map(|trace| trace.clone())
+            .unwrap_or_default()
     }
 }
 
@@ -240,8 +249,8 @@ async fn resolve_content_with_cache(
         .unwrap_or(1);
     let cache_expiry = content_resolve_cache_expiry_seconds(heat);
 
-    if let Some(cached) = get_cached_resolve_content_plan(&provider.redis, &cache_key)
-        .await
+    if let Some(cached) =
+        get_cached_resolve_content_plan(&provider.redis, &cache_key).await
         && validate_cached_trace(provider, &cached.trace).await?
     {
         set_cached_resolve_content_plan(
@@ -279,7 +288,9 @@ async fn increment_content_resolve_cache_heat(
     let mut redis = match redis.connect().await {
         Ok(redis) => redis,
         Err(error) => {
-            tracing::warn!("failed to connect to redis for content resolve cache heat: {error}");
+            tracing::warn!(
+                "failed to connect to redis for content resolve cache heat: {error}"
+            );
             return None;
         }
     };
@@ -291,7 +302,9 @@ async fn increment_content_resolve_cache_heat(
         Ok(Some(count)) => count,
         Ok(None) => 1,
         Err(error) => {
-            tracing::warn!("failed to increment content resolve cache heat: {error}");
+            tracing::warn!(
+                "failed to increment content resolve cache heat: {error}"
+            );
             return None;
         }
     };
@@ -318,7 +331,9 @@ async fn get_cached_resolve_content_plan(
     let mut redis = match redis.connect().await {
         Ok(redis) => redis,
         Err(error) => {
-            tracing::warn!("failed to connect to redis for content resolve cache: {error}");
+            tracing::warn!(
+                "failed to connect to redis for content resolve cache: {error}"
+            );
             return None;
         }
     };
@@ -344,7 +359,9 @@ async fn set_cached_resolve_content_plan(
     let mut redis = match redis.connect().await {
         Ok(redis) => redis,
         Err(error) => {
-            tracing::warn!("failed to connect to redis for content resolve cache: {error}");
+            tracing::warn!(
+                "failed to connect to redis for content resolve cache: {error}"
+            );
             return;
         }
     };
@@ -372,19 +389,20 @@ async fn validate_cached_trace(
         let Some(db_version_id) = parse_version_id(version_id) else {
             return Ok(false);
         };
-        let version = DBVersion::get(db_version_id, &**provider.pool, &provider.redis)
-            .await
-            .map_err(resolve_provider_error)?;
+        let version =
+            DBVersion::get(db_version_id, &**provider.pool, &provider.redis)
+                .await
+                .map_err(resolve_provider_error)?;
 
         let version = if let Some(version) = version {
             if is_visible_version(
-                    &version.inner,
-                    &provider.user_option,
-                    &provider.pool,
-                    &provider.redis,
-                )
-                .await
-                .map_err(resolve_provider_error)?
+                &version.inner,
+                &provider.user_option,
+                &provider.pool,
+                &provider.redis,
+            )
+            .await
+            .map_err(resolve_provider_error)?
             {
                 Some(version_to_resolver(Version::from(version)))
             } else {
@@ -482,7 +500,9 @@ fn hash_version(version: &modrinth_content_management::Version) -> String {
             version_id: dependency.version_id.clone(),
             project_id: dependency.project_id.clone(),
             file_name: dependency.file_name.clone(),
-            dependency_type: dependency_type_cache_key(dependency.dependency_type),
+            dependency_type: dependency_type_cache_key(
+                dependency.dependency_type,
+            ),
         })
         .collect::<Vec<_>>();
     dependencies.sort();
@@ -525,15 +545,17 @@ fn dependency_type_cache_key(
 }
 
 fn hash_serializable(value: &impl Serialize) -> String {
-    let bytes =
-        serde_json::to_vec(value).expect("serializing cache key should not fail");
+    let bytes = serde_json::to_vec(value)
+        .expect("serializing cache key should not fail");
     let mut hasher = Sha256::new();
     hasher.update(bytes);
     format!("{:x}", hasher.finalize())
 }
 
 fn parse_version_id(version_id: &str) -> Option<DBVersionId> {
-    parse_base62(version_id).ok().map(|id| DBVersionId(id as i64))
+    parse_base62(version_id)
+        .ok()
+        .map(|id| DBVersionId(id as i64))
 }
 
 async fn visible_versions(
@@ -545,7 +567,9 @@ async fn visible_versions(
     filter_visible_versions(versions, user_option, pool, redis).await
 }
 
-fn version_to_resolver(version: Version) -> modrinth_content_management::Version {
+fn version_to_resolver(
+    version: Version,
+) -> modrinth_content_management::Version {
     modrinth_content_management::Version {
         id: version.id.to_string(),
         project_id: version.project_id.to_string(),
@@ -595,20 +619,22 @@ fn resolve_error_to_api(error: ResolveError) -> ApiError {
         ResolveError::Provider(message) => {
             ApiError::Internal(eyre::eyre!(message))
         }
-        ResolveError::ProjectNotFound(project_id) => {
-            ApiError::Request(eyre::eyre!("project `{project_id}` was not found"))
-        }
-        ResolveError::VersionNotFound(version_id) => {
-            ApiError::Request(eyre::eyre!("version `{version_id}` was not found"))
-        }
+        ResolveError::ProjectNotFound(project_id) => ApiError::Request(
+            eyre::eyre!("project `{project_id}` was not found"),
+        ),
+        ResolveError::VersionNotFound(version_id) => ApiError::Request(
+            eyre::eyre!("version `{version_id}` was not found"),
+        ),
         ResolveError::VersionProjectMismatch {
             version_id,
             project_id,
         } => ApiError::Request(eyre::eyre!(
             "version `{version_id}` does not belong to project `{project_id}`"
         )),
-        ResolveError::NoCompatibleVersion(project_id) => ApiError::Request(
-            eyre::eyre!("no compatible version was found for project `{project_id}`"),
-        ),
+        ResolveError::NoCompatibleVersion(project_id) => {
+            ApiError::Request(eyre::eyre!(
+                "no compatible version was found for project `{project_id}`"
+            ))
+        }
     }
 }

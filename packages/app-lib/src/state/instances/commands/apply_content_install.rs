@@ -71,8 +71,7 @@ impl ContentMetadataProvider for CachedEntryContentProvider<'_> {
     async fn get_project_versions(
         &self,
         project_id: &str,
-    ) -> Result<Vec<modrinth_content_management::Version>, ResolveError>
-    {
+    ) -> Result<Vec<modrinth_content_management::Version>, ResolveError> {
         let versions = CachedEntry::get_project_versions(
             project_id,
             self.cache_behaviour,
@@ -98,7 +97,9 @@ fn resolver_error(error: ResolveError) -> crate::Error {
     crate::ErrorKind::InputError(error.to_string()).into()
 }
 
-fn version_to_resolver(version: Version) -> modrinth_content_management::Version {
+fn version_to_resolver(
+    version: Version,
+) -> modrinth_content_management::Version {
     modrinth_content_management::Version {
         id: version.id,
         project_id: version.project_id,
@@ -270,7 +271,8 @@ pub(crate) async fn switch_project_version_with_dependencies(
     .await?;
 
     if was_disabled {
-        new_path = toggle_disable_project(instance_id, &new_path, state).await?;
+        new_path =
+            toggle_disable_project(instance_id, &new_path, state).await?;
     }
 
     for dependency in &plan.dependencies {
