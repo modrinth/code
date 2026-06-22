@@ -514,7 +514,7 @@ function formatLoadingBars(loadingBar: LoadingBar): LoadingBar {
 		})
 	}
 	if (formatted.bar_type?.instance_id) {
-		formatted.title = formatted.bar_type.instance_id
+		formatted.title = formatted.bar_type.instance_name ?? formatted.bar_type.instance_id
 	}
 	if (formatted.bar_type?.pack_name) {
 		formatted.title = formatted.bar_type.pack_name

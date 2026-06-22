@@ -1,10 +1,24 @@
 use super::get::get;
 use crate::event::emit::{emit_instance, emit_loading, init_loading};
 use crate::event::{InstancePayloadType, LoadingBarType};
+use crate::state::instances::BulkUpdatePreview;
 use crate::state::{ProjectType, State};
 use crate::util::fetch;
 use std::collections::HashMap;
 use std::path::Path;
+
+#[tracing::instrument]
+pub async fn preview_update_all_projects(
+    instance_id: &str,
+) -> crate::Result<BulkUpdatePreview> {
+    let state = State::get().await?;
+
+    crate::state::instances::commands::preview_update_all_projects(
+        instance_id,
+        &state,
+    )
+    .await
+}
 
 #[tracing::instrument]
 pub async fn update_all_projects(

@@ -567,14 +567,18 @@ function handleSwitchVersionById(id: string) {
 // Bulk updating
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal>>()
 const pendingBulkUpdateItems = ref<ContentItem[]>([])
+const pendingBulkUpdateAll = ref(false)
 
-const hasBulkUpdateSupport = computed(() => !!(ctx.bulkUpdateItem || ctx.bulkUpdateItems))
+const hasBulkUpdateSupport = computed(
+	() => !!(ctx.bulkUpdateAll || ctx.bulkUpdateItem || ctx.bulkUpdateItems),
+)
 
 function promptUpdateAll(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
 	const items = ctx.items.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
+	pendingBulkUpdateAll.value = true
 	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
@@ -587,6 +591,7 @@ function promptUpdateSelected(event?: MouseEvent) {
 	const items = selectedItems.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
+	pendingBulkUpdateAll.value = false
 	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
@@ -599,26 +604,46 @@ async function confirmBulkUpdate() {
 	const items = pendingBulkUpdateItems.value
 	if (items.length === 0 || !hasBulkUpdateSupport.value) return
 
-	if (ctx.bulkUpdateItems) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'update'
-		bulkProgress.value = 0
-		bulkTotal.value = items.length
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkUpdateItems(items)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
+	try {
+		if (pendingBulkUpdateAll.value && ctx.bulkUpdateAll) {
+			isBulkOperating.value = true
+			bulkOperation.value = 'update'
 			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
+			bulkTotal.value = items.length
+			bulkWaiting.value = true
+			try {
+				await ctx.bulkUpdateAll()
+			} finally {
+				clearSelection()
+				isBulkOperating.value = false
+				bulkOperation.value = null
+				bulkProgress.value = 0
+				bulkTotal.value = 0
+				bulkWaiting.value = false
+			}
+		} else if (ctx.bulkUpdateItems) {
+			isBulkOperating.value = true
+			bulkOperation.value = 'update'
+			bulkProgress.value = 0
+			bulkTotal.value = items.length
+			bulkWaiting.value = true
+			try {
+				await ctx.bulkUpdateItems(items)
+			} finally {
+				clearSelection()
+				isBulkOperating.value = false
+				bulkOperation.value = null
+				bulkProgress.value = 0
+				bulkTotal.value = 0
+				bulkWaiting.value = false
+			}
+		} else if (ctx.bulkUpdateItem) {
+			await runBulk('update', items, ctx.bulkUpdateItem, { onComplete: clearSelection })
 		}
-	} else if (ctx.bulkUpdateItem) {
-		await runBulk('update', items, ctx.bulkUpdateItem, { onComplete: clearSelection })
+	} finally {
+		pendingBulkUpdateItems.value = []
+		pendingBulkUpdateAll.value = false
 	}
-	pendingBulkUpdateItems.value = []
 }
 
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()

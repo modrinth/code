@@ -70,6 +70,7 @@ export interface ContentManagerContext {
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void
+	bulkUpdateAll?: () => Promise<void>
 	bulkUpdateItem?: (item: ContentItem) => Promise<void>
 	bulkUpdateItems?: (items: ContentItem[]) => Promise<void>
 
