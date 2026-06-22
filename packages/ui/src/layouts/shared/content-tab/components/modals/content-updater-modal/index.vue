@@ -25,69 +25,75 @@
 				</div>
 
 				<div class="flex-1 overflow-y-auto px-4" :class="isModpack ? 'pb-4' : 'pb-16'">
-					<div v-if="loading" class="flex flex-col items-center justify-center h-full gap-2">
-						<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
-						<span class="text-sm text-secondary">{{
-							formatMessage(messages.loadingVersions)
-						}}</span>
-					</div>
-					<template v-else>
-						<div class="flex flex-col gap-1.5" role="listbox">
-							<button
-								v-for="version in filteredVersions"
-								:key="version.id"
-								role="option"
-								:aria-selected="selectedVersion?.id === version.id"
-								class="flex items-center h-10 px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
-								:class="[
-									selectedVersion?.id === version.id
-										? 'bg-brand-highlight'
-										: 'bg-transparent hover:bg-button-bg',
-								]"
-								@mouseenter="handleVersionMouseEnter(version)"
-								@mouseleave="handleVersionMouseLeave"
-								@focus="emit('versionHover', version)"
-								@click="handleVersionSelect(version)"
-							>
-								<div class="flex items-center justify-between w-full gap-2">
-									<div class="flex items-center gap-2 min-w-0">
-										<VersionChannelIndicator
-											:channel="version.version_type"
-											size="sm"
-											class="shrink-0"
-										/>
+					<Transition name="content-updater-fade" mode="out-in">
+						<div
+							v-if="loading"
+							key="versions-loading"
+							class="flex flex-col items-center justify-center h-full gap-2"
+						>
+							<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
+							<span class="text-sm text-secondary">{{
+								formatMessage(messages.loadingVersions)
+							}}</span>
+						</div>
+						<div v-else key="versions-ready" class="min-h-full">
+							<div class="flex flex-col gap-1.5" role="listbox">
+								<button
+									v-for="version in filteredVersions"
+									:key="version.id"
+									role="option"
+									:aria-selected="selectedVersion?.id === version.id"
+									class="flex items-center h-10 px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
+									:class="[
+										selectedVersion?.id === version.id
+											? 'bg-brand-highlight'
+											: 'bg-transparent hover:bg-button-bg',
+									]"
+									@mouseenter="handleVersionMouseEnter(version)"
+									@mouseleave="handleVersionMouseLeave"
+									@focus="emit('versionHover', version)"
+									@click="handleVersionSelect(version)"
+								>
+									<div class="flex items-center justify-between w-full gap-2">
+										<div class="flex items-center gap-2 min-w-0">
+											<VersionChannelIndicator
+												:channel="version.version_type"
+												size="sm"
+												class="shrink-0"
+											/>
+											<span
+												v-tooltip="version.version_number"
+												class="font-semibold text-contrast truncate"
+											>
+												{{ version.version_number }}
+											</span>
+										</div>
 										<span
-											v-tooltip="version.version_number"
-											class="font-semibold text-contrast truncate"
+											v-if="shouldShowBadge(version)"
+											class="rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
+											:class="[
+												getBadgeClasses(version),
+												shouldShowIncompatibleBadge(version) ? 'p-1' : 'px-2.5 py-0.5',
+											]"
 										>
-											{{ version.version_number }}
+											<CircleAlertIcon
+												v-if="shouldShowIncompatibleBadge(version)"
+												v-tooltip="formatMessage(messages.incompatibleBadge)"
+												class="size-4"
+											/>
+											<template v-else>{{ getBadgeLabel(version) }}</template>
 										</span>
 									</div>
-									<span
-										v-if="shouldShowBadge(version)"
-										class="rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
-										:class="[
-											getBadgeClasses(version),
-											shouldShowIncompatibleBadge(version) ? 'p-1' : 'px-2.5 py-0.5',
-										]"
-									>
-										<CircleAlertIcon
-											v-if="shouldShowIncompatibleBadge(version)"
-											v-tooltip="formatMessage(messages.incompatibleBadge)"
-											class="size-4"
-										/>
-										<template v-else>{{ getBadgeLabel(version) }}</template>
-									</span>
-								</div>
-							</button>
+								</button>
+							</div>
+							<div
+								v-if="filteredVersions.length === 0"
+								class="p-4 text-center text-secondary text-sm"
+							>
+								{{ formatMessage(messages.noVersionsFound) }}
+							</div>
 						</div>
-						<div
-							v-if="filteredVersions.length === 0"
-							class="p-4 text-center text-secondary text-sm"
-						>
-							{{ formatMessage(messages.noVersionsFound) }}
-						</div>
-					</template>
+					</Transition>
 				</div>
 
 				<div
@@ -121,7 +127,12 @@
 			<div class="w-px bg-divider" />
 
 			<div class="flex-1 flex flex-col min-w-0 relative bg-surface-1" aria-live="polite">
-				<template v-if="selectedVersion">
+				<Transition name="content-updater-fade" mode="out-in">
+					<div
+						v-if="selectedVersion"
+						key="changelog-selected"
+						class="flex-1 flex flex-col min-w-0 relative"
+					>
 					<div class="bg-bg p-4">
 						<div class="flex flex-col gap-1.5">
 							<div class="flex items-center justify-between">
@@ -158,32 +169,49 @@
 					<div class="h-px bg-divider" />
 
 					<div class="flex-1 bg-bg p-4 overflow-y-auto">
-						<div
-							v-if="loadingChangelog"
-							class="flex flex-col items-center justify-center h-full gap-2"
-						>
-							<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
-							<span class="text-sm text-secondary">{{
-								formatMessage(messages.loadingChangelog)
-							}}</span>
-						</div>
-						<div
-							v-else-if="selectedVersion.changelog"
-							class="markdown [&_img]:max-w-full [&_img]:h-auto"
-							v-html="renderHighlightedString(selectedVersion.changelog)"
-						/>
-						<div v-else class="text-secondary italic">
-							{{ formatMessage(messages.noChangelog) }}
-						</div>
+						<Transition name="content-updater-fade" mode="out-in">
+							<div
+								v-if="loadingChangelog"
+								key="changelog-loading"
+								class="flex flex-col items-center justify-center h-full gap-2"
+							>
+								<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
+								<span class="text-sm text-secondary">{{
+									formatMessage(messages.loadingChangelog)
+								}}</span>
+							</div>
+							<div
+								v-else-if="selectedVersion.changelog"
+								key="changelog-ready"
+								class="markdown [&_img]:max-w-full [&_img]:h-auto"
+								v-html="renderHighlightedString(selectedVersion.changelog)"
+							/>
+							<div v-else key="changelog-empty" class="text-secondary italic">
+								{{ formatMessage(messages.noChangelog) }}
+							</div>
+						</Transition>
 					</div>
 
 					<div
 						class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-bg to-transparent pointer-events-none"
 					/>
-				</template>
-				<div v-else class="flex-1 flex items-center justify-center text-secondary bg-bg">
-					{{ formatMessage(messages.selectVersionPrompt) }}
-				</div>
+					</div>
+					<div
+						v-else-if="loading || loadingChangelog || props.versions.length > 0"
+						key="changelog-loading-empty"
+						class="flex-1 flex flex-col items-center justify-center h-full gap-2 text-secondary bg-bg"
+					>
+						<SpinnerIcon class="h-6 w-6 animate-spin" />
+						<span class="text-sm">{{ formatMessage(messages.loadingChangelog) }}</span>
+					</div>
+					<div
+						v-else
+						key="changelog-empty-selection"
+						class="flex-1 flex items-center justify-center text-secondary bg-bg"
+					>
+						{{ formatMessage(messages.selectVersionPrompt) }}
+					</div>
+				</Transition>
 			</div>
 		</div>
 
@@ -284,7 +312,7 @@ import {
 	renderHighlightedString,
 } from '@modrinth/utils'
 import { useTimeoutFn } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, toRef } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -300,6 +328,9 @@ import {
 	versionChangesGameVersion,
 	versionMatchesCompatibilityTarget,
 } from '#ui/utils/version-compatibility'
+
+import { useContentUpdaterFiltering } from './use-content-updater-filtering'
+import { useContentUpdaterSelection } from './use-content-updater-selection'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentUpdaterModal')
@@ -473,52 +504,19 @@ const incompatibleUpdateModal = ref<InstanceType<typeof ConfirmModal>>()
 const searchQuery = ref('')
 const hideIncompatibleState = ref(true)
 const switchMode = ref(false)
-const selectedVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const pendingIncompatibleUpdate = ref<{
 	version: Labrinth.Versions.v2.Version
 	event: MouseEvent
 } | null>(null)
 const suppressCancelOnHide = ref(false)
-// Store the initial version ID to select when versions become available
-const pendingInitialVersionId = ref<string | undefined>(undefined)
-const pinnedInitialVersionId = ref<string | undefined>(undefined)
 
-watch(
-	() => props.versions,
-	(newVersions) => {
-		// If we have a selected version, check if it was updated with new data (e.g., changelog)
-		if (selectedVersion.value) {
-			const updatedVersion = newVersions.find((v) => v.id === selectedVersion.value?.id)
-			if (updatedVersion && updatedVersion !== selectedVersion.value) {
-				selectedVersion.value = updatedVersion
-			}
-		}
-
-		// Handle initial selection when versions first arrive
-		if (newVersions.length > 0 && !selectedVersion.value && pendingInitialVersionId.value) {
-			const pendingFound = newVersions.find((v) => v.id === pendingInitialVersionId.value)
-			debug('versions watcher: initial selection', {
-				pendingInitialVersionId: pendingInitialVersionId.value,
-				foundPending: !!pendingFound,
-				currentVersionId: props.currentVersionId,
-				currentInList: newVersions.some((v) => v.id === props.currentVersionId),
-				totalVersions: newVersions.length,
-				loaderDistribution: [...new Set(newVersions.flatMap((v) => v.loaders))],
-				gameVersionDistribution: [...new Set(newVersions.flatMap((v) => v.game_versions))].slice(
-					0,
-					10,
-				),
-			})
-			const version = pendingFound ?? newVersions[0]
-			selectedVersion.value = version
-			if (version) {
-				emit('versionSelect', version)
-			}
-			pendingInitialVersionId.value = undefined
-		}
-	},
-	{ deep: true },
-)
+const { selectedVersion, pinnedInitialVersionId, selectVersion, resetInitialSelection } =
+	useContentUpdaterSelection({
+		versions: toRef(props, 'versions'),
+		currentVersionId: toRef(props, 'currentVersionId'),
+		onVersionSelect: (version) => emit('versionSelect', version),
+		debug,
+	})
 
 function isVersionCompatible(version: Labrinth.Versions.v2.Version): boolean {
 	const compatible = versionMatchesCompatibilityTarget(version, {
@@ -551,41 +549,17 @@ const isDowngrade = computed(() => {
 	)
 })
 
-const filteredVersions = computed(() => {
-	let versions = [...props.versions]
-
-	if (searchQuery.value) {
-		const query = searchQuery.value.toLowerCase()
-		versions = versions.filter(
-			(v) =>
-				v.name.toLowerCase().includes(query) ||
-				v.version_number.toLowerCase().includes(query) ||
-				(incompatibilityWarningMode.value &&
-					[...v.loaders, ...v.game_versions].some((value) => value.toLowerCase().includes(query))),
-		)
-	}
-
-	const beforeFilterCount = versions.length
-	if (!incompatibilityWarningMode.value && !isModpack.value && hideIncompatibleState.value) {
-		versions = versions.filter(
-			(version) =>
-				version.id === props.currentVersionId ||
-				version.id === selectedVersion.value?.id ||
-				version.id === pinnedInitialVersionId.value ||
-				isVersionCompatible(version),
-		)
-	}
-
-	debug('filteredVersions computed', {
-		totalVersions: props.versions.length,
-		afterSearchFilter: beforeFilterCount,
-		afterCompatibilityFilter: versions.length,
-		hiddenByCompatibility: beforeFilterCount - versions.length,
-		hideIncompatible: hideIncompatibleState.value,
-		filteringCompatibility: !isModpack.value && hideIncompatibleState.value,
-	})
-
-	return versions
+const filteredVersions = useContentUpdaterFiltering({
+	versions: toRef(props, 'versions'),
+	searchQuery,
+	isModpack,
+	incompatibilityWarningMode,
+	hideIncompatibleState,
+	selectedVersion,
+	pinnedInitialVersionId,
+	currentVersionId: toRef(props, 'currentVersionId'),
+	isVersionCompatible,
+	debug,
 })
 
 function shouldShowBadge(version: Labrinth.Versions.v2.Version): boolean {
@@ -682,9 +656,7 @@ function handleVersionMouseLeave() {
 
 function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	if (prefetchTimeout) prefetchTimeout.stop()
-	selectedVersion.value = version
-	// Emit event so parent can fetch full version data with changelog
-	emit('versionSelect', version)
+	selectVersion(version)
 }
 
 function handleUpdate(event: MouseEvent) {
@@ -772,7 +744,6 @@ function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 	searchQuery.value = ''
 	hideIncompatibleState.value = incompatibilityWarningMode.value ? false : !isModpack.value
 	pendingIncompatibleUpdate.value = null
-	pinnedInitialVersionId.value = initialVersionId
 	switchMode.value = options?.switchMode ?? false
 
 	debug('show() called', {
@@ -791,25 +762,9 @@ function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 			foundInList: !!currentInList,
 			allVersionIds: props.versions.map((v) => v.id),
 		})
-
-		if (initialVersionId) {
-			selectedVersion.value =
-				props.versions.find((v) => v.id === initialVersionId) ?? props.versions[0]
-		} else {
-			selectedVersion.value = props.versions[0]
-		}
-		pendingInitialVersionId.value = undefined
-		if (selectedVersion.value) {
-			emit('versionSelect', selectedVersion.value)
-		}
-	} else {
-		selectedVersion.value = null
-		pendingInitialVersionId.value = initialVersionId
-		debug('show(): no versions yet, deferring selection', {
-			pendingInitialVersionId: initialVersionId,
-		})
 	}
 
+	resetInitialSelection(initialVersionId)
 	modal.value?.show()
 }
 
@@ -820,3 +775,18 @@ function hide() {
 
 defineExpose({ show, hide })
 </script>
+
+<style scoped>
+.content-updater-fade-enter-active,
+.content-updater-fade-leave-active {
+	transition:
+		opacity 160ms ease,
+		transform 160ms ease;
+}
+
+.content-updater-fade-enter-from,
+.content-updater-fade-leave-to {
+	opacity: 0;
+	transform: translateY(3px);
+}
+</style>

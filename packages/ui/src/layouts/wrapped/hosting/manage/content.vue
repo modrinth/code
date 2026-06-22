@@ -32,7 +32,7 @@ import {
 } from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
+import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
 import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
 import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
