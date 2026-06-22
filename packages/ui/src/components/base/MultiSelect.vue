@@ -616,7 +616,7 @@ const fuzzySearchOptions = computed(() =>
 	})),
 )
 
-const fuzzySearch = computed(
+const fuzzyMatcher = computed(
 	() =>
 		new Fuse(fuzzySearchOptions.value, {
 			keys: ['label', 'searchTerms'],
@@ -632,7 +632,7 @@ const filteredOptions = computed(() => {
 
 	const query = searchQuery.value.toLowerCase()
 	const fuzzyMatches = props.fuzzySearch
-		? new Set(fuzzySearch.value.search(searchQuery.value).map(({ item }) => item.option))
+		? new Set(fuzzyMatcher.value.search(searchQuery.value).map(({ item }) => item.option))
 		: null
 	const items: MultiSelectItem<T>[] = []
 	let pendingSectionHeader: MultiSelectSectionHeader | null = null
