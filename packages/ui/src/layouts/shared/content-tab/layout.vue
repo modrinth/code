@@ -448,6 +448,8 @@ async function confirmDelete() {
 	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'delete'
+		bulkProgress.value = 0
+		bulkTotal.value = itemsToDelete.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkDeleteItems(itemsToDelete)
@@ -456,6 +458,8 @@ async function confirmDelete() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -506,6 +510,8 @@ async function bulkEnable() {
 	if (ctx.bulkEnableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'enable'
+		bulkProgress.value = 0
+		bulkTotal.value = items.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkEnableItems(items)
@@ -513,6 +519,8 @@ async function bulkEnable() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -527,6 +535,8 @@ async function bulkDisable() {
 	if (ctx.bulkDisableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'disable'
+		bulkProgress.value = 0
+		bulkTotal.value = items.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkDisableItems(items)
@@ -534,6 +544,8 @@ async function bulkDisable() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -590,6 +602,8 @@ async function confirmBulkUpdate() {
 	if (ctx.bulkUpdateItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'update'
+		bulkProgress.value = 0
+		bulkTotal.value = items.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkUpdateItems(items)
@@ -597,6 +611,8 @@ async function confirmBulkUpdate() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 	} else if (ctx.bulkUpdateItem) {

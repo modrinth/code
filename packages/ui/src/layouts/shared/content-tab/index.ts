@@ -15,7 +15,7 @@ export type {
 	ContentInstallProjectOwner,
 } from './components/modals/ContentInstallModal.vue'
 export { default as ContentInstallModal } from './components/modals/ContentInstallModal.vue'
-export { default as ContentUpdaterModal } from './components/modals/ContentUpdaterModal.vue'
+export { default as ContentUpdaterModal } from './components/modals/content-updater-modal/index.vue'
 export type { ModpackContentModalState } from './components/modals/ModpackContentModal.vue'
 export { default as ModpackContentModal } from './components/modals/ModpackContentModal.vue'
 export { default as ContentCardLayout } from './layout.vue'

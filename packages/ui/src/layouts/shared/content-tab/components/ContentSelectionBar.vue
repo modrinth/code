@@ -46,6 +46,10 @@ const messages = defineMessages({
 		id: 'content.selection-bar.bulk.updating-waiting',
 		defaultMessage: 'Updating {contentType}...',
 	},
+	bulkUpdatingCount: {
+		id: 'content.selection-bar.bulk.updating-count',
+		defaultMessage: 'Updating {count, number} {contentType}',
+	},
 	bulkDeleting: {
 		id: 'content.selection-bar.bulk.deleting',
 		defaultMessage: 'Deleting {progress}/{total} {contentType}...',
@@ -53,6 +57,18 @@ const messages = defineMessages({
 	bulkDeletingWaiting: {
 		id: 'content.selection-bar.bulk.deleting-waiting',
 		defaultMessage: 'Deleting {contentType}...',
+	},
+	bulkEnablingCount: {
+		id: 'content.selection-bar.bulk.enabling-count',
+		defaultMessage: 'Enabling {count, number} {contentType}',
+	},
+	bulkDisablingCount: {
+		id: 'content.selection-bar.bulk.disabling-count',
+		defaultMessage: 'Disabling {count, number} {contentType}',
+	},
+	bulkDeletingCount: {
+		id: 'content.selection-bar.bulk.deleting-count',
+		defaultMessage: 'Deleting {count, number} {contentType}',
 	},
 	allAlreadyEnabled: {
 		id: 'content.selection-bar.all-already-enabled',
@@ -114,7 +130,22 @@ const allDisabled = computed(() => props.selectedItems.every((m) => !m.enabled))
 const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
 
 const selectedCountText = computed(() => {
-	const count = props.selectedItems.length || props.bulkTotal
+	const count = props.isBulkOperating
+		? props.bulkTotal || props.selectedItems.length
+		: props.selectedItems.length || props.bulkTotal
+	if (props.isBulkOperating && props.bulkOperation) {
+		const messageMap = {
+			enable: messages.bulkEnablingCount,
+			disable: messages.bulkDisablingCount,
+			update: messages.bulkUpdatingCount,
+			delete: messages.bulkDeletingCount,
+		}
+		return formatMessage(messageMap[props.bulkOperation], {
+			count,
+			contentType: formatContentTypeSentence(formatMessage, props.contentTypeLabel, count),
+		})
+	}
+
 	if (props.contentTypeLabel) {
 		return formatMessage(messages.selectedCount, {
 			count,

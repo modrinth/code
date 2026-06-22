@@ -33,7 +33,7 @@ import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmM
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../content-tab/components/modals/ContentUpdaterModal.vue'
+import ContentUpdaterModal from '../content-tab/components/modals/content-updater-modal/index.vue'
 import ContentDiffModal from './components/ContentDiffModal.vue'
 import IncompatibleContentModal from './components/IncompatibleContentModal.vue'
 import { useInstallationForm } from './composables'

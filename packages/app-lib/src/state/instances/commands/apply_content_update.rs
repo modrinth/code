@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use super::apply_content_install::{
     add_project_from_version, remove_project, toggle_disable_project,
 };
-use super::check_content_updates::check_content_updates;
+use super::check_content_updates::{ContentUpdate, check_content_updates};
 
 pub(crate) async fn update_project(
     instance_id: &str,
@@ -27,11 +27,21 @@ pub(crate) async fn update_project(
                 "This project cannot be updated!".to_string(),
             )
         })?;
+
+    apply_content_update(instance_id, project_path, &update, state).await
+}
+
+async fn apply_content_update(
+    instance_id: &str,
+    project_path: &str,
+    update: &ContentUpdate,
+    state: &State,
+) -> crate::Result<String> {
     let mut new_path = add_project_from_version(
         instance_id,
         &update.update_version_id,
         DownloadReason::Update,
-        Some(update.current_version_id),
+        Some(update.current_version_id.clone()),
         ContentSourceKind::Local,
         state,
     )
@@ -62,9 +72,11 @@ pub(crate) async fn update_all_projects(
     let mut changed = HashMap::new();
 
     for update in updates {
+        let project_path = update.relative_path.clone();
         let new_path =
-            update_project(instance_id, &update.relative_path, state).await?;
-        changed.insert(update.relative_path, new_path);
+            apply_content_update(instance_id, &project_path, &update, state)
+                .await?;
+        changed.insert(project_path, new_path);
     }
 
     Ok(changed)
