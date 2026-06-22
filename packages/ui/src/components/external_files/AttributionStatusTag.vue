@@ -6,7 +6,7 @@ import { TagItem } from '#ui/components'
 import { defineMessage, useVIntl } from '../../composables/i18n'
 
 const props = defineProps<{
-	variant: 'pending' | 'attributed' | 'no_permission' | 'proof_rejected'
+	variant: 'pending' | 'attributed' | 'no_permission' | 'proof_rejected' | 'not_allowed'
 }>()
 
 const { formatMessage } = useVIntl()
@@ -27,6 +27,14 @@ const badge = computed(() => {
 				message: defineMessage({
 					id: 'external-files.permissions-card.badge.proof-rejected',
 					defaultMessage: 'Information rejected',
+				}),
+			}
+		case 'not_allowed':
+			return {
+				style: { '--_bg-color': 'var(--color-red-bg)', '--_color': 'var(--color-red)' },
+				message: defineMessage({
+					id: 'external-files.permissions-card.badge.not-allowed',
+					defaultMessage: 'Not allowed',
 				}),
 			}
 		case 'attributed':
