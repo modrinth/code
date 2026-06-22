@@ -7,11 +7,23 @@ use crate::state::{
 };
 use std::collections::HashMap;
 
+use super::sync_content_files::{
+    project_type_for_file, sync_instance_content_files,
+};
+
 #[derive(Clone, Debug)]
 pub(crate) struct ContentUpdate {
     pub relative_path: String,
     pub current_version_id: String,
     pub update_version_id: String,
+}
+
+#[derive(Clone, Debug)]
+struct UpdateCandidate {
+    entry: Option<ContentEntry>,
+    file: InstanceFile,
+    project_type: ProjectType,
+    current_version_id: String,
 }
 
 pub(crate) async fn check_content_updates(
@@ -35,18 +47,42 @@ pub(crate) async fn check_content_updates(
             })?;
     let entries =
         content_rows::get_content_entries(&content_set.id, &state.pool).await?;
-    let files =
-        content_rows::get_instance_files(&instance.id, &state.pool).await?;
-    let files_by_id = files
-        .into_iter()
-        .map(|file| (file.id.clone(), file))
-        .collect::<HashMap<_, _>>();
-    let candidates = entries
-        .into_iter()
+    let entries_by_file_id = entries
+        .iter()
         .filter_map(|entry| {
-            let file = files_by_id.get(entry.file_id.as_ref()?)?;
-            let version_id = entry.version_id.clone()?;
-            Some((entry, file.clone(), version_id))
+            entry.file_id.as_deref().map(|file_id| (file_id, entry))
+        })
+        .collect::<HashMap<_, _>>();
+    let files = sync_instance_content_files(&instance, state).await?;
+    let hashes = files
+        .iter()
+        .map(|file| file.sha1.as_str())
+        .collect::<Vec<_>>();
+    let file_info = CachedEntry::get_file_many(
+        &hashes,
+        cache_behaviour,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+    let file_info_by_hash = file_info
+        .into_iter()
+        .map(|file| (file.hash.clone(), file))
+        .collect::<HashMap<_, _>>();
+    let candidates = files
+        .into_iter()
+        .filter_map(|file| {
+            let project_type = project_type_for_file(&file)?;
+            let metadata = file_info_by_hash.get(&file.sha1)?;
+            Some(UpdateCandidate {
+                entry: entries_by_file_id
+                    .get(file.id.as_str())
+                    .copied()
+                    .cloned(),
+                file,
+                project_type,
+                current_version_id: metadata.version_id.clone(),
+            })
         })
         .collect::<Vec<_>>();
 
@@ -58,13 +94,13 @@ pub(crate) async fn check_content_updates(
         installed_update_channels(&candidates, cache_behaviour, state).await?;
     let update_keys = candidates
         .iter()
-        .map(|(entry, file, _)| {
+        .map(|candidate| {
             update_cache_key(
-                file,
-                entry.project_type,
+                &candidate.file,
+                candidate.project_type,
                 effective_update_channel(
                     instance.update_channel,
-                    installed_channels.get(&file.sha1).copied(),
+                    installed_channels.get(&candidate.file.sha1).copied(),
                 ),
                 &content_set.game_version,
                 content_set.loader.as_str(),
@@ -91,25 +127,29 @@ pub(crate) async fn check_content_updates(
     }
 
     let mut output = Vec::new();
-    for (entry, file, current_version_id) in candidates {
+    for candidate in candidates {
         let update_version_id = updates_by_hash
-            .remove(&file.sha1)
+            .remove(&candidate.file.sha1)
             .unwrap_or_default()
             .into_iter()
-            .find(|update_version_id| update_version_id != &current_version_id);
+            .find(|update_version_id| {
+                update_version_id != &candidate.current_version_id
+            });
 
-        content_rows::upsert_content_update_check(
-            &entry.id,
-            instance.update_channel,
-            update_version_id.as_deref(),
-            &state.pool,
-        )
-        .await?;
+        if let Some(entry) = &candidate.entry {
+            content_rows::upsert_content_update_check(
+                &entry.id,
+                instance.update_channel,
+                update_version_id.as_deref(),
+                &state.pool,
+            )
+            .await?;
+        }
 
         if let Some(update_version_id) = update_version_id {
             output.push(ContentUpdate {
-                relative_path: file.relative_path,
-                current_version_id,
+                relative_path: candidate.file.relative_path,
+                current_version_id: candidate.current_version_id,
                 update_version_id,
             });
         }
@@ -119,13 +159,13 @@ pub(crate) async fn check_content_updates(
 }
 
 async fn installed_update_channels(
-    candidates: &[(ContentEntry, InstanceFile, String)],
+    candidates: &[UpdateCandidate],
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
 ) -> crate::Result<HashMap<String, ReleaseChannel>> {
     let version_ids = candidates
         .iter()
-        .map(|(_, _, version_id)| version_id.as_str())
+        .map(|candidate| candidate.current_version_id.as_str())
         .collect::<Vec<_>>();
     let versions = CachedEntry::get_version_many(
         &version_ids,
@@ -146,11 +186,11 @@ async fn installed_update_channels(
 
     Ok(candidates
         .iter()
-        .filter_map(|(_, file, version_id)| {
+        .filter_map(|candidate| {
             channels_by_version_id
-                .get(version_id)
+                .get(&candidate.current_version_id)
                 .copied()
-                .map(|channel| (file.sha1.clone(), channel))
+                .map(|channel| (candidate.file.sha1.clone(), channel))
         })
         .collect())
 }
