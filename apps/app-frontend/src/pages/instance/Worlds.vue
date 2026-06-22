@@ -173,6 +173,7 @@ import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
+import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import {
 	delete_world,
 	get_instance_protocol_version,
@@ -201,7 +202,6 @@ import {
 } from '@/helpers/worlds.ts'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 
 const messages = defineMessages({
 	searchWorldsPlaceholder: {

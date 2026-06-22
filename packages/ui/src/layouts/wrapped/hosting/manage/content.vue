@@ -26,12 +26,12 @@ import {
 } from '#ui/utils/server-content-installing'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
+import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
 import {
 	flushStoredServerAddonInstallQueue,
-	getTargetInstallPreferences,
 	getStoredServerAddonInstallQueue,
+	getTargetInstallPreferences,
 } from '../../../shared/browse-tab/composables/install-logic'
-import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'

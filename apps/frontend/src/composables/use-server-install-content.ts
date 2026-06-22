@@ -410,9 +410,7 @@ export function useServerInstallContent({
 		}
 	}
 
-	async function resolveQueuedAddonPlans(
-		plans: BrowseInstallPlan<ServerInstallSearchResult>[],
-	) {
+	async function resolveQueuedAddonPlans(plans: BrowseInstallPlan<ServerInstallSearchResult>[]) {
 		const existingProjectIds = getServerInstalledProjectIds()
 		const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
 

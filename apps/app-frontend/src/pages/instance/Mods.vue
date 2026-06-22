@@ -112,7 +112,6 @@ import { install_duplicate_instance, installJobInstanceId } from '@/helpers/inst
 import {
 	add_project_from_path,
 	edit,
-	get,
 	get_linked_modpack_content,
 	list,
 	remove_project,
