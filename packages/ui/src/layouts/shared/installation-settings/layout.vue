@@ -43,6 +43,9 @@ import type { LoaderVersionEntry } from './types'
 const { formatMessage } = useVIntl()
 const ctx = injectInstallationSettings()
 const debug = useDebugLogger('InstallationSettingsLayout')
+const availablePlatforms = computed(() =>
+	Array.isArray(ctx.availablePlatforms) ? ctx.availablePlatforms : ctx.availablePlatforms.value,
+)
 
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const repairModal = ref<InstanceType<typeof ConfirmRepairModal>>()
@@ -177,10 +180,10 @@ if (typeof window !== 'undefined') {
 
 const disabledPlatforms = computed(() => {
 	if (!ctx.lockPlatform || ctx.currentPlatform.value === 'vanilla') return []
-	return ctx.availablePlatforms.filter((p) => p !== ctx.currentPlatform.value)
+	return availablePlatforms.value.filter((p) => p !== ctx.currentPlatform.value)
 })
 const platformDisabledItems = computed(() =>
-	ctx.isBusy.value ? ctx.availablePlatforms : disabledPlatforms.value,
+	ctx.isBusy.value ? availablePlatforms.value : disabledPlatforms.value,
 )
 const platformDisabledTooltip = computed(() =>
 	ctx.isBusy.value
@@ -769,7 +772,7 @@ const messages = defineMessages({
 							</span>
 							<Chips
 								v-model="form.selectedPlatform.value"
-								:items="ctx.availablePlatforms"
+								:items="availablePlatforms"
 								:format-label="formatLoaderLabel"
 								:capitalize="false"
 								:disabled-items="platformDisabledItems"

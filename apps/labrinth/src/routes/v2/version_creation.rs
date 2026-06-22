@@ -13,6 +13,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
+use crate::search::SearchState;
 use crate::util::http::HttpClient;
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
@@ -36,7 +37,7 @@ pub struct InitialVersionData {
     pub file_parts: Vec<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex(path = *crate::util::validate::RE_URL_SAFE)
+        regex(path = *crate::util::validate::RE_URL_SAFE_RELAXED)
     )]
     pub version_number: String,
     #[validate(
@@ -55,6 +56,7 @@ pub struct InitialVersionData {
     pub dependencies: Vec<Dependency>,
     #[validate(length(min = 1))]
     pub game_versions: Vec<String>,
+    pub environment: Option<String>,
     #[serde(alias = "version_type")]
     pub release_channel: VersionType,
     #[validate(length(min = 1))]
@@ -103,6 +105,7 @@ pub async fn version_create(
     session_queue: Data<AuthQueue>,
     moderation_queue: Data<AutomatedModerationQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let payload = v2_reroute::alter_actix_multipart(
         payload,
@@ -160,22 +163,26 @@ pub async fn version_create(
                     .iter()
                     .any(|field| field == "environment")
                 {
-                    // If so, we get the field of an example version of the project, and set the side types to match.
-                    fields.insert(
-                        "environment".into(),
-                        get_example_version_fields(
-                            legacy_create.project_id,
-                            client,
-                            &redis,
-                        )
-                        .await?
-                        .into_iter()
-                        .flatten()
-                        .find(|f| f.field_name == "environment")
-                        .map_or(json!("unknown"), |f| {
-                            f.value.serialize_internal()
-                        }),
-                    );
+                    let environment =
+                        if let Some(environment) = legacy_create.environment {
+                            json!(environment)
+                        } else {
+                            // If so, we get the field of an example version of the project, and set the side types to match.
+                            get_example_version_fields(
+                                legacy_create.project_id,
+                                client,
+                                &redis,
+                            )
+                            .await?
+                            .into_iter()
+                            .flatten()
+                            .find(|f| f.field_name == "environment")
+                            .map_or(json!("unknown"), |f| {
+                                f.value.serialize_internal()
+                            })
+                        };
+
+                    fields.insert("environment".into(), environment);
                 }
                 // Handle project type via file extension prediction
                 let mut project_type = None;
@@ -258,6 +265,7 @@ pub async fn version_create(
         session_queue,
         moderation_queue,
         http,
+        search_state,
     )
     .await?;
 
@@ -330,6 +338,7 @@ pub async fn upload_file_to_version(
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     // Returns NoContent, so no need to convert to V2
     let response = v3::version_creation::upload_file_to_version(
@@ -341,6 +350,7 @@ pub async fn upload_file_to_version(
         file_host,
         session_queue,
         http,
+        search_state,
     )
     .await?;
     Ok(response)

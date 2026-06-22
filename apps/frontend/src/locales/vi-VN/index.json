@@ -131,9 +131,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Hiện thị tất cả {count} đường trong biểu đồ?"
   },
-  "analytics.chart.table-selection.limited": {
-    "message": "Đang hiển thị {limit} {itemType, select, project {{limit, plural, one {dự án} other {dự án}}} country {{limit, plural, one {quốc gia} other {quốc gia}}} monetization {{limit, plural, one {doanh thu} other {doanh thu}}} downloadSource {{limit, plural, one {nơi tải gốc} other {nơi tải gốc}}} downloadReason {{limit, plural, one {lý do tải} other {lý do tải}}} projectVersion {{limit, plural, one {phiên bản dự án} other {phiên bản dự án}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {phiên bản game} other {phiên bản game}}} other {{limit, plural, one {mục} other {mục}}}} từ bảng"
-  },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Che {name} trong biểu đồ"
   },

@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Mengunduh Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Mengunduh pembaruan"
+  },
   "app.action-bar.downloads": {
     "message": "Unduhan"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instans utama"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Muat ulang untuk memperbarui"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Tampilkan lebih banyak instans yang sedang berjalan"
   },
   "app.action-bar.stop-instance": {
     "message": "Hentikan instans"
+  },
+  "app.action-bar.update": {
+    "message": "Perbarui"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Lihat pengunduhan berlangsung"
@@ -86,6 +95,12 @@
   "app.appearance-settings.select-option": {
     "message": "Pilih opsi"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Menampilkan seberapa lama Anda memainkan sebuah instans."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Tampilkan waktu bermain"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Menghidupkan kemampuan untuk menghidupkan dan mematikan bilah sisi."
   },
@@ -142,6 +157,9 @@
   },
   "app.browse.server.installing": {
     "message": "Memasang"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -416,6 +434,12 @@
   "app.skins.rate-limit.title": {
     "message": "Pelan-pelan!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Urutan rupa Anda tidak dapat disimpan."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Gagal mengurut ulang rupa"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -489,7 +513,7 @@
     "message": "Selesai mengunduh"
   },
   "app.update-popup.reload": {
-    "message": "Muat ulang"
+    "message": "Muat ulang untuk memperbarui"
   },
   "app.update-popup.title": {
     "message": "Pembaruan tersedia"
@@ -685,6 +709,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Nama"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Perbarui kanal"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Versi rilisan, beta, dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Versi beta dan alpha akan ditampilkan sebagai pembaruan yang tersedia."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Rilisan"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Hanya versi rilisan yang akan ditampilkan sebagai pembaruan yang tersedia."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Pilih kanal pembaruan"
   },
   "instance.settings.tabs.hooks": {
     "message": "Luncurkan kait"

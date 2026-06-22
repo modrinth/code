@@ -42,7 +42,7 @@
     "message": "高度なレンダリング"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Modrinth Appでのお好みのテーマを選択してください"
+    "message": "Modrinth Appでのお好みのテーマを選択してください。"
   },
   "app.appearance-settings.color-theme.title": {
     "message": "テーマ"
@@ -60,25 +60,25 @@
     "message": "デフォルトの起動ページ"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "スキンページで、プレイヤー名の上にある名前タグを無効にします。"
+    "message": "スキンページでプレイヤー上部のネームタグを非表示にします。"
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "名札を非表示にする"
+    "message": "ネームタグを非表示にする"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
     "message": "ホームページの「ジャンプバック」セクションには、最近追加されたワールドが含まれています。"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "再び世界へ飛び込もう"
+    "message": "最近のワールドを表示"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minecraftが起動した時、ランチャーを最小化します"
+    "message": "Minecraftが起動した時、ランチャーを最小化します。"
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "ランチャーを最小化"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "OSデフォルトのウィンドウUIを使用します(アプリの再起動が必要です)"
+    "message": "OSデフォルトのウィンドウUIを使用します。（アプリの再起動が必要です）"
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "OSのウィンドウUIを使用"
@@ -86,17 +86,23 @@
   "app.appearance-settings.select-option": {
     "message": "オプションを選択してください"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "インスタンスのプレイ時間を表示します。"
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "プレイ時間を表示"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "サイドバーの表示/非表示を切り替える機能を有効にします。"
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "サイドバーの表示/非表示を切り替える"
+    "message": "サイドバーの表示切替を有効化"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Modrinth上にホストされていないModrinth Packファイル（.mrpack）をインストールしようとした場合、インストール前にそのリスクを理解していただけるよう確認します。"
+    "message": "Modrinthで配布されていないModrinth Pack（.mrpack）をインストールする場合、事前にリスクについて警告します。"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "未知のMODパックをインストールする前に警告してください"
+    "message": "不明なModパックのインストール前に警告する"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraftの認証サーバーは現在停止している可能性があります。インターネット接続を確認し、しばらくしてからもう一度お試しください。"
@@ -328,9 +334,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "ダウンロード完了"
-  },
-  "app.update-popup.reload": {
-    "message": "再読み込み"
   },
   "app.update-popup.title": {
     "message": "アップデートが利用可能です"

@@ -341,9 +341,6 @@
   "app.update-popup.download-complete": {
     "message": "Downloaden voltooid"
   },
-  "app.update-popup.reload": {
-    "message": "Herlaad"
-  },
   "app.update-popup.title": {
     "message": "Update beschikbaar"
   },

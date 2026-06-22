@@ -160,7 +160,7 @@ const modpackContentQuery = useQuery({
 		client.archon.content_v1.getAddons(serverId, worldId.value!, {
 			from_modpack: true,
 		}),
-	enabled: computed(() => isModpackContentModalOpen.value && worldId.value !== null),
+	enabled: computed(() => worldId.value !== null && !!contentQuery.data.value?.modpack),
 	staleTime: 0,
 })
 
@@ -934,6 +934,14 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 
 async function handleViewModpackContent() {
 	isModpackContentModalOpen.value = true
+
+	if (modpackContentQuery.data.value) {
+		modpackAddons.value = modpackContentQuery.data.value.addons ?? []
+		modpackContentModal.value?.show(modpackAddons.value.map(addonToContentItem))
+		void modpackContentQuery.refetch()
+		return
+	}
+
 	modpackContentModal.value?.showLoading()
 	try {
 		const { data } = await modpackContentQuery.refetch()

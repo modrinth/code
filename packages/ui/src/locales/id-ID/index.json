@@ -552,7 +552,7 @@
     "defaultMessage": "Impor"
   },
   "creation-flow.button.setup-server": {
-    "defaultMessage": "Buat peladen"
+    "defaultMessage": "Buat server"
   },
   "creation-flow.modal.custom-setup.content-loader.label": {
     "defaultMessage": "Pemuat konten"
@@ -570,7 +570,7 @@
     "defaultMessage": "Pilih ikon"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
-    "defaultMessage": "Termutakhir"
+    "defaultMessage": "Terbaru"
   },
   "creation-flow.modal.custom-setup.loader-version-type.other": {
     "defaultMessage": "Lainnya"
@@ -579,13 +579,13 @@
     "defaultMessage": "Stabil"
   },
   "creation-flow.modal.custom-setup.loader-version.label": {
-    "defaultMessage": "Versi lpemuat"
+    "defaultMessage": "Versi pemuat"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
     "defaultMessage": "Pilih versi pemuat"
   },
   "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
-    "defaultMessage": "Cari versi loader..."
+    "defaultMessage": "Cari versi pemuat..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Pemuat"
@@ -594,7 +594,7 @@
     "defaultMessage": "Nama"
   },
   "creation-flow.modal.custom-setup.name.placeholder": {
-    "defaultMessage": "Masukkan nama instansi"
+    "defaultMessage": "Masukkan nama instans"
   },
   "creation-flow.modal.custom-setup.options.no-versions-available": {
     "defaultMessage": "Tidak ada versi tersedia"
@@ -603,7 +603,7 @@
     "defaultMessage": "Pengaturan tambahan"
   },
   "creation-flow.modal.final-config.backup.before-reset-server.name": {
-    "defaultMessage": "Sebelum reset peladen"
+    "defaultMessage": "Pra-pengaturan ulang server"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "Mudah"
@@ -617,23 +617,44 @@
   "creation-flow.modal.final-config.difficulty.normal": {
     "defaultMessage": "Normal"
   },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "Damai"
+  },
   "creation-flow.modal.final-config.game-version.placeholder": {
     "defaultMessage": "Pilih versi permainan"
   },
   "creation-flow.modal.final-config.gamemode.creative": {
     "defaultMessage": "Kreatif"
   },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "Menantang"
+  },
   "creation-flow.modal.final-config.gamemode.label": {
     "defaultMessage": "Mode permainan"
   },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "Sintas"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "Masukkan JSON untuk pengaturan penghasil"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "Tersuai"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "Bawaan"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "Digunakan untuk penyesuaian dunia lanjutan seperti lapisan Superrata tersuai."
+  },
   "creation-flow.modal.final-config.generator-settings.flat": {
-    "defaultMessage": "Datar"
+    "defaultMessage": "Superrata"
   },
   "creation-flow.modal.final-config.generator-settings.label": {
-    "defaultMessage": "Pengaturan generator"
+    "defaultMessage": "Pengaturan penghasil"
   },
   "creation-flow.modal.final-config.generator-settings.placeholder": {
-    "defaultMessage": "Pilih pengaturan generator"
+    "defaultMessage": "Pilih pengaturan penghasil"
   },
   "creation-flow.modal.final-config.world-name.label": {
     "defaultMessage": "Nama dunia"
@@ -648,25 +669,94 @@
     "defaultMessage": "Benih dunia <optional>(Opsional)</optional>"
   },
   "creation-flow.modal.final-config.world-seed.placeholder": {
-    "defaultMessage": "Masukkan seed dunia"
+    "defaultMessage": "Masukkan benih dunia"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "Diperkuat"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "Bawaan"
   },
   "creation-flow.modal.final-config.world-type.label": {
-    "defaultMessage": "Tipe dunia"
+    "defaultMessage": "Jenis dunia"
   },
   "creation-flow.modal.final-config.world-type.large-biomes": {
     "defaultMessage": "Bioma Besar"
   },
   "creation-flow.modal.final-config.world-type.placeholder": {
-    "defaultMessage": "Pilih tipe dunia"
+    "defaultMessage": "Pilih jenis dunia"
   },
   "creation-flow.modal.final-config.world-type.single-biome": {
     "defaultMessage": "Bioma Tunggal"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "Superrata"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Tambah"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "Tersuai ({pathName})"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "Mendeteksi instans peluncur..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "Instans peluncur"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "Tambah jalur peluncur"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "Jalur ke peluncur..."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "Instans tidak ditemukan"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "Cari nama instans"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "Kosongkan semua"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Hasil pencarian tidak ditemukan"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "Minecraft klasik tanpa mod atau pasang-masuk."
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "Minecraft Vanila"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "Pilih jenis pemasangan"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "Tidak"
+  },
+  "external-project-license-status.permanent-no": {
+    "defaultMessage": "Selamanya tidak"
+  },
+  "external-project-license-status.unidentified": {
+    "defaultMessage": "Tidak dikenal"
+  },
+  "external-project-license-status.with-attribution": {
+    "defaultMessage": "Dengan atribusi"
+  },
+  "external-project-license-status.with-attribution-and-source": {
+    "defaultMessage": "Dengan atribusi dan sumber"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Ya"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Ringkasan pengekstrakan"
   },
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Timpa"
+  },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "Akan menimpa <file-path>{path}</file-path>"
   },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Lebih dari 100 berkas akan ditimpa bila Anda melanjutkan proses ekstraksi; berikut ini beberapa di antaranya."
@@ -679,6 +769,9 @@
   },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Berkas-berkas akan ditimpa"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Buat {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "cth: folder-saya"
@@ -779,6 +872,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Perkecil"
   },
+  "files.item-type.file": {
+    "defaultMessage": "berkas"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "berkas"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "folder"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "folder"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "Operasi berkas dimatikan selama proses sedang berlangsung."
   },
@@ -790,6 +895,108 @@
   },
   "files.layout.empty-folder-description": {
     "defaultMessage": "Tidak ada berkas atau folder."
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Beranda"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Berkas baru"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Folder baru"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Cari berkas"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Bagikan ke mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Unggah berkas"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Unggah dari berkas .zip"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Unggah dari URL .zip"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} terekstraksi"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Mengekstraksi {source}"
+  },
+  "files.operations.extracting-completed": {
+    "defaultMessage": "Selesai mengekstraksi {source}"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "Gagal mengekstraksi {source}"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Ganti nama {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Nama baru"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Dibuat"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Dimodifikasi"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Nama"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Ukuran"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Anda memiliki perubahan belum tersimpan yang akan hilang bila Anda keluar. Apakah Anda ingin menyimpannya sebelum keluar?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Buang"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Perubahan belum tersimpan"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Dibatalkan"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Gagal - Berkas sudah ada"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Gagal - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Gagal - Jenis berkas tidak benar"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Gagal mengunggah {fileName}"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Berkas"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Terjadi kesalahan tidak terduga."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} tersisa"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Lepas {type} di sini untuk mengunggah"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Nama hanya dapat berisi karakter alfanumerik, tanda hubung, garis bawah, atau spasi."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Nama hanya dapat berisi karakter alfanumerik, tanda hubung, garis bawah, titik, atau spasi."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Nama"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Nama diperlukan."
   },
   "form.label.address-line": {
     "defaultMessage": "Baris alamat"
@@ -1096,6 +1303,9 @@
   },
   "label.singleplayer": {
     "defaultMessage": "Bermain sendiri"
+  },
+  "label.sort-by": {
+    "defaultMessage": "Urutkan berdasarkan: "
   },
   "label.success": {
     "defaultMessage": "Berhasil"
@@ -1535,6 +1745,9 @@
   "project.about.server.languages": {
     "defaultMessage": "Bahasa"
   },
+  "project.about.server.region": {
+    "defaultMessage": "Wilayah"
+  },
   "project.about.server.title": {
     "defaultMessage": "Perincian server"
   },
@@ -1564,6 +1777,9 @@
   },
   "project.environment.client-or-server.title": {
     "defaultMessage": "Klien dan server, opsional di keduanya"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Semua fungsionalitas dilakukan oleh sisi server dan kompatibel dengan klien vanila. Hanya berfungsi pada server khusus."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Sisi server saja"
@@ -1608,7 +1824,7 @@
     "defaultMessage": "Azerbaijan"
   },
   "project.server.language.be": {
-    "defaultMessage": "Belarusia"
+    "defaultMessage": "Belarus"
   },
   "project.server.language.bg": {
     "defaultMessage": "Bulgaria"
@@ -1716,7 +1932,7 @@
     "defaultMessage": "Latvia"
   },
   "project.server.language.mk": {
-    "defaultMessage": "Makedonia"
+    "defaultMessage": "Masedonia"
   },
   "project.server.language.ml": {
     "defaultMessage": "Malayalam"
@@ -1764,7 +1980,7 @@
     "defaultMessage": "Slowakia"
   },
   "project.server.language.sl": {
-    "defaultMessage": "Slovenia"
+    "defaultMessage": "Slowenia"
   },
   "project.server.language.sq": {
     "defaultMessage": "Albania"
@@ -1816,6 +2032,33 @@
   },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Asia"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australia"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Eropa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Timur Tengah"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Rusia"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Amerika Selatan"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Server dihoskan di {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "AS Timur"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "AS Barat"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analisis"
@@ -2054,6 +2297,9 @@
   "search.filter_type.server_language": {
     "defaultMessage": "Bahasa"
   },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Wilayah"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Pemuat"
   },
@@ -2071,6 +2317,9 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Pulihkan"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "Dimiliki oleh {username}"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Abaikan"
@@ -2138,11 +2387,26 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Ulas"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Australia"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Eropa Tengah"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Berapa besar RAM yang diinginkan untuk server Anda?"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
+  },
+  "servers.region.north-america-central": {
+    "defaultMessage": "Amerika Utara Tengah"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Amerika Utara Timur"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Amerika Utara Barat"
   },
   "servers.region.prompt": {
     "defaultMessage": "Lokasi manakah yang Anda inginkan untuk server Anda?"

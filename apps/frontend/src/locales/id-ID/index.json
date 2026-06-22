@@ -122,6 +122,99 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Sembunyikan {name} di grafik"
   },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Disematkan"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(sblm.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Tampilkan {name} di grafik"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Jumlah"
+  },
+  "analytics.chart.view.area": {
+    "message": "Luas"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Batang"
+  },
+  "analytics.chart.view.line": {
+    "message": "Garis"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Dependensi"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Paket Mod"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Mod Mandiri"
+  },
+  "analytics.download-reason.update": {
+    "message": "Pembaruan"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Situs Web Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "unduhan"
+  },
+  "analytics.empty.no-data": {
+    "message": "Data tidak tersedia"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Tidak ada data untuk dianalisis"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Proyek tidak tersedia"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Tidak ada proyek untuk dianalisis"
+  },
+  "analytics.empty.select-project": {
+    "message": "Pilih setidaknya satu proyek untuk melihat data"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Jenis versi permainan"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Semua"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Rilisan"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Cari negara..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Cari sumber pengunduhan..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Cari versi proyek..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Cari versi..."
+  },
+  "analytics.group-by.1h": {
+    "message": "1j"
+  },
+  "analytics.group-by.6h": {
+    "message": "6j"
+  },
+  "analytics.group-by.date": {
+    "message": "Tanggal"
+  },
+  "analytics.group-by.day": {
+    "message": "Hari"
+  },
+  "analytics.group-by.month": {
+    "message": "Bulan"
+  },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
   },

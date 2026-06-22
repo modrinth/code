@@ -33,7 +33,7 @@
     "message": "Versione del gioco"
   },
   "analytics.breakdown.generic": {
-    "message": "Scomposizione"
+    "message": "Ripartizione"
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
@@ -42,7 +42,7 @@
     "message": "Monetizzazione"
   },
   "analytics.breakdown.none.selected": {
-    "message": "Nessuna scomposizione"
+    "message": "Nessuna ripartizione"
   },
   "analytics.breakdown.project": {
     "message": "Progetto"
@@ -54,7 +54,7 @@
     "message": "Versione del progetto"
   },
   "analytics.breakdown.selected": {
-    "message": "Scomposizione per {breakdown}"
+    "message": "Ripartizione per {breakdown}"
   },
   "analytics.chart.action.show-all": {
     "message": "Mostra tutti"
@@ -64,9 +64,6 @@
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Mostra i primi 8"
-  },
-  "analytics.chart.axis.playtime-hours": {
-    "message": "{hours} ora"
   },
   "analytics.chart.controls.annotations": {
     "message": "Annotazioni"
@@ -114,34 +111,22 @@
     "message": "Vedi l'annuncio"
   },
   "analytics.chart.legend.monetization-details.aria": {
-    "message": "Mostra i dettagli delle analitiche sulla monetizzazione"
+    "message": "Mostra i dettagli sulla monetizzazione"
   },
   "analytics.chart.legend.monetization-details.description": {
-    "message": "Solo le visualizzazioni e i download da Modrinth contano per la monetizzazione e, per gli ultimi, gli utenti devono aver effettuato l'accesso."
+    "message": "Per la monetizzazione contano solo le visualizzazioni e i download da Modrinth. Per gli ultimi, gli utenti devono aver effettuato l'accesso."
   },
   "analytics.chart.legend.monetization-details.title": {
-    "message": "Dettagli monetizzazione"
+    "message": "Dettagli sulla monetizzazione"
   },
   "analytics.chart.legend.previous-period-suffix": {
-    "message": "{name} (Prec.)"
+    "message": "{name} (prec.)"
   },
   "analytics.chart.render-limit.description": {
-    "message": "Mostrare tutte le linee selezionate dalla tabella potrebbe rallentare la pagina."
+    "message": "Mostrarle tutte potrebbe rallentare la pagina."
   },
   "analytics.chart.render-limit.header": {
     "message": "Mostrare tutte le {count} linee nel grafico?"
-  },
-  "analytics.chart.table-selection.all": {
-    "message": "Mostrando {itemType, select, project {{count, plural, one {il progetto} other {tutti i progetti}}} country {{count, plural, one {il paese} other {tutti i paesi}}} monetization {{count, plural, one {il valore di monetizzazione} other {tutti i valori di monetizzazione}}} downloadSource {{count, plural, one {la fonte} other {tutte le fonti}}} downloadReason {{count, plural, one {il motivo} other {tutti i motivi}}} projectVersion {{count, plural, one {la versione del progetto} other {tutte le versioni del progetto}}} loader {{count, plural, one {il loader} other {tutti i loader}}} gameVersion {{count, plural, one {la versione di gioco} other {tutte le versioni di gioco}}} other {{count, plural, one {l'elemento} other {tutti gli elementi}}}} dalla tabella"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Mostrando {count} {itemType, select, project {{count, plural, one {progetto} other {progetti}}} country {{count, plural, one {paese} other {paesi}}} monetization {{count, plural, one {valore di monetizzazione} other {valori di monetizzazione}}} downloadSource {{count, plural, one {fonte} other {fonti}}} downloadReason {{count, plural, one {motivo} other {motivi}}} projectVersion {{count, plural, one {versione del progetto} other {versioni del progetto}}} loader {loader} gameVersion {{count, plural, one {versione di gioco} other {versioni di gioco}}} other {{count, plural, one {elemento} other {elementi}}}} dalla tabella"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Mostrando {limit} {itemType, select, project {{limit, plural, one {progetto} other {progetti}}} country {{limit, plural, one {paese} other {paesi}}} monetization {{limit, plural, one {valore di monetizzazione} other {valori di monetizzazione}}} downloadSource {{limit, plural, one {fonte} other {fonti}}} downloadReason {{limit, plural, one {motivo} other {motivi}}} projectVersion {{limit, plural, one {versione del progetto} other {versioni del progetto}}} loader {loader} gameVersion {{limit, plural, one {versione di gioco} other {versioni di gioco}}} other {{limit, plural, one {elemento} other {elementi}}}} dalla tabella"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Mostrando {itemType, select, project {{count, plural, one {il primo progetto} other {i primi # progetti}}} country {{count, plural, one {il primo paese} other {i primi # paesi}}} monetization {{count, plural, one {il primo valore di monetizzazione} other {i primi # valori di monetizzazione}}} downloadSource {{count, plural, one {la prima fonte} other {le prime # fonti}}} downloadReason {{count, plural, one {il primo motivo} other {i primi # motivi}}} projectVersion {{count, plural, one {la prima versione del progetto} other {le prime # versioni del progetto}}} loader {{count, plural, one {il primo loader} other {i primi # loader}}} gameVersion {{count, plural, one {la prima versione di gioco} other {le prime # versioni di gioco}}} other {{count, plural, one {il primo elemento} other {i primi {count} elementi}}}} dalla tabella"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# giorno} other {# giorni}}"
@@ -171,7 +156,7 @@
     "message": "Totale"
   },
   "analytics.chart.view.area": {
-    "message": "Area"
+    "message": "Aree"
   },
   "analytics.chart.view.bar": {
     "message": "Barre"
@@ -186,7 +171,7 @@
     "message": "Pacchetto di mod"
   },
   "analytics.download-reason.standalone": {
-    "message": "Autonomo"
+    "message": "Indipendente"
   },
   "analytics.download-reason.update": {
     "message": "Aggiornamento"
@@ -204,25 +189,25 @@
     "message": "Nessun dato disponibile"
   },
   "analytics.empty.no-data-for-analytics": {
-    "message": "Nessun dato disponibile per le analitiche"
+    "message": "Nessun dato disponibile"
   },
   "analytics.empty.no-projects": {
     "message": "Nessun progetto disponibile"
   },
   "analytics.empty.no-projects-for-analytics": {
-    "message": "Nessun progetto disponibile per le analitiche"
+    "message": "Nessun progetto disponibile"
   },
   "analytics.empty.select-project": {
     "message": "Seleziona almeno un progetto per vederne i dati"
   },
   "analytics.filter.game-version-type": {
-    "message": "Tipo di versione di gioco"
+    "message": "Tipo di versione del gioco"
   },
   "analytics.filter.game-version-type.all": {
     "message": "Tutte"
   },
   "analytics.filter.game-version-type.release": {
-    "message": "Stabile"
+    "message": "Stabili"
   },
   "analytics.filter.search.countries": {
     "message": "Cerca tra i paesi..."
@@ -234,7 +219,7 @@
     "message": "Cerca tra le versioni del progetto..."
   },
   "analytics.filter.search.versions": {
-    "message": "Cerca tra le versioni..."
+    "message": "Cerca tra le versioni del gioco..."
   },
   "analytics.graph.title.downloads": {
     "message": "Download nel tempo"
@@ -249,10 +234,10 @@
     "message": "Visualizzazioni nel tempo"
   },
   "analytics.group-by.1h": {
-    "message": "1o"
+    "message": "1 ora"
   },
   "analytics.group-by.6h": {
-    "message": "6o"
+    "message": "6 ore"
   },
   "analytics.group-by.date": {
     "message": "Data"
@@ -288,7 +273,7 @@
     "message": "Anno"
   },
   "analytics.loading.fetching-results": {
-    "message": "Ottenendo i risultati..."
+    "message": "Recupero dei risultati..."
   },
   "analytics.options.loading": {
     "message": "Caricamento..."
@@ -347,11 +332,17 @@
   "analytics.project.select": {
     "message": "Seleziona i progetti"
   },
+  "analytics.project.user": {
+    "message": "Progetti di {username}"
+  },
+  "analytics.project.your": {
+    "message": "I tuoi progetti"
+  },
   "analytics.query.filter.add": {
     "message": "Aggiungi filtro"
   },
   "analytics.query.label.breakdown": {
-    "message": "Scomposizione:"
+    "message": "Ripartizione:"
   },
   "analytics.query.label.grouped-by": {
     "message": "Raggruppato per"
@@ -366,7 +357,7 @@
     "message": "Download"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Ai fini della monetizzazione, sono considerate solo le visualizzazioni e i download da Modrinth che superano i controlli antifrode. I download dalla Modrinth App richiedono anche l'accesso dell'utente. Poiché tutti i progetti presentano una percentuale simile di download monetizzati, sommando tutti i download i ricavi non subirebbero variazioni significative."
+    "message": "Ai fini della monetizzazione, sono considerate solo le visualizzazioni e i download da Modrinth che superano i controlli antifrode. I download dalla Modrinth App richiedono inoltre l'autenticazione dell'utente. Poiché tutti i progetti presentano una percentuale simile di download monetizzati, anche sommando tutti i download i ricavi non subirebbero variazioni significative."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Scopri di più"
@@ -381,10 +372,10 @@
     "message": "{hours} ore"
   },
   "analytics.stat.previous-period-comparison": {
-    "message": "rispetto per. prec."
+    "message": "rispetto al prec."
   },
   "analytics.stat.previous-period-comparison-short": {
-    "message": "rispetto prec."
+    "message": "vs prec."
   },
   "analytics.stat.revenue": {
     "message": "Guadagni"
@@ -393,10 +384,10 @@
     "message": "${value}"
   },
   "analytics.stat.unavailable": {
-    "message": "Non disponibile"
+    "message": "N.D."
   },
   "analytics.stat.unavailable-tooltip": {
-    "message": "Nessuna statistica trovata"
+    "message": "Non disponibile per questa ricerca"
   },
   "analytics.stat.views": {
     "message": "Visualizzazioni"
@@ -405,7 +396,7 @@
     "message": "{start} al {end}"
   },
   "analytics.table.csv.filename": {
-    "message": "Scomposizione analitica per {breakdown} - {dateRange}"
+    "message": "Modrinth - Analitiche per {breakdown} - {dateRange}"
   },
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Secondi di gioco"
@@ -423,7 +414,7 @@
     "message": "{count, plural, one {# minuto} other {# minuti}}"
   },
   "analytics.table.empty.no-matching-rows": {
-    "message": "Nessuna riga corrispondete"
+    "message": "Nessuna riga corrispondente"
   },
   "analytics.table.export-csv": {
     "message": "Esporta CSV"
@@ -441,28 +432,28 @@
     "message": "Cerca..."
   },
   "analytics.threshold.countries-above": {
-    "message": "Paesi sopra"
+    "message": "Paesi con oltre"
   },
   "analytics.threshold.country-downloads-aria": {
-    "message": "Soglia dei download del paese"
+    "message": "Soglia dei download per paese"
   },
   "analytics.threshold.game-version-downloads-aria": {
-    "message": "Soglia dei download della versione di gioco"
+    "message": "Soglia dei download per la versione del gioco"
   },
   "analytics.threshold.game-versions-above": {
-    "message": "Versioni del gioco sopra"
+    "message": "Versioni del gioco con oltre"
   },
   "analytics.threshold.project-downloads-aria": {
-    "message": "Soglia dei download del progetto"
+    "message": "Soglia dei download per il progetto"
   },
   "analytics.threshold.project-version-downloads-aria": {
-    "message": "Soglia dei download della versione del progetto"
+    "message": "Soglia dei download per la versione del progetto"
   },
   "analytics.threshold.project-versions-above": {
-    "message": "Versioni del progetto sopra"
+    "message": "Versioni del progetto con oltre"
   },
   "analytics.threshold.projects-above": {
-    "message": "Progetti sopra"
+    "message": "Progetti con oltre"
   },
   "analytics.title": {
     "message": "Analitiche"
@@ -996,7 +987,7 @@
     "message": "I file aggiuntivi sono per risorse di supporto come il codice sorgente, non per versioni alternative o varianti."
   },
   "create.collection.collection-info": {
-    "message": "La tua nuova raccolta sarà pubblica e verrà creata {count, plural, =0 {senza progetti} one {con un progetto} other {con # progetti}}."
+    "message": "La nuova raccolta sarà pubblica e verrà creata {count, plural, =0 {senza progetti} one {con # progetto} other {con # progetti}}."
   },
   "create.collection.create-collection": {
     "message": "Crea raccolta"
@@ -1453,6 +1444,24 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Hai consumato l'intero tuo limite di <b>{withdrawLimit}</b>. Dovrai compilare un modulo fiscale per prelevare di più."
+  },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Puoi rivendicare i seguenti ruoli: {roles}. Collega il tuo account Discord a Modrinth per sincronizzarli."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Collega Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Ottieni dei ruoli su Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creator"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
   },
   "dashboard.head-title": {
     "message": "Bacheca"
@@ -2276,6 +2285,9 @@
   "landing.subheading": {
     "message": "Scopri, gioca e condividi contenuti per Minecraft attraverso la nostra piattaforma open source creata per la comunità."
   },
+  "layout.action.analytics-events": {
+    "message": "Eventi"
+  },
   "layout.action.change-theme": {
     "message": "Cambia tema"
   },
@@ -2322,7 +2334,7 @@
     "message": "Revisione tecnica"
   },
   "layout.avatar.alt": {
-    "message": "Il tuo avatar"
+    "message": "La tua foto profilo"
   },
   "layout.banner.account-action": {
     "message": "Necessaria azione per l'account"
@@ -2830,6 +2842,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Utente di Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Mostra analitiche"
   },
   "profile.button.billing": {
     "message": "Gestisci pagamento utente"

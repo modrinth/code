@@ -15,7 +15,7 @@
     "message": "Cancelar"
   },
   "analytics.action.refresh": {
-    "message": "Recarregar"
+    "message": "Atualizar"
   },
   "analytics.action.reset": {
     "message": "Redefinir"
@@ -33,16 +33,16 @@
     "message": "Versão do jogo"
   },
   "analytics.breakdown.generic": {
-    "message": "Detalhamento"
+    "message": "Detalhes"
   },
   "analytics.breakdown.loader": {
-    "message": "Carregador"
+    "message": "Loader"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetização"
   },
   "analytics.breakdown.none.selected": {
-    "message": "Sem detalhamento"
+    "message": "Sem detalhes"
   },
   "analytics.breakdown.project": {
     "message": "Projeto"
@@ -54,7 +54,7 @@
     "message": "Versão do projeto"
   },
   "analytics.breakdown.selected": {
-    "message": "Detalhamento por {breakdown}"
+    "message": "Detalhes por {breakdown}"
   },
   "analytics.chart.action.show-all": {
     "message": "Exibir tudo"
@@ -87,7 +87,7 @@
     "message": "Mostrar"
   },
   "analytics.chart.controls.modrinth-events": {
-    "message": "Eventos Modrinth"
+    "message": "Eventos do Modrinth"
   },
   "analytics.chart.controls.no-modrinth-events": {
     "message": "Sem eventos do Modrinth no gráfico."
@@ -102,7 +102,7 @@
     "message": "Eventos do projeto"
   },
   "analytics.chart.controls.ratio": {
-    "message": "Razão"
+    "message": "Proporção"
   },
   "analytics.chart.empty.select-table-items": {
     "message": "Selecione itens da tabela abaixo para visualizar seus dados."
@@ -114,16 +114,16 @@
     "message": "<project>{projectName}</project>: {title}"
   },
   "analytics.chart.events.see-announcement": {
-    "message": "Veja o anúncio"
+    "message": "Ver anúncio"
   },
   "analytics.chart.legend.monetization-details.aria": {
-    "message": "Ver detalhes das análises monetizada"
+    "message": "Ver detalhes das análises de monetização"
   },
   "analytics.chart.legend.monetization-details.description": {
-    "message": "Apenas as visualizações e os downloads feitos através do Modrinth contam para a monetização, e os downloads exigem que os usuários estejam logados."
+    "message": "Somente as visualizações e downloads feitas através do Modrinth contam na monetização, e downloads exigem que usuários estejam registrados."
   },
   "analytics.chart.legend.monetization-details.title": {
-    "message": "Detalhes de análises monetizadas"
+    "message": "Detalhes de análises de monetização"
   },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (Ant.)"
@@ -133,18 +133,6 @@
   },
   "analytics.chart.render-limit.header": {
     "message": "Exibir todas as {count} linhas no gráfico?"
-  },
-  "analytics.chart.table-selection.all": {
-    "message": "Exibindo {itemType, select,project {{count, plural, one {todo o projeto} other {todos os projetos}}}country {{count, plural, one {todo o país} other {todos os países}}}monetization {{count, plural, one {todo o valor de monetização} other {todos os valores de monetização}}}downloadSource {{count, plural, one {toda a fonte de download} other {todas as fontes de download}}} downloadReason {{count, plural, one {todo o motivo de download} other {todos os motivos de download}}} projectVersion {{count, plural, one {toda a versão do projeto} other {todas as versões do projeto}}} loader {{count, plural, one {todo o carregador} other {todos os carregadores}}} gameVersion {{count, plural, one {toda a versão do jogo} other {todas as versões do jogo}}} other {{count, plural, one {todo o item} other {todos os itens}}}\n} da tabela"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Exibindo {count} {itemType, select, project {{count, plural, one {projeto} other {projetos}}} country {{count, plural, one {país} other {países}}} monetization {{count, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{count, plural, one {fonte de download} other {fontes de download}}} downloadReason {{count, plural, one {motivo de download} other {motivos de download}}} projectVersion {{count, plural, one {versão do projeto} other {versões do projeto}}} loader {{count, plural, one {carregador} other {carregadores}}} gameVersion {{count, plural, one {versão do jogo} other {versões do jogo}}} other {{count, plural, one {item} other {itens}}}} da tabela"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Exibindo {limit} {itemType, select, project {{limit, plural, one {projeto} other {projetos}}} country {{limit, plural, one {país} other {países}}} monetization {{limit, plural, one {valor de monetização} other {valores de monetização}}} downloadSource {{limit, plural, one {fonte de download} other {fontes de download}}} downloadReason {{limit, plural, one {motivo de download} other {motivos de download}}} projectVersion {{limit, plural, one {versão do projeto} other {versões do projeto}}} loader {{limit, plural, one {carregador} other {carregadores}}} gameVersion {{limit, plural, one {versão do jogo} other {versões do jogo}}} other {{limit, plural, one {item} other {itens}}}} da tabela"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Exibindo os {count} {itemType, select,\nproject {{count, plural, one {projeto principal} other {principais projetos}}}\ncountry {{count, plural, one {país principal} other {principais países}}}\nmonetization {{count, plural, one {valor de monetização principal} other {principais valores de monetização}}}\ndownloadSource {{count, plural, one {fonte de download principal} other {principais fontes de download}}}\ndownloadReason {{count, plural, one {motivo de download principal} other {principais motivos de download}}}\nprojectVersion {{count, plural, one {versão principal do projeto} other {principais versões do projeto}}}\nloader {{count, plural, one {carregador principal} other {principais carregadores}}}\ngameVersion {{count, plural, one {versão principal do jogo} other {principais versões do jogo}}}\nother {{count, plural, one {item principal} other {principais itens}}}\n} da tabela"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dia} other {# dias}}"
@@ -156,7 +144,7 @@
     "message": "{count, plural, one {# minuto} other {# minutos}}"
   },
   "analytics.chart.tooltip.hide-entry": {
-    "message": "Esconder {name} no gráfico"
+    "message": "Ocultar {name} no gráfico"
   },
   "analytics.chart.tooltip.pinned": {
     "message": "Dica de ferramenta do gráfico fixada"
@@ -225,7 +213,7 @@
     "message": "Tudo"
   },
   "analytics.filter.game-version-type.release": {
-    "message": "Estável"
+    "message": "Release"
   },
   "analytics.filter.search.countries": {
     "message": "Buscar países..."
@@ -240,7 +228,7 @@
     "message": "Buscar versões..."
   },
   "analytics.graph.title.downloads": {
-    "message": "Download ao logo do tempo"
+    "message": "Downloads ao longo do tempo"
   },
   "analytics.graph.title.playtime": {
     "message": "Tempo jogado ao longo do tempo"
@@ -349,6 +337,12 @@
   },
   "analytics.project.select": {
     "message": "Selecione projetos"
+  },
+  "analytics.project.user": {
+    "message": "Projetos de {username}"
+  },
+  "analytics.project.your": {
+    "message": "Seus projetos"
   },
   "analytics.query.filter.add": {
     "message": "Adicionar filtro"
@@ -1457,6 +1451,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Você esgotou seu limite de retirada <b>{withdrawLimit}</b>. Você deve completar o formulário fiscal para retirar mais."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Você é elegível para {roles}. Vincule sua conta do Discord através do Modrinth para podermos sincronizá-las automaticamente."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Vincular Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Reivindicar seus cargos do Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "+1 mi de downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Criador"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Orgulho 2026"
+  },
   "dashboard.head-title": {
     "message": "Painel de controle"
   },
@@ -2288,6 +2300,9 @@
   "landing.subheading": {
     "message": "Descubra, jogue e compartilhe conteúdo de Minecraft por meio de nossa plataforma de código aberto criada para a comunidade."
   },
+  "layout.action.analytics-events": {
+    "message": "Eventos de analítica"
+  },
   "layout.action.change-theme": {
     "message": "Mudar tema"
   },
@@ -2842,6 +2857,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Usuário comum."
+  },
+  "profile.button.analytics": {
+    "message": "Ver estatísticas do usuário"
   },
   "profile.button.billing": {
     "message": "Gerenciar cobrança do usuário"
@@ -4521,7 +4539,7 @@
     "message": "Desenvolvedor"
   },
   "settings.sidebar.label.display": {
-    "message": "Mostrar"
+    "message": "Interface"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Notícias recentes do Modrinth"

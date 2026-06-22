@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "A Java {version} letöltése"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Frissítés letöltése"
+  },
   "app.action-bar.downloads": {
     "message": "Letöltések"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Elsődleges példány"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Töltsd újra a frissítéshez"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "További futó pédányok megjelenítése"
   },
   "app.action-bar.stop-instance": {
     "message": "Példány leállítása"
+  },
+  "app.action-bar.update": {
+    "message": "Frissítés"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Aktív letöltések megtekintése"
@@ -498,7 +507,7 @@
     "message": "Sikeres letöltés"
   },
   "app.update-popup.reload": {
-    "message": "Frissítés"
+    "message": "Töltsd újra a frissítéshez"
   },
   "app.update-popup.title": {
     "message": "Frissítés elérhető"
@@ -694,6 +703,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Név"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Frissítési csatorna"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "A release, béta és az alpha verziók is meg fognak jelenni az elérhető frissítések között."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Béta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "A release és a béta verziók is meg fognak jelenni az elérhető frissítések között."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Release"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Csak a release verziók fognak megjelenni az elérhető frissítések között."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Válaszd ki a frissítési csatornát"
   },
   "instance.settings.tabs.hooks": {
     "message": "Indítási horgok"

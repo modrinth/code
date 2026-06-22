@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Java {version} indiriliyor"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Güncelleme indiriliyor"
+  },
   "app.action-bar.downloads": {
     "message": "İndirmeler"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Birincil kurulum"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Güncellemek için yeniden yükle"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Daha fazla çalışan kurulum göster"
   },
   "app.action-bar.stop-instance": {
     "message": "Kurulumu durdur"
+  },
+  "app.action-bar.update": {
+    "message": "Güncelle"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Şu anda indirilienleri göster"
@@ -428,6 +437,12 @@
   "app.skins.rate-limit.title": {
     "message": "Yavaşla!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Skinini kaydedemedik."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Skinler sıralanamadı"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "İnşaatçılar & Biyomlar"
   },
@@ -501,7 +516,7 @@
     "message": "İndirme tamamlandı"
   },
   "app.update-popup.reload": {
-    "message": "Yeniden başlat"
+    "message": "Güncellemek için yeniden yükle"
   },
   "app.update-popup.title": {
     "message": "Güncelleme mevcut"
@@ -697,6 +712,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Ad"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Güncelleme kanalı"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release, beta ve alpha versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release ve beta versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Yayın"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Yalnızca release versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Güncelleme kanalını seç"
   },
   "instance.settings.tabs.hooks": {
     "message": "Başlatma kancaları"

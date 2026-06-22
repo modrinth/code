@@ -167,6 +167,9 @@
   "analytics.download-reason.modpack": {
     "message": "Modcsomag"
   },
+  "analytics.download-reason.standalone": {
+    "message": "Önálló"
+  },
   "analytics.download-reason.update": {
     "message": "Frissítés"
   },
@@ -190,6 +193,9 @@
   },
   "analytics.empty.no-projects-for-analytics": {
     "message": "Nincs elérhető projekt a statisztikához"
+  },
+  "analytics.empty.select-project": {
+    "message": "Válassz ki legalább egy projektet hogy megnézhesd az adatait"
   },
   "analytics.filter.game-version-type": {
     "message": "Játékverzió típusa"
@@ -317,6 +323,21 @@
   "analytics.project.icon-alt": {
     "message": "{name} ikon"
   },
+  "analytics.project.select": {
+    "message": "Projektek kiválasztása"
+  },
+  "analytics.project.user": {
+    "message": "{username} projektjei"
+  },
+  "analytics.project.your": {
+    "message": "A te projektjeid"
+  },
+  "analytics.query.filter.add": {
+    "message": "Szűrő hozzáadása"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Lebontás:"
+  },
   "analytics.query.label.grouped-by": {
     "message": "Csoportosítás"
   },
@@ -335,14 +356,44 @@
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Tudj meg többet"
   },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Hogyan működik a monetizáció?"
+  },
   "analytics.stat.playtime": {
     "message": "Játékidő"
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} óra"
   },
+  "analytics.stat.revenue": {
+    "message": "Bevétel"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "Megtekintések"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start}-tól {end}-ig"
+  },
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Játékidő (másodpercben)"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# day} other {# days}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# hour} other {# hours}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# minute} other {# minutes}}"
+  },
+  "analytics.table.export-csv": {
+    "message": "CSV exportálása"
   },
   "analytics.table.search.placeholder": {
     "message": "Keresés..."
@@ -523,6 +574,9 @@
   },
   "app-marketing.hero.download-modrinth-app": {
     "message": "Modrinth App letöltése"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Modrinth App letöltése {os} rendszerre"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon profil főmenüjének képernyőképe."
@@ -1011,7 +1065,7 @@
     "message": "Gyűjteményeid"
   },
   "dashboard.collections.placeholder.search": {
-    "message": "Gyűjtemények keresése"
+    "message": "Gyűjtemények keresése..."
   },
   "dashboard.collections.sort.name-ascending": {
     "message": "Név (A-Z)"

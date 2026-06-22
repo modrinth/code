@@ -4581,7 +4581,7 @@
     "defaultMessage": "Tema"
   },
   "settings.feature-flags.title": {
-    "defaultMessage": "Sinalização de recursos"
+    "defaultMessage": "Recursos experimentais"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Idiomas padrão"
