@@ -130,6 +130,8 @@ vars! {
     RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
     REDIS_URL: String = "redis://localhost";
+    KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
+    KAFKA_CLIENT_ID: String = "labrinth";
     BIND_ADDR: String = "";
     SELF_ADDR: String = "";
 

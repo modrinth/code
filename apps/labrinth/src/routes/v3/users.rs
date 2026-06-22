@@ -642,7 +642,7 @@ pub async fn orgs_list(
 
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,

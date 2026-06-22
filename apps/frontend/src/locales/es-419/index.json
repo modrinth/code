@@ -15,10 +15,10 @@
     "message": "Cancelar"
   },
   "analytics.action.refresh": {
-    "message": "Refrescar"
+    "message": "Recargar"
   },
   "analytics.action.reset": {
-    "message": "Reiniciar"
+    "message": "Restablecer"
   },
   "analytics.breakdown.country": {
     "message": "País"
@@ -75,16 +75,16 @@
     "message": "Anotaciones"
   },
   "analytics.chart.controls.aria": {
-    "message": "Control de gráficos de las estadísticas, {activeCount}"
+    "message": "Controles de gráficos de las estadísticas, {activeCount}"
   },
   "analytics.chart.controls.button": {
     "message": "Controles"
   },
   "analytics.chart.controls.dialog-aria": {
-    "message": "Controles de gráficos de Estadísticas"
+    "message": "Controles de gráficos de estadísticas"
   },
   "analytics.chart.controls.display": {
-    "message": "Visualizador"
+    "message": "Mostrar"
   },
   "analytics.chart.controls.modrinth-events": {
     "message": "Eventos de Modrinth"
@@ -102,7 +102,7 @@
     "message": "Eventos del proyecto"
   },
   "analytics.chart.controls.ratio": {
-    "message": "Intervalo"
+    "message": "Proporción"
   },
   "analytics.chart.empty.select-table-items": {
     "message": "Selecciona ítems de la tabla inferior para ver tus datos."
@@ -156,7 +156,7 @@
     "message": "(per. prev.)"
   },
   "analytics.chart.tooltip.show-entry": {
-    "message": "Mostrar {name} en el gráfico"
+    "message": "Mostrar {name} en la gráfica"
   },
   "analytics.chart.tooltip.total": {
     "message": "Total"
@@ -213,7 +213,7 @@
     "message": "Todo"
   },
   "analytics.filter.game-version-type.release": {
-    "message": "Lanzamiento"
+    "message": "Estable"
   },
   "analytics.filter.search.countries": {
     "message": "Buscar países..."
@@ -333,10 +333,16 @@
     "message": "{count, plural, one {# proyecto} other {# proyectos}}"
   },
   "analytics.project.icon-alt": {
-    "message": "{name} Icono"
+    "message": "Icono de {name}"
   },
   "analytics.project.select": {
     "message": "Seleccionar proyectos"
+  },
+  "analytics.project.user": {
+    "message": "Proyectos de {username}"
+  },
+  "analytics.project.your": {
+    "message": "Tus proyectos"
   },
   "analytics.query.filter.add": {
     "message": "Añadir filtro"
@@ -519,7 +525,7 @@
     "message": "Sigue proyectos"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importa todos tus perfiles favoritos desde el launcher que usabas antes y ¡empieza a usar la Modrinth App en segundos!"
+    "message": "Importa todos tus perfiles favoritos desde el launcher que usabas antes ¡y empieza a usar la Modrinth App en segundos!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -573,7 +579,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth app tiene un mejor rendimiento que muchos de los gestores de mods más populares, ¡usando solo 150 MB de RAM!"
+    "message": "Modrinth App tiene un mejor rendimiento que muchos de los gestores de mods más populares, ¡usando solo 150 MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -942,13 +948,13 @@
     "message": "Error al enviar el mensaje"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
-    "message": "Respuesta al hilo..."
+    "message": "Responder al hilo..."
   },
   "conversation-thread.reply-editor.placeholder.send": {
-    "message": "Envía un mensaje..."
+    "message": "Enviar un mensaje..."
   },
   "conversation-thread.reply-modal.confirmation.description": {
-    "message": "Confirmación de que moderadores no monitorean esto activamente"
+    "message": "Confirmo que los moderadores no monitorean esto activamente"
   },
   "conversation-thread.reply-modal.confirmation.label": {
     "message": "Comprendo que los moderadores no monitorean este hilo activamente."
@@ -1236,7 +1242,7 @@
     "message": "Llena el formulario fiscal"
   },
   "dashboard.creator-withdraw-modal.continue-with-limit": {
-    "message": "Continuar con el límite"
+    "message": "Continuar con límites"
   },
   "dashboard.creator-withdraw-modal.details-label": {
     "message": "Detalles"
@@ -1446,7 +1452,25 @@
     "message": "Límite de retiro"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
-    "message": "Has agotado tu límite de retiro <b>{withdrawLimit}</b>. Debes completar un formulario de impuestos para retirar más."
+    "message": "Has agotado tu límite de retiro de <b>{withdrawLimit}</b>. Debes completar un formulario de impuestos para retirar más."
+  },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Cumples los requisitos para los roles {roles}. Vincula tu cuenta de Discord a través de Modrinth y los sincronizaremos automáticamente."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Vincular Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Reclama tus roles de Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "+1 M de descargas"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creador"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Orgullo 2026"
   },
   "dashboard.head-title": {
     "message": "Panel de control"
@@ -2279,6 +2303,9 @@
   "landing.subheading": {
     "message": "Descubre, juega y comparte contenido de Minecraft a través de nuestra plataforma de código abierto creada para la comunidad."
   },
+  "layout.action.analytics-events": {
+    "message": "Eventos de analítica"
+  },
   "layout.action.change-theme": {
     "message": "Cambiar tema"
   },
@@ -2833,6 +2860,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Un usuario de Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Ver estadísticas de usuario"
   },
   "profile.button.billing": {
     "message": "Gestionar la facturación de usuario"

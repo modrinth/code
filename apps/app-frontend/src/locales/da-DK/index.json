@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Downloader Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Downloader opdatering"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
@@ -472,9 +475,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "Download færdiggjort"
-  },
-  "app.update-popup.reload": {
-    "message": "Geninlæs"
   },
   "app.update-popup.title": {
     "message": "Opdatering tilgængelig"

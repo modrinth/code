@@ -332,9 +332,31 @@ async fn fetch_dependent_version_projects(
         DBVersion::get_many(&dependent_on_version_ids, cx.pool, cx.redis)
             .await?;
 
+    let dependent_project_ids = versions
+        .iter()
+        .map(|version| version.inner.project_id.0)
+        .collect::<Vec<_>>();
+    let server_projects = sqlx::query!(
+        "
+        SELECT id FROM mods
+        WHERE id = ANY($1)
+            AND components ? 'minecraft_server'
+        ",
+        &dependent_project_ids,
+    )
+    .fetch_all(cx.pool)
+    .await
+    .wrap_internal_err("failed to fetch server dependent projects")?
+    .into_iter()
+    .map(|project| DBProjectId(project.id))
+    .collect::<HashSet<_>>();
+
     Ok(versions
         .into_iter()
-        .map(|version| (version.inner.id, version.inner.project_id))
+        .filter_map(|version| {
+            (!server_projects.contains(&version.inner.project_id))
+                .then_some((version.inner.id, version.inner.project_id))
+        })
         .collect())
 }
 
@@ -416,6 +438,13 @@ pub(crate) async fn fetch(
             && !normalized_source.as_ref().is_some_and(|source| {
                 metrics.filter_by.user_agent.contains(source)
             })
+        {
+            continue;
+        }
+        if uses(F::DependentProjectId)
+            && row.dependent_on_version_id.0 != 0
+            && !dependent_version_projects
+                .contains_key(&row.dependent_on_version_id)
         {
             continue;
         }
@@ -581,6 +610,7 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
             (r"nothub/mrpack-install", P::Named("mrpack-install")),
             (r"^(packwiz-installer|packwiz/)", P::Named("Packwiz")),
             (r"^mrpack4server", P::Named("mrpack4server")),
+            (r"^DawnLauncher/", P::Named("Dawn")),
             (
                 r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
                 P::Website,

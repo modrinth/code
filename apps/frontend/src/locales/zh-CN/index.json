@@ -159,7 +159,7 @@
     "message": "总计"
   },
   "analytics.chart.view.area": {
-    "message": "地区"
+    "message": "面积图"
   },
   "analytics.chart.view.bar": {
     "message": "柱状图"
@@ -331,6 +331,12 @@
   },
   "analytics.project.select": {
     "message": "选择项目"
+  },
+  "analytics.project.user": {
+    "message": "{username}的项目"
+  },
+  "analytics.project.your": {
+    "message": "你的项目"
   },
   "analytics.query.filter.add": {
     "message": "添加过滤条件"
@@ -1433,6 +1439,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "你已用尽<b>{withdrawLimit}</b>的提现额度。若需继续提现，请先完成税务表格填写。"
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "你符合获取 {roles} 的条件。通过 Modrinth 关联你的 Discord 账户，我们将自动同步这些身份。"
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "关联 Discord 账户"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "领取你的 Discord 身分组"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "破百万下载"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "创作者"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "2026 骄傲月"
+  },
   "dashboard.head-title": {
     "message": "仪表盘"
   },
@@ -2255,6 +2279,9 @@
   "landing.subheading": {
     "message": "在我们为社区打造的开源平台上，探索、畅玩并分享 Minecraft 的无限可能。"
   },
+  "layout.action.analytics-events": {
+    "message": "分析活动"
+  },
   "layout.action.change-theme": {
     "message": "更改界面主题"
   },
@@ -2810,6 +2837,9 @@
   "profile.bio.fallback.user": {
     "message": "一位 Modrinth 用户。"
   },
+  "profile.button.analytics": {
+    "message": "查看用户分析"
+  },
   "profile.button.billing": {
     "message": "管理用户财务"
   },
@@ -3332,17 +3362,14 @@
   "project.settings.permissions.learn-more": {
     "message": "了解详情"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "搜索 {count}{count, plural,one {个外部项目}other {个外部项目}}……"
+  },
   "project.settings.title": {
     "message": "设置"
   },
   "project.settings.visit-dashboard": {
     "message": "访问项目的控制面板"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural,one {下载}other {下载}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural,one {关注者}other {关注者}}"
   },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
@@ -3426,7 +3453,7 @@
     "message": "你正在举报哪种类型的内容？"
   },
   "report.question.report-reason": {
-    "message": "该项目（{item}）违反了 Modrinth 的哪条规则？"
+    "message": "该项目{item}违反了 Modrinth 的哪条规则？"
   },
   "report.report-content": {
     "message": "向管理员举报内容"
@@ -3933,10 +3960,10 @@
     "message": "在登录时为您的账户增加一层额外的安全保障。"
   },
   "settings.account.security.two-factor.modal.remove.header": {
-    "message": "移除双重验证"
+    "message": "移除2重验证"
   },
   "settings.account.security.two-factor.modal.setup.header": {
-    "message": "设置双重验证"
+    "message": "设置2重验证"
   },
   "settings.account.security.two-factor.title": {
     "message": "双因素认证"
@@ -4392,7 +4419,7 @@
     "message": "创建个人访问令牌"
   },
   "settings.pats.description": {
-    "message": "个人访问令牌（PAT）可用于访问 Modrinth 的 API。这些令牌可随时创建和撤销。更多信息，请参阅 <doc-link>Modrinth API 文档</doc-link>。"
+    "message": "个人访问令牌PAT可用于访问 Modrinth 的 API。这些令牌可随时创建和撤销。更多信息，请参阅 <doc-link>Modrinth API 文档</doc-link>。"
   },
   "settings.pats.modal.create.action": {
     "message": "创建个人访问令牌"

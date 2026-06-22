@@ -338,6 +338,12 @@
   "analytics.project.select": {
     "message": "Projekte auswählen"
   },
+  "analytics.project.user": {
+    "message": "Projekte von {username}"
+  },
+  "analytics.project.your": {
+    "message": "Deine Projekte"
+  },
   "analytics.query.filter.add": {
     "message": "Filter hinzufügen"
   },
@@ -1431,7 +1437,7 @@
     "message": "Unverifizierte E-Mail"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "Die Zustellungs-E-Mail die du eingegeben hast ist nicht mit deinem Modrinth-Konto verbunden. Belohnungen, welche an eine falsche E-Mail-Adresse gesendet werden können von Modrinth nicht wiederhergestellt werden."
+    "message": "Die Zustellungs-E-Mail, die du eingegeben hast, ist nicht mit deinem Modrinth-Konto verbunden. Belohnungen, welche an eine falsche E-Mail-Adresse gesendet werden, können von Modrinth nicht wiederhergestellt werden."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Weniger Gebühren verfügbar"
@@ -1447,6 +1453,24 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du hast dein Auszahlungslimit von <b>{withdrawLimit}</b> aufgebraucht. Du musst ein Steuerformular ausfüllen, um merh abzuheben."
+  },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Du bist für {roles} qualifiziert. Verknüpfe dein Discord-Konto über Modrinth, dann synchronisieren wir diese automatisch."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Discord verbinden"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Hol dir deine Discord-Rollen"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Ersteller"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
   },
   "dashboard.head-title": {
     "message": "Dashboard"
@@ -1500,7 +1524,7 @@
     "message": "Benachrichtigungen werden geladen..."
   },
   "dashboard.projects.bulk-edit-hint": {
-    "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unden auswählst."
+    "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unten auswählst."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverprojekte understützen Massenbearbeitung nicht"
@@ -2279,6 +2303,9 @@
   "landing.subheading": {
     "message": "Entdecke, Spiele und teile Minecraft-Inhalte durch unsere quelloffene Platform, welche für die Community entwickelt wird."
   },
+  "layout.action.analytics-events": {
+    "message": "Analytics-Events"
+  },
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
   },
@@ -2834,6 +2861,9 @@
   "profile.bio.fallback.user": {
     "message": "Ein Modrinth Benutzer."
   },
+  "profile.button.analytics": {
+    "message": "Benutzeranalysen anzeigen"
+  },
   "profile.button.billing": {
     "message": "Nutzer Zahlungen verwalten"
   },
@@ -3126,7 +3156,7 @@
     "message": "Platform: {platform}"
   },
   "project.download.platform-error": {
-    "message": "Fehler: Keine Platform gefunden"
+    "message": "Fehler: Keine Plattform gefunden"
   },
   "project.download.platform-tooltip": {
     "message": "{title} ist nur für {platform} verfügbar"

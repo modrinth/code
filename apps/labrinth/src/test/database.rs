@@ -170,11 +170,11 @@ impl TemporaryDatabase {
                             "Dummy data updated, so template DB tables will be dropped and re-created"
                         );
                         // Drop all tables in the database so they can be re-created and later filled with updated dummy data
-                        sqlx::query("DROP SCHEMA public CASCADE;")
+                        sqlx::query!("DROP SCHEMA public CASCADE;")
                             .execute(&pool)
                             .await
                             .unwrap();
-                        sqlx::query("CREATE SCHEMA public;")
+                        sqlx::query!("CREATE SCHEMA public;")
                             .execute(&pool)
                             .await
                             .unwrap();
@@ -211,14 +211,14 @@ impl TemporaryDatabase {
                     &temp_database_name, TEMPLATE_DATABASE_NAME
                 );
 
-                sqlx::query(&create_db_query)
+                sqlx::raw_sql(&create_db_query)
                     .execute(&main_pool)
                     .await
                     .expect("Database creation failed");
 
                 // Release the advisory lock
-                sqlx::query("SELECT pg_advisory_unlock(1)")
-                    .execute(&main_pool)
+                sqlx::query_scalar!("SELECT pg_advisory_unlock(1)")
+                    .fetch_one(&main_pool)
                     .await
                     .unwrap();
 
@@ -248,7 +248,7 @@ impl TemporaryDatabase {
             "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = '{}' AND pid <> pg_backend_pid()",
             &self.database_name
         );
-        sqlx::query(&terminate_query)
+        sqlx::raw_sql(&terminate_query)
             .execute(&self.pool)
             .await
             .unwrap();
@@ -256,7 +256,7 @@ impl TemporaryDatabase {
         // Execute the deletion query asynchronously
         let drop_db_query =
             format!("DROP DATABASE IF EXISTS {}", &self.database_name);
-        sqlx::query(&drop_db_query)
+        sqlx::raw_sql(&drop_db_query)
             .execute(&self.pool)
             .await
             .expect("Database deletion failed");
@@ -265,7 +265,7 @@ impl TemporaryDatabase {
 
 async fn create_template_database(pool: &PgPool) {
     let create_db_query = format!("CREATE DATABASE {TEMPLATE_DATABASE_NAME}");
-    sqlx::query(&create_db_query)
+    sqlx::raw_sql(&create_db_query)
         .execute(pool)
         .await
         .expect("Database creation failed");

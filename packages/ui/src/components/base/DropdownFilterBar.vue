@@ -1878,9 +1878,9 @@ onBeforeUnmount(() => {
 }
 
 .dropdown-filter-bar-options-scrollbar :deep(.os-theme-modrinth) {
-	--os-size: 10px;
-	--os-padding-perpendicular: 2px;
-	--os-padding-axis: 2px;
+	--os-size: 8px;
+	--os-padding-perpendicular: 0px;
+	--os-padding-axis: 0px;
 	--os-track-bg: transparent;
 	--os-track-bg-hover: transparent;
 	--os-track-bg-active: transparent;

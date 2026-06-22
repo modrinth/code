@@ -338,6 +338,12 @@
   "analytics.project.select": {
     "message": "Projeleri seç"
   },
+  "analytics.project.user": {
+    "message": "{username} adlı kullanıcının projeleri"
+  },
+  "analytics.project.your": {
+    "message": "Senin projelerin"
+  },
   "analytics.query.filter.add": {
     "message": "Filtre ekle"
   },
@@ -1445,6 +1451,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "<b>{withdrawLimit}</b> çekme limitinizi kadarını kullandınız. Daha fazla çekmek için vergi formunu gerekir."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "{roles} için uygunsun. Discord hesabını Modrinth üzerinden bağla, bizde bunları otomatik olarak senkronize edelim."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Discord bağla"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Discord rollerini al"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ İndirme"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Oluşturucu"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Onur 2026"
+  },
   "dashboard.head-title": {
     "message": "Kontrol Paneli"
   },
@@ -2273,6 +2297,9 @@
   "landing.subheading": {
     "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
   },
+  "layout.action.analytics-events": {
+    "message": "Analitik olayları"
+  },
   "layout.action.change-theme": {
     "message": "Tema değiştir"
   },
@@ -2827,6 +2854,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Bir Modrinth kullanıcısı."
+  },
+  "profile.button.analytics": {
+    "message": "Kullanıcı analizlerini görüntüle"
   },
   "profile.button.billing": {
     "message": "Kullanıcı faturasını yönet"

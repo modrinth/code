@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Descargando Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Descargando actualización"
+  },
   "app.action-bar.downloads": {
     "message": "Descargas"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instancia principal"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Recargar para actualizar"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Mostrar más instancias en ejecución"
   },
   "app.action-bar.stop-instance": {
     "message": "Detener instancia"
+  },
+  "app.action-bar.update": {
+    "message": "Actualizar"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Mostrar descargas activas"
@@ -48,7 +57,7 @@
     "message": "Tema de color"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Cambia la página que se abre al iniciar el lanzador."
+    "message": "Cambia la página en la que el launcher inicia."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Inicio"
@@ -428,6 +437,12 @@
   "app.skins.rate-limit.title": {
     "message": "¡Cálmate!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "No se ha podido guardar el orden de las skins."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Error al reordenar las skins"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders y Biomas"
   },
@@ -501,7 +516,7 @@
     "message": "Descarga completada"
   },
   "app.update-popup.reload": {
-    "message": "Recargar"
+    "message": "Recargar para actualizar"
   },
   "app.update-popup.title": {
     "message": "Actualización disponible"
@@ -701,6 +716,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Nombre"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Canal de actualizaciones"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Se mostrarán las versiones estables, beta y alfa como actualizaciones disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Se mostrarán las versiones estables y beta como actualizaciones disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Estable"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Solo se mostrarán las versiones estables como actualizaciones disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Seleccionar canal de actualizaciones"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Hooks de lanzamiento"
   },
@@ -882,7 +921,7 @@
     "message": "Versión del juego proporciona por la instancia"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Cargador proporcionado por la instancia"
+    "message": "Loader proporcionado por la instancia"
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar con la instancia"
@@ -897,7 +936,7 @@
     "message": "La versión del juego es proporcionada por el servidor"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "El cargador lo proporciona el servidor"
+    "message": "Loader proporcionado por el servidor"
   },
   "unknown-pack-warning-modal.body": {
     "message": "Un archivo solo es revisado si es subido a Modrinth, independientemente de su formato de archivo (incluyendo .mrpack)."

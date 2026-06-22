@@ -11,6 +11,35 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'app',
+		version: '0.14.8',
+		body: `## Changed
+- Improved performance of the instance settings modal.
+- Updated translations
+
+## Fixed
+- Fixed issue in the Content tab where pressing the "Content" button on the linked modpack card would show zero mods in the Modpack content modal for a few seconds.
+- Fixed issue with modal close animations.
+- Fixed not being able to click scroll bar on "game version" menu when creating new instance.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Improved performance of the server settings modal.
+- Updated translations
+
+## Fixed
+- Fixed issue where users were not able to upgrade their Medal servers after the trial expired.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
 		date: `2026-06-16T18:58:45+00:00`,
 		product: 'app',
 		version: '0.14.7',

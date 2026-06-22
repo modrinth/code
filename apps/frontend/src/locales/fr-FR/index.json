@@ -338,6 +338,12 @@
   "analytics.project.select": {
     "message": "Sélectionner des projets"
   },
+  "analytics.project.user": {
+    "message": "Projets de {username}"
+  },
+  "analytics.project.your": {
+    "message": "Vos projets"
+  },
   "analytics.query.filter.add": {
     "message": "Ajouter un filtre"
   },
@@ -1448,6 +1454,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Vous avez atteint votre limite de retrait de <b>{withdrawLimit}</b>. Vous devez remplir un formulaire fiscal pour effectuer un retrait supplémentaire."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Vous êtes éligible aux rôles {roles}. Associez votre compte Discord via Modrinth et nous les synchroniserons automatiquement."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Associer Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Récupérez vos rôles Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "+1 M de téléchargements"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Créateur"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Tableau de bord"
   },
@@ -1482,7 +1506,7 @@
     "message": "Marquer tout comme lu"
   },
   "dashboard.overview.notifications.button.view-history": {
-    "message": "Voire l'historique"
+    "message": "Voir l'historique"
   },
   "dashboard.overview.notifications.empty.no-unread": {
     "message": "Vous n'avez pas de notifications non lues."
@@ -2279,6 +2303,9 @@
   "landing.subheading": {
     "message": "Découvrez, jouez et partagez du contenu Minecraft grâce à notre plateforme open-source conçue pour la communauté."
   },
+  "layout.action.analytics-events": {
+    "message": "Événements d'analyse"
+  },
   "layout.action.change-theme": {
     "message": "Changer le thème"
   },
@@ -2833,6 +2860,9 @@
   },
   "profile.bio.fallback.user": {
     "message": "Un utilisateur Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Voir les analyses de l'utilisateur"
   },
   "profile.button.billing": {
     "message": "Gérer la facturation de l’utilisateur"

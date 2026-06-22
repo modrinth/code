@@ -346,7 +346,7 @@
 								: projects
 							)
 								.slice()
-								.sort((a, b) => b.downloads - a.downloads)"
+								.sort(projectUserSorting)"
 							:key="project.id"
 							:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
 							:title="project.title"
@@ -562,6 +562,7 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
+import { projectUserSorting } from '~/utils/projects.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
 import { hasActiveMidas, hasPride26Badge } from '~/utils/user-membership.ts'
 

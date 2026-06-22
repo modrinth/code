@@ -90,6 +90,7 @@ import {
 	useVIntl,
 	versionChangesGameVersion,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -153,6 +154,7 @@ const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
 const { installingItems } = injectContentInstall()
 const router = useRouter()
+const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
 
 const props = defineProps<{
@@ -211,6 +213,13 @@ const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
 const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
+
+const modpackContentQueryKey = computed(() => ['linkedModpackContent', props.instance.path])
+const modpackContentQuery = useQuery({
+	queryKey: modpackContentQueryKey,
+	queryFn: () => get_linked_modpack_content(props.instance.path),
+	enabled: computed(() => !!props.instance?.path && !!props.instance?.linked_data),
+})
 
 // TODO: Extract content operation and updater modal state into composables; this page currently owns file mutations, dependency installs, busy flags, and version selection flow.
 const updatingProject = ref<ContentItem | null>(null)
@@ -740,13 +749,19 @@ async function handleModpackContentBulkToggle(items: ContentItem[]) {
 async function handleModpackContent() {
 	if (!props.instance?.path) return
 
+	if (modpackContentQuery.data.value !== undefined) {
+		modpackContentModal.value?.show(modpackContentQuery.data.value)
+		return
+	}
+
 	modpackContentModal.value?.showLoading()
 
-	const contentItems = await get_linked_modpack_content(props.instance.path).catch(handleError)
+	const { data, error } = await modpackContentQuery.refetch()
 
-	if (contentItems) {
-		modpackContentModal.value?.show(contentItems)
+	if (data !== undefined) {
+		modpackContentModal.value?.show(data)
 	} else {
+		if (error) handleError(error)
 		modpackContentModal.value?.hide()
 	}
 }
@@ -754,9 +769,12 @@ async function handleModpackContent() {
 async function refreshModpackContentItems(cacheBehaviour?: CacheBehaviour) {
 	if (!props.instance?.path) return
 
-	const contentItems = await get_linked_modpack_content(props.instance.path, cacheBehaviour).catch(
-		handleError,
-	)
+	const contentItems = await queryClient
+		.fetchQuery({
+			queryKey: modpackContentQueryKey.value,
+			queryFn: () => get_linked_modpack_content(props.instance.path, cacheBehaviour),
+		})
+		.catch(handleError)
 
 	if (contentItems) {
 		modpackContentModal.value?.setItems(contentItems)

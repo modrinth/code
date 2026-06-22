@@ -204,7 +204,7 @@
     "message": "Keine Projekte für die Analyse verfügbar"
   },
   "analytics.empty.select-project": {
-    "message": "Wählen mindestens ein Projekt aus, um Daten anzuzeigen"
+    "message": "Wähle mindestens ein Projekt aus, um Daten anzuzeigen"
   },
   "analytics.filter.game-version-type": {
     "message": "Art der Spielversion"
@@ -337,6 +337,12 @@
   },
   "analytics.project.select": {
     "message": "Projekte auswählen"
+  },
+  "analytics.project.user": {
+    "message": "Projekte von {username}"
+  },
+  "analytics.project.your": {
+    "message": "Deine Projekte"
   },
   "analytics.query.filter.add": {
     "message": "Filter hinzufügen"
@@ -1448,6 +1454,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du hast dein Auszahlungslimit von <b>{withdrawLimit}</b> aufgebraucht. Du musst ein Steuerformular ausfüllen, um merh abzuheben."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Du bist für {roles} qualifiziert. Verknüpfe dein Discord-Konto über Modrinth, dann synchronisieren wir diese automatisch."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Discord verbinden"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Hol dir deine Discord-Rollen"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Ersteller"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Dashboard"
   },
@@ -2279,6 +2303,9 @@
   "landing.subheading": {
     "message": "Entdecke, spiele und teile Minecraft-Inhalte über unsere Open-Source-Plattform, die für die Community entwickelt wurde."
   },
+  "layout.action.analytics-events": {
+    "message": "Analytics-Events"
+  },
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
   },
@@ -2834,6 +2861,9 @@
   "profile.bio.fallback.user": {
     "message": "Ein Modrinth-Benutzer."
   },
+  "profile.button.analytics": {
+    "message": "Benutzeranalysen anzeigen"
+  },
   "profile.button.billing": {
     "message": "Benutzerabrechnungen verwalten"
   },
@@ -3379,6 +3409,9 @@
   },
   "project.stats.downloads-label": {
     "message": "{count, plural, one {Download} other {Downloads}}"
+  },
+  "project.stats.followers-label": {
+    "message": "{count, plural, one {Follower} other {Follower}}"
   },
   "project.status.archived.message": {
     "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheidet sich das Projekt zu dearchivieren."
