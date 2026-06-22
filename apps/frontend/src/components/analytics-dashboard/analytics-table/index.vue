@@ -219,6 +219,7 @@ import {
 } from '../analytics-chart/analytics-chart-utils.ts'
 import {
 	analyticsBreakdownMessages,
+	analyticsChartMessages,
 	analyticsMessages,
 	analyticsTableMessages,
 } from '../analytics-messages.ts'
@@ -527,7 +528,9 @@ function getDependentProjectTooltip(row: AnalyticsTableRow) {
 		.sort((left, right) => left.localeCompare(right))
 
 	return dependencyProjectNames.length > 0
-		? `Dependent on ${dependencyProjectNames.join(', ')}`
+		? formatMessage(analyticsChartMessages.dependentOnProjectTooltip, {
+				project: dependencyProjectNames.join(', '),
+			})
 		: undefined
 }
 

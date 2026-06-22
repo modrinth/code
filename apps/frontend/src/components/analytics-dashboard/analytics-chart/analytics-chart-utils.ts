@@ -207,12 +207,17 @@ export function formatBreakdownLabels(
 			) {
 				return formatAnalyticsDependentProjectFallbackLabel(
 					breakdownValues[downloadReasonBreakdownIndex],
-					userNamesById,
 					formatMessage,
 				)
 			}
 
-			return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName, formatMessage)
+			return formatBreakdownLabel(
+				breakdownValue,
+				breakdown,
+				getVersionDisplayName,
+				userNamesById,
+				formatMessage,
+			)
 		}),
 		formatMessage,
 	).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
