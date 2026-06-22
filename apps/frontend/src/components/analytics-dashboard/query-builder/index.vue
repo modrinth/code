@@ -1030,9 +1030,7 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 	},
 )
 
-function canSelectBreakdownOption(
-	breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>,
-): boolean {
+function canSelectBreakdownOption(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): boolean {
 	return getAnalyticsBreakdownPresetsForProjectSelection(
 		[...selectedBreakdownValue.value, breakdown],
 		selectedProjectIds.value,
