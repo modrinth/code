@@ -78,7 +78,14 @@
 				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_user_id="{ row, value }">
-				<div class="mr-2.5 flex min-w-0 items-center gap-2">
+				<component
+					:is="getUserPageHref(row.breakdownValues.user_id) ? 'a' : 'span'"
+					:href="getUserPageHref(row.breakdownValues.user_id)"
+					:target="getUserPageHref(row.breakdownValues.user_id) ? '_blank' : undefined"
+					:rel="getUserPageHref(row.breakdownValues.user_id) ? 'noopener noreferrer' : undefined"
+					class="mr-2.5 flex min-w-0 items-center gap-2 text-primary"
+					:class="{ 'hover:underline': getUserPageHref(row.breakdownValues.user_id) }"
+				>
 					<span
 						v-tooltip="getUserCellLabel(value)"
 						class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-primary"
@@ -94,7 +101,7 @@
 					<span class="min-w-0 truncate font-semibold leading-tight text-primary">
 						{{ value }}
 					</span>
-				</div>
+				</component>
 			</template>
 			<template #cell-breakdown_dependent_project_download="{ row, value }">
 				<ProjectCell
@@ -469,6 +476,13 @@ function getUserAvatarUrl(userId: string | undefined) {
 
 function getUserCellLabel(value: unknown) {
 	return typeof value === 'string' ? value : String(value ?? '')
+}
+
+function getUserPageHref(userId: string | undefined) {
+	if (!userId) return undefined
+	const username = userNamesById.value.get(userId) ?? userId
+
+	return `/user/${encodeURIComponent(username)}`
 }
 
 function getProjectPageHref(projectId: string | undefined) {
