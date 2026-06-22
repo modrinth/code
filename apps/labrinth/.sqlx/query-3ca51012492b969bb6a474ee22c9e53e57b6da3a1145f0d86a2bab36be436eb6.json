@@ -1,10 +1,6 @@
 {
   "db_name": "PostgreSQL",
-<<<<<<<< HEAD:apps/labrinth/.sqlx/query-cc2056c368e11fcd820dfd6951d4fa2dd26da8813d4b0dbaa6bd66f7060f1e76.json
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
-========
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
->>>>>>>> main:apps/labrinth/.sqlx/query-e6c22fe10d603206c8466da630b30d0d4848455f5cddbf9202d9cdbfa1f306b5.json
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
   "describe": {
     "columns": [
       {
@@ -143,7 +139,7 @@
         "type_info": "Bool"
       },
       {
-        "ordinal": 25,
+        "ordinal": 27,
         "name": "eligibility_verified_at",
         "type_info": "Timestamptz"
       }
@@ -185,9 +181,5 @@
       true
     ]
   },
-<<<<<<<< HEAD:apps/labrinth/.sqlx/query-cc2056c368e11fcd820dfd6951d4fa2dd26da8813d4b0dbaa6bd66f7060f1e76.json
-  "hash": "cc2056c368e11fcd820dfd6951d4fa2dd26da8813d4b0dbaa6bd66f7060f1e76"
-========
-  "hash": "e6c22fe10d603206c8466da630b30d0d4848455f5cddbf9202d9cdbfa1f306b5"
->>>>>>>> main:apps/labrinth/.sqlx/query-e6c22fe10d603206c8466da630b30d0d4848455f5cddbf9202d9cdbfa1f306b5.json
+  "hash": "3ca51012492b969bb6a474ee22c9e53e57b6da3a1145f0d86a2bab36be436eb6"
 }
