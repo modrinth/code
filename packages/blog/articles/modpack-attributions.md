@@ -41,25 +41,32 @@ Uploading a modpack with external content will still work mostly the same. Go th
 
 From there, you can open the new Permissions page to review any content that may be an issue, and provide the required licensing information.
 
-## Permissions page
+## Permissions Page
 
 The new Permissions page shows all external content across every version of your modpack project. These files can be in one of several states:
 
-- **Pending:** You still need to provide information about this file's origin and your permission to distribute it.
-- **Completed:** Information has already been provided, nothing left to do!
-- **Information rejected:** Moderators reviewed the information provided and were unable to confirm your ability to distribute the file. You'll have to remove the file from your modpack or update it with accurate information.
-- **No permission:** You'll need to provide proof of your permission to distribute this file.
+- **Pending**
+  - You still need to provide information about this file’s origin and your permission to distribute it.
+- **Completed**
+  - Information has already been provided, nothing left to do!
+- **Information rejected**
+  - Moderators reviewed the information provided and were unable to confirm your ability to distribute the file. You’ll have to remove the file from your Modpack or update it with accurate information.
+- **No permission**
+  - You’ll need to provide proof of your permission to distribute this file.
 
 ![The Permissions page showing external content grouped by permission status.](./permissions-page.png)
 
 Pending is where you resolve missing permission information. From here, you can choose from four options and attach additional information, such as a link to the work or a short explanation.
 
-- **License:** The project's license allows redistribution.
-- **Your project:** You own the project.
-- **Special permission:** You have verifiable permission from the content's owner.
-- **No permission:** You do not have permission to redistribute the file.
-
-Some licenses may require you to link back to the project. Don't worry, we handle this automatically when you link to the source of the content.
+- **License**
+  - The project's license allows redistribution.
+    > _Some licenses may require you link back to the project, don’t worry, we handle this automatically when you link to the source of the content._
+- **Your project**
+  - You own the project.
+- **Special permission**
+  - You have verifiable permission from the content’s owner.
+- **No permission**
+  - You do not have permission to redistribute the file.
 
 ![A permission details form with options for license, your project, special permission, and no permission.](./permission-details.png)
 
