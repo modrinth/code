@@ -572,11 +572,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Deleting {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "Deleting {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "Deleting {contentType}..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "Disabling {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "Disabling {count, number} {contentType}"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "Disabling {contentType}..."
@@ -584,11 +590,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "Enabling {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "Enabling {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "Enabling {contentType}..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "Updating {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "Updating {count, number} {contentType}"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Updating {contentType}..."

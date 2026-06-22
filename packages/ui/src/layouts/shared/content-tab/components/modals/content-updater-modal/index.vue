@@ -133,68 +133,68 @@
 						key="changelog-selected"
 						class="flex-1 flex flex-col min-w-0 relative"
 					>
-					<div class="bg-bg p-4">
-						<div class="flex flex-col gap-1.5">
-							<div class="flex items-center justify-between">
+						<div class="bg-bg p-4">
+							<div class="flex flex-col gap-1.5">
+								<div class="flex items-center justify-between">
+									<div class="flex items-center gap-2">
+										<span class="font-semibold text-xl text-contrast">
+											{{ selectedVersion.version_number }}
+										</span>
+										<span
+											class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
+											:class="getVersionTypeBadgeClasses(selectedVersion)"
+										>
+											{{ capitalizeString(selectedVersion.version_type) }}
+										</span>
+									</div>
+									<span class="font-medium text-primary">
+										{{ formatLongDate(selectedVersion.date_published) }}
+									</span>
+								</div>
 								<div class="flex items-center gap-2">
-									<span class="font-semibold text-xl text-contrast">
-										{{ selectedVersion.version_number }}
-									</span>
-									<span
-										class="px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center flex-shrink-0 border border-solid"
-										:class="getVersionTypeBadgeClasses(selectedVersion)"
-									>
-										{{ capitalizeString(selectedVersion.version_type) }}
+									<div class="flex items-center gap-2 rounded-xl">
+										<FileTextIcon class="h-6 w-6 text-primary" />
+										<span class="font-medium text-primary">{{
+											formatMessage(commonMessages.changelogLabel)
+										}}</span>
+									</div>
+									<span class="w-1.5 h-1.5 rounded-full bg-divider" />
+									<span class="font-medium text-primary">
+										{{ formatLoaderGameVersion(selectedVersion) }}
 									</span>
 								</div>
-								<span class="font-medium text-primary">
-									{{ formatLongDate(selectedVersion.date_published) }}
-								</span>
-							</div>
-							<div class="flex items-center gap-2">
-								<div class="flex items-center gap-2 rounded-xl">
-									<FileTextIcon class="h-6 w-6 text-primary" />
-									<span class="font-medium text-primary">{{
-										formatMessage(commonMessages.changelogLabel)
-									}}</span>
-								</div>
-								<span class="w-1.5 h-1.5 rounded-full bg-divider" />
-								<span class="font-medium text-primary">
-									{{ formatLoaderGameVersion(selectedVersion) }}
-								</span>
 							</div>
 						</div>
-					</div>
 
-					<div class="h-px bg-divider" />
+						<div class="h-px bg-divider" />
 
-					<div class="flex-1 bg-bg p-4 overflow-y-auto">
-						<Transition name="content-updater-fade" mode="out-in">
-							<div
-								v-if="loadingChangelog"
-								key="changelog-loading"
-								class="flex flex-col items-center justify-center h-full gap-2"
-							>
-								<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
-								<span class="text-sm text-secondary">{{
-									formatMessage(messages.loadingChangelog)
-								}}</span>
-							</div>
-							<div
-								v-else-if="selectedVersion.changelog"
-								key="changelog-ready"
-								class="markdown [&_img]:max-w-full [&_img]:h-auto"
-								v-html="renderHighlightedString(selectedVersion.changelog)"
-							/>
-							<div v-else key="changelog-empty" class="text-secondary italic">
-								{{ formatMessage(messages.noChangelog) }}
-							</div>
-						</Transition>
-					</div>
+						<div class="flex-1 bg-bg p-4 overflow-y-auto">
+							<Transition name="content-updater-fade" mode="out-in">
+								<div
+									v-if="loadingChangelog"
+									key="changelog-loading"
+									class="flex flex-col items-center justify-center h-full gap-2"
+								>
+									<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
+									<span class="text-sm text-secondary">{{
+										formatMessage(messages.loadingChangelog)
+									}}</span>
+								</div>
+								<div
+									v-else-if="selectedVersion.changelog"
+									key="changelog-ready"
+									class="markdown [&_img]:max-w-full [&_img]:h-auto"
+									v-html="renderHighlightedString(selectedVersion.changelog)"
+								/>
+								<div v-else key="changelog-empty" class="text-secondary italic">
+									{{ formatMessage(messages.noChangelog) }}
+								</div>
+							</Transition>
+						</div>
 
-					<div
-						class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-bg to-transparent pointer-events-none"
-					/>
+						<div
+							class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-bg to-transparent pointer-events-none"
+						/>
 					</div>
 					<div
 						v-else-if="loading || loadingChangelog || props.versions.length > 0"

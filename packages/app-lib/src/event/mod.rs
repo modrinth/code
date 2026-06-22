@@ -198,6 +198,23 @@ pub struct WarningPayload {
 }
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct InstanceBulkUpdateProgressPayload {
+    pub instance_id: String,
+    pub stage: InstanceBulkUpdateProgressStage,
+    pub current: usize,
+    pub total: usize,
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum InstanceBulkUpdateProgressStage {
+    ResolvingVersions,
+    Downloading,
+    Finishing,
+}
+
+#[derive(Serialize, Clone)]
 #[serde(tag = "event")]
 pub enum CommandPayload {
     InstallMod {
