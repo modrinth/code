@@ -823,3 +823,32 @@ function getParamValuesAsArray(x: LocationQueryValue | LocationQueryValue[]): st
 		return x.filter((x) => x !== null)
 	}
 }
+
+export function buildDependentsSearchFilters(
+	projectTypes: readonly ProjectType[],
+	dependencyProjectIds: readonly string[],
+): string {
+	const parts: string[] = []
+	const mappedProjectTypes = projectTypes.map(mapProjectTypeToSearch)
+
+	if (mappedProjectTypes.length === 1) {
+		parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
+	} else if (mappedProjectTypes.length > 1) {
+		const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
+		parts.push(`project_types IN [${quoted}]`)
+	}
+
+	const normalizedProjectIds = Array.from(
+		new Set(dependencyProjectIds.map((projectId) => projectId.trim()).filter(Boolean)),
+	)
+	if (normalizedProjectIds.length === 1) {
+		parts.push(
+			`compatible_dependency_project_ids = ${formatSearchFilterValue(normalizedProjectIds[0])}`,
+		)
+	} else if (normalizedProjectIds.length > 1) {
+		const quoted = normalizedProjectIds.map(formatSearchFilterValue).join(', ')
+		parts.push(`compatible_dependency_project_ids IN [${quoted}]`)
+	}
+
+	return parts.join(' AND ')
+}

@@ -101,15 +101,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Visa alla {count} linjer i diagram?"
   },
-  "analytics.chart.table-selection.count": {
-    "message": "Visar {count} {itemType, select, project {projekt} country {{count, plural, one {land} other {länder}}} monetization {{count, plural, one {intäktvärde} other {intäktvärden}}} downloadSource {{count, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{count, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} projectVersion {{count, plural, one {projektversion} other {projektversioner}}} loader {laddare} gameVersion {{count, plural, one {spelversion} other {spelversioner}}} other {föremål}} från tabell"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Visar {limit} {itemType, select, project {projekt} country {{limit, plural, one {land} other {länder}}} monetization {{limit, plural, one {intäktvärde} other {intäktvärden}}} downloadSource {{limit, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{limit, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} projectVersion {{limit, plural, one {projektversion} other {projektversioner}}} loader {laddare} gameVersion {{limit, plural, one {spelversion} other {spelversioner}}} other {föremål}} från tabell"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Visar topp {count} {itemType, select, project {projekt} country {{count, plural, one {land} other {länder}}} monetization {{count, plural, one {intäktvärde} other {intäktvärden}}} downloadSource {{count, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{count, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} projectVersion {{count, plural, one {projektversion} other {projektversioner}}}loader {laddare} gameVersion {{count, plural, one {spelversion} other {spelversioner}}} other {föremål}} från tabell"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dag} other {# dagar}}"
   },

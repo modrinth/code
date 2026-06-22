@@ -64,6 +64,7 @@ export function useAnalyticsChartLegend({
 				id: dataset.projectId,
 				name: dataset.label,
 				projectName: dataset.projectName,
+				tooltip: dataset.tooltip,
 				color: dataset.borderColor,
 				totalValue: getChartDatasetTotal(dataset),
 				hidden: hiddenDatasetIds.value.has(dataset.projectId),
@@ -118,6 +119,7 @@ export function useAnalyticsChartLegend({
 				id: getPreviousPeriodDatasetId(entry.id),
 				name: formatMessage(analyticsChartMessages.previousPeriodSuffix, { name: entry.name }),
 				projectName: entry.projectName,
+				tooltip: entry.tooltip,
 				color: entry.color,
 				totalValue: previousDataset ? getChartDatasetTotal(previousDataset) : 0,
 				hidden: hiddenDatasetIds.value.has(getPreviousPeriodDatasetId(entry.id)),
@@ -153,6 +155,7 @@ export function useAnalyticsChartLegend({
 					name: dataset.label,
 				}),
 				projectName: dataset.projectName,
+				tooltip: dataset.tooltip,
 				data: previousData,
 				borderColor: dataset.borderColor,
 				backgroundColor: dataset.backgroundColor,
@@ -296,7 +299,7 @@ export function useAnalyticsChartLegend({
 	}
 
 	function getLegendEntryTooltip(legendEntry: AnalyticsChartLegendEntry) {
-		return legendEntry.projectName ?? ''
+		return legendEntry.tooltip ?? legendEntry.projectName ?? ''
 	}
 
 	function isUnmonetizedLegendEntry(legendEntry: AnalyticsChartLegendEntry) {

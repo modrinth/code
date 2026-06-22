@@ -97,7 +97,7 @@
 						"
 					/>
 					<span
-						v-tooltip="entry.projectName ?? ''"
+						v-tooltip="entry.tooltip ?? entry.projectName ?? ''"
 						class="min-w-0 truncate"
 						:class="{
 							'line-through': entry.hidden,
@@ -145,6 +145,7 @@ export type AnalyticsChartTooltipEntry = {
 	projectId: string
 	name: string
 	projectName?: string
+	tooltip?: string
 	color: string
 	formattedValue: string
 	hidden: boolean

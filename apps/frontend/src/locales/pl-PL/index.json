@@ -125,9 +125,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Pokazać wszystkie {count} linii na wykresie?"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "Pokazano {itemType, select, project {{count, plural, one {projekt} other {wszystkie projekty}}} country {{count, plural, one {kraj} other {wszystkie kraje}}} monetization {{count, plural, one {wartość z monetyzacji} other {wszystkie wartości z monetyzacji}}} downloadSource {{count, plural, one {żródło pobrań}  other {wszystkie źródła pobrań}}} downloadReason {{count, plural, one {powód pobrań} other {wszystkie powody pobrań}}} projectVersion {{count, plural, one {wersję projektu} other {wszystkie wersje projektu}}} loader {{count, plural, one {loader} other {wszystkie loadery}}} gameVersion {{count, plural, one {wersję gry} other {wszystkie wersje gry}}} other {{count, plural, one {pozycję} other {wszystkie pozycje}}}} z tabeli"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dzień} other {# dni}}"
   },

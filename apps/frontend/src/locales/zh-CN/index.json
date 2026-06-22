@@ -131,18 +131,6 @@
   "analytics.chart.render-limit.header": {
     "message": "是否在图中显示全部 {count} 行？"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "展示全部 {itemType, select, project {{count, plural, one {项目} other {项目}}} country {{count, plural, one {国家} other {国家}}} monetization {{count, plural, one {收益项} other {收益项}}} downloadSource {{count, plural, one {下载来源} other {下载来源}}} downloadReason {{count, plural, one {下载原因} other {下载原因}}} projectVersion {{count, plural, one {项目版本} other {项目版本}}} loader {{count, plural, one {加载器} other {加载器}}} gameVersion {{count, plural, one {游戏版本} other {游戏版本}}} other {{count, plural, one {条目} other {条目}}}} 表格数据"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "正在展示{count}{itemType, select,project {{count, plural,one {项目}other {项目}}}country {{count, plural,one {国家}other {国家}}} monetization {{count, plural,one {变现收益}other {变现收益}}} downloadSource {{count, plural,one {下载来源}other {下载来源}}} downloadReason {{count, plural,one {下载原因}other {下载原因}}} projectVersion {{count, plural,one {项目版本}other {项目版本}}} loader {{count, plural,one {启动器}other {启动器}}} gameVersion {{count, plural,one {游戏版本}other {游戏版本}}} other {{count, plural,one {项目}other {项目}}}}"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "正在展示{limit}{itemType, select,project {{limit, plural,one {项目}other {项目}}}country {{limit, plural,one {国家}other {国家}}} monetization {{limit, plural,one {变现收益}other {变现收益}}} downloadSource {{limit, plural,one {下载来源}other {下载来源}}} downloadReason {{limit, plural,one {下载原因}other {下载原因}}} projectVersion {{limit, plural,one {项目版本}other {项目版本}}} loader {{limit, plural,one {启动器}other {启动器}}} gameVersion {{limit, plural,one {游戏版本}other {游戏版本}}}other {{limit, plural,one {项目}other {项目}}}}"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "从表格中展示前{count}\n{itemType, select,\nproject {{count, plural, one {个项目} other {个项目}}}\ncountry {{count, plural, one {个国家} other {个国家}}}\nmonetization {{count, plural, one {项变现金额} other {项变现金额}}}\ndownloadSource {{count, plural, one {个下载来源} other {个下载来源}}}\ndownloadReason {{count, plural, one {条下载原因} other {条下载原因}}}\nprojectVersion {{count, plural, one {个项目版本} other {个项目版本}}}\nloader {{count, plural, one {个加载器} other {个加载器}}}\ngameVersion {{count, plural, one {个游戏版本} other {个游戏版本}}}\nother {{count, plural, one {条数据} other {条数据}}}\n}"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# 天} other {# 天}}"
   },
