@@ -9,6 +9,9 @@ use crate::state::{
     LauncherFeatureVersion, MemorySettings, ModrinthCredentials,
     ReleaseChannel, TeamMember, Theme, VersionFile, WindowSize,
 };
+use crate::state::instances::{
+    InstanceLaunchOverrides, InstanceLaunchOverridesData,
+};
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
 use p256::ecdsa::SigningKey;
@@ -573,45 +576,31 @@ where
         .await?;
     }
 
-    let extra_launch_args = input
-        .extra_launch_args
-        .as_ref()
-        .map(serde_json::to_string)
-        .transpose()?;
-    let custom_env_vars = input
-        .custom_env_vars
-        .as_ref()
-        .map(serde_json::to_string)
-        .transpose()?;
+    let launch_overrides = InstanceLaunchOverrides {
+        instance_id: instance_id.clone(),
+        java_path: input.java_path,
+        extra_launch_args: input.extra_launch_args,
+        custom_env_vars: input.custom_env_vars,
+        memory: input.memory,
+        force_fullscreen: input.force_fullscreen,
+        game_resolution: input.game_resolution,
+        hooks: input.hooks,
+    };
+    let launch_overrides_data = serde_json::to_string(
+        &InstanceLaunchOverridesData::from(&launch_overrides),
+    )?;
+
     sqlx::query(
         "
         INSERT OR REPLACE INTO instance_launch_overrides (
             instance_id,
-            java_path,
-            extra_launch_args,
-            custom_env_vars,
-            memory,
-            force_fullscreen,
-            game_resolution_x,
-            game_resolution_y,
-            hook_pre_launch,
-            hook_wrapper,
-            hook_post_exit
+            overrides
         )
-        VALUES (?, ?, jsonb(?), jsonb(?), ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, jsonb(?))
         ",
     )
     .bind(&instance_id)
-    .bind(input.java_path.as_deref())
-    .bind(extra_launch_args)
-    .bind(custom_env_vars)
-    .bind(input.memory.map(|value| value.maximum as i64))
-    .bind(input.force_fullscreen.map(i64::from))
-    .bind(input.game_resolution.map(|value| value.0 as i64))
-    .bind(input.game_resolution.map(|value| value.1 as i64))
-    .bind(input.hooks.pre_launch.as_deref())
-    .bind(input.hooks.wrapper.as_deref())
-    .bind(input.hooks.post_exit.as_deref())
+    .bind(launch_overrides_data)
     .execute(exec)
     .await?;
 

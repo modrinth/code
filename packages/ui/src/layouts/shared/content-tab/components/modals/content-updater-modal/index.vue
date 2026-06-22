@@ -81,7 +81,10 @@
 								</div>
 							</button>
 						</div>
-						<div v-if="filteredVersions.length === 0" class="p-4 text-center text-secondary text-sm">
+						<div
+							v-if="filteredVersions.length === 0"
+							class="p-4 text-center text-secondary text-sm"
+						>
 							{{ formatMessage(messages.noVersionsFound) }}
 						</div>
 					</div>
@@ -155,7 +158,10 @@
 					<div class="h-px bg-divider" />
 
 					<div class="flex-1 min-h-0 bg-bg p-4 overflow-y-auto">
-						<div v-if="loadingChangelog" class="flex flex-col items-center justify-center h-full gap-2">
+						<div
+							v-if="loadingChangelog"
+							class="flex flex-col items-center justify-center h-full gap-2"
+						>
 							<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
 							<span class="text-sm text-secondary">{{
 								formatMessage(messages.loadingChangelog)

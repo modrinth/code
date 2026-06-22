@@ -492,8 +492,12 @@ impl DirectoryInfo {
                 sqlx::query(
                     "
                     UPDATE instance_launch_overrides
-                    SET java_path = replace(java_path, ?, ?)
-                    WHERE java_path IS NOT NULL
+                    SET overrides = jsonb(json_set(
+                        overrides,
+                        '$.java_path',
+                        replace(json_extract(overrides, '$.java_path'), ?, ?)
+                    ))
+                    WHERE json_type(overrides, '$.java_path') = 'text'
                     ",
                 )
                 .bind(prev_custom_dir)
