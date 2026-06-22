@@ -94,21 +94,19 @@ async fn consume_batch(
     let mut messages_to_commit = Vec::new();
 
     for message in messages {
-        let payload = match message.payload() {
-            Some(payload) => payload,
-            None => {
-                tracing::error!(
-                    kafka.topic = message.topic(),
-                    kafka.partition = message.partition(),
-                    kafka.offset = message.offset(),
-                    "Skipping incremental search index event without payload"
-                );
-                consumer
-                    .commit_message(&message, CommitMode::Async)
-                    .wrap_err("failed to commit empty Kafka message")?;
-                continue;
-            }
+        let Some(payload) = message.payload() else {
+            tracing::error!(
+                kafka.topic = message.topic(),
+                kafka.partition = message.partition(),
+                kafka.offset = message.offset(),
+                "Skipping incremental search index event without payload"
+            );
+            consumer
+                .commit_message(&message, CommitMode::Async)
+                .wrap_err("failed to commit empty Kafka message")?;
+            continue;
         };
+
         let event = match serde_json::from_slice::<SearchProjectIndexQueueEvent>(
             payload,
         ) {
