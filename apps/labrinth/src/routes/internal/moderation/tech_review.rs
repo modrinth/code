@@ -32,6 +32,7 @@ use crate::{
     },
     queue::session::AuthQueue,
     routes::{ApiError, internal::moderation::Ownership},
+    search::SearchState,
     util::error::Context,
 };
 use eyre::eyre;
@@ -978,6 +979,7 @@ async fn submit_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
     web::Json(submit_report): web::Json<SubmitReport>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<(), ApiError> {
@@ -1132,15 +1134,22 @@ async fn submit_report(
         .insert(&mut txn)
         .await
         .wrap_internal_err("failed to add tech review message")?;
-
-        DBProject::clear_cache(project_id, None, None, &redis)
-            .await
-            .wrap_internal_err("failed to clear project cache")?;
     }
 
     txn.commit()
         .await
         .wrap_internal_err("failed to commit transaction")?;
+
+    if verdict == DelphiVerdict::Unsafe {
+        crate::routes::v3::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id,
+            None,
+            None,
+        )
+        .await?;
+    }
 
     Ok(())
 }

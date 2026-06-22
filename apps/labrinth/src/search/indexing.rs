@@ -27,11 +27,33 @@ use crate::routes::v2_reroute;
 use crate::search::{SearchProjectDependency, UploadSearchProject};
 use crate::util::error::Context;
 
+struct PartialProject {
+    id: DBProjectId,
+    name: String,
+    summary: String,
+    downloads: i32,
+    follows: i32,
+    icon_url: Option<String>,
+    updated: DateTime<Utc>,
+    approved: DateTime<Utc>,
+    slug: Option<String>,
+    color: Option<i32>,
+    license: String,
+    components: exp::ProjectSerial,
+}
+
 fn normalize_for_search(s: &str) -> String {
     static SPECIAL_CHARS_RE: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r"[^a-zA-Z0-9-.\s]").expect("valid regex"));
 
     SPECIAL_CHARS_RE.replace_all(s, "").to_kebab_case()
+}
+
+fn searchable_statuses() -> Vec<String> {
+    crate::models::projects::ProjectStatus::iterator()
+        .filter(|x| x.is_searchable())
+        .map(|x| x.to_string())
+        .collect()
 }
 
 struct ProjectOwner {
@@ -49,30 +71,10 @@ pub async fn index_local(
 ) -> eyre::Result<(Vec<UploadSearchProject>, i64)> {
     info!("Indexing local projects!");
 
-    // todo: loaders, project type, game versions
-    struct PartialProject {
-        id: DBProjectId,
-        name: String,
-        summary: String,
-        downloads: i32,
-        follows: i32,
-        icon_url: Option<String>,
-        updated: DateTime<Utc>,
-        approved: DateTime<Utc>,
-        slug: Option<String>,
-        color: Option<i32>,
-        license: String,
-        components: exp::ProjectSerial,
-    }
-
-    let searchable_statuses =
-        crate::models::projects::ProjectStatus::iterator()
-            .filter(|x| x.is_searchable())
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>();
+    let searchable_statuses = searchable_statuses();
 
     let db_projects = sqlx::query!(
-        r#"
+		r#"
         SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
         m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
         m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
@@ -108,6 +110,64 @@ pub async fn index_local(
         .wrap_err("failed to fetch projects")?;
 
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
+    let Some(largest) = project_ids.iter().max() else {
+        return Ok((vec![], i64::MAX));
+    };
+
+    let uploads = build_search_documents(pool, redis, db_projects).await?;
+    Ok((uploads, *largest))
+}
+
+pub async fn index_project_documents(
+    pool: &PgPool,
+    redis: &RedisPool,
+    project_id: ProjectId,
+) -> eyre::Result<Vec<UploadSearchProject>> {
+    let searchable_statuses = searchable_statuses();
+    let project_ids = vec![DBProjectId::from(project_id).0];
+
+    let db_projects = sqlx::query!(
+        r#"
+		SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
+		m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
+		m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
+		FROM mods m
+		WHERE m.status = ANY($1) AND m.id = ANY($2)
+		GROUP BY m.id
+		ORDER BY m.id ASC;
+		"#,
+        &searchable_statuses,
+        &project_ids,
+    )
+    .fetch(pool)
+    .map_ok(|m| PartialProject {
+        id: DBProjectId(m.id),
+        name: m.name,
+        summary: m.summary,
+        downloads: m.downloads,
+        follows: m.follows,
+        icon_url: m.icon_url,
+        updated: m.updated,
+        approved: m.approved.unwrap_or(m.published),
+        slug: m.slug,
+        color: m.color,
+        license: m.license,
+        components: m.components.0,
+    })
+    .try_collect::<Vec<PartialProject>>()
+    .await
+    .wrap_err("failed to fetch project")?;
+
+    build_search_documents(pool, redis, db_projects).await
+}
+
+async fn build_search_documents(
+    pool: &PgPool,
+    redis: &RedisPool,
+    db_projects: Vec<PartialProject>,
+) -> eyre::Result<Vec<UploadSearchProject>> {
+    let searchable_statuses = searchable_statuses();
+    let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
     let project_components = db_projects
         .iter()
         .map(|project| (ProjectId::from(project.id), &project.components))
@@ -116,10 +176,6 @@ pub async fn index_local(
         exp::project::fetch_query_context(&project_components, pool, redis)
             .await
             .wrap_err("failed to fetch query context")?;
-
-    let Some(largest) = project_ids.iter().max() else {
-        return Ok((vec![], i64::MAX));
-    };
 
     info!("Indexing local dependencies!");
 
@@ -573,7 +629,7 @@ pub async fn index_local(
         }
     }
 
-    Ok((uploads, *largest))
+    Ok(uploads)
 }
 
 struct PartialVersion {

@@ -16,6 +16,7 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
+use crate::search::SearchState;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -663,6 +664,7 @@ pub async fn organization_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -799,8 +801,12 @@ pub async fn organization_delete(
     }
 
     for project_id in organization_project_ids {
-        database::models::DBProject::clear_cache(
-            project_id, None, None, &redis,
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id,
+            None,
+            None,
         )
         .await?;
     }
@@ -828,6 +834,7 @@ pub async fn organization_projects_add(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner().0;
     let current_user = get_user_from_headers(
@@ -961,11 +968,12 @@ pub async fn organization_projects_add(
             &redis,
         )
         .await?;
-        database::models::DBProject::clear_cache(
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
             project_item.inner.id,
             project_item.inner.slug,
             None,
-            &redis,
         )
         .await?;
     } else {
@@ -991,6 +999,7 @@ pub async fn organization_projects_remove(
     data: web::Json<OrganizationProjectRemoval>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let (organization_id, project_id) = info.into_inner();
     let current_user = get_user_from_headers(
@@ -1149,11 +1158,12 @@ pub async fn organization_projects_remove(
             &redis,
         )
         .await?;
-        database::models::DBProject::clear_cache(
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
             project_item.inner.id,
             project_item.inner.slug,
             None,
-            &redis,
         )
         .await?;
     } else {

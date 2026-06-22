@@ -31,6 +31,7 @@ pub enum BackgroundTask {
     SyncPayoutStatuses,
     IndexBilling,
     IndexSubscriptions,
+    IncrementalIndexSearch,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -56,6 +57,7 @@ impl BackgroundTask {
         redis_pool: RedisPool,
         search_backend: web::Data<dyn SearchBackend>,
         file_host: web::Data<dyn FileHost>,
+        kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
@@ -95,12 +97,26 @@ impl BackgroundTask {
                 .await;
                 Ok(())
             }
+            IncrementalIndexSearch => {
+                crate::search::incremental::consume::run(
+                    ro_pool,
+                    redis_pool,
+                    search_backend,
+                )
+                .await
+            }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
                 cache_analytics(&pool, &redis_pool, &clickhouse).await
             }
             PingMinecraftJavaServers => {
-                ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
+                ping_minecraft_java_servers(
+                    pool,
+                    redis_pool,
+                    clickhouse,
+                    kafka_client,
+                )
+                .await
             }
             ScanFiles => scan_all_files(&pool, &redis_pool, &**file_host).await,
             DiscordRoleEmailCampaign => {
@@ -330,17 +346,27 @@ pub async fn ping_minecraft_java_servers(
     pool: PgPool,
     redis_pool: RedisPool,
     clickhouse: clickhouse::Client,
+    kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
 ) -> eyre::Result<()> {
     info!("Started pinging Minecraft Java servers");
 
+    let incremental_search_queue =
+        crate::search::incremental::IncrementalSearchQueue::new(kafka_client);
     let server_ping_queue = crate::queue::server_ping::ServerPingQueue::new(
-        pool, redis_pool, clickhouse,
+        pool,
+        redis_pool,
+        clickhouse,
+        incremental_search_queue.clone(),
     );
 
     server_ping_queue
         .ping_minecraft_java_servers()
         .await
         .wrap_err("failed to ping Minecraft Java servers")?;
+    incremental_search_queue
+        .drain()
+        .await
+        .wrap_err("failed to drain incremental search queue")?;
     info!("Successfully pinged Minecraft Java servers");
 
     info!("Done pinging Minecraft Java servers");

@@ -13,6 +13,7 @@ pub mod guards;
 pub mod http;
 pub mod img;
 pub mod ip;
+pub mod kafka;
 pub mod ratelimit;
 pub mod redis;
 pub mod routes;

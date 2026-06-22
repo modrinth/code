@@ -274,6 +274,7 @@ function hide() {
 		return
 	}
 	props.onHide?.()
+	resetMousePosition()
 	visible.value = false
 	popModal()
 	if (modalStackSize() === 0) {
@@ -315,6 +316,11 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseY.value = event.clientY
 }
 
+function resetMousePosition() {
+	mouseX.value = Math.round(window.innerWidth / 2)
+	mouseY.value = Math.round(window.innerHeight / 2)
+}
+
 onUnmounted(() => {
 	if (open.value) {
 		popModal()
@@ -331,8 +337,6 @@ function handleWindowKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		if (!isTopmostModal()) return
 		hide()
-		mouseX.value = Math.round(window.innerWidth / 2)
-		mouseY.value = Math.round(window.innerHeight / 2)
 	}
 }
 

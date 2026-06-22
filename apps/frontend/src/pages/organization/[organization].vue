@@ -218,7 +218,7 @@
 							: (projects ?? [])
 						)
 							.slice()
-							.sort((a, b) => b.downloads - a.downloads)"
+							.sort(projectUserSorting)"
 						:key="project.id"
 					>
 						<ProjectCard
@@ -334,6 +334,7 @@ import {
 	provideOrganizationContext,
 } from '~/providers/organization-context.ts'
 import { isPermission } from '~/utils/permissions.ts'
+import { projectUserSorting } from '~/utils/projects.ts'
 
 type ProjectV3 = Labrinth.Projects.v3.Project & {
 	client_side: 'required' | 'optional' | 'unsupported'

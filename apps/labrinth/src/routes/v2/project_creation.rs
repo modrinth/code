@@ -12,6 +12,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
+use crate::search::SearchState;
 use crate::util::http::HttpClient;
 use actix_multipart::Multipart;
 use actix_web::web::Data;
@@ -160,6 +161,7 @@ pub async fn project_create(
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     // Convert V2 multipart payload to V3 multipart payload
     let payload = v2_reroute::alter_actix_multipart(
@@ -183,6 +185,12 @@ pub async fn project_create(
                             server_side,
                         ),
                     );
+                    if let Some(environment) = v.environment {
+                        fields.insert(
+                            "environment".to_string(),
+                            json!(environment),
+                        );
+                    }
                     fields.insert(
                         "game_versions".to_string(),
                         json!(v.game_versions),
@@ -272,6 +280,7 @@ pub async fn project_create(
         file_host,
         session_queue,
         http,
+        search_state,
     )
     .await?;
 

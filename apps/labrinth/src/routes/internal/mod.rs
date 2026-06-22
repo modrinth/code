@@ -30,7 +30,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
                 cfg.service(
                     actix_web::web::scope("/admin")
                         .service(admin::count_download)
-                        .service(admin::force_reindex),
+                        .service(admin::force_reindex)
+                        .service(admin::force_reindex_project),
                 );
                 cfg.service(
                     actix_web::web::scope("/session")

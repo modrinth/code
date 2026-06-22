@@ -46,6 +46,10 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
     let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
         .expect("Failed to create Gotenberg client");
+    let kafka_client = actix_web::web::Data::new(
+        crate::util::kafka::KafkaClientState::new()
+            .expect("Kafka connection failed"),
+    );
 
     crate::app_setup(
         pool.clone(),
@@ -58,6 +62,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         anrok_client,
         email_queue,
         gotenberg_client,
+        kafka_client,
         false,
     )
 }

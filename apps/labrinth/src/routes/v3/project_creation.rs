@@ -22,6 +22,7 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
+use crate::search::SearchState;
 use crate::util::guards::admin_key_guard;
 use crate::util::http::HttpClient;
 use crate::util::img::upload_image_optimized;
@@ -292,6 +293,7 @@ pub async fn project_create(
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
         req,
@@ -301,6 +303,7 @@ pub async fn project_create(
         file_host,
         session_queue,
         http,
+        search_state,
     )
     .await
 }
@@ -313,6 +316,7 @@ pub async fn project_create_internal(
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -344,6 +348,14 @@ pub async fn project_create_internal(
         }
     } else {
         transaction.commit().await?;
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id.into(),
+            None,
+            None,
+        )
+        .await?;
     }
 
     result
@@ -362,6 +374,7 @@ pub async fn project_create_with_id(
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
+    search_state: Data<SearchState>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
@@ -393,6 +406,14 @@ pub async fn project_create_with_id(
         }
     } else {
         transaction.commit().await?;
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id.into(),
+            None,
+            None,
+        )
+        .await?;
     }
 
     result

@@ -11,12 +11,19 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, sync::Arc};
 use thiserror::Error;
 use utoipa::ToSchema;
 
 pub mod backend;
+pub mod incremental;
 pub mod indexing;
+
+#[derive(Clone)]
+pub struct SearchState {
+    pub backend: Arc<dyn SearchBackend>,
+    pub queue: incremental::IncrementalSearchQueue,
+}
 
 /// Search parameters which can fit in a URL query string.
 ///
@@ -102,6 +109,16 @@ pub trait SearchBackend: Send + Sync {
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
+    ) -> eyre::Result<()>;
+
+    async fn index_documents(
+        &self,
+        documents: &[UploadSearchProject],
+    ) -> eyre::Result<()>;
+
+    async fn remove_project_documents(
+        &self,
+        ids: &[ProjectId],
     ) -> eyre::Result<()>;
 
     async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;

@@ -27,6 +27,7 @@ use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
+use crate::search::SearchState;
 use crate::util::http::HttpClient;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -113,6 +114,7 @@ pub async fn version_create(
     session_queue: Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
     http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -143,11 +145,19 @@ pub async fn version_create(
         if let Err(e) = rollback_result {
             return Err(e.into());
         }
-    } else {
+    } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            *project_id,
+            None,
+            Some(true),
+        )
+        .await?;
     }
 
-    result
+    result.map(|(response, _)| response)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -162,7 +172,7 @@ async fn version_create_inner(
     session_queue: &AuthQueue,
     moderation_queue: &AutomatedModerationQueue,
     http: &reqwest::Client,
-) -> Result<HttpResponse, CreateError> {
+) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
     let mut initial_version_data = None;
     let mut version_builder = None;
     let mut selected_loaders = None;
@@ -520,8 +530,6 @@ async fn version_create_inner(
         }
     }
 
-    models::DBProject::clear_cache(project_id, None, Some(true), redis).await?;
-
     let project_status = sqlx::query!(
         "SELECT status FROM mods WHERE id = $1",
         project_id as models::DBProjectId,
@@ -535,7 +543,7 @@ async fn version_create_inner(
         moderation_queue.projects.insert(project_id.into());
     }
 
-    Ok(HttpResponse::Ok().json(response))
+    Ok((HttpResponse::Ok().json(response), project_id))
 }
 
 pub async fn upload_file_to_version(
@@ -547,6 +555,7 @@ pub async fn upload_file_to_version(
     file_host: Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -558,7 +567,7 @@ pub async fn upload_file_to_version(
         &mut payload,
         client,
         &mut transaction,
-        redis,
+        redis.clone(),
         &**file_host,
         &mut uploaded_files,
         version_id,
@@ -579,11 +588,19 @@ pub async fn upload_file_to_version(
         if let Err(e) = rollback_result {
             return Err(e.into());
         }
-    } else {
+    } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            *project_id,
+            None,
+            Some(true),
+        )
+        .await?;
     }
 
-    result
+    result.map(|(response, _)| response)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -598,7 +615,7 @@ async fn upload_file_to_version_inner(
     version_id: models::DBVersionId,
     session_queue: &AuthQueue,
     http: &reqwest::Client,
-) -> Result<HttpResponse, CreateError> {
+) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
 
@@ -691,6 +708,7 @@ async fn upload_file_to_version_inner(
     }
 
     let project_id = ProjectId(version.inner.project_id.0 as u64);
+    let db_project_id = version.inner.project_id;
     let mut error = None;
     while let Some(item) = payload.next().await {
         let mut field: Field = item?;
@@ -798,7 +816,7 @@ async fn upload_file_to_version_inner(
     // Clear version cache
     models::DBVersion::clear_cache(&version, &redis).await?;
 
-    Ok(HttpResponse::NoContent().body(""))
+    Ok((HttpResponse::NoContent().body(""), db_project_id))
 }
 
 // This function is used for adding a file to a version, uploading the initial

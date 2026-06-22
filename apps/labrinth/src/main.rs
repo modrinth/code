@@ -160,6 +160,10 @@ async fn app() -> std::io::Result<()> {
         .expect("Failed to create Gotenberg client");
     let muralpay = labrinth::queue::payouts::create_muralpay_client()
         .expect("Failed to create MuralPay client");
+    let kafka_client = actix_web::web::Data::new(
+        labrinth::util::kafka::KafkaClientState::new()
+            .expect("Kafka connection failed"),
+    );
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
@@ -169,6 +173,7 @@ async fn app() -> std::io::Result<()> {
             redis_pool,
             search_backend,
             file_host,
+            kafka_client,
             clickhouse,
             stripe_client,
             anrok_client.clone(),
@@ -211,6 +216,7 @@ async fn app() -> std::io::Result<()> {
         anrok_client.clone(),
         email_queue,
         gotenberg_client,
+        kafka_client,
         !args.no_background_tasks,
     );
 
