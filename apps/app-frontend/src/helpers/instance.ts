@@ -4,7 +4,7 @@
  *  and deserialized into a usable JS object.
  */
 import type { Labrinth } from '@modrinth/api-client'
-import type { ContentDiffItem, ContentItem, ContentOwner } from '@modrinth/ui'
+import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 import { install_to_existing_instance } from '@/helpers/pack'
@@ -167,16 +167,6 @@ export async function check_installed_batch(projectId: string): Promise<Record<s
 
 export async function install(instanceId: string, force: boolean): Promise<void> {
 	return await invoke('plugin:instance|instance_install', { instanceId, force })
-}
-
-export interface BulkUpdatePreview {
-	disableCandidates: ContentDiffItem[]
-	disablePaths: string[]
-	requiresConfirmation: boolean
-}
-
-export async function preview_update_all(instanceId: string): Promise<BulkUpdatePreview> {
-	return await invoke('plugin:instance|instance_preview_update_all', { instanceId })
 }
 
 export async function update_all(instanceId: string): Promise<Record<string, string>> {

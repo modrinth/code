@@ -1,8 +1,5 @@
 #![allow(dead_code)]
 
-mod bulk_update;
-pub use self::bulk_update::*;
-
 mod content_entry;
 pub use self::content_entry::*;
 
