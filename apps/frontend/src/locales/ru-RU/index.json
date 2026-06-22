@@ -3233,9 +3233,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Если вам нужна помощь или у вас есть дополнительные вопросы, посетите <help-center-link>справочный центр Modrinth</help-center-link> и нажмите на синий значок, чтобы обратиться в поддержку."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Показать интерфейс участника"
-  },
   "project.moderation.thread.private-description": {
     "message": "Это приватная переписка с модераторами Modrinth. Они могут связываться с вами по вопросам, связанным с этим проектом."
   },
@@ -3358,9 +3355,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Эта версия в настоящее время скрыта и не отображается} other {Эти версии в настоящее время скрыты и не отображаются}} в публичном списке. Пожалуйста, предоставьте доказательства того, что у вас есть разрешение на распространение определённых файлов, включённых в {count, plural, one {эту версию} other {эти версии}}."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Решить"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Версия {version_name} скрыта} other {Версии скрыты}} из-за неизвестного встроенного контента"

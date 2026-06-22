@@ -29,9 +29,7 @@ impl FileHost for MockHost {
         file_publicity: FileHostPublicity,
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
-        let file_name = urlencoding::decode(file_name)
-            .map_err(|_| FileHostingError::InvalidFilename)?;
-        let path = get_file_path(&file_name, file_publicity);
+        let path = get_file_path(file_name, file_publicity);
         std::fs::create_dir_all(
             path.parent().ok_or(FileHostingError::InvalidFilename)?,
         )?;
@@ -71,6 +69,16 @@ impl FileHost for MockHost {
         Ok(DeleteFileData {
             file_name: file_name.to_string(),
         })
+    }
+
+    async fn read_file(
+        &self,
+        file_name: &str,
+        file_publicity: FileHostPublicity,
+    ) -> Result<Bytes, FileHostingError> {
+        let path = get_file_path(file_name, file_publicity);
+        let data = std::fs::read(&path)?;
+        Ok(Bytes::from(data))
     }
 }
 

@@ -2750,9 +2750,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "도움이 필요하거나 추가 문의 사항이 있다면 <help-center-link>Modrinth 도움말 센터</help-center-link>를 방문하여 파란색 말풍선을 클릭해 지원 센터에 문의해 주세요."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "멤버 UI 표시"
-  },
   "project.moderation.thread.private-description": {
     "message": "이곳은 Modrinth 운영진과의 비공개 대화 스레드입니다. 운영진이 이 프로젝트와 관련된 사항에 대해 메시지를 보낼 수 있습니다."
   },
@@ -2869,9 +2866,6 @@
   },
   "project.versions.title": {
     "message": "버전"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "해결"
   },
   "report.already-reported": {
     "message": "이미 {title} 을(를) 신고했습니다"

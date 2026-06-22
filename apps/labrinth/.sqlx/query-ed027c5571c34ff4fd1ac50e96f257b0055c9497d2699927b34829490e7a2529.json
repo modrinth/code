@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tdelete from project_attribution_groups g\n\t\twhere not exists (\n\t\t\tselect 1 from project_attribution_files f where f.group_id = g.id\n\t\t)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "ed027c5571c34ff4fd1ac50e96f257b0055c9497d2699927b34829490e7a2529"
+}

@@ -59,7 +59,7 @@
 					</ButtonStyled>
 					<ButtonStyled v-if="visibleQuickReplies.length > 0">
 						<OverflowMenu :options="visibleQuickReplies">
-							Quick Reply
+							Quick reply
 							<ChevronDownIcon />
 						</OverflowMenu>
 					</ButtonStyled>
