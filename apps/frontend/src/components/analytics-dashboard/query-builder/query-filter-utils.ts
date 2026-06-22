@@ -13,6 +13,7 @@ export type AnalyticsDashboardDimension =
 	| 'monetization'
 	| 'user_agent'
 	| 'download_reason'
+	| 'user_id'
 	| 'dependent_project_download'
 	| 'dependent_project_id'
 	| 'dependent_project_type'
@@ -26,6 +27,7 @@ export const FILTER_VALUE_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'pro
 	'monetization',
 	'user_agent',
 	'download_reason',
+	'user_id',
 	'version_id',
 	'game_version',
 	'loader_type',
@@ -50,6 +52,7 @@ const ANALYTICS_STATS_BY_DIMENSION: Record<
 	monetization: ['views', 'downloads'],
 	user_agent: ['downloads'],
 	download_reason: ['downloads'],
+	user_id: ['revenue'],
 	dependent_project_download: ['downloads'],
 	dependent_project_type: ['downloads'],
 	game_version: ['downloads', 'playtime'],
@@ -68,6 +71,7 @@ const ANALYTICS_DIMENSION_BY_BREAKDOWN: Record<
 	monetization: 'monetization',
 	user_agent: 'user_agent',
 	download_reason: 'download_reason',
+	user_id: 'user_id',
 	dependent_project_download: 'dependent_project_download',
 	version_id: 'version_id',
 	loader: 'loader_type',
@@ -83,6 +87,7 @@ const ANALYTICS_DIMENSION_BY_FILTER_CATEGORY: Record<
 	monetization: 'monetization',
 	user_agent: 'user_agent',
 	download_reason: 'download_reason',
+	user_id: 'user_id',
 	version_id: 'version_id',
 	game_version: 'game_version',
 	loader_type: 'loader_type',
@@ -100,6 +105,7 @@ const ANALYTICS_FILTER_CATEGORY_BY_BREAKDOWN: Record<
 	monetization: 'monetization',
 	user_agent: 'user_agent',
 	download_reason: 'download_reason',
+	user_id: 'user_id',
 	dependent_project_download: null,
 	version_id: 'version_id',
 	loader: 'loader_type',
@@ -396,6 +402,7 @@ export function cloneSelectedFilters(filters: AnalyticsSelectedFilters): Analyti
 		monetization: [...filters.monetization],
 		user_agent: [...filters.user_agent],
 		download_reason: [...filters.download_reason],
+		user_id: [...filters.user_id],
 		version_id: [...filters.version_id],
 		game_version: [...filters.game_version],
 		loader_type: [...filters.loader_type],

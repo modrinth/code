@@ -134,12 +134,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Afficher les {count} lignes sur le graphique ?"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "Montrer {itemType, select, project {{count, plural, one {1 projet} other {tous les projets}}} country {{count, plural, one {1 pays} other {tous les pays}}} monetization {{count, plural, one {1 valeur de monétisation} other {toutes les valeurs de monétisation}}} downloadSource {{count, plural, one {1 source de téléchargement} other {toutes les sources de téléchargement}}} downloadReason {{count, plural, one {1 raison de téléchargement} other {toutes les raisons de téléchargement}}} projectVersion {{count, plural, one {1 version de projet} other {toutes les versions de projets}}} loader {{count, plural, one {1 loader} other {tous les loaders}}} gameVersion {{count, plural, one {1 version du jeu} other {toutes les version versions du jeu}}} other {{count, plural, one {l'objet} other {tous les objets}}}} du tableau"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Affichage de {count} {itemType, select, project {{count, plural, one {projet} other {projets}}} country {{count, plural, one {pays} other {pays}}} monetization {{count, plural, one {valeur de monétisation} other {valeurs de monétisation}}} downloadSource {{count, plural, one {source de téléchargement} other {sources de téléchargement}}} downloadReason {{count, plural, one {raison de téléchargement} other {raisons de téléchargement}}} projectVersion {{count, plural, one {version de projet} other {versions de projet}}} loader {{count, plural, one {chargeur} other {chargeurs}}} gameVersion {{count, plural, one {version de jeu} other {versions de jeu}}} other {{count, plural, one {élément} other {éléments}}}} du tableau"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# jour} other {# jours}}"
   },

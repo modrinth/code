@@ -13,6 +13,7 @@ export type AnalyticsBreakdownItemType =
 	| 'downloadSource'
 	| 'gameVersion'
 	| 'loader'
+	| 'member'
 	| 'monetization'
 	| 'project'
 	| 'projectVersion'
@@ -186,6 +187,10 @@ export const analyticsMessages = defineMessages({
 	searchDependentProjectsPlaceholder: {
 		id: 'analytics.filter.search.dependent-projects',
 		defaultMessage: 'Search projects...',
+	},
+	searchMembersPlaceholder: {
+		id: 'analytics.filter.search.members',
+		defaultMessage: 'Search members...',
 	},
 	searchVersionsPlaceholder: {
 		id: 'analytics.filter.search.versions',
@@ -362,6 +367,10 @@ export const analyticsBreakdownMessages = defineMessages({
 	downloadReason: {
 		id: 'analytics.breakdown.download-reason',
 		defaultMessage: 'Download reason',
+	},
+	members: {
+		id: 'analytics.breakdown.members',
+		defaultMessage: 'Members',
 	},
 	dependentProjectDownload: {
 		id: 'analytics.breakdown.dependent-project-download',
@@ -552,22 +561,22 @@ export const analyticsChartMessages = defineMessages({
 	tableSelectionLimited: {
 		id: 'analytics.chart.table-selection.limited',
 		defaultMessage:
-			'Showing {limit} {itemType, select, project {{limit, plural, one {project} other {projects}}} country {{limit, plural, one {country} other {countries}}} monetization {{limit, plural, one {monetization value} other {monetization values}}} downloadSource {{limit, plural, one {download source} other {download sources}}} downloadReason {{limit, plural, one {download reason} other {download reasons}}} projectVersion {{limit, plural, one {project version} other {project versions}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {game version} other {game versions}}} other {{limit, plural, one {item} other {items}}}} from table',
+			'Showing {limit} {itemType, select, project {{limit, plural, one {project} other {projects}}} country {{limit, plural, one {country} other {countries}}} monetization {{limit, plural, one {monetization value} other {monetization values}}} downloadSource {{limit, plural, one {download source} other {download sources}}} downloadReason {{limit, plural, one {download reason} other {download reasons}}} member {{limit, plural, one {member} other {members}}} projectVersion {{limit, plural, one {project version} other {project versions}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {game version} other {game versions}}} other {{limit, plural, one {item} other {items}}}} from table',
 	},
 	tableSelectionAll: {
 		id: 'analytics.chart.table-selection.all',
 		defaultMessage:
-			'Showing all {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table',
+			'Showing all {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} member {{count, plural, one {member} other {members}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table',
 	},
 	tableSelectionTop: {
 		id: 'analytics.chart.table-selection.top',
 		defaultMessage:
-			'Showing top {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table',
+			'Showing top {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} member {{count, plural, one {member} other {members}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table',
 	},
 	tableSelectionCount: {
 		id: 'analytics.chart.table-selection.count',
 		defaultMessage:
-			'Showing {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table',
+			'Showing {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} member {{count, plural, one {member} other {members}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table',
 	},
 	lineView: {
 		id: 'analytics.chart.view.line',
@@ -813,6 +822,8 @@ export function formatAnalyticsBreakdownLabel(
 			return formatMessage(analyticsBreakdownMessages.userAgent)
 		case 'download_reason':
 			return formatMessage(analyticsBreakdownMessages.downloadReason)
+		case 'user_id':
+			return formatMessage(analyticsBreakdownMessages.members)
 		case 'dependent_project_download':
 			return formatMessage(analyticsBreakdownMessages.dependentProjectDownload)
 		case 'version_id':
@@ -844,6 +855,8 @@ export function getAnalyticsBreakdownItemType(
 			return 'downloadSource'
 		case 'download_reason':
 			return 'downloadReason'
+		case 'user_id':
+			return 'member'
 		case 'dependent_project_download':
 			return 'project'
 		case 'version_id':

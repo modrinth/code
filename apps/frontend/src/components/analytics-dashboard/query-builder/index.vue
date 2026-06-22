@@ -1013,6 +1013,10 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 				value: 'dependent_project_download',
 				label: formatAnalyticsBreakdownLabel('dependent_project_download', formatMessage),
 			},
+			{
+				value: 'user_id',
+				label: formatAnalyticsBreakdownLabel('user_id', formatMessage),
+			},
 		)
 
 		return options.map((option) => ({
@@ -1139,6 +1143,11 @@ function withBreakdownFields(
 			case 'download_reason':
 				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
 					downloads.push('reason')
+				}
+				break
+			case 'user_id':
+				if (includesStat(breakdownStats, 'revenue') && includesStat(enabledStats, 'revenue')) {
+					revenue.push('user_id')
 				}
 				break
 			case 'dependent_project_download':
@@ -1298,7 +1307,9 @@ function buildMetricFilters(
 			),
 			loader: getFilterValuesForStat('loader_type', 'playtime', enabledStats, filters.loader_type),
 		},
-		revenue: {},
+		revenue: {
+			user_id: getFilterValuesForStat('user_id', 'revenue', enabledStats, filters.user_id),
+		},
 	}
 }
 
@@ -1312,6 +1323,15 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 
 	const bucketBy = withBreakdownFields(selectedBreakdowns.value, selectedFilters.value)
 	const filterBy = buildMetricFilters(selectedBreakdowns.value, selectedFilters.value)
+	if (
+		includesStat(
+			getEnabledAnalyticsStatsForState(selectedBreakdowns.value, selectedFilters.value),
+			'revenue',
+		) &&
+		!bucketBy.revenue.includes('user_id')
+	) {
+		bucketBy.revenue.push('user_id')
+	}
 	const filteredProjectIds = getProjectIdsMatchingStatusFilter(
 		selectedProjectIds.value,
 		projectStatusById.value,

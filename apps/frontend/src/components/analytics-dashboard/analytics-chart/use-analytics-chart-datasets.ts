@@ -58,6 +58,7 @@ export function useAnalyticsChartDatasets(
 		| 'defaultGraphDatasetIds'
 		| 'topGraphDatasetIds'
 		| 'projectNamesById'
+		| 'userNamesById'
 		| 'dependentProjectTypesById'
 		| 'getVersionDisplayName'
 		| 'getVersionProjectName'
@@ -169,6 +170,7 @@ export function useAnalyticsChartDatasets(
 			context.displayedSelectedFilters.value,
 			context.dependentProjectTypesById.value,
 			context.projectNamesById.value,
+			context.userNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
@@ -184,6 +186,7 @@ export function useAnalyticsChartDatasets(
 			context.displayedSelectedFilters.value,
 			context.dependentProjectTypesById.value,
 			context.projectNamesById.value,
+			context.userNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
@@ -376,6 +379,7 @@ function buildDatasetsByStat(
 	selectedFilters: AnalyticsSelectedFilters,
 	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>,
 	projectNamesById: ReadonlyMap<string, string>,
+	userNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: (versionId: string) => string,
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
@@ -392,6 +396,7 @@ function buildDatasetsByStat(
 			selectedFilters,
 			dependentProjectTypesById,
 			projectNamesById,
+			userNamesById,
 			getVersionDisplayName,
 			getVersionProjectName,
 			formatMessage,

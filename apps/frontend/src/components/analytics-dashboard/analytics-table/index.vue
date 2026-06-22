@@ -77,6 +77,25 @@
 			<template #cell-breakdown_download_reason="{ value }">
 				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
+			<template #cell-breakdown_user_id="{ row, value }">
+				<div class="mr-2.5 flex min-w-0 items-center gap-2">
+					<span
+						v-tooltip="getUserCellLabel(value)"
+						class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-primary"
+					>
+						<img
+							v-if="getUserAvatarUrl(row.breakdownValues.user_id)"
+							:src="getUserAvatarUrl(row.breakdownValues.user_id)"
+							:alt="getUserCellLabel(value)"
+							class="h-6 w-6 rounded-full object-cover"
+						/>
+						<UserIcon v-else class="h-full w-full" />
+					</span>
+					<span class="min-w-0 truncate font-semibold leading-tight text-primary">
+						{{ value }}
+					</span>
+				</div>
+			</template>
 			<template #cell-breakdown_dependent_project_download="{ row, value }">
 				<ProjectCell
 					:label="getProjectCellLabel(value)"
@@ -164,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
+import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	OverflowMenu,
@@ -267,6 +286,8 @@ const {
 	projectIconUrlsById,
 	projectOrganizationIdsById,
 	projectOrganizationNamesById,
+	userNamesById,
+	userAvatarUrlsById,
 	dependentProjectTypesById,
 	getVersionDisplayName,
 	getVersionProjectName,
@@ -407,6 +428,7 @@ function buildTableRows(mode: AnalyticsTableMode) {
 		includeDependentProjectTooltipContext: includeDependentProjectTooltipContext.value,
 		relevantStats: relevantStats.value,
 		projectNamesById: projectNamesById.value,
+		userNamesById: userNamesById.value,
 		getVersionDisplayName,
 		getVersionProjectName,
 		showTimeInBucketLabel: showTimeInBucketLabel.value,
@@ -438,6 +460,14 @@ function getProjectOrganizationName(projectId: string | undefined) {
 }
 
 function getProjectCellLabel(value: unknown) {
+	return typeof value === 'string' ? value : String(value ?? '')
+}
+
+function getUserAvatarUrl(userId: string | undefined) {
+	return userId ? userAvatarUrlsById.value.get(userId) : undefined
+}
+
+function getUserCellLabel(value: unknown) {
 	return typeof value === 'string' ? value : String(value ?? '')
 }
 
@@ -549,6 +579,7 @@ watch(
 		projects,
 		dependentProjectTypesById,
 		projectNamesById,
+		userNamesById,
 		versionNumbersById,
 		versionProjectNamesById,
 	],

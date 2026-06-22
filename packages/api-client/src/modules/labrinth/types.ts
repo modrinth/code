@@ -329,7 +329,7 @@ export namespace Labrinth {
 				| 'game_version'
 				| 'country'
 
-			export type ProjectRevenueField = 'project_id'
+			export type ProjectRevenueField = 'project_id' | 'user_id'
 
 			export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
 
@@ -365,7 +365,9 @@ export namespace Labrinth {
 				country?: string[]
 			}
 
-			export type ProjectRevenueFilters = Record<string, never>
+			export type ProjectRevenueFilters = {
+				user_id?: string[]
+			}
 
 			export type AffiliateCodeClicksFilters = {
 				affiliate_code_id?: string[]
@@ -382,6 +384,7 @@ export namespace Labrinth {
 			export type FetchResponse = {
 				metrics: TimeSlice[]
 				projects: Record<string, Projects.v3.Project>
+				users: Record<string, Users.v3.User>
 				project_events: ProjectAnalyticsEvent[]
 			}
 
@@ -483,6 +486,7 @@ export namespace Labrinth {
 			}
 
 			export type ProjectRevenue = {
+				user_id?: string
 				revenue: string
 			}
 

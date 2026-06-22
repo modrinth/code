@@ -49,6 +49,7 @@ type BuildAnalyticsTableRowsOptions = {
 	includeDependentProjectTooltipContext: boolean
 	relevantStats: ReadonlySet<AnalyticsDashboardStat>
 	projectNamesById: ReadonlyMap<string, string>
+	userNamesById: ReadonlyMap<string, string>
 	getVersionDisplayName: (versionId: string) => string
 	getVersionProjectName: (versionId: string) => string | undefined
 	showTimeInBucketLabel: boolean
@@ -67,6 +68,7 @@ export function buildAnalyticsTableRows({
 	includeDependentProjectTooltipContext,
 	relevantStats,
 	projectNamesById,
+	userNamesById,
 	getVersionDisplayName,
 	getVersionProjectName,
 	showTimeInBucketLabel,
@@ -99,6 +101,7 @@ export function buildAnalyticsTableRows({
 				breakdownValue,
 				breakdown,
 				projectNamesById,
+				userNamesById,
 				getVersionDisplayName,
 				formatMessage,
 			)
@@ -366,6 +369,7 @@ function formatAnalyticsTableBreakdownDisplayValue(
 	value: string,
 	breakdown: AnalyticsTableBreakdownPreset,
 	projectNamesById: ReadonlyMap<string, string>,
+	userNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: (versionId: string) => string,
 	formatMessage: FormatMessage,
 ): string {
@@ -381,5 +385,5 @@ function formatAnalyticsTableBreakdownDisplayValue(
 
 		return projectNamesById.get(value) ?? value
 	}
-	return formatBreakdownLabel(value, breakdown, getVersionDisplayName, formatMessage)
+	return formatBreakdownLabel(value, breakdown, getVersionDisplayName, userNamesById, formatMessage)
 }
