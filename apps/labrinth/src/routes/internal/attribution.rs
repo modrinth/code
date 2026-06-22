@@ -1,11 +1,13 @@
 use actix_web::{HttpRequest, get, patch, post, web};
 use chrono::{DateTime, Utc};
+use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
-use crate::database::models::ids::{
-    DBAttributionGroupId, DBProjectId, generate_attribution_group_id,
+use crate::database::models::{
+    DBOrganization, DBTeamMember,
+    ids::{DBAttributionGroupId, DBProjectId, generate_attribution_group_id},
 };
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
@@ -14,6 +16,7 @@ use crate::models::projects::{
     AttributionModerationStatusKind, AttributionResolution,
     AttributionResolutionKind, FlameProject,
 };
+use crate::models::teams::ProjectPermissions;
 use crate::models::users::User;
 use crate::queue::moderation::ApprovalType;
 use crate::queue::session::AuthQueue;
@@ -589,24 +592,63 @@ async fn can_edit_attribution_group(
     group_id: i64,
     user: &User,
 ) -> Result<bool, ApiError> {
-    if user.role.is_mod() {
-        return Ok(true);
-    }
-
-    let attribution = sqlx::query_scalar!(
-        "
-		select attribution
+    let group = sqlx::query!(
+        r#"
+		select attribution, project_id as "project_id: DBProjectId"
 		from project_attribution_groups
 		where id = $1
-		",
+		"#,
         group_id,
     )
     .fetch_optional(pool)
     .await?
     .ok_or(ApiError::NotFound)?;
 
-    let attribution: Option<AttributionResolution> =
-        attribution.and_then(|value| serde_json::from_value(value).ok());
+    if !user.role.is_mod() {
+        let team_member = DBTeamMember::get_from_user_id_project(
+            group.project_id,
+            user.id.into(),
+            false,
+            pool,
+        )
+        .await?;
+
+        let organization =
+            DBOrganization::get_associated_organization_project_id(
+                group.project_id,
+                pool,
+            )
+            .await?;
+
+        let organization_team_member = if let Some(organization) = organization
+        {
+            DBTeamMember::get_from_user_id(
+                organization.team_id,
+                user.id.into(),
+                pool,
+            )
+            .await?
+        } else {
+            None
+        };
+
+        let permissions = ProjectPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+            &organization_team_member,
+        )
+        .unwrap_or_default();
+
+        if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
+            return Err(ApiError::Auth(eyre!(
+                "you do not have permission to edit this attribution group"
+            )));
+        }
+    }
+
+    let attribution: Option<AttributionResolution> = group
+        .attribution
+        .and_then(|value| serde_json::from_value(value).ok());
 
     Ok(!matches!(
         attribution

@@ -6,7 +6,7 @@
   - `ApiError::Request` instead of `ApiError::InvalidInput`
   - `ApiError::Auth` instead of `ApiError::CustomAuthentication`
   - `ApiError::Internal` for database errors, 3rd party service errors, anything else internal
-  - Use `eyre!` to construct a value for `Internal` and `Request` variants
+  - Use `eyre!` to construct a value for `Internal`, `Request`, and `Auth` variants
 - Error messages (both for errors and exceptions) must be formatted as per the Rust API guidelines:
   - lowercase message
   - no trailing punctuation
@@ -31,3 +31,4 @@
   - Hitting the force reindex admin endpoint
 - To seed the database locally: `psql postgresql://labrinth:labrinth@localhost/labrinth -f apps/labrinth/fixtures/labrinth-seed-data-202508052143.sql
 `
+- When writing `sqlx` queries, prefer `r#` raw strings over escaping quotes
