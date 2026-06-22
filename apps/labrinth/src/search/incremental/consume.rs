@@ -1,32 +1,50 @@
 use actix_web::web;
 use eyre::WrapErr;
+use futures::FutureExt;
 use rdkafka::{
-    ClientConfig, Message,
+    Message,
     consumer::{CommitMode, Consumer, StreamConsumer},
+    message::BorrowedMessage,
 };
 use serde::Deserialize;
+use std::collections::HashSet;
 
 use crate::{
     database::{PgPool, redis::RedisPool},
-    env::ENV,
     models::ids::ProjectId,
     search::{
         SearchBackend, incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
         indexing::index_project_documents,
     },
-    util::kafka::KAFKA_OPERATION_INTERVAL,
+    util::kafka::{
+        INCREMENTAL_INDEX_SEARCH_TASK, KAFKA_OPERATION_INTERVAL,
+        KafkaClientState,
+    },
 };
 
-pub const INCREMENTAL_INDEX_SEARCH_TASK: &str = "incremental-index-search";
+const BATCH_SIZE: usize = 100;
 
 pub async fn run(
     ro_pool: PgPool,
     redis_pool: RedisPool,
     search_backend: web::Data<dyn SearchBackend>,
+    kafka_client: web::Data<KafkaClientState>,
 ) -> eyre::Result<()> {
+    let consumer = &kafka_client.incremental_index_search_consumer;
+    consumer
+        .subscribe(&[SEARCH_PROJECT_INDEX_QUEUE_TOPIC])
+        .wrap_err("failed to subscribe to Kafka topic")?;
+
+    tracing::info!(
+        kafka.topic = SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
+        kafka.consumer_group = INCREMENTAL_INDEX_SEARCH_TASK,
+        "Started Kafka consumer"
+    );
+
     loop {
         if let Err(err) =
-            consume(&ro_pool, &redis_pool, search_backend.as_ref()).await
+            consume(&ro_pool, &redis_pool, search_backend.as_ref(), consumer)
+                .await
         {
             tracing::error!(
                 "Background task {INCREMENTAL_INDEX_SEARCH_TASK} failed: {err:?}"
@@ -40,36 +58,55 @@ async fn consume(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
+    consumer: &StreamConsumer,
 ) -> eyre::Result<()> {
-    let consumer: StreamConsumer = ClientConfig::new()
-        .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
-        .set("client.id", &ENV.KAFKA_CLIENT_ID)
-        .set("group.id", INCREMENTAL_INDEX_SEARCH_TASK)
-        .set("enable.auto.commit", "false")
-        .set("auto.offset.reset", "earliest")
-        .set("broker.address.family", "v4")
-        .create()
-        .wrap_err("failed to create Kafka consumer")?;
-    consumer
-        .subscribe(&[SEARCH_PROJECT_INDEX_QUEUE_TOPIC])
-        .wrap_err("failed to subscribe to Kafka topic")?;
-
-    tracing::info!(
-        kafka.bootstrap_servers = ?ENV.KAFKA_BOOTSTRAP_SERVERS.0,
-        kafka.client_id = %ENV.KAFKA_CLIENT_ID,
-        kafka.topic = SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-        kafka.consumer_group = INCREMENTAL_INDEX_SEARCH_TASK,
-        "Started Kafka consumer"
-    );
-
     loop {
-        let message = consumer
-            .recv()
-            .await
-            .wrap_err("failed to receive Kafka message")?;
-        let payload = message.payload().ok_or_else(|| {
-            eyre::eyre!("Kafka message did not have a payload")
-        })?;
+        let mut messages = Vec::with_capacity(BATCH_SIZE);
+        messages.push(
+            consumer
+                .recv()
+                .await
+                .wrap_err("failed to receive Kafka message")?,
+        );
+
+        while messages.len() < BATCH_SIZE {
+            let Some(message) = consumer.recv().now_or_never() else {
+                break;
+            };
+
+            messages.push(message.wrap_err("failed to receive Kafka message")?);
+        }
+
+        consume_batch(ro_pool, redis_pool, search_backend, consumer, messages)
+            .await?;
+    }
+}
+
+async fn consume_batch(
+    ro_pool: &PgPool,
+    redis_pool: &RedisPool,
+    search_backend: &dyn SearchBackend,
+    consumer: &StreamConsumer,
+    messages: Vec<BorrowedMessage<'_>>,
+) -> eyre::Result<()> {
+    let mut project_ids = Vec::new();
+    let mut seen_project_ids = HashSet::new();
+    let mut messages_to_commit = Vec::new();
+
+    for message in messages {
+        let Some(payload) = message.payload() else {
+            tracing::error!(
+                kafka.topic = message.topic(),
+                kafka.partition = message.partition(),
+                kafka.offset = message.offset(),
+                "Skipping incremental search index event without payload"
+            );
+            consumer
+                .commit_message(&message, CommitMode::Async)
+                .wrap_err("failed to commit empty Kafka message")?;
+            continue;
+        };
+
         let event = match serde_json::from_slice::<SearchProjectIndexQueueEvent>(
             payload,
         ) {
@@ -88,24 +125,33 @@ async fn consume(
             }
         };
 
-        tracing::info!(
-            kafka.topic = message.topic(),
-            kafka.partition = message.partition(),
-            kafka.offset = message.offset(),
-            project_id = %event.project_id,
-            "Consumed incremental search index event"
-        );
+        if seen_project_ids.insert(event.project_id) {
+            project_ids.push(event.project_id);
+        }
+        messages_to_commit.push(message);
+    }
 
-        reindex_project(ro_pool, redis_pool, search_backend, event.project_id)
-            .await
-            .wrap_err_with(|| {
-                format!("failed to reindex project {}", event.project_id)
-            })?;
+    if project_ids.is_empty() {
+        return Ok(());
+    }
 
+    tracing::info!(
+        kafka.message_count = messages_to_commit.len(),
+        project_count = project_ids.len(),
+        "Consumed incremental search index event batch"
+    );
+
+    reindex_projects(ro_pool, redis_pool, search_backend, &project_ids)
+        .await
+        .wrap_err("failed to reindex project batch")?;
+
+    for message in messages_to_commit {
         consumer
             .commit_message(&message, CommitMode::Async)
             .wrap_err("failed to commit Kafka message")?;
     }
+
+    Ok(())
 }
 
 pub async fn reindex_project(
@@ -114,13 +160,30 @@ pub async fn reindex_project(
     search_backend: &dyn SearchBackend,
     project_id: ProjectId,
 ) -> eyre::Result<()> {
-    search_backend
-        .remove_project_documents(&[project_id])
-        .await?;
+    reindex_projects(ro_pool, redis_pool, search_backend, &[project_id]).await
+}
 
-    let documents = index_project_documents(ro_pool, redis_pool, project_id)
-        .await
-        .wrap_err("failed to build project search documents")?;
+pub async fn reindex_projects(
+    ro_pool: &PgPool,
+    redis_pool: &RedisPool,
+    search_backend: &dyn SearchBackend,
+    project_ids: &[ProjectId],
+) -> eyre::Result<()> {
+    search_backend.remove_project_documents(project_ids).await?;
+
+    let mut documents = Vec::new();
+    for project_id in project_ids {
+        documents.extend(
+            index_project_documents(ro_pool, redis_pool, *project_id)
+                .await
+                .wrap_err_with(|| {
+                    format!(
+                        "failed to build project {project_id} search documents"
+                    )
+                })?,
+        );
+    }
+
     search_backend.index_documents(&documents).await?;
 
     Ok(())
