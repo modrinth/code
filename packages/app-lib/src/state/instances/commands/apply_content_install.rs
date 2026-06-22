@@ -21,6 +21,15 @@ pub(crate) struct InstalledContentFile {
     pub enabled: bool,
 }
 
+pub(crate) struct DownloadedProjectVersion {
+    pub file_name: String,
+    pub bytes: Bytes,
+    pub sha1: Option<String>,
+    pub project_type: ProjectType,
+    pub project_id: String,
+    pub version_id: String,
+}
+
 pub(crate) async fn resolve_content_scope(
     instance_id: &str,
     content_set_id: Option<&str>,
@@ -55,6 +64,26 @@ pub(crate) async fn add_project_from_version(
     source_kind: ContentSourceKind,
     state: &State,
 ) -> crate::Result<String> {
+    let downloaded = download_project_version(
+        instance_id,
+        version_id,
+        reason,
+        dependent_on_version_id,
+        state,
+    )
+    .await?;
+
+    add_downloaded_project_version(instance_id, downloaded, source_kind, state)
+        .await
+}
+
+pub(crate) async fn download_project_version(
+    instance_id: &str,
+    version_id: &str,
+    reason: DownloadReason,
+    dependent_on_version_id: Option<String>,
+    state: &State,
+) -> crate::Result<DownloadedProjectVersion> {
     let scope = resolve_content_scope(instance_id, None, state).await?;
     let content_set =
         content_rows::get_content_set(&scope.content_set_id, &state.pool)
@@ -108,16 +137,43 @@ pub(crate) async fn add_project_from_version(
             "Unable to infer project type for version {version_id}"
         ))
     })?;
+    let project_id = version.project_id.clone();
+    let version_id = version.id.clone();
+
+    Ok(DownloadedProjectVersion {
+        file_name: file.filename.clone(),
+        bytes,
+        sha1: file.hashes.get("sha1").cloned(),
+        project_type,
+        project_id,
+        version_id,
+    })
+}
+
+pub(crate) async fn add_downloaded_project_version(
+    instance_id: &str,
+    downloaded: DownloadedProjectVersion,
+    source_kind: ContentSourceKind,
+    state: &State,
+) -> crate::Result<String> {
+    let DownloadedProjectVersion {
+        file_name,
+        bytes,
+        sha1,
+        project_type,
+        project_id,
+        version_id,
+    } = downloaded;
 
     add_project_bytes(
-        &scope.instance.id,
-        &file.filename,
+        instance_id,
+        &file_name,
         bytes,
-        file.hashes.get("sha1").map(|hash| hash.as_str()),
+        sha1.as_deref(),
         Some(project_type),
         source_kind,
-        Some(version.project_id.as_str()),
-        Some(version.id.as_str()),
+        Some(project_id.as_str()),
+        Some(version_id.as_str()),
         state,
     )
     .await

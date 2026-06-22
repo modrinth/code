@@ -183,6 +183,7 @@ fn main() {
                         "instance_check_installed",
                         "instance_check_installed_batch",
                         "instance_install",
+                        "instance_preview_update_all",
                         "instance_update_all",
                         "instance_update_project",
                         "instance_add_project_from_version",

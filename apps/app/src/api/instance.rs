@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::DownloadReason;
 use theseus::data::{
-    AppliedContentSetPatch, ContentItem, Dependency,
+    AppliedContentSetPatch, BulkUpdatePreview, ContentItem, Dependency,
     EditInstance as CoreEditInstance, InstanceLaunchOverridesPatch,
     InstanceLink as CoreInstanceLink, InstanceMetadata, LinkedModpackInfo,
 };
@@ -36,6 +36,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_check_installed,
             instance_check_installed_batch,
             instance_install,
+            instance_preview_update_all,
             instance_update_all,
             instance_update_project,
             instance_add_project_from_version,
@@ -583,6 +584,13 @@ pub async fn instance_check_installed_batch(
 pub async fn instance_install(instance_id: &str, force: bool) -> Result<()> {
     theseus::instance::install(instance_id, force).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_preview_update_all(
+    instance_id: &str,
+) -> Result<BulkUpdatePreview> {
+    Ok(theseus::instance::preview_update_all_projects(instance_id).await?)
 }
 
 #[tauri::command]

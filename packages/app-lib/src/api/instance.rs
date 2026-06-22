@@ -23,8 +23,9 @@ pub use self::install::{get_optimal_jre_key, install};
 pub use self::lifecycle::{create, duplicate, edit, edit_icon, remove};
 pub use self::paths::{get_full_path, get_mod_full_path};
 pub use self::projects::{
-    add_project_from_path, add_project_from_version, remove_project,
-    repair_managed_modrinth, toggle_disable_project, update_all_projects,
+    add_project_from_path, add_project_from_version,
+    preview_update_all_projects, remove_project, repair_managed_modrinth,
+    toggle_disable_project, update_all_projects,
     update_managed_modrinth_version, update_project,
 };
 pub use self::run::{

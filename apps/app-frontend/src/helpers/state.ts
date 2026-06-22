@@ -9,6 +9,7 @@ export interface LoadingBarType {
 	type?: string
 	version?: string
 	instance_id?: string
+	instance_name?: string
 	pack_name?: string
 	icon?: string | null
 }

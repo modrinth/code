@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="header" :closable="true" no-padding>
+	<NewModal ref="modal" :header="header" :closable="true" :disable-close="disableClose" no-padding>
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
 				<Admonition :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
@@ -80,7 +80,7 @@
 		</div>
 
 		<template #actions>
-			<div class="flex justify-between gap-2">
+			<div class="flex justify-between gap-2 pt-4">
 				<div>
 					<ButtonStyled v-if="showReportButton" color="red" type="transparent">
 						<button @click="emit('report')">
@@ -132,6 +132,7 @@ const props = defineProps<{
 	showReportButton?: boolean
 	showBackupCreator?: boolean
 	removedLabel?: string
+	disableClose?: boolean
 }>()
 
 const emit = defineEmits<{
