@@ -64,7 +64,7 @@ export function buildAnalyticsTableColumns({
 				key: getAnalyticsTableBreakdownColumnKey(breakdown),
 				label: getAnalyticsTableBreakdownColumnLabel(breakdown, formatMessage),
 				enableSorting: true,
-				// width: breakdown === 'project' ? '25%' : breakdown === 'country' ? '20%' : undefined,
+				width: breakdown === 'project' && selectedBreakdowns.length === 1 ? '45%' : undefined,
 			})
 		}
 	}

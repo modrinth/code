@@ -15,6 +15,7 @@ import {
 	analyticsChartMessages,
 	analyticsMessages,
 	analyticsStatCardMessages,
+	formatAnalyticsDependentProjectFallbackLabel,
 	formatAnalyticsDownloadReasonLabel,
 	formatAnalyticsLoaderLabel,
 	formatAnalyticsMonetizationLabel,
@@ -25,6 +26,8 @@ import {
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	isNoDependentAnalyticsBreakdownValue,
+	isUnknownAnalyticsBreakdownValue,
 	UNKNOWN_BREAKDOWN_VALUE,
 } from '../breakdown'
 import { PREVIOUS_PERIOD_DATASET_ID_PREFIX } from './analytics-chart-constants'
@@ -166,6 +169,9 @@ export function formatBreakdownLabel(
 		return formatAnalyticsDownloadReasonLabel(normalizedLowercaseValue, formatMessage)
 	}
 	if (selectedBreakdown === 'dependent_project_download') {
+		if (isNoDependentAnalyticsBreakdownValue(breakdownValue)) {
+			return formatMessage(analyticsMessages.noDependent)
+		}
 		return breakdownValue
 	}
 	if (selectedBreakdown === 'user_id') {
@@ -188,18 +194,26 @@ export function formatBreakdownLabels(
 	userNamesById: ReadonlyMap<string, string> | undefined,
 	formatMessage: FormatMessage,
 ): string {
+	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
+	const downloadReasonBreakdownIndex = normalizedBreakdowns.indexOf('download_reason')
+
 	return collapseRepeatedUnknownBreakdownLabels(
-		selectedBreakdowns
-			.filter((breakdown) => breakdown !== 'none')
-			.map((breakdown, index) =>
-				formatBreakdownLabel(
-					breakdownValues[index] ?? '',
-					breakdown,
-					getVersionDisplayName,
+		normalizedBreakdowns.map((breakdown, index) => {
+			const breakdownValue = breakdownValues[index] ?? ''
+			if (
+				breakdown === 'dependent_project_download' &&
+				downloadReasonBreakdownIndex !== -1 &&
+				isUnknownAnalyticsBreakdownValue(breakdownValue)
+			) {
+				return formatAnalyticsDependentProjectFallbackLabel(
+					breakdownValues[downloadReasonBreakdownIndex],
 					userNamesById,
 					formatMessage,
-				),
-			),
+				)
+			}
+
+			return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName, formatMessage)
+		}),
 		formatMessage,
 	).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 }
@@ -379,10 +393,30 @@ export function buildChartDatasets(
 	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 
 	function formatChartBreakdownLabels(breakdownValues: readonly string[]): string {
+		const downloadReasonBreakdownIndex = normalizedBreakdowns.indexOf('download_reason')
+
 		return collapseRepeatedUnknownBreakdownLabels(
 			normalizedBreakdowns.map((breakdown, index) => {
 				const breakdownValue = breakdownValues[index] ?? ''
 				if (breakdown === 'project' || breakdown === 'dependent_project_download') {
+					if (
+						breakdown === 'dependent_project_download' &&
+						isNoDependentAnalyticsBreakdownValue(breakdownValue)
+					) {
+						return formatMessage(analyticsMessages.noDependent)
+					}
+					if (
+						breakdown === 'dependent_project_download' &&
+						isUnknownAnalyticsBreakdownValue(breakdownValue)
+					) {
+						return downloadReasonBreakdownIndex === -1
+							? formatMessage(analyticsMessages.unknown)
+							: formatAnalyticsDependentProjectFallbackLabel(
+									breakdownValues[downloadReasonBreakdownIndex],
+									formatMessage,
+								)
+					}
+
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
 				}
 
@@ -484,7 +518,9 @@ export function buildChartDatasets(
 					? breakdownValues[dependentProjectBreakdownIndex]
 					: undefined
 			const dependentProjectName = dependentProjectId
-				? (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
+				? isMissingDependentProjectValue(dependentProjectId)
+					? undefined
+					: (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
 				: undefined
 			const versionProjectName =
 				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
@@ -493,6 +529,18 @@ export function buildChartDatasets(
 			const dependencyProjectNames = [...(dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? [])]
 				.map((projectId) => projectNamesById.get(projectId) ?? projectId)
 				.sort((left, right) => left.localeCompare(right))
+			const dependentProjectTooltip = dependentProjectId
+				? isNoDependentAnalyticsBreakdownValue(dependentProjectId)
+					? formatMessage(analyticsMessages.noDependentTooltip)
+					: isUnknownAnalyticsBreakdownValue(dependentProjectId)
+						? formatMessage(analyticsMessages.unknown)
+						: formatDependentProjectDatasetTooltip(
+								versionName,
+								dependentProjectName,
+								dependencyProjectNames,
+								formatMessage,
+							)
+				: undefined
 			const color =
 				normalizedBreakdowns.length === 1
 					? getBreakdownColor(
@@ -506,13 +554,7 @@ export function buildChartDatasets(
 				projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
 				label: formatChartBreakdownLabels(breakdownValues),
 				projectName: versionProjectName,
-				tooltip:
-					formatDependentProjectDatasetTooltip(
-						versionName,
-						dependentProjectName,
-						dependencyProjectNames,
-						formatMessage,
-					) ?? formatDatasetTooltip(versionProjectName),
+				tooltip: dependentProjectTooltip ?? formatDatasetTooltip(versionProjectName),
 				data,
 				borderColor: color,
 				backgroundColor: color,
@@ -662,6 +704,10 @@ export function buildChartDatasets(
 			backgroundColor: color,
 		}
 	})
+}
+
+function isMissingDependentProjectValue(value: string | undefined): boolean {
+	return isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value)
 }
 
 export function getSliceCount(

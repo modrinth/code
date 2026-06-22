@@ -84,6 +84,14 @@ export const analyticsMessages = defineMessages({
 		id: 'analytics.value.unknown',
 		defaultMessage: 'Unknown',
 	},
+	noDependent: {
+		id: 'analytics.value.no-dependent',
+		defaultMessage: 'No dependents',
+	},
+	noDependentTooltip: {
+		id: 'analytics.value.no-dependent-tooltip',
+		defaultMessage: 'Downloaded for reasons other than being a dependency',
+	},
 	other: {
 		id: 'analytics.value.other',
 		defaultMessage: 'Other',
@@ -892,6 +900,18 @@ export function formatAnalyticsDownloadReasonLabel(
 		default:
 			return reason
 	}
+}
+
+export function formatAnalyticsDependentProjectFallbackLabel(
+	downloadReason: string | undefined,
+	formatMessage: FormatMessage,
+): string {
+	const normalizedReason = downloadReason?.trim().toLowerCase()
+	if (normalizedReason === 'standalone' || normalizedReason === 'update') {
+		return formatMessage(analyticsMessages.noDependent)
+	}
+
+	return formatMessage(analyticsMessages.unknown)
 }
 
 export function formatAnalyticsDownloadSourceLabel(

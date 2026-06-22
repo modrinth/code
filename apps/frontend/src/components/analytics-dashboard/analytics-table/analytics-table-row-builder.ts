@@ -15,13 +15,18 @@ import {
 	getSliceCount,
 } from '../analytics-chart/analytics-chart-utils'
 import type { FormatMessage } from '../analytics-messages'
-import { analyticsMessages } from '../analytics-messages'
+import {
+	analyticsMessages,
+	formatAnalyticsDependentProjectFallbackLabel,
+} from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
 	COMBINED_BREAKDOWN_LABEL_SEPARATOR,
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	isNoDependentAnalyticsBreakdownValue,
+	isUnknownAnalyticsBreakdownValue,
 } from '../breakdown'
 import { getAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
 import type {
@@ -140,6 +145,19 @@ export function buildAnalyticsTableRows({
 			displays[breakdown] = getBreakdownDisplayValue(breakdownValues[index] ?? '', breakdown)
 		})
 
+		const dependentProjectBreakdownIndex = selectedBreakdowns.indexOf('dependent_project_download')
+		const downloadReasonBreakdownIndex = selectedBreakdowns.indexOf('download_reason')
+		if (
+			dependentProjectBreakdownIndex !== -1 &&
+			downloadReasonBreakdownIndex !== -1 &&
+			isUnknownAnalyticsBreakdownValue(breakdownValues[dependentProjectBreakdownIndex])
+		) {
+			displays.dependent_project_download = formatAnalyticsDependentProjectFallbackLabel(
+				breakdownValues[downloadReasonBreakdownIndex],
+				formatMessage,
+			)
+		}
+
 		return displays
 	}
 
@@ -197,6 +215,7 @@ export function buildAnalyticsTableRows({
 				? (projectNamesById.get(dependentOnProjectId) ?? dependentOnProjectId)
 				: '',
 			dependentOnProjectId: dependentOnProjectId ?? '',
+			dependentOnProjectIds: dependentOnProjectId ? [dependentOnProjectId] : [],
 			breakdown: breakdownKey,
 			breakdownValues: Object.fromEntries(
 				selectedBreakdowns.map((breakdown, index) => [breakdown, breakdownValues[index] ?? '']),
@@ -216,6 +235,18 @@ export function buildAnalyticsTableRows({
 
 		nextRows.set(rowId, row)
 		return row
+	}
+
+	function addDependentOnProjectIdToRow(row: AnalyticsTableRow, projectId: string | undefined) {
+		if (!projectId || row.dependentOnProjectIds.includes(projectId)) {
+			return
+		}
+
+		row.dependentOnProjectIds.push(projectId)
+		if (!row.dependentOnProjectId) {
+			row.dependentOnProjectId = projectId
+			row.dependent_on = projectNamesById.get(projectId) ?? projectId
+		}
 	}
 
 	if (!includeDate && selectedBreakdowns.length === 0) {
@@ -266,17 +297,18 @@ export function buildAnalyticsTableRows({
 			const dependentOnProjectId = includeDependentProjectTooltipContext
 				? point.source_project
 				: undefined
+			const dependentTooltipProjectId = selectedBreakdowns.includes('dependent_project_download')
+				? point.source_project
+				: undefined
 			const breakdownKey =
 				breakdownValues.length === 0
 					? ALL_PROJECTS_BREAKDOWN_VALUE
 					: getAnalyticsBreakdownKey(breakdownValues)
-			const dependentOnKey = dependentOnProjectId ? `::${dependentOnProjectId}` : ''
-			const rowId = includeDate
-				? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}${dependentOnKey}`
-				: `${breakdownKey}${dependentOnKey}`
+			const rowId = includeDate ? `${nextBucketLabel?.dateMs ?? 0}::${breakdownKey}` : breakdownKey
 			const row =
 				nextRows.get(rowId) ??
 				createRow(rowId, breakdownValues, dependentOnProjectId, nextBucketLabel)
+			addDependentOnProjectIdToRow(row, dependentTooltipProjectId)
 			addAnalyticsMetricToTableRow(row, point)
 		}
 	})
@@ -342,6 +374,15 @@ function formatAnalyticsTableBreakdownDisplayValue(
 	formatMessage: FormatMessage,
 ): string {
 	if (breakdown === 'project' || breakdown === 'dependent_project_download') {
+		if (breakdown === 'dependent_project_download') {
+			if (isNoDependentAnalyticsBreakdownValue(value)) {
+				return formatMessage(analyticsMessages.noDependent)
+			}
+			if (isUnknownAnalyticsBreakdownValue(value)) {
+				return formatMessage(analyticsMessages.unknown)
+			}
+		}
+
 		return projectNamesById.get(value) ?? value
 	}
 	return formatBreakdownLabel(value, breakdown, getVersionDisplayName, userNamesById, formatMessage)

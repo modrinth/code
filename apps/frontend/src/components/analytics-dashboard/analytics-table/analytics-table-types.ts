@@ -18,7 +18,7 @@ export type AnalyticsTableSortState = {
 export type AnalyticsTableSortDirectionValue = AnalyticsTableSortDirection
 
 export type AnalyticsTableRow = {
-	[key: string]: string | number | AnalyticsTableBreakdownDisplayValues
+	[key: string]: string | number | string[] | AnalyticsTableBreakdownDisplayValues
 	id: string
 	date: string
 	dateMs: number
@@ -26,6 +26,7 @@ export type AnalyticsTableRow = {
 	projectVersionId: string
 	dependent_on: string
 	dependentOnProjectId: string
+	dependentOnProjectIds: string[]
 	breakdown: string
 	breakdownValues: AnalyticsTableBreakdownDisplayValues
 	breakdownDisplays: AnalyticsTableBreakdownDisplayValues

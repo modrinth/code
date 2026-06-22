@@ -60,6 +60,8 @@
 					:label="getProjectCellLabel(value)"
 					:icon-url="getProjectIconUrl(row.breakdownValues.project)"
 					:icon-tooltip="getProjectCellLabel(value)"
+					:label-href="getProjectPageHref(row.breakdownValues.project)"
+					:organization-href="getProjectOrganizationPageHref(row.breakdownValues.project)"
 					:organization-tooltip="getProjectOrganizationName(row.breakdownValues.project)"
 				/>
 			</template>
@@ -97,18 +99,35 @@
 			<template #cell-breakdown_dependent_project_download="{ row, value }">
 				<ProjectCell
 					:label="getProjectCellLabel(value)"
-					:icon-url="getProjectIconUrl(row.breakdownValues.dependent_project_download)"
+					:icon-url="
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectIconUrl(row.breakdownValues.dependent_project_download)
+					"
 					:icon-tooltip="getProjectCellLabel(value)"
-					:organization-tooltip="
-						getProjectOrganizationName(row.breakdownValues.dependent_project_download)
+					:hide-icon="
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
+					"
+					:label-href="
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectPageHref(row.breakdownValues.dependent_project_download)
 					"
 					:label-tooltip="getDependentProjectTooltip(row)"
 				/>
 			</template>
 			<template #cell-breakdown_version_id="{ row, value }">
-				<span v-tooltip="getVersionProjectName(row.projectVersionId)" class="mr-2.5 text-primary">
+				<component
+					:is="getVersionPageHref(row.projectVersionId) ? 'a' : 'span'"
+					v-tooltip="getVersionProjectName(row.projectVersionId)"
+					:href="getVersionPageHref(row.projectVersionId)"
+					:target="getVersionPageHref(row.projectVersionId) ? '_blank' : undefined"
+					:rel="getVersionPageHref(row.projectVersionId) ? 'noopener noreferrer' : undefined"
+					class="mr-2.5 text-primary"
+					:class="{ 'hover:underline': getVersionPageHref(row.projectVersionId) }"
+				>
 					{{ value }}
-				</span>
+				</component>
 			</template>
 			<template #cell-breakdown_loader="{ value }">
 				<span class="mr-2.5 text-primary">{{ value }}</span>
@@ -198,6 +217,10 @@ import {
 } from '../analytics-messages.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
+	isNoDependentAnalyticsBreakdownValue,
+	isUnknownAnalyticsBreakdownValue,
+} from '../breakdown.ts'
+import {
 	buildAnalyticsTableColumns,
 	getAnalyticsTableBreakdownColumnLabel,
 } from './analytics-table-columns.ts'
@@ -257,9 +280,11 @@ const {
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	versionNumbersById,
+	versionProjectIdsById,
 	versionProjectNamesById,
 	projectNamesById,
 	projectIconUrlsById,
+	projectOrganizationIdsById,
 	projectOrganizationNamesById,
 	userNamesById,
 	userAvatarUrlsById,
@@ -446,13 +471,50 @@ function getUserCellLabel(value: unknown) {
 	return typeof value === 'string' ? value : String(value ?? '')
 }
 
-function getDependentProjectTooltip(row: AnalyticsTableRow) {
-	const dependencyProjectId = row.breakdownValues.project ?? row.dependentOnProjectId
-	const dependencyProject = dependencyProjectId
-		? (projectNamesById.value.get(dependencyProjectId) ?? dependencyProjectId)
-		: undefined
+function getProjectPageHref(projectId: string | undefined) {
+	return projectId ? `/project/${encodeURIComponent(projectId)}` : undefined
+}
 
-	return dependencyProject ? `Dependent on ${dependencyProject}` : undefined
+function getProjectOrganizationPageHref(projectId: string | undefined) {
+	if (!projectId) return undefined
+	const organizationId = projectOrganizationIdsById.value.get(projectId)
+	if (!organizationId) return undefined
+
+	return `/organization/${encodeURIComponent(organizationId)}`
+}
+
+function getVersionPageHref(versionId: string | undefined) {
+	if (!versionId) return undefined
+	const projectId = versionProjectIdsById.value.get(versionId)
+	if (!projectId) return undefined
+
+	return `/project/${encodeURIComponent(projectId)}/version/${encodeURIComponent(versionId)}`
+}
+
+function isMissingDependentProjectValue(value: string | undefined) {
+	return isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value)
+}
+
+function getDependentProjectTooltip(row: AnalyticsTableRow) {
+	if (isNoDependentAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
+		return formatMessage(analyticsMessages.noDependentTooltip)
+	}
+	if (isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
+		return formatMessage(analyticsMessages.unknown)
+	}
+
+	const dependencyProjectIds = new Set(row.dependentOnProjectIds)
+	if (row.dependentOnProjectId) {
+		dependencyProjectIds.add(row.dependentOnProjectId)
+	}
+
+	const dependencyProjectNames = [...dependencyProjectIds]
+		.map((projectId) => projectNamesById.value.get(projectId) ?? projectId)
+		.sort((left, right) => left.localeCompare(right))
+
+	return dependencyProjectNames.length > 0
+		? `Dependent on ${dependencyProjectNames.join(', ')}`
+		: undefined
 }
 
 watch(
