@@ -3,7 +3,9 @@ use std::time::Duration;
 use crate::env::ENV;
 use chrono::{DateTime, Utc};
 use eyre::WrapErr;
-use rdkafka::{ClientConfig, consumer::StreamConsumer, producer::FutureProducer};
+use rdkafka::{
+    ClientConfig, consumer::StreamConsumer, producer::FutureProducer,
+};
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -16,16 +18,17 @@ pub struct KafkaClientState {
 }
 
 impl KafkaClientState {
-	pub fn new() -> eyre::Result<Self> {
-		let client = ClientConfig::new()
-			.set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
-			.set("client.id", &ENV.KAFKA_CLIENT_ID)
-			.set("broker.address.family", "v4")
-			.create()
-			.wrap_err("failed to create Kafka producer")?;
-		let incremental_index_search_consumer =
-			create_consumer(INCREMENTAL_INDEX_SEARCH_TASK)
-				.wrap_err("failed to create incremental search Kafka consumer")?;
+    pub fn new() -> eyre::Result<Self> {
+        let client = ClientConfig::new()
+            .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
+            .set("client.id", &ENV.KAFKA_CLIENT_ID)
+            .set("broker.address.family", "v4")
+            .create()
+            .wrap_err("failed to create Kafka producer")?;
+        let incremental_index_search_consumer = create_consumer(
+            INCREMENTAL_INDEX_SEARCH_TASK,
+        )
+        .wrap_err("failed to create incremental search Kafka consumer")?;
 
         tracing::info!(
             kafka.bootstrap_servers = ?ENV.KAFKA_BOOTSTRAP_SERVERS.0,
@@ -37,19 +40,19 @@ impl KafkaClientState {
             client,
             incremental_index_search_consumer,
         })
-	}
+    }
 }
 
 pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {
-	ClientConfig::new()
-		.set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
-		.set("client.id", &ENV.KAFKA_CLIENT_ID)
-		.set("group.id", group_id)
-		.set("enable.auto.commit", "false")
-		.set("auto.offset.reset", "earliest")
-		.set("broker.address.family", "v4")
-		.create()
-		.wrap_err("failed to create Kafka consumer")
+    ClientConfig::new()
+        .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
+        .set("client.id", &ENV.KAFKA_CLIENT_ID)
+        .set("group.id", group_id)
+        .set("enable.auto.commit", "false")
+        .set("auto.offset.reset", "earliest")
+        .set("broker.address.family", "v4")
+        .create()
+        .wrap_err("failed to create Kafka consumer")
 }
 
 #[derive(Debug, Serialize)]

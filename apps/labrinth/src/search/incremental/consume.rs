@@ -77,14 +77,8 @@ async fn consume(
             messages.push(message.wrap_err("failed to receive Kafka message")?);
         }
 
-        consume_batch(
-            ro_pool,
-            redis_pool,
-            search_backend,
-            consumer,
-            messages,
-        )
-        .await?;
+        consume_batch(ro_pool, redis_pool, search_backend, consumer, messages)
+            .await?;
     }
 }
 
@@ -177,9 +171,7 @@ pub async fn reindex_projects(
     search_backend: &dyn SearchBackend,
     project_ids: &[ProjectId],
 ) -> eyre::Result<()> {
-    search_backend
-        .remove_project_documents(project_ids)
-        .await?;
+    search_backend.remove_project_documents(project_ids).await?;
 
     let mut documents = Vec::new();
     for project_id in project_ids {
@@ -187,7 +179,9 @@ pub async fn reindex_projects(
             index_project_documents(ro_pool, redis_pool, *project_id)
                 .await
                 .wrap_err_with(|| {
-                    format!("failed to build project {project_id} search documents")
+                    format!(
+                        "failed to build project {project_id} search documents"
+                    )
                 })?,
         );
     }
