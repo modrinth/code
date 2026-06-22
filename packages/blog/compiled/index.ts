@@ -17,6 +17,7 @@ import { article as introducing_server_projects } from "./introducing_server_pro
 import { article as joining_spark_universe } from "./joining_spark_universe";
 import { article as knossos_v2_1_0 } from "./knossos_v2_1_0";
 import { article as licensing_guide } from "./licensing_guide";
+import { article as modpack_attributions } from "./modpack_attributions";
 import { article as modpack_changes } from "./modpack_changes";
 import { article as modpacks_alpha } from "./modpacks_alpha";
 import { article as modrinth_app_beta } from "./modrinth_app_beta";
@@ -60,6 +61,7 @@ export const articles = [
   joining_spark_universe,
   knossos_v2_1_0,
   licensing_guide,
+  modpack_attributions,
   modpack_changes,
   modpacks_alpha,
   modrinth_app_beta,

@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "A better system for Modpack creators",
+			"summary": "View and manage info about external content in Modrinth modpacks.",
+			"thumbnail": "https://modrinth.com/news/default.webp",
+			"date": "2026-06-22T18:00:00.000Z",
+			"link": "https://modrinth.com/news/article/modpack-attributions"
+		},
+		{
 			"title": "Modrinth joins Spark Universe",
 			"summary": "The next chapter. What it means and why we think it’s right for Modrinth.",
 			"thumbnail": "https://modrinth.com/news/article/joining-spark-universe/thumbnail.webp",
