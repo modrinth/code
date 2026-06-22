@@ -1019,12 +1019,25 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 			},
 		)
 
-		return options.map((option) => ({
-			...option,
-			disabled: hasReachedBreakdownLimit && !selectedBreakdownSet.has(option.value),
-		}))
+		return options.map((option) => {
+			const isSelected = selectedBreakdownSet.has(option.value)
+			return {
+				...option,
+				disabled:
+					!isSelected && (hasReachedBreakdownLimit || !canSelectBreakdownOption(option.value)),
+			}
+		})
 	},
 )
+
+function canSelectBreakdownOption(
+	breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>,
+): boolean {
+	return getAnalyticsBreakdownPresetsForProjectSelection(
+		[...selectedBreakdownValue.value, breakdown],
+		selectedProjectIds.value,
+	).includes(breakdown)
+}
 
 function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
 	return (

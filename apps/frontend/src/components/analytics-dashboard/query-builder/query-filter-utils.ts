@@ -2,6 +2,7 @@ import type {
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardStat,
 	AnalyticsQueryFilterCategory,
+	AnalyticsSelectedBreakdowns,
 	AnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
@@ -302,6 +303,33 @@ export function getAnalyticsStatsForBreakdowns(
 	}
 
 	return stats
+}
+
+export function getAnalyticsBreakdownsWithSharedStats(
+	breakdowns: AnalyticsBreakdownInput,
+): AnalyticsSelectedBreakdowns {
+	const normalizedBreakdowns = normalizeAnalyticsBreakdowns(breakdowns)
+	const compatibleBreakdowns: AnalyticsSelectedBreakdowns = []
+	let sharedStats: readonly AnalyticsDashboardStat[] | null = null
+
+	for (const breakdown of normalizedBreakdowns) {
+		const breakdownStats = getAnalyticsStatsForBreakdown(breakdown)
+		if (sharedStats === null) {
+			compatibleBreakdowns.push(breakdown)
+			sharedStats = breakdownStats
+			continue
+		}
+
+		const nextSharedStats = intersectAnalyticsStats(sharedStats, breakdownStats)
+		if (nextSharedStats.length === 0) {
+			continue
+		}
+
+		compatibleBreakdowns.push(breakdown)
+		sharedStats = nextSharedStats
+	}
+
+	return compatibleBreakdowns
 }
 
 export function getAnalyticsStatsForFilterCategory(

@@ -19,6 +19,8 @@ import type {
 	MutableRouteQuery,
 } from '~/providers/analytics/analytics-types'
 
+import { getAnalyticsBreakdownsWithSharedStats } from './query-builder/query-filter-utils'
+
 export const DEFAULT_TIMEFRAME_PRESET: AnalyticsTimeframePreset = 'last_30_days'
 export const DEFAULT_TIMEFRAME_MODE: AnalyticsTimeframeMode = 'preset'
 export const DEFAULT_LAST_TIMEFRAME_AMOUNT = 1
@@ -476,7 +478,7 @@ export function getAnalyticsBreakdownPresetsForProjectSelection(
 		}
 	}
 
-	return normalizedBreakdowns
+	return getAnalyticsBreakdownsWithSharedStats(normalizedBreakdowns)
 }
 
 export function getAnalyticsBreakdownPresetForProjectSelection(
