@@ -90,6 +90,8 @@ interface Props {
 	bulkProgress?: number
 	bulkTotal?: number
 	bulkWaiting?: boolean
+	bulkStatusMessage?: string | null
+	bulkItemCount?: number
 	ariaLabel?: string
 	getItemId?: (item: ContentItem) => string
 }
@@ -103,6 +105,8 @@ const props = withDefaults(defineProps<Props>(), {
 	bulkProgress: 0,
 	bulkTotal: 0,
 	bulkWaiting: false,
+	bulkStatusMessage: null,
+	bulkItemCount: 0,
 	ariaLabel: undefined,
 	getItemId: undefined,
 })
@@ -131,7 +135,7 @@ const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
 
 const selectedCountText = computed(() => {
 	const count = props.isBulkOperating
-		? props.bulkTotal || props.selectedItems.length
+		? props.bulkItemCount || props.bulkTotal || props.selectedItems.length
 		: props.selectedItems.length || props.bulkTotal
 	if (props.isBulkOperating && props.bulkOperation) {
 		const messageMap = {
@@ -156,6 +160,7 @@ const selectedCountText = computed(() => {
 })
 
 const bulkProgressMessage = computed(() => {
+	if (props.bulkStatusMessage) return props.bulkStatusMessage
 	if (!props.bulkOperation) return ''
 	const messageMap = {
 		enable: props.bulkWaiting ? messages.bulkEnablingWaiting : messages.bulkEnabling,

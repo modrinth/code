@@ -1,7 +1,7 @@
 use super::{FriendPayload, LoadingBarId};
 use crate::event::{
-    CommandPayload, EventError, InstancePayloadType, LoadingBar,
-    LoadingBarType, ProcessPayloadType,
+    CommandPayload, EventError, InstanceBulkUpdateProgressPayload,
+    InstancePayloadType, LoadingBar, LoadingBarType, ProcessPayloadType,
 };
 #[cfg(feature = "tauri")]
 use crate::event::{
@@ -217,6 +217,21 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
             .map_err(EventError::from)?;
     }
     tracing::warn!("{}", message);
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_instance_bulk_update_progress(
+    payload: InstanceBulkUpdateProgressPayload,
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit("instance_bulk_update_progress", payload)
+            .map_err(EventError::from)?;
+    }
     Ok(())
 }
 

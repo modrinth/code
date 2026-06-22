@@ -69,6 +69,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
+	type BulkOperationStatus,
 	commonMessages,
 	ConfirmModpackUpdateModal,
 	ContentCardLayout as ContentPageLayout,
@@ -101,7 +102,11 @@ import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
-import { instance_listener } from '@/helpers/events.js'
+import {
+	instance_bulk_update_progress_listener,
+	instance_listener,
+	type InstanceBulkUpdateProgress,
+} from '@/helpers/events.js'
 import {
 	add_project_from_path,
 	add_project_from_version,
@@ -146,6 +151,18 @@ const messages = defineMessages({
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
 		defaultMessage: 'project',
+	},
+	bulkUpdateResolvingVersions: {
+		id: 'app.instance.mods.bulk-update.resolving-versions',
+		defaultMessage: 'Resolving versions...',
+	},
+	bulkUpdateDownloadingProjects: {
+		id: 'app.instance.mods.bulk-update.downloading-projects',
+		defaultMessage: 'Downloading {current, number}/{total, number} projects...',
+	},
+	bulkUpdateFinishing: {
+		id: 'app.instance.mods.bulk-update.finishing',
+		defaultMessage: 'Finishing update...',
 	},
 })
 
@@ -526,13 +543,53 @@ async function getDeleteDependencyWarning(items: ContentItem[]) {
 	return dependents.length > 0 ? { items, dependents } : null
 }
 
-async function bulkUpdateAllProjects() {
+function formatBulkUpdateProgress(progress: InstanceBulkUpdateProgress): BulkOperationStatus {
+	if (progress.stage === 'resolving_versions') {
+		return {
+			message: formatMessage(messages.bulkUpdateResolvingVersions),
+			waiting: true,
+		}
+	}
+
+	if (progress.stage === 'finishing') {
+		return {
+			message: formatMessage(messages.bulkUpdateFinishing),
+			progress: progress.current,
+			total: progress.total,
+		}
+	}
+
+	return {
+		message: formatMessage(messages.bulkUpdateDownloadingProjects, {
+			current: progress.current,
+			total: progress.total,
+		}),
+		progress: progress.current,
+		total: progress.total,
+	}
+}
+
+async function bulkUpdateAllProjects(onProgress?: (status: BulkOperationStatus) => void) {
+	let unlisten: (() => void) | null = null
 	try {
+		if (onProgress) {
+			onProgress({
+				message: formatMessage(messages.bulkUpdateResolvingVersions),
+				waiting: true,
+			})
+			unlisten = await instance_bulk_update_progress_listener((progress) => {
+				if (progress.instanceId !== props.instance.id) return
+				onProgress(formatBulkUpdateProgress(progress))
+			})
+		}
+
 		await update_all(props.instance.id)
 		await refreshContentState('must_revalidate')
 	} catch (err) {
 		handleError(err as Error)
 		throw err
+	} finally {
+		unlisten?.()
 	}
 }
 

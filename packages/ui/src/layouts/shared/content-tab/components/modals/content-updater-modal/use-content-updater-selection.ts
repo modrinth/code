@@ -64,7 +64,7 @@ export function useContentUpdaterSelection({
 
 		if (versions.value.length > 0) {
 			selectedVersion.value = initialVersionId
-				? versions.value.find((v) => v.id === initialVersionId) ?? versions.value[0]
+				? (versions.value.find((v) => v.id === initialVersionId) ?? versions.value[0])
 				: versions.value[0]
 			pendingInitialVersionId.value = undefined
 			if (selectedVersion.value) {

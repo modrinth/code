@@ -6,12 +6,13 @@ use crate::state::{
     CacheBehaviour, CachedEntry, Dependency, DependencyType, State, Version,
 };
 use crate::util::fetch::DownloadReason;
-use futures::future::try_join_all;
+use futures::stream::{FuturesUnordered, StreamExt};
 use std::collections::{HashMap, HashSet};
 
 use super::apply_content_install::{
-    add_downloaded_project_version, add_project_from_version,
-    download_project_version, remove_project, toggle_disable_project,
+    DownloadedProjectVersion, add_downloaded_project_version,
+    add_project_from_version, download_project_version, remove_project,
+    toggle_disable_project,
 };
 use super::check_content_updates::{ContentUpdate, check_content_updates};
 
@@ -32,6 +33,17 @@ struct PlannedProjectUpdate {
 struct PlannedDependencyInstall {
     version_id: String,
     parent_version_id: String,
+}
+
+#[derive(Clone, Debug)]
+enum PlannedDownload {
+    ProjectUpdate(PlannedProjectUpdate),
+    DependencyAddition(PlannedDependencyInstall),
+}
+
+enum DownloadedBulkProject {
+    ProjectUpdate(PlannedProjectUpdate, DownloadedProjectVersion),
+    DependencyAddition(DownloadedProjectVersion),
 }
 
 #[derive(Clone, Debug)]
@@ -104,69 +116,159 @@ pub(crate) async fn update_all_projects(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<HashMap<String, String>> {
+    emit_bulk_update_progress(
+        instance_id,
+        crate::event::InstanceBulkUpdateProgressStage::ResolvingVersions,
+        0,
+        0,
+    )
+    .await?;
     let plan = plan_bulk_update(instance_id, state).await?;
-    let update_downloads =
-        try_join_all(plan.project_updates.iter().map(|update| async move {
-            let downloaded = download_project_version(
-                instance_id,
-                &update.update_version_id,
-                DownloadReason::Update,
-                Some(update.current_version_id.clone()),
-                state,
-            )
+    let download_total =
+        plan.project_updates.len() + plan.dependency_additions.len();
+    let downloads =
+        download_planned_projects(instance_id, &plan, download_total, state)
             .await?;
 
-            Ok::<_, crate::Error>((update.clone(), downloaded))
-        }));
-    let dependency_downloads =
-        try_join_all(plan.dependency_additions.iter().map(
-            |dependency| async move {
-                download_project_version(
+    let mut changed = HashMap::new();
+    emit_bulk_update_progress(
+        instance_id,
+        crate::event::InstanceBulkUpdateProgressStage::Finishing,
+        download_total,
+        download_total,
+    )
+    .await?;
+    for download in downloads {
+        match download {
+            DownloadedBulkProject::ProjectUpdate(update, downloaded) => {
+                let mut new_path = add_downloaded_project_version(
                     instance_id,
-                    &dependency.version_id,
-                    DownloadReason::Dependency,
-                    Some(dependency.parent_version_id.clone()),
+                    downloaded,
+                    ContentSourceKind::Local,
                     state,
                 )
-                .await
-            },
-        ));
-    let (update_downloads, dependency_downloads) =
-        tokio::try_join!(update_downloads, dependency_downloads)?;
+                .await?;
 
-    let mut changed = HashMap::new();
-    for (update, downloaded) in update_downloads {
-        let mut new_path = add_downloaded_project_version(
-            instance_id,
-            downloaded,
-            ContentSourceKind::Local,
-            state,
-        )
-        .await?;
+                if update.relative_path.ends_with(".disabled") {
+                    new_path =
+                        toggle_disable_project(instance_id, &new_path, state)
+                            .await?;
+                }
 
-        if update.relative_path.ends_with(".disabled") {
-            new_path =
-                toggle_disable_project(instance_id, &new_path, state).await?;
+                if new_path != update.relative_path {
+                    remove_project(instance_id, &update.relative_path, state)
+                        .await?;
+                }
+
+                changed.insert(update.relative_path, new_path);
+            }
+            DownloadedBulkProject::DependencyAddition(downloaded) => {
+                add_downloaded_project_version(
+                    instance_id,
+                    downloaded,
+                    ContentSourceKind::Local,
+                    state,
+                )
+                .await?;
+            }
         }
-
-        if new_path != update.relative_path {
-            remove_project(instance_id, &update.relative_path, state).await?;
-        }
-
-        changed.insert(update.relative_path, new_path);
-    }
-
-    for downloaded in dependency_downloads {
-        add_downloaded_project_version(
-            instance_id,
-            downloaded,
-            ContentSourceKind::Local,
-            state,
-        )
-        .await?;
     }
 
     Ok(changed)
+}
+
+async fn download_planned_projects(
+    instance_id: &str,
+    plan: &BulkUpdatePlan,
+    total: usize,
+    state: &State,
+) -> crate::Result<Vec<DownloadedBulkProject>> {
+    emit_bulk_update_progress(
+        instance_id,
+        crate::event::InstanceBulkUpdateProgressStage::Downloading,
+        0,
+        total,
+    )
+    .await?;
+
+    let mut downloads = plan
+        .project_updates
+        .iter()
+        .cloned()
+        .map(PlannedDownload::ProjectUpdate)
+        .chain(
+            plan.dependency_additions
+                .iter()
+                .cloned()
+                .map(PlannedDownload::DependencyAddition),
+        )
+        .map(|download| async move {
+            match download {
+                PlannedDownload::ProjectUpdate(update) => {
+                    let downloaded = download_project_version(
+                        instance_id,
+                        &update.update_version_id,
+                        DownloadReason::Update,
+                        Some(update.current_version_id.clone()),
+                        state,
+                    )
+                    .await?;
+
+                    Ok::<_, crate::Error>(DownloadedBulkProject::ProjectUpdate(
+                        update, downloaded,
+                    ))
+                }
+                PlannedDownload::DependencyAddition(dependency) => {
+                    let downloaded = download_project_version(
+                        instance_id,
+                        &dependency.version_id,
+                        DownloadReason::Dependency,
+                        Some(dependency.parent_version_id.clone()),
+                        state,
+                    )
+                    .await?;
+
+                    Ok::<_, crate::Error>(
+                        DownloadedBulkProject::DependencyAddition(downloaded),
+                    )
+                }
+            }
+        })
+        .collect::<FuturesUnordered<_>>();
+    let mut completed = 0;
+    let mut output = Vec::with_capacity(total);
+
+    while let Some(download) = downloads.next().await {
+        let download = download?;
+        completed += 1;
+        emit_bulk_update_progress(
+            instance_id,
+            crate::event::InstanceBulkUpdateProgressStage::Downloading,
+            completed,
+            total,
+        )
+        .await?;
+        output.push(download);
+    }
+
+    Ok(output)
+}
+
+async fn emit_bulk_update_progress(
+    instance_id: &str,
+    stage: crate::event::InstanceBulkUpdateProgressStage,
+    current: usize,
+    total: usize,
+) -> crate::Result<()> {
+    crate::event::emit::emit_instance_bulk_update_progress(
+        crate::event::InstanceBulkUpdateProgressPayload {
+            instance_id: instance_id.to_string(),
+            stage,
+            current,
+            total,
+        },
+    )
+    .await
 }
 
 async fn plan_bulk_update(

@@ -68,6 +68,19 @@ export async function instance_listener(callback) {
 	return await listen('instance', (event) => callback(event.payload))
 }
 
+/// Payload for the 'instance_bulk_update_progress' event
+/*
+    InstanceBulkUpdateProgress {
+        instanceId: string
+        stage: "resolving_versions" | "downloading" | "finishing"
+        current: number
+        total: number
+    }
+*/
+export async function instance_bulk_update_progress_listener(callback) {
+	return await listen('instance_bulk_update_progress', (event) => callback(event.payload))
+}
+
 /// Payload for the 'command' event
 /*
   CommandPayload {
