@@ -133,7 +133,7 @@
 						<span class="flex items-center gap-2">
 							{{ user.username }}
 							<BadgeCheckIcon
-								v-if="isModrinthUser"
+								v-if="isOfficialAccount"
 								v-tooltip="formatMessage(messages.officialAccount)"
 								class="size-5 text-brand"
 								fill="var(--color-brand-highlight)"
@@ -810,6 +810,10 @@ const sortedOrgs = computed(() =>
 )
 
 const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
+const isAutoMod = computed(() => user.value?.id === '')
+const isOfficialAccount = computed(
+	() => isModrinthUser.value || isAutoMod.value || user.value?.id === 'GVFjtWTf',
+)
 
 const sortedCollections = computed(() => {
 	const list = collections.value

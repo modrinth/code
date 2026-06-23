@@ -23,6 +23,15 @@
   "analytics.breakdown.country": {
     "message": "Paese"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Dipendenza su"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Progetto dipendente"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Tipo progetto dipendente"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Motivo del download"
   },
@@ -37,6 +46,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Membro"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetizzazione"
@@ -128,6 +140,24 @@
   "analytics.chart.render-limit.header": {
     "message": "Mostrare tutte le {count} linee nel grafico?"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Mostrando {itemType, select, project {tutti i progetti} country {tutti i paesi} monetization {tutti i valori di monetizzazione} downloadSource {tutte le fonti di download} downloadReason {tutti i motivi di download} member {tutti i membri} projectVersion {tutte le versioni del progetto} loader {tutti i loader} gameVersion {tutte le versioni di gioco} other {tutti gli elementi}} dalla tabella"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Mostrando {count} {itemType, select, project {{count, plural, one {progetto} other {progetti}}} country {{count, plural, one {paese} other {paesi}}} monetization {{count, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{count, plural, one {fonte} other {fonti}} di download} downloadReason {{count, plural, one {motivo} other {motivi}} di download} member {{count, plural, one {membro} other {membri}}} projectVersion {{count, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{count, plural, one {versione} other {versioni}} di gioco} other {{count, plural, one {elemento} other {elementi}}}} dalla tabella"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "Mostrando {limit} {itemType, select, project {{limit, plural, one {progetto} other {progetti}}} country {{limit, plural, one {paese} other {paesi}}} monetization {{limit, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{limit, plural, one {fonte} other {fonti}} di download} downloadReason {{limit, plural, one {motivo} other {motivi}} di download} member {{limit, plural, one {membro} other {membri}}} projectVersion {{limit, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{limit, plural, one {versione} other {versioni}} di gioco} other {{limit, plural, one {elemento} other {elementi}}}} dalla tabella"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Mostrando {itemType, select, project {{count, plural, one {il primo progetto} other {i primi # progetti}}} country {{count, plural, one {il primo paese} other {i primi # paesi}}} monetization {{count, plural, one {il primo valore} other {i primi # valori}} di monetizzazione} downloadSource {{count, plural, one {la prima fonte} other {le prime # fonti}} di download} downloadReason {{count, plural, one {il primo motivo} other {i primi # motivi}} di download} member {{count, plural, one {il primo membro} other {i primi # membri}}} projectVersion {{count, plural, one {la prima versione} other {le prime # versioni}} del progetto} loader {{count, plural, one {il primo} other {i primi #}} loader} gameVersion {{count, plural, one {la prima versione} other {le prime # versioni}} di gioco} other {{count, plural, one {il primo elemento} other {i primi {count} elementi}}}} dalla tabella"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Dipendente su {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} dipende su {dependencyProject}, {version}"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# giorno} other {# giorni}}"
   },
@@ -212,8 +242,14 @@
   "analytics.filter.search.countries": {
     "message": "Cerca tra i paesi..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Cerca tra i progetti..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Cerca tra le fonti di download..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Cerca tra i membri..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Cerca tra le versioni del progetto..."
@@ -460,6 +496,12 @@
   },
   "analytics.value.monetized": {
     "message": "Monetizzato"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Nessuno"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Scaricato per altri motivi che non siano per dipendenza"
   },
   "analytics.value.none": {
     "message": "Nessuno"
@@ -1151,6 +1193,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Cerca tra i link affiliati..."
   },
+  "dashboard.analytics.from-projects": {
+    "message": "da {count, plural, one {# progetto} other {# progetti}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Download totali"
   },
@@ -1475,6 +1520,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Mostra cronologia notifiche"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Mostra {extraNotifs, plural, one {# altra notifica} other {altre # notifiche}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Crea organizzazione"
   },
@@ -1483,6 +1531,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Impossibile ottenere le organizzazioni"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count, plural, one {# membro} other {# membri}}"
   },
   "dashboard.organizations.title": {
     "message": "Organizzazioni"
@@ -2903,6 +2954,9 @@
   "profile.label.collection": {
     "message": "Raccolta"
   },
+  "profile.label.downloads": {
+    "message": "{count} download"
+  },
   "profile.label.joined": {
     "message": "Iscrizione"
   },
@@ -2938,6 +2992,9 @@
   },
   "profile.official-account.bio": {
     "message": "L'account ufficiale di Modrinth. Ricevi assistenza presso <support-link></support-link> o tramite mail presso <email></email>"
+  },
+  "profile.stats.projects-followers": {
+    "message": "<stat>{count, plural, =0 {Nessun} other {{count}}}</stat> follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"
@@ -3266,9 +3323,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Se hai bisogno di assistenza o hai altre richieste, visita il <help-center-link>centro assistenza di Modrinth</help-center-link> e clicca sulla bolla blu nell'angolo in basso a destra."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Mostra interfaccia degli utenti"
-  },
   "project.moderation.thread.private-description": {
     "message": "Questa è una conversazione privata con i moderatori di Modrinth. Sarai contattato per eventuali problemi riguardanti questo progetto."
   },
@@ -3374,11 +3428,20 @@
   "project.settings.permissions.learn-more": {
     "message": "Scopri di più"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Cerca tra {count, plural, one {# progetto esterno} other {# progetti esterni}}..."
+  },
   "project.settings.title": {
     "message": "Impostazioni"
   },
   "project.settings.visit-dashboard": {
     "message": "Visita bacheca del progetto"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count} download"
+  },
+  "project.stats.followers-label": {
+    "message": "{count} follower"
   },
   "project.status.archived.message": {
     "message": "{title} è stato archiviato. {title} non riceverà più aggiornamenti a meno che l'autore decida di rimuoverlo dall'archivio."
@@ -3388,9 +3451,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Questa versione è attualmente sospesa e non elencata} other {Queste versioni sono attualmente sospese e non elencate}} pubblicamente. Devi dimostrare di avere il permesso di ridistribuire alcuni dei file presenti in {count, plural, one {questa versione} other {queste versioni}} del pacchetto."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Risolvi"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {La versione {version_name} è stata sospesa} other {Alcune versioni sono state sospese}} per attribuzioni incomplete"

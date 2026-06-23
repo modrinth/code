@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "你選擇了全部 {totalAvailableTags, plural, other {# 個可用標籤}}。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "你的描述目前長度為 {length, plural, other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, other {# 個字元}}，以建立清晰且資訊完整的描述。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
@@ -96,7 +102,7 @@
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# 個標題} other {# 個標題}} 在您的描述中長度過長。標題應簡潔扼要，作為章節的標題即可，不應使用完整句子。"
+    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}字數過多。標題的作用是作為章節標題，應保持簡潔，避免使用完整的長句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "標題請簡短扼要"
@@ -127,6 +133,9 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "檢查回饋"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "你選擇了 {count, plural, other {# 個解析度標籤}} ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
@@ -203,14 +212,23 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請減少到 {maxTagCount} 個或更少，以確保你的伺服器出現在相關的搜尋結果中。"
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "選擇精確的標籤"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請考慮減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "你的{type}至少需要一張圖庫圖片，以展示其內容。"
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "資源包（音效包或在地化語言包除外）。如果你的資源包屬於此類，請選擇對應的標籤"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"
@@ -234,3 +252,4 @@
     "defaultMessage": "前往連結設定"
   }
 }
+

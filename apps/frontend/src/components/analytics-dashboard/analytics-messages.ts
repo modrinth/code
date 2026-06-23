@@ -86,7 +86,7 @@ export const analyticsMessages = defineMessages({
 	},
 	noDependent: {
 		id: 'analytics.value.no-dependent',
-		defaultMessage: 'No dependents',
+		defaultMessage: 'None',
 	},
 	noDependentTooltip: {
 		id: 'analytics.value.no-dependent-tooltip',
@@ -370,7 +370,7 @@ export const analyticsBreakdownMessages = defineMessages({
 	},
 	members: {
 		id: 'analytics.breakdown.members',
-		defaultMessage: 'Members',
+		defaultMessage: 'Member',
 	},
 	dependentProjectDownload: {
 		id: 'analytics.breakdown.dependent-project-download',

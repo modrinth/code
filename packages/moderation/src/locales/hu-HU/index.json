@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Mind a {totalAvailableTags} elérhető címkét kiválasztottad. A címkék célja az, hogy segítsék a felhasználókat a megfelelő projektek megtalálásában. Kérjük, csak a projekthez releváns címkéket válaszd ki."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "A jelenlegi leírás {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Fejtsd ki a leírást"
@@ -95,6 +101,9 @@
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Ne használj linkrövidítőket"
   },
+  "nags.long-headers.description": {
+    "defaultMessage": "A leírásodban {count} fejléc túl hosszú. A fejlécek legyenek tömörek, és csak szakaszcímként szolgáljanak, ne teljes mondatként."
+  },
   "nags.long-headers.title": {
     "defaultMessage": "Rövidebb fejlécek"
   },
@@ -124,6 +133,9 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Visszajelzések áttekintése"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "{count} felbontáscímkét választottál ki ({tags}). A forráscsomagokhoz általában csak egy felbontáscímke szükséges, amely a fő felbontásukkal egyezik."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
@@ -188,6 +200,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Tisztítsd meg az összegzést"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "A jelenlegi összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Fejtsd ki az összegzést"
   },
@@ -197,8 +212,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Tisztítsd meg a nevet"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy szervered biztosan megjelenjen a releváns keresési eredmények között."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy projekted biztosan megjelenjen a releváns keresési eredmények között."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
@@ -231,3 +252,4 @@
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   }
 }
+

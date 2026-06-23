@@ -33,7 +33,7 @@
     "message": "Kurulumu durdur"
   },
   "app.action-bar.update": {
-    "message": "Güncelle"
+    "message": "Güncelleme"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Şu anda indirilienleri göster"
@@ -54,7 +54,7 @@
     "message": "Modrinth App için tercih ettiğiniz temayı seçin."
   },
   "app.appearance-settings.color-theme.title": {
-    "message": "Tema"
+    "message": "Tema Rengi"
   },
   "app.appearance-settings.default-landing-page.description": {
     "message": "Launcher açıldığında varsayılan olarak açılacak sayfayı seçin."
@@ -144,7 +144,7 @@
     "message": "İçerik keşfet"
   },
   "app.browse.discover-servers": {
-    "message": "Sunucu keşfet"
+    "message": "Sunucuları keşfet"
   },
   "app.browse.hide-added-servers": {
     "message": "Zaten eklenmiş sunucuları gizle"
@@ -547,6 +547,9 @@
   },
   "friends.action.add-friend": {
     "message": "Bir arkadaş ekle"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} arkadaşlık isteği"
   },
   "friends.add-friend.submit": {
     "message": "Arkadaşlık isteği gönder"

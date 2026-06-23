@@ -23,6 +23,15 @@
   "analytics.breakdown.country": {
     "message": "Pays"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Dépend de"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Projet dépendant"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Type de projet dépendant"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Télécharger la raison"
   },
@@ -37,6 +46,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Membre"
   },
   "analytics.breakdown.monetization": {
     "message": "Monétisation"
@@ -134,6 +146,24 @@
   "analytics.chart.render-limit.header": {
     "message": "Afficher les {count} lignes sur le graphique ?"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Affichage de tous les {itemType, select, project {{count, plural, one {projet} other {projets}}} country {{count, plural, one {pays} other {pays}}} monetization {{count, plural, one {valeur de monétisation} other {valeurs de monétisation}}} downloadSource {{count, plural, one {source de téléchargement} other {sources de téléchargement}}} downloadReason {{count, plural, one {motif de téléchargement} other {motifs de téléchargement}}} member {{count, plural, one {membre} other {membres}}} projectVersion {{count, plural, one {version du projet} other {versions du projet}}} loader {{count, plural, one {chargeur} other {chargeurs}}} gameVersion {{count, plural, one {version du jeu} other {versions du jeu}}} other {{count, plural, one {élément} other {éléments}}}} du tableau"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Affichage de {count} {itemType, select, project {{count, plural, one {projet} other {projets}}} country {{count, plural, one {pays} other {pays}}} monetization {{count, plural, one {valeur de monétisation} other {valeurs de monétisation}}} downloadSource {{count, plural, one {source de téléchargement} other {sources de téléchargement}}} downloadReason {{count, plural, one {motif de téléchargement} other {motifs de téléchargement}}} member {{count, plural, one {membre} other {membres}}} projectVersion {{count, plural, one {version du projet} other {versions du projet}}} loader {{count, plural, one {chargeur} other {chargeurs}}} gameVersion {{count, plural, one {version du jeu} other {versions du jeu}}} other {{count, plural, one {élément} other {éléments}}}} du tableau"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "Affichage de {limit} {itemType, select, project {{limit, plural, one {projet} other {projets}}} country {{limit, plural, one {pays} other {pays}}} monetization {{limit, plural, one {valeur de monétisation} other {valeurs de monétisation}}} downloadSource {{limit, plural, one {source de téléchargement} other {sources de téléchargement}}} downloadReason {{limit, plural, one {motif de téléchargement} other {motifs de téléchargement}}} member {{limit, plural, one {membre} other {membres}}} projectVersion {{limit, plural, one {version du projet} other {versions du projet}}} loader {{limit, plural, one {chargeur} other {chargeurs}}} gameVersion {{limit, plural, one {version du jeu} other {versions du jeu}}} other {{limit, plural, one {élément} other {éléments}}}} du tableau"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Affichage des {count} {itemType, select, project {{count, plural, one {projet} other {projets}}} country {{count, plural, one {pays} other {pays}}} monetization {{count, plural, one {valeur de monétisation} other {valeurs de monétisation}}} downloadSource {{count, plural, one {source de téléchargement} other {sources de téléchargement}}} downloadReason {{count, plural, one {motif de téléchargement} other {motifs de téléchargement}}} member {{count, plural, one {membre} other {membres}}} projectVersion {{count, plural, one {version du projet} other {versions du projet}}} loader {{count, plural, one {chargeur} other {chargeurs}}} gameVersion {{count, plural, one {version du jeu} other {versions du jeu}}} other {{count, plural, one {élément} other {éléments}}}} les plus pertinents du tableau"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Dépend de {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} dépend de {dependencyProject}, {version}"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# jour} other {# jours}}"
   },
@@ -218,8 +248,14 @@
   "analytics.filter.search.countries": {
     "message": "Rechercher des pays..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Rechercher des projets..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Rechercher des sources de téléchargement..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Rechercher des membres..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Rechercher des versions du projet..."
@@ -466,6 +502,12 @@
   },
   "analytics.value.monetized": {
     "message": "Monétisé"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Aucun"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Téléchargé pour des raisons autres que le fait d'être une dépendance"
   },
   "analytics.value.none": {
     "message": "Aucun"
@@ -2978,11 +3020,14 @@
   "project-member-header.invitation-title": {
     "message": "Invitation à rejoindre un projet"
   },
+  "project-member-header.invitation-with-role": {
+    "message": "Vous avez été invité à être membre de ce projet sous le rôle de '{role}''."
+  },
   "project-member-header.success-decline": {
-    "message": "Vous avez refusé l’invitation à rejoindre l’équipe."
+    "message": "Vous avez refusé l’invitation à rejoindre l’équipe"
   },
   "project-member-header.success-join": {
-    "message": "Vous avez rejoint l’équipe du projet."
+    "message": "Vous avez rejoint l’équipe du projet"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Liste de contrôle de publication"
@@ -3287,9 +3332,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Si vous avez besoin d'aide ou si vous avez des demandes de renseignements supplémentaires, veuillez visiter le <help-center-link>Modrinth Help Center</help-center-link> et cliquez sur la bulle bleue pour contacter le support."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Montrer l'interface des membres"
-  },
   "project.moderation.thread.private-description": {
     "message": "Il s'agit d'un fil de conversation privé avec les modérateurs du Modrinthe. Ils peuvent vous envoyer un message avec des problèmes concernant ce projet."
   },
@@ -3418,9 +3460,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Cette version est actuellement indisponible et n'est pas répertoriée} other {Ces versions sont actuellement indisponibles et n'ont pas été répertoriées}} publiquement. Veuillez fournir la preuve que vous avez l'autorisation de redistribuer certains fichiers inclus dans {count, plural, one {la version} other {les versions}} du modpack."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Résoudre"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name} non disponible} other {Versions non disponibles}} en raison de contenus intégrés inconnus"

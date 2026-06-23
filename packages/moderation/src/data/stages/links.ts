@@ -46,7 +46,8 @@ const links: Stage = {
 			weight: 500,
 			suggestedStatus: 'flagged',
 			severity: 'low',
-			message: async () => (await import('../messages/links/misused.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/links/misused.md?raw')).default,
 			relevantExtraInput: [
 				{
 					label: 'What links are misused?',
@@ -63,7 +64,8 @@ const links: Stage = {
 			suggestedStatus: 'flagged',
 			// Theoretically a conditional could go here to prevent overlap of misuse and inaccessible messages repeating while still allowing for a multi-select in each.
 			// if links_misused was selected, send nothing.
-			message: async () => (await import('../messages/links/not_accessible.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/links/not_accessible.md?raw')).default,
 			enablesActions: [
 				{
 					id: 'links_inaccessible_options',
@@ -76,14 +78,16 @@ const links: Stage = {
 							weight: 511,
 							shouldShow: (project) => Boolean(project.source_url),
 							message: async () =>
-								(await import('../messages/links/not_accessible-source.md?raw')).default,
+								(await import('../messages/checklist-messages/links/not_accessible-source.md?raw'))
+									.default,
 						},
 						{
 							label: 'Discord',
 							weight: 512,
 							shouldShow: (project) => Boolean(project.discord_url),
 							message: async () =>
-								(await import('../messages/links/not_accessible-discord.md?raw')).default,
+								(await import('../messages/checklist-messages/links/not_accessible-discord.md?raw'))
+									.default,
 						},
 					],
 				},

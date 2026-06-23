@@ -1455,19 +1455,19 @@
     "message": "Du hast dein Auszahlungslimit von <b>{withdrawLimit}</b> aufgebraucht. Du musst ein Steuerformular ausfüllen, um merh abzuheben."
   },
   "dashboard.discord-roles.banner.body": {
-    "message": "Du bist für {roles} qualifiziert. Verknüpfe dein Discord-Konto über Modrinth, dann synchronisieren wir diese automatisch."
+    "message": "Du bist berechtigt für {roles}. Verknüpfe dein Discord-Konto über Modrinth und wir synchronisieren sie automatisch."
   },
   "dashboard.discord-roles.banner.cta": {
-    "message": "Discord verbinden"
+    "message": "Discord verknüpfen"
   },
   "dashboard.discord-roles.banner.title": {
-    "message": "Hol dir deine Discord-Rollen"
+    "message": "Beanspruche deine Discord-Rollen"
   },
   "dashboard.discord-roles.role.big-creator": {
-    "message": "1M+ Downloads"
+    "message": "1 Mio.+ Downloads"
   },
   "dashboard.discord-roles.role.creator": {
-    "message": "Ersteller"
+    "message": "Creator"
   },
   "dashboard.discord-roles.role.pride": {
     "message": "Pride 2026"
@@ -2304,7 +2304,7 @@
     "message": "Entdecke, Spiele und teile Minecraft-Inhalte durch unsere quelloffene Platform, welche für die Community entwickelt wird."
   },
   "layout.action.analytics-events": {
-    "message": "Analytics-Events"
+    "message": "Analytics-Ergebnisse"
   },
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
@@ -2862,7 +2862,7 @@
     "message": "Ein Modrinth Benutzer."
   },
   "profile.button.analytics": {
-    "message": "Benutzeranalysen anzeigen"
+    "message": "Nutzungsstatistik anzeigen"
   },
   "profile.button.billing": {
     "message": "Nutzer Zahlungen verwalten"
@@ -3290,9 +3290,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Wenn du Hilfe benötigst oder weitere Fragen hast, besuche bitte das <help-center-link>Hilfezentrum von Modrinth</help-center-link> und klicke auf die blaue Sprechblase, um den Support zu kontaktieren."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Benutzer-UI anzeigen"
-  },
   "project.moderation.thread.private-description": {
     "message": "Dies ist ein privater Unterhaltungsthread mit den Modrinth-Moderatoren. Sie können dich bei Problemen bezüglich dieses Projekts kontaktieren."
   },
@@ -3421,9 +3418,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Diese Version ist} other {Diese Versionen sind}} derzeit zurückgehalten und nicht öffentlich gelistet. Bitte stelle einen Nachweis bereit, dass du die Erlaubnis hast, bestimmte Dateien weiterzuverbreiten, die in {count, plural, one {der Modpack-Version} other {den Modpack-Versionen}} enthalten sind."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Beheben"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name}} other {Versionen}} zurückgehalten aufgrund von unbekannten eingebetteten Inhalten"

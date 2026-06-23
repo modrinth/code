@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "添加外部链接"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "你已选择全部 {totalAvailableTags, plural, other {# 个可用标签}}。这违背了标签的初衷——帮助用户发现相关项目。请仅选择与你项目相关的标签。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "选择准确的标签"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让描述详尽清晰。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "扩展描述"
@@ -95,6 +101,9 @@
   "nags.link-shortener-usage.title": {
     "defaultMessage": "不要使用短链接"
   },
+  "nags.long-headers.description": {
+    "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
+  },
   "nags.long-headers.title": {
     "defaultMessage": "缩短标题"
   },
@@ -124,6 +133,9 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "检查反馈"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}} ({tags})。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
@@ -188,6 +200,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "清除简介"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "你的简介包含 {length, plural, other {# 个字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，来让简介既丰富又引人入胜。"
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "扩充你的简介"
   },
@@ -197,8 +212,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名称"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。请将其数量减少到 {maxTagCount} 个或更少，以确保你的服务器能正常出现在相关搜索结果中。"
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "选择准确的标签"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。建议将其数量减少到 {maxTagCount} 个或更少，以确保你的项目能正常出现在相关搜索结果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "选择准确的标签"
@@ -231,3 +252,4 @@
     "defaultMessage": "访问链接设置"
   }
 }
+

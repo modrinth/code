@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Đang tải xuống Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Đang tải xuống bản cập nhật"
+  },
   "app.action-bar.downloads": {
     "message": "Tải xuống"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Bản instance chính"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Tải lại để cập nhật"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Hiện thêm các phiên bản đang chạy"
   },
   "app.action-bar.stop-instance": {
     "message": "Dừng instance"
+  },
+  "app.action-bar.update": {
+    "message": "Cập nhật"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Xem các lượt tải xuống"
@@ -148,6 +157,9 @@
   },
   "app.browse.server.installing": {
     "message": "Đang cài đặt"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -277,6 +289,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Tải xuống"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {# mod}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Yêu cầu modpack"
@@ -422,6 +437,12 @@
   "app.skins.rate-limit.title": {
     "message": "Bình tĩnh lại!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Không thể lưu thứ tự skin của bạn."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Sắp xếp lại skin thất bại"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -494,6 +515,9 @@
   "app.update-popup.download-complete": {
     "message": "Cài đặt thành công"
   },
+  "app.update-popup.reload": {
+    "message": "Tải lại để cập nhật"
+  },
   "app.update-popup.title": {
     "message": "Cập nhật mới hiện đang khả dụng"
   },
@@ -523,6 +547,9 @@
   },
   "friends.action.add-friend": {
     "message": "Thêm một người bạn"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, other {yêu cầu kết bạn}}"
   },
   "friends.add-friend.submit": {
     "message": "Gửi yêu cầu kết bạn"
@@ -688,6 +715,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Tên"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Kênh cập nhật"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Sơ khai"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Các phiên bản chính thức, thử nghiệm và sơ khai sẽ hiển thị trong danh sách cập nhật có sẵn."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Thử nghiệm"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Các phiên bản chính thức và thử nghiệm sẽ hiển thị trong danh sách cập nhật có sẵn."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Chính thức"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Chỉ phiên bản chính thức sẽ hiển thị trong danh sách cập nhật có sẵn."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Chọn kênh cập nhật"
   },
   "instance.settings.tabs.hooks": {
     "message": "Khởi chạy Hooks"

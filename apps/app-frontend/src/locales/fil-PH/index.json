@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Dina-download ang Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Dina-download ang update"
+  },
   "app.action-bar.downloads": {
     "message": "Mga downloads"
   },
@@ -19,6 +22,9 @@
   },
   "app.action-bar.primary-instance": {
     "message": "Pangunahing instansiya"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Mag-reload upang ma-update"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Ipakita ang mas marami pang tumatakbong instansiya"
@@ -88,6 +94,9 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Pumili ng opsiyon"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Magpapakita ang katagal ng iyong paglalaro sa isang instansiya."
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Pagpapagana na mata-toggle ang sidebar."
