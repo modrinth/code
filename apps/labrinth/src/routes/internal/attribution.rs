@@ -7,7 +7,10 @@ use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::{
     DBOrganization, DBTeamMember,
-    ids::{DBAttributionGroupId, DBProjectId, generate_attribution_group_id},
+    ids::{
+        DBAttributionGroupId, DBProjectId, DBVersionId,
+        generate_attribution_group_id,
+    },
 };
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
@@ -26,6 +29,7 @@ use crate::util::error::Context;
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(list)
         .service(update_group)
+        .service(scan)
         .service(assign)
         .service(split);
 }
@@ -73,6 +77,100 @@ struct ModerationExternalLicenseResponse {
     inserted_by: Option<i64>,
     updated_at: Option<DateTime<Utc>>,
     updated_by: Option<i64>,
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+struct ScanBody {
+    version_ids: Vec<VersionId>,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+struct ScanResponse {
+    queued_files: u64,
+}
+
+#[utoipa::path]
+#[post("/scan")]
+async fn scan(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    web::Json(body): web::Json<ScanBody>,
+) -> Result<web::Json<ScanResponse>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::VERSION_WRITE,
+    )
+    .await?
+    .1;
+
+    let mut version_ids: Vec<i64> = body
+        .version_ids
+        .into_iter()
+        .map(|id| DBVersionId::from(id).0)
+        .collect();
+    version_ids.sort_unstable();
+    version_ids.dedup();
+
+    if version_ids.is_empty() {
+        return Ok(web::Json(ScanResponse { queued_files: 0 }));
+    }
+
+    let versions = sqlx::query!(
+        r#"
+		select
+			id as "id: DBVersionId",
+			mod_id as "project_id: DBProjectId"
+		from versions
+		where id = any($1)
+		"#,
+        &version_ids,
+    )
+    .fetch_all(pool.as_ref())
+    .await
+    .wrap_internal_err("failed to fetch versions for attribution scan")?;
+
+    if versions.len() != version_ids.len() {
+        return Err(ApiError::NotFound);
+    }
+
+    let mut project_ids: Vec<DBProjectId> =
+        versions.iter().map(|version| version.project_id).collect();
+    project_ids.sort_unstable_by_key(|id| id.0);
+    project_ids.dedup_by_key(|id| id.0);
+
+    for project_id in project_ids {
+        ensure_can_upload_versions_to_project(
+            pool.as_ref(),
+            project_id,
+            &user,
+            "you do not have permission to upload versions to this project",
+        )
+        .await?;
+    }
+
+    let result = sqlx::query!(
+        r#"
+		insert into file_scans (file_id)
+		select f.id
+		from files f
+		inner join attribution_enforced_versions aev on aev.id = f.version_id
+		where f.version_id = any($1)
+		on conflict (file_id) do nothing
+		"#,
+        &version_ids,
+    )
+    .execute(pool.as_ref())
+    .await
+    .wrap_internal_err("failed to queue version files for attribution scan")?;
+
+    Ok(web::Json(ScanResponse {
+        queued_files: result.rows_affected(),
+    }))
 }
 
 #[utoipa::path]
@@ -668,50 +766,13 @@ async fn can_edit_attribution_group(
     .wrap_internal_err("failed to fetch attribution group")?
     .ok_or(ApiError::NotFound)?;
 
-    if !user.role.is_mod() {
-        let team_member = DBTeamMember::get_from_user_id_project(
-            group.project_id,
-            user.id.into(),
-            false,
-            pool,
-        )
-        .await
-        .wrap_internal_err("failed to fetch project team member")?;
-
-        let organization =
-            DBOrganization::get_associated_organization_project_id(
-                group.project_id,
-                pool,
-            )
-            .await
-            .wrap_internal_err("failed to fetch associated organization")?;
-
-        let organization_team_member = if let Some(organization) = organization
-        {
-            DBTeamMember::get_from_user_id(
-                organization.team_id,
-                user.id.into(),
-                pool,
-            )
-            .await
-            .wrap_internal_err("failed to fetch organization team member")?
-        } else {
-            None
-        };
-
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
-            &team_member,
-            &organization_team_member,
-        )
-        .unwrap_or_default();
-
-        if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
-            return Err(ApiError::Auth(eyre!(
-                "you do not have permission to edit this attribution group"
-            )));
-        }
-    }
+    ensure_can_upload_versions_to_project(
+        pool,
+        group.project_id,
+        user,
+        "you do not have permission to edit this attribution group",
+    )
+    .await?;
 
     let attribution: Option<AttributionResolution> = group
         .attribution
@@ -723,6 +784,57 @@ async fn can_edit_attribution_group(
             .map(|status| status.kind),
         Some(AttributionModerationStatusKind::NotAllowed)
     ))
+}
+
+async fn ensure_can_upload_versions_to_project(
+    pool: &PgPool,
+    project_id: DBProjectId,
+    user: &User,
+    permission_error: &'static str,
+) -> Result<(), ApiError> {
+    if user.role.is_mod() {
+        return Ok(());
+    }
+
+    let team_member = DBTeamMember::get_from_user_id_project(
+        project_id,
+        user.id.into(),
+        false,
+        pool,
+    )
+    .await
+    .wrap_internal_err("failed to fetch project team member")?;
+
+    let organization = DBOrganization::get_associated_organization_project_id(
+        project_id, pool,
+    )
+    .await
+    .wrap_internal_err("failed to fetch associated organization")?;
+
+    let organization_team_member = if let Some(organization) = organization {
+        DBTeamMember::get_from_user_id(
+            organization.team_id,
+            user.id.into(),
+            pool,
+        )
+        .await
+        .wrap_internal_err("failed to fetch organization team member")?
+    } else {
+        None
+    };
+
+    let permissions = ProjectPermissions::get_permissions_by_role(
+        &user.role,
+        &team_member,
+        &organization_team_member,
+    )
+    .unwrap_or_default();
+
+    if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
+        return Err(ApiError::Auth(eyre!(permission_error)));
+    }
+
+    Ok(())
 }
 
 async fn cleanup_empty_groups(pool: &PgPool) -> Result<(), ApiError> {
