@@ -4,7 +4,9 @@ use crate::state::instances::{
     Instance, InstanceLaunchOverrides, InstanceLaunchOverridesData,
     InstanceLink,
 };
-use crate::state::{InstanceInstallStage, LauncherFeatureVersion, ReleaseChannel};
+use crate::state::{
+    InstanceInstallStage, LauncherFeatureVersion, ReleaseChannel,
+};
 use chrono::{DateTime, TimeZone, Utc};
 use serde::de::DeserializeOwned;
 use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
