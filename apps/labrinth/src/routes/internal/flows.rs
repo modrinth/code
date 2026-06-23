@@ -1214,29 +1214,47 @@ pub async fn auth_callback(
 
     let state_string = query
         .get("state")
-        .ok_or_else(|| AuthenticationError::InvalidCredentials)?
+        .ok_or_else(|| {
+            crate::auth::templates::ErrorPage::from(
+                AuthenticationError::InvalidCredentials,
+            )
+        })?
         .clone();
 
     let state = state_string.clone();
+    let flow = DBFlow::get(&state, &redis)
+        .await
+        .wrap_err("failed to fetch flow state")
+        .map_err(|err| {
+            crate::auth::templates::ErrorPage::from_auth_error(
+                AuthenticationError::Internal(err),
+                None,
+            )
+        })?
+        .wrap_err("no flow for state")
+        .map_err(|err| {
+            crate::auth::templates::ErrorPage::from_auth_error(
+                AuthenticationError::Internal(err),
+                None,
+            )
+        })?;
+
+    // Extract cookie header from request
+    let DBFlow::OAuth {
+        user_id,
+        provider,
+        url,
+        existing_user_id,
+    } = flow
+    else {
+        return Err(crate::auth::templates::ErrorPage::from_auth_error(
+            AuthenticationError::Internal(eyre!("invalid flow kind")),
+            None,
+        ));
+    };
+
+    let error_redirect_url = url.to_string();
     let res: Result<HttpResponse, AuthenticationError> = async move {
-        let flow = DBFlow::get(&state, &redis)
-            .await
-            .wrap_err("failed to fetch flow state")?
-            .wrap_err("no flow for state")?;
-
-        // Extract cookie header from request
-        let DBFlow::OAuth {
-            user_id,
-            provider,
-            url,
-            existing_user_id,
-        } = flow
-        else {
-            return Err(AuthenticationError::Internal(eyre!(
-                "invalid flow kind"
-            )));
-        };
-
         let flow_guard = FlowGuard {
             state: Some(state.clone()),
             redis: redis.clone(),
@@ -1407,7 +1425,12 @@ pub async fn auth_callback(
     }
     .await;
 
-    Ok(res?)
+    Ok(res.map_err(|err| {
+        crate::auth::templates::ErrorPage::from_auth_error(
+            err,
+            Some(error_redirect_url),
+        )
+    })?)
 }
 
 fn requires_dob(provider: AuthProvider) -> bool {
