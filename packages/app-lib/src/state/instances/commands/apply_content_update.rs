@@ -500,7 +500,7 @@ async fn resolve_dependency_version(
         return Ok(None);
     };
 
-    versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+    versions.sort_by_key(|version| std::cmp::Reverse(version.date_published));
 
     Ok(find_preferred_dependency_version(&versions, content_set))
 }

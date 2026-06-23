@@ -2,15 +2,15 @@ use crate::data::{Dependency, ProjectType, User, Version};
 use crate::jre::check_jre;
 use crate::prelude::ModLoader;
 use crate::state;
+use crate::state::instances::{
+    InstanceLaunchOverrides, InstanceLaunchOverridesData,
+};
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
     DeviceTokenPair, FileType, Hooks, InstanceInstallStage,
     LauncherFeatureVersion, MemorySettings, ModrinthCredentials,
     ReleaseChannel, TeamMember, Theme, VersionFile, WindowSize,
-};
-use crate::state::instances::{
-    InstanceLaunchOverrides, InstanceLaunchOverridesData,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
