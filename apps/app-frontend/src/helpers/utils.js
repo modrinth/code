@@ -47,6 +47,10 @@ export async function showLauncherLogsFolder() {
 	return await invoke('plugin:utils|show_launcher_logs_folder', {})
 }
 
+export async function showAppDbBackupsFolder() {
+	return await invoke('plugin:utils|show_app_db_backups_folder', {})
+}
+
 // Opens an instance's folder in the OS file explorer
 export async function showInstanceInFolder(instanceId) {
 	const fullPath = await get_full_path(instanceId)
