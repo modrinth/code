@@ -3191,9 +3191,6 @@
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Ez a verzió} other {Ezek a verziók}} jelenleg vissza van tartva, és nem érhető{count, plural, one {} other {k}} el nyilvánosan. Kérjük, igazold, hogy engedéllyel rendelkezel a modcsomag {count, plural, one {verziójában} other {verzióiban}} található bizonyos fájlok terjesztésére."
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Megoldás"
-  },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {A(z) {version_name} verzió} other {A verziók}} ismeretlen beágyazott tartalom miatt vissza lett{count, plural, one {} other {ek}} tartva"
   },

@@ -881,7 +881,9 @@
 						class="card flex-card"
 					/>
 					<ProjectSidebarCompatibility
-						v-if="projectV3Loaded && !isServerProject"
+						v-if="
+							projectV3Loaded && !isServerProject && route.name !== 'type-project-version-version'
+						"
 						:project="project"
 						:tags="tags"
 						:project-v3="projectV3"

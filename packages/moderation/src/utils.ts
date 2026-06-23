@@ -382,6 +382,10 @@ export function flattenProjectVariables(
 	vars[`PROJECT_LANGUAGE_SETTINGS`] = `https://modrinth.com/project/${project.id}/settings/server`
 	vars[`PROJECT_LANGUAGE_SETTINGS_FLINK`] =
 		`[Language Settings](https://modrinth.com/project/${project.id}/settings/server)`
+	vars[`PROJECT_PERMISSIONS_LINK`] =
+		`https://modrinth.com/project/${project.id}/settings/permissions`
+	vars[`PROJECT_PERMISSIONS_FLINK`] =
+		`[Permissions dashboard](https://modrinth.com/project/${project.id}/settings/permissions)`
 
 	return vars
 }

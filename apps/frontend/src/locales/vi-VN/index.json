@@ -3290,9 +3290,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Nếu bạn cần trợ giúp hoặc có thắc mắc, vui lòng vào <help-center-link>trung tâm trợ giúp</help-center-link> và bấm vào nút tin nhắn màu xanh để liên hệ hỗ trợ."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Hiển thị giao diện thành viên"
-  },
   "project.moderation.thread.private-description": {
     "message": "Đây là nơi hội thoại riêng tư với bên kiểm duyệt của Modrinth. Họ có thể nhắn cho bạn về những vấn đề trong dự án này."
   },
@@ -3421,9 +3418,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, other {Những phiên bản này}} bị giữ lại và không được công khai. Vui lòng đưa ra bằng chứng rằng bạn có quyền để đăng tải một số tệp đưọc bao gồm trong {count, plural, other {các phiên bản}} modpack đó."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Khắc phục"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, other{Phiên bản}} bị giữ lại do chứa nội dung nhúng không xác định"

@@ -48,7 +48,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	useV1ContentTabAPI: true,
 	labrinthApiCanary: false,
 	dismissedExternalProjectsInfo: false,
-	modpackPermissionsPage: false,
 	showAllBanners: false,
 	alwaysIgnoreErrorBanner: false,
 	showViewProdRouteBanner: false,
@@ -56,6 +55,8 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showModeratorPrivateMessageHighlight: true,
 	archonApiStaging: false,
 	showHostingAccessInstanceAuditLog: false,
+	versionDevInfoCollapsed: true,
+	alwaysShowVersionDevInfo: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

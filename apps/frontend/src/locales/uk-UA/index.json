@@ -3074,9 +3074,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Якщо вам потрібна допомога або у вас є додаткові запитання, відвідайте <help-center-link>довідковий центр Modrinth</help-center-link> і натисніть синю підказку, щоб зв’язатися зі службою підтримки."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Показати інтерфейс учасника"
-  },
   "project.moderation.thread.private-description": {
     "message": "Це тема приватної розмови з модераторами Modrinth. Вони можуть надіслати вам повідомлення про проблеми щодо цього проєкту."
   },
@@ -3199,9 +3196,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Розв'язати"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Версія{version_name}} other {Версії}} утримано через невідомий убудований уміст"
