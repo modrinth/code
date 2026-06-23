@@ -1,11 +1,11 @@
 {
 	"articles": [
 		{
-			"title": "A better system for Modpack creators",
-			"summary": "View and manage info about external content in Modrinth modpacks.",
-			"thumbnail": "https://modrinth.com/news/default.webp",
-			"date": "2026-06-22T18:00:00.000Z",
-			"link": "https://modrinth.com/news/article/modpack-attributions"
+			"title": "Improving Modpack review delays",
+			"summary": "Reducing the back-and-forth needed to get your modpack approved.",
+			"thumbnail": "https://modrinth.com/news/article/modpack-permissions/thumbnail.webp",
+			"date": "2026-06-23T20:00:00.000Z",
+			"link": "https://modrinth.com/news/article/modpack-permissions"
 		},
 		{
 			"title": "Modrinth joins Spark Universe",
