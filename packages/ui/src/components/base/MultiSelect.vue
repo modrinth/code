@@ -400,6 +400,7 @@ import 'overlayscrollbars/overlayscrollbars.css'
 import { CheckIcon, ChevronLeftIcon, MinusIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { Menu } from 'floating-vue'
+import Fuse from 'fuse.js'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import {
 	type Component,
@@ -500,6 +501,7 @@ const props = withDefaults(
 		noOptionsMessage?: string
 		noResultsMessage?: string
 		disableSearchFilter?: boolean
+		fuzzySearch?: boolean
 		includeSelectAllOption?: boolean
 		selectAllLabel?: string
 		showSelectionActions?: boolean
@@ -519,6 +521,7 @@ const props = withDefaults(
 		noOptionsMessage: 'No options available',
 		noResultsMessage: 'No results found',
 		includeSelectAllOption: false,
+		fuzzySearch: false,
 		selectAllLabel: 'Select all',
 		showSelectionActions: false,
 		selectionActionsClearLabel: 'Clear',
@@ -605,12 +608,32 @@ const popperOverflowTags = shallowRef<MultiSelectOption<T>[]>([])
 
 const lastClickedValue = shallowRef<{ value: T } | null>(null)
 
+const fuzzySearchOptions = computed(() =>
+	selectableOptions.value.map((option) => ({
+		option,
+		label: option.label,
+		searchTerms: option.searchTerms ?? [],
+	})),
+)
+
+const fuzzyMatcher = computed(
+	() =>
+		new Fuse(fuzzySearchOptions.value, {
+			keys: ['label', 'searchTerms'],
+			threshold: 0.4,
+			ignoreLocation: true,
+		}),
+)
+
 const filteredOptions = computed(() => {
 	if (!searchQuery.value || !props.searchable || props.disableSearchFilter) {
 		return props.options
 	}
 
 	const query = searchQuery.value.toLowerCase()
+	const fuzzyMatches = props.fuzzySearch
+		? new Set(fuzzyMatcher.value.search(searchQuery.value).map(({ item }) => item.option))
+		: null
 	const items: MultiSelectItem<T>[] = []
 	let pendingSectionHeader: MultiSelectSectionHeader | null = null
 
@@ -620,9 +643,10 @@ const filteredOptions = computed(() => {
 			continue
 		}
 
-		const matches =
-			opt.label.toLowerCase().includes(query) ||
-			opt.searchTerms?.some((term) => term.toLowerCase().includes(query))
+		const matches = fuzzyMatches
+			? fuzzyMatches.has(opt)
+			: opt.label.toLowerCase().includes(query) ||
+				opt.searchTerms?.some((term) => term.toLowerCase().includes(query))
 
 		if (!matches) {
 			continue

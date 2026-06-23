@@ -107,6 +107,9 @@
   "analytics.chart.empty.select-table-items": {
     "message": "Chọn các mục trong bảng dưới để hiển thị dự liệu của bạn."
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, other {# sự kiện dự án}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
@@ -131,8 +134,14 @@
   "analytics.chart.render-limit.header": {
     "message": "Hiện thị tất cả {count} đường trong biểu đồ?"
   },
-  "analytics.chart.table-selection.limited": {
-    "message": "Đang hiển thị {limit} {itemType, select, project {{limit, plural, one {dự án} other {dự án}}} country {{limit, plural, one {quốc gia} other {quốc gia}}} monetization {{limit, plural, one {doanh thu} other {doanh thu}}} downloadSource {{limit, plural, one {nơi tải gốc} other {nơi tải gốc}}} downloadReason {{limit, plural, one {lý do tải} other {lý do tải}}} projectVersion {{limit, plural, one {phiên bản dự án} other {phiên bản dự án}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {phiên bản game} other {phiên bản game}}} other {{limit, plural, one {mục} other {mục}}}} từ bảng"
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, other {# ngày}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, other {# giờ}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, other {# phút}}"
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Che {name} trong biểu đồ"
@@ -320,11 +329,20 @@
   "analytics.project.all": {
     "message": "Tất cả dự án"
   },
+  "analytics.project.count": {
+    "message": "{count, plural, other {# dự án}}"
+  },
   "analytics.project.icon-alt": {
     "message": "Biểu tượng {name}"
   },
   "analytics.project.select": {
     "message": "Chọn dự án"
+  },
+  "analytics.project.user": {
+    "message": "Dự án của {username}"
+  },
+  "analytics.project.your": {
+    "message": "Dự án của bạn"
   },
   "analytics.query.filter.add": {
     "message": "Thêm bộ lọc"
@@ -343,6 +361,15 @@
   },
   "analytics.stat.downloads": {
     "message": "Lượt tải"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Chỉ lượt xem và lượt tải qua Modrinth hợp lệ cho việc kiếm tiền và phải vượt qua bộ lọc chống gian lận. Lượt tải từ Modrinth App yêu cầu người dùng phải đăng nhập. Vì tất cả các dự án đều có tỷ lệ lượt tải xuống hợp lệ tương đương nhau, doanh thu của bạn cũng không thay đổi đáng kể ngay cả khi tính toàn bộ lượt tải."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Tìm hiểu thêm"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Việc kiếm tiền hoạt động như thế nào?"
   },
   "analytics.stat.playtime": {
     "message": "Thời gian chơi"
@@ -382,6 +409,15 @@
   },
   "analytics.table.csv.selected-range": {
     "message": "Phạm Vi Được Chọn"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, other {# ngày}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, other {# giờ}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, other {# phút}}"
   },
   "analytics.table.empty.no-matching-rows": {
     "message": "Không mục thống kê nào giống với mục tìm kiếm"
@@ -956,6 +992,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
   },
+  "create.collection.collection-info": {
+    "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
+  },
   "create.collection.create-collection": {
     "message": "Tạo bộ sưu tập"
   },
@@ -1117,6 +1156,9 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Tìm kiếm link affiliate..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "từ {count} {count, plural, other {dự án}} khác"
   },
   "dashboard.analytics.total-downloads": {
     "message": "Tổng số lượt tải xuống"
@@ -1412,6 +1454,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Bạn đã sử dụng hết giới hạn rút tiền <b>{withdrawLimit}</b>. Bạn cần hoàn thành biểu mẫu thuế để rút thêm."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Bạn đủ điều kiện cho vai trò {roles}. Hãy liên kết tài khoản Discord với Modrinth và chúng tôi sẽ đồng bộ chúng tự động."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Liên kết với Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Nhận vai trò Discord của bạn"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creator"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Bảng điều khiển"
   },
@@ -1435,6 +1495,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Không thể tải tổ chức"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural,other {thành viên}}"
   },
   "dashboard.organizations.title": {
     "message": "Tổ chức"
@@ -1480,6 +1543,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "Sửa liên kết"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "<strong>{count}</strong> {count, plural, other {dự án}} sẽ được thay đổi."
   },
   "dashboard.projects.links.description": {
     "message": "Bất kể đường liên kết nào bạn nhập ở dưới sẽ được ghi đè lên các dự án được chọn. Mục nào để trống sẽ được bỏ qua. Bạn có thể xóa đường liên kết trong tất cả các dự án được chọn bằng nút thùng rác."
@@ -1898,6 +1964,9 @@
   "frog.title": {
     "message": "Ếch"
   },
+  "hosting-marketing.available-locations": {
+    "message": "Có mặt tại Bắc Mỹ, Châu Âu, Đông Nam Á và Úc với độ phủ sóng rộng."
+  },
   "hosting-marketing.billing.monthly": {
     "message": "Thanh toán hàng tháng"
   },
@@ -1957,6 +2026,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Những máy chủ Modrinth Hosting được nằm ở đâu? Tôi có thể chọn khu vực không?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Hiện giờ chúng tôi có máy chủ khắp Bắc Mỹ, Châu Âu, Đông Nam Á và Úc mà bạn có thể chọn khi mua. Sẽ có thêm khu vực trong tương lai! Nếu bạn muốn đổi khu vực, hãy liên hệ đội hỗ trợ."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Những phiên bản Minecraft và modloader nào có thể được sử dụng?"
@@ -2230,6 +2302,9 @@
   },
   "landing.subheading": {
     "message": "Khám phá, chơi và chia sẻ nội dung Minecraft thông qua nền tảng nguồn mở được xây dựng cho cộng đồng."
+  },
+  "layout.action.analytics-events": {
+    "message": "Sự kiện phân tích"
   },
   "layout.action.change-theme": {
     "message": "Đổi chủ đề"
@@ -2777,11 +2852,17 @@
   "muralpay.warning.wallet-address": {
     "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "{count, plural, other {# dự án}} sẽ được thay đổi."
+  },
   "profile.bio.fallback.creator": {
     "message": "Một nhà sáng tạo trên Modrinth."
   },
   "profile.bio.fallback.user": {
     "message": "Một người dùng Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Xem phân tích người dùng"
   },
   "profile.button.billing": {
     "message": "Quản lý thanh toán người dùng"
@@ -2800,6 +2881,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Đặt làm affiliate"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, other {# dự án}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Nhà cung cấp xác thực"
@@ -2875,6 +2959,9 @@
   },
   "profile.official-account.bio": {
     "message": "Tài khoản chính thức của Modrinth. Nhận hỗ trợ từ <support-link></support-link> hoặc qua email tại <email></email>"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> người theo dõi dự án}}"
   },
   "profile.user-id": {
     "message": "ID người dùng: {id}"
@@ -3308,17 +3395,32 @@
   "project.settings.permissions.learn-more": {
     "message": "Tìm hiểu thêm"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Tìm kiếm trong {count} {count, plural,other {dự án ngoài}}..."
+  },
   "project.settings.title": {
     "message": "Cài đặt"
   },
   "project.settings.visit-dashboard": {
     "message": "Truy cập bảng điều khiển dự án"
   },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, other {lượt tải}}"
+  },
+  "project.stats.followers-label": {
+    "message": "{count, plural, other {lượt theo dõi}}"
+  },
   "project.status.archived.message": {
     "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
   },
   "project.versions.title": {
     "message": "Phiên bản"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {Những phiên bản này}} bị giữ lại và không được công khai. Vui lòng đưa ra bằng chứng rằng bạn có quyền để đăng tải một số tệp đưọc bao gồm trong {count, plural, other {các phiên bản}} modpack đó."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, other{Phiên bản}} bị giữ lại do chứa nội dung nhúng không xác định"
   },
   "report.already-reported": {
     "message": "Bạn đã báo cáo {title}"

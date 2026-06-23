@@ -23,6 +23,9 @@
   "analytics.breakdown.country": {
     "message": "Land"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Beroende på"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Nedladdningsanledning"
   },
@@ -37,6 +40,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Laddare"
+  },
+  "analytics.breakdown.members": {
+    "message": "Medlem"
   },
   "analytics.breakdown.monetization": {
     "message": "Intäkter"
@@ -58,6 +64,9 @@
   },
   "analytics.chart.action.show-all": {
     "message": "Visa alla"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Visa begränsad"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Visa topp 8"
@@ -95,20 +104,14 @@
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
+  "analytics.chart.events.see-announcement": {
+    "message": "Se meddelande"
+  },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (förhandsvisa)"
   },
   "analytics.chart.render-limit.header": {
     "message": "Visa alla {count} linjer i diagram?"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Visar {count} {itemType, select, project {projekt} country {{count, plural, one {land} other {länder}}} monetization {{count, plural, one {intäktvärde} other {intäktvärden}}} downloadSource {{count, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{count, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} projectVersion {{count, plural, one {projektversion} other {projektversioner}}} loader {laddare} gameVersion {{count, plural, one {spelversion} other {spelversioner}}} other {föremål}} från tabell"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Visar {limit} {itemType, select, project {projekt} country {{limit, plural, one {land} other {länder}}} monetization {{limit, plural, one {intäktvärde} other {intäktvärden}}} downloadSource {{limit, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{limit, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} projectVersion {{limit, plural, one {projektversion} other {projektversioner}}} loader {laddare} gameVersion {{limit, plural, one {spelversion} other {spelversioner}}} other {föremål}} från tabell"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Visar topp {count} {itemType, select, project {projekt} country {{count, plural, one {land} other {länder}}} monetization {{count, plural, one {intäktvärde} other {intäktvärden}}} downloadSource {{count, plural, one {nedladdningskälla} other {nedladdningskällor}}} downloadReason {{count, plural, one {nedladdningsanledning} other {nedladdningsanledningar}}} projectVersion {{count, plural, one {projektversion} other {projektversioner}}}loader {laddare} gameVersion {{count, plural, one {spelversion} other {spelversioner}}} other {föremål}} från tabell"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dag} other {# dagar}}"
@@ -292,6 +295,9 @@
   },
   "analytics.project.all": {
     "message": "Alla projekt"
+  },
+  "analytics.project.count": {
+    "message": "{count, number} projekt"
   },
   "analytics.project.icon-alt": {
     "message": "{name} Ikon"
@@ -1429,6 +1435,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "Ändra länkar"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Ändringar kommer appliceras till <strong>{count}</strong> projekt."
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discordinbjudan"

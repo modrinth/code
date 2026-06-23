@@ -20,6 +20,14 @@ on:
         required: true
         type: string
         description: 'The environment to deploy to (staging-preview or production-preview)'
+      head_sha:
+        required: false
+        type: string
+        description: 'The commit SHA to deploy (defaults to github.sha)'
+      head_ref:
+        required: false
+        type: string
+        description: 'The branch name to deploy (defaults to github.ref_name)'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.environment || 'push' }}
@@ -40,12 +48,14 @@ jobs:
 
       - name: Configure environment
         id: meta
+        env:
+          ENV_INPUT: ${{ inputs.environment }}
+          REF: ${{ github.ref }}
+          DEPLOY_SHA: ${{ inputs.head_sha || github.sha }}
         run: |
           echo "cmd=deploy" >> $GITHUB_OUTPUT
 
-          ENV_INPUT="${{ inputs.environment }}"
-          REF="${{ github.ref }}"
-          SHA_SHORT="${GITHUB_SHA::8}"
+          SHA_SHORT="${DEPLOY_SHA::8}"
 
           if [ "$ENV_INPUT" = "staging-preview" ]; then
             echo "env=staging" >> $GITHUB_OUTPUT
@@ -106,8 +116,8 @@ jobs:
         working-directory: ./apps/frontend
         run: pnpm build
         env:
-          CF_PAGES_BRANCH: ${{ github.ref_name }}
-          CF_PAGES_COMMIT_SHA: ${{ github.sha }}
+          CF_PAGES_BRANCH: ${{ inputs.head_ref || github.ref_name }}
+          CF_PAGES_COMMIT_SHA: ${{ inputs.head_sha || github.sha }}
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
           BUILD_ENV: ${{ steps.meta.outputs.env }}
           PREVIEW: ${{ inputs.environment != '' && 'true' || 'false' }}

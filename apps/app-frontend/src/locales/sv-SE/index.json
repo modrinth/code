@@ -74,6 +74,9 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
   },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Hoppa tillbaka i världar"
+  },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimera programstartare"
   },
@@ -457,6 +460,9 @@
   },
   "app.skins.sign-in.button": {
     "message": "Logga in"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Snälla logga in din Minecraft konto att använda hud hantering förmågor i Modrinth appen."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Exalterad Modrinth bot"

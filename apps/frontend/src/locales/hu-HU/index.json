@@ -134,11 +134,14 @@
   "analytics.chart.render-limit.header": {
     "message": "Megjelenítse a grafikonon mind a {count} sort?"
   },
-  "analytics.chart.table-selection.limited": {
-    "message": "Mutatás {limit} {itemType, select, project {{limit, plural, one {project} other {projects}}} country {{limit, plural, one {country} other {countries}}} monetization {{limit, plural, one {monetization value} other {monetization values}}} downloadSource {{limit, plural, one {download source} other {download sources}}} downloadReason {{limit, plural, one {download reason} other {download reasons}}} projectVersion {{limit, plural, one {project version} other {project versions}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {game version} other {game versions}}} other {{limit, plural, one {item} other {items}}}} from table"
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count} nap"
   },
-  "analytics.chart.table-selection.top": {
-    "message": "Mutatás top {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count} óra"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count} perc"
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "{name} elrejtése a grafikonon"
@@ -326,6 +329,9 @@
   "analytics.project.all": {
     "message": "Összes projekt"
   },
+  "analytics.project.count": {
+    "message": "{count} projekt"
+  },
   "analytics.project.icon-alt": {
     "message": "{name} ikon"
   },
@@ -401,8 +407,29 @@
   "analytics.table.export-csv": {
     "message": "CSV exportálása"
   },
+  "analytics.table.export.grouped": {
+    "message": "{groupBy} szerint csoportosítva"
+  },
   "analytics.table.search.placeholder": {
     "message": "Keresés..."
+  },
+  "analytics.title": {
+    "message": "Statisztika"
+  },
+  "analytics.value.monetized": {
+    "message": "Bevételszerzés"
+  },
+  "analytics.value.none": {
+    "message": "Nincs"
+  },
+  "analytics.value.other": {
+    "message": "Egyéb"
+  },
+  "analytics.value.unknown": {
+    "message": "Ismeretlen"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Nem bevételszerző"
   },
   "app-marketing.download.description": {
     "message": "Asztali alkalmazásunk minden platformon elérhető, válaszd ki a kívánt verziót."
@@ -517,6 +544,9 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -884,6 +914,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "A kiegészítő fájlok olyan kiegészítő forrásokhoz tartoznak, mint például a forráskód, nem pedig alternatív verziókhoz vagy változatokhoz."
   },
+  "create.collection.collection-info": {
+    "message": "Az új gyűjteményed nyilvános gyűjteményként jön létre {count, plural, =0 {projektek nélkül} other {# projekttel}}."
+  },
   "create.collection.create-collection": {
     "message": "Gyűjtemény létrehozása"
   },
@@ -1043,6 +1076,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Társulati linkek keresése..."
   },
+  "dashboard.analytics.from-projects": {
+    "message": "{count} projektből"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Összes letöltés"
   },
@@ -1063,6 +1099,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Próbáld meg módosítani a szűrőket vagy a keresési kifejezéseket."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} projekt"
   },
   "dashboard.collections.label.search-input": {
     "message": "Keresd meg a gyűjteményeidet"
@@ -1346,11 +1385,17 @@
   "dashboard.notifications.link.view-history": {
     "message": "Értesítési előzmények megtekintése"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "További {extraNotifs} értesítés megtekintése"
+  },
   "dashboard.organizations.button.create": {
     "message": "Szervezet létrehozása"
   },
   "dashboard.organizations.empty.cta": {
     "message": "Hozz létre egy szervezetet!"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} tag"
   },
   "dashboard.organizations.title": {
     "message": "Szervezetek"
@@ -1394,11 +1439,17 @@
   "dashboard.projects.links.button.edit": {
     "message": "Linkek szerkesztése"
   },
+  "dashboard.projects.links.changes-applied": {
+    "message": "A változtatások <strong>{count}</strong> projektre vonatkoznak."
+  },
   "dashboard.projects.links.discord-invite.description": {
     "message": "Meghívólink a Discord szerveredre."
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord meghívó"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Hivatkozások szerkesztése"
   },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "Egy hely, ahol a felhasználók hibákat, problémákat és aggályokat jelenthetnek a projekteddel kapcsolatban."
@@ -2091,7 +2142,7 @@
     "message": "{time} kaptad"
   },
   "landing.notifications.version-released": {
-    "message": "Egy új verzió {version} kijött erre: {gameVersion}"
+    "message": "Egy új verzió ({version}) kijött erre: {gameVersion}"
   },
   "landing.section.for-creators.description": {
     "message": "Adj otthont alkotásaidnak az interneten, és érj el hatalmas közönséget elkötelezett játékosokból."
@@ -2657,6 +2708,9 @@
   "muralpay.warning.wallet-address": {
     "message": "Nézd át jól a pénztárca címedet. Az egyenleg rossz címre lesz küldve az nem szerezhető vissza."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "A módosítások {count} projektre vonatkoznak."
+  },
   "profile.bio.fallback.creator": {
     "message": "Egy Modrinth fejlesztő."
   },
@@ -2680,6 +2734,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Beállítás társult vállalkozás ként"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count} projekt"
   },
   "profile.details.label.auth-providers": {
     "message": "Auth szolgáltatók"
@@ -2717,6 +2774,9 @@
   "profile.label.collection": {
     "message": "Gyűjtemény"
   },
+  "profile.label.downloads": {
+    "message": "{count} letöltés"
+  },
   "profile.label.joined": {
     "message": "Csatlakozott"
   },
@@ -2735,6 +2795,9 @@
   "profile.label.organizations": {
     "message": "Szervezetek"
   },
+  "profile.label.projects": {
+    "message": "{count} projekt"
+  },
   "profile.label.saving": {
     "message": "Mentés..."
   },
@@ -2743,6 +2806,9 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Töltsd le {username} projektjeit a Modrinthon"
+  },
+  "profile.stats.projects-followers": {
+    "message": "<stat>{count}</stat> projektkövető"
   },
   "profile.user-id": {
     "message": "Felhasználói azonosító: {id}"
@@ -3104,11 +3170,17 @@
   "project.settings.permissions.learn-more": {
     "message": "További információ"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Keresés {count} külső projekt között..."
+  },
   "project.settings.title": {
     "message": "Beállítások"
   },
   "project.settings.visit-dashboard": {
     "message": "Projektek irányítópult megnyitása"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count} letöltés"
   },
   "project.status.archived.message": {
     "message": "A(z) {title} archiválásra került. A(z) {title} nem kap további frissítéseket, kivéve, ha a fejlesztő úgy dönt, hogy visszavonja a projekt archiválását."

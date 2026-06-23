@@ -8,6 +8,366 @@
   "admin.billing.error.not-found": {
     "message": "Gebruiker niet gevonden"
   },
+  "analytics.action.add": {
+    "message": "Toevoegen"
+  },
+  "analytics.action.cancel": {
+    "message": "Annuleren"
+  },
+  "analytics.action.refresh": {
+    "message": "Ververs"
+  },
+  "analytics.action.reset": {
+    "message": "Herstel"
+  },
+  "analytics.breakdown.country": {
+    "message": "Land"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Download reden"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Download bron"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Spel versie"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Lader"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Monetisatie"
+  },
+  "analytics.breakdown.project": {
+    "message": "Project"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Project status"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Project versie"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Allemaal laten zien"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Laat de top 8 zien"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} actief"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Annotatie"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Weergave"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth evenementen"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Geen Modrinth evenementen in de grafiek."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Geen project evenementen in de grafiek."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Vorige periode"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Project evenementen"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Percentage"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Selecteer een element uit de tabel beneden om jouw data te visualiseren."
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Zie aankondiging"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "Het laten zien van alle lijnen in de grafiek kan de pagina slomer maken."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Alle {count} punten in de grafiek laten zien?"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# dag} other {# dagen}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# uur} other {# uren}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# minuut} other {# minuten}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Verberg {name} in de grafiek"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Grafiek tooltip vastgepind"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Vastgepind"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Laat {name} in de grafiek zien"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Totaal"
+  },
+  "analytics.chart.view.area": {
+    "message": "Vlak"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Staaf"
+  },
+  "analytics.chart.view.line": {
+    "message": "Lijn"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modpack"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Direct"
+  },
+  "analytics.download-reason.update": {
+    "message": "Update"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth Website"
+  },
+  "analytics.downloads.suffix": {
+    "message": "installaties"
+  },
+  "analytics.empty.no-data": {
+    "message": "Geen data beschikbaar"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Geen data beschikbaar voor analyse"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Geen projecten beschikbaar"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Geen projecten beschikbaar voor analyse"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Game versie typen"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Allemaal"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Uitgaves"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Zoek landen..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Zoek download bron..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Zoek project versies..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Zoek versies"
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Downloads Over Tijd"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Speeltijd Over Tijd"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Inkomsten Over Tijd"
+  },
+  "analytics.group-by.1h": {
+    "message": "1h"
+  },
+  "analytics.group-by.6h": {
+    "message": "6h"
+  },
+  "analytics.group-by.date": {
+    "message": "Datum"
+  },
+  "analytics.group-by.day": {
+    "message": "Dag"
+  },
+  "analytics.group-by.month": {
+    "message": "Maand"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Sorteer per dag"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Sorteer per uur"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Sorteer per maand"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Sorteer per 6 uur"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Sorteer per week"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Sorteer per jaar"
+  },
+  "analytics.group-by.week": {
+    "message": "Week"
+  },
+  "analytics.group-by.year": {
+    "message": "Jaar"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Resultaten ophalen..."
+  },
+  "analytics.options.loading": {
+    "message": "Laden..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Project goedgekeurd"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Project privé gemaakt"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Project status veranderd"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Project verborgen"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} gelanceerd"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Versie geüpdate"
+  },
+  "analytics.project-status.approved": {
+    "message": "Goedgekeurd"
+  },
+  "analytics.project-status.archived": {
+    "message": "Gearchiveerd"
+  },
+  "analytics.project-status.draft": {
+    "message": "Concept"
+  },
+  "analytics.project-status.other": {
+    "message": "Ander"
+  },
+  "analytics.project-status.private": {
+    "message": "Privé"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Afgekeurd"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Verborgen"
+  },
+  "analytics.project.all": {
+    "message": "Alle projecten"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# project} other {# projecten}}"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name} Icoon"
+  },
+  "analytics.project.select": {
+    "message": "Selecteer projecten"
+  },
+  "analytics.project.user": {
+    "message": "{username} zijn projecten"
+  },
+  "analytics.project.your": {
+    "message": "Jouw projecten"
+  },
+  "analytics.query.filter.add": {
+    "message": "Filter toevoegen"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Groepeer per"
+  },
+  "analytics.query.label.project": {
+    "message": "Project:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Tijdsframe:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Installaties"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Meer informatie"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Hoe werkt monetisatie?"
+  },
+  "analytics.stat.playtime": {
+    "message": "Speeltijd"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} uur"
+  },
+  "analytics.stat.revenue": {
+    "message": "Inkomsten"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "n.v.t."
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start} tot {end}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Speeltijd (seconden)"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "Geen passende gegevens"
+  },
+  "analytics.table.export-csv": {
+    "message": "Exporteer naar CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Cumulatief"
+  },
+  "analytics.table.export.grouped": {
+    "message": "Gegroepeerd op {groupBy}"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "Laat {start} t/m {end} van de {total} resultaten zien"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Zoek..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Landen boven"
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "Land download limiet"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Projecten boven"
+  },
+  "analytics.title": {
+    "message": "Analytica"
+  },
+  "analytics.value.unknown": {
+    "message": "Onbekend"
+  },
   "app-marketing.download.description": {
     "message": "Ons bureaublad app is overal verkrijgbaar, kies de gewenste versie."
   },
@@ -122,6 +482,9 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ MB"
+  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
@@ -162,13 +525,13 @@
     "message": "Deel modpacks"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Onvergelijkbaar met de concurrentie "
+    "message": "Onvergelijkbaar met de concurrentie"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App is volledig geïntegreerd met de website, zodat u vanuit de app toegang heeft tot al uw favoriete projecten!"
   },
   "app-marketing.features.website.title": {
-    "message": "Website integratie "
+    "message": "Website integratie"
   },
   "app-marketing.features.youve-used-before": {
     "message": "je hebt het al gezien"
@@ -398,11 +761,113 @@
   "collection.title": {
     "message": "{name} - Collectie"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Voeg privé notatie toe"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Accepteren"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Accepteren met antwoord"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Sluit thread"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Sluit met antwoord"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Afkeuren"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Afkeuren met antwoord"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Heropen thread"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Beantwoorden"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Beantwoord thread"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Heropsturen voor beoordeling"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Heropsturen voor beoordeling met antwoord"
+  },
+  "conversation-thread.action.send": {
+    "message": "Versturen"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Versturen naar beoordelingen"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Versturen naar beoordelingen met antwoord"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Wijzig naar concept"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Wijzig naar concept met antwoord"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Terughouden"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Terughouden met antwoord"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Deze thread is gesloten en kan geen nieuwe berichten meer ontvangen."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Fout tijdens het sluiten van rapport"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Fout tijdens het heropenen van rapport"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Fout tijdens het versturen van bericht"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Reageer op het thread..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Verstuur een bericht..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Conformeer dat moderators hier niet actief naar kijken"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Ik erken dat de moderators deze thread niet actief monitoren."
+  },
   "conversation-thread.reply-modal.description": {
     "message": "Je project is al goedgekeurd. Daarom houdt het moderatieteam deze thread niet actief in de gaten. Mocht er echter een probleem met je project zijn, dan kunnen zij je bericht wel zien."
   },
+  "conversation-thread.reply-modal.header": {
+    "message": "Reageer op thread"
+  },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Als je contact wilt opnemen met het moderatorteam, ga dan naar het <help-center-link>Modrinth Helpcentrum</help-center-link> en klik op het blauwe ballonnetje rechtsonder om contact op te nemen met de ondersteuning."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Conformeer dat ik de opmerking van de moderator heb geadresseerd"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Ik conformeer dat ik de opmerking van de moderator heb geadresseerd."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Je verstuurd <project-title>{projectTitle}</project-title> om opnieuw door de moderators gereviewd te laten worden."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Heropsturen voor beoordeling"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Versuur voor beoordeling"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Zorg ervoor dat je alle opmerkingen van het moderatie team verwerkt hebt."
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Herhaaldelijk berichten plaatsen zonder in te gaan op de opmerkingen van de moderators kan leiden tot een opschorting van je account."
@@ -445,6 +910,9 @@
   },
   "create.limit-alert.limit-reached": {
     "message": "{type} limiet bereikt"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Je hebt het {type} limiet bereikt. Neem contact op met support om je limiet te verhogen."
   },
   "create.limit-alert.type-collection": {
     "message": "Collectie"
@@ -546,7 +1014,7 @@
     "message": "Publiek"
   },
   "create.project.visibility-unlisted": {
-    "message": "Niet vermeld"
+    "message": "Verborgen"
   },
   "dashboard.affiliate-links.create.button": {
     "message": "Maak een affiliate-link"
@@ -572,6 +1040,12 @@
   "dashboard.analytics.from-projects": {
     "message": "van {count} {count, plural, one {project} other {projects}}"
   },
+  "dashboard.analytics.total-downloads": {
+    "message": "Totale downoads"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Totale volgers"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Maak nieuwe"
   },
@@ -595,6 +1069,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Je collecties"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Zoek naar collecties..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Naam (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Recentelijk gemaakt"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Recentelijk geüpdate"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
@@ -848,17 +1334,137 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Je hebt je opnamelimiet <b>{withdrawLimit}</b> bereikt. Je moet een belastingformulier invullen om meer geld op te nemen."
   },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Verbind Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Claim uw Discord rollen"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Maaker"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
+  "dashboard.head-title": {
+    "message": "Dashboard"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "U heeft geen ongelezen notificaties."
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Allemaal bekijken"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Zie notificatie geschiedenis"
+  },
   "dashboard.notifications.link.view-more": {
     "message": "Bekijk {extraNotifs} meer {extraNotifs, plural, one {notification} other {notifications}}"
   },
+  "dashboard.organizations.button.create": {
+    "message": "Creëer organisatie"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Maak een organisatie!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Organisaties niet op kunnen halen"
+  },
   "dashboard.organizations.member-count": {
     "message": "{count} {count, plural, one {member} other {members}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisaties"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Markeer allemaal als gelezen"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Geschiedenis bekijken"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "U heeft geen ongelezen notificaties."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Fout tijdens het laden van de notificaties:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Geschiedenis"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Notificatie geschiedenis"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Notificaties aan het laden..."
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "U kunt meerdere projecten tegelijkertijd bijwerken door ze hieronder te selecteren."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Massa wijzigingen worden niet ondersteund door server projecten"
+  },
+  "dashboard.projects.empty": {
+    "message": "U heeft nog geen projecten. Klik de groene knop hierboven om te beginnen."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projecten"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "en nog {count} anderen..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Leeg link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Wijzig link"
   },
   "dashboard.projects.links.changes-applied": {
     "message": "De wijzigingen worden toegepast op <strong>{count}</strong> {count, plural, one {project} other {projects}}."
   },
   "dashboard.projects.links.description": {
     "message": "Alle links die u hieronder opgeeft, worden in elk van de geselecteerde projecten overschreven. Links die u leeg laat, worden genegeerd. U kunt een link uit alle geselecteerde projecten verwijderen met de prullenbakknop."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Een uitnodigingslink naar jouw Discord server."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord uitnodiging"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Wijzig linken"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Broncode"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wiki pagina"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Alle links van de geselecteerde projecten zijn geüpdate."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icoon voor {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Dit project heeft een bericht van de moderators. Bekijk het project voor meer informatie."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Controller project metadata alstublieft"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Naam"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Naam"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
   },
   "dashboard.revenue.available-now": {
     "message": "Nu beschikbaar"
@@ -1329,7 +1935,7 @@
     "message": "Krijg gedetailleerde overzichten over paginaweergaven, aantal downloads en inkomsten"
   },
   "landing.creator.feature.data-statistics.title": {
-    "message": "Cijfers en Statistieken "
+    "message": "Cijfers en Statistieken"
   },
   "landing.creator.feature.discovery.description": {
     "message": "Word ontdekt door duizenden gebruikers door middel van zoekresultaten, onze startpagina, Discord server, en nog veel meer mogelijkheden in de toekomst!"
@@ -1347,7 +1953,7 @@
     "message": "Krijg advertentie geld van jouw project paginas, en neem je winst op elk moment op."
   },
   "landing.creator.feature.monetization.title": {
-    "message": "Maak jouw projecten te gelden"
+    "message": "Monetisatie"
   },
   "landing.creator.feature.team-management.description": {
     "message": "Nodig je teamleden uit en beheer rollen en machtigingen eenvoudig"
@@ -2327,6 +2933,15 @@
   "project.license.title": {
     "message": "Licentie"
   },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Jouw project is verborgen. Dit betekend dat het alleen beschikbaar is via een directe link en niet vindbaar is op Modrinth."
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Jouw project wordt niet publiek weergegeven en kan alleen benaderd worden via een directe link. {requestedStatus, select, unlisted { Gebaseerd op jouw geselecteerde <visibility-settings-link>zichtbaarheidsinstelling</visibility-settings-link> hoeft u waarschijnlijk geen verdere actie te ondernemen.} other { Verbeter alstublieft alle gekregen punten en de hieronder genoteerde problemen voordat u dit project opnieuw inzend.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Verborgen door moderator"
+  },
   "project.moderation.title": {
     "message": "Moderatie"
   },
@@ -2394,7 +3009,7 @@
     "message": "Instellingen"
   },
   "project.settings.visit-dashboard": {
-    "message": "Bezoek dashboard van het project"
+    "message": "Bezoek het project dashboard"
   },
   "project.status.archived.message": {
     "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."

@@ -96,10 +96,10 @@
     "message": "選擇選項"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "顯示你在該實例的遊玩時間。"
+    "message": "顯示你在該實例的遊玩時數。"
   },
   "app.appearance-settings.show-play-time.title": {
-    "message": "顯示遊玩時間"
+    "message": "顯示遊玩時數"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "啟用切換側邊欄的功能。"
@@ -280,6 +280,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "安裝"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {# 個模組}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "所需模組包"
@@ -483,7 +486,7 @@
     "message": "請登入"
   },
   "app.skins.title": {
-    "message": "外觀選擇"
+    "message": "外觀選擇工具"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
@@ -535,6 +538,9 @@
   },
   "friends.action.add-friend": {
     "message": "新增好友"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} 個好友{count, plural, other {邀請}}"
   },
   "friends.add-friend.submit": {
     "message": "送出好友邀請"
@@ -786,10 +792,10 @@
     "message": "自訂記憶體分配"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
-    "message": "輸入環境變數……"
+    "message": "輸入環境變數..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "輸入 Java 參數……"
+    "message": "輸入 Java 參數..."
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "環境變數"

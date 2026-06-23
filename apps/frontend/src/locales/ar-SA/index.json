@@ -80,6 +80,9 @@
   "analytics.project-event.project-status-changed": {
     "message": "تم تغيير حالة المشروع"
   },
+  "analytics.project-event.version-released": {
+    "message": ""
+  },
   "analytics.project-status.draft": {
     "message": "مسودة"
   },
@@ -505,6 +508,9 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "الملفات التكميلية تستخدم لدعم الموارد مثل كود المصدر، وليس للإصدارات أو الأنواع البديلة."
+  },
+  "create.collection.collection-info": {
+    "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
   },
   "create.collection.create-collection": {
     "message": "إنشاء مجموعة"

@@ -23,6 +23,15 @@
   "analytics.breakdown.country": {
     "message": "Paese"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Dipendenza su"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Progetto dipendente"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Tipo progetto dipendente"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Motivo del download"
   },
@@ -37,6 +46,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Membro"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetizzazione"
@@ -129,16 +141,22 @@
     "message": "Mostrare tutte le {count} linee nel grafico?"
   },
   "analytics.chart.table-selection.all": {
-    "message": "Mostrando {itemType, select, project {{count, plural, one {l'unico progetto} other {tutti i progetti}}} country {{count, plural, one {l'unico paese} other {tutti i paesi}}} monetization {{count, plural, one {l'unico valore} other {tutti i valori}} di monetizzazione} downloadSource {{count, plural, one {l'unica fonte} other {tutte le fonti}}} downloadReason {{count, plural, one {l'unico motivo} other {tutti i motivi}} di download} projectVersion {{count, plural, one {l'unica versione} other {tutte le versioni}} del progetto} loader {{count, plural, one {l'unico loader} other {tutti i loader}}} gameVersion {{count, plural, one {l'unica versione} other {tutte le versioni}} del gioco} other {{count, plural, one {l'unico elemento} other {tutti gli elementi}}}} dalla tabella"
+    "message": "Mostrando {itemType, select, project {tutti i progetti} country {tutti i paesi} monetization {tutti i valori di monetizzazione} downloadSource {tutte le fonti di download} downloadReason {tutti i motivi di download} member {tutti i membri} projectVersion {tutte le versioni del progetto} loader {tutti i loader} gameVersion {tutte le versioni di gioco} other {tutti gli elementi}} dalla tabella"
   },
   "analytics.chart.table-selection.count": {
-    "message": "Mostrando {count} {itemType, select, project {{count, plural, one {progetto} other {progetti}}} country {{count, plural, one {paese} other {paesi}}} monetization {{count, plural, one {valore di monetizzazione} other {valori di monetizzazione}}} downloadSource {{count, plural, one {fonte} other {fonti}}} downloadReason {{count, plural, one {motivo} other {motivi}}} projectVersion {{count, plural, one {versione del progetto} other {versioni del progetto}}} loader {loader} gameVersion {{count, plural, one {versione di gioco} other {versioni di gioco}}} other {{count, plural, one {elemento} other {elementi}}}} dalla tabella"
+    "message": "Mostrando {count} {itemType, select, project {{count, plural, one {progetto} other {progetti}}} country {{count, plural, one {paese} other {paesi}}} monetization {{count, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{count, plural, one {fonte} other {fonti}} di download} downloadReason {{count, plural, one {motivo} other {motivi}} di download} member {{count, plural, one {membro} other {membri}}} projectVersion {{count, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{count, plural, one {versione} other {versioni}} di gioco} other {{count, plural, one {elemento} other {elementi}}}} dalla tabella"
   },
   "analytics.chart.table-selection.limited": {
-    "message": "Mostrando {limit} {itemType, select, project {{limit, plural, one {progetto} other {progetti}}} country {{limit, plural, one {paese} other {paesi}}} monetization {{limit, plural, one {valore di monetizzazione} other {valori di monetizzazione}}} downloadSource {{limit, plural, one {fonte} other {fonti}}} downloadReason {{limit, plural, one {motivo} other {motivi}}} projectVersion {{limit, plural, one {versione del progetto} other {versioni del progetto}}} loader {loader} gameVersion {{limit, plural, one {versione di gioco} other {versioni di gioco}}} other {{limit, plural, one {elemento} other {elementi}}}} dalla tabella"
+    "message": "Mostrando {limit} {itemType, select, project {{limit, plural, one {progetto} other {progetti}}} country {{limit, plural, one {paese} other {paesi}}} monetization {{limit, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{limit, plural, one {fonte} other {fonti}} di download} downloadReason {{limit, plural, one {motivo} other {motivi}} di download} member {{limit, plural, one {membro} other {membri}}} projectVersion {{limit, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{limit, plural, one {versione} other {versioni}} di gioco} other {{limit, plural, one {elemento} other {elementi}}}} dalla tabella"
   },
   "analytics.chart.table-selection.top": {
-    "message": "Mostrando {itemType, select, project {{count, plural, one {il primo progetto} other {i primi # progetti}}} country {{count, plural, one {il primo paese} other {i primi # paesi}}} monetization {{count, plural, one {il primo valore di monetizzazione} other {i primi # valori di monetizzazione}}} downloadSource {{count, plural, one {la prima fonte} other {le prime # fonti}}} downloadReason {{count, plural, one {il primo motivo} other {i primi # motivi}}} projectVersion {{count, plural, one {la prima versione del progetto} other {le prime # versioni del progetto}}} loader {{count, plural, one {il primo loader} other {i primi # loader}}} gameVersion {{count, plural, one {la prima versione di gioco} other {le prime # versioni di gioco}}} other {{count, plural, one {il primo elemento} other {i primi {count} elementi}}}} dalla tabella"
+    "message": "Mostrando {itemType, select, project {{count, plural, one {il primo progetto} other {i primi # progetti}}} country {{count, plural, one {il primo paese} other {i primi # paesi}}} monetization {{count, plural, one {il primo valore} other {i primi # valori}} di monetizzazione} downloadSource {{count, plural, one {la prima fonte} other {le prime # fonti}} di download} downloadReason {{count, plural, one {il primo motivo} other {i primi # motivi}} di download} member {{count, plural, one {il primo membro} other {i primi # membri}}} projectVersion {{count, plural, one {la prima versione} other {le prime # versioni}} del progetto} loader {{count, plural, one {il primo} other {i primi #}} loader} gameVersion {{count, plural, one {la prima versione} other {le prime # versioni}} di gioco} other {{count, plural, one {il primo elemento} other {i primi {count} elementi}}}} dalla tabella"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Dipendente su {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} dipende su {dependencyProject}, {version}"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# giorno} other {# giorni}}"
@@ -224,8 +242,14 @@
   "analytics.filter.search.countries": {
     "message": "Cerca tra i paesi..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Cerca tra i progetti..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Cerca tra le fonti di download..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Cerca tra i membri..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Cerca tra le versioni del progetto..."
@@ -472,6 +496,12 @@
   },
   "analytics.value.monetized": {
     "message": "Monetizzato"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Nessuno"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Scaricato per altri motivi che non siano per dipendenza"
   },
   "analytics.value.none": {
     "message": "Nessuno"
@@ -1163,6 +1193,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Cerca tra i link affiliati..."
   },
+  "dashboard.analytics.from-projects": {
+    "message": "da {count, plural, one {# progetto} other {# progetti}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Download totali"
   },
@@ -1487,6 +1520,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Mostra cronologia notifiche"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Mostra {extraNotifs, plural, one {# altra notifica} other {altre # notifiche}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Crea organizzazione"
   },
@@ -1495,6 +1531,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Impossibile ottenere le organizzazioni"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count, plural, one {# membro} other {# membri}}"
   },
   "dashboard.organizations.title": {
     "message": "Organizzazioni"
@@ -2915,6 +2954,9 @@
   "profile.label.collection": {
     "message": "Raccolta"
   },
+  "profile.label.downloads": {
+    "message": "{count} download"
+  },
   "profile.label.joined": {
     "message": "Iscrizione"
   },
@@ -2950,6 +2992,9 @@
   },
   "profile.official-account.bio": {
     "message": "L'account ufficiale di Modrinth. Ricevi assistenza presso <support-link></support-link> o tramite mail presso <email></email>"
+  },
+  "profile.stats.projects-followers": {
+    "message": "<stat>{count, plural, =0 {Nessun} other {{count}}}</stat> follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"
@@ -3383,11 +3428,20 @@
   "project.settings.permissions.learn-more": {
     "message": "Scopri di più"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Cerca tra {count, plural, one {# progetto esterno} other {# progetti esterni}}..."
+  },
   "project.settings.title": {
     "message": "Impostazioni"
   },
   "project.settings.visit-dashboard": {
     "message": "Visita bacheca del progetto"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count} download"
+  },
+  "project.stats.followers-label": {
+    "message": "{count} follower"
   },
   "project.status.archived.message": {
     "message": "{title} è stato archiviato. {title} non riceverà più aggiornamenti a meno che l'autore decida di rimuoverlo dall'archivio."

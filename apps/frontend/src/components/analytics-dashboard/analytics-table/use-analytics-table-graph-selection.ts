@@ -7,6 +7,10 @@ import type {
 	AnalyticsSelectedBreakdowns,
 } from '~/providers/analytics/analytics'
 
+import {
+	isNoDependentAnalyticsBreakdownValue,
+	isUnknownAnalyticsBreakdownValue,
+} from '../breakdown'
 import { getAnalyticsTableMetricSortedGraphDatasetIds } from './analytics-table-sorting'
 import type { AnalyticsTableColumnKey, AnalyticsTableRow } from './analytics-table-types'
 
@@ -58,6 +62,9 @@ export function useAnalyticsTableGraphSelection({
 	const filteredSelectableGraphDatasetIds = computed(() =>
 		getAnalyticsTableSelectableGraphDatasetIds(filteredRows.value),
 	)
+	const excludedGraphDatasetIds = computed(() =>
+		getAnalyticsTableExcludedGraphDatasetIds(sortedRows.value),
+	)
 	const sortedMetricGraphDatasetIds = computed(() =>
 		getAnalyticsTableMetricSortedGraphDatasetIds(sortedRows.value, sortColumn.value, sortCollator),
 	)
@@ -65,7 +72,9 @@ export function useAnalyticsTableGraphSelection({
 		const sortedMetricIds = sortedMetricGraphDatasetIds.value
 		const defaultIds =
 			sortedMetricIds.length > 0 ? sortedMetricIds : selectableGraphDatasetIds.value
-		return defaultIds.slice(0, graphDatasetSelectionLimit)
+		return defaultIds
+			.filter((id) => !excludedGraphDatasetIds.value.has(id))
+			.slice(0, graphDatasetSelectionLimit)
 	})
 	const tableSelectedGraphDatasetIds = computed<unknown[]>({
 		get: () => selectedGraphDatasetIds.value,
@@ -149,7 +158,9 @@ export function useAnalyticsTableGraphSelection({
 			defaultGraphDatasetIds.value = nextShowGraphDatasetSelection
 				? [...nextDefaultGraphDatasetIds]
 				: []
-			topGraphDatasetIds.value = nextShowGraphDatasetSelection ? [...nextTopGraphDatasetIds] : []
+			topGraphDatasetIds.value = nextShowGraphDatasetSelection
+				? nextTopGraphDatasetIds.filter((id) => !excludedGraphDatasetIds.value.has(id))
+				: []
 		},
 		{ immediate: true },
 	)
@@ -182,6 +193,20 @@ export function useAnalyticsTableGraphSelection({
 
 	function getAnalyticsTableSelectableGraphDatasetIds(rows: AnalyticsTableRow[]): string[] {
 		return Array.from(new Set(rows.map((row) => row.graphDatasetId)))
+	}
+
+	function getAnalyticsTableExcludedGraphDatasetIds(rows: AnalyticsTableRow[]): Set<string> {
+		return new Set(
+			rows
+				.filter((row) =>
+					Object.values(row.breakdownValues).some(
+						(value) =>
+							isUnknownAnalyticsBreakdownValue(value) ||
+							isNoDependentAnalyticsBreakdownValue(value),
+					),
+				)
+				.map((row) => row.graphDatasetId),
+		)
 	}
 
 	return {

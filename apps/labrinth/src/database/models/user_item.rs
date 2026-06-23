@@ -719,7 +719,7 @@ impl DBUser {
                 "
                 SELECT t.id
                 FROM threads t
-                INNER JOIN reports r ON t.report_id = r.id AND (r.user_id = $1 OR r.reporter = $1)
+                INNER JOIN reports r ON t.report_id = r.id AND r.reporter = $1
                 WHERE report_id IS NOT NULL
                 ",
                 id as DBUserId,

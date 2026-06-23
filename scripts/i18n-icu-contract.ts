@@ -10,7 +10,8 @@ import { parse as parseYaml } from 'yaml'
 type MessageEntry = string | { message?: string; defaultMessage?: string }
 type MessageFile = Record<string, MessageEntry>
 type CrowdinFileEntry = { source: string; dest?: string; translation: string }
-type Contract = { args: string[]; tags: string[]; branches: string[] }
+type ArgUse = 'argument' | 'number' | 'date' | 'time' | 'plural' | 'select'
+type Contract = { args: Record<string, ArgUse[]>; tags: string[]; selectBranches: Record<string, string[]> }
 type Issue = { file: string; key: string; reason: string }
 type CrowdinListResponse<T> = {
 	data: Array<{ data: T }>
@@ -35,42 +36,61 @@ function textOf(entry: MessageEntry | undefined): string | undefined {
 	return entry?.message ?? entry?.defaultMessage
 }
 
-function stable(items: Set<string>) {
+function stable<T extends string>(items: Set<T>) {
 	return [...items].sort()
 }
 
+function stableRecord<T extends string>(items: Map<string, Set<T>>) {
+	return Object.fromEntries(
+		[...items.entries()]
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([key, values]) => [key, stable(values)]),
+	)
+}
+
 export function contractFromMessage(message: string, label: string): Contract {
-	const args = new Set<string>()
+	const args = new Map<string, Set<ArgUse>>()
 	const tags = new Set<string>()
-	const branches = new Set<string>()
+	const selectBranches = new Map<string, Set<string>>()
+
+	function addArg(name: string, use: ArgUse) {
+		const uses = args.get(name) ?? new Set<ArgUse>()
+		uses.add(use)
+		args.set(name, uses)
+	}
+
+	function addSelectBranch(name: string, selector: string) {
+		const branches = selectBranches.get(name) ?? new Set<string>()
+		branches.add(selector)
+		selectBranches.set(name, branches)
+	}
 
 	function visit(elements: ReturnType<typeof parse>) {
 		for (const element of elements) {
 			switch (element.type) {
 				case TYPE.argument:
-					args.add(`${element.value}:argument`)
+					addArg(element.value, 'argument')
 					break
 				case TYPE.number:
-					args.add(`${element.value}:number`)
+					addArg(element.value, 'number')
 					break
 				case TYPE.date:
-					args.add(`${element.value}:date`)
+					addArg(element.value, 'date')
 					break
 				case TYPE.time:
-					args.add(`${element.value}:time`)
+					addArg(element.value, 'time')
 					break
 				case TYPE.select: {
-					args.add(`${element.value}:select`)
+					addArg(element.value, 'select')
 					for (const [selector, option] of Object.entries(element.options)) {
-						branches.add(`${element.value}:select:${selector}`)
+						addSelectBranch(element.value, selector)
 						visit(option.value)
 					}
 					break
 				}
 				case TYPE.plural: {
-					args.add(`${element.value}:plural:${element.pluralType}`)
+					addArg(element.value, 'plural')
 					for (const [selector, option] of Object.entries(element.options)) {
-						branches.add(`${element.value}:plural:${selector}`)
 						visit(option.value)
 					}
 					break
@@ -93,11 +113,56 @@ export function contractFromMessage(message: string, label: string): Contract {
 		}
 	}
 
-	return { args: stable(args), tags: stable(tags), branches: stable(branches) }
+	return { args: stableRecord(args), tags: stable(tags), selectBranches: stableRecord(selectBranches) }
 }
 
 export function contractsEqual(a: Contract, b: Contract) {
 	return JSON.stringify(a) === JSON.stringify(b)
+}
+
+export function translationCompatibleWithSource(source: Contract, translation: Contract) {
+	const sourceArgs = new Map(
+		Object.entries(source.args).map(([key, value]) => [key, new Set<ArgUse>(value)]),
+	)
+	const sourceTags = new Set(source.tags)
+	const sourceSelectBranches = new Map(
+		Object.entries(source.selectBranches).map(([key, value]) => [key, new Set(value)]),
+	)
+
+	for (const tag of translation.tags) {
+		if (!sourceTags.has(tag)) return false
+	}
+
+	for (const tag of source.tags) {
+		if (!translation.tags.includes(tag)) return false
+	}
+
+	for (const [arg, uses] of Object.entries(translation.args)) {
+		const allowedUses = sourceArgs.get(arg)
+		if (!allowedUses) return false
+
+		for (const use of uses) {
+			if (use === 'argument') continue
+
+			if (use === 'number' || use === 'plural') {
+				if (!allowedUses.has('number') && !allowedUses.has('plural')) return false
+				continue
+			}
+
+			if (!allowedUses.has(use)) return false
+		}
+	}
+
+	for (const [arg, branches] of Object.entries(translation.selectBranches)) {
+		const allowedBranches = sourceSelectBranches.get(arg)
+		if (!allowedBranches) return false
+
+		for (const branch of branches) {
+			if (branch !== 'other' && !allowedBranches.has(branch)) return false
+		}
+	}
+
+	return true
 }
 
 export function sourceContractChanged(
@@ -110,7 +175,7 @@ export function sourceContractChanged(
 
 	try {
 		const before = contractFromMessage(previousText, previousLabel)
-		return !contractsEqual(before, after)
+		return !translationCompatibleWithSource(after, before)
 	} catch {
 		return true
 	}
@@ -206,10 +271,14 @@ export async function pruneLocalTranslations(options: { check: boolean; scope?: 
 
 					try {
 						const translationContract = contractFromMessage(translationText, `${translationFile}:${key}`)
-						if (!contractsEqual(sourceContract, translationContract)) {
+						if (!translationCompatibleWithSource(sourceContract, translationContract)) {
 							delete translations[key]
 							changed = true
-							issues.push({ file: translationFile, key, reason: 'ICU contract differs from en-US' })
+							issues.push({
+								file: translationFile,
+								key,
+								reason: 'translation uses unsupported ICU variables, tags, or select branches',
+							})
 						}
 					} catch {
 						delete translations[key]

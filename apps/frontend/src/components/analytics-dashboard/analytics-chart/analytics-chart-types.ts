@@ -14,6 +14,7 @@ export type AnalyticsChartLegendEntry = {
 	id: string
 	name: string
 	projectName?: string
+	tooltip?: string
 	color: string
 	totalValue: number
 	hidden: boolean
