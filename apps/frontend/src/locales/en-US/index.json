@@ -771,7 +771,7 @@
     "message": "Date of birth required"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "You cannot create an account at Modrinth unless you are over 13 years old."
+    "message": "You do not meet the age requirement to create an account at Modrinth."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevant source code"
@@ -791,7 +791,7 @@
   "auth.create-account.title": {
     "message": "Create an Account"
   },
-  "auth.create-account.username.optional-label": {
+  "auth.create-account.username.label": {
     "message": "Username"
   },
   "auth.create-account.username.placeholder": {

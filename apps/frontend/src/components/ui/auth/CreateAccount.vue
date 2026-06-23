@@ -44,7 +44,6 @@
 		<section class="flex flex-col gap-2.5">
 			<label class="text-md font-semibold text-contrast" for="create-account-username">
 				{{ formatMessage(messages.usernameOptionalLabel) }}
-				<span class="font-normal text-primary">(optional)</span>
 			</label>
 			<StyledInput
 				id="create-account-username"
@@ -233,7 +232,7 @@ const messages = defineMessages({
 	},
 	under13HelperText: {
 		id: 'auth.create-account.date-of-birth.under13-helper',
-		defaultMessage: 'You cannot create an account at Modrinth unless you are over 13 years old.',
+		defaultMessage: 'You do not meet the age requirement to create an account at Modrinth.',
 	},
 	ageRequirementWarningTitle: {
 		id: 'auth.create-account.age-requirement.warning-title',
@@ -249,7 +248,7 @@ const messages = defineMessages({
 		defaultMessage: 'Relevant source code',
 	},
 	usernameOptionalLabel: {
-		id: 'auth.create-account.username.optional-label',
+		id: 'auth.create-account.username.label',
 		defaultMessage: 'Username',
 	},
 	usernamePlaceholder: {
