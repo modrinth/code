@@ -102,7 +102,7 @@
     "message": "Afficher le temps de jeu"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Permet d’afficher ou de masquer la barre latérale."
+    "message": "Permet d'ouvrir ou de fermer la barre latérale."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Tiroir latéral"

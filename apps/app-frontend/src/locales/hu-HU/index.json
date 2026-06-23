@@ -78,7 +78,7 @@
     "message": "A kezdőlap „Folytasd itt” részében a legújabb világok is megtalálhatók."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "„Folytasd itt” a világokat is"
+    "message": "Visszaugrás a világokba"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizáld az indítót a Minecraft indításakor."
@@ -289,6 +289,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} mod"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Szükséges modcsomag"
@@ -539,6 +542,9 @@
   "friends.action.add-friend": {
     "message": "Barát hozzáadása"
   },
+  "friends.action.view-friend-requests": {
+    "message": "{count} barát {count, plural, other {kérelem}}"
+  },
   "friends.add-friend.submit": {
     "message": "Barátkérelem elküldése"
   },
@@ -708,19 +714,19 @@
     "message": "Frissítési csatorna"
   },
   "instance.settings.tabs.general.update-channel.alpha": {
-    "message": "Alpha"
+    "message": "Alfa"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "A release, béta és az alpha verziók is meg fognak jelenni az elérhető frissítések között."
+    "message": "A kiadás, béta és az alfa verziók is meg fognak jelenni az elérhető frissítések között."
   },
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Béta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "A release és a béta verziók is meg fognak jelenni az elérhető frissítések között."
+    "message": "A kiadás és a béta verziók is meg fognak jelenni az elérhető frissítések között."
   },
   "instance.settings.tabs.general.update-channel.release": {
-    "message": "Release"
+    "message": "Kiadás"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
     "message": "Csak a release verziók fognak megjelenni az elérhető frissítések között."

@@ -377,6 +377,48 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Trennen"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Dieser Inhalt wird von anderen Inhalten benötigt"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Betroffenes Projekt} other {Betroffene Projekte}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Einige der ausgewählten Projekte sind als Abhängigkeiten installiert. Sie zu löschen kann dein {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "Instanz"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "Server"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Trotzdem löschen"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "{count, number} {itemType} trotzdem löschen"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Wird gelöscht"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Abhängige Inhalte nach dem Löschen deaktivieren"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Abhängige Inhalte werden möglicherweise nicht geladen oder deaktivieren sich selbst"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Dein {context} stürzt möglicherweise ab, startet nicht mehr oder verhält sich unerwartet"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Abhängigkeitswarnung"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} ist als Abhängigkeit installiert. Das Löschen kann deinen {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Was passiert?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hinzugefügt"
   },
@@ -5096,6 +5138,9 @@
   "time-frame-picker.increase-amount": {
     "defaultMessage": "Zeitraum verlängern"
   },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select, hours {{amount, plural, one {In der letzten Stunde} other {In den letzten # Stunden} }} days {{amount, plural, one {Am letzten Tag} other {In den letzten # Tagen} }} weeks {{amount, plural, one {In der letzten Woche} other {In den letzten # Wochen} }} months {{amount, plural, one {Im letzten Monat} other {In den letzten # Monaten} }} other {In den letzten # Tagen}}"
+  },
   "time-frame-picker.last-timeframe-prefix": {
     "defaultMessage": "In der letzten"
   },
@@ -5277,3 +5322,4 @@
     "defaultMessage": "Modrinth-Team"
   }
 }
+

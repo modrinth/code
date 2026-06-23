@@ -429,7 +429,7 @@
     "message": "Nicht so schnell!"
   },
   "app.skins.reorder-error.text": {
-    "message": "Die Anordnung deiner Skins konnte nicht gespeichert werden."
+    "message": "Deine Skin-Reihenfolge konnte nicht gespeichert werden."
   },
   "app.skins.reorder-error.title": {
     "message": "Skins konnten nicht neu angeordnet werden"
@@ -708,28 +708,28 @@
     "message": "Name"
   },
   "instance.settings.tabs.general.update-channel": {
-    "message": "Aktualisierungskanal"
+    "message": "Update-Kanal"
   },
   "instance.settings.tabs.general.update-channel.alpha": {
     "message": "Alpha"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Voll, Beta- und Alpha-Versionen werden als verfügbare Aktualisierungen angezeigt."
+    "message": "Release-, Beta- und Alpha-Versionen werden als verfügbare Updates angezeigt."
   },
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "Voll- und Beta-Versionen werden als verfügbare Aktualisierungen angezeigt."
+    "message": "Release- und Beta-Versionen werden als verfügbare Updates angezeigt."
   },
   "instance.settings.tabs.general.update-channel.release": {
-    "message": "Vollversion"
+    "message": "Release"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Nur Vollversionen werden als verfügbare Aktualisierungen angezeigt."
+    "message": "Nur Release-Versionen werden als verfügbare Updates angezeigt."
   },
   "instance.settings.tabs.general.update-channel.select": {
-    "message": "Aktualisierungskanal auswählen"
+    "message": "Update-Kanal auswählen"
   },
   "instance.settings.tabs.hooks": {
     "message": "Start Hooks"

@@ -72,7 +72,7 @@
     "message": "在皮肤页面中禁用你玩家头顶上的名牌。"
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "隐藏名称标签"
+    "message": "隐藏名牌"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
     "message": "在主页的“快速回到”部分包含最近的世界。"
@@ -153,7 +153,7 @@
     "message": "整合包"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "加入服务器时，添加内容可能会破坏兼容性。当更新服务器实例内容时任何添加的内容也将丢失。"
+    "message": "加入服务器时，添加内容可能会破坏兼容性。当更新服务器实例内容时，任何添加的内容也将丢失。"
   },
   "app.browse.server.installing": {
     "message": "安装中"
@@ -280,6 +280,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "安装"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} 个模组"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "需求整合包"
@@ -535,6 +538,9 @@
   },
   "friends.action.add-friend": {
     "message": "添加好友"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} 个好友请求"
   },
   "friends.add-friend.submit": {
     "message": "发送好友请求"

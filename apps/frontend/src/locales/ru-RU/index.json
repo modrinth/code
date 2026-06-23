@@ -38,6 +38,9 @@
   "analytics.breakdown.loader": {
     "message": "Загрузчик"
   },
+  "analytics.breakdown.members": {
+    "message": "Участник"
+  },
   "analytics.breakdown.monetization": {
     "message": "Монетизация"
   },
@@ -104,6 +107,9 @@
   "analytics.chart.empty.select-table-items": {
     "message": "Выберите элементы из таблицы ниже, чтобы отобразить данные."
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# событие аналитики} few {# события аналитики} other {# событий аналитики}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
@@ -124,6 +130,33 @@
   },
   "analytics.chart.render-limit.description": {
     "message": "Если показать все выбранные строки, страница может работать медленнее."
+  },
+  "analytics.chart.table-selection.all": {
+    "message": "Показаны все {itemType, select,\n  project {проекты}\n  country {страны}\n  monetization {типы монетизации}\n  downloadSource {источники скачивания}\n  downloadReason {причины скачивания}\n  member {участники}\n  projectVersion {версии проекта}\n  loader {загрузчики}\n  gameVersion {версии игры}\n  other {элементы}\n} из таблицы"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "{itemType, select,\n  project {{count, plural, one {Показан # проект} few {Показано # проекта} other {Показано # проектов}}}\n  country {{count, plural, one {Показана # страна} few {Показано # страны} other {Показано # стран}}}\n  monetization {{count, plural, one {Показан # тип монетизации} few {Показано # типа монетизации} other {Показано # типов монетизации}}}\n  downloadSource {{count, plural, one {Показан # источник скачивания} few {Показано # источника скачивания} other {Показано # источников скачивания}}}\n  downloadReason {{count, plural, one {Показана # причина скачивания} few {Показано # причины скачивания} other {Показано # причин скачивания}}}\n  member {{count, plural, one {Показан # участник} few {Показано # участника} other {Показано # участников}}}\n  projectVersion {{count, plural, one {Показана # версия проекта} few {Показано # версии проекта} other {Показано # версий проекта}}}\n  loader {{count, plural, one {Показан # загрузчик} few {Показано # загрузчика} other {Показано # загрузчиков}}}\n  gameVersion {{count, plural, one {Показана # версия игры} few {Показано # версии игры} other {Показано # версий игры}}}\n  other {{count, plural, one {Показан # элемент} few {Показано # элемента} other {Показано # элементов}}}\n} из таблицы"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "{itemType, select,\n  project {{limit, plural, one {Показан # проект} few {Показано # проекта} other {Показано # проектов}}}\n  country {{limit, plural, one {Показана # страна} few {Показано # страны} other {Показано # стран}}}\n  monetization {{limit, plural, one {Показан # тип монетизации} few {Показано # типа монетизации} other {Показано # типов монетизации}}}\n  downloadSource {{limit, plural, one {Показан # источник скачивания} few {Показано # источника скачивания} other {Показано # источников скачивания}}}\n  downloadReason {{limit, plural, one {Показана # причина скачивания} few {Показано # причины скачивания} other {Показано # причин скачивания}}}\n  member {{limit, plural, one {Показан # участник} few {Показано # участника} other {Показано # участников}}}\n  projectVersion {{limit, plural, one {Показана # версия проекта} few {Показано # версии проекта} other {Показано # версий проекта}}}\n  loader {{limit, plural, one {Показан # загрузчик} few {Показано # загрузчика} other {Показано # загрузчиков}}}\n  gameVersion {{limit, plural, one {Показана # версия игры} few {Показано # версии игры} other {Показано # версий игры}}}\n  other {{limit, plural, one {Показан # элемент} few {Показано # элемента} other {Показано # элементов}}}\n} из таблицы"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Показан топ‑{count} {itemType, select,\n  project {проектов}\n  country {стран}\n  monetization {типов монетизации}\n  downloadSource {источников скачивания}\n  downloadReason {причин скачивания}\n  member {участников}\n  projectVersion {версий проекта}\n  loader {загрузчиков}\n  gameVersion {версий игры}\n  other {элементов}\n} из таблицы"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Зависит от {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} зависит от {dependencyProject} версии {version}"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# день} few {# дня} other {# дней}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# час} few {# часа} other {# часов}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# минута} few {# минуты} other {# минут}}"
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Скрыть {name} на диаграмме"
@@ -200,8 +233,14 @@
   "analytics.filter.search.countries": {
     "message": "Поиск стран..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Поиск проектов..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Поиск источников..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Поиск участников..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Поиск версий проекта..."
@@ -311,6 +350,9 @@
   "analytics.project.all": {
     "message": "Все проекты"
   },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
   "analytics.project.icon-alt": {
     "message": "Иконка {name}"
   },
@@ -387,13 +429,22 @@
     "message": "Время игры (в секундах)"
   },
   "analytics.table.csv.selected-range": {
-    "message": "Выбранный диапазон"
+    "message": "в выбранном диапазоне"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# день} few {# дня} other {# дней}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# час} few {# часа} other {# часов}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# минута} few {# минуты} other {# минут}}"
   },
   "analytics.table.empty.no-matching-rows": {
     "message": "Нет данных по этому запросу"
   },
   "analytics.table.export-csv": {
-    "message": "Экспорт в CSV"
+    "message": "Экспортировать в CSV"
   },
   "analytics.table.export.cumulative": {
     "message": "С накоплением"
@@ -402,7 +453,7 @@
     "message": "С группировкой: {groupBy}"
   },
   "analytics.table.pagination.summary": {
-    "message": "Показано с {start} по {end} из {total}"
+    "message": "Показано с {start} по {end} из {total}"
   },
   "analytics.table.search.placeholder": {
     "message": "Поиск..."
@@ -436,6 +487,9 @@
   },
   "analytics.value.monetized": {
     "message": "С монетизацией"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Нет"
   },
   "analytics.value.none": {
     "message": "Нет"
@@ -989,6 +1043,9 @@
   "create.limit-alert.approaching-limit": {
     "message": "Почти исчерпан лимит {type} ({current}/{max})"
   },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Почти достигнут лимит в {max} {type}. Увеличьте его, обратившись в поддержку."
+  },
   "create.limit-alert.contact-support": {
     "message": "Связаться с поддержкой"
   },
@@ -1124,6 +1181,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Поиск ссылок..."
   },
+  "dashboard.analytics.from-projects": {
+    "message": "с {count, plural, one {# проекта} other {# проектов}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Всего скачиваний"
   },
@@ -1144,6 +1204,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Попробуйте изменить фильтры или запрос."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Поиск по коллекциям"
@@ -1416,22 +1479,22 @@
     "message": "Достигнут лимит вывода в <b>{withdrawLimit}</b>. Для снятия лимита заполните налоговую форму."
   },
   "dashboard.discord-roles.banner.body": {
-    "message": "Привяжите ваш аккаунт Discord через Modrinth для синхронизации следующих ролей: {roles}."
+    "message": "Вам доступны роли за {roles}. Привяжите Discord к аккаунту Modrinth, чтобы синхронизировать роли."
   },
   "dashboard.discord-roles.banner.cta": {
     "message": "Привязать Discord"
   },
   "dashboard.discord-roles.banner.title": {
-    "message": "Получите ваши роли Discord"
+    "message": "Получите роли в Discord"
   },
   "dashboard.discord-roles.role.big-creator": {
-    "message": ">1 млн скачиваний"
+    "message": "1 млн скачиваний"
   },
   "dashboard.discord-roles.role.creator": {
-    "message": "Автор"
+    "message": "статус автора"
   },
   "dashboard.discord-roles.role.pride": {
-    "message": "Pride 2026"
+    "message": "поддержку ЛГБТК+"
   },
   "dashboard.head-title": {
     "message": "Панель управления"
@@ -1445,6 +1508,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "История уведомлений"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Посмотреть ещё {extraNotifs, number}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Создать организацию"
   },
@@ -1453,6 +1519,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Не удалось получить организации"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count, plural, one {# участник} few {# участника} other {# участников}}"
   },
   "dashboard.organizations.title": {
     "message": "Организации"
@@ -1479,7 +1548,7 @@
     "message": "Загрузка уведомлений..."
   },
   "dashboard.projects.bulk-edit-hint": {
-    "message": "Вы можете редактировать сразу несколько проектов, выбрав их ниже."
+    "message": "Можно редактировать сразу несколько проектов, выбрав их ниже."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Серверные проекты не поддерживают массовое редактирование"
@@ -1554,7 +1623,7 @@
     "message": "Модераторы оставили сообщение к проекту. Перейдите на страницу проекта, чтобы узнать подробности."
   },
   "dashboard.projects.project.review-environment-metadata": {
-    "message": "Пожалуйста, проверьте файл metadata"
+    "message": "Проверьте метаданные среды"
   },
   "dashboard.projects.sort.ascending": {
     "message": "По возрастанию"
@@ -2837,6 +2906,9 @@
   "profile.button.set-affiliate": {
     "message": "Сделать партнёром"
   },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
   "profile.details.label.auth-providers": {
     "message": "Сервисы входа"
   },
@@ -2862,7 +2934,7 @@
     "message": "Почта подтверждена"
   },
   "profile.error.not-found": {
-    "message": "Пользователь не найден"
+    "message": "Пользователь не найден"
   },
   "profile.label.affiliate": {
     "message": "Партнёр"
@@ -2872,6 +2944,9 @@
   },
   "profile.label.collection": {
     "message": "Коллекция"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, one {скачивание} few {скачивания} other {скачиваний}}"
   },
   "profile.label.joined": {
     "message": "Регистрация:"
@@ -2891,6 +2966,9 @@
   "profile.label.organizations": {
     "message": "Организации"
   },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
+  },
   "profile.label.saving": {
     "message": "Сохранение..."
   },
@@ -2905,6 +2983,9 @@
   },
   "profile.official-account.bio": {
     "message": "Официальный аккаунт Modrinth. Связаться с поддержкой можно по ссылке <support-link></support-link> или по электронной почте: <email></email>"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> подписчик} few {<stat>{count}</stat> подписчика} other {<stat>{count}</stat> подписчиков}} у проектов"
   },
   "profile.user-id": {
     "message": "ID пользователя: {id}"
@@ -3349,6 +3430,12 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Управление проектами"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, one {загрузка} few {загрузки} other {загрузок}}"
+  },
+  "project.stats.followers-label": {
+    "message": "{count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
   },
   "project.status.archived.message": {
     "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."

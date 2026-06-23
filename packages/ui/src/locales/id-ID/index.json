@@ -104,6 +104,15 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Proyek terpilih"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Pasang {count, plural, other {# proyek}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {# proyek dipilih}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Anda telah memilih {count, plural, other {# proyek}} untuk dipasang. Pasang sekarang atau kembali tanpa memasangnya."
+  },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Proyek terpilih belum terpasang"
   },
@@ -311,6 +320,9 @@
   "content-type.content.lowercase": {
     "defaultMessage": "konten"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, other {benda}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Pilih {project}"
   },
@@ -325,6 +337,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Tahan tombol Shift saat mengeklik \"Perbarui semua\" untuk melewati pesan konfirmasi ini untuk kedepannya."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Perbarui {count, plural, other {# proyek}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Menghapus mod bisa berdampak pada dunia Anda dan mungkin menyebabkan konten hilang atau masalah tak terduga saat dunia dimuat kembali."
@@ -361,6 +376,21 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Lepas tautan"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instans"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "server"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Tetap hapus"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Menghapus"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Apa yang akan terjadi?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} ditambahkan"
@@ -550,6 +580,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "Impor"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Impor {count, plural, other {# instans}}"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Buat server"
@@ -1169,6 +1202,9 @@
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Tidak ada proyek yang cocok dengan pencarian Anda."
   },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Cari {count, number} {count, plural, other {proyek}}"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Saat ini"
   },
@@ -1619,26 +1655,68 @@
   "project-type.all": {
     "defaultMessage": "Semua"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Data}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Paket Data"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {paket data}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {Mod}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Mod"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Mod}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Paket Mod"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {paket mod}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {Pasang-masuk}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Pasang-masuk"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {pasang-masuk}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, other {Proyek}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Proyek"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {proyek}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Sumber}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Paket Sumber"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {paket sumber}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {Server}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Server"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {server}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Efek Gambar} other {Efek Gambar}}"
@@ -1751,6 +1829,9 @@
   "project.about.server.title": {
     "defaultMessage": "Perincian server"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {pengunduhan}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Diperlukan pada klien dan server."
   },
@@ -1807,6 +1888,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Lingkungan tidak dikenal"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {pengikut}}"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} orang daring"
@@ -2474,6 +2558,9 @@
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Cari bahasa..."
   },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Tidak ada bahasa yang cocok} other {# bahasa cocok}} dengan pencarian Anda."
+  },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Tidak ada bahasa yang cocok dengan pencarian Anda."
   },
@@ -2913,3 +3000,4 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
+

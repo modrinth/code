@@ -107,6 +107,9 @@
   "analytics.chart.empty.select-table-items": {
     "message": "Виберіть елементи з таблиці знизу щоб відобразити ваші дані."
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# подія аналітики} few {# події аналітики} other {# подій аналітики}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
@@ -130,6 +133,39 @@
   },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Закріплено"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Сайт Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "завантажень"
+  },
+  "analytics.empty.no-data": {
+    "message": "Данні не доступні"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Данні не доступні для аналітики"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Немає доступних проєктів"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Немає доступних проєктів для аналітики"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Усі"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Випуск"
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Пошук версій проєкту…"
+  },
+  "analytics.filter.search.versions": {
+    "message": "Пошук версії…"
   },
   "analytics.graph.title.downloads": {
     "message": "Динаміка завантажень"
@@ -221,6 +257,9 @@
   "analytics.project.all": {
     "message": "Усі проєкти"
   },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєктів}}"
+  },
   "analytics.project.icon-alt": {
     "message": "Значок {name}"
   },
@@ -247,6 +286,30 @@
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} год"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "Показано {start} до {end} з {total}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Пошук…"
+  },
+  "analytics.title": {
+    "message": "Аналітика"
+  },
+  "analytics.value.monetized": {
+    "message": "Монетизація"
+  },
+  "analytics.value.none": {
+    "message": "Немає"
+  },
+  "analytics.value.other": {
+    "message": "Інше"
+  },
+  "analytics.value.unknown": {
+    "message": "Невідомо"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Прибрати монетизацію"
   },
   "app-marketing.download.description": {
     "message": "Наш застосунок доступний на всіх платформах, виберіть бажану вами версію."
@@ -761,6 +824,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Додаткові файли призначені для допоміжних ресурсів, таких як початковий код, а не для альтернативних версій чи варіантів."
   },
+  "create.collection.collection-info": {
+    "message": "Ваша нова добірка після створення буде публічною {count, plural,=0 {без проєктів} one {і міститиме # проєкт} few {і міститиме # проєкти} other {і міститиме # проєктів}}."
+  },
   "create.collection.create-collection": {
     "message": "Створити добірку"
   },
@@ -923,6 +989,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Пошук партнерських посилань…"
   },
+  "dashboard.analytics.from-projects": {
+    "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Всього завантажень"
   },
@@ -943,6 +1012,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Спробуйте налаштувати фільтри або пошукові терміни."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Пошук у ваших добірках"
@@ -1214,6 +1286,15 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Ви використали свій ліміт зняття коштів <b>{withdrawLimit}</b>. Щоб зняти більше, вам потрібно заповнити податкову форму."
   },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Посилання Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Забрати ваші Discord ролі"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "понад 1млн завантажень"
+  },
   "dashboard.head-title": {
     "message": "Панель керування"
   },
@@ -1226,6 +1307,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Побачити історію сповіщень"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Побачити {extraNotifs} ще {extraNotifs, plural, one {повідомлення} few {повідомлень} many {повідомлень} other {повідомлень}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Створити організацію"
   },
@@ -1234,6 +1318,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Не вдалося отримати організації"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {учасник} few {учасники} many {учасників} other {учасників}}"
   },
   "dashboard.organizations.title": {
     "message": "Організації"
@@ -1291,6 +1378,9 @@
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Запрошення до Discord"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Редагувати посилання"
   },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "Місце, де користувачі можуть повідомляти про помилки, проблеми та сумніви щодо вашого проєкту."
@@ -2621,6 +2711,9 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, one {завантаження} few {завантаження} many {завантажень} other {завантажень}}"
+  },
   "profile.label.joined": {
     "message": "Приєднався"
   },
@@ -2639,6 +2732,9 @@
   "profile.label.organizations": {
     "message": "Організації"
   },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
+  },
   "profile.label.saving": {
     "message": "Збереження…"
   },
@@ -2647,6 +2743,9 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — Завантажуйте проєкти {username} на Modrinth"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> відстежує} few {<stat>{count}</stat> відстежує} other {<stat>{count}</stat> відстежують}}"
   },
   "profile.user-id": {
     "message": "ID користувача: {id}"
@@ -3083,6 +3182,9 @@
   "project.settings.permissions.learn-more": {
     "message": "Дізнатися більше"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Пошук {count} {count, plural, one {зовнішнього проєкту} few {зовнішніх проєктів} many {зовнішніх проєктів} other {зовнішніх проєктів}}…"
+  },
   "project.settings.title": {
     "message": "Налаштування"
   },
@@ -3094,6 +3196,9 @@
   },
   "project.versions.title": {
     "message": "Версії"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
   },
   "project.versions.withheld-versions-warning.resolve-button": {
     "message": "Розв'язати"
@@ -3985,6 +4090,9 @@
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Щомісячна оплата обійдеться вам у додаткові {amount} на рік"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Змінено на {interval, select, monthly {monthly} yearly {yearly} other {{interval}}} оплату  {date}"
   },
   "settings.billing.update-method": {
     "message": "Оновити спосіб"

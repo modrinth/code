@@ -338,6 +338,9 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Gelecekte bu onayı atlamak için \"Hepsini güncelle\" seçeneğine tıklarken Shift tuşuna basılı tutun."
   },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "{count} projeyi güncelle"
+  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Mod kaldırmak dünyanızı kalıcı şekilde etkileyebilir ve eksik içerik ve beklenmedik sorunlar yaşayabilirsiniz."
   },
@@ -370,6 +373,15 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Bağlantıyı kopar/kes"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Bu içerik diğer içerikler için gereklidir"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "sunucu"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Siliniyor"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
@@ -475,6 +487,9 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Lütfen bekleyin"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "{count, number} türündeki içerikleri arayın..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Dosya adları"
@@ -1625,6 +1640,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} uyumlu kurulum"
+  },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Var olan kurulum"
   },
@@ -2369,6 +2387,9 @@
   "payment-method.amex": {
     "defaultMessage": "American Express"
   },
+  "payment-method.card_display": {
+    "defaultMessage": ""
+  },
   "payment-method.cashapp": {
     "defaultMessage": "Cash App"
   },
@@ -2447,17 +2468,41 @@
   "project-type.all": {
     "defaultMessage": "Tümü"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "Veri Paketi"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Veri Paketleri"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "veri paketi"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "Mod"
   },
   "project-type.mod.category": {
     "defaultMessage": "Modlar"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "mod"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "Mod Paketi"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Mod Paketleri"
   },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "mod paketi"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "Plugin"
+  },
   "project-type.plugin.category": {
     "defaultMessage": "Pluginler"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "plugin"
   },
   "project-type.project.capital": {
     "defaultMessage": "{count, plural,one {Proje} other {Projeler}}"
@@ -2465,11 +2510,29 @@
   "project-type.project.category": {
     "defaultMessage": "Projeler"
   },
+  "project-type.project.lowercase": {
+    "defaultMessage": "proje"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "Kaynak Paketi"
+  },
   "project-type.resourcepack.category": {
     "defaultMessage": "Kaynak Paketleri"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "kaynak paketi"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "Sunucu"
+  },
   "project-type.server.category": {
     "defaultMessage": "Sunucular"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "sunucu"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "Shader"
   },
   "project-type.shader.category": {
     "defaultMessage": "Shaderlar"
@@ -2600,6 +2663,9 @@
   "project.about.tags.title": {
     "defaultMessage": "Etiketler"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} indirme"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Hem istemci hem de sunucu tarafında gereklidir."
   },
@@ -2666,8 +2732,20 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Bilinmeyen ortam"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} takipçi"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} çevrim içi"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} çevrim içi oyuncu"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} oynama"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "Modrinth'den son 2 haftada {count} oynama"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Bu proje özel bir mod paketi kullanmaktadır"
