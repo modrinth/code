@@ -1,10 +1,22 @@
 use crate::api::Result;
 #[cfg(target_os = "macos")]
 use std::hash::{DefaultHasher, Hash, Hasher};
-use std::path::{Path, PathBuf};
 #[cfg(target_os = "windows")]
-use std::process::Command;
+use std::os::windows::ffi::OsStrExt;
+use std::path::{Path, PathBuf};
 use tauri::Runtime;
+#[cfg(target_os = "windows")]
+use windows::{
+    Win32::{
+        System::Com::{
+            CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED,
+            COINIT_DISABLE_OLE1DDE, CoCreateInstance, CoInitializeEx,
+            CoUninitialize, IPersistFile,
+        },
+        UI::Shell::{IShellLinkW, ShellLink},
+    },
+    core::{Interface, PCWSTR},
+};
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("shortcuts")
@@ -121,39 +133,101 @@ async fn create_shortcut(
         .parent()
         .map(Path::to_path_buf)
         .unwrap_or_default();
-    let script = r#"
-$WshShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WshShell.CreateShortcut($env:MODRINTH_SHORTCUT_PATH)
-$Shortcut.TargetPath = $env:MODRINTH_TARGET_PATH
-$Shortcut.Arguments = $env:MODRINTH_SHORTCUT_ARGUMENTS
-$Shortcut.WorkingDirectory = $env:MODRINTH_WORKING_DIRECTORY
-$Shortcut.IconLocation = $env:MODRINTH_TARGET_PATH
-$Shortcut.Save()
-"#;
+    let output_path = output_path.to_path_buf();
+    let launch_url = launch_url.to_string();
 
-    let status = Command::new("powershell")
-        .args([
-            "-NoProfile",
-            "-NonInteractive",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command",
-            script,
-        ])
-        .env("MODRINTH_SHORTCUT_PATH", output_path)
-        .env("MODRINTH_TARGET_PATH", &target_path)
-        .env("MODRINTH_SHORTCUT_ARGUMENTS", launch_url)
-        .env("MODRINTH_WORKING_DIRECTORY", working_dir)
-        .status()?;
-
-    if !status.success() {
-        return Err(std::io::Error::other(format!(
-            "failed to create shortcut with exit status {status}"
+    tokio::task::spawn_blocking(move || {
+        create_windows_shortcut(
+            output_path,
+            target_path,
+            working_dir,
+            launch_url,
+        )
+    })
+    .await
+    .map_err(|error| {
+        std::io::Error::other(format!(
+            "failed to join shortcut creation task: {error}"
         ))
-        .into());
+    })??;
+
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
+fn create_windows_shortcut(
+    output_path: PathBuf,
+    target_path: PathBuf,
+    working_dir: PathBuf,
+    launch_url: String,
+) -> std::io::Result<()> {
+    let output_path = windows_wide_path(&output_path);
+    let target_path = windows_wide_path(&target_path);
+    let working_dir = windows_wide_path(&working_dir);
+    let launch_url = windows_wide_string(&launch_url);
+
+    unsafe {
+        let init_result = CoInitializeEx(
+            None,
+            COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE,
+        );
+        windows_result(init_result.ok())?;
+        let _com = WindowsComGuard;
+
+        let shortcut: IShellLinkW = windows_result(CoCreateInstance(
+            &ShellLink,
+            None,
+            CLSCTX_INPROC_SERVER,
+        ))?;
+        windows_result(shortcut.SetPath(windows_pcwstr(&target_path)))?;
+        windows_result(shortcut.SetArguments(windows_pcwstr(&launch_url)))?;
+        windows_result(
+            shortcut.SetWorkingDirectory(windows_pcwstr(&working_dir)),
+        )?;
+        windows_result(
+            shortcut.SetIconLocation(windows_pcwstr(&target_path), 0),
+        )?;
+
+        let persist_file: IPersistFile = windows_result(shortcut.cast())?;
+        windows_result(persist_file.Save(windows_pcwstr(&output_path), true))?;
     }
 
     Ok(())
+}
+
+#[cfg(target_os = "windows")]
+fn windows_result<T>(result: windows::core::Result<T>) -> std::io::Result<T> {
+    result.map_err(std::io::Error::other)
+}
+
+#[cfg(target_os = "windows")]
+struct WindowsComGuard;
+
+#[cfg(target_os = "windows")]
+impl Drop for WindowsComGuard {
+    fn drop(&mut self) {
+        unsafe {
+            CoUninitialize();
+        }
+    }
+}
+
+#[cfg(target_os = "windows")]
+fn windows_wide_path(path: &Path) -> Vec<u16> {
+    path.as_os_str()
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect()
+}
+
+#[cfg(target_os = "windows")]
+fn windows_wide_string(value: &str) -> Vec<u16> {
+    value.encode_utf16().chain(std::iter::once(0)).collect()
+}
+
+#[cfg(target_os = "windows")]
+fn windows_pcwstr(value: &[u16]) -> PCWSTR {
+    PCWSTR::from_raw(value.as_ptr())
 }
 
 #[cfg(not(any(target_os = "windows", target_os = "macos")))]
