@@ -26,7 +26,6 @@ use crate::util::fetch::{
 use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-use std::cmp::Reverse;
 use std::collections::HashSet;
 use std::io::Cursor;
 
