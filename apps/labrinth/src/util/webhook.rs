@@ -186,7 +186,7 @@ pub enum PayoutSourceAlertType {
     },
     CheckFailure {
         source: String,
-        display_error: String,
+        display_error: eyre::Report,
     },
 }
 
@@ -204,7 +204,7 @@ impl PayoutSourceAlertType {
                 source,
                 display_error,
             } => format!(
-                "\u{1f6a8} *Payout Source Alert*\n\nFAILED TO CHECK payout source '{source}' balance.\nError: {display_error}"
+                "\u{1f6a8} *Payout Source Alert*\n\nFAILED TO CHECK payout source '{source}' balance.\nError: {display_error:#?}"
             ),
         }
     }

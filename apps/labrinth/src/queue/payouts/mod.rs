@@ -481,8 +481,7 @@ impl PayoutsQueue {
         Ok(options.options)
     }
 
-    pub async fn get_brex_balance() -> Result<Option<AccountBalance>, ApiError>
-    {
+    pub async fn get_brex_balance() -> eyre::Result<Option<AccountBalance>> {
         #[derive(Deserialize)]
         struct BrexBalance {
             pub amount: i64,
@@ -505,9 +504,11 @@ impl PayoutsQueue {
             .get(format!("{}accounts/cash", ENV.BREX_API_URL))
             .bearer_auth(&ENV.BREX_API_KEY)
             .send()
-            .await?
+            .await
+            .wrap_request_err("sending `accounts/cash` request")?
             .json::<BrexResponse>()
-            .await?;
+            .await
+            .wrap_request_err("reading `accounts/cash` request")?;
 
         Ok(Some(AccountBalance {
             available: Decimal::from(
@@ -527,8 +528,7 @@ impl PayoutsQueue {
         }))
     }
 
-    pub async fn get_paypal_balance() -> Result<Option<AccountBalance>, ApiError>
-    {
+    pub async fn get_paypal_balance() -> eyre::Result<Option<AccountBalance>> {
         let api_username = &ENV.PAYPAL_NVP_USERNAME;
         let api_password = &ENV.PAYPAL_NVP_PASSWORD;
         let api_signature = &ENV.PAYPAL_NVP_SIGNATURE;
@@ -544,9 +544,17 @@ impl PayoutsQueue {
         let endpoint = "https://api-3t.paypal.com/nvp";
 
         let client = reqwest::Client::new();
-        let response = client.post(endpoint).form(&params).send().await?;
+        let response = client
+            .post(endpoint)
+            .form(&params)
+            .send()
+            .await
+            .wrap_err("requesting `nvp` endpoint")?;
 
-        let text = response.text().await?;
+        let text = response
+            .text()
+            .await
+            .wrap_err("reading response text from `nvp`")?;
         let body = urlencoding::decode(&text).unwrap_or_default();
 
         let mut key_value_map = HashMap::new();
@@ -573,7 +581,7 @@ impl PayoutsQueue {
 
     pub async fn get_tremendous_balance(
         &self,
-    ) -> Result<Option<AccountBalance>, ApiError> {
+    ) -> eyre::Result<Option<AccountBalance>> {
         #[derive(Deserialize)]
         struct FundingSourceMeta {
             available_cents: Option<u64>,
@@ -597,7 +605,8 @@ impl PayoutsQueue {
                 "funding_sources",
                 None,
             )
-            .await?;
+            .await
+            .wrap_request_err("fetching funding sources")?;
 
         Ok(val
             .funding_sources
@@ -1349,8 +1358,8 @@ pub async fn insert_bank_balances_and_webhook(
 async fn check_balance_with_webhook(
     source: &str,
     threshold: u64,
-    result: Result<Option<AccountBalance>, ApiError>,
-) -> Result<Option<AccountBalance>, ApiError> {
+    result: anyhow::Result<Option<AccountBalance>>,
+) -> anyhow::Result<Option<AccountBalance>> {
     let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
     let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
