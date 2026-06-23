@@ -849,7 +849,7 @@
     "message": "Forgot password"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "Last sign in"
+    "message": "Last used"
   },
   "auth.sign-in.no-account": {
     "message": "Don't have an account?"

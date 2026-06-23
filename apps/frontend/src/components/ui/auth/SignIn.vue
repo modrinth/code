@@ -7,7 +7,7 @@
 	</div>
 	<div
 		v-else
-		class="universal-card mx-auto flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+		class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
 		<template v-if="flow && !subtleLauncherRedirectUri">
 			<div class="flex flex-col items-end gap-4">
@@ -36,119 +36,30 @@
 			</div>
 		</template>
 		<template v-else>
-			<div class="flex flex-col gap-6">
+			<div class="flex flex-col gap-5">
 				<div class="text-center text-2xl font-semibold text-contrast">
 					{{ formatMessage(messages.signInWithLabel) }}
 				</div>
 
-				<section class="flex flex-col gap-2.5">
-					<ButtonStyled>
+				<section class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+					<ButtonStyled v-for="provider in oauthProviders" :key="provider.id">
 						<a
-							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'google' }"
-							:href="getAuthUrl('google', redirectTarget)"
-							@click="onOAuthProviderClick('google')"
+							class="relative w-full !justify-center overflow-visible !shadow-none"
+							:class="{
+								'!border !border-[var(--color-green)]': lastSignInProvider === provider.id,
+							}"
+							:href="getAuthUrl(provider.id, redirectTarget)"
+							:aria-label="
+								formatMessage(messages.continueWithProvider, { provider: provider.name })
+							"
+							@click="onOAuthProviderClick(provider.id)"
 						>
-							<GoogleColorIcon />
-							<span class="ml-1">{{
-								formatMessage(messages.continueWithProvider, { provider: 'Google' })
-							}}</span>
+							<component :is="provider.icon" />
+							<span>{{ provider.name }}</span>
 							<span
-								v-if="lastSignInProvider === 'google'"
+								v-if="lastSignInProvider === provider.id"
 								class="oauth-provider-last-sign-in-badge"
 							>
-								{{ formatMessage(messages.lastSignInLabel) }}
-							</span>
-						</a>
-					</ButtonStyled>
-					<ButtonStyled>
-						<a
-							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'microsoft' }"
-							:href="getAuthUrl('microsoft', redirectTarget)"
-							@click="onOAuthProviderClick('microsoft')"
-						>
-							<MicrosoftColorIcon />
-							<span class="ml-1">{{
-								formatMessage(messages.continueWithProvider, { provider: 'Microsoft' })
-							}}</span>
-							<span
-								v-if="lastSignInProvider === 'microsoft'"
-								class="oauth-provider-last-sign-in-badge"
-							>
-								{{ formatMessage(messages.lastSignInLabel) }}
-							</span>
-						</a>
-					</ButtonStyled>
-					<ButtonStyled>
-						<a
-							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'discord' }"
-							:href="getAuthUrl('discord', redirectTarget)"
-							@click="onOAuthProviderClick('discord')"
-						>
-							<DiscordColorIcon />
-							<span class="ml-1">{{
-								formatMessage(messages.continueWithProvider, { provider: 'Discord' })
-							}}</span>
-							<span
-								v-if="lastSignInProvider === 'discord'"
-								class="oauth-provider-last-sign-in-badge"
-							>
-								{{ formatMessage(messages.lastSignInLabel) }}
-							</span>
-						</a>
-					</ButtonStyled>
-					<ButtonStyled>
-						<a
-							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'github' }"
-							:href="getAuthUrl('github', redirectTarget)"
-							@click="onOAuthProviderClick('github')"
-						>
-							<GitHubColorIcon />
-							<span class="ml-1">{{
-								formatMessage(messages.continueWithProvider, { provider: 'GitHub' })
-							}}</span>
-							<span
-								v-if="lastSignInProvider === 'github'"
-								class="oauth-provider-last-sign-in-badge"
-							>
-								{{ formatMessage(messages.lastSignInLabel) }}
-							</span>
-						</a>
-					</ButtonStyled>
-					<ButtonStyled>
-						<a
-							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'gitlab' }"
-							:href="getAuthUrl('gitlab', redirectTarget)"
-							@click="onOAuthProviderClick('gitlab')"
-						>
-							<GitLabColorIcon />
-							<span class="ml-1">{{
-								formatMessage(messages.continueWithProvider, { provider: 'GitLab' })
-							}}</span>
-							<span
-								v-if="lastSignInProvider === 'gitlab'"
-								class="oauth-provider-last-sign-in-badge"
-							>
-								{{ formatMessage(messages.lastSignInLabel) }}
-							</span>
-						</a>
-					</ButtonStyled>
-					<ButtonStyled>
-						<a
-							class="oauth-provider-link !shadow-none"
-							:class="{ 'oauth-provider-link--last': lastSignInProvider === 'steam' }"
-							:href="getAuthUrl('steam', redirectTarget)"
-							@click="onOAuthProviderClick('steam')"
-						>
-							<SteamColorIcon />
-							<span class="ml-1">{{
-								formatMessage(messages.continueWithProvider, { provider: 'Steam' })
-							}}</span>
-							<span v-if="lastSignInProvider === 'steam'" class="oauth-provider-last-sign-in-badge">
 								{{ formatMessage(messages.lastSignInLabel) }}
 							</span>
 						</a>
@@ -157,7 +68,7 @@
 
 				<div class="h-px w-full bg-surface-5"></div>
 
-				<section class="flex flex-col gap-2.5">
+				<section class="mx-auto flex w-full flex-col gap-2.5">
 					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
 					<StyledInput
 						id="email"
@@ -248,7 +159,16 @@ import {
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 } from '@/composables/auth.ts'
 
-type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
+const oauthProviders = [
+	{ id: 'discord', name: 'Discord', icon: DiscordColorIcon },
+	{ id: 'github', name: 'GitHub', icon: GitHubColorIcon },
+	{ id: 'microsoft', name: 'Microsoft', icon: MicrosoftColorIcon },
+	{ id: 'google', name: 'Google', icon: GoogleColorIcon },
+	{ id: 'steam', name: 'Steam', icon: SteamColorIcon },
+	{ id: 'gitlab', name: 'GitLab', icon: GitLabColorIcon },
+] as const
+
+type AuthProvider = (typeof oauthProviders)[number]['id']
 
 interface AuthGlobals {
 	captcha_enabled?: boolean
@@ -341,32 +261,22 @@ const messages = defineMessages({
 	},
 	lastSignInLabel: {
 		id: 'auth.sign-in.last-sign-in',
-		defaultMessage: 'Last sign in',
+		defaultMessage: 'Last used',
 	},
 })
 </script>
 
 <style scoped lang="scss">
-.oauth-provider-link {
-	position: relative;
-	overflow: visible;
-}
-
-.oauth-provider-link--last {
-	border-width: 1px !important;
-	border-color: var(--color-green) !important;
-}
-
 .oauth-provider-last-sign-in-badge {
 	position: absolute;
 	top: -0.75rem;
-	right: 0.5rem;
+	right: 0.25rem;
 	z-index: 1;
 	border-radius: 9999px;
 	background-color: var(--surface-3);
 	color: var(--color-green);
 	border: 1px solid var(--color-green);
-	padding: 0.25rem 0.5rem;
+	padding: 0.125rem 0.375rem;
 	font-size: 0.75rem;
 	font-weight: 600;
 	line-height: 1;
