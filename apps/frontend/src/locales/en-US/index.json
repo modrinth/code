@@ -761,9 +761,6 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Date of birth"
   },
-  "auth.create-account.date-of-birth.over13-helper": {
-    "message": "You must be over 13 years old to use Modrinth."
-  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Select your date of birth"
   },
@@ -780,7 +777,7 @@
     "message": "Relevant source code"
   },
   "auth.create-account.info-panel.text": {
-    "message": "We do not store your date of birth, only whether you are over 13 to use Modrinth."
+    "message": "We do not store your date of birth. We only use it during sign-up to validate COPPA compliance."
   },
   "auth.create-account.page-title": {
     "message": "Create Account"

@@ -506,38 +506,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Уведіть код…"
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Забули пароль?</forgot-password-link> • <create-account-link>Створити обліковий запис</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Увійдіть за допомогою"
   },
   "auth.sign-in.title": {
     "message": "Вхід"
   },
-  "auth.sign-in.use-password": {
-    "message": "Або ж з паролем"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Створити обліковий запис"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Створивши обліковий запис, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Паролі не збігаються!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже маєте обліковий запис?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Підписатися на оновлення Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Реєстрація"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Або зробіть обліковий запис самотужки"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Реєстрація за допомогою"
@@ -571,21 +553,6 @@
   },
   "auth.verify-email.title": {
     "message": "Підтвердити електронну пошту"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Підписатися на оновлення Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ви тепер частина чудової спільноти авторів і дослідників, що вже створюють, завантажують та оновлюють дивовижні моди."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Створивши обліковий запис, ви погодилися з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Вітаємо в Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Вітаємо"
   },
   "collection.button.edit-icon": {
     "message": "Редагувати значок"

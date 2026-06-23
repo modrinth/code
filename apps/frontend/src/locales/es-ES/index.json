@@ -737,38 +737,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Introducir código..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>¿Olvidaste tu contraseña?</forgot-password-link> • <create-account-link>Crear una cuenta</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Iniciar sesión con"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sesión"
   },
-  "auth.sign-in.use-password": {
-    "message": "O usa una contraseña"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Crear cuenta"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Al crear una cuenta, tú aceptas los <terms-link>Términos</terms-link> y <privacy-policy-link>Política de Privacidad</privacy-policy-link> de Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "¡Las contraseñas no coinciden!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "¿Ya tienes una cuenta?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Suscríbete para recibir actualizaciones sobre Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registro"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "O crea una cuenta tú mismo"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Registrarse con"
@@ -802,21 +784,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verificar correo electrónico"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Suscríbete a las novedades sobre Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ahora formas parte de la increíble comunidad de creadores y exploradores que ya están creando, descargando y manteniéndose al día con mods increíbles."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Al crear esta cuenta, aceptas los <terms-link>términos de Modrinth</terms-link> y la <privacy-policy-link>Política de Privacidad</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "¡Bienvenido a Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Bienvenido"
   },
   "collection.button.edit-icon": {
     "message": "Editar icono"

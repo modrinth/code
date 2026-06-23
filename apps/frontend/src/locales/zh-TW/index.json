@@ -701,38 +701,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "輸入驗證碼..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>忘記密碼？</forgot-password-link> • <create-account-link>建立帳號</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "使用以下方式登入"
   },
   "auth.sign-in.title": {
     "message": "登入"
   },
-  "auth.sign-in.use-password": {
-    "message": "或使用密碼"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "建立帳號"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "密碼不相符！"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "已經有帳號了？"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "訂閱 Modrinth 的最新消息"
-  },
   "auth.sign-up.title": {
     "message": "註冊"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "或自行建立帳號"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "使用以下方式註冊"
@@ -766,21 +748,6 @@
   },
   "auth.verify-email.title": {
     "message": "驗證電子郵件"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "訂閱 Modrinth 的最新消息"
-  },
-  "auth.welcome.description": {
-    "message": "你現在已加入由創作者與探索者組成的精彩社群，大家都在積極打造、下載並持續掌握優質模組的最新動態。"
-  },
-  "auth.welcome.label.tos": {
-    "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
-  },
-  "auth.welcome.long-title": {
-    "message": "歡迎使用 Modrinth！"
-  },
-  "auth.welcome.title": {
-    "message": "歡迎"
   },
   "collection.button.edit-icon": {
     "message": "編輯圖示"

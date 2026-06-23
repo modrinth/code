@@ -737,38 +737,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Saisir le code..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Mot de passe oublié ?</forgot-password-link> • <create-account-link>Créer un compte</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Se connecter avec"
   },
   "auth.sign-in.title": {
     "message": "Se connecter"
   },
-  "auth.sign-in.use-password": {
-    "message": "Ou utiliser un mot de passe"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Créer un compte"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Les mots de passe ne correspondent pas !"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Vous avez déjà un compte ?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "S'abonner aux mises à jour de Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "S'inscrire"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Ou créez vous-même un compte"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "S'inscrire avec"
@@ -802,21 +784,6 @@
   },
   "auth.verify-email.title": {
     "message": "Vérifier l'adresse e-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "S'abonner aux mises à jour de Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Vous faites maintenant partie de la formidable communauté de créateurs et d'explorateurs qui construisent, téléchargent et se tiennent au courant des incroyables mods."
-  },
-  "auth.welcome.label.tos": {
-    "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Bienvenue sur Modrinth !"
-  },
-  "auth.welcome.title": {
-    "message": "Bienvenue"
   },
   "collection.button.edit-icon": {
     "message": "Modifier l'icône"

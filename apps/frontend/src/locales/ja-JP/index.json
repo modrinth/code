@@ -398,38 +398,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "コードを入力…"
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>パスワードをお忘れですか？</forgot-password-link> • <create-account-link>アカウントを作成する</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "外部アカウントでログイン"
   },
   "auth.sign-in.title": {
     "message": "ログイン"
   },
-  "auth.sign-in.use-password": {
-    "message": "パスワードでログイン"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "アカウントを作成"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "パスワードが一致しません！"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "すでにアカウントをお持ちですか？"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Modrinthのアップデートを受け取る"
-  },
   "auth.sign-up.title": {
     "message": "アカウント作成"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "メールアドレスで作成"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "外部アカウントで作成"
@@ -463,21 +445,6 @@
   },
   "auth.verify-email.title": {
     "message": "メールアドレスを確認"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Modrinthのアップデートを受け取る"
-  },
-  "auth.welcome.description": {
-    "message": "素晴らしいModの開発や導入、アップデートを日々行っている、クリエイターと冒険者たちの活気あるコミュニティへようこそ。"
-  },
-  "auth.welcome.label.tos": {
-    "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
-  },
-  "auth.welcome.long-title": {
-    "message": "Modrinthへようこそ！"
-  },
-  "auth.welcome.title": {
-    "message": "ようこそ"
   },
   "collection.button.edit-icon": {
     "message": "アイコンを編集"

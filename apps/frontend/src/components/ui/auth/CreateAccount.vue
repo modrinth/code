@@ -22,9 +22,6 @@
 				preserve-day
 				:placeholder="formatMessage(messages.dateOfBirthPlaceholder)"
 			/>
-			<div>
-				{{ formatMessage(messages.over13HelperText) }}
-			</div>
 			<Admonition :type="'info'">
 				<template #header>
 					<div class="-mb-3 -mt-1 flex flex-col gap-0 text-sm font-normal leading-normal">
@@ -234,10 +231,6 @@ const messages = defineMessages({
 		id: 'auth.create-account.date-of-birth.invalid.text',
 		defaultMessage: 'Please enter a valid date of birth. Year cannot be 0000.',
 	},
-	over13HelperText: {
-		id: 'auth.create-account.date-of-birth.over13-helper',
-		defaultMessage: 'You must be over 13 years old to use Modrinth.',
-	},
 	under13HelperText: {
 		id: 'auth.create-account.date-of-birth.under13-helper',
 		defaultMessage: 'You cannot create an account at Modrinth unless you are over 13 years old.',
@@ -249,7 +242,7 @@ const messages = defineMessages({
 	infoPanelText: {
 		id: 'auth.create-account.info-panel.text',
 		defaultMessage:
-			'We do not store your date of birth, only whether you are over 13 to use Modrinth.',
+			'We do not store your date of birth. We only use it during sign-up to validate COPPA compliance.',
 	},
 	relevantSourceCodeText: {
 		id: 'auth.create-account.info-panel.source-code-link',

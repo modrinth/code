@@ -275,38 +275,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "코드 입력..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>비밀번호를 잊으셨나요?</forgot-password-link> • <create-account-link>계정 만들기</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "다음을 통해 로그인"
   },
   "auth.sign-in.title": {
     "message": "로그인"
   },
-  "auth.sign-in.use-password": {
-    "message": "또는 비밀번호 사용하기"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "계정 생성"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "계정을 생성함으로써, Modrinth의 <terms-link>이용 약관</terms-link> 및 <privacy-policy-link>개인정보 보호정책</privacy-policy-link>에 동의합니다."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "비밀번호가 일치하지 않습니다!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "이미 계정이 있으신가요?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Modrinth의 업데이트 소식 전달받기"
-  },
   "auth.sign-up.title": {
     "message": "회원 가입"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "또는 직접 계정을 만드세요"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "다음 계정으로 가입"
@@ -340,21 +322,6 @@
   },
   "auth.verify-email.title": {
     "message": "이메일 인증"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Modrinth의 업데이트 소식 전달받기"
-  },
-  "auth.welcome.description": {
-    "message": "이제 당신은 놀라운 모드를 만들고, 다운로드하고, 최신 상태로 유지하는 훌륭한 크리에이터 및 탐험가들의 모임의 일원이 되었습니다."
-  },
-  "auth.welcome.label.tos": {
-    "message": "계정을 생성함으로써, Modrinth의 <terms-link>이용 약관</terms-link> 및 <privacy-policy-link>개인정보 보호정책</privacy-policy-link>에 동의하게 됩니다."
-  },
-  "auth.welcome.long-title": {
-    "message": "Modrinth에 오신 걸 환영합니다!"
-  },
-  "auth.welcome.title": {
-    "message": "환영합니다"
   },
   "collection.button.edit-icon": {
     "message": "아이콘 수정"

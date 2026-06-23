@@ -230,35 +230,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "ป้อนรหัส"
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link> ลืมรหัสผ่าน? </forgot-password-link> • <create-account-link> สร้างบัญชีใหม่ </create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "ลงชื่อเข้าใช้ด้วย"
   },
   "auth.sign-in.title": {
     "message": "ลงชื่อเข้าใช้"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "สร้างบัญชี"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "ในการสร้างบัญชี คุณยอมรับ <terms-link> ข้อกำหนด </terms-link> และ <privacy-policy-link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ Modrinth"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "รหัสผ่านไม่ตรงกัน!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "มีบัญชีอยู่แล้ว?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "สมัครรับข้อมูลการอัพเดทเกี่ยวกับ Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "ลงทะเบียน"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "หรือจะสร้างบัญชีด้วยตัวคุณเอง"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "สมัครใช้งานด้วย"
@@ -292,18 +277,6 @@
   },
   "auth.verify-email.title": {
     "message": "ยืนยันอีเมล"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "สมัครรับข้อมูลอัปเดตเกี่ยวกับ Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "ตอนนี้คุณได้เป็นส่วนหนึ่งของคอมมูนิตี้สุดเจ๋งของเหล่าครีเอเตอร์และนักสำรวจ ที่กำลังสร้างสรรค์ ดาวน์โหลด และอัปเดตม็อดสุดยอดอยู่เสมอ"
-  },
-  "auth.welcome.long-title": {
-    "message": "ยินดีต้อนรับเข้าสู่ modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "ยินดีต้อนรับ"
   },
   "collection.button.edit-icon": {
     "message": "แก้ไขไอคอน"

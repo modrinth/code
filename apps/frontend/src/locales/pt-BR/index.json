@@ -737,38 +737,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Insira o código..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Esqueceu sua senha?</forgot-password-link> • <create-account-link>Criar uma conta</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Iniciar sessão com"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sessão"
   },
-  "auth.sign-in.use-password": {
-    "message": "Ou com senha"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Criar conta"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ao criar uma conta, você concorda com os <terms-link>Termos</terms-link> e a <privacy-policy-link>Política de Privacidade</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "As senhas não estão iguais!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Já possui uma conta?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Inscreva-se para receber atualizações sobre o Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Entrar"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Ou crie uma conta você mesmo"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Entrar com"
@@ -802,21 +784,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verificar e-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Inscreva-se para receber atualizações sobre o Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Agora você faz parte da incrível comunidade de criadores e exploradores que já estão criando, baixando e acompanhando mods incríveis."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Ao criar uma conta, você concorda com os <terms-link>Termos</terms-link> e a <privacy-policy-link>Política de Privacidade</privacy-policy-link> do Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Bem-vindo(a) ao Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Bem-vindo"
   },
   "collection.button.edit-icon": {
     "message": "Editar ícone"
