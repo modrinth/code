@@ -44,6 +44,7 @@ mod tunnel;
 pub use self::tunnel::*;
 
 pub mod db;
+pub(crate) mod db_backup;
 mod mr_auth;
 
 pub use self::mr_auth::*;
