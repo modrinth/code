@@ -1266,7 +1266,7 @@ pub async fn index_payouts_notifications(
 pub async fn insert_bank_balances_and_webhook(
     payouts: &PayoutsQueue,
     pool: &PgPool,
-) -> Result<(), ApiError> {
+) -> eyre::Result<()> {
     let mut transaction = pool.begin().await?;
 
     let paypal_result = PayoutsQueue::get_paypal_balance().await;
@@ -1329,25 +1329,29 @@ pub async fn insert_bank_balances_and_webhook(
             ENV.PAYPAL_BALANCE_ALERT_THRESHOLD,
             paypal_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking PayPal balance")?;
         check_balance_with_webhook(
             "brex",
             ENV.BREX_BALANCE_ALERT_THRESHOLD,
             brex_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Brex balance")?;
         check_balance_with_webhook(
             "tremendous",
             ENV.TREMENDOUS_BALANCE_ALERT_THRESHOLD,
             tremendous_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Tremendous balance")?;
         check_balance_with_webhook(
             "mural",
             ENV.MURAL_BALANCE_ALERT_THRESHOLD,
             mural_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Mural balance")?;
     }
 
     transaction.commit().await?;
@@ -1358,8 +1362,8 @@ pub async fn insert_bank_balances_and_webhook(
 async fn check_balance_with_webhook(
     source: &str,
     threshold: u64,
-    result: anyhow::Result<Option<AccountBalance>>,
-) -> anyhow::Result<Option<AccountBalance>> {
+    result: eyre::Result<Option<AccountBalance>>,
+) -> eyre::Result<Option<AccountBalance>> {
     let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
     let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
@@ -1383,13 +1387,18 @@ async fn check_balance_with_webhook(
         }
 
         Err(error) => {
-            error!(%error, "Failure getting balance for payout source '{source}'");
+            // use compact single-line error repr here
+            error!(
+                error = format!("{error:#?}"),
+                "Failure getting balance for payout source '{source}'"
+            );
 
             if maybe_threshold.is_some() {
+                // use expanded multi-line error repr here
                 send_slack_payout_source_alert_webhook(
                     PayoutSourceAlertType::CheckFailure {
                         source: source.to_owned(),
-                        display_error: error.to_string(),
+                        display_error: format!("{error:?}"),
                     },
                     payout_alert_webhook,
                 )
