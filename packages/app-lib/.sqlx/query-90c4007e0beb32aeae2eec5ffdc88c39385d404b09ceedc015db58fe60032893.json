@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT display_status, project_id, content_kind\n            FROM attached_world_data\n            WHERE profile_path = $1 and world_type = $2 and world_id = $3\n            ",
+  "query": "\n\t\t\tSELECT display_status, project_id, content_kind\n\t\t\tFROM attached_world_data\n\t\t\tWHERE instance_id = ? and world_type = ? and world_id = ?\n\t\t\t",
   "describe": {
     "columns": [
       {
@@ -28,5 +28,5 @@
       true
     ]
   },
-  "hash": "613192379e1fb8fd1becf2f6330365bb5bc2a8f0be01f6e4eef708474f38a3d0"
+  "hash": "90c4007e0beb32aeae2eec5ffdc88c39385d404b09ceedc015db58fe60032893"
 }

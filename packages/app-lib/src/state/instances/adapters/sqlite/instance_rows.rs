@@ -173,14 +173,15 @@ pub(crate) async fn get_instance_by_id<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, InstanceRow>(
+    let row = sqlx::query_as!(
+        InstanceRow,
         "
 		SELECT *
 		FROM instances
 		WHERE id = ?
 		",
+        id,
     )
-    .bind(id)
     .fetch_optional(exec)
     .await?;
 
@@ -194,14 +195,15 @@ pub(crate) async fn get_instance_by_path<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, InstanceRow>(
+    let row = sqlx::query_as!(
+        InstanceRow,
         "
 		SELECT *
 		FROM instances
 		WHERE path = ?
 		",
+        path,
     )
-    .bind(path)
     .fetch_optional(exec)
     .await?;
 
@@ -211,7 +213,8 @@ where
 pub(crate) async fn list_instances(
     pool: &SqlitePool,
 ) -> crate::Result<Vec<Instance>> {
-    let rows = sqlx::query_as::<_, InstanceRow>(
+    let rows = sqlx::query_as!(
+        InstanceRow,
         "
 		SELECT *
 		FROM instances
@@ -230,8 +233,9 @@ pub(crate) async fn get_instance_link<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, InstanceLinkRow>(
-        "
+    let row = sqlx::query_as!(
+        InstanceLinkRow,
+        r#"
         SELECT
             instance_id,
             link_kind,
@@ -241,14 +245,14 @@ where
             content_project_id,
             content_version_id,
             hosting_server_id,
-            json(hosting_instance_ids) AS hosting_instance_ids,
+            json(hosting_instance_ids) AS "hosting_instance_ids?: String",
             hosting_active_instance_id,
             shared_instance_id
         FROM instance_links
         WHERE instance_id = ?
-        ",
+        "#,
+        instance_id,
     )
-    .bind(instance_id)
     .fetch_optional(exec)
     .await?;
 
@@ -265,15 +269,15 @@ pub(crate) async fn get_instance_groups<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let rows = sqlx::query_scalar::<_, String>(
+    let rows = sqlx::query_scalar!(
         "
 		SELECT group_name
 		FROM instance_groups
 		WHERE instance_id = ?
 		ORDER BY group_name
 		",
+        instance_id,
     )
-    .bind(instance_id)
     .fetch_all(exec)
     .await?;
 
@@ -287,16 +291,17 @@ pub(crate) async fn get_instance_launch_overrides<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, InstanceLaunchOverridesRow>(
-        "
+    let row = sqlx::query_as!(
+        InstanceLaunchOverridesRow,
+        r#"
 		SELECT
 			instance_id,
-			json(overrides) AS overrides
+			json(overrides) AS "overrides!: String"
 		FROM instance_launch_overrides
 		WHERE instance_id = ?
-		",
+		"#,
+        instance_id,
     )
-    .bind(instance_id)
     .fetch_optional(exec)
     .await?;
 
@@ -307,7 +312,21 @@ pub(crate) async fn insert_instance(
     instance: &Instance,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let id = instance.id.as_str();
+    let path = instance.path.as_str();
+    let applied_content_set_id = instance.applied_content_set_id.as_deref();
+    let install_stage = instance.install_stage.as_str();
+    let launcher_feature_version = instance.launcher_feature_version.as_str();
+    let update_channel = instance.update_channel.key();
+    let name = instance.name.as_str();
+    let icon_path = instance.icon_path.as_deref();
+    let created = instance.created.timestamp();
+    let modified = instance.modified.timestamp();
+    let last_played = instance.last_played.map(|value| value.timestamp());
+    let submitted_time_played = instance.submitted_time_played as i64;
+    let recent_time_played = instance.recent_time_played as i64;
+
+    sqlx::query!(
         "
 		INSERT INTO instances (
 			id,
@@ -326,20 +345,20 @@ pub(crate) async fn insert_instance(
 		)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		",
+        id,
+        path,
+        applied_content_set_id,
+        install_stage,
+        launcher_feature_version,
+        update_channel,
+        name,
+        icon_path,
+        created,
+        modified,
+        last_played,
+        submitted_time_played,
+        recent_time_played,
     )
-    .bind(instance.id.as_str())
-    .bind(instance.path.as_str())
-    .bind(instance.applied_content_set_id.as_deref())
-    .bind(instance.install_stage.as_str())
-    .bind(instance.launcher_feature_version.as_str())
-    .bind(instance.update_channel.key())
-    .bind(instance.name.as_str())
-    .bind(instance.icon_path.as_deref())
-    .bind(instance.created.timestamp())
-    .bind(instance.modified.timestamp())
-    .bind(instance.last_played.map(|value| value.timestamp()))
-    .bind(instance.submitted_time_played as i64)
-    .bind(instance.recent_time_played as i64)
     .execute(&mut **tx)
     .await?;
 
@@ -350,7 +369,20 @@ pub(crate) async fn update_instance(
     instance: &Instance,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let id = instance.id.as_str();
+    let path = instance.path.as_str();
+    let applied_content_set_id = instance.applied_content_set_id.as_deref();
+    let install_stage = instance.install_stage.as_str();
+    let launcher_feature_version = instance.launcher_feature_version.as_str();
+    let update_channel = instance.update_channel.key();
+    let name = instance.name.as_str();
+    let icon_path = instance.icon_path.as_deref();
+    let modified = instance.modified.timestamp();
+    let last_played = instance.last_played.map(|value| value.timestamp());
+    let submitted_time_played = instance.submitted_time_played as i64;
+    let recent_time_played = instance.recent_time_played as i64;
+
+    sqlx::query!(
         "
 		UPDATE instances
 		SET
@@ -367,19 +399,19 @@ pub(crate) async fn update_instance(
 			recent_time_played = ?
 		WHERE id = ?
 		",
+        path,
+        applied_content_set_id,
+        install_stage,
+        launcher_feature_version,
+        update_channel,
+        name,
+        icon_path,
+        modified,
+        last_played,
+        submitted_time_played,
+        recent_time_played,
+        id,
     )
-    .bind(instance.path.as_str())
-    .bind(instance.applied_content_set_id.as_deref())
-    .bind(instance.install_stage.as_str())
-    .bind(instance.launcher_feature_version.as_str())
-    .bind(instance.update_channel.key())
-    .bind(instance.name.as_str())
-    .bind(instance.icon_path.as_deref())
-    .bind(instance.modified.timestamp())
-    .bind(instance.last_played.map(|value| value.timestamp()))
-    .bind(instance.submitted_time_played as i64)
-    .bind(instance.recent_time_played as i64)
-    .bind(instance.id.as_str())
     .execute(&mut **tx)
     .await?;
 
@@ -392,8 +424,17 @@ pub(crate) async fn upsert_instance_link(
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     let columns = instance_link_columns(link)?;
+    let modrinth_project_id = columns.modrinth_project_id.as_deref();
+    let modrinth_version_id = columns.modrinth_version_id.as_deref();
+    let server_project_id = columns.server_project_id.as_deref();
+    let content_project_id = columns.content_project_id.as_deref();
+    let content_version_id = columns.content_version_id.as_deref();
+    let hosting_server_id = columns.hosting_server_id.as_deref();
+    let hosting_instance_ids = columns.hosting_instance_ids.as_deref();
+    let hosting_active_instance_id = columns.hosting_active_instance_id.as_deref();
+    let shared_instance_id = columns.shared_instance_id.as_deref();
 
-    sqlx::query(
+    sqlx::query!(
         "
 		INSERT INTO instance_links (
 			instance_id,
@@ -421,18 +462,18 @@ pub(crate) async fn upsert_instance_link(
 			hosting_active_instance_id = excluded.hosting_active_instance_id,
 			shared_instance_id = excluded.shared_instance_id
 		",
+        instance_id,
+        columns.link_kind,
+        modrinth_project_id,
+        modrinth_version_id,
+        server_project_id,
+        content_project_id,
+        content_version_id,
+        hosting_server_id,
+        hosting_instance_ids,
+        hosting_active_instance_id,
+        shared_instance_id,
     )
-    .bind(instance_id)
-    .bind(columns.link_kind)
-    .bind(columns.modrinth_project_id.as_deref())
-    .bind(columns.modrinth_version_id.as_deref())
-    .bind(columns.server_project_id.as_deref())
-    .bind(columns.content_project_id.as_deref())
-    .bind(columns.content_version_id.as_deref())
-    .bind(columns.hosting_server_id.as_deref())
-    .bind(columns.hosting_instance_ids.as_deref())
-    .bind(columns.hosting_active_instance_id.as_deref())
-    .bind(columns.shared_instance_id.as_deref())
     .execute(&mut **tx)
     .await?;
 
@@ -444,25 +485,25 @@ pub(crate) async fn replace_instance_groups(
     groups: &[String],
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    sqlx::query(
+    sqlx::query!(
         "
 		DELETE FROM instance_groups
 		WHERE instance_id = ?
 		",
+        instance_id,
     )
-    .bind(instance_id)
     .execute(&mut **tx)
     .await?;
 
     for group in groups {
-        sqlx::query(
+        sqlx::query!(
             "
 			INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
 			VALUES (?, ?)
 			",
+            instance_id,
+            group,
         )
-        .bind(instance_id)
-        .bind(group.as_str())
         .execute(&mut **tx)
         .await?;
     }
@@ -476,8 +517,9 @@ pub(crate) async fn upsert_instance_launch_overrides(
 ) -> crate::Result<()> {
     let overrides_data =
         serde_json::to_string(&InstanceLaunchOverridesData::from(overrides))?;
+    let instance_id = overrides.instance_id.as_str();
 
-    sqlx::query(
+    sqlx::query!(
         "
 		INSERT INTO instance_launch_overrides (
 			instance_id,
@@ -487,9 +529,9 @@ pub(crate) async fn upsert_instance_launch_overrides(
 		ON CONFLICT (instance_id) DO UPDATE SET
 			overrides = excluded.overrides
 		",
+        instance_id,
+        overrides_data,
     )
-    .bind(overrides.instance_id.as_str())
-    .bind(overrides_data)
     .execute(&mut **tx)
     .await?;
 
@@ -500,13 +542,13 @@ pub(crate) async fn delete_instance_by_id(
     instance_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    sqlx::query!(
         "
 		DELETE FROM instances
 		WHERE id = ?
 		",
+        instance_id,
     )
-    .bind(instance_id)
     .execute(pool)
     .await?;
 

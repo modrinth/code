@@ -62,7 +62,7 @@ async fn open_app_db_pool(db_path: &Path) -> crate::Result<Pool<Sqlite>> {
 }
 
 async fn record_current_app_version(pool: &Pool<Sqlite>) -> crate::Result<()> {
-    sqlx::query(
+    sqlx::query!(
         "
 		INSERT INTO app_metadata (key, value, updated_at)
 		VALUES ('app_version', ?, unixepoch())
@@ -70,8 +70,8 @@ async fn record_current_app_version(pool: &Pool<Sqlite>) -> crate::Result<()> {
 			value = excluded.value,
 			updated_at = excluded.updated_at
 		",
+        env!("CARGO_PKG_VERSION"),
     )
-    .bind(env!("CARGO_PKG_VERSION"))
     .execute(pool)
     .await?;
 

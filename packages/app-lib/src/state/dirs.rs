@@ -478,18 +478,19 @@ impl DirectoryInfo {
                     .trim_end_matches('/')
                     .trim_end_matches('\\')
                     .to_string();
-                sqlx::query(
+                let new_dir = new_dir.as_str();
+                sqlx::query!(
                     "
                     UPDATE instances
                     SET icon_path = replace(icon_path, ?, ?)
                     WHERE icon_path IS NOT NULL
                     ",
+                    prev_custom_dir,
+                    new_dir,
                 )
-                .bind(prev_custom_dir)
-                .bind(&new_dir)
                 .execute(exec)
                 .await?;
-                sqlx::query(
+                sqlx::query!(
                     "
                     UPDATE instance_launch_overrides
                     SET overrides = jsonb(json_set(
@@ -499,9 +500,9 @@ impl DirectoryInfo {
                     ))
                     WHERE json_type(overrides, '$.java_path') = 'text'
                     ",
+                    prev_custom_dir,
+                    new_dir,
                 )
-                .bind(prev_custom_dir)
-                .bind(&new_dir)
                 .execute(exec)
                 .await?;
             }

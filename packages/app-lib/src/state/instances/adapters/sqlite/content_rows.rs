@@ -192,7 +192,8 @@ pub(crate) async fn get_applied_content_set<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, ContentSetRow>(
+    let row = sqlx::query_as!(
+        ContentSetRow,
         "
 		SELECT cs.*
 		FROM instances i
@@ -200,8 +201,8 @@ where
 			ON cs.id = i.applied_content_set_id
 		WHERE i.id = ?
 		",
+        instance_id,
     )
-    .bind(instance_id)
     .fetch_optional(exec)
     .await?;
 
@@ -215,14 +216,15 @@ pub(crate) async fn get_content_set<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, ContentSetRow>(
+    let row = sqlx::query_as!(
+        ContentSetRow,
         "
 		SELECT *
 		FROM instance_content_sets
 		WHERE id = ?
 		",
+        content_set_id,
     )
-    .bind(content_set_id)
     .fetch_optional(exec)
     .await?;
 
@@ -236,15 +238,16 @@ pub(crate) async fn get_content_sets_for_instance<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let rows = sqlx::query_as::<_, ContentSetRow>(
+    let rows = sqlx::query_as!(
+        ContentSetRow,
         "
 		SELECT *
 		FROM instance_content_sets
 		WHERE instance_id = ?
 		ORDER BY created ASC, id ASC
 		",
+        instance_id,
     )
-    .bind(instance_id)
     .fetch_all(exec)
     .await?;
 
@@ -255,7 +258,19 @@ pub(crate) async fn insert_content_set(
     content_set: &ContentSet,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let id = content_set.id.as_str();
+    let instance_id = content_set.instance_id.as_str();
+    let name = content_set.name.as_str();
+    let source_kind = content_set.source_kind.as_str();
+    let status = content_set.status.as_str();
+    let game_version = content_set.game_version.as_str();
+    let protocol_version = content_set.protocol_version.map(|value| value as i64);
+    let loader = content_set.loader.as_str();
+    let loader_version = content_set.loader_version.as_deref();
+    let created = content_set.created.timestamp();
+    let modified = content_set.modified.timestamp();
+
+    sqlx::query!(
         "
 		INSERT INTO instance_content_sets (
 			id,
@@ -272,18 +287,18 @@ pub(crate) async fn insert_content_set(
 		)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		",
+        id,
+        instance_id,
+        name,
+        source_kind,
+        status,
+        game_version,
+        protocol_version,
+        loader,
+        loader_version,
+        created,
+        modified,
     )
-    .bind(content_set.id.as_str())
-    .bind(content_set.instance_id.as_str())
-    .bind(content_set.name.as_str())
-    .bind(content_set.source_kind.as_str())
-    .bind(content_set.status.as_str())
-    .bind(content_set.game_version.as_str())
-    .bind(content_set.protocol_version.map(|value| value as i64))
-    .bind(content_set.loader.as_str())
-    .bind(content_set.loader_version.as_deref())
-    .bind(content_set.created.timestamp())
-    .bind(content_set.modified.timestamp())
     .execute(&mut **tx)
     .await?;
 
@@ -294,7 +309,17 @@ pub(crate) async fn update_content_set(
     content_set: &ContentSet,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let id = content_set.id.as_str();
+    let name = content_set.name.as_str();
+    let source_kind = content_set.source_kind.as_str();
+    let status = content_set.status.as_str();
+    let game_version = content_set.game_version.as_str();
+    let protocol_version = content_set.protocol_version.map(|value| value as i64);
+    let loader = content_set.loader.as_str();
+    let loader_version = content_set.loader_version.as_deref();
+    let modified = content_set.modified.timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instance_content_sets
 		SET
@@ -308,16 +333,16 @@ pub(crate) async fn update_content_set(
 			modified = ?
 		WHERE id = ?
 		",
+        name,
+        source_kind,
+        status,
+        game_version,
+        protocol_version,
+        loader,
+        loader_version,
+        modified,
+        id,
     )
-    .bind(content_set.name.as_str())
-    .bind(content_set.source_kind.as_str())
-    .bind(content_set.status.as_str())
-    .bind(content_set.game_version.as_str())
-    .bind(content_set.protocol_version.map(|value| value as i64))
-    .bind(content_set.loader.as_str())
-    .bind(content_set.loader_version.as_deref())
-    .bind(content_set.modified.timestamp())
-    .bind(content_set.id.as_str())
     .execute(&mut **tx)
     .await?;
 
@@ -331,15 +356,16 @@ pub(crate) async fn get_content_set_remote_refs<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let rows = sqlx::query_as::<_, ContentSetRemoteRefRow>(
+    let rows = sqlx::query_as!(
+        ContentSetRemoteRefRow,
         "
 		SELECT *
 		FROM instance_content_set_remote_refs
 		WHERE content_set_id = ?
 		ORDER BY ref_type ASC
 		",
+        content_set_id,
     )
-    .bind(content_set_id)
     .fetch_all(exec)
     .await?;
 
@@ -353,14 +379,15 @@ pub(crate) async fn get_content_set_sync_state<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, ContentSetSyncStateRow>(
+    let row = sqlx::query_as!(
+        ContentSetSyncStateRow,
         "
 		SELECT *
 		FROM instance_content_set_sync_state
 		WHERE content_set_id = ?
 		",
+        content_set_id,
     )
-    .bind(content_set_id)
     .fetch_optional(exec)
     .await?;
 
@@ -374,15 +401,16 @@ pub(crate) async fn get_instance_files<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let rows = sqlx::query_as::<_, InstanceFileRow>(
+    let rows = sqlx::query_as!(
+        InstanceFileRow,
         "
 		SELECT *
 		FROM instance_files
 		WHERE instance_id = ?
 		ORDER BY relative_path ASC
 		",
+        instance_id,
     )
-    .bind(instance_id)
     .fetch_all(exec)
     .await?;
 
@@ -393,7 +421,9 @@ pub(crate) async fn mark_instance_files_missing(
     instance_id: &str,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let modified_at = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instance_files
 		SET
@@ -401,9 +431,9 @@ pub(crate) async fn mark_instance_files_missing(
 			modified_at = ?
 		WHERE instance_id = ?
 		",
+        modified_at,
+        instance_id,
     )
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
     .execute(&mut **tx)
     .await?;
 
@@ -414,7 +444,18 @@ pub(crate) async fn upsert_instance_file(
     file: &InstanceFile,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let id = file.id.as_str();
+    let instance_id = file.instance_id.as_str();
+    let relative_path = file.relative_path.as_str();
+    let file_name = file.file_name.as_str();
+    let enabled = i64::from(file.enabled);
+    let sha1 = file.sha1.as_str();
+    let size = file.size as i64;
+    let missing = i64::from(file.missing);
+    let added_at = file.added_at.timestamp();
+    let modified_at = file.modified_at.timestamp();
+
+    sqlx::query!(
         "
 		INSERT INTO instance_files (
 			id,
@@ -437,17 +478,17 @@ pub(crate) async fn upsert_instance_file(
 			missing = excluded.missing,
 			modified_at = excluded.modified_at
 		",
+        id,
+        instance_id,
+        relative_path,
+        file_name,
+        enabled,
+        sha1,
+        size,
+        missing,
+        added_at,
+        modified_at,
     )
-    .bind(file.id.as_str())
-    .bind(file.instance_id.as_str())
-    .bind(file.relative_path.as_str())
-    .bind(file.file_name.as_str())
-    .bind(i64::from(file.enabled))
-    .bind(file.sha1.as_str())
-    .bind(file.size as i64)
-    .bind(i64::from(file.missing))
-    .bind(file.added_at.timestamp())
-    .bind(file.modified_at.timestamp())
     .execute(&mut **tx)
     .await?;
 
@@ -461,15 +502,16 @@ pub(crate) async fn get_content_entries<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let rows = sqlx::query_as::<_, ContentEntryRow>(
+    let rows = sqlx::query_as!(
+        ContentEntryRow,
         "
 		SELECT *
 		FROM instance_content_entries
 		WHERE content_set_id = ?
 		ORDER BY added_at ASC, id ASC
 		",
+        content_set_id,
     )
-    .bind(content_set_id)
     .fetch_all(exec)
     .await?;
 
@@ -483,14 +525,15 @@ pub(crate) async fn get_content_update_check<'e, E>(
 where
     E: Executor<'e, Database = Sqlite>,
 {
-    let row = sqlx::query_as::<_, ContentUpdateCheckRow>(
+    let row = sqlx::query_as!(
+        ContentUpdateCheckRow,
         "
 		SELECT *
 		FROM instance_content_update_checks
 		WHERE content_entry_id = ?
 		",
+        content_entry_id,
     )
-    .bind(content_entry_id)
     .fetch_optional(exec)
     .await?;
 
@@ -512,15 +555,16 @@ pub(crate) async fn get_instance_file_by_relative_path(
     relative_path: &str,
     pool: &SqlitePool,
 ) -> crate::Result<Option<InstanceFile>> {
-    let row = sqlx::query_as::<_, InstanceFileRow>(
+    let row = sqlx::query_as!(
+        InstanceFileRow,
         "
 		SELECT *
 		FROM instance_files
 		WHERE instance_id = ? AND relative_path = ?
 		",
+        instance_id,
+        relative_path,
     )
-    .bind(instance_id)
-    .bind(relative_path)
     .fetch_optional(pool)
     .await?;
 
@@ -571,7 +615,10 @@ pub(crate) async fn rename_instance_file(
     enabled: bool,
     pool: &SqlitePool,
 ) -> crate::Result<Option<InstanceFile>> {
-    sqlx::query(
+    let enabled = i64::from(enabled);
+    let modified_at = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instance_files
 		SET
@@ -581,13 +628,13 @@ pub(crate) async fn rename_instance_file(
 			modified_at = ?
 		WHERE instance_id = ? AND relative_path = ?
 		",
+        new_relative_path,
+        new_file_name,
+        enabled,
+        modified_at,
+        instance_id,
+        old_relative_path,
     )
-    .bind(new_relative_path)
-    .bind(new_file_name)
-    .bind(i64::from(enabled))
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
-    .bind(old_relative_path)
     .execute(pool)
     .await?;
 
@@ -600,14 +647,14 @@ pub(crate) async fn remove_instance_file_by_relative_path(
     relative_path: &str,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    sqlx::query!(
         "
 		DELETE FROM instance_files
 		WHERE instance_id = ? AND relative_path = ?
 		",
+        instance_id,
+        relative_path,
     )
-    .bind(instance_id)
-    .bind(relative_path)
     .execute(pool)
     .await?;
 
@@ -631,14 +678,15 @@ pub(crate) async fn get_content_entry_by_id(
     id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<Option<ContentEntry>> {
-    let row = sqlx::query_as::<_, ContentEntryRow>(
+    let row = sqlx::query_as!(
+        ContentEntryRow,
         "
 		SELECT *
 		FROM instance_content_entries
 		WHERE id = ?
 		",
+        id,
     )
-    .bind(id)
     .fetch_optional(pool)
     .await?;
 
@@ -650,7 +698,8 @@ pub(crate) async fn get_content_entry_by_file(
     file_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<Option<ContentEntry>> {
-    let row = sqlx::query_as::<_, ContentEntryRow>(
+    let row = sqlx::query_as!(
+        ContentEntryRow,
         "
 		SELECT *
 		FROM instance_content_entries
@@ -658,9 +707,9 @@ pub(crate) async fn get_content_entry_by_file(
 		ORDER BY modified_at DESC
 		LIMIT 1
 		",
+        content_set_id,
+        file_id,
     )
-    .bind(content_set_id)
-    .bind(file_id)
     .fetch_optional(pool)
     .await?;
 
@@ -672,7 +721,7 @@ pub(crate) async fn upsert_content_entry_from_parts(
     pool: &SqlitePool,
 ) -> crate::Result<ContentEntry> {
     let existing_id = if let Some(file_id) = input.file_id {
-        sqlx::query_scalar::<_, String>(
+        sqlx::query_scalar!(
             "
 			SELECT id
 			FROM instance_content_entries
@@ -680,15 +729,15 @@ pub(crate) async fn upsert_content_entry_from_parts(
 			ORDER BY modified_at DESC
 			LIMIT 1
 			",
+            input.content_set_id,
+            file_id,
         )
-        .bind(input.content_set_id)
-        .bind(file_id)
         .fetch_optional(pool)
         .await?
     } else if let (Some(project_id), Some(version_id)) =
         (input.project_id, input.version_id)
     {
-        sqlx::query_scalar::<_, String>(
+        sqlx::query_scalar!(
             "
 			SELECT id
 			FROM instance_content_entries
@@ -698,10 +747,10 @@ pub(crate) async fn upsert_content_entry_from_parts(
 			ORDER BY modified_at DESC
 			LIMIT 1
 			",
+            input.content_set_id,
+            project_id,
+            version_id,
         )
-        .bind(input.content_set_id)
-        .bind(project_id)
-        .bind(version_id)
         .fetch_optional(pool)
         .await?
     } else {
@@ -729,8 +778,21 @@ pub(crate) async fn upsert_content_entry_from_parts(
         .await?
         .map(|entry| entry.added_at)
         .unwrap_or(entry.added_at);
+    let id = entry.id.as_str();
+    let entry_instance_id = entry.instance_id.as_str();
+    let content_set_id = entry.content_set_id.as_str();
+    let file_id = entry.file_id.as_deref();
+    let project_type = entry.project_type.get_name();
+    let project_id = entry.project_id.as_deref();
+    let version_id = entry.version_id.as_deref();
+    let source_kind = entry.source_kind.as_str();
+    let server_requirement = entry.server_requirement.as_str();
+    let client_requirement = entry.client_requirement.as_str();
+    let enabled = i64::from(entry.enabled);
+    let added_at = added_at.timestamp();
+    let modified_at = entry.modified_at.timestamp();
 
-    sqlx::query(
+    sqlx::query!(
         "
 		INSERT INTO instance_content_entries (
 			id,
@@ -759,20 +821,20 @@ pub(crate) async fn upsert_content_entry_from_parts(
 			enabled = excluded.enabled,
 			modified_at = excluded.modified_at
 		",
+        id,
+        entry_instance_id,
+        content_set_id,
+        file_id,
+        project_type,
+        project_id,
+        version_id,
+        source_kind,
+        server_requirement,
+        client_requirement,
+        enabled,
+        added_at,
+        modified_at,
     )
-    .bind(entry.id.as_str())
-    .bind(entry.instance_id.as_str())
-    .bind(entry.content_set_id.as_str())
-    .bind(entry.file_id.as_deref())
-    .bind(entry.project_type.get_name())
-    .bind(entry.project_id.as_deref())
-    .bind(entry.version_id.as_deref())
-    .bind(entry.source_kind.as_str())
-    .bind(entry.server_requirement.as_str())
-    .bind(entry.client_requirement.as_str())
-    .bind(i64::from(entry.enabled))
-    .bind(added_at.timestamp())
-    .bind(entry.modified_at.timestamp())
     .execute(pool)
     .await?;
 
@@ -793,17 +855,20 @@ pub(crate) async fn set_content_entry_enabled_for_file(
     enabled: bool,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let enabled = i64::from(enabled);
+    let modified_at = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instance_content_entries
 		SET enabled = ?, modified_at = ?
 		WHERE content_set_id = ? AND file_id = ?
 		",
+        enabled,
+        modified_at,
+        content_set_id,
+        file_id,
     )
-    .bind(i64::from(enabled))
-    .bind(Utc::now().timestamp())
-    .bind(content_set_id)
-    .bind(file_id)
     .execute(pool)
     .await?;
 
@@ -815,14 +880,14 @@ pub(crate) async fn remove_content_entries_for_file(
     file_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    sqlx::query!(
         "
 		DELETE FROM instance_content_entries
 		WHERE content_set_id = ? AND file_id = ?
 		",
+        content_set_id,
+        file_id,
     )
-    .bind(content_set_id)
-    .bind(file_id)
     .execute(pool)
     .await?;
 
@@ -835,7 +900,10 @@ pub(crate) async fn upsert_content_update_check(
     update_version_id: Option<&str>,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let update_channel = update_channel.key();
+    let checked_at = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		INSERT INTO instance_content_update_checks (
 			content_entry_id,
@@ -849,11 +917,11 @@ pub(crate) async fn upsert_content_update_check(
 			update_version_id = excluded.update_version_id,
 			checked_at = excluded.checked_at
 		",
+        content_entry_id,
+        update_channel,
+        update_version_id,
+        checked_at,
     )
-    .bind(content_entry_id)
-    .bind(update_channel.key())
-    .bind(update_version_id)
-    .bind(Utc::now().timestamp())
     .execute(pool)
     .await?;
 

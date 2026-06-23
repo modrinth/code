@@ -264,7 +264,7 @@ async fn resolve_instance_identity(
     instance: &str,
     state: &State,
 ) -> Result<(String, String)> {
-    sqlx::query_as::<_, (String, String)>(
+    let row = sqlx::query!(
         "
 		SELECT id, path
 		FROM instances
@@ -272,10 +272,10 @@ async fn resolve_instance_identity(
 		ORDER BY CASE WHEN id = ? THEN 0 ELSE 1 END
 		LIMIT 1
 		",
+        instance,
+        instance,
+        instance,
     )
-    .bind(instance)
-    .bind(instance)
-    .bind(instance)
     .fetch_optional(&state.pool)
     .await?
     .ok_or_else(|| {
@@ -283,7 +283,9 @@ async fn resolve_instance_identity(
             "Unknown instance id or path: {instance}"
         ))
         .as_error()
-    })
+    })?;
+
+    Ok((row.id, row.path))
 }
 
 async fn get_all_worlds_in_instance(

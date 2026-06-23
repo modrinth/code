@@ -46,16 +46,19 @@ pub(crate) async fn set_instance_install_stage(
     install_stage: InstanceInstallStage,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let install_stage = install_stage.as_str();
+    let modified = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instances
 		SET install_stage = ?, modified = ?
 		WHERE id = ?
 		",
+        install_stage,
+        modified,
+        instance_id,
     )
-    .bind(install_stage.as_str())
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
     .execute(pool)
     .await?;
 
@@ -67,7 +70,9 @@ pub(crate) async fn set_applied_content_set_loader_version(
     loader_version: Option<&str>,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let modified = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instance_content_sets
 		SET loader_version = ?, modified = ?
@@ -77,10 +82,10 @@ pub(crate) async fn set_applied_content_set_loader_version(
 			WHERE id = ?
 		)
 		",
+        loader_version,
+        modified,
+        instance_id,
     )
-    .bind(loader_version)
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
     .execute(pool)
     .await?;
 
@@ -92,7 +97,10 @@ pub(crate) async fn set_applied_content_set_protocol_version(
     protocol_version: Option<u32>,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let protocol_version = protocol_version.map(i64::from);
+    let modified = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instance_content_sets
 		SET protocol_version = ?, modified = ?
@@ -102,10 +110,10 @@ pub(crate) async fn set_applied_content_set_protocol_version(
 			WHERE id = ?
 		)
 		",
+        protocol_version,
+        modified,
+        instance_id,
     )
-    .bind(protocol_version.map(i64::from))
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
     .execute(pool)
     .await?;
 
@@ -117,16 +125,19 @@ pub(crate) async fn set_instance_last_played(
     last_played: DateTime<Utc>,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let last_played = last_played.timestamp();
+    let modified = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instances
 		SET last_played = ?, modified = ?
 		WHERE id = ?
 		",
+        last_played,
+        modified,
+        instance_id,
     )
-    .bind(last_played.timestamp())
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
     .execute(pool)
     .await?;
 
@@ -138,16 +149,19 @@ pub(crate) async fn add_instance_recent_playtime(
     seconds: u64,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let seconds = seconds as i64;
+    let modified = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instances
 		SET recent_time_played = recent_time_played + ?, modified = ?
 		WHERE id = ?
 		",
+        seconds,
+        modified,
+        instance_id,
     )
-    .bind(seconds as i64)
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
     .execute(pool)
     .await?;
 
@@ -159,7 +173,10 @@ pub(crate) async fn mark_instance_playtime_submitted(
     recent_time_played: u64,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    sqlx::query(
+    let recent_time_played = recent_time_played as i64;
+    let modified = Utc::now().timestamp();
+
+    sqlx::query!(
         "
 		UPDATE instances
 		SET
@@ -168,10 +185,10 @@ pub(crate) async fn mark_instance_playtime_submitted(
 			modified = ?
 		WHERE id = ?
 		",
+        recent_time_played,
+        modified,
+        instance_id,
     )
-    .bind(recent_time_played as i64)
-    .bind(Utc::now().timestamp())
-    .bind(instance_id)
     .execute(pool)
     .await?;
 
