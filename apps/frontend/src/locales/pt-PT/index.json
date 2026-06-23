@@ -398,6 +398,9 @@
   "create.collection.title": {
     "message": "Criar uma coleção"
   },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Estás prestes a atingir o limite de {typePlural}, por favor contacta o suporte se precisas de mais do que {max} {typePlural}."
+  },
   "create.limit-alert.contact-support": {
     "message": "Contacta o suporte"
   },

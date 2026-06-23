@@ -23,6 +23,9 @@
   "analytics.breakdown.country": {
     "message": "Land"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Beroende på"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Nedladdningsanledning"
   },
@@ -37,6 +40,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Laddare"
+  },
+  "analytics.breakdown.members": {
+    "message": "Medlem"
   },
   "analytics.breakdown.monetization": {
     "message": "Intäkter"
@@ -58,6 +64,9 @@
   },
   "analytics.chart.action.show-all": {
     "message": "Visa alla"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Visa begränsad"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Visa topp 8"
@@ -94,6 +103,9 @@
   },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Se meddelande"
   },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (förhandsvisa)"
@@ -283,6 +295,9 @@
   },
   "analytics.project.all": {
     "message": "Alla projekt"
+  },
+  "analytics.project.count": {
+    "message": "{count, number} projekt"
   },
   "analytics.project.icon-alt": {
     "message": "{name} Ikon"
@@ -1387,6 +1402,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "Ändra länkar"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Ändringar kommer appliceras till <strong>{count}</strong> projekt."
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discordinbjudan"

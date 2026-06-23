@@ -12,6 +12,7 @@
 				:placeholder="formatMessage(analyticsMessages.selectProjects)"
 				:no-options-message="noProjectsMessage"
 				:searchable="projectOptions.length > 6"
+				fuzzy-search
 				:max-tag-rows="1"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
@@ -211,6 +212,7 @@
 						:placeholder="formatMessage(analyticsMessages.selectProjects)"
 						:no-options-message="noProjectsMessage"
 						:searchable="projectOptions.length > 6"
+						fuzzy-search
 						:max-tag-rows="1"
 						checkbox-position="right"
 						show-selection-actions
@@ -545,7 +547,7 @@ function getProjectOption(
 	return {
 		value: project.id,
 		label: project.name,
-		searchTerms: groupTitle ? [groupTitle] : undefined,
+		searchTerms: [project.id, groupTitle].filter((term): term is string => Boolean(term)),
 	}
 }
 

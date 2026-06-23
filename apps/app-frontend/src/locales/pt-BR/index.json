@@ -290,6 +290,9 @@
   "app.modal.install-to-play.install-button": {
     "message": "Instalar"
   },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
+  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pacote de mods necessário"
   },

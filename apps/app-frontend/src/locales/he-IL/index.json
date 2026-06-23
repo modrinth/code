@@ -8,6 +8,12 @@
   "app.action-bar.downloads": {
     "message": "הורדות"
   },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "החבא יותר התקנים רצים"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "הפוך למקרה ראשי"
+  },
   "app.action-bar.offline": {
     "message": "לא מקוון"
   },
@@ -259,6 +265,9 @@
   },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count, plural, one {בקשת חברות אחת} other {# בקשות חברות}}"
   },
   "friends.add-friend.submit": {
     "message": "שליחת בקשת חברות"

@@ -98,6 +98,15 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Выбранные проекты"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Установить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# проект выбран} few {# проекта выбрано} other {# проектов выбрано}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "{count, plural, one {Выбран # проект} few {Выбрано # проекта} other {Выбрано # проектов}} для установки. Установите {count, plural, =1 {его} other {их}} сейчас или вернитесь без изменений."
+  },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Выбранные проекты ещё не установлены"
   },
@@ -305,8 +314,14 @@
   "content-type.content.lowercase": {
     "defaultMessage": "контент"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural,  one {# элемент}  few {# элемента} many {# элементов} other {#элементов}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Выбрать {project}"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Вы уверены, что хотите обновить {count, plural, one {# проект} few {# проекта} other {# проектов}} до их последней совместимой версии? Рекомендуется обновлять контент по отдельности."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Предупреждение об обновлении"
@@ -316,6 +331,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Удерживайте Shift при нажатии на «Обновить всё», чтобы больше не показывать это окно."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Обновить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Удаление мода может необратимо повлиять на ваш мир, что приведет к потере контента или непредвиденным ошибкам при следующей загрузке."
@@ -349,6 +367,39 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Отвязать"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Этот контент необходим для другого контента"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, =1 {Зависимый проект} other {Зависимые проекты}}"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "сборка"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "сервер"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Всё равно удалить"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Всё равно удалить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Удаление"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Отключить зависимый контент после удаления"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Зависимый контент может не загрузиться или отключиться"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Предупреждение о зависимостях"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Что произойдёт?"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Добавлен (зависимость)"
@@ -419,6 +470,9 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Пожалуйста, дождитесь завершения операции перед редактированием."
   },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Найдите проекты или добавьте файлы"
+  },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Добавьте дополнительный контент поверх этой сборки"
   },
@@ -479,6 +533,18 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Все выбранные проекты уже включены"
   },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Удаление проектов..."
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Отключение проектов..."
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Включение проектов..."
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Обновление проектов..."
+  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Выбрано: {count, number}"
   },
@@ -493,6 +559,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "Импортировать"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Импортировать {count, plural, one {# сборку} few {# сборки} other {# сборок}}"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Установить сервер"
@@ -1001,6 +1070,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Новое имя"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# элемент} few {# элемента} other {# элементов}}"
+  },
   "files.table-header.created": {
     "defaultMessage": "Создан"
   },
@@ -1198,6 +1270,9 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Введите край/область"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# байт} few {# байта} many {# байт} other {# байта}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} КиБ"
@@ -1528,6 +1603,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Неизвестный режим игры"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count, plural, one {# совместимая сборка} few {# совместимые сборки} other {# совместимых сборок}}"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Существующая сборка"
@@ -2351,29 +2429,77 @@
   "project-type.all": {
     "defaultMessage": "Всё"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {набор данных} few {набора данных} other {наборов данных}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Наборы данных"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {набор данных} few {набора данных} other {наборов данных}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {мод} few {мода} other {модов}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Моды"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {мод} few {мода} other {модов}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {сборка} few {сборки} other {сборок}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Сборки"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {сборка} few {сборки} other {сборок}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {плагин} few {плагина} other {плагинов}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Плагины"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {плагин} few {плагина} other {плагинов}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Проекты"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} other {наборов ресурсов}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Наборы ресурсов"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} other {наборов ресурсов}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {сервер} few {сервера} other {серверов}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Серверы"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {сервер} few {сервера} other {серверов}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдера} other {шейдеров}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Шейдеры"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдера} other {шейдеров}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Поддерживаемые среды"
@@ -2498,6 +2624,9 @@
   "project.about.tags.title": {
     "defaultMessage": "Теги"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Обязателен и для клиента, и для сервера."
   },
@@ -2564,8 +2693,20 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Неизвестная среда"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} в игре"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {игрок} few {игрока} other {игроков}} сейчас на сервере"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, one {недавний запуск} few {недавних запуска} other {недавних запусков}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {запуск} few {запуска} other {запусков}} через Modrinth за последние 2 недели"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Используется собственная сборка"
@@ -3023,6 +3164,9 @@
   "search.filter.locked.default.sync": {
     "defaultMessage": "Синхронизировать"
   },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "Фильтр заблокирован"
+  },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Разблокировать"
   },
@@ -3347,6 +3491,9 @@
   "servers.access-page.role.viewer-description": {
     "defaultMessage": "Запуск, остановка и просмотр сервера без возможности вносить изменения."
   },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Поиск по {count, plural, one {# пользователю} other {# пользователям}}..."
+  },
   "servers.access-role.editor": {
     "defaultMessage": "Редактор"
   },
@@ -3565,6 +3712,9 @@
   },
   "servers.audit-log.event.server-plan-changed": {
     "defaultMessage": "Изменён план на <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, number} CPU"
   },
   "servers.audit-log.event.server-plan.new-plan": {
     "defaultMessage": "новый план"
@@ -3962,6 +4112,9 @@
   "servers.listing.new-label": {
     "defaultMessage": "Новый"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Ваши файлы будут храниться еще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дня} other {дней}}</days-remaining>. Обратитесь в службу поддержки, чтобы скачать файлы до их удаления."
+  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Ваши файлы будут храниться в течение 30 дней после отмены."
   },
@@ -4088,6 +4241,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Готово"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Поиск по {count, plural, one {# серверу} other {# серверам}}..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4105,6 +4261,9 @@
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Ваши серверы"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {день} few {дня} other {дней}} <hours-count>{hours}</hours-count> {hours, plural, one {час} few {часа} other {часов}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {минута} few {минуты} other {минут}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {секунда} few {секунды} other {секунд}} осталось..."
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Новый сервер"
@@ -4429,6 +4588,9 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Поиск языка..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Не найдены языки, соответствующие} one {Найден # язык, соответствующий} few {Найдено # языка, соответствующих} other {Найдено # языков, соответствующих}} запросу."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Не найдены языки, соответствующие запросу."
@@ -4901,6 +5063,9 @@
   "time-frame-picker.increase-amount": {
     "defaultMessage": "Увеличить период"
   },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select,\n  hours {{amount, plural, =1 {Последний час} one {Последний # час} few {Последние # часа} other {Последние # часов}}}\n  days {{amount, plural, =1 {Последний день} one {Последний # день} few {Последние # дня} other {Последние # дней}}}\n  weeks {{amount, plural, =1 {Последняя неделя} one {Последняя # неделя} few {Последние # недели} other {Последние # недель}}}\n  months {{amount, plural, =1 {Последний месяц} one {Последний # месяц} few {Последние # месяца} other {Последние # месяцев}}}\n  other {Последнее время}\n}"
+  },
   "time-frame-picker.last-timeframe-prefix": {
     "defaultMessage": "Последние"
   },
@@ -4978,6 +5143,9 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Уйти со страницы?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, one {# уведомление} few {# уведомления} other {# уведомлений}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Закрыть всё"

@@ -48,7 +48,7 @@
     "message": "Loader"
   },
   "analytics.breakdown.members": {
-    "message": "Members"
+    "message": "Member"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetization"
@@ -504,7 +504,7 @@
     "message": "Monetized"
   },
   "analytics.value.no-dependent": {
-    "message": "No dependents"
+    "message": "None"
   },
   "analytics.value.no-dependent-tooltip": {
     "message": "Downloaded for reasons other than being a dependency"

@@ -74,6 +74,84 @@
   "analytics.chart.controls.button": {
     "message": "Ovládání"
   },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Skrýt {name} v grafu"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Zobrazit {name} v grafu"
+  },
+  "analytics.chart.view.area": {
+    "message": "Oblast"
+  },
+  "analytics.download-reason.update": {
+    "message": "Aktualizace"
+  },
+  "analytics.downloads.suffix": {
+    "message": "stažení"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Žádné dostupné projekty"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Žádné dostupné projekty pro analýzu "
+  },
+  "analytics.empty.select-project": {
+    "message": "Vyber alespoň jeden projekt pro zobrazení dat"
+  },
+  "analytics.group-by.1h": {
+    "message": "1h"
+  },
+  "analytics.group-by.6h": {
+    "message": "6h"
+  },
+  "analytics.group-by.date": {
+    "message": "Datum"
+  },
+  "analytics.group-by.day": {
+    "message": "Den"
+  },
+  "analytics.group-by.month": {
+    "message": "Měsíc"
+  },
+  "analytics.group-by.week": {
+    "message": "Týden "
+  },
+  "analytics.group-by.year": {
+    "message": "Rok"
+  },
+  "analytics.options.loading": {
+    "message": "Načítání..."
+  },
+  "analytics.project-status.approved": {
+    "message": "Schválený"
+  },
+  "analytics.project-status.archived": {
+    "message": "Archivovaný "
+  },
+  "analytics.project-status.other": {
+    "message": "Jiné"
+  },
+  "analytics.project-status.private": {
+    "message": "Soukromý "
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Neveřejný "
+  },
+  "analytics.project-status.withheld": {
+    "message": "Pozastavený"
+  },
+  "analytics.project.all": {
+    "message": "Všechny projekty"
+  },
+  "analytics.query.label.project": {
+    "message": "Projekt:"
+  },
+  "analytics.value.other": {
+    "message": "Jiné"
+  },
   "app-marketing.download.description": {
     "message": "Naše aplikace je dostupná pro všechny počítačové platformy, vyberte si požadovanou verzi."
   },
@@ -437,6 +515,12 @@
   "conversation-thread.action.add-private-note": {
     "message": "Přidat soukromou poznámku"
   },
+  "conversation-thread.action.approve": {
+    "message": "Schválit"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Schválit s odpovědí"
+  },
   "conversation-thread.action.close-thread": {
     "message": "Uzavřít vlákno"
   },
@@ -458,6 +542,12 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Odpovědět vláknu"
   },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Znovu odeslat ke kontrole"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Znovu odeslat ke kontrole s odpovědí "
+  },
   "conversation-thread.action.send": {
     "message": "Odeslat"
   },
@@ -466,6 +556,12 @@
   },
   "conversation-thread.action.send-to-review-with-reply": {
     "message": "Odeslat ke kontrole s odpovědí"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Pozastavit "
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Pozastavit s odpovědí"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Odpovědět vláknu..."
@@ -478,6 +574,9 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Doplňkové soubory slouží jako podpůrné materiály (např. zdrojový kód), ne jako alternativní verze či varianty."
+  },
+  "create.collection.collection-info": {
+    "message": "Tvá nová kolekce bude vytvořena jako veřejná a bude obsahovat {count, plural, =0 {žádné projekty} one {# projekt} few {# projekty} other {# projektů}}."
   },
   "create.collection.create-collection": {
     "message": "Vytvořit kolekci"
@@ -653,6 +752,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Nedávno aktualizováno"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Stáhnout {formType}"
+  },
   "dashboard.creator-tax-form-modal.confirmation.title": {
     "message": "Hotovo! 🎉"
   },
@@ -687,7 +789,7 @@
     "message": "Vyhladaj štát..."
   },
   "dashboard.creator-withdraw-modal.method-selection.region": {
-    "message": "Región"
+    "message": "Oblast"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Majitel účtu"
@@ -706,6 +808,9 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
     "message": "Zadejte DIČ"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Síť"
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Účet"
@@ -726,7 +831,7 @@
     "message": "Přihlásit přes PayPal"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
-    "message": ""
+    "message": "Daňový formulář"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Zadejte množství"
@@ -749,6 +854,9 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Vyčerpali jste svůj limit pro výběr <b>{withdrawLimit}</b>. Pro vyšší výběr musíte vyplnit daňový formulář."
   },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Tvůrce"
+  },
   "dashboard.organizations.button.create": {
     "message": "Vytvořit organizaci"
   },
@@ -758,11 +866,17 @@
   "dashboard.organizations.error.fetch": {
     "message": "Nepodařilo se načíst organizace"
   },
+  "dashboard.organizations.title": {
+    "message": "Organizace"
+  },
   "dashboard.overview.notifications.button.mark-all-as-read": {
     "message": "Označit vše jako přečtené"
   },
   "dashboard.overview.notifications.button.view-history": {
     "message": "Ukázat historii"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Nemáš žádná nepřečtená oznámení."
   },
   "dashboard.overview.notifications.history.label": {
     "message": "Historie"
@@ -775,6 +889,9 @@
   },
   "dashboard.projects.head-title": {
     "message": "Projekty"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Upravit odkazy"
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord pozvánka"
@@ -793,6 +910,9 @@
   },
   "dashboard.projects.table.status": {
     "message": "Stav"
+  },
+  "dashboard.report.title": {
+    "message": "Nahlásit {id}"
   },
   "dashboard.revenue.available-now": {
     "message": "K dispozici nyní"
@@ -1237,6 +1357,9 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Stáhněte si projekty od {username} na Modrinthu"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> sledující projektu} few {<stat>{count}</stat> sledující projektu} other {<stat>{count}</stat> sledujících projektu}}"
   },
   "profile.user-id": {
     "message": "ID uživatele: {id}"

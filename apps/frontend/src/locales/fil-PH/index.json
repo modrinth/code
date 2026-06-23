@@ -986,6 +986,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Tingnan ang kasaysayan ng notipikasyon"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Lumikha ng organisasyon"
   },

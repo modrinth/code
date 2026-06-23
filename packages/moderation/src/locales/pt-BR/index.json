@@ -212,6 +212,9 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpe o nome"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Você selecionou {tagCount, plural,=0 {nenhuma tag} one {# tag} other {# tags}}. Por favor reduza para {maxTagCount} ou menos para garantir que seu servidor apareça nos resultados de pesquisa relevantes."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecione etiquetas específicas"
   },
@@ -249,3 +252,4 @@
     "defaultMessage": "Visitar página de links"
   }
 }
+
