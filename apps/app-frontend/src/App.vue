@@ -112,6 +112,7 @@ import {
 	isNetworkMetered,
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
+import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n from '@/i18n.config'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
@@ -863,7 +864,13 @@ async function handleCommand(e) {
 			})
 		}
 	} else if (e.event === 'LaunchProfile') {
-		await run(decodeURIComponent(e.path)).catch(handleError)
+		if (e.server) {
+			await start_join_server(e.path, e.server).catch(handleError)
+		} else if (e.singleplayer_world) {
+			await start_join_singleplayer_world(e.path, e.singleplayer_world).catch(handleError)
+		} else {
+			await run(e.path).catch(handleError)
+		}
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)

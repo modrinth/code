@@ -117,6 +117,7 @@
 						world.type === 'server' ? serverData[world.address]?.renderedMotd : undefined
 					"
 					:game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
+					:shortcut-instance-path="instance.path"
 					@play="() => joinWorld(world)"
 					@stop="() => emit('stop')"
 					@refresh="() => refreshServer((world as ServerWorld).address)"

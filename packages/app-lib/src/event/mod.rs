@@ -214,6 +214,8 @@ pub enum CommandPayload {
     },
     LaunchProfile {
         path: String,
+        server: Option<String>,
+        singleplayer_world: Option<String>,
     },
     RunMRPack {
         // run or install .mrpack

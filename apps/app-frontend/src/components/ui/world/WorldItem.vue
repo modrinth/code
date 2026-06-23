@@ -3,6 +3,7 @@ import {
 	ClipboardCopyIcon,
 	EditIcon,
 	EyeIcon,
+	ExternalIcon,
 	FolderOpenIcon,
 	IssuesIcon,
 	MoreVerticalIcon,
@@ -23,6 +24,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	injectNotificationManager,
 	OverflowMenu,
 	SmartClickable,
 	TagItem,
@@ -39,7 +41,7 @@ import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { copyToClipboard } from '@/helpers/utils'
+import { copyToClipboard, createProfileShortcut } from '@/helpers/utils'
 import type {
 	ProtocolVersion,
 	ServerStatus,
@@ -60,6 +62,7 @@ const formatDateTime = useFormatDateTime({
 })
 
 const router = useRouter()
+const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
 	(e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
@@ -94,6 +97,7 @@ const props = withDefaults(
 		instancePath?: string
 		instanceName?: string
 		instanceIcon?: string
+		shortcutInstancePath?: string
 	}>(),
 	{
 		playingInstance: false,
@@ -113,6 +117,7 @@ const props = withDefaults(
 		instancePath: undefined,
 		instanceName: undefined,
 		instanceIcon: undefined,
+		shortcutInstancePath: undefined,
 	},
 )
 
@@ -131,6 +136,33 @@ const serverIncompatible = computed(
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
 const managed = computed(() => props.managed)
+const shortcutInstancePath = computed(() => props.shortcutInstancePath ?? props.instancePath)
+
+async function createShortcut() {
+	if (!shortcutInstancePath.value) return
+
+	try {
+		const shortcutPath = await createProfileShortcut(
+			props.world.name,
+			shortcutInstancePath.value,
+			props.world.type === 'server'
+				? { server: (props.world as ServerWorld).address }
+				: { singleplayerWorld: (props.world as SingleplayerWorld).path },
+		)
+		if (!shortcutPath) return
+
+		addNotification({
+			type: 'success',
+			title: 'Shortcut created',
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Failed to create shortcut',
+			text: error instanceof Error ? error.message : '',
+		})
+	}
+}
 
 const messages = defineMessages({
 	hardcore: {
@@ -184,6 +216,10 @@ const messages = defineMessages({
 	dontShowOnHome: {
 		id: 'instance.worlds.dont_show_on_home',
 		defaultMessage: `Don't show on Home`,
+	},
+	createShortcut: {
+		id: 'instance.worlds.create_shortcut',
+		defaultMessage: 'Create shortcut',
 	},
 	linkedServer: {
 		id: 'instance.worlds.linked_server',
@@ -440,6 +476,11 @@ const messages = defineMessages({
 								action: () => copyToClipboard((world as ServerWorld).address),
 							},
 							{
+								id: 'create-shortcut',
+								shown: !!shortcutInstancePath,
+								action: () => createShortcut(),
+							},
+							{
 								id: 'edit',
 								action: () => emit('edit'),
 								shown: !instancePath,
@@ -516,6 +557,10 @@ const messages = defineMessages({
 						<template #refresh>
 							<UpdatedIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.refreshButton) }}
+						</template>
+						<template #create-shortcut>
+							<ExternalIcon aria-hidden="true" />
+							{{ formatMessage(messages.createShortcut) }}
 						</template>
 						<template #dont-show-on-home>
 							<XIcon aria-hidden="true" />

@@ -7,6 +7,7 @@ use crate::{
     },
     util::io,
 };
+use url::form_urlencoded;
 use urlencoding::decode;
 
 /// Handles external functions (such as through URL deep linkage)
@@ -32,9 +33,37 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         // /launch/profile/{id}   -    Launches a profile
         Some(("launch", rest)) if rest.starts_with("profile/") => {
             let raw = rest.trim_start_matches("profile/");
+            let (raw, query) = raw.split_once('?').unwrap_or((raw, ""));
+            let mut server = None;
+            let mut singleplayer_world = None;
+
+            for (key, value) in form_urlencoded::parse(query.as_bytes()) {
+                match &*key {
+                    "server" => server = Some(value.into_owned()),
+                    "singleplayer_world" => {
+                        singleplayer_world = Some(value.into_owned());
+                    }
+                    _ => {}
+                }
+            }
+
+            if server.is_some() && singleplayer_world.is_some() {
+                emit_warning(
+                    "Invalid command, cannot launch both a server and a singleplayer world",
+                )
+                .await?;
+                return Err(crate::ErrorKind::InputError(
+                    "Cannot launch both a server and a singleplayer world"
+                        .to_string(),
+                )
+                .into());
+            }
+
             match decode(raw) {
                 Ok(decoded) => CommandPayload::LaunchProfile {
                     path: decoded.to_string(),
+                    server,
+                    singleplayer_world,
                 },
                 Err(e) => {
                     emit_warning(&format!(

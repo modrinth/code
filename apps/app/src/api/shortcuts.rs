@@ -29,11 +29,28 @@ pub async fn create_profile_shortcut(
     profile_name: String,
     profile_path: String,
     output_path: PathBuf,
+    server: Option<String>,
+    singleplayer_world: Option<String>,
 ) -> Result<PathBuf> {
-    let launch_url = format!(
+    if server.is_some() && singleplayer_world.is_some() {
+        return Err(std::io::Error::other(
+            "shortcut cannot launch both a server and a singleplayer world",
+        )
+        .into());
+    }
+
+    let mut launch_url = format!(
         "modrinth://launch/profile/{}",
         urlencoding::encode(&profile_path)
     );
+    if let Some(server) = server {
+        launch_url.push_str("?server=");
+        launch_url.push_str(&urlencoding::encode(&server));
+    } else if let Some(singleplayer_world) = singleplayer_world {
+        launch_url.push_str("?singleplayer_world=");
+        launch_url.push_str(&urlencoding::encode(&singleplayer_world));
+    }
+
     let output_path = shortcut_path_with_extension(output_path);
     let output_path_existed =
         tokio::fs::try_exists(&output_path).await.unwrap_or(false);

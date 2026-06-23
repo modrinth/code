@@ -48,7 +48,7 @@ export async function showLauncherLogsFolder() {
 	return await invoke('plugin:utils|show_launcher_logs_folder', {})
 }
 
-export async function createProfileShortcut(profileName, profilePath) {
+export async function createProfileShortcut(profileName, profilePath, options = {}) {
 	const outputPath = await save({
 		defaultPath: `Modrinth - ${profileName}`,
 	})
@@ -59,6 +59,8 @@ export async function createProfileShortcut(profileName, profilePath) {
 		profileName,
 		profilePath,
 		outputPath,
+		server: options.server,
+		singleplayerWorld: options.singleplayerWorld,
 	})
 }
 
