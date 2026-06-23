@@ -306,21 +306,6 @@ const authorLink = computed(() =>
 			</div>
 		</div>
 		<hr class="w-full border-none h-[1px] bg-surface-4 m-0" />
-		<section v-if="requiredContent.length > 0" id="dependencies">
-			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.required) }}</h3>
-			<div class="grid md:grid-cols-2 gap-4">
-				<VersionDependencyItem
-					v-for="depContext in requiredContent"
-					:key="`required-dep-${depContext.dependency.version_id ?? depContext.dependency.project_id ?? depContext.dependency.file_name}`"
-					:context="depContext"
-					:dependency-link="dependencyLinkCreator(depContext)"
-					target="_blank"
-					class="bg-surface-3 border border-solid border-surface-4 p-4 rounded-2xl"
-				>
-					<slot name="dependencyActions" :dependency="depContext" />
-				</VersionDependencyItem>
-			</div>
-		</section>
 		<section id="compatibility">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.compatibility) }}</h3>
 			<div
@@ -371,6 +356,21 @@ const authorLink = computed(() =>
 						<EnvironmentTags :environment="version.environment" />
 					</div>
 				</div>
+			</div>
+		</section>
+		<section v-if="requiredContent.length > 0" id="dependencies">
+			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.required) }}</h3>
+			<div class="grid md:grid-cols-2 gap-4">
+				<VersionDependencyItem
+					v-for="depContext in requiredContent"
+					:key="`required-dep-${depContext.dependency.version_id ?? depContext.dependency.project_id ?? depContext.dependency.file_name}`"
+					:context="depContext"
+					:dependency-link="dependencyLinkCreator(depContext)"
+					target="_blank"
+					class="bg-surface-3 border border-solid border-surface-4 p-4 rounded-2xl"
+				>
+					<slot name="dependencyActions" :dependency="depContext" />
+				</VersionDependencyItem>
 			</div>
 		</section>
 		<section id="changes">
