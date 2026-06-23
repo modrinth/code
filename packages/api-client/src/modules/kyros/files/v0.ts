@@ -167,49 +167,6 @@ export class KyrosFilesV0Module extends AbstractModule {
 	}
 
 	/**
-	 * Move a file or folder to a new location
-	 *
-	 * @param sourcePath - Current path
-	 * @param destPath - New path
-	 */
-	public async moveFileOrFolder(sourcePath: string, destPath: string): Promise<void> {
-		return this.client.request<void>('/fs/move', {
-			api: '',
-			version: 'modrinth/v0',
-			method: 'POST',
-			body: { source: sourcePath, destination: destPath },
-			useNodeAuth: true,
-		})
-	}
-
-	/**
-	 * Rename a file or folder (convenience wrapper around move)
-	 *
-	 * @param path - Current file/folder path
-	 * @param newName - New name (not full path)
-	 */
-	public async renameFileOrFolder(path: string, newName: string): Promise<void> {
-		const newPath = path.split('/').slice(0, -1).join('/') + '/' + newName
-		return this.moveFileOrFolder(path, newPath)
-	}
-
-	/**
-	 * Delete a file or folder
-	 *
-	 * @param path - Path to delete
-	 * @param recursive - If true, delete directory contents recursively
-	 */
-	public async deleteFileOrFolder(path: string, recursive: boolean): Promise<void> {
-		return this.client.request<void>('/fs/delete', {
-			api: '',
-			version: 'modrinth/v0',
-			method: 'DELETE',
-			params: { path, recursive },
-			useNodeAuth: true,
-		})
-	}
-
-	/**
 	 * Delete a file or folder using explicit filesystem auth credentials.
 	 *
 	 * @param auth - Filesystem auth (url + token) from Archon

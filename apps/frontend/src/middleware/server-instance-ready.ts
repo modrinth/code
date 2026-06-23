@@ -41,8 +41,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		if (tab === 'files') {
 			const path = typeof to.query.path === 'string' ? to.query.path : '/'
 			await queryClient.ensureQueryData({
-				queryKey: ['files', serverId, path],
-				queryFn: () => client.kyros.files_v0.listDirectory(path, 1, 2000),
+				queryKey: ['files', 'v1', worldId, path],
+				queryFn: () => client.kyros.files_v1.listDescendants(worldId, path, 1, 200),
 				staleTime: 30_000,
 			})
 			return
