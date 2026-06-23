@@ -139,7 +139,7 @@ pub fn app_db_backup_dir() -> crate::Result<PathBuf> {
 }
 
 async fn has_user_tables(conn: &mut SqliteConnection) -> crate::Result<bool> {
-    let count = sqlx::query_scalar::<_, i64>(
+    let count = sqlx::query_scalar!(
         "
 		SELECT COUNT(*)
 		FROM sqlite_master
@@ -161,9 +161,7 @@ async fn read_stored_app_version(
         return Ok(None);
     }
 
-    Ok(sqlx::query_scalar::<_, String>(
-        "SELECT value FROM app_metadata WHERE key = 'app_version'",
-    )
+    Ok(sqlx::query_scalar!("SELECT value FROM app_metadata WHERE key = 'app_version'")
     .fetch_optional(&mut *conn)
     .await?)
 }
@@ -172,14 +170,14 @@ async fn has_table(
     conn: &mut SqliteConnection,
     table_name: &str,
 ) -> crate::Result<bool> {
-    let count = sqlx::query_scalar::<_, i64>(
+    let count = sqlx::query_scalar!(
         "
 		SELECT COUNT(*)
 		FROM sqlite_master
 		WHERE type = 'table' AND name = ?
 		",
+        table_name,
     )
-    .bind(table_name)
     .fetch_one(&mut *conn)
     .await?;
 
@@ -249,8 +247,7 @@ async fn create_sqlite_snapshot(
         .to_str()
         .ok_or_else(|| crate::ErrorKind::UTFError(backup_path.to_path_buf()))?;
 
-    sqlx::query("VACUUM INTO ?")
-        .bind(backup_path)
+    sqlx::query!("VACUUM INTO ?", backup_path)
         .execute(&mut *conn)
         .await?;
 

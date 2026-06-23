@@ -100,14 +100,14 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 										let world = world.clone();
 										tokio::spawn(async move {
 											if let Ok(state) = State::get().await {
-												let instance_id = sqlx::query_scalar::<_, String>(
+												let instance_id = sqlx::query_scalar!(
 													"
 													SELECT id
 													FROM instances
 													WHERE path = ?
 													",
+													instance_path_str,
 												)
-												.bind(&instance_path_str)
 												.fetch_optional(&state.pool)
 												.await;
 												let Ok(Some(instance_id)) = instance_id else {

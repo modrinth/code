@@ -429,8 +429,24 @@ where
 {
     let instance_id = format!("local:{}", Uuid::new_v4());
     let content_set_id = format!("content-set:{}", Uuid::new_v4());
+    let instance_id_str = instance_id.as_str();
+    let content_set_id_str = content_set_id.as_str();
+    let path = input.path.as_str();
+    let install_stage = input.install_stage.as_str();
+    let launcher_feature_version = input.launcher_feature_version.as_str();
+    let update_channel = ReleaseChannel::Release.key();
+    let name = input.name.as_str();
+    let icon_path = input.icon_path.as_deref();
+    let game_version = input.game_version.as_str();
+    let loader = input.loader.as_str();
+    let loader_version = input.loader_version.as_deref();
+    let created = input.created.timestamp();
+    let modified = input.modified.timestamp();
+    let last_played = input.last_played.map(|value| value.timestamp());
+    let submitted_time_played = input.submitted_time_played as i64;
+    let recent_time_played = input.recent_time_played as i64;
 
-    sqlx::query(
+    sqlx::query!(
         "
         INSERT OR REPLACE INTO instances (
             id,
@@ -449,20 +465,20 @@ where
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ",
+        instance_id_str,
+        path,
+        content_set_id_str,
+        install_stage,
+        launcher_feature_version,
+        update_channel,
+        name,
+        icon_path,
+        created,
+        modified,
+        last_played,
+        submitted_time_played,
+        recent_time_played,
     )
-    .bind(&instance_id)
-    .bind(&input.path)
-    .bind(&content_set_id)
-    .bind(input.install_stage.as_str())
-    .bind(input.launcher_feature_version.as_str())
-    .bind(ReleaseChannel::Release.key())
-    .bind(&input.name)
-    .bind(input.icon_path.as_deref())
-    .bind(input.created.timestamp())
-    .bind(input.modified.timestamp())
-    .bind(input.last_played.map(|value| value.timestamp()))
-    .bind(input.submitted_time_played as i64)
-    .bind(input.recent_time_played as i64)
     .execute(exec)
     .await?;
 
@@ -499,7 +515,7 @@ where
         None => ("local", "unmanaged", None, None, None),
     };
 
-    sqlx::query(
+    sqlx::query!(
         "
         INSERT OR REPLACE INTO instance_content_sets (
             id,
@@ -516,22 +532,22 @@ where
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ",
+        content_set_id_str,
+        instance_id_str,
+        "Default",
+        source_kind,
+        "available",
+        game_version,
+        None::<i64>,
+        loader,
+        loader_version,
+        created,
+        modified,
     )
-    .bind(&content_set_id)
-    .bind(&instance_id)
-    .bind("Default")
-    .bind(source_kind)
-    .bind("available")
-    .bind(&input.game_version)
-    .bind(None::<i64>)
-    .bind(input.loader.as_str())
-    .bind(input.loader_version.as_deref())
-    .bind(input.created.timestamp())
-    .bind(input.modified.timestamp())
     .execute(exec)
     .await?;
 
-    sqlx::query(
+    sqlx::query!(
         "
         INSERT OR REPLACE INTO instance_links (
             instance_id,
@@ -548,30 +564,30 @@ where
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, jsonb(?), ?, ?)
         ",
+        instance_id_str,
+        link_kind,
+        modrinth_project_id,
+        modrinth_version_id,
+        server_project_id,
+        None::<&str>,
+        None::<&str>,
+        None::<&str>,
+        "[]",
+        None::<&str>,
+        None::<&str>,
     )
-    .bind(&instance_id)
-    .bind(link_kind)
-    .bind(modrinth_project_id.as_deref())
-    .bind(modrinth_version_id.as_deref())
-    .bind(server_project_id.as_deref())
-    .bind(None::<&str>)
-    .bind(None::<&str>)
-    .bind(None::<&str>)
-    .bind("[]")
-    .bind(None::<&str>)
-    .bind(None::<&str>)
     .execute(exec)
     .await?;
 
     for group in input.groups {
-        sqlx::query(
+        sqlx::query!(
             "
             INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
             VALUES (?, ?)
             ",
+            instance_id_str,
+            group,
         )
-        .bind(&instance_id)
-        .bind(group)
         .execute(exec)
         .await?;
     }
@@ -590,7 +606,7 @@ where
         &InstanceLaunchOverridesData::from(&launch_overrides),
     )?;
 
-    sqlx::query(
+    sqlx::query!(
         "
         INSERT OR REPLACE INTO instance_launch_overrides (
             instance_id,
@@ -598,9 +614,9 @@ where
         )
         VALUES (?, jsonb(?))
         ",
+        instance_id_str,
+        launch_overrides_data,
     )
-    .bind(&instance_id)
-    .bind(launch_overrides_data)
     .execute(exec)
     .await?;
 

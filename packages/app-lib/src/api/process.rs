@@ -31,7 +31,7 @@ async fn resolve_instance_id_with_state(
     instance: &str,
     state: &State,
 ) -> crate::Result<Option<String>> {
-    sqlx::query_scalar::<_, String>(
+    sqlx::query_scalar!(
         "
 		SELECT id
 		FROM instances
@@ -39,10 +39,10 @@ async fn resolve_instance_id_with_state(
 		ORDER BY CASE WHEN id = ? THEN 0 ELSE 1 END
 		LIMIT 1
 		",
+        instance,
+        instance,
+        instance,
     )
-    .bind(instance)
-    .bind(instance)
-    .bind(instance)
     .fetch_optional(&state.pool)
     .await
     .map_err(Into::into)
