@@ -2,8 +2,8 @@
 import {
 	ClipboardCopyIcon,
 	EditIcon,
-	EyeIcon,
 	ExternalIcon,
+	EyeIcon,
 	FolderOpenIcon,
 	IssuesIcon,
 	MoreVerticalIcon,
