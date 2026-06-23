@@ -273,10 +273,10 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
             continue;
         }
 
-        if name.matches('/').count() > 2
-            || name.ends_with(".txt")
-            || name.ends_with(".rpo")
-        {
+        let should_scan_file = name.contains(".jar")
+            || (name.contains(".zip") && !name.ends_with(".zip.txt"));
+
+        if name.matches('/').count() > 2 || !should_scan_file {
             continue;
         }
 

@@ -21,6 +21,7 @@ use crate::models::users::User;
 use crate::queue::moderation::ApprovalType;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::error::Context;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(list)
@@ -109,7 +110,8 @@ async fn list(
         project_id as DBProjectId,
     )
     .fetch_all(pool.as_ref())
-    .await?;
+    .await
+    .wrap_internal_err("failed to fetch attribution groups")?;
 
     let group_ids: Vec<i64> = groups.iter().map(|g| g.id.0).collect();
 
@@ -136,7 +138,8 @@ async fn list(
             project_id as DBProjectId,
         )
         .fetch_all(pool.as_ref())
-        .await?
+        .await
+        .wrap_internal_err("failed to fetch attribution group files")?
     };
 
     let moderation_external_licenses = if requester_is_mod {
@@ -170,7 +173,8 @@ async fn list(
                 &ids,
             )
             .fetch_all(pool.as_ref())
-            .await?
+            .await
+            .wrap_internal_err("failed to fetch moderation external licenses")?
             .into_iter()
             .map(|row| {
                 (
@@ -217,7 +221,8 @@ async fn list(
             &all_version_ids,
         )
         .fetch_all(pool.as_ref())
-        .await?;
+        .await
+        .wrap_internal_err("failed to fetch attribution group versions")?;
         rows.into_iter()
             .map(|v| VersionInfo {
                 id: VersionId(v.id as u64),
@@ -381,7 +386,8 @@ async fn update_group(
         user.id.0 as i64,
     )
     .execute(pool.as_ref())
-    .await?;
+    .await
+    .wrap_internal_err("failed to update attribution group")?;
 
     if result.rows_affected() == 0 {
         return Err(ApiError::NotFound);
@@ -436,7 +442,8 @@ async fn assign(
         project_id as DBProjectId,
     )
     .fetch_optional(pool.as_ref())
-    .await?
+    .await
+    .wrap_internal_err("failed to fetch source attribution group")?
     .ok_or(ApiError::NotFound)?;
 
     let target_group_exists = sqlx::query_scalar!(
@@ -449,7 +456,8 @@ async fn assign(
         project_id as DBProjectId,
     )
     .fetch_one(pool.as_ref())
-    .await?;
+    .await
+    .wrap_internal_err("failed to check target attribution group")?;
 
     if !target_group_exists {
         return Err(ApiError::NotFound);
@@ -483,13 +491,16 @@ async fn assign(
         project_id as DBProjectId,
     )
     .execute(pool.as_ref())
-    .await?;
+    .await
+    .wrap_internal_err("failed to assign attribution file to group")?;
 
     if result.rows_affected() == 0 {
         return Err(ApiError::NotFound);
     }
 
-    cleanup_empty_groups(pool.as_ref()).await?;
+    cleanup_empty_groups(pool.as_ref())
+        .await
+        .wrap_internal_err("failed to clean up empty attribution groups")?;
 
     Ok(())
 }
@@ -538,7 +549,8 @@ async fn split(
         project_id as DBProjectId,
     )
     .fetch_optional(pool.as_ref())
-    .await?;
+    .await
+    .wrap_internal_err("failed to fetch attribution file to split")?;
 
     let Some(existing) = existing else {
         return Err(ApiError::NotFound);
@@ -552,9 +564,14 @@ async fn split(
         ));
     }
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin attribution split transaction")?;
 
-    let new_group_id = generate_attribution_group_id(&mut txn).await?;
+    let new_group_id = generate_attribution_group_id(&mut txn)
+        .await
+        .wrap_internal_err("failed to generate attribution group id")?;
 
     sqlx::query!(
         "
@@ -565,7 +582,8 @@ async fn split(
         project_id as DBProjectId,
     )
     .execute(&mut txn)
-    .await?;
+    .await
+    .wrap_internal_err("failed to insert split attribution group")?;
 
     sqlx::query!(
         "
@@ -578,11 +596,16 @@ async fn split(
         existing.group_id,
     )
     .execute(&mut txn)
-    .await?;
+    .await
+    .wrap_internal_err("failed to move attribution file to split group")?;
 
-    txn.commit().await?;
+    txn.commit()
+        .await
+        .wrap_internal_err("failed to commit attribution split transaction")?;
 
-    cleanup_empty_groups(pool.as_ref()).await?;
+    cleanup_empty_groups(pool.as_ref())
+        .await
+        .wrap_internal_err("failed to clean up empty attribution groups")?;
 
     Ok(())
 }
@@ -601,7 +624,8 @@ async fn can_edit_attribution_group(
         group_id,
     )
     .fetch_optional(pool)
-    .await?
+    .await
+    .wrap_internal_err("failed to fetch attribution group")?
     .ok_or(ApiError::NotFound)?;
 
     if !user.role.is_mod() {
@@ -611,14 +635,16 @@ async fn can_edit_attribution_group(
             false,
             pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("failed to fetch project team member")?;
 
         let organization =
             DBOrganization::get_associated_organization_project_id(
                 group.project_id,
                 pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("failed to fetch associated organization")?;
 
         let organization_team_member = if let Some(organization) = organization
         {
@@ -627,7 +653,8 @@ async fn can_edit_attribution_group(
                 user.id.into(),
                 pool,
             )
-            .await?
+            .await
+            .wrap_internal_err("failed to fetch organization team member")?
         } else {
             None
         };
@@ -668,7 +695,8 @@ async fn cleanup_empty_groups(pool: &PgPool) -> Result<(), ApiError> {
 		",
     )
     .execute(pool)
-    .await?;
+    .await
+    .wrap_internal_err("failed to delete empty attribution groups")?;
     Ok(())
 }
 

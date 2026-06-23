@@ -3479,6 +3479,12 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Unknown external content"
   },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Modrinth's moderation team has rejected the permission information you provided for some external content. Please review the rejected items below and provide acceptable proof or remove the content."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Some proofs were rejected"
+  },
   "project.settings.permissions.collapse-all": {
     "message": "Collapse all"
   },
@@ -3514,6 +3520,9 @@
   },
   "project.settings.permissions.no-results": {
     "message": "No external files match your search."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Some of the external content included cannot be distributed on Modrinth because it violates our Content Rules and must be removed."
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {No attributions need approval} one {# attribution needs approval} other {# attributions need approval}}"

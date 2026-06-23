@@ -914,6 +914,9 @@
   "external-files.permissions-card.badge.no-permission": {
     "defaultMessage": "No permission"
   },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Not allowed"
+  },
   "external-files.permissions-card.badge.pending": {
     "defaultMessage": "Pending"
   },

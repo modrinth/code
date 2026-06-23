@@ -155,15 +155,21 @@ const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionRes
 
 const isAttributed = computed(() => initialAttribution.value !== null)
 const attributionStatusVariant = computed<
-	'pending' | 'attributed' | 'no_permission' | 'proof_rejected'
+	'pending' | 'attributed' | 'no_permission' | 'proof_rejected' | 'not_allowed'
 >(() => {
 	if (isAttributed.value && props.group.attribution?.kind === 'no_permission') {
 		return 'no_permission'
-	}
-	if (isAttributed.value && props.group.attribution?.moderation_status?.kind === 'bad_proof') {
+	} else if (
+		isAttributed.value &&
+		props.group.attribution?.moderation_status?.kind === 'not_allowed'
+	) {
+		return 'not_allowed'
+	} else if (
+		isAttributed.value &&
+		props.group.attribution?.moderation_status?.kind === 'bad_proof'
+	) {
 		return 'proof_rejected'
-	}
-	if (isAttributed.value) {
+	} else if (isAttributed.value) {
 		return 'attributed'
 	}
 	return 'pending'
@@ -579,7 +585,13 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 					:attributor-avatar-url="attributorMember?.user.avatar_url"
 					:moderator="isModerator"
 				>
-					<template v-if="group.attribution?.kind !== 'globally_allowed'" #actions>
+					<template
+						v-if="
+							group.attribution?.kind !== 'globally_allowed' &&
+							(group.attribution?.moderation_status?.kind !== 'not_allowed' || isModerator)
+						"
+						#actions
+					>
 						<ButtonStyled>
 							<button @click="startEditingAttribution">
 								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
@@ -596,7 +608,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 						<div class="flex gap-4 flex-wrap">
 							<div>
 								<p
-									class="font-semibold m-0 flex items-center gap-2 mb-3"
+									class="font-semibold m-0 flex items-center gap-2"
 									:class="isModerator ? 'text-orange' : moderationStatusIndicator?.class"
 								>
 									<template v-if="isModerator">
@@ -614,9 +626,9 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 								</p>
 								<template v-if="isModerator">
 									<template
-										v-if="group.attribution.moderation_status && !isEditingModerationReview"
+										v-if="group.attribution?.moderation_status && !isEditingModerationReview"
 									>
-										<div class="grid grid-cols-[auto_1fr] gap-y-3 gap-x-4">
+										<div class="grid grid-cols-[auto_1fr] gap-y-3 gap-x-4 mt-3">
 											<div>Status:</div>
 											<div
 												class="flex items-center gap-1"
@@ -635,7 +647,9 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 											<div>
 												<div
 													class="markdown-body"
-													v-html="renderString(group.attribution.moderation_status.reason || 'N/A')"
+													v-html="
+														renderString(group.attribution?.moderation_status?.reason || 'N/A')
+													"
 												/>
 											</div>
 										</div>
@@ -645,6 +659,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 											v-model="reviewReasonInput"
 											multiline
 											placeholder="Explanation of review (optional)"
+											class="mt-3"
 										/>
 										<div class="flex items-center gap-2 flex-wrap mt-3">
 											<ButtonStyled v-if="visibleQuickReplies.length > 0">
@@ -725,17 +740,13 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 										</div>
 									</template>
 								</template>
-								<div v-else class="grid grid-cols-[auto_1fr] gap-y-3 gap-x-4">
-									<div class="leading-[1.5]">
-										{{ formatMessage(messages.moderationReasonLabel) }}
-									</div>
+								<div
+									v-else-if="group.attribution?.moderation_status?.reason"
+									class="flex flex-col gap-2 mt-3"
+								>
 									<div
 										class="markdown-body"
-										v-html="
-											renderString(
-												group.attribution?.moderation_status?.reason || 'No reason provided',
-											)
-										"
+										v-html="renderString(group.attribution?.moderation_status?.reason)"
 									/>
 								</div>
 							</div>

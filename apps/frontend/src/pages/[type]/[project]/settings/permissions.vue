@@ -124,6 +124,14 @@ function isModerationRejected(group: Labrinth.Attribution.Internal.AttributionGr
 	return kind === 'bad_proof' || kind === 'not_allowed'
 }
 
+function isNotAllowed(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	return group.attribution?.moderation_status?.kind === 'not_allowed'
+}
+
+function isBadProof(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
+	return group.attribution?.moderation_status?.kind === 'bad_proof'
+}
+
 function needsModerationApproval(group: Labrinth.Attribution.Internal.AttributionGroup): boolean {
 	const attribution = group.attribution
 	if (!attribution || attribution.kind === 'globally_allowed') {
@@ -261,6 +269,16 @@ const noPermissionCount = computed(() => {
 	return groups.filter((group) => group.attribution?.kind === 'no_permission').length
 })
 
+const notAllowedCount = computed(() => {
+	const groups = attributionData.value ?? []
+	return groups.filter(isNotAllowed).length
+})
+
+const badProofCount = computed(() => {
+	const groups = attributionData.value ?? []
+	return groups.filter(isBadProof).length
+})
+
 const pendingCount = computed(() => {
 	const groups = attributionData.value ?? []
 	return groups.filter((group) => !group.attribution || isModerationRejected(group)).length
@@ -309,6 +327,18 @@ const messages = defineMessages({
 	failDescription: {
 		id: 'project.settings.permissions.fail.description',
 		defaultMessage: `You may not have permission to redistribute some of the external content in your project. In order to publish on Modrinth, please remove this content or provide proof that you do have permission to use it.`,
+	},
+	notAllowedDescription: {
+		id: 'project.settings.permissions.not-allowed.description',
+		defaultMessage: `Some of the external content included cannot be distributed on Modrinth because it violates our Content Rules and must be removed.`,
+	},
+	badProofTitle: {
+		id: 'project.settings.permissions.bad-proof.title',
+		defaultMessage: `Some proofs were rejected`,
+	},
+	badProofDescription: {
+		id: 'project.settings.permissions.bad-proof.description',
+		defaultMessage: `Modrinth's moderation team has rejected the permission information you provided for some external content. Please review the rejected items below and provide acceptable proof or remove the content.`,
 	},
 	attentionNeededTitle: {
 		id: 'project.settings.permissions.attention-needed.title',
@@ -421,11 +451,23 @@ function dismissInfoBanner() {
 	<template v-else-if="totalGroups > 0">
 		<template v-if="!isModerator">
 			<Admonition
-				v-if="stats.pending === 0 && stats.noPermission === 0"
+				v-if="
+					stats.pending === 0 &&
+					stats.noPermission === 0 &&
+					notAllowedCount === 0 &&
+					badProofCount === 0
+				"
 				type="success"
 				class="mb-4"
 				:header="formatMessage(messages.completedTitle)"
 				:body="formatMessage(messages.completedDescription)"
+			/>
+			<Admonition
+				v-else-if="notAllowedCount > 0"
+				type="critical"
+				class="mb-4"
+				:header="formatMessage(messages.failTitle)"
+				:body="formatMessage(messages.notAllowedDescription)"
 			/>
 			<Admonition
 				v-else-if="stats.noPermission > 0"
@@ -433,6 +475,13 @@ function dismissInfoBanner() {
 				class="mb-4"
 				:header="formatMessage(messages.failTitle)"
 				:body="formatMessage(messages.failDescription)"
+			/>
+			<Admonition
+				v-else-if="badProofCount > 0"
+				type="critical"
+				class="mb-4"
+				:header="formatMessage(messages.badProofTitle)"
+				:body="formatMessage(messages.badProofDescription)"
 			/>
 			<Admonition
 				v-else-if="stats.pending > 0"
