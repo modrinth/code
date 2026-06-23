@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            update file_scans\n            set attributions_scanned_at = now\n            from unnest($1::bigint[], $2::timestamptz[]) as u(id, now)\n            where file_scans.file_id = u.id\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TimestamptzArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "968904f577c2c696c6222e19cc145bce0e845f2ab9f8629b0789a4861bddb4dc"
+}

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tinsert into file_scans (file_id)\n\t\tselect f.id\n\t\tfrom files f\n\t\tinner join attribution_enforced_versions aev on aev.id = f.version_id\n\t\twhere f.version_id = any($1)\n\t\ton conflict (file_id) do nothing\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "43ce7cbf44ce123c3d71c5dee035022d2e6b537eb53fcb39608e820e77174b81"
+}

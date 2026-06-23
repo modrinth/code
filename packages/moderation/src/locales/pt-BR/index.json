@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Insira uma descrição que descreva claramente o propósito e funcionamento do projeto."
+    "defaultMessage": "É necessária uma descrição que descreva com clareza o propósito e função do projeto."
   },
   "nags.add-description.title": {
     "defaultMessage": "Adicione uma descrição"
@@ -12,85 +12,85 @@
     "defaultMessage": "Adicione um ícone"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Adicione o endereço IP e a porta que os jogadores da Edição Java podem usar para entrar no seu servidor."
+    "defaultMessage": "Adicione o endereço IP e a porta para que jogadores da Edição Java possam usar para entrar em seu servidor."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Adicionar um endereço do Java"
+    "defaultMessage": "Adicione um endereço Java"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Adicione links relevantes direcionados para fora do Modrinth, como um site, loja ou um convite de Discord."
+    "defaultMessage": "Adicione qualquer link relevante direcionado fora do Modrinth, como um site, loja ou convite do Discord."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Adicione links externos"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Adicione links relevantes direcionados para fora do Modrinth, como código-fonte, rastreador de problemas ou um convite de Discord."
+    "defaultMessage": "Adicione qualquer link relevante direcionado fora do Modrinth, como o código-fonte, um rastreador de erros ou convite do Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Adicione links externos"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Você selecionou todas {totalAvailableTags, plural, one {# etiqueta disponível} other {# etiquetas disponíveis}}. Isso desvia do propósito das etiquetas, que são feitas para ajudar os usuários a acharem projetos relevantes. Por favor, selecione apenas as etiquetas relevantes a seu projeto."
+    "defaultMessage": "Você selecionou {totalAvailableTags, plural,one {# etiqueta disponível} other {todas as # etiquetas disponíveis}}. Isso vai contra o propósito das etiquetas, que são feitas para ajudar usuários a encontrarem projetos relevantes. Selecione apenas as etiquetas relevantes para seu projeto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecione etiquetas específicas"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Sua descrição é {length, plural, one {# caractére legível} other {# caractéres legíveis}}. É recomendado pelo menos {minChars, plural, one {# caractére} other {# caractéres}} para criar uma descrição informativa e limpa."
+    "defaultMessage": "Sua descrição possui {length, plural, one {apenas # caractere legível} other {apenas # caracteres legíveis}}. No mínimo, {minChars, plural, one {# caractere é recomendado} other {# characteres são recomendados}} para criar uma descrição concisa e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expandir a descrição"
   },
   "nags.edit-description.title": {
-    "defaultMessage": "Editar descrição"
+    "defaultMessage": "Edite a descrição"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Editar licença"
+    "defaultMessage": "Edite a licença"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "Editar sumário"
+    "defaultMessage": "Edite o sumário"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Editar etiquetas"
+    "defaultMessage": "Edite as etiquetas"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "Editar título"
+    "defaultMessage": "Edite o título"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "A imagem da galeria em destaque é geralmente a primeira impressão que seu projeto causa."
+    "defaultMessage": "A imagem em destaque da galeria é geralmente de onde seu projeto faz as primeiras impressões."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Destacar uma imagem da galeria"
+    "defaultMessage": "Destaque uma imagem da galeria"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Visitar página da galeria"
+    "defaultMessage": "Visite a página da galeria"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Seu {type} utiliza uma licença que exige um código-fonte para ser disponibilizado. Forneça um link do código-fonte ou seus arquivos de origem para cada versão adicional, ou considere utilizar outra licença."
+    "defaultMessage": "Seu {type} usa uma licença que exige código-fonte para estar disponível. Forneça um link do código-fonte ou arquivo de origem para cada versão adicional ou considere usar uma licença diferente."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Forneça o código-fonte"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Alguns dos seus links externos parecem ser idênticos. Cada link deve ser inserido apenas uma vez e com o tipo de link apropriado."
+    "defaultMessage": "Alguns de seus links externos parecem ser iguais. Cada link só deve ser inserido uma vez e com o tipo de link apropriado."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Limpar links idênticos"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "Sua descrição deve conter texto simples ou uma imagem com texto alternativo, mantendo-a acessível para aqueles que usam leitores de tela ou têm conexões de rede lentas."
+    "defaultMessage": "Sua descrição deve conter texto simples ou imagem com texto alternativo, permanecendo acessível para usuários que usam leitores de tela ou têm conexão lenta."
   },
   "nags.image-heavy-description.title": {
-    "defaultMessage": "Garantir acessibilidade"
+    "defaultMessage": "Garanta a acessibilidade"
   },
   "nags.invalid-license-url.description.default": {
-    "defaultMessage": "O URL da licença é inválido."
+    "defaultMessage": "O URL de licença é inválido."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Seu URL de licença aponta para {domain}, o que não é apropriado para informações sobre licenças. Os URLs de licença devem direcionar diretamente para o seu arquivo de licença, não para redes sociais, plataformas de jogos, etc."
+    "defaultMessage": "O URL de licença leva a {domain}, o que não é apropriado para informações da licença. Os URLs de licença devem vincular diretamente para seu arquivo de licença e não para redes sociais, plataformas de jogos ou outros."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "Seu URL de licença parece estar incorreto. Forneça um URL válido para o texto da sua licença."
+    "defaultMessage": "O URL de licença parece estar incorreto. Forneça um URL válido para o texto de sua licença."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Adicione um link de licença válido"
@@ -212,6 +212,9 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpe o nome"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Você selecionou {tagCount, plural,=0 {nenhuma tag} one {# tag} other {# tags}}. Por favor reduza para {maxTagCount} ou menos para garantir que seu servidor apareça nos resultados de pesquisa relevantes."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecione etiquetas específicas"
   },
@@ -249,3 +252,4 @@
     "defaultMessage": "Visitar página de links"
   }
 }
+

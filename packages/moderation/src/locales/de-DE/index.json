@@ -65,6 +65,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Galerieseite besuchen"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Dein {type} verwendet eine Lizenz, die erfordert, dass der Quellcode verfügbar ist. Bitte gib für jede zusätzliche Version einen Link zum Quellcode oder eine Quelldatei an, oder erwäge, eine andere Lizenz zu verwenden."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
   },
@@ -155,6 +158,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Sprache auswählen"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Wähle die Lizenz aus, unter der dein {type} verbreitet wird."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Lizenz auswählen"
   },
@@ -217,6 +223,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wähle passende Tags aus"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Es ist mindestens ein Galeriebild erforderlich, um den Inhalt deines {type} zu präsentieren."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "Ressourcenpaket, mit Ausnahme von Audio- oder Lokalisierungspaketen. Wenn dies auf dein Paket zutrifft, wähle bitte den entsprechenden Tag aus"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriebild hochladen"

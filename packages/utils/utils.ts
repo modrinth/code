@@ -289,3 +289,33 @@ export function arrayBufferToBase64(buffer: Uint8Array | ArrayBuffer): string {
 }
 export const DEFAULT_CREDIT_EMAIL_MESSAGE =
 	"We're really sorry about the recent issues with your server."
+
+/**
+ * Comparator for sorting values by first occurrence index in {@link order}.
+ * Values absent from {@link order} behave as tied after listed values (`order.length`).
+ */
+export function compareByIndex<T>(order: readonly T[], a: T, b: T): number {
+	const ia = order.indexOf(a)
+	const ib = order.indexOf(b)
+	const ra = ia === -1 ? order.length : ia
+	const rb = ib === -1 ? order.length : ib
+	return ra - rb
+}
+
+/**
+ * Sort {@link items} in place according to {@link order}, returning the same array reference.
+ *
+ * If the array should not be mutated, use {@link sortedByIndex}.
+ */
+export function sortByIndex<T>(order: readonly T[], items: T[]): T[] {
+	items.sort((a, b) => compareByIndex(order, a, b))
+	return items
+}
+
+/**
+ * Creates a sorted copy of {@link items} according to {@link order}.
+ *
+ */
+export function sortedByIndex<T>(order: readonly T[], items: T[]): T[] {
+	return items.slice().sort((a, b) => compareByIndex(order, a, b))
+}

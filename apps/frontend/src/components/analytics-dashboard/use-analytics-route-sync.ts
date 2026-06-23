@@ -6,6 +6,7 @@ import {
 	areStringArraysEqual,
 	buildAnalyticsQueryBuilderRouteQuery,
 	getAnalyticsBreakdownPresetsForProjectSelection,
+	hasAnalyticsAllProjectSelectionQuery,
 	hasAnalyticsQueryBuilderRouteChange,
 	readAnalyticsGraphState,
 	readAnalyticsQueryBuilderState,
@@ -53,6 +54,8 @@ export interface UseAnalyticsRouteSyncOptions {
 	queryBuilder: AnalyticsQueryBuilderRefs
 	graph: AnalyticsGraphRefs
 	availableProjectIds: Ref<string[]>
+	defaultProjectIds: Ref<string[]>
+	areProjectsLoaded: Ref<boolean>
 	sanitizeSelectedFilters: (
 		breakdowns: readonly AnalyticsBreakdownPreset[],
 		filters: AnalyticsSelectedFilters,
@@ -60,7 +63,14 @@ export interface UseAnalyticsRouteSyncOptions {
 }
 
 export function useAnalyticsRouteSync(options: UseAnalyticsRouteSyncOptions) {
-	const { queryBuilder, graph, availableProjectIds, sanitizeSelectedFilters } = options
+	const {
+		queryBuilder,
+		graph,
+		availableProjectIds,
+		defaultProjectIds,
+		areProjectsLoaded,
+		sanitizeSelectedFilters,
+	} = options
 	const route = useRoute()
 	const router = useRouter()
 
@@ -111,11 +121,16 @@ export function useAnalyticsRouteSync(options: UseAnalyticsRouteSyncOptions) {
 			return
 		}
 
+		if (hasAnalyticsAllProjectSelectionQuery(route.query) && !areProjectsLoaded.value) {
+			return
+		}
+
 		const nextRouteQuery = buildAnalyticsQueryBuilderRouteQuery(
 			route.query,
 			getSelectedAnalyticsQueryBuilderState(),
 			availableProjectIds.value,
 			getSelectedAnalyticsGraphState(),
+			defaultProjectIds.value,
 		)
 
 		const hasAnalyticsQueryChange = hasAnalyticsQueryBuilderRouteChange(route.query, nextRouteQuery)
@@ -144,7 +159,15 @@ export function useAnalyticsRouteSync(options: UseAnalyticsRouteSyncOptions) {
 	}
 
 	function applyRouteQueryToState(nextQuery: LocationQuery) {
-		const nextQueryState = readAnalyticsQueryBuilderState(nextQuery, availableProjectIds.value)
+		if (hasAnalyticsAllProjectSelectionQuery(nextQuery) && !areProjectsLoaded.value) {
+			return
+		}
+
+		const nextQueryState = readAnalyticsQueryBuilderState(
+			nextQuery,
+			availableProjectIds.value,
+			defaultProjectIds.value,
+		)
 		const availableProjectIdSet = new Set(availableProjectIds.value)
 		const nextSelectedProjectIds = nextQueryState.selectedProjectIds.filter((projectId) =>
 			availableProjectIdSet.has(projectId),

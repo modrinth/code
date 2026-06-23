@@ -281,6 +281,15 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
   },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Tapusin"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "I-angkat"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Iba pa"
+  },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Pangalan"
   },
@@ -970,6 +979,9 @@
   },
   "markdown-editor.image-modal.upload-mode.link": {
     "defaultMessage": "Link"
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Label"
   },
   "markdown-editor.toolbar.bold": {
     "defaultMessage": "Bold"
@@ -1981,6 +1993,33 @@
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Tagagamit"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Lahat"
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "May-ari"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "May-ari"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Tungkulin"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Tagagamit"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Oras"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Tagagamit"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "May maling nangyari habang nililikha ang {backupName}. Mangyaring subukan muli o abutin ang suporta kung magpapatuloy ang suliranin."

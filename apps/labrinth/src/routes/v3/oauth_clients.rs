@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fmt::Display, sync::Arc};
+use std::{collections::HashSet, fmt::Display};
 
 use super::ApiError;
 use crate::database::{PgPool, PgTransaction};
@@ -354,7 +354,7 @@ pub async fn oauth_client_icon_edit(
     client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -382,7 +382,7 @@ pub async fn oauth_client_icon_edit(
         client.icon_url.clone(),
         client.raw_icon_url.clone(),
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -399,7 +399,7 @@ pub async fn oauth_client_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -424,7 +424,7 @@ pub async fn oauth_client_icon_delete(
     client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -450,7 +450,7 @@ pub async fn oauth_client_icon_delete(
         client.icon_url.clone(),
         client.raw_icon_url.clone(),
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 

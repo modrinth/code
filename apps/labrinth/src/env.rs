@@ -130,6 +130,8 @@ vars! {
     RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
     REDIS_URL: String = "redis://localhost";
+    KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
+    KAFKA_CLIENT_ID: String = "labrinth";
     BIND_ADDR: String = "";
     SELF_ADDR: String = "";
 
@@ -189,6 +191,8 @@ vars! {
     GITLAB_CLIENT_SECRET: String = "none";
     DISCORD_CLIENT_ID: String = "none";
     DISCORD_CLIENT_SECRET: String = "none";
+    DISCORD_COMMUNITY_BOT_HANDOFF_URL: String = "http://localhost:3000/modrinth/handoff";
+    DISCORD_COMMUNITY_LINK_SECRET: String = "";
     MICROSOFT_CLIENT_ID: String = "none";
     MICROSOFT_CLIENT_SECRET: String = "none";
     GOOGLE_CLIENT_ID: String = "none";

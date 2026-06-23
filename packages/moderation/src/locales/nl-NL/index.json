@@ -209,6 +209,9 @@
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selecteer relevante tags"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": ""
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
   },
@@ -234,3 +237,4 @@
     "defaultMessage": "Bezoek linkjes instellingen"
   }
 }
+

@@ -530,6 +530,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "보조 파일은 소스 코드와 같은 지원용 리소스를 위한 것이며, 대체 버전이나 변형을 위한 것이 아닙니다."
   },
+  "create.collection.collection-info": {
+    "message": "새 컬렉션은 {count, plural, =0 {프로젝트 없음} other {#개의 프로젝트}}를 포함한 공개 컬렉션으로 생성됩니다."
+  },
   "create.collection.create-collection": {
     "message": "컬렉션 생성"
   },
@@ -685,6 +688,9 @@
   },
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "취소"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "'{title}' 제휴 링크를 정말 삭제하시겠습니까?"
   },
   "dashboard.affiliate-links.search": {
     "message": "제휴 링크 검색..."
@@ -998,6 +1004,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "알림 기록 보기"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "알림 {extraNotifs}개 더 보기"
+  },
   "dashboard.organizations.button.create": {
     "message": "조직 생성"
   },
@@ -1006,6 +1015,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "조직 정보 가져오기 실패"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "멤버 {count}명"
   },
   "dashboard.organizations.title": {
     "message": "조직"
@@ -1051,6 +1063,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "링크 편집"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "변경사항이 <strong>{count}개</strong>의 프로젝트에 적용됩니다."
   },
   "dashboard.projects.links.description": {
     "message": "아래 지정한 링크는 선택한 각 프로젝트에서 덮어쓰게 됩니다. 비워 둔 항목은 무시됩니다. 휴지통 버튼을 클릭하면 선택한 모든 프로젝트에서 링크를 삭제할 수 있습니다."
@@ -1451,9 +1466,6 @@
   "frog.title": {
     "message": "개구리"
   },
-  "hosting-marketing.available-locations": {
-    "message": "북미, 유럽, 동남아시아에서 이용 가능하며 광범위한 서비스를 제공합니다."
-  },
   "hosting-marketing.billing.monthly": {
     "message": "매달 결제"
   },
@@ -1513,9 +1525,6 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Modrinth 호스팅 서버는 어디에 위치해 있나요? 지역을 선택할 수 있나요?"
-  },
-  "hosting-marketing.faq.location.answer": {
-    "message": "현재 북미, 유럽, 동남아시아 전역에서 구매 시 선택할 수 있는 서버가 있습니다. 앞으로 더 많은 지역이 추가될 예정입니다! 지역을 변경하고 싶으시면 지원팀에 문의해 주세요."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "어떤 마인크래프트 버전과 로더를 사용할 수 있나요?"
@@ -2429,6 +2438,9 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Modrinth에서 {username}의 프로젝트 다운로드"
   },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> 프로젝트 팔로워}}"
+  },
   "profile.user-id": {
     "message": "사용자 ID: {id}"
   },
@@ -2756,9 +2768,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "도움이 필요하거나 추가 문의 사항이 있다면 <help-center-link>Modrinth 도움말 센터</help-center-link>를 방문하여 파란색 말풍선을 클릭해 지원 센터에 문의해 주세요."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "멤버 UI 표시"
-  },
   "project.moderation.thread.private-description": {
     "message": "이곳은 Modrinth 운영진과의 비공개 대화 스레드입니다. 운영진이 이 프로젝트와 관련된 사항에 대해 메시지를 보낼 수 있습니다."
   },
@@ -2864,6 +2873,9 @@
   "project.settings.permissions.learn-more": {
     "message": "더보기"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "{count}개의 {count, plural, other {외부 프로젝트}} 검색..."
+  },
   "project.settings.title": {
     "message": "설정"
   },
@@ -2876,8 +2888,11 @@
   "project.versions.title": {
     "message": "버전"
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "해결"
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {해당 버전은}} 현재 보류 상태이며 공개되지 않았습니다. 이 모드팩 {count, plural, other {버전에}} 포함된 특정 파일들을 재배포할 수 있는 권한이 있음을 증명하는 자료를 제출해주세요."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "알 수 없는 내장 콘텐츠로 인해 일부 {count, plural, other {버전}}은 공개되지 않았습니다"
   },
   "report.already-reported": {
     "message": "이미 {title} 을(를) 신고했습니다"

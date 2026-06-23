@@ -431,6 +431,9 @@
   "create.collection.title": {
     "message": "Criar uma coleção"
   },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Estás prestes a atingir o limite de {typePlural}, por favor contacta o suporte se precisas de mais do que {max} {typePlural}."
+  },
   "create.limit-alert.contact-support": {
     "message": "Contacta o suporte"
   },
@@ -1150,9 +1153,6 @@
   },
   "frog.title": {
     "message": "Sapo"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "Disponível na América do Norte, Europa e Ásia Sudeste para uma cobertura extensa."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Pagar mensalmente"

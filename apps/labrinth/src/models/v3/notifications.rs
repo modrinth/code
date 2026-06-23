@@ -59,6 +59,7 @@ pub enum NotificationType {
     ProjectStatusNeutral,
     ProjectTransferred,
     PayoutAvailable,
+    DiscordRoleCreatorClub,
     Custom,
     Unknown,
 }
@@ -98,6 +99,9 @@ impl NotificationType {
             NotificationType::Custom => "custom",
             NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
+            NotificationType::DiscordRoleCreatorClub => {
+                "discord_role_creator_club"
+            }
             NotificationType::Unknown => "unknown",
         }
     }
@@ -134,6 +138,9 @@ impl NotificationType {
             }
             "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
+            "discord_role_creator_club" => {
+                NotificationType::DiscordRoleCreatorClub
+            }
             "custom" => NotificationType::Custom,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
@@ -259,6 +266,7 @@ pub enum NotificationBody {
         date_available: DateTime<Utc>,
         amount: u64,
     },
+    DiscordRoleCreatorClub,
     Custom {
         key: String,
         title: String,
@@ -346,6 +354,9 @@ impl NotificationBody {
             }
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
+            }
+            NotificationBody::DiscordRoleCreatorClub => {
+                NotificationType::DiscordRoleCreatorClub
             }
             NotificationBody::Custom { .. } => NotificationType::Custom,
             NotificationBody::Unknown => NotificationType::Unknown,
@@ -618,6 +629,12 @@ impl From<DBNotification> for Notification {
                     "Payout available".to_string(),
                     "A payout is available!".to_string(),
                     "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::DiscordRoleCreatorClub => (
+                    "Join the Creator Club".to_string(),
+                    "Link your Discord account to claim your creator community role.".to_string(),
+                    "/discord/link".to_string(),
                     vec![],
                 ),
 				NotificationBody::ModerationMessageReceived { .. } => (

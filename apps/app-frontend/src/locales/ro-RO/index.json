@@ -65,9 +65,6 @@
   "app.settings.tabs.resource-management": {
     "message": "Administrare resurse"
   },
-  "app.update-popup.body": {
-    "message": "Aplicația Modrinth v{version} este gata de instalat! Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Aplicația Modrinth v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
   },
@@ -86,9 +83,6 @@
   "app.update-popup.download-complete": {
     "message": "Descărcare finalizată"
   },
-  "app.update-popup.reload": {
-    "message": "Reîncărcați"
-  },
   "app.update-popup.title": {
     "message": "Actualizare disponibilă"
   },
@@ -97,15 +91,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versiunea {version} a fost instalată cu succes!"
-  },
-  "app.update.download-update": {
-    "message": "Descarcă actualizarea"
-  },
-  "app.update.downloading-update": {
-    "message": "Se descarcă actualizarea ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Reîncarcă pentru a instala actualizarea"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Selectează o opțiune"

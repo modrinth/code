@@ -1,6 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
-use crate::database::models::ids::DBUserId;
+use crate::database::models::ids::{DBNotificationId, DBUserId};
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
@@ -64,34 +64,12 @@ pub async fn create(
         .insert_many(user_ids, &mut txn, &redis)
         .await?;
 
-    let notifications = DBNotification::get_many(&notification_ids, &mut txn)
-        .await?
-        .into_iter()
-        .map(Notification::from)
-        .collect::<Vec<_>>();
+    let notifications =
+        get_site_exposed_notifications(&notification_ids, &mut txn).await?;
 
     txn.commit().await?;
 
-    for notification in notifications {
-        let notification_id = notification.id;
-        let to_user = notification.user_id;
-        if let Err(error) = broadcast_friends_message(
-            &redis,
-            RedisFriendsMessage::Notification {
-                to_user,
-                notification,
-            },
-        )
-        .await
-        {
-            tracing::warn!(
-                ?error,
-                ?notification_id,
-                ?to_user,
-                "failed to broadcast realtime notification"
-            );
-        }
-    }
+    broadcast_notifications(&redis, notifications).await;
 
     Ok(HttpResponse::Accepted().finish())
 }
@@ -155,37 +133,12 @@ pub async fn create_email_sync(
         .insert_many_without_delivery(notification_user_ids, &mut txn, &redis)
         .await?;
 
-    let notifications = DBNotification::get_many(&notification_ids, &mut txn)
-        .await?
-        .into_iter()
-        .map(Notification::from)
-        .collect::<Vec<_>>();
+    let notifications =
+        get_site_exposed_notifications(&notification_ids, &mut txn).await?;
 
     txn.commit().await?;
 
-    for notification in notifications {
-        let Notification {
-            user_id: to_user,
-            id: notification_id,
-            ..
-        } = notification;
-        if let Err(error) = broadcast_friends_message(
-            &redis,
-            RedisFriendsMessage::Notification {
-                to_user,
-                notification,
-            },
-        )
-        .await
-        {
-            tracing::warn!(
-                ?error,
-                ?notification_id,
-                ?to_user,
-                "failed to broadcast realtime notification"
-            );
-        }
-    }
+    broadcast_notifications(&redis, notifications).await;
 
     let mut email_txn = pool.begin().await?;
 
@@ -331,4 +284,58 @@ pub async fn send_custom_email(
     txn.commit().await?;
 
     Ok(HttpResponse::Accepted().finish())
+}
+
+async fn get_site_exposed_notifications(
+    notification_ids: &[DBNotificationId],
+    txn: &mut crate::database::PgTransaction<'_>,
+) -> Result<Vec<Notification>, ApiError> {
+    let raw_ids = notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
+    let exposed_ids = sqlx::query_scalar!(
+        r#"
+        SELECT n.id AS "id!"
+        FROM notifications n
+        INNER JOIN notifications_types nt ON nt.name = n.body ->> 'type'
+        WHERE n.id = ANY($1::BIGINT[])
+          AND nt.expose_in_site_notifications = TRUE
+        "#,
+        &raw_ids[..],
+    )
+    .fetch_all(&mut *txn)
+    .await?
+    .into_iter()
+    .map(DBNotificationId)
+    .collect::<Vec<_>>();
+
+    Ok(DBNotification::get_many(&exposed_ids, txn)
+        .await?
+        .into_iter()
+        .map(Notification::from)
+        .collect())
+}
+
+async fn broadcast_notifications(
+    redis: &RedisPool,
+    notifications: Vec<Notification>,
+) {
+    for notification in notifications {
+        let notification_id = notification.id;
+        let to_user = notification.user_id;
+        if let Err(error) = broadcast_friends_message(
+            redis,
+            RedisFriendsMessage::Notification {
+                to_user,
+                notification,
+            },
+        )
+        .await
+        {
+            tracing::warn!(
+                ?error,
+                ?notification_id,
+                ?to_user,
+                "failed to broadcast realtime notification"
+            );
+        }
+    }
 }

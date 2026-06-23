@@ -1,5 +1,6 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { UploadHandle, UploadProgress } from '../../../types/upload'
+import { getNodeBaseUrl } from '../../../utils/node-url'
 import type { Archon } from '../../archon/types'
 import type { Kyros } from '../types'
 
@@ -11,7 +12,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	}
 
 	private getNodeBaseUrl(auth: NodeFsAuth): string {
-		return `https://${auth.url.replace(/\/modrinth\/v\d+\/fs\/?$/, '')}`
+		return getNodeBaseUrl(auth.url)
 	}
 
 	/**

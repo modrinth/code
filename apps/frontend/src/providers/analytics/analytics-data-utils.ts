@@ -1,7 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter'
+import type { ProjectStatusFilterValue } from '~/components/analytics-dashboard/query-builder/query-filter-utils'
 
+import {
+	doesAnalyticsPointMatchNormalizedFilters,
+	normalizeAnalyticsSelectedFilters,
+} from './analytics-filter-utils'
 import { getProjectIdsMatchingStatusFilter } from './analytics-project-utils'
 import type {
 	AnalyticsDashboardTotals,
@@ -203,6 +207,30 @@ function mergeAnalyticsProjectEvents(
 	})
 }
 
+function mergeAnalyticsProjects(
+	projectGroups: Record<string, Labrinth.Projects.v3.Project>[],
+): Record<string, Labrinth.Projects.v3.Project> {
+	const projects: Record<string, Labrinth.Projects.v3.Project> = {}
+
+	for (const projectGroup of projectGroups) {
+		Object.assign(projects, projectGroup)
+	}
+
+	return projects
+}
+
+function mergeAnalyticsUsers(
+	userGroups: Record<string, Labrinth.Users.v3.User>[],
+): Record<string, Labrinth.Users.v3.User> {
+	const users: Record<string, Labrinth.Users.v3.User> = {}
+
+	for (const userGroup of userGroups) {
+		Object.assign(users, userGroup)
+	}
+
+	return users
+}
+
 function waitForAnalyticsFetchBatchDelay(): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ANALYTICS_PROJECT_IDS_FETCH_BATCH_DELAY_MS))
 }
@@ -215,6 +243,8 @@ export async function fetchAnalyticsData(
 ): Promise<AnalyticsFetchData> {
 	const fetchRequests = buildAnalyticsFetchRequestBatches(fetchRequest)
 	const timeSliceGroups: Labrinth.Analytics.v3.TimeSlice[][] = []
+	const projectGroups: Record<string, Labrinth.Projects.v3.Project>[] = []
+	const userGroups: Record<string, Labrinth.Users.v3.User>[] = []
 	const projectEventGroups: Labrinth.Analytics.v3.ProjectAnalyticsEvent[][] = []
 
 	for (let index = 0; index < fetchRequests.length; index++) {
@@ -224,11 +254,15 @@ export async function fetchAnalyticsData(
 
 		const response = await fetchAnalytics(fetchRequests[index])
 		timeSliceGroups.push(response.metrics)
+		projectGroups.push(response.projects ?? {})
+		userGroups.push(response.users ?? {})
 		projectEventGroups.push(response.project_events ?? [])
 	}
 
 	return {
 		metrics: mergeAnalyticsTimeSlices(timeSliceGroups),
+		projects: mergeAnalyticsProjects(projectGroups),
+		users: mergeAnalyticsUsers(userGroups),
 		project_events: mergeAnalyticsProjectEvents(projectEventGroups),
 	}
 }
@@ -433,6 +467,7 @@ export function computeTotals(
 	availableProjectIds: Set<string>,
 	projectStatusById: Map<string, ProjectStatusFilterValue>,
 	filters: AnalyticsSelectedFilters,
+	dependentProjectTypesById?: ReadonlyMap<string, readonly string[]>,
 ): AnalyticsDashboardTotals {
 	const totals: AnalyticsDashboardTotals = {
 		views: 0,
@@ -452,6 +487,7 @@ export function computeTotals(
 	if (filteredProjectIds.size === 0) {
 		return totals
 	}
+	const normalizedFilters = normalizeAnalyticsSelectedFilters(filters)
 
 	for (const timeSlice of timeSlices) {
 		for (const dataPoint of timeSlice) {
@@ -460,6 +496,15 @@ export function computeTotals(
 			}
 
 			if (!filteredProjectIds.has(dataPoint.source_project)) {
+				continue
+			}
+			if (
+				!doesAnalyticsPointMatchNormalizedFilters(
+					dataPoint,
+					normalizedFilters,
+					dependentProjectTypesById,
+				)
+			) {
 				continue
 			}
 

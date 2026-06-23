@@ -16,15 +16,17 @@ use std::{
     num::NonZeroU64,
 };
 
-use crate::database::PgPool;
+use crate::database::{PgPool, models::DBUserId};
 use actix_web::{HttpRequest, post, web};
+use ariadne::ids::UserId;
 use chrono::{DateTime, TimeDelta, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::{
-        AuthenticationError, checks::filter_visible_version_ids,
+        AuthenticationError,
+        checks::{filter_visible_project_ids, filter_visible_version_ids},
         get_user_from_headers,
     },
     database::{
@@ -42,7 +44,7 @@ use crate::{
         projects::ProjectStatus,
         teams::ProjectPermissions,
         threads::MessageBody,
-        v3::analytics::DownloadReason,
+        v3::{analytics::DownloadReason, projects::Project, users::User},
     },
     queue::session::AuthQueue,
     routes::ApiError,
@@ -127,6 +129,12 @@ pub struct GetResponse {
     /// time interval of metrics collection. The number of slices is determined
     /// by [`GetRequest::time_range`].
     pub metrics: Vec<TimeSlice>,
+    /// Project metadata for projects referenced in the response metrics.
+    #[serde(default)]
+    pub projects: HashMap<ProjectId, Project>,
+    /// User metadata for users referenced in the response metrics.
+    #[serde(default)]
+    pub users: HashMap<UserId, User>,
     /// List of events associated with projects that were requested.
     pub project_events: Vec<ProjectAnalyticsEvent>,
 }
@@ -318,6 +326,8 @@ pub async fn fetch_analytics(
 
     let mut query_clickhouse_cx = QueryClickhouseContext {
         clickhouse: &clickhouse,
+        pool: &pool,
+        redis: &redis,
         req: &req,
         time_slices: &mut time_slices,
         project_ids: &project_ids,
@@ -349,10 +359,29 @@ pub async fn fetch_analytics(
             .await?;
     }
 
-    if req.return_metrics.project_revenue.is_some() {
+    if let Some(metrics) = &req.return_metrics.project_revenue {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
+
+        let user_id_bucket_project_ids = sqlx::query!(
+            "
+            SELECT m.id
+            FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id
+            WHERE
+                m.id = ANY($1)
+                AND tm.user_id = $2
+                AND tm.accepted
+            ",
+            &project_id_values,
+            DBUserId::from(user.id).0,
+        )
+        .fetch_all(&**pool)
+        .await?
+        .into_iter()
+        .map(|row| row.id)
+        .collect::<Vec<_>>();
 
         metrics::fetch_project_revenue(
             &pool,
@@ -360,6 +389,9 @@ pub async fn fetch_analytics(
             &req,
             num_time_slices,
             &project_id_values,
+            &user_id_bucket_project_ids,
+            user.role.is_mod(),
+            metrics,
         )
         .await?;
     }
@@ -392,8 +424,14 @@ pub async fn fetch_analytics(
         .await?;
     }
 
+    let projects =
+        fetch_response_projects(&mut time_slices, &user, &pool, &redis).await?;
+    let users = fetch_response_users(&time_slices, &pool, &redis).await?;
+
     Ok(web::Json(GetResponse {
         metrics: time_slices,
+        projects,
+        users,
         project_events,
     }))
 }
@@ -462,6 +500,125 @@ pub(crate) fn normalize_loader_for_project(
     }
 }
 
+async fn fetch_response_projects(
+    time_slices: &mut [TimeSlice],
+    user: &crate::models::users::User,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<HashMap<ProjectId, Project>, ApiError> {
+    let mut project_ids = HashSet::<DBProjectId>::new();
+
+    for time_slice in &*time_slices {
+        for data in &time_slice.0 {
+            let AnalyticsData::Project(project) = data else {
+                continue;
+            };
+
+            let source_project_id = DBProjectId::from(project.source_project);
+            if source_project_id.0 != 0 {
+                project_ids.insert(source_project_id);
+            }
+            if let ProjectMetrics::Downloads(downloads) = &project.metrics
+                && let Some(dependent_project_id) =
+                    downloads.dependent_project_id
+            {
+                project_ids.insert(dependent_project_id.into());
+            }
+        }
+    }
+
+    let project_ids = project_ids.into_iter().collect::<Vec<_>>();
+    let projects = DBProject::get_many_ids(&project_ids, pool, redis).await?;
+    let visible_project_ids = filter_visible_project_ids(
+        projects.iter().map(|project| &project.inner).collect(),
+        &Some(user.clone()),
+        pool,
+        false,
+    )
+    .await?
+    .into_iter()
+    .collect::<HashSet<_>>();
+
+    filter_response_project_ids(time_slices, &visible_project_ids);
+
+    Ok(projects
+        .into_iter()
+        .filter(|project| visible_project_ids.contains(&project.inner.id))
+        .map(|project| {
+            let project_id = project.inner.id.into();
+            (project_id, Project::from(project))
+        })
+        .collect())
+}
+
+async fn fetch_response_users(
+    time_slices: &[TimeSlice],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<HashMap<UserId, User>, ApiError> {
+    let mut user_ids = HashSet::<DBUserId>::new();
+
+    for time_slice in time_slices {
+        for data in &time_slice.0 {
+            let AnalyticsData::Project(project) = data else {
+                continue;
+            };
+
+            if let ProjectMetrics::Revenue(revenue) = &project.metrics
+                && let Some(user_id) = revenue.user_id
+            {
+                user_ids.insert(user_id.into());
+            }
+        }
+    }
+
+    let user_ids = user_ids.into_iter().collect::<Vec<_>>();
+    if user_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    let users = DBUser::get_many_ids(&user_ids, pool, redis).await?;
+
+    Ok(users
+        .into_iter()
+        .map(|user| {
+            let user_id = UserId::from(user.id);
+            (user_id, User::from(user))
+        })
+        .collect())
+}
+
+fn filter_response_project_ids(
+    time_slices: &mut [TimeSlice],
+    visible_project_ids: &HashSet<DBProjectId>,
+) {
+    for time_slice in time_slices {
+        time_slice.0.retain_mut(|data| {
+            let AnalyticsData::Project(project) = data else {
+                return true;
+            };
+
+            let source_project_id = DBProjectId::from(project.source_project);
+            if source_project_id.0 != 0
+                && !visible_project_ids.contains(&source_project_id)
+            {
+                return false;
+            }
+
+            if let ProjectMetrics::Downloads(downloads) = &mut project.metrics
+                && let Some(dependent_project_id) =
+                    downloads.dependent_project_id
+                && !visible_project_ids
+                    .contains(&DBProjectId::from(dependent_project_id))
+            {
+                downloads.dependent_project_id = None;
+            }
+
+            true
+        });
+    }
+}
+
 async fn fetch_project_status_change_events(
     project_ids: &[DBProjectId],
     time_range: &TimeRange,
@@ -516,6 +673,8 @@ async fn fetch_project_status_change_events(
 
 pub(crate) struct QueryClickhouseContext<'a> {
     pub(crate) clickhouse: &'a clickhouse::Client,
+    pub(crate) pool: &'a PgPool,
+    pub(crate) redis: &'a RedisPool,
     pub(crate) req: &'a GetRequest,
     pub(crate) time_slices: &'a mut [TimeSlice],
     pub(crate) project_ids: &'a [DBProjectId],
@@ -871,10 +1030,13 @@ mod tests {
                 TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
                     source_project: test_project_3,
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        user_id: None,
                         revenue: Decimal::new(20000, 2),
                     }),
                 })]),
             ],
+            projects: HashMap::new(),
+            users: HashMap::new(),
             project_events: vec![],
         };
         let target = json!({
@@ -901,6 +1063,8 @@ mod tests {
                     }
                 ]
             ],
+            "projects": {},
+            "users": {},
             "project_events": []
         });
 

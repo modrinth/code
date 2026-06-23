@@ -9,6 +9,7 @@ use crate::database::models::version_item::{
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
+use crate::models::projects::FileType;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
@@ -250,29 +251,31 @@ fn find_file<'a>(
         return Some(selected_file);
     }
 
-    // Minecraft mods are not going to be both a mod and a modpack, so this minecraft-specific handling is fine
-    // As there can be multiple project types, returns the first allowable match
-    let mut fileexts = vec![];
-    for project_type in &version.project_types {
-        match project_type.as_str() {
-            "mod" => fileexts.push("jar"),
-            "modpack" => fileexts.push("mrpack"),
-            _ => (),
-        }
-    }
+    if let Some((file_name, desired_file_ext)) = file.rsplit_once('.') {
+        let formatted_name = format!("{}-{}", &project_id, &vcoords);
+        let mut filtered_files = version
+            .files
+            .iter()
+            .filter(|x| x.filename.ends_with(desired_file_ext));
 
-    for fileext in fileexts {
-        if file.eq_ignore_ascii_case(&format!(
-            "{}-{}.{}",
-            &project_id, &vcoords, fileext
-        )) {
-            return version
-                .files
-                .iter()
+        if file_name.eq_ignore_ascii_case(&formatted_name) {
+            return filtered_files
                 .find(|x| x.primary)
-                .or_else(|| version.files.iter().last());
+                .or_else(|| filtered_files.next_back());
+        } else if file_name.len() > formatted_name.len()
+            && file_name.as_bytes()[..formatted_name.len()]
+                .eq_ignore_ascii_case(formatted_name.as_bytes())
+        {
+            let desired_file_type = FileType::from_string(&format!(
+                "{}-{}",
+                &file_name[formatted_name.len()..].trim_start_matches('-'),
+                desired_file_ext
+            ));
+            return filtered_files
+                .find(|x| x.file_type == Some(desired_file_type));
         }
-    }
+    };
+
     None
 }
 

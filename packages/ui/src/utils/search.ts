@@ -7,6 +7,7 @@ import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-ro
 import { defineMessage, useVIntl } from '../composables/i18n'
 import {
 	DEFAULT_MOD_LOADERS,
+	DEFAULT_PLUGIN_LOADERS,
 	DEFAULT_SHADER_LOADERS,
 	formatCategory,
 	formatCategoryHeader,
@@ -311,7 +312,8 @@ export function useSearch(
 					}),
 				),
 				supported_project_types: ['plugin'],
-				display: 'all',
+				display: 'expandable',
+				default_values: DEFAULT_PLUGIN_LOADERS,
 				query_param: 'g',
 				supports_negative_filter: true,
 				searchable: false,
@@ -482,7 +484,7 @@ export function useSearch(
 					}
 					orGroups[field].push(val)
 				} else {
-					parts.push(`${field} = ${enquoteNonBools(val)}`)
+					parts.push(`${field} = ${formatSearchFilterValue(val)}`)
 				}
 			}
 		}
@@ -490,15 +492,15 @@ export function useSearch(
 		for (const [field, values] of Object.entries(orGroups)) {
 			if (values.length === 1) {
 				const val = values[0]
-				parts.push(`${field} = ${enquoteNonBools(val)}`)
+				parts.push(`${field} = ${formatSearchFilterValue(val)}`)
 			} else {
-				const quoted = values.map(enquoteNonBools).join(', ')
+				const quoted = values.map(formatSearchFilterValue).join(', ')
 				parts.push(`${field} IN [${quoted}]`)
 			}
 		}
 
 		for (const [field, values] of Object.entries(negativeByType)) {
-			const quoted = values.map(enquoteNonBools).join(', ')
+			const quoted = values.map(formatSearchFilterValue).join(', ')
 			parts.push(`${field} NOT IN [${quoted}]`)
 		}
 
@@ -512,11 +514,11 @@ export function useSearch(
 		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
 			if (envGroup.length === 1) {
 				const [field, val] = envGroup[0].split(':')
-				parts.push(`${field} = ${enquoteNonBools(val)}`)
+				parts.push(`${field} = ${formatSearchFilterValue(val)}`)
 			} else if (envGroup.length > 1) {
 				const conditions = envGroup.map((f) => {
 					const [field, val] = f.split(':')
-					return `${field} = ${enquoteNonBools(val)}`
+					return `${field} = ${formatSearchFilterValue(val)}`
 				})
 				parts.push(`(${conditions.join(' OR ')})`)
 			}
@@ -525,9 +527,9 @@ export function useSearch(
 		// Project types
 		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
 		if (mappedProjectTypes.length === 1) {
-			parts.push(`project_types = ${enquoteNonBools(mappedProjectTypes[0])}`)
+			parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
 		} else if (mappedProjectTypes.length > 1) {
-			const quoted = mappedProjectTypes.map(enquoteNonBools).join(', ')
+			const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
 			parts.push(`project_types IN [${quoted}]`)
 		}
 
@@ -790,11 +792,11 @@ function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][
 	return groups
 }
 
-function enquoteNonBools(value: string): string {
+export function formatSearchFilterValue(value: string): string {
 	if (value === 'true' || value === 'false') {
 		return value
 	}
-	return `"${value}"`
+	return `\`${value}\``
 }
 
 function getOptionValue(option: FilterOption, negative?: boolean): string {
@@ -820,4 +822,33 @@ function getParamValuesAsArray(x: LocationQueryValue | LocationQueryValue[]): st
 	} else {
 		return x.filter((x) => x !== null)
 	}
+}
+
+export function buildDependentsSearchFilters(
+	projectTypes: readonly ProjectType[],
+	dependencyProjectIds: readonly string[],
+): string {
+	const parts: string[] = []
+	const mappedProjectTypes = projectTypes.map(mapProjectTypeToSearch)
+
+	if (mappedProjectTypes.length === 1) {
+		parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
+	} else if (mappedProjectTypes.length > 1) {
+		const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
+		parts.push(`project_types IN [${quoted}]`)
+	}
+
+	const normalizedProjectIds = Array.from(
+		new Set(dependencyProjectIds.map((projectId) => projectId.trim()).filter(Boolean)),
+	)
+	if (normalizedProjectIds.length === 1) {
+		parts.push(
+			`compatible_dependency_project_ids = ${formatSearchFilterValue(normalizedProjectIds[0])}`,
+		)
+	} else if (normalizedProjectIds.length > 1) {
+		const quoted = normalizedProjectIds.map(formatSearchFilterValue).join(', ')
+		parts.push(`compatible_dependency_project_ids IN [${quoted}]`)
+	}
+
+	return parts.join(' AND ')
 }

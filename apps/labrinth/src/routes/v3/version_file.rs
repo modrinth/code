@@ -721,6 +721,11 @@ pub async fn delete_file(
         .execute(&mut transaction)
         .await?;
 
+        database::models::version_item::cleanup_empty_attribution_groups(
+            &mut transaction,
+        )
+        .await?;
+
         delphi::send_tech_review_exit_file_deleted_message_if_exited(
             row.project_id,
             was_in_tech_review,

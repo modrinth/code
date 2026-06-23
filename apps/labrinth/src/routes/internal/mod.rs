@@ -1,5 +1,6 @@
 pub mod admin;
 pub mod affiliate;
+pub mod attribution;
 pub mod billing;
 pub mod campaign;
 pub mod delphi;
@@ -29,7 +30,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
                 cfg.service(
                     actix_web::web::scope("/admin")
                         .service(admin::count_download)
-                        .service(admin::force_reindex),
+                        .service(admin::force_reindex)
+                        .service(admin::force_reindex_project),
                 );
                 cfg.service(
                     actix_web::web::scope("/session")
@@ -54,7 +56,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
                         .service(flows::set_email)
                         .service(flows::verify_email)
                         .service(flows::subscribe_newsletter)
-                        .service(flows::get_newsletter_subscription_status),
+                        .service(flows::get_newsletter_subscription_status)
+                        .service(flows::discord_community_link),
                 );
                 cfg.service(pats::get_pats);
                 cfg.service(pats::create_pat);
@@ -105,5 +108,10 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/server-ping")
             .wrap(default_cors())
             .configure(server_ping::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/attribution")
+            .wrap(default_cors())
+            .configure(attribution::config),
     );
 }

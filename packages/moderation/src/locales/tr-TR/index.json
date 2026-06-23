@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Dış bağlantı ekle"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Bütün {totalAvailableTags} alınabilecek etiketi seçtin. Bu etiketlerin amacına uygun değil. Etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmalıdır. Lütfen sadece projenle ilgili etiketleri seç."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Uygun etiketleri seç"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Açıklamayı uzat"
@@ -59,11 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Galeriye göz at"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Sizin kullandığınız {type} lisansı, kaynak kodunun erişilebilir olmasını gerektiriyor. Lütfen her ek sürüm için bir kaynak kod bağlantısı veya kaynak dosyası sağlayın ya da farklı bir lisans kullanmayı düşünün."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Bazı dış bağlantılarınız aynı. Her bağlantı sadece bir kere doğru bağlantı türüyle girilmelidir."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Özdeş bağlantıları temizle"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Açıklaman yeterli düz yazı veya resim açıklamalı içermeli ki ekran okuyucu veya patates internet kullananlar için erişilebilir olsun."
@@ -122,6 +134,9 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Geri bildirimleri incele"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "{count} çözünürlük etiketi şeçtiniz ({tags}). Kaynak paketlerinin genelde birincil çözünürlüklerine uyan bir çözünürlük etiketi olmalıdır."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
   },
@@ -142,6 +157,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Dil seç"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Lütfen {type} ürününüzün hangi lisans altında dağıtıldığını seçin."
   },
   "nags.select-license.title": {
     "defaultMessage": "Bir lisans seç"
@@ -182,6 +200,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Özetini düzenle"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Özetin {length} karakter. Bilgilendirici ve çekici bir özet için en az {minChars} karakter önerilir."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Özeti uzat"
   },
@@ -197,8 +218,17 @@
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Uygun etiketleri seç"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount} etiket seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Uygun etiketleri seç"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type} içeriğinizi sergilemek için en az bir galeri görseli gereklidir."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "ses veya yerelleştirme paketleri hariç kaynak paketi. Eğer paketiniz bu tanıma uyuyorsa, lütfen uygun etiketi seçin"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"
@@ -222,3 +252,4 @@
     "defaultMessage": "Bağlantı ayarlarına göz at"
   }
 }
+

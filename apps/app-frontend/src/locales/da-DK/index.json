@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Downloader Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Downloader opdatering"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primære instance"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Genindlæs for at opdater"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Vis flere kørende instances"
   },
   "app.action-bar.stop-instance": {
     "message": "Stop instance"
+  },
+  "app.action-bar.update": {
+    "message": "Opdater"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Vis aktive downloads"
@@ -79,6 +88,12 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Vælg en mulighed"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Vis hvor meget tid du har brugt på at spille en instance."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Vis tid spillet"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Aktivere muligheden for at slå sidepanelet til og fra."
@@ -136,6 +151,9 @@
   },
   "app.browse.server.installing": {
     "message": "Installere"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -359,8 +377,95 @@
   "app.skins.modal.cape-fallback-name": {
     "message": "Kappe"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} er klar til at blive installeret! Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
+  "app.skins.modal.cape-section": {
+    "message": "Kappe"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Rediger skin"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Rediger skinnet først!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Ingen kappe"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Ingen"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Gem skin"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Gemmer..."
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Upload et skin først!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Rediger skin"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Forhåndsvisning"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Du skifter dit skin for ofte. Mojang's servere har midlertidigt blokeret fremtidige anmodninger. Vent venligst et øjeblik for du prøver igen."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Ro på!"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Standard skins"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Du modtog disse skins for at donere til en Modrinth Pride indsamling imens der er Pride Month."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Gemte skins"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Log Ind"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Venligst log ind til din Minecraft konto for at kunne funktionerne til at administrere dit skin i Modrinth appen."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Overrasket Modrinth Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Venligst log ind"
+  },
+  "app.skins.title": {
+    "message": "Skin vælger"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
@@ -380,9 +485,6 @@
   "app.update-popup.download-complete": {
     "message": "Download færdiggjort"
   },
-  "app.update-popup.reload": {
-    "message": "Geninlæs"
-  },
   "app.update-popup.title": {
     "message": "Opdatering tilgængelig"
   },
@@ -392,14 +494,23 @@
   "app.update.complete-toast.title": {
     "message": "Version {version} var installeret med succes!"
   },
-  "app.update.download-update": {
-    "message": "Download opdatering"
+  "app.world.server-modal.placeholder-address": {
+    "message": "eksemple.modrinth.gg"
   },
-  "app.update.downloading-update": {
-    "message": "Downloader opdatering ({percent}%)"
+  "app.world.server-modal.select-an-option": {
+    "message": "Vælg en mulighed"
   },
-  "app.update.reload-to-update": {
-    "message": "Genindlæs for at installere opdatering"
+  "app.world.world-item.incompatible-version": {
+    "message": "Ikke kompatibel version {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ikke spillet endnu"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Tilføj en ven"
@@ -499,6 +610,12 @@
   },
   "instance.edit-world.title": {
     "message": "Rediger verden"
+  },
+  "instance.files.adding-files": {
+    "message": "Tilføjer filer ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Gem som..."
   },
   "instance.server-modal.address": {
     "message": "Adresse"
@@ -614,6 +731,9 @@
   "instance.settings.tabs.java": {
     "message": "Java og hukommelse"
   },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Indskriv Java argumenter..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Omgivelses variabler"
   },
@@ -628,6 +748,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Allokeret hukommelse"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/vej/til/java"
   },
   "instance.settings.tabs.window": {
     "message": "Vindue"
@@ -701,8 +824,23 @@
   "instance.worlds.world_in_use": {
     "message": "Verden er i brug"
   },
+  "minecraft-account.add-account": {
+    "message": "Tilføj konto"
+  },
+  "minecraft-account.label": {
+    "message": "Minecraft konto"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Ikke logged ind"
+  },
   "minecraft-account.remove-account": {
     "message": "Fjern konto"
+  },
+  "minecraft-account.select-account": {
+    "message": "Vælg konto"
+  },
+  "minecraft-account.sign-in": {
+    "message": "Log ind på Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Givet af instanceen"
@@ -727,5 +865,20 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader er givet af serveren"
+  },
+  "unknown-pack-warning-modal.body": {
+    "message": "En fil behandles kun, hvis den uploades til Modrinth, uanset filformat (herunder .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Vis ikke denne advarsel igen"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Bekræft installation"
+  },
+  "unknown-pack-warning-modal.install-anyway": {
+    "message": "Installer alligevel"
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Ukendt fil advarsel"
   }
 }

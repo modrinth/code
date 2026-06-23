@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Descargando Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Descargando actualización"
+  },
   "app.action-bar.downloads": {
     "message": "Descargas"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instancia principal"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Reinicia para actualizar"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Mostrar más instancias en ejecución"
   },
   "app.action-bar.stop-instance": {
     "message": "Detener instancia"
+  },
+  "app.action-bar.update": {
+    "message": "Actualizar"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Ver descargas en curso"
@@ -86,6 +95,12 @@
   "app.appearance-settings.select-option": {
     "message": "Selecciona una opción"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Muestra cuánto tiempo has estado jugando en una instancia."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Mostrar tiempo de juego"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Permite mostrar u ocultar la barra lateral."
   },
@@ -142,6 +157,9 @@
   },
   "app.browse.server.installing": {
     "message": "Instalando"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "No hay versiones disponibles que coincidan con {compatibilityLabel}. Selecciona una versión para instalarla de todas formas. Las dependencias no se instalarán automáticamente."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
@@ -294,7 +312,7 @@
     "message": "Este proyecto ya está instalado"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Volver a descubrir contenido"
+    "message": "Volver al explorador"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Instalar contenido a la instancia"
@@ -327,7 +345,7 @@
     "message": "Añadir skin"
   },
   "app.skins.add-button.drag-and-drop": {
-    "message": "Arrastrar y soltar"
+    "message": "Arrastra y suelta"
   },
   "app.skins.apply-button": {
     "message": "Aplicar"
@@ -336,10 +354,10 @@
     "message": "Eliminar skin"
   },
   "app.skins.delete-modal.description": {
-    "message": "Esto eliminará permanentemente el skin seleccionado. Esta acción no se puede deshacer."
+    "message": "Esto eliminará permanentemente la skin seleccionada. Esta acción no se puede deshacer."
   },
   "app.skins.delete-modal.title": {
-    "message": "¿Estás seguro de que quieres eliminar este skin?"
+    "message": "¿Estás seguro de que quieres eliminar esta skin?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Error al leer el archivo arrastrado."
@@ -354,7 +372,7 @@
     "message": "Añadir skin"
   },
   "app.skins.modal.add-title": {
-    "message": "Añadiendo un skin"
+    "message": "Añadiendo una skin"
   },
   "app.skins.modal.arm-style-section": {
     "message": "Estilo de brazo"
@@ -396,7 +414,7 @@
     "message": "Textura"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "¡Primero carga un skin!"
+    "message": "¡Primero carga una skin!"
   },
   "app.skins.preview.edit-button": {
     "message": "Editar skin"
@@ -410,6 +428,12 @@
   "app.skins.rate-limit.title": {
     "message": "¡Más despacio!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "No se ha podido guardar el orden de las skins."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Error al reordenar las skins"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Constructores y Biomas"
   },
@@ -422,11 +446,20 @@
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Orgullo Modrinth"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Has recibido estas skins por donar a la fundación Orgullo Modrinth durante el Mes del Orgullo."
+  },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Monturas del Caos"
   },
   "app.skins.section.saved-skins": {
-    "message": "Skins guardados"
+    "message": "Skins guardadas"
   },
   "app.skins.section.striding-hero": {
     "message": "Striding Hero"
@@ -455,9 +488,6 @@
   "app.skins.title": {
     "message": "Selector de skin"
   },
-  "app.update-popup.body": {
-    "message": "¡Modrinth App v{version} está lista para instalarse! Actualiza ahora o automáticamente al cerrar la Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "La descarga de la Modrinth App v{version} ha finalizado. Actualiza ahora o automáticamente al cerrar la Modrinth App."
   },
@@ -477,7 +507,7 @@
     "message": "Descarga completada"
   },
   "app.update-popup.reload": {
-    "message": "Recargar"
+    "message": "Reinicia para actualizar"
   },
   "app.update-popup.title": {
     "message": "Actualización disponible"
@@ -487,15 +517,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "¡La versión {version} se ha instalado correctamente!"
-  },
-  "app.update.download-update": {
-    "message": "Descargar actualización"
-  },
-  "app.update.downloading-update": {
-    "message": "Descargando actualización ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Recarga para instalar la actualización"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "ejemplo.modrinth.gg"
@@ -685,6 +706,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Nombre"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Canal de actualizaciones"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Las versiones estables, beta y alpha se mostrarán como actualizaciones disponibles. "
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Las versiones estables y beta serán mostradas como actualizaciones disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Estable"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Sólo las versiones estables serán mostradas como actualizaciones disponibles."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Selecciona el canal de actualizaciones"
   },
   "instance.settings.tabs.hooks": {
     "message": "Hooks de inicio"
@@ -876,7 +921,7 @@
     "message": "Proporcionado por el servidor"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "Solo se puede añadir mods que sean del lado del cliente a la instancia del servidor"
+    "message": "Solo se pueden añadir mods que sean del lado del cliente a la instancia del servidor"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "La versión del juego es proporcionada por el servidor"
