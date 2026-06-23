@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-3 mb-3">
+	<div class="mb-3 flex flex-col gap-3">
 		<div class="flex flex-wrap justify-between gap-2">
 			<VersionFilterControl
 				ref="versionFilters"
@@ -24,7 +24,7 @@
 
 		<div
 			v-if="openModal && filteredVersions.length > pageSize"
-			class="flex flex-wrap justify-between items-center gap-2"
+			class="flex flex-wrap items-center justify-between gap-2"
 		>
 			<span>
 				Showing {{ (currentPage - 1) * pageSize + 1 }} to
@@ -40,90 +40,192 @@
 			/>
 		</div>
 	</div>
-	<div
+
+	<Table
 		v-if="versions.length > 0"
-		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content]"
-		:class="[
-			hasMultipleEnvironments
-				? 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_auto_min-content] has-environment'
-				: 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content] no-environment',
-		]"
+		class="hidden sm:block"
+		:columns="versionColumns"
+		:data="currentVersionRows"
+		row-key="id"
+		row-class="group"
 	>
-		<div class="versions-grid-row">
-			<div class="w-9 max-sm:hidden"></div>
-			<div class="text-sm font-bold text-contrast max-sm:hidden">Name</div>
-			<div
-				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
-			>
-				Game version
-			</div>
-			<div
-				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
-			>
-				Platforms
-			</div>
-			<div
-				v-if="hasMultipleEnvironments"
-				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
-			>
-				Environment
-			</div>
-			<div
-				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
-			>
-				Published
-			</div>
-			<div
-				class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
-			>
-				Downloads
-			</div>
-			<div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">
-				Compatibility
-			</div>
-			<div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">Stats</div>
-			<div class="w-9 max-sm:hidden"></div>
-		</div>
-		<template v-for="(version, index) in currentVersions" :key="index">
-			<!-- Row divider -->
-			<div
-				class="versions-grid-row h-px w-full bg-surface-5"
-				:class="{
-					'max-sm:!hidden': index === 0,
-				}"
-			></div>
-			<div class="versions-grid-row group relative">
-				<AutoLink
-					v-if="!!versionLink"
-					class="absolute inset-[calc(-1rem-2px)_-2rem] before:absolute before:inset-0 before:transition-all before:content-[''] hover:before:backdrop-brightness-110"
-					:to="versionLink?.(version)"
+		<template #cell-channel="{ row: version }">
+			<div class="flex items-center justify-center">
+				<VersionChannelIndicator
+					v-tooltip="`Toggle filter for ${version.version_type}`"
+					:channel="version.version_type"
+					class="cursor-pointer"
+					@click="versionFilters?.toggleFilter('channel', version.version_type)"
 				/>
-				<div class="flex flex-col justify-center gap-2 sm:contents">
-					<div class="flex flex-row items-center gap-2 sm:contents">
-						<div class="self-center">
-							<div class="relative z-[1] cursor-pointer">
-								<VersionChannelIndicator
-									v-tooltip="`Toggle filter for ${version.version_type}`"
-									:channel="version.version_type"
-									@click="versionFilters?.toggleFilter('channel', version.version_type)"
-								/>
-							</div>
+			</div>
+		</template>
+
+		<template #cell-name="{ row: version }">
+			<div class="flex min-w-0 flex-col gap-2">
+				<AutoLink
+					:to="versionLink?.(version)"
+					class="flex min-w-0 flex-col gap-1"
+					:link-class="versionLink ? 'hover:underline' : ''"
+					:title="`${version.version_number} - ${version.name}`"
+				>
+					<div class="flex min-w-0 items-center gap-2">
+						<div class="overflow-hidden text-ellipsis font-bold text-contrast">
+							{{ version.version_number }}
 						</div>
 						<div
-							class="pointer-events-none relative z-[1] flex flex-col gap-1 justify-center overflow-hidden min-w-32"
+							v-if="version.files_missing_attribution"
+							v-tooltip="formatMessage(messages.withheldTooltip)"
+							:style="{
+								'--_bg-color': 'var(--color-orange-bg)',
+								'--_color': 'var(--color-orange)',
+							}"
+						>
+							<TagItem> <CircleAlertIcon /> {{ formatMessage(messages.withheld) }}</TagItem>
+						</div>
+					</div>
+					<div class="overflow-hidden text-ellipsis text-xs font-medium">
+						{{ version.name }}
+					</div>
+				</AutoLink>
+				<div v-if="showFiles" class="tag-list">
+					<div
+						v-for="(file, fileIdx) in version.files"
+						:key="`file-tag-${fileIdx}`"
+						:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
+					>
+						<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
+						{{ file.filename }} - {{ formatBytes(file.size) }}
+					</div>
+				</div>
+			</div>
+		</template>
+
+		<template #cell-gameVersions="{ row: version }">
+			<div class="flex flex-wrap gap-1">
+				<TagItem
+					v-for="gameVersion in getDisplayGameVersions(version).slice(0, maxGameVersionTags)"
+					:key="`version-tag-${gameVersion}`"
+					v-tooltip="`Toggle filter for ${gameVersion}`"
+					:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
+				>
+					{{ gameVersion }}
+				</TagItem>
+				<Menu
+					v-if="getDisplayGameVersions(version).length > maxGameVersionTags"
+					:delay="{ hide: 50, show: 0 }"
+					no-auto-focus
+					class="cursor-default"
+				>
+					<TagItem tabindex="0">
+						+{{ getDisplayGameVersions(version).length - maxGameVersionTags }}
+					</TagItem>
+					<template #popper>
+						<div class="flex max-w-[20rem] flex-wrap gap-1">
+							<TagItem
+								v-for="gameVersion in getDisplayGameVersions(version).slice(maxGameVersionTags)"
+								:key="`overflow-version-tag-${gameVersion}`"
+								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
+							>
+								{{ gameVersion }}
+							</TagItem>
+						</div>
+					</template>
+				</Menu>
+			</div>
+		</template>
+
+		<template #cell-platforms="{ row: version }">
+			<div class="flex flex-wrap gap-1">
+				<template v-if="version.noModLoader">
+					<TagItem class="border !border-solid border-surface-5"> No mod loader </TagItem>
+				</template>
+				<template v-else>
+					<TagItem
+						v-for="platform in version.loaders"
+						:key="`platform-tag-${platform}`"
+						v-tooltip="`Toggle filter for ${platform}`"
+						:style="`--_color: var(--color-platform-${platform})`"
+						:action="() => versionFilters?.toggleFilter('platform', platform)"
+					>
+						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+						<FormattedTag :tag="platform" enforce-type="loader" />
+					</TagItem>
+				</template>
+			</div>
+		</template>
+
+		<template v-if="showEnvironmentColumn" #cell-environment="{ row: version }">
+			<div class="flex flex-wrap gap-1">
+				<TagItem
+					v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
+					:key="`env-tag-${tagIdx}`"
+					class="text-center"
+				>
+					<component :is="tag.icon" />
+					{{ formatMessage(tag.label).replace('and', '&') }}
+				</TagItem>
+			</div>
+		</template>
+
+		<template #cell-published="{ row: version }">
+			<div
+				v-tooltip="formatDateTime(version.date_published)"
+				class="flex cursor-help items-center gap-1 text-nowrap font-medium"
+			>
+				{{ formatRelativeTime(new Date(version.date_published)) }}
+			</div>
+		</template>
+
+		<template #cell-downloads="{ row: version }">
+			<div class="flex items-center gap-1 font-medium">
+				{{ formatCompactNumber(version.downloads) }}
+			</div>
+		</template>
+
+		<template #cell-actions="{ row: version }">
+			<div class="flex items-center justify-end gap-1">
+				<slot name="actions" :version="version"></slot>
+			</div>
+		</template>
+	</Table>
+
+	<div
+		v-if="versions.length > 0"
+		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 sm:hidden"
+	>
+		<template v-for="(version, index) in currentVersions" :key="version.id ?? index">
+			<div
+				class="h-px w-full bg-surface-5"
+				:class="{
+					hidden: index === 0,
+				}"
+			></div>
+			<div class="group relative grid grid-cols-[1fr_min-content] gap-4">
+				<div class="flex flex-col justify-center gap-2">
+					<div class="flex flex-row items-center gap-2">
+						<div class="self-center">
+							<VersionChannelIndicator
+								v-tooltip="`Toggle filter for ${version.version_type}`"
+								:channel="version.version_type"
+								class="cursor-pointer"
+								@click="versionFilters?.toggleFilter('channel', version.version_type)"
+							/>
+						</div>
+						<AutoLink
+							:to="versionLink?.(version)"
+							class="flex min-w-32 flex-col justify-center gap-1 overflow-hidden"
 							:class="{
 								'group-hover:underline': !!versionLink,
 							}"
-							title="`${version.version_number} - ${version.name}`"
+							:title="`${version.version_number} - ${version.name}`"
 						>
 							<div class="flex items-center gap-2">
-								<div class="font-bold text-contrast text-ellipsis overflow-hidden">
+								<div class="overflow-hidden text-ellipsis font-bold text-contrast">
 									{{ version.version_number }}
 								</div>
 								<div
 									v-if="version.files_missing_attribution"
 									v-tooltip="formatMessage(messages.withheldTooltip)"
-									class="z-[1]"
 									:style="{
 										'--_bg-color': 'var(--color-orange-bg)',
 										'--_color': 'var(--color-orange)',
@@ -132,23 +234,22 @@
 									<TagItem> <CircleAlertIcon /> {{ formatMessage(messages.withheld) }}</TagItem>
 								</div>
 							</div>
-							<div class="text-xs font-medium text-ellipsis overflow-hidden">
+							<div class="overflow-hidden text-ellipsis text-xs font-medium">
 								{{ version.name }}
 							</div>
-						</div>
+						</AutoLink>
 					</div>
-					<div class="flex flex-col justify-center gap-2 sm:contents">
-						<div class="flex flex-row flex-wrap items-center gap-1 xl:contents">
+					<div class="flex flex-col justify-center gap-2">
+						<div class="flex flex-row flex-wrap items-center gap-1">
 							<div class="flex items-center">
 								<div class="flex flex-wrap gap-1">
 									<TagItem
-										v-for="gameVersion in formatVersionsForDisplay(
-											version.game_versions,
-											gameVersions,
-										).slice(0, maxGameVersionTags)"
+										v-for="gameVersion in getDisplayGameVersions(version).slice(
+											0,
+											maxGameVersionTags,
+										)"
 										:key="`version-tag-${gameVersion}`"
 										v-tooltip="`Toggle filter for ${gameVersion}`"
-										class="z-[1]"
 										:action="
 											() => versionFilters?.toggleFilters('gameVersion', version.game_versions)
 										"
@@ -156,27 +257,20 @@
 										{{ gameVersion }}
 									</TagItem>
 									<Menu
-										v-if="
-											formatVersionsForDisplay(version.game_versions, gameVersions).length >
-											maxGameVersionTags
-										"
+										v-if="getDisplayGameVersions(version).length > maxGameVersionTags"
 										:delay="{ hide: 50, show: 0 }"
 										no-auto-focus
-										class="z-[1] cursor-default"
+										class="cursor-default"
 									>
 										<TagItem tabindex="0">
-											+{{
-												formatVersionsForDisplay(version.game_versions, gameVersions).length -
-												maxGameVersionTags
-											}}
+											+{{ getDisplayGameVersions(version).length - maxGameVersionTags }}
 										</TagItem>
 										<template #popper>
-											<div class="flex gap-1 flex-wrap max-w-[20rem]">
+											<div class="flex max-w-[20rem] flex-wrap gap-1">
 												<TagItem
-													v-for="gameVersion in formatVersionsForDisplay(
-														version.game_versions,
-														gameVersions,
-													).slice(maxGameVersionTags)"
+													v-for="gameVersion in getDisplayGameVersions(version).slice(
+														maxGameVersionTags,
+													)"
 													:key="`overflow-version-tag-${gameVersion}`"
 													:action="
 														() =>
@@ -193,16 +287,13 @@
 							<div class="flex items-center">
 								<div class="flex flex-wrap gap-1">
 									<template v-if="version.noModLoader">
-										<TagItem class="z-[1] border !border-solid border-surface-5">
-											No mod loader
-										</TagItem>
+										<TagItem class="border !border-solid border-surface-5"> No mod loader </TagItem>
 									</template>
 									<template v-else>
 										<TagItem
 											v-for="platform in version.loaders"
 											:key="`platform-tag-${platform}`"
 											v-tooltip="`Toggle filter for ${platform}`"
-											class="z-[1]"
 											:style="`--_color: var(--color-platform-${platform})`"
 											:action="() => versionFilters?.toggleFilter('platform', platform)"
 										>
@@ -212,12 +303,12 @@
 									</template>
 								</div>
 							</div>
-							<div v-if="hasMultipleEnvironments" class="flex items-center">
+							<div v-if="showEnvironmentColumn" class="flex items-center">
 								<div class="flex flex-wrap gap-1">
 									<TagItem
 										v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
 										:key="`env-tag-${tagIdx}`"
-										class="z-[1] text-center"
+										class="text-center"
 									>
 										<component :is="tag.icon" />
 										{{ formatMessage(tag.label).replace('and', '&') }}
@@ -225,44 +316,41 @@
 								</div>
 							</div>
 						</div>
-						<div
-							class="flex flex-col justify-center gap-1 max-sm:flex-row max-sm:justify-start max-sm:gap-3 xl:contents"
-						>
+						<div class="flex flex-row justify-start gap-3">
 							<div
 								v-tooltip="formatDateTime(version.date_published)"
-								class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
+								class="flex cursor-help items-center gap-1 text-nowrap font-medium"
 							>
-								<CalendarIcon class="xl:hidden" />
+								<CalendarIcon />
 								{{ formatRelativeTime(new Date(version.date_published)) }}
 							</div>
-							<div
-								class="pointer-events-none z-[1] flex items-center gap-1 font-medium xl:self-center"
-							>
-								<DownloadIcon class="xl:hidden" />
+							<div class="flex items-center gap-1 font-medium">
+								<DownloadIcon />
 								{{ formatCompactNumber(version.downloads) }}
 							</div>
 						</div>
 					</div>
+					<div v-if="showFiles" class="tag-list">
+						<div
+							v-for="(file, fileIdx) in version.files"
+							:key="`file-tag-${fileIdx}`"
+							:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
+						>
+							<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
+							{{ file.filename }} - {{ formatBytes(file.size) }}
+						</div>
+					</div>
 				</div>
 				<div
-					class="flex items-start justify-end gap-1 sm:items-center z-[1] max-[400px]:flex-col max-[400px]:justify-start"
+					class="flex items-start justify-end gap-1 max-[400px]:flex-col max-[400px]:justify-start"
 				>
 					<slot name="actions" :version="version"></slot>
-				</div>
-				<div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
-					<div
-						v-for="(file, fileIdx) in version.files"
-						:key="`platform-tag-${fileIdx}`"
-						:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
-					>
-						<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
-						{{ file.filename }} - {{ formatBytes(file.size) }}
-					</div>
 				</div>
 			</div>
 		</template>
 	</div>
-	<div class="flex mt-3">
+
+	<div class="mt-3 flex">
 		<Pagination
 			:page="currentPage"
 			class="ml-auto"
@@ -286,6 +374,8 @@ import {
 	ButtonStyled,
 	FormattedTag,
 	Pagination,
+	Table,
+	type TableColumn,
 	TagItem,
 	useCompactNumber,
 	useFormatBytes,
@@ -321,6 +411,17 @@ type DisplayVersion = VersionWithDisplayUrlEnding & {
 	noModLoader: boolean
 }
 
+type VersionTableColumn =
+	| 'channel'
+	| 'name'
+	| 'gameVersions'
+	| 'platforms'
+	| 'environment'
+	| 'published'
+	| 'downloads'
+	| 'actions'
+type VersionTableRow = DisplayVersion & Record<string, unknown>
+
 const props = withDefaults(
 	defineProps<{
 		baseId?: string
@@ -331,6 +432,7 @@ const props = withDefaults(
 		}
 		versions: VersionWithDisplayUrlEnding[]
 		showFiles?: boolean
+		showEnvironmentColumn?: boolean
 		currentMember?: boolean
 		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
@@ -341,10 +443,98 @@ const props = withDefaults(
 	{
 		baseId: undefined,
 		showFiles: false,
+		showEnvironmentColumn: false,
 		currentMember: false,
 		versionLink: undefined,
 	},
 )
+
+const visibleCellClass = '!overflow-visible py-3 align-middle'
+const versionColumnWidths = computed<Record<VersionTableColumn, string>>(() =>
+	props.showEnvironmentColumn
+		? {
+				channel: '7%',
+				name: '15%',
+				gameVersions: '15%',
+				platforms: '15%',
+				environment: '14%',
+				published: '11%',
+				downloads: '8%',
+				actions: '7%',
+			}
+		: {
+				channel: '7%',
+				name: '20%',
+				gameVersions: '15%',
+				platforms: '15%',
+				environment: '0%',
+				published: '12%',
+				downloads: '10%',
+				actions: '8%',
+			},
+)
+
+const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
+	const columns: TableColumn<VersionTableColumn>[] = [
+		{
+			key: 'channel',
+			width: versionColumnWidths.value.channel,
+			headerClass: 'text-secondary',
+			cellClass: visibleCellClass,
+		},
+		{
+			key: 'name',
+			label: 'Name',
+			width: versionColumnWidths.value.name,
+			cellClass: '!overflow-visible py-3',
+		},
+		{
+			key: 'gameVersions',
+			label: 'Game version',
+			width: 'fit-content',
+			cellClass: visibleCellClass,
+		},
+		{
+			key: 'platforms',
+			label: 'Platforms',
+			width: 'fit-content',
+			cellClass: visibleCellClass,
+		},
+	]
+
+	if (props.showEnvironmentColumn) {
+		columns.push({
+			key: 'environment',
+			label: 'Environment',
+			width: versionColumnWidths.value.environment,
+			cellClass: visibleCellClass,
+		})
+	}
+
+	columns.push(
+		{
+			key: 'published',
+			label: 'Published',
+			width: versionColumnWidths.value.published,
+			cellClass: visibleCellClass,
+		},
+		{
+			key: 'downloads',
+			label: 'Downloads',
+			width: versionColumnWidths.value.downloads,
+			cellClass: visibleCellClass,
+		},
+		{
+			key: 'actions',
+			width: versionColumnWidths.value.actions,
+			align: 'right',
+			headerClass: 'text-secondary',
+			cellClass: visibleCellClass,
+		},
+	)
+
+	return columns
+})
 
 function getModpackLoaders(version: VersionWithDisplayUrlEnding): string[] {
 	const loaders = Array.isArray(version.loaders) ? version.loaders : []
@@ -372,6 +562,10 @@ function hasNoModLoader(loaders: string[]): boolean {
 			loaders[0] === 'minecraft') ||
 		loaders.length === 0
 	)
+}
+
+function getDisplayGameVersions(version: DisplayVersion): string[] {
+	return formatVersionsForDisplay(version.game_versions, props.gameVersions)
 }
 
 const normalizedVersions = computed<DisplayVersion[]>(() =>
@@ -403,11 +597,6 @@ const selectedPlatforms: Ref<string[]> = computed(
 )
 const selectedChannels: Ref<string[]> = computed(() => versionFilters.value?.selectedChannels ?? [])
 
-const hasMultipleEnvironments = computed(() => {
-	const environments = new Set(currentVersions.value.map((v) => v.environment).filter(Boolean))
-	return environments.size > 1
-})
-
 const filteredVersions = computed(() => {
 	return normalizedVersions.value.filter(
 		(version) =>
@@ -430,6 +619,9 @@ const currentVersions = computed(() =>
 		(currentPage.value - 1) * pageSize.value,
 		currentPage.value * pageSize.value,
 	),
+)
+const currentVersionRows = computed<VersionTableRow[]>(
+	() => currentVersions.value as VersionTableRow[],
 )
 
 const route = useRoute()
@@ -478,16 +670,3 @@ const messages = defineMessages({
 	},
 })
 </script>
-<style scoped>
-.versions-grid-row {
-	@apply grid grid-cols-[1fr_min-content] gap-4 supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid sm:grid-cols-[min-content_1fr_1fr_1fr_min-content];
-}
-
-.has-environment .versions-grid-row {
-	@apply xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_1fr_min-content];
-}
-
-.no-environment .versions-grid-row {
-	@apply xl:grid-cols-[min-content_1fr_1fr_1fr_1fr_1fr_min-content];
-}
-</style>

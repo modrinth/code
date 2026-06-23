@@ -27,6 +27,7 @@
 				:project="project"
 				:versions="versions"
 				:show-files="flags.showVersionFilesInTable"
+				:show-environment-column="flags.showVersionEnvironmentColumn"
 				:current-member="!!currentMember"
 				:loaders="tags.loaders"
 				:game-versions="tags.gameVersions"
