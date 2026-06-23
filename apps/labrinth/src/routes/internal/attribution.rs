@@ -477,26 +477,66 @@ async fn assign(
         ));
     }
 
+    let mut txn = pool.begin().await.wrap_internal_err(
+        "failed to begin attribution assignment transaction",
+    )?;
+
     let result = sqlx::query!(
-        "
-		update project_attribution_files
-		set group_id = $1
-		where sha1 = $2
-		and group_id in (
-			select id from project_attribution_groups where project_id = $3
+        r#"
+		insert into project_attribution_files (
+			group_id,
+			name,
+			sha1,
+			moderation_external_license_id
 		)
-		",
+		select
+			$1,
+			paf.name,
+			paf.sha1,
+			paf.moderation_external_license_id
+		from project_attribution_files paf
+		inner join project_attribution_groups pag on pag.id = paf.group_id
+		where paf.sha1 = $2 and pag.project_id = $3
+		order by paf.moderation_external_license_id nulls last, paf.name
+		limit 1
+		on conflict (group_id, sha1) do update
+		set moderation_external_license_id = coalesce(
+			project_attribution_files.moderation_external_license_id,
+			excluded.moderation_external_license_id
+		)
+		"#,
         body.target_group_id,
         &sha1_bytes,
         project_id as DBProjectId,
     )
-    .execute(pool.as_ref())
+    .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to assign attribution file to group")?;
+    .wrap_internal_err("failed to insert assigned attribution file")?;
 
     if result.rows_affected() == 0 {
         return Err(ApiError::NotFound);
     }
+
+    sqlx::query!(
+        r#"
+		delete from project_attribution_files paf
+		using project_attribution_groups pag
+		where pag.id = paf.group_id
+			and pag.project_id = $1
+			and paf.sha1 = $2
+			and paf.group_id != $3
+		"#,
+        project_id as DBProjectId,
+        &sha1_bytes,
+        body.target_group_id,
+    )
+    .execute(&mut txn)
+    .await
+    .wrap_internal_err("failed to remove old assigned attribution files")?;
+
+    txn.commit().await.wrap_internal_err(
+        "failed to commit attribution assignment transaction",
+    )?;
 
     cleanup_empty_groups(pool.as_ref())
         .await

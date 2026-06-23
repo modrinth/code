@@ -401,10 +401,12 @@ async fn persist_attribution_results(
             .and_then(|fp| existing_flame_group_ids.get(&fp.id))
         {
             sqlx::query!(
-                "
+                r#"
                 insert into project_attribution_files (group_id, name, sha1, moderation_external_license_id)
                 values ($1, $2, $3, $4)
-                ",
+                on conflict (group_id, sha1) do update
+                set moderation_external_license_id = excluded.moderation_external_license_id
+                "#,
                 *group_id as DBAttributionGroupId,
                 &file.path,
                 &file.sha1.as_bytes().to_vec() as &[u8],
@@ -436,10 +438,12 @@ async fn persist_attribution_results(
         .wrap_err("inserting external license attribution group")?;
 
         sqlx::query!(
-            "
+            r#"
             insert into project_attribution_files (group_id, name, sha1, moderation_external_license_id)
             values ($1, $2, $3, $4)
-            ",
+            on conflict (group_id, sha1) do update
+            set moderation_external_license_id = excluded.moderation_external_license_id
+            "#,
             group_id as DBAttributionGroupId,
             &file.path,
             &file.sha1.as_bytes().to_vec() as &[u8],
@@ -488,10 +492,11 @@ async fn persist_attribution_results(
             files.iter().map(|f| f.sha1.as_bytes().to_vec()).collect();
 
         sqlx::query!(
-            "
+            r#"
             insert into project_attribution_files (group_id, name, sha1)
             select $1, unnest($2::text[]), unnest($3::bytea[])
-            ",
+            on conflict (group_id, sha1) do nothing
+            "#,
             group_id as DBAttributionGroupId,
             &names,
             &sha1s,
@@ -516,10 +521,11 @@ async fn persist_attribution_results(
         .wrap_err("inserting unknown attribution group")?;
 
         sqlx::query!(
-            "
+            r#"
             insert into project_attribution_files (group_id, name, sha1)
             values ($1, $2, $3)
-            ",
+            on conflict (group_id, sha1) do nothing
+            "#,
             group_id as DBAttributionGroupId,
             &file.path,
             &file.sha1.as_bytes().to_vec() as &[u8],
