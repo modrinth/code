@@ -32,7 +32,7 @@
 						<th
 							v-for="column in columns"
 							:key="column.key"
-							class="h-14 first:pl-4 last:pr-4"
+							class="h-12 first:pl-4 last:pr-4"
 							:class="[
 								`text-${column.align ?? 'left'}`,
 								column.enableSorting ? 'cursor-pointer select-none' : '',
@@ -44,7 +44,7 @@
 								<span
 									v-if="column.label || column.enableSorting"
 									class="inline-flex min-w-0 max-w-full items-center gap-1 font-semibold"
-									:class="`${sortColumn === column.key ? 'text-contrast' : ''}`"
+									:class="`${sortColumn === column.key ? 'text-contrast -mr-1' : ''}`"
 								>
 									<span class="min-w-0 truncate">{{ column.label ?? '' }}</span>
 									<template v-if="column.enableSorting">

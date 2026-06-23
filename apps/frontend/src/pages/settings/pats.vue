@@ -468,7 +468,6 @@ async function removePat(id) {
 </script>
 <style lang="scss" scoped>
 .scope-items :deep(.checkbox-outer) {
-	white-space: nowrap !important;
 	justify-content: flex-start !important;
 }
 

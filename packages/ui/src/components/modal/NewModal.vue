@@ -123,7 +123,11 @@
 						<slot> You just lost the game.</slot>
 					</div>
 
-					<div v-if="$slots.actions" class="p-4 pt-0">
+					<div
+						v-if="$slots.actions"
+						:class="{ 'pt-4 border-0 border-t border-solid border-surface-5': actionsDivider }"
+						class="p-4 pt-0"
+					>
 						<slot name="actions" />
 					</div>
 				</div>
@@ -178,6 +182,7 @@ const props = withDefaults(
 		width?: string
 		/** Disables all close actions (close button, ESC key, click outside). */
 		disableClose?: boolean
+		actionsDivider?: boolean
 	}>(),
 	{
 		type: true,
@@ -200,6 +205,7 @@ const props = withDefaults(
 		maxWidth: undefined,
 		width: undefined,
 		disableClose: false,
+		actionsDivider: false,
 	},
 )
 
@@ -268,6 +274,7 @@ function hide() {
 		return
 	}
 	props.onHide?.()
+	resetMousePosition()
 	visible.value = false
 	popModal()
 	if (modalStackSize() === 0) {
@@ -309,6 +316,11 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseY.value = event.clientY
 }
 
+function resetMousePosition() {
+	mouseX.value = Math.round(window.innerWidth / 2)
+	mouseY.value = Math.round(window.innerHeight / 2)
+}
+
 onUnmounted(() => {
 	if (open.value) {
 		popModal()
@@ -325,8 +337,6 @@ function handleWindowKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		if (!isTopmostModal()) return
 		hide()
-		mouseX.value = Math.round(window.innerWidth / 2)
-		mouseY.value = Math.round(window.innerHeight / 2)
 	}
 }
 

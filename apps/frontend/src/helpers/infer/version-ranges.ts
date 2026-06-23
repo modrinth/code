@@ -50,15 +50,15 @@ export function getGameVersionsMatchingMavenRange(
 		ranges.push(range)
 	}
 
-	const LESS_THAN_EQUAL = /^\(,(.*)]$/
-	const LESS_THAN = /^\(,(.*)\)$/
-	const EQUAL = /^\[(.*)]$/
-	const GREATER_THAN_EQUAL = /^\[(.*),\)$/
-	const GREATER_THAN = /^\((.*),\)$/
-	const BETWEEN = /^\((.*),(.*)\)$/
-	const BETWEEN_EQUAL = /^\[(.*),(.*)]$/
-	const BETWEEN_LESS_THAN_EQUAL = /^\((.*),(.*)]$/
-	const BETWEEN_GREATER_THAN_EQUAL = /^\[(.*),(.*)\)$/
+	const LESS_THAN_EQUAL = /^\(,([^,]*)]$/
+	const LESS_THAN = /^\(,([^,]*)\)$/
+	const EQUAL = /^\[([^,]*)]$/
+	const GREATER_THAN_EQUAL = /^\[([^,]*),\)$/
+	const GREATER_THAN = /^\(([^,]*),\)$/
+	const BETWEEN = /^\(([^,]*),([^,]*)\)$/
+	const BETWEEN_EQUAL = /^\[([^,]*),([^,]*)]$/
+	const BETWEEN_LESS_THAN_EQUAL = /^\(([^,]*),([^,]*)]$/
+	const BETWEEN_GREATER_THAN_EQUAL = /^\[([^,]*),([^,]*)\)$/
 
 	const semverRanges = []
 

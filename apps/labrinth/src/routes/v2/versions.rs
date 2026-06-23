@@ -11,7 +11,7 @@ use crate::models::projects::{
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
-use crate::search::SearchBackend;
+use crate::search::{SearchBackend, SearchState};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -314,7 +314,7 @@ pub struct EditVersion {
     pub name: Option<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex(path = *crate::util::validate::RE_URL_SAFE)
+        regex(path = *crate::util::validate::RE_URL_SAFE_RELAXED)
     )]
     pub version_number: Option<String>,
     #[validate(length(max = 65536))]
@@ -367,6 +367,7 @@ pub async fn version_edit(
     redis: web::Data<RedisPool>,
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let new_version = new_version.into_inner();
 
@@ -445,6 +446,7 @@ pub async fn version_edit(
         redis,
         web::Json(serde_json::to_value(new_version)?),
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -477,6 +479,7 @@ pub async fn version_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_backend: web::Data<dyn SearchBackend>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::versions::version_delete(
@@ -486,6 +489,7 @@ pub async fn version_delete(
         redis,
         session_queue,
         search_backend,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)

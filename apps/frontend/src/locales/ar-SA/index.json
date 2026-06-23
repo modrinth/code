@@ -8,6 +8,108 @@
   "admin.billing.error.not-found": {
     "message": "المستخدم غير موجود"
   },
+  "analytics.action.add": {
+    "message": "إضافة"
+  },
+  "analytics.action.cancel": {
+    "message": "إلغاء"
+  },
+  "analytics.action.refresh": {
+    "message": "تحديث"
+  },
+  "analytics.action.reset": {
+    "message": "إعادة ضبط"
+  },
+  "analytics.breakdown.country": {
+    "message": "الدولة"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "سبب التنزيل"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "مصدر التنزيل"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "إصدار اللُعبة"
+  },
+  "analytics.breakdown.project": {
+    "message": "المشروع"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "حالة المشروع"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "إصدار المشروع"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "أظهار الكل"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ساعة"
+  },
+  "analytics.chart.controls.display": {
+    "message": "عرض"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "مجموع"
+  },
+  "analytics.downloads.suffix": {
+    "message": "التنزيلات"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "الكل"
+  },
+  "analytics.group-by.week": {
+    "message": "الأسبوع"
+  },
+  "analytics.group-by.year": {
+    "message": "السنة"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "جلب البيانات..."
+  },
+  "analytics.options.loading": {
+    "message": "تحميل..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "المشروع قُبل"
+  },
+  "analytics.project-event.project-private": {
+    "message": "وضع المشروع خاص"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "تم تغيير حالة المشروع"
+  },
+  "analytics.project-event.version-released": {
+    "message": ""
+  },
+  "analytics.project-status.draft": {
+    "message": "مسودة"
+  },
+  "analytics.project-status.private": {
+    "message": "خاص"
+  },
+  "analytics.project-status.rejected": {
+    "message": "رُفض المشروع"
+  },
+  "analytics.project.your": {
+    "message": "مشاريعك"
+  },
+  "analytics.query.label.project": {
+    "message": "المشروع:"
+  },
+  "analytics.stat.downloads": {
+    "message": "التنزيلات"
+  },
+  "analytics.stat.playtime": {
+    "message": "وقت اللعب"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} ساعة"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "بحث..."
+  },
   "app-marketing.download.description": {
     "message": "تطبيقنا لسطح المكتب متاح على جميع المنصات، اختر الإصدار الذي تريده."
   },
@@ -406,6 +508,9 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "الملفات التكميلية تستخدم لدعم الموارد مثل كود المصدر، وليس للإصدارات أو الأنواع البديلة."
+  },
+  "create.collection.collection-info": {
+    "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
   },
   "create.collection.create-collection": {
     "message": "إنشاء مجموعة"

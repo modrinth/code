@@ -296,11 +296,12 @@ pub async fn add_dummy_data(api: &ApiV3, db: TemporaryDatabase) -> DummyData {
 
     let oauth_client_alpha = get_oauth_client_alpha(api).await;
 
-    sqlx::query("INSERT INTO dummy_data (update_id) VALUES ($1)")
-        .bind(DUMMY_DATA_UPDATE)
-        .execute(pool)
-        .await
-        .unwrap();
+    sqlx::raw_sql(&format!(
+        "INSERT INTO dummy_data (update_id) VALUES ({DUMMY_DATA_UPDATE})"
+    ))
+    .execute(pool)
+    .await
+    .unwrap();
 
     DummyData::new(
         alpha_project,

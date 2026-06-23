@@ -21,25 +21,11 @@ const frontImage = `data:image/svg+xml,${encodeURIComponent(`
 </svg>
 )}`)}`
 
-const backImage = `data:image/svg+xml,${encodeURIComponent(`
-<svg width="114" height="176" viewBox="0 0 114 176" fill="none" xmlns="http://www.w3.org/2000/svg">
-	<rect x="36" y="10" width="42" height="46" fill="#5A3828"/>
-	<rect x="28" y="57" width="58" height="60" fill="#1E7FAC"/>
-	<rect x="18" y="63" width="18" height="54" fill="#2693C7"/>
-	<rect x="78" y="63" width="18" height="54" fill="#19759E"/>
-	<rect x="22" y="117" width="14" height="43" fill="#A96A4D"/>
-	<rect x="78" y="117" width="14" height="43" fill="#A96A4D"/>
-	<rect x="36" y="117" width="18" height="55" fill="#1D334F"/>
-	<rect x="60" y="117" width="18" height="55" fill="#162B45"/>
-</svg>
-)}`)}`
-
 const meta = {
 	title: 'Skin/SkinButton',
 	component: SkinButton,
 	args: {
 		forwardImageSrc: frontImage,
-		backwardImageSrc: backImage,
 		selected: false,
 		active: false,
 		tooltip: 'Steve',

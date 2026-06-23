@@ -377,6 +377,48 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Entkoppeln"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Dieser Inhalt wird gebraucht von anderen Inhalten"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Betroffenes Projekt} other {Betroffene Projekte}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Einige der ausgewählten Projekte sind als Abhängigkeiten installiert. Sie zu löschen kann dein {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "Instanz"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "Server"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Löschen"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "{count, number} {itemType} trotzdem löschen"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Löschen"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Abhängige Inhalte nach dem Löschen deaktivieren"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Abhängige Inhalte werden möglicherweise nicht geladen oder deaktivieren sich selbst"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Dein {context} stürzt möglicherweise ab, startet nicht mehr oder verhält sich unerwartet"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Abhängigkeitswarnung"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} ist als Abhängigkeit installiert. Das Löschen kann deinen {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Was passiert?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hinzugefügt"
   },
@@ -2130,7 +2172,7 @@
     "defaultMessage": "Beschreibe das Bild..."
   },
   "markdown-editor.image-modal.description-field.title": {
-    "defaultMessage": "Beschreibung (Alt-Text)"
+    "defaultMessage": "Beschreibung (Alternativtext)"
   },
   "markdown-editor.image-modal.header": {
     "defaultMessage": "Bild einfügen"
@@ -2145,10 +2187,10 @@
     "defaultMessage": "Hochladen"
   },
   "markdown-editor.image-modal.upload.prompt": {
-    "defaultMessage": "Ziehe eine Datei in dieses Fenster oder drücke \"Hochladen\""
+    "defaultMessage": "Drag-and-Drop um hochzuladen oder klicke Datei Hochladen"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
-    "defaultMessage": "URL des Bilds eingeben..."
+    "defaultMessage": "Gib die Bild-URL ein..."
   },
   "markdown-editor.insert-button": {
     "defaultMessage": "Einfügen"
@@ -2157,13 +2199,13 @@
     "defaultMessage": "Link einfügen"
   },
   "markdown-editor.link-modal.label-field.placeholder": {
-    "defaultMessage": "Beschriftung eingeben..."
+    "defaultMessage": "Label einfügen..."
   },
   "markdown-editor.link-modal.label-field.title": {
-    "defaultMessage": "Beschriftung"
+    "defaultMessage": "Label"
   },
   "markdown-editor.link-modal.url-field.placeholder": {
-    "defaultMessage": "URL des Links eingeben..."
+    "defaultMessage": "Gib die IRL des Links ein..."
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Dieser Editor unterstützt <markdown-link>Markdown-Formatierung</markdown-link>."
@@ -2172,7 +2214,7 @@
     "defaultMessage": "Maximale Länge:"
   },
   "markdown-editor.max-length.unlimited": {
-    "defaultMessage": "Unbegrenzt"
+    "defaultMessage": "Unlimitiert"
   },
   "markdown-editor.max-length.value": {
     "defaultMessage": "{currentLength}/{maxLength}"
@@ -2229,7 +2271,7 @@
     "defaultMessage": "Video"
   },
   "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Keine Datei vorhanden"
+    "defaultMessage": "Keine Datei gegeben"
   },
   "markdown-editor.upload-error.no-handler": {
     "defaultMessage": "Kein Bild-Upload-Handler vorhanden"
@@ -2238,28 +2280,28 @@
     "defaultMessage": "URL"
   },
   "markdown-editor.url-validation-error.blocked-domain": {
-    "defaultMessage": "Ungültige URL. Diese Domain ist nicht zulässig."
+    "defaultMessage": "Ungültige URL. Diese Domain ist nicht erlaubt."
   },
   "markdown-editor.url-validation-error.malformed": {
-    "defaultMessage": "Ungültige URL. Stelle sicher, dass die URL korrekt formatiert ist."
+    "defaultMessage": "Ungültige URL. Stelle sicher, dass die URL richtig geschrieben wurde."
   },
   "markdown-editor.url-validation-error.unsupported-protocol": {
-    "defaultMessage": "Nicht unterstütztes Protokoll. Verwende http oder https."
+    "defaultMessage": "Ungültiges Protokoll. Bitte benutze http oder https."
   },
   "markdown-editor.video-embed.title": {
-    "defaultMessage": "YouTube-Videoplayer"
+    "defaultMessage": "YouTube Videoplayer"
   },
   "markdown-editor.video-modal.header": {
-    "defaultMessage": "YouTube-Video einfügen"
+    "defaultMessage": "YouTube Video einfügen"
   },
   "markdown-editor.video-modal.url-field.description": {
-    "defaultMessage": "Gib einen gültigen Link zu einem YouTube-Video ein."
+    "defaultMessage": "Gib einen gültigen YouTube-Link ein."
   },
   "markdown-editor.video-modal.url-field.placeholder": {
-    "defaultMessage": "Gib die URL des YouTube-Videos ein"
+    "defaultMessage": "Gib eine YouTube-Video-URL ein"
   },
   "markdown-editor.video-modal.url-field.title": {
-    "defaultMessage": "URL des YouTube-Videos"
+    "defaultMessage": "YouTube-Video URL"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Zahlungsmethode hinzufügen"
@@ -3276,7 +3318,7 @@
     "defaultMessage": "Vanilla"
   },
   "servers.access-page.activity-log-filter.action-group.backups": {
-    "defaultMessage": "Sicherungen"
+    "defaultMessage": "Backups"
   },
   "servers.access-page.activity-log-filter.action-group.content": {
     "defaultMessage": "Inhalt und Modpack"
@@ -3300,13 +3342,13 @@
     "defaultMessage": "Aktionen"
   },
   "servers.access-page.activity-log-filter.action-types-search": {
-    "defaultMessage": "Aktionen durchsuchen..."
+    "defaultMessage": "Suchaktionen..."
   },
   "servers.access-page.activity-log-filter.action.addon-added": {
-    "defaultMessage": "Inhalte hinzugefügt"
+    "defaultMessage": "Hinzugefügte Inhalte"
   },
   "servers.access-page.activity-log-filter.action.addon-deleted": {
-    "defaultMessage": "Inhalte gelöscht"
+    "defaultMessage": "Gelöschter Inhalt"
   },
   "servers.access-page.activity-log-filter.action.addon-disabled": {
     "defaultMessage": "Inhalte deaktiviert"
@@ -3315,28 +3357,28 @@
     "defaultMessage": "Inhalte aktiviert"
   },
   "servers.access-page.activity-log-filter.action.addon-updated": {
-    "defaultMessage": "Inhalt aktualisiert"
+    "defaultMessage": "Inhalte aktualisiert"
   },
   "servers.access-page.activity-log-filter.action.addon-uploaded": {
-    "defaultMessage": "Inhalt hochgeladen"
+    "defaultMessage": "Hochgeladener Inhalt"
   },
   "servers.access-page.activity-log-filter.action.backup-created": {
-    "defaultMessage": "Sicherung erstellt"
+    "defaultMessage": "Backup erstellt"
   },
   "servers.access-page.activity-log-filter.action.backup-deleted": {
-    "defaultMessage": "Sicherung gelöscht"
+    "defaultMessage": "Backup gelöscht"
   },
   "servers.access-page.activity-log-filter.action.backup-renamed": {
-    "defaultMessage": "Sicherung umbenannt"
+    "defaultMessage": "Backup umbenannt"
   },
   "servers.access-page.activity-log-filter.action.backup-restored": {
-    "defaultMessage": "Sicherung wiederhergestellt"
+    "defaultMessage": "Backup wiederhergestellt"
   },
   "servers.access-page.activity-log-filter.action.changed-server-name": {
     "defaultMessage": "Servername geändert"
   },
   "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
-    "defaultMessage": "Subdomain des Servers geändert"
+    "defaultMessage": "Server-Subdomain geändert"
   },
   "servers.access-page.activity-log-filter.action.console-cleared": {
     "defaultMessage": "Konsole geleert"
@@ -3345,16 +3387,16 @@
     "defaultMessage": "Konsolenbefehl ausgeführt"
   },
   "servers.access-page.activity-log-filter.action.file-deleted": {
-    "defaultMessage": "Datei gelöscht"
+    "defaultMessage": "Gelöschte Datei"
   },
   "servers.access-page.activity-log-filter.action.file-edited": {
-    "defaultMessage": "Datei bearbeitet"
+    "defaultMessage": "Bearbeitete Datei"
   },
   "servers.access-page.activity-log-filter.action.file-renamed": {
-    "defaultMessage": "Datei umbenannt"
+    "defaultMessage": "Umbenannte Datei"
   },
   "servers.access-page.activity-log-filter.action.file-uploaded": {
-    "defaultMessage": "Datei hochgeladen"
+    "defaultMessage": "Hochgeladene Datei"
   },
   "servers.access-page.activity-log-filter.action.game-version-edited": {
     "defaultMessage": "Minecraft-Version geändert"
@@ -3363,7 +3405,7 @@
     "defaultMessage": "Java-Laufzeitumgebung geändert"
   },
   "servers.access-page.activity-log-filter.action.java-version-modified": {
-    "defaultMessage": "Javaversion geändert"
+    "defaultMessage": "Java-Version geändert"
   },
   "servers.access-page.activity-log-filter.action.loader-version-edited": {
     "defaultMessage": "Loaderversion geändert"
@@ -4274,6 +4316,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Erfolg"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Durchsuche {count} Server..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -5093,6 +5138,9 @@
   "time-frame-picker.increase-amount": {
     "defaultMessage": "Zeitraum verlängern"
   },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select, hours {{amount, plural, one {In der letzten Stunde} other {In den letzten # Stunden} }} days {{amount, plural, one {Am letzten Tag} other {In den letzten # Tagen} }} weeks {{amount, plural, one {In der letzten Woche} other {In den letzten # Wochen} }} months {{amount, plural, one {Im letzten Monat} other {In den letzten # Monaten} }} other {In den letzten # Tagen}}"
+  },
   "time-frame-picker.last-timeframe-prefix": {
     "defaultMessage": "In der letzten"
   },
@@ -5274,3 +5322,4 @@
     "defaultMessage": "Modrinth-Team"
   }
 }
+

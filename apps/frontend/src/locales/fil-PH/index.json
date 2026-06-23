@@ -80,6 +80,9 @@
   "analytics.chart.controls.ratio": {
     "message": "Ratio"
   },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Naka-pin"
+  },
   "analytics.chart.tooltip.total": {
     "message": "Kabuoan"
   },
@@ -91,6 +94,9 @@
   },
   "analytics.chart.view.line": {
     "message": "Line"
+  },
+  "analytics.download-reason.update": {
+    "message": "Pag-update"
   },
   "analytics.filter.game-version-type.all": {
     "message": "Lahat"
@@ -119,6 +125,9 @@
   "analytics.project-status.draft": {
     "message": "Burador"
   },
+  "analytics.project-status.other": {
+    "message": "Iba pa"
+  },
   "analytics.stat.unavailable": {
     "message": "N/A"
   },
@@ -127,6 +136,9 @@
   },
   "analytics.value.none": {
     "message": "Wala"
+  },
+  "analytics.value.other": {
+    "message": "Iba pa"
   },
   "app-marketing.download.description": {
     "message": "Magagamit ang aming desktop app sa iba’t-ibang plataporma, piliin ang iyong gugustohing bersiyon."
@@ -523,6 +535,9 @@
   },
   "collection.title": {
     "message": "{name} - Koleksiyon"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Tanggihan"
   },
   "conversation-thread.action.reply": {
     "message": "Tugunan"
@@ -1003,6 +1018,9 @@
   },
   "dashboard.notifications.link.view-history": {
     "message": "Tingnan ang kasaysayan ng notipikasyon"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
   },
   "dashboard.organizations.button.create": {
     "message": "Lumikha ng organisasyon"
@@ -1705,6 +1723,9 @@
   },
   "layout.banner.build-fail.description": {
     "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estado galing sa API. Maaaring dahil ito sa isang kawalan o kamalian sa kumpigurasyon. Muling magpatayo kapag magagamit na muli ang API. Mga code ng kamalian: {errors}; Ang kasalukuyang URL ng API ay: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Baliwalain"
   },
   "layout.banner.build-fail.title": {
     "message": "Error sa pagbubuo ng estado galing sa API habang nagpapatayo."

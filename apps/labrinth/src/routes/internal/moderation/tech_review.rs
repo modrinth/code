@@ -32,6 +32,7 @@ use crate::{
     },
     queue::session::AuthQueue,
     routes::{ApiError, internal::moderation::Ownership},
+    search::SearchState,
     util::error::Context,
 };
 use eyre::eyre;
@@ -289,13 +290,13 @@ async fn get_report(
                 'flag_reason', 'delphi',
                 'download_url', f.url,
                 -- TODO: replace with `json_array` in Postgres 16
-                'issues', (
-                    SELECT json_agg(
-                        to_jsonb(dri)
-                        || jsonb_build_object(
-                            -- TODO: replace with `json_array` in Postgres 16
-                            'details', (
-                                SELECT coalesce(jsonb_agg(
+				'issues', (
+					SELECT coalesce(json_agg(
+						to_jsonb(dri)
+						|| jsonb_build_object(
+							-- TODO: replace with `json_array` in Postgres 16
+							'details', (
+								SELECT coalesce(jsonb_agg(
                                     jsonb_build_object(
                                         'id', didws.id,
                                         'issue_id', didws.issue_id,
@@ -310,11 +311,11 @@ async fn get_report(
                                 FROM delphi_issue_details_with_statuses didws
                                 WHERE didws.issue_id = dri.id
                             )
-                        )
-                    )
-                    FROM delphi_report_issues dri
-                    WHERE
-                        dri.report_id = dr.id
+						)
+					), '[]'::json)
+					FROM delphi_report_issues dri
+					WHERE
+						dri.report_id = dr.id
                         -- see delphi.rs todo comment
                         AND dri.issue_type != '__dummy'
                 )
@@ -978,6 +979,7 @@ async fn submit_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
     web::Json(submit_report): web::Json<SubmitReport>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<(), ApiError> {
@@ -1132,15 +1134,22 @@ async fn submit_report(
         .insert(&mut txn)
         .await
         .wrap_internal_err("failed to add tech review message")?;
-
-        DBProject::clear_cache(project_id, None, None, &redis)
-            .await
-            .wrap_internal_err("failed to clear project cache")?;
     }
 
     txn.commit()
         .await
         .wrap_internal_err("failed to commit transaction")?;
+
+    if verdict == DelphiVerdict::Unsafe {
+        crate::routes::v3::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id,
+            None,
+            None,
+        )
+        .await?;
+    }
 
     Ok(())
 }

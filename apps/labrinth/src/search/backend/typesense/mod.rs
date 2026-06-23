@@ -12,7 +12,7 @@ use tracing::{info, warn};
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::models::ids::VersionId;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::routes::ApiError;
 use crate::search::backend::{
     SearchIndex, SearchIndexName, combined_search_filters, parse_search_index,
@@ -325,16 +325,16 @@ impl TypesenseClient {
         filter_by: &str,
     ) -> Result<()> {
         let resp = self
-			.request(
-				Method::DELETE,
-				&format!(
+            .request(
+                Method::DELETE,
+                &format!(
 					"/collections/{collection}/documents?filter_by={}&batch_size=1000",
 					urlencoding::encode(filter_by)
 				),
-			)
-			.send()
-			.await
-			.wrap_err("failed to DELETE Typesense documents by filter")?;
+            )
+            .send()
+            .await
+            .wrap_err("failed to DELETE Typesense documents by filter")?;
         if resp.status() == reqwest::StatusCode::NOT_FOUND {
             return Ok(());
         }
@@ -359,6 +359,7 @@ pub struct TypesenseFieldSpec {
     pub facet: bool,
     pub sort: bool,
     pub optional: bool,
+    pub token_separators: Option<&'static [&'static str]>,
 }
 
 impl SearchField {
@@ -370,6 +371,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::Name => TypesenseFieldSpec {
                 path: "name",
@@ -377,6 +379,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: false,
+                token_separators: None,
             },
             SearchField::Author => TypesenseFieldSpec {
                 path: "author",
@@ -384,6 +387,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: false,
+                token_separators: None,
             },
             SearchField::License => TypesenseFieldSpec {
                 path: "license",
@@ -391,6 +395,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::ProjectTypes => TypesenseFieldSpec {
                 path: "project_types",
@@ -398,6 +403,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::ProjectId => TypesenseFieldSpec {
                 path: "project_id",
@@ -405,6 +411,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: false,
+                token_separators: None,
             },
             SearchField::OpenSource => TypesenseFieldSpec {
                 path: "open_source",
@@ -412,6 +419,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::Environment => TypesenseFieldSpec {
                 path: "environment",
@@ -419,6 +427,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::GameVersions => TypesenseFieldSpec {
                 path: "game_versions",
@@ -426,6 +435,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: Some(&["-", "."]),
             },
             SearchField::ClientSide => TypesenseFieldSpec {
                 path: "client_side",
@@ -433,6 +443,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::ServerSide => TypesenseFieldSpec {
                 path: "server_side",
@@ -440,6 +451,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftServerRegion => TypesenseFieldSpec {
                 path: "minecraft_server.region",
@@ -447,6 +459,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftServerLanguages => TypesenseFieldSpec {
                 path: "minecraft_server.languages",
@@ -454,6 +467,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftJavaServerContentKind => TypesenseFieldSpec {
                 path: "minecraft_java_server.content.kind",
@@ -461,6 +475,7 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
             },
             SearchField::MinecraftJavaServerContentSupportedGameVersions => {
                 TypesenseFieldSpec {
@@ -469,6 +484,7 @@ impl SearchField {
                     facet: true,
                     sort: false,
                     optional: true,
+                    token_separators: Some(&["-", "."]),
                 }
             }
             SearchField::MinecraftJavaServerPingData => TypesenseFieldSpec {
@@ -477,6 +493,23 @@ impl SearchField {
                 facet: true,
                 sort: false,
                 optional: true,
+                token_separators: None,
+            },
+            SearchField::DependencyProjectIds => TypesenseFieldSpec {
+                path: "dependency_project_ids",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: None,
+            },
+            SearchField::CompatibleDependencyProjectIds => TypesenseFieldSpec {
+                path: "compatible_dependency_project_ids",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: None,
             },
         }
     }
@@ -500,6 +533,19 @@ static TYPESENSE_SEARCH_FIELDS: LazyLock<Vec<Value>> = LazyLock::new(|| {
             }
             if spec.optional {
                 obj.insert("optional".to_string(), Value::Bool(true));
+            }
+            if let Some(token_separators) = spec.token_separators {
+                obj.insert(
+                    "token_separators".to_string(),
+                    Value::Array(
+                        token_separators
+                            .iter()
+                            .map(|separator| {
+                                Value::String((*separator).to_string())
+                            })
+                            .collect(),
+                    ),
+                );
             }
             Value::Object(obj)
         })
@@ -526,13 +572,13 @@ impl Typesense {
             json!({"name": "minecraft_java_server.verified_plays_2w", "type": "int64", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.is_online", "type": "bool", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.ping.data.players_online", "type": "int32", "sort": true, "optional": true}),
+            json!({"name": "dependencies", "type": "object[]", "optional": true}),
         ];
         fields.extend(TYPESENSE_SEARCH_FIELDS.iter().cloned());
 
         json!({
             "name": name,
             "enable_nested_fields": true,
-            "token_separators": ["-"],
             "fields": fields,
             "default_sorting_field": "log_downloads"
         })
@@ -940,6 +986,75 @@ impl SearchBackend for Typesense {
         }
 
         info!("indexing complete");
+        Ok(())
+    }
+
+    async fn index_documents(
+        &self,
+        documents: &[UploadSearchProject],
+    ) -> eyre::Result<()> {
+        if documents.is_empty() {
+            return Ok(());
+        }
+
+        let jsonl = documents_to_jsonl(documents)?;
+        for alias in [
+            self.config.get_alias_name("projects"),
+            self.config.get_alias_name("projects_filtered"),
+        ] {
+            let live = self.client.get_alias(&alias).await?;
+            let shadow_alt = self.config.get_next_collection_name(&alias, true);
+            let shadow_current =
+                self.config.get_next_collection_name(&alias, false);
+
+            for collection in
+                live.into_iter().chain([shadow_alt, shadow_current])
+            {
+                if self.client.collection_exists(&collection).await? {
+                    self.client
+                        .import_documents(&collection, jsonl.clone())
+                        .await?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn remove_project_documents(
+        &self,
+        ids: &[ProjectId],
+    ) -> eyre::Result<()> {
+        if ids.is_empty() {
+            return Ok(());
+        }
+
+        let id_list = ids
+            .iter()
+            .map(|id| to_base62(id.0))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let filter = format!("project_id:[{id_list}]");
+
+        for alias in [
+            self.config.get_alias_name("projects"),
+            self.config.get_alias_name("projects_filtered"),
+        ] {
+            let live = self.client.get_alias(&alias).await?;
+            let shadow_alt = self.config.get_next_collection_name(&alias, true);
+            let shadow_current =
+                self.config.get_next_collection_name(&alias, false);
+
+            for collection in
+                live.into_iter().chain([shadow_alt, shadow_current])
+            {
+                if self.client.collection_exists(&collection).await? {
+                    self.client
+                        .delete_documents_by_filter(&collection, &filter)
+                        .await?;
+                }
+            }
+        }
         Ok(())
     }
 

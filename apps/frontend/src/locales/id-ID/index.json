@@ -107,6 +107,9 @@
   "analytics.chart.empty.select-table-items": {
     "message": "Pilih benda dari tabel di bawah ini untuk memvisualisasi data Anda."
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, other {# acara analisis}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
@@ -119,8 +122,110 @@
   "analytics.chart.render-limit.header": {
     "message": "Tampilkan semua ({count}) garis di grafik?"
   },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, other {# hari}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, other {# jam}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, other {# menit}}"
+  },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Sembunyikan {name} di grafik"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Disematkan"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(sblm.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Tampilkan {name} di grafik"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Jumlah"
+  },
+  "analytics.chart.view.area": {
+    "message": "Luas"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Batang"
+  },
+  "analytics.chart.view.line": {
+    "message": "Garis"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Dependensi"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Paket Mod"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Mod Mandiri"
+  },
+  "analytics.download-reason.update": {
+    "message": "Pembaruan"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Situs Web Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "unduhan"
+  },
+  "analytics.empty.no-data": {
+    "message": "Data tidak tersedia"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Tidak ada data untuk dianalisis"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Proyek tidak tersedia"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Tidak ada proyek untuk dianalisis"
+  },
+  "analytics.empty.select-project": {
+    "message": "Pilih setidaknya satu proyek untuk melihat data"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Jenis versi permainan"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Semua"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Rilisan"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Cari negara..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Cari sumber pengunduhan..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Cari versi proyek..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Cari versi..."
+  },
+  "analytics.group-by.1h": {
+    "message": "1j"
+  },
+  "analytics.group-by.6h": {
+    "message": "6j"
+  },
+  "analytics.group-by.date": {
+    "message": "Tanggal"
+  },
+  "analytics.group-by.day": {
+    "message": "Hari"
+  },
+  "analytics.group-by.month": {
+    "message": "Bulan"
   },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
@@ -521,6 +626,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Berkas tambahan hanya untuk sumber pendukung seperti kode sumber, bukan untuk versi atau varian lain."
   },
+  "create.collection.collection-info": {
+    "message": "Koleksi baru Anda akan dibuat sebagai koleksi publik dengan {count, plural, =0 {0 proyek} other {# proyek}}."
+  },
   "create.collection.create-collection": {
     "message": "Buat koleksi"
   },
@@ -694,6 +802,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Coba sesuaikan kata kunci pencarian atau penyaringan Anda."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, other {proyek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi Anda"
@@ -2153,6 +2264,9 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, other {pengunduhan}}"
+  },
   "profile.label.joined": {
     "message": "Telah bergabung"
   },
@@ -2171,6 +2285,9 @@
   "profile.label.organizations": {
     "message": "Organisasi"
   },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, other {proyek}}"
+  },
   "profile.label.saving": {
     "message": "Menyimpan..."
   },
@@ -2179,6 +2296,9 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Unduh proyek milik {username} di Modrinth"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> pengikut proyek}}"
   },
   "profile.user-id": {
     "message": "Pengenal Pengguna: {id}"

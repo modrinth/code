@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "A Java {version} letöltése"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Frissítés letöltése"
+  },
   "app.action-bar.downloads": {
     "message": "Letöltések"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Elsődleges példány"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Töltsd újra a frissítéshez"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "További futó pédányok megjelenítése"
   },
   "app.action-bar.stop-instance": {
     "message": "Példány leállítása"
+  },
+  "app.action-bar.update": {
+    "message": "Frissítés"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Aktív letöltések megtekintése"
@@ -69,7 +78,7 @@
     "message": "A kezdőlap „Folytasd itt” részében a legújabb világok is megtalálhatók."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "„Folytasd itt” a világokat is"
+    "message": "Visszaugrás a világokba"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizáld az indítót a Minecraft indításakor."
@@ -280,6 +289,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} mod"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Szükséges modcsomag"
@@ -498,7 +510,7 @@
     "message": "Sikeres letöltés"
   },
   "app.update-popup.reload": {
-    "message": "Frissítés"
+    "message": "Töltsd újra a frissítéshez"
   },
   "app.update-popup.title": {
     "message": "Frissítés elérhető"
@@ -529,6 +541,9 @@
   },
   "friends.action.add-friend": {
     "message": "Barát hozzáadása"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} barát {count, plural, other {kérelem}}"
   },
   "friends.add-friend.submit": {
     "message": "Barátkérelem elküldése"
@@ -694,6 +709,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Név"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Frissítési csatorna"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "A kiadás, béta és az alfa verziók is meg fognak jelenni az elérhető frissítések között."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Béta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "A kiadás és a béta verziók is meg fognak jelenni az elérhető frissítések között."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Kiadás"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Csak a release verziók fognak megjelenni az elérhető frissítések között."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Válaszd ki a frissítési csatornát"
   },
   "instance.settings.tabs.hooks": {
     "message": "Indítási horgok"

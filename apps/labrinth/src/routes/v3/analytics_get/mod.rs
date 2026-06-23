@@ -16,8 +16,9 @@ use std::{
     num::NonZeroU64,
 };
 
-use crate::database::PgPool;
+use crate::database::{PgPool, models::DBUserId};
 use actix_web::{HttpRequest, post, web};
+use ariadne::ids::UserId;
 use chrono::{DateTime, TimeDelta, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
@@ -43,7 +44,7 @@ use crate::{
         projects::ProjectStatus,
         teams::ProjectPermissions,
         threads::MessageBody,
-        v3::{analytics::DownloadReason, projects::Project},
+        v3::{analytics::DownloadReason, projects::Project, users::User},
     },
     queue::session::AuthQueue,
     routes::ApiError,
@@ -131,6 +132,9 @@ pub struct GetResponse {
     /// Project metadata for projects referenced in the response metrics.
     #[serde(default)]
     pub projects: HashMap<ProjectId, Project>,
+    /// User metadata for users referenced in the response metrics.
+    #[serde(default)]
+    pub users: HashMap<UserId, User>,
     /// List of events associated with projects that were requested.
     pub project_events: Vec<ProjectAnalyticsEvent>,
 }
@@ -355,10 +359,29 @@ pub async fn fetch_analytics(
             .await?;
     }
 
-    if req.return_metrics.project_revenue.is_some() {
+    if let Some(metrics) = &req.return_metrics.project_revenue {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
+
+        let user_id_bucket_project_ids = sqlx::query!(
+            "
+            SELECT m.id
+            FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id
+            WHERE
+                m.id = ANY($1)
+                AND tm.user_id = $2
+                AND tm.accepted
+            ",
+            &project_id_values,
+            DBUserId::from(user.id).0,
+        )
+        .fetch_all(&**pool)
+        .await?
+        .into_iter()
+        .map(|row| row.id)
+        .collect::<Vec<_>>();
 
         metrics::fetch_project_revenue(
             &pool,
@@ -366,6 +389,9 @@ pub async fn fetch_analytics(
             &req,
             num_time_slices,
             &project_id_values,
+            &user_id_bucket_project_ids,
+            user.role.is_mod(),
+            metrics,
         )
         .await?;
     }
@@ -400,10 +426,12 @@ pub async fn fetch_analytics(
 
     let projects =
         fetch_response_projects(&mut time_slices, &user, &pool, &redis).await?;
+    let users = fetch_response_users(&time_slices, &pool, &redis).await?;
 
     Ok(web::Json(GetResponse {
         metrics: time_slices,
         projects,
+        users,
         project_events,
     }))
 }
@@ -519,6 +547,43 @@ async fn fetch_response_projects(
         .map(|project| {
             let project_id = project.inner.id.into();
             (project_id, Project::from(project))
+        })
+        .collect())
+}
+
+async fn fetch_response_users(
+    time_slices: &[TimeSlice],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<HashMap<UserId, User>, ApiError> {
+    let mut user_ids = HashSet::<DBUserId>::new();
+
+    for time_slice in time_slices {
+        for data in &time_slice.0 {
+            let AnalyticsData::Project(project) = data else {
+                continue;
+            };
+
+            if let ProjectMetrics::Revenue(revenue) = &project.metrics
+                && let Some(user_id) = revenue.user_id
+            {
+                user_ids.insert(user_id.into());
+            }
+        }
+    }
+
+    let user_ids = user_ids.into_iter().collect::<Vec<_>>();
+    if user_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    let users = DBUser::get_many_ids(&user_ids, pool, redis).await?;
+
+    Ok(users
+        .into_iter()
+        .map(|user| {
+            let user_id = UserId::from(user.id);
+            (user_id, User::from(user))
         })
         .collect())
 }
@@ -965,11 +1030,13 @@ mod tests {
                 TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
                     source_project: test_project_3,
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        user_id: None,
                         revenue: Decimal::new(20000, 2),
                     }),
                 })]),
             ],
             projects: HashMap::new(),
+            users: HashMap::new(),
             project_events: vec![],
         };
         let target = json!({
@@ -997,6 +1064,7 @@ mod tests {
                 ]
             ],
             "projects": {},
+            "users": {},
             "project_events": []
         });
 

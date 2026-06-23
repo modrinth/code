@@ -4,11 +4,12 @@ use common::database::*;
 
 use common::dummy_data::DUMMY_CATEGORIES;
 
-use ariadne::ids::base62_impl::parse_base62;
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use common::environment::TestEnvironment;
 use common::environment::with_test_environment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
+use labrinth::models::projects::DependencyType;
 use serde_json::json;
 
 use crate::common::api_common::Api;
@@ -29,6 +30,12 @@ async fn search_projects() {
 
             let api = &test_env.api;
             let test_name = test_env.db.database_name.clone();
+            let dependency_project_id = id_conversion
+                .iter()
+                .find_map(|(project_id, test_id)| {
+                    (*test_id == 1).then_some(to_base62(*project_id))
+                })
+                .unwrap();
 
             // Pairs of:
             // 1. vec of search facets
@@ -83,6 +90,18 @@ async fn search_projects() {
                     json!([["categories:fabric"], ["project_types:modpack"]]),
                     vec![4],
                 ),
+                (
+                    json!([[format!(
+                        "dependency_project_ids:{dependency_project_id}"
+                    )]]),
+                    vec![7],
+                ),
+                (
+                    json!([[format!(
+                        "compatible_dependency_project_ids:{dependency_project_id}"
+                    )]]),
+                    vec![7],
+                ),
             ];
             // TODO: versions, game versions
             // Untested:
@@ -123,6 +142,46 @@ async fn search_projects() {
                     }
                 })
                 .await;
+
+            let projects = api
+                .search_deserialized(
+                    Some(&format!("&{test_name}")),
+                    Some(json!([[format!(
+                        "dependency_project_ids:{dependency_project_id}"
+                    )]])),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_eq!(projects.total_hits, 1);
+            assert_eq!(projects.hits[0].dependency_project_ids.len(), 1);
+            assert_eq!(
+                projects.hits[0].dependency_project_ids[0],
+                dependency_project_id
+            );
+            assert_eq!(
+                projects.hits[0].compatible_dependency_project_ids.len(),
+                1
+            );
+            assert_eq!(
+                projects.hits[0].compatible_dependency_project_ids[0],
+                dependency_project_id
+            );
+            assert_eq!(projects.hits[0].dependencies.len(), 1);
+            assert_eq!(
+                projects.hits[0].dependencies[0].project_id,
+                dependency_project_id
+            );
+            assert_eq!(
+                projects.hits[0].dependencies[0].dependency_type,
+                DependencyType::Required
+            );
+            assert!(
+                projects.hits[0].dependencies[0]
+                    .slug
+                    .as_ref()
+                    .unwrap()
+                    .contains("searchable-project-1")
+            );
         },
     )
     .await;

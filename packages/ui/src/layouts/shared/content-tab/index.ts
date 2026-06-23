@@ -8,6 +8,7 @@ export { default as ConfirmModpackUpdateModal } from './components/modals/Confir
 export { default as ConfirmReinstallModal } from './components/modals/ConfirmReinstallModal.vue'
 export { default as ConfirmRepairModal } from './components/modals/ConfirmRepairModal.vue'
 export { default as ConfirmUnlinkModal } from './components/modals/ConfirmUnlinkModal.vue'
+export { default as ContentDependencyWarningModal } from './components/modals/ContentDependencyWarningModal.vue'
 export type {
 	ContentInstallInstance,
 	ContentInstallProjectInfo,

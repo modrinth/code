@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Pobieranie Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Pobieranie aktualizacji"
+  },
   "app.action-bar.downloads": {
     "message": "Pobrania"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Główna instancja"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Załaduj ponownie, by zaktualizować"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Pokaż więcej włączonych instancji"
   },
   "app.action-bar.stop-instance": {
     "message": "Zatrzymaj instancję"
+  },
+  "app.action-bar.update": {
+    "message": "Zaktualizuj"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Pokaż aktualnie pobierane"
@@ -270,13 +279,16 @@
     "message": "ten serwer"
   },
   "app.modal.install-to-play.content-required": {
-    "message": "Wymagane treści"
+    "message": "Wymagana zawartość"
   },
   "app.modal.install-to-play.header": {
     "message": "Zainstaluj, aby grać"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Zainstaluj"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Wymagana paczka modów"
@@ -422,6 +434,12 @@
   "app.skins.rate-limit.title": {
     "message": "Zwolnij!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Nie udało się zapisać kolejności skórek."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Nie udało się zmienić kolejności skórek"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -495,7 +513,7 @@
     "message": "Pobieranie ukończone"
   },
   "app.update-popup.reload": {
-    "message": "Załaduj ponownie"
+    "message": "Załaduj ponownie, by zaktualizować"
   },
   "app.update-popup.title": {
     "message": "Dostępna aktualizacja"
@@ -526,6 +544,9 @@
   },
   "friends.action.add-friend": {
     "message": "Dodaj znajomego"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {zaproszenie} few {zaproszenia} other {zaproszeń}} do znajomych"
   },
   "friends.add-friend.submit": {
     "message": "Wyślij zaproszenie"
@@ -691,6 +712,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Nazwa"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Kanał aktualizacji"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Wersje stabilne, beta i alfa będą pokazane jako dostępne aktualizacje."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Tylko wersje stabilne i wersje beta będą pokazane jako dostępne aktualizacje."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Stabilny"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Tylko wersje stabilne będą pokazane jako dostępne aktualizacje."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Wybierz kanał aktualizacji"
   },
   "instance.settings.tabs.hooks": {
     "message": "Haczyki startowe"

@@ -24,7 +24,7 @@ export interface InstallationSettingsContext {
 	currentGameVersion: ComputedRef<string>
 	currentLoaderVersion: ComputedRef<string>
 
-	availablePlatforms: string[]
+	availablePlatforms: string[] | ComputedRef<string[]>
 
 	resolveGameVersions: (loader: string, showSnapshots: boolean) => GameVersionOption[]
 	resolveLoaderVersions: (loader: string, gameVersion: string) => LoaderVersionEntry[]
