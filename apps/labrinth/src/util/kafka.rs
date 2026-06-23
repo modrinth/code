@@ -2,14 +2,19 @@ use std::time::Duration;
 
 use crate::env::ENV;
 use chrono::{DateTime, Utc};
-use rdkafka::{ClientConfig, producer::FutureProducer};
+use eyre::WrapErr;
+use rdkafka::{
+    ClientConfig, consumer::StreamConsumer, producer::FutureProducer,
+};
 use serde::Serialize;
 use uuid::Uuid;
 
 pub const KAFKA_OPERATION_INTERVAL: Duration = Duration::from_secs(5);
+pub const INCREMENTAL_INDEX_SEARCH_TASK: &str = "incremental-index-search";
 
 pub struct KafkaClientState {
     pub client: FutureProducer,
+    pub incremental_index_search_consumer: StreamConsumer,
 }
 
 impl KafkaClientState {
@@ -18,7 +23,12 @@ impl KafkaClientState {
             .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
             .set("client.id", &ENV.KAFKA_CLIENT_ID)
             .set("broker.address.family", "v4")
-            .create()?;
+            .create()
+            .wrap_err("failed to create Kafka producer")?;
+        let incremental_index_search_consumer = create_consumer(
+            INCREMENTAL_INDEX_SEARCH_TASK,
+        )
+        .wrap_err("failed to create incremental search Kafka consumer")?;
 
         tracing::info!(
             kafka.bootstrap_servers = ?ENV.KAFKA_BOOTSTRAP_SERVERS.0,
@@ -26,8 +36,23 @@ impl KafkaClientState {
             "Connected to Kafka"
         );
 
-        Ok(Self { client })
+        Ok(Self {
+            client,
+            incremental_index_search_consumer,
+        })
     }
+}
+
+pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {
+    ClientConfig::new()
+        .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
+        .set("client.id", &ENV.KAFKA_CLIENT_ID)
+        .set("group.id", group_id)
+        .set("enable.auto.commit", "false")
+        .set("auto.offset.reset", "earliest")
+        .set("broker.address.family", "v4")
+        .create()
+        .wrap_err("failed to create Kafka consumer")
 }
 
 #[derive(Debug, Serialize)]

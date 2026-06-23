@@ -134,18 +134,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Grafikteki {count} satırın tümünü göstermek ister misiniz?"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "Tablodaki tüm {itemType, select, project {{count, plural, one {proje} other {projeler}}} country {{count, plural, one {ülke} other {ülkeler}}} monetization {{count, plural, one {gelir elde etme değeri} other {gelir elde etme değerleri}}} downloadSource {{count, plural, one {indirme kaynağı} other {indirme kaynakları}}} downloadReason {{count, plural, one {indirme nedeni} other {indirme nedenleri}}} projectVersion {{count, plural, one {proje sürümü} other {proje sürümleri}}} loader {{count, plural, one {yükleyici} other {yükleyiciler}}} gameVersion {{count, plural, one {oyun sürümü} other {oyun sürümleri}}} other {{count, plural, one {öğe} other {öğeler}}}} gösteriliyor"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Tablodan {count} {itemType, select, project {{count, plural, one {proje} other {projeler}}} country {{count, plural, one {ülke} other {ülkeler}}} monetization {{count, plural, one {gelir elde etme değeri} other {gelir elde etme değerleri}}} downloadSource {{count, plural, one {indirme kaynağı} other {indirme kaynakları}}} downloadReason {{count, plural, one {indirme nedeni} other {indirme nedenleri}}} projectVersion {{count, plural, one {proje sürümü} other {proje sürümleri}}} loader {{count, plural, one {yükleyici} other {yükleyiciler}}} gameVersion {{count, plural, one {oyun sürümü} other {oyun sürümleri}}} other {{count, plural, one {öğe} other {öğeler}}}} seçildi"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Tablodan {limit} {itemType, select, project {{limit, plural, one {proje} other {projeler}}} country {{limit, plural, one {ülke} other {ülkeler}}} monetization {{limit, plural, one {gelir elde etme değeri} other {gelir elde etme değerleri}}} downloadSource {{limit, plural, one {indirme kaynağı} other {indirme kaynakları}}} downloadReason {{limit, plural, one {indirme nedeni} other {indirme nedenleri}}} projectVersion {{limit, plural, one {proje sürümü} other {proje sürümleri}}} loader {{limit, plural, one {yükleyici} other {yükleyiciler}}} gameVersion {{limit, plural, one {oyun sürümü} other {oyun sürümleri}}} other {{limit, plural, one {öğe} other {öğeler}}}} gösteriliyor"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Tablodan en iyi {count} {itemType, select, project {{count, plural, one {proje} other {projeler}}} country {{count, plural, one {ülke} other {ülkeler}}} monetization {{count, plural, one {gelir elde etme değeri} other {gelir elde etme değerleri}}} downloadSource {{count, plural, one {indirme kaynağı} other {indirme kaynakları}}} downloadReason {{count, plural, one {indirme nedeni} other {indirme nedenleri}}} projectVersion {{count, plural, one {proje sürümü} other {proje sürümleri}}} loader {{count, plural, one {yükleyici} other {yükleyiciler}}} gameVersion {{count, plural, one {oyun sürümü} other {oyun sürümleri}}} other {{count, plural, one {öğe} other {öğeler}}}} gösteriliyor"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# gün} other {# gün}}"
   },
