@@ -515,6 +515,9 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Preuzmite projekte korisnika {username} na Modrinthu"
   },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> pratilac projekta} few {<stat>{count}</stat> pratioca projekta} other {<stat>{count}</stat> pratilaca projekta}}"
+  },
   "profile.user-id": {
     "message": "ID korisnika: {id}"
   },

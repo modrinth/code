@@ -8,6 +8,405 @@
   "admin.billing.error.not-found": {
     "message": "Pengguna tidak dijumpai"
   },
+  "analytics.action.add": {
+    "message": "Tambah"
+  },
+  "analytics.action.cancel": {
+    "message": "Batal"
+  },
+  "analytics.action.refresh": {
+    "message": "Segar semula"
+  },
+  "analytics.action.reset": {
+    "message": "Tetap semula"
+  },
+  "analytics.breakdown.country": {
+    "message": "Negara"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Sebab muat turun"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Sumber muat turun"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Versi permainan"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Pecahan"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Pemuat"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Pengewangan"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Tiada pecahan"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projek"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Status projek"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Versi projek"
+  },
+  "analytics.breakdown.selected": {
+    "message": "Pecahan mengikut {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Tunjukkan semua"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Tunjukkan terhad"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Tunjukkan 8 teratas"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} j"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktif"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Anotasi"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Kawalan graf analitik, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Kawalan"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Kawalan graf analitik"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Paparan"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Peristiwa Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Tiada peristiwa Modrinth dalam graf."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Tiada peristiwa projek dalam graf."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Tempoh sebelumnya"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Peristiwa projek"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Nisbah"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Pilih item daripada jadual di bawah untuk menggambarkan data anda."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, other {# peristiwa analitik}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Tunjukkan pengumuman"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Lihat butiran analitik pengewangan"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Hanya tontonan dan muat turun yang dibuat melalui Modrinth diambil kira untuk pengewangan, dan muat turun memerlukan pengguna log masuk ke akaun mereka."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Butiran analitik pengewangan"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Sblm.)"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, other {# hari}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, other {# jam}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, other {# minit}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Sembunyikan {name} dalam graf"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Petua alat carta disemat"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Disemat"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(sblm.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Tunjukkan {name} dalam graf"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Jumlah"
+  },
+  "analytics.chart.view.area": {
+    "message": "Kawasan"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Palang"
+  },
+  "analytics.chart.view.line": {
+    "message": "Garis"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Kebergantungan"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Pek mod"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Berdiri sendiri"
+  },
+  "analytics.download-reason.update": {
+    "message": "Kemas kini"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Laman sesawang Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "muat turun"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Semua"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Terbitan"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Cari negara..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Cari sumber muat turun..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Cari versi projek..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Cari versi..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Muat Turun Sepanjang Masa"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Masa Bermain Sepanjang Masa"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Pendapatan Sepanjang Masa"
+  },
+  "analytics.graph.title.views": {
+    "message": "Tontonan Sepanjang Masa"
+  },
+  "analytics.group-by.1h": {
+    "message": "1j"
+  },
+  "analytics.group-by.6h": {
+    "message": "6j"
+  },
+  "analytics.group-by.date": {
+    "message": "Tarikh"
+  },
+  "analytics.group-by.day": {
+    "message": "Hari"
+  },
+  "analytics.group-by.month": {
+    "message": "Bulan"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Setiap hari"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Setiap jam"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Setiap bulan"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Setiap 6 jam"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Setiap minggu"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Setiap tahun"
+  },
+  "analytics.group-by.week": {
+    "message": "Minggu"
+  },
+  "analytics.group-by.year": {
+    "message": "Tahun"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Sedang mendapatkan hasil..."
+  },
+  "analytics.options.loading": {
+    "message": "Sedang memuat..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projek diluluskan"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Projek ditetapkan kepada peribadi"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Status projek berubah"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projek dinyahsenaraikan"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} diterbitkan"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Versi dimuat naik"
+  },
+  "analytics.project-status.approved": {
+    "message": "Diluluskan"
+  },
+  "analytics.project-status.archived": {
+    "message": "Diarkibkan"
+  },
+  "analytics.project-status.draft": {
+    "message": "Draf"
+  },
+  "analytics.project-status.other": {
+    "message": "Lain-lain"
+  },
+  "analytics.project-status.private": {
+    "message": "Peribadi"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Ditolak"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Tidak disenaraikan"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Ditahan"
+  },
+  "analytics.project.all": {
+    "message": "Semua projek"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, other {# projek}}"
+  },
+  "analytics.project.icon-alt": {
+    "message": "Ikon {name}"
+  },
+  "analytics.project.select": {
+    "message": "Pilih projek"
+  },
+  "analytics.query.filter.add": {
+    "message": "Tambah tapisan"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Pecahan:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Dikelompokkan setiap"
+  },
+  "analytics.query.label.project": {
+    "message": "Projek:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Jangka masa:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Muat turun"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Hanya tontonan dan muat turun yang dibuat melalui Modrinth layak untuk pengewangan dan mesti melepasi penapisan pencegahan penipuan. Muat turun melalui Modrinth App juga memerlukan pengguna log masuk ke akaun mereka. Oleh sebab semua projek mempunyai nisbah muat turun yang layak untuk pengewangan yang hampir sama, pendapatan anda tidak akan berubah secara ketara walaupun semua muat turun diambil kira."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Ketahui lebih lanjut"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Bagaimanakah pengewangan berfungsi?"
+  },
+  "analytics.stat.playtime": {
+    "message": "Masa bermain"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} jam"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "lwn tempoh sblm."
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "lwn sblm."
+  },
+  "analytics.stat.revenue": {
+    "message": "Pendapatan"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "Tidak tersedia"
+  },
+  "analytics.stat.views": {
+    "message": "Tontonan"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, other {# hari}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, other {# jam}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, other {# minit}}"
+  },
+  "analytics.table.export-csv": {
+    "message": "Eksport CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Kumulatif"
+  },
+  "analytics.table.export.grouped": {
+    "message": "Dikelompokkan setiap {groupBy}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Cari..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Negara di atas"
+  },
+  "analytics.title": {
+    "message": "Analitik"
+  },
+  "analytics.value.monetized": {
+    "message": "Dipengewangkan"
+  },
+  "analytics.value.none": {
+    "message": "Tiada"
+  },
+  "analytics.value.other": {
+    "message": "Lain-lain"
+  },
+  "analytics.value.unknown": {
+    "message": "Tidak diketahui"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Belum dipengewangkan"
+  },
   "app-marketing.download.description": {
     "message": "Aplikasi desktop kami tersedia pada semua platform, pilih versi yang anda inginkan."
   },
@@ -121,6 +520,9 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -363,7 +765,7 @@
     "message": "Nyahikut projek"
   },
   "collection.delete-modal.description": {
-    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibatalkan."
+    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
   },
   "collection.delete-modal.title": {
     "message": "Adakah anda pasti mahu memadamkan koleksi ini?"
@@ -482,8 +884,17 @@
   "conversation-thread.reply-modal.confirmation.label": {
     "message": "Saya akui bahawa penyederhana tidak memantau bebenang ini secara aktif."
   },
+  "conversation-thread.reply-modal.description": {
+    "message": "Projek anda telah diluluskan. Oleh itu, pasukan penyederhana tidak memantau bebenang ini secara aktif. Walau bagaimanapun, mereka mungkin masih melihat mesej anda jika terdapat masalah dengan projek anda."
+  },
   "conversation-thread.reply-modal.header": {
     "message": "Balas bebenang"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Jika anda perlu menghubungi pasukan penyederhana, sila gunakan <help-center-link>Pusat Bantuan Modrinth</help-center-link> dan klik gelembung biru di penjuru kanan bawah untuk menghubungi sokongan."
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Saya mengesahkan bahawa saya telah menjawab ulasan-ulasan penyederhana dengan betul."
   },
   "conversation-thread.resubmit-modal.description": {
     "message": "Anda sedang menghantar <project-title>{projectTitle}</project-title> untuk disemak semula oleh penyederhana."
@@ -494,8 +905,14 @@
   "conversation-thread.resubmit-modal.header.submitting": {
     "message": "Sedang menyerahkan untuk semakan"
   },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Penyerahan berulang tanpa menangani ulasan penyederhana boleh mengakibatkan penggantungan akaun."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
+  },
+  "create.collection.collection-info": {
+    "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
   },
   "create.collection.create-collection": {
     "message": "Cipta koleksi"
@@ -656,6 +1073,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Cari pautan afiliasi..."
   },
+  "dashboard.analytics.from-projects": {
+    "message": "daripada {count} {count, plural, other {projek}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Jumlah muat turun"
   },
@@ -676,6 +1096,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Cuba laraskan penapis atau istilah carian anda."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi anda"
@@ -959,6 +1382,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Lihat sejarah pemberitahuan"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Lihat {extraNotifs} lagi {extraNotifs, plural, other {pemberitahuan}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Cipta organisasi"
   },
@@ -986,6 +1412,12 @@
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
   },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Anda boleh menyunting berbilang projek sekaligus dengan memilihnya di bawah."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Projek pelayan tidak menyokong penyuntingan pukal"
+  },
   "dashboard.projects.head-title": {
     "message": "Projek"
   },
@@ -998,6 +1430,9 @@
   "dashboard.projects.links.button.edit": {
     "message": "Sunting pautan"
   },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Perubahan akan diterapkan kepada <strong>{count}</strong> {count, plural, other {projek}}."
+  },
   "dashboard.projects.links.description": {
     "message": "Sebarang pautan yang anda nyatakan di bawah akan ditulis ganti pada setiap projek yang dipilih. Sebarang pautan yang anda biarkan kosong akan diabaikan. Anda boleh memadamkan pautan daripada semua projek yang dipilih menggunakan butang tong sampah."
   },
@@ -1006,6 +1441,9 @@
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Jemputan Discord"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Sunting pautan"
   },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "Tempat untuk pengguna melaporkan pepijat, isu dan kebimbangan tentang projek anda."
@@ -1289,6 +1727,9 @@
   "discover.install.cancel-reset": {
     "message": "Batalkan penetapan semula"
   },
+  "discover.seo.description": {
+    "message": "Cari dan layari beribu-ribu {projectType} Minecraft di Modrinth dengan hasil carian yang segera dan tepat. Penapis kami membantu anda mencari {projectType} Minecraft terbaik dengan cepat."
+  },
   "error.collection.404.list_item.1": {
     "message": "Anda mungkin tersalah taip URL koleksi."
   },
@@ -1386,7 +1827,7 @@
     "message": "Katak"
   },
   "hosting-marketing.available-locations": {
-    "message": "Tersedia di Amerika Utara, Eropah dan Asia Tenggara untuk liputan yang luas."
+    "message": "Tersedia di Amerika Utara, Eropah, Asia Tenggara dan Australia untuk liputan yang luas."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Bayar setiap bulan"
@@ -1447,6 +1888,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Di manakah pelayan Modrinth Hosting terletak? Bolehkah saya memilih rantau?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Kami mempunyai pelayan yang tersedia merentasi Amerika Utara, Eropah, Asia Tenggara dan Australia pada masa ini yang boleh anda pilih semasa pembelian. Lebih banyak rantau akan datang pada masa hadapan! Jika anda ingin menukar rantau anda, sila hubungi sokongan."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Versi Minecraft dan pemuat apa yang boleh digunakan?"
@@ -1626,7 +2070,7 @@
     "message": "Pengewangan"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "Jemput rakan sepasukan anda dan uruskan peranan serta kebenaran dengan mudah"
+    "message": "Jemput rakan sepasukan anda dan uruskan peranan serta keizinan dengan mudah"
   },
   "landing.creator.feature.team-management.title": {
     "message": "Pengurusan Pasukan"
@@ -1789,6 +2233,9 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Ralat menjana keadaan daripada API semasa membina."
+  },
+  "layout.banner.preview.description": {
+    "message": "Jika anda bermaksud untuk mengakses laman sesawang rasmi Modrinth, kunjungi {url}. Pralihat pelaksanaan ini digunakan oleh kakitangan Modrinth untuk tujuan pengujian. Ia dibina menggunakan {ref}."
   },
   "layout.banner.preview.title": {
     "message": "Ini ialah pengaturan pralihat laman sesawang Modrinth."
@@ -2264,6 +2711,9 @@
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "Pemasangan akan diterapkan kepada {count, plural, other {# projek}}."
+  },
   "profile.bio.fallback.creator": {
     "message": "Seorang pencipta Modrinth."
   },
@@ -2287,6 +2737,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Tetapkan sebagai rakan afiliasi"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, other {# projek}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Penyedia pengesahan"
@@ -2324,6 +2777,9 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, other {muat turun}}"
+  },
   "profile.label.joined": {
     "message": "Telah menyertai"
   },
@@ -2342,6 +2798,9 @@
   "profile.label.organizations": {
     "message": "Organisasi"
   },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, other {projek}}"
+  },
   "profile.label.saving": {
     "message": "Sedang menyimpan..."
   },
@@ -2350,6 +2809,12 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Muat turun projek milik {username} di Modrinth"
+  },
+  "profile.official-account.bio": {
+    "message": "Akaun pengguna rasmi Modrinth. Dapatkan sokongan di <support-link></support-link> atau melalui e-mel di <email></email>"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> pengikut projek}}"
   },
   "profile.user-id": {
     "message": "ID Pengguna: {id}"
@@ -2678,9 +3143,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Jika anda memerlukan bantuan atau mempunyai pertanyaan tambahan, sila lawati <help-center-link>Pusat Bantuan Modrinth</help-center-link> dan klik gelembung biru untuk menghubungi sokongan."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Tunjukkan antara muka ahli"
-  },
   "project.moderation.thread.private-description": {
     "message": "Ini adalah bebenang perbualan peribadi dengan penyederhana Modrinth. Mereka mungkin akan menghantar mesej kepada anda tentang isu-isu berkaitan projek ini."
   },
@@ -2786,11 +3248,17 @@
   "project.settings.permissions.learn-more": {
     "message": "Ketahui lebih lanjut"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Cari {count} {count, plural, other {projek luaran}}..."
+  },
   "project.settings.title": {
     "message": "Tetapan"
   },
   "project.settings.visit-dashboard": {
     "message": "Kunjungi papan pemuka projek"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, other {muat turun}}"
   },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
@@ -2798,11 +3266,17 @@
   "project.versions.title": {
     "message": "Versi"
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Selesaikan"
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {Versi ini}} kini ditahan dan tidak disenaraikan secara umum. Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula fail tertentu yang disertakan dalam {count, plural, other {versi}} pek mod ini."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, other {Versi}} telah ditahan kerana kandungan terbenam yang tidak diketahui"
   },
   "report.already-reported": {
     "message": "Anda telah melaporkan {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Anda sudah mempunyai laporan terbuka untuk {item} ini. Anda boleh menambah lebih banyak butiran pada laporan anda jika anda mempunyai lebih banyak maklumat untuk ditambahkan."
   },
   "report.body.description": {
     "message": "Sertakan pautan dan gambar jika boleh dan adalah berkaitan. Laporan kosong atau tidak mencukupi akan ditutup dan diabaikan."
@@ -3179,6 +3653,9 @@
   "servers.plan.small.description": {
     "message": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
   },
+  "servers.purchase.step.plan.billed": {
+    "message": "dibilkan {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Lengkapkan persediaan"
   },
@@ -3340,6 +3817,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Tambahkan lapisan keselamatan tambahan pada akaun anda semasa log masuk."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Alih keluar 2FA"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Sediakan 2FA"
   },
   "settings.account.security.two-factor.title": {
     "message": "Pengesahan dua faktor (2FA)"
@@ -3674,8 +4157,17 @@
   "settings.billing.subscription.title": {
     "message": "Langganan"
   },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Sedang menukar kepada {interval, select, monthly {monthly} yearly {yearly} other {{interval}}}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Tukar kepada {interval, select, monthly {monthly} yearly {yearly} other {{interval}}}"
+  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Bil bulanan akan dikenakan bayaran tambahan sebanyak {amount} setahun"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Akan bertukar kepada pengebilan {interval, select, monthly {monthly} yearly {yearly} other {{interval}}} pada {date}"
   },
   "settings.billing.update-method": {
     "message": "Kaedah kemas kini"

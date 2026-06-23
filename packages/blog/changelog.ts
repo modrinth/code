@@ -11,6 +11,150 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-23T19:31:16+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new modpack permissions system. Read our blog post about it [here](/news/article/modpack-permissions/).`,
+	},
+	{
+		date: `2026-06-22T18:12:52+00:00`,
+		product: 'web',
+		body: `## Added
+- Added dependents project breakdown and filter to download analytics, handling for case when there are multiple projects selected.
+- Added project icons to table for project columns in analytics.
+- Added members breakdown/filter to revenue analytics.
+
+## Changed
+- Removed project version's project column when there were multiple projects selected with project version breakdown as it's redundant when project breakdown can be added.
+
+## Fixed
+- Fixed all project selection geting unselected when reload page in analytics.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'app',
+		version: '0.14.8',
+		body: `## Changed
+- Improved performance of the instance settings modal.
+- Updated translations
+
+## Fixed
+- Fixed issue in the Content tab where pressing the "Content" button on the linked modpack card would show zero mods in the Modpack content modal for a few seconds.
+- Fixed issue with modal close animations.
+- Fixed not being able to click scroll bar on "game version" menu when creating new instance.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Improved performance of the server settings modal.
+- Updated translations
+
+## Fixed
+- Fixed issue where users were not able to upgrade their Medal servers after the trial expired.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-06-16T18:58:45+00:00`,
+		product: 'app',
+		version: '0.14.7',
+		body: `## Added
+- Warning modal before deleting content that other content in the instance depends on.
+
+## Changed
+- Improved folder filtering when exporting a modpack from an instance.
+- Improved error messages when parts of the Modrinth API are unavailable.
+
+## Fixed
+- Fixed the Content tab showing updates for installed content when the recommended version used the same file as installed.
+- Fixed automatically installed dependencies not appearing as installed when installing content from the Discover page.
+- Fixed the search filter for older game versions.
+- Fixed bulk action content modals sometimes saying no projects were selected.
+- Fixed the Content tab multi-select bar shifting when modals were opened.`,
+	},
+	{
+		date: `2026-06-16T18:58:45+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed Babric project versions being detected as Fabric versions.
+- Fixed the search filter for older game versions.`,
+	},
+	{
+		date: `2026-06-11T19:05:19+00:00`,
+		product: 'app',
+		version: '0.14.6',
+		body: `## Added
+- Added the ability to reorder saved skins in the skin selector by dragging and dropping them.
+- Added recovery steps for more Microsoft sign-in and Xbox authentication errors.
+
+## Changed
+- Adding a skin to the skin selector will no longer automatically apply it to your Minecraft account.
+
+## Fixed
+- Fixed issue where the theme would not change automatically if set to "System theme" and the system theme changes.
+- Fixed rate limit issue when adding a skin in the skin selector.
+- Fixed issue with the Skin selector appearing in a broken state when the Minecraft api is unavailable. Now it appears in a read only state, showing the last selected skin or the default skin if it is unable to determine the last selected skin.
+- Fixed issue where skins which had translucency in the outer layer did not correctly render.
+- Fixed issue in Skin selector where the Edit button was not available on skins included within Modrinth App - meaning you could not change the cape of the skin without first applying it.
+- Fixed loading state incorrectly showing briefly in the Skins selector when a saved skin is deleted.`,
+	},
+	{
+		date: `2026-06-11T19:05:19+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Datepicker dropdown can overflow and get cut off by page since it shows below instead of above the input.`,
+	},
+	{
+		date: `2026-06-08T22:54:32+00:00`,
+		product: 'web',
+		body: `## Changed
+- Less common plugin loaders are now behind a "Show more" toggle.
+- Disable playtime metric if its purely a plugin project
+- Updated translations
+
+## Fixed
+- Fixed publishing checklist displaying that you have no versions sometimes when you do.
+- Add "Your projects" project dropdown preset option
+- Fix revenue and playtime rounding for values less than 1 in the metric card for total revenue and in tooltip total
+- Incorrectly showing empty state for versions page when refreshing on the page.
+- Malformed versions causing versions table page to crash`,
+	},
+	{
+		date: `2026-06-08T22:54:32+00:00`,
+		product: 'app',
+		version: '0.14.5',
+		body: `## Added
+- Added a new setting to the General tab of instance settings which allows you to control what content versions are considered an update. By default this will be set to release channel only.
+- Fixed drag and drop file upload not working in instances Files tab.
+- Fixed layering issue with the expanded console view in the Logs tab of instances and Modrinth Hosting panels.
+
+## Changed
+- Moved "Reload to update" button from the bottom left to the top right action bar.
+- Changed update notifications to show only after 24 hours of ignoring the "Reload to update" button.
+- Updated translations
+
+## Fixed
+- Fixed updater restarting the app even if you didn't ask it to.
+- Fixed user pages incorrectly opening in the app when clicking user objects in the Modrinth Hosting`,
+	},
+	{
+		date: `2026-06-08T22:54:32+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations
+
+## Fixed
+- Fixed drag and drop file upload not working in the Files tab.
+- Fixed the wrong loader icon showing up in the server panel header.
+- Fixed password managers incorrectly suggesting usernames for the invite modal on the access tab.
+- Backups now correctly show the user who created them.`,
+	},
+	{
 		date: `2026-06-04T15:59:11+00:00`,
 		product: 'hosting',
 		body: `## Added

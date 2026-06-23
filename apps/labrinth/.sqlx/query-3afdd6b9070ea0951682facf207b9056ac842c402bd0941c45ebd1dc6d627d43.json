@@ -1,0 +1,53 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT DISTINCT v.mod_id dependent_project_id,\n                d.mod_dependency_id dependency_project_id,\n                d.dependency_type dependency_type,\n                m.name dependency_name,\n                m.slug dependency_slug,\n                m.icon_url dependency_icon_url\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            INNER JOIN mods m ON m.id = d.mod_dependency_id\n            WHERE v.mod_id = ANY($1)\n                AND d.mod_dependency_id IS NOT NULL\n                AND m.status = ANY($2)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "dependent_project_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "dependency_project_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "dependency_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "dependency_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "dependency_slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "dependency_icon_url",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "3afdd6b9070ea0951682facf207b9056ac842c402bd0941c45ebd1dc6d627d43"
+}

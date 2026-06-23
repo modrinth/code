@@ -8,6 +8,477 @@
   "admin.billing.error.not-found": {
     "message": "Kullanıcı bulunamadı"
   },
+  "analytics.action.add": {
+    "message": "Ekle"
+  },
+  "analytics.action.cancel": {
+    "message": "Vazgeç"
+  },
+  "analytics.action.refresh": {
+    "message": "Yenile"
+  },
+  "analytics.action.reset": {
+    "message": "Sıfırla"
+  },
+  "analytics.breakdown.country": {
+    "message": "Ülke"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "İndirme sebebi"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "İndirme kaynağı"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Oyun sürümü"
+  },
+  "analytics.breakdown.generic": {
+    "message": "Analiz"
+  },
+  "analytics.breakdown.loader": {
+    "message": "Yükleyici"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Para Kazanma"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Analiz yok"
+  },
+  "analytics.breakdown.project": {
+    "message": "Proje"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Proje durumu"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Proje sürümü"
+  },
+  "analytics.breakdown.selected": {
+    "message": "{breakdown} tarafından analiz"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Hepsini göster"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Sınırlı sayıda göster"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Üst 8'i göster"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} sa"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} çevrimiçi"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Rahatsız ediciler"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Analitik grafik denetimleri: {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Kontroller"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Analiz grafik kontrolleri"
+  },
+  "analytics.chart.controls.display": {
+    "message": "Göster"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth etkinlikleri"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Grafikte Modrinth etkinlikleri yok."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Grafikte proje etkinliği yok."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Önceki dönem"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Proje etkinlikleri"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Oran"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Verilerinizi görselleştirmek için aşağıdaki tablodan öğeler seçin."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# etkinlik analizi} other {# etkinlik analizleri}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Duyuruyu görüntüle"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Gelir elde edilen analiz detaylarını görüntüle"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Sadece Modrinth üzerinden yapılan görüntülemeler ve indirmeler para kazanma kriterlerine dahil edilir ve indirmeler için kullanıcıların oturum açmış olması gerekir."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Para kazanma analiz detayları"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Önceki)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "Tablodaki seçili tüm satırların gösterilmesi sayfa performansını düşürebilir."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Grafikteki {count} satırın tümünü göstermek ister misiniz?"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# gün} other {# gün}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# Saat} other {# Saat}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# dakika} other {# dakika}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Grafikte {name}'i gizle"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Grafik ipucu sabitlendi"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Sabitlendi"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(önceki)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Grafikte {name}'i göster"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Toplam"
+  },
+  "analytics.chart.view.area": {
+    "message": "Alan"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Çubuk"
+  },
+  "analytics.chart.view.line": {
+    "message": "Satır"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Bağımlılıklar"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Mod paketi"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Bağımsız"
+  },
+  "analytics.download-reason.update": {
+    "message": "Güncelleme"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth Uygulaması"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth Websitesi"
+  },
+  "analytics.downloads.suffix": {
+    "message": "indirmeler"
+  },
+  "analytics.empty.no-data": {
+    "message": "Veri mevcut değil"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Analizler için veri mevcut değil"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Mevcut proje yok"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Analizler için mevcut proje yok"
+  },
+  "analytics.empty.select-project": {
+    "message": "Verileri görüntülemek için en az bir proje seçin"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Oyun sürüm türü"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Tümü"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Yayın"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Ülkeleri ara..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "İndirme kaynakları ara..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Proje sürümleri ara..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Sürümleri ara..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Zaman İçindeki İndirmeler"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Zaman İçinde Oyun Süresi"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Zaman İçinde Gelir"
+  },
+  "analytics.graph.title.views": {
+    "message": "Zaman İçinde Görüntülenmeler"
+  },
+  "analytics.group-by.1h": {
+    "message": "1sa"
+  },
+  "analytics.group-by.6h": {
+    "message": "6sa"
+  },
+  "analytics.group-by.date": {
+    "message": "Tarih"
+  },
+  "analytics.group-by.day": {
+    "message": "Gün"
+  },
+  "analytics.group-by.month": {
+    "message": "Ay"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Güne göre gruplandır"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Saate göre gruplandır"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Aya göre gruplandır"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "6 saate göre gruplandır"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Haftaya göre gruplandır"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Yıla göre gruplandır"
+  },
+  "analytics.group-by.week": {
+    "message": "Hafta"
+  },
+  "analytics.group-by.year": {
+    "message": "Yıl"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Sonuçlar alınıyor..."
+  },
+  "analytics.options.loading": {
+    "message": "Yükleniyor..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Proje onaylandı"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Proje gizliye ayarlandı"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Proje durumu değişti"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Proje listelenmedi"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} yayınlandı"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Sürüm yüklendi"
+  },
+  "analytics.project-status.approved": {
+    "message": "Onaylandı"
+  },
+  "analytics.project-status.archived": {
+    "message": "Arşivlendi"
+  },
+  "analytics.project-status.draft": {
+    "message": "Taslak"
+  },
+  "analytics.project-status.other": {
+    "message": "Diğer"
+  },
+  "analytics.project-status.private": {
+    "message": "Gizli"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Reddedilmiş"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Listelenmemiş"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Kısıtlanmış"
+  },
+  "analytics.project.all": {
+    "message": "Tüm Projeler"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# project} other {# projects}}"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name} İkon"
+  },
+  "analytics.project.select": {
+    "message": "Projeleri seç"
+  },
+  "analytics.project.user": {
+    "message": "{username} adlı kullanıcının projeleri"
+  },
+  "analytics.project.your": {
+    "message": "Senin projelerin"
+  },
+  "analytics.query.filter.add": {
+    "message": "Filtre ekle"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Kısıtlama:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Gruplandırma türü"
+  },
+  "analytics.query.label.project": {
+    "message": "Proje:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Zaman aralığı:"
+  },
+  "analytics.stat.downloads": {
+    "message": "İndirmeler"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Sadece Modrinth üzerinden yapılan görüntülemeler ve indirmeler para kazanmaya uygundur ve sahtekarlık önleme filtrelerinden geçmelidir. Modrinth Uygulaması indirmeleri ayrıca kullanıcının oturum açmış olmasını gerektirir. Tüm projelerin para kazandıran indirme oranları benzer olduğundan, tüm indirmeler sayılsa bile gelirinizde anlamlı bir değişiklik olmaz."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Daha fazla bilgi edinin"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Para kazanma nasıl işler?"
+  },
+  "analytics.stat.playtime": {
+    "message": "Oynanma süresi"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} sa"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "önceki döneme kıyasla"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "öncekine kıyasla."
+  },
+  "analytics.stat.revenue": {
+    "message": "Gelir"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "Mevcut Değil"
+  },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "Mevcut sorgu için istatistik mevcut değil"
+  },
+  "analytics.stat.views": {
+    "message": "Görüntülenmeler"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start} - {end}"
+  },
+  "analytics.table.csv.filename": {
+    "message": "Modrinth Analizleri {breakdown} Ayrıntılı Bilgi - {dateRange}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Oynanma süresi (saniye)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "Seçili aralık"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# gün} other {# günler}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural,one {# saat}other {# saatler}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# minute} other {# minutes}}"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "Eşleşen analitik satırı bulunamadı"
+  },
+  "analytics.table.export-csv": {
+    "message": "CSV dışa aktar"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Toplu"
+  },
+  "analytics.table.export.grouped": {
+    "message": "İle gruplandı {groupBy}"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "{start} ile {end} arası gösteriliyor toplam {total}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Ara..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Üstteki Ülkeler"
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "Ülke indirme sınırı"
+  },
+  "analytics.threshold.game-version-downloads-aria": {
+    "message": "Oyun sürümü indirme eşiği"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Yukarıdaki oyun sürümleri"
+  },
+  "analytics.threshold.project-downloads-aria": {
+    "message": "Proje indirme eşiği"
+  },
+  "analytics.threshold.project-version-downloads-aria": {
+    "message": "Proje sürümü indirme eşiği"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Yukarıdaki proje sürümleri"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Yukarıdaki projeler"
+  },
+  "analytics.title": {
+    "message": "Analitik"
+  },
+  "analytics.value.monetized": {
+    "message": "Gelir elde eden"
+  },
+  "analytics.value.none": {
+    "message": "Yok"
+  },
+  "analytics.value.other": {
+    "message": "Diğer"
+  },
+  "analytics.value.unknown": {
+    "message": "Bilinmiyor"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Değerlendirilmemiş"
+  },
   "app-marketing.download.description": {
     "message": "Masaüstü uygulamamız tüm platformlarda kullanılabilir, istediğiniz sürümü seçin."
   },
@@ -121,6 +592,9 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -517,6 +991,9 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
+  },
+  "create.collection.collection-info": {
+    "message": "Yeni koleksiyonunuz herkese açık olarak {count, plural, =0 {projesiz hâlde} other {# proje ile}} oluşturulacaktır."
   },
   "create.collection.create-collection": {
     "message": "Koleksiyon oluştur"
@@ -977,6 +1454,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "<b>{withdrawLimit}</b> çekme limitinizi kadarını kullandınız. Daha fazla çekmek için vergi formunu gerekir."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "{roles} için uygunsun. Discord hesabını Modrinth üzerinden bağla, bizde bunları otomatik olarak senkronize edelim."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Discord bağla"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Discord rollerini al"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ İndirme"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Oluşturucu"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Onur 2026"
+  },
   "dashboard.head-title": {
     "message": "Kontrol Paneli"
   },
@@ -1061,6 +1556,9 @@
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord daveti"
   },
+  "dashboard.projects.links.header.edit": {
+    "message": "Bağlantıları düzenle"
+  },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "Kullanıcıların projenizle ilgili hataları, sorunları ve endişelerini bildirebilecekleri bir alan."
   },
@@ -1084,6 +1582,9 @@
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Kaynak kodu"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Proje ile ilgili bilgi, dokümantasyon ve yardım içeren bir sayfa"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Viki sayfası"
@@ -1346,8 +1847,20 @@
   "discover.install.error.no-server-world": {
     "message": "Yüklenebilecek hiçbir sunucu dünyası mevcut değil."
   },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Bu içerik türü, \"Discover\" platformundan bir sunucuya yüklenemez."
+  },
   "discover.install.heading.reset-modpack": {
     "message": "Sıfırlama sonrası yüklenecek mod paketi seçiliyor"
+  },
+  "discover.seo.description": {
+    "message": "Modrinth'deki binlerce Minecraft {projectType}'ini arayın ve anında, doğru sonuçlarla keşfedin. Filtrelerimiz sayesinde en iyi Minecraft {projectType}'i hızlı bir şekilde bulabilirsiniz."
+  },
+  "discover.seo.title": {
+    "message": "{projectType} türündeki projeleri arayın"
+  },
+  "discover.seo.title-with-query": {
+    "message": "{projectType} türündeki projeleri arayın | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Koleksiyonun URL'ini yanlış yazmış olabilirsin."
@@ -1452,7 +1965,7 @@
     "message": "Kurbağa"
   },
   "hosting-marketing.available-locations": {
-    "message": "Kuzey Amerika, Avrupa ve Güneydoğu Asya'da mevcut."
+    "message": "Kuzey Amerika, Avrupa, Güneydoğu Asya ve Avustralya'da geniş bir coğrafyada kullanılabilir."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Aylık Ödeme"
@@ -1515,7 +2028,7 @@
     "message": "Modrinth Hosting sunucuları nerede bulunuyor? Bölge seçebilir miyim?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Şu anda satın alma sırasında seçebileceğiniz sunucular Kuzey Amerika, Avrupa ve Güneydoğu Asya bölgelerinde mevcuttur. Yakında daha fazla bölge eklenecektir. Bölgenizi değiştirmek isterseniz lütfen destek ekibiyle iletişime geçin."
+    "message": "Şu anda Kuzey Amerika, Avrupa, Güneydoğu Asya ve Avustralya'da sunucu seçeneklerimiz mevcuttur ve satın alma sırasında tercih edebilirsiniz. Gelecekte daha fazla bölge de eklenecek! Bölgenizi değiştirmek isterseniz, lütfen destek ekibiyle iletişime geçin."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Hangi Minecraft sürümleri ve yükleyiciler kullanılabilir?"
@@ -1784,8 +2297,14 @@
   "landing.section.for-players.label": {
     "message": "Oyuncular İçin"
   },
+  "landing.section.for-players.tagline": {
+    "message": "{count}'un üzerinde içerik keşfedin"
+  },
   "landing.subheading": {
     "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
+  },
+  "layout.action.analytics-events": {
+    "message": "Analitik olayları"
   },
   "layout.action.change-theme": {
     "message": "Tema değiştir"
@@ -2333,11 +2852,17 @@
   "muralpay.warning.wallet-address": {
     "message": "Cüzdan adresinizi iki kez kontrol edin. Yanlış adrese gönderilen fonlar kurtarılamaz."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "Değişiklikler {count, plural, one {# project} other {# projects}} için uygulanacaktır."
+  },
   "profile.bio.fallback.creator": {
     "message": "Bir Modrinth içerik üreticisi."
   },
   "profile.bio.fallback.user": {
     "message": "Bir Modrinth kullanıcısı."
+  },
+  "profile.button.analytics": {
+    "message": "Kullanıcı analizlerini görüntüle"
   },
   "profile.button.billing": {
     "message": "Kullanıcı faturasını yönet"
@@ -2356,6 +2881,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Ortak olarak ayarla"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, one {# project} other {# projects}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Kimlik doğrulama sağlayıcıları"
@@ -2425,6 +2953,12 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - {username} kullanıcısının Modrinth'teki projelerini indir"
+  },
+  "profile.official-account": {
+    "message": "Resmi Modrinth hesabı"
+  },
+  "profile.official-account.bio": {
+    "message": "Modrinth'in resmi kullanıcı hesabı Destek için<support-link></support-link> adresinden veya <email></email> e-posta adresinden iletişime geçebilirsiniz"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> proje takipçisi} other {<stat>{count}</stat> proje takipçisi}}"
@@ -2714,11 +3248,17 @@
   "project.moderation.admonition.rejected.header": {
     "message": "Talep edilen değişiklikler"
   },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Projenizi düzenli olarak göndermeden önce tüm moderasyon sorunlarını çözmemeniz durumunda, hesabınızın askıya alınması söz konusu olabilir."
+  },
   "project.moderation.admonition.under-review.body.1": {
     "message": "Projeniz Modrinth'in moderasyon ekibi tarafından incelenmek üzere sıraya alındı."
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Projenizi değiştirmeye devam edebilirsiniz, bu kuyruktaki konumunuzu etkilemeyecektir."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Gönderileri 24-48 saat içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum gönderinizle ilgili bir sorun olduğu anlamına gelmez."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Moderatörlerimiz Modrinth'i güvende tutmak için çok çalışırken gösterdiğiniz sabır için teşekkür ediyor ve içeriğinizi paylaşmanıza yardımcı olmayı dört gözle bekliyoruz! 💚</emphasis>"
@@ -2740,9 +3280,6 @@
   },
   "project.moderation.thread.help-center-note.2": {
     "message": "Yardıma ihtiyacınız varsa veya ek sorularınız varsa, lütfen <help-center-link>Modrinth Yardım Merkezi'ni</help-center-link> ziyaret edin ve destekle iletişime geçmek için mavi baloncuğa tıklayın."
-  },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Üye kullanıcı arayüzünü göster"
   },
   "project.moderation.thread.private-description": {
     "message": "Bu, Modrinth moderatörleri ile özel bir konuşma başlığıdır. Bu projeyle ilgili konularda size mesaj gönderebilirler."
@@ -2813,6 +3350,12 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Lütfen aşağıdaki dosyaların tümünü yeniden dağıtma izniniz olduğuna dair kanıt sunun; böylece bekletilen tüm sürümler otomatik olarak yayınlanacaktır."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Projenizi inceleme için göndermeden önce, lütfen aşağıdaki dosyaların tümünü yeniden dağıtma izniniz olduğuna dair kanıt sunun."
+  },
   "project.settings.permissions.attention-needed.title": {
     "message": "Bilinmeyen gömülü içerik"
   },
@@ -2828,8 +3371,14 @@
   "project.settings.permissions.empty-state.heading": {
     "message": "Hazırsınız!"
   },
+  "project.settings.permissions.fail.description": {
+    "message": "Eklediğiniz bazı harici içerikleri yeniden dağıtma izniniz yok. Modrinth'te yayınlamak için lütfen ihlalde bulunan içeriği kaldırın."
+  },
   "project.settings.permissions.fail.title": {
     "message": "Bazı içerikler dahil edilemez"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Eğer Modrinth'te barındırılmayan içerik ekliyorsanız, bu içeriğin nereden geldiğini ve dosyaları dağıtmak için yetkininize sahip olduğunuzu bize bildirmelisiniz. Bunu nasıl doğru bir şekilde yapacağınızı öğrenmek için <link>rehberimizi</link> inceleyin!"
   },
   "project.settings.permissions.info-banner.title": {
     "message": "Atıfların nasıl çalıştığını öğrenin"
@@ -2837,11 +3386,20 @@
   "project.settings.permissions.learn-more": {
     "message": "Daha Fazla Bilgi edinin"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "{count} {count, plural, one {harici proje} other {harici proje}} aranıyor..."
+  },
   "project.settings.title": {
     "message": "Ayarlar"
   },
   "project.settings.visit-dashboard": {
     "message": "Projeler panelini ziyaret et"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, one {download} other {downloads}}"
+  },
+  "project.stats.followers-label": {
+    "message": "{count, plural, one {follower} other {followers}}"
   },
   "project.status.archived.message": {
     "message": "{title} arşivlenmiş. {title}, yapımcı fikrini değiştirmediği sürece daha fazla güncelleme almayacak."
@@ -2849,17 +3407,32 @@
   "project.versions.title": {
     "message": "Sürümler"
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Çöz"
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Bu sürüm} other {Bu sürümler}} şu anda gizlenmiş durumda ve herkese açık olarak listelenmiyor. Lütfen {count, plural, one {sürüm} other {sürümler}} mod paketine dahil edilen belirli dosyaları yeniden dağıtma izniniz olduğuna dair kanıt sunun."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Sürüm {version_name}} other {Sürümler}} bilinmeyen gömülü içerik nedeniyle gizlendi"
   },
   "report.already-reported": {
     "message": "Zaten {title} ögesini bildirdiniz"
+  },
+  "report.already-reported-description": {
+    "message": "Bu {item} için zaten açık bir raporunuz bulunuyor. Eklemek istediğiniz başka bilgiler varsa, raporunuza daha fazla detay ekleyebilirsiniz."
+  },
+  "report.back-to-item": {
+    "message": "{item} kısmına dön"
   },
   "report.body.description": {
     "message": "Eğer mümkünse ve alakalıysa bağlantılar ve görseller ekleyin. Boş ve yetersiz raporlar kapatılacak ve yok sayılacak."
   },
   "report.body.title": {
     "message": "Lütfen raporunuzla ilgili ekstra bağlam sağlayın"
+  },
+  "report.checking": {
+    "message": "{item} kontrol ediliyor..."
+  },
+  "report.could-not-find": {
+    "message": "{item} bulunamadı"
   },
   "report.for.violation": {
     "message": "Modrinth <rules-link>Kuralları</rules-link> veya <terms-link>Kullanım Koşulları</terms-link> İhlali"
@@ -2900,8 +3473,14 @@
   "report.please-report": {
     "message": "Lütfen bildirin:"
   },
+  "report.question.content-id": {
+    "message": "{item} kimliği (ID) nedir?"
+  },
   "report.question.content-type": {
     "message": "Ne tür bir içerik bildiriyorsunuz?"
+  },
+  "report.question.report-reason": {
+    "message": "{item} hangi Modrinth kuralını ihlal ediyor?"
   },
   "report.report-content": {
     "message": "Moderatörlere içerik bildir"
@@ -3014,14 +3593,26 @@
   "scopes.organizationWrite.label": {
     "message": "Organizasyon yaz"
   },
+  "scopes.patCreate.description": {
+    "message": "Kişisel erişim belirteçleri oluşturun"
+  },
   "scopes.patCreate.label": {
     "message": "PAT oluştur"
+  },
+  "scopes.patDelete.description": {
+    "message": "Kişisel erişim belirteçlerinizi silin"
   },
   "scopes.patDelete.label": {
     "message": "PAT sil"
   },
+  "scopes.patRead.description": {
+    "message": "Oluşturulan kişisel erişim belirteçlerini görüntüle"
+  },
   "scopes.patRead.label": {
     "message": "PAT oku"
+  },
+  "scopes.patWrite.description": {
+    "message": "Kişisel erişim belirteçlerini düzenle"
   },
   "scopes.patWrite.label": {
     "message": "PAT yaz"
@@ -3230,6 +3821,9 @@
   "servers.plan.small.description": {
     "message": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
   },
+  "servers.purchase.step.plan.billed": {
+    "message": "{interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}} faturalandırıldı"
+  },
   "settings.account.button.complete-setup": {
     "message": "Kurulumu tamamla"
   },
@@ -3391,6 +3985,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Hesabınıza giriş yaparken ek bir güvenlik katmanı ekleyin."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "2 Aşamalı Doğrulama'yı kaldır"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "2 Aşamalı Doğrulama'yı kur"
   },
   "settings.account.security.two-factor.title": {
     "message": "İki aşamalı doğrulama"
@@ -3725,8 +4325,17 @@
   "settings.billing.subscription.title": {
     "message": "Abonelikler"
   },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "{interval, select, monthly {monthly} yearly {yearly} other {{interval}}} faturalandırmaya geçiliyor"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "{interval, select, monthly {monthly} yearly {yearly} other {{interval}}} faturalandırmaya geç"
+  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Aylık faturalandırma size yıllık ek olarak {amount} maliyet çıkaracaktır"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "{date} tarihinde {interval, select, monthly {monthly} yearly {yearly} other {{interval}}} faturalandırmaya geçer"
   },
   "settings.billing.update-method": {
     "message": "Güncelleme metodu"
@@ -3766,6 +4375,9 @@
   },
   "settings.display.project-list-layouts.mode.grid": {
     "message": "Izgara"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Satırlar"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Mod paketleri sayfası"

@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Tambah pautan luaran"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Anda telah memilih kesemua {totalAvailableTags, plural, other {# tag yang tersedia}}. Ini mengalahkan tujuan tag, yang bertujuan untuk membantu pengguna mencari projek yang berkaitan. Sila pilih hanya tag yang berkaitan dengan projek anda."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Pilih tag yang tepat"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Panjang keterangan anda ialah {length, plural, other {# aksara yang boleh dibaca}}. Sekurang-kurangnya {minChars, plural, other {# aksara}} disyorkan untuk membuat keterangan yang jelas dan bermaklumat."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Kembangkan keterangan"
@@ -59,11 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Kunjungi laman galeri"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type} anda menggunakan lesen yang memerlukan kod sumber tersedia. Sila berikan pautan kod sumber atau fail sumber untuk setiap versi tambahan atau pertimbangkan untuk menggunakan lesen yang berbeza."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Sediakan kod sumber"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Sesetengah daripada pautan luaran anda kelihatan sama. Setiap pautan hendaklah dimasukkan sekali sahaja dan dengan jenis pautan yang sesuai."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Bersihkan pautan yang serupa"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Keterangan anda harus mengandungi teks biasa atau teks alt gambar yang mencukupi, memastikan ia boleh diakses oleh mereka yang menggunakan pembaca skrin atau dengan sambungan internet yang perlahan."
@@ -88,6 +100,9 @@
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Jangan gunakan pemendek pautan"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, other {# tajuk}} di dalam keterangan anda {count, plural, other {adalah}} terlalu panjang. Tajuk hendaklah ringkas dan bertindak sebagai tajuk bahagian, bukan ayat penuh."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Pendekkan tajuk"
@@ -119,6 +134,9 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Semak maklum balas"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Anda telah memilih {count, plural, other {# tag resolusi}} ({tags}). Pek sumber biasanya hanya mempunyai satu tag resolusi yang sepadan dengan resolusi utamanya."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang betul"
   },
@@ -139,6 +157,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Pilih bahasa"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Pilih lesen yang digunakan untuk pengedaran {type} anda."
   },
   "nags.select-license.title": {
     "defaultMessage": "Pilih lesen"
@@ -179,6 +200,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Bersihkan ringkasan"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Panjang ringkasan anda ialah {length, plural, other {# aksara}}. Sekurang-kurangnya {minChars, plural, other {# aksara}} disyorkan untuk membuat ringkasan yang bermaklumat dan menarik."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Kembangkan ringkasan"
   },
@@ -188,11 +212,23 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Bersihkan nama"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Anda telah memilih sebanyak {tagCount, plural, other {# tag}} Pertimbangkan untuk mengurangkannya kepada kurang atau sama dengan {maxTagCount} untuk memastikan pelayan anda dipaparkan dalam hasil carian yang berkaitan."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Pilih tag yang tepat"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Anda telah memilih sebanyak {tagCount, plural, other {# tag}} Pertimbangkan untuk mengurangkannya kepada kurang atau sama dengan {maxTagCount} untuk memastikan projek anda dipaparkan dalam hasil carian yang berkaitan."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Pilih tag yang tepat"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Sekurang-kurangnya satu gambar galeri diperlukan untuk mempamerkan kandungan {type} anda."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pek sumber anda, melainkan ianya pek audio atau terjemahan. Jika pek ini adalah pek audio atau terjemahan, sila pilih tag yang sesuai"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Muat naik gambar galeri"
@@ -216,3 +252,4 @@
     "defaultMessage": "Kunjungi tetapan pautan"
   }
 }
+

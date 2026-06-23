@@ -90,6 +90,7 @@ import {
 	useVIntl,
 	versionChangesGameVersion,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -99,7 +100,7 @@ import { useRouter } from 'vue-router'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_versions, get_version } from '@/helpers/cache.js'
+import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import {
@@ -153,6 +154,7 @@ const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
 const { installingItems } = injectContentInstall()
 const router = useRouter()
+const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
 
 const props = defineProps<{
@@ -211,6 +213,13 @@ const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
 const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
+
+const modpackContentQueryKey = computed(() => ['linkedModpackContent', props.instance.path])
+const modpackContentQuery = useQuery({
+	queryKey: modpackContentQueryKey,
+	queryFn: () => get_linked_modpack_content(props.instance.path),
+	enabled: computed(() => !!props.instance?.path && !!props.instance?.linked_data),
+})
 
 // TODO: Extract content operation and updater modal state into composables; this page currently owns file mutations, dependency installs, busy flags, and version selection flow.
 const updatingProject = ref<ContentItem | null>(null)
@@ -451,6 +460,63 @@ async function removeMod(mod: ContentItem) {
 	}
 }
 
+function isBreakingDependency(dependency: Labrinth.Versions.v2.Dependency) {
+	return dependency.dependency_type === 'required' || dependency.dependency_type === 'embedded'
+}
+
+function dependencyTargetsItem(dependency: Labrinth.Versions.v2.Dependency, item: ContentItem) {
+	return (
+		(!!dependency.project_id && dependency.project_id === item.project?.id) ||
+		('version_id' in dependency &&
+			!!dependency.version_id &&
+			dependency.version_id === item.version?.id)
+	)
+}
+
+async function getDeleteDependencyWarning(items: ContentItem[]) {
+	if (props.isServerInstance) return null
+
+	const deletingIds = new Set(items.map(getContentItemId))
+	const remainingItems = projects.value.filter((item) => !deletingIds.has(getContentItemId(item)))
+	const versionIds = [
+		...new Set(remainingItems.map((item) => item.version?.id).filter((id): id is string => !!id)),
+	]
+
+	if (versionIds.length === 0) return null
+
+	const versions = (await get_version_many(versionIds).catch((err) => {
+		handleError(err as Error)
+		return null
+	})) as Labrinth.Versions.v2.Version[] | null
+
+	if (!versions) return null
+
+	const versionsById = new Map(versions.map((version) => [version.id, version]))
+
+	const dependents = remainingItems
+		.map((candidate) => {
+			const version = candidate.version?.id ? versionsById.get(candidate.version.id) : null
+			if (!version) return null
+
+			const dependencies = items.filter((item) => {
+				if (!item.project?.id && !item.version?.id) return false
+
+				return version.dependencies?.some(
+					(dependency) =>
+						isBreakingDependency(dependency) && dependencyTargetsItem(dependency, item),
+				)
+			})
+
+			return dependencies.length > 0 ? { item: candidate, dependencies } : null
+		})
+		.filter(
+			(dependent): dependent is { item: ContentItem; dependencies: ContentItem[] } =>
+				dependent !== null,
+		)
+
+	return dependents.length > 0 ? { items, dependents } : null
+}
+
 async function updateProject(mod: ContentItem) {
 	if (!mod.file_path) return
 	const operation = beginContentOperation(mod)
@@ -481,6 +547,7 @@ async function updateProject(mod: ContentItem) {
 		})
 	} catch (err) {
 		handleError(err as Error)
+		throw err
 	} finally {
 		await refreshContentState('must_revalidate')
 		finishContentOperation(mod, operation)
@@ -682,13 +749,19 @@ async function handleModpackContentBulkToggle(items: ContentItem[]) {
 async function handleModpackContent() {
 	if (!props.instance?.path) return
 
+	if (modpackContentQuery.data.value !== undefined) {
+		modpackContentModal.value?.show(modpackContentQuery.data.value)
+		return
+	}
+
 	modpackContentModal.value?.showLoading()
 
-	const contentItems = await get_linked_modpack_content(props.instance.path).catch(handleError)
+	const { data, error } = await modpackContentQuery.refetch()
 
-	if (contentItems) {
-		modpackContentModal.value?.show(contentItems)
+	if (data !== undefined) {
+		modpackContentModal.value?.show(data)
 	} else {
+		if (error) handleError(error)
 		modpackContentModal.value?.hide()
 	}
 }
@@ -696,9 +769,12 @@ async function handleModpackContent() {
 async function refreshModpackContentItems(cacheBehaviour?: CacheBehaviour) {
 	if (!props.instance?.path) return
 
-	const contentItems = await get_linked_modpack_content(props.instance.path, cacheBehaviour).catch(
-		handleError,
-	)
+	const contentItems = await queryClient
+		.fetchQuery({
+			queryKey: modpackContentQueryKey.value,
+			queryFn: () => get_linked_modpack_content(props.instance.path, cacheBehaviour),
+		})
+		.catch(handleError)
 
 	if (contentItems) {
 		modpackContentModal.value?.setItems(contentItems)
@@ -885,13 +961,15 @@ async function handleModalUpdate(
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
 
-		if (mod.has_update && mod.update_version_id === selectedVersion.id) {
-			await updateProject(mod)
-		} else {
-			await switchProjectVersion(mod, selectedVersion)
+		try {
+			if (mod.has_update && mod.update_version_id === selectedVersion.id) {
+				await updateProject(mod)
+			} else {
+				await switchProjectVersion(mod, selectedVersion)
+			}
+		} finally {
+			resetUpdateState()
 		}
-
-		resetUpdateState()
 	}
 }
 
@@ -1081,6 +1159,7 @@ provideContentManager({
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
 		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
@@ -1222,6 +1301,15 @@ watch(
 	() => props.instance?.linked_data,
 	async (newLinkedData, oldLinkedData) => {
 		if (oldLinkedData && !newLinkedData) {
+			await initProjects('must_revalidate')
+		}
+	},
+)
+
+watch(
+	() => props.instance?.preferred_update_channel,
+	async (newValue, oldValue) => {
+		if (newValue !== oldValue) {
 			await initProjects('must_revalidate')
 		}
 	},

@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Select correct resolution"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Make sure you have provided proof of your permission to distribute any external content in your Modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Review external permissions"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Select what versions your server supports, choose a Modpack, or upload your own."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Visit links settings"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visit permissions dashboard"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Visit tag settings"

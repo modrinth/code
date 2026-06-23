@@ -74,6 +74,9 @@
   "nags.identical-links.description": {
     "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado."
   },
+  "nags.identical-links.title": {
+    "defaultMessage": "Limpiar links idénticos"
+  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Tu descripción debe incluir suficiente texto plano o texto alternativo para imágenes, de modo que sea accesible para quienes usan lectores de pantalla o tienen conexiones lentas a Internet."
   },
@@ -195,7 +198,7 @@
     "defaultMessage": "Tu resumen no debe contener formato, saltos de línea, caracteres especiales ni enlaces, ya que solo se mostrará texto plano."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Hacer el resumen más claro"
+    "defaultMessage": "Aclara el resumen"
   },
   "nags.summary-too-short.description": {
     "defaultMessage": "Tu resumen tiene {length, plural, one {# carácter} other {# caracteres}}. Se recomienda al menos {minChars, plural, one {# carácter} other {# caracteres}} para crear un resumen informativo y atractivo."
@@ -223,6 +226,9 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "pack de recursos, excepto para audio o packs de localización. Si esto describe tu pack, por favor, seleccionar la etiqueta apropiada"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

@@ -1,6 +1,5 @@
 use std::any::type_name;
 use std::collections::HashMap;
-use std::sync::Arc;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
@@ -29,7 +28,9 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
-use crate::search::{SearchBackend, SearchQuery, SearchRequest, SearchResults};
+use crate::search::{
+    SearchBackend, SearchQuery, SearchRequest, SearchResults, SearchState,
+};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
@@ -71,6 +72,25 @@ pub fn utoipa_config(
         .service(super::versions::version_list)
         .service(super::versions::version_project_get)
         .service(dependency_list);
+}
+
+pub async fn clear_project_cache_and_queue_search(
+    redis: &RedisPool,
+    search_state: &SearchState,
+    project_id: db_ids::DBProjectId,
+    slug: Option<String>,
+    clear_dependencies: Option<bool>,
+) -> Result<(), ApiError> {
+    db_models::DBProject::clear_cache(
+        project_id,
+        slug,
+        clear_dependencies,
+        redis,
+    )
+    .await?;
+    search_state.queue.push(project_id.into()).await;
+
+    Ok(())
 }
 
 #[derive(Deserialize, Validate)]
@@ -291,21 +311,21 @@ async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_backend: web::Data<dyn SearchBackend>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     project_edit_internal(
         req,
         info,
         pool,
-        search_backend,
         web::Json(new_project),
         redis,
         session_queue,
         moderation_queue,
+        search_state,
     )
     .await
 }
@@ -314,11 +334,11 @@ pub async fn project_edit_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_backend: web::Data<dyn SearchBackend>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -977,6 +997,7 @@ pub async fn project_edit_internal(
                     ..Default::default()
                 },
                 session_queue.clone(),
+                search_state.clone(),
             )
             .await
             {
@@ -1113,11 +1134,12 @@ pub async fn project_edit_internal(
 
     transaction.commit().await?;
 
-    db_models::DBProject::clear_cache(
+    clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
         project_item.inner.id,
         project_item.inner.slug,
         None,
-        &redis,
     )
     .await?;
 
@@ -1126,7 +1148,8 @@ pub async fn project_edit_internal(
         project_item.inner.status.is_searchable(),
         new_project.status.map(|status| status.is_searchable()),
     ) {
-        search_backend
+        search_state
+            .backend
             .remove_documents(
                 &project_item
                     .versions
@@ -1398,6 +1421,7 @@ pub async fn projects_edit(
     bulk_edit_project: web::Json<BulkEditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1471,6 +1495,7 @@ pub async fn projects_edit(
         db_models::categories::LinkPlatform::list(&**pool, &redis).await?;
 
     let mut transaction = pool.begin().await?;
+    let mut changed_projects = Vec::new();
 
     for project in projects_data {
         if !user.role.is_mod() {
@@ -1595,16 +1620,21 @@ pub async fn projects_edit(
             }
         }
 
-        db_models::DBProject::clear_cache(
-            project.inner.id,
-            project.inner.slug,
-            None,
-            &redis,
-        )
-        .await?;
+        changed_projects.push((project.inner.id, project.inner.slug));
     }
 
     transaction.commit().await?;
+
+    for (project_id, slug) in changed_projects {
+        clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id,
+            slug,
+            None,
+        )
+        .await?;
+    }
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -1694,9 +1724,10 @@ async fn project_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     project_icon_edit_internal(
         web::Query(ext),
@@ -1707,6 +1738,7 @@ async fn project_icon_edit(
         file_host,
         payload,
         session_queue,
+        search_state,
     )
     .await
 }
@@ -1717,9 +1749,10 @@ pub async fn project_icon_edit_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1775,7 +1808,7 @@ pub async fn project_icon_edit_internal(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1794,7 +1827,7 @@ pub async fn project_icon_edit_internal(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1815,11 +1848,12 @@ pub async fn project_icon_edit_internal(
     .await?;
 
     transaction.commit().await?;
-    db_models::DBProject::clear_cache(
+    clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
         project_item.inner.id,
         project_item.inner.slug,
         None,
-        &redis,
     )
     .await?;
 
@@ -1833,8 +1867,9 @@ async fn delete_project_icon(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     delete_project_icon_internal(
         req,
@@ -1843,6 +1878,7 @@ async fn delete_project_icon(
         redis,
         file_host,
         session_queue,
+        search_state,
     )
     .await
 }
@@ -1852,8 +1888,9 @@ pub async fn delete_project_icon_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1908,7 +1945,7 @@ pub async fn delete_project_icon_internal(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1926,11 +1963,12 @@ pub async fn delete_project_icon_internal(
     .await?;
 
     transaction.commit().await?;
-    db_models::DBProject::clear_cache(
+    clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
         project_item.inner.id,
         project_item.inner.slug,
         None,
-        &redis,
     )
     .await?;
 
@@ -1957,9 +1995,10 @@ pub async fn add_gallery_item(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     add_gallery_item_internal(
         web::Query(ext),
@@ -1971,6 +2010,7 @@ pub async fn add_gallery_item(
         file_host,
         payload,
         session_queue,
+        search_state,
     )
     .await
 }
@@ -1982,9 +2022,10 @@ pub async fn add_gallery_item_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     item.validate().map_err(|err| {
         ApiError::Validation(validation_errors_to_string(err, None))
@@ -2062,7 +2103,7 @@ pub async fn add_gallery_item_internal(
         &ext.ext,
         Some(350),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -2109,11 +2150,12 @@ pub async fn add_gallery_item_internal(
     .await?;
 
     transaction.commit().await?;
-    db_models::DBProject::clear_cache(
+    clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
         project_item.inner.id,
         project_item.inner.slug,
         None,
-        &redis,
     )
     .await?;
 
@@ -2150,6 +2192,7 @@ async fn edit_gallery_item(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     edit_gallery_item_internal(
         req,
@@ -2157,6 +2200,7 @@ async fn edit_gallery_item(
         pool,
         redis,
         session_queue,
+        search_state,
     )
     .await
 }
@@ -2167,6 +2211,7 @@ pub async fn edit_gallery_item_internal(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -2311,11 +2356,12 @@ pub async fn edit_gallery_item_internal(
 
     transaction.commit().await?;
 
-    db_models::DBProject::clear_cache(
+    clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
         project_item.inner.id,
         project_item.inner.slug,
         None,
-        &redis,
     )
     .await?;
 
@@ -2334,8 +2380,9 @@ async fn delete_gallery_item(
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     delete_gallery_item_internal(
         req,
@@ -2344,6 +2391,7 @@ async fn delete_gallery_item(
         redis,
         file_host,
         session_queue,
+        search_state,
     )
     .await
 }
@@ -2353,8 +2401,9 @@ pub async fn delete_gallery_item_internal(
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -2429,7 +2478,7 @@ pub async fn delete_gallery_item_internal(
         Some(item.image_url),
         Some(item.raw_image_url),
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -2447,11 +2496,12 @@ pub async fn delete_gallery_item_internal(
 
     transaction.commit().await?;
 
-    db_models::DBProject::clear_cache(
+    clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
         project_item.inner.id,
         project_item.inner.slug,
         None,
-        &redis,
     )
     .await?;
 
@@ -2465,18 +2515,11 @@ async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<(), ApiError> {
-    project_delete_internal(
-        req,
-        info,
-        pool,
-        redis,
-        search_backend,
-        session_queue,
-    )
-    .await
+    project_delete_internal(req, info, pool, redis, session_queue, search_state)
+        .await
 }
 
 pub async fn project_delete_internal(
@@ -2484,8 +2527,8 @@ pub async fn project_delete_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<(), ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
@@ -2596,7 +2639,8 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
-    search_backend
+    search_state
+        .backend
         .remove_documents(
             &project
                 .versions
@@ -2608,6 +2652,14 @@ pub async fn project_delete_internal(
         .wrap_internal_err("failed to remove project version documents")?;
 
     if result.is_some() {
+        clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project.inner.id,
+            project.inner.slug,
+            None,
+        )
+        .await?;
         Ok(())
     } else {
         Err(ApiError::NotFound)

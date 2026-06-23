@@ -140,6 +140,7 @@ quick-xml = "0.38.3"
 quote = { version = "1.0" }
 rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
+rdkafka = { version = "0.36.2", features = ["cmake-build"] }
 redis = "0.32.7"
 regex = "1.12.2"
 reqwest = { version = "0.12.24", default-features = false }
@@ -192,7 +193,7 @@ tauri-plugin-http = "2.5.7"
 tauri-plugin-opener = "2.5.0"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-single-instance = "2.3.4"
-tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
+tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "0d30f2aa28ec668ce187d527da1c475da3c01cbc", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }
@@ -269,6 +270,7 @@ redundant_type_annotations = "warn"
 result_large_err = "allow"
 todo = "warn"
 too_many_arguments = "allow"
+type_complexity = "allow"
 uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 wildcard_dependencies = "warn"

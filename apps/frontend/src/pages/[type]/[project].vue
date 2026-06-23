@@ -881,7 +881,9 @@
 						class="card flex-card"
 					/>
 					<ProjectSidebarCompatibility
-						v-if="projectV3Loaded && !isServerProject"
+						v-if="
+							projectV3Loaded && !isServerProject && route.name !== 'type-project-version-version'
+						"
 						:project="project"
 						:tags="tags"
 						:project-v3="projectV3"
@@ -1898,6 +1900,7 @@ const versions = computed(() => {
 
 // Versions loading state
 const versionsLoading = computed(() => versionsV3Loading.value)
+const versionsLoaded = computed(() => versionsV3.value !== undefined || !!_versionsV3Error.value)
 
 // Load versions on demand (client-side only)
 function loadVersions() {
@@ -2741,6 +2744,7 @@ provideProjectPageContext({
 	// Lazy version loading
 	versions,
 	versionsLoading,
+	versionsLoaded,
 	// Lazy dependencies loading
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),

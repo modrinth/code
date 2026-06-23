@@ -9,7 +9,7 @@
     "message": "Không tìm thấy người dùng"
   },
   "analytics.action.add": {
-    "message": "Tạo"
+    "message": "Thêm"
   },
   "analytics.action.cancel": {
     "message": "Hủy"
@@ -18,7 +18,7 @@
     "message": "Làm mới"
   },
   "analytics.action.reset": {
-    "message": "Dặt lại"
+    "message": "Đặt lại"
   },
   "analytics.breakdown.country": {
     "message": "Quốc gia"
@@ -32,8 +32,17 @@
   "analytics.breakdown.game-version": {
     "message": "Phiên bản game"
   },
+  "analytics.breakdown.generic": {
+    "message": "Phân tích chi tiết"
+  },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "Lợi nhuận"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Không phân tích chi tiết"
   },
   "analytics.breakdown.project": {
     "message": "Dự án"
@@ -44,8 +53,14 @@
   "analytics.breakdown.project-version": {
     "message": "Phiên bản dự án"
   },
+  "analytics.breakdown.selected": {
+    "message": "Phân tích qua {breakdown}"
+  },
   "analytics.chart.action.show-all": {
-    "message": "Hiện thị tất cả"
+    "message": "Hiển thị tất cả"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Hiển thị giới hạn"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Hiển thị 8 hạng đầu"
@@ -53,8 +68,416 @@
   "analytics.chart.axis.playtime-hours": {
     "message": "{hours} h"
   },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} đang bật"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "Chú thích"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Tùy chọn biểu đồ, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Tùy chọn"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Tùy chọn biểu đồ"
+  },
   "analytics.chart.controls.display": {
     "message": "Hiển thị"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Sự kiện Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Không có sự kiện Modrinth trong biểu đồ."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Không có sự kiện dự án trong biểu đồ."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Gian đoạn trước"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Sự kiện dự án"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Tỉ lệ"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Chọn các mục trong bảng dưới để hiển thị dự liệu của bạn."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, other {# sự kiện dự án}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Xem thông báo"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Xem chi tiết phân tích kiếm tiền"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Chỉ lượt xem và lượt tải qua Modrinth mới được tính vào doanh thu kiếm tiền, và những lượt tải xuống phải từ thành viên đã đăng nhập."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Chi tiết phân tích kiếm tiền"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Trc.)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "Hiển thị tất cả các mục từ bảng có thể gây suy giảm hiệu suất của trang."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "Hiện thị tất cả {count} đường trong biểu đồ?"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, other {# ngày}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, other {# giờ}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, other {# phút}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Che {name} trong biểu đồ"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Đã ghim chú thích từ biểu đồ"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Đã ghim"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(trc.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Hiển thị {name} trong biểu đồ"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Tổng cộng"
+  },
+  "analytics.chart.view.area": {
+    "message": "Khu vực"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Thanh"
+  },
+  "analytics.chart.view.line": {
+    "message": "Đường"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Phụ thuộc"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modpack"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Riêng lẻ"
+  },
+  "analytics.download-reason.update": {
+    "message": "Cập nhật"
+  },
+  "analytics.download-source.app": {
+    "message": "Ứng dụng Modrinth"
+  },
+  "analytics.download-source.website": {
+    "message": "Trang Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "lượt tải"
+  },
+  "analytics.empty.no-data": {
+    "message": "Không dữ liệu khả dụng"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Không dữ liệu khả dụng cho thống kê"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Không dự án có sẵn"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Không dự án có sẵn cho thống kê"
+  },
+  "analytics.empty.select-project": {
+    "message": "Sử dụng ít nhất một dự án để xem dữ liệu"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Loại phiên bản game"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Tất cả"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Release"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Tìm quốc gia..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Tìm nguồn tải..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Tìm phiên bản dự án..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Tìm phiên bản..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Lượt Tải Qua Thời Gian"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Thời Gian Chơi Qua Thời Gian"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Lợi Nhuận Qua Thời Gian"
+  },
+  "analytics.graph.title.views": {
+    "message": "Lượt Xem Qua Thời Gian"
+  },
+  "analytics.group-by.1h": {
+    "message": "1h"
+  },
+  "analytics.group-by.6h": {
+    "message": "6h"
+  },
+  "analytics.group-by.date": {
+    "message": "Thời gian"
+  },
+  "analytics.group-by.day": {
+    "message": "Ngày"
+  },
+  "analytics.group-by.month": {
+    "message": "Tháng"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Nhóm theo ngày"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Nhóm theo giờ"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Nhóm theo tháng"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Nhóm theo 6 giờ"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Nhóm theo tuần"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Nhóm theo năm"
+  },
+  "analytics.group-by.week": {
+    "message": "Tuần"
+  },
+  "analytics.group-by.year": {
+    "message": "Năm"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Đang lấy kết quả..."
+  },
+  "analytics.options.loading": {
+    "message": "Đang tải..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Dự án đã dược xác nhận"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Dự án đã chỉnh sang riêng tư"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Đã chỉnh trạng thái dự án"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Dự án đã chỉnh sang không công khai"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} đã phát hành"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Đã tải lên phiên bản"
+  },
+  "analytics.project-status.approved": {
+    "message": "Được chấp nhận"
+  },
+  "analytics.project-status.archived": {
+    "message": "Đã lưu trữ"
+  },
+  "analytics.project-status.draft": {
+    "message": "Nháp"
+  },
+  "analytics.project-status.other": {
+    "message": "Khác"
+  },
+  "analytics.project-status.private": {
+    "message": "Riêng tư"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Bị từ chối"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Không công khai"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Bị giữ lại"
+  },
+  "analytics.project.all": {
+    "message": "Tất cả dự án"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, other {# dự án}}"
+  },
+  "analytics.project.icon-alt": {
+    "message": "Biểu tượng {name}"
+  },
+  "analytics.project.select": {
+    "message": "Chọn dự án"
+  },
+  "analytics.project.user": {
+    "message": "Dự án của {username}"
+  },
+  "analytics.project.your": {
+    "message": "Dự án của bạn"
+  },
+  "analytics.query.filter.add": {
+    "message": "Thêm bộ lọc"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Phân tích:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Được nhóm theo"
+  },
+  "analytics.query.label.project": {
+    "message": "Dự án:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Khung thời gian:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Lượt tải"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Chỉ lượt xem và lượt tải qua Modrinth hợp lệ cho việc kiếm tiền và phải vượt qua bộ lọc chống gian lận. Lượt tải từ Modrinth App yêu cầu người dùng phải đăng nhập. Vì tất cả các dự án đều có tỷ lệ lượt tải xuống hợp lệ tương đương nhau, doanh thu của bạn cũng không thay đổi đáng kể ngay cả khi tính toàn bộ lượt tải."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Tìm hiểu thêm"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Việc kiếm tiền hoạt động như thế nào?"
+  },
+  "analytics.stat.playtime": {
+    "message": "Thời gian chơi"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} h"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "vs gđoạn trc"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "vs trc."
+  },
+  "analytics.stat.revenue": {
+    "message": "Lợi nhuận"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "Thống kê không khả dụng trong thời điểm hiện tại"
+  },
+  "analytics.stat.views": {
+    "message": "Lượt xem"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start} đến {end}"
+  },
+  "analytics.table.csv.filename": {
+    "message": "Thống kê {breakdown} trong Modrinth - {dateRange}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Thời gian (giây)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "Phạm Vi Được Chọn"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, other {# ngày}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, other {# giờ}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, other {# phút}}"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "Không mục thống kê nào giống với mục tìm kiếm"
+  },
+  "analytics.table.export-csv": {
+    "message": "Xuất CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Tích lũy"
+  },
+  "analytics.table.export.grouped": {
+    "message": "Nhóm theo {groupBy}"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "Đang hiển thị {start} đến {end} của {total}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Tìm..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Quốc gia trên"
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "Ngưỡng tải của quốc gia"
+  },
+  "analytics.threshold.game-version-downloads-aria": {
+    "message": "Ngưỡng tải của phiên bản game"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Các phiên bản trên"
+  },
+  "analytics.threshold.project-downloads-aria": {
+    "message": "Ngưỡng tải của dự án"
+  },
+  "analytics.threshold.project-version-downloads-aria": {
+    "message": "Ngưỡng tải của phiên bản dự án"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Các phiên bản dự án trên"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Các phiên bản trên"
+  },
+  "analytics.title": {
+    "message": "Phân tích chi tiết"
+  },
+  "analytics.value.monetized": {
+    "message": "Kiếm tiền"
+  },
+  "analytics.value.none": {
+    "message": "Không có"
+  },
+  "analytics.value.other": {
+    "message": "Khác"
+  },
+  "analytics.value.unknown": {
+    "message": "Không rõ"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Không kiếm tiền"
   },
   "app-marketing.download.description": {
     "message": "Ứng dụng máy tính của chúng tôi có sẵn trên mọi nền tảng, hãy chọn phiên bản bạn muốn."
@@ -170,11 +593,14 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
   },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "cânnặngmẹbạn MB"
+  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "App Modrinth"
+    "message": "Ứng dụng Modrinth"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 tỉ %"
@@ -527,8 +953,47 @@
   "conversation-thread.reply-editor.placeholder.send": {
     "message": "Gửi một tin nhắn..."
   },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Xác nhận bên kiểm duyệt không hay kiểm duyệt chỗ này"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "Tôi đã rõ rằng bên kiểm duyệt không hay kiểm duyệt chỗ này nữa."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Dự án của bạn đã được chấp nhận. Vì thế, bên kiểm duyệt sẽ không còn kiểm duyệt chỗ này. Tuy nhiên, họ có thể sẽ xem tin của bạn khi dự án của bạn có vấn đề."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Phản hồi chủ đề"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Nếu bạn muốn liên lạc với bên kiểm duyệt, hãy sử dụng trang <help-center-link>Trung Tậm Trợ giúp Modrinth</help-center-link> và bấm biểu tượng tin nhắn màu xanh ở góc phải dưới để liên lạc bên hỗ trợ."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Chắc chắn rằng tôi đã trả lời tin nhắn từ bên kiểm duyệt"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Tôi đã chắc chắn rằng tôi đã trả lời đúng cách các bình luận từ bên kiểm duyệt."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Bạn sẽ gửi <project-title>{projectTitle}</project-title> để được xem lại từ bên kiểm duyệt."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Gửi lại để kiểm duyệt"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Gửi để kiểm duyệt"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Hãy chắc chắn rằng bạn đã trả lời tất cả các bình luận từ bên kiểm duyệt."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Gửi lại nhiều lần mà không trả lời các bình luận từ bên kiểm duyệt có thể đình chỉ tài khoản của bạn."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
+  },
+  "create.collection.collection-info": {
+    "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
   },
   "create.collection.create-collection": {
     "message": "Tạo bộ sưu tập"
@@ -693,7 +1158,7 @@
     "message": "Tìm kiếm link affiliate..."
   },
   "dashboard.analytics.from-projects": {
-    "message": "từ {count} {count, plural, one {dự án} other {dự án}} khác"
+    "message": "từ {count} {count, plural, other {dự án}} khác"
   },
   "dashboard.analytics.total-downloads": {
     "message": "Tổng số lượt tải xuống"
@@ -989,8 +1454,29 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Bạn đã sử dụng hết giới hạn rút tiền <b>{withdrawLimit}</b>. Bạn cần hoàn thành biểu mẫu thuế để rút thêm."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Bạn đủ điều kiện cho vai trò {roles}. Hãy liên kết tài khoản Discord với Modrinth và chúng tôi sẽ đồng bộ chúng tự động."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Liên kết với Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Nhận vai trò Discord của bạn"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creator"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
   "dashboard.head-title": {
     "message": "Bảng điều khiển"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Bạn không có thông báo chưa đọc."
   },
   "dashboard.notifications.link.see-all": {
     "message": "Xem tất cả"
@@ -1000,6 +1486,159 @@
   },
   "dashboard.notifications.link.view-more": {
     "message": "Xem thêm {extraNotifs} {extraNotifs, plural, one {thông báo} other {thông báo}} khác"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Tạo tổ chức"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Tạo một tổ chức!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Không thể tải tổ chức"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural,other {thành viên}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Tổ chức"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Đánh dấu đã đọc tất cả"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Xem lịch sử"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Bạn không có thông báo chưa đọc nào."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Không thể tải thông báo:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Lịch sử"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Lịch sử thông báo"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Đang tải thông báo..."
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "Bạn có thể sửa đổi nhiều dự án cùng một lúc bằng cách chọn chúng ở dưới."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Dự án máy chủ không hỗ trợ sửa đổi nhiều mục cùng một lúc"
+  },
+  "dashboard.projects.empty": {
+    "message": "Bạn chưa có dự án nào. Bấm nút màu xanh ở bên để bắt đầu."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Dự án"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "và {count} mục nữa..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Xóa liên kết"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Sửa liên kết"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "<strong>{count}</strong> {count, plural, other {dự án}} sẽ được thay đổi."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Bất kể đường liên kết nào bạn nhập ở dưới sẽ được ghi đè lên các dự án được chọn. Mục nào để trống sẽ được bỏ qua. Bạn có thể xóa đường liên kết trong tất cả các dự án được chọn bằng nút thùng rác."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Đường liên kết đến máy chủ Discord của bạn."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Lời mời Discord"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Chỉnh sửa liên kết"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Nơi người dùng báo cáo lỗi, vấn đề và sự lo ngại đối với dự án của bạn."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Báo vấn đề"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Đường liên kết liên quan sẽ bị xóa"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Nhập URL lời mời máy chủ Discord"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Nhập URL hợp lệ"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Hiện thị mọi dự án"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "Một trang lưu trữ chứa mã nguồn cho dự án của bạn"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Mã nguồn"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Một trang chứa thông tin hướng dẫn và trợ giúp cho dự án của bạn"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Trang wiki"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Đã chỉnh sửa đường liên kết cho các trang đã chọn."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Biểu tượng của {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Dự án có tin từ bên kiểm duyệt. Xem dự án để xem thêm."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Vui lòng xem lại thông tin dữ liệu"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Từ dưới lên"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Từ trên xuống"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Tên"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Trạng thái"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Loại"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "B.tượng"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Tên"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Trạng thái"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Loại"
+  },
+  "dashboard.report.title": {
+    "message": "Báo cáo {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Báo cáo hiện hành"
+  },
+  "dashboard.reports.title": {
+    "message": "Báo cáo"
   },
   "dashboard.revenue.available-now": {
     "message": "Khả dụng ngay"
@@ -1037,6 +1676,9 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Tải xuống dưới dạng CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Lịch sử giao dịch"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Giao dịch"
   },
@@ -1046,8 +1688,17 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Các khoản thanh toán và rút tiền của bạn sẽ hiển thị tại đây."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Tháng trước"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Tháng này"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Xem tất cả"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Mọi năm"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Việc rút tiền của bạn tạm thời bị khóa do TIN hoặc SSN không khớp với hồ sơ của IRS. Vui lòng liên hệ hỗ trợ để đặt lại và gửi lại biểu mẫu thuế của bạn."
@@ -1060,6 +1711,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Rút tiền"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Báo cáo hiện hành"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Thống kê"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Nhà sáng tạo"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Bảng điều khiển"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Thông báo"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Tổ chức"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Tổng quan"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Dự án"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Doanh thu"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Tài khoản"
@@ -1157,6 +1835,33 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Vui lòng hoàn thành biểu mẫu thuế"
   },
+  "discover.install.back-to-server": {
+    "message": "Quay lại máy chủ"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Quay lại cài đặt"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Hủy cài lại"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Không thế giới máy chủ có sẵn để tải."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Loại nội dung này không thể tải từ trang khám phá vào máy chủ."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Chọn modpack để tải sau khi cài lại"
+  },
+  "discover.seo.description": {
+    "message": "Tìm và khám phá hàng nghìn {projectType} của Minecraft trên Modrinth một cách nhánh chóng và chính xác. Bộ lọc ở đây có thể giúp bạn tìm các {projectType} tốt nhất của Minecraft."
+  },
+  "discover.seo.title": {
+    "message": "Tìm kiếm {projectType}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Tìm kiếm {projectType} | {query}"
+  },
   "error.collection.404.list_item.1": {
     "message": "Có thể bạn đã nhập sai URL của bộ sưu tập."
   },
@@ -1171,6 +1876,12 @@
   },
   "error.collection.404.title": {
     "message": "Không tìm thấy bộ sưu tập"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "Bạn hiện được dăng nhập là:"
+  },
+  "error.generic.401.title": {
+    "message": "Bạn không có quyền vào trang này"
   },
   "error.generic.404.subtitle": {
     "message": "Trang bạn đang tìm kiếm dường như không tồn tại."
@@ -1254,7 +1965,7 @@
     "message": "Ếch"
   },
   "hosting-marketing.available-locations": {
-    "message": "Có sẵn ở Bắc Mỹ, Châu Âu và Đông Nam Á để phủ sóng rộng rãi."
+    "message": "Có mặt tại Bắc Mỹ, Châu Âu, Đông Nam Á và Úc với độ phủ sóng rộng."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Thanh toán hàng tháng"
@@ -1315,6 +2026,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Những máy chủ Modrinth Hosting được nằm ở đâu? Tôi có thể chọn khu vực không?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Hiện giờ chúng tôi có máy chủ khắp Bắc Mỹ, Châu Âu, Đông Nam Á và Úc mà bạn có thể chọn khi mua. Sẽ có thêm khu vực trong tương lai! Nếu bạn muốn đổi khu vực, hãy liên hệ đội hỗ trợ."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Những phiên bản Minecraft và modloader nào có thể được sử dụng?"
@@ -1524,7 +2238,7 @@
     "message": "Nơi dành cho {content} Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "data pack"
+    "message": "gói dữ liệu"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "modpack"
@@ -1589,11 +2303,17 @@
   "landing.subheading": {
     "message": "Khám phá, chơi và chia sẻ nội dung Minecraft thông qua nền tảng nguồn mở được xây dựng cho cộng đồng."
   },
+  "layout.action.analytics-events": {
+    "message": "Sự kiện phân tích"
+  },
   "layout.action.change-theme": {
     "message": "Đổi chủ đề"
   },
   "layout.action.create-new": {
     "message": "Tạo mới..."
+  },
+  "layout.action.external-projects": {
+    "message": "Dự án ngoài"
   },
   "layout.action.file-lookup": {
     "message": "Tra cứu tệp"
@@ -1643,11 +2363,20 @@
   "layout.banner.add-email.description": {
     "message": "Vì lý do bảo mật, Modrinth yêu cầu bạn đăng ký một địa chỉ email cho tài khoản của mình."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "Không hiển thị lại"
+  },
   "layout.banner.build-fail.description": {
     "message": "Lần triển khai frontend của Modrinth này không thể tạo trạng thái từ API. Nguyên nhân có thể do sự cố hệ thống hoặc lỗi cấu hình. Hãy build lại khi API khả dụng. Mã lỗi: {errors}; URL API hiện tại: {url}"
   },
+  "layout.banner.build-fail.ignore": {
+    "message": "Kệ"
+  },
   "layout.banner.build-fail.title": {
     "message": "Lỗi tạo trạng thái từ API trong quá trình build."
+  },
+  "layout.banner.preview.description": {
+    "message": "Nếu bạn muốn truy cập trang Modrinth chính thức, truy cập {url}. Trang xem trước này được sử dụng bởi Modrinth cho mục đích thử nghiệm. Được xây qua {ref}."
   },
   "layout.banner.preview.title": {
     "message": "Đây là bản mẫu của trang web Modrinth."
@@ -1844,11 +2573,17 @@
   "moderation.moderate": {
     "message": "Kiểm duyệt"
   },
+  "moderation.page.external-projects": {
+    "message": "Dự án ngoài"
+  },
   "moderation.page.projects": {
     "message": "Dự án"
   },
   "moderation.page.reports": {
     "message": "Báo cáo"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Đánh giá kỹ thuật"
   },
   "muralpay.account-type.checking": {
     "message": "Tài khoản thanh toán"
@@ -2117,11 +2852,17 @@
   "muralpay.warning.wallet-address": {
     "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "{count, plural, other {# dự án}} sẽ được thay đổi."
+  },
   "profile.bio.fallback.creator": {
     "message": "Một nhà sáng tạo trên Modrinth."
   },
   "profile.bio.fallback.user": {
     "message": "Một người dùng Modrinth."
+  },
+  "profile.button.analytics": {
+    "message": "Xem phân tích người dùng"
   },
   "profile.button.billing": {
     "message": "Quản lý thanh toán người dùng"
@@ -2140,6 +2881,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Đặt làm affiliate"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, other {# dự án}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Nhà cung cấp xác thực"
@@ -2210,6 +2954,15 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Tải xuống các dự án của {username} trên Modrinth"
   },
+  "profile.official-account": {
+    "message": "Tài khoản chính thúc bởi Modrinth"
+  },
+  "profile.official-account.bio": {
+    "message": "Tài khoản chính thức của Modrinth. Nhận hỗ trợ từ <support-link></support-link> hoặc qua email tại <email></email>"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> người theo dõi dự án}}"
+  },
   "profile.user-id": {
     "message": "ID người dùng: {id}"
   },
@@ -2274,10 +3027,10 @@
     "message": "Bộ sưu tập"
   },
   "project-type.datapack.plural": {
-    "message": "Data pack"
+    "message": "Gói dữ liệu"
   },
   "project-type.datapack.singular": {
-    "message": "Data pack"
+    "message": "Gói dữ liệu"
   },
   "project-type.minecraft_java_server.plural": {
     "message": "Các máy chủ"
@@ -2468,6 +3221,81 @@
   "project.license.title": {
     "message": "Giấy phép"
   },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Dự án của bạn đang để chế độ riêng tư, nghĩa là chỉ có bạn và những người khác được mời có thể truy cập nó."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Dự án của bạn đã được phát hành và công khai trên Modrinth."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Dự án của bạn đang để chế độ không công khai, nghĩa là nó chỉ có thể được truy cập qua đường liên kết và không được công khai tại Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Bạn có thể tùy chỉnh chế độ hiển thị qua <visibility-settings-link>cài đặt hiển thị</visibility-settings-link> của dự án."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Dự án được chấp nhận"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Đây là dự án nháp và không thể xem bởi người khác đến khi được xem và chấp nhận bởi bên kiểm duyệt của Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Dự án nháp"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Khi bạn đã hoàn thành tất cả các bước và đã chắc chắn nó tuân thủ <rules-link>Quy Tắc Nội Dung</rules-link> của modrinth, bạn có thể đăng tải để bên kiểm duyệt xem xét."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Vui lòng trả lời mối lo ngại từ bên kiểm duyệt, bao gồm mọi vấn đề ở tin dưới, trước khi đăng lại dự án."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Yêu cầu thay đổi"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Gửi đi gửi lại dự án của bạn mà không trả lời các câu hỏi của bên kiểm duyệt có thể gây đình chỉ tài khoản."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Dự án của bạn đang trong hàng để được xem xét bởi bên kiểm duyệt của modrinth."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Dự án của bạn sẽ được quét và xem xét bởi người trong bên kiểm duyệt để chắc chắn nó tuân thủ <rules-link>Quy Tắc Nội Dung</rules-link> và <terms-link>Điều khoản Sử dụng</terms-link>."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Bạn có thể thay đổi dự án mà không làm ảnh hưởng đến thứ tự trong hàng của bạn."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Chúng tôi hướng tới việc kiểm duyệt trong vòng 24-48 giờ, nhưng một số dự án có thể bị trì hoãn. Điều này không có nghĩa là có vấn đề trong dự án bạn gửi."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Chúng tôi rất cảm ơn sự kiên nhẫn của bạn trong khi đội ngũ kiểm duyệt chúng tôi đang nỗ lực giữ cho Modrinth an toàn, và mong được hỗ trợ bạn để chia sẻ nội dung của mình!💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Dự án đang xem xét"
+  },
+  "project.moderation.admonition.withheld.body": {
+    "message": "Dự án của bạn sẽ chỉ được truy cập trực tiếp qua đường liên kết mà không được công khai hoàn toàn.{requestedStatus, select, unlisted { Dựa trên <visibility-settings-link>cài đặt hiển thị</visibility-settings-link> của bạn, không cần hành động nào thêm.} other { Vui lòng trả lời tin từ bên kiểm duyệt, bao gồm các tin nhắn ở dưới trước khi đăng lại dự án này.}}"
+  },
+  "project.moderation.admonition.withheld.header": {
+    "message": "Không công khai bởi đội ngũ"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Vô quyền"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Nơi này không được theo dõi thường xuyên, nhưng có thể được xem lại cho các thông tin về dự án của bạn nếu cần."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Bên kiểm duyệt không thể hỗ trợ cho hầu hết các vấn đề và các tin nhắn ở đây không thông báo cho bên đội ngũ."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Nếu bạn cần trợ giúp hoặc có thắc mắc, vui lòng vào <help-center-link>trung tâm trợ giúp</help-center-link> và bấm vào nút tin nhắn màu xanh để liên hệ hỗ trợ."
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Đây là nơi hội thoại riêng tư với bên kiểm duyệt của Modrinth. Họ có thể nhắn cho bạn về những vấn đề trong dự án này."
+  },
+  "project.moderation.thread.title": {
+    "message": "Tin từ bên kiểm duyệt"
+  },
   "project.moderation.title": {
     "message": "Kiểm duyệt"
   },
@@ -2531,11 +3359,56 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Vui lòng đưa ra bằng chứng cho rằng bạn có quyền để đăng lại mọi tệp trên và bất kỳ phiên bản nào bị giữ lại sẽ tự động được đăng tải."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Vui lòng đưa ra bằng chứng cho rằng bạn có quyền để đăng lại mọi tệp trên trước khi bạn có thể đăng tải để kiểm duyệt."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Nội dung nhúng không xác định"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Mọi nội dung ngoài đều có sự quy kết."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Đã hoàn thành quy kết!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Không phiên bản nào của bạn đều có nội dung ngoài, nên bạn không cần lo lắng về quyền."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Mọi thứ đều sẵn sàng!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Bạn không có quyền đăng tải một số nội dung bạn đã thêm. Để đăng lên Modrinth, xóa nội dung bản quyền."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Một số nội dung không thể bao gồm"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Nếu bạn đăng nội dung không dược chủ trì trên modrinth, bạn cần cho chúng tôi biết nó đến từ đâu và xác minh mạn có quyền để đăng tải những tệp đó. Hãy xem <link>hướng dẫn</link> để biết về cách làm điều này đúng cách!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Tìm hiểu cách quy kết hoạt động"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Tìm hiểu thêm"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Tìm kiếm trong {count} {count, plural,other {dự án ngoài}}..."
+  },
   "project.settings.title": {
     "message": "Cài đặt"
   },
   "project.settings.visit-dashboard": {
     "message": "Truy cập bảng điều khiển dự án"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, other {lượt tải}}"
+  },
+  "project.stats.followers-label": {
+    "message": "{count, plural, other {lượt theo dõi}}"
   },
   "project.status.archived.message": {
     "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
@@ -2543,14 +3416,32 @@
   "project.versions.title": {
     "message": "Phiên bản"
   },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {Những phiên bản này}} bị giữ lại và không được công khai. Vui lòng đưa ra bằng chứng rằng bạn có quyền để đăng tải một số tệp đưọc bao gồm trong {count, plural, other {các phiên bản}} modpack đó."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, other{Phiên bản}} bị giữ lại do chứa nội dung nhúng không xác định"
+  },
   "report.already-reported": {
     "message": "Bạn đã báo cáo {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Bạn đã có sẵn một bản báo cáo cho {item}. Bạn có thể thêm một số chi tiết cho bản báo cáo nếu bạn có thêm thông tin."
+  },
+  "report.back-to-item": {
+    "message": "Quay lại {item}"
   },
   "report.body.description": {
     "message": "Hãy kèm theo liên kết và hình ảnh nếu có và phù hợp. Các báo cáo trống hoặc không đầy đủ sẽ bị đóng và bỏ qua."
   },
   "report.body.title": {
     "message": "Vui lòng cung cấp thêm ngữ cảnh cho báo cáo của bạn"
+  },
+  "report.checking": {
+    "message": "Đang tìm {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Không tìm được {item}"
   },
   "report.for.violation": {
     "message": "Vi phạm <rules-link>Quy định</rules-link> hoặc <terms-link>Điều khoản sử dụng</terms-link> của Modrinth"
@@ -2591,8 +3482,14 @@
   "report.please-report": {
     "message": "Vui lòng báo cáo:"
   },
+  "report.question.content-id": {
+    "message": "ID của {item} là gì?"
+  },
   "report.question.content-type": {
     "message": "Bạn đang báo cáo loại nội dung nào?"
+  },
+  "report.question.report-reason": {
+    "message": "{item} này đang vi phạm quy tắc của modrinth nào?"
   },
   "report.report-content": {
     "message": "Báo cáo nội dung cho kiểm duyệt viên"
@@ -2705,14 +3602,26 @@
   "scopes.organizationWrite.label": {
     "message": "Ghi tổ chức"
   },
+  "scopes.patCreate.description": {
+    "message": "Tạo mã truy cập cá nhân"
+  },
   "scopes.patCreate.label": {
     "message": "Tạo PAT"
+  },
+  "scopes.patDelete.description": {
+    "message": "Xóa mã truy cập cá nhân của bạn"
   },
   "scopes.patDelete.label": {
     "message": "Xoá PAT"
   },
+  "scopes.patRead.description": {
+    "message": "Xem các những mã truy cập cá nhân đã tạo"
+  },
   "scopes.patRead.label": {
     "message": "Đọc PAT"
+  },
+  "scopes.patWrite.description": {
+    "message": "Chỉnh sửa mã truy cập cá nhân"
   },
   "scopes.patWrite.label": {
     "message": "Ghi PAT"
@@ -2882,6 +3791,9 @@
   "search.filter.locked.server.sync": {
     "message": "Đồng bộ với máy chủ"
   },
+  "servers.manage.content.title": {
+    "message": "{serverName} - Nội dung Modrinth"
+  },
   "servers.notice.actions": {
     "message": "Hành động"
   },
@@ -2917,6 +3829,9 @@
   },
   "servers.plan.small.description": {
     "message": "Hoàn hảo cho 1–5 người bạn với một vài mod nhẹ."
+  },
+  "servers.purchase.step.plan.billed": {
+    "message": "trả tiền hàng {interval, select, monthly {tháng} quarterly {quý (3 tháng)} yearly {năm} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Hoàn tất thiết lập"
@@ -3079,6 +3994,12 @@
   },
   "settings.account.security.two-factor.description": {
     "message": "Thêm một lớp bảo mật cho tài khoản của bạn khi đăng nhập."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Xóa xác minh 2 bước"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Thiết lập 2FA"
   },
   "settings.account.security.two-factor.title": {
     "message": "Xác thực hai yếu tố"
@@ -3248,11 +4169,17 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Khoản phí trước đây"
+  },
   "settings.billing.expires": {
     "message": "Hết hạn {date}"
   },
   "settings.billing.interval.month": {
     "message": "tháng"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "quý"
   },
   "settings.billing.interval.year": {
     "message": "năm"
@@ -3362,6 +4289,9 @@
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Xảy ra lỗi đăng ký lại"
   },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Nếu máy chủ đang bị hủy, có thể mất 10-15 phút để thiếp lập máy chủ."
+  },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Yêu cầu đăng ký lại đã được gửi"
   },
@@ -3404,8 +4334,17 @@
   "settings.billing.subscription.title": {
     "message": "Gói đăng ký"
   },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Đang đổi sang {interval, select, monthly {hàng tháng} yearly {hàng năm} other {{interval}}}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Đổi sang hàng {interval, select, monthly {tháng} yearly {năm} other {{interval}}}"
+  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Thanh toán hàng tháng sẽ tốn thêm {amount} mỗi năm"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Sẽ đổi sang hàng {interval, select, monthly {tháng}  yearly {năm} other {{interval}}} vào {date}"
   },
   "settings.billing.update-method": {
     "message": "Cập nhật phương thức"
@@ -3432,7 +4371,7 @@
     "message": "Chế độ nhà phát triển đã tắt"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Trang data pack"
+    "message": "Trang Gói dữ liệu"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Chọn bố cục hiển thị bạn ưa thích cho từng trang có danh sách dự án trên thiết bị này."

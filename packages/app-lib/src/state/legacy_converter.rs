@@ -7,7 +7,7 @@ use crate::state::{
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
     DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion, LinkedData,
     MemorySettings, ModrinthCredentials, Profile, ProfileInstallStage,
-    TeamMember, Theme, VersionFile, WindowSize,
+    ReleaseChannel, TeamMember, Theme, VersionFile, WindowSize,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
@@ -225,6 +225,10 @@ where
                                         ProjectType::get_from_parent_folder(
                                             &full_path,
                                         ),
+                                    project_id: Some(
+                                        version.project_id.clone(),
+                                    ),
+                                    version_id: Some(version.id.clone()),
                                 },
                             ));
                         }
@@ -248,6 +252,9 @@ where
                                     loaders: vec![
                                         mod_loader.as_str().to_string(),
                                     ],
+                                    channel_policy: ReleaseChannel::Alpha
+                                        .key()
+                                        .to_string(),
                                     update_version_id: update_version
                                         .id
                                         .clone(),
@@ -333,6 +340,7 @@ where
 
                         None
                     }),
+                    preferred_update_channel: ReleaseChannel::Release,
                     created: profile.metadata.date_created,
                     modified: profile.metadata.date_modified,
                     last_played: profile.metadata.last_played,

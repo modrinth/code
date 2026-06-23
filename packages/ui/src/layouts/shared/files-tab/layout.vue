@@ -69,6 +69,8 @@
 					<FileUploadDragAndDrop
 						ref="fileUploadRef"
 						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
+						:disabled="isBusy"
+						@drop-error="handleDropError"
 						@files-dropped="handleDroppedFiles"
 					>
 						<FileTableHeader
@@ -589,6 +591,14 @@ function showBulkDeleteModal() {
 function handleDroppedFiles(files: File[]) {
 	if (isEditing.value || isBusy.value) return
 	ctx.uploadFiles(files)
+}
+
+function handleDropError(error: unknown) {
+	addNotification({
+		title: formatMessage(commonMessages.uploadFailedLabel),
+		text: error instanceof Error ? error.message : undefined,
+		type: 'error',
+	})
 }
 
 function initiateFileUpload() {

@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::sync::Arc;
 
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
@@ -17,6 +16,7 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
+use crate::search::SearchState;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -664,6 +664,7 @@ pub async fn organization_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -732,9 +733,9 @@ pub async fn organization_delete(
     // Handle projects- every project that is in this organization needs to have its owner changed the organization owner
     // Now, no project should have an owner if it is in an organization, and also
     // the owner of an organization should not be a team member in any project
-    let organization_project_teams = sqlx::query!(
+    let organization_projects = sqlx::query!(
         "
-        SELECT t.id FROM organizations o
+        SELECT t.id team_id, m.id project_id FROM organizations o
         INNER JOIN mods m ON m.organization_id = o.id
         INNER JOIN teams t ON t.id = m.team_id
         WHERE o.id = $1 AND $1 IS NOT NULL
@@ -742,9 +743,22 @@ pub async fn organization_delete(
         organization.id as database::models::ids::DBOrganizationId
     )
     .fetch(&mut transaction)
-    .map_ok(|c| database::models::DBTeamId(c.id))
+    .map_ok(|c| {
+        (
+            database::models::DBTeamId(c.team_id),
+            database::models::DBProjectId(c.project_id),
+        )
+    })
     .try_collect::<Vec<_>>()
     .await?;
+    let organization_project_teams = organization_projects
+        .iter()
+        .map(|(team_id, _)| *team_id)
+        .collect::<Vec<_>>();
+    let organization_project_ids = organization_projects
+        .iter()
+        .map(|(_, project_id)| *project_id)
+        .collect::<Vec<_>>();
 
     for organization_project_team in &organization_project_teams {
         let new_id = crate::database::models::ids::generate_team_member_id(
@@ -786,6 +800,17 @@ pub async fn organization_delete(
         database::models::DBTeamMember::clear_cache(*team_id, &redis).await?;
     }
 
+    for project_id in organization_project_ids {
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_id,
+            None,
+            None,
+        )
+        .await?;
+    }
+
     if !organization_project_teams.is_empty() {
         database::models::DBUser::clear_project_cache(&[owner_id], &redis)
             .await?;
@@ -809,6 +834,7 @@ pub async fn organization_projects_add(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner().0;
     let current_user = get_user_from_headers(
@@ -942,11 +968,12 @@ pub async fn organization_projects_add(
             &redis,
         )
         .await?;
-        database::models::DBProject::clear_cache(
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
             project_item.inner.id,
             project_item.inner.slug,
             None,
-            &redis,
         )
         .await?;
     } else {
@@ -972,6 +999,7 @@ pub async fn organization_projects_remove(
     data: web::Json<OrganizationProjectRemoval>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let (organization_id, project_id) = info.into_inner();
     let current_user = get_user_from_headers(
@@ -1130,11 +1158,12 @@ pub async fn organization_projects_remove(
             &redis,
         )
         .await?;
-        database::models::DBProject::clear_cache(
+        super::projects::clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
             project_item.inner.id,
             project_item.inner.slug,
             None,
-            &redis,
         )
         .await?;
     } else {
@@ -1158,7 +1187,7 @@ pub async fn organization_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -1209,7 +1238,7 @@ pub async fn organization_icon_edit(
         organization_item.icon_url,
         organization_item.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1228,7 +1257,7 @@ pub async fn organization_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1264,7 +1293,7 @@ pub async fn delete_organization_icon(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -1314,7 +1343,7 @@ pub async fn delete_organization_icon(
         organization_item.icon_url,
         organization_item.raw_icon_url,
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 

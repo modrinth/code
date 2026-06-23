@@ -1,9 +1,14 @@
 use crate::database;
 use crate::database::PgPool;
+use crate::database::models::ids::DBUserId;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::redis::RedisPool;
+use crate::file_hosting::FileHost;
+use crate::models::notifications::NotificationBody;
 use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
+use crate::queue::file_scan::scan_all_files;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_affiliate_payouts,
@@ -26,6 +31,7 @@ pub enum BackgroundTask {
     SyncPayoutStatuses,
     IndexBilling,
     IndexSubscriptions,
+    IncrementalIndexSearch,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -34,6 +40,12 @@ pub enum BackgroundTask {
     /// Attempts to ping Minecraft Java servers as if we were a client, to
     /// collect info on if they're online, game version, description, etc.
     PingMinecraftJavaServers,
+    /// Finds files of versions which have not been scanned for attributions
+    /// yet, extracts them to find file overrides, and finds any overrides which
+    /// require attribution from the creator.
+    ScanFiles,
+    /// Queues Discord Creator Club role claim emails for newly eligible users.
+    DiscordRoleEmailCampaign,
 }
 
 impl BackgroundTask {
@@ -44,6 +56,8 @@ impl BackgroundTask {
         ro_pool: PgPool,
         redis_pool: RedisPool,
         search_backend: web::Data<dyn SearchBackend>,
+        file_host: web::Data<dyn FileHost>,
+        kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
@@ -83,12 +97,31 @@ impl BackgroundTask {
                 .await;
                 Ok(())
             }
+            IncrementalIndexSearch => {
+                crate::search::incremental::consume::run(
+                    ro_pool,
+                    redis_pool,
+                    search_backend,
+                    kafka_client,
+                )
+                .await
+            }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
                 cache_analytics(&pool, &redis_pool, &clickhouse).await
             }
             PingMinecraftJavaServers => {
-                ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
+                ping_minecraft_java_servers(
+                    pool,
+                    redis_pool,
+                    clickhouse,
+                    kafka_client,
+                )
+                .await
+            }
+            ScanFiles => scan_all_files(&pool, &redis_pool, &**file_host).await,
+            DiscordRoleEmailCampaign => {
+                discord_role_email_campaign(pool, redis_pool).await
             }
         }
     }
@@ -208,6 +241,83 @@ pub async fn payouts(
     Ok(())
 }
 
+pub async fn discord_role_email_campaign(
+    pool: PgPool,
+    redis_pool: RedisPool,
+) -> eyre::Result<()> {
+    info!("Started indexing Discord role email campaign");
+
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_err("failed to begin Discord role email campaign transaction")?;
+
+    let lock_acquired = sqlx::query_scalar!(
+        r#"SELECT pg_try_advisory_xact_lock(hashtextextended('discord_role_email_campaign', 0)) AS "lock_acquired!""#,
+    )
+    .fetch_one(&mut txn)
+    .await
+    .wrap_err("failed to acquire Discord role email campaign lock")?;
+
+    if !lock_acquired {
+        info!("Discord role email campaign is already running");
+        return Ok(());
+    }
+
+    let user_ids = sqlx::query_scalar!(
+        r#"
+        WITH
+          user_project_downloads AS (
+            SELECT
+              tm.user_id,
+              SUM(m.downloads)::BIGINT total_downloads
+            FROM team_members tm
+            INNER JOIN mods m ON m.team_id = tm.team_id
+            WHERE tm.accepted = TRUE
+            GROUP BY tm.user_id
+          )
+        SELECT u.id AS "id!"
+        FROM users u
+        INNER JOIN user_project_downloads upd ON upd.user_id = u.id
+        WHERE u.email IS NOT NULL
+          AND u.email_verified = TRUE
+          AND upd.total_downloads > 20000
+          AND NOT EXISTS (
+            SELECT 1
+            FROM notifications n
+            WHERE n.user_id = u.id
+              AND n.body ->> 'type' = 'discord_role_creator_club'
+          )
+        ORDER BY upd.total_downloads DESC, u.id
+        LIMIT 1000
+        "#,
+    )
+    .fetch_all(&mut txn)
+    .await
+    .wrap_err("failed to fetch Discord role email campaign recipients")?
+    .into_iter()
+    .map(DBUserId)
+    .collect::<Vec<_>>();
+
+    let count = user_ids.len();
+
+    if !user_ids.is_empty() {
+        NotificationBuilder {
+            body: NotificationBody::DiscordRoleCreatorClub,
+        }
+        .insert_many(user_ids, &mut txn, &redis_pool)
+        .await
+        .wrap_err("failed to queue Discord role email notifications")?;
+    }
+
+    txn.commit()
+        .await
+        .wrap_err("failed to commit Discord role email campaign transaction")?;
+
+    info!(count, "Finished indexing Discord role email campaign");
+    Ok(())
+}
+
 pub async fn sync_payout_statuses(
     pool: PgPool,
     mural: muralpay::Client,
@@ -237,17 +347,27 @@ pub async fn ping_minecraft_java_servers(
     pool: PgPool,
     redis_pool: RedisPool,
     clickhouse: clickhouse::Client,
+    kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
 ) -> eyre::Result<()> {
     info!("Started pinging Minecraft Java servers");
 
+    let incremental_search_queue =
+        crate::search::incremental::IncrementalSearchQueue::new(kafka_client);
     let server_ping_queue = crate::queue::server_ping::ServerPingQueue::new(
-        pool, redis_pool, clickhouse,
+        pool,
+        redis_pool,
+        clickhouse,
+        incremental_search_queue.clone(),
     );
 
     server_ping_queue
         .ping_minecraft_java_servers()
         .await
         .wrap_err("failed to ping Minecraft Java servers")?;
+    incremental_search_queue
+        .drain()
+        .await
+        .wrap_err("failed to drain incremental search queue")?;
     info!("Successfully pinged Minecraft Java servers");
 
     info!("Done pinging Minecraft Java servers");

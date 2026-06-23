@@ -19,6 +19,8 @@ import type {
 	MutableRouteQuery,
 } from '~/providers/analytics/analytics-types'
 
+import { getAnalyticsBreakdownsWithSharedStats } from './query-builder/query-filter-utils'
+
 export const DEFAULT_TIMEFRAME_PRESET: AnalyticsTimeframePreset = 'last_30_days'
 export const DEFAULT_TIMEFRAME_MODE: AnalyticsTimeframeMode = 'preset'
 export const DEFAULT_LAST_TIMEFRAME_AMOUNT = 1
@@ -73,9 +75,11 @@ const BREAKDOWN_PRESET_VALUES: AnalyticsBreakdownPreset[] = [
 	'monetization',
 	'user_agent',
 	'download_reason',
+	'user_id',
 	'version_id',
 	'loader',
 	'game_version',
+	'dependent_project_download',
 ]
 
 const ANALYTICS_DASHBOARD_STAT_VALUES: AnalyticsDashboardStat[] = [
@@ -89,15 +93,18 @@ const ANALYTICS_GRAPH_VIEW_MODE_VALUES: AnalyticsGraphViewMode[] = ['line', 'are
 const ANALYTICS_TABLE_SORT_COLUMN_VALUES: AnalyticsTableSortColumn[] = [
 	'date',
 	'project',
+	'dependent_on',
 	'breakdown',
 	'breakdown_project',
 	'breakdown_country',
 	'breakdown_monetization',
 	'breakdown_user_agent',
 	'breakdown_download_reason',
+	'breakdown_user_id',
 	'breakdown_version_id',
 	'breakdown_loader',
 	'breakdown_game_version',
+	'breakdown_dependent_project_download',
 	'views',
 	'downloads',
 	'revenue',
@@ -131,9 +138,12 @@ const QUERY_KEY_FILTER_MONETIZATION = 'a_monetization'
 const QUERY_KEY_FILTER_USER_AGENT = 'a_user_agent'
 const QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE = 'a_download_source'
 const QUERY_KEY_FILTER_DOWNLOAD_REASON = 'a_download_reason'
+const QUERY_KEY_FILTER_USER_ID = 'a_user_id'
 const QUERY_KEY_FILTER_VERSION_ID = 'a_version_id'
 const QUERY_KEY_FILTER_GAME_VERSION = 'a_game_version'
 const QUERY_KEY_FILTER_LOADER_TYPE = 'a_loader_type'
+const QUERY_KEY_FILTER_DEPENDENT_PROJECT_ID = 'a_dependent_project_id'
+const QUERY_KEY_FILTER_DEPENDENT_PROJECT_TYPE = 'a_dependent_project_type'
 const QUERY_KEY_STAT = 'a_stat'
 const QUERY_KEY_GRAPH_VIEW_MODE = 'a_chart'
 const QUERY_KEY_GRAPH_RATIO_MODE = 'a_ratio'
@@ -146,6 +156,7 @@ const QUERY_KEY_TABLE_SORT = 'a_table_sort'
 const QUERY_KEY_TABLE_SORT_DIRECTION = 'a_table_sort_direction'
 const QUERY_KEY_LEGACY_GRAPH_TOP_BREAKDOWN_FILTER = 'a_top_breakdown'
 const QUERY_KEY_LEGACY_GRAPH_LEGEND_EXPANSION = 'a_legend_expanded'
+const PROJECT_SELECTION_ALL_QUERY_VALUE = 'all'
 
 const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] = [
 	'project_status',
@@ -153,9 +164,12 @@ const URL_FILTER_CATEGORIES: Exclude<AnalyticsQueryFilterCategory, 'project'>[] 
 	'monetization',
 	'user_agent',
 	'download_reason',
+	'user_id',
 	'version_id',
 	'game_version',
 	'loader_type',
+	'dependent_project_id',
+	'dependent_project_type',
 ]
 
 const FILTER_QUERY_KEY_BY_CATEGORY: Record<
@@ -167,9 +181,12 @@ const FILTER_QUERY_KEY_BY_CATEGORY: Record<
 	monetization: QUERY_KEY_FILTER_MONETIZATION,
 	user_agent: QUERY_KEY_FILTER_USER_AGENT,
 	download_reason: QUERY_KEY_FILTER_DOWNLOAD_REASON,
+	user_id: QUERY_KEY_FILTER_USER_ID,
 	version_id: QUERY_KEY_FILTER_VERSION_ID,
 	game_version: QUERY_KEY_FILTER_GAME_VERSION,
 	loader_type: QUERY_KEY_FILTER_LOADER_TYPE,
+	dependent_project_id: QUERY_KEY_FILTER_DEPENDENT_PROJECT_ID,
+	dependent_project_type: QUERY_KEY_FILTER_DEPENDENT_PROJECT_TYPE,
 }
 
 const ANALYTICS_QUERY_KEYS = [
@@ -188,9 +205,12 @@ const ANALYTICS_QUERY_KEYS = [
 	QUERY_KEY_FILTER_USER_AGENT,
 	QUERY_KEY_FILTER_LEGACY_DOWNLOAD_SOURCE,
 	QUERY_KEY_FILTER_DOWNLOAD_REASON,
+	QUERY_KEY_FILTER_USER_ID,
 	QUERY_KEY_FILTER_VERSION_ID,
 	QUERY_KEY_FILTER_GAME_VERSION,
 	QUERY_KEY_FILTER_LOADER_TYPE,
+	QUERY_KEY_FILTER_DEPENDENT_PROJECT_ID,
+	QUERY_KEY_FILTER_DEPENDENT_PROJECT_TYPE,
 	QUERY_KEY_STAT,
 	QUERY_KEY_GRAPH_VIEW_MODE,
 	QUERY_KEY_GRAPH_RATIO_MODE,
@@ -211,9 +231,12 @@ export function buildEmptySelectedFilters(): AnalyticsSelectedFilters {
 		monetization: [],
 		user_agent: [],
 		download_reason: [],
+		user_id: [],
 		version_id: [],
 		game_version: [],
 		loader_type: [],
+		dependent_project_id: [],
+		dependent_project_type: [],
 	}
 }
 
@@ -254,7 +277,7 @@ function normalizeFilterQueryValues(
 			.filter((value) => PROJECT_STATUS_FILTER_VALUES.includes(value))
 	}
 
-	if (category !== 'loader_type') {
+	if (category !== 'loader_type' && category !== 'dependent_project_type') {
 		return values
 	}
 
@@ -405,9 +428,10 @@ export function buildDefaultAnalyticsGraphState(
 
 export function buildDefaultAnalyticsQueryBuilderState(
 	availableProjectIds: string[],
+	defaultProjectIds: string[] = availableProjectIds,
 ): AnalyticsQueryBuilderState {
 	return {
-		selectedProjectIds: [...availableProjectIds],
+		selectedProjectIds: [...defaultProjectIds],
 		selectedTimeframeMode: DEFAULT_TIMEFRAME_MODE,
 		selectedTimeframe: DEFAULT_TIMEFRAME_PRESET,
 		selectedLastTimeframeAmount: DEFAULT_LAST_TIMEFRAME_AMOUNT,
@@ -415,7 +439,7 @@ export function buildDefaultAnalyticsQueryBuilderState(
 		selectedCustomTimeframeStartDate: getDefaultCustomStartDate(),
 		selectedCustomTimeframeEndDate: getDefaultCustomEndDate(),
 		selectedGroupBy: DEFAULT_GROUP_BY_PRESET,
-		selectedBreakdowns: getDefaultAnalyticsBreakdownPresets(availableProjectIds),
+		selectedBreakdowns: getDefaultAnalyticsBreakdownPresets(defaultProjectIds),
 		selectedFilters: buildEmptySelectedFilters(),
 	}
 }
@@ -454,7 +478,7 @@ export function getAnalyticsBreakdownPresetsForProjectSelection(
 		}
 	}
 
-	return normalizedBreakdowns
+	return getAnalyticsBreakdownsWithSharedStats(normalizedBreakdowns)
 }
 
 export function getAnalyticsBreakdownPresetForProjectSelection(
@@ -475,12 +499,16 @@ export function getAnalyticsBreakdownPresetForProjectSelection(
 export function isAnalyticsQueryBuilderStateDefault(
 	state: AnalyticsQueryBuilderState,
 	availableProjectIds: string[],
+	defaultProjectIds: string[] = availableProjectIds,
 ): boolean {
-	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds)
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(
+		availableProjectIds,
+		defaultProjectIds,
+	)
 	const areDefaultProjectsSelected =
-		availableProjectIds.length === 0
+		defaultProjectIds.length === 0
 			? state.selectedProjectIds.length === 0
-			: areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
+			: areAllProjectsSelected(state.selectedProjectIds, defaultProjectIds)
 
 	return (
 		areDefaultProjectsSelected &&
@@ -666,13 +694,19 @@ export function readAnalyticsTableSortState(
 export function readAnalyticsQueryBuilderState(
 	query: LocationQuery,
 	availableProjectIds: string[],
+	defaultProjectIds: string[] = availableProjectIds,
 ): AnalyticsQueryBuilderState {
-	const defaultState = buildDefaultAnalyticsQueryBuilderState(availableProjectIds)
+	const defaultState = buildDefaultAnalyticsQueryBuilderState(
+		availableProjectIds,
+		defaultProjectIds,
+	)
 	const selectedProjectIdsFromQuery = parseListQueryValue(query[QUERY_KEY_PROJECT_IDS])
-	const selectedProjectIds =
-		selectedProjectIdsFromQuery.length > 0
-			? selectedProjectIdsFromQuery
-			: defaultState.selectedProjectIds
+	let selectedProjectIds = defaultState.selectedProjectIds
+	if (selectedProjectIdsFromQuery.includes(PROJECT_SELECTION_ALL_QUERY_VALUE)) {
+		selectedProjectIds = [...availableProjectIds]
+	} else if (selectedProjectIdsFromQuery.length > 0) {
+		selectedProjectIds = selectedProjectIdsFromQuery
+	}
 
 	const selectedFilters = buildEmptySelectedFilters()
 	for (const category of URL_FILTER_CATEGORIES) {
@@ -764,6 +798,12 @@ export function hasAnalyticsProjectSelectionQuery(query: LocationQuery): boolean
 	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).length > 0
 }
 
+export function hasAnalyticsAllProjectSelectionQuery(query: LocationQuery): boolean {
+	return parseListQueryValue(query[QUERY_KEY_PROJECT_IDS]).includes(
+		PROJECT_SELECTION_ALL_QUERY_VALUE,
+	)
+}
+
 export function hasAnalyticsGraphProjectEventsVisibilityQuery(query: LocationQuery): boolean {
 	return query[QUERY_KEY_GRAPH_PROJECT_EVENTS_VISIBILITY] !== undefined
 }
@@ -779,14 +819,17 @@ export function buildAnalyticsQueryBuilderRouteQuery(
 	state: AnalyticsQueryBuilderState,
 	availableProjectIds: string[],
 	graphState?: AnalyticsGraphState,
+	defaultProjectIds: string[] = availableProjectIds,
 ): MutableRouteQuery {
 	const nextRouteQuery = {
 		...currentRouteQuery,
 	} as MutableRouteQuery
 
-	const projectIdsQueryValue = areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
+	const projectIdsQueryValue = areAllProjectsSelected(state.selectedProjectIds, defaultProjectIds)
 		? undefined
-		: serializeListQueryValue(state.selectedProjectIds)
+		: areAllProjectsSelected(state.selectedProjectIds, availableProjectIds)
+			? PROJECT_SELECTION_ALL_QUERY_VALUE
+			: serializeListQueryValue(state.selectedProjectIds)
 	const isCustomTimeframeMode =
 		state.selectedTimeframeMode === 'custom_range' ||
 		state.selectedTimeframeMode === 'custom_datetime_range'

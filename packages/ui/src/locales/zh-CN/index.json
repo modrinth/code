@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "你没有权限。"
+  },
   "affiliate.create.button": {
     "defaultMessage": "创建推广链接"
   },
@@ -65,6 +68,9 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "获取订阅信息失败。"
   },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5天} monthly {/月} quarterly {/季度} yearly {/年} other {{interval}}}"
+  },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "你的下一次扣费日期为 <charge-date>{date}</charge-date>。"
   },
@@ -93,10 +99,19 @@
     "defaultMessage": "你目前处于离线状态。连接互联网来浏览Modrinth！"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "搜索{projectType}..."
+    "defaultMessage": "搜索{projectType}……"
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "选定的项目"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "安装{count, plural, other {#个项目}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {#个已选择的项目}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "你已经选择了{count, plural, other {#个}}要安装的项目。立即安装它们，或不安装并返回。"
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "选定的项目尚未安装"
@@ -305,8 +320,14 @@
   "content-type.content.lowercase": {
     "defaultMessage": "内容"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {个项目} other {个项目}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "选择 {project}"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "是否确定要将 {count, plural,  other {# 个项目}}更新至最新的兼容版本？建议逐个更新内容。"
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "更新警告"
@@ -316,6 +337,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "在点击“全部更新”时按住 Shift 键，以后将跳过此确认。"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "更新 {count, plural, other {# 个项目}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "删除模组可能会对你的游戏世界造成永久性影响，并可能导致再次加载时出现内容缺失或意外问题。"
@@ -352,6 +376,48 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "解除关联"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "其他内容需要此内容"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "影响的{count, plural, other {项目}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "你选择的部分项目已作为依赖项安装。删除它们可能破坏你的 {context} 或者阻止依赖项内容正常加载。"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "实例"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "服务器"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "仍然删除"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "仍然删除这 {count, number} 个{itemType}"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "即将删除"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "删除后禁用依赖项"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "依赖项内容可能无法加载或者被自动禁用"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "你的 {context} 可能会崩溃、无法启动或无法正常工作"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "依赖项警告"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} 已作为依赖项安装。删除它可能破坏你的 {context} 或者阻止依赖项内容正常加载。"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "发生什么了？"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "添加了 {count} 项"
@@ -410,6 +476,9 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "在点击时按住 Shift 键可跳过确认步骤。"
   },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "我们建议在进行下一步操作之前创建备份，以便在出现问题时可以恢复你的{type}。"
+  },
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
@@ -454,6 +523,9 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "请稍等"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "搜索到 {count, number}个{contentType}……"
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "文件名"
@@ -518,6 +590,9 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "正在更新 {contentType}……"
   },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "已选中{count, number}个{contentType}"
+  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "已选择 {count, number} 个"
   },
@@ -532,6 +607,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "导入"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "导入 {count} 个实例"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "初始化服务器"
@@ -812,6 +890,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "覆盖"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "将覆盖<file-path>{path}</file-path>"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "如果继续解压，将有超过 100 个文件被覆盖。以下是其中一部分。"
   },
@@ -841,6 +922,12 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "删除文件"
+  },
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "该文件将被永久删除。此操作无法被撤销。"
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "该文件夹以及文件夹以下的所有内容将被永久删除。此操作无法被撤销。"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "无法加载文件内容。"
@@ -1049,6 +1136,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "新名称"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count} 项"
+  },
   "files.table-header.created": {
     "defaultMessage": "创建时间"
   },
@@ -1104,10 +1194,10 @@
     "defaultMessage": "把{type}拖到此处上传"
   },
   "files.validation.name-invalid-directory": {
-    "defaultMessage": "名称只能包含字母、数字、连字符（-）、下划线（_）或空格。"
+    "defaultMessage": "名称只能包含字母、数字、连字符、下划线或空格。"
   },
   "files.validation.name-invalid-file": {
-    "defaultMessage": "名称只能包含字母、数字、连字符（-）、下划线（_）、点（.）或空格。"
+    "defaultMessage": "名称只能包含字母、数字、连字符、下划线或空格。"
   },
   "files.validation.name-label": {
     "defaultMessage": "名称"
@@ -1158,7 +1248,7 @@
     "defaultMessage": "找到整合包"
   },
   "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "进入“文件（Files）”标签页并选择要安装的版本。"
+    "defaultMessage": "进入“文件”标签页并选择要安装的版本。"
   },
   "files.zip-url-modal.step-select-title": {
     "defaultMessage": "选择一个版本"
@@ -1249,6 +1339,9 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "输入州/省"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, other {# 字节}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1472,6 +1565,9 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "更改加载器具有破坏性"
   },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "与{projectType}关联"
+  },
   "installation-settings.linked.modpack": {
     "defaultMessage": "整合包"
   },
@@ -1483,6 +1579,9 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "你需要重置服务器以切换加载器。"
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "重新安装整合包会将{type}内容重置到其初始状态，此操作将删除所有您自行添加的模组或内容。"
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "重新安装整合包"
@@ -1526,6 +1625,9 @@
   "installation-settings.unlink": {
     "defaultMessage": "取消链接"
   },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "解除关联将永久断开该 {type} 与 {projectType} 项目的关联，你可以自由更换加载器与Minecraft版本，但此后你将无法接收到整合包的后续更新。"
+  },
   "installation-settings.verifying": {
     "defaultMessage": "正在验证……"
   },
@@ -1540,6 +1642,12 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "重新安装整合包"
+  },
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "修复功能会重新安装启动器和Minecraft依赖项，但不会删除你的内容。如果游戏因启动器出错而无法启动，修复操作可能会解决这些问题。"
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "修复功能会重新安装启动器和Minecraft依赖项，但不会删除你的内容。如果你的服务器无法正确启动，这可能解决问题。"
   },
   "instance.confirm-repair.header": {
     "defaultMessage": "修复 {type}"
@@ -1579,6 +1687,9 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "安装项目"
+  },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "该实例所使用的加载器或游戏版本，与此项目支持的配置不一致。"
   },
   "instances.content-install.install-button": {
     "defaultMessage": "安装"
@@ -1628,6 +1739,9 @@
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "没有符合搜索条件的项目。"
   },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
   },
@@ -1649,6 +1763,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "隐藏不兼容项"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "该版本未标记为与此实例兼容，依赖项将不会自动安装。"
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "选择版本"
+  },
   "instances.updater-modal.incompatible-update.description": {
     "defaultMessage": "{version} 未被标记为与当前安装兼容。它可能无法启动或出现不可预期的行为。"
   },
@@ -1657,6 +1777,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "仍然更新"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "仍然安装"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "正在加载更新日志..."
@@ -1668,7 +1791,7 @@
     "defaultMessage": "此版本未提供更新日志。"
   },
   "instances.updater-modal.no-versions": {
-    "defaultMessage": "无可用版本"
+    "defaultMessage": "未找到版本"
   },
   "instances.updater-modal.search-placeholder": {
     "defaultMessage": "查找版本…"
@@ -1848,7 +1971,7 @@
     "defaultMessage": "平台"
   },
   "label.played": {
-    "defaultMessage": "上次游玩 {ago}"
+    "defaultMessage": "上次游玩于{ago}"
   },
   "label.project": {
     "defaultMessage": "项目"
@@ -2357,6 +2480,9 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.label.badges": {
+    "defaultMessage": "荣誉徽章"
+  },
   "project-card.date.published.tooltip": {
     "defaultMessage": "发布于 {date}"
   },
@@ -2378,14 +2504,35 @@
   "project-type.all": {
     "defaultMessage": "全部"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "数据包"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {模组}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "模组"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {模组}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "整合包"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {插件}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "插件"
@@ -2393,17 +2540,41 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {插件} other {插件集}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "项目"
+  },
   "project-type.project.category": {
     "defaultMessage": "项目"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {项目}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {资源包}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "资源包"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {资源包}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {服务器}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "服务器"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {服务器}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {光影包}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "光影包"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {光影包}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "支持的运行环境"
@@ -2528,6 +2699,9 @@
   "project.about.tags.title": {
     "defaultMessage": "标签"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {次下载}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "客户端和服务端都需要。"
   },
@@ -2594,8 +2768,20 @@
   "project.environment.unknown.title": {
     "defaultMessage": "未知运行环境"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {人关注}}"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 在线"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, other {个玩家}} 在线"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, other {人最近游玩}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "在过去两周内共有 {count} {countPlural, plural, other {人}}通过 Modrinth 游玩"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "这个项目使用了自定义整合包"
@@ -3131,8 +3317,557 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "原版"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "备份"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "内容和整合包"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "文件和 SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "驱动和控制台"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "服务器"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "设置和运行时"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "用户和邀请"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "操作"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "搜索行动…"
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "添加内容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "删除内容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "禁用内容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "启用内容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "更新内容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "上传内容"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "创建备份"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "删除备份"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "重命名备份"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "恢复备份"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "修改服务器名称"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "更改服务器子域名"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "清除控制台"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "运行控制台命令"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "删除文件"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "编辑文件"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "重命名文件"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "上传文件"
+  },
+  "servers.access-page.activity-log-filter.action.game-version-edited": {
+    "defaultMessage": "更改 Minecraft 版本"
+  },
+  "servers.access-page.activity-log-filter.action.java-runtime-modified": {
+    "defaultMessage": "更改 Java 运行时"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "更改 Java 版本"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "更改加载器版本"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "更改整合包"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "解除整合包关联"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "添加端口分配"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "移除端口分配"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "创建服务器"
+  },
+  "servers.access-page.activity-log-filter.action.server-killed": {
+    "defaultMessage": "关闭服务器"
+  },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "修改方案"
+  },
+  "servers.access-page.activity-log-filter.action.server-properties-modified": {
+    "defaultMessage": "修改服务器属性"
+  },
+  "servers.access-page.activity-log-filter.action.server-reallocated": {
+    "defaultMessage": "重分配服务器"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "修复服务器"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "重置服务器"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "重启服务器"
+  },
+  "servers.access-page.activity-log-filter.action.server-started": {
+    "defaultMessage": "开启服务器"
+  },
+  "servers.access-page.activity-log-filter.action.server-stopped": {
+    "defaultMessage": "停止服务器"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-login": {
+    "defaultMessage": "通过SFTP登录"
+  },
+  "servers.access-page.activity-log-filter.action.startup-command-modified": {
+    "defaultMessage": "更改启动命令"
+  },
+  "servers.access-page.activity-log-filter.action.user-invite-revoked": {
+    "defaultMessage": "撤回用户邀请"
+  },
+  "servers.access-page.activity-log-filter.action.user-invited": {
+    "defaultMessage": "邀请用户"
+  },
+  "servers.access-page.activity-log-filter.action.user-permission-modified": {
+    "defaultMessage": "更改用户权限"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "撤回访问权"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "添加筛选"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "清空筛选"
+  },
+  "servers.access-page.activity-log-filter.empty-options": {
+    "defaultMessage": "无可用选项。"
+  },
+  "servers.access-page.activity-log-filter.empty-search": {
+    "defaultMessage": "未找到选项。"
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "实例"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "服务器"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "支持"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "用户"
+  },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "活动记录"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "添加用户"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "好友请求发送失败"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "已撤销发给 {target} 的邀请。"
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "邀请已撤销"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "邀请发送失败"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "已再次向 {target} 发送邀请。"
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "邀请已重发"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "邀请 {target} 成为{role}。"
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "邀请已发送"
+  },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "刷新此页面以重试。"
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "访问权限加载失败"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "已撤销 {target} 的访问权限。"
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "访问权限已撤销"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "访问权限移除失败"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "角色信息更新失败"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "全部"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "角色：{role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "编辑"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "管理实例内容、文件、备份及其他设置。"
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "所有者"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "拥有包括账单管理、成员管理及破坏性操作在内的全部权限。"
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "受限"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "可启动、停止并查看服务器状态，但无法进行更改。"
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "搜索 {count} {count, plural, one {用户} other {用户}}..."
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "编辑"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "所有者"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "受限"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "撤回邀请"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "撤回访问权"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "重新发送邀请"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "{seconds} 秒后重发"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "操作"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "已加入"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "角色"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "用户"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "没有符合筛选条件的用户。"
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "{username}的行为"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "待定"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "{username}的头像"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "后台任务正在运行"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "支持"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "操作"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "时间"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "用户"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "实例"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "服务器实例是独立的环境，各自拥有已安装的内容与世界存档。"
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "即将到来！"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "没有符合筛选条件的活动记录。"
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "在您的服务器上执行任意操作后，相关内容便会显示于此！"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "添加了 <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "更改了 <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "删除了 <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "删除内容"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "禁用了 <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "启用了 <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "更新了 <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "上传了 <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "更改了备份 <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "更改了备份"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "创建了备份 <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "创建了备份"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "删除了备份 <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "删除了备份"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "将备份 <from></from> 重命名为 <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "重命名了备份"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "恢复了备份 <backup></backup>"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "恢复了备份"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "更改了服务器配置"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "清除了控制台"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "运行了控制台命令 <command></command>"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "更改了文件 <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "删除了文件 <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "编辑了文件 <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "将 <from></from> 重命名为 <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "上传了文件 <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "将 Minecraft 版本更改为 <version></version>"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "已将 Java 运行时更改为 <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "已将 Java 版本更改为 <java-version></java-version>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "已将加载器更改为 <loader></loader><version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "已将加载器更改为 <loader></loader>"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "已将加载新版本更改为 <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "清除了加载器版本"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "更改了整合包"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "将整合包更改为 <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "将整合包版本更改为 <version></version>"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "解除了整合包关联"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "解除了整合包关联 <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "解除了整合包关联版本 <version></version>"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "添加了端口分配 <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "移除了端口分配 <port></port>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "创建了服务器"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "关闭了服务器"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "更改了服务器元数据"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "将服务器重命名为 <name></name>"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "将服务器方案修改为 <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, one {# CPU} other {# CPU}}"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "新方案"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} GB 内存"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB 内存"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB 存储"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB 存储"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "修改了服务器属性 <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "修改了服务器属性"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "重分配了服务器"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "修复了服务器"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "重置了服务器"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "重启了服务器"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "开启了服务器"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "停止了服务器"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "已将服务器子域更改为 <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "通过SFTP登录"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "已将启动命令更改为 <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "未知活动"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "已记录服务器活动"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "已撤销发给 <target-user></target-user> 的邀请"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "已邀请 <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "已邀请 <target-user></target-user>，权限为 <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "已更改 <target-user></target-user> 的权限"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "已将 <target-user></target-user> 的权限更改为 <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "已撤销 <target-user></target-user> 的访问权限"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "服务器"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "{username}的头像"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "备份 {backupName} 已取消。"
@@ -3209,6 +3944,15 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "从备份中恢复"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "已选择 {count} 个备份的批量操作"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "正在删除 {total} 个备份……"
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count} 个备份被选中"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "一旦删除， {count, plural, one {这个备份将不能} other {这些备份将不能}}被恢复。删除是永久性的。"
   },
@@ -3220,6 +3964,9 @@
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "删除{count, plural, one {备份} other { # 个备份}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "删除备份"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "创建你的第一个备份"
@@ -3241,6 +3988,12 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "备份计划"
+  },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "{username}的头像"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "支持"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "手动备份"
@@ -3277,6 +4030,57 @@
   },
   "servers.busy.syncing-content": {
     "defaultMessage": "正在同步內容"
+  },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "同时发送好友邀请"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "此用户已被邀请"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "添加用户"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "邀请"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "在<link>这里</link>查看各职务的完整清单。"
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "编辑"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "管理实例内容、文件、备份及其他设置。"
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "选择职能"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "受制"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "可以启动、停止与查看服务器，但无法进行任何更改。"
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "{username}的头像"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "不要使用他们的 Minecraft 用户名。"
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Modrinth 用户名"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "未找到匹配的用户。"
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "输入 Modrinth 用户名"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "正在搜索…"
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "安装失败"
@@ -3344,6 +4148,9 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "目前还没有服务器"
   },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "选出你最喜欢的模组，其余的交给我们来处理。"
+  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "一键安装模组"
   },
@@ -3380,14 +4187,26 @@
   "servers.listing.new-label": {
     "defaultMessage": "新"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "您的文件还将保留<days-remaining>{daysRemaining}{daysRemaining, plural, one {天} other {天}}</days-remaining>。请在文件被删除前联系客服下载数据。"
+  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "取消订阅后，你的文件将保留 30 天。"
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "你的服务器已被管理员暂停使用。"
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "您的服务器将于<date>{formattedDate}</date>{verb, select, downgrade {降级} other {升级}}至{planSize}套餐。"
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "请等待我们设置你的服务器。这可能需要长达10分钟的时间。"
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "你的订阅已取消。"
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "你的订阅已于 <date>{formattedDate}</date> 取消。"
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "由于付款失败，你的订阅已被取消。"
@@ -3406,6 +4225,12 @@
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "你的服务器硬件正在升级，很快就会重新上线。"
+  },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username}的头像"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "{username}所有"
   },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "重新订阅"
@@ -3455,8 +4280,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "新建服务器"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "没有符合你搜索的个人服务器。"
+  },
   "servers.manage.no-servers-found": {
-    "defaultMessage": "无可用版本."
+    "defaultMessage": "未找到服务器。"
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "没有符合你搜索的共享服务器。"
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "支付信息仍在加载中，加载完成后将立即打开结账页面。"
@@ -3485,6 +4316,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "成功"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "搜索 {count} {count, plural, other {个服务器}}..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3496,6 +4330,15 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "你的服务器设置已移动"
+  },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "共享服务器"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "你的服务器"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, other {天}} <hours-count>{hours}</hours-count> {hours, plural, other {小时}} <minutes-count>{minutes}</minutes-count> {minutes, plural, other {分钟}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {秒}} 剩余……"
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "新服务器"
@@ -3511,6 +4354,12 @@
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "你的服务器硬件正在升级，很快就会重新上线。"
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username}的头像"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "{username}所有"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "服务器图标"
@@ -3563,6 +4412,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支付方式"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "计费{interval, select, monthly {按月} quarterly {按季度} yearly {按年} other {{interval}}}"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "在北美、欧洲和东南亚可用。"
   },
@@ -3611,6 +4463,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "再次确认"
   },
+  "servers.region.australia": {
+    "defaultMessage": "澳大利亚"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "中欧"
   },
@@ -3640,6 +4495,54 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "西欧"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "{time}添加"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "撤回邀请"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "他们不会被添加至此服务器"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "你可以稍后再给他们发送邀请"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "撤回邀请"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "如果你撤回了这个邀请，{username} 就需要新的邀请，之后才能加入此服务器。"
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "撤回访问权"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "{time}加入"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "待定邀请"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "撤回访问权"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "他们会立即失去对服务器面板的访问权，也将无法再编辑内容"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "除非你做了单独的更改，否则他们仍然可以加入并游玩此服务器"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "未知加入日期"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username}的头像"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "如果你撤回了某个用户对你服务器的访问权限，你需要重新邀请他们以恢复访问。"
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "发生什么了？"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "安装时出现了未被预料的错误。请稍后再试。"
@@ -3760,6 +4663,9 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "搜索语言..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {没有符合搜索条件的语言} other {共有 # 个语言符合搜索条件}}。"
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "没有符合搜索条件的语言。"
@@ -4217,17 +5123,71 @@
   "time-frame-picker.clear-range": {
     "defaultMessage": "清除"
   },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "自定义固定日期范围……"
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "减少计费周期时长"
+  },
   "time-frame-picker.empty-range": {
     "defaultMessage": "未选择时间范围。"
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "结束日期"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "增加计费周期时长"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "在最后的{amount} {unit, select, hours {{amount, plural, one {小时} other {小时}}} days {{amount, plural, one {天} other {天}}} weeks {{amount, plural, one {周} other {周}}} months {{amount, plural, one {月} other {月}}} other {天}}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "最后的时间"
   },
   "time-frame-picker.option.all-time": {
     "defaultMessage": "所有时间"
   },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "过去14天"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "过去180天"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "过去30天"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "过去7天"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "过去90天"
+  },
   "time-frame-picker.option.today": {
     "defaultMessage": "今天"
   },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "年初至今"
+  },
   "time-frame-picker.option.yesterday": {
     "defaultMessage": "昨天"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "选择时间段"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "已选择"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "正在选择"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "开始日期"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "周期数值"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "周期单位"
   },
   "time-frame-picker.unit.days": {
     "defaultMessage": "日"
@@ -4259,7 +5219,107 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "离开页面？"
   },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count} 个警报"
+  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "全部忽略"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "该用户自 Modrinth 内测时期便已加入平台，该测试版于 2020 年 11 月收官。"
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "内测用户"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "该用户自 Modrinth 公测时期便已加入平台，该测试版于 2022 年 2 月收官。"
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "点击阅读关于 Modrinth 测试版的发布信息。"
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "公测用户"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "该用户的项目总共获得了{download_sum}次下载。"
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} 次下载"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "该用户在数据包功能于 2023 年 1 月正式上线前，协助我们在 Modrinth 平台完成了数据包项目的测试工作。"
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "数据包功能首发体验者"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "该用户在整合包功能于 2022 年 5 月正式上线前，协助我们在 Modrinth 平台参与了整合包项目的测试工作。"
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "整合包功能首发体验者"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "该用户在插件功能于 2022 年 8 月正式上线前，协助我们在 Modrinth 平台测试插件相关项目。"
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "插件功能首发体验者"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "该用户在资源包功能于 2022 年 8 月上线前，协助我们在 Modrinth 平台测试资源包相关项目。"
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "资源包功能首发体验者"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "该用户在服务器项目于 2026 年 3 月正式上线前，协助我们在 Modrinth 平台测试服务器相关项目。"
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "服务器功能首发体验者"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "该用户在光影包项目于 2023 年 1 月正式上线前，协助我们在 Modrinth 平台参与光影包项目测试。"
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "光影包功能首发体验者"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "该用户在 Modrinth 托管服务 2024 年 11 月开启 Beta 公测前，参与了此项功能的封闭内测。"
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "托管服务内测用户"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "该用户任职于 Modrinth，担任内容审核员。"
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Modrinth 的内容审核员负责审核各类项目、处理用户举报，维护平台安全环境。"
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "内容审核员"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "该用户尽心尽力支持 Modrinth 平台与站内创作者。"
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "点击了解如何成为会员。"
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Modrinth+ 会员成员"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "该用户至少参与过一次 Modrinth 为 LGBTQ+ 群体举办的骄傲月公益募捐活动。"
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "点击访问我们最新的骄傲月筹款活动。"
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "骄傲月活动筹款支持者"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "该用户任职于 Modrinth 。"
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth 团队"
   }
 }
+

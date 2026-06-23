@@ -387,8 +387,8 @@ pub async fn install_zipped_mrpack_files(
             profile_path: profile_path.clone(),
             pack_name: pack.name.clone(),
             icon,
-            pack_id: project_id,
-            pack_version: version_id,
+            pack_id: project_id.clone(),
+            pack_version: version_id.clone(),
         },
         100.0,
         "Downloading modpack",
@@ -409,6 +409,7 @@ pub async fn install_zipped_mrpack_files(
         reason,
         game_version: profile.game_version.clone(),
         loader: profile.loader.as_str().to_string(),
+        dependent_on: version_id.clone(),
     };
 
     let num_files = pack.files.len();
@@ -440,6 +441,7 @@ pub async fn install_zipped_mrpack_files(
                         .collect::<Vec<&str>>(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
                     Some(&download_meta),
+                    None,
                     &state.fetch_semaphore,
                     &state.pool,
                 )
@@ -455,6 +457,7 @@ pub async fn install_zipped_mrpack_files(
                     project.path.as_str(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
                     ProjectType::get_from_parent_folder(&path),
+                    None,
                     &state.pool,
                 )
                 .await?;
@@ -513,6 +516,7 @@ pub async fn install_zipped_mrpack_files(
             ProjectType::get_from_parent_folder(
                 relative_override_file_path.as_str(),
             ),
+            None,
             &state.pool,
         )
         .await?;

@@ -15,12 +15,10 @@ import { skinPreviewStorage } from '../storage/skin-preview-storage'
 
 export interface RenderResult {
 	forwards: string
-	backwards: string
 }
 
 export interface RawRenderResult {
 	forwards: Blob
-	backwards: Blob
 }
 
 class BatchSkinRenderer {
@@ -92,12 +90,9 @@ class BatchSkinRenderer {
 		}
 
 		const frontCameraPos: [number, number, number] = [-1.3, 1, 6.3]
-		const backCameraPos: [number, number, number] = [-1.3, 1, -2.5]
-
 		const forwards = await this.renderView(frontCameraPos, lookAtTarget)
-		const backwards = await this.renderView(backCameraPos, lookAtTarget)
 
-		return { forwards, backwards }
+		return { forwards }
 	}
 
 	private async renderView(
@@ -404,16 +399,15 @@ async function generateSkinPreviewsForGeneration(
 			const headKey = headKeys[i]
 
 			const rawCached = cachedSkinPreviews[skinKey]
-			if (rawCached) {
+			if (rawCached && !skinBlobUrlMap.has(skinKey)) {
 				const cached: RenderResult = {
 					forwards: URL.createObjectURL(rawCached.forwards),
-					backwards: URL.createObjectURL(rawCached.backwards),
 				}
 				skinBlobUrlMap.set(skinKey, cached)
 			}
 
 			const cachedHead = cachedHeadPreviews[headKey]
-			if (cachedHead) {
+			if (cachedHead && !headBlobUrlMap.has(headKey)) {
 				headBlobUrlMap.set(headKey, URL.createObjectURL(cachedHead))
 			}
 		}
@@ -427,7 +421,6 @@ async function generateSkinPreviewsForGeneration(
 				if (DEBUG_MODE) {
 					const result = skinBlobUrlMap.get(key)!
 					URL.revokeObjectURL(result.forwards)
-					URL.revokeObjectURL(result.backwards)
 					skinBlobUrlMap.delete(key)
 				} else continue
 			}
@@ -456,7 +449,6 @@ async function generateSkinPreviewsForGeneration(
 
 			const renderResult: RenderResult = {
 				forwards: URL.createObjectURL(rawRenderResult.forwards),
-				backwards: URL.createObjectURL(rawRenderResult.backwards),
 			}
 
 			skinBlobUrlMap.set(key, renderResult)

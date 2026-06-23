@@ -143,6 +143,9 @@
   "app.browse.server.installing": {
     "message": "Asennetaan"
   },
+  "app.content-install.no-compatible-versions": {
+    "message": "Yhtään versiota ei ole saatavilla yhteensopivuudella {compatibilityLabel}. Valitse asennettava versio siitä huolimatta. Riippuvuuksia ei asenneta automaattisesti."
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },
@@ -332,8 +335,20 @@
   "app.settings.tabs.resource-management": {
     "message": "Resurssien hallinta"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App versio {version} on valmis asennettavaksi. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
+  "app.skins.reorder-error.title": {
+    "message": "Skinien järjestyksen muuttaminen epäonnistui"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Sekasorron ratsut"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Pienten vallankumous"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Kirjaudu sisään"
+  },
+  "app.skins.title": {
+    "message": "Skinivalinta"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
@@ -354,7 +369,7 @@
     "message": "Lataus valmis"
   },
   "app.update-popup.reload": {
-    "message": "Lataa uudelleen"
+    "message": "Lataa uudelleen päivittääksesi"
   },
   "app.update-popup.title": {
     "message": "Päivitys saatavilla"
@@ -364,15 +379,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Versio {version} asennettiin onnistuneesti!"
-  },
-  "app.update.download-update": {
-    "message": "Lataa päivitys"
-  },
-  "app.update.downloading-update": {
-    "message": "Ladataan päivitystä ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Lataa uudelleen asentaaksesi päivityksen"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -562,6 +568,15 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Nimi"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Julkaisu"
   },
   "instance.settings.tabs.hooks": {
     "message": "Aloitustoiminnot"
