@@ -476,11 +476,6 @@ const messages = defineMessages({
 								action: () => copyToClipboard((world as ServerWorld).address),
 							},
 							{
-								id: 'create-shortcut',
-								shown: !!shortcutInstancePath,
-								action: () => createShortcut(),
-							},
-							{
 								id: 'edit',
 								action: () => emit('edit'),
 								shown: !instancePath,
@@ -513,6 +508,11 @@ const messages = defineMessages({
 										emit('update')
 									})
 								},
+							},
+							{
+								id: 'create-shortcut',
+								shown: !!shortcutInstancePath,
+								action: () => createShortcut(),
 							},
 							{
 								divider: true,
