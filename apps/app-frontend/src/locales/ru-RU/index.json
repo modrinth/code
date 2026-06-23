@@ -275,6 +275,9 @@
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
   },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
+  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Необходимая сборка"
   },
@@ -529,6 +532,9 @@
   },
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
   },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"

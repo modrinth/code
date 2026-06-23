@@ -104,6 +104,15 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Wybrane projekty"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Zainstaluj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "Wybrano {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Wybrano {count, plural, one{# projekt} few {# projekty} other {# projektów}} do zainstalowania. Zainstaluj je teraz lub wróć bez instalowania ich."
+  },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Wybrane projekty jeszcze nie zainstalowane"
   },
@@ -311,8 +320,14 @@
   "content-type.content.lowercase": {
     "defaultMessage": "zawartość"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {przedmiot} few {przedmioty} other {przedmiotów}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Wybierz {project}"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Czy na pewno chcesz zaktualizować {count, plural, one {# projekt} few {# projekty} other {# projektów}} do ich najnowszych wersji? Zalecane jest aktualizowanie modów jeden po drugim."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Ostrzeżenie o aktualizacjach"
@@ -322,6 +337,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Przytrzymaj Shift klikając \"Zaktualizuj wszystko\", by pominąć ten dialog w przyszłości."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Aktualizuj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Usuwanie modyfikacji może permanentnie wpłynąć na twój świat i spowodować brakujące elementy lub nieoczekiwane problemy przy ponownym jego wczytaniu."
@@ -358,6 +376,48 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Rozłącz"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Ta zawartość jest wymagana przez inną zawartość"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Objęty projekt} other {Objęte projekty}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Niektóre zainstalowane projekty są zależnościami innych projektów. {context} może przestać działać po ich usunięciu."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "Twoja instancja"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "Twój serwer"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Usuń mimo to"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Usuń {count, number} {itemType} mimo to"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Usuwanie"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Wyłącz zawartość polegającą na tym projekcie po usunięciu"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Zawartość, która zależy na tym projekcie może przestać działać lub wyłączyć się"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "{context} może przestać się uruchamiać, powodować błędy lub zachowywać się w niespodziewany sposób"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Ostrzeżenie o zależności"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} jest zainstalowany jako zależność innego projektu. {context} może przestać działać po jego usunięciu."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Co się stanie?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "Dodano {count}"
@@ -547,6 +607,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "Importuj"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Importuj {count, plural, one {# instancję} few {# instancje} other {# instancji}}"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Ustaw serwer"
@@ -1067,6 +1130,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Nowa nazwa"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# przedmiot} few {# przedmioty} other {# przedmiotów}}"
+  },
   "files.table-header.created": {
     "defaultMessage": "Utworzono"
   },
@@ -1264,6 +1330,9 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Wprowadź województwo"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# bajt} few {# bajty} other {# bajtów}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1547,6 +1616,9 @@
   "installation-settings.unlink": {
     "defaultMessage": "Rozłącz"
   },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Trwale odłączy to {type} od projektu. Zezwoli to na zmianę wersji gry i loadera, ale nie będziesz otrzymywać dalszych aktualizacji tego projektu."
+  },
   "installation-settings.verifying": {
     "defaultMessage": "Weryfikowanie..."
   },
@@ -1594,6 +1666,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Nieznany tryb gry"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} {count, plural, one {kompatybilna} few {kompatybilne} many {kompatybilnych} other {kompatybilne}} {count, plural, one {instalacja} few {instalacje} many {instalacji} other {instalacje}}"
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Istniejąca instancja"
@@ -1686,7 +1761,7 @@
     "defaultMessage": "Wybierz wersję"
   },
   "instances.updater-modal.incompatible-update.description": {
-    "defaultMessage": "Wersja {version} nie jest kompatybilna z tą instalacją. Może się nie uruchomić lub zachowywać się niepoprawnie."
+    "defaultMessage": "Wersja {version} nie jest kompatybilna z tą instalacją. Może się nie uruchomić lub zachowywać się w niespodziewany sposób."
   },
   "instances.updater-modal.incompatible-update.header": {
     "defaultMessage": "Aktualizować do niekompatybilnej wersji?"
@@ -2420,29 +2495,77 @@
   "project-type.all": {
     "defaultMessage": "Wszystko"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Paczka danych} few {Paczki danych} other {Paczek danych}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Paczki danych"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {paczka danych} few {paczki danych} other {paczek danych}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} few {Mody} other {Modów}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Modyfikacje"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} few {mody} other {modów}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Paczka modów} few {Paczki modów} other {Paczek modów}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Paczki modów"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {paczka modów} few {paczki modów} other {paczek modów}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} few {Pluginy} other {Pluginów}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Pluginy"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} few {pluginy} other {pluginów}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Projekt} few {Projekty} other {Projektów}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projekty"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {projekt} few {projekty} other {projektów}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Paczka zasobów} few {Paczki zasobów} other {Paczek zasobów}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Paczki zasobów"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {paczka zasobów} few {paczki zasobów} other {paczek zasobów}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Serwer} few {Serwery} other {Serwerów}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Serwery"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {serwer} few {serwery} other {serwerów}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} few {Shadery} other {Shaderów}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Shadery"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} few {shadery} other {shaderów}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Wspierane środowiska"
@@ -2566,6 +2689,9 @@
   },
   "project.about.tags.title": {
     "defaultMessage": "Etykiety"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
   },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Wymagany i na kliencie, i na serwerze."
@@ -3299,6 +3425,9 @@
   "servers.access-page.activity-log-filter.action.server-properties-modified": {
     "defaultMessage": "Zmieniono właściwości serwera"
   },
+  "servers.access-page.activity-log-filter.action.server-reallocated": {
+    "defaultMessage": "Przeniesiono serwer"
+  },
   "servers.access-page.activity-log-filter.action.server-repaired": {
     "defaultMessage": "Naprawiono serwer"
   },
@@ -3328,6 +3457,9 @@
   },
   "servers.access-page.activity-log-filter.action.user-permission-modified": {
     "defaultMessage": "Zmieniono uprawnienia użytkownika"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "Odwołano dostęp"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "Dodaj filtr"
@@ -3386,6 +3518,18 @@
   "servers.access-page.notification.load-failed.text": {
     "defaultMessage": "Odśwież stronę, by spróbować ponownie."
   },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Nie udało się załadować informacji o dostępie"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Odwołano dostęp użytkownika {target}."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Odwołano dostęp"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Nie udało się odwołać dostępu"
+  },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Nie udało się zmienić roli"
   },
@@ -3407,6 +3551,12 @@
   "servers.access-page.role.owner-description": {
     "defaultMessage": "Pełny dostęp, w tym zarządzanie opłatami, użytkownikami i destruktywnymi akcjami."
   },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Ograniczone"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Włączanie, wyłączanie i przeglądanie serwera bez możliwości wykonywania zmian."
+  },
   "servers.access-page.search-users-placeholder": {
     "defaultMessage": "Szukaj wśród {count} {count, plural, one {użytkownika} other {użytkowników}}..."
   },
@@ -3416,8 +3566,14 @@
   "servers.access-role.owner": {
     "defaultMessage": "Właściciel"
   },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Ograniczone"
+  },
   "servers.access-table.action.cancel-invite": {
     "defaultMessage": "Odwołaj zaproszenie"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Odwołaj dostęp"
   },
   "servers.access-table.action.resend-invite": {
     "defaultMessage": "Wyślij ponownie zaproszenie"
@@ -3460,6 +3616,9 @@
   },
   "servers.audit-log.column.event": {
     "defaultMessage": "Akcje"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Kiedy"
   },
   "servers.audit-log.column.user": {
     "defaultMessage": "Użytkownik"
@@ -3620,6 +3779,9 @@
   "servers.audit-log.event.server-plan-changed": {
     "defaultMessage": "Zmieniono plan na <specs></specs>"
   },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, other{# CPU}}"
+  },
   "servers.audit-log.event.server-plan.new-plan": {
     "defaultMessage": "nowy plan"
   },
@@ -3640,6 +3802,9 @@
   },
   "servers.audit-log.event.server-properties-modified-label": {
     "defaultMessage": "Zmieniono właściwości serwera"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Przeniesiono serwer"
   },
   "servers.audit-log.event.server-repaired": {
     "defaultMessage": "Naprawiono serwer"
@@ -3668,6 +3833,9 @@
   "servers.audit-log.event.unknown": {
     "defaultMessage": "Nieznane wydarzenie"
   },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Zarejestrowano aktywność na serwerze"
+  },
   "servers.audit-log.event.user-invite-revoked": {
     "defaultMessage": "Odwołano zaproszenie dla <target-user></target-user>"
   },
@@ -3679,6 +3847,12 @@
   },
   "servers.audit-log.event.user-permission-modified": {
     "defaultMessage": "Zmieniono uprawnienia dla <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Zmieniono uprawnienia <target-user></target-user> na <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "Odwołano dostęp użytkownika <target-user></target-user>"
   },
   "servers.audit-log.scope.server": {
     "defaultMessage": "Serwer"
@@ -3767,6 +3941,9 @@
   "servers.backups.bulk-bar.deleting": {
     "defaultMessage": "Usuwanie {total, plural, one {# kopii zapasowej} other {# kopii zapasowych}}..."
   },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "Wybrano {count, plural, one {# kopię zapasową} few {# kopie zapasowe} other {# kopii zapasowych}}"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Po usunięciu nie będzie można odzyskać {count, plural, one {tej kopii zapasowej} other {tych kopii zapasowych}}. Usuwanie jest trwałe."
   },
@@ -3775,6 +3952,9 @@
   },
   "servers.backups.delete-modal.backups-label": {
     "defaultMessage": "{count, plural, one {Kopia zapasowa} other {Kopie zapasowe ({count})}}"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "Usuń {count, plural, one {kopię zapasową} few {# kopie zapasowe} other {# kopii zapasowych}}"
   },
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Usuń {count, plural, one {kopię zapasową} other {kopie zapasowe}}"
@@ -3857,6 +4037,9 @@
   "servers.grant-access-modal.invite": {
     "defaultMessage": "Zaproś"
   },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "Pełna lista uprawnień dla każdej roli znajduje się <link>tutaj</link>."
+  },
   "servers.grant-access-modal.role.editor": {
     "defaultMessage": "Edytor"
   },
@@ -3865,6 +4048,12 @@
   },
   "servers.grant-access-modal.role.label": {
     "defaultMessage": "Wybierz rolę"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Ograniczone"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Włączanie, wyłączanie i przeglądanie serwera bez możliwości wykonywania zmian."
   },
   "servers.grant-access-modal.suggestion-avatar-alt": {
     "defaultMessage": "Awatar użytkownika {username}"
@@ -3998,6 +4187,9 @@
   "servers.listing.notice.moderated": {
     "defaultMessage": "Twój serwer został zawieszony poprzez działania moderatorskie."
   },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Twój serwer zostanie {verb, select, downgrade {przeniesiony} other {ulepszony}} na plan {planSize} dnia <date>{formattedDate}</date>."
+  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Prosimy o cierpliwość, podczas gdy ustawiamy Twój serwer. Może to potrwać nawet 10 minut."
   },
@@ -4079,8 +4271,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "Nowy serwer"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "Żaden z Twoich serwerów nie pasuje do Twojego wyszukiwania."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "Nie znaleziono żadnych serwerów."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "Żaden z Twoich współdzielonych serwerów nie pasuje do Twojego wyszukiwania."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Trwa ładowanie informacji o płatności. Kasa zostanie otwarta, gdy ładowanie się zakończy."
@@ -4129,6 +4327,9 @@
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Twoje serwery"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {dzień} other {dni}}, <hours-count>{hours}</hours-count> {hours, plural, one {godzina} few {godziny} other {godzin}}, <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuta} few {minuty} other {minut}}, <seconds-count>{seconds}</seconds-count> {seconds, plural, one {sekunda} few {sekundy} other {sekund}} do końca..."
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Nowy serwer"
@@ -4201,6 +4402,9 @@
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metoda płatności"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "naliczane {interval, select, monthly {miesięcznie} quarterly {co kwartał} yearly {rocznie} other {{interval}}}"
   },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Dostępne w Północnej Ameryce, Europie i Południowowschodniej Azji."
@@ -4298,14 +4502,35 @@
   "servers.remove-access-modal.cancel-header": {
     "defaultMessage": "Odwołaj zaproszenie"
   },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "Jeżeli odwołasz to zaproszenie, użytkownik {username} będzie potrzebował nowego zaproszenia, żeby móc dołączyć do tego serwera."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "Odwołaj dostęp"
+  },
   "servers.remove-access-modal.invited-label": {
     "defaultMessage": "Zaproszono {time}"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "Bieżące zaproszenie"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "Odwołaj dostęp"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "Ten użytkownik od razu straci dostęp do panelu serwera i nie będzie mógł edytować zawartości"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "Może jednak nadal dołączać do i grać na serwerze, dopóki nie zmienisz tego osobno"
   },
   "servers.remove-access-modal.unknown-added-label": {
     "defaultMessage": "Dodano w nieznanym czasie"
   },
   "servers.remove-access-modal.user-avatar-alt": {
     "defaultMessage": "Awatar użytkownika {username}"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "Po odwołaniu dostępu tego użytkownika do Twojego serwera będzie on musiał być ponownie zaproszony, by odzyskać dostęp."
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Co się stanie?"
@@ -4430,6 +4655,9 @@
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Szukaj języka..."
   },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Żaden język nie pasuje} one {# język pasuje} few {# języki pasują} other {# języków pasuje}} do Twojego wyszukiwania."
+  },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Nie znaleziono żadnego języka pasującego do Twojego wyszukiwania."
   },
@@ -4446,7 +4674,7 @@
     "defaultMessage": "Zmiana języka {platform} może spowodować, że niektóre treści będą wyświetlane w języku angielskim, jeśli tłumaczenie nie będzie dostępne. Tłumaczenie {platform} jest niekompletne, więc niektóre treści mogą pozostać w języku angielskim w przypadku niektórych języków."
   },
   "settings.pats.title": {
-    "defaultMessage": "Osobiste tokeny dostępu"
+    "defaultMessage": "Klucze dostępu osobistego"
   },
   "settings.profile.title": {
     "defaultMessage": "Profil publiczny"
@@ -4886,11 +5114,23 @@
   "time-frame-picker.clear-range": {
     "defaultMessage": "Wyczyść"
   },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Niestandardowy przedział czasowy..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Skróć przedział czasowy"
+  },
   "time-frame-picker.empty-range": {
     "defaultMessage": "Nie wybrano przedziału czasowego."
   },
   "time-frame-picker.end-date": {
     "defaultMessage": "Data końcowa"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Przedłuż przedział czasowy"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select, hours {{amount, plural, one {Ostatnia godzina} few {Ostatnie {amount} godziny} other {Ostatnie {amount} godzin}}} days {{amount, plural, one {Ostatni dzień} other {Ostatnie {amount} dni}}} weeks {{amount, plural, one {Ostatni tydzień} few {Ostatnie {amount} tygodnie} other {Ostatnie {amount} tygodni}}} months {{amount, plural, one {Ostatni miesiąc} few {Ostatnie {amount} miesiące} other {Ostatnie {amount} miesięcy}}} other {{amount, plural, one {Ostatni dzień} other {Ostatnie {amount} dni}}}}"
   },
   "time-frame-picker.last-timeframe-prefix": {
     "defaultMessage": "Ostatnie"
@@ -4969,6 +5209,9 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Opuścić stronę?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, one {# alert} few {# alerty} other {# alertów}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Odrzuć wszystkie"
@@ -5059,6 +5302,9 @@
   },
   "user.profile.badge.pride.link": {
     "defaultMessage": "Odwiedź naszą najnowszą zbiórkę na rzecz miesiąca dumy."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Wsparcie zbiórki na miesiąc dumy"
   },
   "user.profile.badge.staff.about.1": {
     "defaultMessage": "Ten użytkownik pracuje w Modrinth."

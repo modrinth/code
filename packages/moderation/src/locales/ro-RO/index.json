@@ -128,6 +128,9 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Examinați feedback-ul"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Ați selectat {count, plural, one {# tag de resoluție} other {# tag-uri de resoluție}}. Pachete de resursă ar trebui tipic să aibă numai un tag de resoluție care să se potrivească cu resoluția primară."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selectează rezoluția corectă"
   },
@@ -234,3 +237,4 @@
     "defaultMessage": "Vizitează setările link-urilor"
   }
 }
+

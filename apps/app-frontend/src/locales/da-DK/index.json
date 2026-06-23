@@ -23,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primære instance"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Genindlæs for at opdater"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Vis flere kørende instances"
   },
   "app.action-bar.stop-instance": {
     "message": "Stop instance"
+  },
+  "app.action-bar.update": {
+    "message": "Opdater"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Vis aktive downloads"
@@ -145,6 +151,9 @@
   },
   "app.browse.server.installing": {
     "message": "Installere"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
   },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"

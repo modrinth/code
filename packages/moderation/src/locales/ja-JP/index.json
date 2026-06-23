@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "外部リンクを追加する"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}のすべてを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "プロジェクトと関係のあるタグを選択する"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "説明文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい説明文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "さらに説明を追加する"
@@ -65,6 +71,9 @@
   "nags.identical-links.description": {
     "defaultMessage": "まったく同じ外部リンクが複数あるようです。各リンクは適切なリンク形式で一度だけ入力してください。"
   },
+  "nags.identical-links.title": {
+    "defaultMessage": "リンクの重複を整理"
+  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "視覚障害のある方やインターネット回線速度の遅い方への配慮のため、十分で分かりやすい説明または画像の代替テキストが必要です。"
   },
@@ -88,6 +97,9 @@
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "短縮リンクサービスを使用しないでください"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}{count, plural, other{}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "ヘッダーを短縮"
@@ -118,6 +130,9 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "フィードバックの確認"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "{count, plural, other {#個の解像度タグ}} ({tags}) を選択しました。リソースパックは通常、主要な解像度と一致する1つの解像度タグのみを設定すべきです。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
@@ -171,13 +186,16 @@
     "defaultMessage": "プロジェクトの名前と要約は同じにできません。情報豊富で魅力的な要約を作成することが重要です。"
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "要約を独自のものにしましょう！"
+    "defaultMessage": "要約を独自のものにしましょう"
   },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "要約には、フォーマット、改行、特殊文字、またはリンクを含めないでください。要約はプレーンテキストのみ表示されるためです。"
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "要約を整理"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "要約文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい要約文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "要約を展開"
@@ -193,6 +211,9 @@
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "適切なタグを選択する"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "正確なタグを選択"
@@ -219,3 +240,4 @@
     "defaultMessage": "リンク設定を表示"
   }
 }
+

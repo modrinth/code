@@ -287,6 +287,9 @@
   "app.modal.install-to-play.install-button": {
     "message": "Zainstaluj"
   },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
+  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Wymagana paczka modów"
   },
@@ -541,6 +544,9 @@
   },
   "friends.action.add-friend": {
     "message": "Dodaj znajomego"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {zaproszenie} few {zaproszenia} other {zaproszeń}} do znajomych"
   },
   "friends.add-friend.submit": {
     "message": "Wyślij zaproszenie"
