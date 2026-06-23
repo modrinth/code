@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-23T19:31:16+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new modpack permissions system. Read our blog post about it [here](/news/article/modpack-permissions/).`,
+	},
+	{
 		date: `2026-06-22T18:12:52+00:00`,
 		product: 'web',
 		body: `## Added
