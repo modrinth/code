@@ -119,38 +119,77 @@ function initializeFileEdit() {
 	}
 }
 
+function getWorldId() {
+	if (!worldId.value) {
+		throw new Error('World ID is not available.')
+	}
+	return worldId.value
+}
+
+function timestampSeconds(value: string) {
+	return Math.floor(new Date(value).getTime() / 1000)
+}
+
+function toFileItem(item: Kyros.Files.v1.FileListingItem): FileItem | null {
+	if (item.type === 'other') return null
+
+	return {
+		name: item.name,
+		type: item.type === 'regular' ? 'file' : item.type,
+		path: item.full_path,
+		modified: timestampSeconds(item.mtime),
+		created: timestampSeconds(item.ctime),
+		...(item.type === 'directory' ? { count: item.descendants } : { size: item.size_bytes }),
+	}
+}
+
 // Directory listing query
 const {
 	data: directoryData,
 	isLoading,
 	error: loadError,
 } = useQuery({
-	queryKey: computed(() => ['files', serverId, currentPath.value]),
+	queryKey: computed(() => ['files', 'v1', worldId.value, currentPath.value]),
 	queryFn: async () => {
-		return client.kyros.files_v0.listDirectory(currentPath.value, 1, 2000)
+		return client.kyros.files_v1.listDescendants(getWorldId(), currentPath.value, 1, 200)
 	},
+	enabled: computed(() => !!worldId.value),
 	staleTime: 30_000,
 })
 
-function isVisibleFileItem(item: Kyros.Files.v0.DirectoryItem) {
+function isVisibleFileItem(item: FileItem) {
 	return !item.path.split('/').includes('.modrinth-staged')
 }
 
 const items = computed<FileItem[]>(() =>
-	(directoryData.value?.items ?? []).filter(isVisibleFileItem),
+	(directoryData.value?.items ?? [])
+		.map(toFileItem)
+		.filter((item): item is FileItem => !!item)
+		.filter(isVisibleFileItem),
 )
 
 const filesReadyPending = useReadyState({ isLoading, data: directoryData })
 
 // Prefetching
 function prefetchDirectory(path: string) {
+	const id = worldId.value
+	if (!id) return
+
 	queryClient.prefetchQuery({
-		queryKey: ['files', serverId, path],
+		queryKey: ['files', 'v1', id, path],
 		queryFn: async () => {
 			try {
-				return await client.kyros.files_v0.listDirectory(path, 1, 2000)
+				return await client.kyros.files_v1.listDescendants(id, path, 1, 200)
 			} catch {
-				return { items: [], total: 0, current: 1 }
+				return {
+					items: [],
+					page: 1,
+					items_per_page: 200,
+					page_total: 0,
+					items_total: 0,
+					too_many_descendants: false,
+					descendants_limit: 0,
+				}
 			}
 		},
 		staleTime: 30_000,
@@ -158,11 +197,14 @@ function prefetchDirectory(path: string) {
 }
 
 function prefetchFile(path: string) {
+	const id = worldId.value
+	if (!id) return
+
 	queryClient.prefetchQuery({
-		queryKey: ['file-content', serverId, path],
+		queryKey: ['file-content', id, path],
 		queryFn: async () => {
 			try {
-				const blob = await client.kyros.files_v0.downloadFile(path)
+				const blob = await client.kyros.files_v1.downloadRawFileContents(id, path)
 				return await blob.text()
 			} catch {
 				return null
@@ -173,24 +215,24 @@ function prefetchFile(path: string) {
 }
 
 function getQueryKey() {
-	return ['files', serverId, currentPath.value]
+	return ['files', 'v1', worldId.value, currentPath.value]
 }
 
 function refreshList() {
-	queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+	queryClient.invalidateQueries({ queryKey: ['files', 'v1', worldId.value] })
 }
 
 // Mutations
 const deleteMutation = useMutation({
-	mutationFn: ({ path, recursive }: { path: string; recursive: boolean }) =>
-		client.kyros.files_v0.deleteFileOrFolder(path, recursive),
+	mutationFn: ({ path }: { path: string; recursive: boolean }) =>
+		client.kyros.files_v1.deleteFile(getWorldId(), path),
 	onMutate: async ({ path }) => {
 		const queryKey = getQueryKey()
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
-		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
+		queryClient.setQueryData(queryKey, (old: Kyros.Files.v1.FileListingResponse | undefined) => {
 			if (!old) return old
-			return { ...old, items: old.items.filter((item) => item.path !== path) }
+			return { ...old, items: old.items.filter((item) => item.full_path !== path) }
 		})
 		return { previous }
 	},
@@ -210,27 +252,27 @@ const deleteMutation = useMutation({
 		})
 	},
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+		refreshList()
 	},
 })
 
 const renameMutation = useMutation({
 	mutationFn: ({ path, newName }: { path: string; newName: string }) =>
-		client.kyros.files_v0.renameFileOrFolder(path, newName),
+		client.kyros.files_v1.renameFile(getWorldId(), path, newName),
 	onMutate: async ({ path, newName }) => {
 		const queryKey = getQueryKey()
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
-		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
+		queryClient.setQueryData(queryKey, (old: Kyros.Files.v1.FileListingResponse | undefined) => {
 			if (!old) return old
 			return {
 				...old,
 				items: old.items.map((item) =>
-					item.path === path
+					item.full_path === path
 						? {
 								...item,
 								name: newName,
-								path: item.path.replace(/[^/]+$/, newName),
+								full_path: item.full_path.replace(/[^/]+$/, newName),
 							}
 						: item,
 				),
@@ -250,20 +292,20 @@ const renameMutation = useMutation({
 		addNotification({ title: 'Renamed', text: `Renamed to ${newName}`, type: 'success' })
 	},
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+		refreshList()
 	},
 })
 
 const moveMutation = useMutation({
 	mutationFn: ({ source, destination }: { source: string; destination: string }) =>
-		client.kyros.files_v0.moveFileOrFolder(source, destination),
+		client.kyros.files_v1.moveFile(getWorldId(), source, destination),
 	onMutate: async ({ source }) => {
 		const queryKey = getQueryKey()
 		await queryClient.cancelQueries({ queryKey })
 		const previous = queryClient.getQueryData(queryKey)
-		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
+		queryClient.setQueryData(queryKey, (old: Kyros.Files.v1.FileListingResponse | undefined) => {
 			if (!old) return old
-			return { ...old, items: old.items.filter((item) => item.path !== source) }
+			return { ...old, items: old.items.filter((item) => item.full_path !== source) }
 		})
 		return { previous }
 	},
@@ -279,86 +321,50 @@ const moveMutation = useMutation({
 		addNotification({ title: 'Moved', text: `Moved to ${destination}`, type: 'success' })
 	},
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
+		refreshList()
 	},
 })
 
 const createMutation = useMutation({
-	mutationFn: ({ path, type }: { path: string; type: 'file' | 'directory' }) =>
-		client.kyros.files_v0.createFileOrFolder(path, type),
-	onMutate: async ({ path, type }) => {
-		const queryKey = getQueryKey()
-		await queryClient.cancelQueries({ queryKey })
-		const previous = queryClient.getQueryData(queryKey)
-		const name = path.split('/').pop()!
-		const now = Math.floor(Date.now() / 1000)
-		const newItem: Kyros.Files.v0.DirectoryItem = {
-			name,
-			path,
-			type,
-			modified: now,
-			created: now,
-			...(type === 'directory' ? { count: 0 } : { size: 0 }),
-		}
-		queryClient.setQueryData(queryKey, (old: Kyros.Files.v0.DirectoryResponse | undefined) => {
-			if (!old) return old
-			return { ...old, items: [newItem, ...old.items] }
-		})
-		return { previous }
+	mutationFn: (_vars: { path: string; type: 'file' | 'directory' }) => {
+		// await client.kyros.files_v0.createFileOrFolder(path, type)
+		throw new Error('Creating files or folders is not supported by the v1 world-scoped files API.')
 	},
-	onError: (err: Error, _vars, context) => {
-		queryClient.setQueryData(getQueryKey(), context?.previous)
+	onError: (err: Error) => {
 		addNotification({
 			title: formatMessage(commonMessages.createFailedLabel),
 			text: err.message,
 			type: 'error',
 		})
 	},
-	onSuccess: (_, { path, type }) => {
-		const name = path.split('/').pop()
-		addNotification({
-			title: `${type === 'directory' ? 'Folder' : 'File'} created`,
-			text: `Created ${name}`,
-			type: 'success',
-		})
-	},
-	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
-	},
 })
-
-// Extraction
-async function extractFile(path: string, override: boolean, dry: boolean) {
-	if (fileWriteDisabled.value) return
-	if (dry) {
-		return await client.kyros.files_v0.extractFile(path, override, true)
-	}
-	await client.kyros.files_v0.extractFile(path, override, false)
-}
 
 // File I/O
 async function readFile(path: string): Promise<string> {
 	const normalizedPath = path.startsWith('/') ? path : `/${path}`
-	const cachedContent = queryClient.getQueryData<string>(['file-content', serverId, normalizedPath])
+	const id = getWorldId()
+	const cachedContent = queryClient.getQueryData<string>(['file-content', id, normalizedPath])
 	if (cachedContent) return cachedContent
-	const blob = await client.kyros.files_v0.downloadFile(normalizedPath)
+	const blob = await client.kyros.files_v1.downloadRawFileContents(id, normalizedPath)
 	return await blob.text()
 }
 
 async function readFileAsBlob(path: string): Promise<Blob> {
 	const normalizedPath = path.startsWith('/') ? path : `/${path}`
-	return await client.kyros.files_v0.downloadFile(normalizedPath)
+	return await client.kyros.files_v1.downloadRawFileContents(getWorldId(), normalizedPath)
 }
 
 async function writeFile(path: string, content: string): Promise<void> {
 	if (fileWriteDisabled.value) return
-	await client.kyros.files_v0.updateFile(path, content)
-	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+	void path
+	void content
+	// await client.kyros.files_v0.updateFile(path, content)
+	throw new Error('Updating file contents is not supported by the v1 world-scoped files API.')
 }
 
 async function downloadFile(path: string, fileName: string): Promise<void> {
 	try {
-		const fileData = await client.kyros.files_v0.downloadFile(path)
+		const fileData = await client.kyros.files_v1.downloadRawFileContents(getWorldId(), path)
 		if (fileData) {
 			const blob = new Blob([fileData], { type: 'application/octet-stream' })
 			const link = document.createElement('a')
@@ -460,10 +466,10 @@ provideFileManager({
 	isBusy: fileWriteDisabled,
 	busyTooltip: fileWriteDisabledTooltip,
 	busyWarning,
-	extractFile,
+	// extractFile: async (path, override, dry) => client.kyros.files_v0.extractFile(path, override, dry),
 	prefetchDirectory,
 	prefetchFile,
-	showInstallFromUrl: true,
+	showInstallFromUrl: false,
 	canRestart: canUsePowerActions.value,
 	restartServer,
 	canShareToMclogs: true,
