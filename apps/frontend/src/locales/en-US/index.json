@@ -3411,7 +3411,7 @@
     "message": "Some content can't be included"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn more and get started!"
+    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our announcement of this new system</link> to learn more!"
   },
   "project.settings.permissions.info-banner.title": {
     "message": "Learn about distribution permissions"

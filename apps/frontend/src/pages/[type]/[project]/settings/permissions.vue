@@ -297,7 +297,7 @@ const messages = defineMessages({
 	},
 	infoBannerDescription: {
 		id: 'project.settings.permissions.info-banner.description',
-		defaultMessage: `If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn more and get started!`,
+		defaultMessage: `If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our announcement of this new system</link> to learn more!`,
 	},
 	learnMore: {
 		id: 'project.settings.permissions.learn-more',
@@ -428,7 +428,9 @@ function dismissInfoBanner() {
 	>
 		<IntlFormatted :message-id="messages.infoBannerDescription">
 			<template #link="{ children }">
-				<a class="text-link" target="_blank"> <component :is="() => children" /> </a>
+				<nuxt-link class="text-link" to="/news/article/modpack-permissions/" target="_blank">
+					<component :is="() => children" />
+				</nuxt-link>
 			</template>
 		</IntlFormatted>
 		<template #actions>
