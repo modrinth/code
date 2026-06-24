@@ -1,10 +1,10 @@
 use crate::auth::checks::filter_visible_versions;
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
@@ -229,7 +229,12 @@ impl Default for AutomatedModerationQueue {
 }
 
 impl AutomatedModerationQueue {
-    pub async fn task(&self, pool: PgPool, redis: RedisPool) {
+    pub async fn task(
+        &self,
+        pool: PgPool,
+        ro_pool: ReadOnlyPgPool,
+        redis: RedisPool,
+    ) {
         loop {
             let projects = self.projects.clone();
             self.projects.clear();
@@ -375,6 +380,7 @@ impl AutomatedModerationQueue {
                                             .await?,
                                         &None,
                                         &pool,
+                                        &ro_pool,
                                         &redis,
                                     )
                                         .await?;

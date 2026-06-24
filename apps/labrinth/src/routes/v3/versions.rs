@@ -7,7 +7,6 @@ use crate::auth::checks::{
 };
 use crate::auth::get_user_from_headers;
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
 };
@@ -16,6 +15,7 @@ use crate::database::models::version_item::{
 };
 use crate::database::models::{DBOrganization, image_item};
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
@@ -64,16 +64,19 @@ pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner();
-    version_project_get_helper(req, info, pool, redis, session_queue).await
+    version_project_get_helper(req, info, pool, ro_pool, redis, session_queue)
+        .await
 }
 pub async fn version_project_get_helper(
     req: HttpRequest,
     id: (String, String),
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -118,7 +121,7 @@ pub async fn version_project_get_helper(
             let version_id = version.inner.id;
             enrich_dependency_attributions(
                 std::slice::from_mut(&mut version),
-                &pool,
+                &ro_pool,
             )
             .await;
             let mut v = models::projects::Version::from(version);
@@ -168,6 +171,7 @@ pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -191,9 +195,14 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let mut versions =
-        filter_visible_versions(versions_data, &user_option, &pool, &redis)
-            .await?;
+    let mut versions = filter_visible_versions(
+        versions_data,
+        &user_option,
+        &pool,
+        &ro_pool,
+        &redis,
+    )
+    .await?;
 
     if !ids.include_changelog {
         for version in &mut versions {
@@ -208,17 +217,19 @@ pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<models::projects::Version>, ApiError> {
     let id = info.into_inner().0;
-    version_get_helper(req, id, pool, redis, session_queue).await
+    version_get_helper(req, id, pool, ro_pool, redis, session_queue).await
 }
 
 pub async fn version_get_helper(
     req: HttpRequest,
     id: models::ids::VersionId,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<models::projects::Version>, ApiError> {
@@ -240,8 +251,11 @@ pub async fn version_get_helper(
         && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
     {
         let version_id = data.inner.id;
-        enrich_dependency_attributions(std::slice::from_mut(&mut data), &pool)
-            .await;
+        enrich_dependency_attributions(
+            std::slice::from_mut(&mut data),
+            &ro_pool,
+        )
+        .await;
         let mut version = models::projects::Version::from(data);
         let missing = get_files_missing_attribution(&**pool, &[version_id])
             .await
@@ -797,6 +811,7 @@ async fn version_list(
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -805,6 +820,7 @@ async fn version_list(
         info,
         web::Query(filters),
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -816,6 +832,7 @@ pub async fn version_list_internal(
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -955,9 +972,14 @@ pub async fn version_list_internal(
         });
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let mut response =
-            filter_visible_versions(response, &user_option, &pool, &redis)
-                .await?;
+        let mut response = filter_visible_versions(
+            response,
+            &user_option,
+            &pool,
+            &ro_pool,
+            &redis,
+        )
+        .await?;
 
         if !filters.include_changelog {
             for version in &mut response {
