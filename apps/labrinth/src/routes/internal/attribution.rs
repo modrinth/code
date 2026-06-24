@@ -143,30 +143,58 @@ async fn scan(
     project_ids.sort_unstable_by_key(|id| id.0);
     project_ids.dedup_by_key(|id| id.0);
 
-    for project_id in project_ids {
+    for project_id in &project_ids {
         ensure_can_upload_versions_to_project(
             pool.as_ref(),
-            project_id,
+            *project_id,
             &user,
             "you do not have permission to upload versions to this project",
         )
         .await?;
     }
 
+    let project_ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin attribution scan transaction")?;
+
+    sqlx::query!(
+        r#"
+		delete from attributions_exemptions
+		where version_id = any($1) or project_id = any($2)
+		"#,
+        &version_ids,
+        &project_ids,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("failed to remove attribution scan exemptions")?;
+
     let result = sqlx::query!(
         r#"
 		insert into file_scans (file_id)
 		select f.id
 		from files f
-		inner join attribution_enforced_versions aev on aev.id = f.version_id
 		where f.version_id = any($1)
 		on conflict (file_id) do nothing
 		"#,
         &version_ids,
     )
-    .execute(pool.as_ref())
+    .execute(&mut transaction)
     .await
     .wrap_internal_err("failed to queue version files for attribution scan")?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit attribution scan transaction")?;
+
+    let version_ids =
+        version_ids.into_iter().map(DBVersionId).collect::<Vec<_>>();
+    DBVersion::clear_cache_ids(&version_ids, redis.as_ref())
+        .await
+        .wrap_internal_err("failed to clear version cache")?;
 
     Ok(web::Json(ScanResponse {
         queued_files: result.rows_affected(),
