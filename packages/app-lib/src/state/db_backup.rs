@@ -161,7 +161,9 @@ async fn read_stored_app_version(
         return Ok(None);
     }
 
-    Ok(sqlx::query_scalar!("SELECT value FROM app_metadata WHERE key = 'app_version'")
+    Ok(sqlx::query_scalar!(
+        "SELECT value FROM app_metadata WHERE key = 'app_version'"
+    )
     .fetch_optional(&mut *conn)
     .await?)
 }

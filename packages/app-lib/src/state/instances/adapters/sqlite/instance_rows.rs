@@ -431,7 +431,8 @@ pub(crate) async fn upsert_instance_link(
     let content_version_id = columns.content_version_id.as_deref();
     let hosting_server_id = columns.hosting_server_id.as_deref();
     let hosting_instance_ids = columns.hosting_instance_ids.as_deref();
-    let hosting_active_instance_id = columns.hosting_active_instance_id.as_deref();
+    let hosting_active_instance_id =
+        columns.hosting_active_instance_id.as_deref();
     let shared_instance_id = columns.shared_instance_id.as_deref();
 
     sqlx::query!(
