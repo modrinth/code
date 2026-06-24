@@ -73,7 +73,7 @@ const props = withDefaults(
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const { serverId, server } = injectModrinthServerContext()
+const { serverId, server, worldId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 const isUploadingIcon = ref(false)
 const isSyncingIcon = ref(false)
@@ -95,6 +95,7 @@ const {
 	computed(() => server.value?.upstream ?? null),
 	{
 		includeProjectFallback: false,
+		worldId,
 	},
 )
 
@@ -105,6 +106,19 @@ function getStatusCode(error: unknown): number | undefined {
 
 function isNotFound(error: unknown): boolean {
 	return getStatusCode(error) === 404
+}
+
+function getWorldId() {
+	if (!worldId.value) {
+		throw new Error('World ID is not available.')
+	}
+	return worldId.value
+}
+
+async function uploadWorldFile(path: string, file: File | Blob) {
+	const id = getWorldId()
+	await client.kyros.files_v1.ensureFile(id, path)
+	await client.kyros.files_v1.uploadFile(id, path, file).promise
 }
 
 const uploadFile = async (e: Event) => {
@@ -144,39 +158,11 @@ const uploadFile = async (e: Event) => {
 			img.src = URL.createObjectURL(file)
 		})
 
-		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-
-		try {
-			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
-		} catch (scaledUploadError) {
-			// Node FS may reject create when file already exists. Delete and retry once.
-			try {
-				await client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, '/server-icon.png', false)
-			} catch (deleteError) {
-				if (!isNotFound(deleteError)) {
-					throw scaledUploadError
-				}
-			}
-
-			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
-		}
+		await uploadWorldFile('/server-icon.png', scaledFile)
 
 		// Keep original file in sync when possible, but don't block icon updates on failures here.
 		try {
-			await client.kyros.files_v0.deleteFileOrFolderWithAuth(
-				fsAuth,
-				'/server-icon-original.png',
-				false,
-			)
-		} catch (deleteOriginalError) {
-			if (!isNotFound(deleteOriginalError)) {
-				// best effort
-			}
-		}
-
-		try {
-			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', file)
-				.promise
+			await uploadWorldFile('/server-icon-original.png', file)
 		} catch (originalUploadError) {
 			if (!isNotFound(originalUploadError)) {
 				// best effort
@@ -222,10 +208,10 @@ const resetIcon = async () => {
 	isSyncingIcon.value = true
 
 	try {
-		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
+		const id = getWorldId()
 		const deleteResults = await Promise.allSettled([
-			client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, '/server-icon.png', false),
-			client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, '/server-icon-original.png', false),
+			client.kyros.files_v1.deleteFile(id, '/server-icon.png'),
+			client.kyros.files_v1.deleteFile(id, '/server-icon-original.png'),
 		])
 
 		for (const result of deleteResults) {

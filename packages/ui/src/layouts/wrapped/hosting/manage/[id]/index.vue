@@ -818,6 +818,7 @@ const { disconnect: disconnectPanelSync } = useServerPanelSync({
 const { image: serverImage } = useServerImage(
 	props.serverId,
 	computed(() => serverData.value?.upstream ?? null),
+	{ worldId },
 )
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
 
@@ -1228,7 +1229,7 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 	const cancelled = allOps.filter((x) => x.state === 'cancelled')
 	Promise.all(
 		cancelled.map((x) =>
-			client.kyros.files_v0.modifyOperation(x.id, 'dismiss').catch((error) => {
+			client.kyros.files_v1.modifyOperation(x.id, 'dismiss').catch((error) => {
 				console.error('Failed to dismiss cancelled operation:', error)
 			}),
 		),
@@ -1260,20 +1261,25 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 			installError.value = new Error(errorMessage.value)
 
 			try {
-				let files = await client.kyros.files_v0.listDirectory('/', 1, 100)
-				if (files && files.total > 1) {
-					for (let i = 2; i <= files.total; i++) {
-						const nextFiles = await client.kyros.files_v0.listDirectory('/', i, 100)
-						if (nextFiles?.items?.length === 0) break
-						if (nextFiles) files = nextFiles
+				if (!worldId.value) break
+				let files = await client.kyros.files_v1.listDescendants(worldId.value, '/', 1, 100)
+				for (let i = 2; i <= files.page_total; i++) {
+					const nextFiles = await client.kyros.files_v1.listDescendants(worldId.value, '/', i, 100)
+					if (nextFiles.items.length === 0) break
+					files = {
+						...nextFiles,
+						items: [...files.items, ...nextFiles.items],
 					}
 				}
-				const fileName = files?.items?.find((file) =>
+				const file = files.items.find((file) =>
 					file.name.startsWith('modrinth-installation'),
-				)?.name
-				errorLogFile.value = fileName ?? ''
-				if (fileName) {
-					const content = await client.kyros.files_v0.downloadFile(fileName)
+				)
+				errorLogFile.value = file?.full_path ?? ''
+				if (file) {
+					const content = await client.kyros.files_v1.downloadRawFileContents(
+						worldId.value,
+						file.full_path,
+					)
 					errorLog.value = await content.text()
 				}
 			} catch (err) {

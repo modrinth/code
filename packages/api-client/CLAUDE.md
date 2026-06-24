@@ -40,7 +40,8 @@ client.archon.servers_v1
 client.archon.backups_queue_v1
 client.archon.backups_v1
 client.archon.content_v0
-client.kyros.files_v0
+client.kyros.files_v1
+client.kyros.upload_sessions_v1
 client.iso3166.data
 ... etc.
 ```
@@ -140,7 +141,8 @@ Uploads go through the feature chain (auth, retry, etc.). Features detect upload
 ### Usage Example (server file upload)
 
 ```ts
-const uploader = client.kyros.files_v0.uploadFile(path, file, {
+await client.kyros.files_v1.ensureFile(worldId, path)
+const uploader = client.kyros.files_v1.uploadFile(worldId, path, file, {
 	onProgress: ({ progress }) => {
 		uploadProgress.value = Math.round(progress * 100)
 	},

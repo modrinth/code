@@ -370,7 +370,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			dismissedOpIds.value = new Set([...dismissedOpIds.value, opId])
 		}
 		try {
-			await client.kyros.files_v0.modifyOperation(opId, action)
+			await client.kyros.files_v1.modifyOperation(opId, action)
 		} catch (error) {
 			if (action === 'dismiss') return
 			console.error(`Failed to ${action} operation:`, error)

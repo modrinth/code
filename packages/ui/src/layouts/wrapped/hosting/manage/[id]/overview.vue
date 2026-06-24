@@ -58,6 +58,7 @@ const client = injectModrinthClient()
 const {
 	server: _serverData,
 	serverId,
+	worldId,
 	isConnected,
 	isWsAuthIncorrect,
 	stats,
@@ -83,9 +84,13 @@ const isDismissed = () => Date.now() < dismissedUntil.value
 
 const inspectError = async () => {
 	if (isDismissed()) return
+	if (!worldId.value) return
 
 	try {
-		const blob = await client.kyros.files_v0.downloadFile('/logs/latest.log')
+		const blob = await client.kyros.files_v1.downloadRawFileContents(
+			worldId.value,
+			'/logs/latest.log',
+		)
 		const log = await blob.text()
 		if (!log) return
 

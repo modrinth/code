@@ -121,6 +121,7 @@ const { formatMessage } = useVIntl()
 
 const props = withDefaults(
 	defineProps<{
+		worldId: string
 		disabled?: boolean
 		disabledTooltip?: string
 	}>(),
@@ -186,14 +187,6 @@ const messages = defineMessages({
 	errorUrlInvalid: {
 		id: 'files.zip-url-modal.error-url-invalid',
 		defaultMessage: 'URL must be valid.',
-	},
-	cfNotFoundTitle: {
-		id: 'files.zip-url-modal.cf-not-found-title',
-		defaultMessage: 'CurseForge modpack not found',
-	},
-	cfNotFoundText: {
-		id: 'files.zip-url-modal.cf-not-found-text',
-		defaultMessage: 'Could not find CurseForge modpack at that URL.',
 	},
 	installFailedTitle: {
 		id: 'files.zip-url-modal.install-failed-title',
@@ -265,19 +258,16 @@ const handleSubmit = async () => {
 
 	submitted.value = true
 	try {
-		const dry = await client.kyros.files_v0.extractFile(trimmedUrl.value, true, true)
-
-		if (!cf.value || dry.modpack_name) {
-			await client.kyros.files_v0.extractFile(trimmedUrl.value, true, false)
-			hide()
-		} else {
-			submitted.value = false
-			addNotification({
-				title: formatMessage(messages.cfNotFoundTitle),
-				text: formatMessage(messages.cfNotFoundText),
-				type: 'error',
-			})
+		const stream = await client.kyros.files_v1.unzipFile(props.worldId, {
+			source: { type: 'zip_url', url: trimmedUrl.value },
+			target: '/',
+		})
+		const reader = stream.getReader()
+		while (true) {
+			const { done } = await reader.read()
+			if (done) break
 		}
+		hide()
 	} catch (err) {
 		submitted.value = false
 		console.error('Error installing:', err)

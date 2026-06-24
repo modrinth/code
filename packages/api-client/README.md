@@ -147,7 +147,8 @@ Built-in features include authentication, node auth, retries, circuit breaking, 
 Upload endpoints return an `UploadHandle<T>` with progress and cancellation support:
 
 ```ts
-const upload = client.kyros.files_v0.uploadFile(path, file)
+await client.kyros.files_v1.ensureFile(worldId, path)
+const upload = client.kyros.files_v1.uploadFile(worldId, path, file)
 
 upload.onProgress(({ progress }) => {
 	console.log(Math.round(progress * 100))

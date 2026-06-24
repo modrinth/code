@@ -2,11 +2,6 @@ import { AbstractModule } from '../../../core/abstract-module'
 import type { UploadHandle, UploadProgress } from '../../../types/upload'
 import type { Kyros } from '../types'
 
-export type UploadSessionFile = {
-	file: File | Blob
-	filename: string
-}
-
 export class KyrosUploadSessionsV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'kyros_upload_sessions_v1'
@@ -46,7 +41,7 @@ export class KyrosUploadSessionsV1Module extends AbstractModule {
 		scope: Kyros.UploadSessions.v1.Scope,
 		worldId: string,
 		uploadId: string,
-		files: UploadSessionFile[],
+		files: Kyros.UploadSessions.v1.UploadSessionFile[],
 		options?: {
 			onProgress?: (progress: UploadProgress) => void
 			retry?: boolean | number

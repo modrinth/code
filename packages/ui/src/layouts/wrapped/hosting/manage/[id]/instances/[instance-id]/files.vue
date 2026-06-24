@@ -326,9 +326,11 @@ const moveMutation = useMutation({
 })
 
 const createMutation = useMutation({
-	mutationFn: (_vars: { path: string; type: 'file' | 'directory' }) => {
-		// await client.kyros.files_v0.createFileOrFolder(path, type)
-		throw new Error('Creating files or folders is not supported by the v1 world-scoped files API.')
+	mutationFn: ({ path, type }: { path: string; type: 'file' | 'directory' }) => {
+		const id = getWorldId()
+		return type === 'directory'
+			? client.kyros.files_v1.mkdirFile(id, path)
+			: client.kyros.files_v1.touchFile(id, path)
 	},
 	onError: (err: Error) => {
 		addNotification({
@@ -337,6 +339,9 @@ const createMutation = useMutation({
 			type: 'error',
 		})
 	},
+	onSettled: () => {
+		refreshList()
+	},
 })
 
 // File I/O
@@ -344,7 +349,7 @@ async function readFile(path: string): Promise<string> {
 	const normalizedPath = path.startsWith('/') ? path : `/${path}`
 	const id = getWorldId()
 	const cachedContent = queryClient.getQueryData<string>(['file-content', id, normalizedPath])
-	if (cachedContent) return cachedContent
+	if (cachedContent != null) return cachedContent
 	const blob = await client.kyros.files_v1.downloadRawFileContents(id, normalizedPath)
 	return await blob.text()
 }
@@ -356,10 +361,11 @@ async function readFileAsBlob(path: string): Promise<Blob> {
 
 async function writeFile(path: string, content: string): Promise<void> {
 	if (fileWriteDisabled.value) return
-	void path
-	void content
-	// await client.kyros.files_v0.updateFile(path, content)
-	throw new Error('Updating file contents is not supported by the v1 world-scoped files API.')
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`
+	const id = getWorldId()
+	await client.kyros.files_v1.editFile(id, normalizedPath, content)
+	queryClient.setQueryData(['file-content', id, normalizedPath], content)
+	refreshList()
 }
 
 async function downloadFile(path: string, fileName: string): Promise<void> {
@@ -462,14 +468,14 @@ provideFileManager({
 	uploadFiles,
 	cancelUpload,
 	uploadState,
+	worldId,
 	refresh: refreshList,
 	isBusy: fileWriteDisabled,
 	busyTooltip: fileWriteDisabledTooltip,
 	busyWarning,
-	// extractFile: async (path, override, dry) => client.kyros.files_v0.extractFile(path, override, dry),
 	prefetchDirectory,
 	prefetchFile,
-	showInstallFromUrl: false,
+	showInstallFromUrl: true,
 	canRestart: canUsePowerActions.value,
 	restartServer,
 	canShareToMclogs: true,

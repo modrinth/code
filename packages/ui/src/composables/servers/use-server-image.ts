@@ -6,11 +6,13 @@ import { injectModrinthClient } from '#ui/providers'
 
 type UpstreamRef = ComputedRef<Archon.Servers.v0.Server['upstream'] | null | undefined>
 type ServerIdSource = string | { readonly value: string }
+type WorldIdSource = string | null | undefined | { readonly value: string | null | undefined }
 
 type UseServerImageOptions = {
 	enabled?: ComputedRef<boolean> | boolean
 	size?: number
 	includeProjectFallback?: boolean
+	worldId?: WorldIdSource
 }
 
 export async function processImageBlob(blob: Blob, size: number): Promise<string> {
@@ -49,6 +51,7 @@ export function useServerImage(
 	const iconSize = options.size ?? 512
 	const includeProjectFallback = options.includeProjectFallback ?? false
 	const resolvedServerId = computed(() => resolveServerId(serverId))
+	const resolvedWorldId = computed(() => resolveWorldId(options.worldId))
 
 	const queryKey = computed(
 		() =>
@@ -57,6 +60,7 @@ export function useServerImage(
 				'detail',
 				resolvedServerId.value,
 				'icon',
+				resolvedWorldId.value ?? 'active',
 				upstream.value?.project_id ?? null,
 			] as const,
 	)
@@ -74,18 +78,22 @@ export function useServerImage(
 			if (!id) return null
 
 			try {
-				const fsAuth = await client.archon.servers_v0.getFilesystemAuth(id)
+				const targetWorldId = resolvedWorldId.value ?? (await getActiveWorldId(id))
+				if (!targetWorldId) return null
 
 				try {
-					const blob = await client.kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
+					const blob = await client.kyros.files_v1.downloadRawFileContents(
+						targetWorldId,
+						'/server-icon.png',
+					)
 					return await processImageBlob(blob, iconSize)
 				} catch (error) {
 					if (!isNotFound(error)) throw error
 				}
 
 				try {
-					const blob = await client.kyros.files_v0.downloadFileWithAuth(
-						fsAuth,
+					const blob = await client.kyros.files_v1.downloadRawFileContents(
+						targetWorldId,
 						'/server-icon-original.png',
 					)
 					return await processImageBlob(blob, iconSize)
@@ -94,7 +102,6 @@ export function useServerImage(
 				}
 			} catch (error) {
 				console.debug('Server image fetch failed:', error)
-				return null
 			}
 
 			if (!includeProjectFallback || !upstream.value?.project_id) return null
@@ -133,6 +140,12 @@ export function useServerImage(
 		localImage.value = undefined
 	}
 
+	async function getActiveWorldId(id: string): Promise<string | null> {
+		const server = await client.archon.servers_v1.get(id)
+		const activeWorld = server.worlds.find((world) => world.is_active)
+		return activeWorld?.id ?? server.worlds[0]?.id ?? null
+	}
+
 	return {
 		image,
 		queryKey,
@@ -145,4 +158,10 @@ export function useServerImage(
 
 function resolveServerId(serverId: ServerIdSource): string {
 	return typeof serverId === 'string' ? serverId : serverId.value
+}
+
+function resolveWorldId(worldId: WorldIdSource): string | null {
+	if (worldId == null) return null
+	if (typeof worldId === 'string') return worldId
+	return worldId.value ?? null
 }
