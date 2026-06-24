@@ -1,11 +1,12 @@
 use crate::api::Result;
 use std::path::Path;
+use url::Url;
 
 pub(super) const SHORTCUT_EXTENSION: &str = "desktop";
 
 pub(super) async fn create_shortcut(
     profile_name: &str,
-    launch_url: &str,
+    launch_url: &Url,
     output_path: &Path,
 ) -> Result<()> {
     let target_path = std::env::current_exe()?;
@@ -21,7 +22,7 @@ pub(super) async fn create_shortcut(
 			Categories=Game;\n",
             escape_desktop_entry_value(&format!("Launch {profile_name}")),
             quote_desktop_exec_arg(&target_path.to_string_lossy()),
-            quote_desktop_exec_arg(launch_url),
+            quote_desktop_exec_arg(launch_url.as_str()),
         ),
     )
     .await?;

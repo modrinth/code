@@ -3,6 +3,7 @@ use std::{
     os::windows::ffi::OsStrExt,
     path::{Path, PathBuf},
 };
+use url::Url;
 use windows::{
     Win32::{
         System::Com::{
@@ -19,7 +20,7 @@ pub(super) const SHORTCUT_EXTENSION: &str = "lnk";
 
 pub(super) async fn create_shortcut(
     _profile_name: &str,
-    launch_url: &str,
+    launch_url: &Url,
     output_path: &Path,
 ) -> Result<()> {
     let target_path = std::env::current_exe()?;

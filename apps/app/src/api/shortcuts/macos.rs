@@ -3,12 +3,13 @@ use std::{
     hash::{DefaultHasher, Hash, Hasher},
     path::Path,
 };
+use url::Url;
 
 pub(super) const SHORTCUT_EXTENSION: &str = "app";
 
 pub(super) async fn create_shortcut(
     profile_name: &str,
-    launch_url: &str,
+    launch_url: &Url,
     output_path: &Path,
 ) -> Result<()> {
     let contents_dir = output_path.join("Contents");
@@ -24,7 +25,7 @@ pub(super) async fn create_shortcut(
         format!(
             "#!/bin/sh\nexec {} {}\n",
             shell_quote(&target_path.to_string_lossy()),
-            shell_quote(launch_url),
+            shell_quote(launch_url.as_str()),
         ),
     )
     .await?;
@@ -55,7 +56,7 @@ pub(super) async fn create_shortcut(
 			\t<string>APPL</string>\n\
 			</dict>\n\
 			</plist>\n",
-            macos_shortcut_identifier(launch_url),
+            macos_shortcut_identifier(launch_url.as_str()),
             escape_xml(&format!("Launch {profile_name}")),
         ),
     )
