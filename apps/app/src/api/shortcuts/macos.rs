@@ -38,24 +38,23 @@ pub(super) async fn create_shortcut(
 
     tokio::fs::write(
         contents_dir.join("Info.plist"),
-        format!(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
-			<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \
-			\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n\
-			<plist version=\"1.0\">\n\
-			<dict>\n\
-			\t<key>CFBundleExecutable</key>\n\
-			\t<string>launch</string>\n\
-			\t<key>CFBundleIdentifier</key>\n\
-			\t<string>{}</string>\n\
-			\t<key>CFBundleIconFile</key>\n\
-			\t<string>icon.icns</string>\n\
-			\t<key>CFBundleName</key>\n\
-			\t<string>{}</string>\n\
-			\t<key>CFBundlePackageType</key>\n\
-			\t<string>APPL</string>\n\
-			</dict>\n\
-			</plist>\n",
+        format!(r#"<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>launch</string>
+	<key>CFBundleIdentifier</key>
+	<string>{}</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.icns</string>
+	<key>CFBundleName</key>
+	<string>{}</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+</dict>
+</plist>
+"#,
             macos_shortcut_identifier(launch_url.as_str()),
             escape_xml(&format!("Launch {profile_name}")),
         ),

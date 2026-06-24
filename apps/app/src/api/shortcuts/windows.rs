@@ -60,6 +60,12 @@ fn create_windows_shortcut(
     let working_dir = windows_wide_path(&working_dir);
     let launch_url = windows_wide_string(&launch_url);
 
+    // SAFETY:
+    // - COM is initialized for this blocking thread before any COM object is created.
+    // - `_com` is declared before the COM interface values, so it is dropped
+    //   after them and calls `CoUninitialize` only once they are released.
+    // - Every PCWSTR points to a NUL-terminated UTF-16 buffer that lives until
+    //   each call using it has returned.
     unsafe {
         let init_result = CoInitializeEx(
             None,
