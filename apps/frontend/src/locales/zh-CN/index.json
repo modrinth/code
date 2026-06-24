@@ -3251,9 +3251,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "如果你需要帮助或有其他疑问，请访问 <help-center-link>Modrinth Help Center</help-center-link>，然后点击蓝色气泡以联系支持。"
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "显示成员图形界面"
-  },
   "project.moderation.thread.private-description": {
     "message": "这是与 Modrinth 管理员的私人对话消息。他们可能会就此项目的问题向你发送消息。"
   },
@@ -3382,9 +3379,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, other {此版本}}已保留且未公开列出。请提供你有权重新分发此模组包{count, plural, other {版本}}所包含的某些文件的证明。"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "完成"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {版本 {version_name}} other {这些版本}} 因未知嵌入内容被保留"

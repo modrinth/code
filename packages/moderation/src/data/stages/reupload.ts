@@ -18,7 +18,8 @@ const reupload: Stage = {
 			suggestedStatus: 'rejected',
 			severity: 'high',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-			message: async () => (await import('../messages/reupload/reupload.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/reupload/reupload.md?raw')).default,
 			disablesActions: [
 				'reupload_unclear_fork',
 				'reupload_insufficient_fork',
@@ -50,7 +51,8 @@ const reupload: Stage = {
 			suggestedStatus: 'rejected',
 			severity: 'high',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-			message: async () => (await import('../messages/reupload/fork.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/reupload/fork.md?raw')).default,
 			disablesActions: [
 				'reupload_reupload',
 				'reupload_insufficient_fork',
@@ -68,7 +70,8 @@ const reupload: Stage = {
 			suggestedStatus: 'rejected',
 			severity: 'high',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-			message: async () => (await import('../messages/reupload/insufficient_fork.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/reupload/insufficient_fork.md?raw')).default,
 			disablesActions: [
 				'reupload_unclear_fork',
 				'reupload_reupload',
@@ -86,7 +89,8 @@ const reupload: Stage = {
 			suggestedStatus: 'rejected',
 			severity: 'high',
 			message: async () =>
-				(await import('../messages/reupload/proof_of_permissions.md?raw')).default,
+				(await import('../messages/checklist-messages/reupload/proof_of_permissions.md?raw'))
+					.default,
 			disablesActions: [
 				'reupload_reupload',
 				'reupload_unclear_fork',
@@ -105,8 +109,9 @@ const reupload: Stage = {
 			severity: 'high',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/reupload/identity-verification/identity_verification.md?raw'))
-					.default,
+				(
+					await import('../messages/checklist-messages/reupload/identity-verification/identity_verification.md?raw')
+				).default,
 			relevantExtraInput: [
 				{
 					label: 'Where else can the project be found?',
@@ -131,7 +136,7 @@ const reupload: Stage = {
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
 			message: async () =>
 				(
-					await import('../messages/reupload/identity-verification/identity_verification-server.md?raw')
+					await import('../messages/checklist-messages/reupload/identity-verification/identity_verification-server.md?raw')
 				).default,
 			relevantExtraInput: [
 				{
@@ -159,8 +164,9 @@ const reupload: Stage = {
 				projectV3?.minecraft_java_server?.content?.kind === 'modpack' &&
 				projectV3?.minecraft_java_server?.content?.['project_id'] === project.id,
 			message: async () =>
-				(await import('../messages/reupload/custom_server/custom_server_permissions.md?raw'))
-					.default,
+				(
+					await import('../messages/checklist-messages/reupload/custom_server/custom_server_permissions.md?raw')
+				).default,
 			disablesActions: [
 				'reupload_reupload',
 				'reupload_unclear_fork',
@@ -182,7 +188,7 @@ const reupload: Stage = {
 				projectV3?.minecraft_java_server?.content?.['project_id'] === project.id,
 			message: async () =>
 				(
-					await import('../messages/reupload/custom_server/custom_server_overrides-verification.md?raw')
+					await import('../messages/checklist-messages/reupload/custom_server/custom_server_overrides-verification.md?raw')
 				).default,
 			enablesActions: [
 				{
@@ -192,7 +198,7 @@ const reupload: Stage = {
 					weight: 1101,
 					message: async () =>
 						(
-							await import('../messages/reupload/custom_server/custom_server_overrides-verification-list.md?raw')
+							await import('../messages/checklist-messages/reupload/custom_server/custom_server_overrides-verification-list.md?raw')
 						).default,
 					relevantExtraInput: [
 						{
@@ -227,7 +233,7 @@ const reupload: Stage = {
 				projectV3?.minecraft_java_server?.content?.['project_id'] === project.id,
 			message: async () =>
 				(
-					await import('../messages/reupload/custom_server/custom_server_overrides-prohibited.md?raw')
+					await import('../messages/checklist-messages/reupload/custom_server/custom_server_overrides-prohibited.md?raw')
 				).default,
 			relevantExtraInput: [
 				{

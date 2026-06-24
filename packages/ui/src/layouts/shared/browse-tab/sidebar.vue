@@ -143,7 +143,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:open-by-default="getFilterOpenByDefault(filterType.id)"
 			>
 				<template #header>
-					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg'">
+					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg font-semibold'">
 						{{ filterType.formatted_name }}
 					</h3>
 				</template>
@@ -165,7 +165,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:open-by-default="getFilterOpenByDefault(filter.id)"
 			>
 				<template #header>
-					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg'">
+					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg font-semibold'">
 						{{ filter.formatted_name }}
 					</h3>
 				</template>
