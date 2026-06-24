@@ -736,6 +736,7 @@ const createDataPackVersionMutation = useMutation({
 			game_versions: version.value.game_versions,
 			loaders: packageLoaders.value,
 			featured: version.value.featured,
+			environment: 'server_only',
 		}
 
 		const uploadHandle = client.labrinth.versions_v3.createVersion(draftVersion, [{ file }], 'mod')
@@ -856,7 +857,7 @@ const messages = defineMessages({
 	},
 	packageDataPackHeader: {
 		id: 'version.package-as-mod.header',
-		defaultMessage: 'Package datapack as mod',
+		defaultMessage: 'Package data pack as mod',
 	},
 	packageDataPackDescription: {
 		id: 'version.package-as-mod.description',
