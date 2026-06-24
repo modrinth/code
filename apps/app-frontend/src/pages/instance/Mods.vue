@@ -275,30 +275,6 @@ const modpackContentQuery = useQuery({
 	),
 })
 
-const displayedProjects = computed<ContentItem[]>(() => {
-	if (!localImportedModpackProject.value) return mergedProjects.value
-
-	const modpackItems = modpackContentQuery.data.value
-	if (!modpackItems?.length) {
-		return modpackContentQuery.isLoading.value ? [] : mergedProjects.value
-	}
-
-	const modpackItemKeys = new Set(
-		modpackItems.flatMap((item) =>
-			[getContentItemId(item), item.file_path, item.file_name].filter(
-				(key): key is string => !!key,
-			),
-		),
-	)
-
-	return mergedProjects.value.filter(
-		(item) =>
-			!modpackItemKeys.has(getContentItemId(item)) &&
-			(!item.file_path || !modpackItemKeys.has(item.file_path)) &&
-			!modpackItemKeys.has(item.file_name),
-	)
-})
-
 // TODO: Extract content operation and updater modal state into composables; this page currently owns file mutations, dependency installs, busy flags, and version selection flow.
 const updatingProject = ref<ContentItem | null>(null)
 const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
@@ -1158,7 +1134,7 @@ async function handleShareItems(
 	items: ContentItem[],
 	format: 'names' | 'file-names' | 'urls' | 'markdown',
 ) {
-	const source = items.length > 0 ? items : displayedProjects.value
+	const source = items.length > 0 ? items : projects.value
 	let text: string
 	switch (format) {
 		case 'names':
@@ -1220,7 +1196,9 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 }
 
 function applyContentData(contentData: InstanceContentData) {
-	if (contentData.path !== props.instance.id) return false
+	if (contentData.path !== props.instance.id) {
+		return false
+	}
 
 	if (!contentData.contentItems) {
 		loading.value = false
@@ -1277,7 +1255,7 @@ function dismissContentHint() {
 }
 
 provideContentManager({
-	items: displayedProjects,
+	items: mergedProjects,
 	loading,
 	error: ref(null),
 	modpack: computed(() => {

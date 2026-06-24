@@ -4,6 +4,7 @@ use crate::state::instances::{Instance, InstanceFile};
 use crate::state::{CachedEntry, ProjectType};
 use chrono::Utc;
 use std::collections::HashMap;
+use uuid::Uuid;
 
 pub(crate) async fn sync_content_files(
     instance_id: &str,
@@ -42,6 +43,13 @@ pub(crate) async fn sync_instance_content_files(
         .into_iter()
         .map(|hash| (hash.path.clone(), hash))
         .collect::<HashMap<_, _>>();
+    let existing_files =
+        sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
+            .await?;
+    let existing_files_by_path = existing_files
+        .into_iter()
+        .map(|file| (file.relative_path.clone(), file))
+        .collect::<HashMap<_, _>>();
 
     let now = Utc::now();
     let mut files = Vec::new();
@@ -51,9 +59,12 @@ pub(crate) async fn sync_instance_content_files(
         let Some(hash) = hashes_by_path.get(&cache_path) else {
             continue;
         };
+        let existing_file = existing_files_by_path.get(&file.relative_path);
 
         files.push(InstanceFile {
-            id: instance_file_id(&instance.id, &file.relative_path),
+            id: existing_file
+                .map(|file| file.id.clone())
+                .unwrap_or_else(instance_file_id),
             instance_id: instance.id.clone(),
             relative_path: file.relative_path,
             file_name: file.file_name,
@@ -61,7 +72,7 @@ pub(crate) async fn sync_instance_content_files(
             sha1: hash.hash.clone(),
             size: file.size,
             missing: false,
-            added_at: now,
+            added_at: existing_file.map(|file| file.added_at).unwrap_or(now),
             modified_at: now,
         });
     }
@@ -85,6 +96,6 @@ pub(crate) fn project_type_for_file(
     filesystem::project_type_from_relative_path(&file.relative_path)
 }
 
-fn instance_file_id(instance_id: &str, relative_path: &str) -> String {
-    format!("instance-file:{instance_id}:{relative_path}")
+fn instance_file_id() -> String {
+    format!("instance-file:{}", Uuid::new_v4())
 }
