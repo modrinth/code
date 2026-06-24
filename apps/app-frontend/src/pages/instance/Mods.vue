@@ -240,7 +240,12 @@ const modpackContentQueryKey = computed(() => ['linkedModpackContent', props.ins
 const modpackContentQuery = useQuery({
 	queryKey: modpackContentQueryKey,
 	queryFn: () => get_linked_modpack_content(props.instance.id),
-	enabled: computed(() => !!props.instance?.id && !!props.instance?.link),
+	enabled: computed(
+		() =>
+			!!props.instance?.id &&
+			!!props.instance?.link &&
+			props.instance.install_stage === 'installed',
+	),
 })
 
 // TODO: Extract content operation and updater modal state into composables; this page currently owns file mutations, dependency installs, busy flags, and version selection flow.
@@ -825,7 +830,7 @@ async function handleModpackContentBulkToggle(items: ContentItem[]) {
 async function handleModpackContent() {
 	if (!props.instance?.id) return
 
-	if (modpackContentQuery.data.value !== undefined) {
+	if (modpackContentQuery.data.value?.length) {
 		modpackContentModal.value?.show(modpackContentQuery.data.value)
 		return
 	}
@@ -1363,7 +1368,7 @@ watch(
 	() => props.instance?.install_stage,
 	async (newStage, oldStage) => {
 		if (oldStage !== 'installed' && newStage === 'installed') {
-			await initProjects('must_revalidate')
+			await refreshContentState('must_revalidate')
 		} else if (oldStage === 'not_installed' && newStage === 'pack_installing') {
 			await initProjects()
 		}
