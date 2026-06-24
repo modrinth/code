@@ -16,23 +16,23 @@
 			:header="formatMessage(messages.packageDataPackHeader)"
 		>
 			<div class="flex max-w-[35rem] flex-col">
-				<p class="m-0 mb-4">
+				<p class="m-0 mb-6">
 					{{ formatMessage(messages.packageDataPackDescription) }}
 				</p>
-				<label for="package-mod-loaders" class="mb-2 flex flex-col gap-1">
+				<div for="package-mod-loaders" class="mb-2 flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
 						formatMessage(messages.modLoadersLabel)
 					}}</span>
+					<MultiSelect
+						id="package-mod-loaders"
+						v-model="packageLoaders"
+						:options="packageLoaderOptions"
+						:searchable="false"
+						:placeholder="formatMessage(messages.modLoadersPlaceholder)"
+					/>
 					<span>{{ formatMessage(messages.modLoadersDescription) }}</span>
-				</label>
-				<MultiSelect
-					id="package-mod-loaders"
-					v-model="packageLoaders"
-					class="max-w-[20rem]"
-					:options="packageLoaderOptions"
-					:searchable="false"
-					:placeholder="formatMessage(messages.modLoadersPlaceholder)"
-				/>
+				</div>
+
 				<div class="ml-auto mt-4 flex items-center gap-2">
 					<ButtonStyled type="outlined">
 						<button @click="packageModal?.hide()">
@@ -856,7 +856,7 @@ const messages = defineMessages({
 	},
 	packageDataPackHeader: {
 		id: 'version.package-as-mod.header',
-		defaultMessage: 'Packaging data pack as a mod',
+		defaultMessage: 'Package datapack as mod',
 	},
 	packageDataPackDescription: {
 		id: 'version.package-as-mod.description',
