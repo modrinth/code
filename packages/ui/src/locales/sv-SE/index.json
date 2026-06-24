@@ -386,17 +386,8 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Skapa säkerhetskopia"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "instans"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Håll Skift medan du klickar för att hoppa över bekräftelsen."
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "Vi rekommenderar att du skapar en säkerhetskopia innan du fortsätter så att du kan återställa din {type} om något går sönder."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "värld"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Modpaketets innehåll kan nu ses här!"

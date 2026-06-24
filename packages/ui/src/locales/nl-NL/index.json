@@ -797,12 +797,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Installeer een CurseForge modpack"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "De modpack van CurseForge kon op die URL niet worden gevonden."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpack niet gevonden"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Link invoeren"
   },
@@ -2806,15 +2800,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Je vindt ze nu hier!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Niet meer weergeven"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Uw serverinstellingen zijn verplaatst"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} Resterend..."

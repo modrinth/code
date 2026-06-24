@@ -1130,12 +1130,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Установить сборку из CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Не удалось найти сборку модов на CurseForge по этому URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Сборка модов CurseForge не найдена"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Вставьте ссылку"
   },
@@ -3512,12 +3506,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Экземпляр"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Экземпляры сервера — это изолированные среды со своим установленным контентом и файлами мира."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Скоро будет доступно!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Нет событий, соответствующих фильтрам."
   },
@@ -4198,15 +4186,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Теперь они находятся здесь!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Больше не показывать"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Настройки сервера перемещены"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Общие серверы"

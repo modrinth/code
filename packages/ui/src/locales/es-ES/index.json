@@ -1196,12 +1196,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instala un modpack de CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "No se pudo encontrar un modpack de CurseForge en esa URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Modpack de CurseForge no encontrado"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Introduce el link"
   },
@@ -1520,9 +1514,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "Contenido incompatible instalado"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Al cambiar de loader, se desactivará todo el contenido instalado. En su lugar, recomendamos reiniciar el servidor."
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Cambiar los loaders es destructivo"
   },
@@ -1537,9 +1528,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} versión"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Tendrás que reiniciar el servidor para cambiar de loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Al reinstalar el modpack, el contenido de {type} se restablecerá a su estado original, eliminando cualquier mod o contenido que hayas añadido."
@@ -3587,12 +3575,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instancia"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Las instancias del servidor son entornos aislados con su propio contenido instalado y archivos de mundo."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "¡Próximamente!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Ninguna actividad coincide con tus filtros."
   },
@@ -4273,15 +4255,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Servidores de Modrinth"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "¡Ahora pueden encontrarse aquí!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "No volver a mostrar"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "La configuración de tu servidor se ha movido"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Servidores compartidos"

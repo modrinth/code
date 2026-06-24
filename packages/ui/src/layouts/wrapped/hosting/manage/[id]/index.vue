@@ -1243,9 +1243,7 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 						items: [...files.items, ...nextFiles.items],
 					}
 				}
-				const file = files.items.find((file) =>
-					file.name.startsWith('modrinth-installation'),
-				)
+				const file = files.items.find((file) => file.name.startsWith('modrinth-installation'))
 				errorLogFile.value = file?.full_path ?? ''
 				if (file) {
 					const content = await client.kyros.files_v1.downloadRawFileContents(

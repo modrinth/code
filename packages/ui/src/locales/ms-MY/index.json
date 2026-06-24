@@ -1112,12 +1112,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Pasang pek mod CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Tidak dapat menemui pek mod CurseForge pada URL tersebut."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Pek mod CurseForge tidak ditemui"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Masukkan pautan"
   },
@@ -3398,12 +3392,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Pemasangan"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Pemasangan pelayan ialah persekitaran yang terkandung dengan kandungan dan fail dunia yang dipasang sendiri."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Akan datang!"
-  },
   "servers.audit-log.event.backup-renamed": {
     "defaultMessage": "Sandaran <from></from> telah dinamakan semula kepada <renamed-backup></renamed-backup>"
   },
@@ -3838,15 +3826,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mereka kini boleh ditemui di sini!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Jangan tunjukkan lagi"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Tetapan pelayan anda telah dipindahkan"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Pelayan anda"

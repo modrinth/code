@@ -1196,12 +1196,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "安裝 CurseForge 整合包"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "在該網址找不到 CurseForge 整合包"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "找不到 CurseForge 整合包"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "輸入連結"
   },
@@ -3569,9 +3563,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "實例"
   },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "即將推出！"
-  },
   "servers.audit-log.event.addon-added": {
     "defaultMessage": "已新增內容 <content></content>"
   },
@@ -4243,15 +4234,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "現在可以在這裡找到伺服器設定！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "不再顯示"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "你的伺服器設定已移動位置"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享伺服器"

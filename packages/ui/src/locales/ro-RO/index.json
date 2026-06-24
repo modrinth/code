@@ -662,12 +662,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instalează un pachet de moduri CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Nu s-a găsit un pachet de moduri CurseForge cu acel URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Pachet de moduri CurseForge negăsit"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Introduceți link"
   },

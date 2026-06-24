@@ -1196,12 +1196,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "安装一个 CurseForge 整合包"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "无法通过该链接找到 CurseForge 整合包。"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "未找到 CurseForge 整合包"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "输入链接"
   },
@@ -3584,12 +3578,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "实例"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "服务器实例是独立的环境，各自拥有已安装的内容与世界存档。"
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "即将到来！"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "没有符合筛选条件的活动记录。"
   },
@@ -4270,15 +4258,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "他们现在可以在这里找到！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "不再显示"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "你的服务器设置已移动"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享服务器"

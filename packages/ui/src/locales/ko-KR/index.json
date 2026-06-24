@@ -1154,12 +1154,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "CurseForge 모드팩 설치"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "해당 URL에서 CurseForge 모드팩을 찾을 수 없습니다."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge 모드팩을 찾을 수 없음"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "링크 입력"
   },
@@ -3542,12 +3536,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "인스턴스"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "서버 인스턴스는 자체적으로 설치된 콘텐츠와 세계 파일을 갖춘 독립된 환경입니다."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "공개 예정!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "조건에 일치하는 활동이 없습니다."
   },
@@ -4150,15 +4138,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth 호스팅"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "여기서 찾을 수 있습니다!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "다시 보지 않기"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "서버 설정이 이동되었습니다"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {일} other {일}} <hours-count>{hours}</hours-count> {hours, plural, one {시간} other {시간}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {분} other {분}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {초} other {초}} 남음..."

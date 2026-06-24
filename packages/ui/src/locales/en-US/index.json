@@ -1475,12 +1475,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Install a CurseForge modpack"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Could not find CurseForge modpack at that URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpack not found"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Enter link"
   },
@@ -3582,7 +3576,7 @@
     "defaultMessage": "Delete instance"
   },
   "server.instance-settings.general.delete-instance.description": {
-    "defaultMessage": "Permanently delete this instance, including its content, files, settings, and backups."
+    "defaultMessage": "Permanently delete this instance. World data, content, files, settings, and backups will be removed."
   },
   "server.instance-settings.general.delete-instance.error": {
     "defaultMessage": "Failed to delete instance"
@@ -3618,16 +3612,16 @@
     "defaultMessage": "Instance renamed"
   },
   "server.instance-settings.general.reset-everything.button": {
-    "defaultMessage": "Reset everything"
+    "defaultMessage": "Reset instance"
   },
   "server.instance-settings.general.reset-everything.description": {
-    "defaultMessage": "Reset your instance completely. This removes world data, content, and any configuration. A backup of the previous instance will remain available."
+    "defaultMessage": "Recreate this instance from scratch. World data, content, files, and settings are removed. Previous backups will remain available."
   },
   "server.instance-settings.general.reset-world-files.button": {
-    "defaultMessage": "Reset world data"
+    "defaultMessage": "Reset world"
   },
   "server.instance-settings.general.reset-world-files.description": {
-    "defaultMessage": "Delete the current world data and generate a new one. Your content and files will stay the same."
+    "defaultMessage": "Create a fresh world for this instance. Content, files, settings, and backups stay the same."
   },
   "server.instance-settings.general.reset-world-files.error": {
     "defaultMessage": "Failed to reset world data"
@@ -3636,7 +3630,7 @@
     "defaultMessage": "This deletes the world directory for this instance. Installed content and settings will stay the same."
   },
   "server.instance-settings.general.reset-world-files.modal.title": {
-    "defaultMessage": "Reset world data"
+    "defaultMessage": "Reset world"
   },
   "server.instance-settings.general.reset-world-files.started.description": {
     "defaultMessage": "The world directory is being reset."
@@ -3979,12 +3973,6 @@
   },
   "servers.audit-log.column.world": {
     "defaultMessage": "Instance"
-  },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Server instances are contained environments with their own installed content and world files."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Coming soon!"
   },
   "servers.audit-log.empty": {
     "defaultMessage": "No activity matches your filters."
@@ -4858,15 +4846,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "They can now be found here!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Don't show again"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Your server settings have moved"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Shared servers"

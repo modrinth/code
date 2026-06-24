@@ -1133,12 +1133,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "CurseForgeのmodpackをインストールする"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "そのURLでCurseForge modpackが見つかりませんでした。"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpackが見つかりません"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "リンクを入力"
   },

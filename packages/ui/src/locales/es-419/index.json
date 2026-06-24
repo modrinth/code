@@ -1196,12 +1196,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instalar un modpack de CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "No se pudo encontrar un modpack de CurseForge con ese URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Modpack de CurseForge no encontrado"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Introduce el enlace"
   },
@@ -3584,12 +3578,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instancia"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Las instancias de servidor son entornos cerrados con su propio contenido instalado y archivos de mundo."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "¡Próximamente!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "No se encontró actividad que coincida con tus filtros."
   },
@@ -4270,15 +4258,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "¡Ahora puedes encontrarlos aquí!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "No volver a mostrar"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "La configuración de tu servidor se ha movido"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Servidores compartidos"

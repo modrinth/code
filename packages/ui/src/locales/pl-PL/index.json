@@ -434,9 +434,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "Usunięto {count}"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Zawartość na Twoim serwerze nie mogła zostać przeanalizowana i może być objęta tą zmianą."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "Zaktualizowano {count}"
   },
@@ -1189,12 +1186,6 @@
   },
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Instaluj paczkę modów CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Nie znaleziono paczki modów CurseForge pod tym adresem."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Nie znaleziono paczki modów CurseForge"
   },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Wprowadź link"
@@ -3578,12 +3569,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Instancja"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Instancje serwerów to odosobnione środowiska z własną zainstalowaną zawartością i plikami światów."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Już wkrótce!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Nie znaleziono akcji pasujących do tych filtrów."
   },
@@ -4264,15 +4249,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Teraz mogą być znalezione tutaj!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Nie pokazuj ponownie"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Ustawienia twojego serwera zostały przeniesione"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Współdzielone serwery"

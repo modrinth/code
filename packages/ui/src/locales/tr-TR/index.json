@@ -1160,12 +1160,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Install a CurseForge modpack"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Belirtilen URL'de CurseForge mod paketi bulunamadı."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge mod paketi bulunamadı"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Bağlantıyı girin"
   },
@@ -3548,12 +3542,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Örnek"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Sunucu örnekleri, kendi yüklü içeriğine ve dünya dosyalarına sahip, bağımsız ortamlardır."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Yakında!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Belirtilen filtrelerle eşleşen herhangi bir aktivite bulunamadı."
   },
@@ -4222,15 +4210,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Artık burada bulunabilirler!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Bir daha gösterme"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Sunucu ayarlarınız taşındı"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Paylaşımlı sunucular"
