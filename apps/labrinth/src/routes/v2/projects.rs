@@ -1,7 +1,7 @@
-use crate::database::PgPool;
 use crate::database::models::categories::LinkPlatform;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, Version,
@@ -366,6 +366,7 @@ pub async fn dependency_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -374,6 +375,7 @@ pub async fn dependency_list(
         req,
         info,
         pool.clone(),
+        ro_pool,
         redis.clone(),
         session_queue,
     )
