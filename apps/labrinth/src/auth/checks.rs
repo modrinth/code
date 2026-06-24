@@ -1,10 +1,10 @@
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::FileId;
 use crate::models::projects::{
     MissingAttributionFile, OverrideSource, Version,
@@ -19,10 +19,10 @@ use itertools::Itertools;
 
 pub async fn enrich_dependency_attributions(
     versions: &mut [VersionQueryResult],
-    pool: &PgPool,
+    pool: &ReadOnlyPgPool,
 ) {
     let version_ids = versions.iter().map(|v| v.inner.id).collect::<Vec<_>>();
-    let dep_attr = get_dependency_attributions(pool, &version_ids)
+    let dep_attr = get_dependency_attributions(&**pool, &version_ids)
         .await
         .unwrap_or_default();
 
@@ -222,6 +222,7 @@ pub async fn filter_visible_versions(
     mut versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
     pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<crate::models::projects::Version>, ApiError> {
     let filtered_version_ids = filter_visible_version_ids(
@@ -238,7 +239,7 @@ pub async fn filter_visible_versions(
         .await
         .unwrap_or_default();
 
-    enrich_dependency_attributions(&mut versions, pool).await;
+    enrich_dependency_attributions(&mut versions, ro_pool).await;
 
     Ok(versions
         .into_iter()

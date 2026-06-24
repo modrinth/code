@@ -44,8 +44,6 @@ pub async fn scan_all_files(
     redis: &RedisPool,
     file_host: &dyn FileHost,
 ) -> Result<()> {
-    let mut txn = db.begin().await.wrap_err("beginning transaction")?;
-
     let files_to_scan = sqlx::query!(
         r#"
         select
@@ -59,13 +57,13 @@ pub async fn scan_all_files(
         where fa.attributions_scanned_at is null
         "#
     )
-    .fetch_all(&mut txn)
+    .fetch_all(db)
     .await
     .wrap_err("fetching files to scan")?;
 
     info!("Found {} files to scan", files_to_scan.len());
 
-    let mut scanned_ids = Vec::new();
+    let mut scanned_count = 0;
 
     for row in files_to_scan {
         let human_file_id = FileId::from(row.file_id);
@@ -74,6 +72,10 @@ pub async fn scan_all_files(
             info!("Scanning file");
 
             let file_id = row.file_id;
+            let mut txn = db
+                .begin()
+                .await
+                .wrap_err("beginning file scan transaction")?;
 
             let overrides = extract_override_files_from_storage(
                 file_host, file_id, &row.url,
@@ -108,33 +110,33 @@ pub async fn scan_all_files(
                 })?;
             }
 
-            scanned_ids.push(file_id.0);
+            let now = Utc::now();
+            sqlx::query!(
+                "
+                update file_scans
+                set attributions_scanned_at = $2
+                where file_id = $1
+                ",
+                file_id.0,
+                now,
+            )
+            .execute(&mut txn)
+            .await
+            .wrap_err("marking file as scanned")?;
+
+            txn.commit()
+                .await
+                .wrap_err("committing file scan transaction")?;
+
             eyre::Ok(())
         }
         .instrument(span)
         .await?;
+
+        scanned_count += 1;
     }
 
-    if !scanned_ids.is_empty() {
-        let now = Utc::now();
-        sqlx::query!(
-            "
-            update file_scans
-            set attributions_scanned_at = now
-            from unnest($1::bigint[], $2::timestamptz[]) as u(id, now)
-            where file_scans.file_id = u.id
-            ",
-            &scanned_ids,
-            &vec![now; scanned_ids.len()],
-        )
-        .execute(&mut txn)
-        .await
-        .wrap_err("marking files as scanned")?;
-    }
-
-    info!("Marked {} files as scanned", scanned_ids.len());
-
-    txn.commit().await.wrap_err("committing transaction")?;
+    info!("Marked {} files as scanned", scanned_count);
 
     Ok(())
 }

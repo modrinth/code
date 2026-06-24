@@ -11,7 +11,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
-use crate::database::{PgPool, PgTransaction};
+use crate::database::{PgPool, PgTransaction, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ProjectId, VersionId};
@@ -1289,16 +1289,19 @@ pub async fn dependency_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    dependency_list_internal(req, info, pool, redis, session_queue).await
+    dependency_list_internal(req, info, pool, ro_pool, redis, session_queue)
+        .await
 }
 
 pub async fn dependency_list_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -1372,6 +1375,7 @@ pub async fn dependency_list_internal(
             versions_result,
             &user_option,
             &pool,
+            &ro_pool,
             &redis,
         )
         .await?;
