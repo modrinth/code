@@ -449,17 +449,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Crea backup"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "istanza"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Salta la conferma tenendo premuto Shift."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Si consiglia di creare un backup prima di procedere, così da poterlo ripristinare nel caso qualcosa andasse storto."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "mondo"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "I contenuti del tuo pacchetto ora si trovano qui!"
@@ -1175,12 +1169,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Importa un pacchetto da CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Non è stato trovato un pacchetto di mod a quell'URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Pacchetto da CurseForge non trovato"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Inserisci link"
   },
@@ -1391,9 +1379,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Impossibile riparare il server"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Impossibile reinizializzare il server"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Impossibile salvare le impostazioni"
   },
@@ -1409,29 +1394,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Riparazione completata"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Reimposta server"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Rimuove tutti i dati dal tuo server, inclusi i mondi, mod, e configurazioni. Eventuali backup rimarranno intatti e potranno essere ripristinati."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Reinizializza"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Il server verrà ripristinato alla configurazione iniziale così da poterlo riconfigurare. Vuoi davvero continuare?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Reinizializza"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Il server è stato ripristinato alla configurazione iniziale."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Server reinizializzato"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opzioni di assistenza"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"
@@ -1768,12 +1735,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Aggiorna alla {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Aggiornare potrebbe portare problemi alla tua istanza. Controlla i cambiamenti e fai prima un backup."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Aggiornare potrebbe portare problemi al tuo mondo. Controlla i cambiamenti e fai prima un backup."
   },
   "label.actions": {
     "defaultMessage": "Azioni"
@@ -3596,12 +3557,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Istanza"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Le istanze del server sono ambienti autonomi con i propri contenuti installati e file del mondo."
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "In arrivo!"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "Nessuna attività corrisponde ai filtri."
   },
@@ -4283,15 +4238,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Ora le puoi trovare qui!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Non mostrare più"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Le impostazioni del server sono state spostate"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Server condivisi"
   },
@@ -4525,12 +4471,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Scegli a cosa giocare"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Imposta il tuo mondo come faresti nel gioco. Scegline la modalità e il seme."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Configura il tuo mondo"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Condividi il server con chi vuoi, copiando l'indirizzo e l'elenco di mod di cui avranno bisogno per entrare."

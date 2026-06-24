@@ -422,14 +422,8 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "profil"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "A megerősítés kihagyásához tartsd lenyomva a Shift billentyűt a kattintás közben."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "világ"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Mostantól itt találhatod meg!"
@@ -1067,12 +1061,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "CurseForge modcsomag telepítése"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "A CurseForge modcsomag nem található az adott URL-címen."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Nem található a CurseForge modpack"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Link beírása"
   },
@@ -1291,12 +1279,6 @@
   },
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Javítás befejezve"
-  },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Szerver javítása"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "A szerverről minden adatot eltávolít, beleértve a világokat, a modokat és a konfigurációs fájlokat is. A biztonsági mentések megmaradnak, és visszaállíthatók."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
@@ -1600,12 +1582,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Frissítés a(z) {version} verzióra"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "A frissítés meghibásodást okozhat a profilban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "A frissítés meghibásodást okozhat a világban. Először nézd át a változásnaplót, és készíts biztonsági mentést."
   },
   "label.actions": {
     "defaultMessage": "Műveletek"
@@ -3296,9 +3272,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "Példány"
   },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "Hamarosan érkezik!"
-  },
   "servers.audit-log.event.addon-updated": {
     "defaultMessage": "Frissített tartalom <content></content>"
   },
@@ -3695,15 +3668,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mostantól itt található!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne mutasd újra"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "A szerver beállításait áthelyeztük"
-  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> nap <hours-count>{hours}</hours-count> óra <minutes-count>{minutes}</minutes-count> perc és <seconds-count>{seconds}</seconds-count> másodperc van hátra..."
   },
@@ -3859,12 +3823,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Válaszd ki, mit szeretnél játszani"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Állítsd be a világodat, akárcsak az egyjátékos módban. Válaszd ki a játékmódot és a világ kezdőértékét."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Állítsd be a világodat"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Oszd meg a szerveredet a barátaiddal úgy, hogy kimásolod a címet, és megmondod nekik, melyik modokra lesz szükségük a csatlakozáshoz."

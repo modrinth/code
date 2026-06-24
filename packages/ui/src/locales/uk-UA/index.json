@@ -428,17 +428,11 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Створити резервну копію"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "профіль"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Утримуйте клавішу Shift під час натискання, щоб пропустити підтвердження."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Ми рекомендуємо створити резервну копію перш ніж продовжувати, щоб ви могли відновити свій {type}, якщо щось піде не так."
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "світ"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Уміст вашої збірки тепер можна знайти тут!"
@@ -1139,12 +1133,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "Установити збірку CurseForge"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Не вдалося знайти збірку CurseForge за цим посиланням."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Збірку CurseForge не знайдено"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "Укажіть посилання"
   },
@@ -1355,9 +1343,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "Не вдалося полагодити сервер"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "Не вдалося скинути до початкового стану"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "Не вдалося зберегти налаштування інсталяції"
   },
@@ -1373,29 +1358,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "Лагодження завершено"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "Скинути сервер"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Скинути до початкового стану"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "Це призведе до повернення сервера в початковий стан, щоб можна було повторно виконати процес налаштування. Ви впевнені, що хочете продовжити?"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "Скинути до початкового стану"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "Сервер повернуто до початкового стану для налаштування."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "Сервер скинуто до початкового стану"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Налаштування підтримки"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
@@ -1735,12 +1702,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Оновити до {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "Оновлення може зламати ваш профіль. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "Оновлення може зламати ваш світ. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
   },
   "label.actions": {
     "defaultMessage": "Дії"
@@ -3803,15 +3764,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Тепер їх можна знайти тут!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Не показувати знову"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Налаштування вашого сервера переміщено"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Спільні сервери"
   },
@@ -4045,12 +3997,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Виберіть в що грати"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "Налаштуйте свій світ, як у грі наодинці. Виберіть свій ігровий режим і зерно світу."
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "Налаштуйте свій світ"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "Поділіться своїм сервером з друзями, скопіювавши адресу та повідомивши їм, які моди потрібні, щоб приєднатися."
