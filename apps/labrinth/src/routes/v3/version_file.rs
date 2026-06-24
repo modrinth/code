@@ -251,7 +251,7 @@ pub async fn get_versions_from_hashes(
             .await?,
         &user_option,
         &pool,
-        &pool,
+        pool.as_ref(),
         &redis,
     )
     .await?;

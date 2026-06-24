@@ -1307,7 +1307,8 @@ pub async fn dependency_list_internal(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result = db_models::DBProject::get(&string, &**pool, &redis).await?;
+    let result =
+        db_models::DBProject::get(&string, &***ro_pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -1329,7 +1330,7 @@ pub async fn dependency_list_internal(
 
         let dependencies = database::DBProject::get_dependencies(
             project.inner.id,
-            &**pool,
+            &***ro_pool,
             &redis,
         )
         .await?;
@@ -1355,11 +1356,19 @@ pub async fn dependency_list_internal(
             .unique()
             .collect::<Vec<db_models::DBVersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
-            database::DBProject::get_many_ids(&project_ids, &**pool, &redis),
+            database::DBProject::get_many_ids(
+                &project_ids,
+                &***ro_pool,
+                &redis,
+            ),
             async {
-                database::DBVersion::get_many(&dep_version_ids, &**pool, &redis)
-                    .await
-                    .wrap_internal_err("failed to fetch dependency versions")
+                database::DBVersion::get_many(
+                    &dep_version_ids,
+                    &***ro_pool,
+                    &redis,
+                )
+                .await
+                .wrap_internal_err("failed to fetch dependency versions")
             },
         )
         .await?;

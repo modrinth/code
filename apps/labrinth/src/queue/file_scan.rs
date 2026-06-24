@@ -102,6 +102,7 @@ pub async fn scan_all_files(
                     file_id,
                     &overrides,
                     &resolved,
+                    redis,
                     &mut txn,
                 )
                 .await
@@ -164,7 +165,7 @@ pub async fn scan_file(
             })?;
 
         persist_attribution_results(
-            project_id, file_id, &overrides, &resolved, txn,
+            project_id, file_id, &overrides, &resolved, redis, txn,
         )
         .await
         .wrap_err_with(|| {
@@ -303,6 +304,7 @@ async fn persist_attribution_results(
     file_id: DBFileId,
     overrides: &[OverrideFile],
     resolved: &HashMap<String, OverrideResolution>,
+    redis: &RedisPool,
     txn: &mut PgTransaction<'_>,
 ) -> Result<()> {
     let all_sha1s: Vec<Vec<u8>> = overrides
@@ -551,6 +553,22 @@ async fn persist_attribution_results(
         .await
         .wrap_err("inserting override file sources")?;
     }
+
+    let version_id = sqlx::query_scalar!(
+        r#"
+        select version_id as "version_id: DBVersionId"
+        from files
+        where id = $1
+        "#,
+        file_id as DBFileId,
+    )
+    .fetch_one(&mut *txn)
+    .await
+    .wrap_err("fetching scanned file version")?;
+
+    DBVersion::clear_cache_ids(&[version_id], redis)
+        .await
+        .wrap_err("clearing version cache after attribution scan")?;
 
     Ok(())
 }

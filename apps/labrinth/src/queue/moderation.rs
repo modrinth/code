@@ -242,7 +242,8 @@ impl AutomatedModerationQueue {
             for project in projects {
                 async {
                     let project =
-                        database::DBProject::get_id((project).into(), &pool, &redis).await?;
+                        database::DBProject::get_id((project).into(), &*ro_pool, &redis)
+                            .await?;
 
                     if let Some(project) = project {
                         let res = async {
@@ -282,7 +283,7 @@ impl AutomatedModerationQueue {
                             }
 
                             let versions =
-                                database::DBVersion::get_many(&project.versions, &pool, &redis)
+                                database::DBVersion::get_many(&project.versions, &*ro_pool, &redis)
                                     .await?
                                     .into_iter()
                                     // we only support modpacks at this time
@@ -374,7 +375,7 @@ impl AutomatedModerationQueue {
                                     let versions_data = filter_visible_versions(
                                         database::models::DBVersion::get_many(
                                             &version_ids,
-                                            &pool,
+                                            &*ro_pool,
                                             &redis,
                                         )
                                             .await?,
