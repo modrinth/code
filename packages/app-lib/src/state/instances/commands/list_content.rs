@@ -114,32 +114,39 @@ pub(crate) async fn list_content(
         &state.pool,
     )
     .await?;
-    let modpack_ids = match linked_modpack_ids(&link) {
-        Some((_, version_id)) => get_modpack_identifiers(
-            &version_id,
-            &resolved.content_set,
-            &state.pool,
-            &state.api_semaphore,
-        )
-        .await
-        .ok(),
-        None => None,
-    };
-    let filter = if let Some(ids) = modpack_ids.as_ref() {
-        ContentFilter::ExcludeModpack(ids)
-    } else if matches!(
-        link,
-        InstanceLink::ImportedModpack {
-            project_id: None,
-            version_id: None,
-            ..
+    let imported_modpack_scope = is_imported_modpack_scope(&resolved, &link);
+    let modpack_ids = if imported_modpack_scope {
+        None
+    } else {
+        match linked_modpack_ids(&link) {
+            Some((_, version_id)) => match get_modpack_identifiers(
+                &version_id,
+                &resolved.content_set,
+                &state.pool,
+                &state.api_semaphore,
+            )
+            .await
+            {
+                Ok(ids) => Some(ids),
+                Err(err) => {
+                    tracing::warn!(
+                        "Failed to fetch modpack identifiers: {}",
+                        err
+                    );
+                    None
+                }
+            },
+            None => None,
         }
-    ) {
+    };
+    let filter = if imported_modpack_scope {
         ContentFilter::ExcludeSourceKind {
             source_kind: ContentSourceKind::ImportedModpack,
             exclude_untracked: resolved.instance.install_stage
                 != crate::state::InstanceInstallStage::Installed,
         }
+    } else if let Some(ids) = modpack_ids.as_ref() {
+        ContentFilter::ExcludeModpack(ids)
     } else {
         ContentFilter::All
     };
@@ -174,37 +181,30 @@ pub(crate) async fn list_linked_modpack_content(
         &state.pool,
     )
     .await?;
+    if is_imported_modpack_scope(&resolved, &link) {
+        let files = content_projects_for_scope(
+            &resolved,
+            cache_behaviour,
+            state,
+            ContentFilter::OnlySourceKind {
+                source_kind: ContentSourceKind::ImportedModpack,
+                include_untracked: resolved.instance.install_stage
+                    != crate::state::InstanceInstallStage::Installed,
+            },
+        )
+        .await?;
+        let files = files.into_iter().collect::<Vec<_>>();
+
+        return content_files_to_content_items(
+            &resolved.instance,
+            &files,
+            cache_behaviour,
+            state,
+        )
+        .await;
+    }
+
     let Some((_, version_id)) = linked_modpack_ids(&link) else {
-        if matches!(
-            link,
-            InstanceLink::ImportedModpack {
-                project_id: None,
-                version_id: None,
-                ..
-            }
-        ) {
-            let files = content_projects_for_scope(
-                &resolved,
-                cache_behaviour,
-                state,
-                ContentFilter::OnlySourceKind {
-                    source_kind: ContentSourceKind::ImportedModpack,
-                    include_untracked: resolved.instance.install_stage
-                        != crate::state::InstanceInstallStage::Installed,
-                },
-            )
-            .await?;
-            let files = files.into_iter().collect::<Vec<_>>();
-
-            return content_files_to_content_items(
-                &resolved.instance,
-                &files,
-                cache_behaviour,
-                state,
-            )
-            .await;
-        }
-
         return Ok(Vec::new());
     };
     let ids = match get_modpack_identifiers(
@@ -964,6 +964,14 @@ fn file_metadata_from_entry_or_cache(
         project_id,
         version_id,
     })
+}
+
+fn is_imported_modpack_scope(
+    resolved: &ResolvedContentScope,
+    link: &InstanceLink,
+) -> bool {
+    resolved.content_set.source_kind == ContentSourceKind::ImportedModpack
+        || matches!(link, InstanceLink::ImportedModpack { .. })
 }
 
 async fn linked_modpack_ids_for_instance(
