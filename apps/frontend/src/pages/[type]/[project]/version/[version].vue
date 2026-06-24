@@ -82,6 +82,7 @@
 				<VersionPage
 					:version="version"
 					:enrichment="enrichment"
+					:enrichment-loading="dependenciesLoading"
 					:members="members"
 					:user-link-creator="(user) => (moderator ? `/user/${user.id}` : undefined)"
 					:dependency-link-creator="createDependencyLink"
@@ -400,7 +401,7 @@
 				</pre
 				>
 			</template>
-			<template v-else>
+			<template v-else-if="showVersionSkeleton">
 				<div class="flex flex-col gap-4 pb-[30rem]">
 					<div
 						class="mt-4 flex h-[8rem] w-full animate-pulse items-center justify-center rounded-2xl bg-surface-3"
@@ -466,10 +467,12 @@ import {
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { onServerPrefetch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
-import { STALE_TIME } from '~/composables/queries/project'
+import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
+import { versionQueryOptions } from '~/composables/queries/version'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
@@ -499,6 +502,7 @@ const {
 	versionsLoading,
 	loadVersions,
 	dependencies: contextDependencies,
+	dependenciesLoading,
 	loadDependencies,
 	invalidate,
 	cdnDownloadReason,
@@ -522,26 +526,31 @@ const signInRouteObj = computed(() => getSignInRouteObj(route))
 const versionRouteParam = computed(() => route.params.version as string)
 const isLatestRoute = computed(() => versionRouteParam.value === 'latest')
 
+function filterVersionsForLatestRoute(allVersions: Labrinth.Versions.v3.Version[]) {
+	let filtered = allVersions
+
+	const loaderFilter = route.query.loader
+	if (typeof loaderFilter === 'string') {
+		filtered = filtered.filter((x) => x.loaders.includes(loaderFilter))
+	}
+
+	const gameVersionFilter = route.query.version
+	if (typeof gameVersionFilter === 'string') {
+		filtered = filtered.filter((x) => x.game_versions.includes(gameVersionFilter))
+	}
+
+	return filtered
+}
+
 const latestVersionId = computed(() => {
 	if (!isLatestRoute.value) {
 		return null
 	}
 
-	let allVersions = versions.value ?? []
+	const filtered = filterVersionsForLatestRoute(versions.value ?? [])
+	if (filtered.length === 0) return null
 
-	const loaderFilter = route.query.loader
-	if (typeof loaderFilter === 'string') {
-		allVersions = allVersions.filter((x) => x.loaders.includes(loaderFilter))
-	}
-
-	const gameVersionFilter = route.query.version
-	if (typeof gameVersionFilter === 'string') {
-		allVersions = allVersions.filter((x) => x.game_versions.includes(gameVersionFilter))
-	}
-
-	if (allVersions.length === 0) return null
-
-	return allVersions.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
+	return filtered.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
 })
 
 const versionLookupKey = computed(() =>
@@ -552,6 +561,7 @@ const {
 	data: version,
 	refetch: refetchVersion,
 	error: versionError,
+	isPending: versionPending,
 } = useQuery({
 	queryKey: computed(
 		() => ['project', project.value.id, 'version', 'v3', versionLookupKey.value] as const,
@@ -560,6 +570,30 @@ const {
 		client.labrinth.versions_v3.getVersionFromIdOrNumber(project.value.id, versionLookupKey.value!),
 	enabled: computed(() => !!project.value.id && !!versionLookupKey.value),
 	staleTime: STALE_TIME,
+})
+
+const showVersionSkeleton = computed(() => import.meta.client && versionPending.value)
+
+onServerPrefetch(async () => {
+	if (!project.value.id) return
+
+	let lookupKey = versionRouteParam.value
+
+	if (isLatestRoute.value) {
+		loadVersions()
+		const versionsData = await queryClient.ensureQueryData(
+			projectQueryOptions.versionsV3(project.value.id, client),
+		)
+		const filtered = filterVersionsForLatestRoute(versionsData ?? [])
+		if (filtered.length === 0) return
+		lookupKey = filtered.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
+	}
+
+	if (!lookupKey || lookupKey === 'latest') return
+
+	await queryClient.ensureQueryData(
+		versionQueryOptions.fromProject(project.value.id, lookupKey, client),
+	)
 })
 
 watch(

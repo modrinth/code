@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, FileIcon, SearchIcon } from '@modrinth/assets'
-import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
+import { DownloadIcon, ExternalIcon, FileIcon, SearchIcon } from '@modrinth/assets'
+import {
+	capitalizeString,
+	formatVersionsForDisplay,
+	type GameVersionTag,
+	renderHighlightedString,
+} from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -11,6 +16,7 @@ import { useCompactNumber, useFormatNumber } from '#ui/composables/format-number
 import { useRelativeTime } from '#ui/composables/how-ago.ts'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n.ts'
 import { injectModrinthClient } from '#ui/providers/api-client.ts'
+import { injectTags } from '#ui/providers/tags.ts'
 import {
 	commonMessages,
 	fileTypeMessages,
@@ -41,12 +47,23 @@ const { formatCompactNumber } = useCompactNumber()
 const props = defineProps<{
 	version: Labrinth.Versions.v3.Version
 	enrichment?: Labrinth.Projects.v2.DependencyInfo
+	enrichmentLoading?: boolean
 	dependencyLinkCreator: (context: DependencyContext) => string | undefined
 	members?: Labrinth.Projects.v3.TeamMember[]
 	userLinkCreator?: (user: Labrinth.Users.v3.User) => string | undefined
 }>()
 
 const api = injectModrinthClient()
+const tags = injectTags(null)
+
+const gameVersionsToDisplay = computed(() =>
+	tags?.gameVersions.value?.length
+		? formatVersionsForDisplay(
+				props.version.game_versions,
+				tags.gameVersions.value as GameVersionTag[],
+			)
+		: props.version.game_versions,
+)
 
 const versionNumber = computed(() => props.version.version_number)
 const versionSubtitle = computed(() => props.version.name)
@@ -101,21 +118,81 @@ const optionalContent = computed(() =>
 const incompatibleContent = computed(() =>
 	dependencies.value.filter((dep) => dep.dependency.dependency_type === 'incompatible'),
 )
-const includedContent = computed(() =>
-	dependencies.value
-		.filter((context) => context.dependency.dependency_type === 'embedded')
-		.map((context) => ({
-			icon_url: context.project
-				? context.project.icon_url
-				: context.dependency.attribution?.icon_url,
-			name: context.project ? context.project.title : context.dependency.file_name,
-			version: context.version ? context.version.version_number : undefined,
-			link: context.project
-				? props.dependencyLinkCreator(context)
-				: context.dependency.attribution?.link,
-			hasProject: !!context.project,
-		})),
+const embeddedDependencies = computed(() =>
+	dependencies.value.filter((context) => context.dependency.dependency_type === 'embedded'),
 )
+
+const includedContentLoading = computed(
+	() =>
+		!!props.enrichmentLoading &&
+		embeddedDependencies.value.some((context) => context.dependency.project_id && !context.project),
+)
+
+function getEmbeddedDependencyId(context: DependencyContext) {
+	return (
+		context.dependency.project_id ??
+		context.dependency.file_name ??
+		context.dependency.version_id ??
+		'included'
+	)
+}
+
+type IncludedContentLoadingRow = { loading: true; id: string }
+type IncludedContentRow = {
+	id: string
+	icon_url?: string
+	name?: string
+	version?: string
+	link?: string
+	hasProject: boolean
+}
+
+function isIncludedContentLoadingRow(
+	row: IncludedContentLoadingRow | IncludedContentRow,
+): row is IncludedContentLoadingRow {
+	return 'loading' in row
+}
+
+const includedContent = computed((): (IncludedContentLoadingRow | IncludedContentRow)[] => {
+	if (includedContentLoading.value) {
+		return embeddedDependencies.value.map((context) => ({
+			loading: true as const,
+			id: getEmbeddedDependencyId(context),
+		}))
+	}
+
+	return embeddedDependencies.value
+		.map((context) => {
+			const resolution = context.dependency.attribution?.resolution
+			return {
+				id: getEmbeddedDependencyId(context),
+				icon_url: context.project
+					? context.project.icon_url
+					: context.dependency.attribution?.flame_project?.icon_url,
+				name: context.project ? context.project.title : context.dependency.file_name,
+				version: context.version ? context.version.version_number : undefined,
+				link: context.project
+					? props.dependencyLinkCreator(context)
+					: resolution && 'link_to_work' in resolution
+						? resolution.link_to_work
+						: undefined,
+				hasProject: !!context.project,
+			}
+		})
+		.sort((a, b) => {
+			const priority = (row: typeof a) => {
+				if (row.hasProject) return 0
+				if (row.link) return 1
+				return 2
+			}
+			const priorityDiff = priority(a) - priority(b)
+			if (priorityDiff !== 0) {
+				return priorityDiff
+			}
+			const sortName = (name: string | undefined) => (name ?? '').replace(/[^a-zA-Z0-9]/g, '')
+			return sortName(a.name).localeCompare(sortName(b.name))
+		})
+})
 
 const contentTableColumns = computed(() => {
 	const cols = [
@@ -128,7 +205,11 @@ const contentTableColumns = computed(() => {
 			label: formatMessage(defineMessage({ id: 'version.content.name', defaultMessage: 'Name' })),
 		},
 	]
-	if (includedContent.value.some((x) => x.version)) {
+	if (
+		includedContentLoading.value
+			? embeddedDependencies.value.some((context) => context.dependency.version_id)
+			: includedContent.value.some((row) => 'version' in row && row.version)
+	) {
 		cols.push({
 			key: 'version',
 			label: formatMessage(
@@ -318,7 +399,7 @@ const authorLink = computed(() =>
 					{{ formatMessage(projectCompatibilityMessages.minecraftJava) }}
 					<div class="flex gap-1 flex-wrap mt-2">
 						<TagItem
-							v-for="gameVersion in version.game_versions"
+							v-for="gameVersion in gameVersionsToDisplay"
 							:key="`version-compat-game-version-${gameVersion}`"
 							>{{ gameVersion }}</TagItem
 						>
@@ -414,7 +495,7 @@ const authorLink = computed(() =>
 				/>
 			</div>
 		</section>
-		<section v-if="includedContent?.length > 0" id="content">
+		<section v-if="embeddedDependencies.length > 0" id="content">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">
 				{{
 					formatMessage(
@@ -422,36 +503,60 @@ const authorLink = computed(() =>
 					)
 				}}
 			</h3>
-			<Table :columns="contentTableColumns" :data="includedContent">
+			<Table :columns="contentTableColumns" :data="includedContent" row-key="id">
 				<template #header-actions>
 					<StyledInput
 						v-model="contentSearchQuery"
 						:icon="SearchIcon"
 						:placeholder="formatMessage(messages.searchContent)"
+						:disabled="includedContentLoading"
 						clearable
 						wrapper-class="w-full sm:w-64"
 					/>
 				</template>
 				<template #cell-icon="{ row }">
-					<AutoLink :to="row.link" tabindex="-1" class="flex" target="_blank">
-						<Avatar v-if="row.icon_url" :src="row.icon_url" alt="" size="2rem" />
+					<div
+						v-if="isIncludedContentLoadingRow(row)"
+						class="size-[2rem] shrink-0 rounded-[16%] bg-surface-3 animate-pulse"
+					/>
+					<AutoLink v-else :to="row.link" tabindex="-1" class="flex" target="_blank">
+						<Avatar v-if="row.hasProject || row.icon_url" :src="row.icon_url" alt="" size="2rem" />
 						<div v-else class="size-[2rem] flex items-center justify-center">
 							<FileIcon class="size-5 text-secondary" />
 						</div>
 					</AutoLink>
 				</template>
 				<template #cell-name="{ row }">
+					<div
+						v-if="isIncludedContentLoadingRow(row)"
+						class="h-4 max-w-[12rem] rounded-lg bg-surface-3 animate-pulse"
+					/>
 					<AutoLink
+						v-else
 						:to="row.link"
 						class="flex w-fit"
 						link-class="hover:underline hover:text-contrast"
 						target="_blank"
 					>
 						{{ row.name }}
+						<ExternalIcon v-if="row.link?.startsWith('http')" class="shrink-0 ml-2" />
 					</AutoLink>
 				</template>
 				<template #cell-version="{ row }">
-					{{ (row.version ?? row.hasProject) ? formatMessage(commonMessages.unknownLabel) : '—' }}
+					<div
+						v-if="isIncludedContentLoadingRow(row)"
+						class="h-4 w-16 rounded-lg bg-surface-3 animate-pulse"
+					/>
+					<AutoLink
+						v-else
+						:to="row.version ? row.link : undefined"
+						class="flex w-fit"
+						tabindex="-1"
+						link-class="hover:underline hover:text-contrast"
+						target="_blank"
+					>
+						{{ row.version ?? '—' }}
+					</AutoLink>
 				</template>
 			</Table>
 		</section>
