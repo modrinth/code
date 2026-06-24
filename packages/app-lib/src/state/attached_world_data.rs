@@ -27,16 +27,14 @@ impl AttachedWorldData {
             world_type,
             world_id,
         )
-            .fetch_optional(exec)
-            .await?;
+        .fetch_optional(exec)
+        .await?;
 
-        Ok(attached_data.map(|row| {
-                AttachedWorldData {
-                    display_status: DisplayStatus::from_string(&row.display_status),
-                    project_id: row.project_id,
-                    content_kind: row.content_kind,
-                }
-            }))
+        Ok(attached_data.map(|row| AttachedWorldData {
+            display_status: DisplayStatus::from_string(&row.display_status),
+            project_id: row.project_id,
+            content_kind: row.content_kind,
+        }))
     }
 
     pub async fn get_all_for_instance(
@@ -56,21 +54,19 @@ impl AttachedWorldData {
 
         Ok(attached_data
             .into_iter()
-            .map(
-                |row| {
-                    let world_type = WorldType::from_string(&row.world_type);
-                    let display_status =
-                        DisplayStatus::from_string(&row.display_status);
-                    (
-                        (world_type, row.world_id),
-                        AttachedWorldData {
-                            display_status,
-                            project_id: row.project_id,
-                            content_kind: row.content_kind,
-                        },
-                    )
-                },
-            )
+            .map(|row| {
+                let world_type = WorldType::from_string(&row.world_type);
+                let display_status =
+                    DisplayStatus::from_string(&row.display_status);
+                (
+                    (world_type, row.world_id),
+                    AttachedWorldData {
+                        display_status,
+                        project_id: row.project_id,
+                        content_kind: row.content_kind,
+                    },
+                )
+            })
             .collect())
     }
 

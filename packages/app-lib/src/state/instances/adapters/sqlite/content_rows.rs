@@ -264,7 +264,8 @@ pub(crate) async fn insert_content_set(
     let source_kind = content_set.source_kind.as_str();
     let status = content_set.status.as_str();
     let game_version = content_set.game_version.as_str();
-    let protocol_version = content_set.protocol_version.map(|value| value as i64);
+    let protocol_version =
+        content_set.protocol_version.map(|value| value as i64);
     let loader = content_set.loader.as_str();
     let loader_version = content_set.loader_version.as_deref();
     let created = content_set.created.timestamp();
@@ -314,7 +315,8 @@ pub(crate) async fn update_content_set(
     let source_kind = content_set.source_kind.as_str();
     let status = content_set.status.as_str();
     let game_version = content_set.game_version.as_str();
-    let protocol_version = content_set.protocol_version.map(|value| value as i64);
+    let protocol_version =
+        content_set.protocol_version.map(|value| value as i64);
     let loader = content_set.loader.as_str();
     let loader_version = content_set.loader_version.as_deref();
     let modified = content_set.modified.timestamp();
