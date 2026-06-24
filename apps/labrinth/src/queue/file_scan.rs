@@ -29,6 +29,8 @@ use crate::queue::moderation::{
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 
+const PENDING_FILE_SCAN_BATCH_SIZE: i64 = 100;
+
 /// Attribution enforcement is version/project-scoped, not file-hash-scoped.
 ///
 /// Versions or projects listed in `attributions_exemptions` predate this
@@ -39,11 +41,28 @@ use crate::util::http::HTTP_CLIENT;
 /// versions must go through the `attribution_enforced_versions` view so
 /// grandfathered versions and projects are ignored without making the SHA1
 /// itself exempt.
-pub async fn scan_all_files(
+pub async fn scan_all_pending_files(
     db: &PgPool,
     redis: &RedisPool,
     file_host: &dyn FileHost,
 ) -> Result<()> {
+    loop {
+        let scanned_count =
+            scan_pending_files_batch(db, redis, file_host).await?;
+
+        if scanned_count == 0 {
+            break;
+        }
+    }
+
+    Ok(())
+}
+
+async fn scan_pending_files_batch(
+    db: &PgPool,
+    redis: &RedisPool,
+    file_host: &dyn FileHost,
+) -> Result<usize> {
     let files_to_scan = sqlx::query!(
         r#"
         select
@@ -55,13 +74,16 @@ pub async fn scan_all_files(
         inner join attribution_enforced_versions aev on aev.id = f.version_id
         inner join versions v on v.id = f.version_id
         where fa.attributions_scanned_at is null
-        "#
+        order by fa.file_id
+        limit $1
+        "#,
+        PENDING_FILE_SCAN_BATCH_SIZE,
     )
     .fetch_all(db)
     .await
     .wrap_err("fetching files to scan")?;
 
-    info!("Found {} files to scan", files_to_scan.len());
+    info!("Found {} pending files to scan", files_to_scan.len());
 
     let mut scanned_count = 0;
 
@@ -139,7 +161,7 @@ pub async fn scan_all_files(
 
     info!("Marked {} files as scanned", scanned_count);
 
-    Ok(())
+    Ok(scanned_count)
 }
 
 pub async fn scan_file(

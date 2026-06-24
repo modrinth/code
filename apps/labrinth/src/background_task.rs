@@ -8,7 +8,7 @@ use crate::models::notifications::NotificationBody;
 use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
-use crate::queue::file_scan::scan_all_files;
+use crate::queue::file_scan::scan_all_pending_files;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_affiliate_payouts,
@@ -43,7 +43,7 @@ pub enum BackgroundTask {
     /// Finds files of versions which have not been scanned for attributions
     /// yet, extracts them to find file overrides, and finds any overrides which
     /// require attribution from the creator.
-    ScanFiles,
+    ScanPendingFiles,
     /// Queues Discord Creator Club role claim emails for newly eligible users.
     DiscordRoleEmailCampaign,
 }
@@ -119,7 +119,9 @@ impl BackgroundTask {
                 )
                 .await
             }
-            ScanFiles => scan_all_files(&pool, &redis_pool, &**file_host).await,
+            ScanPendingFiles => {
+                scan_all_pending_files(&pool, &redis_pool, &**file_host).await
+            }
             DiscordRoleEmailCampaign => {
                 discord_role_email_campaign(pool, redis_pool).await
             }
