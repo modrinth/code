@@ -191,7 +191,7 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</template>
-						<ButtonStyled v-else type="outlined" circular>
+						<ButtonStyled type="outlined" circular>
 							<OverflowMenu
 								v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
@@ -201,12 +201,38 @@
 										action: () =>
 											auth.user ? reportVersion(version!.id) : navigateTo(signInRouteObj),
 									},
+									{ divider: true, shown: flags.developerMode },
+									{
+										id: 'copy-id',
+										action: () => copyToClipboard(version!.id),
+										shown: flags.developerMode,
+									},
+									{
+										id: 'copy-permalink',
+										action: () =>
+											copyToClipboard(
+												`https://modrinth.com/project/${project.id}/version/${version!.id}`,
+											),
+										shown: flags.developerMode,
+									},
 								]"
 							>
 								<MoreVerticalIcon />
 								<template #report>
 									<ReportIcon aria-hidden="true" />
 									{{ formatMessage(commonMessages.reportButton) }}
+								</template>
+								<template #copy-link>
+									<ReportIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.reportButton) }}
+								</template>
+								<template #copy-id>
+									<ClipboardCopyIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.copyIdButton) }}
+								</template>
+								<template #copy-permalink>
+									<ClipboardCopyIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.copyPermalinkButton) }}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -401,6 +427,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	ChevronLeftIcon,
+	ClipboardCopyIcon,
 	CopyIcon,
 	DownloadIcon,
 	DropdownIcon,
