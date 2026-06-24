@@ -17,6 +17,7 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
+import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
 const props = defineProps<{
 	showDebugInfo?: boolean
@@ -199,6 +200,7 @@ function prefetchDirectory(path: string) {
 function prefetchFile(path: string) {
 	const id = worldId.value
 	if (!id) return
+	if (!canOpenInFileEditor(path.split('/').pop() ?? path)) return
 
 	queryClient.prefetchQuery({
 		queryKey: ['file-content', id, path],

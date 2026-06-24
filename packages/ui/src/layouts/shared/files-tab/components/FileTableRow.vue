@@ -119,9 +119,8 @@ import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import { commonMessages } from '#ui/utils/common-messages'
 import {
+	canOpenInFileEditor,
 	getFileExtension,
-	isEditableFile as isEditableFileExt,
-	isImageFile,
 } from '#ui/utils/file-extensions'
 
 import {
@@ -303,8 +302,7 @@ const formattedCreationDate = computed(() => {
 
 const isEditableFile = computed(() => {
 	if (props.type === 'file') {
-		const ext = fileExtension.value
-		return !props.name.includes('.') || isEditableFileExt(ext) || isImageFile(ext)
+		return canOpenInFileEditor(props.name)
 	}
 	return false
 })

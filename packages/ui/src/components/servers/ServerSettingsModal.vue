@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
 import type { TabbedModalTab } from '#ui/components'
@@ -56,16 +56,6 @@ const currentUserId = ref<string | null>(null)
 const currentUserRole = ref<string | null>(null)
 
 const isApp = ref(true)
-
-// Preload
-useQuery({
-	queryKey: computed(() => ['content', 'list', 'v1', currentServerId]),
-	queryFn: () =>
-		client.archon.content_v1.getAddons(currentServerId, worldId.value!, {
-			from_modpack: false,
-		}),
-	enabled: computed(() => !!worldId.value),
-})
 
 const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
