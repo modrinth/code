@@ -166,6 +166,7 @@ vars! {
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;
+    FILE_SCAN_CONCURRENCY: i64 = 8i64;
 
     // s3
     S3_PUBLIC_BUCKET_NAME: String = "";

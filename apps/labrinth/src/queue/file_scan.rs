@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 use std::io::{Cursor, Read};
+use std::sync::Arc;
 
 use chrono::Utc;
 use eyre::{Result, eyre};
 use hex::ToHex;
 use sha1::Digest;
-use tokio::task::spawn_blocking;
+use tokio::task::{spawn, spawn_blocking};
 use tracing::{Instrument, info, info_span, warn};
 use zip::ZipArchive;
 
@@ -31,6 +32,13 @@ use crate::util::http::HTTP_CLIENT;
 
 const PENDING_FILE_SCAN_BATCH_SIZE: i64 = 100;
 
+#[derive(Clone)]
+struct PendingFileScan {
+    file_id: DBFileId,
+    url: String,
+    project_id: DBProjectId,
+}
+
 /// Attribution enforcement is version/project-scoped, not file-hash-scoped.
 ///
 /// Versions or projects listed in `attributions_exemptions` predate this
@@ -44,8 +52,10 @@ const PENDING_FILE_SCAN_BATCH_SIZE: i64 = 100;
 pub async fn scan_all_pending_files(
     db: &PgPool,
     redis: &RedisPool,
-    file_host: &dyn FileHost,
+    file_host: Arc<dyn FileHost>,
 ) -> Result<()> {
+    let scan_concurrency = ENV.FILE_SCAN_CONCURRENCY.max(1);
+
     let total_to_scan = sqlx::query_scalar!(
         r#"
         select count(*) as "count!" from file_scans
@@ -57,12 +67,17 @@ pub async fn scan_all_pending_files(
     .wrap_err("fetching number of files to scan")?;
 
     info!(
-        "Found {total_to_scan} total pending files to scan, running in batches of {PENDING_FILE_SCAN_BATCH_SIZE}"
+        "Found {total_to_scan} total pending files to scan, running in batches of {PENDING_FILE_SCAN_BATCH_SIZE} with concurrency {scan_concurrency}"
     );
 
     loop {
-        let scanned_count =
-            scan_pending_files_batch(db, redis, file_host).await?;
+        let scanned_count = scan_pending_files_batch(
+            db,
+            redis,
+            file_host.clone(),
+            scan_concurrency * PENDING_FILE_SCAN_BATCH_SIZE,
+        )
+        .await?;
 
         if scanned_count == 0 {
             break;
@@ -75,7 +90,8 @@ pub async fn scan_all_pending_files(
 async fn scan_pending_files_batch(
     db: &PgPool,
     redis: &RedisPool,
-    file_host: &dyn FileHost,
+    file_host: Arc<dyn FileHost>,
+    scan_limit: i64,
 ) -> Result<usize> {
     let files_to_scan = sqlx::query!(
         r#"
@@ -91,14 +107,58 @@ async fn scan_pending_files_batch(
         order by fa.file_id
         limit $1
         "#,
-        PENDING_FILE_SCAN_BATCH_SIZE,
+        scan_limit,
     )
     .fetch_all(db)
     .await
     .wrap_err("fetching files to scan")?;
 
-    info!("Found {} pending files to scan", files_to_scan.len());
+    info!(
+        "Found {} pending files to scan, splitting into jobs of {PENDING_FILE_SCAN_BATCH_SIZE}",
+        files_to_scan.len(),
+    );
 
+    let files_to_scan: Vec<_> = files_to_scan
+        .into_iter()
+        .map(|row| PendingFileScan {
+            file_id: row.file_id,
+            url: row.url,
+            project_id: row.project_id,
+        })
+        .collect();
+
+    let mut tasks = Vec::new();
+    for chunk in files_to_scan.chunks(PENDING_FILE_SCAN_BATCH_SIZE as usize) {
+        let db = db.clone();
+        let redis = redis.clone();
+        let file_host = file_host.clone();
+        let chunk = chunk.to_vec();
+
+        tasks.push(spawn(async move {
+            scan_pending_files_chunk(&db, &redis, &*file_host, chunk).await
+        }));
+    }
+
+    let mut scanned_count = 0;
+    for task in tasks {
+        scanned_count += task
+            .await
+            .wrap_err("joining file scan task")?
+            .wrap_err("scanning pending file chunk")?;
+    }
+
+    info!("Marked {} files as scanned", scanned_count);
+
+    Ok(scanned_count)
+}
+
+async fn scan_pending_files_chunk(
+    db: &PgPool,
+    redis: &RedisPool,
+    file_host: &dyn FileHost,
+    files_to_scan: Vec<PendingFileScan>,
+) -> Result<usize> {
+    info!("Scanning {} files", files_to_scan.len());
     let mut scanned_count = 0;
 
     for row in files_to_scan {
@@ -174,8 +234,6 @@ async fn scan_pending_files_batch(
 
         scanned_count += 1;
     }
-
-    info!("Marked {} files as scanned", scanned_count);
 
     Ok(scanned_count)
 }

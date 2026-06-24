@@ -120,7 +120,12 @@ impl BackgroundTask {
                 .await
             }
             ScanPendingFiles => {
-                scan_all_pending_files(&pool, &redis_pool, &**file_host).await
+                scan_all_pending_files(
+                    &pool,
+                    &redis_pool,
+                    file_host.into_inner(),
+                )
+                .await
             }
             DiscordRoleEmailCampaign => {
                 discord_role_email_campaign(pool, redis_pool).await
