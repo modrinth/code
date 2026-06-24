@@ -372,10 +372,19 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
             continue;
         }
 
-        let should_scan_file = name.contains(".jar")
-            || (name.contains(".zip") && !name.ends_with(".zip.txt"));
-
-        if name.matches('/').count() > 2 || !should_scan_file {
+        let should_skip = name.starts_with("mods/.connector/")
+            || name.starts_with(".sable/natives/")
+            || name.starts_with("local/crash_assistant/")
+            || name.starts_with("mods/mcef-libraries/")
+            || name.starts_with("mods/mcef-cache/")
+            || name.starts_with("config/super_resolution/libraries/")
+            || name.starts_with("config/Veinminer/update/")
+            || name.starts_with("config/epicfight/native/")
+            || name.starts_with("essential/")
+            || name.ends_with(".rpo")
+            || name.ends_with(".txt");
+        let should_scan = name.contains(".jar") || name.contains(".zip");
+        if should_scan && !should_skip {
             continue;
         }
 
