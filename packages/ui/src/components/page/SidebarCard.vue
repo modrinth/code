@@ -9,13 +9,12 @@ defineProps<{
 </script>
 <template>
 	<div
-		class="flex flex-col gap-3 p-4 pt-3"
+		class="flex flex-col gap-3 p-4"
 		:class="{
-			'card-shadow mb-4 last:mb-0 rounded-2xl bg-surface-3 border border-solid border-surface-4':
-				!hierarchicalSidebarAvailable,
+			'card-shadow mb-4 last:mb-0 rounded-2xl bg-bg-raised': !hierarchicalSidebarAvailable,
 		}"
 	>
-		<h2 class="text-lg font-semibold m-0">{{ title }}</h2>
+		<span class="font-semibold">{{ title }}</span>
 		<slot />
 	</div>
 </template>

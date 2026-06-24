@@ -5,8 +5,6 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::database::PgPool;
-use crate::database::models::ids::DBUserId;
-use crate::database::models::moderation_external_item::ExternalLicense;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::queue::moderation::ApprovalType;
@@ -16,11 +14,7 @@ use crate::{auth::check_is_moderator_from_headers, queue::session::AuthQueue};
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(search)
         .service(get_by_sha1)
-        .service(get_by_sha1_bulk)
-        .service(lookup)
-        .service(update_license)
-        .service(add_file)
-        .service(reassign_file);
+        .service(update_license);
 }
 
 #[derive(Serialize, Deserialize, utoipa::ToSchema)]
@@ -49,26 +43,6 @@ pub struct LinkedFile {
 pub struct SearchRequest {
     pub title: Option<String>,
     pub flame_id: Option<i32>,
-    pub flame_ids: Option<Vec<i32>>,
-}
-
-#[derive(Deserialize, utoipa::ToSchema)]
-pub struct HashLookupRequest {
-    pub hashes: Vec<String>,
-}
-
-#[derive(Deserialize, utoipa::ToSchema)]
-pub struct ExternalLicenseLookupRequest {
-    #[serde(default)]
-    pub flame_ids: Vec<i32>,
-    #[serde(default)]
-    pub hashes: Vec<String>,
-}
-
-#[derive(Serialize, utoipa::ToSchema)]
-pub struct ExternalLicenseLookupResponse {
-    pub flame_ids: HashMap<i32, Vec<ExternalProject>>,
-    pub hashes: HashMap<String, ExternalProject>,
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -79,32 +53,6 @@ pub struct UpdateLicenseRequest {
     pub exceptions: Option<String>,
     pub proof: Option<String>,
     pub flame_project_id: Option<i32>,
-}
-
-#[derive(Deserialize, utoipa::ToSchema)]
-pub struct FileLicenseRequest {
-    pub hashes: Vec<String>,
-    pub license_id: LicenseId,
-}
-
-#[derive(Deserialize, utoipa::ToSchema)]
-#[serde(untagged)]
-pub enum LicenseId {
-    Number(i64),
-    String(String),
-}
-
-impl LicenseId {
-    fn parse(self) -> Result<i64, ApiError> {
-        match self {
-            LicenseId::Number(id) => Ok(id),
-            LicenseId::String(id) => id.parse().map_err(|_| {
-                ApiError::InvalidInput(
-                    "license_id must be a valid integer".to_string(),
-                )
-            }),
-        }
-    }
 }
 
 struct LicenseRow {
@@ -119,38 +67,6 @@ struct LicenseRow {
     inserted_by: Option<i64>,
     updated_at: Option<DateTime<Utc>>,
     updated_by: Option<i64>,
-}
-
-struct LicenseHashRow {
-    hash: Vec<u8>,
-    id: i64,
-    title: Option<String>,
-    status: String,
-    link: Option<String>,
-    exceptions: Option<String>,
-    proof: Option<String>,
-    flame_project_id: Option<i32>,
-    inserted_at: Option<DateTime<Utc>>,
-    inserted_by: Option<i64>,
-    updated_at: Option<DateTime<Utc>>,
-    updated_by: Option<i64>,
-}
-
-fn normalize_sha1_hashes(hashes: &[String]) -> Result<Vec<String>, ApiError> {
-    hashes
-        .iter()
-        .map(|hash| {
-            let hash = hash.trim().to_lowercase();
-            if hash.len() != 40 || !hash.chars().all(|c| c.is_ascii_hexdigit())
-            {
-                return Err(ApiError::InvalidInput(
-                    "hash must be a valid SHA1 hex string".to_string(),
-                ));
-            }
-
-            Ok(hash)
-        })
-        .collect()
 }
 
 impl LicenseRow {
@@ -204,129 +120,10 @@ async fn fetch_linked_files(
             .or_default()
             .push(LinkedFile {
                 name: row.filename,
-                sha1: String::from_utf8(row.sha1)
-                    .unwrap_or_else(|err| hex::encode(err.into_bytes())),
+                sha1: hex::encode(&row.sha1),
             });
     }
     Ok(map)
-}
-
-async fn fetch_by_hashes(
-    pool: &PgPool,
-    hashes: &[String],
-) -> Result<HashMap<String, ExternalProject>, ApiError> {
-    if hashes.is_empty() {
-        return Ok(HashMap::new());
-    }
-
-    let hash_bytes = hashes
-        .iter()
-        .map(|hash| hash.as_bytes().to_vec())
-        .collect::<Vec<_>>();
-
-    let rows = sqlx::query_as!(
-        LicenseHashRow,
-        r#"
-        SELECT
-            mef.sha1 hash,
-            mel.id,
-            mel.title,
-            mel.status,
-            mel.link,
-            mel.exceptions,
-            mel.proof,
-            mel.flame_project_id,
-            mel.inserted_at,
-            mel.inserted_by,
-            mel.updated_at,
-            mel.updated_by
-        FROM moderation_external_files mef
-        INNER JOIN moderation_external_licenses mel ON mel.id = mef.external_license_id
-        WHERE mef.sha1 = ANY($1)
-        "#,
-        &hash_bytes,
-    )
-    .fetch_all(pool)
-    .await?;
-
-    let license_ids = rows.iter().map(|row| row.id).collect::<Vec<_>>();
-    let files_map = fetch_linked_files(pool, &license_ids).await?;
-
-    let mut results = HashMap::new();
-    for row in rows {
-        let hash = String::from_utf8(row.hash)
-            .unwrap_or_else(|err| hex::encode(err.into_bytes()));
-        let linked_files = files_map.get(&row.id).cloned().unwrap_or_default();
-        results.insert(
-            hash,
-            LicenseRow {
-                id: row.id,
-                title: row.title,
-                status: row.status,
-                link: row.link,
-                exceptions: row.exceptions,
-                proof: row.proof,
-                flame_project_id: row.flame_project_id,
-                inserted_at: row.inserted_at,
-                inserted_by: row.inserted_by,
-                updated_at: row.updated_at,
-                updated_by: row.updated_by,
-            }
-            .into_external_project(linked_files),
-        );
-    }
-
-    Ok(results)
-}
-
-async fn fetch_by_flame_ids(
-    pool: &PgPool,
-    flame_ids: &[i32],
-) -> Result<HashMap<i32, Vec<ExternalProject>>, ApiError> {
-    if flame_ids.is_empty() {
-        return Ok(HashMap::new());
-    }
-
-    let rows = sqlx::query_as!(
-        LicenseRow,
-        r#"
-        SELECT
-            mel.id,
-            mel.title,
-            mel.status,
-            mel.link,
-            mel.exceptions,
-            mel.proof,
-            mel.flame_project_id,
-            mel.inserted_at,
-            mel.inserted_by,
-            mel.updated_at,
-            mel.updated_by
-        FROM moderation_external_licenses mel
-        WHERE mel.flame_project_id = ANY($1)
-        ORDER BY mel.id
-        "#,
-        flame_ids,
-    )
-    .fetch_all(pool)
-    .await?;
-
-    let license_ids = rows.iter().map(|row| row.id).collect::<Vec<_>>();
-    let files_map = fetch_linked_files(pool, &license_ids).await?;
-
-    let mut results: HashMap<i32, Vec<ExternalProject>> = HashMap::new();
-    for row in rows {
-        if let Some(flame_project_id) = row.flame_project_id {
-            let linked_files =
-                files_map.get(&row.id).cloned().unwrap_or_default();
-            results
-                .entry(flame_project_id)
-                .or_default()
-                .push(row.into_external_project(linked_files));
-        }
-    }
-
-    Ok(results)
 }
 
 #[utoipa::path]
@@ -347,8 +144,7 @@ async fn search(
     )
     .await?;
 
-    let rows = sqlx::query_as!(
-        LicenseRow,
+    let rows = sqlx::query!(
         r#"
         SELECT
             mel.id,
@@ -364,16 +160,11 @@ async fn search(
             mel.updated_by
         FROM moderation_external_licenses mel
         WHERE ($1::text IS NULL OR mel.title ILIKE '%' || $1 || '%')
-          AND (
-            ($2::integer IS NULL AND $3::integer[] IS NULL)
-            OR mel.flame_project_id = $2
-            OR mel.flame_project_id = ANY($3)
-          )
+          AND ($2::integer IS NULL OR mel.flame_project_id = $2)
         ORDER BY mel.id
         "#,
         body.title,
         body.flame_id,
-        body.flame_ids.as_deref(),
     )
     .fetch_all(&**pool)
     .await?;
@@ -386,40 +177,24 @@ async fn search(
         .map(|row| {
             let linked_files =
                 files_map.get(&row.id).cloned().unwrap_or_default();
-            row.into_external_project(linked_files)
+            LicenseRow {
+                id: row.id,
+                title: row.title,
+                status: row.status,
+                link: row.link,
+                exceptions: row.exceptions,
+                proof: row.proof,
+                flame_project_id: row.flame_project_id,
+                inserted_at: row.inserted_at,
+                inserted_by: row.inserted_by,
+                updated_at: row.updated_at,
+                updated_by: row.updated_by,
+            }
+            .into_external_project(linked_files)
         })
         .collect();
 
     Ok(web::Json(results))
-}
-
-#[utoipa::path]
-#[post("/lookup")]
-async fn lookup(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    body: web::Json<ExternalLicenseLookupRequest>,
-) -> Result<web::Json<ExternalLicenseLookupResponse>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
-
-    let body = body.into_inner();
-    let hashes = normalize_sha1_hashes(&body.hashes)?;
-    let flame_ids = fetch_by_flame_ids(&pool, &body.flame_ids).await?;
-    let hashes = fetch_by_hashes(&pool, &hashes).await?;
-
-    Ok(web::Json(ExternalLicenseLookupResponse {
-        flame_ids,
-        hashes,
-    }))
 }
 
 #[utoipa::path]
@@ -440,145 +215,48 @@ async fn get_by_sha1(
     )
     .await?;
 
-    let hashes = normalize_sha1_hashes(&[path.into_inner().0])?;
-    let hash = hashes.first().ok_or(ApiError::NotFound)?;
-    let mut results = fetch_by_hashes(&pool, &hashes).await?;
-    let result = results.remove(hash).ok_or(ApiError::NotFound)?;
+    let sha1 = path.into_inner().0;
 
-    Ok(web::Json(result))
-}
-
-#[utoipa::path]
-#[post("/by-sha1")]
-async fn get_by_sha1_bulk(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    body: web::Json<HashLookupRequest>,
-) -> Result<web::Json<HashMap<String, ExternalProject>>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
-
-    let hashes = normalize_sha1_hashes(&body.hashes)?;
-    let results = fetch_by_hashes(&pool, &hashes).await?;
-
-    Ok(web::Json(results))
-}
-
-#[utoipa::path]
-#[post("/file")]
-async fn add_file(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    body: web::Json<FileLicenseRequest>,
-) -> Result<web::Json<ExternalProject>, ApiError> {
-    upsert_file_license(req, pool, redis, session_queue, body).await
-}
-
-#[utoipa::path]
-#[post("/file/reassign")]
-async fn reassign_file(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    body: web::Json<FileLicenseRequest>,
-) -> Result<web::Json<ExternalProject>, ApiError> {
-    upsert_file_license(req, pool, redis, session_queue, body).await
-}
-
-async fn upsert_file_license(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    body: web::Json<FileLicenseRequest>,
-) -> Result<web::Json<ExternalProject>, ApiError> {
-    let user = check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
-
-    let body = body.into_inner();
-    let license_id = body.license_id.parse()?;
-    if body.hashes.is_empty() {
-        return Err(ApiError::InvalidInput(
-            "hashes must contain at least one SHA1 hex string".to_string(),
-        ));
-    }
-    let hashes = normalize_sha1_hashes(&body.hashes)?;
-    let hash_bytes = hashes
-        .iter()
-        .map(|hash| hash.as_bytes().to_vec())
-        .collect::<Vec<_>>();
-    let filenames = vec![None; hashes.len()];
-    let license_ids = vec![license_id; hashes.len()];
-
-    let mut transaction = pool.begin().await?;
-
-    let license = sqlx::query!(
+    let row = sqlx::query!(
         r#"
         SELECT
-            id,
-            title,
-            status,
-            link,
-            exceptions,
-            proof,
-            flame_project_id,
-            inserted_at,
-            inserted_by,
-            updated_at,
-            updated_by
-        FROM moderation_external_licenses
-        WHERE id = $1
+            mel.id,
+            mel.title,
+            mel.status,
+            mel.link,
+            mel.exceptions,
+            mel.proof,
+            mel.flame_project_id,
+            mel.inserted_at,
+            mel.inserted_by,
+            mel.updated_at,
+            mel.updated_by
+        FROM moderation_external_files mef
+        INNER JOIN moderation_external_licenses mel ON mel.id = mef.external_license_id
+        WHERE mef.sha1 = $1
         "#,
-        license_id,
+        sha1.as_bytes().to_vec(),
     )
-    .fetch_optional(&mut transaction)
+    .fetch_optional(&**pool)
     .await?
     .ok_or(ApiError::NotFound)?;
 
-    ExternalLicense::insert_files(
-        &mut transaction,
-        &hash_bytes,
-        &filenames,
-        &license_ids,
-        DBUserId(user.id.0 as i64),
-    )
-    .await?;
-
-    transaction.commit().await?;
-
-    let files_map = fetch_linked_files(&pool, &[license_id]).await?;
-    let linked_files = files_map.get(&license_id).cloned().unwrap_or_default();
+    let files_map = fetch_linked_files(&pool, &[row.id]).await?;
+    let linked_files = files_map.get(&row.id).cloned().unwrap_or_default();
 
     Ok(web::Json(
         LicenseRow {
-            id: license.id,
-            title: license.title,
-            status: license.status,
-            link: license.link,
-            exceptions: license.exceptions,
-            proof: license.proof,
-            flame_project_id: license.flame_project_id,
-            inserted_at: license.inserted_at,
-            inserted_by: license.inserted_by,
-            updated_at: license.updated_at,
-            updated_by: license.updated_by,
+            id: row.id,
+            title: row.title,
+            status: row.status,
+            link: row.link,
+            exceptions: row.exceptions,
+            proof: row.proof,
+            flame_project_id: row.flame_project_id,
+            inserted_at: row.inserted_at,
+            inserted_by: row.inserted_by,
+            updated_at: row.updated_at,
+            updated_by: row.updated_by,
         }
         .into_external_project(linked_files),
     ))

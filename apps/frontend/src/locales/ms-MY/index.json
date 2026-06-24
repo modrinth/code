@@ -3110,6 +3110,9 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Jika anda memerlukan bantuan atau mempunyai pertanyaan tambahan, sila lawati <help-center-link>Pusat Bantuan Modrinth</help-center-link> dan klik gelembung biru untuk menghubungi sokongan."
   },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Tunjukkan antara muka ahli"
+  },
   "project.moderation.thread.private-description": {
     "message": "Ini adalah bebenang perbualan peribadi dengan penyederhana Modrinth. Mereka mungkin akan menghantar mesej kepada anda tentang isu-isu berkaitan projek ini."
   },
@@ -3235,6 +3238,9 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, other {Versi ini}} kini ditahan dan tidak disenaraikan secara umum. Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula fail tertentu yang disertakan dalam {count, plural, other {versi}} pek mod ini."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Selesaikan"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, other {Versi}} telah ditahan kerana kandungan terbenam yang tidak diketahui"

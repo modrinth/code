@@ -11,20 +11,6 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-06-24T00:30:00-07:00`,
-		product: 'web',
-		body: `## Fixed
-- Fixed a number of consistency issues across collection, project, and user pages.
-- Fixed a number of bugs with the new modpack permissions system.
-- Fxied some issues with the new version page.`,
-	},
-	{
-		date: `2026-06-23T19:31:16+00:00`,
-		product: 'web',
-		body: `## Added
-- Added new modpack permissions system. Read our blog post about it [here](/news/article/modpack-permissions/).`,
-	},
-	{
 		date: `2026-06-22T18:12:52+00:00`,
 		product: 'web',
 		body: `## Added
@@ -33,7 +19,6 @@ const VERSIONS: VersionEntry[] = [
 - Added members breakdown/filter to revenue analytics.
 
 ## Changed
-- Overhauled the version page.
 - Removed project version's project column when there were multiple projects selected with project version breakdown as it's redundant when project breakdown can be added.
 
 ## Fixed

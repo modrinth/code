@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -167,7 +169,7 @@ pub async fn message_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::threads::message_delete(

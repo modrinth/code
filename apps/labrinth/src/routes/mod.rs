@@ -97,8 +97,7 @@ pub enum ApiError {
     FileHosting(#[from] FileHostingError),
     #[error("database error")]
     Database(#[from] crate::database::models::DatabaseError),
-    // todo: remove this variant
-    #[error("Postgres database error: {0}")]
+    #[error("Postgres database error")]
     SqlxDatabase(#[from] sqlx::Error),
     #[error("redis database error")]
     RedisDatabase(#[from] redis::RedisError),

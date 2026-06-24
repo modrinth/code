@@ -5,7 +5,6 @@ import {
 	CalendarIcon,
 	CardIcon,
 	CheckCircleIcon,
-	CircleAlertIcon,
 	CurrencyIcon,
 	DiscordIcon,
 	FileArchiveIcon,
@@ -73,7 +72,6 @@ export const SEVERITY_ICONS: Record<string, Component> = {
 	critical: XCircleIcon,
 	success: CheckCircleIcon,
 	moderation: ScaleIcon,
-	'circle-warning': CircleAlertIcon,
 }
 
 export const PROJECT_STATUS_ICONS: Record<ProjectStatus, Component> = {

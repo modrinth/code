@@ -106,20 +106,20 @@ impl PayoutsQueue {
 
     pub async fn get_mural_balance(
         &self,
-    ) -> eyre::Result<Option<AccountBalance>> {
+    ) -> Result<Option<AccountBalance>, ApiError> {
         let muralpay = self.muralpay.load();
         let muralpay = muralpay
             .as_ref()
-            .wrap_err("Mural Pay client not available")?;
+            .wrap_internal_err("Mural Pay client not available")?;
 
         let account = muralpay
             .client
             .get_account(muralpay.source_account_id)
             .await
-            .wrap_err("failed to get source account")?;
+            .wrap_internal_err("failed to get source account")?;
         let details = account
             .account_details
-            .wrap_err("source account does not have details")?;
+            .wrap_internal_err("source account does not have details")?;
         let available = details
             .balances
             .iter()

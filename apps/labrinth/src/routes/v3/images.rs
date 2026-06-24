@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::threads::is_authorized_thread;
 use crate::auth::checks::{is_team_member_project, is_team_member_version};
 use crate::auth::get_user_from_headers;
@@ -39,7 +41,7 @@ pub struct ImageUpload {
 pub async fn images_add(
     req: HttpRequest,
     web::Query(data): web::Query<ImageUpload>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -189,7 +191,7 @@ pub async fn images_add(
         &data.ext,
         None,
         None,
-        &**file_host,
+        &***file_host,
     )
     .await?;
 

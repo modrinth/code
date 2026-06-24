@@ -80,7 +80,7 @@ import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{
-		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation' | 'circle-warning'
+		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation'
 		header?: string
 		body?: string
 		showActionsUnderneath?: boolean
@@ -139,7 +139,6 @@ const timestampTooltip = computed(() => {
 const typeClasses = {
 	info: 'border-brand-blue bg-bg-blue',
 	warning: 'border-brand-orange bg-bg-orange',
-	'circle-warning': 'border-brand-orange bg-bg-orange',
 	critical: 'border-brand-red bg-bg-red',
 	success: 'border-brand-green bg-bg-green',
 	moderation: 'border-brand-orange bg-bg-orange',
@@ -148,7 +147,6 @@ const typeClasses = {
 const iconClasses = {
 	info: 'text-brand-blue',
 	warning: 'text-brand-orange',
-	'circle-warning': 'text-brand-orange',
 	critical: 'text-brand-red',
 	success: 'text-brand-green',
 	moderation: 'text-brand-orange',
@@ -157,7 +155,6 @@ const iconClasses = {
 const buttonColors = {
 	info: 'blue',
 	warning: 'orange',
-	'circle-warning': 'orange',
 	critical: 'red',
 	success: 'green',
 	moderation: 'orange',
@@ -166,7 +163,6 @@ const buttonColors = {
 const progressTrackClasses = {
 	info: 'bg-brand-blue/20',
 	warning: 'bg-brand-orange/20',
-	'circle-warning': 'bg-brand-orange/20',
 	critical: 'bg-brand-red/20',
 	success: 'bg-brand-green/20',
 	moderation: 'bg-brand-orange/20',
@@ -175,7 +171,6 @@ const progressTrackClasses = {
 const progressFillClasses = {
 	info: 'bg-brand-blue',
 	warning: 'bg-brand-orange',
-	'circle-warning': 'bg-brand-orange',
 	critical: 'bg-brand-red',
 	success: 'bg-brand-green',
 	blue: 'bg-brand-blue',

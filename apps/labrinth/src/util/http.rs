@@ -1,23 +1,24 @@
-use std::sync::LazyLock;
+use std::time::Duration;
 
 use derive_more::Deref;
+use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 
-pub static HTTP_CLIENT: LazyLock<HttpClient> = LazyLock::new(HttpClient::new);
-
+/// Generic HTTP client used for anywhere you need to send an HTTP request, and
+/// do not care what headers or other parameters are used.
 #[derive(Debug, Clone, Deref)]
-pub struct HttpClient(reqwest::Client);
+pub struct HttpClient(pub reqwest::Client);
 
 impl HttpClient {
     pub fn new() -> Self {
         let client = reqwest::Client::builder()
-            .default_headers(reqwest::header::HeaderMap::from_iter([(
-                reqwest::header::USER_AGENT,
-                reqwest::header::HeaderValue::from_static(concat!(
+            .default_headers(HeaderMap::from_iter([(
+                USER_AGENT,
+                HeaderValue::from_static(concat!(
                     "Labrinth/",
                     env!("COMPILATION_DATE")
                 )),
             )]))
-            .timeout(std::time::Duration::from_secs(30))
+            .timeout(Duration::from_secs(30))
             .build()
             .unwrap();
         Self(client)

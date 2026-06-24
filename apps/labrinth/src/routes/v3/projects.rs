@@ -1,6 +1,7 @@
 use std::any::type_name;
 use std::cmp::Reverse;
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
@@ -12,7 +13,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
-use crate::database::{PgPool, PgTransaction, ReadOnlyPgPool};
+use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ProjectId, VersionId};
@@ -1290,26 +1291,22 @@ pub async fn dependency_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    dependency_list_internal(req, info, pool, ro_pool, redis, session_queue)
-        .await
+    dependency_list_internal(req, info, pool, redis, session_queue).await
 }
 
 pub async fn dependency_list_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result =
-        db_models::DBProject::get(&string, &***ro_pool, &redis).await?;
+    let result = db_models::DBProject::get(&string, &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -1331,7 +1328,7 @@ pub async fn dependency_list_internal(
 
         let dependencies = database::DBProject::get_dependencies(
             project.inner.id,
-            &***ro_pool,
+            &**pool,
             &redis,
         )
         .await?;
@@ -1357,19 +1354,11 @@ pub async fn dependency_list_internal(
             .unique()
             .collect::<Vec<db_models::DBVersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
-            database::DBProject::get_many_ids(
-                &project_ids,
-                &***ro_pool,
-                &redis,
-            ),
+            database::DBProject::get_many_ids(&project_ids, &**pool, &redis),
             async {
-                database::DBVersion::get_many(
-                    &dep_version_ids,
-                    &***ro_pool,
-                    &redis,
-                )
-                .await
-                .wrap_internal_err("failed to fetch dependency versions")
+                database::DBVersion::get_many(&dep_version_ids, &**pool, &redis)
+                    .await
+                    .wrap_internal_err("failed to fetch dependency versions")
             },
         )
         .await?;
@@ -1385,7 +1374,6 @@ pub async fn dependency_list_internal(
             versions_result,
             &user_option,
             &pool,
-            &ro_pool,
             &redis,
         )
         .await?;
@@ -1738,7 +1726,7 @@ async fn project_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
@@ -1763,7 +1751,7 @@ pub async fn project_icon_edit_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
@@ -1822,7 +1810,7 @@ pub async fn project_icon_edit_internal(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
         FileHostPublicity::Public,
-        &**file_host,
+        &***file_host,
     )
     .await?;
 
@@ -1841,7 +1829,7 @@ pub async fn project_icon_edit_internal(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &**file_host,
+        &***file_host,
     )
     .await?;
 
@@ -1881,7 +1869,7 @@ async fn delete_project_icon(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
@@ -1902,7 +1890,7 @@ pub async fn delete_project_icon_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
@@ -1959,7 +1947,7 @@ pub async fn delete_project_icon_internal(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
         FileHostPublicity::Public,
-        &**file_host,
+        &***file_host,
     )
     .await?;
 
@@ -2009,7 +1997,7 @@ pub async fn add_gallery_item(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
@@ -2036,7 +2024,7 @@ pub async fn add_gallery_item_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
@@ -2117,7 +2105,7 @@ pub async fn add_gallery_item_internal(
         &ext.ext,
         Some(350),
         Some(1.0),
-        &**file_host,
+        &***file_host,
     )
     .await?;
 
@@ -2394,7 +2382,7 @@ async fn delete_gallery_item(
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
@@ -2415,7 +2403,7 @@ pub async fn delete_gallery_item_internal(
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
@@ -2492,7 +2480,7 @@ pub async fn delete_gallery_item_internal(
         Some(item.image_url),
         Some(item.raw_image_url),
         FileHostPublicity::Public,
-        &**file_host,
+        &***file_host,
     )
     .await?;
 

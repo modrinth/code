@@ -19,8 +19,7 @@ const gallery: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/gallery/insufficient.md?raw')).default,
+			message: async () => (await import('../messages/gallery/insufficient.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'gallery_not_relevant',
@@ -30,8 +29,7 @@ const gallery: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			shouldShow: (project) => project.gallery && project.gallery.length > 0,
-			message: async () =>
-				(await import('../messages/checklist-messages/gallery/not-relevant.md?raw')).default,
+			message: async () => (await import('../messages/gallery/not-relevant.md?raw')).default,
 		} as ButtonAction,
 	],
 }

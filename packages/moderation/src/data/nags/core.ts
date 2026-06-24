@@ -202,33 +202,4 @@ export const coreNags: Nag[] = [
 			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-license',
 		},
 	},
-	{
-		id: 'review-permissions',
-		title: defineMessage({
-			id: 'nags.review-permissions.title',
-			defaultMessage: 'Review external permissions',
-		}),
-		description: (context: NagContext) => {
-			const { formatMessage } = useVIntl()
-			return formatMessage(
-				defineMessage({
-					id: 'nags.review-permissions.description',
-					defaultMessage:
-						'Make sure you have provided proof of your permission to distribute any external content in your Modpack.',
-				}),
-			)
-		},
-		status: 'required',
-		shouldShow: (context: NagContext) =>
-			context.versions.some((version) => (version.files_missing_attribution?.length ?? 0) >= 1),
-		link: {
-			path: 'settings/permissions',
-			title: defineMessage({
-				id: 'nags.settings.permissions.title',
-				defaultMessage: 'Visit permissions dashboard',
-			}),
-			shouldShow: (context: NagContext) =>
-				context.currentRoute !== 'type-project-settings-permissions',
-		},
-	},
 ]

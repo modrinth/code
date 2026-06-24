@@ -23,8 +23,7 @@ const categories: Stage = {
 			weight: 700,
 			suggestedStatus: 'flagged',
 			severity: 'low',
-			message: async () =>
-				(await import('../messages/checklist-messages/categories/inaccurate.md?raw')).default,
+			message: async () => (await import('../messages/categories/inaccurate.md?raw')).default,
 			disablesActions: ['categories_optimization_misused', 'categories_resolutions_misused'],
 		} as ButtonAction,
 		{
@@ -38,9 +37,8 @@ const categories: Stage = {
 				project.categories.includes('optimization') ||
 				project.additional_categories.includes('optimization'),
 			message: async () =>
-				(await import('../messages/checklist-messages/categories/inaccurate.md?raw')).default +
-				(await import('../messages/checklist-messages/categories/optimization_misused.md?raw'))
-					.default,
+				(await import('../messages/categories/inaccurate.md?raw')).default +
+				(await import('../messages/categories/optimization_misused.md?raw')).default,
 			disablesActions: ['categories_inaccurate', 'categories_resolutions_misused'],
 		} as ButtonAction,
 		{
@@ -52,9 +50,8 @@ const categories: Stage = {
 			severity: 'low',
 			shouldShow: (project) => project.project_type === 'resourcepack',
 			message: async () =>
-				(await import('../messages/checklist-messages/categories/inaccurate.md?raw')).default +
-				(await import('../messages/checklist-messages/categories/resolutions_misused.md?raw'))
-					.default,
+				(await import('../messages/categories/inaccurate.md?raw')).default +
+				(await import('../messages/categories/resolutions_misused.md?raw')).default,
 			disablesActions: ['categories_inaccurate', 'categories_optimization_misused'],
 		},
 	],

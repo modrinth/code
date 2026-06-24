@@ -494,8 +494,7 @@ pub async fn test_patch_version() {
                 project_id: Some(*beta_project_id_parsed),
                 version_id: None,
                 file_name: Some("dummy_file_name".to_string()),
-                dependency_type: DependencyType::Required,
-                attribution: None,
+                dependency_type: DependencyType::Required
             }]
         );
         assert_eq!(version.loaders, vec!["forge".to_string()]);

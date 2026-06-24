@@ -72,9 +72,11 @@
 					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
 						{{ formatMessage(messages.threadSectionTitle) }}
 					</h2>
-					<div v-if="isStaff(currentMember?.user)" class="flex items-center gap-2">
+					<div v-if="currentMember?.staffOnly" class="flex items-center gap-2">
 						<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
-						<label for="moderator-see-user-ui-toggle"> Show member UI </label>
+						<label for="moderator-see-user-ui-toggle">
+							{{ formatMessage(messages.moderatorSeeUserUiToggle) }}
+						</label>
 					</div>
 				</div>
 				<template v-if="userFacingUiVisible">
@@ -149,9 +151,8 @@ import {
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { isStaff } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, watch } from 'vue'
+import { computed, type Ref, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
@@ -159,6 +160,7 @@ import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 
+type ProjectPageMember = Labrinth.Projects.v3.TeamMember & { staffOnly?: boolean }
 type ModerationAdmonitionSection =
 	| {
 			type: 'paragraph'
@@ -178,6 +180,10 @@ const messages = defineMessages({
 	threadSectionTitle: {
 		id: 'project.moderation.thread.title',
 		defaultMessage: 'Moderation messages',
+	},
+	moderatorSeeUserUiToggle: {
+		id: 'project.moderation.thread.moderator-see-user-ui-toggle',
+		defaultMessage: 'Show member UI',
 	},
 	threadPrivateDescription: {
 		id: 'project.moderation.thread.private-description',
@@ -207,10 +213,18 @@ const messages = defineMessages({
 })
 
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, invalidate, allMembers } = injectProjectPageContext()
+const {
+	projectV2: project,
+	currentMember: currentMemberRaw,
+	invalidate,
+	allMembers,
+} = injectProjectPageContext()
+const currentMember = currentMemberRaw as Ref<ProjectPageMember | null>
 
 const canAccess = computed(() => !!currentMember.value)
-const userFacingUiVisible = computed(() => !!currentMember.value && moderatorSeeUserUi.value)
+const userFacingUiVisible = computed(
+	() => !!currentMember.value && (!currentMember.value.staffOnly || moderatorSeeUserUi.value),
+)
 
 const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 	switch (project.value?.status) {

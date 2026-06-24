@@ -20,8 +20,7 @@ const versions: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
-				(await import('../messages/checklist-messages/versions/incorrect_additional_files.md?raw'))
-					.default,
+				(await import('../messages/versions/incorrect_additional_files.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'versions_incorrect_project_type',
@@ -42,25 +41,21 @@ const versions: Stage = {
 							weight: 1001,
 							shouldShow: (project) => project.project_type !== 'modpack',
 							message: async () =>
-								(await import('../messages/checklist-messages/versions/invalid-modpacks.md?raw'))
-									.default,
+								(await import('../messages/versions/invalid-modpacks.md?raw')).default,
 						} as DropdownActionOption,
 						{
 							label: 'Resource Pack',
 							weight: 1001,
 							shouldShow: (project) => project.project_type !== 'resourcepack',
 							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/invalid-resourcepacks.md?raw')
-								).default,
+								(await import('../messages/versions/invalid-resourcepacks.md?raw')).default,
 						} as DropdownActionOption,
 						{
 							label: 'Data Pack',
 							weight: 1001,
 							shouldShow: (project) => !project.loaders.includes('datapack'),
 							message: async () =>
-								(await import('../messages/checklist-messages/versions/invalid-datapacks.md?raw'))
-									.default,
+								(await import('../messages/versions/invalid-datapacks.md?raw')).default,
 						} as DropdownActionOption,
 					],
 				} as DropdownAction,
@@ -84,17 +79,13 @@ const versions: Stage = {
 							label: 'Primary Files',
 							weight: 1002,
 							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-primary.md?raw')
-								).default,
+								(await import('../messages/versions/alternate_versions-primary.md?raw')).default,
 						} as DropdownActionOption,
 						{
 							label: 'Additional Files',
 							weight: 1002,
 							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-additional.md?raw')
-								).default,
+								(await import('../messages/versions/alternate_versions-additional.md?raw')).default,
 						} as DropdownActionOption,
 						{
 							label: 'Monofile',
@@ -102,18 +93,14 @@ const versions: Stage = {
 							shouldShow: (project) =>
 								project.project_type === 'resourcepack' || project.loaders.includes('datapack'),
 							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-mono.md?raw')
-								).default,
+								(await import('../messages/versions/alternate_versions-mono.md?raw')).default,
 						} as DropdownActionOption,
 						{
 							label: 'Server Files (Primary Files)',
 							weight: 1002,
 							shouldShow: (project) => project.project_type === 'modpack',
 							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-server.md?raw')
-								).default,
+								(await import('../messages/versions/alternate_versions-server.md?raw')).default,
 						} as DropdownActionOption,
 						{
 							label: 'Server Files (Additional Files)',
@@ -122,9 +109,8 @@ const versions: Stage = {
 							severity: 'high',
 							shouldShow: (project) => project.project_type === 'modpack',
 							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-server-additional.md?raw')
-								).default,
+								(await import('../messages/versions/alternate_versions-server-additional.md?raw'))
+									.default,
 						} as DropdownActionOption,
 						{
 							label: 'mods.zip',
@@ -133,9 +119,7 @@ const versions: Stage = {
 							severity: 'high',
 							shouldShow: (project) => project.project_type === 'modpack',
 							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-zip.md?raw')
-								).default,
+								(await import('../messages/versions/alternate_versions-zip.md?raw')).default,
 						} as DropdownActionOption,
 					],
 				} as DropdownAction,
@@ -149,8 +133,7 @@ const versions: Stage = {
 			severity: `medium`,
 			weight: 1003,
 			shouldShow: (project) => project.project_type === 'resourcepack',
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/vanilla_assets.md?raw')).default,
+			message: async () => (await import('../messages/versions/vanilla_assets.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'versions_redist_libs',
@@ -160,8 +143,7 @@ const versions: Stage = {
 			severity: `medium`,
 			weight: 1003,
 			shouldShow: (project) => project.project_type === 'mod' || project.project_type === 'plugin',
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/redist_libs.md?raw')).default,
+			message: async () => (await import('../messages/versions/redist_libs.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'versions_duplicate_primary_files',
@@ -170,8 +152,7 @@ const versions: Stage = {
 			suggestedStatus: 'flagged',
 			severity: `medium`,
 			weight: 1004,
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/broken_version.md?raw')).default,
+			message: async () => (await import('../messages/versions/broken_version.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'unsupported_project_type',
@@ -181,8 +162,7 @@ const versions: Stage = {
 			severity: `medium`,
 			weight: 1005,
 			message: async () =>
-				(await import('../messages/checklist-messages/versions/unsupported_project.md?raw'))
-					.default,
+				(await import('../messages/versions/unsupported_project.md?raw')).default,
 			relevantExtraInput: [
 				{
 					label: 'Project Type',

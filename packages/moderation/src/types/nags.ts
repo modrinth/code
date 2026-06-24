@@ -28,7 +28,7 @@ export interface NagContext {
 	/**
 	 * The versions associated with the project.
 	 */
-	versions: Labrinth.Versions.v3.Version[]
+	versions: Labrinth.Versions.v2.Version[]
 	/**
 	 * The current project member viewing the nag.
 	 */

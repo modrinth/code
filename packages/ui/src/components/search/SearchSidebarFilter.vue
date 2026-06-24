@@ -9,7 +9,7 @@
 	>
 		<template #title>
 			<slot name="header" :filter="filterType">
-				<h2 class="font-semibold">{{ filterType.formatted_name }}</h2>
+				<h2>{{ filterType.formatted_name }}</h2>
 			</slot>
 		</template>
 		<template

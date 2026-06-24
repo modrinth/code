@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<h2 class="text-lg font-semibold m-0">{{ formatMessage(messages.title) }}</h2>
+		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold">
 			<template v-if="organization">
 				<AutoLink
@@ -10,10 +10,10 @@
 				>
 					<Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
 					<div class="flex flex-col flex-nowrap justify-center">
-						<span class="group-hover:underline font-medium">
+						<span class="group-hover:underline">
 							{{ organization.name }}
 						</span>
-						<span class="text-sm font-normal text-secondary flex items-center gap-1"
+						<span class="text-secondary text-sm font-medium flex items-center gap-1"
 							><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
 						>
 					</div>
@@ -38,7 +38,7 @@
 						/>
 						<ExternalIcon v-if="linkTarget === '_blank'" />
 					</span>
-					<span class="text-sm font-normal text-secondary">{{ member.role }}</span>
+					<span class="text-secondary text-sm font-medium">{{ member.role }}</span>
 				</div>
 			</AutoLink>
 		</div>

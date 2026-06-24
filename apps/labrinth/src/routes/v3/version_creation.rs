@@ -42,6 +42,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha1::Digest;
 use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
 use validator::Validate;
 
 fn default_requested_status() -> VersionStatus {
@@ -110,7 +111,7 @@ pub async fn version_create(
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<dyn FileHost>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
     http: web::Data<HttpClient>,
@@ -124,7 +125,7 @@ pub async fn version_create(
         &mut payload,
         &mut transaction,
         &redis,
-        &**file_host,
+        &***file_host,
         &mut uploaded_files,
         &client,
         &session_queue,
@@ -135,7 +136,7 @@ pub async fn version_create(
 
     if result.is_err() {
         let undo_result = super::project_creation::undo_uploads(
-            &**file_host,
+            &***file_host,
             &uploaded_files,
         )
         .await;
@@ -490,11 +491,10 @@ async fn version_create_inner(
         loaders: version_data.loaders,
         fields: version_data.fields,
         components: exp::VersionQuery::default(),
-        files_missing_attribution: Vec::new(),
     };
 
     let project_id = builder.project_id;
-    builder.insert(transaction, redis, file_host, http).await?;
+    builder.insert(transaction, http).await?;
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
@@ -552,7 +552,7 @@ pub async fn upload_file_to_version(
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<dyn FileHost>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
     search_state: Data<SearchState>,
@@ -568,7 +568,7 @@ pub async fn upload_file_to_version(
         client,
         &mut transaction,
         redis.clone(),
-        &**file_host,
+        &***file_host,
         &mut uploaded_files,
         version_id,
         &session_queue,
@@ -578,7 +578,7 @@ pub async fn upload_file_to_version(
 
     if result.is_err() {
         let undo_result = super::project_creation::undo_uploads(
-            &**file_host,
+            &***file_host,
             &uploaded_files,
         )
         .await;
@@ -798,18 +798,8 @@ async fn upload_file_to_version_inner(
             "At least one file must be specified".to_string(),
         ));
     } else {
-        let project_id = version.inner.project_id;
-
         for file in file_builders {
-            file.insert(
-                version_id,
-                project_id,
-                &mut *transaction,
-                &redis,
-                file_host,
-                http,
-            )
-            .await?;
+            file.insert(version_id, &mut *transaction, http).await?;
         }
     }
 
@@ -890,10 +880,8 @@ pub async fn upload_file(
         ));
     }
 
-    let data = data.freeze();
-
     let validation_result = validate_file(
-        data.clone(),
+        data.clone().into(),
         file_extension.to_string(),
         loaders.clone(),
         file_type,
@@ -970,6 +958,7 @@ pub async fn upload_file(
         }
     }
 
+    let data = data.freeze();
     let primary = (validation_result.is_passed()
         && version_files.iter().all(|x| !x.primary)
         && !ignore_primary)

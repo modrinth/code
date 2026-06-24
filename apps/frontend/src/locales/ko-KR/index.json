@@ -2735,6 +2735,9 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "도움이 필요하거나 추가 문의 사항이 있다면 <help-center-link>Modrinth 도움말 센터</help-center-link>를 방문하여 파란색 말풍선을 클릭해 지원 센터에 문의해 주세요."
   },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "멤버 UI 표시"
+  },
   "project.moderation.thread.private-description": {
     "message": "이곳은 Modrinth 운영진과의 비공개 대화 스레드입니다. 운영진이 이 프로젝트와 관련된 사항에 대해 메시지를 보낼 수 있습니다."
   },
@@ -2857,6 +2860,9 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, other {해당 버전은}} 현재 보류 상태이며 공개되지 않았습니다. 이 모드팩 {count, plural, other {버전에}} 포함된 특정 파일들을 재배포할 수 있는 권한이 있음을 증명하는 자료를 제출해주세요."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "해결"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "알 수 없는 내장 콘텐츠로 인해 일부 {count, plural, other {버전}}은 공개되지 않았습니다"

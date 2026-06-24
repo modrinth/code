@@ -18,8 +18,7 @@ const ruleFollowing: Stage = {
 			weight: 0,
 			suggestedStatus: 'rejected',
 			severity: 'critical',
-			message: async () =>
-				(await import('../messages/checklist-messages/rule-breaking.md?raw')).default,
+			message: async () => (await import('../messages/rule-breaking.md?raw')).default,
 			relevantExtraInput: [
 				{
 					label: 'Please explain to the user how it infringes on our content rules.',
@@ -39,8 +38,7 @@ const ruleFollowing: Stage = {
 			shouldShow(project, projectV3) {
 				return !!projectV3?.minecraft_server
 			},
-			message: async () =>
-				(await import('../messages/checklist-messages/paid-access-server.md?raw')).default,
+			message: async () => (await import('../messages/paid-access-server.md?raw')).default,
 		},
 		{
 			id: 'excessive_languages',
@@ -57,9 +55,7 @@ const ruleFollowing: Stage = {
 				)
 			},
 			message: async () =>
-				(
-					await import('../messages/checklist-messages/misc-metadata/excessive_languages-server.md?raw')
-				).default,
+				(await import('../messages/misc-metadata/excessive_languages-server.md?raw')).default,
 		},
 	],
 }

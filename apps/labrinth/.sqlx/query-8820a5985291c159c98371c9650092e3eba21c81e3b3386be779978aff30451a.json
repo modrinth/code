@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT ON (dr.id)\n            to_jsonb(dr)\n            || jsonb_build_object(\n                'report_id', dr.id,\n                'file_id', to_base62(f.id),\n                'version_id', to_base62(v.id),\n                'project_id', to_base62(v.mod_id),\n                'file_name', f.filename,\n                'file_size', f.size,\n                'flag_reason', 'delphi',\n                'download_url', f.url,\n                -- TODO: replace with `json_array` in Postgres 16\n                'issues', (\n                    SELECT json_agg(\n                        to_jsonb(dri)\n                        || jsonb_build_object(\n                            -- TODO: replace with `json_array` in Postgres 16\n                            'details', (\n                                SELECT coalesce(jsonb_agg(\n                                    jsonb_build_object(\n                                        'id', didws.id,\n                                        'issue_id', didws.issue_id,\n                                        'key', didws.key,\n                                        'file_path', didws.file_path,\n                                        'decompiled_source', didws.decompiled_source,\n                                        'data', didws.data,\n                                        'severity', didws.severity,\n                                        'status', didws.status\n                                    )\n                                ), '[]'::jsonb)\n                                FROM delphi_issue_details_with_statuses didws\n                                WHERE didws.issue_id = dri.id\n                            )\n                        )\n                    )\n                    FROM delphi_report_issues dri\n                    WHERE\n                        dri.report_id = dr.id\n                        -- see delphi.rs todo comment\n                        AND dri.issue_type != '__dummy'\n                )\n            ) AS \"data!: sqlx::types::Json<FileReport>\"\n        FROM delphi_reports dr\n        INNER JOIN files f ON f.id = dr.file_id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE dr.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "data!: sqlx::types::Json<FileReport>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "8820a5985291c159c98371c9650092e3eba21c81e3b3386be779978aff30451a"
+}

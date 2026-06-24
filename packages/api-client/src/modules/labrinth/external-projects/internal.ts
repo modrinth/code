@@ -47,18 +47,4 @@ export class LabrinthExternalProjectsInternalModule extends AbstractModule {
 			},
 		)
 	}
-
-	public async addFile(
-		data: Labrinth.ExternalProjects.Internal.AddFileRequest,
-	): Promise<Labrinth.ExternalProjects.Internal.ExternalProject> {
-		return this.client.request<Labrinth.ExternalProjects.Internal.ExternalProject>(
-			'/moderation/external-license/file',
-			{
-				api: 'labrinth',
-				version: 'internal',
-				method: 'POST',
-				body: data,
-			},
-		)
-	}
 }

@@ -251,7 +251,6 @@ pub async fn get_versions_from_hashes(
             .await?,
         &user_option,
         &pool,
-        pool.as_ref(),
         &redis,
     )
     .await?;
@@ -720,11 +719,6 @@ pub async fn delete_file(
             row.id.0,
         )
         .execute(&mut transaction)
-        .await?;
-
-        database::models::version_item::cleanup_empty_attribution_groups(
-            &mut transaction,
-        )
         .await?;
 
         delphi::send_tech_review_exit_file_deleted_message_if_exited(

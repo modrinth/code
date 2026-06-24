@@ -185,7 +185,7 @@ function mapExternalProject(
 		exceptions: project.exceptions,
 		proof: project.proof,
 		flame_project_id: project.flame_project_id,
-		files: project.linked_files ?? [],
+		files: project.linked_files,
 	}
 }
 

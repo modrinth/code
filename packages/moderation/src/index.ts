@@ -8,7 +8,6 @@ export {
 	type TechReviewContext,
 	default as techReviewQuickReplies,
 } from './data/tech-review-quick-replies'
-export { default as attributionQuickReplies } from './data/attribution-quick-replies'
 export * from './locales'
 export * from './types/actions'
 export * from './types/keybinds'

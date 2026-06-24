@@ -70,11 +70,7 @@ impl TiltifyClient {
         }
 
         if state.rate_limited_until > Instant::now() {
-            return Err(eyre!(
-                "waiting for rate limit to reset at {:.0?} (backoff {:.0?})",
-                state.rate_limited_until,
-                state.rate_limit_backoff
-            ));
+            return Err(eyre!("waiting for rate limit to reset"));
         }
 
         if ENV.TILTIFY_CLIENT_ID.is_empty()

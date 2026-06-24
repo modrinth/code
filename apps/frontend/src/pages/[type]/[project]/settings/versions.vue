@@ -14,22 +14,21 @@
 			proceed-label="Delete"
 			@proceed="deleteVersion()"
 		/>
+
 		<Admonition
-			v-if="withheldVersions.length > 0"
-			type="circle-warning"
+			v-if="flags.modpackPermissionsPage && withheldVersions.length > 0"
+			type="warning"
 			class="mb-4"
 			:header="
 				formatMessage(messages.withheldVersionsWarningTitle, {
 					count: withheldVersions.length,
-					version_name:
-						withheldVersions.length === 1 ? withheldVersions[0].version_number : undefined,
+					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
 				})
 			"
 			:body="
 				formatMessage(messages.withheldVersionsWarningDescription, {
 					count: withheldVersions.length,
-					version_name:
-						withheldVersions.length === 1 ? withheldVersions[0].version_number : undefined,
+					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
 				})
 			"
 		>
@@ -41,8 +40,7 @@
 								project.slug ? project.slug : project.id
 							}/settings/permissions`"
 						>
-							{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
-							<RightArrowIcon />
+							{{ formatMessage(messages.withheldVersionsWarningResolve) }} <RightArrowIcon />
 						</nuxt-link>
 					</ButtonStyled>
 				</div>
@@ -335,7 +333,6 @@ import {
 import {
 	Admonition,
 	ButtonStyled,
-	commonProjectSettingsMessages,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
@@ -461,9 +458,7 @@ async function deleteVersion() {
 	stopLoading()
 }
 
-const withheldVersions = computed(() =>
-	versions.value.filter((x) => x.files_missing_attribution?.length > 0),
-)
+const withheldVersions = computed(() => ['4.0.0'])
 
 const messages = defineMessages({
 	withheldVersionsWarningTitle: {
@@ -475,6 +470,10 @@ const messages = defineMessages({
 		id: 'project.versions.withheld-versions-warning.description',
 		defaultMessage:
 			'{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}.',
+	},
+	withheldVersionsWarningResolve: {
+		id: 'project.versions.withheld-versions-warning.resolve-button',
+		defaultMessage: 'Resolve',
 	},
 })
 </script>

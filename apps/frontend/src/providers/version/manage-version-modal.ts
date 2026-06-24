@@ -3,11 +3,9 @@ import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	type ComboboxOption,
 	createContext,
-	defineMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	type MessageDescriptor,
 	type MultiStageModal,
 	resolveCtxFn,
 	type StageButtonConfig,
@@ -164,44 +162,6 @@ export const fileTypeLabels: Record<Labrinth.Versions.v3.FileType | 'primary', s
 	'dev-jar': 'Dev JAR',
 	'javadoc-jar': 'Javadoc JAR',
 	signature: 'Signature',
-}
-
-export const fileTypeMessages: Record<
-	Labrinth.Versions.v3.FileType | 'primary',
-	MessageDescriptor
-> = {
-	primary: defineMessage({
-		id: 'version.file-type.primary',
-		defaultMessage: 'Primary',
-	}),
-	unknown: defineMessage({
-		id: 'version.file-type.unknown',
-		defaultMessage: 'Other',
-	}),
-	'required-resource-pack': defineMessage({
-		id: 'version.file-type.required-resource-pack',
-		defaultMessage: 'Required resource pack',
-	}),
-	'optional-resource-pack': defineMessage({
-		id: 'version.file-type.optional-resource-pack',
-		defaultMessage: 'Optional resource pack',
-	}),
-	'sources-jar': defineMessage({
-		id: 'version.file-type.sources-jar',
-		defaultMessage: 'Sources jar',
-	}),
-	'dev-jar': defineMessage({
-		id: 'version.file-type.dev-jar',
-		defaultMessage: 'Dev jar',
-	}),
-	'javadoc-jar': defineMessage({
-		id: 'version.file-type.javadoc-jar',
-		defaultMessage: 'Javadoc jar',
-	}),
-	signature: defineMessage({
-		id: 'version.file-type.signature',
-		defaultMessage: 'Signature file',
-	}),
 }
 
 export const [injectManageVersionContext, provideManageVersionContext] =

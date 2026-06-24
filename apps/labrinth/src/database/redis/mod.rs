@@ -25,8 +25,6 @@ pub mod util;
 
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
 const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
-const VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 48; // 48 hours
-const VERSION_ACTUAL_EXPIRY: i64 = 60 * 60 * 24; // 24 hours
 
 // Bound how many commands we send in a single Redis pipeline. The multiplexed
 // connection's BytesMut write buffer keeps its peak capacity for the life of
@@ -40,15 +38,6 @@ const MGET_CHUNK_SIZE: usize = 32;
 // of activity. Forced recycling is the only way to release the per-connection
 // BytesMut peak capacity that builds up under steady load.
 const REDIS_MAX_CONN_AGE: Duration = Duration::from_secs(120);
-
-fn cache_expiries(namespace: &str) -> (i64, i64) {
-    match namespace {
-        "versions" | "versions_files" => {
-            (VERSION_DEFAULT_EXPIRY, VERSION_ACTUAL_EXPIRY)
-        }
-        _ => (DEFAULT_EXPIRY, ACTUAL_EXPIRY),
-    }
-}
 
 #[derive(Clone)]
 pub struct RedisPool {
@@ -383,7 +372,6 @@ impl RedisPool {
             .instrument(info_span!("get cached values"))
         };
 
-        let (default_expiry, actual_expiry) = cache_expiries(namespace);
         let current_time = Utc::now();
         let mut expired_values = HashMap::new();
 
@@ -391,7 +379,7 @@ impl RedisPool {
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, val)| {
-                if Utc.timestamp_opt(val.iat + actual_expiry, 0).unwrap()
+                if Utc.timestamp_opt(val.iat + ACTUAL_EXPIRY, 0).unwrap()
                     < current_time
                 {
                     expired_values.insert(val.key.to_string(), val);
@@ -493,7 +481,7 @@ impl RedisPool {
                                 self.meta_namespace
                             ),
                             serde_json::to_string(&value)?,
-                            default_expiry as u64,
+                            DEFAULT_EXPIRY as u64,
                         );
                         pipe_cmds += 1;
 
@@ -513,7 +501,7 @@ impl RedisPool {
                                         self.meta_namespace, actual_slug
                                     ),
                                     key.to_string(),
-                                    default_expiry as u64,
+                                    DEFAULT_EXPIRY as u64,
                                 );
                                 pipe_cmds += 1;
                             }

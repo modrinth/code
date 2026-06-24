@@ -18,8 +18,7 @@ const postApproval: Stage = {
 			weight: 3000,
 			suggestedStatus: 'approved',
 			severity: 'low',
-			message: async () =>
-				(await import('../messages/checklist-messages/post-approval/issue-warning.md?raw')).default,
+			message: async () => (await import('../messages/post-approval/issue-warning.md?raw')).default,
 		},
 		{
 			id: 'missed_deadline',
@@ -29,8 +28,7 @@ const postApproval: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'high',
 			message: async () =>
-				(await import('../messages/checklist-messages/post-approval/missed-deadline.md?raw'))
-					.default,
+				(await import('../messages/post-approval/missed-deadline.md?raw')).default,
 			disablesActions: ['issue_warning', 'metadata_issue'],
 			relevantExtraInput: [
 				{
@@ -48,8 +46,7 @@ const postApproval: Stage = {
 			suggestedStatus: 'approved',
 			severity: 'low',
 			message: async () =>
-				(await import('../messages/checklist-messages/post-approval/metadata-issue.md?raw'))
-					.default,
+				(await import('../messages/post-approval/metadata-issue.md?raw')).default,
 			enablesActions: [
 				{
 					id: 'dependencies',
@@ -58,8 +55,7 @@ const postApproval: Stage = {
 					weight: 1,
 					severity: 'low',
 					message: async () =>
-						(await import('../messages/checklist-messages/misc-metadata/dependencies.md?raw'))
-							.default,
+						(await import('../messages/misc-metadata/dependencies.md?raw')).default,
 					relevantExtraInput: [
 						{
 							label: 'Dependency Name',
@@ -80,8 +76,7 @@ const postApproval: Stage = {
 					weight: 2,
 					severity: 'low',
 					message: async () =>
-						(await import('../messages/checklist-messages/misc-metadata/mc-versions.md?raw'))
-							.default,
+						(await import('../messages/misc-metadata/mc-versions.md?raw')).default,
 					relevantExtraInput: [
 						{
 							label: 'Provide more details about game versions issue?',
@@ -97,8 +92,7 @@ const postApproval: Stage = {
 					label: 'Loaders',
 					weight: 3,
 					severity: 'low',
-					message: async () =>
-						(await import('../messages/checklist-messages/misc-metadata/loaders.md?raw')).default,
+					message: async () => (await import('../messages/misc-metadata/loaders.md?raw')).default,
 					relevantExtraInput: [
 						{
 							label: 'Provide more details about loaders issue?',
@@ -115,9 +109,7 @@ const postApproval: Stage = {
 					weight: 4,
 					severity: 'low',
 					message: async () =>
-						(
-							await import('../messages/checklist-messages/misc-metadata/inconsistent-license.md?raw')
-						).default,
+						(await import('../messages/misc-metadata/inconsistent-license.md?raw')).default,
 				},
 			],
 		} as ButtonAction,

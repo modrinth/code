@@ -57,15 +57,4 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 			},
 		)
 	}
-
-	public async setProjectJudgements(
-		judgements: Labrinth.Moderation.Internal.ProjectJudgements,
-	): Promise<void> {
-		return this.client.request<void>('/moderation/project', {
-			api: 'labrinth',
-			version: 'internal',
-			method: 'POST',
-			body: judgements,
-		})
-	}
 }

@@ -36,7 +36,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 </template>
 <style scoped>
 .ui-normal-page {
-	@apply grid gap-x-6 gap-y-4 mx-auto py-4;
+	@apply grid gap-6 mx-auto py-4;
 	width: min(calc(100% - 2rem), calc(80rem - 3rem));
 
 	grid-template:

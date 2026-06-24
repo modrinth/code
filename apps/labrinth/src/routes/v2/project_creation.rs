@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use std::collections::HashMap;
+use std::sync::Arc;
 use validator::Validate;
 
 use super::version_creation::InitialVersionData;
@@ -158,7 +159,7 @@ pub async fn project_create(
     payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<dyn FileHost>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
     search_state: Data<SearchState>,

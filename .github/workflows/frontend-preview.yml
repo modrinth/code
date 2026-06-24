@@ -24,8 +24,6 @@ jobs:
         environment: [staging-preview, production-preview]
     with:
       environment: ${{ matrix.environment }}
-      head_sha: ${{ github.event.pull_request.head.sha }}
-      head_ref: ${{ github.event.pull_request.head.ref }}
 
   deploy-storybook:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
@@ -70,9 +68,7 @@ jobs:
 
       - name: Configure short SHA
         id: meta
-        env:
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: echo "sha_short=${HEAD_SHA::8}" >> $GITHUB_OUTPUT
+        run: echo "sha_short=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
 
       - name: Deploy Storybook preview
         uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
@@ -97,8 +93,6 @@ jobs:
 
       - name: Read deployment URLs
         id: urls
-        env:
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           STAGING_PREVIEW_URL=$(cat deployment-url-staging-preview.txt)
           PRODUCTION_PREVIEW_URL=$(cat deployment-url-production-preview.txt)
@@ -108,7 +102,7 @@ jobs:
 
           echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
           echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
-          echo "storybook-preview-url=https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev" >> $GITHUB_OUTPUT
+          echo "storybook-preview-url=https://git-${GITHUB_SHA::8}-storybook.modrinth.workers.dev" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'
@@ -129,7 +123,7 @@ jobs:
           body: |
             ## Frontend previews
 
-            Last deployed commit is [${{ github.event.pull_request.head.sha }}](${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.event.pull_request.head.sha }})
+            Last deployed commit is [${{ github.sha }}](${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.sha }})
 
             | Environment | URL |
             |-------------|-----|

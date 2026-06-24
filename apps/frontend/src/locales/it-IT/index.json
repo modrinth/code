@@ -3290,6 +3290,9 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Se hai bisogno di assistenza o hai altre richieste, visita il <help-center-link>centro assistenza di Modrinth</help-center-link> e clicca sulla bolla blu nell'angolo in basso a destra."
   },
+  "project.moderation.thread.moderator-see-user-ui-toggle": {
+    "message": "Mostra interfaccia degli utenti"
+  },
   "project.moderation.thread.private-description": {
     "message": "Questa è una conversazione privata con i moderatori di Modrinth. Sarai contattato per eventuali problemi riguardanti questo progetto."
   },
@@ -3418,6 +3421,9 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Questa versione è attualmente sospesa e non elencata} other {Queste versioni sono attualmente sospese e non elencate}} pubblicamente. Devi dimostrare di avere il permesso di ridistribuire alcuni dei file presenti in {count, plural, one {questa versione} other {queste versioni}} del pacchetto."
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "message": "Risolvi"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {La versione {version_name} è stata sospesa} other {Alcune versioni sono state sospese}} per attribuzioni incomplete"

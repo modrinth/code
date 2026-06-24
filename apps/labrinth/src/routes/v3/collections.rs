@@ -25,6 +25,7 @@ use chrono::Utc;
 use eyre::eyre;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -389,7 +390,7 @@ pub async fn collection_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -422,7 +423,7 @@ pub async fn collection_icon_edit(
         collection_item.icon_url,
         collection_item.raw_icon_url,
         FileHostPublicity::Public,
-        &**file_host,
+        &***file_host,
     )
     .await?;
 
@@ -441,7 +442,7 @@ pub async fn collection_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &**file_host,
+        &***file_host,
     )
     .await?;
 
@@ -473,7 +474,7 @@ pub async fn delete_collection_icon(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<dyn FileHost>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -504,7 +505,7 @@ pub async fn delete_collection_icon(
         collection_item.icon_url,
         collection_item.raw_icon_url,
         FileHostPublicity::Public,
-        &**file_host,
+        &***file_host,
     )
     .await?;
     let mut transaction = pool.begin().await?;

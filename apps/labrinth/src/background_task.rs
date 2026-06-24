@@ -3,12 +3,10 @@ use crate::database::PgPool;
 use crate::database::models::ids::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
 use crate::models::notifications::NotificationBody;
 use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
-use crate::queue::file_scan::scan_all_files;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_affiliate_payouts,
@@ -40,10 +38,6 @@ pub enum BackgroundTask {
     /// Attempts to ping Minecraft Java servers as if we were a client, to
     /// collect info on if they're online, game version, description, etc.
     PingMinecraftJavaServers,
-    /// Finds files of versions which have not been scanned for attributions
-    /// yet, extracts them to find file overrides, and finds any overrides which
-    /// require attribution from the creator.
-    ScanFiles,
     /// Queues Discord Creator Club role claim emails for newly eligible users.
     DiscordRoleEmailCampaign,
 }
@@ -56,7 +50,6 @@ impl BackgroundTask {
         ro_pool: PgPool,
         redis_pool: RedisPool,
         search_backend: web::Data<dyn SearchBackend>,
-        file_host: web::Data<dyn FileHost>,
         kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
@@ -119,7 +112,6 @@ impl BackgroundTask {
                 )
                 .await
             }
-            ScanFiles => scan_all_files(&pool, &redis_pool, &**file_host).await,
             DiscordRoleEmailCampaign => {
                 discord_role_email_campaign(pool, redis_pool).await
             }
