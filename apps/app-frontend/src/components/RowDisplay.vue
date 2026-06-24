@@ -21,7 +21,8 @@ import Instance from '@/components/ui/Instance.vue'
 import LegacyProjectCard from '@/components/ui/LegacyProjectCard.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { duplicate, kill, remove, run } from '@/helpers/instance'
+import { install_duplicate_instance } from '@/helpers/install'
+import { kill, remove, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process.js'
 import { showInstanceInFolder } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
@@ -67,7 +68,7 @@ async function deleteInstance() {
 }
 
 async function duplicateInstance(p) {
-	await duplicate(p).catch(handleError)
+	await install_duplicate_instance(p).catch(handleError)
 }
 
 const handleInstanceRightClick = async (event, passedInstance) => {

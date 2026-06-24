@@ -93,18 +93,24 @@ pub struct State {
 
 impl State {
     pub async fn init(app_identifier: String) -> crate::Result<()> {
-        let state = LAUNCHER_STATE
-            .get_or_try_init(move || Self::initialize_state(app_identifier))
-            .await?;
+		let state = LAUNCHER_STATE
+			.get_or_try_init(move || Self::initialize_state(app_identifier))
+			.await?;
 
-        tokio::task::spawn(async move {
-            instances::watcher::watch_instances_init(
-                &state.file_watcher,
-                &state.directories,
-            )
-            .await;
+		if let Err(e) =
+			crate::install::recovery::recover_interrupted_jobs(state).await
+		{
+			tracing::error!("Error recovering interrupted install jobs: {e}");
+		}
 
-            let res = tokio::try_join!(
+		tokio::task::spawn(async move {
+			instances::watcher::watch_instances_init(
+				&state.file_watcher,
+				&state.directories,
+			)
+			.await;
+
+			let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
                 instances::refresh_all_instances(),
                 Settings::migrate(&state.pool),

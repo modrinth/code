@@ -94,47 +94,6 @@ pub async fn init_loading_unsafe(
     Ok(key)
 }
 
-pub async fn init_or_edit_loading(
-    id: Option<LoadingBarId>,
-    bar_type: LoadingBarType,
-    total: f64,
-    title: &str,
-) -> crate::Result<LoadingBarId> {
-    if let Some(id) = id {
-        edit_loading(&id, bar_type, total, title).await?;
-
-        Ok(id)
-    } else {
-        init_loading(bar_type, total, title).await
-    }
-}
-
-// Edits a loading bar's type
-// This also resets the bar's current progress to 0
-pub async fn edit_loading(
-    id: &LoadingBarId,
-    bar_type: LoadingBarType,
-    total: f64,
-    title: &str,
-) -> crate::Result<()> {
-    let event_state = crate::EventState::get()?;
-
-    if let Some(mut bar) = event_state.loading_bars.get_mut(&id.0) {
-        bar.bar_type = bar_type;
-        bar.total = total;
-        bar.message = title.to_string();
-        bar.current = 0.0;
-        bar.last_sent = 0.0;
-        #[cfg(feature = "cli")]
-        {
-            bar.cli_progress_bar.reset(); // indicatif::ProgressBar::new(CLI_PROGRESS_BAR_TOTAL as u64);
-        }
-    };
-
-    emit_loading(id, 0.0, None)?;
-    Ok(())
-}
-
 // emit_loading emits a loading event to the frontend
 // key refers to the loading bar to update
 // increment refers to by what relative increment to the loading struct's total to update

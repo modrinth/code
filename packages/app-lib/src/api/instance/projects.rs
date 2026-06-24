@@ -105,6 +105,7 @@ pub async fn add_project_from_path(
 pub async fn toggle_disable_project(
     instance_id: &str,
     project: &str,
+    desired_enabled: Option<bool>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
     let metadata = get(instance_id).await?.ok_or_else(|| {
@@ -113,6 +114,7 @@ pub async fn toggle_disable_project(
     let res = crate::state::instances::commands::toggle_disable_project(
         instance_id,
         project,
+        desired_enabled,
         &state,
     )
     .await?;
@@ -145,22 +147,117 @@ pub async fn remove_project(
 pub async fn update_managed_modrinth_version(
     instance_id: &str,
     version_id: &str,
-) -> crate::Result<()> {
+) -> crate::Result<crate::install::InstallJobSnapshot> {
     let state = State::get().await?;
-    crate::state::instances::commands::update_managed_modrinth_version(
-        instance_id,
-        version_id,
-        &state,
+    let metadata =
+        crate::state::instances::commands::get_instance_metadata(
+            instance_id,
+            &state.pool,
+        )
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+
+    let post_install_edit = match &metadata.link {
+        crate::state::InstanceLink::ServerProjectModpack {
+            server_project_id,
+            content_project_id,
+            ..
+        } => Some(crate::install::InstallPostInstallEdit {
+            name: Some(metadata.instance.name.clone()),
+            icon_path: Some(metadata.instance.icon_path.clone()),
+            link: Some(crate::state::InstanceLink::ServerProjectModpack {
+                server_project_id: server_project_id.clone(),
+                content_project_id: content_project_id.clone(),
+                content_version_id: version_id.to_string(),
+            }),
+        }),
+        _ => None,
+    };
+
+    let project_id = match &metadata.link {
+        crate::state::InstanceLink::ModrinthModpack { project_id, .. } => {
+            project_id.clone()
+        }
+        crate::state::InstanceLink::ServerProjectModpack {
+            content_project_id,
+            ..
+        } => content_project_id.clone(),
+        _ => {
+            return Err(unmanaged_pack_error(&metadata.instance.id).into());
+        }
+    };
+
+    crate::install::install_pack_to_existing_instance(
+        metadata.instance.id,
+        crate::api::pack::install_from::CreatePackLocation::FromVersionId {
+            project_id,
+            version_id: version_id.to_string(),
+            title: metadata.instance.name.clone(),
+            icon_url: None,
+        },
+        post_install_edit,
     )
     .await
 }
 
 #[tracing::instrument]
-pub async fn repair_managed_modrinth(instance_id: &str) -> crate::Result<()> {
+pub async fn repair_managed_modrinth(
+    instance_id: &str,
+) -> crate::Result<crate::install::InstallJobSnapshot> {
     let state = State::get().await?;
-    crate::state::instances::commands::repair_managed_modrinth(
-        instance_id,
-        &state,
+    let metadata =
+        crate::state::instances::commands::get_instance_metadata(
+            instance_id,
+            &state.pool,
+        )
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+
+    let post_install_edit = match &metadata.link {
+        crate::state::InstanceLink::ServerProjectModpack { .. } => {
+            Some(crate::install::InstallPostInstallEdit {
+                name: Some(metadata.instance.name.clone()),
+                icon_path: Some(metadata.instance.icon_path.clone()),
+                link: Some(metadata.link.clone()),
+            })
+        }
+        _ => None,
+    };
+
+    let (project_id, version_id) = match &metadata.link {
+        crate::state::InstanceLink::ModrinthModpack {
+            project_id,
+            version_id,
+        } => (project_id.clone(), version_id.clone()),
+        crate::state::InstanceLink::ServerProjectModpack {
+            content_project_id,
+            content_version_id,
+            ..
+        } => (content_project_id.clone(), content_version_id.clone()),
+        _ => {
+            return Err(unmanaged_pack_error(&metadata.instance.id).into());
+        }
+    };
+
+    crate::install::install_pack_to_existing_instance(
+        metadata.instance.id,
+        crate::api::pack::install_from::CreatePackLocation::FromVersionId {
+            project_id,
+            version_id,
+            title: metadata.instance.name.clone(),
+            icon_url: None,
+        },
+        post_install_edit,
     )
     .await
+}
+
+fn unmanaged_pack_error(instance_id: &str) -> crate::ErrorKind {
+    crate::ErrorKind::InputError(format!(
+        "Instance {instance_id} is not a managed Modrinth pack, or has been disconnected."
+    ))
 }

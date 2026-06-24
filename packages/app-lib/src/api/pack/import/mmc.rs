@@ -3,9 +3,10 @@ use std::path::{Path, PathBuf};
 use serde::{Deserialize, Serialize, de};
 
 use crate::{
+    install::{InstallPhaseDetails, InstallProgressReporter},
     State,
     pack::{
-        import::{self, copy_dotminecraft},
+        import::{self, finish_import},
         install_from::{self, CreatePackDescription, PackDependency},
     },
     util::io,
@@ -179,6 +180,8 @@ pub async fn import_mmc(
     mmc_base_path: PathBuf,  // path to base mmc folder
     instance_folder: String, // instance folder in mmc_base_path
     instance_id: &str,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     let mmc_instance_path =
         mmc_base_path.join("instances").join(instance_folder);
@@ -208,8 +211,8 @@ pub async fn import_mmc(
         override_title: instance_cfg.name,
         project_id: None,
         version_id: None,
-        existing_loading_bar: None,
         instance_id: instance_id.to_string(),
+        source_filename: None,
     };
 
     let mut minecraft_folder = mmc_instance_path.join("minecraft");
@@ -232,17 +235,17 @@ pub async fn import_mmc(
 
                 // Modrinth Managed Pack
                 // Kept separate as we may in the future want to add special handling for modrinth managed packs
-                import_mmc_unmanaged(instance_id, minecraft_folder, "Imported Modrinth Modpack".to_string(), description, mmc_pack).await?;
+                import_mmc_unmanaged(instance_id, minecraft_folder, "Imported Modrinth Modpack".to_string(), description, mmc_pack, reporter, details).await?;
             }
             Some(MMCManagedPackType::Flame | MMCManagedPackType::ATLauncher) => {
                 // For flame/atlauncher managed packs
                 // Treat as unmanaged, but with 'minecraft' folder instead of '.minecraft'
-                import_mmc_unmanaged(instance_id, minecraft_folder, "Imported Modpack".to_string(), description, mmc_pack).await?;
+                import_mmc_unmanaged(instance_id, minecraft_folder, "Imported Modpack".to_string(), description, mmc_pack, reporter, details).await?;
             },
             Some(_) => {
                 // For managed packs that aren't modrinth, flame, atlauncher
                 // Treat as unmanaged
-                import_mmc_unmanaged(instance_id, minecraft_folder, "ImportedModpack".to_string(), description, mmc_pack).await?;
+                import_mmc_unmanaged(instance_id, minecraft_folder, "ImportedModpack".to_string(), description, mmc_pack, reporter, details).await?;
             },
             _ => return Err(crate::ErrorKind::InputError("Instance is managed, but managed pack type not specified in instance.cfg".to_string()).into())
         }
@@ -254,6 +257,8 @@ pub async fn import_mmc(
             "Imported Modpack".to_string(),
             description,
             mmc_pack,
+            reporter,
+            details,
         )
         .await?;
     }
@@ -266,6 +271,8 @@ async fn import_mmc_unmanaged(
     backup_name: String,
     description: CreatePackDescription,
     mmc_pack: MMCPack,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     // Pack dependencies stored in mmc-pack.json, we convert to .mrpack pack dependencies
     let dependencies = mmc_pack
@@ -311,6 +318,7 @@ async fn import_mmc_unmanaged(
         instance_id.to_string(),
         &description,
         &backup_name,
+        None,
         &dependencies,
         false,
     )
@@ -318,18 +326,12 @@ async fn import_mmc_unmanaged(
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
-    let loading_bar = copy_dotminecraft(
+    finish_import(
         instance_id,
         minecraft_folder,
         &state.io_semaphore,
-        None,
-    )
-    .await?;
-
-    crate::launcher::install_minecraft_for_instance_id(
-        instance_id,
-        Some(loading_bar),
-        false,
+        reporter,
+        details,
     )
     .await?;
     Ok(())

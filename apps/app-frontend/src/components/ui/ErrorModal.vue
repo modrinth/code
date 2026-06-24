@@ -16,7 +16,7 @@ import { ChatIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
-import { install } from '@/helpers/instance'
+import { install_existing_instance } from '@/helpers/install'
 import { cancel_directory_change } from '@/helpers/settings.ts'
 import { handleSevereError } from '@/store/error.js'
 
@@ -125,7 +125,7 @@ const loadingRepair = ref(false)
 async function repairInstance() {
 	loadingRepair.value = true
 	try {
-		await install(metadata.value.instanceId, false)
+		await install_existing_instance(metadata.value.instanceId, false)
 		errorModal.value.hide()
 	} catch (err) {
 		handleSevereError(err)

@@ -28,6 +28,9 @@ pub enum InstanceLink {
     ImportedModpack {
         project_id: Option<String>,
         version_id: Option<String>,
+        name: Option<String>,
+        version_number: Option<String>,
+        filename: Option<String>,
     },
     SharedInstance {
         shared_instance_id: Uuid,

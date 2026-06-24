@@ -40,6 +40,3 @@ mod check_content_updates;
 
 mod apply_content_update;
 pub(crate) use self::apply_content_update::*;
-
-mod replace_modpack;
-pub(crate) use self::replace_modpack::*;

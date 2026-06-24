@@ -15,7 +15,8 @@ import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
-import { finish_install, kill, run } from '@/helpers/instance'
+import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
+import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
@@ -94,7 +95,20 @@ const stop = async (e, context) => {
 const repair = async (e) => {
 	e?.stopPropagation()
 
-	await finish_install(props.instance).catch(handleError)
+	if (
+		props.instance.install_stage !== 'pack_installed' &&
+		(props.instance.link?.type === 'modrinth_modpack' ||
+			props.instance.link?.type === 'server_project_modpack')
+	) {
+		await install_pack_to_existing_instance(props.instance.id, {
+			type: 'fromVersionId',
+			project_id: props.instance.link.project_id ?? props.instance.link.server_project_id ?? '',
+			version_id: props.instance.link.version_id ?? props.instance.link.content_version_id ?? '',
+			title: props.instance.name,
+		}).catch(handleError)
+	} else {
+		await install_existing_instance(props.instance.id, false).catch(handleError)
+	}
 }
 
 const openFolder = async () => {

@@ -1,7 +1,11 @@
 //! Logic for launching Minecraft
 use crate::data::ModLoader;
-use crate::event::emit::{emit_instance, emit_loading, init_or_edit_loading};
-use crate::event::{InstancePayloadType, LoadingBarId, LoadingBarType};
+use crate::event::emit::{emit_instance, emit_loading, init_loading};
+use crate::event::{InstancePayloadType, LoadingBarType};
+use crate::install::{
+    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallProgressReporter,
+};
 use crate::instance::QuickPlayType;
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
@@ -238,24 +242,33 @@ async fn get_instance_full_path(instance_path: &str) -> crate::Result<PathBuf> {
     Ok(full_path)
 }
 
-pub async fn install_minecraft(
+pub async fn install_minecraft_with_reporter(
     context: &InstanceLaunchContext,
-    existing_loading_bar: Option<LoadingBarId>,
     repairing: bool,
+    reporter: Option<InstallProgressReporter>,
 ) -> crate::Result<()> {
     let instance = &context.instance;
     let content_set = &context.applied_content_set;
-    let loading_bar = init_or_edit_loading(
-        existing_loading_bar,
-        LoadingBarType::MinecraftDownload {
-            // If we are downloading minecraft for a profile, provide its name and uuid
-            instance_name: instance.name.clone(),
-            instance_id: instance.id.clone(),
-        },
-        100.0,
-        "Downloading Minecraft",
-    )
-    .await?;
+    let phase_details = InstallPhaseDetails::Minecraft {
+        game_version: content_set.game_version.clone(),
+        loader: content_set.loader,
+    };
+    let loading_bar = if reporter.is_none() {
+        Some(
+            init_loading(
+                LoadingBarType::MinecraftDownload {
+                    // If we are downloading minecraft for a profile, provide its name and uuid
+                    instance_name: instance.name.clone(),
+                    instance_id: instance.id.clone(),
+                },
+                100.0,
+                "Downloading Minecraft",
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
 
     let state = State::get().await?;
 
@@ -268,6 +281,15 @@ pub async fn install_minecraft(
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     let instance_path = get_instance_full_path(&instance.path).await?;
+    if let Some(reporter) = &reporter {
+        reporter
+            .update(
+                InstallPhaseId::ResolvingMinecraft,
+                None,
+                phase_details.clone(),
+            )
+            .await?;
+    }
     let (minecraft, version_index) =
         resolve_minecraft_manifest(&content_set.game_version, &state).await?;
     let version = &minecraft.versions[version_index];
@@ -277,6 +299,18 @@ pub async fn install_minecraft(
             .iter()
             .position(|x| x.id == "22w16a")
             .unwrap_or(0);
+
+    if content_set.loader != ModLoader::Vanilla
+        && let Some(reporter) = &reporter
+    {
+        reporter
+            .update(
+                InstallPhaseId::ResolvingLoader,
+                None,
+                phase_details.clone(),
+            )
+            .await?;
+    }
 
     let mut loader_version = get_loader_version_from_profile(
         &content_set.game_version,
@@ -313,7 +347,7 @@ pub async fn install_minecraft(
         version,
         loader_version.as_ref(),
         Some(repairing),
-        Some(&loading_bar),
+        loading_bar.as_ref(),
     )
     .await?;
 
@@ -321,12 +355,23 @@ pub async fn install_minecraft(
         .java_version
         .as_ref()
         .map_or(8, |it| it.major_version);
+    if let Some(reporter) = &reporter {
+        reporter
+            .update(
+                InstallPhaseId::PreparingJava,
+                None,
+                phase_details.clone(),
+            )
+            .await?;
+    }
     let (java_version, set_java) = if let Some(java_version) =
         get_java_version_from_launch_context(context, &version_info).await?
     {
         (std::path::PathBuf::from(java_version.path), false)
     } else {
-        let path = crate::api::jre::auto_install_java(key).await?;
+        let path =
+            crate::api::jre::auto_install_java_with_loading(key, reporter.is_none())
+                .await?;
 
         (path, true)
     };
@@ -339,13 +384,24 @@ pub async fn install_minecraft(
     }
 
     // Download minecraft (5-90)
+    if let Some(reporter) = &reporter {
+        reporter
+            .update(
+                InstallPhaseId::DownloadingMinecraft,
+                None,
+                phase_details.clone(),
+            )
+            .await?;
+    }
     download::download_minecraft(
         &state,
         &version_info,
-        &loading_bar,
+        loading_bar.as_ref(),
         &java_version.architecture,
         repairing,
         minecraft_updated,
+        reporter.clone(),
+        phase_details.clone(),
     )
     .await?;
 
@@ -376,14 +432,40 @@ pub async fn install_minecraft(
                     server => "";
             }
 
-            emit_loading(&loading_bar, 0.0, Some("Running forge processors"))?;
+            if let Some(loading_bar) = &loading_bar {
+                emit_loading(loading_bar, 0.0, Some("Running forge processors"))?;
+            }
             let total_length = processors.len();
+            if let Some(reporter) = &reporter {
+                reporter
+                    .update(
+                        InstallPhaseId::RunningLoaderProcessors,
+                        Some(InstallProgress {
+                            current: 0,
+                            total: total_length as u64,
+                        }),
+                        phase_details.clone(),
+                    )
+                    .await?;
+            }
 
             // Forge processors (90-100)
             for (index, processor) in processors.iter().enumerate() {
                 if let Some(sides) = &processor.sides
                     && !sides.contains(&String::from("client"))
                 {
+                    if let Some(reporter) = &reporter {
+                        reporter
+                            .update(
+                                InstallPhaseId::RunningLoaderProcessors,
+                                Some(InstallProgress {
+                                    current: (index + 1) as u64,
+                                    total: total_length as u64,
+                                }),
+                                phase_details.clone(),
+                            )
+                            .await?;
+                    }
                     continue;
                 }
 
@@ -436,13 +518,27 @@ pub async fn install_minecraft(
                     .as_error());
                 }
 
-                emit_loading(
-                    &loading_bar,
-                    30.0 / total_length as f64,
-                    Some(&format!(
-                        "Running forge processor {index}/{total_length}"
-                    )),
-                )?;
+                if let Some(loading_bar) = &loading_bar {
+                    emit_loading(
+                        loading_bar,
+                        30.0 / total_length as f64,
+                        Some(&format!(
+                            "Running forge processor {index}/{total_length}"
+                        )),
+                    )?;
+                }
+                if let Some(reporter) = &reporter {
+                    reporter
+                        .update(
+                            InstallPhaseId::RunningLoaderProcessors,
+                            Some(InstallProgress {
+                                current: (index + 1) as u64,
+                                total: total_length as u64,
+                            }),
+                            phase_details.clone(),
+                        )
+                        .await?;
+                }
             }
         }
     }
@@ -462,15 +558,17 @@ pub async fn install_minecraft(
         &state.pool,
     )
     .await?;
-    emit_loading(&loading_bar, 1.0, Some("Finished installing"))?;
+    if let Some(loading_bar) = &loading_bar {
+        emit_loading(loading_bar, 1.0, Some("Finished installing"))?;
+    }
 
     Ok(())
 }
 
-pub async fn install_minecraft_for_instance_id(
+pub async fn install_minecraft_for_instance_id_with_reporter(
     instance_id: &str,
-    existing_loading_bar: Option<LoadingBarId>,
     repairing: bool,
+    reporter: Option<InstallProgressReporter>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let context =
@@ -485,7 +583,12 @@ pub async fn install_minecraft_for_instance_id(
             ))
         })?;
 
-    install_minecraft(&context, existing_loading_bar, repairing).await
+    install_minecraft_with_reporter(
+        &context,
+        repairing,
+        reporter,
+    )
+    .await
 }
 
 pub async fn read_protocol_version_from_jar(
@@ -533,6 +636,7 @@ fn link_project_and_version(
         InstanceLink::ImportedModpack {
             project_id,
             version_id,
+            ..
         } => (project_id.as_ref(), version_id.as_ref()),
         InstanceLink::Unmanaged
         | InstanceLink::ModrinthHosting { .. }
@@ -567,7 +671,10 @@ pub async fn launch_minecraft(
     }
 
     if instance.install_stage != InstanceInstallStage::Installed {
-        install_minecraft(context, None, false).await?;
+        return Err(crate::ErrorKind::LauncherError(
+            "Instance is not installed; start an install job first".to_string(),
+        )
+        .into());
     }
 
     let state = State::get().await?;
@@ -631,7 +738,7 @@ pub async fn launch_minecraft(
         }
     }
 
-    download_log_config(&state, &version_info, None, false).await?;
+    let _ = download_log_config(&state, &version_info, None, false).await?;
 
     let java_version =
         get_java_version_from_launch_context(context, &version_info)

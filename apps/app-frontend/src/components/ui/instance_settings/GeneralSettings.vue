@@ -19,7 +19,8 @@ import { useRouter } from 'vue-router'
 
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { duplicate, edit, edit_icon, list, remove } from '@/helpers/instance'
+import { install_duplicate_instance } from '@/helpers/install'
+import { edit, edit_icon, list, remove } from '@/helpers/instance'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
 import type { GameInstance } from '../../../helpers/types'
@@ -49,7 +50,7 @@ const newCategoryInput = ref('')
 const installing = computed(() => instance.value.install_stage !== 'installed')
 
 async function duplicateInstance() {
-	await duplicate(instance.value.id).catch(handleError)
+	await install_duplicate_instance(instance.value.id).catch(handleError)
 	trackEvent('InstanceDuplicate', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,

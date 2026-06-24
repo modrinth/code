@@ -320,7 +320,8 @@ import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
-import { finish_install, get, get_full_path, kill, run } from '@/helpers/instance'
+import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
+import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
@@ -572,7 +573,20 @@ const handlePlayServer = async () => {
 }
 
 const repairInstance = async () => {
-	await finish_install(instance.value).catch(handleError)
+	if (
+		instance.value.install_stage !== 'pack_installed' &&
+		(instance.value.link?.type === 'modrinth_modpack' ||
+			instance.value.link?.type === 'server_project_modpack')
+	) {
+		await install_pack_to_existing_instance(instance.value.id, {
+			type: 'fromVersionId',
+			project_id: instance.value.link.project_id ?? instance.value.link.server_project_id ?? '',
+			version_id: instance.value.link.version_id ?? instance.value.link.content_version_id ?? '',
+			title: instance.value.name,
+		}).catch(handleError)
+	} else {
+		await install_existing_instance(instance.value.id, false).catch(handleError)
+	}
 }
 
 const handleRightClick = (event: MouseEvent) => {

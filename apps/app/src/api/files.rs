@@ -37,12 +37,12 @@ pub async fn file_read_dragged_file(path: String) -> Result<Vec<u8>> {
 
 #[tauri::command]
 pub async fn file_extract_zip(
-    instance_path: &str,
+    instance_id: &str,
     file_path: &str,
     override_conflicts: bool,
     dry_run: bool,
 ) -> Result<Option<ExtractDryRunResult>> {
-    let base = get_full_path(instance_path).await?;
+    let base = get_full_path(instance_id).await?;
     let zip_path = base.join(file_path);
     let canonical_zip = tokio::fs::canonicalize(&zip_path).await?;
     let canonical_base = tokio::fs::canonicalize(&base).await?;
@@ -146,10 +146,10 @@ pub async fn file_extract_zip(
 #[tauri::command]
 pub async fn file_save_as<R: Runtime>(
     app: tauri::AppHandle<R>,
-    instance_path: &str,
+    instance_id: &str,
     file_path: &str,
 ) -> Result<()> {
-    let base = get_full_path(instance_path).await?;
+    let base = get_full_path(instance_id).await?;
     let source = base.join(file_path);
     let file_name = source
         .file_name()

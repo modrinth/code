@@ -1,6 +1,10 @@
 //! Downloader for Minecraft data
 
 use crate::instance::QuickPlayType;
+use crate::install::{
+    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallProgressReporter,
+};
 use crate::launcher::parse_rules;
 use crate::{
     event::{
@@ -21,21 +25,95 @@ use daedalus::{
 };
 use futures::prelude::*;
 use reqwest::Method;
+use std::sync::{
+    Arc,
+    atomic::{AtomicU64, Ordering},
+};
 use tokio::sync::OnceCell;
+
+#[derive(Clone, Debug)]
+pub struct MinecraftDownloadProgress {
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
+    current: Arc<AtomicU64>,
+    total: u64,
+}
+
+impl MinecraftDownloadProgress {
+    async fn new(
+        reporter: InstallProgressReporter,
+        details: InstallPhaseDetails,
+        current: u64,
+        total: u64,
+    ) -> crate::Result<Self> {
+        reporter
+            .update(
+                InstallPhaseId::DownloadingMinecraft,
+                Some(InstallProgress { current, total }),
+                details.clone(),
+            )
+            .await?;
+
+        Ok(Self {
+            reporter,
+            details,
+            current: Arc::new(AtomicU64::new(current)),
+            total,
+        })
+    }
+
+    async fn mark_complete(&self) -> crate::Result<()> {
+        let current = self.current.fetch_add(1, Ordering::Relaxed) + 1;
+        self.reporter
+            .update(
+                InstallPhaseId::DownloadingMinecraft,
+                Some(InstallProgress {
+                    current: current.min(self.total),
+                    total: self.total,
+                }),
+                self.details.clone(),
+            )
+            .await
+    }
+}
 
 #[tracing::instrument(skip(st, version))]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
-    loading_bar: &LoadingBarId,
+    loading_bar: Option<&LoadingBarId>,
     java_arch: &str,
     force: bool,
     minecraft_updated: bool,
+    reporter: Option<InstallProgressReporter>,
+    phase_details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     tracing::info!("Downloading Minecraft version {}", version.id);
+    let log_config_count = u64::from(
+        version
+            .logging
+            .as_ref()
+            .and_then(|x| x.get(&LoggingSide::Client))
+            .is_some(),
+    );
+
     // 5
-    let assets_index =
-        download_assets_index(st, version, Some(loading_bar), force).await?;
+    let assets_index = download_assets_index(st, version, loading_bar, force).await?;
+    let progress = if let Some(reporter) = reporter {
+        Some(
+            MinecraftDownloadProgress::new(
+                reporter,
+                phase_details,
+                1,
+                2 + log_config_count
+                    + assets_index.objects.len() as u64
+                    + version.libraries.len() as u64,
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
 
     let amount = if version.processors.as_ref().is_some_and(|x| !x.is_empty()) {
         25.0
@@ -45,10 +123,24 @@ pub async fn download_minecraft(
 
     tokio::try_join! {
         // Total loading sums to 90/60
-        download_client(st, version, Some(loading_bar), force), // 9
-        download_log_config(st, version, Some(loading_bar), force),
-        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount, force), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch, force, minecraft_updated) // 40
+        async {
+            download_client(st, version, loading_bar, force).await?;
+            if let Some(progress) = &progress {
+                progress.mark_complete().await?;
+            }
+            Ok::<_, crate::Error>(())
+        }, // 9
+        async {
+            let had_log_config = download_log_config(st, version, loading_bar, force).await?;
+            if had_log_config
+                && let Some(progress) = &progress
+            {
+                progress.mark_complete().await?;
+            }
+            Ok::<_, crate::Error>(())
+        },
+        download_assets(st, version.assets == "legacy", &assets_index, loading_bar, amount, force, progress.clone()), // 40
+        download_libraries(st, version.libraries.as_slice(), &version.id, loading_bar, amount, java_arch, force, minecraft_updated, progress.clone()) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -218,6 +310,7 @@ pub async fn download_assets(
     loading_bar: Option<&LoadingBarId>,
     loading_amount: f64,
     force: bool,
+    progress: Option<MinecraftDownloadProgress>,
 ) -> crate::Result<()> {
     tracing::debug!("Loading assets");
     let num_futs = index.objects.len();
@@ -230,7 +323,9 @@ pub async fn download_assets(
             loading_amount,
             num_futs,
             None,
-            |(name, asset)| async move {
+            |(name, asset)| {
+                let progress = progress.clone();
+                async move {
                 let hash = &asset.hash;
                 let resource_path = st.directories.object_dir(hash);
                 let url = format!(
@@ -267,7 +362,11 @@ pub async fn download_assets(
                 }?;
 
                 tracing::trace!("Loaded asset with hash {hash}");
+                if let Some(progress) = &progress {
+                    progress.mark_complete().await?;
+                }
                 Ok(())
+                }
             }).await?;
     tracing::debug!("Done loading assets!");
     Ok(())
@@ -284,6 +383,7 @@ pub async fn download_libraries(
     java_arch: &str,
     force: bool,
     minecraft_updated: bool,
+    progress: Option<MinecraftDownloadProgress>,
 ) -> crate::Result<()> {
     tracing::debug!("Loading libraries");
 
@@ -299,7 +399,9 @@ pub async fn download_libraries(
         loading_amount,
         num_files,
         None,
-        |library| async move {
+        |library| {
+            let progress = progress.clone();
+            async move {
             if let Some(rules) = &library.rules
                 && !parse_rules(
                     rules,
@@ -309,6 +411,9 @@ pub async fn download_libraries(
                 )
             {
                 tracing::trace!("Skipped library {}", &library.name);
+                if let Some(progress) = &progress {
+                    progress.mark_complete().await?;
+                }
                 return Ok(());
             }
 
@@ -317,6 +422,9 @@ pub async fn download_libraries(
                     "Skipped non-downloadable library {}",
                     &library.name
                 );
+                if let Some(progress) = &progress {
+                    progress.mark_complete().await?;
+                }
                 return Ok(());
             }
 
@@ -365,6 +473,9 @@ pub async fn download_libraries(
                 let path = st.directories.libraries_dir().join(&artifact_path);
 
                 if path.exists() && !force {
+                    if let Some(progress) = &progress {
+                        progress.mark_complete().await?;
+                    }
                     return Ok(());
                 }
 
@@ -446,7 +557,11 @@ pub async fn download_libraries(
             }
 
             tracing::debug!("Loaded library {}", library.name);
+            if let Some(progress) = &progress {
+                progress.mark_complete().await?;
+            }
             Ok(())
+            }
         },
     )
     .await?;
@@ -461,7 +576,7 @@ pub async fn download_log_config(
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
     force: bool,
-) -> crate::Result<()> {
+) -> crate::Result<bool> {
     let log_download = version_info
         .logging
         .as_ref()
@@ -473,7 +588,7 @@ pub async fn download_log_config(
         if let Some(loading_bar) = loading_bar {
             emit_loading(loading_bar, 1.0, None)?;
         }
-        return Ok(());
+        return Ok(false);
     };
 
     let path = st.directories.log_configs_dir().join(&log_download.id);
@@ -496,5 +611,5 @@ pub async fn download_log_config(
     }
 
     tracing::debug!("Log config {} loaded", log_download.id);
-    Ok(())
+    Ok(true)
 }

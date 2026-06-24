@@ -5,7 +5,7 @@ use crate::State;
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::instances::adapters::sqlite;
 use crate::state::instances::{
-    ContentEntry, ContentSet, Instance, InstanceLink,
+    ContentEntry, ContentSet, ContentSourceKind, Instance, InstanceLink,
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, CachedFile, ContentFile, ContentItem,
@@ -32,7 +32,15 @@ struct ResolvedContentScope {
 enum ContentFilter<'a> {
     All,
     ExcludeModpack(&'a ModpackIdentifiers),
+    ExcludeSourceKind {
+        source_kind: ContentSourceKind,
+        exclude_untracked: bool,
+    },
     OnlyModpack(&'a ModpackIdentifiers),
+    OnlySourceKind {
+        source_kind: ContentSourceKind,
+        include_untracked: bool,
+    },
 }
 
 pub(crate) async fn list_content_sets(
@@ -101,12 +109,12 @@ pub(crate) async fn list_content(
         &state.pool,
     )
     .await?;
-    let modpack_ids = match linked_modpack_ids_for_instance(
+    let link = sqlite::instance_rows::get_instance_link(
         &resolved.instance.id,
         &state.pool,
     )
-    .await?
-    {
+    .await?;
+    let modpack_ids = match linked_modpack_ids(&link) {
         Some((_, version_id)) => get_modpack_identifiers(
             &version_id,
             &resolved.content_set,
@@ -117,10 +125,24 @@ pub(crate) async fn list_content(
         .ok(),
         None => None,
     };
-    let filter = modpack_ids
-        .as_ref()
-        .map(ContentFilter::ExcludeModpack)
-        .unwrap_or(ContentFilter::All);
+    let filter = if let Some(ids) = modpack_ids.as_ref() {
+        ContentFilter::ExcludeModpack(ids)
+    } else if matches!(
+        link,
+        InstanceLink::ImportedModpack {
+            project_id: None,
+            version_id: None,
+            ..
+        }
+    ) {
+        ContentFilter::ExcludeSourceKind {
+            source_kind: ContentSourceKind::ImportedModpack,
+            exclude_untracked: resolved.instance.install_stage
+                != crate::state::InstanceInstallStage::Installed,
+        }
+    } else {
+        ContentFilter::All
+    };
     let files =
         content_projects_for_scope(&resolved, cache_behaviour, state, filter)
             .await?;
@@ -147,10 +169,42 @@ pub(crate) async fn list_linked_modpack_content(
         &state.pool,
     )
     .await?;
-    let Some((_, version_id)) =
-        linked_modpack_ids_for_instance(&resolved.instance.id, &state.pool)
-            .await?
-    else {
+    let link = sqlite::instance_rows::get_instance_link(
+        &resolved.instance.id,
+        &state.pool,
+    )
+    .await?;
+    let Some((_, version_id)) = linked_modpack_ids(&link) else {
+        if matches!(
+            link,
+            InstanceLink::ImportedModpack {
+                project_id: None,
+                version_id: None,
+                ..
+            }
+        ) {
+            let files = content_projects_for_scope(
+                &resolved,
+                cache_behaviour,
+                state,
+                ContentFilter::OnlySourceKind {
+                    source_kind: ContentSourceKind::ImportedModpack,
+                    include_untracked: resolved.instance.install_stage
+                        != crate::state::InstanceInstallStage::Installed,
+                },
+            )
+            .await?;
+            let files = files.into_iter().collect::<Vec<_>>();
+
+            return content_files_to_content_items(
+                &resolved.instance,
+                &files,
+                cache_behaviour,
+                state,
+            )
+            .await;
+        }
+
         return Ok(Vec::new());
     };
     let ids = match get_modpack_identifiers(
@@ -540,12 +594,32 @@ async fn content_projects_for_scope(
                     continue;
                 }
             }
+            ContentFilter::ExcludeSourceKind {
+                source_kind,
+                exclude_untracked,
+            } => {
+                if entry.is_some_and(|entry| entry.source_kind == source_kind)
+                    || (exclude_untracked && entry.is_none())
+                {
+                    continue;
+                }
+            }
             ContentFilter::OnlyModpack(ids) => {
                 if !ids.is_modpack_file(
                     &file.sha1,
                     metadata.as_ref(),
                     entry.and_then(|entry| entry.project_id.as_deref()),
                 ) {
+                    continue;
+                }
+            }
+            ContentFilter::OnlySourceKind {
+                source_kind,
+                include_untracked,
+            } => {
+                if !entry.is_some_and(|entry| entry.source_kind == source_kind)
+                    && !(include_untracked && entry.is_none())
+                {
                     continue;
                 }
             }
@@ -915,6 +989,7 @@ fn linked_modpack_ids(link: &InstanceLink) -> Option<(String, String)> {
         InstanceLink::ImportedModpack {
             project_id: Some(project_id),
             version_id: Some(version_id),
+            ..
         } => Some((project_id.clone(), version_id.clone())),
         _ => None,
     }

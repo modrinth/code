@@ -7,8 +7,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
-import { install_to_existing_instance } from '@/helpers/pack'
-
+import type { InstallJobSnapshot } from './install'
 import type {
 	CacheBehaviour,
 	ContentFile,
@@ -17,42 +16,6 @@ import type {
 	InstanceLink,
 	InstanceLoader,
 } from './types'
-
-// Add instance
-/*
-    name: String,           // the name of the instance
-    game_version: String,   // the game version of the instance
-    modloader: ModLoader,   // the modloader to use
-    - ModLoader is an enum, with the following variants: Vanilla, Forge, Fabric, Quilt
-    loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-    icon: Path,  // the icon for the instance
-*/
-
-export async function create(
-	name: string,
-	gameVersion: string,
-	modloader: InstanceLoader,
-	loaderVersion: string | null,
-	icon: string | null,
-	skipInstall: boolean,
-	link?: InstanceLink | null,
-): Promise<string> {
-	// Trim string name to avoid "Unable to find directory"
-	name = name.trim()
-	return await invoke('plugin:instance|instance_create', {
-		name,
-		gameVersion,
-		modloader,
-		loaderVersion,
-		icon,
-		skipInstall,
-		link,
-	})
-}
-
-export async function duplicate(instanceId: string): Promise<string> {
-	return await invoke('plugin:instance|instance_duplicate', { instanceId })
-}
 
 export async function remove(instanceId: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove', { instanceId })
@@ -165,10 +128,6 @@ export async function check_installed_batch(projectId: string): Promise<Record<s
 	return await invoke('plugin:instance|instance_check_installed_batch', { projectId })
 }
 
-export async function install(instanceId: string, force: boolean): Promise<void> {
-	return await invoke('plugin:instance|instance_install', { instanceId, force })
-}
-
 export async function update_all(instanceId: string): Promise<Record<string, string>> {
 	return await invoke('plugin:instance|instance_update_all', { instanceId })
 }
@@ -214,10 +173,12 @@ export async function add_project_from_path(
 export async function toggle_disable_project(
 	instanceId: string,
 	projectPath: string,
+	desiredEnabled?: boolean,
 ): Promise<string> {
 	return await invoke('plugin:instance|instance_toggle_disable_project', {
 		instanceId,
 		projectPath,
+		desiredEnabled,
 	})
 }
 
@@ -230,7 +191,7 @@ export async function remove_project(instanceId: string, projectPath: string): P
 export async function update_managed_modrinth_version(
 	instanceId: string,
 	versionId: string,
-): Promise<void> {
+): Promise<InstallJobSnapshot> {
 	return await invoke('plugin:instance|instance_update_managed_modrinth_version', {
 		instanceId,
 		versionId,
@@ -238,7 +199,7 @@ export async function update_managed_modrinth_version(
 }
 
 // Repair a managed Modrinth instance
-export async function update_repair_modrinth(instanceId: string): Promise<void> {
+export async function update_repair_modrinth(instanceId: string): Promise<InstallJobSnapshot> {
 	return await invoke('plugin:instance|instance_repair_managed_modrinth', { instanceId })
 }
 
@@ -296,19 +257,4 @@ export async function edit(instanceId: string, editInstance: Partial<GameInstanc
 // Edits an instance's icon
 export async function edit_icon(instanceId: string, iconPath: string | null): Promise<void> {
 	return await invoke('plugin:instance|instance_edit_icon', { instanceId, iconPath })
-}
-
-export async function finish_install(instance: GameInstance): Promise<void> {
-	if (instance.install_stage !== 'pack_installed') {
-		if (instance.link) {
-			await install_to_existing_instance(
-				instance.link.project_id ?? instance.link.server_project_id ?? '',
-				instance.link.version_id ?? instance.link.content_version_id ?? '',
-				instance.name,
-				instance.id,
-			)
-		}
-	} else {
-		await install(instance.id, false)
-	}
 }

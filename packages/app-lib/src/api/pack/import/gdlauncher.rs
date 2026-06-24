@@ -4,12 +4,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     State,
+    install::{InstallPhaseDetails, InstallProgressReporter},
     prelude::ModLoader,
     state::{AppliedContentSetPatch, EditInstance, InstanceInstallStage},
     util::io,
 };
 
-use super::{copy_dotminecraft, recache_icon};
+use super::{finish_import, recache_icon};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -42,6 +43,8 @@ pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
 pub async fn import_gdlauncher(
     gdlauncher_instance_folder: PathBuf, // instance's folder
     instance_id: &str,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     // Load config.json
     let config = serde_json::from_str::<GDLauncherConfig>(
@@ -99,6 +102,7 @@ pub async fn import_gdlauncher(
                 icon.clone().map(|x| x.to_string_lossy().to_string()),
             ),
             content_set_patch: Some(AppliedContentSetPatch {
+                source_kind: None,
                 game_version: Some(game_version.clone()),
                 protocol_version: Some(None),
                 loader: Some(mod_loader),
@@ -111,18 +115,12 @@ pub async fn import_gdlauncher(
 
     // Copy in contained folders as overrides
     let state = State::get().await?;
-    let loading_bar = copy_dotminecraft(
+    finish_import(
         instance_id,
         gdlauncher_instance_folder,
         &state.io_semaphore,
-        None,
-    )
-    .await?;
-
-    crate::launcher::install_minecraft_for_instance_id(
-        instance_id,
-        Some(loading_bar),
-        false,
+        reporter,
+        details,
     )
     .await?;
 

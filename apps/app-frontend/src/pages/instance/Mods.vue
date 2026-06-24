@@ -10,21 +10,21 @@
 				/>
 				<ModpackContentModal
 					ref="modpackContentModal"
-					:modpack-name="linkedModpackProject?.title"
-					:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
+					:modpack-name="displayedModpackProject?.title"
+					:modpack-icon-url="displayedModpackProject?.icon_url ?? undefined"
 					:enable-toggle="!props.isServerInstance"
 					:busy="isBulkOperating"
 					:get-overflow-options="getOverflowOptions"
 					:switch-version="handleSwitchVersion"
 					@update:enabled="handleModpackContentToggle"
-					@bulk:enable="handleModpackContentBulkToggle"
-					@bulk:disable="handleModpackContentBulkToggle"
+					@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
+					@bulk:disable="(items) => handleModpackContentBulkToggle(items, false)"
 				/>
 				<ConfirmModpackUpdateModal
 					ref="modpackUpdateConfirmModal"
 					:downgrade="isModpackUpdateDowngrade"
 					:backup-tip="
-						[linkedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
+						[displayedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
 							.filter(Boolean)
 							.join(' ')
 					"
@@ -46,11 +46,11 @@
 					:is-app="true"
 					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
 					:project-icon-url="
-						updatingModpack ? linkedModpackProject?.icon_url : updatingProject?.project?.icon_url
+						updatingModpack ? displayedModpackProject?.icon_url : updatingProject?.project?.icon_url
 					"
 					:project-name="
 						updatingModpack
-							? (linkedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
+							? (displayedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
 							: (updatingProject?.project?.title ?? updatingProject?.file_name)
 					"
 					:loading="loadingVersions"
@@ -92,6 +92,7 @@ import {
 	versionChangesGameVersion,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -107,10 +108,10 @@ import {
 	instance_listener,
 	type InstanceBulkUpdateProgress,
 } from '@/helpers/events.js'
+import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
 import {
 	add_project_from_path,
 	add_project_from_version,
-	duplicate,
 	edit,
 	get,
 	get_linked_modpack_content,
@@ -220,6 +221,32 @@ const linkedModpackOwner = ref<ContentOwner | null>(null)
 const linkedModpackCategories = ref<ContentModpackCardCategory[]>([])
 const linkedModpackHasUpdate = ref(false)
 const linkedModpackUpdateVersionId = ref<string | null>(null)
+const localImportedModpackUnlinked = ref(false)
+
+const localImportedModpackProject = computed<ContentModpackCardProject | null>(() => {
+	const link = props.instance.link
+	if (localImportedModpackUnlinked.value || link?.type !== 'imported_modpack') return null
+
+	return {
+		id: link.filename ?? props.instance.id,
+		slug: link.filename ?? props.instance.id,
+		title: link.name ?? props.instance.name,
+		icon_url: props.instance.icon_path ? convertFileSrc(props.instance.icon_path) : undefined,
+		description: '',
+		filename: link.filename ?? undefined,
+	}
+})
+
+const displayedModpackProject = computed(
+	() => linkedModpackProject.value ?? localImportedModpackProject.value,
+)
+
+watch(
+	() => props.instance.link,
+	() => {
+		localImportedModpackUnlinked.value = false
+	},
+)
 
 const isModpackUpdating = ref(false)
 const isBulkOperating = ref(false)
@@ -248,6 +275,30 @@ const modpackContentQuery = useQuery({
 	),
 })
 
+const displayedProjects = computed<ContentItem[]>(() => {
+	if (!localImportedModpackProject.value) return mergedProjects.value
+
+	const modpackItems = modpackContentQuery.data.value
+	if (!modpackItems?.length) {
+		return modpackContentQuery.isLoading.value ? [] : mergedProjects.value
+	}
+
+	const modpackItemKeys = new Set(
+		modpackItems.flatMap((item) =>
+			[getContentItemId(item), item.file_path, item.file_name].filter(
+				(key): key is string => !!key,
+			),
+		),
+	)
+
+	return mergedProjects.value.filter(
+		(item) =>
+			!modpackItemKeys.has(getContentItemId(item)) &&
+			(!item.file_path || !modpackItemKeys.has(item.file_path)) &&
+			!modpackItemKeys.has(item.file_name),
+	)
+})
+
 // TODO: Extract content operation and updater modal state into composables; this page currently owns file mutations, dependency installs, busy flags, and version selection flow.
 const updatingProject = ref<ContentItem | null>(null)
 const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
@@ -264,6 +315,38 @@ const activeUpdateRequestId = ref(0)
 
 function fileNameFromPath(path: string) {
 	return path.split('/').pop() ?? path
+}
+
+function matchesContentItem(
+	item: ContentItem,
+	target: ContentItem,
+	originalFileName: string,
+	originalFilePath?: string,
+) {
+	if (item.file_name === originalFileName || item.file_path === originalFilePath) return true
+
+	const projectId = target.project?.id
+	if (!projectId || item.project?.id !== projectId) return false
+
+	const versionId = target.version?.id
+	return !versionId || item.version?.id === versionId
+}
+
+function updateLinkedModpackContentCache(
+	target: ContentItem,
+	originalFileName: string,
+	originalFilePath: string | undefined,
+	updates: Partial<ContentItem>,
+) {
+	queryClient.setQueryData<ContentItem[]>(modpackContentQueryKey.value, (items) => {
+		if (!items) return items
+
+		return items.map((item) =>
+			matchesContentItem(item, target, originalFileName, originalFilePath)
+				? { ...item, ...updates }
+				: item,
+		)
+	})
 }
 
 function getContentItemId(item: ContentItem | null | undefined) {
@@ -433,21 +516,28 @@ async function handleUploadFiles() {
 	}
 }
 
-async function toggleDisableMod(mod: ContentItem) {
+async function toggleDisableMod(mod: ContentItem, desiredEnabled?: boolean) {
 	if (!mod.file_path) return
 	const operation = beginContentOperation(mod)
 	if (!operation) return
+	const originalFilePath = mod.file_path
 
 	try {
-		const newPath = await toggle_disable_project(props.instance.id, mod.file_path)
+		const newPath = await toggle_disable_project(props.instance.id, mod.file_path, desiredEnabled)
 		const newFileName = fileNameFromPath(newPath)
+		const enabled = !newPath.endsWith('.disabled')
 		mod.file_path = newPath
 		mod.file_name = newFileName
-		mod.enabled = !mod.enabled
+		mod.enabled = enabled
 		modpackContentModal.value?.updateItem(operation.originalFileName, {
 			file_path: newPath,
 			file_name: newFileName,
-			enabled: mod.enabled,
+			enabled,
+		})
+		updateLinkedModpackContentCache(mod, operation.originalFileName, originalFilePath, {
+			file_path: newPath,
+			file_name: newFileName,
+			enabled,
 		})
 
 		trackEvent('InstanceProjectDisable', {
@@ -456,7 +546,7 @@ async function toggleDisableMod(mod: ContentItem) {
 			id: mod.project?.id,
 			name: mod.project?.title ?? mod.file_name,
 			project_type: mod.project_type,
-			disabled: !mod.enabled,
+			disabled: !enabled,
 		})
 	} catch (err) {
 		handleError(err as Error)
@@ -650,7 +740,7 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 		shouldRemoveNewOnError = newPath !== oldPath
 
 		if (wasDisabled) {
-			newPath = await toggle_disable_project(props.instance.id, newPath)
+			newPath = await toggle_disable_project(props.instance.id, newPath, false)
 		}
 
 		const instance = await get(props.instance.id).catch(handleError)
@@ -819,12 +909,12 @@ async function handleSwitchVersion(item: ContentItem) {
 	updatingProjectVersions.value = versions
 }
 
-async function handleModpackContentToggle(item: ContentItem) {
-	await toggleDisableDebounced(item)
+async function handleModpackContentToggle(item: ContentItem, enabled: boolean) {
+	await toggleDisableDebounced(item, enabled)
 }
 
-async function handleModpackContentBulkToggle(items: ContentItem[]) {
-	await Promise.all(items.map((item) => toggleDisableMod(item)))
+async function handleModpackContentBulkToggle(items: ContentItem[], enabled: boolean) {
+	await Promise.all(items.map((item) => toggleDisableMod(item, enabled)))
 }
 
 async function handleModpackContent() {
@@ -1060,6 +1150,7 @@ async function unpairInstance() {
 	linkedModpackOwner.value = null
 	linkedModpackHasUpdate.value = false
 	linkedModpackUpdateVersionId.value = null
+	localImportedModpackUnlinked.value = true
 	await initProjects()
 }
 
@@ -1067,7 +1158,7 @@ async function handleShareItems(
 	items: ContentItem[],
 	format: 'names' | 'file-names' | 'urls' | 'markdown',
 ) {
-	const source = items.length > 0 ? items : projects.value
+	const source = items.length > 0 ? items : displayedProjects.value
 	let text: string
 	switch (format) {
 		case 'names':
@@ -1170,8 +1261,11 @@ provideAppBackup({
 			.map((p) => parseInt(p.name.slice(prefix.length), 10))
 			.filter((n) => !isNaN(n))
 		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const newPath = await duplicate(props.instance.id)
-		await edit(newPath, { name: `${prefix}${nextNum}` })
+		const job = await install_duplicate_instance(props.instance.id)
+		const newInstanceId = installJobInstanceId(job)
+		if (newInstanceId) {
+			await edit(newInstanceId, { name: `${prefix}${nextNum}` })
+		}
 	},
 })
 
@@ -1183,56 +1277,70 @@ function dismissContentHint() {
 }
 
 provideContentManager({
-	items: mergedProjects,
+	items: displayedProjects,
 	loading,
 	error: ref(null),
-	modpack: computed(() =>
-		linkedModpackProject.value
-			? {
-					project: linkedModpackProject.value,
-					projectLink: {
-						path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}`,
-						query: { i: props.instance.id },
-					},
-					version: linkedModpackVersion.value ?? undefined,
-					versionLink:
-						linkedModpackProject.value && linkedModpackVersion.value
-							? {
-									path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`,
-									query: { i: props.instance.id },
-								}
-							: undefined,
-					owner: linkedModpackOwner.value
+	modpack: computed(() => {
+		if (linkedModpackProject.value) {
+			return {
+				project: linkedModpackProject.value,
+				projectLink: {
+					path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}`,
+					query: { i: props.instance.id },
+				},
+				version: linkedModpackVersion.value ?? undefined,
+				versionLink:
+					linkedModpackProject.value && linkedModpackVersion.value
 						? {
-								...linkedModpackOwner.value,
-								link: () =>
-									openUrl(
-										`https://modrinth.com/${linkedModpackOwner.value!.type}/${linkedModpackOwner.value!.id}`,
-									),
+								path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`,
+								query: { i: props.instance.id },
 							}
 						: undefined,
-					categories: linkedModpackCategories.value,
-					hasUpdate: linkedModpackHasUpdate.value,
-					disabled: isModpackUpdating.value,
-					disabledText: isModpackUpdating.value
-						? formatMessage(commonMessages.updatingLabel)
-						: formatMessage(commonMessages.installingLabel),
-				}
-			: null,
-	),
+				owner: linkedModpackOwner.value
+					? {
+							...linkedModpackOwner.value,
+							link: () =>
+								openUrl(
+									`https://modrinth.com/${linkedModpackOwner.value!.type}/${linkedModpackOwner.value!.id}`,
+								),
+						}
+					: undefined,
+				categories: linkedModpackCategories.value,
+				hasUpdate: linkedModpackHasUpdate.value,
+				disabled: isModpackUpdating.value,
+				disabledText: isModpackUpdating.value
+					? formatMessage(commonMessages.updatingLabel)
+					: formatMessage(commonMessages.installingLabel),
+			}
+		}
+
+		if (localImportedModpackProject.value) {
+			return {
+				project: localImportedModpackProject.value,
+				categories: [],
+				hasUpdate: false,
+				disabled: isModpackUpdating.value,
+				disabledText: isModpackUpdating.value
+					? formatMessage(commonMessages.updatingLabel)
+					: formatMessage(commonMessages.installingLabel),
+			}
+		}
+
+		return null
+	}),
 	isPackLocked,
 	isBusy: isInstanceBusy,
 	isBulkOperating,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableDebounced,
 	bulkEnableItems: (items: ContentItem[]) =>
-		Promise.all(items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item))).then(
-			() => {},
-		),
+		Promise.all(
+			items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item, true)),
+		).then(() => {}),
 	bulkDisableItems: (items: ContentItem[]) =>
-		Promise.all(items.filter((item) => item.enabled).map((item) => toggleDisableMod(item))).then(
-			() => {},
-		),
+		Promise.all(
+			items.filter((item) => item.enabled).map((item) => toggleDisableMod(item, false)),
+		).then(() => {}),
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
 		Promise.all(items.map((item) => removeMod(item))).then(() => {}),

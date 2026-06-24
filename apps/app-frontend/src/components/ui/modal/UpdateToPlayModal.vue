@@ -31,6 +31,7 @@ import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
+import { wait_for_install_job } from '@/helpers/install'
 import { update_managed_modrinth_version } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { injectServerInstall } from '@/providers/server-install'
@@ -242,7 +243,8 @@ async function handleUpdate() {
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
 		if (modpackVersionId.value && instance.value) {
-			await update_managed_modrinth_version(instance.value.id, modpackVersionId.value)
+			const job = await update_managed_modrinth_version(instance.value.id, modpackVersionId.value)
+			await wait_for_install_job(job.job_id)
 			await onUpdateComplete.value()
 		}
 	} catch (error) {

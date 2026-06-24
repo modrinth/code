@@ -19,8 +19,9 @@ pub use self::export_mrpack::{
     create_mrpack_json, export_mrpack, get_pack_export_candidates,
 };
 pub use self::get::{get, get_many, list};
-pub use self::install::{get_optimal_jre_key, install};
-pub use self::lifecycle::{create, duplicate, edit, edit_icon, remove};
+pub use self::install::get_optimal_jre_key;
+pub(crate) use self::lifecycle::create;
+pub use self::lifecycle::{edit, edit_icon, remove};
 pub use self::paths::{get_full_path, get_mod_full_path};
 pub use self::projects::{
     add_project_from_path, add_project_from_version, remove_project,

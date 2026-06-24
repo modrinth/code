@@ -1,4 +1,4 @@
-use crate::state::{InstanceInstallStage, JavaVersion, State};
+use crate::state::{JavaVersion, State};
 
 pub async fn get_optimal_jre_key(
     instance_id: &str,
@@ -42,44 +42,4 @@ pub async fn get_optimal_jre_key(
         &version_info,
     )
     .await
-}
-
-#[tracing::instrument]
-pub async fn install(instance_id: &str, force: bool) -> crate::Result<()> {
-    let state = State::get().await?;
-    let context =
-        crate::state::instances::commands::get_instance_launch_context(
-            instance_id,
-            &state.pool,
-        )
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::OtherError(format!(
-                "Tried to install a nonexistent instance {instance_id}!"
-            ))
-        })?;
-    let result =
-        crate::launcher::install_minecraft(&context, None, force).await;
-    if result.is_err() {
-        let current_stage =
-            crate::state::instances::commands::get_instance_launch_context(
-                instance_id,
-                &state.pool,
-            )
-            .await
-            .ok()
-            .flatten()
-            .map(|context| context.instance.install_stage)
-            .unwrap_or(InstanceInstallStage::NotInstalled);
-        if current_stage != InstanceInstallStage::Installed {
-            crate::state::instances::commands::set_instance_install_stage(
-                &context.instance.id,
-                InstanceInstallStage::NotInstalled,
-                &state.pool,
-            )
-            .await?;
-        }
-    }
-
-    result
 }

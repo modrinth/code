@@ -4,9 +4,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     State,
+    install::{InstallPhaseDetails, InstallProgressReporter},
     pack::{
         self,
-        import::{self, copy_dotminecraft},
+        import::{self, finish_import},
         install_from::CreatePackDescription,
     },
     prelude::ModLoader,
@@ -127,6 +128,8 @@ pub async fn import_atlauncher(
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
     instance_id: &str,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     let atlauncher_instance_path = atlauncher_base_path
         .join("instances")
@@ -167,8 +170,8 @@ pub async fn import_atlauncher(
         override_title: Some(atinstance.launcher.name.clone()),
         project_id: None,
         version_id: None,
-        existing_loading_bar: None,
         instance_id: instance_id.to_string(),
+        source_filename: None,
     };
 
     let backup_name = format!("ATLauncher-{instance_folder}");
@@ -180,6 +183,8 @@ pub async fn import_atlauncher(
         backup_name,
         description,
         atinstance,
+        reporter,
+        details,
     )
     .await?;
     Ok(())
@@ -191,6 +196,8 @@ async fn import_atlauncher_unmanaged(
     backup_name: String,
     description: CreatePackDescription,
     atinstance: ATInstance,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     let mod_loader = format!(
         "\"{}\"",
@@ -243,6 +250,7 @@ async fn import_atlauncher_unmanaged(
             ),
             link,
             content_set_patch: Some(AppliedContentSetPatch {
+                source_kind: None,
                 game_version: Some(game_version.clone()),
                 protocol_version: Some(None),
                 loader: Some(mod_loader),
@@ -255,18 +263,12 @@ async fn import_atlauncher_unmanaged(
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
-    let loading_bar = copy_dotminecraft(
+    finish_import(
         instance_id,
         minecraft_folder,
         &state.io_semaphore,
-        None,
-    )
-    .await?;
-
-    crate::launcher::install_minecraft_for_instance_id(
-        instance_id,
-        Some(loading_bar),
-        false,
+        reporter,
+        details,
     )
     .await?;
     Ok(())

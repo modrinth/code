@@ -164,6 +164,7 @@ import { Dropdown } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
 import { trackEvent } from '@/helpers/analytics'
 import { loading_listener, process_listener } from '@/helpers/events'
 import { get_many as getInstances } from '@/helpers/instance'
@@ -395,12 +396,12 @@ const stop = async (process: RunningProcess) => {
 	await refresh()
 }
 
-function goToTerminal(path?: string) {
-	const selectedPath = path ?? selectedProcess.value?.instance.id
-	if (!selectedPath) {
+function goToTerminal(instanceId?: string) {
+	const selectedInstanceId = instanceId ?? selectedProcess.value?.instance.id
+	if (!selectedInstanceId) {
 		return
 	}
-	router.push(`/instance/${encodeURIComponent(selectedPath)}/logs`)
+	router.push(`/instance/${encodeURIComponent(selectedInstanceId)}/logs`)
 }
 
 const currentLoadingBars = ref<LoadingBar[]>([])
@@ -420,8 +421,7 @@ function getLoadingProgress(loadingBar: LoadingBar): number {
 }
 
 function getLoadingText(loadingBar: LoadingBar): string {
-	const percent = Math.floor(getLoadingProgress(loadingBar) * 100)
-	return loadingBar.message ? `${percent}% ${loadingBar.message}` : `${percent}%`
+	return loadingBar.message ?? ''
 }
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
@@ -453,25 +453,33 @@ function removeNotification(): void {
 }
 
 function buildDownloadItems(): PopupNotificationProgressItem[] {
-	return currentLoadingBars.value.map((bar) => ({
-		id: getLoadingBarKey(bar),
-		title: bar.title ?? '',
-		text: getLoadingText(bar),
-		iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
-		progress: getLoadingProgress(bar),
-		waiting: !bar.total || bar.total <= 0,
-	}))
+	return [
+		...installJobNotifications.progressItems.value,
+		...currentLoadingBars.value.map((bar) => ({
+			id: getLoadingBarKey(bar),
+			title: bar.title ?? '',
+			text: getLoadingText(bar),
+			iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
+			progress: getLoadingProgress(bar),
+			waiting: !bar.total || bar.total <= 0,
+			progressType: 'percentage',
+			progressCurrent: bar.current,
+			progressTotal: bar.total,
+		})),
+	]
 }
 
 const hasVisibleActiveDownloadToasts = computed(() => !!getNotification())
-const hasActiveLoadingBars = computed(() => currentLoadingBars.value.length > 0)
+const hasActiveLoadingBars = computed(
+	() => currentLoadingBars.value.length > 0 || installJobNotifications.active.value,
+)
 
 function updateNotification(resummon = false): void {
 	if (resummon) {
 		dismissed.value = false
 	}
 
-	if (currentLoadingBars.value.length === 0) {
+	if (currentLoadingBars.value.length === 0 && !installJobNotifications.active.value) {
 		removeNotification()
 		dismissed.value = false
 		return
@@ -490,17 +498,23 @@ function updateNotification(resummon = false): void {
 	const progressItems = buildDownloadItems()
 
 	if (notif) {
-		notif.title = formatMessage(messages.downloads)
+		notif.title = installJobNotifications.active.value
+			? installJobNotifications.title.value
+			: formatMessage(messages.downloads)
 		notif.text = undefined
 		notif.progressItems = progressItems
+		notif.buttons = installJobNotifications.buttons.value
 		notif.progress = undefined
 		notif.waiting = undefined
 	} else {
 		notif = popupNotificationManager.addPopupNotification({
-			title: formatMessage(messages.downloads),
+			title: installJobNotifications.active.value
+				? installJobNotifications.title.value
+				: formatMessage(messages.downloads),
 			type: 'download',
 			autoCloseMs: null,
 			progressItems,
+			buttons: installJobNotifications.buttons.value,
 		})
 		notificationId.value = notif.id
 	}
@@ -530,7 +544,17 @@ async function refreshLoadingBars() {
 
 	currentLoadingBars.value = Object.values(bars)
 		.map(formatLoadingBars)
-		.filter((bar) => bar?.bar_type?.type !== 'launcher_update')
+		.filter(
+			(bar) =>
+				bar?.bar_type?.type !== 'launcher_update' &&
+				![
+					'java_download',
+					'pack_file_download',
+					'pack_download',
+					'minecraft_download',
+					'copy_instance',
+				].includes(bar?.bar_type?.type ?? ''),
+		)
 
 	const instanceIds = Array.from(
 		new Set(
@@ -567,6 +591,12 @@ async function refreshLoadingBars() {
 	updateNotification()
 }
 
+const installJobNotifications = await useInstallJobNotifications({
+	router,
+	handleError,
+	onChange: updateNotification,
+})
+
 await refreshLoadingBars()
 
 const unlistenLoading = await loading_listener(async () => {
@@ -588,6 +618,7 @@ onBeforeUnmount(() => {
 	window.removeEventListener('online', handleOnline)
 	unlistenProcess()
 	unlistenLoading()
+	installJobNotifications.dispose()
 	if (readyPillAnimationFrame !== null) {
 		cancelAnimationFrame(readyPillAnimationFrame)
 	}

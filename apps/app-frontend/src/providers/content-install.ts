@@ -16,15 +16,18 @@ import {
 	get_version_many,
 } from '@/helpers/cache.js'
 import {
+	install_create_instance,
+	install_create_modpack_instance,
+	installJobInstanceId,
+} from '@/helpers/install'
+import {
 	add_project_from_version,
 	check_installed_batch,
-	create,
 	get,
 	get_projects,
 	list,
 	remove_project,
 } from '@/helpers/instance'
-import { create_instance_and_install as packInstall } from '@/helpers/pack'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
 import {
@@ -582,14 +585,14 @@ export function createContentInstall(opts: {
 			) ?? currentVersions[0]
 
 		try {
-			const id = await create(
-				data.name,
-				data.gameVersion,
-				data.loader as InstanceLoader,
-				'latest',
-				data.iconPath,
-				false,
-			)
+			const job = await install_create_instance({
+				name: data.name,
+				gameVersion: data.gameVersion,
+				loader: data.loader as InstanceLoader,
+				loaderVersion: 'latest',
+				iconPath: data.iconPath,
+			})
+			const id = installJobInstanceId(job)
 			if (!id) return
 
 			await add_project_from_version(id, version.id, 'standalone')
@@ -649,13 +652,17 @@ export function createContentInstall(opts: {
 				return
 			}
 
-			await packInstall(
-				project.id,
-				version,
-				project.title,
-				project.icon_url,
-				createInstanceCallback,
-			)
+			const job = await install_create_modpack_instance({
+				type: 'fromVersionId',
+				project_id: project.id,
+				version_id: version,
+				title: project.title,
+				icon_url: project.icon_url,
+			})
+			const instanceId = installJobInstanceId(job)
+			if (instanceId) {
+				createInstanceCallback(instanceId)
+			}
 			trackEvent('PackInstall', {
 				id: project.id,
 				version_id: version,
@@ -756,13 +763,17 @@ export function createContentInstall(opts: {
 			if (!pendingModpackInstall) return
 			const { project, version, source, callback, createInstanceCallback } = pendingModpackInstall
 			pendingModpackInstall = null
-			await packInstall(
-				project.id,
-				version,
-				project.title,
-				project.icon_url,
-				createInstanceCallback,
-			)
+			const job = await install_create_modpack_instance({
+				type: 'fromVersionId',
+				project_id: project.id,
+				version_id: version,
+				title: project.title,
+				icon_url: project.icon_url,
+			})
+			const instanceId = installJobInstanceId(job)
+			if (instanceId) {
+				createInstanceCallback(instanceId)
+			}
 			trackEvent('PackInstall', {
 				id: project.id,
 				version_id: version,
