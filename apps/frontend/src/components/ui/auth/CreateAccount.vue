@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="shadow-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 rounded-2xl border border-button-bg bg-surface-3 !p-6"
+		class="shadow-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 rounded-2xl border border-solid border-button-bg bg-surface-3 !p-6"
 	>
 		<h1
 			class="mx-auto my-0 flex w-full justify-center text-center text-2xl font-semibold text-contrast"
