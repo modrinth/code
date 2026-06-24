@@ -808,6 +808,18 @@ impl DBVersion {
                     }
                     ).await?;
 
+                let dependency_attributions =
+                    crate::queue::file_scan::get_dependency_attributions(
+                        &mut exec,
+                        &version_ids
+                            .iter()
+                            .copied()
+                            .map(DBVersionId)
+                            .collect_vec(),
+                    )
+                    .await
+                    .unwrap_or_default();
+
                 let res = sqlx::query!(
                     r#"
                     SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
@@ -832,6 +844,19 @@ impl DBVersion {
                         let hashes = hashes.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let version_fields = version_fields.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let dependencies = dependencies.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        let dependencies = dependencies
+                            .into_iter()
+                            .map(|mut dependency| {
+                                if let Some(attr) = dependency_attributions.get(&dependency.id)
+                                    && (attr.attribution.flame_project.is_some()
+                                        || attr.attribution.resolution.is_some())
+                                {
+                                    dependency.attribution = Some(attr.attribution.clone());
+                                }
+
+                                dependency
+                            })
+                            .collect_vec();
 
                         let loader_fields = loader_fields.iter()
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
@@ -1026,6 +1051,22 @@ impl DBVersion {
                         })
                     },
                 )),
+            )
+            .await?;
+        Ok(())
+    }
+
+    pub async fn clear_cache_ids(
+        version_ids: &[DBVersionId],
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
+
+        redis
+            .delete_many(
+                version_ids
+                    .iter()
+                    .map(|id| (VERSIONS_NAMESPACE, Some(id.0.to_string()))),
             )
             .await?;
         Ok(())

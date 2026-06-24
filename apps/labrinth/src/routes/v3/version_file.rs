@@ -250,8 +250,8 @@ pub async fn get_versions_from_hashes(
         database::models::DBVersion::get_many(&version_ids, &***pool, &redis)
             .await?,
         &user_option,
-        &pool,
-        &pool,
+        &***pool,
+        pool.as_ref(),
         &redis,
     )
     .await?;

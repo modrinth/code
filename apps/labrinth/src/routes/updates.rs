@@ -65,7 +65,7 @@ pub async fn forge_updates(
 
     let versions = database::models::DBVersion::get_many(
         &project.versions,
-        &**pool,
+        &***ro_pool,
         &redis,
     )
     .await?;

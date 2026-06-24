@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::{
-    DBOrganization, DBTeamMember,
+    DBOrganization, DBTeamMember, DBVersion,
     ids::{
         DBAttributionGroupId, DBProjectId, DBVersionId,
         generate_attribution_group_id,
@@ -491,6 +491,9 @@ async fn update_group(
         return Err(ApiError::NotFound);
     }
 
+    clear_group_version_cache(pool.as_ref(), redis.as_ref(), &[group_id])
+        .await?;
+
     Ok(())
 }
 
@@ -640,6 +643,14 @@ async fn assign(
         .await
         .wrap_internal_err("failed to clean up empty attribution groups")?;
 
+    clear_project_sha1_version_cache(
+        pool.as_ref(),
+        redis.as_ref(),
+        project_id,
+        &sha1_bytes,
+    )
+    .await?;
+
     Ok(())
 }
 
@@ -744,6 +755,72 @@ async fn split(
     cleanup_empty_groups(pool.as_ref())
         .await
         .wrap_internal_err("failed to clean up empty attribution groups")?;
+
+    clear_project_sha1_version_cache(
+        pool.as_ref(),
+        redis.as_ref(),
+        project_id,
+        &sha1_bytes,
+    )
+    .await?;
+
+    Ok(())
+}
+
+async fn clear_group_version_cache(
+    pool: &PgPool,
+    redis: &RedisPool,
+    group_ids: &[i64],
+) -> Result<(), ApiError> {
+    let version_ids = sqlx::query_scalar!(
+        r#"
+		select distinct f.version_id as "version_id: DBVersionId"
+		from project_attribution_files paf
+		inner join project_attribution_groups pag on pag.id = paf.group_id
+		inner join override_file_sources ofs on ofs.sha1 = paf.sha1
+		inner join files f on f.id = ofs.file_id
+		inner join versions v on v.id = f.version_id
+		where paf.group_id = any($1)
+			and pag.project_id = v.mod_id
+		"#,
+        group_ids,
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch attribution group versions")?;
+
+    DBVersion::clear_cache_ids(&version_ids, redis)
+        .await
+        .wrap_internal_err("failed to clear version attribution cache")?;
+
+    Ok(())
+}
+
+async fn clear_project_sha1_version_cache(
+    pool: &PgPool,
+    redis: &RedisPool,
+    project_id: DBProjectId,
+    sha1: &[u8],
+) -> Result<(), ApiError> {
+    let version_ids = sqlx::query_scalar!(
+        r#"
+		select distinct f.version_id as "version_id: DBVersionId"
+		from override_file_sources ofs
+		inner join files f on f.id = ofs.file_id
+		inner join versions v on v.id = f.version_id
+		where ofs.sha1 = $1
+			and v.mod_id = $2
+		"#,
+        sha1,
+        project_id as DBProjectId,
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch attribution file versions")?;
+
+    DBVersion::clear_cache_ids(&version_ids, redis)
+        .await
+        .wrap_internal_err("failed to clear version attribution cache")?;
 
     Ok(())
 }
