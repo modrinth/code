@@ -26,6 +26,7 @@ export namespace Labrinth {
 				status: SubscriptionStatus
 				created: string
 				metadata?: SubscriptionMetadata
+				next_charge_tax_amount?: number | null
 			}
 
 			export type SubscriptionMetadata =
