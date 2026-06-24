@@ -12,7 +12,6 @@ use crate::routes::ApiError;
 use dashmap::DashSet;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sha1::Digest;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::time::Duration;
@@ -579,14 +578,4 @@ pub struct FlameLogo {
 #[serde(rename_all = "camelCase")]
 pub struct FlameLinks {
     pub website_url: String,
-}
-
-fn hash_flame_murmur32(input: Vec<u8>) -> u32 {
-    murmur2::murmur2(
-        &input
-            .into_iter()
-            .filter(|x| *x != 9 && *x != 10 && *x != 13 && *x != 32)
-            .collect::<Vec<u8>>(),
-        1,
-    )
 }
