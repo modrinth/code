@@ -46,6 +46,20 @@ pub async fn scan_all_pending_files(
     redis: &RedisPool,
     file_host: &dyn FileHost,
 ) -> Result<()> {
+    let total_to_scan = sqlx::query_scalar!(
+        r#"
+        select count(*) as "count!" from file_scans
+        where attributions_scanned_at is null
+        "#,
+    )
+    .fetch_one(db)
+    .await
+    .wrap_err("fetching number of files to scan")?;
+
+    info!(
+        "Found {total_to_scan} total pending files to scan, running in batches of {PENDING_FILE_SCAN_BATCH_SIZE}"
+    );
+
     loop {
         let scanned_count =
             scan_pending_files_batch(db, redis, file_host).await?;
@@ -94,10 +108,6 @@ async fn scan_pending_files_batch(
             info!("Scanning file");
 
             let file_id = row.file_id;
-            let mut txn = db
-                .begin()
-                .await
-                .wrap_err("beginning file scan transaction")?;
 
             let overrides = extract_override_files_from_storage(
                 file_host, file_id, &row.url,
@@ -109,29 +119,35 @@ async fn scan_pending_files_batch(
 
             if overrides.is_empty() {
                 info!("Found no overrides");
-            } else {
-                info!("Found {} overrides", overrides.len());
+                return Ok(());
+            }
 
-                let resolved = resolve_overrides(&overrides, redis, &mut txn)
-                    .await
-                    .wrap_err_with(|| {
-                        eyre!("resolving overrides for file {file_id:?}")
-                    })?;
-                info!("Resolved: {resolved:#?}");
+            info!("Found {} overrides", overrides.len());
 
-                persist_attribution_results(
-                    row.project_id,
-                    file_id,
-                    &overrides,
-                    &resolved,
-                    redis,
-                    &mut txn,
-                )
+            let mut txn = db
+                .begin()
+                .await
+                .wrap_err("beginning file scan transaction")?;
+
+            let resolved = resolve_overrides(&overrides, redis, &mut txn)
                 .await
                 .wrap_err_with(|| {
-                    eyre!("persisting attribution results for file {file_id:?}")
+                    eyre!("resolving overrides for file {file_id:?}")
                 })?;
-            }
+            info!("Resolved: {resolved:#?}");
+
+            persist_attribution_results(
+                row.project_id,
+                file_id,
+                &overrides,
+                &resolved,
+                redis,
+                &mut txn,
+            )
+            .await
+            .wrap_err_with(|| {
+                eyre!("persisting attribution results for file {file_id:?}")
+            })?;
 
             let now = Utc::now();
             sqlx::query!(
