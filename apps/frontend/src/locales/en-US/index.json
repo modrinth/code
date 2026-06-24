@@ -4704,7 +4704,7 @@
     "message": "This will create a new version with support for the selected mod loaders. You will be redirected to the new version and can edit it to your liking."
   },
   "version.package-as-mod.header": {
-    "message": "Packaging data pack as a mod"
+    "message": "Package data pack as mod"
   },
   "version.package-as-mod.mod-loaders": {
     "message": "Mod loaders"

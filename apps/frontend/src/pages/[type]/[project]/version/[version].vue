@@ -16,23 +16,54 @@
 			:header="formatMessage(messages.packageDataPackHeader)"
 		>
 			<div class="flex max-w-[35rem] flex-col">
-				<p class="m-0 mb-4">
+				<p class="m-0 mb-6">
 					{{ formatMessage(messages.packageDataPackDescription) }}
 				</p>
-				<label for="package-mod-loaders" class="mb-2 flex flex-col gap-1">
+				<div for="package-mod-loaders" class="mb-2 flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
 						formatMessage(messages.modLoadersLabel)
 					}}</span>
+					<MultiSelect
+						id="package-mod-loaders"
+						v-model="packageLoaders"
+						:options="packageLoaderOptions"
+						:searchable="false"
+						:placeholder="formatMessage(messages.modLoadersPlaceholder)"
+					>
+						<template #input-content="{ selectedOptions, isOpen, openDirection }">
+							<div class="flex min-h-8 min-w-0 flex-1 flex-wrap items-center gap-1.5 pr-1">
+								<template v-if="selectedOptions.length > 0">
+									<span
+										v-for="{ value: loader, label } in selectedOptions"
+										:key="`package-loader-tag-${loader}`"
+										class="inline-flex cursor-pointer items-center gap-1 rounded-full border border-solid bg-surface-4 px-2 py-1 text-sm font-medium transition-all hover:brightness-[110%]"
+										:style="`color: var(--color-platform-${loader})`"
+										@click.stop="packageLoaders = packageLoaders.filter((x) => x !== loader)"
+									>
+										<component
+											:is="getLoaderIcon(loader)"
+											v-if="getLoaderIcon(loader)"
+											class="size-3.5 shrink-0"
+										/>
+										{{ label }}
+										<XIcon aria-hidden="true" class="size-3.5 shrink-0" />
+									</span>
+								</template>
+								<span v-else class="text-base font-medium text-primary opacity-50">
+									{{ formatMessage(messages.modLoadersPlaceholder) }}
+								</span>
+							</div>
+							<ChevronLeftIcon
+								class="ml-2 size-5 shrink-0 text-secondary transition-transform duration-150"
+								:class="
+									isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+								"
+							/>
+						</template>
+					</MultiSelect>
 					<span>{{ formatMessage(messages.modLoadersDescription) }}</span>
-				</label>
-				<MultiSelect
-					id="package-mod-loaders"
-					v-model="packageLoaders"
-					class="max-w-[20rem]"
-					:options="packageLoaderOptions"
-					:searchable="false"
-					:placeholder="formatMessage(messages.modLoadersPlaceholder)"
-				/>
+				</div>
+
 				<div class="ml-auto mt-4 flex items-center gap-2">
 					<ButtonStyled type="outlined">
 						<button @click="packageModal?.hide()">
@@ -434,6 +465,7 @@ import {
 	DropdownIcon,
 	ExternalIcon,
 	FileIcon,
+	getLoaderIcon,
 	InfoIcon,
 	MoreVerticalIcon,
 	PackageClosedIcon,
@@ -736,6 +768,7 @@ const createDataPackVersionMutation = useMutation({
 			game_versions: version.value.game_versions,
 			loaders: packageLoaders.value,
 			featured: version.value.featured,
+			environment: 'server_only',
 		}
 
 		const uploadHandle = client.labrinth.versions_v3.createVersion(draftVersion, [{ file }], 'mod')
@@ -856,7 +889,7 @@ const messages = defineMessages({
 	},
 	packageDataPackHeader: {
 		id: 'version.package-as-mod.header',
-		defaultMessage: 'Packaging data pack as a mod',
+		defaultMessage: 'Package data pack as mod',
 	},
 	packageDataPackDescription: {
 		id: 'version.package-as-mod.description',
