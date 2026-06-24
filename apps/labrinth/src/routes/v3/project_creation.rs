@@ -41,7 +41,6 @@ use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
 
@@ -291,7 +290,7 @@ pub async fn project_create(
     payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
     search_state: Data<SearchState>,
@@ -314,7 +313,7 @@ pub async fn project_create_internal(
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
     search_state: Data<SearchState>,
@@ -329,7 +328,7 @@ pub async fn project_create_internal(
         req,
         &mut payload,
         &mut transaction,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
@@ -340,7 +339,7 @@ pub async fn project_create_internal(
     .await;
 
     if result.is_err() {
-        let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
+        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
         let rollback_result = transaction.rollback().await;
 
         undo_result?;
@@ -372,7 +371,7 @@ pub async fn project_create_with_id(
     mut payload: Multipart,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
     http: Data<HttpClient>,
     search_state: Data<SearchState>,
@@ -387,7 +386,7 @@ pub async fn project_create_with_id(
         req,
         &mut payload,
         &mut transaction,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
@@ -398,7 +397,7 @@ pub async fn project_create_with_id(
     .await;
 
     if result.is_err() {
-        let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
+        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
         let rollback_result = transaction.rollback().await;
 
         undo_result?;
@@ -928,7 +927,7 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual
-            .insert(&mut *transaction, http)
+            .insert(&mut *transaction, redis, file_host, http)
             .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 

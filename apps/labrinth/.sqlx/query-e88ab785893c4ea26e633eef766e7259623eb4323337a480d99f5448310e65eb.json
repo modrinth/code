@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tselect\n\t\t\tid as \"id: DBVersionId\",\n\t\t\tmod_id as \"project_id: DBProjectId\"\n\t\tfrom versions\n\t\twhere id = any($1)\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "e88ab785893c4ea26e633eef766e7259623eb4323337a480d99f5448310e65eb"
+}

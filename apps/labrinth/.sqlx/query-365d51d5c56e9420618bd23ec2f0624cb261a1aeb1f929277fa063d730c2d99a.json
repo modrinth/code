@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tselect distinct f.version_id as \"version_id: DBVersionId\"\n\t\tfrom override_file_sources ofs\n\t\tinner join files f on f.id = ofs.file_id\n\t\tinner join versions v on v.id = f.version_id\n\t\twhere ofs.sha1 = $1\n\t\t\tand v.mod_id = $2\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bytea",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "365d51d5c56e9420618bd23ec2f0624cb261a1aeb1f929277fa063d730c2d99a"
+}

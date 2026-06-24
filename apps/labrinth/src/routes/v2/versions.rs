@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::projects::{
@@ -89,6 +89,7 @@ pub async fn version_list(
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -147,6 +148,7 @@ pub async fn version_list(
         info,
         web::Query(filters),
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -196,6 +198,7 @@ pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -204,6 +207,7 @@ pub async fn version_project_get(
         req,
         id,
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -238,6 +242,7 @@ pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -249,6 +254,7 @@ pub async fn versions_get(
         req,
         web::Query(ids),
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -286,15 +292,22 @@ pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let response =
-        v3::versions::version_get_helper(req, id, pool, redis, session_queue)
-            .await
-            .map(|b| HttpResponse::Ok().json(b))
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::versions::version_get_helper(
+        req,
+        id,
+        pool,
+        ro_pool,
+        redis,
+        session_queue,
+    )
+    .await
+    .map(|b| HttpResponse::Ok().json(b))
+    .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -364,6 +377,7 @@ pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
@@ -384,6 +398,7 @@ pub async fn version_edit(
         req.clone(),
         (*info).0,
         pool.clone(),
+        ro_pool.clone(),
         redis.clone(),
         session_queue.clone(),
     )

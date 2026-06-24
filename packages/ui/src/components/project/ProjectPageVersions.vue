@@ -110,14 +110,27 @@
 							</div>
 						</div>
 						<div
-							class="pointer-events-none relative z-[1] flex flex-col justify-center overflow-hidden min-w-32"
+							class="pointer-events-none relative z-[1] flex flex-col gap-1 justify-center overflow-hidden min-w-32"
 							:class="{
 								'group-hover:underline': !!versionLink,
 							}"
 							title="`${version.version_number} - ${version.name}`"
 						>
-							<div class="font-bold text-contrast text-ellipsis overflow-hidden">
-								{{ version.version_number }}
+							<div class="flex items-center gap-2">
+								<div class="font-bold text-contrast text-ellipsis overflow-hidden">
+									{{ version.version_number }}
+								</div>
+								<div
+									v-if="version.files_missing_attribution"
+									v-tooltip="formatMessage(messages.withheldTooltip)"
+									class="z-[1]"
+									:style="{
+										'--_bg-color': 'var(--color-orange-bg)',
+										'--_color': 'var(--color-orange)',
+									}"
+								>
+									<TagItem> <CircleAlertIcon /> {{ formatMessage(messages.withheld) }}</TagItem>
+								</div>
 							</div>
 							<div class="text-xs font-medium text-ellipsis overflow-hidden">
 								{{ version.name }}
@@ -260,7 +273,14 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CalendarIcon, DownloadIcon, getLoaderIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import {
+	CalendarIcon,
+	CircleAlertIcon,
+	DownloadIcon,
+	getLoaderIcon,
+	PlusIcon,
+	StarIcon,
+} from '@modrinth/assets'
 import {
 	AutoLink,
 	ButtonStyled,
@@ -279,7 +299,7 @@ import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
-import { useVIntl } from '../../composables/i18n'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
@@ -446,6 +466,17 @@ function updateQuery(newQueries: Record<string, string | string[] | undefined | 
 		},
 	})
 }
+
+const messages = defineMessages({
+	withheld: {
+		id: 'project.versions.version.withheld',
+		defaultMessage: 'Withheld',
+	},
+	withheldTooltip: {
+		id: 'project.versions.version.withheld.tooltip',
+		defaultMessage: 'Version withheld due to missing permissions',
+	},
+})
 </script>
 <style scoped>
 .versions-grid-row {

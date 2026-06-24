@@ -3257,9 +3257,6 @@
   "project.moderation.admonition.withheld.header": {
     "message": "由工作人員設為不公開"
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "顯示成員 UI"
-  },
   "project.moderation.thread.title": {
     "message": "審核訊息"
   },
@@ -3385,9 +3382,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {這個版本} other {這些版本}}目前被限制存取且不公開。請提供你擁有轉載該模組包{count, plural, other {版本}}版本中特定檔案的許可證明。"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "解決"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {版本 {version_name}} other {版本}}因未知的嵌入內容而被限制存取"

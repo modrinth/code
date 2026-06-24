@@ -133,7 +133,7 @@
 						<span class="flex items-center gap-2">
 							{{ user.username }}
 							<BadgeCheckIcon
-								v-if="isModrinthUser"
+								v-if="isOfficialAccount"
 								v-tooltip="formatMessage(messages.officialAccount)"
 								class="size-5 text-brand"
 								fill="var(--color-brand-highlight)"
@@ -477,7 +477,7 @@
 					v-if="organizations?.length > 0"
 					class="mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 pt-3"
 				>
-					<h2 class="m-0 mb-2 text-lg text-contrast">
+					<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
 					<div class="flex flex-wrap gap-2">
@@ -810,6 +810,10 @@ const sortedOrgs = computed(() =>
 )
 
 const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
+const isAutoMod = computed(() => user.value?.id === '')
+const isOfficialAccount = computed(
+	() => isModrinthUser.value || isAutoMod.value || user.value?.id === 'GVFjtWTf',
+)
 
 const sortedCollections = computed(() => {
 	const list = collections.value
@@ -1035,5 +1039,9 @@ export default defineNuxtComponent({
 			}
 		}
 	}
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>

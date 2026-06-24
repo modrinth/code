@@ -21,7 +21,9 @@ const description: Stage = {
 			shouldShow: (project, projectV3) =>
 				project.project_type === 'modpack' && !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/description/insufficient/insufficient-packs.md?raw')).default,
+				(
+					await import('../messages/checklist-messages/description/insufficient/insufficient-packs.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_insufficient_projects',
@@ -33,7 +35,9 @@ const description: Stage = {
 			shouldShow: (project, projectV3) =>
 				project.project_type !== 'modpack' && !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/description/insufficient/insufficient-projects.md?raw')).default,
+				(
+					await import('../messages/checklist-messages/description/insufficient/insufficient-projects.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_insufficient_servers',
@@ -44,7 +48,9 @@ const description: Stage = {
 			severity: 'medium',
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
 			message: async () =>
-				(await import('../messages/description/insufficient/insufficient-servers.md?raw')).default,
+				(
+					await import('../messages/checklist-messages/description/insufficient/insufficient-servers.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_insufficient',
@@ -54,7 +60,9 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
-				(await import('../messages/description/insufficient/insufficient.md?raw')).default,
+				(
+					await import('../messages/checklist-messages/description/insufficient/insufficient.md?raw')
+				).default,
 			relevantExtraInput: [
 				{
 					label: 'Please elaborate on how the author can improve their description.',
@@ -73,8 +81,9 @@ const description: Stage = {
 			severity: 'medium',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_java_server,
 			message: async () =>
-				(await import('../messages/description/accessability/non-english/non-english.md?raw'))
-					.default,
+				(
+					await import('../messages/checklist-messages/description/accessability/non-english/non-english.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_non_english-server',
@@ -86,7 +95,7 @@ const description: Stage = {
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
 			message: async () =>
 				(
-					await import('../messages/description/accessability/non-english/non-english-server.md?raw')
+					await import('../messages/checklist-messages/description/accessability/non-english/non-english-server.md?raw')
 				).default,
 		} as ButtonAction,
 		{
@@ -96,7 +105,8 @@ const description: Stage = {
 			weight: 403,
 			suggestedStatus: 'flagged',
 			severity: 'low',
-			message: async () => (await import('../messages/description/unfinished.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/description/unfinished.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'description_headers_as_body',
@@ -106,7 +116,9 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			message: async () =>
-				(await import('../messages/description/accessability/headers-as-body.md?raw')).default,
+				(
+					await import('../messages/checklist-messages/description/accessability/headers-as-body.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_image_only',
@@ -116,7 +128,8 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
-				(await import('../messages/description/accessability/image-only.md?raw')).default,
+				(await import('../messages/checklist-messages/description/accessability/image-only.md?raw'))
+					.default,
 		} as ButtonAction,
 		{
 			id: 'description_non_standard_text',
@@ -126,7 +139,9 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
-				(await import('../messages/description/accessability/non-standard-text.md?raw')).default,
+				(
+					await import('../messages/checklist-messages/description/accessability/non-standard-text.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_clarity',
@@ -135,7 +150,8 @@ const description: Stage = {
 			weight: 407,
 			suggestedStatus: 'rejected',
 			severity: 'high',
-			message: async () => (await import('../messages/description/clarity.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/description/clarity.md?raw')).default,
 		} as ButtonAction,
 	],
 }

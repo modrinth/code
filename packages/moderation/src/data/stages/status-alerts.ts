@@ -20,7 +20,8 @@ const statusAlerts: Stage = {
 			suggestedStatus: 'approved',
 			disablesActions: ['status_private_use', 'status_account_issues'],
 			shouldShow: (project) => project.status !== 'approved',
-			message: async () => (await import('../messages/status-alerts/fixed.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/status-alerts/fixed.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'status_corrections_applied-approved',
@@ -31,7 +32,8 @@ const statusAlerts: Stage = {
 			disablesActions: ['status_private_use', 'status_account_issues'],
 			shouldShow: (project) => project.status === 'approved',
 			message: async () =>
-				(await import('../messages/status-alerts/fixed-approved.md?raw')).default,
+				(await import('../messages/checklist-messages/status-alerts/fixed-approved.md?raw'))
+					.default,
 		} as ButtonAction,
 		{
 			id: 'status_private_use',
@@ -42,7 +44,8 @@ const statusAlerts: Stage = {
 			disablesActions: ['status_corrections_applied', 'status_account_issues'],
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/status-alerts/private/private.md?raw')).default,
+				(await import('../messages/checklist-messages/status-alerts/private/private.md?raw'))
+					.default,
 		} as ButtonAction,
 		{
 			id: 'status_private_use-server',
@@ -53,7 +56,8 @@ const statusAlerts: Stage = {
 			disablesActions: ['status_corrections_applied', 'status_account_issues'],
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/status-alerts/private/private-server.md?raw')).default,
+				(await import('../messages/checklist-messages/status-alerts/private/private-server.md?raw'))
+					.default,
 		} as ButtonAction,
 		{
 			id: 'status_server_use',
@@ -62,7 +66,8 @@ const statusAlerts: Stage = {
 			weight: -999999,
 			shouldShow: (project, projectV3) =>
 				project.project_type === 'modpack' && !projectV3?.minecraft_server,
-			message: async () => (await import('../messages/status-alerts/serverpack.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/status-alerts/serverpack.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'status_account_issues',
@@ -72,7 +77,8 @@ const statusAlerts: Stage = {
 			suggestedStatus: 'rejected',
 			disablesActions: ['status_corrections_applied', 'status_private_use'],
 			message: async () =>
-				(await import('../messages/status-alerts/account_issues.md?raw')).default,
+				(await import('../messages/checklist-messages/status-alerts/account_issues.md?raw'))
+					.default,
 		} as ButtonAction,
 		{
 			id: 'status_automod_confusion',
@@ -81,7 +87,8 @@ const statusAlerts: Stage = {
 			weight: -999999,
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/status-alerts/automod_confusion.md?raw')).default,
+				(await import('../messages/checklist-messages/status-alerts/automod_confusion.md?raw'))
+					.default,
 		} as ButtonAction,
 	],
 }

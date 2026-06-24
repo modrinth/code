@@ -50,7 +50,7 @@ Run these from the **root** folder before opening a pull request - do not run th
 - **App frontend:** `pnpm prepr:frontend:app`
 - **Frontend libs:** `pnpm prepr:frontend:lib`
 - **All frontend (app+web):** `pnpm prepr`
-- **Labrinth (backend):** See `apps/labrinth/CLAUDE.md`
+- **Labrinth (backend):** See `apps/labrinth/AGENTS.md`
 
 The website and app `prepr` commands
 
@@ -62,7 +62,7 @@ The website and app `prepr` commands
 
 ## Project-Specific Instructions
 
-Each project may have its own `CLAUDE.md` with detailed instructions:
+Each project may have its own file with detailed instructions:
 
 - [`apps/labrinth/AGENTS.md`](apps/labrinth/AGENTS.md) — Backend API
 - [`apps/frontend/CLAUDE.md`](apps/frontend/CLAUDE.md) - Frontend Website

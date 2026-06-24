@@ -779,6 +779,9 @@
 	"auth.sign-in.2fa.placeholder": {
 		"message": "Insira o código..."
 	},
+	"auth.sign-in.additional-options": {
+		"message": "<forgot-password-link>Esqueceu sua senha?</forgot-password-link> • <create-account-link>Criar uma conta</create-account-link>"
+	},
 	"auth.sign-in.sign-in-with": {
 		"message": "Iniciar sessão com"
 	},
@@ -804,7 +807,7 @@
 		"message": "Inscreva-se para receber novidades do Modrinth"
 	},
 	"auth.sign-up.title": {
-		"message": "Entrar"
+		"message": "Criar conta"
 	},
 	"auth.sign-up.title.create-account": {
 		"message": "Ou crie uma conta você mesmo"
@@ -841,6 +844,21 @@
 	},
 	"auth.verify-email.title": {
 		"message": "Verificar e-mail"
+	},
+	"auth.welcome.checkbox.subscribe": {
+		"message": "Inscreva-se para receber atualizações sobre o Modrinth"
+	},
+	"auth.welcome.description": {
+		"message": "Agora você faz parte da incrível comunidade de criadores e exploradores que já estão criando, baixando e acompanhando mods incríveis."
+	},
+	"auth.welcome.label.tos": {
+		"message": "Ao criar uma conta, você concorda com os <terms-link>Termos</terms-link> e a <privacy-policy-link>Política de Privacidade</privacy-policy-link> do Modrinth."
+	},
+	"auth.welcome.long-title": {
+		"message": "Bem-vindo(a) ao Modrinth!"
+	},
+	"auth.welcome.title": {
+		"message": "Bem-vindo"
 	},
 	"collection.button.edit-icon": {
 		"message": "Editar ícone"
@@ -3305,9 +3323,6 @@
 	"project.moderation.thread.help-center-note.2": {
 		"message": "Se precisar de ajuda ou tiver dúvidas adicionais, visite a <help-center-link>Central de Ajuda do Modrinth</help-center-link> e clique no balão azul para entrar em contato com o suporte."
 	},
-	"project.moderation.thread.moderator-see-user-ui-toggle": {
-		"message": "Exibir interface do membro"
-	},
 	"project.moderation.thread.private-description": {
 		"message": "Este é um tópico de conversa privada com os moderadores do Modrinth. Eles podem entrar em contato com você para tratar de assuntos relacionados a este projeto."
 	},
@@ -3436,9 +3451,6 @@
 	},
 	"project.versions.withheld-versions-warning.description": {
 		"message": "{count, plural, one {Esta versão está atualmente retida e não listada} other {Estas versões estão atualmente retidas e não listadas}} publicamente. Por favor, forneça prova de que você tem permissão para redistribuir certos arquivos incluídos {count, plural, one {na versão} other {nas versões}} do pacote de mods."
-	},
-	"project.versions.withheld-versions-warning.resolve-button": {
-		"message": "Resolver"
 	},
 	"project.versions.withheld-versions-warning.title": {
 		"message": "{count, plural,one {Versão {version_name} retida} other {Versões retidas}} por conteúdo incluso desconhecido"
