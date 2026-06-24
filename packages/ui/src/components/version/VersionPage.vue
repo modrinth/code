@@ -375,7 +375,7 @@ const authorLink = computed(() =>
 		</section>
 		<section id="changes">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.changes) }}</h3>
-			<div class="p-4 bg-surface-3 rounded-2xl flex border-solid border border-surface-4">
+			<div class="p-4 bg-surface-3 rounded-2xl border-solid border border-surface-4">
 				<div
 					v-if="version.changelog"
 					class="markdown-body"
