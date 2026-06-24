@@ -24,7 +24,8 @@ import { computed, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
-import { duplicate, remove } from '@/helpers/instance'
+import { install_duplicate_instance } from '@/helpers/install'
+import { remove } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
 
@@ -58,7 +59,7 @@ async function deleteInstance() {
 }
 
 async function duplicateInstance(p) {
-	await duplicate(p).catch(handleError)
+	await install_duplicate_instance(p).catch(handleError)
 }
 
 const handleRightClick = (event, instanceId) => {

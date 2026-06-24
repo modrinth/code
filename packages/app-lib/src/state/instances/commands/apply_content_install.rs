@@ -319,6 +319,7 @@ pub(crate) async fn record_project_file(
 pub(crate) async fn toggle_disable_project(
     instance_id: &str,
     project_path: &str,
+    desired_enabled: Option<bool>,
     state: &State,
 ) -> crate::Result<String> {
     let scope = resolve_content_scope(instance_id, None, state).await?;
@@ -336,21 +337,24 @@ pub(crate) async fn toggle_disable_project(
         ))
         .into());
     };
-    let new_path = if current_path.ends_with(".disabled") {
-        current_path.trim_end_matches(".disabled").to_string()
+    let current_enabled = !current_path.ends_with(".disabled");
+    let enabled = desired_enabled.unwrap_or(!current_enabled);
+    let new_path = if enabled {
+        trimmed.to_string()
     } else {
-        format!("{current_path}.disabled")
+        format!("{trimmed}.disabled")
     };
 
-    io::rename_or_move(&base.join(&current_path), &base.join(&new_path))
-        .await?;
+    if current_path != new_path {
+        io::rename_or_move(&base.join(&current_path), &base.join(&new_path))
+            .await?;
+    }
 
     let file_name = Path::new(&new_path)
         .file_name()
         .unwrap_or_default()
         .to_string_lossy()
         .to_string();
-    let enabled = !new_path.ends_with(".disabled");
     let file = match content_rows::rename_instance_file(
         &scope.instance.id,
         &current_path,
@@ -362,6 +366,19 @@ pub(crate) async fn toggle_disable_project(
     .await?
     {
         Some(file) => file,
+        None if current_path != project_path => match content_rows::rename_instance_file(
+            &scope.instance.id,
+            project_path,
+            &new_path,
+            &file_name,
+            enabled,
+            &state.pool,
+        )
+        .await?
+        {
+            Some(file) => file,
+            None => index_existing_file(&scope, &new_path, state).await?,
+        },
         None => index_existing_file(&scope, &new_path, state).await?,
     };
     content_rows::set_content_entry_enabled_for_file(

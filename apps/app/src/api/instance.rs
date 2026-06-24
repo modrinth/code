@@ -21,8 +21,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get,
             instance_get_many,
             instance_list,
-            instance_create,
-            instance_duplicate,
             instance_get_projects,
             instance_get_installed_project_ids,
             instance_content,
@@ -35,7 +33,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_mod_full_path,
             instance_check_installed,
             instance_check_installed_batch,
-            instance_install,
             instance_update_all,
             instance_update_project,
             instance_add_project_from_version,
@@ -97,10 +94,15 @@ pub enum InstanceLink {
         server_project_id: String,
         content_project_id: Option<String>,
         content_version_id: String,
+        project_id: Option<String>,
+        version_id: Option<String>,
     },
     ImportedModpack {
         project_id: Option<String>,
         version_id: Option<String>,
+        name: Option<String>,
+        version_number: Option<String>,
+        filename: Option<String>,
     },
     ModrinthHosting {
         server_id: String,
@@ -230,6 +232,8 @@ impl InstanceLink {
                 content_project_id,
                 content_version_id,
             } => Some(Self::ServerProjectModpack {
+                project_id: Some(server_project_id.clone()),
+                version_id: Some(content_version_id.clone()),
                 server_project_id,
                 content_project_id: Some(content_project_id),
                 content_version_id,
@@ -237,9 +241,15 @@ impl InstanceLink {
             CoreInstanceLink::ImportedModpack {
                 project_id,
                 version_id,
+                name,
+                version_number,
+                filename,
             } => Some(Self::ImportedModpack {
                 project_id,
                 version_id,
+                name,
+                version_number,
+                filename,
             }),
             CoreInstanceLink::ModrinthHosting {
                 server_id,
@@ -261,7 +271,7 @@ impl InstanceLink {
         }
     }
 
-    fn into_core(self) -> Result<CoreInstanceLink> {
+    pub(crate) fn into_core(self) -> Result<CoreInstanceLink> {
         match self {
             Self::ModrinthModpack {
                 project_id,
@@ -277,6 +287,7 @@ impl InstanceLink {
                 server_project_id,
                 content_project_id,
                 content_version_id,
+                ..
             } => Ok(CoreInstanceLink::ServerProjectModpack {
                 server_project_id,
                 content_project_id: content_project_id.unwrap_or_default(),
@@ -285,9 +296,15 @@ impl InstanceLink {
             Self::ImportedModpack {
                 project_id,
                 version_id,
+                name,
+                version_number,
+                filename,
             } => Ok(CoreInstanceLink::ImportedModpack {
                 project_id,
                 version_id,
+                name,
+                version_number,
+                filename,
             }),
             Self::ModrinthHosting {
                 server_id,
@@ -365,6 +382,7 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
             hooks: edit_instance.hooks,
         }),
         content_set_patch: Some(AppliedContentSetPatch {
+            source_kind: None,
             game_version: edit_instance.game_version,
             protocol_version: Some(None),
             loader: edit_instance.loader,
@@ -408,38 +426,6 @@ pub async fn instance_list() -> Result<Vec<Instance>> {
         .into_iter()
         .map(Instance::from)
         .collect())
-}
-
-#[tauri::command]
-pub async fn instance_create(
-    name: String,
-    game_version: String,
-    modloader: ModLoader,
-    loader_version: Option<String>,
-    icon: Option<String>,
-    skip_install: Option<bool>,
-    link: Option<InstanceLink>,
-) -> Result<String> {
-    let link = match link {
-        Some(link) => link.into_core()?,
-        None => CoreInstanceLink::Unmanaged,
-    };
-    let metadata = theseus::instance::create(
-        name,
-        game_version,
-        modloader,
-        loader_version,
-        icon,
-        link,
-        skip_install,
-    )
-    .await?;
-    Ok(metadata.instance.id)
-}
-
-#[tauri::command]
-pub async fn instance_duplicate(instance_id: &str) -> Result<String> {
-    Ok(theseus::instance::duplicate(instance_id).await?)
 }
 
 #[tauri::command]
@@ -580,12 +566,6 @@ pub async fn instance_check_installed_batch(
 }
 
 #[tauri::command]
-pub async fn instance_install(instance_id: &str, force: bool) -> Result<()> {
-    theseus::instance::install(instance_id, force).await?;
-    Ok(())
-}
-
-#[tauri::command]
 pub async fn instance_update_all(
     instance_id: &str,
 ) -> Result<HashMap<String, String>> {
@@ -637,11 +617,14 @@ pub async fn instance_add_project_from_path(
 pub async fn instance_toggle_disable_project(
     instance_id: &str,
     project_path: &str,
+    desired_enabled: Option<bool>,
 ) -> Result<String> {
-    Ok(
-        theseus::instance::toggle_disable_project(instance_id, project_path)
-            .await?,
+    Ok(theseus::instance::toggle_disable_project(
+        instance_id,
+        project_path,
+        desired_enabled,
     )
+    .await?)
 }
 
 #[tauri::command]
@@ -657,7 +640,7 @@ pub async fn instance_remove_project(
 pub async fn instance_update_managed_modrinth_version(
     instance_id: String,
     version_id: String,
-) -> Result<()> {
+) -> Result<theseus::install::InstallJobSnapshot> {
     Ok(theseus::instance::update_managed_modrinth_version(
         &instance_id,
         &version_id,
@@ -666,7 +649,9 @@ pub async fn instance_update_managed_modrinth_version(
 }
 
 #[tauri::command]
-pub async fn instance_repair_managed_modrinth(instance_id: &str) -> Result<()> {
+pub async fn instance_repair_managed_modrinth(
+    instance_id: &str,
+) -> Result<theseus::install::InstallJobSnapshot> {
     Ok(theseus::instance::repair_managed_modrinth(instance_id).await?)
 }
 

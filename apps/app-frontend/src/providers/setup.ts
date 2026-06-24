@@ -16,6 +16,6 @@ export function setupProviders(
 	setupInstanceImportProvider(notificationManager)
 
 	return {
-		...setupCreationModal(notificationManager, popupNotificationManager),
+		...setupCreationModal(notificationManager),
 	}
 }

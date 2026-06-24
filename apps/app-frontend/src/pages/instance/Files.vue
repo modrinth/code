@@ -221,7 +221,7 @@ async function handleWriteFile(path: string, content: string) {
 
 async function handleDownloadFile(path: string, _fileName: string) {
 	await invoke('plugin:files|file_save_as', {
-		instancePath: props.instance.id,
+		instanceId: props.instance.id,
 		filePath: path,
 	})
 }
@@ -275,7 +275,7 @@ async function handleUploadFiles(files: File[]) {
 async function handleExtractFile(path: string, override: boolean, dry: boolean) {
 	try {
 		return await invoke('plugin:files|file_extract_zip', {
-			instancePath: props.instance.id,
+			instanceId: props.instance.id,
 			filePath: path,
 			overrideConflicts: override,
 			dryRun: dry,

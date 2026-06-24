@@ -46,11 +46,11 @@ async function hydrate(instanceId: string): Promise<void> {
 	}
 }
 
-async function getHistoricalLogs(instanceId: string, instancePath: string): Promise<LogEntry[]> {
+async function getHistoricalLogs(instanceId: string): Promise<LogEntry[]> {
 	const entry = getOrCreate(instanceId)
 	if (entry.logList) return entry.logList
 
-	const logs: LogEntry[] = await get_logs(instancePath, true)
+	const logs: LogEntry[] = await get_logs(instanceId, true)
 	entry.logList = logs
 
 	for (const log of logs) {
@@ -90,7 +90,7 @@ export function useInstanceConsole(instanceId: string) {
 		liveConsole: entry.liveConsole,
 		historicalConsole: entry.historicalConsole,
 		hydrate: () => hydrate(instanceId),
-		getHistoricalLogs: (instancePath: string) => getHistoricalLogs(instanceId, instancePath),
+		getHistoricalLogs: () => getHistoricalLogs(instanceId),
 		getHistoricalContent: (filename: string) => getHistoricalContent(instanceId, filename),
 		invalidate: () => invalidate(instanceId),
 		clearLive: () => clearLive(instanceId),

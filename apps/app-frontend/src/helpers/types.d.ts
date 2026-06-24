@@ -74,6 +74,9 @@ export type InstanceLink = InstanceLinkIdentity &
 				type: 'imported_modpack'
 				project_id?: ModrinthId | null
 				version_id?: ModrinthId | null
+				name?: string | null
+				version_number?: string | null
+				filename?: string | null
 		  }
 		| {
 				type: 'modrinth_hosting'

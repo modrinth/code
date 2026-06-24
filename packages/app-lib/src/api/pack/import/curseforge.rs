@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     State,
+    install::{InstallPhaseDetails, InstallProgressReporter},
     prelude::ModLoader,
     state::{AppliedContentSetPatch, EditInstance, InstanceInstallStage},
     util::{
@@ -12,7 +13,7 @@ use crate::{
     },
 };
 
-use super::{copy_dotminecraft, recache_icon};
+use super::{finish_import, recache_icon};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -50,6 +51,8 @@ pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
 pub async fn import_curseforge(
     curseforge_instance_folder: PathBuf, // instance's folder
     instance_id: &str,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     // Load minecraftinstance.json
     let minecraft_instance = serde_json::from_str::<MinecraftInstance>(
@@ -147,6 +150,7 @@ pub async fn import_curseforge(
                     icon.clone().map(|x| x.to_string_lossy().to_string()),
                 ),
                 content_set_patch: Some(AppliedContentSetPatch {
+                    source_kind: None,
                     game_version: Some(game_version.clone()),
                     protocol_version: Some(None),
                     loader: Some(mod_loader),
@@ -169,6 +173,7 @@ pub async fn import_curseforge(
                     icon.clone().map(|x| x.to_string_lossy().to_string()),
                 ),
                 content_set_patch: Some(AppliedContentSetPatch {
+                    source_kind: None,
                     game_version: Some(minecraft_instance.game_version.clone()),
                     protocol_version: Some(None),
                     loader: Some(ModLoader::Vanilla),
@@ -182,18 +187,12 @@ pub async fn import_curseforge(
 
     // Copy in contained folders as overrides
     let state = State::get().await?;
-    let loading_bar = copy_dotminecraft(
+    finish_import(
         instance_id,
         curseforge_instance_folder,
         &state.io_semaphore,
-        None,
-    )
-    .await?;
-
-    crate::launcher::install_minecraft_for_instance_id(
-        instance_id,
-        Some(loading_bar),
-        false,
+        reporter,
+        details,
     )
     .await?;
 

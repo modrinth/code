@@ -1,7 +1,8 @@
 use crate::State;
-use crate::event::LoadingBarType;
-use crate::event::emit::{
-    emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
+use crate::event::emit::loading_try_for_each_concurrent;
+use crate::install::{
+    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallProgressReporter,
 };
 use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_instance_information,
@@ -17,15 +18,22 @@ use async_zip::base::read::{WithEntry, ZipEntryReader};
 use async_zip::tokio::read::fs::ZipFileReader as FsZipFileReader;
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
-
-use super::install_from::{
-    CreatePack, CreatePackFile, CreatePackLocation, PackFormat,
-    generate_pack_from_file, generate_pack_from_version_id,
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::{
+    Arc,
+    atomic::{AtomicU64, Ordering},
 };
+
+use super::install_from::{CreatePack, CreatePackFile, PackFormat};
 use crate::data::ProjectType;
 use std::io::{Cursor, ErrorKind};
 use std::path::Path;
 use tokio::io::AsyncWriteExt;
+
+type ExtractProgressFn<'a> = dyn FnMut(u64) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
+    + Send
+    + 'a;
 
 enum MrpackZipReader {
     Memory(async_zip::tokio::read::seek::ZipFileReader<Cursor<bytes::Bytes>>),
@@ -100,6 +108,7 @@ impl MrpackZipReader {
         index: usize,
         path: &Path,
         semaphore: &crate::util::fetch::IoSemaphore,
+        progress: Option<&mut ExtractProgressFn<'_>>,
     ) -> crate::Result<(u64, String)> {
         match self {
             Self::Memory(reader) => {
@@ -107,6 +116,7 @@ impl MrpackZipReader {
                     reader.reader_with_entry(index).await?,
                     path,
                     semaphore,
+                    progress,
                 )
                 .await
             }
@@ -115,6 +125,7 @@ impl MrpackZipReader {
                     reader.reader_with_entry(index).await?,
                     path,
                     semaphore,
+                    progress,
                 )
                 .await
             }
@@ -156,6 +167,7 @@ async fn extract_zip_entry<R>(
     mut reader: ZipEntryReader<'_, R, WithEntry<'_>>,
     path: &Path,
     semaphore: &crate::util::fetch::IoSemaphore,
+    mut progress: Option<&mut ExtractProgressFn<'_>>,
 ) -> crate::Result<(u64, String)>
 where
     R: futures_lite::io::AsyncBufRead + Unpin,
@@ -197,6 +209,9 @@ where
             .map_err(|e| io::IOError::with_path(e, &temp_path))?;
         hasher.update(&buffer[..bytes_read]);
         size += bytes_read as u64;
+        if let Some(progress) = progress.as_mut() {
+            progress(bytes_read as u64).await?;
+        }
     }
 
     file.flush()
@@ -216,62 +231,11 @@ where
     Ok((size, hasher.digest().to_string()))
 }
 
-/// Install a pack
-/// Wrapper around install_pack_files that generates a pack creation description, and
-/// attempts to install the pack files. If it fails, it will remove the profile (fail safely)
-/// Install a modpack from a mrpack file (a modrinth .zip format)
-pub async fn install_zipped_mrpack(
-    location: CreatePackLocation,
-    instance_id: String,
-) -> crate::Result<String> {
-    // Get file from description
-    let create_pack: CreatePack = match location {
-        CreatePackLocation::FromVersionId {
-            project_id,
-            version_id,
-            title,
-            icon_url,
-        } => {
-            generate_pack_from_version_id(
-                project_id,
-                version_id,
-                title,
-                icon_url,
-                instance_id.clone(),
-                None,
-                DownloadReason::Modpack,
-            )
-            .await?
-        }
-        CreatePackLocation::FromFile { path } => {
-            generate_pack_from_file(path, instance_id.clone()).await?
-        }
-    };
-
-    // Install pack files, and if it fails, fail safely by removing the instance.
-    let result = install_zipped_mrpack_files(
-        create_pack,
-        false,
-        DownloadReason::Modpack,
-    )
-    .await;
-
-    match result {
-        Ok(instance_id) => Ok(instance_id),
-        Err(err) => {
-            let _ = crate::api::instance::remove(&instance_id).await;
-
-            Err(err)
-        }
-    }
-}
-
-/// Install all pack files from a description
-/// Does not remove the profile if it fails
-pub async fn install_zipped_mrpack_files(
+pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     create_pack: CreatePack,
     ignore_lock: bool,
     reason: DownloadReason,
+    reporter: InstallProgressReporter,
 ) -> crate::Result<String> {
     let state = &State::get().await?;
 
@@ -280,11 +244,24 @@ pub async fn install_zipped_mrpack_files(
     let icon = create_pack.description.icon;
     let project_id = create_pack.description.project_id;
     let version_id = create_pack.description.version_id;
-    let existing_loading_bar = create_pack.description.existing_loading_bar;
     let instance_id = create_pack.description.instance_id;
-    let icon_exists = icon.is_some();
+    let mut icon_exists = icon.is_some();
 
     let mut zip_reader = MrpackZipReader::new(&file).await?;
+    let instance_full_path =
+        crate::api::instance::get_full_path(&instance_id).await?;
+    let modpack_details = InstallPhaseDetails::Modpack {
+        project_id: project_id.clone(),
+        version_id: version_id.clone(),
+        title: description.override_title.clone(),
+    };
+    reporter
+        .update(
+            InstallPhaseId::ReadingPackManifest,
+            None,
+            modpack_details.clone(),
+        )
+        .await?;
 
     // Extract index of modrinth.index.json
     let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
@@ -299,12 +276,45 @@ pub async fn install_zipped_mrpack_files(
     manifest.push_str(&zip_reader.read_entry_to_string(manifest_idx).await?);
 
     let pack: PackFormat = serde_json::from_str(&manifest)?;
-
     if &*pack.game != "minecraft" {
         return Err(crate::ErrorKind::InputError(
             "Pack does not support Minecraft".to_string(),
         )
         .into());
+    }
+
+    reporter
+        .update(InstallPhaseId::ResolvingPack, None, modpack_details.clone())
+        .await?;
+
+    if !icon_exists {
+        let icon_entry =
+            zip_reader.file().entries().iter().enumerate().find_map(
+                |(index, entry)| {
+                    matches!(
+                        entry.filename().as_str(),
+                        Ok("icon.png"
+                            | "overrides/icon.png"
+                            | "client-overrides/icon.png")
+                    )
+                    .then_some(index)
+                },
+            );
+
+        if let Some(icon_entry) = icon_entry {
+            let icon_path = instance_full_path.join("icon.png");
+            zip_reader
+                .extract_entry(
+                    icon_entry,
+                    &icon_path,
+                    &state.io_semaphore,
+                    None,
+                )
+                .await?;
+            crate::api::instance::edit_icon(&instance_id, Some(&icon_path))
+                .await?;
+            icon_exists = true;
+        }
     }
 
     // Cache the modpack file hashes for later filtering of user-added content
@@ -374,6 +384,7 @@ pub async fn install_zipped_mrpack_files(
         instance_id.clone(),
         &description,
         &pack.name,
+        Some(&pack.version_id),
         &pack.dependencies,
         ignore_lock,
     )
@@ -388,22 +399,6 @@ pub async fn install_zipped_mrpack_files(
                 ))
             })?;
     let instance_path = metadata.instance.path.clone();
-    let instance_full_path =
-        crate::api::instance::get_full_path(&instance_id).await?;
-    let loading_bar = init_or_edit_loading(
-        existing_loading_bar,
-        LoadingBarType::PackDownload {
-            instance_id: instance_id.clone(),
-            pack_name: pack.name.clone(),
-            icon,
-            pack_id: project_id.clone(),
-            pack_version: version_id.clone(),
-        },
-        100.0,
-        "Downloading modpack",
-    )
-    .await?;
-
     let download_meta = DownloadMeta {
         reason,
         game_version: metadata.applied_content_set.game_version.clone(),
@@ -412,10 +407,21 @@ pub async fn install_zipped_mrpack_files(
     };
 
     let num_files = pack.files.len();
+    reporter
+        .update(
+            InstallPhaseId::DownloadingContent,
+            Some(InstallProgress {
+                current: 0,
+                total: num_files as u64,
+            }),
+            modpack_details.clone(),
+        )
+        .await?;
+    let content_progress = Arc::new(AtomicU64::new(0));
     loading_try_for_each_concurrent(
         futures::stream::iter(pack.files).map(Ok::<PackFile, crate::Error>),
         None,
-        Some(&loading_bar),
+        None,
         70.0,
         num_files,
         None,
@@ -425,13 +431,39 @@ pub async fn install_zipped_mrpack_files(
             let instance_full_path = instance_full_path.clone();
             let download_meta = download_meta.clone();
             let pack_version_id = version_id.clone();
+            let reporter = reporter.clone();
+            let modpack_details = modpack_details.clone();
+            let content_progress = content_progress.clone();
             async move {
+                let mark_downloaded = || {
+                    let reporter = reporter.clone();
+                    let modpack_details = modpack_details.clone();
+                    let content_progress = content_progress.clone();
+                    async move {
+                        let current = content_progress
+                            .fetch_add(1, Ordering::Relaxed)
+                            + 1;
+                        reporter
+                            .update(
+                                InstallPhaseId::DownloadingContent,
+                                Some(InstallProgress {
+                                    current,
+                                    total: num_files as u64,
+                                }),
+                                modpack_details,
+                            )
+                            .await?;
+                        Ok::<(), crate::Error>(())
+                    }
+                };
+
                 //TODO: Future update: prompt user for optional files in a modpack
                 if let Some(env) = project.env
                     && env
                         .get(&EnvType::Client)
                         .is_some_and(|x| x == &SideType::Unsupported)
                 {
+                    mark_downloaded().await?;
                     return Ok(());
                 }
 
@@ -502,13 +534,12 @@ pub async fn install_zipped_mrpack_files(
                     }
                 }
 
+                mark_downloaded().await?;
                 Ok(())
             }
         },
     )
     .await?;
-
-    emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))?;
 
     let override_file_entries = zip_reader
         .file()
@@ -523,9 +554,58 @@ pub async fn install_zipped_mrpack_files(
             .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
-    let override_file_entries_count = override_file_entries.len();
+    let override_total_bytes = override_file_entries
+        .iter()
+        .map(|(_, file)| file.uncompressed_size())
+        .sum::<u64>();
+    let progress = (override_total_bytes > 0).then_some(InstallProgress {
+        current: 0,
+        total: override_total_bytes,
+    });
+    reporter
+        .update(
+            InstallPhaseId::ExtractingOverrides,
+            progress,
+            modpack_details.clone(),
+        )
+        .await?;
 
-    for (i, (index, file)) in override_file_entries.into_iter().enumerate() {
+    let extracted_override_bytes = Arc::new(AtomicU64::new(0));
+    let mut last_reported_override_bytes = 0_u64;
+    let reporter_for_overrides = reporter.clone();
+    let details_for_overrides = modpack_details.clone();
+    let mut report_override_progress = |bytes_read: u64| -> Pin<
+        Box<dyn Future<Output = crate::Result<()>> + Send>,
+    > {
+        let current = extracted_override_bytes
+            .fetch_add(bytes_read, Ordering::Relaxed)
+            + bytes_read;
+        let min_delta = (override_total_bytes / 200).max(256 * 1024);
+        if current < override_total_bytes
+            && current.saturating_sub(last_reported_override_bytes) < min_delta
+        {
+            return Box::pin(async { Ok(()) });
+        }
+
+        last_reported_override_bytes = current;
+        let reporter = reporter_for_overrides.clone();
+        let details = details_for_overrides.clone();
+        Box::pin(async move {
+            reporter
+                .update(
+                    InstallPhaseId::ExtractingOverrides,
+                    Some(InstallProgress {
+                        current: current.min(override_total_bytes),
+                        total: override_total_bytes,
+                    }),
+                    details,
+                )
+                .await?;
+            Ok(())
+        })
+    };
+
+    for (index, file) in override_file_entries {
         let relative_override_file_path =
             SafeRelativeUtf8UnixPathBuf::try_from(
                 file.filename().as_str().unwrap().to_string(),
@@ -541,9 +621,22 @@ pub async fn install_zipped_mrpack_files(
 
         let path =
             instance_full_path.join(relative_override_file_path.as_str());
-        let (size, hash) = zip_reader
-            .extract_entry(index, &path, &state.io_semaphore)
-            .await?;
+        let (size, hash) = if override_total_bytes > 0 {
+            let progress =
+                &mut report_override_progress as &mut ExtractProgressFn<'_>;
+            zip_reader
+                .extract_entry(
+                    index,
+                    &path,
+                    &state.io_semaphore,
+                    Some(progress),
+                )
+                .await?
+        } else {
+            zip_reader
+                .extract_entry(index, &path, &state.io_semaphore, None)
+                .await?
+        };
 
         crate::state::cache_file_hash_metadata(
             &instance_path,
@@ -574,15 +667,6 @@ pub async fn install_zipped_mrpack_files(
             )
             .await?;
         }
-
-        emit_loading(
-            &loading_bar,
-            30.0 / override_file_entries_count as f64,
-            Some(&format!(
-                "Extracting override {}/{override_file_entries_count}",
-                i + 1
-            )),
-        )?;
     }
 
     // If the icon doesn't exist, we expect icon.png to be a potential icon.
@@ -593,10 +677,10 @@ pub async fn install_zipped_mrpack_files(
             .await?;
     }
 
-    crate::launcher::install_minecraft_for_instance_id(
+    crate::launcher::install_minecraft_for_instance_id_with_reporter(
         &instance_id,
-        Some(loading_bar),
         false,
+        Some(reporter),
     )
     .await?;
 

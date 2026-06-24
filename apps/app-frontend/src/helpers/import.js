@@ -3,9 +3,7 @@
  * So, for example, addDefaultInstance creates a blank instance object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import { invoke } from '@tauri-apps/api/core'
-
-import { create } from './instance'
+import { install_import_instance } from './install'
 
 /*
   API for importing instances from other launchers
@@ -33,17 +31,7 @@ export async function get_importable_instances(launcherType, basePath) {
 
 /// Import an instance from a launcher type and base path
 export async function import_instance(launcherType, basePath, instanceFolder) {
-	// create a basic, empty instance (most properties will be filled in by the import process)
-	// We do NOT watch the fs for changes to avoid duplicate events during installation
-	// fs watching will be enabled once the instance is imported
-	const instanceId = await create(instanceFolder, '1.19.4', 'vanilla', 'latest', null, true)
-
-	return await invoke('plugin:import|import_instance', {
-		instanceId,
-		launcherType,
-		basePath,
-		instanceFolder,
-	})
+	return await install_import_instance(launcherType, basePath, instanceFolder)
 }
 
 /// Checks if this instance is valid for importing, given a certain launcher type

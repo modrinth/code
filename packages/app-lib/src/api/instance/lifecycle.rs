@@ -1,5 +1,4 @@
 use super::get::get;
-use super::paths::get_full_path;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::{
@@ -11,14 +10,13 @@ use std::path::Path;
 
 #[tracing::instrument]
 #[allow(clippy::too_many_arguments)]
-pub async fn create(
+pub(crate) async fn create(
     name: String,
     game_version: String,
     modloader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
     link: InstanceLink,
-    skip_install: Option<bool>,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
     let instance = crate::state::create_instance(
@@ -38,22 +36,6 @@ pub async fn create(
     let result = async {
         emit_instance(&instance.id, InstancePayloadType::Created).await?;
 
-        if !skip_install.unwrap_or(false) {
-            let context =
-                crate::state::instances::commands::get_instance_launch_context(
-                    &instance.id,
-                    &state.pool,
-                )
-                .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::OtherError(format!(
-                        "Missing launch context for instance {}",
-                        instance.id
-                    ))
-                })?;
-            crate::launcher::install_minecraft(&context, None, false).await?;
-        }
-
         crate::state::get_instance(&instance.id, &state.pool)
             .await?
             .ok_or_else(|| {
@@ -70,45 +52,6 @@ pub async fn create(
     }
 
     result
-}
-
-pub async fn duplicate(copy_from: &str) -> crate::Result<String> {
-    let metadata = get(copy_from).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
-    let created = create(
-        metadata.instance.name.clone(),
-        metadata.applied_content_set.game_version.clone(),
-        metadata.applied_content_set.loader,
-        metadata.applied_content_set.loader_version.clone(),
-        metadata.instance.icon_path.clone(),
-        metadata.link.clone(),
-        Some(true),
-    )
-    .await?;
-
-    let state = State::get().await?;
-    let bar = crate::pack::import::copy_dotminecraft(
-        &created.instance.id,
-        get_full_path(copy_from).await?,
-        &state.io_semaphore,
-        None,
-    )
-    .await?;
-
-    let context =
-        crate::state::instances::commands::get_instance_launch_context(
-            &created.instance.id,
-            &state.pool,
-        )
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
-    crate::launcher::install_minecraft(&context, Some(bar), false).await?;
-    emit_instance(&created.instance.id, InstancePayloadType::Edited).await?;
-
-    Ok(created.instance.id)
 }
 
 pub async fn edit(

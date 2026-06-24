@@ -1,5 +1,5 @@
 use crate::state::instances::{
-    Instance, InstanceLaunchOverrides, InstanceLink,
+    ContentSourceKind, Instance, InstanceLaunchOverrides, InstanceLink,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
@@ -79,6 +79,8 @@ pub struct InstanceLaunchOverridesPatch {
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AppliedContentSetPatch {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_kind: Option<ContentSourceKind>,
     pub game_version: Option<String>,
     #[serde(
         default,
@@ -210,6 +212,9 @@ fn apply_content_set_patch(
 ) -> crate::state::instances::ContentSet {
     if let Some(game_version) = patch.game_version {
         content_set.game_version = game_version;
+    }
+    if let Some(source_kind) = patch.source_kind {
+        content_set.source_kind = source_kind;
     }
     if let Some(protocol_version) = patch.protocol_version {
         content_set.protocol_version = protocol_version;

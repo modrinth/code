@@ -89,7 +89,7 @@ function buildLogList(rawLogs) {
 
 const logs = ref(buildLogList([]))
 
-void getHistoricalLogs(props.instance.id)
+void getHistoricalLogs()
 	.then((allLogs) => {
 		logs.value = buildLogList(allLogs)
 	})
@@ -148,7 +148,7 @@ async function deleteSelectedLog() {
 	if (!log || log.live) return
 	await delete_logs_by_filename(props.instance.id, log.log_type, log.filename)
 	invalidate()
-	const freshLogs = await getHistoricalLogs(props.instance.id)
+	const freshLogs = await getHistoricalLogs()
 	logs.value = buildLogList(freshLogs)
 	selectedLogIndex.value = 0
 }
@@ -220,7 +220,7 @@ const unlistenProcesses = await process_listener(async (e) => {
 	}
 	if (e.event === 'finished') {
 		invalidate()
-		const freshLogs = await getHistoricalLogs(props.instance.id)
+		const freshLogs = await getHistoricalLogs()
 		logs.value = buildLogList(freshLogs)
 		void analyseForCrash()
 	}

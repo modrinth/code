@@ -96,7 +96,10 @@ import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
-import { create_instance_and_install_from_file } from '@/helpers/pack'
+import {
+	install_create_modpack_instance,
+	install_get_modpack_preview,
+} from '@/helpers/install'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -852,9 +855,18 @@ async function handleCommand(e) {
 	if (e.event === 'RunMRPack') {
 		// RunMRPack should directly install a local mrpack given a path
 		if (e.path.endsWith('.mrpack')) {
-			await create_instance_and_install_from_file(e.path, (createInstance, fileName) =>
-				unknownPackWarningModal.value?.show(createInstance, fileName),
-			).catch(handleError)
+			const location = { type: 'fromFile', path: e.path }
+			const preview = await install_get_modpack_preview(location).catch(handleError)
+			if (preview?.unknownFile) {
+				const splitPath = e.path.split(/[\\/]/)
+				const fileName = splitPath ? splitPath[splitPath.length - 1] : e.path
+				unknownPackWarningModal.value?.show(
+					() => install_create_modpack_instance(location).then(() => undefined),
+					fileName,
+				)
+			} else {
+				await install_create_modpack_instance(location).catch(handleError)
+			}
 			trackEvent('InstanceCreate', {
 				source: 'CreationModalFileDrop',
 			})

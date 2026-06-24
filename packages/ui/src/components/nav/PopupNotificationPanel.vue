@@ -25,6 +25,10 @@
 					:status-text="item.toast.statusText"
 					:progress="item.toast.progress"
 					:waiting="item.toast.waiting"
+					:show-progress="item.toast.showProgress"
+					:progress-type="item.toast.progressType"
+					:progress-current="item.toast.progressCurrent"
+					:progress-total="item.toast.progressTotal"
 					@accept="handleToastAction(item, item.toast.onAccept)"
 					@decline="handleToastAction(item, item.toast.onDecline)"
 					@dismiss="handleToastAction(item, item.toast.onDismiss)"
@@ -33,17 +37,28 @@
 					@open-instance="handleToastAction(item, item.toast.onOpenInstance)"
 				/>
 				<div v-else-if="isDownloadNotification(item)" class="flex flex-col gap-4">
-					<NotificationToast
+					<div
 						v-for="progressItem in downloadToastItems(item)"
 						:key="progressItem.id"
-						type="instance-download"
-						:entity-name="progressItem.title || item.title"
-						:entity-icon-url="progressItem.iconUrl ?? item.iconUrl ?? MinecraftServerIcon"
-						:status-text="downloadStatusText(progressItem)"
-						:progress="progressItem.progress"
-						:waiting="progressItem.waiting"
-						@dismiss="dismiss(item.id)"
-					/>
+					>
+						<NotificationToast
+							type="instance-download"
+							:entity-name="progressItem.title || item.title"
+							:entity-icon-url="progressItem.iconUrl ?? item.iconUrl ?? MinecraftServerIcon"
+							:status-text="progressItem.text"
+							:progress="progressItem.progress"
+							:waiting="progressItem.waiting"
+							:show-progress="progressItem.showProgress"
+							:wrap-text="progressItem.wrapText"
+							:progress-type="progressItem.progressType"
+							:progress-current="progressItem.progressCurrent"
+							:progress-total="progressItem.progressTotal"
+							:action-label="progressItem.buttons?.[0]?.label"
+							:action-icon="progressItem.buttons?.[0]?.icon"
+							@dismiss="handleProgressItemDismiss(item, progressItem)"
+							@action="handleProgressItemAction(progressItem)"
+						/>
+					</div>
 				</div>
 				<div
 					v-else
@@ -203,12 +218,39 @@ function downloadToastItems(item: PopupNotification): PopupNotificationProgressI
 			iconUrl: item.iconUrl,
 			progress: item.progress ?? 0,
 			waiting: item.waiting ?? false,
+			showProgress: true,
+			progressType: 'percentage',
 		},
 	]
 }
 
-function downloadStatusText(progressItem: PopupNotificationProgressItem) {
-	return progressItem.text?.replace(/^\d+%\s*/, '') ?? ''
+async function handleProgressItemDismiss(
+	item: PopupNotification,
+	progressItem: PopupNotificationProgressItem,
+) {
+	if (progressItem.onDismiss) {
+		await progressItem.onDismiss()
+		return
+	}
+
+	dismiss(item.id)
+}
+
+async function handleProgressItemAction(progressItem: PopupNotificationProgressItem) {
+	const button = progressItem.buttons?.[0]
+	if (button) {
+		await handleProgressItemButtonClick(progressItem, button)
+	}
+}
+
+async function handleProgressItemButtonClick(
+	progressItem: PopupNotificationProgressItem,
+	btn: PopupNotificationButton,
+) {
+	await btn.action()
+	if (!btn.keepOpen) {
+		await progressItem.onDismiss?.()
+	}
 }
 
 function handleButtonClick(id: string | number, btn: PopupNotificationButton) {

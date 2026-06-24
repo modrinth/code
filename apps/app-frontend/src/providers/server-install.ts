@@ -6,8 +6,14 @@ import type { Router } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
-import { create, edit, edit_icon, get, install as installInstance, list } from '@/helpers/instance'
-import { install_to_existing_instance } from '@/helpers/pack.js'
+import {
+	install_create_instance,
+	install_create_modpack_instance,
+	install_existing_instance,
+	installJobInstanceId,
+	wait_for_install_job,
+} from '@/helpers/install'
+import { edit, get, list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { start_join_server } from '@/helpers/worlds.ts'
 import { handleSevereError } from '@/store/error.js'
@@ -114,19 +120,21 @@ export function createServerInstall(opts: {
 		gameVersion: string,
 		serverAddress: string | null,
 	) {
-		const instanceId = await create(
-			project.title,
+		const job = await install_create_instance({
+			name: project.title,
 			gameVersion,
-			'vanilla',
-			null,
-			project.icon_url ?? null,
-			false,
-			{
+			loader: 'vanilla',
+			loaderVersion: null,
+			iconPath: project.icon_url ?? null,
+			link: {
 				type: 'server_project',
 				project_id: project.id,
 			},
-		)
+		})
+		const instanceId = installJobInstanceId(job)
+		if (!instanceId) return null
 
+		await wait_for_install_job(job.job_id)
 		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 
 		return instanceId
@@ -136,7 +144,8 @@ export function createServerInstall(opts: {
 		if (instance.game_version === targetGameVersion) return
 
 		await edit(instance.id, { game_version: targetGameVersion })
-		await installInstance(instance.id, false)
+		const job = await install_existing_instance(instance.id, false)
+		await wait_for_install_job(job.job_id)
 	}
 
 	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
@@ -228,51 +237,31 @@ export function createServerInstall(opts: {
 		const contentVersionId = content.version_id
 		const contentVersion = await get_version(contentVersionId, 'bypass')
 		const contentProjectId = contentVersion.project_id
-		const gameVersion = contentVersion.game_versions?.[0] ?? ''
 
-		const instanceId = await create(
-			project.title,
-			gameVersion,
-			'vanilla',
-			null,
-			project.icon_url,
-			true,
+		const createJob = await install_create_modpack_instance(
 			{
-				type: 'server_project_modpack',
-				server_project_id: serverProjectId,
-				content_project_id: contentProjectId,
-				content_version_id: contentVersionId,
-				project_id: serverProjectId,
+				type: 'fromVersionId',
+				project_id: contentProjectId,
 				version_id: contentVersionId,
+				title: project.title,
+			},
+			{
+				name: project.title,
+				iconPath: project.icon_url ?? null,
+				link: {
+					type: 'server_project_modpack',
+					server_project_id: serverProjectId,
+					content_project_id: contentProjectId,
+					content_version_id: contentVersionId,
+					project_id: serverProjectId,
+					version_id: contentVersionId,
+				},
 			},
 		)
+		const instanceId = installJobInstanceId(createJob)
+		if (!instanceId) return
 
-		// Save the icon path before pack install overwrites it
-		const instanceBeforeInstall = await get(instanceId)
-		const originalIconPath = instanceBeforeInstall?.icon_path ?? null
-
-		await install_to_existing_instance(
-			contentProjectId,
-			contentVersionId,
-			project.title,
-			instanceId,
-		)
-
-		// Pack install overwrites name, icon, and link with the content project's values.
-		// Restore them to point to the server project.
-		await edit(instanceId, {
-			name: project.title,
-			link: {
-				type: 'server_project_modpack',
-				server_project_id: serverProjectId,
-				content_project_id: contentProjectId,
-				content_version_id: contentVersionId,
-				project_id: serverProjectId,
-				version_id: contentVersionId,
-			},
-		})
-		await edit_icon(instanceId, originalIconPath)
-
+		await wait_for_install_job(createJob.job_id)
 		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
 	}
 

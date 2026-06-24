@@ -4,6 +4,7 @@ import {
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
+	injectFilePicker,
 	injectNotificationManager,
 	InstallationSettingsLayout,
 	provideAppBackup,
@@ -18,10 +19,15 @@ import { computed, ref } from 'vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
-	duplicate,
+	install_duplicate_instance,
+	install_existing_instance,
+	install_pack_to_existing_instance,
+	installJobInstanceId,
+	wait_for_install_job,
+} from '@/helpers/install'
+import {
 	edit,
 	get_linked_modpack_info,
-	install,
 	list,
 	update_managed_modrinth_version,
 	update_repair_modrinth,
@@ -33,6 +39,7 @@ import { injectInstanceSettings } from '@/providers/instance-settings'
 import type { Manifest } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
+const filePicker = injectFilePicker()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('AppInstallationSettings')
@@ -40,7 +47,7 @@ const debug = useDebugLogger('AppInstallationSettings')
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
 
 debug('metadata load: start', {
-	instancePath: instance.value.id,
+	instanceId: instance.value.id,
 	loader: instance.value.loader,
 	gameVersion: instance.value.game_version,
 	installStage: instance.value.install_stage,
@@ -91,15 +98,22 @@ const metadataLoading = computed(() =>
 )
 
 debug('metadata queries configured', {
-	instancePath: instance.value.id,
+	instanceId: instance.value.id,
 	loader: instance.value.loader,
 	gameVersion: instance.value.game_version,
 })
 
+const isModrinthLinkedModpack = computed(
+	() =>
+		instance.value.link?.type === 'modrinth_modpack' ||
+		instance.value.link?.type === 'server_project_modpack',
+)
+const isImportedModpack = computed(() => instance.value.link?.type === 'imported_modpack')
+
 const modpackInfoQuery = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.id]),
 	queryFn: () => get_linked_modpack_info(instance.value.id, 'must_revalidate'),
-	enabled: computed(() => !!instance.value.link?.project_id && !offline),
+	enabled: computed(() => isModrinthLinkedModpack.value && !offline),
 })
 const modpackInfo = modpackInfoQuery.data
 
@@ -129,10 +143,24 @@ function getManifest(loader: string) {
 	return manifest
 }
 
+async function installLocalModpackFromPicker() {
+	const picked = await filePicker.pickModpackFile({ readFile: false })
+	if (!picked?.path) return false
+
+	const job = await install_pack_to_existing_instance(instance.value.id, {
+		type: 'fromFile',
+		path: picked.path,
+	}).catch(handleError)
+	if (!job) return false
+
+	const completed = await wait_for_install_job(job.job_id).catch(handleError)
+	return !!completed
+}
+
 provideAppBackup({
 	async createBackup() {
 		debug('createBackup: start', {
-			instancePath: instance.value.id,
+			instanceId: instance.value.id,
 			instanceName: instance.value.name,
 		})
 		const allInstances = await list()
@@ -142,9 +170,12 @@ provideAppBackup({
 			.map((p) => parseInt(p.name.slice(prefix.length), 10))
 			.filter((n) => !isNaN(n))
 		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const newPath = await duplicate(instance.value.id)
-		await edit(newPath, { name: `${prefix}${nextNum}` })
-		debug('createBackup: done', { newPath, backupName: `${prefix}${nextNum}` })
+		const job = await install_duplicate_instance(instance.value.id)
+		const newInstanceId = installJobInstanceId(job)
+		if (newInstanceId) {
+			await edit(newInstanceId, { name: `${prefix}${nextNum}` })
+		}
+		debug('createBackup: done', { newInstanceId, backupName: `${prefix}${nextNum}` })
 	},
 })
 
@@ -172,11 +203,7 @@ provideInstallationSettings({
 		}
 		return rows
 	}),
-	isLinked: computed(
-		() =>
-			instance.value.link?.type === 'modrinth_modpack' ||
-			instance.value.link?.type === 'server_project_modpack',
-	),
+	isLinked: computed(() => isModrinthLinkedModpack.value || isImportedModpack.value),
 	isBusy: computed(
 		() =>
 			instance.value.install_stage !== 'installed' ||
@@ -185,6 +212,14 @@ provideInstallationSettings({
 			!!offline,
 	),
 	modpack: computed(() => {
+		if (isImportedModpack.value && instance.value.link?.type === 'imported_modpack') {
+			return {
+				iconUrl: instance.value.icon_path,
+				title: instance.value.link.name ?? instance.value.name,
+				versionNumber: instance.value.link.version_number ?? undefined,
+				filename: instance.value.link.filename ?? undefined,
+			}
+		}
 		if (!modpackInfo.value) return null
 		return {
 			iconUrl: modpackInfo.value.project.icon_url,
@@ -265,7 +300,7 @@ provideInstallationSettings({
 
 	async save(platform, gameVersion, loaderVersionId) {
 		debug('save: called', {
-			instancePath: instance.value.id,
+			instanceId: instance.value.id,
 			platform,
 			gameVersion,
 			loaderVersionId,
@@ -282,8 +317,8 @@ provideInstallationSettings({
 	},
 
 	afterSave: async () => {
-		debug('afterSave: installing', { instancePath: instance.value.id })
-		await install(instance.value.id, false).catch(handleError)
+		debug('afterSave: installing', { instanceId: instance.value.id })
+		await install_existing_instance(instance.value.id, false).catch(handleError)
 		trackEvent('InstanceRepair', {
 			loader: instance.value.loader,
 			game_version: instance.value.game_version,
@@ -292,9 +327,9 @@ provideInstallationSettings({
 	},
 
 	async repair() {
-		debug('repair: called', { instancePath: instance.value.id })
+		debug('repair: called', { instanceId: instance.value.id })
 		repairing.value = true
-		await install(instance.value.id, true).catch(handleError)
+		await install_existing_instance(instance.value.id, true).catch(handleError)
 		repairing.value = false
 		trackEvent('InstanceRepair', {
 			loader: instance.value.loader,
@@ -304,19 +339,47 @@ provideInstallationSettings({
 	},
 
 	async reinstallModpack() {
-		debug('reinstallModpack: called', { instancePath: instance.value.id })
+		debug('reinstallModpack: called', { instanceId: instance.value.id })
 		reinstalling.value = true
-		await update_repair_modrinth(instance.value.id).catch(handleError)
-		reinstalling.value = false
-		trackEvent('InstanceRepair', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-		})
+		let shouldTrack = false
+		try {
+			if (isImportedModpack.value) {
+				shouldTrack = await installLocalModpackFromPicker()
+			} else {
+				await update_repair_modrinth(instance.value.id).catch(handleError)
+				shouldTrack = true
+			}
+		} finally {
+			reinstalling.value = false
+		}
+		if (shouldTrack) {
+			trackEvent('InstanceRepair', {
+				loader: instance.value.loader,
+				game_version: instance.value.game_version,
+			})
+		}
 		debug('reinstallModpack: done')
 	},
 
+	async swapModpack() {
+		debug('swapModpack: called', { instanceId: instance.value.id })
+		reinstalling.value = true
+		try {
+			const installed = await installLocalModpackFromPicker()
+			if (installed) {
+				trackEvent('InstanceRepair', {
+					loader: instance.value.loader,
+					game_version: instance.value.game_version,
+				})
+			}
+		} finally {
+			reinstalling.value = false
+		}
+		debug('swapModpack: done')
+	},
+
 	async unlinkModpack() {
-		debug('unlinkModpack: called', { instancePath: instance.value.id })
+		debug('unlinkModpack: called', { instanceId: instance.value.id })
 		await edit(instance.value.id, {
 			link: null as unknown as undefined,
 		})
@@ -347,7 +410,7 @@ provideInstallationSettings({
 	async onModpackVersionConfirm(version) {
 		debug('onModpackVersionConfirm: called', {
 			versionId: version.id,
-			instancePath: instance.value.id,
+			instanceId: instance.value.id,
 		})
 		await update_managed_modrinth_version(instance.value.id, version.id)
 		await queryClient.invalidateQueries({
@@ -367,7 +430,8 @@ provideInstallationSettings({
 
 	isServer: false,
 	isApp: true,
-	showModpackVersionActions: !isMinecraftServer.value,
+	showModpackVersionActions: computed(() => isModrinthLinkedModpack.value && !isMinecraftServer.value),
+	isLocalFile: isImportedModpack,
 	repairing,
 	reinstalling,
 })

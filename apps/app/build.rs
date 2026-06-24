@@ -142,9 +142,22 @@ fn main() {
                     ),
             )
             .plugin(
-                "pack",
+                "install",
                 InlinedPlugin::new()
-                    .commands(&["pack_install", "pack_get_instance_from_pack"])
+                    .commands(&[
+                        "install_get_modpack_preview",
+                        "install_create_instance",
+                        "install_create_modpack_instance",
+                        "install_import_instance",
+                        "install_duplicate_instance",
+                        "install_existing_instance",
+                        "install_pack_to_existing_instance",
+                        "install_job_list",
+                        "install_job_get",
+                        "install_job_retry",
+                        "install_job_cancel",
+                        "install_job_dismiss",
+                    ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
@@ -182,7 +195,6 @@ fn main() {
                         "instance_list",
                         "instance_check_installed",
                         "instance_check_installed_batch",
-                        "instance_install",
                         "instance_update_all",
                         "instance_update_project",
                         "instance_add_project_from_version",
@@ -197,8 +209,6 @@ fn main() {
                         "instance_edit_icon",
                         "instance_export_mrpack",
                         "instance_get_pack_export_candidates",
-                        "instance_create",
-                        "instance_duplicate",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

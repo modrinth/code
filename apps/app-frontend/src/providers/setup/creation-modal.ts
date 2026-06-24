@@ -1,10 +1,8 @@
 import type {
-	AbstractPopupNotificationManager,
 	AbstractWebNotificationManager,
 	CreationFlowContextValue,
 	CreationFlowModal,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@modrinth/ui'
 import { provide, ref, useTemplateRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import { useRouter } from 'vue-router'
@@ -13,30 +11,22 @@ import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPa
 import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
+import {
+	install_create_instance,
+	install_create_modpack_instance,
+	install_get_modpack_preview,
+	type CreatePackLocation,
+} from '@/helpers/install'
 import { import_instance } from '@/helpers/import.js'
-import { create, list } from '@/helpers/instance'
+import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
-import { create_instance_and_install, create_instance_and_install_from_file } from '@/helpers/pack'
 import type { InstanceLoader } from '@/helpers/types'
 
 export function setupCreationModal(
 	notificationManager: AbstractWebNotificationManager,
-	popupNotificationManager: AbstractPopupNotificationManager,
 ) {
 	const { handleError } = notificationManager
-	const { formatMessage } = useVIntl()
 	const router = useRouter()
-
-	const messages = defineMessages({
-		installingModpackTitle: {
-			id: 'app.creation-modal.installing-modpack.title',
-			defaultMessage: 'Installing modpack...',
-		},
-		installingModpackDescription: {
-			id: 'app.creation-modal.installing-modpack.description',
-			defaultMessage: '{fileName}',
-		},
-	})
 
 	const installationModal =
 		useTemplateRef<ComponentExposed<typeof CreationFlowModal>>('installationModal')
@@ -65,7 +55,13 @@ export function setupCreationModal(
 		name: string,
 		iconUrl?: string,
 	) {
-		await create_instance_and_install(projectId, versionId, name, iconUrl).catch(handleError)
+		await install_create_modpack_instance({
+			type: 'fromVersionId',
+			project_id: projectId,
+			version_id: versionId,
+			title: name,
+			icon_url: iconUrl,
+		}).catch(handleError)
 		trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
 	}
 
@@ -108,24 +104,28 @@ export function setupCreationModal(
 			}
 
 			if (config.modpackFilePath.value) {
-				const waitingNotification = popupNotificationManager.addPopupNotification({
-					title: formatMessage(messages.installingModpackTitle),
-					text: formatMessage(messages.installingModpackDescription, {
-						fileName: config.modpackFilePath.value.split('/').pop() ?? config.modpackFilePath.value,
-					}),
-					type: 'info',
-					autoCloseMs: null,
-					waiting: true,
-				})
+				const location: CreatePackLocation = {
+					type: 'fromFile',
+					path: config.modpackFilePath.value,
+				}
+				const preview = await install_get_modpack_preview(location)
 
-				await create_instance_and_install_from_file(
-					config.modpackFilePath.value,
-					(createInstance, fileName) => {
-						popupNotificationManager.removeNotification(waitingNotification.id)
-						unknownPackWarningModal.value?.show(createInstance, fileName)
-					},
-				).catch(handleError)
-				popupNotificationManager.removeNotification(waitingNotification.id)
+				if (preview.unknownFile) {
+					const splitPath = config.modpackFilePath.value.split(/[\\/]/)
+					const fileName = splitPath
+						? splitPath[splitPath.length - 1]
+						: config.modpackFilePath.value
+					if (unknownPackWarningModal.value) {
+						unknownPackWarningModal.value?.show(
+							() => install_create_modpack_instance(location).then(() => undefined),
+							fileName,
+						)
+					} else {
+						await install_create_modpack_instance(location)
+					}
+				} else {
+					await install_create_modpack_instance(location)
+				}
 				trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
 				return
 			}
@@ -140,14 +140,13 @@ export function setupCreationModal(
 			const iconPath = config.instanceIconPath.value ?? null
 			const name = config.instanceName.value.trim() || config.autoInstanceName.value
 
-			await create(
+			await install_create_instance({
 				name,
-				config.selectedGameVersion.value!,
-				loader as InstanceLoader,
+				gameVersion: config.selectedGameVersion.value!,
+				loader: loader as InstanceLoader,
 				loaderVersion,
 				iconPath,
-				false,
-			).catch(handleError)
+			}).catch(handleError)
 
 			trackEvent('InstanceCreate', {
 				source: 'CreationModal',

@@ -52,16 +52,29 @@ pub async fn find_filtered_jres(
 }
 
 pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
+    auto_install_java_with_loading(java_version, true).await
+}
+
+pub async fn auto_install_java_with_loading(
+    java_version: u32,
+    show_loading: bool,
+) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
-    let loading_bar = init_loading(
-        LoadingBarType::JavaDownload {
-            version: java_version,
-        },
-        100.0,
-        "Downloading java version",
-    )
-    .await?;
+    let loading_bar = if show_loading {
+        Some(
+            init_loading(
+                LoadingBarType::JavaDownload {
+                    version: java_version,
+                },
+                100.0,
+                "Downloading java version",
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
 
     #[derive(Deserialize)]
     struct Package {
@@ -69,7 +82,9 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
         pub name: PathBuf,
     }
 
-    emit_loading(&loading_bar, 0.0, Some("Fetching java version"))?;
+    if let Some(loading_bar) = &loading_bar {
+        emit_loading(loading_bar, 0.0, Some("Fetching java version"))?;
+    }
     let packages = fetch_json::<Vec<Package>>(
                 Method::GET,
                 &format!(
@@ -82,7 +97,9 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 &state.fetch_semaphore,
                 &state.pool,
             ).await?;
-    emit_loading(&loading_bar, 10.0, Some("Downloading java version"))?;
+    if let Some(loading_bar) = &loading_bar {
+        emit_loading(loading_bar, 10.0, Some("Downloading java version"))?;
+    }
 
     if let Some(download) = packages.first() {
         let file = fetch_advanced(
@@ -92,7 +109,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             None,
             None,
             None,
-            Some((&loading_bar, 80.0)),
+            loading_bar.as_ref().map(|loading_bar| (loading_bar, 80.0)),
             None,
             &state.fetch_semaphore,
             &state.pool,
@@ -119,13 +136,17 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             }
         }
 
-        emit_loading(&loading_bar, 0.0, Some("Extracting java"))?;
+        if let Some(loading_bar) = &loading_bar {
+            emit_loading(loading_bar, 0.0, Some("Extracting java"))?;
+        }
         archive.extract(&path).map_err(|_| {
             crate::Error::from(crate::ErrorKind::InputError(
                 "Failed to extract java zip".to_string(),
             ))
         })?;
-        emit_loading(&loading_bar, 10.0, Some("Done extracting java"))?;
+        if let Some(loading_bar) = &loading_bar {
+            emit_loading(loading_bar, 10.0, Some("Done extracting java"))?;
+        }
         let mut base_path = path.join(
             download
                 .name

@@ -72,6 +72,9 @@ pub(crate) struct InstanceLinkRow {
     pub hosting_instance_ids: Option<String>,
     pub hosting_active_instance_id: Option<String>,
     pub shared_instance_id: Option<String>,
+    pub imported_name: Option<String>,
+    pub imported_version_number: Option<String>,
+    pub imported_filename: Option<String>,
 }
 
 impl TryFrom<InstanceLinkRow> for InstanceLink {
@@ -128,6 +131,9 @@ impl TryFrom<InstanceLinkRow> for InstanceLink {
             "imported_modpack" => Ok(Self::ImportedModpack {
                 project_id: row.modrinth_project_id,
                 version_id: row.modrinth_version_id,
+                name: row.imported_name,
+                version_number: row.imported_version_number,
+                filename: row.imported_filename,
             }),
             "shared_instance" => Ok(Self::SharedInstance {
                 shared_instance_id: parse_uuid(
@@ -247,7 +253,10 @@ where
             hosting_server_id,
             json(hosting_instance_ids) AS "hosting_instance_ids?: String",
             hosting_active_instance_id,
-            shared_instance_id
+            shared_instance_id,
+            imported_name,
+            imported_version_number,
+            imported_filename
         FROM instance_links
         WHERE instance_id = ?
         "#,
@@ -434,6 +443,9 @@ pub(crate) async fn upsert_instance_link(
     let hosting_active_instance_id =
         columns.hosting_active_instance_id.as_deref();
     let shared_instance_id = columns.shared_instance_id.as_deref();
+    let imported_name = columns.imported_name.as_deref();
+    let imported_version_number = columns.imported_version_number.as_deref();
+    let imported_filename = columns.imported_filename.as_deref();
 
     sqlx::query!(
         "
@@ -448,9 +460,12 @@ pub(crate) async fn upsert_instance_link(
 			hosting_server_id,
 			hosting_instance_ids,
 			hosting_active_instance_id,
-			shared_instance_id
+			shared_instance_id,
+			imported_name,
+			imported_version_number,
+			imported_filename
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, jsonb(?), ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, jsonb(?), ?, ?, ?, ?, ?)
 		ON CONFLICT (instance_id) DO UPDATE SET
 			link_kind = excluded.link_kind,
 			modrinth_project_id = excluded.modrinth_project_id,
@@ -461,7 +476,10 @@ pub(crate) async fn upsert_instance_link(
 			hosting_server_id = excluded.hosting_server_id,
 			hosting_instance_ids = excluded.hosting_instance_ids,
 			hosting_active_instance_id = excluded.hosting_active_instance_id,
-			shared_instance_id = excluded.shared_instance_id
+			shared_instance_id = excluded.shared_instance_id,
+			imported_name = excluded.imported_name,
+			imported_version_number = excluded.imported_version_number,
+			imported_filename = excluded.imported_filename
 		",
         instance_id,
         columns.link_kind,
@@ -474,6 +492,9 @@ pub(crate) async fn upsert_instance_link(
         hosting_instance_ids,
         hosting_active_instance_id,
         shared_instance_id,
+        imported_name,
+        imported_version_number,
+        imported_filename,
     )
     .execute(&mut **tx)
     .await?;
@@ -567,6 +588,9 @@ struct InstanceLinkColumns {
     hosting_instance_ids: Option<String>,
     hosting_active_instance_id: Option<String>,
     shared_instance_id: Option<String>,
+    imported_name: Option<String>,
+    imported_version_number: Option<String>,
+    imported_filename: Option<String>,
 }
 
 fn instance_link_columns(
@@ -584,6 +608,9 @@ fn instance_link_columns(
             hosting_instance_ids: None,
             hosting_active_instance_id: None,
             shared_instance_id: None,
+            imported_name: None,
+            imported_version_number: None,
+            imported_filename: None,
         }),
         InstanceLink::ModrinthModpack {
             project_id,
@@ -599,6 +626,9 @@ fn instance_link_columns(
             hosting_instance_ids: None,
             hosting_active_instance_id: None,
             shared_instance_id: None,
+            imported_name: None,
+            imported_version_number: None,
+            imported_filename: None,
         }),
         InstanceLink::ServerProject { project_id } => Ok(InstanceLinkColumns {
             link_kind: "server_project",
@@ -611,6 +641,9 @@ fn instance_link_columns(
             hosting_instance_ids: None,
             hosting_active_instance_id: None,
             shared_instance_id: None,
+            imported_name: None,
+            imported_version_number: None,
+            imported_filename: None,
         }),
         InstanceLink::ServerProjectModpack {
             server_project_id,
@@ -627,6 +660,9 @@ fn instance_link_columns(
             hosting_instance_ids: None,
             hosting_active_instance_id: None,
             shared_instance_id: None,
+            imported_name: None,
+            imported_version_number: None,
+            imported_filename: None,
         }),
         InstanceLink::ModrinthHosting {
             server_id,
@@ -644,10 +680,16 @@ fn instance_link_columns(
             hosting_active_instance_id: active_instance_id
                 .map(|value| value.to_string()),
             shared_instance_id: None,
+            imported_name: None,
+            imported_version_number: None,
+            imported_filename: None,
         }),
         InstanceLink::ImportedModpack {
             project_id,
             version_id,
+            name,
+            version_number,
+            filename,
         } => Ok(InstanceLinkColumns {
             link_kind: "imported_modpack",
             modrinth_project_id: project_id.clone(),
@@ -659,6 +701,9 @@ fn instance_link_columns(
             hosting_instance_ids: None,
             hosting_active_instance_id: None,
             shared_instance_id: None,
+            imported_name: name.clone(),
+            imported_version_number: version_number.clone(),
+            imported_filename: filename.clone(),
         }),
         InstanceLink::SharedInstance { shared_instance_id } => {
             Ok(InstanceLinkColumns {
@@ -672,6 +717,9 @@ fn instance_link_columns(
                 hosting_instance_ids: None,
                 hosting_active_instance_id: None,
                 shared_instance_id: Some(shared_instance_id.to_string()),
+                imported_name: None,
+                imported_version_number: None,
+                imported_filename: None,
             })
         }
     }
