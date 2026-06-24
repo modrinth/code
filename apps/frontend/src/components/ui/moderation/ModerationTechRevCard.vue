@@ -10,26 +10,32 @@ import {
 	CodeIcon,
 	CopyIcon,
 	DownloadIcon,
-	EllipsisVerticalIcon, EyeOffIcon,
+	EllipsisVerticalIcon,
+	EyeOffIcon,
 	LinkIcon,
-	LoaderCircleIcon, ScaleIcon,
-	ShieldCheckIcon, SpinnerIcon,
+	LoaderCircleIcon,
+	ScaleIcon,
+	ShieldCheckIcon,
+	SpinnerIcon,
 	TimerIcon,
-	TriangleAlertIcon, XIcon,
+	TriangleAlertIcon,
+	XIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
 	ButtonStyled,
 	Collapsible,
-	CollapsibleRegion, commonMessages,
+	CollapsibleRegion,
+	commonMessages,
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
 	OverflowMenu,
 	type OverflowMenuOption,
 	useFormatBytes,
-	useFormatDateTime, useVIntl,
+	useFormatDateTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { NavTabs } from '@modrinth/ui'
 import {
@@ -100,7 +106,10 @@ const emit = defineEmits<{
 const projectStatus = ref<Labrinth.Projects.v2.ProjectStatus>(props.item.project.status)
 const isProjectApproved = computed(() => {
 	return (
-		projectStatus.value === 'approved' || projectStatus.value === 'archived' || projectStatus.value === 'unlisted' || projectStatus.value === 'private'
+		projectStatus.value === 'approved' ||
+		projectStatus.value === 'archived' ||
+		projectStatus.value === 'unlisted' ||
+		projectStatus.value === 'private'
 	)
 })
 
