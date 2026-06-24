@@ -112,10 +112,6 @@ const props = withDefaults(
 		worlds?: HeaderWorld[]
 		powerDisabled?: boolean
 		settingsLabel?: string
-		showSettingsHint?: boolean
-		settingsHintTitle?: string
-		settingsHintDescription?: string
-		settingsHintDismissLabel?: string
 		actions?: HeaderAction[]
 	}>(),
 	{
@@ -131,17 +127,12 @@ const props = withDefaults(
 		worlds: () => [],
 		powerDisabled: false,
 		settingsLabel: 'Server settings',
-		showSettingsHint: false,
-		settingsHintTitle: '',
-		settingsHintDescription: '',
-		settingsHintDismissLabel: "Don't show again",
 		actions: () => [],
 	},
 )
 
 const emit = defineEmits<{
 	openSettings: []
-	dismissSettingsHint: []
 }>()
 
 const client = injectModrinthClient()
@@ -408,16 +399,8 @@ const settingsAction = computed<HeaderAction>(() => ({
 	label: props.settingsLabel,
 	icon: SettingsIcon,
 	labelHidden: true,
-	tooltip: props.showSettingsHint ? undefined : props.settingsLabel,
+	tooltip: props.settingsLabel,
 	onClick: () => emit('openSettings'),
-	prompt: {
-		title: props.settingsHintTitle,
-		description: props.settingsHintDescription,
-		dismissLabel: props.settingsHintDismissLabel,
-		shown: props.showSettingsHint,
-		placement: 'bottom-end',
-		onDismiss: () => emit('dismissSettingsHint'),
-	},
 }))
 
 const headerActions = computed<HeaderAction[]>(() => [

@@ -5,7 +5,7 @@
 			class="flex flex-col gap-2"
 		>
 			<span class="font-semibold text-contrast">
-				{{ formatMessage(messages.worldNameLabel) }} <span class="text-red">*</span>
+				{{ formatMessage(messages.worldNameLabel) }}
 			</span>
 			<StyledInput
 				v-model="worldName"

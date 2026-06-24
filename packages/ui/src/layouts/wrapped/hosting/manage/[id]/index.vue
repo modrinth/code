@@ -130,12 +130,7 @@
 				:worlds="serverFull?.worlds ?? []"
 				:power-disabled="!!installError"
 				:settings-label="formatMessage(messages.serverSettings)"
-				:show-settings-hint="showSettingsHint"
-				:settings-hint-title="formatMessage(settingsHintMessages.title)"
-				:settings-hint-description="formatMessage(settingsHintMessages.description)"
-				:settings-hint-dismiss-label="formatMessage(settingsHintMessages.dismiss)"
 				@open-settings="openServerSettingsModal()"
-				@dismiss-settings-hint="dismissSettingsHint"
 			/>
 
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
@@ -443,21 +438,6 @@ const leaveMessages = defineMessages({
 	},
 })
 
-const settingsHintMessages = defineMessages({
-	title: {
-		id: 'servers.manage.settings-hint.title',
-		defaultMessage: 'Your server settings have moved',
-	},
-	description: {
-		id: 'servers.manage.settings-hint.description',
-		defaultMessage: 'They can now be found here!',
-	},
-	dismiss: {
-		id: 'servers.manage.settings-hint.dismiss',
-		defaultMessage: "Don't show again",
-	},
-})
-
 const instancesHintMessages = defineMessages({
 	title: {
 		id: 'servers.manage.instances-hint.title',
@@ -711,14 +691,6 @@ const errorMessage = ref(formatMessage(messages.genericErrorMessage))
 const errorLog = ref('')
 const errorLogFile = ref('')
 const isOnboarding = computed(() => serverData.value?.flows?.intro)
-
-const SETTINGS_HINT_KEY = 'server-panel-settings-hint-dismissed'
-const settingsHintDismissed = useStorage(SETTINGS_HINT_KEY, false)
-const showSettingsHint = ref(!settingsHintDismissed.value)
-function dismissSettingsHint() {
-	showSettingsHint.value = false
-	settingsHintDismissed.value = true
-}
 
 const INSTANCES_HINT_KEY = 'server-panel-instances-hint-dismissed'
 const instancesHintDismissed = useStorage(INSTANCES_HINT_KEY, false)

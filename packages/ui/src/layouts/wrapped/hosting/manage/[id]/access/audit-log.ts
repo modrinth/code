@@ -36,7 +36,6 @@ type UseAccessAuditLogOptions = {
 	client: AbstractModrinthClient
 	serverId: string
 	serverFull: ComputedRef<Archon.Servers.v1.ServerFull | null>
-	showAuditLogInstances: ComputedRef<boolean>
 	addNotification: AbstractWebNotificationManager['addNotification']
 }
 
@@ -47,7 +46,6 @@ export function useAccessAuditLog({
 	client,
 	serverId,
 	serverFull,
-	showAuditLogInstances,
 	addNotification,
 }: UseAccessAuditLogOptions) {
 	const { formatMessage } = useVIntl()
@@ -68,9 +66,7 @@ export function useAccessAuditLog({
 	const worldOptions = computed(
 		() => serverFull.value?.worlds.map((world) => ({ id: world.id, name: world.name })) ?? [],
 	)
-	const isAuditLogWorldFilterVisible = computed(
-		() => showAuditLogInstances.value && worldOptions.value.length > 0,
-	)
+	const isAuditLogWorldFilterVisible = computed(() => worldOptions.value.length > 0)
 
 	const worldById = computed(
 		() => new Map(worldOptions.value.map((world) => [world.id, world] as const)),

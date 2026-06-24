@@ -63,7 +63,7 @@
 				:has-more="hasMoreActionLogEntries"
 				:loading="isActionLogFiltering"
 				:loading-more="isLoadingMoreActionLogEntries"
-				:show-world-column="showAuditLogInstances"
+				show-world-column
 				:suppress-row-transitions="isActionLogSortTransitioning"
 				@load-more="loadMoreActionLogEntries"
 			>
@@ -145,14 +145,10 @@ type RoleFilter = ServerAccessRole | 'all'
 
 const props = withDefaults(
 	defineProps<{
-		showAuditLogInstances?: boolean
 		userProfileLink?: (username: string) => ServerAccessUserProfileLink
 	}>(),
-	{
-		showAuditLogInstances: false,
-	},
+	{},
 )
-const showAuditLogInstances = computed(() => props.showAuditLogInstances)
 
 const INVITE_RESEND_COOLDOWN_SECONDS = 2 * 60
 
@@ -294,7 +290,6 @@ const {
 	client,
 	serverId,
 	serverFull,
-	showAuditLogInstances,
 	addNotification,
 })
 

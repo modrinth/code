@@ -201,9 +201,13 @@ async function loadContentSummary(
 	index: number,
 ): Promise<ContentSummary> {
 	try {
-		const content = await client.archon.content_v1.getAddons(serverId, world.id, {
-			addons: true,
-			updates: false,
+		const content = await queryClient.fetchQuery({
+			queryKey: ['content', 'list', 'v1', serverId, world.id],
+			queryFn: () =>
+				client.archon.content_v1.getAddons(serverId, world.id, {
+					from_modpack: false,
+				}),
+			staleTime: 0,
 		})
 
 		return {
@@ -211,10 +215,32 @@ async function loadContentSummary(
 			loader: content.modloader ?? world.content?.modloader ?? null,
 			loaderVersion: content.modloader_version ?? world.content?.modloader_version ?? null,
 			linkedModpack: getLinkedModpack(content.modpack),
-			installedContentCount: content.addons?.length ?? 0,
+			installedContentCount: await getInstalledContentCount(world.id, content),
 		}
 	} catch {
 		return createDummyContentSummary(world, index)
+	}
+}
+
+async function getInstalledContentCount(
+	worldId: string,
+	content: Archon.Content.v1.Addons,
+): Promise<number> {
+	const addonCount = content.addons?.length ?? 0
+	if (!content.modpack) return addonCount
+
+	try {
+		const modpackContent = await queryClient.fetchQuery({
+			queryKey: ['content', 'list', 'v1', serverId, worldId, 'modpack'],
+			queryFn: () =>
+				client.archon.content_v1.getAddons(serverId, worldId, {
+					from_modpack: true,
+				}),
+			staleTime: 0,
+		})
+		return addonCount + (modpackContent.addons?.length ?? 0)
+	} catch {
+		return addonCount
 	}
 }
 

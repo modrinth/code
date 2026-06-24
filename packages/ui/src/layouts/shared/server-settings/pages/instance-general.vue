@@ -170,16 +170,16 @@ const messages = defineMessages({
 	},
 	resetWorldFilesButton: {
 		id: 'server.instance-settings.general.reset-world-files.button',
-		defaultMessage: 'Reset world data',
+		defaultMessage: 'Reset world',
 	},
 	resetWorldFilesDescription: {
 		id: 'server.instance-settings.general.reset-world-files.description',
 		defaultMessage:
-			'Delete the current world data and generate a new one. Your content and files will stay the same.',
+			'Create a fresh world for this instance. Content, files, settings, and backups stay the same.',
 	},
 	resetWorldFilesModalTitle: {
 		id: 'server.instance-settings.general.reset-world-files.modal.title',
-		defaultMessage: 'Reset world data',
+		defaultMessage: 'Reset world',
 	},
 	resetWorldFilesModalDescription: {
 		id: 'server.instance-settings.general.reset-world-files.modal.description',
@@ -200,12 +200,12 @@ const messages = defineMessages({
 	},
 	resetEverythingButton: {
 		id: 'server.instance-settings.general.reset-everything.button',
-		defaultMessage: 'Reset everything',
+		defaultMessage: 'Reset instance',
 	},
 	resetEverythingDescription: {
 		id: 'server.instance-settings.general.reset-everything.description',
 		defaultMessage:
-			'Reset your instance completely. This removes world data, content, and any configuration. A backup of the previous instance will remain available.',
+			'Recreate this instance from scratch. World data, content, files, and settings are removed. Previous backups will remain available.',
 	},
 	deleteInstanceButton: {
 		id: 'server.instance-settings.general.delete-instance.button',
@@ -214,7 +214,7 @@ const messages = defineMessages({
 	deleteInstanceDescription: {
 		id: 'server.instance-settings.general.delete-instance.description',
 		defaultMessage:
-			'Permanently delete this instance, including its content, files, settings, and backups.',
+			'Permanently delete this instance. World data, content, files, settings, and backups will be removed.',
 	},
 	deleteInstanceModalTitle: {
 		id: 'server.instance-settings.general.delete-instance.modal.title',
