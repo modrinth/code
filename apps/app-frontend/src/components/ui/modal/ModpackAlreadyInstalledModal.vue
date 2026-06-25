@@ -68,17 +68,17 @@ const messages = defineMessages({
 })
 
 const emit = defineEmits<{
-	(e: 'go-to-instance', instancePath: string): void
+	(e: 'go-to-instance', instanceId: string): void
 	(e: 'create-anyway'): void
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const instanceName = ref('')
-const instancePath = ref('')
+const instanceId = ref('')
 
-function show(name: string, path: string) {
+function show(name: string, id: string) {
 	instanceName.value = name
-	instancePath.value = path
+	instanceId.value = id
 	modal.value?.show()
 }
 
@@ -88,7 +88,7 @@ function handleCancel() {
 
 function handleGoToInstance() {
 	modal.value?.hide()
-	emit('go-to-instance', instancePath.value)
+	emit('go-to-instance', instanceId.value)
 }
 
 function handleCreateAnyway() {

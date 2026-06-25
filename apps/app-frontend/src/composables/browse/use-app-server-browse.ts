@@ -2,17 +2,17 @@ import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, PlayIcon, PlusIcon, StopCircleIcon } from '@modrinth/assets'
 import type { CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { ComputedRef, Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
 import { process_listener } from '@/helpers/events'
-import { get_by_profile_path } from '@/helpers/process'
-import { kill, list as listInstances } from '@/helpers/profile.js'
+import { kill, list as listInstances } from '@/helpers/instance'
+import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { add_server_to_profile, getServerLatency } from '@/helpers/worlds'
-import { getServerAddress } from '@/store/install.js'
+import { add_server_to_instance, getServerAddress, getServerLatency } from '@/helpers/worlds'
 
 interface BrowseServerInstance {
 	name: string
@@ -65,6 +65,7 @@ const messages = defineMessages({
 
 export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	const { formatMessage } = useVIntl()
+	const queryClient = useQueryClient()
 	const debugLog = useDebugLogger('BrowseServer')
 	const serverPings = shallowRef<Record<string, number | undefined>>({})
 	const serverPingCache = new Map<string, number | undefined>()
@@ -83,13 +84,11 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		})
 		const newRunning: Record<string, string> = {}
 		for (const hit of hits) {
-			const inst = packs.find(
-				(pack: GameInstance) => pack.linked_data?.project_id === hit.project_id,
-			)
+			const inst = packs.find((pack: GameInstance) => pack.link?.project_id === hit.project_id)
 			if (inst) {
-				const processes = await get_by_profile_path(inst.path).catch(() => [])
+				const processes = await get_by_instance_id(inst.id).catch(() => [])
 				if (Array.isArray(processes) && processes.length > 0) {
-					newRunning[hit.project_id] = inst.path
+					newRunning[hit.project_id] = inst.id
 				}
 			}
 		}
@@ -99,9 +98,9 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 
 	async function handleStopServerProject(projectId: string) {
 		debugLog('handleStopServerProject', projectId)
-		const instancePath = runningServerProjects.value[projectId]
-		if (!instancePath) return
-		await kill(instancePath).catch(() => {})
+		const instanceId = runningServerProjects.value[projectId]
+		if (!instanceId) return
+		await kill(instanceId).catch(() => {})
 		const { [projectId]: _, ...rest } = runningServerProjects.value
 		runningServerProjects.value = rest
 	}
@@ -118,9 +117,10 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		if (!address) return
 
 		if (options.instance.value) {
+			const instanceId = options.instance.value.id
 			try {
-				await add_server_to_profile(
-					options.instance.value.path,
+				await add_server_to_instance(
+					instanceId,
 					project.name,
 					address,
 					'prompt',
@@ -128,6 +128,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					project.minecraft_java_server?.content?.kind,
 				)
 				options.newlyInstalled.value.push(project.project_id)
+				await queryClient.invalidateQueries({ queryKey: ['worlds', instanceId] })
 			} catch (error) {
 				options.handleError(error)
 			}
@@ -289,11 +290,11 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		}
 	}
 
-	process_listener((event: { event: string; profile_path_id: string }) => {
+	process_listener((event: { event: string; instance_id: string }) => {
 		debugLog('process event', event)
 		if (event.event === 'finished') {
 			const projectId = Object.entries(runningServerProjects.value).find(
-				([, path]) => path === event.profile_path_id,
+				([, path]) => path === event.instance_id,
 			)?.[0]
 			if (projectId) {
 				const { [projectId]: _, ...rest } = runningServerProjects.value

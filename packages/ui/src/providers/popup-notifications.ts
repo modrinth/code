@@ -10,6 +10,8 @@ export interface PopupNotificationButton {
 	keepOpen?: boolean
 }
 
+export type PopupNotificationProgressType = 'percentage' | 'bytes' | 'count'
+
 export interface PopupNotificationProgressItem {
 	id: string
 	title: string
@@ -17,6 +19,13 @@ export interface PopupNotificationProgressItem {
 	iconUrl?: string | null
 	progress: number
 	waiting: boolean
+	showProgress?: boolean
+	wrapText?: boolean
+	progressType?: PopupNotificationProgressType
+	progressCurrent?: number
+	progressTotal?: number
+	onDismiss?: () => void | Promise<void>
+	buttons?: PopupNotificationButton[]
 }
 
 export type PopupNotificationToastType =
@@ -35,6 +44,10 @@ export interface PopupNotificationToast {
 	statusText?: string
 	progress?: number
 	waiting?: boolean
+	showProgress?: boolean
+	progressType?: PopupNotificationProgressType
+	progressCurrent?: number
+	progressTotal?: number
 	onAccept?: () => void | Promise<void>
 	onDecline?: () => void | Promise<void>
 	onDismiss?: () => void | Promise<void>

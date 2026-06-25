@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Žádná dostupná verze se neshoduje s verzí {compatibilityLabel}. Vyber verzi, abys ji i přesto nainstaloval/a. Závislosti nebudou automaticky nainstalovány."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Probíhá instalace modpacku..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Zadej popis modpacku..."
   },
@@ -242,12 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Procházet servery"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' bude **navždy smazán** a nebude možné jej obnovit."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Jsi si jistý, že chceš trvale smazat tento svět?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Módovaný"
   },
@@ -266,20 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Žádné servery nebo světy nebyly přidány"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' bude odstraněn z tvého seznamu i ze hry a nebude možné jej obnovit."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) bude odstraněn z tvého seznamu i ze hry a nebude možné jej obnovit."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Opravdu chceš odstranit {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hledat v {count} světech..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "tento server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Požadovaný obsah"

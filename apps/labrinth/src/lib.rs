@@ -28,6 +28,8 @@ use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use crate::util::tiltify::TiltifyClient;
 use sync::friends::handle_pubsub;
+use url::Url;
+use webauthn_rs::{Webauthn, WebauthnBuilder};
 
 pub mod auth;
 pub mod background_task;
@@ -76,6 +78,7 @@ pub struct LabrinthConfig {
     pub http_client: web::Data<HttpClient>,
     pub tiltify_client: web::Data<TiltifyClient>,
     pub kafka_client: web::Data<util::kafka::KafkaClientState>,
+    pub webauthn: web::Data<Webauthn>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -312,6 +315,19 @@ pub fn app_setup(
         });
     }
 
+    let webauthn_origin = Url::parse(&ENV.SITE_URL).expect("invalid SITE_URL");
+    let webauthn_rp_id = webauthn_origin
+        .host_str()
+        .expect("SITE_URL has no host")
+        .to_string();
+    let webauthn = web::Data::new(
+        WebauthnBuilder::new(&webauthn_rp_id, &webauthn_origin)
+            .expect("invalid webauthn configuration")
+            .rp_name(&ENV.WEBAUTHN_RP_NAME)
+            .build()
+            .expect("failed to build webauthn"),
+    );
+
     LabrinthConfig {
         pool,
         ro_pool,
@@ -338,6 +354,7 @@ pub fn app_setup(
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
         ),
         email_queue: web::Data::new(email_queue),
+        webauthn,
     }
 }
 
@@ -381,6 +398,7 @@ pub fn app_config(
     .app_data(labrinth_config.rate_limiter.clone())
     .app_data(labrinth_config.kafka_client.clone())
     .app_data(labrinth_config.search_state.clone())
+    .app_data(labrinth_config.webauthn.clone())
     .configure(routes::v3::config)
     .configure(routes::internal::config)
     .configure(routes::root_config)

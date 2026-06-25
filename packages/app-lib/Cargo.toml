@@ -6,9 +6,9 @@ edition.workspace = true
 
 [dependencies]
 ariadne = { workspace = true }
-async-compression = { workspace = true, features = ["gzip", "tokio"] }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
+async-trait = { workspace = true }
 async-tungstenite = { workspace = true, features = [
   "tokio-runtime",
   "tokio-rustls-webpki-roots"
@@ -46,6 +46,7 @@ heck = { workspace = true }
 hickory-resolver = { workspace = true }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
+modrinth-content-management = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }

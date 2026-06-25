@@ -761,38 +761,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Забыли пароль?</forgot-password-link> • <create-account-link>Создать аккаунт</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Войдите через"
   },
   "auth.sign-in.title": {
     "message": "Вход"
   },
-  "auth.sign-in.use-password": {
-    "message": "Или используйте пароль"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Создать аккаунт"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Регистрируясь, вы принимаете наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденци­аль­ности</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Пароли не совпадают!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже есть аккаунт?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Получать новости о Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Регистрация"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Или создайте аккаунт сами"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Зарегистрируйтесь через"
@@ -826,21 +808,6 @@
   },
   "auth.verify-email.title": {
     "message": "Подтверждение почты"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Получать новости о Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Теперь вы часть потрясающего сообщества авторов и игроков, которые вместе создают, находят и следят за любимыми модами."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Зарегистрировавшись, вы приняли наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденци­аль­ности</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Добро пожаловать!"
-  },
-  "auth.welcome.title": {
-    "message": "Добро пожаловать"
   },
   "collection.button.edit-icon": {
     "message": "Изменить иконку"

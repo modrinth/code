@@ -689,38 +689,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Kód beírása..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Elfelejtetted a jelszavad?</forgot-password-link> • <create-account-link>Hozz létre egy fiókot</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Bejelentkezés ezzel"
   },
   "auth.sign-in.title": {
     "message": "Bejelentkezés"
   },
-  "auth.sign-in.use-password": {
-    "message": "Vagy használj jelszót"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Fiók létrehozása"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "A jelszavak nem jegyeznek!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Már van fiókod?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
-  },
   "auth.sign-up.title": {
     "message": "Regisztráció"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Vagy hozz létre egyet magadnak"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Regisztráció ezzel"
@@ -754,21 +736,6 @@
   },
   "auth.verify-email.title": {
     "message": "Email-cím hitelesítése"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
-  },
-  "auth.welcome.description": {
-    "message": "Most már része vagy annak a fantasztikus fejlesztők és felfedezők közösségének, akik már építenek, letöltenek és naprakészek maradnak a csodálatos modokkal kapcsolatban."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Üdvözlünk a Modrinthon!"
-  },
-  "auth.welcome.title": {
-    "message": "Üdvözlünk"
   },
   "collection.button.edit-icon": {
     "message": "Ikon szerkesztése"

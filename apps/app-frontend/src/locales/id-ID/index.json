@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Memasang paket mod..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan deskripsi paket mod..."
   },
@@ -242,12 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Telusuri server"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' akan **dihapus secara permanen**, dan Anda tidak akan dapat memulihkannya."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Apakah Anda yakin ingin menghapus dunia ini secara permanen?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Dimodifikasi"
   },
@@ -266,20 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Tidak ada server atau dunia yang ditambahkan"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' akan dihapus dari daftar Anda, termasuk di dalam permainan, dan Anda tidak akan dapat memulihkannya."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) akan dihapus dari daftar Anda, termasuk di dalam permainan, dan Anda tidak akan dapat memulihkannya."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Apakah Anda yakin ingin menghapus {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "server ini"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Konten diperlukan"

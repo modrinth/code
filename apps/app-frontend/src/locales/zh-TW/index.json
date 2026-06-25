@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "沒有符合 {compatibilityLabel} 的可用版本。請選擇一個版本強制安裝。不會自動安裝相依模組。"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "正在安裝模組包..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "輸入模組包描述..."
   },
@@ -242,9 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "瀏覽伺服器"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "確定要永久刪除這個世界嗎？"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "模組"
   },
@@ -263,14 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未新增任何伺服器或世界"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "確定要移除「{name}」嗎？"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "這個伺服器"
   },
   "app.modal.install-to-play.content-required": {
     "message": "所需內容"

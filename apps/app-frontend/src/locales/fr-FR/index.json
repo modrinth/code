@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Aucune version disponible ne correspond à {compatibilityLabel}. Sélectionnez une version pour l'installer malgré tout. Les dépendances ne seront pas installées automatiquement."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installation du modpack..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Saisir la description du modpack..."
   },
@@ -242,9 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Parcourir des serveurs"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Êtes-vous sûr·e de vouloir supprimer ce monde pour toujours ?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Moddé"
   },
@@ -263,14 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Aucun serveur ou monde ajoutés"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Êtes-vous sûr·e de vouloir retirer {name} ?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Rechercher {count} mondes..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "ce serveur"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Contenu requis"

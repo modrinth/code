@@ -33,7 +33,7 @@ import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmM
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../content-tab/components/modals/ContentUpdaterModal.vue'
+import ContentUpdaterModal from '../content-tab/components/modals/content-updater-modal/index.vue'
 import ContentDiffModal from './components/ContentDiffModal.vue'
 import IncompatibleContentModal from './components/IncompatibleContentModal.vue'
 import { useInstallationForm } from './composables'
@@ -203,6 +203,8 @@ const isLocalFile = computed(() => {
 	return typeof val === 'boolean' ? val : val.value
 })
 
+const isLinkedModpack = computed(() => showModpackVersionActions.value || isLocalFile.value)
+
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	debug('handleModpackUpdateRequest: start', {
 		versionId: version.id,
@@ -241,6 +243,25 @@ function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event
 		refs: modalRefsSnapshot(),
 	})
 	modpackUpdateModal.value?.show()
+}
+
+function handleSwapModpack() {
+	debug('handleSwapModpack: start', { snapshot: stateSnapshot() })
+	if (ctx.isBusy.value) {
+		debug('handleSwapModpack: ignored busy')
+		return
+	}
+	form.cancelEditing()
+	ctx.swapModpack?.()
+	debug('handleSwapModpack: invoked ctx.swapModpack')
+}
+
+function handleModpackPrimaryAction() {
+	if (showModpackVersionActions.value) {
+		form.handleChangeModpackVersion()
+	} else {
+		handleSwapModpack()
+	}
 }
 
 function handleModpackUpdateConfirm() {
@@ -629,12 +650,12 @@ const messages = defineMessages({
 						</div>
 					</div>
 					<div class="flex flex-wrap gap-2">
-						<ButtonStyled v-if="showModpackVersionActions">
+						<ButtonStyled v-if="showModpackVersionActions || isLocalFile">
 							<button
 								v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="form.handleChangeModpackVersion()"
+								@click="handleModpackPrimaryAction"
 							>
 								<ArrowLeftRightIcon class="size-5" />
 								{{ formatMessage(commonMessages.changeVersionButton) }}
@@ -649,7 +670,7 @@ const messages = defineMessages({
 						{{
 							formatMessage(messages.linkedInstanceTitle, {
 								projectType: formatMessage(
-									showModpackVersionActions ? messages.modpackLabel : messages.serverProjectLabel,
+									isLinkedModpack ? messages.modpackLabel : messages.serverProjectLabel,
 								),
 							})
 						}}
@@ -665,9 +686,7 @@ const messages = defineMessages({
 								<UnlinkIcon class="size-5" />
 								{{
 									formatMessage(
-										showModpackVersionActions
-											? commonMessages.unlinkModpackButton
-											: messages.unlinkButton,
+										isLinkedModpack ? commonMessages.unlinkModpackButton : messages.unlinkButton,
 									)
 								}}
 							</button>
@@ -678,7 +697,7 @@ const messages = defineMessages({
 							formatMessage(messages.unlinkDescription, {
 								type: formatMessage(ctx.isServer ? messages.serverLabel : messages.instanceLabel),
 								projectType: formatMessage(
-									showModpackVersionActions ? messages.modpackLabel : messages.serverLabel,
+									isLinkedModpack ? messages.modpackLabel : messages.serverLabel,
 								),
 							})
 						}}

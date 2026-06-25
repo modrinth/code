@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tDELETE FROM instance_groups\n\t\tWHERE instance_id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "073e4c6fbf434f94c8015076b50c099d57f217b4c1f4a63761b5e07129eb1f84"
+}
