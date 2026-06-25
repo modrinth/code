@@ -175,37 +175,35 @@ async fn auto_install_java_inner(
         let file = if reporter.is_some() {
             let mut last_reported_bytes = 0_u64;
             let download_reporter = reporter.clone();
-            let mut progress =
-                move |current: u64,
-                      total: u64|
-                      -> Pin<
-                    Box<dyn Future<Output = crate::Result<()>> + Send>,
-                > {
-                    let min_delta =
-                        (total / 200).max(JAVA_DOWNLOAD_PROGRESS_MIN_BYTES);
-                    if current < total
-                        && current.saturating_sub(last_reported_bytes)
-                            < min_delta
-                    {
-                        return Box::pin(async { Ok(()) });
-                    }
+            let mut progress = move |current: u64,
+                                     total: u64|
+                  -> Pin<
+                Box<dyn Future<Output = crate::Result<()>> + Send>,
+            > {
+                let min_delta =
+                    (total / 200).max(JAVA_DOWNLOAD_PROGRESS_MIN_BYTES);
+                if current < total
+                    && current.saturating_sub(last_reported_bytes) < min_delta
+                {
+                    return Box::pin(async { Ok(()) });
+                }
 
-                    last_reported_bytes = current;
-                    let reporter = download_reporter.clone();
-                    Box::pin(async move {
-                        update_java_install_progress(
-                            reporter.as_ref(),
-                            java_version,
-                            InstallJavaStep::Downloading,
-                            Some(InstallProgress {
-                                current,
-                                total,
-                                secondary: None,
-                            }),
-                        )
-                        .await
-                    })
-                };
+                last_reported_bytes = current;
+                let reporter = download_reporter.clone();
+                Box::pin(async move {
+                    update_java_install_progress(
+                        reporter.as_ref(),
+                        java_version,
+                        InstallJavaStep::Downloading,
+                        Some(InstallProgress {
+                            current,
+                            total,
+                            secondary: None,
+                        }),
+                    )
+                    .await
+                })
+            };
 
             fetch_advanced_with_progress(
                 Method::GET,

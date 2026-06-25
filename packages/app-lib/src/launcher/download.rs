@@ -138,15 +138,8 @@ async fn fetch_minecraft_file(
     progress: Option<MinecraftDownloadProgress>,
 ) -> crate::Result<bytes::Bytes> {
     let Some(progress) = progress else {
-        return fetch(
-            url,
-            sha1,
-            None,
-            None,
-            &st.fetch_semaphore,
-            &st.pool,
-        )
-        .await;
+        return fetch(url, sha1, None, None, &st.fetch_semaphore, &st.pool)
+            .await;
     };
 
     let last_downloaded = Arc::new(AtomicU64::new(0));
@@ -198,8 +191,10 @@ fn missing_client_bytes(
     version: &GameVersionInfo,
     force: bool,
 ) -> crate::Result<u64> {
-    let client_download =
-        version.downloads.get(&d::minecraft::DownloadType::Client).ok_or(
+    let client_download = version
+        .downloads
+        .get(&d::minecraft::DownloadType::Client)
+        .ok_or(
             crate::ErrorKind::LauncherError(format!(
                 "No client downloads exist for version {}",
                 version.id
@@ -274,7 +269,8 @@ fn missing_asset_bytes(
             let legacy_path = st.directories.legacy_assets_dir().join(
                 name.replace('/', &String::from(std::path::MAIN_SEPARATOR)),
             );
-            let should_fetch_object = should_download(object_path.exists(), force);
+            let should_fetch_object =
+                should_download(object_path.exists(), force);
             let should_fetch_legacy =
                 (with_legacy && !legacy_path.exists()) || force;
 
@@ -391,9 +387,14 @@ pub async fn download_minecraft(
     };
 
     // 5
-    let assets_index =
-        download_assets_index(st, version, loading_bar, force, progress.clone())
-            .await?;
+    let assets_index = download_assets_index(
+        st,
+        version,
+        loading_bar,
+        force,
+        progress.clone(),
+    )
+    .await?;
     if let Some(progress) = &progress {
         progress
             .add_total(missing_asset_bytes(

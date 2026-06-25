@@ -297,8 +297,8 @@ fn row_to_record(row: InstallJobRow) -> crate::Result<InstallJobRecord> {
             ))
         })?,
         instance_id: row.instance_id,
-        kind: InstallJobKind::from_str(&row.kind),
-        status: InstallJobStatus::from_str(&row.status),
+        kind: InstallJobKind::from_stored_str(&row.kind),
+        status: InstallJobStatus::from_stored_str(&row.status),
         state: serde_json::from_str(&row.state)?,
         created: timestamp(row.created),
         modified: timestamp(row.modified),

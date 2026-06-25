@@ -617,8 +617,9 @@ async fn content_projects_for_scope(
                 source_kind,
                 include_untracked,
             } => {
-                if !entry.is_some_and(|entry| entry.source_kind == source_kind)
-                    && !(include_untracked && entry.is_none())
+                if !(entry
+                    .is_some_and(|entry| entry.source_kind == source_kind)
+                    || include_untracked && entry.is_none())
                 {
                     continue;
                 }
