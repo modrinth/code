@@ -12,7 +12,6 @@ import {
 	get_organization,
 	get_project,
 	get_project_many,
-	get_project_v3_many,
 	get_team,
 	get_version_many,
 } from '@/helpers/cache.js'
