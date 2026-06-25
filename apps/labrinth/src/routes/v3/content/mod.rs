@@ -567,6 +567,13 @@ async fn visible_versions(
 fn version_to_resolver(
     version: Version,
 ) -> modrinth_content_management::Version {
+    let game_versions = version
+        .fields
+        .get("game_versions")
+        .cloned()
+        .and_then(|value| serde_json::from_value(value).ok())
+        .unwrap_or_default();
+
     modrinth_content_management::Version {
         id: version.id.to_string(),
         project_id: version.project_id.to_string(),
@@ -583,7 +590,7 @@ fn version_to_resolver(
                 ),
             })
             .collect(),
-        game_versions: version.games,
+        game_versions,
         loaders: version.loaders.into_iter().map(|loader| loader.0).collect(),
     }
 }
