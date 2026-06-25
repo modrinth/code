@@ -214,11 +214,7 @@
 			<NavTabs :links="tabs" />
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
-			<RouterView
-				:route="displayedInstanceRoute"
-				v-slot="{ Component }"
-				:key="instance.id"
-			>
+			<RouterView v-slot="{ Component }" :key="instance.id" :route="displayedInstanceRoute">
 				<template v-if="Component">
 					<Suspense
 						:key="instance.id"

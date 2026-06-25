@@ -236,9 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "瀏覽伺服器"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "確定要永久刪除這個世界嗎？"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "模組"
   },
@@ -257,14 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未新增任何伺服器或世界"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "確定要移除「{name}」嗎？"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "這個伺服器"
   },
   "app.modal.install-to-play.content-required": {
     "message": "所需內容"

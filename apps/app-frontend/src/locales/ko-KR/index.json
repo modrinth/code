@@ -230,12 +230,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "서버 탐색하기"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}'이(가) **영구적으로 삭제**되며, 복구할 수 없습니다."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "정말로 이 세계를 영구적으로 삭제하시겠습니까?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "수정됨"
   },
@@ -254,20 +248,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "추가된 서버 또는 세계 없음"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}'이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address})이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "정말로 {name}을(를) 제거하시겠습니까?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count}개의 세계 검색..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "이 서버"
   },
   "app.modal.install-to-play.content-required": {
     "message": "콘텐츠 설치 필요"

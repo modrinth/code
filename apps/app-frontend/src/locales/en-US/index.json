@@ -326,11 +326,17 @@
   "app.instance.worlds.browse-servers": {
     "message": "Browse servers"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' will be **permanently deleted**, and there will be no way to recover it."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Delete world"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Are you sure you want to permanently delete this world?"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Delete world"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "This world will be permanently deleted from this instance. This action cannot be undone."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Deleting {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Modded"
@@ -350,20 +356,20 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "No servers or worlds added"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' will be removed from your list, including in-game, and there will be no way to recover it."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Remove server"
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) will be removed from your list, including in-game, and there will be no way to recover it."
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Remove server"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Are you sure you want to remove {name}?"
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "This server will be removed from your server list and from the in-game server list. You can add it again later if you know the address."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Removing {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "this server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content required"

@@ -236,9 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Переглянути сервери"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Ви впевнені, що хочете назавжди видалити цей світ?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Модифіковано"
   },
@@ -257,14 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Сервера або світи не додано"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Ви впевнені, що хочете видалити «{name}»?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Пошук {count} світів…"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "цей сервер"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Потрібний уміст"

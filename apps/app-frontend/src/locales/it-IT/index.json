@@ -233,9 +233,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Esplora i server"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Vuoi davvero eliminare questo mondo per sempre?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Moddato"
   },
@@ -254,14 +251,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nessun server o mondo aggiunto"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Vuoi davvero rimuovere {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cerca tra {count} mondi..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "questo server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Contenuto richiesto"
