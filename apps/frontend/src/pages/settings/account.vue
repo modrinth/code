@@ -33,7 +33,7 @@
 						@keyup.enter="saveEmail()"
 					/>
 				</div>
-				<div class="input-group push-right">
+				<div class="flex justify-end gap-2.5">
 					<ButtonStyled>
 						<button @click="$refs.changeEmailModal.hide()">
 							<XIcon />
@@ -128,7 +128,7 @@
 						</div>
 					</div>
 				</template>
-				<div class="input-group push-right">
+				<div class="flex justify-end gap-2.5">
 					<ButtonStyled>
 						<button @click="$refs.managePasswordModal.hide()">
 							<XIcon />
@@ -201,7 +201,7 @@
 					<p v-if="twoFactorIncorrect" class="known-errors m-0">
 						{{ formatMessage(messages.twoFactorIncorrectError) }}
 					</p>
-					<div class="input-group push-right">
+					<div class="flex justify-end gap-2.5">
 						<ButtonStyled>
 							<button @click="$refs.manageTwoFactorModal.hide()">
 								<XIcon />
@@ -279,7 +279,7 @@
 							<li v-for="code in backupCodes" :key="code">{{ code }}</li>
 						</ul>
 					</template>
-					<div class="input-group push-right">
+					<div class="flex justify-end gap-2.5">
 						<ButtonStyled v-if="twoFactorStep === 1">
 							<button @click="twoFactorStep = 0">
 								<LeftArrowIcon />

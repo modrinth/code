@@ -27,7 +27,7 @@
 					<div
 						v-for="passkey in passkeys"
 						:key="passkey.id"
-						class="universal-card recessed passkey"
+						class="universal-card recessed flex items-center justify-between"
 					>
 						<div>
 							<div>
@@ -54,29 +54,31 @@
 								</span>
 							</div>
 						</div>
-						<div class="passkey-actions flex gap-2">
-							<ButtonStyled>
+						<div class="flex gap-2">
+							<ButtonStyled circular>
 								<button
+									v-tooltip="formatMessage(commonMessages.renameButton)"
 									@click="
 										() => {
 											passkeyToRename = { ...passkey }
-											$refs.renamePasskeyModal.show()
+											renamePasskeyModal?.show()
 										}
 									"
 								>
-									<EditIcon /> {{ formatMessage(commonMessages.renameButton) }}
+									<EditIcon />
 								</button>
 							</ButtonStyled>
-							<ButtonStyled>
+							<ButtonStyled circular>
 								<button
+									v-tooltip="formatMessage(commonMessages.removeButton)"
 									@click="
 										() => {
 											passkeyToRemove = passkey
-											$refs.removePasskeyModal.show()
+											removePasskeyModal?.show()
 										}
 									"
 								>
-									<TrashIcon /> {{ formatMessage(commonMessages.removeButton) }}
+									<TrashIcon />
 								</button>
 							</ButtonStyled>
 						</div>
@@ -90,7 +92,7 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled>
-						<button @click="$refs.managePasskeyModal.hide()">
+						<button @click="managePasskeyModal?.hide()">
 							<XIcon />
 							{{ formatMessage(commonMessages.closeButton) }}
 						</button>
@@ -106,32 +108,30 @@
 		>
 			<div class="flex flex-col gap-6">
 				<div class="flex flex-col gap-2.5">
-					<label for="passkey-name">
-						<div class="text-md mb-2 font-semibold text-contrast">
-							{{ formatMessage(messages.passkeyNameLabel) }}
-						</div>
-						<div class="label__description mb-2">
-							{{ formatMessage(messages.passkeyNameDescription) }}
-						</div>
-					</label>
+					<div class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.passkeyNameLabel) }}
+					</div>
 					<StyledInput
 						id="passkey-name"
-						v-model="pendingPasskey.name"
+						v-model="pendingPasskeyName"
 						:maxlength="255"
 						type="text"
 						:placeholder="formatMessage(messages.passkeyNamePlaceholder)"
-						@keyup.enter="pendingPasskey.name && finishRegisterPasskey()"
+						@keyup.enter="pendingPasskeyName && finishRegisterPasskey()"
 					/>
+					<div class="label__description">
+						{{ formatMessage(messages.passkeyNameDescription) }}
+					</div>
 				</div>
-				<div class="input-group push-right">
+				<div class="flex justify-end gap-2.5">
 					<ButtonStyled>
-						<button @click="$refs.addPasskeyModal.hide()">
+						<button @click="addPasskeyModal?.hide()">
 							<XIcon />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button :disabled="!pendingPasskey.name" @click="finishRegisterPasskey()">
+						<button :disabled="!pendingPasskeyName" @click="finishRegisterPasskey()">
 							<PlusIcon />
 							{{ formatMessage(messages.managePasskeyAddPasskey) }}
 						</button>
@@ -145,34 +145,32 @@
 			width="500px"
 			:header="formatMessage(messages.renamePasskeyModalHeader)"
 		>
-			<div class="flex flex-col gap-6">
+			<div v-if="passkeyToRename" class="flex flex-col gap-6">
 				<div class="flex flex-col gap-2.5">
-					<label for="passkey-rename">
-						<div class="text-md mb-2 font-semibold text-contrast">
-							{{ formatMessage(messages.passkeyNameLabel) }}
-						</div>
-						<div class="label__description mb-2">
-							{{ formatMessage(messages.passkeyNameDescription) }}
-						</div>
-					</label>
+					<div class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.passkeyNameLabel) }}
+					</div>
 					<StyledInput
 						id="passkey-rename"
-						v-model="passkeyToRename.name"
+						v-model="passkeyToRenameName"
 						:maxlength="255"
 						type="text"
 						:placeholder="formatMessage(messages.passkeyNamePlaceholder)"
-						@keyup.enter="passkeyToRename.name && renamePasskey()"
+						@keyup.enter="passkeyToRenameName && renamePasskey()"
 					/>
+					<div class="label__description">
+						{{ formatMessage(messages.passkeyNameDescription) }}
+					</div>
 				</div>
-				<div class="input-group push-right">
+				<div class="flex justify-end gap-2.5">
 					<ButtonStyled>
-						<button @click="$refs.renamePasskeyModal.hide()">
+						<button @click="renamePasskeyModal?.hide()">
 							<XIcon />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button :disabled="!passkeyToRename.name" @click="renamePasskey()">
+						<button :disabled="!passkeyToRenameName" @click="renamePasskey()">
 							<SaveIcon />
 							{{ formatMessage(commonMessages.saveButton) }}
 						</button>
@@ -223,6 +221,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import { createPasskeyCredential } from '~/helpers/passkey.ts'
 
@@ -304,13 +303,30 @@ const messages = defineMessages({
 	},
 })
 
-const managePasskeyModal = ref()
-const renamePasskeyModal = ref()
-const addPasskeyModal = ref()
+const removePasskeyModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('removePasskeyModal')
+const managePasskeyModal = useTemplateRef<InstanceType<typeof NewModal>>('managePasskeyModal')
+const addPasskeyModal = useTemplateRef<InstanceType<typeof NewModal>>('addPasskeyModal')
+const renamePasskeyModal = useTemplateRef<InstanceType<typeof NewModal>>('renamePasskeyModal')
 
 const pendingPasskey = ref<Labrinth.Auth.v2.PasskeyRegisterFinishRequest | null>(null)
 const passkeyToRemove = ref<Labrinth.Auth.v2.Passkey | null>(null)
 const passkeyToRename = ref<Labrinth.Auth.v2.Passkey | null>(null)
+const pendingPasskeyName = computed({
+	get: () => pendingPasskey.value?.name ?? '',
+	set: (name) => {
+		if (pendingPasskey.value) {
+			pendingPasskey.value.name = name
+		}
+	},
+})
+const passkeyToRenameName = computed({
+	get: () => passkeyToRename.value?.name ?? '',
+	set: (name) => {
+		if (passkeyToRename.value) {
+			passkeyToRename.value.name = name
+		}
+	},
+})
 
 const passkeys = ref<Labrinth.Auth.v2.Passkey[]>([])
 const passkeysLoading = ref(false)
@@ -326,7 +342,7 @@ async function fetchPasskeys() {
 }
 
 async function showPasskeyModal() {
-	managePasskeyModal.value.show()
+	managePasskeyModal.value?.show()
 	await fetchPasskeys()
 }
 
@@ -342,7 +358,7 @@ async function registerPasskey() {
 			name: '',
 		}
 
-		addPasskeyModal.value.show()
+		addPasskeyModal.value?.show()
 	} catch (err) {
 		notifyError(err)
 	}
@@ -357,7 +373,7 @@ async function finishRegisterPasskey() {
 		const passkey = await labrinth.auth_v2.registerPasskeyFinish(pendingPasskey.value)
 		passkeys.value.unshift(passkey)
 		pendingPasskey.value = null
-		addPasskeyModal.value.hide()
+		addPasskeyModal.value?.hide()
 	} catch (err) {
 		notifyError(err)
 	}
@@ -376,7 +392,7 @@ async function renamePasskey() {
 			existing.name = name
 		}
 		passkeyToRename.value = null
-		renamePasskeyModal.value.hide()
+		renamePasskeyModal.value?.hide()
 	} catch (err) {
 		notifyError(err)
 	}
@@ -398,25 +414,3 @@ async function removePasskey() {
 	stopLoading()
 }
 </script>
-
-<style lang="scss" scoped>
-.passkey {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-
-	@media screen and (min-width: 650px) {
-		flex-direction: row;
-		align-items: center;
-	}
-}
-
-.passkey-actions {
-	flex-direction: row;
-
-	@media screen and (min-width: 650px) {
-		flex-direction: column;
-		margin-left: auto;
-	}
-}
-</style>
