@@ -467,6 +467,21 @@ onBeforeRouteLeave(() => {
 
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
 
+function resetInstanceContext() {
+	if (!instance.value) return
+
+	debugLog('instance context removed, resetting')
+	instance.value = null
+	installedProjectIds.value = null
+	instanceHideInstalled.value = false
+	newlyInstalled.value = []
+	hiddenInstanceProjectIds.value = new Set()
+	hiddenInstanceProjectIdsInitialized.value = false
+	isServerInstance.value = false
+	breadcrumbs.setName('BrowseTitle', formatMessage(messages.discoverContent))
+	breadcrumbs.setContext(null)
+}
+
 watch(
 	() => route.params.projectType as ProjectType,
 	async (newType) => {
@@ -479,16 +494,14 @@ watch(
 
 		debugLog('projectType route param changed', { from: projectType.value, to: newType })
 		projectType.value = newType
+	},
+)
 
-		if (!route.query.i && instance.value) {
-			debugLog('instance context removed, resetting')
-			instance.value = null
-			installedProjectIds.value = null
-			instanceHideInstalled.value = false
-			newlyInstalled.value = []
-			isServerInstance.value = false
-			breadcrumbs.setName('BrowseTitle', formatMessage(messages.discoverContent))
-			breadcrumbs.setContext(null)
+watch(
+	() => route.query.i,
+	(instanceId) => {
+		if (!instanceId && route.path.startsWith('/browse')) {
+			resetInstanceContext()
 		}
 	},
 )
@@ -982,7 +995,7 @@ if (instance.value?.game_version) {
 	}
 }
 
-await searchState.refreshSearch()
+void searchState.refreshSearch()
 
 type UnlistenFn = () => void
 

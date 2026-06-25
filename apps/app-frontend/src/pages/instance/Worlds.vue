@@ -13,29 +13,10 @@
 	/>
 	<EditServerModal ref="editServerModal" :instance="instance" @submit="editServer" />
 	<EditWorldModal ref="editWorldModal" :instance="instance" @submit="editWorld" />
-	<ConfirmModalWrapper
-		ref="removeServerModal"
-		:title="
-			formatMessage(messages.removeServerTitle, {
-				name: serverToRemove?.name ?? formatMessage(messages.thisServer),
-			})
-		"
-		:description="
-			serverToRemove?.address === serverToRemove?.name
-				? formatMessage(messages.removeServerDescription, { name: serverToRemove?.name })
-				: formatMessage(messages.removeServerDescriptionWithAddress, {
-						name: serverToRemove?.name,
-						address: serverToRemove?.address,
-					})
-		"
-		:markdown="false"
-		@proceed="proceedRemoveServer"
-	/>
-	<ConfirmModalWrapper
-		ref="deleteWorldModal"
-		:title="formatMessage(messages.deleteWorldTitle)"
-		:description="formatMessage(messages.deleteWorldDescription, { name: worldToDelete?.name })"
-		@proceed="proceedDeleteWorld"
+	<ConfirmRemoveWorldModal
+		ref="removeWorldModal"
+		:world="worldToRemove"
+		@confirm="proceedRemoveWorld"
 	/>
 	<ReadyTransition :pending="worldsReadyPending">
 		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
@@ -182,8 +163,8 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
+import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWorldModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
@@ -223,29 +204,6 @@ import { handleSevereError } from '@/store/error.js'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install'
 
 const messages = defineMessages({
-	removeServerTitle: {
-		id: 'app.instance.worlds.remove-server-title',
-		defaultMessage: 'Are you sure you want to remove {name}?',
-	},
-	removeServerDescription: {
-		id: 'app.instance.worlds.remove-server-description',
-		defaultMessage:
-			"'{name}' will be removed from your list, including in-game, and there will be no way to recover it.",
-	},
-	removeServerDescriptionWithAddress: {
-		id: 'app.instance.worlds.remove-server-description-with-address',
-		defaultMessage:
-			"'{name}' ({address}) will be removed from your list, including in-game, and there will be no way to recover it.",
-	},
-	deleteWorldTitle: {
-		id: 'app.instance.worlds.delete-world-title',
-		defaultMessage: 'Are you sure you want to permanently delete this world?',
-	},
-	deleteWorldDescription: {
-		id: 'app.instance.worlds.delete-world-description',
-		defaultMessage:
-			"'{name}' will be **permanently deleted**, and there will be no way to recover it.",
-	},
 	searchWorldsPlaceholder: {
 		id: 'app.instance.worlds.search-worlds-placeholder',
 		defaultMessage: 'Search {count} worlds...',
@@ -265,10 +223,6 @@ const messages = defineMessages({
 	noWorldsDescription: {
 		id: 'app.instance.worlds.no-worlds-description',
 		defaultMessage: 'Add a server or browse to get started',
-	},
-	thisServer: {
-		id: 'app.instance.worlds.this-server',
-		defaultMessage: 'this server',
 	},
 	vanillaFilter: {
 		id: 'app.instance.worlds.filter-vanilla',
@@ -297,11 +251,9 @@ const router = useRouter()
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()
 const editServerModal = ref<InstanceType<typeof EditServerModal>>()
 const editWorldModal = ref<InstanceType<typeof EditWorldModal>>()
-const removeServerModal = ref<InstanceType<typeof ConfirmModalWrapper>>()
-const deleteWorldModal = ref<InstanceType<typeof ConfirmModalWrapper>>()
+const removeWorldModal = ref<InstanceType<typeof ConfirmRemoveWorldModal>>()
 
-const serverToRemove = ref<ServerWorld>()
-const worldToDelete = ref<SingleplayerWorld>()
+const worldToRemove = ref<World | null>(null)
 
 const emit = defineEmits<{
 	(event: 'play', world: World): void
@@ -744,33 +696,18 @@ const filteredWorlds = computed(() =>
 const highlightedWorld = ref(route.query.highlight)
 
 function promptToRemoveWorld(world: World): boolean {
+	worldToRemove.value = world
+	removeWorldModal.value?.show()
+	return !!removeWorldModal.value
+}
+
+async function proceedRemoveWorld(world: World) {
 	if (world.type === 'server') {
-		serverToRemove.value = world
-		removeServerModal.value?.show()
-		return !!removeServerModal.value
+		await removeServer(world)
 	} else {
-		worldToDelete.value = world
-		deleteWorldModal.value?.show()
-		return !!deleteWorldModal.value
+		await deleteWorld(world)
 	}
-}
-
-async function proceedRemoveServer() {
-	if (!serverToRemove.value) {
-		handleError(new Error(`Error removing server, no server marked for removal.`))
-		return
-	}
-	await removeServer(serverToRemove.value)
-	serverToRemove.value = undefined
-}
-
-async function proceedDeleteWorld() {
-	if (!worldToDelete.value) {
-		handleError(new Error(`Error deleting world, no world marked for removal.`))
-		return
-	}
-	await deleteWorld(worldToDelete.value)
-	worldToDelete.value = undefined
+	worldToRemove.value = null
 }
 
 onBeforeUnmount(() => {
