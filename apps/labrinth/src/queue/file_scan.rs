@@ -243,6 +243,7 @@ async fn scan_pending_files_chunk(
             txn.commit()
                 .await
                 .wrap_err("committing file scan transaction")?;
+            log_marked_override_projects(&resolved);
 
             eyre::Ok(())
         }
@@ -317,6 +318,7 @@ async fn scan_file_inner(
         .wrap_err_with(|| {
             eyre!("persisting attribution results for file {file_id:?}")
         })?;
+        log_marked_override_projects(&resolved);
     }
 
     Ok(())
@@ -438,6 +440,33 @@ pub enum OverrideResolution {
     },
     Flame(FlameProject),
     Unknown,
+}
+
+fn log_marked_override_projects(
+    resolved: &HashMap<String, OverrideResolution>,
+) {
+    let mut projects = resolved
+        .values()
+        .filter_map(|resolution| match resolution {
+            OverrideResolution::ExternalLicense {
+                flame_project: Some(flame_project),
+                ..
+            }
+            | OverrideResolution::Flame(flame_project) => {
+                Some(format!("{} ({})", flame_project.title, flame_project.id))
+            }
+            OverrideResolution::OnModrinth
+            | OverrideResolution::ExternalLicense { .. }
+            | OverrideResolution::Unknown => None,
+        })
+        .collect::<Vec<_>>();
+
+    projects.sort();
+    projects.dedup();
+
+    if !projects.is_empty() {
+        info!(override_projects = ?projects, "Marked projects as overrides");
+    }
 }
 
 const OVERRIDE_PREFIXES: &[&str] = &[
