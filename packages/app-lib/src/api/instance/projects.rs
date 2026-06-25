@@ -94,7 +94,7 @@ pub async fn install_project_with_dependencies(
     request: InstallProjectWithDependenciesRequest,
 ) -> crate::Result<ResolveContentPlan> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
+    let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
     let plan = crate::state::instances::commands::resolve_install_plan(
@@ -181,7 +181,7 @@ pub async fn switch_project_version_with_dependencies(
     version_id: &str,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
+    let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
     let path =

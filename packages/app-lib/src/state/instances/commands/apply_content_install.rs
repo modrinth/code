@@ -270,7 +270,7 @@ pub(crate) async fn switch_project_version_with_dependencies(
 
     if was_disabled {
         new_path =
-            toggle_disable_project(instance_id, &new_path, state).await?;
+            toggle_disable_project(instance_id, &new_path, Some(false), state).await?;
     }
 
     for dependency in &plan.dependencies {
