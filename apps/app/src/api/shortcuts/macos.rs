@@ -19,12 +19,10 @@ pub(super) async fn create_shortcut(
     tokio::fs::create_dir_all(&resources_dir).await?;
 
     let executable_path = macos_dir.join("launch");
-    let target_path = std::env::current_exe()?;
     tokio::fs::write(
         &executable_path,
         format!(
-            "#!/bin/sh\nexec {} {}\n",
-            shell_quote(&target_path.to_string_lossy()),
+            "#!/bin/sh\nexec /usr/bin/open {}\n",
             shell_quote(launch_url.as_str()),
         ),
     )
