@@ -3131,7 +3131,7 @@ pub async fn register_passkey_start(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
     webauthn: Data<Webauthn>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<RegisterPasskeyResponse>, ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -3192,7 +3192,7 @@ pub async fn register_passkey_start(
     .await
     .wrap_internal_err("failed to store passkey registration flow")?;
 
-    Ok(HttpResponse::Ok().json(RegisterPasskeyResponse { options: ccr, flow }))
+    Ok(web::Json(RegisterPasskeyResponse { options: ccr, flow }))
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
@@ -3230,7 +3230,7 @@ pub async fn register_passkey_finish(
     session_queue: Data<AuthQueue>,
     webauthn: Data<Webauthn>,
     response: web::Json<RegisterPasskeyFinish>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(web::Json<PasskeyResponse>, StatusCode), ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -3295,12 +3295,15 @@ pub async fn register_passkey_finish(
             .wrap_internal_err("Failed to create passkey object")?;
 
         transaction.commit().await?;
-        Ok(HttpResponse::Created().json(PasskeyResponse {
-            id: passkey.id.into(),
-            name: passkey.name,
-            created_at: passkey.created_at,
-            last_used: passkey.last_used,
-        }))
+        Ok((
+            web::Json(PasskeyResponse {
+                id: passkey.id.into(),
+                name: passkey.name,
+                created_at: passkey.created_at,
+                last_used: passkey.last_used,
+            }),
+            StatusCode::CREATED,
+        ))
     } else {
         Err(ApiError::Request(eyre!(
             "flow does not exist. try restarting the passkey registration process"
@@ -3326,7 +3329,7 @@ pub struct AuthenticatePasskeyResponse {
 pub async fn authenticate_passkey_start(
     redis: Data<RedisPool>,
     webauthn: Data<Webauthn>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<AuthenticatePasskeyResponse>, ApiError> {
     let (mut ccr, auth_state) = webauthn
         .start_discoverable_authentication()
         .wrap_internal_err("failed to start passkey authentication")?;
@@ -3342,8 +3345,10 @@ pub async fn authenticate_passkey_start(
         .await
         .wrap_internal_err("failed to store passkey authentication flow")?;
 
-    Ok(HttpResponse::Ok()
-        .json(AuthenticatePasskeyResponse { options: ccr, flow }))
+    Ok(web::Json(AuthenticatePasskeyResponse {
+        options: ccr,
+        flow,
+    }))
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -3368,7 +3373,7 @@ pub async fn authenticate_passkey_finish(
     redis: Data<RedisPool>,
     webauthn: Data<Webauthn>,
     response: web::Json<AuthenticatePasskeyFinish>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<crate::models::sessions::Session>, ApiError> {
     let flow = DBFlow::take_if(
         &response.flow,
         |f| matches!(f, DBFlow::AuthenticatePasskey { .. }),
@@ -3459,7 +3464,7 @@ pub async fn authenticate_passkey_finish(
         let res = crate::models::sessions::Session::from(session, true, None);
 
         transaction.commit().await?;
-        Ok(HttpResponse::Ok().json(res))
+        Ok(web::Json(res))
     } else {
         Err(ApiError::Request(eyre!(
             "flow does not exist. try restarting the passkey authentication process"
@@ -3482,7 +3487,7 @@ pub async fn list_passkeys(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<Vec<PasskeyResponse>>, ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -3505,7 +3510,7 @@ pub async fn list_passkeys(
         })
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(passkeys))
+    Ok(web::Json(passkeys))
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
