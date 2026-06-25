@@ -54,8 +54,9 @@ use url::Url;
 use uuid::Uuid;
 use validator::Validate;
 use webauthn_rs::prelude::{
-    CredentialID, DiscoverableKey, PublicKeyCredential,
-    RegisterPublicKeyCredential, Webauthn, WebauthnError,
+    CreationChallengeResponse, CredentialID, DiscoverableKey,
+    PublicKeyCredential, RegisterPublicKeyCredential, RequestChallengeResponse,
+    Webauthn, WebauthnError,
 };
 use zxcvbn::Score;
 
@@ -3107,11 +3108,18 @@ pub async fn get_newsletter_subscription_status(
 
 const MAX_PASSKEYS_PER_USER: usize = 20;
 
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct RegisterPasskeyResponse {
+    #[schema(value_type = Object)]
+    pub options: CreationChallengeResponse,
+    pub flow: String,
+}
+
 #[utoipa::path(
     post,
     operation_id = "registerPasskeyStart",
     responses(
-        (status = 200, description = "Passkey registration challenge created"),
+        (status = 200, description = "Passkey registration challenge created", body = RegisterPasskeyResponse),
         (status = 401, description = "Invalid credentials")
     ),
     security(("bearer_auth" = []))
@@ -3184,10 +3192,7 @@ pub async fn register_passkey_start(
     .await
     .wrap_internal_err("failed to store passkey registration flow")?;
 
-    Ok(HttpResponse::Ok().json(serde_json::json!({
-        "options": ccr,
-        "flow": flow,
-    })))
+    Ok(HttpResponse::Ok().json(RegisterPasskeyResponse { options: ccr, flow }))
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
@@ -3303,11 +3308,18 @@ pub async fn register_passkey_finish(
     }
 }
 
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct AuthenticatePasskeyResponse {
+    #[schema(value_type = Object)]
+    pub options: RequestChallengeResponse,
+    pub flow: String,
+}
+
 #[utoipa::path(
     post,
     operation_id = "authenticatePasskeyStart",
     responses(
-        (status = 200, description = "Passkey authentication challenge created")
+        (status = 200, description = "Passkey authentication challenge created", body = AuthenticatePasskeyResponse)
     )
 )]
 #[post("/passkey/start")]
@@ -3330,10 +3342,8 @@ pub async fn authenticate_passkey_start(
         .await
         .wrap_internal_err("failed to store passkey authentication flow")?;
 
-    Ok(HttpResponse::Ok().json(serde_json::json!({
-        "options": ccr,
-        "flow": flow,
-    })))
+    Ok(HttpResponse::Ok()
+        .json(AuthenticatePasskeyResponse { options: ccr, flow }))
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
