@@ -5,13 +5,14 @@ use crate::State;
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::instances::adapters::sqlite;
 use crate::state::instances::{
-    ContentEntry, ContentSet, ContentSourceKind, Instance, InstanceLink,
+    ContentEntry, ContentSet, ContentSourceKind, Instance,
+    InstanceInstallCandidate, InstanceInstallTarget, InstanceLink,
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, CachedFile, ContentFile, ContentItem,
     ContentItemOwner, ContentItemProject, ContentItemVersion, Dependency,
-    LinkedModpackInfo, Organization, OwnerType, Project, ProjectType,
-    ReleaseChannel, TeamMember, Version,
+    LinkedModpackInfo, ModLoader, Organization, OwnerType, Project,
+    ProjectType, ReleaseChannel, TeamMember, Version,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
@@ -95,6 +96,98 @@ pub(crate) async fn get_installed_project_ids_for_instance(
         .collect::<HashSet<_>>()
         .into_iter()
         .collect())
+}
+
+#[derive(sqlx::FromRow)]
+struct InstanceInstallCandidateRow {
+    id: String,
+    name: String,
+    icon_path: Option<String>,
+    game_version: String,
+    loader: String,
+    installed: i64,
+}
+
+pub(crate) async fn get_instance_install_candidates(
+    project_id: &str,
+    project_type: ProjectType,
+    targets: &[InstanceInstallTarget],
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstanceInstallCandidate>> {
+    let rows = sqlx::query_as!(
+        InstanceInstallCandidateRow,
+        r#"
+		SELECT
+			i.id,
+			i.name,
+			i.icon_path,
+			cs.game_version,
+			cs.loader,
+			CASE
+				WHEN EXISTS (
+					SELECT 1
+					FROM instance_content_entries entry
+					INNER JOIN instance_files file
+						ON file.id = entry.file_id
+					WHERE entry.content_set_id = cs.id
+						AND entry.project_id = ?
+						AND file.missing = 0
+				)
+					THEN 1
+				ELSE 0
+			END AS "installed!: i64"
+		FROM instances i
+		INNER JOIN instance_content_sets cs
+			ON cs.id = i.applied_content_set_id
+		LEFT JOIN instance_links link
+			ON link.instance_id = i.id
+		WHERE COALESCE(link.link_kind, 'unmanaged') NOT IN (
+			'server_project',
+			'server_project_modpack'
+		)
+		ORDER BY i.name ASC
+		"#,
+        project_id,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(rows
+        .into_iter()
+        .map(|row| {
+            let loader = ModLoader::from_string(&row.loader);
+            let compatible = instance_matches_targets(
+                project_type,
+                &row.game_version,
+                loader.as_str(),
+                targets,
+            );
+
+            InstanceInstallCandidate {
+                id: row.id,
+                name: row.name,
+                icon_path: row.icon_path,
+                game_version: row.game_version,
+                loader,
+                installed: row.installed != 0,
+                compatible,
+            }
+        })
+        .collect())
+}
+
+fn instance_matches_targets(
+    project_type: ProjectType,
+    game_version: &str,
+    loader: &str,
+    targets: &[InstanceInstallTarget],
+) -> bool {
+    targets.iter().any(|target| {
+        target.game_version == game_version
+            && (project_type != ProjectType::Mod
+                || target.loader == loader
+                || target.loader == "datapack")
+    })
 }
 
 pub(crate) async fn list_content(

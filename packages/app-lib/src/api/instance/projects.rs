@@ -1,6 +1,6 @@
-use super::get::get;
 use crate::event::emit::{emit_instance, emit_loading, init_loading};
 use crate::event::{InstancePayloadType, LoadingBarType};
+use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{ProjectType, State};
 use crate::util::fetch;
 use std::collections::HashMap;
@@ -11,13 +11,11 @@ pub async fn update_all_projects(
     instance_id: &str,
 ) -> crate::Result<HashMap<String, String>> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    let instance = get_instance_display_info(instance_id, &state).await?;
     let loading_bar = init_loading(
         LoadingBarType::InstanceUpdate {
-            instance_id: metadata.instance.id.clone(),
-            instance_name: metadata.instance.name.clone(),
+            instance_id: instance.id.clone(),
+            instance_name: instance.name.clone(),
         },
         100.0,
         "Updating instance",
@@ -29,7 +27,7 @@ pub async fn update_all_projects(
     )
     .await?;
     emit_loading(&loading_bar, 100.0, Some("Updated instance"))?;
-    emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
+    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     Ok(map)
 }
@@ -41,9 +39,6 @@ pub async fn update_project(
     skip_send_event: Option<bool>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
     let path = crate::state::instances::commands::update_project(
         instance_id,
         project_path,
@@ -52,8 +47,7 @@ pub async fn update_project(
     .await?;
 
     if !skip_send_event.unwrap_or(false) {
-        emit_instance(&metadata.instance.id, InstancePayloadType::Edited)
-            .await?;
+        emit_instance(instance_id, InstancePayloadType::Edited).await?;
     }
 
     Ok(path)
@@ -67,9 +61,6 @@ pub async fn add_project_from_version(
     dependent_on_version_id: Option<String>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
     let project_path =
         crate::state::instances::commands::add_project_from_version(
             instance_id,
@@ -80,7 +71,7 @@ pub async fn add_project_from_version(
             &state,
         )
         .await?;
-    emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(project_path)
 }
@@ -108,9 +99,6 @@ pub async fn toggle_disable_project(
     desired_enabled: Option<bool>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
     let res = crate::state::instances::commands::toggle_disable_project(
         instance_id,
         project,
@@ -118,7 +106,7 @@ pub async fn toggle_disable_project(
         &state,
     )
     .await?;
-    emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(res)
 }
@@ -129,16 +117,13 @@ pub async fn remove_project(
     project: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
     crate::state::instances::commands::remove_project(
         instance_id,
         project,
         &state,
     )
     .await?;
-    emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(())
 }
@@ -258,4 +243,15 @@ fn unmanaged_pack_error(instance_id: &str) -> crate::ErrorKind {
     crate::ErrorKind::InputError(format!(
         "Instance {instance_id} is not a managed Modrinth pack, or has been disconnected."
     ))
+}
+
+async fn get_instance_display_info(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<instance_rows::InstanceDisplayInfo> {
+    instance_rows::get_instance_display_info(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string()).into()
+        })
 }

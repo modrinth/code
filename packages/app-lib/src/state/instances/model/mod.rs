@@ -18,6 +18,9 @@ pub use self::file::*;
 mod instance;
 pub use self::instance::*;
 
+mod install_candidate;
+pub use self::install_candidate::*;
+
 mod launch;
 pub use self::launch::*;
 

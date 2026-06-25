@@ -8,7 +8,13 @@ import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot } from './install'
-import type { CacheBehaviour, ContentFile, ContentFileProjectType, GameInstance } from './types'
+import type {
+	CacheBehaviour,
+	ContentFile,
+	ContentFileProjectType,
+	GameInstance,
+	InstanceLoader,
+} from './types'
 
 export async function remove(instanceId: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove', { instanceId })
@@ -31,6 +37,33 @@ export async function get_projects(
 
 export async function get_installed_project_ids(instanceId: string): Promise<string[]> {
 	return await invoke('plugin:instance|instance_get_installed_project_ids', { instanceId })
+}
+
+export type InstanceInstallTarget = {
+	game_version: string
+	loader: string
+}
+
+export type InstanceInstallCandidate = {
+	id: string
+	name: string
+	icon_path?: string | null
+	game_version: string
+	loader: InstanceLoader
+	installed: boolean
+	compatible: boolean
+}
+
+export async function get_install_candidates(
+	projectId: string,
+	projectType: string,
+	targets: InstanceInstallTarget[],
+): Promise<InstanceInstallCandidate[]> {
+	return await invoke('plugin:instance|instance_get_install_candidates', {
+		projectId,
+		projectType,
+		targets,
+	})
 }
 
 // Get content items with rich metadata for an instance
@@ -115,10 +148,6 @@ export async function list(): Promise<GameInstance[]> {
 
 export async function check_installed(instanceId: string, projectId: string): Promise<boolean> {
 	return await invoke('plugin:instance|instance_check_installed', { instanceId, projectId })
-}
-
-export async function check_installed_batch(projectId: string): Promise<Record<string, boolean>> {
-	return await invoke('plugin:instance|instance_check_installed_batch', { projectId })
 }
 
 export async function update_all(instanceId: string): Promise<Record<string, string>> {

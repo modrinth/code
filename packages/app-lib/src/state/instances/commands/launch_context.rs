@@ -1,7 +1,6 @@
 use crate::state::InstanceInstallStage;
 use crate::state::instances::{
-    InstanceLaunchContext, InstanceLaunchOverrides,
-    adapters::sqlite::{content_rows, instance_rows},
+    InstanceLaunchContext, adapters::sqlite::instance_rows,
 };
 use chrono::{DateTime, Utc};
 use sqlx::SqlitePool;
@@ -10,35 +9,7 @@ pub(crate) async fn get_instance_launch_context(
     instance_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<Option<InstanceLaunchContext>> {
-    let Some(instance) =
-        instance_rows::get_instance_by_id(instance_id, pool).await?
-    else {
-        return Ok(None);
-    };
-
-    let applied_content_set =
-        content_rows::get_applied_content_set(&instance.id, pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Instance {} has no applied content set",
-                    instance.id
-                ))
-            })?;
-    let link = instance_rows::get_instance_link(&instance.id, pool).await?;
-    let launch_overrides =
-        instance_rows::get_instance_launch_overrides(&instance.id, pool)
-            .await?
-            .unwrap_or_else(|| {
-                InstanceLaunchOverrides::empty(instance.id.clone())
-            });
-
-    Ok(Some(InstanceLaunchContext {
-        instance,
-        applied_content_set,
-        link,
-        launch_overrides,
-    }))
+    instance_rows::get_instance_launch_context(instance_id, pool).await
 }
 
 pub(crate) async fn set_instance_install_stage(

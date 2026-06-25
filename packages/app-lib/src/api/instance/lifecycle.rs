@@ -1,6 +1,6 @@
-use super::get::get;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
+use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     CreateInstance, EditInstance, InstanceLink, InstanceMetadata, ModLoader,
     State,
@@ -73,11 +73,12 @@ pub async fn edit_icon(
     icon_path: Option<&Path>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let metadata = crate::state::get_instance(instance_id, &state.pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+    let instance =
+        instance_rows::get_instance_display_info(instance_id, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError("Unknown instance".to_string())
+            })?;
     let icon_path = if let Some(icon) = icon_path {
         let bytes = io::read(icon).await?;
         let file = crate::util::fetch::write_cached_icon(
@@ -101,7 +102,7 @@ pub async fn edit_icon(
         &state.pool,
     )
     .await?;
-    emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
+    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     Ok(())
 }
@@ -109,12 +110,13 @@ pub async fn edit_icon(
 #[tracing::instrument]
 pub async fn remove(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let metadata = get(instance_id).await?;
+    let instance =
+        instance_rows::get_instance_display_info(instance_id, &state.pool)
+            .await?;
     crate::state::remove_instance(instance_id, &state).await?;
 
-    if let Some(metadata) = metadata {
-        emit_instance(&metadata.instance.id, InstancePayloadType::Removed)
-            .await?;
+    if let Some(instance) = instance {
+        emit_instance(&instance.id, InstancePayloadType::Removed).await?;
     }
 
     Ok(())

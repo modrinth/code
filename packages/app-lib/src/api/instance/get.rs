@@ -11,17 +11,7 @@ pub async fn get_many(
     instance_ids: &[&str],
 ) -> crate::Result<Vec<InstanceMetadata>> {
     let state = State::get().await?;
-    let mut instances = Vec::with_capacity(instance_ids.len());
-
-    for instance_id in instance_ids {
-        if let Some(instance) =
-            crate::state::get_instance(instance_id, &state.pool).await?
-        {
-            instances.push(instance);
-        }
-    }
-
-    Ok(instances)
+    crate::state::get_instances_metadata(instance_ids, &state.pool).await
 }
 
 #[tracing::instrument]
