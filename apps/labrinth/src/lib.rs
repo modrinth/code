@@ -101,10 +101,11 @@ pub fn app_setup(
     {
         let automated_moderation_queue_ref = automated_moderation_queue.clone();
         let pool_ref = pool.clone();
+        let ro_pool_ref = ro_pool.clone();
         let redis_pool_ref = redis_pool.clone();
         actix_rt::spawn(async move {
             automated_moderation_queue_ref
-                .task(pool_ref, redis_pool_ref)
+                .task(pool_ref, ro_pool_ref, redis_pool_ref)
                 .await;
         });
     }

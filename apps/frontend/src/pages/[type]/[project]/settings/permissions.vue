@@ -433,7 +433,7 @@ function dismissInfoBanner() {
 				</nuxt-link>
 			</template>
 		</IntlFormatted>
-		<template #actions>
+		<template v-if="false" #actions>
 			<div class="flex">
 				<ButtonStyled color="blue">
 					<a> {{ formatMessage(messages.learnMore) }} <RightArrowIcon /> </a>
