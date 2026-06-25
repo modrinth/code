@@ -85,7 +85,7 @@
 					</div>
 				</template>
 				<div class="input-group self-end">
-					<ButtonStyled color="brand">
+					<ButtonStyled>
 						<button @click="registerPasskey()">
 							<PlusIcon />
 							{{ formatMessage(messages.managePasskeyAddPasskey) }}
@@ -261,7 +261,7 @@ const messages = defineMessages({
 	},
 	managePasskeyModalNoPasskeys: {
 		id: 'settings.account.security.passkey.modal.no-passkeys',
-		defaultMessage: 'You have no passkeys registered yet.',
+		defaultMessage: 'You do not have any passkeys registered.',
 	},
 	managePasskeyModalAdded: {
 		id: 'settings.account.security.passkey.modal.added',
