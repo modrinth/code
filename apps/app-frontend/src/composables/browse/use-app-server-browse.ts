@@ -2,6 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, PlayIcon, PlusIcon, StopCircleIcon } from '@modrinth/assets'
 import type { CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { ComputedRef, Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
@@ -65,6 +66,7 @@ const messages = defineMessages({
 
 export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	const { formatMessage } = useVIntl()
+	const queryClient = useQueryClient()
 	const debugLog = useDebugLogger('BrowseServer')
 	const serverPings = shallowRef<Record<string, number | undefined>>({})
 	const serverPingCache = new Map<string, number | undefined>()
@@ -116,9 +118,10 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		if (!address) return
 
 		if (options.instance.value) {
+			const instanceId = options.instance.value.id
 			try {
 				await add_server_to_instance(
-					options.instance.value.id,
+					instanceId,
 					project.name,
 					address,
 					'prompt',
@@ -126,6 +129,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					project.minecraft_java_server?.content?.kind,
 				)
 				options.newlyInstalled.value.push(project.project_id)
+				await queryClient.invalidateQueries({ queryKey: ['worlds', instanceId] })
 			} catch (error) {
 				options.handleError(error)
 			}

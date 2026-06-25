@@ -183,7 +183,11 @@ const props = defineProps<{
 	preloadedContent?: InstanceContentData | null
 }>()
 
-const loading = ref(true)
+function hasPreloadedContent(contentData: InstanceContentData | null | undefined) {
+	return contentData?.path === props.instance.id
+}
+
+const loading = ref(!hasPreloadedContent(props.preloadedContent))
 const projects = ref<ContentItem[]>([])
 
 const installingBuffer = ref<ContentItem[]>([])

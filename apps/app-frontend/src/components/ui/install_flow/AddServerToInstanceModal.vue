@@ -7,6 +7,7 @@ import {
 	injectNotificationManager,
 	StyledInput,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
@@ -16,6 +17,7 @@ import { list } from '@/helpers/instance'
 import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
 
 const { handleError } = injectNotificationManager()
+const queryClient = useQueryClient()
 
 const modal = ref()
 const searchFilter = ref('')
@@ -65,6 +67,7 @@ async function addServer(instance) {
 	try {
 		await add_server_to_instance(instance.id, serverName.value, serverAddress.value, 'prompt')
 		instance.added = true
+		await queryClient.invalidateQueries({ queryKey: ['worlds', instance.id] })
 
 		trackEvent('AddServerToInstance', {
 			server_name: serverName.value,

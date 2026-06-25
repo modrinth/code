@@ -215,7 +215,7 @@
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
 			<RouterView
-				v-if="route.path.startsWith('/instance')"
+				:route="displayedInstanceRoute"
 				v-slot="{ Component }"
 				:key="instance.id"
 			>
@@ -309,7 +309,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -340,6 +340,7 @@ const queryClient = useQueryClient()
 const route = useRoute()
 
 const router = useRouter()
+const displayedInstanceRoute = shallowRef(router.currentRoute.value)
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_instance_play_time'))
@@ -378,7 +379,17 @@ const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
 
-function isContentSubpageRoute(routeName = route.name) {
+watch(
+	() => router.currentRoute.value,
+	(nextRoute) => {
+		if (nextRoute.path.startsWith('/instance')) {
+			displayedInstanceRoute.value = nextRoute
+		}
+	},
+	{ immediate: true },
+)
+
+function isContentSubpageRoute(routeName = displayedInstanceRoute.value.name) {
 	return typeof routeName === 'string' && contentSubpageRouteNames.has(routeName)
 }
 
@@ -467,7 +478,9 @@ watch(
 	},
 )
 
-const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
+const basePath = computed(
+	() => `/instance/${encodeURIComponent(displayedInstanceRoute.value.params.id as string)}`,
+)
 
 /**
  * Per-route layout mode.
@@ -478,7 +491,7 @@ const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id 
  *   Used by tabs whose content (e.g. the log console) needs a bounded height to resolve `h-full`.
  */
 const renderMode = computed<'scroll' | 'fixed'>(() =>
-	route.meta.renderMode === 'fixed' ? 'fixed' : 'scroll',
+	displayedInstanceRoute.value.meta.renderMode === 'fixed' ? 'fixed' : 'scroll',
 )
 const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
@@ -517,8 +530,8 @@ if (instance.value) {
 	)
 	breadcrumbs.setContext({
 		name: instance.value.name,
-		link: route.path,
-		query: route.query,
+		link: displayedInstanceRoute.value.path,
+		query: displayedInstanceRoute.value.query,
 	})
 }
 
@@ -711,7 +724,7 @@ const timePlayedHumanized = computed(() => {
 onUnmounted(() => {
 	unlistenProcesses()
 	unlistenInstances()
-	const instanceId = route.params.id
+	const instanceId = displayedInstanceRoute.value.params.id
 	if (instanceId) {
 		const { destroy } = useInstanceConsole(instanceId)
 		destroy()
