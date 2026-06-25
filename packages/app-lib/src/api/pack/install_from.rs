@@ -375,7 +375,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     // When installing to an existing profile (e.g. server projects),
     // icon_url is None and we preserve the profile's existing icon.
     let icon = if has_icon_url {
-        let fetched = if let Some(icon_url) = project.icon_url {
+        if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
             let icon_bytes = fetch(
                 &icon_url,
@@ -404,8 +404,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
             }
         } else {
             None
-        };
-        fetched
+        }
     } else {
         None
     };

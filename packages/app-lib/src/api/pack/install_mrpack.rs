@@ -467,13 +467,11 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                                     current,
                                     total: num_files as u64,
                                     secondary: (content_total_bytes > 0)
-                                        .then_some(
-                                            InstallProgressSecondary {
-                                                current: current_bytes
-                                                    .min(content_total_bytes),
-                                                total: content_total_bytes,
-                                            },
-                                        ),
+                                        .then_some(InstallProgressSecondary {
+                                            current: current_bytes
+                                                .min(content_total_bytes),
+                                            total: content_total_bytes,
+                                        }),
                                 }),
                                 modpack_details,
                             )

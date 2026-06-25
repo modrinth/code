@@ -164,7 +164,7 @@ impl InstallJobKind {
         }
     }
 
-    pub fn from_str(value: &str) -> Self {
+    pub fn from_stored_str(value: &str) -> Self {
         match value {
             "create_modpack_instance" => Self::CreateModpackInstance,
             "import_instance" => Self::ImportInstance,
@@ -201,7 +201,7 @@ impl InstallJobStatus {
         }
     }
 
-    pub fn from_str(value: &str) -> Self {
+    pub fn from_stored_str(value: &str) -> Self {
         match value {
             "running" => Self::Running,
             "succeeded" => Self::Succeeded,
