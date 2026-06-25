@@ -311,5 +311,5 @@ vars! {
     SERVER_PING_TIMEOUT_MS: u64 = 3u64 * 1000;
     SERVER_PING_MAX_FAIL_COUNT: u64 = 3u64;
 
-    WEBAUTHN_RP_NAME: String;
+    WEBAUTHN_RP_NAME: String = "Modrinth";
 }
