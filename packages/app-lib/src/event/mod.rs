@@ -229,8 +229,8 @@ pub enum CommandPayload {
     InstallServer {
         id: String,
     },
-    LaunchProfile {
-        path: String,
+    LaunchInstance {
+        id: String,
         server: Option<String>,
         singleplayer_world: Option<String>,
     },

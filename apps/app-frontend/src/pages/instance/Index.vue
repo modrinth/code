@@ -326,7 +326,7 @@ import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { createProfileShortcut, showInstanceInFolder } from '@/helpers/utils.js'
+import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
@@ -606,15 +606,19 @@ const repairInstance = async () => {
 const createShortcut = async () => {
 	if (!instance.value) return
 	try {
-		const shortcutPath = await createProfileShortcut(instance.value.name, instance.value.path)
+		const shortcutPath = await createInstanceShortcut(instance.value.name, instance.value.id)
 		if (!shortcutPath) return
 
 		addNotification({
 			type: 'success',
 			title: 'Shortcut created',
 		})
-	} catch (error) {
-		handleError(error)
+	} catch (error: unknown) {
+		addNotification({
+			type: 'error',
+			title: `Error creating shortcut`,
+			text: `${error}`,
+		})
 	}
 }
 

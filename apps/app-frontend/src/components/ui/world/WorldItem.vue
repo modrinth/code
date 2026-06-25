@@ -41,7 +41,7 @@ import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { copyToClipboard, createProfileShortcut } from '@/helpers/utils'
+import { copyToClipboard, createInstanceShortcut } from '@/helpers/utils'
 import type {
 	ProtocolVersion,
 	ServerStatus,
@@ -97,7 +97,7 @@ const props = withDefaults(
 		instanceId?: string
 		instanceName?: string
 		instanceIcon?: string
-		shortcutInstancePath?: string
+		shortcutInstanceId?: string
 	}>(),
 	{
 		playingInstance: false,
@@ -117,7 +117,7 @@ const props = withDefaults(
 		instanceId: undefined,
 		instanceName: undefined,
 		instanceIcon: undefined,
-		shortcutInstancePath: undefined,
+		shortcutInstanceId: undefined,
 	},
 )
 
@@ -136,15 +136,15 @@ const serverIncompatible = computed(
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
 const managed = computed(() => props.managed)
-const shortcutInstancePath = computed(() => props.shortcutInstancePath ?? props.instancePath)
+const shortcutInstanceId = computed(() => props.shortcutInstanceId ?? props.instanceId)
 
 async function createShortcut() {
-	if (!shortcutInstancePath.value) return
+	if (!shortcutInstanceId.value) return
 
 	try {
-		const shortcutPath = await createProfileShortcut(
+		const shortcutPath = await createInstanceShortcut(
 			props.world.name,
-			shortcutInstancePath.value,
+			shortcutInstanceId.value,
 			props.world.type === 'server'
 				? { server: (props.world as ServerWorld).address }
 				: { singleplayerWorld: (props.world as SingleplayerWorld).path },
@@ -511,7 +511,7 @@ const messages = defineMessages({
 							},
 							{
 								id: 'create-shortcut',
-								shown: !!shortcutInstancePath,
+								shown: !!shortcutInstanceId,
 								action: () => createShortcut(),
 							},
 							{

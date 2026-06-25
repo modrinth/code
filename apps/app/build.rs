@@ -243,7 +243,7 @@ fn main() {
             .plugin(
                 "shortcuts",
                 InlinedPlugin::new()
-                    .commands(&["create_profile_shortcut"])
+                    .commands(&["create_instance_shortcut"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

@@ -30,9 +30,9 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         Some(("server", id)) => {
             CommandPayload::InstallServer { id: id.to_string() }
         }
-        // /launch/profile/{id}   -    Launches a profile
-        Some(("launch", rest)) if rest.starts_with("profile/") => {
-            let raw = rest.trim_start_matches("profile/");
+        // /launch/instance/{id}   -    Launches an instance
+        Some(("launch", rest)) if rest.starts_with("instance/") => {
+            let raw = rest.trim_start_matches("instance/");
             let (raw, query) = raw.split_once('?').unwrap_or((raw, ""));
             let mut server = None;
             let mut singleplayer_world = None;
@@ -60,18 +60,18 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
             }
 
             match decode(raw) {
-                Ok(decoded) => CommandPayload::LaunchProfile {
-                    path: decoded.to_string(),
+                Ok(decoded) => CommandPayload::LaunchInstance {
+                    id: decoded.to_string(),
                     server,
                     singleplayer_world,
                 },
                 Err(e) => {
                     emit_warning(&format!(
-                        "Invalid UTF-8 in profile path: {e}"
+                        "Invalid UTF-8 in instance path: {e}"
                     ))
                     .await?;
                     return Err(crate::ErrorKind::InputError(format!(
-                        "Invalid UTF-8 in profile path: {e}"
+                        "Invalid UTF-8 in instance path: {e}"
                     ))
                     .into());
                 }

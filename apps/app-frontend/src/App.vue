@@ -869,13 +869,13 @@ async function handleCommand(e) {
 				source: 'CreationModalFileDrop',
 			})
 		}
-	} else if (e.event === 'LaunchProfile') {
+	} else if (e.event === 'LaunchInstance') {
 		if (e.server) {
-			await start_join_server(e.path, e.server).catch(handleError)
+			await start_join_server(e.id, e.server).catch(handleError)
 		} else if (e.singleplayer_world) {
-			await start_join_singleplayer_world(e.path, e.singleplayer_world).catch(handleError)
+			await start_join_singleplayer_world(e.id, e.singleplayer_world).catch(handleError)
 		} else {
-			await run(e.path).catch(handleError)
+			await run(e.id).catch(handleError)
 		}
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
