@@ -3259,6 +3259,17 @@ pub async fn register_passkey_finish(
             .wrap_request_err("failed to finish passkey registration")?;
 
         let mut transaction = pool.begin().await?;
+
+        let existing_passkeys =
+            DBPasskey::get_for_user(db_user_id, &mut transaction)
+                .await
+                .wrap_internal_err("failed to fetch passkeys for user")?;
+        if existing_passkeys.len() >= MAX_PASSKEYS_PER_USER {
+            return Err(ApiError::Request(eyre!(
+                "maximum of {MAX_PASSKEYS_PER_USER} passkeys per user reached"
+            )));
+        }
+
         let passkey_id =
             crate::database::models::generate_passkey_id(&mut transaction)
                 .await
