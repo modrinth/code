@@ -357,11 +357,7 @@ pub async fn install_minecraft_with_reporter(
         .map_or(8, |it| it.major_version);
     if let Some(reporter) = &reporter {
         reporter
-            .update(
-                InstallPhaseId::PreparingJava,
-                None,
-                phase_details.clone(),
-            )
+            .update(InstallPhaseId::PreparingJava, None, phase_details.clone())
             .await?;
     }
     let (java_version, set_java) = if let Some(java_version) =
@@ -369,9 +365,11 @@ pub async fn install_minecraft_with_reporter(
     {
         (std::path::PathBuf::from(java_version.path), false)
     } else {
-        let path =
-            crate::api::jre::auto_install_java_with_loading(key, reporter.is_none())
-                .await?;
+        let path = crate::api::jre::auto_install_java_with_loading(
+            key,
+            reporter.is_none(),
+        )
+        .await?;
 
         (path, true)
     };
@@ -433,7 +431,11 @@ pub async fn install_minecraft_with_reporter(
             }
 
             if let Some(loading_bar) = &loading_bar {
-                emit_loading(loading_bar, 0.0, Some("Running forge processors"))?;
+                emit_loading(
+                    loading_bar,
+                    0.0,
+                    Some("Running forge processors"),
+                )?;
             }
             let total_length = processors.len();
             if let Some(reporter) = &reporter {
@@ -583,12 +585,7 @@ pub async fn install_minecraft_for_instance_id_with_reporter(
             ))
         })?;
 
-    install_minecraft_with_reporter(
-        &context,
-        repairing,
-        reporter,
-    )
-    .await
+    install_minecraft_with_reporter(&context, repairing, reporter).await
 }
 
 pub async fn read_protocol_version_from_jar(

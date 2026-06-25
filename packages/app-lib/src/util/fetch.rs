@@ -210,11 +210,11 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
 const FETCH_ATTEMPTS: usize = 2;
 
 pub type FetchProgressFn<'a> = dyn FnMut(
-		u64,
-		u64,
-	) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
-	+ Send
-	+ 'a;
+        u64,
+        u64,
+    ) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
+    + Send
+    + 'a;
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
