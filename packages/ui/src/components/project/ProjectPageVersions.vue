@@ -47,8 +47,10 @@
 		:columns="versionColumns"
 		:data="currentVersionRows"
 		row-key="id"
-		row-class="group"
+		:row-class="getVersionRowClass"
+		:row-clickable="!!versionLink"
 		table-layout="auto"
+		@row-click="openVersionRow"
 	>
 		<template #cell-channel="{ row: version }">
 			<div class="flex items-center justify-center">
@@ -56,7 +58,8 @@
 					v-tooltip="`Toggle filter for ${version.version_type}`"
 					:channel="version.version_type"
 					class="cursor-pointer"
-					@click="versionFilters?.toggleFilter('channel', version.version_type)"
+					data-no-row-click
+					@click.stop="versionFilters?.toggleFilter('channel', version.version_type)"
 				/>
 			</div>
 		</template>
@@ -65,12 +68,16 @@
 			<div class="flex min-w-0 flex-col gap-2">
 				<AutoLink
 					:to="versionLink?.(version)"
-					class="flex min-w-0 flex-col gap-1"
-					:link-class="versionLink ? 'hover:underline' : ''"
+					class="flex min-w-0 flex-col gap-1 w-fit"
+					:link-class="versionLink ? 'focus-visible:underline' : ''"
 					:title="`${version.version_number} - ${version.name}`"
+					v-tooltip="`${version.version_number} - ${version.name}`"
 				>
 					<div class="flex min-w-0 items-center gap-2">
-						<div class="overflow-hidden text-ellipsis font-medium text-contrast">
+						<div
+							class="overflow-hidden text-ellipsis font-medium text-contrast"
+							:class="versionLink ? 'version-row-name' : ''"
+						>
 							{{ version.version_number }}
 						</div>
 						<div
@@ -101,6 +108,7 @@
 		<template #cell-gameVersions="{ row: version }">
 			<div class="flex flex-wrap gap-1">
 				<TagItem
+					data-no-row-click
 					v-for="gameVersion in getDisplayGameVersions(version).slice(0, maxGameVersionTags)"
 					:key="`version-tag-${gameVersion}`"
 					v-tooltip="`Toggle filter for ${gameVersion}`"
@@ -110,6 +118,7 @@
 				</TagItem>
 				<Menu
 					v-if="getDisplayGameVersions(version).length > maxGameVersionTags"
+					data-no-row-click
 					:delay="{ hide: 50, show: 0 }"
 					no-auto-focus
 					class="cursor-default"
@@ -139,6 +148,7 @@
 				</template>
 				<template v-else>
 					<TagItem
+						data-no-row-click
 						v-for="platform in version.loaders"
 						:key="`platform-tag-${platform}`"
 						v-tooltip="`Toggle filter for ${platform}`"
@@ -155,6 +165,7 @@
 		<template v-if="showEnvironmentColumn" #cell-environment="{ row: version }">
 			<div class="flex flex-wrap gap-1">
 				<TagItem
+					data-no-row-click
 					v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
 					:key="`env-tag-${tagIdx}`"
 					class="text-center"
@@ -168,25 +179,31 @@
 		<template #cell-published="{ row: version }">
 			<div
 				v-tooltip="formatDateTime(version.date_published)"
-				class="flex cursor-help items-center gap-1 text-nowrap font-medium"
+				class="flex items-center gap-1 text-nowrap font-medium w-max cursor-default"
+				data-no-row-click
 			>
 				{{ formatRelativeTime(new Date(version.date_published)) }}
 			</div>
 		</template>
 
 		<template #cell-downloads="{ row: version }">
-			<div class="flex items-center gap-1 font-medium">
+			<div
+				v-tooltip="`${version.downloads} downloads`"
+				class="flex items-center gap-1 font-medium w-max text-nowrap cursor-default"
+				data-no-row-click
+			>
 				{{ formatCompactNumber(version.downloads) }}
 			</div>
 		</template>
 
 		<template #cell-actions="{ row: version }">
-			<div class="flex items-center justify-end gap-1">
+			<div class="flex items-center justify-end gap-0.5 h-full cursor-default" data-no-row-click>
 				<slot name="actions" :version="version"></slot>
 			</div>
 		</template>
 	</Table>
 
+	<!-- MOBILE VERSIONS TABLE/LIST -->
 	<div
 		v-if="versions.length > 0"
 		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 sm:hidden"
@@ -315,10 +332,7 @@
 							</div>
 						</div>
 						<div class="flex flex-row justify-start gap-3">
-							<div
-								v-tooltip="formatDateTime(version.date_published)"
-								class="flex cursor-help items-center gap-1 text-nowrap font-medium"
-							>
+							<div class="flex cursor-help items-center gap-1 text-nowrap font-medium">
 								<CalendarIcon />
 								{{ formatRelativeTime(new Date(version.date_published)) }}
 							</div>
@@ -407,6 +421,7 @@ type VersionWithDisplayUrlEnding = Version & {
 
 type DisplayVersion = VersionWithDisplayUrlEnding & {
 	noModLoader: boolean
+	files_missing_attribution?: boolean
 }
 
 type VersionTableColumn =
@@ -487,19 +502,19 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		{
 			key: 'published',
 			label: 'Published',
-			cellClass: visibleCellClass,
+			cellClass: '!overflow-visible align-middle pr-2.5 w-max',
 		},
 		{
 			key: 'downloads',
 			label: 'Downloads',
-			cellClass: '!overflow-visible py-3 align-middle',
+			cellClass: '!overflow-visible align-middle',
 		},
 		{
 			key: 'actions',
 			align: 'right',
 			width: '4.5rem',
 			headerClass: 'text-secondary',
-			cellClass: '!overflow-visible py-3 align-middle',
+			cellClass: '!overflow-visible align-middle',
 		},
 	)
 
@@ -614,6 +629,18 @@ function switchPage(page: number) {
 	window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+function getVersionRowClass(): string {
+	return props.versionLink
+		? 'group version-row-link cursor-pointer transition-[filter] [&:hover:not(:has([data-no-row-click]:hover))]:brightness-[115%]'
+		: 'group'
+}
+
+function openVersionRow(version: VersionTableRow) {
+	const link = props.versionLink?.(version)
+	if (!link) return
+	router.push(link)
+}
+
 function updateQuery(newQueries: Record<string, string | string[] | undefined | null>) {
 	if (newQueries.page) {
 		currentPage.value = Number(newQueries.page)
@@ -640,3 +667,9 @@ const messages = defineMessages({
 	},
 })
 </script>
+
+<style scoped>
+:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) .version-row-name) {
+	text-decoration-line: underline;
+}
+</style>

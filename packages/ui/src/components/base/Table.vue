@@ -83,6 +83,7 @@
 							v-for="(row, rowIndex) in renderedRows"
 							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
 							:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+							@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 						>
 							<td
 								v-if="showSelection"
@@ -135,6 +136,7 @@
 							v-for="(row, rowIndex) in renderedRows"
 							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
 							:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+							@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 						>
 							<td
 								v-if="showSelection"
@@ -230,6 +232,7 @@ const props = withDefaults(
 		tableMinWidth?: string
 		tableLayout?: TableLayout
 		rowClass?: string | ((row: T, index: number) => string)
+		rowClickable?: boolean | ((row: T, index: number) => boolean)
 	}>(),
 	{
 		showSelection: false,
@@ -275,6 +278,7 @@ const bottomSpacerHeight = computed(() => {
 
 const emit = defineEmits<{
 	sort: [column: string, direction: SortDirection]
+	rowClick: [row: T, index: number, event: MouseEvent]
 }>()
 
 const selectableRows = computed(() => props.selectionData ?? props.data)
@@ -333,6 +337,31 @@ function getRowClass(row: T, rowIndex: number): string[] {
 		typeof props.rowClass === 'function' ? props.rowClass(row, rowIndex) : props.rowClass
 
 	return customClass ? [baseClass, customClass] : [baseClass]
+}
+
+function isRowClickable(row: T, rowIndex: number): boolean {
+	return typeof props.rowClickable === 'function'
+		? props.rowClickable(row, rowIndex)
+		: props.rowClickable === true
+}
+
+function isNoRowClickTarget(event: MouseEvent): boolean {
+	const target = event.target
+	const currentTarget = event.currentTarget
+	if (!(target instanceof Element) || !(currentTarget instanceof Element)) {
+		return false
+	}
+
+	const noRowClickTarget = target.closest('[data-no-row-click]')
+	return noRowClickTarget !== null && noRowClickTarget !== currentTarget
+}
+
+function handleRowClick(row: T, rowIndex: number, event: MouseEvent) {
+	if (!isRowClickable(row, rowIndex) || isNoRowClickTarget(event)) {
+		return
+	}
+
+	emit('rowClick', row, rowIndex, event)
 }
 
 function isSelected(row: T): boolean {
