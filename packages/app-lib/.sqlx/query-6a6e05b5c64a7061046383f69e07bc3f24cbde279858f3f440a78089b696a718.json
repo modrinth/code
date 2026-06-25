@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tSELECT id\n\t\t\tFROM instance_content_entries\n\t\t\tWHERE content_set_id = ? AND file_id = ?\n\t\t\tORDER BY modified_at DESC\n\t\t\tLIMIT 1\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "6a6e05b5c64a7061046383f69e07bc3f24cbde279858f3f440a78089b696a718"
+}

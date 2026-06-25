@@ -13,11 +13,11 @@ const props = defineProps({
 
 const serverProjectIds = ref(new Set())
 
-const linkedInstances = computed(() => props.instances.filter((i) => i.linked_data))
+const linkedInstances = computed(() => props.instances.filter((i) => i.link))
 
 watchEffect(async () => {
 	const projectIds = [
-		...new Set(linkedInstances.value.map((i) => i.linked_data?.project_id).filter(Boolean)),
+		...new Set(linkedInstances.value.map((i) => i.link?.project_id).filter(Boolean)),
 	]
 	if (projectIds.length === 0) {
 		serverProjectIds.value = new Set()
@@ -35,7 +35,7 @@ watchEffect(async () => {
 })
 
 const filteredInstances = computed(() =>
-	linkedInstances.value.filter((i) => !serverProjectIds.value.has(i.linked_data?.project_id)),
+	linkedInstances.value.filter((i) => !serverProjectIds.value.has(i.link?.project_id)),
 )
 </script>
 <template>

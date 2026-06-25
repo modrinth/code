@@ -63,6 +63,7 @@ pub enum FeatureFlag {
     ServerProjectQa,
     I18nDebug,
     ShowInstancePlayTime,
+    SkipNonEssentialWarnings,
 }
 
 impl Settings {
@@ -361,7 +362,7 @@ pub struct MemorySettings {
 pub struct WindowSize(pub u16, pub u16);
 
 /// Game initialization hooks
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde_with::serde_as]
 pub struct Hooks {
     #[serde_as(as = "serde_with::NoneAsEmptyString")]

@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Nie znaleziono żadnych wersji pasujących do {compatibilityLabel}. Wybierz wersję, by zainstalować ją mimo tego. Zależności nie zostaną zainstalowane automatycznie."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Instalowanie paczki modów..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Wprowadź opis paczki modów..."
   },
@@ -239,12 +233,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Szukaj serwerów"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' zostanie **permanentnie usunięty** i nie ma możliwości go odzyskać."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Czy na pewno chcesz trwale usunąć ten świat?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Zmodowany"
   },
@@ -263,20 +251,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nie dodano żadnych światów ani serwerów"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' zostanie usunięty z twojej listy, również z gry, i nie będzie możliwości go odzyskać."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) zostanie usunięty z twojej listy, również z gry, i nie będzie możliwości go odzyskać."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Czy jesteś pewny, że chcesz usunąć {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Szukaj wśród {count} światów..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "ten serwer"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Wymagana zawartość"

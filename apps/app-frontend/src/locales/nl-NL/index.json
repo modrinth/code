@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Er zijn geen beschikbare versies die overeenkomen met {compatibilityLabel}. Selecteer toch een versie om te installeren. Afhankelijkheden worden niet automatisch geïnstalleerd."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modpack aan het installeren..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Voeg modpack beschrijving in..."
   },
@@ -242,9 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Zoek servers"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Weet je zeker dat je deze wereld definitief wilt verwijderen?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Gemod"
   },
@@ -263,20 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Noch servers noch werelden toegevoegd"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Ben je zeker dat je {name} wil verwijderen?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Zoek werelden"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "deze server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content vereist"

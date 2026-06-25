@@ -11,6 +11,7 @@ const themeStore = useTheming()
 const { formatMessage } = useVIntl()
 
 const worldsInHomeFlag: FeatureFlag = 'worlds_in_home'
+const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
 const skipUnknownPackWarningFlag: FeatureFlag = 'skip_unknown_pack_warning'
 const showPlayTimeFlag: FeatureFlag = 'show_instance_play_time'
 
@@ -100,6 +101,15 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.unknown-pack-warning.description',
 		defaultMessage:
 			"If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it.",
+	},
+	skipNonEssentialWarningsTitle: {
+		id: 'app.appearance-settings.skip-non-essential-warnings.title',
+		defaultMessage: 'Skip non-essential warnings',
+	},
+	skipNonEssentialWarningsDescription: {
+		id: 'app.appearance-settings.skip-non-essential-warnings.description',
+		defaultMessage:
+			'Automatically skips low-risk confirmations like duplicate modpack installs, normal content deletion, bulk updates, unlinking modpacks, and repair prompts. Dangerous warnings will still be shown.',
 	},
 	showPlayTimeTitle: {
 		id: 'app.appearance-settings.show-play-time.title',
@@ -280,6 +290,25 @@ watch(
 					const skipUnknownPackWarning = !warnBeforeUnknownPackInstall
 					themeStore.featureFlags[skipUnknownPackWarningFlag] = skipUnknownPackWarning
 					settings.feature_flags[skipUnknownPackWarningFlag] = skipUnknownPackWarning
+				}
+			"
+		/>
+	</div>
+
+	<div class="mt-6 flex items-center justify-between gap-4">
+		<div>
+			<h2 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.skipNonEssentialWarningsTitle) }}
+			</h2>
+			<p class="m-0 mt-1">{{ formatMessage(messages.skipNonEssentialWarningsDescription) }}</p>
+		</div>
+		<Toggle
+			:model-value="themeStore.getFeatureFlag(skipNonEssentialWarningsFlag)"
+			@update:model-value="
+				() => {
+					const newValue = !themeStore.getFeatureFlag(skipNonEssentialWarningsFlag)
+					themeStore.featureFlags[skipNonEssentialWarningsFlag] = newValue
+					settings.feature_flags[skipNonEssentialWarningsFlag] = newValue
 				}
 			"
 		/>

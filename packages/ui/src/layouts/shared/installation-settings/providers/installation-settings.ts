@@ -17,6 +17,7 @@ export interface InstallationSettingsContext {
 	isLinked: ComputedRef<boolean>
 	isBusy: Ref<boolean> | ComputedRef<boolean>
 	busyMessage?: Ref<string | null> | ComputedRef<string | null>
+	skipNonEssentialWarnings?: Ref<boolean> | ComputedRef<boolean>
 
 	modpack: Ref<InstallationModpackData | null> | ComputedRef<InstallationModpackData | null>
 
@@ -36,6 +37,7 @@ export interface InstallationSettingsContext {
 	save: (platform: string, gameVersion: string, loaderVersionId: string | null) => Promise<void>
 	repair: () => Promise<void>
 	reinstallModpack: () => Promise<void>
+	swapModpack?: () => Promise<void>
 	unlinkModpack: () => Promise<void>
 
 	getCachedModpackVersions: () => Labrinth.Versions.v2.Version[] | null
