@@ -151,6 +151,7 @@ const messages = defineMessages({
 })
 
 const ctx = injectContentManager()
+const skipNonEssentialWarnings = computed(() => ctx.skipNonEssentialWarnings?.value ?? false)
 
 function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
@@ -389,7 +390,7 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 }
 
 function showDeletionConfirmation(event?: MouseEvent) {
-	if (event?.shiftKey && !ctx.isBusy.value) {
+	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
 		confirmDelete()
 	} else {
 		confirmDeletionModal.value?.show()
@@ -581,7 +582,7 @@ function promptUpdateAll(event?: MouseEvent) {
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
 	pendingBulkUpdateAll.value = true
-	if (event?.shiftKey && !ctx.isBusy.value) {
+	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
 		confirmBulkUpdateModal.value?.show()
@@ -594,7 +595,7 @@ function promptUpdateSelected(event?: MouseEvent) {
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
 	pendingBulkUpdateAll.value = false
-	if (event?.shiftKey && !ctx.isBusy.value) {
+	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
 		confirmBulkUpdateModal.value?.show()

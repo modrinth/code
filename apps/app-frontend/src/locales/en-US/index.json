@@ -128,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Show play time"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Automatically skips low-risk confirmations like duplicate modpack installs, normal content deletion, bulk updates, unlinking modpacks, and repair prompts. Dangerous warnings will still be shown."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Skip non-essential warnings"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Enables the ability to toggle the sidebar."
   },

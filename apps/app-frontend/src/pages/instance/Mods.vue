@@ -124,6 +124,7 @@ import { type InstanceContentData, loadInstanceContentData } from '@/helpers/ins
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
+import { useTheming } from '@/store/state'
 
 const messages = defineMessages({
 	shareTitle: {
@@ -173,6 +174,10 @@ const { installingItems, installRevisionByInstance, installFailureRevisionByInst
 const router = useRouter()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
+const themeStore = useTheming()
+const skipNonEssentialWarnings = computed(() =>
+	themeStore.getFeatureFlag('skip_non_essential_warnings'),
+)
 
 const props = defineProps<{
 	instance: GameInstance
@@ -1059,7 +1064,7 @@ async function handleModpackUpdateRequest(selectedVersion: Labrinth.Versions.v2.
 		isModpackUpdateDowngrade.value ||
 		versionChangesGameVersion(selectedVersion, props.instance.game_version)
 
-	if (!shouldShowWarning) {
+	if (skipNonEssentialWarnings.value || !shouldShowWarning) {
 		await handleModpackUpdateConfirm()
 		return
 	}
@@ -1306,6 +1311,7 @@ provideContentManager({
 	isPackLocked,
 	isBusy: isInstanceBusy,
 	isBulkOperating,
+	skipNonEssentialWarnings,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableDebounced,
 	bulkEnableItems: (items: ContentItem[]) =>

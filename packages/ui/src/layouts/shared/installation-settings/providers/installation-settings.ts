@@ -17,6 +17,7 @@ export interface InstallationSettingsContext {
 	isLinked: ComputedRef<boolean>
 	isBusy: Ref<boolean> | ComputedRef<boolean>
 	busyMessage?: Ref<string | null> | ComputedRef<string | null>
+	skipNonEssentialWarnings?: Ref<boolean> | ComputedRef<boolean>
 
 	modpack: Ref<InstallationModpackData | null> | ComputedRef<InstallationModpackData | null>
 

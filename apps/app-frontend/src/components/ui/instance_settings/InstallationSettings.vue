@@ -35,6 +35,7 @@ import {
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { injectInstanceSettings } from '@/providers/instance-settings'
+import { useTheming } from '@/store/state'
 
 import type { Manifest } from '../../../helpers/types'
 
@@ -43,8 +44,12 @@ const filePicker = injectFilePicker()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('AppInstallationSettings')
+const themeStore = useTheming()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
+const skipNonEssentialWarnings = computed(() =>
+	themeStore.getFeatureFlag('skip_non_essential_warnings'),
+)
 
 debug('metadata load: start', {
 	instanceId: instance.value.id,
@@ -211,6 +216,7 @@ provideInstallationSettings({
 			reinstalling.value ||
 			!!offline,
 	),
+	skipNonEssentialWarnings,
 	modpack: computed(() => {
 		if (isImportedModpack.value && instance.value.link?.type === 'imported_modpack') {
 			return {

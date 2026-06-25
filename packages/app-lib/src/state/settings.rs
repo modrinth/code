@@ -63,6 +63,7 @@ pub enum FeatureFlag {
     ServerProjectQa,
     I18nDebug,
     ShowInstancePlayTime,
+    SkipNonEssentialWarnings,
 }
 
 impl Settings {

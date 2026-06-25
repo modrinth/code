@@ -43,6 +43,7 @@ import type { LoaderVersionEntry } from './types'
 const { formatMessage } = useVIntl()
 const ctx = injectInstallationSettings()
 const debug = useDebugLogger('InstallationSettingsLayout')
+const skipNonEssentialWarnings = computed(() => ctx.skipNonEssentialWarnings?.value ?? false)
 const availablePlatforms = computed(() =>
 	Array.isArray(ctx.availablePlatforms) ? ctx.availablePlatforms : ctx.availablePlatforms.value,
 )
@@ -228,7 +229,7 @@ function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event
 		isUpdateDowngrade.value ||
 		versionChangesGameVersion(version, ctx.updaterModalProps.value.currentGameVersion)
 
-	if (event?.shiftKey || !shouldShowWarning) {
+	if (event?.shiftKey || skipNonEssentialWarnings.value || !shouldShowWarning) {
 		debug('handleModpackUpdateRequest: confirming without warning', {
 			isUpdateDowngrade: isUpdateDowngrade.value,
 			shouldShowWarning,
@@ -371,6 +372,10 @@ function handleShowRepairModal() {
 		snapshot: stateSnapshot(),
 		refs: modalRefsSnapshot(),
 	})
+	if (skipNonEssentialWarnings.value) {
+		handleRepair()
+		return
+	}
 	repairModal.value?.show()
 	nextTick(() => {
 		debug('handleShowRepairModal: after nextTick', {
@@ -386,7 +391,7 @@ function handleShowUnlinkModal(event: MouseEvent) {
 		snapshot: stateSnapshot(),
 		refs: modalRefsSnapshot(),
 	})
-	if (event.shiftKey) {
+	if (event.shiftKey || skipNonEssentialWarnings.value) {
 		handleUnlink()
 		return
 	}

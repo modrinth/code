@@ -8,9 +8,12 @@ import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { get, set } from '@/helpers/settings.ts'
 import { showAppDbBackupsFolder } from '@/helpers/utils.js'
+import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
+const themeStore = useTheming()
 const settings = ref(await get())
+const purgeCacheConfirmModal = ref(null)
 
 watch(
 	settings,
@@ -47,6 +50,15 @@ async function purgeCache() {
 		'search_results',
 		'search_results_v3',
 	]).catch(handleError)
+}
+
+function handlePurgeCacheClick() {
+	if (themeStore.getFeatureFlag('skip_non_essential_warnings')) {
+		void purgeCache()
+		return
+	}
+
+	purgeCacheConfirmModal.value?.show()
 }
 
 async function openDbBackupsFolder() {
@@ -102,7 +114,7 @@ async function findLauncherDir() {
 				@proceed="purgeCache"
 			/>
 			<h2 class="m-0 text-lg font-semibold text-contrast">App cache</h2>
-			<button id="purge-cache" class="btn min-w-max" @click="$refs.purgeCacheConfirmModal.show()">
+			<button id="purge-cache" class="btn min-w-max" @click="handlePurgeCacheClick">
 				<TrashIcon />
 				Purge cache
 			</button>

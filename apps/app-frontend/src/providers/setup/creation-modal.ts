@@ -21,10 +21,12 @@ import {
 import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
 import type { InstanceLoader } from '@/helpers/types'
+import { useTheming } from '@/store/state'
 
 export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
 	const { handleError } = notificationManager
 	const router = useRouter()
+	const themeStore = useTheming()
 
 	const installationModal =
 		useTemplateRef<ComponentExposed<typeof CreationFlowModal>>('installationModal')
@@ -71,7 +73,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 				const instances = await list().catch(handleError)
 				const existingInstance = instances?.find((i) => i.link?.project_id === projectId)
 
-				if (existingInstance) {
+				if (existingInstance && !themeStore.getFeatureFlag('skip_non_essential_warnings')) {
 					pendingModpackCreation.value = { projectId, versionId, name, iconUrl }
 					installationModal.value?.hide()
 					modpackAlreadyInstalledModal.value?.show(existingInstance.name, existingInstance.id)

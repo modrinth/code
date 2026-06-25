@@ -33,6 +33,7 @@ import {
 } from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
+import { useTheming } from '@/store/state'
 interface ModalRef {
 	show: (initialVersionId?: string) => void
 	hide: () => void
@@ -187,6 +188,7 @@ export function createContentInstall(opts: {
 	handleError: (err: unknown) => void
 }): ContentInstallContext {
 	const { formatMessage } = useVIntl()
+	const themeStore = useTheming()
 	const instances = ref<ContentInstallInstance[]>([])
 	const compatibleLoaders = ref<string[]>([])
 	const gameVersions = ref<string[]>([])
@@ -810,7 +812,7 @@ export function createContentInstall(opts: {
 			const packs = await list()
 			const existingPack = packs.find((pack) => pack.link?.project_id === project.id)
 
-			if (existingPack) {
+			if (existingPack && !themeStore.getFeatureFlag('skip_non_essential_warnings')) {
 				pendingModpackInstall = { project, version, source, callback, createInstanceCallback }
 				modpackAlreadyInstalledModalRef?.show(existingPack.name, existingPack.id)
 				return
