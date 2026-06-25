@@ -11,6 +11,45 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-25T21:22:14+00:00`,
+		product: 'app',
+		version: '0.15.0',
+		body: `## Added
+- Existing app data is now backed up after the app updates.
+- Added an option to open the folder which contains the app database backups in the Resource management tab in the app settings.
+- Added an option to skip non-essential warnings across the app.
+- Added the ability to create desktop shortcuts for your instances.
+
+## Changed
+- Instance installs in the Modrinth App now show detailed progress for preparing Java, downloading modpack files, downloading content, extracting overrides, and downloading Minecraft.
+- Java, modpack, content, overrides and Minecraft downloads/extracting now show downloaded/extracted and total size.
+- The Content tab’s "Update all" action now shows live progress while resolving versions, downloading projects, and finishing updates.
+- Changed the visual style of the Delete server/Delete world modal on the Worlds tab of instances to match the Content tab's modals.
+
+## Fixed
+- Fixed broken Delete server modal on the Worlds tab of instances.
+- Fixed the navigation bars across the app not animating when clicking between pages.
+- Fixed fade in animation incorrectly playing on the Mods page even when the instance content is already loaded into the UI.
+- Failed or interrupted instance installs now roll back partial changes instead of leaving incomplete new instances or modified/broken existing instances behind.
+- Failed or interrupted instance installs now explain why the failure or interruption occurred, and provide a retry action.
+- The Home page, Library page, and the quick instance switcher in the left sidebar now correctly refresh when an instance begins or finishes installing.
+- Fixed issue where going from an instance page to the browse page via the left sidebar would cause the app to completely freeze up.
+- Fixed issue where using the "Add to instance" button on search results in the browse page would take a long time to process if you have a lot of instances.
+- Fixed many performance issues with loading/editing of instances.`,
+	},
+	{
+		date: `2026-06-25T21:22:14+00:00`,
+		product: 'web',
+		body: `## Added
+- Create account page where user can input username for new account.
+- Log in with passkeys support, thanks [@DeDiamondPro](https://github.com/DeDiamondPro)!
+
+## Changed
+- Refreshed sign in and sign up page styles.
+- Refreshed forget password and verify email pages.
+- Updated account settings modals to match website styles for consistency.`,
+	},
+	{
 		date: `2026-06-24T00:30:00-07:00`,
 		product: 'web',
 		body: `## Fixed
