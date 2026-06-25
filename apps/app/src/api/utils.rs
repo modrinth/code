@@ -3,7 +3,7 @@ use tauri::Runtime;
 use tauri_plugin_opener::OpenerExt;
 use theseus::{
     handler,
-    prelude::{CommandPayload, DirectoryInfo},
+    prelude::{CommandPayload, DirectoryInfo, app_db_backup_dir},
 };
 
 use crate::api::{Result, TheseusSerializableError};
@@ -21,6 +21,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             highlight_in_folder,
             open_path,
             show_launcher_logs_folder,
+            show_app_db_backups_folder,
             progress_bars_list,
             get_opening_command
         ])
@@ -117,6 +118,16 @@ pub async fn show_launcher_logs_folder<R: Runtime>(app: tauri::AppHandle<R>) {
         // (ie: if in debug mode only and launcher_logs never created)
         open_path(app, path).await;
     }
+}
+
+#[tauri::command]
+pub async fn show_app_db_backups_folder<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<()> {
+    let path = app_db_backup_dir()?;
+    tokio::fs::create_dir_all(&path).await?;
+    open_path(app, path).await;
+    Ok(())
 }
 
 // Get opening command

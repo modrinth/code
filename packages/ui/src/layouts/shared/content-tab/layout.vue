@@ -45,7 +45,7 @@ import {
 	useContentSelection,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { ContentCardTableItem, ContentItem } from './types'
+import type { BulkOperationStatus, ContentCardTableItem, ContentItem } from './types'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
@@ -247,6 +247,8 @@ if (ctx.isBulkOperating) {
 const { isChanging, markChanging, unmarkChanging } = useChangingItems()
 
 const bulkWaiting = ref(false)
+const bulkStatusMessage = ref<string | null>(null)
+const bulkItemCount = ref(0)
 
 const refreshing = ref(false)
 async function handleRefresh() {
@@ -448,6 +450,8 @@ async function confirmDelete() {
 	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'delete'
+		bulkProgress.value = 0
+		bulkTotal.value = itemsToDelete.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkDeleteItems(itemsToDelete)
@@ -456,6 +460,8 @@ async function confirmDelete() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -506,6 +512,8 @@ async function bulkEnable() {
 	if (ctx.bulkEnableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'enable'
+		bulkProgress.value = 0
+		bulkTotal.value = items.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkEnableItems(items)
@@ -513,6 +521,8 @@ async function bulkEnable() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -527,6 +537,8 @@ async function bulkDisable() {
 	if (ctx.bulkDisableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'disable'
+		bulkProgress.value = 0
+		bulkTotal.value = items.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkDisableItems(items)
@@ -534,6 +546,8 @@ async function bulkDisable() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -555,14 +569,18 @@ function handleSwitchVersionById(id: string) {
 // Bulk updating
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal>>()
 const pendingBulkUpdateItems = ref<ContentItem[]>([])
+const pendingBulkUpdateAll = ref(false)
 
-const hasBulkUpdateSupport = computed(() => !!(ctx.bulkUpdateItem || ctx.bulkUpdateItems))
+const hasBulkUpdateSupport = computed(
+	() => !!(ctx.bulkUpdateAll || ctx.bulkUpdateItem || ctx.bulkUpdateItems),
+)
 
 function promptUpdateAll(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
 	const items = ctx.items.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
+	pendingBulkUpdateAll.value = true
 	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
@@ -575,6 +593,7 @@ function promptUpdateSelected(event?: MouseEvent) {
 	const items = selectedItems.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
+	pendingBulkUpdateAll.value = false
 	if (event?.shiftKey && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
@@ -587,22 +606,61 @@ async function confirmBulkUpdate() {
 	const items = pendingBulkUpdateItems.value
 	if (items.length === 0 || !hasBulkUpdateSupport.value) return
 
-	if (ctx.bulkUpdateItems) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'update'
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkUpdateItems(items)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkWaiting.value = false
-		}
-	} else if (ctx.bulkUpdateItem) {
-		await runBulk('update', items, ctx.bulkUpdateItem, { onComplete: clearSelection })
+	const setBulkStatus = (status: BulkOperationStatus) => {
+		bulkStatusMessage.value = status.message ?? null
+		bulkProgress.value = status.progress ?? bulkProgress.value
+		bulkTotal.value = status.total ?? bulkTotal.value
+		bulkWaiting.value = status.waiting ?? false
 	}
-	pendingBulkUpdateItems.value = []
+
+	try {
+		if (pendingBulkUpdateAll.value && ctx.bulkUpdateAll) {
+			isBulkOperating.value = true
+			bulkOperation.value = 'update'
+			bulkProgress.value = 0
+			bulkTotal.value = items.length
+			bulkItemCount.value = items.length
+			bulkStatusMessage.value = null
+			bulkWaiting.value = true
+			try {
+				await ctx.bulkUpdateAll(setBulkStatus)
+			} finally {
+				clearSelection()
+				isBulkOperating.value = false
+				bulkOperation.value = null
+				bulkProgress.value = 0
+				bulkTotal.value = 0
+				bulkItemCount.value = 0
+				bulkStatusMessage.value = null
+				bulkWaiting.value = false
+			}
+		} else if (ctx.bulkUpdateItems) {
+			isBulkOperating.value = true
+			bulkOperation.value = 'update'
+			bulkProgress.value = 0
+			bulkTotal.value = items.length
+			bulkItemCount.value = items.length
+			bulkStatusMessage.value = null
+			bulkWaiting.value = true
+			try {
+				await ctx.bulkUpdateItems(items)
+			} finally {
+				clearSelection()
+				isBulkOperating.value = false
+				bulkOperation.value = null
+				bulkProgress.value = 0
+				bulkTotal.value = 0
+				bulkItemCount.value = 0
+				bulkStatusMessage.value = null
+				bulkWaiting.value = false
+			}
+		} else if (ctx.bulkUpdateItem) {
+			await runBulk('update', items, ctx.bulkUpdateItem, { onComplete: clearSelection })
+		}
+	} finally {
+		pendingBulkUpdateItems.value = []
+		pendingBulkUpdateAll.value = false
+	}
 }
 
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
@@ -883,6 +941,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:bulk-progress="bulkProgress"
 			:bulk-total="bulkTotal"
 			:bulk-waiting="bulkWaiting"
+			:bulk-status-message="bulkStatusMessage"
+			:bulk-item-count="bulkItemCount"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
 			:get-item-id="getItemId"
 			@clear="clearSelection"

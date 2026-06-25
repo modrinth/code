@@ -10,10 +10,10 @@
 				>
 					<Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
 					<div class="flex flex-col flex-nowrap justify-center">
-						<span class="group-hover:underline font-normal text-contrast">
+						<span class="group-hover:underline font-medium">
 							{{ organization.name }}
 						</span>
-						<span class="text-sm font-normal flex items-center gap-1"
+						<span class="text-sm font-normal text-secondary flex items-center gap-1"
 							><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
 						>
 					</div>
@@ -30,9 +30,7 @@
 				<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
 				<div class="flex flex-col">
 					<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
-						<span class="min-w-0 overflow-hidden font-normal text-contrast truncate">{{
-							member.user.username
-						}}</span>
+						<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
 						<CrownIcon
 							v-if="member.is_owner"
 							v-tooltip="formatMessage(messages.owner)"
@@ -40,7 +38,7 @@
 						/>
 						<ExternalIcon v-if="linkTarget === '_blank'" />
 					</span>
-					<span class="text-sm font-normal">{{ member.role }}</span>
+					<span class="text-sm font-normal text-secondary">{{ member.role }}</span>
 				</div>
 			</AutoLink>
 		</div>

@@ -1,27 +1,20 @@
-use crate::auth::checks::filter_visible_versions;
 use crate::database;
-use crate::database::PgPool;
-use crate::database::models::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
-use crate::models::pack::{PackFile, PackFileHash, PackFormat};
 use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
 use crate::routes::ApiError;
 use dashmap::DashSet;
-use hex::ToHex;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use sha1::Digest;
 use std::collections::HashMap;
 use std::fmt::Write;
-use std::io::{Cursor, Read};
 use std::time::Duration;
-use zip::ZipArchive;
 
 pub const AUTOMOD_ID: i64 = 0;
 
@@ -229,7 +222,12 @@ impl Default for AutomatedModerationQueue {
 }
 
 impl AutomatedModerationQueue {
-    pub async fn task(&self, pool: PgPool, redis: RedisPool) {
+    pub async fn task(
+        &self,
+        pool: PgPool,
+        ro_pool: ReadOnlyPgPool,
+        redis: RedisPool,
+    ) {
         loop {
             let projects = self.projects.clone();
             self.projects.clear();
@@ -237,7 +235,8 @@ impl AutomatedModerationQueue {
             for project in projects {
                 async {
                     let project =
-                        database::DBProject::get_id((project).into(), &pool, &redis).await?;
+                        database::DBProject::get_id((project).into(), &*ro_pool, &redis)
+                            .await?;
 
                     if let Some(project) = project {
                         let res = async {
@@ -277,7 +276,7 @@ impl AutomatedModerationQueue {
                             }
 
                             let versions =
-                                database::DBVersion::get_many(&project.versions, &pool, &redis)
+                                database::DBVersion::get_many(&project.versions, &*ro_pool, &redis)
                                     .await?
                                     .into_iter()
                                     // we only support modpacks at this time
@@ -287,342 +286,7 @@ impl AutomatedModerationQueue {
                             for version in versions {
                                 let primary_file = version.files.iter().find_or_first(|x| x.primary);
 
-                                if let Some(primary_file) = primary_file {
-                                    let data = reqwest::get(&primary_file.url).await?.bytes().await?;
-
-                                    let reader = Cursor::new(data);
-                                    let mut zip = ZipArchive::new(reader)?;
-
-                                    let pack: PackFormat = {
-                                        let Ok(mut file) = zip.by_name("modrinth.index.json") else {
-                                                continue;
-                                            };
-
-                                        let mut contents = String::new();
-                                        file.read_to_string(&mut contents)?;
-
-                                        serde_json::from_str(&contents)?
-                                    };
-
-                                    // sha1, pack file, file path, murmur
-                                    let mut hashes: Vec<(
-                                        String,
-                                        Option<PackFile>,
-                                        String,
-                                        Option<u32>,
-                                    )> = pack
-                                        .files
-                                        .clone()
-                                        .into_iter()
-                                        .filter_map(|x| {
-                                            let hash = x.hashes.get(&PackFileHash::Sha1);
-
-                                            if let Some(hash) = hash {
-                                                let path = x.path.to_string();
-                                                Some((hash.clone(), Some(x), path, None))
-                                            } else {
-                                                None
-                                            }
-                                        })
-                                        .collect();
-
-                                    for i in 0..zip.len() {
-                                        let mut file = zip.by_index(i)?;
-
-                                        if file.name().starts_with("overrides/mods")
-                                            || file.name().starts_with("client-overrides/mods")
-                                            || file.name().starts_with("server-overrides/mods")
-                                            || file.name().starts_with("overrides/shaderpacks")
-                                            || file.name().starts_with("client-overrides/shaderpacks")
-                                            || file.name().starts_with("overrides/resourcepacks")
-                                            || file.name().starts_with("client-overrides/resourcepacks")
-                                        {
-                                            if file.name().matches('/').count() > 2 || file.name().ends_with(".txt") || file.name().ends_with(".rpo") {
-                                                continue;
-                                            }
-
-                                            let mut contents = Vec::new();
-                                            file.read_to_end(&mut contents)?;
-
-                                            let hash = sha1::Sha1::digest(&contents).encode_hex::<String>();
-                                            let murmur = hash_flame_murmur32(contents);
-
-                                            hashes.push((
-                                                hash,
-                                                None,
-                                                file.name().to_string(),
-                                                Some(murmur),
-                                            ));
-                                        }
-                                    }
-
-                                    let files = database::models::DBVersion::get_files_from_hash(
-                                        "sha1".to_string(),
-                                        &hashes.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-                                        &pool,
-                                        &redis,
-                                    )
-                                        .await?;
-
-                                    let version_ids =
-                                        files.iter().map(|x| x.version_id).collect::<Vec<_>>();
-                                    let versions_data = filter_visible_versions(
-                                        database::models::DBVersion::get_many(
-                                            &version_ids,
-                                            &pool,
-                                            &redis,
-                                        )
-                                            .await?,
-                                        &None,
-                                        &pool,
-                                        &redis,
-                                    )
-                                        .await?;
-
-                                    let mut final_hashes = HashMap::new();
-
-                                    for version in versions_data {
-                                        for file in
-                                        files.iter().filter(|x| x.version_id == version.id.into())
-                                        {
-                                            if let Some(hash) = file.hashes.get("sha1")
-                                                && let Some((index, (sha1, _, file_name, _))) = hashes
-                                                    .iter()
-                                                    .enumerate()
-                                                    .find(|(_, (value, _, _, _))| value == hash)
-                                                {
-                                                    final_hashes
-                                                        .insert(sha1.clone(), IdentifiedFile { status: ApprovalType::Yes, file_name: file_name.clone() });
-
-                                                    hashes.remove(index);
-                                                }
-                                        }
-                                    }
-
-                                    // All files are on Modrinth, so we don't send any messages
-                                    if hashes.is_empty() {
-                                        sqlx::query!(
-                                            "
-                                            UPDATE files
-                                            SET metadata = $1
-                                            WHERE id = $2
-                                            ",
-                                            serde_json::to_value(&MissingMetadata {
-                                                identified: final_hashes,
-                                                flame_files: HashMap::new(),
-                                                unknown_files: HashMap::new(),
-                                            })?,
-                                            primary_file.id.0
-                                        )
-                                            .execute(&pool)
-                                            .await?;
-
-                                        continue;
-                                    }
-
-                                    let rows = sqlx::query!(
-                                        "
-                                        SELECT encode(mef.sha1, 'escape') sha1, mel.status status
-                                        FROM moderation_external_files mef
-                                        INNER JOIN moderation_external_licenses mel ON mef.external_license_id = mel.id
-                                        WHERE mef.sha1 = ANY($1)
-                                        ",
-                                        &hashes.iter().map(|x| x.0.as_bytes().to_vec()).collect::<Vec<_>>()
-                                    )
-                                        .fetch_all(&pool)
-                                        .await?;
-
-                                    for row in rows {
-                                        if let Some(sha1) = row.sha1
-                                            && let Some((index, (sha1, _, file_name, _))) = hashes.iter().enumerate().find(|(_, (value, _, _, _))| value == &sha1) {
-                                                final_hashes.insert(sha1.clone(), IdentifiedFile { file_name: file_name.clone(), status: ApprovalType::from_string(&row.status).unwrap_or(ApprovalType::Unidentified) });
-                                                hashes.remove(index);
-                                            }
-                                    }
-
-                                    if hashes.is_empty() {
-                                        let metadata = MissingMetadata {
-                                            identified: final_hashes,
-                                            flame_files: HashMap::new(),
-                                            unknown_files: HashMap::new(),
-                                        };
-
-                                        sqlx::query!(
-                                            "
-                                            UPDATE files
-                                            SET metadata = $1
-                                            WHERE id = $2
-                                            ",
-                                            serde_json::to_value(&metadata)?,
-                                            primary_file.id.0
-                                        )
-                                            .execute(&pool)
-                                            .await?;
-
-                                        if metadata.identified.values().any(|x| x.status != ApprovalType::Yes && x.status != ApprovalType::WithAttributionAndSource) {
-                                            let val = mod_messages.version_specific.entry(version.inner.version_number).or_default();
-                                            val.push(ModerationMessage::PackFilesNotAllowed {files: metadata.identified, incomplete: false });
-                                        }
-                                        continue;
-                                    }
-
-                                    let client = reqwest::Client::new();
-                                    let res = client
-                                        .post(format!("{}/v1/fingerprints", ENV.FLAME_ANVIL_URL))
-                                        .json(&serde_json::json!({
-                                        "fingerprints": hashes.iter().filter_map(|x| x.3).collect::<Vec<u32>>()
-                                    }))
-                                        .send()
-                                        .await?.text()
-                                        .await?;
-
-                                    let flame_hashes = serde_json::from_str::<FlameResponse<FingerprintResponse>>(&res)?
-                                        .data
-                                        .exact_matches
-                                        .into_iter()
-                                        .map(|x| x.file)
-                                        .collect::<Vec<_>>();
-
-                                    let mut flame_files = Vec::new();
-
-                                    for file in flame_hashes {
-                                        let hash = file
-                                            .hashes
-                                            .iter()
-                                            .find(|x| x.algo == 1)
-                                            .map(|x| x.value.clone());
-
-                                        if let Some(hash) = hash  {
-                                            flame_files.push((hash, file.mod_id))
-                                        }
-                                    }
-
-                                    let rows = sqlx::query!(
-                                        "
-                                        SELECT mel.id, mel.flame_project_id, mel.status status
-                                        FROM moderation_external_licenses mel
-                                        WHERE mel.flame_project_id = ANY($1)
-                                        ",
-                                        &flame_files.iter().map(|x| x.1 as i32).collect::<Vec<_>>()
-                                    )
-                                        .fetch_all(&pool).await?;
-
-                                    let mut insert_hashes = Vec::new();
-                                    let mut insert_filenames = Vec::new();
-                                    let mut insert_ids = Vec::new();
-
-                                    for row in rows {
-                                        if let Some((curse_index, (hash, _flame_id))) = flame_files.iter().enumerate().find(|(_, x)| Some(x.1 as i32) == row.flame_project_id)
-                                            && let Some((index, (sha1, _, file_name, _))) = hashes.iter().enumerate().find(|(_, (value, _, _, _))| value == hash) {
-                                                final_hashes.insert(sha1.clone(), IdentifiedFile {
-                                                    file_name: file_name.clone(),
-                                                    status: ApprovalType::from_string(&row.status).unwrap_or(ApprovalType::Unidentified),
-                                                });
-
-                                                insert_hashes.push(hash.clone().as_bytes().to_vec());
-                                                insert_filenames.push(Some(file_name.clone()));
-                                                insert_ids.push(row.id);
-
-                                                hashes.remove(index);
-                                                flame_files.remove(curse_index);
-                                            }
-                                    }
-
-                                    if !insert_ids.is_empty() && !insert_hashes.is_empty() {
-                                        crate::database::models::moderation_external_item::ExternalLicense::insert_files(
-                                            &pool,
-                                            &insert_hashes,
-                                            &insert_filenames,
-                                            &insert_ids,
-                                            DBUserId(0),
-                                        )
-                                            .await?;
-                                    }
-
-                                    if hashes.is_empty() {
-                                        let metadata = MissingMetadata {
-                                            identified: final_hashes,
-                                            flame_files: HashMap::new(),
-                                            unknown_files: HashMap::new(),
-                                        };
-
-                                        sqlx::query!(
-                                            "
-                                            UPDATE files
-                                            SET metadata = $1
-                                            WHERE id = $2
-                                            ",
-                                            serde_json::to_value(&metadata)?,
-                                            primary_file.id.0
-                                        )
-                                            .execute(&pool)
-                                            .await?;
-
-                                        if metadata.identified.values().any(|x| x.status != ApprovalType::Yes && x.status != ApprovalType::WithAttributionAndSource) {
-                                            let val = mod_messages.version_specific.entry(version.inner.version_number).or_default();
-                                            val.push(ModerationMessage::PackFilesNotAllowed {files: metadata.identified, incomplete: false });
-                                        }
-
-                                        continue;
-                                    }
-
-                                        let flame_projects  = if flame_files.is_empty() {
-                                            Vec::new()
-                                        } else {
-                                            let res = client
-                                                .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
-                                            .json(&serde_json::json!({
-                                                "modIds": flame_files.iter().map(|x| x.1).collect::<Vec<_>>()
-                                            }))
-                                            .send()
-                                            .await?
-                                            .text()
-                                            .await?;
-
-                                        serde_json::from_str::<FlameResponse<Vec<FlameProjectResponse>>>(&res)?.data
-                                    };
-
-                                    let mut missing_metadata = MissingMetadata {
-                                        identified: final_hashes,
-                                        flame_files: HashMap::new(),
-                                        unknown_files: HashMap::new(),
-                                    };
-
-                                    for (sha1, _pack_file, file_name, _mumur2) in hashes {
-                                        let flame_file = flame_files.iter().find(|x| x.0 == sha1);
-
-                                        if let Some((_, flame_project_id)) = flame_file
-                                            && let Some(project) = flame_projects.iter().find(|x| &x.id == flame_project_id) {
-                                                missing_metadata.flame_files.insert(sha1, MissingMetadataFlame {
-                                                    title: project.name.clone(),
-                                                    file_name,
-                                                    url: project.links.website_url.clone(),
-                                                    id: *flame_project_id,
-                                                });
-
-                                                continue;
-                                            }
-
-                                        missing_metadata.unknown_files.insert(sha1, file_name);
-                                    }
-
-                                    sqlx::query!(
-                                        "
-                                        UPDATE files
-                                        SET metadata = $1
-                                        WHERE id = $2
-                                        ",
-                                        serde_json::to_value(&missing_metadata)?,
-                                        primary_file.id.0
-                                    )
-                                        .execute(&pool)
-                                        .await?;
-
-                                    if missing_metadata.identified.values().any(|x| x.status != ApprovalType::Yes && x.status != ApprovalType::WithAttributionAndSource) {
-                                        let val = mod_messages.version_specific.entry(version.inner.version_number).or_default();
-                                        val.push(ModerationMessage::PackFilesNotAllowed {files: missing_metadata.identified, incomplete: true });
-                                    }
-                                } else {
+                                if primary_file.is_none() {
                                     let val = mod_messages.version_specific.entry(version.inner.version_number).or_default();
                                     val.push(ModerationMessage::NoPrimaryFile);
                                 }
@@ -914,14 +578,4 @@ pub struct FlameLogo {
 #[serde(rename_all = "camelCase")]
 pub struct FlameLinks {
     pub website_url: String,
-}
-
-fn hash_flame_murmur32(input: Vec<u8>) -> u32 {
-    murmur2::murmur2(
-        &input
-            .into_iter()
-            .filter(|x| *x != 9 && *x != 10 && *x != 13 && *x != 32)
-            .collect::<Vec<u8>>(),
-        1,
-    )
 }

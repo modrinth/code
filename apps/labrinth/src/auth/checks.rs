@@ -1,42 +1,19 @@
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::FileId;
 use crate::models::projects::{
     MissingAttributionFile, OverrideSource, Version,
 };
 use crate::models::users::User;
-use crate::queue::file_scan::{
-    get_dependency_attributions, get_files_missing_attribution,
-};
+use crate::queue::file_scan::get_files_missing_attribution;
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
-
-pub async fn enrich_dependency_attributions(
-    versions: &mut [VersionQueryResult],
-    pool: &PgPool,
-) {
-    let version_ids = versions.iter().map(|v| v.inner.id).collect::<Vec<_>>();
-    let dep_attr = get_dependency_attributions(pool, &version_ids)
-        .await
-        .unwrap_or_default();
-
-    for version in versions {
-        for dep in &mut version.dependencies {
-            if let Some(attr) = dep_attr.get(&dep.id)
-                && (attr.attribution.flame_project.is_some()
-                    || attr.attribution.resolution.is_some())
-            {
-                dep.attribution = Some(attr.attribution.clone());
-            }
-        }
-    }
-}
 
 pub trait ValidateAuthorized {
     fn validate_authorized(
@@ -222,6 +199,7 @@ pub async fn filter_visible_versions(
     mut versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
     pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<crate::models::projects::Version>, ApiError> {
     let filtered_version_ids = filter_visible_version_ids(
@@ -234,11 +212,9 @@ pub async fn filter_visible_versions(
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
 
     let version_ids: Vec<_> = versions.iter().map(|v| v.inner.id).collect();
-    let missing = get_files_missing_attribution(pool, &version_ids)
+    let missing = get_files_missing_attribution(&**ro_pool, &version_ids)
         .await
         .unwrap_or_default();
-
-    enrich_dependency_attributions(&mut versions, pool).await;
 
     Ok(versions
         .into_iter()

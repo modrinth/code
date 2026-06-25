@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { save } from '@tauri-apps/plugin-dialog'
 
-import { get_full_path, get_mod_full_path } from '@/helpers/profile'
+import { get_full_path, get_mod_full_path } from '@/helpers/instance'
 
 export async function isDev() {
 	return await invoke('is_dev')
@@ -64,14 +64,18 @@ export async function createProfileShortcut(profileName, profilePath, options = 
 	})
 }
 
-// Opens a profile's folder in the OS file explorer
-export async function showProfileInFolder(path) {
-	const fullPath = await get_full_path(path)
+export async function showAppDbBackupsFolder() {
+	return await invoke('plugin:utils|show_app_db_backups_folder', {})
+}
+
+// Opens an instance's folder in the OS file explorer
+export async function showInstanceInFolder(instanceId) {
+	const fullPath = await get_full_path(instanceId)
 	return await openPath(fullPath)
 }
 
-export async function highlightModInProfile(profilePath, projectPath) {
-	const fullPath = await get_mod_full_path(profilePath, projectPath)
+export async function highlightModInInstance(instanceId, projectPath) {
+	const fullPath = await get_mod_full_path(instanceId, projectPath)
 	return await highlightInFolder(fullPath)
 }
 

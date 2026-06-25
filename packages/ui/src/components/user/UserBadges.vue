@@ -483,7 +483,7 @@ const earnedBadges = computed(() => {
 
 <template>
 	<div v-if="earnedBadges.length > 0 || !!downloadsBadge" class="flex flex-col">
-		<h2 class="text-lg text-contrast m-0 mb-2">
+		<h2 class="text-lg font-semibold text-contrast m-0 mb-2">
 			{{ formatMessage(messages.title) }}
 		</h2>
 		<div class="grid grid-cols-[repeat(auto-fill,minmax(64px,1fr))] gap-2">

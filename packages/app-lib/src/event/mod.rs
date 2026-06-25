@@ -145,36 +145,36 @@ pub enum LoadingBarType {
         version: u32,
     },
     PackFileDownload {
-        profile_path: String,
+        instance_id: String,
         pack_name: String,
         icon: Option<String>,
         pack_version: String,
     },
     PackDownload {
-        profile_path: String,
+        instance_id: String,
         pack_name: String,
         icon: Option<PathBuf>,
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
     MinecraftDownload {
-        profile_path: String,
-        profile_name: String,
+        instance_id: String,
+        instance_name: String,
     },
-    ProfileUpdate {
-        profile_path: String,
-        profile_name: String,
+    InstanceUpdate {
+        instance_id: String,
+        instance_name: String,
     },
     ZipExtract {
-        profile_path: String,
-        profile_name: String,
+        instance_id: String,
+        instance_name: String,
     },
     ConfigChange {
         new_path: PathBuf,
     },
-    CopyProfile {
+    CopyInstance {
         import_location: PathBuf,
-        profile_name: String,
+        instance_name: String,
     },
     LauncherUpdate {
         version: String,
@@ -195,6 +195,23 @@ pub struct LoadingPayload {
 #[cfg(feature = "tauri")]
 pub struct WarningPayload {
     pub message: String,
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct InstanceBulkUpdateProgressPayload {
+    pub instance_id: String,
+    pub stage: InstanceBulkUpdateProgressStage,
+    pub current: usize,
+    pub total: usize,
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum InstanceBulkUpdateProgressStage {
+    ResolvingVersions,
+    Downloading,
+    Finishing,
 }
 
 #[derive(Serialize, Clone)]
@@ -226,7 +243,7 @@ pub enum CommandPayload {
 #[derive(Serialize, Clone)]
 #[cfg(feature = "tauri")]
 pub struct ProcessPayload {
-    pub profile_path_id: String,
+    pub instance_id: String,
     pub uuid: Uuid,
     pub event: ProcessPayloadType,
     pub message: String,
@@ -241,15 +258,15 @@ pub enum ProcessPayloadType {
 
 #[derive(Serialize, Clone)]
 #[cfg(feature = "tauri")]
-pub struct ProfilePayload {
-    pub profile_path_id: String,
+pub struct InstancePayload {
+    pub instance_id: String,
     #[serde(flatten)]
-    pub event: ProfilePayloadType,
+    pub event: InstancePayloadType,
 }
 
 #[derive(Serialize, Clone)]
 #[serde(tag = "event", rename_all = "snake_case")]
-pub enum ProfilePayloadType {
+pub enum InstancePayloadType {
     Created,
     Synced,
     ServersUpdated,
@@ -292,7 +309,7 @@ mod log_types {
 
     #[derive(Serialize, Clone)]
     pub struct LogPayload {
-        pub profile_path_id: String,
+        pub instance_id: String,
         #[serde(flatten)]
         pub event: LogEvent,
     }

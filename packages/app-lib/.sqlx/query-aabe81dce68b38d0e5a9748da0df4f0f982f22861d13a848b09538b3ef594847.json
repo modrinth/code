@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_files (\n\t\t\tid,\n\t\t\tinstance_id,\n\t\t\trelative_path,\n\t\t\tfile_name,\n\t\t\tenabled,\n\t\t\tsha1,\n\t\t\tsize,\n\t\t\tmissing,\n\t\t\tadded_at,\n\t\t\tmodified_at\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\tON CONFLICT (instance_id, relative_path) DO UPDATE SET\n\t\t\tfile_name = excluded.file_name,\n\t\t\tenabled = excluded.enabled,\n\t\t\tsha1 = excluded.sha1,\n\t\t\tsize = excluded.size,\n\t\t\tmissing = excluded.missing,\n\t\t\tmodified_at = excluded.modified_at\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "aabe81dce68b38d0e5a9748da0df4f0f982f22861d13a848b09538b3ef594847"
+}

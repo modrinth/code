@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    UPDATE instance_launch_overrides\n                    SET overrides = jsonb(json_set(\n                        overrides,\n                        '$.java_path',\n                        replace(json_extract(overrides, '$.java_path'), ?, ?)\n                    ))\n                    WHERE json_type(overrides, '$.java_path') = 'text'\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "555d8a24feefe6c53c26a7f72a2920654cf998c84bfdf2ae9e10fb82c4acbc03"
+}

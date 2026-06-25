@@ -477,7 +477,7 @@
 					v-if="organizations?.length > 0"
 					class="mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 pt-3"
 				>
-					<h2 class="m-0 mb-2 text-lg text-contrast">
+					<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
 					<div class="flex flex-wrap gap-2">
@@ -1039,5 +1039,9 @@ export default defineNuxtComponent({
 			}
 		}
 	}
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>

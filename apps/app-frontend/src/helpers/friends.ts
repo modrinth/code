@@ -8,7 +8,7 @@ import type { ModrinthCredentials } from '@/helpers/mr_auth'
 
 export type UserStatus = {
 	user_id: string
-	profile_name: string | null
+	instance_name: string | null
 	last_update: string
 }
 

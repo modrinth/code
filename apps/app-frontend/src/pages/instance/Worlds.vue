@@ -13,29 +13,10 @@
 	/>
 	<EditServerModal ref="editServerModal" :instance="instance" @submit="editServer" />
 	<EditWorldModal ref="editWorldModal" :instance="instance" @submit="editWorld" />
-	<ConfirmModalWrapper
-		ref="removeServerModal"
-		:title="
-			formatMessage(messages.removeServerTitle, {
-				name: serverToRemove?.name ?? formatMessage(messages.thisServer),
-			})
-		"
-		:description="
-			serverToRemove?.address === serverToRemove?.name
-				? formatMessage(messages.removeServerDescription, { name: serverToRemove?.name })
-				: formatMessage(messages.removeServerDescriptionWithAddress, {
-						name: serverToRemove?.name,
-						address: serverToRemove?.address,
-					})
-		"
-		:markdown="false"
-		@proceed="proceedRemoveServer"
-	/>
-	<ConfirmModalWrapper
-		ref="deleteWorldModal"
-		:title="formatMessage(messages.deleteWorldTitle)"
-		:description="formatMessage(messages.deleteWorldDescription, { name: worldToDelete?.name })"
-		@proceed="proceedDeleteWorld"
+	<ConfirmRemoveWorldModal
+		ref="removeWorldModal"
+		:world="worldToRemove"
+		@confirm="proceedRemoveWorld"
 	/>
 	<ReadyTransition :pending="worldsReadyPending">
 		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
@@ -64,7 +45,7 @@
 						<button
 							class="!h-10 flex items-center gap-2"
 							@click="
-								router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })
+								router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
 							"
 						>
 							<CompassIcon class="size-5" />
@@ -130,7 +111,7 @@
 									: editServerModal?.show(world)
 					"
 					@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
-					@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
+					@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.id, world.path)"
 				/>
 			</div>
 		</div>
@@ -151,7 +132,7 @@
 					<button
 						class="!h-10 flex items-center gap-2"
 						@click="
-							router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })
+							router.push({ path: '/browse/server', query: { i: instance.id, from: 'worlds' } })
 						"
 					>
 						<CompassIcon class="size-5" />
@@ -183,32 +164,32 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
+import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWorldModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
-import { profile_listener } from '@/helpers/events'
+import { instance_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import {
 	delete_world,
-	get_profile_protocol_version,
+	get_instance_protocol_version,
 	getServerDomainKey,
 	getWorldIdentifier,
-	handleDefaultProfileUpdateEvent,
+	handleDefaultInstanceUpdateEvent,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
+	type InstanceEvent,
 	normalizeServerAddress,
-	type ProfileEvent,
 	type ProtocolVersion,
 	refreshServerData,
 	refreshServers,
 	refreshWorld,
 	refreshWorlds,
-	remove_server_from_profile,
+	remove_server_from_instance,
 	resolveManagedServerWorld,
 	type ServerData,
 	type ServerWorld,
@@ -224,29 +205,6 @@ import { handleSevereError } from '@/store/error.js'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install'
 
 const messages = defineMessages({
-	removeServerTitle: {
-		id: 'app.instance.worlds.remove-server-title',
-		defaultMessage: 'Are you sure you want to remove {name}?',
-	},
-	removeServerDescription: {
-		id: 'app.instance.worlds.remove-server-description',
-		defaultMessage:
-			"'{name}' will be removed from your list, including in-game, and there will be no way to recover it.",
-	},
-	removeServerDescriptionWithAddress: {
-		id: 'app.instance.worlds.remove-server-description-with-address',
-		defaultMessage:
-			"'{name}' ({address}) will be removed from your list, including in-game, and there will be no way to recover it.",
-	},
-	deleteWorldTitle: {
-		id: 'app.instance.worlds.delete-world-title',
-		defaultMessage: 'Are you sure you want to permanently delete this world?',
-	},
-	deleteWorldDescription: {
-		id: 'app.instance.worlds.delete-world-description',
-		defaultMessage:
-			"'{name}' will be **permanently deleted**, and there will be no way to recover it.",
-	},
 	searchWorldsPlaceholder: {
 		id: 'app.instance.worlds.search-worlds-placeholder',
 		defaultMessage: 'Search {count} worlds...',
@@ -266,10 +224,6 @@ const messages = defineMessages({
 	noWorldsDescription: {
 		id: 'app.instance.worlds.no-worlds-description',
 		defaultMessage: 'Add a server or browse to get started',
-	},
-	thisServer: {
-		id: 'app.instance.worlds.this-server',
-		defaultMessage: 'this server',
 	},
 	vanillaFilter: {
 		id: 'app.instance.worlds.filter-vanilla',
@@ -298,11 +252,9 @@ const router = useRouter()
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()
 const editServerModal = ref<InstanceType<typeof EditServerModal>>()
 const editWorldModal = ref<InstanceType<typeof EditWorldModal>>()
-const removeServerModal = ref<InstanceType<typeof ConfirmModalWrapper>>()
-const deleteWorldModal = ref<InstanceType<typeof ConfirmModalWrapper>>()
+const removeWorldModal = ref<InstanceType<typeof ConfirmRemoveWorldModal>>()
 
-const serverToRemove = ref<ServerWorld>()
-const worldToDelete = ref<SingleplayerWorld>()
+const worldToRemove = ref<World | null>(null)
 
 const emit = defineEmits<{
 	(event: 'play', world: World): void
@@ -358,8 +310,8 @@ const startingInstance = ref(false)
 const worldPlaying = ref<World>()
 
 const worldsQuery = useQuery({
-	queryKey: computed(() => ['worlds', instance.value.path]),
-	queryFn: () => refreshWorlds(instance.value.path),
+	queryKey: computed(() => ['worlds', instance.value.id]),
+	queryFn: () => refreshWorlds(instance.value.id),
 	staleTime: 30_000,
 })
 
@@ -407,12 +359,12 @@ function isManagedServerWorld(world: World): world is ServerWorld {
 
 async function refreshManagedServerMetadata() {
 	await ensureManagedServerWorldExists(
-		instance.value.path,
+		instance.value.id,
 		managedServerName.value,
 		managedServerAddress.value,
 	)
 
-	const projectId = instance.value.linked_data?.project_id
+	const projectId = instance.value.link?.project_id
 	if (!projectId) {
 		managedServerName.value = null
 		managedServerAddress.value = null
@@ -442,7 +394,7 @@ async function refreshManagedServerMetadata() {
 		managedServerAddress.value = serverAddress
 	} catch (err) {
 		console.error(
-			`Failed to resolve managed server metadata for profile: ${instance.value.path}`,
+			`Failed to resolve managed server metadata for instance: ${instance.value.id}`,
 			err,
 		)
 		managedServerName.value = null
@@ -451,22 +403,22 @@ async function refreshManagedServerMetadata() {
 }
 
 watch(
-	() => instance.value.linked_data?.project_id,
+	() => instance.value.link?.project_id,
 	async () => {
 		await refreshManagedServerMetadata()
 	},
 	{ immediate: true },
 )
 
-let unlistenProfile: (() => void) | null = null
+let unlistenInstance: (() => void) | null = null
 let worldsTabAlive = true
 
 async function initWorldsTab() {
-	const [_unlistenProfile, resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
-		profile_listener(async (e: ProfileEvent) => {
-			if (e.profile_path_id !== instance.value.path) return
+	const [_unlistenInstance, resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
+		instance_listener(async (e: InstanceEvent) => {
+			if (e.instance_id !== instance.value.id) return
 
-			console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
+			console.info(`Handling instance event '${e.event}' for instance: ${e.instance_id}`)
 
 			if (e.event === 'servers_updated') {
 				if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
@@ -475,18 +427,18 @@ async function initWorldsTab() {
 				await refreshAllWorlds()
 			}
 
-			await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
+			await handleDefaultInstanceUpdateEvent(worlds.value, instance.value.id, e)
 		}),
-		get_profile_protocol_version(instance.value.path).catch(() => null),
+		get_instance_protocol_version(instance.value.id).catch(() => null),
 		get_game_versions().catch(() => [] as GameVersion[]),
 	])
 
 	if (!worldsTabAlive) {
-		_unlistenProfile()
+		_unlistenInstance()
 		return
 	}
 
-	unlistenProfile = _unlistenProfile
+	unlistenInstance = _unlistenInstance
 	protocolVersion.value = resolvedProtocolVersion
 	gameVersions.value = resolvedGameVersions
 }
@@ -509,7 +461,7 @@ async function refreshAllWorlds() {
 	}
 
 	refreshingAll.value = true
-	await queryClient.invalidateQueries({ queryKey: ['worlds', instance.value.path] })
+	await queryClient.invalidateQueries({ queryKey: ['worlds', instance.value.id] })
 	refreshingAll.value = false
 }
 
@@ -535,7 +487,7 @@ async function editServer(server: ServerWorld) {
 }
 
 async function removeServer(server: ServerWorld) {
-	await remove_server_from_profile(instance.value.path, server.index).catch(handleError)
+	await remove_server_from_instance(instance.value.id, server.index).catch(handleError)
 	worlds.value = worlds.value.filter((w) => w.type !== 'server' || w.index !== server.index)
 	let serverIdx = 0
 	for (const w of worlds.value) {
@@ -560,12 +512,12 @@ async function editWorld(path: string, name: string, removeIcon: boolean) {
 }
 
 async function deleteWorld(world: SingleplayerWorld) {
-	await delete_world(instance.value.path, world.path).catch(handleError)
+	await delete_world(instance.value.id, world.path).catch(handleError)
 	worlds.value = worlds.value.filter((w) => w.type !== 'singleplayer' || w.path !== world.path)
 }
 
 function handleJoinError(err: Error) {
-	handleSevereError(err, { profilePath: instance.value.path })
+	handleSevereError(err, { instanceId: instance.value.id })
 	startingInstance.value = false
 	worldPlaying.value = undefined
 }
@@ -575,7 +527,7 @@ async function joinWorld(world: World) {
 	startingInstance.value = true
 	worldPlaying.value = world
 	if (world.type === 'server') {
-		const managedProjectId = instance.value.linked_data?.project_id
+		const managedProjectId = instance.value.link?.project_id
 		if (managedProjectId && isManagedServerWorld(world)) {
 			await playServerProject(managedProjectId).catch(handleJoinError)
 			trackEvent('InstanceStart', {
@@ -586,14 +538,14 @@ async function joinWorld(world: World) {
 			startingInstance.value = false
 			return
 		}
-		await start_join_server(instance.value.path, world.address).catch(handleJoinError)
+		await start_join_server(instance.value.id, world.address).catch(handleJoinError)
 		trackEvent('InstanceStart', {
 			loader: instance.value.loader,
 			game_version: instance.value.game_version,
 			source: 'WorldsPage',
 		})
 	} else if (world.type === 'singleplayer') {
-		await start_join_singleplayer_world(instance.value.path, world.path).catch(handleJoinError)
+		await start_join_singleplayer_world(instance.value.id, world.path).catch(handleJoinError)
 	}
 	play(world)
 	startingInstance.value = false
@@ -608,7 +560,7 @@ watch(
 			setTimeout(async () => {
 				for (const world of worlds.value) {
 					if (world.type === 'singleplayer' && world.locked) {
-						await refreshWorld(worlds.value, instance.value.path, world.path)
+						await refreshWorld(worlds.value, instance.value.id, world.path)
 					}
 				}
 			}, 1000)
@@ -745,37 +697,22 @@ const filteredWorlds = computed(() =>
 const highlightedWorld = ref(route.query.highlight)
 
 function promptToRemoveWorld(world: World): boolean {
+	worldToRemove.value = world
+	removeWorldModal.value?.show()
+	return !!removeWorldModal.value
+}
+
+async function proceedRemoveWorld(world: World) {
 	if (world.type === 'server') {
-		serverToRemove.value = world
-		removeServerModal.value?.show()
-		return !!removeServerModal.value
+		await removeServer(world)
 	} else {
-		worldToDelete.value = world
-		deleteWorldModal.value?.show()
-		return !!deleteWorldModal.value
+		await deleteWorld(world)
 	}
-}
-
-async function proceedRemoveServer() {
-	if (!serverToRemove.value) {
-		handleError(new Error(`Error removing server, no server marked for removal.`))
-		return
-	}
-	await removeServer(serverToRemove.value)
-	serverToRemove.value = undefined
-}
-
-async function proceedDeleteWorld() {
-	if (!worldToDelete.value) {
-		handleError(new Error(`Error deleting world, no world marked for removal.`))
-		return
-	}
-	await deleteWorld(worldToDelete.value)
-	worldToDelete.value = undefined
+	worldToRemove.value = null
 }
 
 onBeforeUnmount(() => {
 	worldsTabAlive = false
-	unlistenProfile?.()
+	unlistenInstance?.()
 })
 </script>

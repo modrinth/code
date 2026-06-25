@@ -4,15 +4,14 @@ use thiserror::Error;
 
 pub mod auth;
 pub mod import;
+pub mod install;
+pub mod instance;
 pub mod jre;
 pub mod logs;
 pub mod metadata;
 pub mod minecraft_skins;
 pub mod mr_auth;
-pub mod pack;
 pub mod process;
-pub mod profile;
-pub mod profile_create;
 pub mod settings;
 pub mod shortcuts;
 pub mod tags;
