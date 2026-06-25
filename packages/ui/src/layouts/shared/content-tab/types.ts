@@ -46,6 +46,13 @@ export interface ContentCardTableItem {
 export type ContentCardTableSortColumn = 'project' | 'version'
 export type ContentCardTableSortDirection = 'asc' | 'desc'
 
+export interface BulkOperationStatus {
+	message?: string
+	progress?: number
+	total?: number
+	waiting?: boolean
+}
+
 /** Content item returned from the app backend API - maps to ContentCardTableItem for display */
 export interface ContentItem extends Omit<
 	ContentCardTableItem,

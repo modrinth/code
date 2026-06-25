@@ -40,14 +40,14 @@ const hideFromHome = ref(false)
 const newDisplayStatus = computed(() => (hideFromHome.value ? 'hidden' : 'normal'))
 
 async function saveWorld() {
-	await rename_world(props.instance.path, path.value, name.value).catch(handleError)
+	await rename_world(props.instance.id, path.value, name.value).catch(handleError)
 
 	if (removeIcon.value) {
-		await reset_world_icon(props.instance.path, path.value).catch(handleError)
+		await reset_world_icon(props.instance.id, path.value).catch(handleError)
 	}
 	if (newDisplayStatus.value !== displayStatus.value) {
 		await set_world_display_status(
-			props.instance.path,
+			props.instance.id,
 			'singleplayer',
 			path.value,
 			newDisplayStatus.value,

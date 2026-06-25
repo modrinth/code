@@ -72,6 +72,7 @@ export const FigmaExamples: Story = {
 					:entity-icon-url="instanceIconUrl"
 					status-text="Downloading Minecraft..."
 					:progress="0.5"
+					progress-type="percentage"
 					@dismiss="noop"
 				/>
 				<NotificationToast
@@ -154,6 +155,53 @@ export const WaitingDownload: Story = {
 				waiting
 				@dismiss="noop"
 			/>
+		`,
+	}),
+}
+
+export const DownloadProgressLabels: Story = {
+	render: () => ({
+		components: { NotificationToast },
+		setup() {
+			return {
+				instanceIconUrl: MinecraftServerIcon,
+				noop,
+			}
+		},
+		template: /* html */ `
+			<div class="flex flex-col gap-4">
+				<NotificationToast
+					type="instance-download"
+					entity-name="Cobblemon Official Modpack"
+					:entity-icon-url="instanceIconUrl"
+					status-text="Downloading pack file"
+					progress-type="bytes"
+					:progress-current="128 * 1024 * 1024"
+					:progress-total="512 * 1024 * 1024"
+					:progress="0.25"
+					@dismiss="noop"
+				/>
+				<NotificationToast
+					type="instance-download"
+					entity-name="Cobblemon Official Modpack"
+					:entity-icon-url="instanceIconUrl"
+					status-text="Downloading content"
+					progress-type="count"
+					:progress-current="3"
+					:progress-total="193"
+					:progress="3 / 193"
+					@dismiss="noop"
+				/>
+				<NotificationToast
+					type="instance-download"
+					entity-name="New Creation"
+					:entity-icon-url="instanceIconUrl"
+					status-text="Downloading Minecraft"
+					progress-type="percentage"
+					:progress="0.63"
+					@dismiss="noop"
+				/>
+			</div>
 		`,
 	}),
 }

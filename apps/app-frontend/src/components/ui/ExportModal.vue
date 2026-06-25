@@ -15,7 +15,7 @@ import { ref } from 'vue'
 
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
+import { export_instance_mrpack, get_pack_export_candidates } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -75,7 +75,7 @@ const initFiles = async () => {
 	const newFolders = new Map()
 	const sep = '/'
 	files.value = []
-	await get_pack_export_candidates(props.instance.path).then((filePaths) =>
+	await get_pack_export_candidates(props.instance.id).then((filePaths) =>
 		filePaths
 			.map((folder) => ({
 				path: folder,
@@ -136,8 +136,8 @@ const exportPack = async () => {
 	})
 
 	if (outputPath) {
-		export_profile_mrpack(
-			props.instance.path,
+		export_instance_mrpack(
+			props.instance.id,
 			outputPath,
 			filesToExport,
 			versionInput.value,

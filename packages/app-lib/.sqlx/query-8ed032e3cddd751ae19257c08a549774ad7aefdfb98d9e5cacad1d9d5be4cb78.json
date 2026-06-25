@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT\n\t\t\tid AS \"id!: String\",\n\t\t\tinstance_id,\n\t\t\tkind AS \"kind!: String\",\n\t\t\tstatus AS \"status!: String\",\n\t\t\tstate AS \"state!: String\",\n\t\t\tcreated AS \"created!: i64\",\n\t\t\tmodified AS \"modified!: i64\",\n\t\t\tfinished,\n\t\t\tdismissed AS \"dismissed!: i64\"\n\t\tFROM install_jobs\n\t\tWHERE status IN ('queued', 'running')\n\t\tORDER BY created ASC\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!: String",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "kind!: String",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "status!: String",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "state!: String",
+        "ordinal": 4,
+        "type_info": "Null"
+      },
+      {
+        "name": "created!: i64",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified!: i64",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "finished",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "dismissed!: i64",
+        "ordinal": 8,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "8ed032e3cddd751ae19257c08a549774ad7aefdfb98d9e5cacad1d9d5be4cb78"
+}

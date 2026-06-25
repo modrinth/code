@@ -23,7 +23,7 @@ import { computed, readonly, ref, watch } from 'vue'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
 import useJavaTest from '@/composables/useJavaTest'
 import useMemorySlider from '@/composables/useMemorySlider'
-import { edit, get_optimal_jre_key } from '@/helpers/profile'
+import { edit, get_optimal_jre_key } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
@@ -36,7 +36,7 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
-const optimalJava = readonly(await get_optimal_jre_key(instance.value.path).catch(handleError))
+const optimalJava = readonly(await get_optimal_jre_key(instance.value.id).catch(handleError))
 
 const overrideJavaInstall = ref(!!instance.value.java_path)
 const javaPath = ref(instance.value.java_path ?? optimalJava?.path ?? '')
@@ -104,7 +104,7 @@ const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) a
 	snapPoints: number[]
 }
 
-const editProfileObject = computed(() => {
+const editInstanceObject = computed(() => {
 	return {
 		java_path:
 			overrideJavaInstall.value && javaPath.value
@@ -136,7 +136,7 @@ watch(
 		memory,
 	],
 	async () => {
-		await edit(instance.value.path, editProfileObject.value)
+		await edit(instance.value.id, editInstanceObject.value)
 	},
 	{ deep: true },
 )

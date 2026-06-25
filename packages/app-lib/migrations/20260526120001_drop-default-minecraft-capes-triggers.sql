@@ -1,0 +1,3 @@
+DROP TRIGGER IF EXISTS default_minecraft_capes_user_uuid_insert_check;
+DROP TRIGGER IF EXISTS default_minecraft_capes_user_uuid_update_check;
+DROP TRIGGER IF EXISTS default_minecraft_capes_user_uuid_update_cascade;

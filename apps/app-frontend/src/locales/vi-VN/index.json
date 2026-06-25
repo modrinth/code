@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Đang cài đặt modpack..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Thêm miêu tả cho gói modpack..."
   },
@@ -242,12 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Tìm kiếm máy chủ"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' sẽ bị **xóa vĩnh viễn** và không có cách nào khôi phục lại."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Bạn có chắc cắn rằng bạn muốn xoá vĩnh viễn thế giới này không?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modded"
   },
@@ -266,20 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Không có máy chủ hay thế giới nào đã được thêm"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' sẽ bị xóa khỏi danh sách của bạn, kể cả trong game, và bạn sẽ không có cách nào để khôi phục lại."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) sẽ bị xóa khỏi danh sách của bạn, kể cả trong game, và bạn sẽ không có cách nào để khôi phục lại."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Bạn có chắc chắn rằng bạn muốn xoá {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Tìm kiếm {count} world..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "Máy chủ này"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Nội dung bắt buộc"
