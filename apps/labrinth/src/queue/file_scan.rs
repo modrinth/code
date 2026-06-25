@@ -147,20 +147,28 @@ async fn scan_pending_files_batch(
     }
 
     let mut scanned_count = 0;
-    let mut first_err = None;
+    let mut errors = Vec::new();
     for task in tasks {
         match task.await.wrap_err("joining file scan task")? {
             Ok(count) => scanned_count += count,
             Err(err) => {
-                if first_err.is_none() {
-                    first_err = Some(err);
-                }
+                errors.push(err);
             }
         }
     }
 
-    if let Some(err) = first_err {
-        return Err(err).wrap_err("scanning pending file chunk");
+    if !errors.is_empty() {
+        let error_count = errors.len();
+        let error_messages = errors
+            .into_iter()
+            .enumerate()
+            .map(|(index, err)| format!("chunk {}: {err:?}", index + 1))
+            .collect::<Vec<_>>()
+            .join("\n\n");
+
+        return Err(eyre!(
+            "failed to scan {error_count} pending file chunks:\n\n{error_messages}"
+        ));
     }
 
     if fetched_count > 0 && scanned_count == 0 {
