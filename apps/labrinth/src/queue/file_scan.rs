@@ -58,8 +58,11 @@ pub async fn scan_all_pending_files(
 
     let total_to_scan = sqlx::query_scalar!(
         r#"
-        select count(*) as "count!" from file_scans
-        where attributions_scanned_at is null
+        select count(*) as "count!"
+        from file_scans fa
+        inner join files f on f.id = fa.file_id
+        inner join attribution_enforced_versions aev on aev.id = f.version_id
+        where fa.attributions_scanned_at is null
         "#,
     )
     .fetch_one(db)
@@ -113,9 +116,10 @@ async fn scan_pending_files_batch(
     .await
     .wrap_err("fetching files to scan")?;
 
+    let fetched_count = files_to_scan.len();
+
     info!(
-        "Found {} pending files to scan, splitting into jobs of {PENDING_FILE_SCAN_BATCH_SIZE}",
-        files_to_scan.len(),
+        "Found {fetched_count} pending files to scan, splitting into jobs of {PENDING_FILE_SCAN_BATCH_SIZE}",
     );
 
     let files_to_scan: Vec<_> = files_to_scan
@@ -140,11 +144,26 @@ async fn scan_pending_files_batch(
     }
 
     let mut scanned_count = 0;
+    let mut first_err = None;
     for task in tasks {
-        scanned_count += task
-            .await
-            .wrap_err("joining file scan task")?
-            .wrap_err("scanning pending file chunk")?;
+        match task.await.wrap_err("joining file scan task")? {
+            Ok(count) => scanned_count += count,
+            Err(err) => {
+                if first_err.is_none() {
+                    first_err = Some(err);
+                }
+            }
+        }
+    }
+
+    if let Some(err) = first_err {
+        return Err(err).wrap_err("scanning pending file chunk");
+    }
+
+    if fetched_count > 0 && scanned_count == 0 {
+        return Err(eyre!(
+            "file scan batch made no progress after fetching {fetched_count} files"
+        ));
     }
 
     info!("Marked {} files as scanned", scanned_count);
@@ -164,6 +183,7 @@ async fn scan_pending_files_chunk(
     for row in files_to_scan {
         let human_file_id = FileId::from(row.file_id);
         let span = info_span!("scan", file_id = %human_file_id);
+
         async {
             info!("Scanning file");
 
@@ -179,6 +199,21 @@ async fn scan_pending_files_chunk(
 
             if overrides.is_empty() {
                 info!("Found no overrides");
+
+                let now = Utc::now();
+                sqlx::query!(
+                    "
+                    update file_scans
+                    set attributions_scanned_at = $2
+                    where file_id = $1
+                    ",
+                    file_id.0,
+                    now,
+                )
+                .execute(db)
+                .await
+                .wrap_err("marking file as scanned")?;
+
                 return Ok(());
             }
 
