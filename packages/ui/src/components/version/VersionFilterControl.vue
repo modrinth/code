@@ -13,31 +13,57 @@
 					<FormattedTag :tag="option" enforce-type="loader" />
 				</template>
 			</ManySelect>
-			<ManySelect
-				v-model="selectedGameVersions"
-				:options="filterOptions.gameVersion"
-				:dropdown-id="`${baseId}-game-version`"
-				search
-				@change="updateFilters"
+			<MultiSelect
+				v-if="filterOptions.gameVersion.length > 1"
+				:model-value="selectedGameVersions"
+				:options="gameVersionOptions"
+				searchable
+				search-placeholder="Search..."
+				fit-content
+				:dropdown-min-width="240"
+				trigger-class="!min-h-9 !px-3 !py-0"
+				@update:model-value="updateSelectedGameVersions"
 			>
-				<FilterIcon class="h-5 w-5 text-secondary" />
-				Game versions
-				<template #footer>
-					<Checkbox v-model="showSnapshots" class="mx-1" :label="`Show all versions`" />
+				<template #input-content="{ isOpen, openDirection }">
+					<div class="flex items-center gap-2">
+						<FilterIcon class="h-5 w-5 text-secondary" />
+						<span class="font-semibold text-primary">Game versions</span>
+						<ChevronLeftIcon
+							class="h-5 w-5 text-secondary transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+						/>
+					</div>
 				</template>
-			</ManySelect>
-			<ManySelect
-				v-model="selectedChannels"
-				:options="filterOptions.channel"
-				:dropdown-id="`${baseId}-channel`"
-				@change="updateFilters"
+				<template #bottom>
+					<div class="border-0 border-t border-solid border-t-surface-5 px-3 py-3">
+						<Checkbox v-model="showSnapshots" class="mx-1" :label="`Show all versions`" />
+					</div>
+				</template>
+			</MultiSelect>
+			<MultiSelect
+				v-if="filterOptions.channel.length > 1"
+				:model-value="selectedChannels"
+				:options="channelOptions"
+				fit-content
+				:dropdown-min-width="180"
+				trigger-class="!min-h-9 !px-3 !py-0"
+				@update:model-value="updateSelectedChannels"
 			>
-				<FilterIcon class="h-5 w-5 text-secondary" />
-				Channels
-				<template #option="{ option }">
-					{{ option === 'release' ? 'Release' : option === 'beta' ? 'Beta' : 'Alpha' }}
+				<template #input-content="{ isOpen, openDirection }">
+					<div class="flex items-center gap-2">
+						<FilterIcon class="h-5 w-5 text-secondary" />
+						<span class="font-semibold text-primary">Channels</span>
+						<ChevronLeftIcon
+							class="h-5 w-5 text-secondary transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+						/>
+					</div>
 				</template>
-			</ManySelect>
+			</MultiSelect>
 		</div>
 		<div class="flex flex-wrap items-center gap-1 empty:hidden">
 			<TagItem
@@ -79,8 +105,9 @@
 </template>
 
 <script setup lang="ts">
-import { FilterIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import { Checkbox, FormattedTag, ManySelect, TagItem } from '@modrinth/ui'
+import { ChevronLeftIcon, FilterIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import type { MultiSelectOption } from '@modrinth/ui'
+import { Checkbox, FormattedTag, ManySelect, MultiSelect, TagItem } from '@modrinth/ui'
 import type { GameVersionTag, Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -141,6 +168,20 @@ const filterOptions = computed(() => {
 	return filters
 })
 
+const gameVersionOptions = computed<MultiSelectOption<string>[]>(() =>
+	filterOptions.value.gameVersion.map((version) => ({
+		value: version,
+		label: version,
+	})),
+)
+
+const channelOptions = computed<MultiSelectOption<string>[]>(() =>
+	filterOptions.value.channel.map((channel) => ({
+		value: channel,
+		label: getChannelLabel(channel),
+	})),
+)
+
 const selectedChannels = ref<string[]>([])
 const selectedGameVersions = ref<string[]>([])
 const selectedPlatforms = ref<string[]>([])
@@ -176,6 +217,16 @@ async function toggleFilter(type: FilterType, filter: Filter, bulk = false) {
 	}
 }
 
+function updateSelectedGameVersions(versions: string[]) {
+	selectedGameVersions.value = versions
+	updateFilters()
+}
+
+function updateSelectedChannels(channels: string[]) {
+	selectedChannels.value = channels
+	updateFilters()
+}
+
 async function clearFilters() {
 	selectedChannels.value = []
 	selectedGameVersions.value = []
@@ -207,5 +258,9 @@ function getArrayOrString(x: string | string[]): string[] {
 	} else {
 		return x
 	}
+}
+
+function getChannelLabel(channel: string) {
+	return channel === 'release' ? 'Release' : channel === 'beta' ? 'Beta' : 'Alpha'
 }
 </script>
