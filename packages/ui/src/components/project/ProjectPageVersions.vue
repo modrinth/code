@@ -48,6 +48,7 @@
 		:data="currentVersionRows"
 		row-key="id"
 		row-class="group"
+		table-layout="auto"
 	>
 		<template #cell-channel="{ row: version }">
 			<div class="flex items-center justify-center">
@@ -69,7 +70,7 @@
 					:title="`${version.version_number} - ${version.name}`"
 				>
 					<div class="flex min-w-0 items-center gap-2">
-						<div class="overflow-hidden text-ellipsis font-bold text-contrast">
+						<div class="overflow-hidden text-ellipsis font-medium text-contrast">
 							{{ version.version_number }}
 						</div>
 						<div
@@ -82,9 +83,6 @@
 						>
 							<TagItem> <CircleAlertIcon /> {{ formatMessage(messages.withheld) }}</TagItem>
 						</div>
-					</div>
-					<div class="overflow-hidden text-ellipsis text-xs font-medium">
-						{{ version.name }}
 					</div>
 				</AutoLink>
 				<div v-if="showFiles" class="tag-list">
@@ -449,55 +447,30 @@ const props = withDefaults(
 	},
 )
 
-const visibleCellClass = '!overflow-visible py-3 align-middle'
-const versionColumnWidths = computed<Record<VersionTableColumn, string>>(() =>
-	props.showEnvironmentColumn
-		? {
-				channel: '7%',
-				name: '15%',
-				gameVersions: '15%',
-				platforms: '15%',
-				environment: '14%',
-				published: '11%',
-				downloads: '8%',
-				actions: '7%',
-			}
-		: {
-				channel: '7%',
-				name: '20%',
-				gameVersions: '15%',
-				platforms: '15%',
-				environment: '0%',
-				published: '12%',
-				downloads: '10%',
-				actions: '8%',
-			},
-)
+const visibleCellClass = '!overflow-visible py-3 align-middle pr-2.5'
 
 const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 	const columns: TableColumn<VersionTableColumn>[] = [
 		{
 			key: 'channel',
-			width: versionColumnWidths.value.channel,
+			width: '4.5rem',
 			headerClass: 'text-secondary',
 			cellClass: visibleCellClass,
 		},
 		{
 			key: 'name',
 			label: 'Name',
-			width: versionColumnWidths.value.name,
-			cellClass: '!overflow-visible py-3',
+			cellClass: '!overflow-visible py-3 pr-4 min-w-[5rem]',
 		},
 		{
 			key: 'gameVersions',
+			width: '18%',
 			label: 'Game version',
-			width: 'fit-content',
 			cellClass: visibleCellClass,
 		},
 		{
 			key: 'platforms',
 			label: 'Platforms',
-			width: 'fit-content',
 			cellClass: visibleCellClass,
 		},
 	]
@@ -506,7 +479,6 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		columns.push({
 			key: 'environment',
 			label: 'Environment',
-			width: versionColumnWidths.value.environment,
 			cellClass: visibleCellClass,
 		})
 	}
@@ -515,21 +487,19 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		{
 			key: 'published',
 			label: 'Published',
-			width: versionColumnWidths.value.published,
 			cellClass: visibleCellClass,
 		},
 		{
 			key: 'downloads',
 			label: 'Downloads',
-			width: versionColumnWidths.value.downloads,
-			cellClass: visibleCellClass,
+			cellClass: '!overflow-visible py-3 align-middle',
 		},
 		{
 			key: 'actions',
-			width: versionColumnWidths.value.actions,
 			align: 'right',
+			width: '4.5rem',
 			headerClass: 'text-secondary',
-			cellClass: visibleCellClass,
+			cellClass: '!overflow-visible py-3 align-middle',
 		},
 	)
 

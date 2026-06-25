@@ -8,7 +8,8 @@
 		</div>
 		<div class="overflow-x-auto overflow-y-hidden">
 			<table
-				class="w-full table-fixed border-separate border-spacing-0 border-surface-4"
+				class="w-full border-separate border-spacing-0 border-surface-4"
+				:class="tableLayout === 'auto' ? 'table-auto' : 'table-fixed'"
 				:style="tableMinWidth ? { minWidth: tableMinWidth } : undefined"
 			>
 				<colgroup>
@@ -189,6 +190,7 @@ import Checkbox from './Checkbox.vue'
 
 export type TableColumnAlign = 'left' | 'center' | 'right'
 export type SortDirection = 'asc' | 'desc'
+export type TableLayout = 'fixed' | 'auto'
 
 /**
  * Defines a table column configuration.
@@ -226,11 +228,13 @@ const props = withDefaults(
 		 * Sets a minimum width for the table content, allowing horizontal overflow below that width.
 		 */
 		tableMinWidth?: string
+		tableLayout?: TableLayout
 		rowClass?: string | ((row: T, index: number) => string)
 	}>(),
 	{
 		showSelection: false,
 		rowKey: 'id' as keyof T,
+		tableLayout: 'fixed',
 		virtualized: false,
 		virtualRowHeight: 56,
 		virtualBufferSize: 5,
