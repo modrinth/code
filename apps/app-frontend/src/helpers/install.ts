@@ -202,7 +202,12 @@ export function installJobInstanceId(job: InstallJobSnapshot): string | null {
 }
 
 export function isInstallJobFinished(status: InstallJobStatus) {
-	return status === 'succeeded' || status === 'failed' || status === 'interrupted' || status === 'canceled'
+	return (
+		status === 'succeeded' ||
+		status === 'failed' ||
+		status === 'interrupted' ||
+		status === 'canceled'
+	)
 }
 
 function settleInstallJob(job: InstallJobSnapshot) {

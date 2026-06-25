@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "没有与 {compatibilityLabel} 匹配的可用版本。如果仍要安装，请选择一个版本。依赖项将不会自动安装。"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "正在安装整合包……"
-  },
   "app.export-modal.description-placeholder": {
     "message": "输入整合包描述……"
   },

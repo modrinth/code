@@ -8,7 +8,7 @@ import { setupTagsProvider } from './setup/tags'
 
 export function setupProviders(
 	notificationManager: AbstractWebNotificationManager,
-	popupNotificationManager: AbstractPopupNotificationManager,
+	_popupNotificationManager: AbstractPopupNotificationManager,
 ) {
 	setupTagsProvider(notificationManager)
 	setupFileDropProvider()

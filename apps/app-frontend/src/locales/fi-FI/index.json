@@ -146,12 +146,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Yhtään versiota ei ole saatavilla yhteensopivuudella {compatibilityLabel}. Valitse asennettava versio siitä huolimatta. Riippuvuuksia ei asenneta automaattisesti."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Asennetaan modipakettia..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Lisää modipaketin kuvaus..."
   },

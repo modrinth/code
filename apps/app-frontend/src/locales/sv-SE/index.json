@@ -152,12 +152,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tillgänglig version matchar {compatibilityLabel}. Välj en version att installera ändå. Beroenden kommer inte installeras automatiskt."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installerar modpaket..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."
   },

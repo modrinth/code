@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Hide more running instances"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Dismiss"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Install failed"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Installation failed due to app closing."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Installation failed due to a network error."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Installation failed due to an unknown error."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Open instance"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Retry"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Unknown instance"
+  },
+  "app.action-bar.installs": {
+    "message": "Installs"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Make primary instance"
   },
@@ -161,12 +188,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installing modpack..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
   },
@@ -193,6 +214,60 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Downloading content"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Downloading Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Downloading pack file"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extracting overrides"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalizing"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Preparing instance"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Preparing Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Downloading Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Extracting Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Fetching Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Preparing Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validating Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Reading pack manifest"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Resolving loader"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Resolving Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Resolving content"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Rolling back"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Running loader processors"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."

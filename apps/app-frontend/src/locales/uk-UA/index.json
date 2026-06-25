@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Жодна доступна версія не сумісна з {compatibilityLabel}. Виберіть версію, щоб усе одно її встановити. Залежності не встановлюватимуться автоматично."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Установлення збірки…"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Уведіть опис збірки…"
   },

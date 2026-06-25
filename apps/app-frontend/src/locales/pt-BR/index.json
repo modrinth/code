@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Nenhuma versão disponível corresponde a {compatibilityLabel}. Selecione uma versão para instalar mesmo assim. As dependências não serão instaladas automaticamente."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Instalando pacote de mods..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Insira uma descrição para o pacote de mods..."
   },
