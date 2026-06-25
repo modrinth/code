@@ -430,7 +430,9 @@ provideInstallationSettings({
 
 	isServer: false,
 	isApp: true,
-	showModpackVersionActions: computed(() => isModrinthLinkedModpack.value && !isMinecraftServer.value),
+	showModpackVersionActions: computed(
+		() => isModrinthLinkedModpack.value && !isMinecraftServer.value,
+	),
 	isLocalFile: isImportedModpack,
 	repairing,
 	reinstalling,

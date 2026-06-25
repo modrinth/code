@@ -155,12 +155,6 @@
   "app.browse.server.installing": {
     "message": "Ini-install"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Ini-install ang modpack..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Ilagay ang paglalarawan ng modpack..."
   },

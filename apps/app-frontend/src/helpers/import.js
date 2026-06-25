@@ -3,6 +3,8 @@
  * So, for example, addDefaultInstance creates a blank instance object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
+import { invoke } from '@tauri-apps/api/core'
+
 import { install_import_instance } from './install'
 
 /*

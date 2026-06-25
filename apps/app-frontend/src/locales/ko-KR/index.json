@@ -155,12 +155,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "{compatibilityLabel} 버전과 일치하는 버전이 없습니다. 설치할 버전을 선택하세요. 종속성은 자동으로 설치되지 않습니다."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "모드팩 설치중..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "모드팩 설명 입력..."
   },

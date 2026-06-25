@@ -140,12 +140,6 @@
   "app.browse.server.installing": {
     "message": "インストール中"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modパックをインストール中..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
   },

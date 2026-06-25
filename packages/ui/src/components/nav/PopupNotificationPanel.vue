@@ -37,10 +37,7 @@
 					@open-instance="handleToastAction(item, item.toast.onOpenInstance)"
 				/>
 				<div v-else-if="isDownloadNotification(item)" class="flex flex-col gap-4">
-					<div
-						v-for="progressItem in downloadToastItems(item)"
-						:key="progressItem.id"
-					>
+					<div v-for="progressItem in downloadToastItems(item)" :key="progressItem.id">
 						<NotificationToast
 							type="instance-download"
 							:entity-name="progressItem.title || item.title"

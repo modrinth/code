@@ -107,12 +107,6 @@
   "app.browse.server.installing": {
     "message": "جاري التثبيت"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "تنزيل الحزم"
-  },
   "app.export-modal.description-placeholder": {
     "message": "أدخل وصف التعديل..."
   },

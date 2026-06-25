@@ -133,10 +133,7 @@
 							<button @click="$emit('open-instance')">Instance</button>
 						</ButtonStyled>
 					</div>
-					<div
-						v-if="progressLabel"
-						class="notification-inline-progress-label flex-none"
-					>
+					<div v-if="progressLabel" class="notification-inline-progress-label flex-none">
 						{{ progressLabel }}
 					</div>
 				</div>
@@ -175,7 +172,7 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { computed, ref, type Component } from 'vue'
+import { type Component, computed, ref } from 'vue'
 
 import { useFormatBytes, useFormatNumber } from '../../composables'
 import type { PopupNotificationProgressType } from '../../providers'

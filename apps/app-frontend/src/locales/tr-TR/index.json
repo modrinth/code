@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Kullanılabilir sürümler {compatibilityLabel} ile eşleşmiyor. Yine de kurulacak bir sürüm seçin. Bağımlılıklar otomatik olarak yüklenmeyecektir."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Mod paketi indiriliyor..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Mod paketi açıklaması girin..."
   },

@@ -11,20 +11,18 @@ import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPa
 import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
+import { import_instance } from '@/helpers/import.js'
 import {
+	type CreatePackLocation,
 	install_create_instance,
 	install_create_modpack_instance,
 	install_get_modpack_preview,
-	type CreatePackLocation,
 } from '@/helpers/install'
-import { import_instance } from '@/helpers/import.js'
 import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
 import type { InstanceLoader } from '@/helpers/types'
 
-export function setupCreationModal(
-	notificationManager: AbstractWebNotificationManager,
-) {
+export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
 	const { handleError } = notificationManager
 	const router = useRouter()
 

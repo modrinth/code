@@ -686,9 +686,7 @@ const messages = defineMessages({
 								<UnlinkIcon class="size-5" />
 								{{
 									formatMessage(
-										isLinkedModpack
-											? commonMessages.unlinkModpackButton
-											: messages.unlinkButton,
+										isLinkedModpack ? commonMessages.unlinkModpackButton : messages.unlinkButton,
 									)
 								}}
 							</button>

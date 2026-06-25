@@ -16,9 +16,9 @@ import {
 	install_job_list,
 	install_job_retry,
 	installJobInstanceId,
-	type InstallProgress,
 	type InstallJobSnapshot,
 	type InstallJobStatus,
+	type InstallProgress,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
 

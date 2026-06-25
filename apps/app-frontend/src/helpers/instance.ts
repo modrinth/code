@@ -8,14 +8,7 @@ import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot } from './install'
-import type {
-	CacheBehaviour,
-	ContentFile,
-	ContentFileProjectType,
-	GameInstance,
-	InstanceLink,
-	InstanceLoader,
-} from './types'
+import type { CacheBehaviour, ContentFile, ContentFileProjectType, GameInstance } from './types'
 
 export async function remove(instanceId: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove', { instanceId })
