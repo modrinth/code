@@ -6,7 +6,7 @@ use crate::auth::get_user_from_headers;
 use crate::database::models::ids::DBVersionId;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBProject, DBVersion};
-use crate::database::{PgPool, redis::RedisPool};
+use crate::database::{PgPool, ReadOnlyPgPool, redis::RedisPool};
 use crate::models::pats::Scopes;
 use crate::models::projects::{DependencyType, Version};
 use crate::models::users::User;
@@ -36,6 +36,7 @@ async fn resolve_content(
     req: HttpRequest,
     request: web::Json<ResolveContentRequest>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ResolveContentPlan>, ApiError> {
@@ -52,6 +53,7 @@ async fn resolve_content(
     let cache_public_result = user_option.is_none();
     let mut provider = LabrinthContentProvider {
         pool: pool.get_ref(),
+        ro_pool: ro_pool.get_ref(),
         redis: redis.get_ref(),
         user_option: &user_option,
         trace: ResolveContentTrace::default(),
@@ -70,6 +72,7 @@ async fn resolve_content(
 
 struct LabrinthContentProvider<'a> {
     pool: &'a PgPool,
+    ro_pool: &'a ReadOnlyPgPool,
     redis: &'a RedisPool,
     user_option: &'a Option<User>,
     trace: ResolveContentTrace,
@@ -179,10 +182,15 @@ impl ContentMetadataProvider for &mut LabrinthContentProvider<'_> {
             DBVersion::get_many(&project.versions, self.pool, self.redis)
                 .await
                 .map_err(resolve_provider_error)?;
-        let versions =
-            visible_versions(versions, self.user_option, self.pool, self.redis)
-                .await
-                .map_err(resolve_provider_error)?;
+        let versions = visible_versions(
+            versions,
+            self.user_option,
+            self.pool,
+            self.ro_pool,
+            self.redis,
+        )
+        .await
+        .map_err(resolve_provider_error)?;
 
         let versions = versions
             .into_iter()
@@ -230,17 +238,17 @@ async fn resolve_content_with_cache(
 ) -> Result<ResolveContentPlan, ResolveError> {
     let cache_key = content_resolve_cache_key(&request);
     let heat_key = content_resolve_heat_key(&request);
-    let heat = increment_content_resolve_cache_heat(&provider.redis, &heat_key)
+    let heat = increment_content_resolve_cache_heat(provider.redis, &heat_key)
         .await
         .unwrap_or(1);
     let cache_expiry = content_resolve_cache_expiry_seconds(heat);
 
     if let Some(cached) =
-        get_cached_resolve_content_plan(&provider.redis, &cache_key).await
+        get_cached_resolve_content_plan(provider.redis, &cache_key).await
         && validate_cached_trace(provider, &cached.trace).await?
     {
         set_cached_resolve_content_plan(
-            &provider.redis,
+            provider.redis,
             &cache_key,
             &cached,
             cache_expiry,
@@ -255,7 +263,7 @@ async fn resolve_content_with_cache(
             .await?;
     let trace = provider.trace();
     set_cached_resolve_content_plan(
-        &provider.redis,
+        provider.redis,
         &cache_key,
         &CachedResolveContentPlan {
             trace,
@@ -550,9 +558,10 @@ async fn visible_versions(
     versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
     pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<Version>, ApiError> {
-    filter_visible_versions(versions, user_option, pool, redis).await
+    filter_visible_versions(versions, user_option, pool, ro_pool, redis).await
 }
 
 fn version_to_resolver(
