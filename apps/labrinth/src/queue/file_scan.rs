@@ -19,6 +19,7 @@ use crate::database::models::{DBFileId, DBUserId, DBVersion};
 use crate::database::{PgPool, PgTransaction, redis::RedisPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::error::ApiError;
 use crate::models::ids::FileId;
 use crate::models::projects::{
     AttributionResolution, AttributionResolutionKind, DependencyAttribution,
@@ -31,6 +32,8 @@ use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 
 const PENDING_FILE_SCAN_BATCH_SIZE: i64 = 100;
+
+type FileScanResult<'a> = std::result::Result<(), ApiError<'a>>;
 
 #[derive(Clone)]
 struct PendingFileScan {
@@ -58,8 +61,11 @@ pub async fn scan_all_pending_files(
 
     let total_to_scan = sqlx::query_scalar!(
         r#"
-        select count(*) as "count!" from file_scans
-        where attributions_scanned_at is null
+        select count(*) as "count!"
+        from file_scans fa
+        inner join files f on f.id = fa.file_id
+        inner join attribution_enforced_versions aev on aev.id = f.version_id
+        where fa.attributions_scanned_at is null
         "#,
     )
     .fetch_one(db)
@@ -113,9 +119,10 @@ async fn scan_pending_files_batch(
     .await
     .wrap_err("fetching files to scan")?;
 
+    let fetched_count = files_to_scan.len();
+
     info!(
-        "Found {} pending files to scan, splitting into jobs of {PENDING_FILE_SCAN_BATCH_SIZE}",
-        files_to_scan.len(),
+        "Found {fetched_count} pending files to scan, splitting into jobs of {PENDING_FILE_SCAN_BATCH_SIZE}",
     );
 
     let files_to_scan: Vec<_> = files_to_scan
@@ -140,11 +147,26 @@ async fn scan_pending_files_batch(
     }
 
     let mut scanned_count = 0;
+    let mut first_err = None;
     for task in tasks {
-        scanned_count += task
-            .await
-            .wrap_err("joining file scan task")?
-            .wrap_err("scanning pending file chunk")?;
+        match task.await.wrap_err("joining file scan task")? {
+            Ok(count) => scanned_count += count,
+            Err(err) => {
+                if first_err.is_none() {
+                    first_err = Some(err);
+                }
+            }
+        }
+    }
+
+    if let Some(err) = first_err {
+        return Err(err).wrap_err("scanning pending file chunk");
+    }
+
+    if fetched_count > 0 && scanned_count == 0 {
+        return Err(eyre!(
+            "file scan batch made no progress after fetching {fetched_count} files"
+        ));
     }
 
     info!("Marked {} files as scanned", scanned_count);
@@ -164,10 +186,10 @@ async fn scan_pending_files_chunk(
     for row in files_to_scan {
         let human_file_id = FileId::from(row.file_id);
         let span = info_span!("scan", file_id = %human_file_id);
-        async {
-            info!("Scanning file");
 
-            let file_id = row.file_id;
+        let file_id = row.file_id;
+        let result = async {
+            info!("Scanning file");
 
             let overrides = extract_override_files_from_storage(
                 file_host, file_id, &row.url,
@@ -179,6 +201,7 @@ async fn scan_pending_files_chunk(
 
             if overrides.is_empty() {
                 info!("Found no overrides");
+
                 return Ok(());
             }
 
@@ -209,20 +232,6 @@ async fn scan_pending_files_chunk(
                 eyre!("persisting attribution results for file {file_id:?}")
             })?;
 
-            let now = Utc::now();
-            sqlx::query!(
-                "
-                update file_scans
-                set attributions_scanned_at = $2
-                where file_id = $1
-                ",
-                file_id.0,
-                now,
-            )
-            .execute(&mut txn)
-            .await
-            .wrap_err("marking file as scanned")?;
-
             txn.commit()
                 .await
                 .wrap_err("committing file scan transaction")?;
@@ -230,7 +239,21 @@ async fn scan_pending_files_chunk(
             eyre::Ok(())
         }
         .instrument(span)
-        .await?;
+        .await;
+
+        let scan_result = file_scan_result(&result);
+        match result {
+            Ok(()) => {
+                info!(%human_file_id, "Successfully scanned file");
+            }
+            Err(err) => {
+                warn!(%human_file_id, "Failed to scan file: {err:?}");
+            }
+        }
+
+        update_file_scan_result(db, file_id, scan_result)
+            .await
+            .wrap_err("marking file as scanned")?;
 
         scanned_count += 1;
     }
@@ -239,6 +262,25 @@ async fn scan_pending_files_chunk(
 }
 
 pub async fn scan_file(
+    txn: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    file_host: &dyn FileHost,
+    project_id: DBProjectId,
+    file_id: DBFileId,
+    file_url: &str,
+) -> Result<()> {
+    let result =
+        scan_file_inner(txn, redis, file_host, project_id, file_id, file_url)
+            .await;
+
+    upsert_file_scan_result(txn, file_id, file_scan_result(&result))
+        .await
+        .wrap_err("marking file as scanned")?;
+
+    result
+}
+
+async fn scan_file_inner(
     txn: &mut PgTransaction<'_>,
     redis: &RedisPool,
     file_host: &dyn FileHost,
@@ -269,17 +311,69 @@ pub async fn scan_file(
         })?;
     }
 
+    Ok(())
+}
+
+fn file_scan_result(result: &Result<()>) -> FileScanResult<'static> {
+    match result {
+        Ok(()) => Ok(()),
+        Err(err) => Err(ApiError {
+            error: "internal_error",
+            description: format!("{err:#}"),
+            details: None,
+        }),
+    }
+}
+
+async fn update_file_scan_result(
+    db: &PgPool,
+    file_id: DBFileId,
+    result: FileScanResult<'_>,
+) -> Result<()> {
+    let now = Utc::now();
+
     sqlx::query!(
-        "
-        insert into file_scans (file_id, attributions_scanned_at)
-        values ($1, now())
-        on conflict (file_id) do update set attributions_scanned_at = now()
-        ",
+        r#"
+        update file_scans
+        set
+            attributions_scanned_at = $2,
+            attributions_scan_result = $3
+        where file_id = $1
+        "#,
         file_id.0,
+        now,
+        sqlx::types::Json(result) as _,
+    )
+    .execute(db)
+    .await
+    .wrap_err("updating file scan result")?;
+
+    Ok(())
+}
+
+async fn upsert_file_scan_result(
+    txn: &mut PgTransaction<'_>,
+    file_id: DBFileId,
+    result: FileScanResult<'_>,
+) -> Result<()> {
+    sqlx::query!(
+        r#"
+        insert into file_scans (
+            file_id,
+            attributions_scanned_at,
+            attributions_scan_result
+        )
+        values ($1, now(), $2)
+        on conflict (file_id) do update set
+            attributions_scanned_at = now(),
+            attributions_scan_result = $2
+        "#,
+        file_id.0,
+        sqlx::types::Json(result) as _,
     )
     .execute(&mut *txn)
     .await
-    .wrap_err("marking file as scanned")?;
+    .wrap_err("upserting file scan result")?;
 
     Ok(())
 }
