@@ -151,14 +151,13 @@ pub(crate) async fn update_all_projects(
                 .await?;
 
                 if update.relative_path.ends_with(".disabled") {
-                    new_path =
-                        toggle_disable_project(
-                            instance_id,
-                            &new_path,
-                            Some(false),
-                            state,
-                        )
-                        .await?;
+                    new_path = toggle_disable_project(
+                        instance_id,
+                        &new_path,
+                        Some(false),
+                        state,
+                    )
+                    .await?;
                 }
 
                 if new_path != update.relative_path {

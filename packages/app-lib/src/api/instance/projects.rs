@@ -149,15 +149,14 @@ pub async fn update_managed_modrinth_version(
     version_id: &str,
 ) -> crate::Result<crate::install::InstallJobSnapshot> {
     let state = State::get().await?;
-    let metadata =
-        crate::state::instances::commands::get_instance_metadata(
-            instance_id,
-            &state.pool,
-        )
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
 
     let post_install_edit = match &metadata.link {
         crate::state::InstanceLink::ServerProjectModpack {
@@ -207,15 +206,14 @@ pub async fn repair_managed_modrinth(
     instance_id: &str,
 ) -> crate::Result<crate::install::InstallJobSnapshot> {
     let state = State::get().await?;
-    let metadata =
-        crate::state::instances::commands::get_instance_metadata(
-            instance_id,
-            &state.pool,
-        )
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
 
     let post_install_edit = match &metadata.link {
         crate::state::InstanceLink::ServerProjectModpack { .. } => {

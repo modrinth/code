@@ -3,8 +3,8 @@ use std::path::{Path, PathBuf};
 use serde::{Deserialize, Serialize, de};
 
 use crate::{
-    install::{InstallPhaseDetails, InstallProgressReporter},
     State,
+    install::{InstallPhaseDetails, InstallProgressReporter},
     pack::{
         import::{self, finish_import},
         install_from::{self, CreatePackDescription, PackDependency},

@@ -1,10 +1,10 @@
 //! Downloader for Minecraft data
 
-use crate::instance::QuickPlayType;
 use crate::install::{
     InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter,
 };
+use crate::instance::QuickPlayType;
 use crate::launcher::parse_rules;
 use crate::{
     event::{
@@ -98,7 +98,8 @@ pub async fn download_minecraft(
     );
 
     // 5
-    let assets_index = download_assets_index(st, version, loading_bar, force).await?;
+    let assets_index =
+        download_assets_index(st, version, loading_bar, force).await?;
     let progress = if let Some(reporter) = reporter {
         Some(
             MinecraftDownloadProgress::new(

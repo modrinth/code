@@ -366,19 +366,21 @@ pub(crate) async fn toggle_disable_project(
     .await?
     {
         Some(file) => file,
-        None if current_path != project_path => match content_rows::rename_instance_file(
-            &scope.instance.id,
-            project_path,
-            &new_path,
-            &file_name,
-            enabled,
-            &state.pool,
-        )
-        .await?
-        {
-            Some(file) => file,
-            None => index_existing_file(&scope, &new_path, state).await?,
-        },
+        None if current_path != project_path => {
+            match content_rows::rename_instance_file(
+                &scope.instance.id,
+                project_path,
+                &new_path,
+                &file_name,
+                enabled,
+                &state.pool,
+            )
+            .await?
+            {
+                Some(file) => file,
+                None => index_existing_file(&scope, &new_path, state).await?,
+            }
+        }
         None => index_existing_file(&scope, &new_path, state).await?,
     };
     content_rows::set_content_entry_enabled_for_file(
