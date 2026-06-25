@@ -26,7 +26,6 @@ use crate::util::fetch::{
 use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
-use std::cmp::Reverse;
 use std::collections::HashSet;
 use std::io::Cursor;
 
@@ -896,6 +895,7 @@ async fn get_modpack_identifiers(
         &[&primary_file.url],
         primary_file.hashes.get("sha1").map(|s| s.as_str()),
         Some(&download_meta),
+        None,
         fetch_semaphore,
         pool,
     )

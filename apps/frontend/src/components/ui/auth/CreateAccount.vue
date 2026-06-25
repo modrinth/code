@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="shadow-card mx-auto flex w-full max-w-[28rem] flex-col gap-6 rounded-2xl border border-button-bg bg-surface-3 p-6"
+		class="shadow-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 rounded-2xl border border-solid border-button-bg bg-surface-3 !p-6"
 	>
 		<h1
 			class="mx-auto my-0 flex w-full justify-center text-center text-2xl font-semibold text-contrast"
@@ -22,9 +22,6 @@
 				preserve-day
 				:placeholder="formatMessage(messages.dateOfBirthPlaceholder)"
 			/>
-			<div>
-				{{ formatMessage(messages.over13HelperText) }}
-			</div>
 			<Admonition :type="'info'">
 				<template #header>
 					<div class="-mb-3 -mt-1 flex flex-col gap-0 text-sm font-normal leading-normal">
@@ -47,7 +44,6 @@
 		<section class="flex flex-col gap-2.5">
 			<label class="text-md font-semibold text-contrast" for="create-account-username">
 				{{ formatMessage(messages.usernameOptionalLabel) }}
-				<span class="font-normal text-primary">(optional)</span>
 			</label>
 			<StyledInput
 				id="create-account-username"
@@ -234,13 +230,9 @@ const messages = defineMessages({
 		id: 'auth.create-account.date-of-birth.invalid.text',
 		defaultMessage: 'Please enter a valid date of birth. Year cannot be 0000.',
 	},
-	over13HelperText: {
-		id: 'auth.create-account.date-of-birth.over13-helper',
-		defaultMessage: 'You must be over 13 years old to use Modrinth.',
-	},
 	under13HelperText: {
 		id: 'auth.create-account.date-of-birth.under13-helper',
-		defaultMessage: 'You cannot create an account at Modrinth unless you are over 13 years old.',
+		defaultMessage: 'You do not meet the age requirement to create an account at Modrinth.',
 	},
 	ageRequirementWarningTitle: {
 		id: 'auth.create-account.age-requirement.warning-title',
@@ -249,14 +241,14 @@ const messages = defineMessages({
 	infoPanelText: {
 		id: 'auth.create-account.info-panel.text',
 		defaultMessage:
-			'We do not store your date of birth, only whether you are over 13 to use Modrinth.',
+			'We do not store your date of birth. We only use it during sign-up to validate COPPA compliance.',
 	},
 	relevantSourceCodeText: {
 		id: 'auth.create-account.info-panel.source-code-link',
 		defaultMessage: 'Relevant source code',
 	},
 	usernameOptionalLabel: {
-		id: 'auth.create-account.username.optional-label',
+		id: 'auth.create-account.username.label',
 		defaultMessage: 'Username',
 	},
 	usernamePlaceholder: {

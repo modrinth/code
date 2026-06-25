@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+		class="universal-card flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
 		<template v-if="auth.user && auth.user.email_verified && !success">
 			<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">

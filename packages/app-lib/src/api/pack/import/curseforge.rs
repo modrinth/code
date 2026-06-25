@@ -82,6 +82,7 @@ pub async fn import_curseforge(
             &thumbnail_url,
             None,
             None,
+            None,
             &state.fetch_semaphore,
             &state.pool,
         )

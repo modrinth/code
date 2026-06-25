@@ -11,27 +11,32 @@ export interface TechReviewContext {
 export default [
 	{
 		label: '⚠️ Unclear/Misleading',
-		message: async () => (await import('./messages/tech-review/unclear-misleading.md?raw')).default,
+		message: async () =>
+			(await import('./messages/quick-replies/tech-review/unclear-misleading.md?raw')).default,
 		private: false,
 	},
 	{
 		label: '📝 Request Source',
-		message: async () => (await import('./messages/tech-review/request-source.md?raw')).default,
+		message: async () =>
+			(await import('./messages/quick-replies/tech-review/request-source.md?raw')).default,
 		private: false,
 	},
 	{
 		label: '🔒 Request Source (Obf)',
-		message: async () => (await import('./messages/tech-review/request-source-obf.md?raw')).default,
+		message: async () =>
+			(await import('./messages/quick-replies/tech-review/request-source-obf.md?raw')).default,
 		private: false,
 	},
 	{
 		label: '📦 Request Source (Bin)',
-		message: async () => (await import('./messages/tech-review/request-source-bin.md?raw')).default,
+		message: async () =>
+			(await import('./messages/quick-replies/tech-review/request-source-bin.md?raw')).default,
 		private: false,
 	},
 	{
 		label: '🚫 Malware',
-		message: async () => (await import('./messages/tech-review/malware.md?raw')).default,
+		message: async () =>
+			(await import('./messages/quick-replies/tech-review/malware.md?raw')).default,
 		private: false,
 	},
 ] as ReadonlyArray<QuickReply<TechReviewContext>>

@@ -881,7 +881,9 @@
 						class="card flex-card"
 					/>
 					<ProjectSidebarCompatibility
-						v-if="projectV3Loaded && !isServerProject"
+						v-if="
+							projectV3Loaded && !isServerProject && route.name !== 'type-project-version-version'
+						"
 						:project="project"
 						:tags="tags"
 						:project-v3="projectV3"
@@ -2930,6 +2932,10 @@ provideProjectPageContext({
 	> div {
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 	}
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>
 

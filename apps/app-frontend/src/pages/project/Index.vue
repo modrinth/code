@@ -406,6 +406,20 @@ function buildProjectHref(path, extraQuery = {}) {
 	return qs ? `${path}?${qs}` : path
 }
 
+function buildBrowseHref(path) {
+	const params = new URLSearchParams()
+	for (const [key, val] of Object.entries(route.query)) {
+		if (key === 'b') continue
+		if (Array.isArray(val)) {
+			for (const v of val) params.append(key, v)
+		} else if (val) {
+			params.append(key, String(val))
+		}
+	}
+	const qs = params.toString()
+	return qs ? `${path}?${qs}` : path
+}
+
 const projectDescriptionHref = computed(() => buildProjectHref(`/project/${route.params.id}`))
 const versionsHref = computed(() =>
 	buildProjectHref(`/project/${route.params.id}/versions`, instanceFilters.value),
@@ -416,7 +430,7 @@ const projectBrowseBackUrl = computed(() => {
 	const browsePath = route.query.b
 	if (typeof browsePath === 'string' && browsePath.startsWith('/browse/')) return browsePath
 	const type = data.value?.project_type ? `${data.value.project_type}` : 'mod'
-	return `/browse/${type}`
+	return buildBrowseHref(`/browse/${type}`)
 })
 
 const projectInstallContext = computed(() => {
@@ -725,10 +739,11 @@ async function install(version) {
 		version,
 		instance.value ? instance.value.path : null,
 		'ProjectPage',
-		(version) => {
+		(version, installedProjectIds) => {
 			installing.value = false
 
-			if (instance.value && version) {
+			const installedIds = installedProjectIds ?? [data.value.id]
+			if (instance.value && version && installedIds.includes(data.value.id)) {
 				installed.value = true
 				installedVersion.value = version
 			}

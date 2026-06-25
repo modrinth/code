@@ -351,7 +351,7 @@
     "defaultMessage": "Borrar {count, number} {itemType}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Borrar {itemType}"
+    "defaultMessage": "Eliminar {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Bajar de versión} other {Actualizar}} puede causar problemas de compatibilidad. Los mods o contenido que agregaste sobre el modpack se mantendrán, pero podrían no ser compatibles con la nueva versión."
@@ -376,6 +376,48 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Desvincular"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Este contenido es requerido por otro contenido"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Proyecto afectado} other {Proyectos afectados}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Algunos proyectos seleccionados son instalados como dependencias. Eliminarlos puede dañar tu {context} o impedir que el contenido dependiente se cargue correctamente."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instancia"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "servidor"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Eliminar de todas formas"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Eliminar {count, number} {itemType} de todas formas"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Eliminando"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Desactivar elementos dependientes tras eliminar"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Es posible que el contenido dependiente no se cargue o se desactive a sí mismo"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Tu {context} podría fallar, no iniciar o comportarse de forma inesperada"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Advertencia de dependencia"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} está instalado como una dependencia. Eliminarlo puede dañar su {context} o impedir que el contenido dependiente se cargue correctamente."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "¿Qué pasa?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} añadido"
@@ -547,6 +589,9 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Actualizando {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} {count, plural, one {seleccionado} other {seleccionados}}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} seleccionados"
@@ -864,7 +909,7 @@
     "defaultMessage": "Crear {type}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "Crear un/a {type}"
+    "defaultMessage": "Crear un {type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "por ej., mi-carpeta"
@@ -879,7 +924,7 @@
     "defaultMessage": "Borrar archivo"
   },
   "files.delete-modal.warning.file": {
-    "defaultMessage": "Este archivo será permanentemente eliminado. Esta acción no se puede deshacer."
+    "defaultMessage": "Éste archivo será eliminado permanentemente. Ésta acción no se puede deshacer."
   },
   "files.delete-modal.warning.folder": {
     "defaultMessage": "Esta carpeta y todo su contenido será permanentemente eliminado. Esta acción no se puede deshacer."
@@ -1146,7 +1191,7 @@
     "defaultMessage": " - {count} restantes"
   },
   "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Arrastra {type} aquí para subir"
+    "defaultMessage": "Suelta el {type} a subir"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "El nombre solo debe contener caracteres alfanuméricos, guiones, guiones bajos o espacios."
@@ -3521,6 +3566,9 @@
   "servers.access-page.role.viewer-description": {
     "defaultMessage": "Puede iniciar, detener y ver el servidor pero sin poder modificarlo."
   },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Buscar {count, plural, one {# usuario} other {# usuarios}}..."
+  },
   "servers.access-role.editor": {
     "defaultMessage": "Editor/a"
   },
@@ -3745,6 +3793,18 @@
   },
   "servers.audit-log.event.server-plan.new-plan": {
     "defaultMessage": "nuevo plan"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, plural, one {# GB de RAM} other {# GBs de RAM}}"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, plural, one {# MB de RAM} other {# MBs de RAM}}"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, plural, one {# GB} other {# GBs}} se almacenamiento"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, plural, one {# MB} other {# MBs}} se almacenamiento"
   },
   "servers.audit-log.event.server-properties-modified": {
     "defaultMessage": "Propiedades <properties></properties> del servidor modificadas"
@@ -4089,7 +4149,7 @@
     "defaultMessage": "Aún no hay servidores"
   },
   "servers.list-empty.one-click-mod-installs-description": {
-    "defaultMessage": "Elige tus mods favoritos y nosotros nos encargamos del resto."
+    "defaultMessage": "Escoge tus mods favoritos y nos encargaremos del resto."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Instalación de mods en un clic"
@@ -4134,10 +4194,10 @@
     "defaultMessage": "Tus archivos se conservarán durante 30 días tras la cancelación."
   },
   "servers.listing.notice.moderated": {
-    "defaultMessage": "Tu servidor ha sido suspendido por acciones de moderación."
+    "defaultMessage": "Tu servidor ha sido suspendido por moderación."
   },
   "servers.listing.notice.pending-change": {
-    "defaultMessage": "Tu servidor será {verb, select, downgrade {degradado} other {actualizado}} al Plan {planSize} en la fecha <date>{formattedDate}</date>."
+    "defaultMessage": "Tu servidor será {verb, select,downgrade {degradado} other {mejorado}} al plan {planSize} el <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Por favor, espera mientras configuramos su servidor. Esto puede tardar hasta 10 minutos."
@@ -4146,7 +4206,7 @@
     "defaultMessage": "Tu suscripción fue cancelada."
   },
   "servers.listing.notice.subscription-cancelled-on-date": {
-    "defaultMessage": "Tu suscripción fue cancelada en la fecha <date>{formattedDate}</date>."
+    "defaultMessage": "Tu suscripción se canceló el <date>{formattedDate}</date>"
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Tu suscripción se canceló por un error en el pago."
@@ -5070,7 +5130,7 @@
     "defaultMessage": "Disminuir la cantidad del plazo"
   },
   "time-frame-picker.empty-range": {
-    "defaultMessage": "No se ha seleccionado ningún rango de fechas."
+    "defaultMessage": "Sin rango de fecha seleccionado."
   },
   "time-frame-picker.end-date": {
     "defaultMessage": "Fecha final"
@@ -5082,7 +5142,7 @@
     "defaultMessage": "Durante {unit, select,\n  hours {{amount, plural, one {la última hora} other {las últimas {amount} horas}}}\n  days {{amount, plural, one {el último día} other {los últimos {amount} días}}}\n  weeks {{amount, plural, one {la última semana} other {las últimas {amount} semanas}}}\n  months {{amount, plural, one {el último mes} other {los últimos {amount} meses}}}\n  other {{amount} días}\n}"
   },
   "time-frame-picker.last-timeframe-prefix": {
-    "defaultMessage": "Durante el último tiempo"
+    "defaultMessage": "En las últimas"
   },
   "time-frame-picker.option.all-time": {
     "defaultMessage": "Todo el tiempo"
@@ -5115,22 +5175,22 @@
     "defaultMessage": "Seleccionar periodo de tiempo"
   },
   "time-frame-picker.selected-range": {
-    "defaultMessage": "Seleccionado"
+    "defaultMessage": "Seleccionados"
   },
   "time-frame-picker.selecting-range": {
     "defaultMessage": "Seleccionando"
   },
   "time-frame-picker.start-date": {
-    "defaultMessage": "Fecha de inicio"
+    "defaultMessage": "Fecha inicial"
   },
   "time-frame-picker.timeframe-amount": {
     "defaultMessage": "Cantidad del periodo de tiempo"
   },
   "time-frame-picker.timeframe-unit": {
-    "defaultMessage": "Unidad de periodo de tiempo"
+    "defaultMessage": "Unidad de tiempo"
   },
   "time-frame-picker.unit.days": {
-    "defaultMessage": "días"
+    "defaultMessage": "Dias"
   },
   "time-frame-picker.unit.hours": {
     "defaultMessage": "horas"
@@ -5262,3 +5322,4 @@
     "defaultMessage": "Equipo de Modrinth"
   }
 }
+

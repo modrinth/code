@@ -1,10 +1,10 @@
 use crate::auth::checks::filter_visible_versions;
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
@@ -229,7 +229,12 @@ impl Default for AutomatedModerationQueue {
 }
 
 impl AutomatedModerationQueue {
-    pub async fn task(&self, pool: PgPool, redis: RedisPool) {
+    pub async fn task(
+        &self,
+        pool: PgPool,
+        ro_pool: ReadOnlyPgPool,
+        redis: RedisPool,
+    ) {
         loop {
             let projects = self.projects.clone();
             self.projects.clear();
@@ -237,7 +242,8 @@ impl AutomatedModerationQueue {
             for project in projects {
                 async {
                     let project =
-                        database::DBProject::get_id((project).into(), &pool, &redis).await?;
+                        database::DBProject::get_id((project).into(), &*ro_pool, &redis)
+                            .await?;
 
                     if let Some(project) = project {
                         let res = async {
@@ -277,7 +283,7 @@ impl AutomatedModerationQueue {
                             }
 
                             let versions =
-                                database::DBVersion::get_many(&project.versions, &pool, &redis)
+                                database::DBVersion::get_many(&project.versions, &*ro_pool, &redis)
                                     .await?
                                     .into_iter()
                                     // we only support modpacks at this time
@@ -369,12 +375,13 @@ impl AutomatedModerationQueue {
                                     let versions_data = filter_visible_versions(
                                         database::models::DBVersion::get_many(
                                             &version_ids,
-                                            &pool,
+                                            &*ro_pool,
                                             &redis,
                                         )
                                             .await?,
                                         &None,
                                         &pool,
+                                        &ro_pool,
                                         &redis,
                                     )
                                         .await?;
@@ -570,7 +577,7 @@ impl AutomatedModerationQueue {
                                             Vec::new()
                                         } else {
                                             let res = client
-                                                .post(format!("{}v1/mods", ENV.FLAME_ANVIL_URL))
+                                                .post(format!("{}/v1/mods", ENV.FLAME_ANVIL_URL))
                                             .json(&serde_json::json!({
                                                 "modIds": flame_files.iter().map(|x| x.1).collect::<Vec<_>>()
                                             }))
@@ -579,7 +586,7 @@ impl AutomatedModerationQueue {
                                             .text()
                                             .await?;
 
-                                        serde_json::from_str::<FlameResponse<Vec<FlameProject>>>(&res)?.data
+                                        serde_json::from_str::<FlameResponse<Vec<FlameProjectResponse>>>(&res)?.data
                                     };
 
                                     let mut missing_metadata = MissingMetadata {
@@ -823,7 +830,7 @@ pub enum ApprovalType {
 }
 
 impl ApprovalType {
-    fn approved(&self) -> bool {
+    pub fn approved(&self) -> bool {
         match self {
             ApprovalType::Yes => true,
             ApprovalType::WithAttributionAndSource => true,
@@ -896,11 +903,18 @@ pub struct FlameFileHash {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct FlameProject {
+pub struct FlameProjectResponse {
     pub id: u32,
     pub name: String,
     pub slug: String,
     pub links: FlameLinks,
+    pub logo: FlameLogo,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FlameLogo {
+    pub thumbnail_url: String,
 }
 
 #[derive(Deserialize, Serialize)]

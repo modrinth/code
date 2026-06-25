@@ -8,6 +8,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchBackend;
+use crate::search::incremental::consume::reindex_project;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
@@ -26,7 +27,8 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
         utoipa_actix_web::scope("/admin")
             .service(count_download)
-            .service(force_reindex),
+            .service(force_reindex)
+            .service(force_reindex_project),
     );
 }
 
@@ -325,5 +327,35 @@ pub async fn force_reindex(
         .index_projects(pool.as_ref().clone(), redis.clone())
         .await
         .wrap_internal_err("failed to index projects")?;
+    Ok(HttpResponse::NoContent().finish())
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "forceReindexProject",
+    responses(
+        (status = 204, description = "Project search documents rebuilt successfully"),
+        (status = 401, description = "Unauthorized")
+    )
+)]
+#[post("/_force_reindex/{project_id}", guard = "admin_key_guard")]
+pub async fn force_reindex_project(
+    path: web::Path<(ProjectId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    search_backend: web::Data<dyn SearchBackend>,
+) -> Result<HttpResponse, ApiError> {
+    let (project_id,) = path.into_inner();
+    reindex_project(
+        pool.as_ref(),
+        redis.as_ref(),
+        search_backend.as_ref(),
+        project_id,
+    )
+    .await
+    .wrap_internal_err_with(|| {
+        eyre!("failed to reindex project `{project_id}`")
+    })?;
+
     Ok(HttpResponse::NoContent().finish())
 }

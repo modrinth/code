@@ -377,6 +377,48 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Desvincular"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Este contenido es necesario para otro contenido"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Proyecto afectado} other {Proyectos afectados}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Algunos proyectos seleccionados están instalados como dependencias. Eliminarlos puede dañar tu {context} o impedir que el contenido dependiente se cargue correctamente."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instancia"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "servidor"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Eliminar de todos modos"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Eliminar {count, number} {itemType} de todos modos"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Eliminando"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Desactivar elementos dependientes tras eliminar"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Es posible que el contenido dependiente no se cargue o se desactive a sí mismo"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Tu {context} podría fallar, no arrancar o comportarse de forma inesperada"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Advertencia de dependencia"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} está instalado como una dependencia. Eliminarlo puede dañar tu {context} o impedir que el contenido dependiente se cargue correctamente."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "¿Qué ocurre?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} añadido/s"
   },
@@ -547,6 +589,12 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Actualizando {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} {count, plural, one {seleccionado} other {seleccionados}}"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} {count, plural, one {seleccionado} other {seleccionados}}"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Crear instancia"
@@ -1497,7 +1545,7 @@
     "defaultMessage": "Autocorregir"
   },
   "installation-settings.incompatible-content.change-loader-button": {
-    "defaultMessage": "Cambiar cargador"
+    "defaultMessage": "Cambiar loader"
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Desactivar conflictos"
@@ -1512,10 +1560,10 @@
     "defaultMessage": "Contenido incompatible instalado"
   },
   "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "Al cambiar el cargador, se desactivará todo el contenido instalado. En su lugar, recomendamos reiniciar el servidor."
+    "defaultMessage": "Al cambiar de loader, se desactivará todo el contenido instalado. En su lugar, recomendamos reiniciar el servidor."
   },
   "installation-settings.incompatible-content.loader-change-title": {
-    "defaultMessage": "Cambiar los cargadores es destructivo"
+    "defaultMessage": "Cambiar los loaders es destructivo"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "{projectType} enlazado"
@@ -1530,7 +1578,7 @@
     "defaultMessage": "{loader} versión"
   },
   "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Tendrás que reiniciar el servidor para cambiar de cargador."
+    "defaultMessage": "Tendrás que reiniciar el servidor para cambiar de loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Al reinstalar el modpack, el contenido de {type} se restablecerá a su estado original, eliminando cualquier mod o contenido que hayas añadido."
@@ -1551,7 +1599,7 @@
     "defaultMessage": "Reparar instancia"
   },
   "installation-settings.repair.server-description": {
-    "defaultMessage": "Reinstala el cargador y las dependencias de Minecraft sin borrar tu contenido. Esto puede resolver los problemas si tu servidor no se inicia correctamente."
+    "defaultMessage": "Reinstala el loader y las dependencias de Minecraft sin borrar tu contenido. Esto puede resolver los problemas si tu servidor no se inicia correctamente."
   },
   "installation-settings.repair.server-title": {
     "defaultMessage": "Reparar servidor"
@@ -1653,7 +1701,7 @@
     "defaultMessage": "Tipo de instancia"
   },
   "instances.content-install.loader-label": {
-    "defaultMessage": "Cargador"
+    "defaultMessage": "Loader"
   },
   "instances.content-install.name-label": {
     "defaultMessage": "Nombre"
@@ -3231,13 +3279,13 @@
     "defaultMessage": "Código abierto"
   },
   "search.filter_type.mod_loader": {
-    "defaultMessage": "Cargador"
+    "defaultMessage": "Loader"
   },
   "search.filter_type.modpack_loader": {
-    "defaultMessage": "Cargador"
+    "defaultMessage": "Loader"
   },
   "search.filter_type.plugin_loader": {
-    "defaultMessage": "Cargador"
+    "defaultMessage": "Loader"
   },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Plataforma"
@@ -3258,7 +3306,7 @@
     "defaultMessage": "Estado"
   },
   "search.filter_type.shader_loader": {
-    "defaultMessage": "Cargador"
+    "defaultMessage": "Loader"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modificado"
@@ -3514,6 +3562,9 @@
   },
   "servers.access-page.role.viewer-description": {
     "defaultMessage": "Puede iniciar, detener y ver el servidor pero sin poder modificarlo."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Buscar {count, plural, one {# usuario} other {# usuarios}}..."
   },
   "servers.access-role.editor": {
     "defaultMessage": "Editor/a"

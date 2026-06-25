@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+		class="universal-card flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
 		<div class="mx-auto text-center text-2xl font-semibold text-contrast">
 			{{ formatMessage(messages.signUpWithTitle) }}

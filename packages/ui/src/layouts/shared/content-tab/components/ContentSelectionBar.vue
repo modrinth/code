@@ -141,7 +141,7 @@ const bulkProgressMessage = computed(() => {
 </script>
 
 <template>
-	<FloatingActionBar :shown="shown" :aria-label="ariaLabel">
+	<FloatingActionBar :shown="shown" :aria-label="ariaLabel" hide-when-modal-open>
 		<div class="flex items-center gap-0.5">
 			<div
 				v-if="selectedItems.length > 0"

@@ -48,7 +48,6 @@ use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use std::collections::HashMap;
 use std::str::FromStr;
-use std::sync::Arc;
 use thiserror::Error;
 use tracing::{error, info};
 use url::Url;
@@ -110,7 +109,7 @@ impl TempUser {
         provider: AuthProvider,
         transaction: &mut PgTransaction<'_>,
         client: &PgPool,
-        file_host: &Arc<dyn FileHost + Send + Sync>,
+        file_host: &dyn FileHost,
         redis: &RedisPool,
         username: String,
         sign_up_newsletter: bool,
@@ -159,7 +158,7 @@ impl TempUser {
                     ext,
                     Some(96),
                     Some(1.0),
-                    &**file_host,
+                    file_host,
                 )
                 .await;
 
@@ -1453,7 +1452,7 @@ struct NewOAuthAccount {
 async fn create_oauth_account(
     req: HttpRequest,
     db: Data<PgPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: Data<dyn FileHost>,
     redis: Data<RedisPool>,
     web::Json(new_account): web::Json<NewOAuthAccount>,
 ) -> Result<HttpResponse, ApiError> {
@@ -1489,7 +1488,7 @@ async fn create_oauth_account(
             provider,
             &mut txn,
             &db,
-            &file_host,
+            &**file_host,
             &redis,
             new_account.username,
             new_account.sign_up_newsletter,

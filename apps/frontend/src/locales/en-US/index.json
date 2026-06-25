@@ -23,6 +23,15 @@
   "analytics.breakdown.country": {
     "message": "Country"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Dependent on"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Dependent project"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Dependent project type"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Download reason"
   },
@@ -37,6 +46,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Member"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetization"
@@ -135,16 +147,22 @@
     "message": "Show all {count} lines in graph?"
   },
   "analytics.chart.table-selection.all": {
-    "message": "Showing all {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+    "message": "Showing all {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} member {{count, plural, one {member} other {members}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
   },
   "analytics.chart.table-selection.count": {
-    "message": "Showing {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+    "message": "Showing {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} member {{count, plural, one {member} other {members}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
   },
   "analytics.chart.table-selection.limited": {
-    "message": "Showing {limit} {itemType, select, project {{limit, plural, one {project} other {projects}}} country {{limit, plural, one {country} other {countries}}} monetization {{limit, plural, one {monetization value} other {monetization values}}} downloadSource {{limit, plural, one {download source} other {download sources}}} downloadReason {{limit, plural, one {download reason} other {download reasons}}} projectVersion {{limit, plural, one {project version} other {project versions}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {game version} other {game versions}}} other {{limit, plural, one {item} other {items}}}} from table"
+    "message": "Showing {limit} {itemType, select, project {{limit, plural, one {project} other {projects}}} country {{limit, plural, one {country} other {countries}}} monetization {{limit, plural, one {monetization value} other {monetization values}}} downloadSource {{limit, plural, one {download source} other {download sources}}} downloadReason {{limit, plural, one {download reason} other {download reasons}}} member {{limit, plural, one {member} other {members}}} projectVersion {{limit, plural, one {project version} other {project versions}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {game version} other {game versions}}} other {{limit, plural, one {item} other {items}}}} from table"
   },
   "analytics.chart.table-selection.top": {
-    "message": "Showing top {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+    "message": "Showing top {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} member {{count, plural, one {member} other {members}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} from table"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Dependent on {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} dependent on {dependencyProject}, {version}"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# day} other {# days}}"
@@ -230,8 +248,14 @@
   "analytics.filter.search.countries": {
     "message": "Search countries..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Search projects..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Search download sources..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Search members..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Search project versions..."
@@ -478,6 +502,12 @@
   },
   "analytics.value.monetized": {
     "message": "Monetized"
+  },
+  "analytics.value.no-dependent": {
+    "message": "None"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Downloaded for reasons other than being a dependency"
   },
   "analytics.value.none": {
     "message": "None"
@@ -731,9 +761,6 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Date of birth"
   },
-  "auth.create-account.date-of-birth.over13-helper": {
-    "message": "You must be over 13 years old to use Modrinth."
-  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Select your date of birth"
   },
@@ -744,13 +771,13 @@
     "message": "Date of birth required"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "You cannot create an account at Modrinth unless you are over 13 years old."
+    "message": "You do not meet the age requirement to create an account at Modrinth."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevant source code"
   },
   "auth.create-account.info-panel.text": {
-    "message": "We do not store your date of birth, only whether you are over 13 to use Modrinth."
+    "message": "We do not store your date of birth. We only use it during sign-up to validate COPPA compliance."
   },
   "auth.create-account.page-title": {
     "message": "Create Account"
@@ -764,7 +791,7 @@
   "auth.create-account.title": {
     "message": "Create an Account"
   },
-  "auth.create-account.username.optional-label": {
+  "auth.create-account.username.label": {
     "message": "Username"
   },
   "auth.create-account.username.placeholder": {
@@ -825,7 +852,7 @@
     "message": "Forgot password"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "Last sign in"
+    "message": "Last used"
   },
   "auth.sign-in.no-account": {
     "message": "Don't have an account?"
@@ -3374,9 +3401,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Show member UI"
-  },
   "project.moderation.thread.private-description": {
     "message": "This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project."
   },
@@ -3447,43 +3471,76 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Please provide proof that you have permission to redistribute all of the following files and any withheld versions will be automatically published."
+    "message": "Please provide proof that you have permission to redistribute all of the following files. Once completed, withheld versions will be automatically published."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Please provide proof that you have permission to redistribute all of the following files before you can submit your project for review."
+    "message": "Please provide proof that you have permission to redistribute all of the following files before submitting your project for review."
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "Unknown embedded content"
+    "message": "Unknown external content"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Modrinth's moderation team has rejected the permission information you provided for some external content. Please review the rejected items below and provide acceptable proof or remove the content."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Some proofs were rejected"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Collapse all"
   },
   "project.settings.permissions.completed.description": {
-    "message": "All external content has attributions provided."
+    "message": "All external content has permission information and attributions have been provided."
   },
   "project.settings.permissions.completed.title": {
-    "message": "Attributions completed!"
+    "message": "Permissions completed!"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "None of your versions contain external content, so you don't need to worry about obtaining permissions."
+    "message": "None of your project's versions contain external content, so you don't need to worry about obtaining permissions."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "You're all set!"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "Expand all"
+  },
   "project.settings.permissions.fail.description": {
-    "message": "You don't have permission to redistribute some of the external content you've added. In order to publish on Modrinth, remove the infringing content."
+    "message": "You may not have permission to redistribute some of the external content in your project. In order to publish on Modrinth, please remove this content or provide proof that you do have permission to use it."
   },
   "project.settings.permissions.fail.title": {
     "message": "Some content can't be included"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our guide</link> to learn about how to do this properly!"
+    "message": "If you include content that isn’t hosted on Modrinth, you need to let us know where it’s from and verify that you have permission to distribute the files. Check out <link>our announcement of this new system</link> to learn more!"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "Learn how attributions work"
+    "message": "Learn about distribution permissions"
   },
   "project.settings.permissions.learn-more": {
     "message": "Learn more"
   },
+  "project.settings.permissions.no-results": {
+    "message": "No external files match your search."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Some of the external content included cannot be distributed on Modrinth because it violates our Content Rules and must be removed."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {No attributions need approval} one {# attribution needs approval} other {# attributions need approval}}"
+  },
   "project.settings.permissions.search-placeholder": {
-    "message": "Search {count} {count, plural, one {external project} other {external projects}}..."
+    "message": "Search {count} {count, plural, one {project} other {projects}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Most files"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Recently edited"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Rejected"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
   },
   "project.settings.title": {
     "message": "Settings"
@@ -3505,9 +3562,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Resolve"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name}} other {Versions}} withheld due to unknown embedded content"
@@ -4700,6 +4754,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "Subscribe to the Modrinth newsletter"
   },
+  "version.all-versions": {
+    "message": "All versions"
+  },
+  "version.confirm-delete.description": {
+    "message": "This version will be permanently deleted. This action cannot be undone."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Delete version"
+  },
+  "version.confirm-delete.title": {
+    "message": "Are you sure you want to delete this version?"
+  },
+  "version.dependency.view-project": {
+    "message": "View project"
+  },
+  "version.dependency.view-version": {
+    "message": "View version"
+  },
+  "version.download.download-dependency": {
+    "message": "Download dependency"
+  },
+  "version.download.no-primary-file": {
+    "message": "Error: No primary file found"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Optional resource pack"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Required resource pack"
+  },
+  "version.edit.button": {
+    "message": "Edit"
+  },
+  "version.edit.details": {
+    "message": "Edit details"
+  },
+  "version.edit.files": {
+    "message": "Edit files"
+  },
+  "version.edit.metadata": {
+    "message": "Edit metadata"
+  },
   "version.environment.none.description": {
     "message": "The environment for this version has not been specified."
   },
@@ -4711,5 +4807,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Unknown environment"
+  },
+  "version.package-as-mod.button": {
+    "message": "Package as mod"
+  },
+  "version.package-as-mod.description": {
+    "message": "This will create a new version with support for the selected mod loaders. You will be redirected to the new version and can edit it to your liking."
+  },
+  "version.package-as-mod.header": {
+    "message": "Packaging data pack as a mod"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Mod loaders"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "The mod loaders you would like to package your data pack for."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Choose mod loaders..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Package data pack"
+  },
+  "version.section.content.dev-info": {
+    "message": "Developer information"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Maven coordinates:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Projects on Modrinth are automatically available through a Maven repository for use with JVM build tools such as <gradle-link>Gradle</gradle-link>. To learn more about the Modrinth Maven API, <article-link>click here</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Note: When available, you should use the creator's maven repo instead as it will have transitive dependency information that the Modrinth Maven API does not. You may also end up with duplicate dependencies if you use a mix of Modrinth and non-Modrinth Maven repositories for your dependencies, because the group identifier will be different when served through the Modrinth Maven API."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "Version ID:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Copy SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Copy SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "This version is currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Withheld due to unknown embedded content"
   }
 }

@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "ليس لديك صلاحية."
+  },
   "affiliate.create.button": {
     "defaultMessage": "إنشاء رابط تسويق بالعمولة"
   },

@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="universal-card flex w-full max-w-[28rem] flex-col gap-6 border border-solid border-surface-5"
+		class="universal-card flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
 		<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
 			{{ formatMessage(messages.longTitle) }}
@@ -31,17 +31,17 @@
 				/>
 			</div>
 
-			<div class="flex flex-col gap-2.5">
+			<div v-if="globals?.captcha_enabled" class="flex flex-col gap-2.5">
 				<label class="text-md font-semibold text-contrast">{{
 					formatMessage(messages.securityCheckLabel)
 				}}</label>
-				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
+				<HCaptcha ref="captcha" v-model="token" />
 			</div>
 
 			<ButtonStyled color="brand">
 				<button
 					class="!w-full"
-					:disabled="globals?.captcha_enabled ? !token : false"
+					:disabled="(globals?.captcha_enabled ? !token : false) || !email"
 					@click="recovery"
 				>
 					<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}

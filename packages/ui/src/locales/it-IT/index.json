@@ -98,9 +98,6 @@
   "browse.offline": {
     "defaultMessage": "Al momento sembri offline. Connettiti a Internet per usare Modrinth!"
   },
-  "browse.search.placeholder": {
-    "defaultMessage": "Cerca {projectType}..."
-  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Progetti selezionati"
   },
@@ -377,6 +374,39 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Scollega"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Questo contenuto è richiesto da altri contenuti"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Progetto interessato} other {Progetti interessati}}"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "istanza"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "server"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Elimina comunque"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Elimina {count, number} {itemType} comunque"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Eliminazione"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Disabilita le dipendenze dopo l'eliminazione"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "I contenuti dipendenti potrebbero non caricarsi o autodisabilitarsi"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Avviso sulle dipendenze"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Cosa succede?"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Aggiunto (dipendenza)"
   },
@@ -424,6 +454,9 @@
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Salta la conferma tenendo premuto Shift."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Si consiglia di creare un backup prima di procedere, così da poterlo ripristinare nel caso qualcosa andasse storto."
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "mondo"
@@ -535,6 +568,9 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Aggiornando {contentType}..."
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, plural, one {# selezionato} other {# selezionati}}"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Crea istanza"
@@ -1267,6 +1303,9 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Inserisci lo stato/provincia"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, number} byte"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -2109,7 +2148,7 @@
     "defaultMessage": "Carica"
   },
   "markdown-editor.image-modal.upload.prompt": {
-    "defaultMessage": "Trascina e rilascia per caricare o clicca per selezionare"
+    "defaultMessage": "Trascina per caricare o clicca per selezionare"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
     "defaultMessage": "Inserisci l'URL dell'immagine..."
@@ -2435,8 +2474,14 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "pacchett{count, plural, one {o} other {i}} di dati"
   },
+  "project-type.mod.capital": {
+    "defaultMessage": "Mod"
+  },
   "project-type.mod.category": {
     "defaultMessage": "Mod"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "mod"
   },
   "project-type.modpack.capital": {
     "defaultMessage": "Pacchett{count, plural, one {o} other {i}} di mod"
@@ -2447,8 +2492,14 @@
   "project-type.modpack.lowercase": {
     "defaultMessage": "pacchett{count, plural, one {o} other {i}} di mod"
   },
+  "project-type.plugin.capital": {
+    "defaultMessage": "Plugin"
+  },
   "project-type.plugin.category": {
     "defaultMessage": "Plugin"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "plugin"
   },
   "project-type.project.capital": {
     "defaultMessage": "Progett{count, plural, one {o} other {i}}"
@@ -2468,11 +2519,23 @@
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "pacchett{count, plural, one {o} other {i}} di risorse"
   },
+  "project-type.server.capital": {
+    "defaultMessage": "Server"
+  },
   "project-type.server.category": {
     "defaultMessage": "Server"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "server"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "Shader"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Shader"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "shader"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ambienti supportati"
@@ -2597,6 +2660,9 @@
   "project.about.tags.title": {
     "defaultMessage": "Tag"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} download"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Necessario sul client e sul server."
   },
@@ -2662,6 +2728,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente sconosciuto"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} follower"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
@@ -3321,7 +3390,7 @@
     "defaultMessage": "Server terminato"
   },
   "servers.access-page.activity-log-filter.action.server-plan-changed": {
-    "defaultMessage": "Piano modificato"
+    "defaultMessage": "Piano cambiato"
   },
   "servers.access-page.activity-log-filter.action.server-properties-modified": {
     "defaultMessage": "Proprietà del server modificate"
@@ -3564,7 +3633,7 @@
     "defaultMessage": "Ha caricato <files></files>"
   },
   "servers.audit-log.event.backup-changed": {
-    "defaultMessage": "Ha modificato il backup <backup></backup>"
+    "defaultMessage": "Ha cambiato il backup <backup></backup>"
   },
   "servers.audit-log.event.backup-changed-fallback": {
     "defaultMessage": "Ha cambiato il backup"
@@ -3672,13 +3741,16 @@
     "defaultMessage": "Ha terminato il server"
   },
   "servers.audit-log.event.server-metadata-changed": {
-    "defaultMessage": "Ha modificato i metadati del server"
+    "defaultMessage": "Ha cambiato i metadati del server"
   },
   "servers.audit-log.event.server-name-changed": {
     "defaultMessage": "Ha cambiato il nome del server in <name></name>"
   },
   "servers.audit-log.event.server-plan-changed": {
     "defaultMessage": "Ha cambiato il piano a <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, number} CPU"
   },
   "servers.audit-log.event.server-plan.new-plan": {
     "defaultMessage": "nuovo piano"
@@ -3833,6 +3905,12 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Ripristinando dal backup..."
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "Operazioni su {count} backup selezionat{count, plural, one {o} other {i}}"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "Eliminando {total} backup..."
+  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup selezionato} other {# backup selezionati}}"
   },
@@ -3846,7 +3924,10 @@
     "defaultMessage": "Backup{count, plural, one {} other { ({count})}}"
   },
   "servers.backups.delete-modal.confirm": {
-    "defaultMessage": "Elimina{count, plural, one {} other { #}} backup"
+    "defaultMessage": "Elimina # backup"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "Elimina {count, plural, one {backup} other {i backup}}"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Prova a creare il tuo primo backup!"
@@ -4067,11 +4148,17 @@
   "servers.listing.new-label": {
     "defaultMessage": "Nuovo"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "I file saranno preservati ancora per <days-remaining>{daysRemaining, plural, one {# giorno} other {# giorni}}</days-remaining>. Contatta l'assistenza per scaricarli prima che verranno eliminati."
+  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "I file saranno preservati per 30 giorni dopo l'annullamento."
   },
   "servers.listing.notice.moderated": {
     "defaultMessage": "Il server è stato sospeso dal team di moderazione."
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Il server {verb, select, downgrade {retrocederà} other {si aggiornerà}} al piano {planSize} il <date>{formattedDate}</date>."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Attendi mentre prepariamo il tuo server. Potrebbe richiedere fino a 10 minuti."
@@ -4189,6 +4276,9 @@
   },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Rinnovo riuscito"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Cerca tra {count} server..."
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
@@ -4529,11 +4619,14 @@
   "settings.language.categories.search-result": {
     "defaultMessage": "Risultati di ricerca"
   },
+  "settings.language.description": {
+    "defaultMessage": "Scegli la tua lingua che preferisci per l'interfaccia. Le traduzioni sono contribuite da volontari <crowdin-link>su Crowdin</crowdin-link>."
+  },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Cerca una lingua..."
   },
   "settings.language.languages.search-results-announcement": {
-    "defaultMessage": "{matches, plural, =0 {Nessuna lingua trovata} one {Una lingua trovata} other {# lingue trovate}}."
+    "defaultMessage": "{matches, plural, =0 {Nessuna lingua trovata} one {# lingua trovata} other {# lingue trovate}}."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Nessuna lingua trovata."
@@ -4546,6 +4639,9 @@
   },
   "settings.language.title": {
     "defaultMessage": "Lingua"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "È possibile che alcune frasi rimangano in inglese in quanto la piattaforma non è ancora stata tradotta del tutto e per tutte le lingue."
   },
   "settings.pats.title": {
     "defaultMessage": "Token di accesso (PAT)"

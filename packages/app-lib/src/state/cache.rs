@@ -372,6 +372,16 @@ pub struct CachedFileHash {
     pub size: u64,
     pub hash: String,
     pub project_type: Option<ProjectType>,
+    #[serde(default)]
+    pub project_id: Option<String>,
+    #[serde(default)]
+    pub version_id: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct KnownModrinthFile<'a> {
+    pub project_id: &'a str,
+    pub version_id: &'a str,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -1080,6 +1090,7 @@ impl CachedEntry {
             method: Method,
             api_url: &str,
             url: &str,
+            uri_path: Option<&'static str>,
             keys: &DashSet<impl Display + Eq + Hash + Serialize>,
             fetch_semaphore: &FetchSemaphore,
             pool: &SqlitePool,
@@ -1102,6 +1113,7 @@ impl CachedEntry {
                     url,
                     None,
                     None,
+                    uri_path,
                     fetch_semaphore,
                     pool,
                 )
@@ -1112,11 +1124,12 @@ impl CachedEntry {
         }
 
         macro_rules! fetch_original_values {
-            ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
+            ($type:ident, $api_url:expr, $url_suffix:expr, $uri_path:expr, $cache_variant:path) => {{
                 let mut results = fetch_many_batched(
                     Method::GET,
                     $api_url,
                     &format!("{}?ids=", $url_suffix),
+                    $uri_path,
                     &keys,
                     &fetch_semaphore,
                     &pool,
@@ -1172,7 +1185,7 @@ impl CachedEntry {
         }
 
         macro_rules! fetch_original_value {
-            ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
+            ($type:ident, $api_url:expr, $url_suffix:expr, $uri_path:expr, $cache_variant:path) => {{
                 vec![(
                     $cache_variant(
                         fetch_json(
@@ -1180,6 +1193,7 @@ impl CachedEntry {
                             &*format!("{}{}", $api_url, $url_suffix),
                             None,
                             None,
+                            $uri_path,
                             &fetch_semaphore,
                             pool,
                         )
@@ -1197,6 +1211,7 @@ impl CachedEntry {
                     Project,
                     env!("MODRINTH_API_URL"),
                     "projects",
+                    Some("/v2/projects"),
                     CacheValue::Project
                 )
             }
@@ -1205,6 +1220,7 @@ impl CachedEntry {
                     ProjectV3,
                     env!("MODRINTH_API_URL_V3"),
                     "projects",
+                    Some("/v3/projects"),
                     CacheValue::ProjectV3
                 )
             }
@@ -1213,6 +1229,7 @@ impl CachedEntry {
                     Version,
                     env!("MODRINTH_API_URL"),
                     "versions",
+                    Some("/v2/versions"),
                     CacheValue::Version
                 )
             }
@@ -1221,6 +1238,7 @@ impl CachedEntry {
                     User,
                     env!("MODRINTH_API_URL"),
                     "users",
+                    Some("/v2/users"),
                     CacheValue::User
                 )
             }
@@ -1229,6 +1247,7 @@ impl CachedEntry {
                     Method::GET,
                     env!("MODRINTH_API_URL_V3"),
                     "teams?ids=",
+                    Some("/v3/teams"),
                     &keys,
                     fetch_semaphore,
                     pool,
@@ -1268,6 +1287,7 @@ impl CachedEntry {
                     Method::GET,
                     env!("MODRINTH_API_URL_V3"),
                     "organizations?ids=",
+                    Some("/v3/organizations"),
                     &keys,
                     fetch_semaphore,
                     pool,
@@ -1327,6 +1347,7 @@ impl CachedEntry {
                         "algorithm": "sha1",
                         "hashes": &keys,
                     })),
+                    Some("/v2/version_files"),
                     fetch_semaphore,
                     pool,
                 )
@@ -1393,6 +1414,7 @@ impl CachedEntry {
                             url,
                             None,
                             None,
+                            None,
                             fetch_semaphore,
                             pool,
                         )
@@ -1421,6 +1443,7 @@ impl CachedEntry {
                         "minecraft/v{}/manifest.json",
                         daedalus::minecraft::CURRENT_FORMAT_VERSION
                     ),
+                    None,
                     CacheValue::MinecraftManifest
                 )
             }
@@ -1429,6 +1452,7 @@ impl CachedEntry {
                     Categories,
                     env!("MODRINTH_API_URL"),
                     "tag/category",
+                    Some("/v2/tag/category"),
                     CacheValue::Categories
                 )
             }
@@ -1437,6 +1461,7 @@ impl CachedEntry {
                     ReportTypes,
                     env!("MODRINTH_API_URL"),
                     "tag/report_type",
+                    Some("/v2/tag/report_type"),
                     CacheValue::ReportTypes
                 )
             }
@@ -1445,6 +1470,7 @@ impl CachedEntry {
                     Loaders,
                     env!("MODRINTH_API_URL"),
                     "tag/loader",
+                    Some("/v2/tag/loader"),
                     CacheValue::Loaders
                 )
             }
@@ -1453,6 +1479,7 @@ impl CachedEntry {
                     GameVersions,
                     env!("MODRINTH_API_URL"),
                     "tag/game_version",
+                    Some("/v2/tag/game_version"),
                     CacheValue::GameVersions
                 )
             }
@@ -1461,6 +1488,7 @@ impl CachedEntry {
                     DonationPlatforms,
                     env!("MODRINTH_API_URL"),
                     "tag/donation_platform",
+                    Some("/v2/tag/donation_platform"),
                     CacheValue::DonationPlatforms
                 )
             }
@@ -1503,6 +1531,8 @@ impl CachedEntry {
                             project_type: ProjectType::get_from_parent_folder(
                                 &full_path,
                             ),
+                            project_id: None,
+                            version_id: None,
                         })
                         .get_entry(),
                         true,
@@ -1617,6 +1647,7 @@ impl CachedEntry {
                                         "game_versions": [game_version],
                                         "version_types": version_types
                                     })),
+                                    Some("/v2/version_files/update_many"),
                                     fetch_semaphore,
                                     pool,
                                 )
@@ -1653,13 +1684,32 @@ impl CachedEntry {
                         let versions = variation.remove(hash);
 
                         if let Some(versions) = versions {
+                            let mut emitted_update = false;
+
                             for version in versions {
                                 let version_id = version.id.clone();
+                                let target_hash = version
+                                    .files
+                                    .iter()
+                                    .find(|file| file.primary)
+                                    .or_else(|| version.files.first())
+                                    .and_then(|file| file.hashes.get("sha1"))
+                                    .map(String::as_str);
+
+                                // Some update responses point at a different version ID for the exact installed file.
+                                let same_file =
+                                    target_hash == Some(hash.as_str());
+
                                 vals.push((
                                     CacheValue::Version(version).get_entry(),
                                     false,
                                 ));
 
+                                if same_file {
+                                    continue;
+                                }
+
+                                emitted_update = true;
                                 vals.push((
                                     CacheValue::FileUpdate(CachedFileUpdate {
                                         hash: hash.clone(),
@@ -1673,6 +1723,16 @@ impl CachedEntry {
                                         update_version_id: version_id,
                                     })
                                     .get_entry(),
+                                    true,
+                                ));
+                            }
+
+                            if !emitted_update {
+                                vals.push((
+                                    CacheValueType::FileUpdate
+                                        .get_empty_entry(format!(
+                                            "{hash}-{loaders_key}-{channel_policy_key}-{game_version}"
+                                        )),
                                     true,
                                 ));
                             }
@@ -1713,6 +1773,7 @@ impl CachedEntry {
                             url,
                             None,
                             None,
+                            Some("/v2/search"),
                             fetch_semaphore,
                             pool,
                         )
@@ -1754,6 +1815,7 @@ impl CachedEntry {
                         &url,
                         None,
                         None,
+                        Some("/v2/project/:id/version"),
                         fetch_semaphore,
                         pool,
                     )
@@ -1805,6 +1867,7 @@ impl CachedEntry {
                             url,
                             None,
                             None,
+                            Some("/v3/search"),
                             fetch_semaphore,
                             pool,
                         )
@@ -2061,6 +2124,7 @@ pub async fn cache_file_hash(
     path: &str,
     known_hash: Option<&str>,
     project_type: Option<ProjectType>,
+    known_modrinth_file: Option<KnownModrinthFile<'_>>,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<()> {
     let size = bytes.len();
@@ -2077,6 +2141,7 @@ pub async fn cache_file_hash(
         size as u64,
         hash,
         project_type,
+        known_modrinth_file,
         exec,
     )
     .await
@@ -2088,8 +2153,17 @@ pub async fn cache_file_hash_metadata(
     size: u64,
     hash: String,
     project_type: Option<ProjectType>,
+    known_modrinth_file: Option<KnownModrinthFile<'_>>,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<()> {
+    let (project_id, version_id) =
+        known_modrinth_file.map_or((None, None), |metadata| {
+            (
+                Some(metadata.project_id.to_string()),
+                Some(metadata.version_id.to_string()),
+            )
+        });
+
     // Streamed extraction already computed these values, so avoid buffering the file just to cache them.
     CachedEntry::upsert_many(
         &[CacheValue::FileHash(CachedFileHash {
@@ -2097,6 +2171,8 @@ pub async fn cache_file_hash_metadata(
             size,
             hash,
             project_type,
+            project_id,
+            version_id,
         })
         .get_entry()],
         exec,

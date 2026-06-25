@@ -134,18 +134,6 @@
   "analytics.chart.render-limit.header": {
     "message": "Alle {count} Zeilen im Graphen anzeigen?"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "Zeige alle {itemType, select, project {{count, plural, one {Projekt} other {Projekte}}} country {{count, plural, one {Land} other {Länder}}} monetization {{count, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{count, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{count, plural, one {Downloadgrund} other {Downloadgründe}}} projectVersion {{count, plural, one {Projektversion} other {Projektversionen}}} loader {{count, plural, one {Loader} other {Loader}}} gameVersion {{count, plural, one {Spielversion} other {Spielversionen}}} other {{count, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "Zeige {count} {itemType, select, project {{count, plural, one {Projekt} other {Projekte}}} country {{count, plural, one {Land} other {Länder}}} monetization {{count, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{count, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{count, plural, one {Downloadgrund} other {Downloadgründe}}} projectVersion {{count, plural, one {Projektversion} other {Projektversionen}}} loader {{count, plural, one {Loader} other {Loader}}} gameVersion {{count, plural, one {Spielversion} other {Spielversionen}}} other {{count, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "Zeige {limit} {itemType, select, project {{limit, plural, one {Projekt} other {Projekte}}} country {{limit, plural, one {Land} other {Länder}}} monetization {{limit, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{limit, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{limit, plural, one {Downloadgrund} other {Downloadgründe}}} projectVersion {{limit, plural, one {Projektversion} other {Projektversionen}}} loader {{limit, plural, one {Loader} other {Loader}}} gameVersion {{limit, plural, one {Spielversion} other {Spielversionen}}} other {{limit, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "Zeige die top {count} {itemType, select, project {{count, plural, one {Projekt} other {Projekte}}} country {{count, plural, one {Land} other {Länder}}} monetization {{count, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{count, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{count, plural, one {Downloadgrund} other {Downloadgründe}}} projectVersion {{count, plural, one {Projektversion} other {Projektversionen}}} loader {{count, plural, one {Loader} other {Loader}}} gameVersion {{count, plural, one {Spielversion} other {Spielversionen}}} other {{count, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
-  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# Tag} other {# Tage}}"
   },
@@ -216,7 +204,7 @@
     "message": "Keine Projekte für die Analyse verfügbar"
   },
   "analytics.empty.select-project": {
-    "message": "Wählen mindestens ein Projekt aus, um Daten anzuzeigen"
+    "message": "Wähle mindestens ein Projekt aus, um Daten anzuzeigen"
   },
   "analytics.filter.game-version-type": {
     "message": "Art der Spielversion"
@@ -349,6 +337,12 @@
   },
   "analytics.project.select": {
     "message": "Projekte auswählen"
+  },
+  "analytics.project.user": {
+    "message": "Projekte von {username}"
+  },
+  "analytics.project.your": {
+    "message": "Deine Projekte"
   },
   "analytics.query.filter.add": {
     "message": "Filter hinzufügen"
@@ -743,38 +737,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Code eingeben..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Passwort vergessen?</forgot-password-link> • <create-account-link>Erstelle ein Konto</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Anmelden mit"
   },
   "auth.sign-in.title": {
     "message": "Anmelden"
   },
-  "auth.sign-in.use-password": {
-    "message": "Oder Passwort verwenden"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Konto erstellen"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Durch die Erstellung eines Kontos stimmst du den <terms-link>Nutzungsbedingungen</terms-link> und der <privacy-policy-link>Datenschutzerklärung</privacy-policy-link> von Modrinth zu."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Passwörter stimmen nicht überein!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Du hast bereits ein Konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Updates zu Modrinth abonnieren"
-  },
   "auth.sign-up.title": {
     "message": "Registrieren"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Oder erstelle selbst ein Konto"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Registrieren mit"
@@ -808,21 +784,6 @@
   },
   "auth.verify-email.title": {
     "message": "E-Mail bestätigen"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Erhalte Neuigkeiten zu Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Du bist jetzt Teil der großartigen Community von Entwicklern und Entdeckern die bereits fantastische Mods erstellen, herunterladen und auf dem neuesten Stand halten."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Durch die Erstellung eines Kontos hast du den <terms-link>Nutzungsbedingungen</terms-link> und der <privacy-policy-link>Datenschutzerklärung</privacy-policy-link> von Modrinth zugestimmt."
-  },
-  "auth.welcome.long-title": {
-    "message": "Willkommen bei Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Willkommen"
   },
   "collection.button.edit-icon": {
     "message": "Icon bearbeiten"
@@ -1459,6 +1420,24 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du hast dein Auszahlungslimit von <b>{withdrawLimit}</b> aufgebraucht. Du musst ein Steuerformular ausfüllen, um merh abzuheben."
+  },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Du bist für {roles} qualifiziert. Verknüpfe dein Discord-Konto über Modrinth, dann synchronisieren wir diese automatisch."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Discord verbinden"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Hol dir deine Discord-Rollen"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Ersteller"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
   },
   "dashboard.head-title": {
     "message": "Dashboard"
@@ -2291,6 +2270,9 @@
   "landing.subheading": {
     "message": "Entdecke, spiele und teile Minecraft-Inhalte über unsere Open-Source-Plattform, die für die Community entwickelt wurde."
   },
+  "layout.action.analytics-events": {
+    "message": "Analytics-Events"
+  },
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
   },
@@ -2846,6 +2828,9 @@
   "profile.bio.fallback.user": {
     "message": "Ein Modrinth-Benutzer."
   },
+  "profile.button.analytics": {
+    "message": "Benutzeranalysen anzeigen"
+  },
   "profile.button.billing": {
     "message": "Benutzerabrechnungen verwalten"
   },
@@ -3272,9 +3257,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Falls du Hilfe benötigst oder weitere Fragen hast, besuche bitte das <help-center-link>Hilfezentrum von Modrinth</help-center-link> und klicke auf die blaue Sprechblase, um den Support zu kontaktieren."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Mitglieder-UI anzeigen"
-  },
   "project.moderation.thread.private-description": {
     "message": "Dies ist eine private Konversation mit den Moderatoren von Modrinth. Diese können dir Nachrichten zu Problemen bezüglich dieses Projekts senden."
   },
@@ -3392,6 +3374,9 @@
   "project.stats.downloads-label": {
     "message": "{count, plural, one {Download} other {Downloads}}"
   },
+  "project.stats.followers-label": {
+    "message": "{count, plural, one {Follower} other {Follower}}"
+  },
   "project.status.archived.message": {
     "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheidet sich das Projekt zu dearchivieren."
   },
@@ -3400,9 +3385,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Diese Version ist} other {Diese Versionen sind}} derzeit zurückgehalten und nicht öffentlich gelistet. Bitte stelle einen Nachweis bereit, dass du die Erlaubnis hast, bestimmte Dateien weiterzuverbreiten, die im Modpack in {count, plural, one {Version} other {Versionen}} enthalten sind."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Beheben"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name} wurde} other {Versionen wurden}} aufgrund unbekannter eingebetteter Inhalte zurückgehalten"

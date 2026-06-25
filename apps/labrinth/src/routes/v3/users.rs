@@ -1,7 +1,6 @@
 use std::{
     cmp::Reverse,
     collections::{HashMap, HashSet},
-    sync::Arc,
 };
 
 use super::{ApiError, oauth_clients::get_user_clients};
@@ -643,7 +642,7 @@ pub async fn orgs_list(
 
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,
@@ -834,7 +833,7 @@ pub async fn user_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -861,7 +860,7 @@ pub async fn user_icon_edit(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
             FileHostPublicity::Public,
-            &***file_host,
+            &**file_host,
         )
         .await?;
 
@@ -880,7 +879,7 @@ pub async fn user_icon_edit(
             &ext.ext,
             Some(96),
             Some(1.0),
-            &***file_host,
+            &**file_host,
         )
         .await?;
 
@@ -909,7 +908,7 @@ pub async fn user_icon_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -935,7 +934,7 @@ pub async fn user_icon_delete(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
             FileHostPublicity::Public,
-            &***file_host,
+            &**file_host,
         )
         .await?;
 

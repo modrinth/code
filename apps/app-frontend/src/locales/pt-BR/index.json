@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Baixando Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Baixando atualização"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Instância principal"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Recarregar para atualizar"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Exibir mais instâncias em execução"
   },
   "app.action-bar.stop-instance": {
     "message": "Parar instância"
+  },
+  "app.action-bar.update": {
+    "message": "Atualizar"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Ver downloads ativos"
@@ -42,7 +51,7 @@
     "message": "Renderização avançada"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Selecione seu tema de cores preferido para o Modrinth App."
+    "message": "Escolha seu tema de cores preferido para o Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema de cores"
@@ -99,7 +108,7 @@
     "message": "Alternar barra lateral"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Se você tentar instalar um arquivo Modrinth Pack (.mrpack) não hospedado no Modrinth, garantiremos que você entenda os riscos antes de instalá-lo."
+    "message": "Se você tentar instalar um arquivo Modrinth Pack (.mrpack) não hospedado no Modrinth, garantiremos que você entenda os riscos antes de instalar."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Avise-me antes de instalar pacotes de mods desconhecidos"
@@ -281,6 +290,9 @@
   "app.modal.install-to-play.install-button": {
     "message": "Instalar"
   },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
+  },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pacote de mods necessário"
   },
@@ -425,6 +437,12 @@
   "app.skins.rate-limit.title": {
     "message": "Mais lento!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Não foi possível salvar a ordem de skins."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Falhou ao reordenar skins"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Construtores & Biomas"
   },
@@ -456,7 +474,7 @@
     "message": "Striding Hero"
   },
   "app.skins.section.the-copper-age": {
-    "message": "A Era do Cobre"
+    "message": "The Copper Age"
   },
   "app.skins.section.the-garden-awakens": {
     "message": "The Garden Awakens"
@@ -468,7 +486,7 @@
     "message": "Iniciar sessão"
   },
   "app.skins.sign-in.description": {
-    "message": "Faça login na sua conta do Minecraft para usar os recursos de gerenciamento de skins do Modrinth app."
+    "message": "Inicie sessão na sua conta do Minecraft para usar os recursos de gerenciamento de skins no Modrinth App."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Modrinth Bot animado"
@@ -480,10 +498,10 @@
     "message": "Seletor de skins"
   },
   "app.update-popup.body.download-complete": {
-    "message": "O Modrinth App v{version} foi baixado. Recarregue para atualizar agora ou a atualização será aplicada automaticamente ao fechar o Modrinth App."
+    "message": "O Modrinth App v{version} já foi instalado. Recarregue para atualizar agora ou ela será feita automaticamente ao fechar o Modrinth App."
   },
   "app.update-popup.body.linux": {
-    "message": "O Modrinth App v{version} está disponível. Use seu gerenciador de pacotes para atualizar e obter os recursos e correções mais recentes!"
+    "message": "O Modrinth App v{version} está disponível. Use o gerenciador de pacotes para atualizar para obter novos recursos e correções!"
   },
   "app.update-popup.body.metered": {
     "message": "O Modrinth App v{version} já está disponível! Já que sua rede é limitada, não a instalamos automaticamente."
@@ -498,7 +516,7 @@
     "message": "Instalação concluída"
   },
   "app.update-popup.reload": {
-    "message": "Recarregar"
+    "message": "Recarregar para atualizar"
   },
   "app.update-popup.title": {
     "message": "Atualização disponível"
@@ -552,13 +570,13 @@
     "message": "<link>Adicione amigos</link> para ver o que eles estão jogando!"
   },
   "friends.friend.cancel-request": {
-    "message": "Cancelar solicitação"
+    "message": "Cancelar pedido"
   },
   "friends.friend.remove-friend": {
     "message": "Remover amigo"
   },
   "friends.friend.request-sent": {
-    "message": "Solicitação de amizade enviada"
+    "message": "Pedido de amizade enviado"
   },
   "friends.friend.view-profile": {
     "message": "Ver perfil"
@@ -612,7 +630,7 @@
     "message": "Editar servidor"
   },
   "instance.edit-world.hide-from-home": {
-    "message": "Esconder da página inicial"
+    "message": "Ocultar da página inicial"
   },
   "instance.edit-world.name": {
     "message": "Nome"
@@ -654,7 +672,7 @@
     "message": "Excluir instância"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Exclui permanentemente uma instância do seu dispositivo, incluindo seus mundos, configurações e todo o conteúdo instalado. Tome cuidado, pois, uma vez excluída, a instância não poderá ser recuperada."
+    "message": "Exclui permanentemente uma instância do seu dispositivo, incluindo seus mundos, configs e todo o conteúdo instalado. Tome cuidado, assim que excluído, a instância não pode ser recuperada."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Excluindo..."
@@ -669,7 +687,7 @@
     "message": "Duplicar instância"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Cria uma cópia desta instância, incluindo mundos, configurações, mods, etc."
+    "message": "Cria uma cópia desta instância, incluindo mundos, configs, mods, etc."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Editar ícone"
@@ -687,7 +705,7 @@
     "message": "Grupos"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "Criar novo grupo"
+    "message": "Criar grupo novo"
   },
   "instance.settings.tabs.general.library-groups.description": {
     "message": "Os grupos da biblioteca permitem que você organize suas instâncias em diferentes seções."
@@ -698,6 +716,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Nome"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Canal de atualização"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "As versões release, beta e alpha aparecerão como atualizações disponíveis."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "As versões release e beta aparecerão como atualizações disponíveis."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Release"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Apenas versões release aparecerão como atualizações disponíveis."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Selecionar canal de atualização"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Ações de inicialização"
   },
@@ -705,7 +747,7 @@
     "message": "Ações de inicialização personalizadas"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Essas ações permitem que usuários mais experientes executem comandos do sistema antes e depois de inicializar o jogo."
+    "message": "As ações permitem usuários experientes que executem certos comandos do sistema antes ou após iniciar o jogo."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Ao sair"
@@ -714,16 +756,16 @@
     "message": "Executado após o jogo fechar."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Insira o comando a ser executado após o jogo fechar..."
+    "message": "Insira o comando ao sair..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Pré-inicialização"
+    "message": "Ao iniciar"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
     "message": "Executado antes que a instância seja inicializada."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Insira o comando a ser executado antes da inicialização..."
+    "message": "Insira o comando ao iniciar..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Ações de inicialização do jogo"
@@ -735,13 +777,13 @@
     "message": "Comando auxiliar para iniciar o Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Insira um comando..."
+    "message": "Insira um comando auxiliar..."
   },
   "instance.settings.tabs.installation": {
     "message": "Instalação"
   },
   "instance.settings.tabs.installation.loader-version": {
-    "message": "Versão do {loader}"
+    "message": "Versão {loader}"
   },
   "instance.settings.tabs.java": {
     "message": "Java e memória"
@@ -786,13 +828,13 @@
     "message": "Janela"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configurações de janela personalizada"
+    "message": "Opções de janela personalizada"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tela cheia"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Faz com que o jogo inicie em tela cheia (usando options.txt)."
+    "message": "Faz o jogo iniciar em tela cheia (usando options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Altura"
@@ -822,7 +864,7 @@
     "message": "Copiar endereço"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Não mostrar no início"
+    "message": "Não exibir na página inicial"
   },
   "instance.worlds.game_already_open": {
     "message": "A instância já está aberta"
@@ -834,19 +876,19 @@
     "message": "Servidor incompatível"
   },
   "instance.worlds.linked_server": {
-    "message": "Gerenciado pelo projeto de servidor"
+    "message": "Gerenciado pelo projeto do servidor"
   },
   "instance.worlds.no_contact": {
     "message": "Não foi possível conectar-se ao servidor"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Você só pode entrar diretamente em servidores a partir do Minecraft 1.0.5"
+    "message": "Só é possível entrar diretamente em servidores a partir do Minecraft Alpha 1.0.5"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Você só pode entrar diretamente em mundos de um jogador a partir do Minecraft 1.20+"
+    "message": "Só é possível entrar em mundos um jogador diretamente a partir do Minecraft 1.20"
   },
   "instance.worlds.play_instance": {
-    "message": "Jogar na instância"
+    "message": "Iniciar instância"
   },
   "instance.worlds.view_instance": {
     "message": "Ver instância"
@@ -858,7 +900,7 @@
     "message": "Adicionar conta"
   },
   "minecraft-account.label": {
-    "message": "Conta do minecraft"
+    "message": "Conta de Minecraft"
   },
   "minecraft-account.not-signed-in": {
     "message": "Não conectado"
@@ -870,7 +912,7 @@
     "message": "Selecionar conta"
   },
   "minecraft-account.sign-in": {
-    "message": "Faça login no Minecraft"
+    "message": "Inicie sessão no Minecraft"
   },
   "search.filter.locked.instance": {
     "message": "Fornecido pela instância"
@@ -879,7 +921,7 @@
     "message": "A versão do jogo é fornecida pela instância"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "O carregador é fornecido pela instância"
+    "message": "O loader é fornecido pela instância"
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar com a instância"
@@ -888,19 +930,19 @@
     "message": "Fornecido pelo servidor"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "Apenas mods do lado do cliente podem ser adicionados à instância do servidor"
+    "message": "Somente mods do cliente podem ser adicionados à instância do servidor"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "A versão do jogo é fornecida pelo servidor"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "O carregador é fornecido pelo servidor"
+    "message": "O loader é fornecido pelo servidor"
   },
   "unknown-pack-warning-modal.body": {
-    "message": "Um arquivo só é revisado se for enviado para o Modrinth, não importa o seu formato de arquivo (incluindo .mrpack)."
+    "message": "Um arquivo só é revisado se for enviado no Modrinth, independente do formato do arquivo (incluindo .mrpack)."
   },
   "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Não mostrar este aviso novamente"
+    "message": "Não exibir aviso novamente"
   },
   "unknown-pack-warning-modal.header": {
     "message": "Confirmar instalação"
@@ -909,10 +951,10 @@
     "message": "Instalar mesmo assim"
   },
   "unknown-pack-warning-modal.malware-statement": {
-    "message": "Malware é frequentemente distribuído através de arquivos de pacotes de mods compartilhados em plataformas como o Discord."
+    "message": "O malware é distribuído frequentemente através de arquivos de pacote de mods compartilhados em plataformas como Discord."
   },
   "unknown-pack-warning-modal.warning.body": {
-    "message": "Não foi possível encontrar este arquivo no Modrinth. Recomendamos fortemente que você instale apenas arquivos de fontes confiáveis."
+    "message": "Não encontramos este arquivo no Modrinth. Nós recomendamos fortemente instalar arquivos apenas de fontes confiáveis."
   },
   "unknown-pack-warning-modal.warning.title": {
     "message": "Aviso de arquivo desconhecido"

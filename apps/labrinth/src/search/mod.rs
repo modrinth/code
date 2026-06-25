@@ -2,6 +2,7 @@ use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::projects::DependencyType;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
@@ -10,12 +11,19 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, sync::Arc};
 use thiserror::Error;
 use utoipa::ToSchema;
 
 pub mod backend;
+pub mod incremental;
 pub mod indexing;
+
+#[derive(Clone)]
+pub struct SearchState {
+    pub backend: Arc<dyn SearchBackend>,
+    pub queue: incremental::IncrementalSearchQueue,
+}
 
 /// Search parameters which can fit in a URL query string.
 ///
@@ -101,6 +109,16 @@ pub trait SearchBackend: Send + Sync {
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
+    ) -> eyre::Result<()>;
+
+    async fn index_documents(
+        &self,
+        documents: &[UploadSearchProject],
+    ) -> eyre::Result<()>;
+
+    async fn remove_project_documents(
+        &self,
+        ids: &[ProjectId],
     ) -> eyre::Result<()>;
 
     async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;
@@ -196,6 +214,7 @@ pub enum SearchField {
     MinecraftJavaServerContentSupportedGameVersions,
     MinecraftJavaServerPingData,
     DependencyProjectIds,
+    CompatibleDependencyProjectIds,
 }
 
 #[derive(Debug, Error)]
@@ -252,6 +271,8 @@ pub struct UploadSearchProject {
     #[serde(default)]
     pub dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
@@ -267,6 +288,7 @@ pub struct UploadSearchProject {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SearchProjectDependency {
     pub project_id: String,
+    pub dependency_type: DependencyType,
     pub name: String,
     pub slug: Option<String>,
     pub icon_url: Option<String>,
@@ -311,6 +333,8 @@ pub struct ResultSearchProject {
     #[serde(default)]
     pub dependency_project_ids: Vec<String>,
     #[serde(default)]
+    pub compatible_dependency_project_ids: Vec<String>,
+    #[serde(default)]
     pub dependencies: Vec<SearchProjectDependency>,
 
     // Hidden fields to get the Project model out of the search results.
@@ -350,6 +374,8 @@ impl From<UploadSearchProject> for ResultSearchProject {
             featured_gallery: source.featured_gallery,
             color: source.color,
             dependency_project_ids: source.dependency_project_ids,
+            compatible_dependency_project_ids: source
+                .compatible_dependency_project_ids,
             dependencies: source.dependencies,
             loaders: source.loaders,
             project_loader_fields: source.project_loader_fields,

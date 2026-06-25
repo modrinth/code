@@ -8,7 +8,7 @@ useSeoMeta({
 })
 </script>
 <template>
-	<div class="grid min-h-[calc(100vh-4.5rem)] place-items-center pb-20">
+	<div class="grid min-h-[calc(100vh-14.5rem)] place-items-center px-2.5 pb-20 pt-10">
 		<NuxtPage />
 	</div>
 </template>

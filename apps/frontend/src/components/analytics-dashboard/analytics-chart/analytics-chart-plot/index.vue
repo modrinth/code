@@ -208,6 +208,7 @@ const hoverEntries = computed(() => {
 			projectId: legendEntry.id,
 			name: legendEntry.name,
 			projectName: legendEntry.projectName,
+			tooltip: legendEntry.tooltip,
 			color: legendEntry.color,
 			formattedValue: props.isRatioMode
 				? `${ratioValue.toFixed(1)}%`

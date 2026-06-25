@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Dina-download ang Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Dina-download ang update"
+  },
   "app.action-bar.downloads": {
     "message": "Mga downloads"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Pangunahing instansiya"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Mag-reload upang ma-update"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Ipakita ang mas marami pang tumatakbong instansiya"
   },
   "app.action-bar.stop-instance": {
     "message": "Itigil ang instansiya"
+  },
+  "app.action-bar.update": {
+    "message": "Mag-update"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Tignan ang mga active downloads"
@@ -85,6 +94,9 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Pumili ng opsiyon"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Magpapakita ang katagal ng iyong paglalaro sa isang instansiya."
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Pagpapagana na mata-toggle ang sidebar."
@@ -377,9 +389,6 @@
   "app.update-popup.download-complete": {
     "message": "Nakumpleto ang pagdownload"
   },
-  "app.update-popup.reload": {
-    "message": "Mag-reload"
-  },
   "app.update-popup.title": {
     "message": "May bagong update"
   },
@@ -577,6 +586,12 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Pangalan"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
   },
   "instance.settings.tabs.hooks": {
     "message": "Mga launch hook"

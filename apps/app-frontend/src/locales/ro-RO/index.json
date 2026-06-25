@@ -83,9 +83,6 @@
   "app.update-popup.download-complete": {
     "message": "Descărcare finalizată"
   },
-  "app.update-popup.reload": {
-    "message": "Reîncărcați"
-  },
   "app.update-popup.title": {
     "message": "Actualizare disponibilă"
   },

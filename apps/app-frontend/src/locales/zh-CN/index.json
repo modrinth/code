@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "正在下载 Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "下载更新中"
+  },
   "app.action-bar.downloads": {
     "message": "下载"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "主实例"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "重新加载以更新"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "显示更多运行中的实例"
   },
   "app.action-bar.stop-instance": {
     "message": "停止实例"
+  },
+  "app.action-bar.update": {
+    "message": "更新"
   },
   "app.action-bar.view-active-downloads": {
     "message": "查看正在下载内容"
@@ -63,7 +72,7 @@
     "message": "在皮肤页面中禁用你玩家头顶上的名牌。"
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "隐藏名称标签"
+    "message": "隐藏名牌"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
     "message": "在主页的“快速回到”部分包含最近的世界。"
@@ -111,7 +120,7 @@
     "message": "无法连接到身份验证服务器"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "将服务器添加到实例"
+    "message": "正在添加服务器到此实例"
   },
   "app.browse.add-to-an-instance": {
     "message": "添加到实例"
@@ -144,7 +153,7 @@
     "message": "整合包"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "加入服务器时，添加内容可能会破坏兼容性。当更新服务器实例内容时任何添加的内容也将丢失。"
+    "message": "加入服务器时，添加内容可能会破坏兼容性。当更新服务器实例内容时，任何添加的内容也将丢失。"
   },
   "app.browse.server.installing": {
     "message": "安装中"
@@ -271,6 +280,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "安装"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} 个模组"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "需求整合包"
@@ -416,6 +428,12 @@
   "app.skins.rate-limit.title": {
     "message": "慢点！"
   },
+  "app.skins.reorder-error.text": {
+    "message": "未能保存皮肤顺序。"
+  },
+  "app.skins.reorder-error.title": {
+    "message": "皮肤排序失败"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "建造者与生物群系"
   },
@@ -489,7 +507,7 @@
     "message": "下载完成"
   },
   "app.update-popup.reload": {
-    "message": "重新启动"
+    "message": "重新加载以更新"
   },
   "app.update-popup.title": {
     "message": "有可用的更新"
@@ -520,6 +538,9 @@
   },
   "friends.action.add-friend": {
     "message": "添加好友"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} 个好友请求"
   },
   "friends.add-friend.submit": {
     "message": "发送好友请求"
@@ -685,6 +706,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "名称"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "更新渠道"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha 测试版"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "正式版，beta 和 alpha 测试版会被显示为可用更新。"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta 测试版"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "正式版和 beta 测试版会被显示为可用更新。"
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "正式版"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "只有正式版会被显示为可用更新。"
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "选择更新渠道"
   },
   "instance.settings.tabs.hooks": {
     "message": "启动 Hooks"

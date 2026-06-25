@@ -339,29 +339,29 @@ impl AnalyticsQueue {
                 downloads.write(&download).await?;
             }
 
-            sqlx::query(
+            sqlx::query!(
                 "
                 UPDATE versions v
                 SET downloads = v.downloads + x.amount
                 FROM unnest($1::BIGINT[], $2::int[]) AS x(id, amount)
                 WHERE v.id = x.id
                 ",
+                &version_downloads.keys().copied().collect::<Vec<_>>(),
+                &version_downloads.values().copied().collect::<Vec<_>>(),
             )
-            .bind(version_downloads.keys().copied().collect::<Vec<_>>())
-            .bind(version_downloads.values().copied().collect::<Vec<_>>())
             .execute(&mut transaction)
             .await?;
 
-            sqlx::query(
+            sqlx::query!(
                 "
                     UPDATE mods m
                     SET downloads = m.downloads + x.amount
                     FROM unnest($1::BIGINT[], $2::int[]) AS x(id, amount)
                     WHERE m.id = x.id
                     ",
+                &project_downloads.keys().copied().collect::<Vec<_>>(),
+                &project_downloads.values().copied().collect::<Vec<_>>(),
             )
-            .bind(project_downloads.keys().copied().collect::<Vec<_>>())
-            .bind(project_downloads.values().copied().collect::<Vec<_>>())
             .execute(&mut transaction)
             .await?;
 

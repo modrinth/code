@@ -107,6 +107,9 @@
   "analytics.chart.empty.select-table-items": {
     "message": "从下表中选择项目以可视化您的数据。"
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural,other {# 个分析事件}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>：{title}"
   },
@@ -131,20 +134,8 @@
   "analytics.chart.render-limit.header": {
     "message": "是否在图中显示全部 {count} 行？"
   },
-  "analytics.chart.table-selection.all": {
-    "message": "展示全部 {itemType, select, project {{count, plural, one {项目} other {项目}}} country {{count, plural, one {国家} other {国家}}} monetization {{count, plural, one {收益项} other {收益项}}} downloadSource {{count, plural, one {下载来源} other {下载来源}}} downloadReason {{count, plural, one {下载原因} other {下载原因}}} projectVersion {{count, plural, one {项目版本} other {项目版本}}} loader {{count, plural, one {加载器} other {加载器}}} gameVersion {{count, plural, one {游戏版本} other {游戏版本}}} other {{count, plural, one {条目} other {条目}}}} 表格数据"
-  },
-  "analytics.chart.table-selection.count": {
-    "message": "正在展示{count}{itemType, select,project {{count, plural,one {项目}other {项目}}}country {{count, plural,one {国家}other {国家}}} monetization {{count, plural,one {变现收益}other {变现收益}}} downloadSource {{count, plural,one {下载来源}other {下载来源}}} downloadReason {{count, plural,one {下载原因}other {下载原因}}} projectVersion {{count, plural,one {项目版本}other {项目版本}}} loader {{count, plural,one {启动器}other {启动器}}} gameVersion {{count, plural,one {游戏版本}other {游戏版本}}} other {{count, plural,one {项目}other {项目}}}}"
-  },
-  "analytics.chart.table-selection.limited": {
-    "message": "正在展示{limit}{itemType, select,project {{limit, plural,one {项目}other {项目}}}country {{limit, plural,one {国家}other {国家}}} monetization {{limit, plural,one {变现收益}other {变现收益}}} downloadSource {{limit, plural,one {下载来源}other {下载来源}}} downloadReason {{limit, plural,one {下载原因}other {下载原因}}} projectVersion {{limit, plural,one {项目版本}other {项目版本}}} loader {{limit, plural,one {启动器}other {启动器}}} gameVersion {{limit, plural,one {游戏版本}other {游戏版本}}}other {{limit, plural,one {项目}other {项目}}}}"
-  },
-  "analytics.chart.table-selection.top": {
-    "message": "从表格中展示前{count}\n{itemType, select,\nproject {{count, plural, one {个项目} other {个项目}}}\ncountry {{count, plural, one {个国家} other {个国家}}}\nmonetization {{count, plural, one {项变现金额} other {项变现金额}}}\ndownloadSource {{count, plural, one {个下载来源} other {个下载来源}}}\ndownloadReason {{count, plural, one {条下载原因} other {条下载原因}}}\nprojectVersion {{count, plural, one {个项目版本} other {个项目版本}}}\nloader {{count, plural, one {个加载器} other {个加载器}}}\ngameVersion {{count, plural, one {个游戏版本} other {个游戏版本}}}\nother {{count, plural, one {条数据} other {条数据}}}\n}"
-  },
   "analytics.chart.tooltip.duration.days": {
-    "message": "{count, plural, one {# 天} other {# 天}}"
+    "message": "{count, plural, other {# 天}}"
   },
   "analytics.chart.tooltip.duration.hours": {
     "message": "{count, plural, one {# 小时} other {# 小时}}"
@@ -171,7 +162,7 @@
     "message": "总计"
   },
   "analytics.chart.view.area": {
-    "message": "地区"
+    "message": "面积图"
   },
   "analytics.chart.view.bar": {
     "message": "柱状图"
@@ -344,6 +335,12 @@
   "analytics.project.select": {
     "message": "选择项目"
   },
+  "analytics.project.user": {
+    "message": "{username}的项目"
+  },
+  "analytics.project.your": {
+    "message": "你的项目"
+  },
   "analytics.query.filter.add": {
     "message": "添加过滤条件"
   },
@@ -411,7 +408,7 @@
     "message": "选择范围"
   },
   "analytics.table.duration.days": {
-    "message": "{count, plural, one {# 天} other {# 天}}"
+    "message": "{count, plural, other {# 天}}"
   },
   "analytics.table.duration.hours": {
     "message": "{count, plural, one {# 小时} other {# 小时}}"
@@ -729,16 +726,13 @@
     "message": "重置你的密码"
   },
   "auth.sign-in.2fa.description": {
-    "message": "请输入双重身份验证代码以继续。"
+    "message": "请输入双重验证代码以便继续操作。"
   },
   "auth.sign-in.2fa.label": {
-    "message": "输入双重身份验证代码"
+    "message": "输入双重验证代码"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "输入验证码…"
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>忘记密码？</forgot-password-link> • <create-account-link>创建新账户</create-account-link>"
   },
   "auth.sign-in.sign-in-with": {
     "message": "通过以下方式登录"
@@ -746,29 +740,14 @@
   "auth.sign-in.title": {
     "message": "登录"
   },
-  "auth.sign-in.use-password": {
-    "message": "或使用密码"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "创建账户"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "创建账户即表示你同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "密码不一致！"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "已有账户？"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "订阅有关 Modrinth 更新的邮件"
-  },
   "auth.sign-up.title": {
     "message": "注册"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "或者自己创建一个账户"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "通过以下方式注册"
@@ -802,21 +781,6 @@
   },
   "auth.verify-email.title": {
     "message": "验证电子邮箱"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "订阅有关 Modrinth 的更新邮件"
-  },
-  "auth.welcome.description": {
-    "message": "你现在是这个超棒社区的一员了——与创作者和社区玩家们一起创作、探索、获取模组并持续追踪最新的精彩模组动态吧。"
-  },
-  "auth.welcome.label.tos": {
-    "message": "创建账户即表示你已同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
-  },
-  "auth.welcome.long-title": {
-    "message": "欢迎来到 Modrinth！"
-  },
-  "auth.welcome.title": {
-    "message": "欢迎"
   },
   "collection.button.edit-icon": {
     "message": "编辑图标"
@@ -992,6 +956,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "补充文件仅用来保存源代码等支持性资料，不能用来存放替代版本或者变体文件。"
   },
+  "create.collection.collection-info": {
+    "message": "将创建一个公开收藏夹，包含{count, plural, =0 {0个项目}  other {#个项目}}。"
+  },
   "create.collection.create-collection": {
     "message": "新建收藏夹"
   },
@@ -1154,6 +1121,9 @@
   "dashboard.affiliate-links.search": {
     "message": "搜索推广链接…"
   },
+  "dashboard.analytics.from-projects": {
+    "message": "来自 {count} {count, plural, other {个项目}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "总下载量"
   },
@@ -1174,6 +1144,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "尝试调整你的过滤器或搜索词。"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, other {个项目}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "搜索你的收藏夹"
@@ -1445,6 +1418,24 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "你已用尽<b>{withdrawLimit}</b>的提现额度。若需继续提现，请先完成税务表格填写。"
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "你符合获取 {roles} 的条件。通过 Modrinth 关联你的 Discord 账户，我们将自动同步这些身份。"
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "关联 Discord 账户"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "领取你的 Discord 身分组"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "破百万下载"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "创作者"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "2026 骄傲月"
+  },
   "dashboard.head-title": {
     "message": "仪表盘"
   },
@@ -1457,6 +1448,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "查看历史通知"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "查看更多 {extraNotifs} 个{extraNotifs, plural, other {通知}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "创建组织"
   },
@@ -1465,6 +1459,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "获取组织失败"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, other {名成员}}"
   },
   "dashboard.organizations.title": {
     "message": "组织"
@@ -1510,6 +1507,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "编辑链接"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "更改将应用到 <strong>{count}</strong> {count, plural, other {个项目}}。"
   },
   "dashboard.projects.links.description": {
     "message": "以下你指定的任何链接，都会覆盖所选项目上的现有链接。留空的内容将被忽略。你可以使用垃圾桶按钮从所有选定的项目中清除某个链接。"
@@ -2267,6 +2267,9 @@
   "landing.subheading": {
     "message": "在我们为社区打造的开源平台上，探索、畅玩并分享 Minecraft 的无限可能。"
   },
+  "layout.action.analytics-events": {
+    "message": "分析活动"
+  },
   "layout.action.change-theme": {
     "message": "更改界面主题"
   },
@@ -2822,6 +2825,9 @@
   "profile.bio.fallback.user": {
     "message": "一位 Modrinth 用户。"
   },
+  "profile.button.analytics": {
+    "message": "查看用户分析"
+  },
   "profile.button.billing": {
     "message": "管理用户财务"
   },
@@ -2876,6 +2882,9 @@
   "profile.label.collection": {
     "message": "收藏夹"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, other {次下载}}"
+  },
   "profile.label.joined": {
     "message": "加入于"
   },
@@ -2894,6 +2903,9 @@
   "profile.label.organizations": {
     "message": "组织"
   },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, other {个项目}}"
+  },
   "profile.label.saving": {
     "message": "正在保存…"
   },
@@ -2908,6 +2920,9 @@
   },
   "profile.official-account.bio": {
     "message": "Modrinth的官方用户账号。在<support-link></support-link>处获取支持或通过电子邮件<email></email>获取支持。"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat>项目关注者}}"
   },
   "profile.user-id": {
     "message": "用户ID：{id}"
@@ -3236,9 +3251,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "如果你需要帮助或有其他疑问，请访问 <help-center-link>Modrinth Help Center</help-center-link>，然后点击蓝色气泡以联系支持。"
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "显示成员图形界面"
-  },
   "project.moderation.thread.private-description": {
     "message": "这是与 Modrinth 管理员的私人对话消息。他们可能会就此项目的问题向你发送消息。"
   },
@@ -3344,6 +3356,9 @@
   "project.settings.permissions.learn-more": {
     "message": "了解详情"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "搜索 {count}{count, plural,one {个外部项目}other {个外部项目}}……"
+  },
   "project.settings.title": {
     "message": "设置"
   },
@@ -3351,10 +3366,10 @@
     "message": "访问项目的控制面板"
   },
   "project.stats.downloads-label": {
-    "message": "{count, plural,one {下载}other {下载}}"
+    "message": "{count, plural, other {下载}}"
   },
   "project.stats.followers-label": {
-    "message": "{count, plural,one {关注者}other {关注者}}"
+    "message": "{count, plural, other {关注者}}"
   },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
@@ -3363,10 +3378,7 @@
     "message": "版本"
   },
   "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {此版本已保留且未公开列出。} other {这些版本已保留且未公开列出。}} 请提供证明，证明你有权重新分发该模组包{count, plural, one {版本} other {各版本}}中包含的某些文件。"
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "完成"
+    "message": "{count, plural, other {此版本}}已保留且未公开列出。请提供你有权重新分发此模组包{count, plural, other {版本}}所包含的某些文件的证明。"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {版本 {version_name}} other {这些版本}} 因未知嵌入内容被保留"
@@ -3438,7 +3450,7 @@
     "message": "你正在举报哪种类型的内容？"
   },
   "report.question.report-reason": {
-    "message": "该项目（{item}）违反了 Modrinth 的哪条规则？"
+    "message": "该项目{item}违反了 Modrinth 的哪条规则？"
   },
   "report.report-content": {
     "message": "向管理员举报内容"
@@ -3936,10 +3948,10 @@
     "message": "账户安全"
   },
   "settings.account.security.two-factor.action.remove": {
-    "message": "移除 2FA"
+    "message": "移除双重验证"
   },
   "settings.account.security.two-factor.action.setup": {
-    "message": "设置 2FA"
+    "message": "设置双重验证"
   },
   "settings.account.security.two-factor.description": {
     "message": "在登录时为您的账户增加一层额外的安全保障。"
@@ -4404,7 +4416,7 @@
     "message": "创建个人访问令牌"
   },
   "settings.pats.description": {
-    "message": "个人访问令牌（PAT）可用于访问 Modrinth 的 API。这些令牌可随时创建和撤销。更多信息，请参阅 <doc-link>Modrinth API 文档</doc-link>。"
+    "message": "个人访问令牌PAT可用于访问 Modrinth 的 API。这些令牌可随时创建和撤销。更多信息，请参阅 <doc-link>Modrinth API 文档</doc-link>。"
   },
   "settings.pats.modal.create.action": {
     "message": "创建个人访问令牌"

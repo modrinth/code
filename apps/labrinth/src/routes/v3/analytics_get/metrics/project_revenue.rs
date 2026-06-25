@@ -1,17 +1,21 @@
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use sqlx::Row;
+
+use ariadne::ids::UserId;
 
 use crate::{
-    database::{PgPool, models::DBProjectId},
+    database::{
+        PgPool,
+        models::{DBProjectId, DBUserId},
+    },
     models::ids::ProjectId,
     routes::ApiError,
     util::error::Context,
 };
 
 use super::super::{TimeSlice, add_to_time_slice};
-use super::{AnalyticsData, ProjectAnalytics, ProjectMetrics};
+use super::{AnalyticsData, Metrics, ProjectAnalytics, ProjectMetrics};
 
 /// Fields for [`super::ReturnMetrics::project_revenue`].
 #[derive(
@@ -21,6 +25,13 @@ use super::{AnalyticsData, ProjectAnalytics, ProjectMetrics};
 pub enum ProjectRevenueField {
     /// Project ID.
     ProjectId,
+    /// User ID.
+    ///
+    /// You can only bucket by user if you are a member on the project.
+    /// If you are a member of the parent organization (and have view analytics
+    /// permissions), but not a member of the project, you cannot bucket by
+    /// user.
+    UserId,
 }
 
 /// Filters for [`super::ReturnMetrics::project_revenue`].
@@ -30,6 +41,9 @@ pub struct ProjectRevenueFilters {}
 /// [`super::ReturnMetrics::project_revenue`].
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectRevenue {
+    /// User these metrics are for.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<UserId>,
     /// Total revenue for this bucket.
     pub(crate) revenue: Decimal,
 }
@@ -40,17 +54,28 @@ pub(crate) async fn fetch(
     req: &super::super::GetRequest,
     num_time_slices: usize,
     project_id_values: &[i64],
+    user_id_bucket_project_ids: &[i64],
+    can_view_all_revenue_splits: bool,
+    metrics: &Metrics<ProjectRevenueField, ProjectRevenueFilters>,
 ) -> Result<(), ApiError> {
-    let mut rows = sqlx::query(
-        "SELECT
+    let bucket_by_user_id =
+        metrics.bucket_by.contains(&ProjectRevenueField::UserId);
+
+    let mut rows = sqlx::query!(
+        r#"
+        SELECT
             WIDTH_BUCKET(
                 EXTRACT(EPOCH FROM created)::bigint,
                 EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                 $3::integer
-            ) AS bucket,
-            mod_id,
-            SUM(amount) amount_sum
+            ) AS "bucket?",
+            mod_id AS "mod_id?",
+            CASE
+                WHEN $5 AND ($6 OR mod_id = ANY($7)) THEN user_id
+                ELSE 0
+            END AS "user_id?",
+            SUM(amount) AS "amount_sum?"
         FROM payouts_values
         WHERE
             -- only project revenue is counted here
@@ -59,16 +84,20 @@ pub(crate) async fn fetch(
             AND payouts_values.mod_id = ANY($4)
             AND created >= $1
             AND created < $2
-        GROUP BY bucket, mod_id",
+        GROUP BY 1, 2, 3
+        "#,
+        req.time_range.start,
+        req.time_range.end,
+        num_time_slices as i64,
+        project_id_values,
+        bucket_by_user_id,
+        can_view_all_revenue_splits,
+        user_id_bucket_project_ids,
     )
-    .bind(req.time_range.start)
-    .bind(req.time_range.end)
-    .bind(num_time_slices as i64)
-    .bind(project_id_values)
     .fetch(pool);
     while let Some(row) = rows.next().await.transpose()? {
         let bucket = row
-            .try_get::<Option<i32>, _>("bucket")?
+            .bucket
             .wrap_internal_err("bucket should be non-null - query bug!")?;
         let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
             eyre::eyre!(
@@ -76,11 +105,9 @@ pub(crate) async fn fetch(
             )
         })?;
 
-        let mod_id = row.try_get::<Option<i64>, _>("mod_id")?;
-        let amount_sum = row.try_get::<Option<Decimal>, _>("amount_sum")?;
         if let Some(source_project) =
-            mod_id.map(DBProjectId).map(ProjectId::from)
-            && let Some(revenue) = amount_sum
+            row.mod_id.map(DBProjectId).map(ProjectId::from)
+            && let Some(revenue) = row.amount_sum
         {
             add_to_time_slice(
                 time_slices,
@@ -88,6 +115,11 @@ pub(crate) async fn fetch(
                 AnalyticsData::Project(ProjectAnalytics {
                     source_project,
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                        user_id: row
+                            .user_id
+                            .filter(|id| bucket_by_user_id && *id != 0)
+                            .map(DBUserId)
+                            .map(UserId::from),
                         revenue,
                     }),
                 }),

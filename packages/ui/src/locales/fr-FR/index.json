@@ -377,6 +377,48 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Dissocier"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Ce contenu est requis par d'autres contenus"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Projet affecté} other {Projects affectés}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Certains projets sélectionnés sont installés en tant que dépendances. Les supprimer peut endommager votre {context} ou empêcher le chargement correct du contenu dépendant."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instance"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "serveur"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Supprimer malgré tout"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Supprimer {count, number} {itemType} malgré tout"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Suppression"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Désactiver les éléments dépendants après la suppression"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Le contenu dépendant peut ne pas se charger ou se désactiver"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Votre {context} peut planter, refuser de démarrer ou se comporter de manière inattendue"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Avertissement de dépendance"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} est installé en tant que dépendance. Le supprimer peut endommager votre {context} ou empêcher le chargement correct du contenu dépendant."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Que se passe-t-il ?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} ajoutés"
   },
@@ -550,6 +592,9 @@
   },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count, number} {contentType} sélectionné"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} {count, plural, one {sélectionné} other {sélectionnés}}"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Créer une instance"
@@ -4145,6 +4190,9 @@
   "servers.listing.notice.moderated": {
     "defaultMessage": "Votre serveur a été suspendu par les actions de la modération."
   },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "Votre serveur pasera au forfait {planSize} le <date>{formattedDate}</date>."
+  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Veuillez patienter pendant que nous mettons en place votre serveur. Cela peut prendre jusqu'à 10 minutes."
   },
@@ -4959,7 +5007,7 @@
     "defaultMessage": "Utile"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "Goût Vanilla"
+    "defaultMessage": "Proche de Vanilla"
   },
   "tag.category.whitelisted": {
     "defaultMessage": "Liste Blanche"

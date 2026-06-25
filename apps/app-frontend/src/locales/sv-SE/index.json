@@ -2,17 +2,20 @@
   "app.action-bar.downloading-java": {
     "message": "Laddar ner Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Laddar ner uppdatering"
+  },
   "app.action-bar.downloads": {
     "message": "Nedladdningar"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Göm fler pågående instanser"
+    "message": "Göm fler aktiva instanser"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Gör till primärinstans"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Ingen pågående instans"
+    "message": "Ingen aktiva instans"
   },
   "app.action-bar.offline": {
     "message": "Offline"
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primärinstans"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Ladda om för att uppdatera"
+  },
   "app.action-bar.show-more-running-instances": {
-    "message": "Visa fler pågående instanser"
+    "message": "Visa fler aktiva instanser"
   },
   "app.action-bar.stop-instance": {
     "message": "Avsluta instans"
+  },
+  "app.action-bar.update": {
+    "message": "Uppdatera"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Visa aktiva nedladdningar"
@@ -65,6 +74,9 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
   },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Hoppa tillbaka i världar"
+  },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimera programstartare"
   },
@@ -77,17 +89,32 @@
   "app.appearance-settings.select-option": {
     "message": "Välj ett alternativ"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Visar hur mycket tid du spelat på en instans."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Visa speltid"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Låter dig växla sidofältet."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Växla sidofält"
   },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Om du försöker installera en Modrinth Pack fil (.mrpack) som inte kommer från Modrinth ser vi till att du känner till riskerna innan du installerar den."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Varna mig innan jag installerar okända modpaket"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Lägger till server till instans"
   },
   "app.browse.add-to-an-instance": {
     "message": "Lägg till i en instans"
@@ -122,6 +149,9 @@
   "app.browse.server.installing": {
     "message": "Installerar"
   },
+  "app.content-install.no-compatible-versions": {
+    "message": "Ingen tillgänglig version matchar {compatibilityLabel}. Välj en version att installera ändå. Beroenden kommer inte installeras automatiskt."
+  },
   "app.creation-modal.installing-modpack.description": {
     "message": "{fileName}"
   },
@@ -146,6 +176,9 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketets namn"
   },
+  "app.export-modal.select-files-label": {
+    "message": "Konfigurera vilka filer som inkluderas i denna export"
+  },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
   },
@@ -153,7 +186,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "All data från din instans kommer att raderas permanent, inklusive dina världar, konfigurationer och allt installerat innehåll."
+    "message": "All data från din instans kommer permanent raderas, däribland dina världar, konfigurationer samt allt installerat innehåll."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Detta kan inte ogöras"
@@ -275,6 +308,12 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till senaste version för att starta spelet."
   },
+  "app.project.install-button.already-installed": {
+    "message": "Detta projekt är redan installerat"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "Installera innehåll till instans"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Utvecklarläge aktiverat."
   },
@@ -302,8 +341,26 @@
   "app.skins.add-button": {
     "message": "Lägg till utseende"
   },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Dra och släpp"
+  },
+  "app.skins.apply-button": {
+    "message": "Tillämpa"
+  },
   "app.skins.delete-button": {
     "message": "Ta bort utseende"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Du kommer permanent radera det valda utseendet. Detta kan inte ångras."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Är du säker på att du vill radera utseendet?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Misslyckades att läsa den släppta filen."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Fel med behandlingen av filen"
   },
   "app.skins.edit-button": {
     "message": "Redigera utseende"
@@ -353,6 +410,69 @@
   "app.skins.modal.texture-section": {
     "message": "Textur"
   },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Ladda upp utseende först!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Redigera utseende"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Förhandsvisa"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Du ändrar ditt utseende för ofta. Mojangs servrar har temporärt blockerat ytterligare förfrågningar. Vänligen vänta en stund innan du försöker igen."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Sakta ner!"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Standard utseenden"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Du har fått dessa utseende eftersom du donerat till en Modrinth Pride insamling under pride månaden."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Sparade utseenden"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Logga in"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Snälla logga in din Minecraft konto att använda hud hantering förmågor i Modrinth appen."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Exalterad Modrinth bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Vänligen logga in"
+  },
+  "app.skins.title": {
+    "message": "Utseende väljare"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
   },
@@ -372,7 +492,7 @@
     "message": "Nedladdning slutförd"
   },
   "app.update-popup.reload": {
-    "message": "Ladda om"
+    "message": "Ladda om för att uppdatera"
   },
   "app.update-popup.title": {
     "message": "Uppdatering tillgänglig"
@@ -572,6 +692,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Namn"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Uppdateringskanal"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Utgåvor, beta och alfa versioner visas som tillgängliga uppdateringar."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Utgåvor och beta versioner visas som tillgängliga uppdateringar."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Utgåva"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Endast utgivna versioner visas som tillgängliga uppdateringar."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Välj uppdateringskanal"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Startkrokar"
   },
@@ -620,6 +764,24 @@
   "instance.settings.tabs.java": {
     "message": "Java och minne"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Anpassade miljövariabler"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Anpassade Java-argument"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Anpassad Java-installation"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Anpassad minnestilldelning"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Skriv in miljövariabler..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Skriv in Java-argument..."
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Miljövariabler"
   },
@@ -634,6 +796,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Tilldelat minne"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/sökväg/till/java"
   },
   "instance.settings.tabs.window": {
     "message": "Fönster"
@@ -651,7 +816,7 @@
     "message": "Höjd"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Höjden på spel-fönstret vid uppstart."
+    "message": "Höjden på spelfönstret vid uppstart."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Ange höjd..."
@@ -660,7 +825,7 @@
     "message": "Bredd"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Bredden på spel-fönstret vid uppstart."
+    "message": "Bredden på spelfönstret vid uppstart."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Ange bredd..."
@@ -749,7 +914,25 @@
   "search.filter.locked.server-loader.title": {
     "message": "Loader tillhandahålls av servern"
   },
+  "unknown-pack-warning-modal.body": {
+    "message": "En fil granskas bara om den laddas upp till Modrinth, oavsett dess filformat (däribland .mrpack)."
+  },
+  "unknown-pack-warning-modal.dont-show-again": {
+    "message": "Visa inte denna varning igen"
+  },
+  "unknown-pack-warning-modal.header": {
+    "message": "Bekräfta installation"
+  },
   "unknown-pack-warning-modal.install-anyway": {
     "message": "Installera ändå"
+  },
+  "unknown-pack-warning-modal.malware-statement": {
+    "message": "Skadeprogram distribueras ofta via modpaketfiler genom att dela dem på plattformar som Discord."
+  },
+  "unknown-pack-warning-modal.warning.body": {
+    "message": "Vi kunde inte hitta filen på Modrinth. Vi rekommenderar starkt att endast installera filer från källor du litar på."
+  },
+  "unknown-pack-warning-modal.warning.title": {
+    "message": "Okänd filvarning"
   }
 }
