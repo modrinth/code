@@ -56,6 +56,35 @@ const messages = defineMessages({
 		defaultMessage:
 			'Hooks allow advanced users to run certain system commands before and after launching the game.',
 	},
+	hookVariablesDescription: {
+		id: 'instance.settings.tabs.hooks.variables.description',
+		defaultMessage:
+			'Hooks run in the working directory of the instance, with the following variables:',
+	},
+	instanceNameDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-name.description',
+		defaultMessage: '$INST_NAME: The name of the instance',
+	},
+	instanceIdDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-id.description',
+		defaultMessage: "$INST_ID: The name of the instance's folder",
+	},
+	instanceDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-dir.description',
+		defaultMessage: "$INST_DIR: The absolute path to the instance's folder",
+	},
+	instanceMcDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-mc-dir.description',
+		defaultMessage: '$INST_MC_DIR: An alias for $INST_DIR',
+	},
+	instanceJavaDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java.description',
+		defaultMessage: '$INST_JAVA: The absolute path to the java binary',
+	},
+	instanceJavaArgsDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java-args.description',
+		defaultMessage: '$INST_JAVA_ARGS: The JVM Arguments provided to the game',
+	},
 	customHooks: {
 		id: 'instance.settings.tabs.hooks.custom-hooks',
 		defaultMessage: 'Custom launch hooks',
@@ -153,5 +182,17 @@ const messages = defineMessages({
 		<p class="m-0">
 			{{ formatMessage(messages.postExitDescription) }}
 		</p>
+
+		<div class="m-0 mt-6">
+			{{ formatMessage(messages.hookVariablesDescription) }}
+		</div>
+		<ul class="m-0 mt-2">
+			<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
+		</ul>
 	</div>
 </template>
