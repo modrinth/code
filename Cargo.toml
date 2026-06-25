@@ -119,8 +119,8 @@ lettre = { version = "0.11.19", default-features = false, features = [
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.30.0", default-features = false }
-modrinth-log = { path = "packages/modrinth-log" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
+modrinth-log = { path = "packages/modrinth-log" }
 modrinth-util = { path = "packages/modrinth-util" }
 muralpay = { path = "packages/muralpay" }
 murmur2 = "0.1.0"
