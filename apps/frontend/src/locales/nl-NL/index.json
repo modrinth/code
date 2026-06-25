@@ -626,35 +626,17 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Voer code in..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Wachtwoord vergeten?</forgot-password-link> • <create-account-link>Maak een account aan</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Log in met"
   },
   "auth.sign-in.title": {
     "message": "Log in"
   },
-  "auth.sign-in.use-password": {
-    "message": "Of gebruik een wachtwoord"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Account aanmaken"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Wachtwoorden komen niet overeen!"
-  },
   "auth.sign-up.sign-in-option.title": {
     "message": "Heb je al een account?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Schrijf je in voor updates van Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Aanmelden"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Of maak zelf een account"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Meld je aan met"
@@ -688,18 +670,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifieer e-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Abonneer op updates over Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Je bent nu deel van de geweldige community van makers en ontdekkers die mods bouwen, downloaden en up-to-date blijven van geweldige mods."
-  },
-  "auth.welcome.long-title": {
-    "message": "Welkom op Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Welkom"
   },
   "collection.button.edit-icon": {
     "message": "Bewerk icoon"

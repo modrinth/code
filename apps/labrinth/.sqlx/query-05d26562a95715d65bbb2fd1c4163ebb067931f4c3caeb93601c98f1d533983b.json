@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, user_id, name, credential_id,\n                   passkey AS \"passkey: sqlx::types::Json<Passkey>\",\n                   last_used, created_at\n            FROM user_passkeys\n            WHERE credential_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "credential_id",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 4,
+        "name": "passkey: sqlx::types::Json<Passkey>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "last_used",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bytea"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "05d26562a95715d65bbb2fd1c4163ebb067931f4c3caeb93601c98f1d533983b"
+}

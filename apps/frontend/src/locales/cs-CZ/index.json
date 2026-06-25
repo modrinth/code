@@ -407,38 +407,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Zadejte kód..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Zapomněli jste heslo?</forgot-password-link> • <create-account-link>Vytvořte si účet</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Přihlášte se pomocí"
   },
   "auth.sign-in.title": {
     "message": "Přihlásit se"
   },
-  "auth.sign-in.use-password": {
-    "message": "Nebo použijte heslo"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Vytvořte účet"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Vytvořením účtu souhlasíte s <terms-link>Podmínkami</terms-link> a <privacy-policy-link>Zásadami ochrany osobních údajů</privacy-policy-link> Modrinthu."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Hesla se neshodují!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Již máte účet?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Přihlásit se k odběru informací o Modrinthu"
-  },
   "auth.sign-up.title": {
     "message": "Registrace"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Nebo si vytvořte účet"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Registrujte se pomocí"
@@ -472,21 +454,6 @@
   },
   "auth.verify-email.title": {
     "message": "Ověřit e-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Přihlásit se k odběru informací o Modrinthu"
-  },
-  "auth.welcome.description": {
-    "message": "Nyní jste součástí úžasné komunity tvůrců a průzkumníků, kteří již vytvářejí, stahují a aktualizují úžasné módy."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Vytvořením účtu souhlasíte s <terms-link>Podmínkami</terms-link> a <privacy-policy-link>Zásadami ochrany osobních údajů</privacy-policy-link> Modrinthu."
-  },
-  "auth.welcome.long-title": {
-    "message": "Vítejte v Modrinthu!"
-  },
-  "auth.welcome.title": {
-    "message": "Vítejte"
   },
   "collection.button.edit-icon": {
     "message": "Upravit ikonu"

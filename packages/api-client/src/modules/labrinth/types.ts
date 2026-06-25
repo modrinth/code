@@ -695,6 +695,23 @@ export namespace Labrinth {
 				session: string
 			}
 
+			export type ValidateCreateAccountRequest = {
+				username: string
+				password: string
+				email: string
+			}
+
+			export type CreateOAuthAccountRequest = {
+				username: string
+				state: string
+				challenge: string
+				sign_up_newsletter: boolean
+			}
+
+			export type CreateOAuthAccountResponse = {
+				session: string
+			}
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string
@@ -704,6 +721,38 @@ export namespace Labrinth {
 				flow?: string
 				old_password?: string
 				new_password?: string
+			}
+
+			export type Passkey = {
+				id: string
+				name: string
+				created_at: string
+				last_used: string | null
+			}
+
+			export type PasskeyRegisterStartResponse = {
+				options: Record<string, unknown>
+				flow: string
+			}
+
+			export type PasskeyRegisterFinishRequest = {
+				flow: string
+				name: string
+				credential: unknown
+			}
+
+			export type PasskeyAuthenticateStartResponse = {
+				options: Record<string, unknown>
+				flow: string
+			}
+
+			export type PasskeyAuthenticateFinishRequest = {
+				flow: string
+				credential: unknown
+			}
+
+			export type PasskeyRenameRequest = {
+				name: string
 			}
 		}
 	}

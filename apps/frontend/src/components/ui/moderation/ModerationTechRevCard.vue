@@ -31,13 +31,13 @@ import {
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	NavTabs,
 	OverflowMenu,
 	type OverflowMenuOption,
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { NavTabs } from '@modrinth/ui'
 import {
 	capitalizeString,
 	formatProjectType,
