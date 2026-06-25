@@ -2,7 +2,7 @@ use crate::State;
 use crate::event::emit::loading_try_for_each_concurrent;
 use crate::install::{
     InstallPhaseDetails, InstallPhaseId, InstallProgress,
-    InstallProgressReporter,
+    InstallProgressReporter, InstallProgressSecondary,
 };
 use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_instance_information,
@@ -407,17 +407,29 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     };
 
     let num_files = pack.files.len();
+    let content_total_bytes = pack
+        .files
+        .iter()
+        .map(|file| file.file_size as u64)
+        .sum::<u64>();
     reporter
         .update(
             InstallPhaseId::DownloadingContent,
             Some(InstallProgress {
                 current: 0,
                 total: num_files as u64,
+                secondary: (content_total_bytes > 0).then_some(
+                    InstallProgressSecondary {
+                        current: 0,
+                        total: content_total_bytes,
+                    },
+                ),
             }),
             modpack_details.clone(),
         )
         .await?;
     let content_progress = Arc::new(AtomicU64::new(0));
+    let content_bytes_progress = Arc::new(AtomicU64::new(0));
     loading_try_for_each_concurrent(
         futures::stream::iter(pack.files).map(Ok::<PackFile, crate::Error>),
         None,
@@ -434,21 +446,34 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             let reporter = reporter.clone();
             let modpack_details = modpack_details.clone();
             let content_progress = content_progress.clone();
+            let content_bytes_progress = content_bytes_progress.clone();
             async move {
-                let mark_downloaded = || {
+                let mark_downloaded = |file_size: u64| {
                     let reporter = reporter.clone();
                     let modpack_details = modpack_details.clone();
                     let content_progress = content_progress.clone();
+                    let content_bytes_progress = content_bytes_progress.clone();
                     async move {
                         let current = content_progress
                             .fetch_add(1, Ordering::Relaxed)
                             + 1;
+                        let current_bytes = content_bytes_progress
+                            .fetch_add(file_size, Ordering::Relaxed)
+                            + file_size;
                         reporter
                             .update(
                                 InstallPhaseId::DownloadingContent,
                                 Some(InstallProgress {
                                     current,
                                     total: num_files as u64,
+                                    secondary: (content_total_bytes > 0)
+                                        .then_some(
+                                            InstallProgressSecondary {
+                                                current: current_bytes
+                                                    .min(content_total_bytes),
+                                                total: content_total_bytes,
+                                            },
+                                        ),
                                 }),
                                 modpack_details,
                             )
@@ -463,7 +488,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         .get(&EnvType::Client)
                         .is_some_and(|x| x == &SideType::Unsupported)
                 {
-                    mark_downloaded().await?;
+                    mark_downloaded(project.file_size as u64).await?;
                     return Ok(());
                 }
 
@@ -534,7 +559,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     }
                 }
 
-                mark_downloaded().await?;
+                mark_downloaded(project.file_size as u64).await?;
                 Ok(())
             }
         },
@@ -561,6 +586,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     let progress = (override_total_bytes > 0).then_some(InstallProgress {
         current: 0,
         total: override_total_bytes,
+        secondary: None,
     });
     reporter
         .update(
@@ -597,6 +623,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     Some(InstallProgress {
                         current: current.min(override_total_bytes),
                         total: override_total_bytes,
+                        secondary: None,
                     }),
                     details,
                 )

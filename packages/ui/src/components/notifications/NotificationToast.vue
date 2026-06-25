@@ -103,38 +103,42 @@
 						</button>
 					</ButtonStyled>
 				</div>
-				<p
-					ref="statusRef"
-					v-tooltip="truncatedTooltip(statusRef, statusLine)"
-					class="col-start-1 row-start-2 m-0 min-w-0 font-normal leading-tight text-contrast/85"
-					:class="wrapText ? 'whitespace-normal break-words' : 'truncate'"
-				>
-					{{ statusLine }}
-				</p>
 				<div
-					v-if="type === 'instance-download' && progressLabel"
-					class="notification-inline-progress-label col-start-2 row-start-2 self-center justify-self-end"
-					:style="{ width: progressLabelWidth }"
+					class="col-start-1 col-end-3 row-start-2 flex min-w-0 items-center justify-between gap-0.5"
 				>
-					{{ progressLabel }}
+					<p
+						ref="statusRef"
+						v-tooltip="truncatedTooltip(statusRef, statusLine)"
+						class="m-0 min-w-0 flex-1 font-normal leading-tight text-contrast/85"
+						:class="wrapText ? 'whitespace-normal break-words' : 'truncate'"
+					>
+						{{ statusLine }}
+					</p>
+					<div
+						v-if="type === 'instance-download' && progressLabel"
+						class="notification-inline-progress-label flex-none text-xs"
+					>
+						{{ progressLabel }}
+					</div>
 				</div>
 				<div
 					v-if="type === 'instance-ready'"
-					class="col-start-1 row-start-3 mt-2 flex min-w-0 items-center gap-2"
+					class="col-start-1 col-end-3 row-start-3 mt-2 flex min-w-0 items-center justify-between gap-2"
 				>
-					<ButtonStyled color="brand">
-						<button @click="$emit('launch')">Launch game</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined">
-						<button @click="$emit('open-instance')">Instance</button>
-					</ButtonStyled>
-				</div>
-				<div
-					v-if="type === 'instance-ready' && progressLabel"
-					class="notification-inline-progress-label col-start-2 row-start-3 mt-2 self-center justify-self-end"
-					:style="{ width: progressLabelWidth }"
-				>
-					{{ progressLabel }}
+					<div class="flex min-w-0 items-center gap-2">
+						<ButtonStyled color="brand">
+							<button @click="$emit('launch')">Launch game</button>
+						</ButtonStyled>
+						<ButtonStyled type="outlined">
+							<button @click="$emit('open-instance')">Instance</button>
+						</ButtonStyled>
+					</div>
+					<div
+						v-if="progressLabel"
+						class="notification-inline-progress-label flex-none"
+					>
+						{{ progressLabel }}
+					</div>
 				</div>
 				<div
 					v-if="type === 'instance-download' && actionLabel"
@@ -279,36 +283,33 @@ const progressCurrent = computed(() => {
 
 const progressTotal = computed(() => Math.max(0, props.progressTotal ?? 0))
 
+function formatProgressLabel(
+	type: PopupNotificationProgressType | undefined,
+	current: number,
+	total: number,
+): string {
+	if (type === 'bytes' && total > 0) {
+		return `${formatBytes(Math.min(current, total), 1)} / ${formatBytes(total, 1)}`
+	}
+
+	if (type === 'count' && total > 0) {
+		return `${formatNumber(Math.min(current, total))} / ${formatNumber(total)}`
+	}
+
+	return `${progressPercent.value}%`
+}
+
 const progressLabel = computed(() => {
 	if (!showsBottomProgress.value || isWaitingProgress.value) {
 		return ''
 	}
 
-	if (props.progressType === 'bytes' && progressTotal.value > 0) {
-		const current = Math.min(progressCurrent.value, progressTotal.value)
-		return `${formatBytes(current, 1)} / ${formatBytes(progressTotal.value, 1)}`
-	}
-
-	if (props.progressType === 'count' && progressTotal.value > 0) {
-		const current = Math.min(progressCurrent.value, progressTotal.value)
-		return `${formatNumber(current)} / ${formatNumber(progressTotal.value)}`
-	}
-
-	return `${progressPercent.value}%`
-})
-
-const progressLabelWidth = computed(() => {
-	if (props.progressType === 'bytes' && progressTotal.value > 0) {
-		const total = formatBytes(progressTotal.value, 1)
-		return `${`${total} / ${total}`.length}ch`
-	}
-
-	if (props.progressType === 'count' && progressTotal.value > 0) {
-		const total = formatNumber(progressTotal.value)
-		return `${Math.max(7, `${total} / ${total}`.length)}ch`
-	}
-
-	return '4ch'
+	const primary = formatProgressLabel(
+		props.progressType,
+		progressCurrent.value,
+		progressTotal.value,
+	)
+	return primary
 })
 
 const titleRef = ref<HTMLElement | null>(null)

@@ -263,6 +263,24 @@ pub enum InstallPhaseId {
 pub struct InstallProgress {
     pub current: u64,
     pub total: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub secondary: Option<InstallProgressSecondary>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InstallProgressSecondary {
+    pub current: u64,
+    pub total: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum InstallJavaStep {
+    Resolving,
+    FetchingMetadata,
+    Downloading,
+    Extracting,
+    Validating,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -275,6 +293,10 @@ pub enum InstallPhaseDetails {
     Minecraft {
         game_version: String,
         loader: ModLoader,
+    },
+    Java {
+        major_version: u32,
+        step: InstallJavaStep,
     },
     Modpack {
         project_id: Option<String>,
