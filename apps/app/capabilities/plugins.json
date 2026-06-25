@@ -105,6 +105,7 @@
 		"cache:default",
 		"files:default",
 		"settings:default",
+		"shortcuts:default",
 		"tags:default",
 		"utils:default",
 		"ads:default",

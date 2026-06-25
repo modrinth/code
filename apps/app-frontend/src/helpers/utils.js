@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
+import { save } from '@tauri-apps/plugin-dialog'
 
 import { get_full_path, get_mod_full_path } from '@/helpers/instance'
 
@@ -45,6 +46,22 @@ export async function highlightInFolder(path) {
 
 export async function showLauncherLogsFolder() {
 	return await invoke('plugin:utils|show_launcher_logs_folder', {})
+}
+
+export async function createInstanceShortcut(instanceName, instanceId, options = {}) {
+	const outputPath = await save({
+		defaultPath: `Modrinth - ${instanceName}`,
+	})
+
+	if (!outputPath) return null
+
+	return await invoke('plugin:shortcuts|create_instance_shortcut', {
+		instanceName,
+		instanceId,
+		outputPath,
+		server: options.server,
+		singleplayerWorld: options.singleplayerWorld,
+	})
 }
 
 export async function showAppDbBackupsFolder() {

@@ -140,11 +140,18 @@ pub async fn get_opening_command(
     state: tauri::State<'_, crate::macos::deep_link::InitialPayload>,
 ) -> Result<Option<CommandPayload>> {
     let payload = state.payload.lock().await;
+    let cmd_arg = std::env::args_os()
+        .nth(1)
+        .map(|path| path.to_string_lossy().to_string());
 
     return if let Some(payload) = payload.as_ref() {
         tracing::info!("opening command {payload}");
 
         Ok(Some(handler::parse_command(payload).await?))
+    } else if let Some(cmd_arg) = cmd_arg {
+        tracing::info!("opening command {cmd_arg:?}");
+
+        Ok(Some(handler::parse_command(&cmd_arg).await?))
     } else {
         Ok(None)
     };

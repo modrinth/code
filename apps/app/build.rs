@@ -243,6 +243,14 @@ fn main() {
                     ),
             )
             .plugin(
+                "shortcuts",
+                InlinedPlugin::new()
+                    .commands(&["create_instance_shortcut"])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "utils",
                 InlinedPlugin::new()
                     .commands(&[

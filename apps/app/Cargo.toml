@@ -22,11 +22,6 @@ path-util = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
-tauri = { workspace = true, features = [
-  "devtools",
-  "macos-private-api",
-  "protocol-asset",
-] }
 tauri-plugin-deep-link = { workspace = true }
 tauri-plugin-dialog = { workspace = true }
 tauri-plugin-fs = { workspace = true }
@@ -45,6 +40,10 @@ url = { workspace = true }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 
+[dependencies.tauri]
+workspace = true
+features = ["devtools", "macos-private-api", "protocol-asset"]
+
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }
 
@@ -54,19 +53,22 @@ tauri-plugin-updater = { workspace = true, optional = true }
 [target.'cfg(target_os = "macos")'.dependencies]
 core-foundation.workspace = true
 core-graphics.workspace = true
-objc2-app-kit = { workspace = true, features = [
-  "NSWindow",
-] }
+objc2-app-kit = { workspace = true, features = ["NSWindow"] }
 
 [target.'cfg(windows)'.dependencies]
 webview2-com.workspace = true
-windows = { workspace = true, features = [
+windows-core.workspace = true
+
+[target.'cfg(windows)'.dependencies.windows]
+workspace = true
+features = [
   "Win32_Foundation",
   "Win32_Graphics_Dwm",
   "Win32_Graphics_Gdi",
+  "Win32_System_Com",
+  "Win32_UI_Shell",
   "Win32_UI_WindowsAndMessaging",
-] }
-windows-core.workspace = true
+]
 
 [features]
 # by default Tauri runs in production mode

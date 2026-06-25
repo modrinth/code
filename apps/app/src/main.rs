@@ -241,6 +241,7 @@ fn main() {
         .plugin(api::minecraft_skins::init())
         .plugin(api::process::init())
         .plugin(api::settings::init())
+        .plugin(api::shortcuts::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())
         .plugin(api::cache::init())

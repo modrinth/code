@@ -229,6 +229,11 @@ pub enum CommandPayload {
     InstallServer {
         id: String,
     },
+    LaunchInstance {
+        id: String,
+        server: Option<String>,
+        singleplayer_world: Option<String>,
+    },
     RunMRPack {
         // run or install .mrpack
         path: PathBuf,

@@ -959,6 +959,9 @@
   "instance.worlds.copy_address": {
     "message": "Copy address"
   },
+  "instance.worlds.create_shortcut": {
+    "message": "Create shortcut"
+  },
   "instance.worlds.dont_show_on_home": {
     "message": "Don't show on Home"
   },

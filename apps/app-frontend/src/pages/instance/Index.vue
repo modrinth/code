@@ -197,6 +197,10 @@
 										id: 'export-mrpack',
 										action: () => exportModal?.show(),
 									},
+									{
+										id: 'create-shortcut',
+										action: () => createShortcut(),
+									},
 								]"
 							>
 								<MoreVerticalIcon />
@@ -204,6 +208,7 @@
 								<template #host-a-server> <ServerIcon /> Create a server </template>
 								<template #open-folder> <FolderOpenIcon /> Open folder </template>
 								<template #export-mrpack> <PackageIcon /> Export modpack </template>
+								<template #create-shortcut> <ExternalIcon /> Create shortcut </template>
 							</OverflowMenu>
 						</ButtonStyled>
 					</div>
@@ -321,7 +326,7 @@ import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { showInstanceInFolder } from '@/helpers/utils.js'
+import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
@@ -330,7 +335,7 @@ import { useBreadcrumbs, useTheming } from '@/store/state'
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
-const { handleError } = injectNotificationManager()
+const { addNotification, handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
 const queryClient = useQueryClient()
 const route = useRoute()
@@ -595,6 +600,25 @@ const repairInstance = async () => {
 		}).catch(handleError)
 	} else {
 		await install_existing_instance(instance.value.id, false).catch(handleError)
+	}
+}
+
+const createShortcut = async () => {
+	if (!instance.value) return
+	try {
+		const shortcutPath = await createInstanceShortcut(instance.value.name, instance.value.id)
+		if (!shortcutPath) return
+
+		addNotification({
+			type: 'success',
+			title: 'Shortcut created',
+		})
+	} catch (error: unknown) {
+		addNotification({
+			type: 'error',
+			title: `Error creating shortcut`,
+			text: `${error}`,
+		})
 	}
 }
 
