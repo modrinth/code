@@ -210,6 +210,30 @@ fn main() {
                     ),
             )
             .plugin(
+                "server",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "server_list",
+                        "server_get",
+                        "server_create",
+                        "server_remove",
+                        "server_install",
+                        "server_start",
+                        "server_stop",
+                        "server_kill",
+                        "server_send_command",
+                        "server_get_log",
+                        "server_get_running",
+                        "server_is_running",
+                        "server_get_config",
+                        "server_set_config",
+                        "server_get_versions",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "settings",
                 InlinedPlugin::new()
                     .commands(&[

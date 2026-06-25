@@ -281,6 +281,111 @@
   "app.instance.worlds.this-server": {
     "message": "this server"
   },
+  "app.local-server.back": {
+    "message": "All servers"
+  },
+  "app.local-server.command-placeholder": {
+    "message": "Type a command and press Enter…"
+  },
+  "app.local-server.config-empty": {
+    "message": "This file does not exist yet. Saving will create it."
+  },
+  "app.local-server.config-file": {
+    "message": "File"
+  },
+  "app.local-server.config-saved": {
+    "message": "Configuration saved"
+  },
+  "app.local-server.download": {
+    "message": "Download server"
+  },
+  "app.local-server.installing": {
+    "message": "Downloading server…"
+  },
+  "app.local-server.not-installed": {
+    "message": "This server has not been downloaded yet."
+  },
+  "app.local-server.retry": {
+    "message": "Retry download"
+  },
+  "app.local-server.running": {
+    "message": "Running"
+  },
+  "app.local-server.send": {
+    "message": "Send"
+  },
+  "app.local-server.start": {
+    "message": "Start"
+  },
+  "app.local-server.stop": {
+    "message": "Stop"
+  },
+  "app.local-server.stopped": {
+    "message": "Stopped"
+  },
+  "app.local-server.tab.config": {
+    "message": "Configuration"
+  },
+  "app.local-server.tab.console": {
+    "message": "Console"
+  },
+  "app.local-servers.create.installing": {
+    "message": "Downloading server…"
+  },
+  "app.local-servers.create.loading-versions": {
+    "message": "Loading versions…"
+  },
+  "app.local-servers.create.name": {
+    "message": "Server name"
+  },
+  "app.local-servers.create.software": {
+    "message": "Server software"
+  },
+  "app.local-servers.create.submit": {
+    "message": "Create & download"
+  },
+  "app.local-servers.create.title": {
+    "message": "New self-hosted server"
+  },
+  "app.local-servers.create.version": {
+    "message": "Minecraft version"
+  },
+  "app.local-servers.delete.description": {
+    "message": "Are you sure you want to delete this server? All of its files and worlds will be permanently removed."
+  },
+  "app.local-servers.delete.title": {
+    "message": "Delete server"
+  },
+  "app.local-servers.empty.description": {
+    "message": "Create a dedicated server to run on your own machine, with no port forwarding setup required for LAN play."
+  },
+  "app.local-servers.empty.title": {
+    "message": "No servers yet"
+  },
+  "app.local-servers.new-server": {
+    "message": "New server"
+  },
+  "app.local-servers.status.failed": {
+    "message": "Install failed"
+  },
+  "app.local-servers.status.installing": {
+    "message": "Installing"
+  },
+  "app.local-servers.status.not-installed": {
+    "message": "Not installed"
+  },
+  "app.local-servers.status.running": {
+    "message": "Running"
+  },
+  "app.local-servers.status.stopped": {
+    "message": "Stopped"
+  },
+  "app.local-servers.subtitle": {
+    "message": "Host dedicated Minecraft servers on this computer."
+  },
+  "app.local-servers.title": {
+    "message": "Servers"
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Content required"
   },

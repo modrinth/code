@@ -11,6 +11,7 @@ pub mod mr_auth;
 pub mod pack;
 pub mod process;
 pub mod profile;
+pub mod server;
 pub mod server_address;
 pub mod settings;
 pub mod tags;
@@ -36,7 +37,7 @@ pub mod prelude {
         event::CommandPayload,
         jre, metadata, minecraft_auth, mr_auth, pack, process,
         profile::{self, Profile, create},
-        settings,
+        server, settings,
         state::ReleaseChannel,
         util::{
             io::{IOError, canonicalize},

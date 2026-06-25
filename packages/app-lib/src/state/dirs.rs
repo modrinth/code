@@ -13,6 +13,7 @@ pub const CACHES_FOLDER_NAME: &str = "caches";
 pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
 pub const PROFILES_FOLDER_NAME: &str = "profiles";
 pub const METADATA_FOLDER_NAME: &str = "meta";
+pub const SERVERS_FOLDER_NAME: &str = "servers";
 
 #[derive(Debug)]
 pub struct DirectoryInfo {
@@ -154,6 +155,18 @@ impl DirectoryInfo {
         self.config_dir.join(PROFILES_FOLDER_NAME)
     }
 
+    /// Get the directory containing locally-hosted dedicated servers
+    #[inline]
+    pub fn servers_dir(&self) -> PathBuf {
+        self.config_dir.join(SERVERS_FOLDER_NAME)
+    }
+
+    /// Get the directory for a single locally-hosted server
+    #[inline]
+    pub fn server_dir(&self, server_id: &str) -> PathBuf {
+        self.servers_dir().join(server_id)
+    }
+
     /// Gets the logs dir for a given profile
     #[inline]
     pub fn profile_logs_dir(&self, profile_path: &str) -> PathBuf {
@@ -267,6 +280,7 @@ impl DirectoryInfo {
                     CACHES_FOLDER_NAME,
                     PROFILES_FOLDER_NAME,
                     METADATA_FOLDER_NAME,
+                    SERVERS_FOLDER_NAME,
                 ];
 
                 struct MovePath {

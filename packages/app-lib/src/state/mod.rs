@@ -23,6 +23,9 @@ pub use self::settings::*;
 mod process;
 pub use self::process::*;
 
+mod server_instance;
+pub use self::server_instance::*;
+
 mod java_globals;
 pub use self::java_globals::*;
 

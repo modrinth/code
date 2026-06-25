@@ -103,6 +103,7 @@
 		"pack:default",
 		"process:default",
 		"profile:default",
+		"server:default",
 		"cache:default",
 		"files:default",
 		"settings:default",

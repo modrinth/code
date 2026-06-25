@@ -4,6 +4,7 @@ import * as Pages from '@/pages'
 import * as Hosting from '@/pages/hosting/manage'
 import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
+import LocalServer from '@/pages/localserver/Index.vue'
 import * as Project from '@/pages/project'
 
 /**
@@ -26,6 +27,22 @@ export default new createRouter({
 			component: Pages.Worlds,
 			meta: {
 				breadcrumb: [{ name: 'Worlds' }],
+			},
+		},
+		{
+			path: '/servers',
+			name: 'LocalServers',
+			component: Pages.LocalServers,
+			meta: {
+				breadcrumb: [{ name: 'Servers' }],
+			},
+		},
+		{
+			path: '/servers/:id',
+			name: 'LocalServer',
+			component: LocalServer,
+			meta: {
+				breadcrumb: [{ name: 'Servers', link: '/servers' }, { name: '?Server' }],
 			},
 		},
 		{

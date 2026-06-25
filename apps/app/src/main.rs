@@ -241,6 +241,7 @@ fn main() {
         .plugin(api::process::init())
         .plugin(api::profile::init())
         .plugin(api::profile_create::init())
+        .plugin(api::server::init())
         .plugin(api::settings::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())

@@ -23,6 +23,7 @@ import {
 	PlusIcon,
 	RefreshCwIcon,
 	RightArrowIcon,
+	ServerIcon,
 	ServerStackIcon,
 	SettingsIcon,
 	UserIcon,
@@ -1406,6 +1407,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
 				<WorldIcon />
+			</NavButton>
+			<NavButton
+				v-tooltip.right="'Servers'"
+				to="/servers"
+				:is-primary="(r) => r.path === '/servers'"
+				:is-subpage="(r) => r.path.startsWith('/servers/')"
+			>
+				<ServerIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="'Discover content'"
