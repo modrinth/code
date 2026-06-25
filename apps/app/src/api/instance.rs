@@ -7,7 +7,8 @@ use std::path::{Path, PathBuf};
 use theseus::DownloadReason;
 use theseus::data::{
     AppliedContentSetPatch, ContentItem, Dependency,
-    EditInstance as CoreEditInstance, InstanceLaunchOverridesPatch,
+    EditInstance as CoreEditInstance, InstanceInstallCandidate,
+    InstanceInstallTarget, InstanceLaunchOverridesPatch,
     InstanceLink as CoreInstanceLink, InstanceMetadata, LinkedModpackInfo,
 };
 use theseus::instance::QuickPlayType;
@@ -23,6 +24,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_list,
             instance_get_projects,
             instance_get_installed_project_ids,
+            instance_get_install_candidates,
             instance_content,
             instance_get_content_items,
             instance_get_dependencies_as_content_items,
@@ -32,7 +34,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_full_path,
             instance_get_mod_full_path,
             instance_check_installed,
-            instance_check_installed_batch,
             instance_update_all,
             instance_update_project,
             instance_add_project_from_version,
@@ -444,6 +445,20 @@ pub async fn instance_get_installed_project_ids(
 }
 
 #[tauri::command]
+pub async fn instance_get_install_candidates(
+    project_id: &str,
+    project_type: ProjectType,
+    targets: Vec<InstanceInstallTarget>,
+) -> Result<Vec<InstanceInstallCandidate>> {
+    Ok(theseus::instance::get_install_candidates(
+        project_id,
+        project_type,
+        targets,
+    )
+    .await?)
+}
+
+#[tauri::command]
 pub async fn instance_content(
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
@@ -539,30 +554,6 @@ pub async fn instance_check_installed(
     } else {
         Ok(false)
     }
-}
-
-#[tauri::command]
-pub async fn instance_check_installed_batch(
-    project_id: &str,
-) -> Result<HashMap<String, bool>> {
-    let instances = theseus::instance::list().await?;
-    let mut result = HashMap::new();
-    for instance in instances {
-        let instance_id = instance.instance.id.clone();
-        let installed = if let Ok(projects) =
-            theseus::instance::get_projects(&instance_id, None).await
-        {
-            projects.into_iter().any(|(_, pf)| {
-                pf.metadata
-                    .as_ref()
-                    .is_some_and(|m| m.project_id == project_id)
-            })
-        } else {
-            false
-        };
-        result.insert(instance_id, installed);
-    }
-    Ok(result)
 }
 
 #[tauri::command]

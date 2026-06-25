@@ -5,17 +5,18 @@ use std::path::PathBuf;
 #[tracing::instrument]
 pub async fn get_full_path(instance_id: &str) -> crate::Result<PathBuf> {
     let state = State::get().await?;
-    let metadata = crate::state::get_instance(instance_id, &state.pool)
+    let path =
+        crate::state::instances::adapters::sqlite::instance_rows::get_instance_path_by_id(
+            instance_id,
+            &state.pool,
+        )
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
 
     Ok(io::canonicalize(
-        state
-            .directories
-            .instances_dir()
-            .join(metadata.instance.path),
+        state.directories.instances_dir().join(path),
     )?)
 }
 

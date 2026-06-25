@@ -256,7 +256,7 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -480,6 +480,15 @@ function resetState() {
 		: (props.gameVersions[0] ?? null)
 	selectedGameVersion.value = preferred ?? defaultVersion
 }
+
+watch(
+	() => props.loading,
+	(loading, wasLoading) => {
+		if (wasLoading && !loading) {
+			tab.value = props.defaultTab ?? 'existing'
+		}
+	},
+)
 
 function handleHide() {
 	emit('cancel')

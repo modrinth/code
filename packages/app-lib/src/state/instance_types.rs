@@ -135,6 +135,7 @@ pub enum ProjectType {
     Mod,
     DataPack,
     ResourcePack,
+    #[serde(alias = "shader")]
     ShaderPack,
 }
 

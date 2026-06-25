@@ -1,5 +1,4 @@
 use super::content::get_projects;
-use super::paths::get_full_path;
 use crate::server_address::ServerAddress;
 use crate::state::{
     Credentials, InstanceLink, ProcessMetadata, Settings, State,
@@ -69,7 +68,12 @@ async fn run_credentials(
             .into_iter();
 
         if let Some(command) = cmd.next() {
-            let full_path = get_full_path(&context.instance.id).await?;
+            let full_path = crate::util::io::canonicalize(
+                state
+                    .directories
+                    .instances_dir()
+                    .join(&context.instance.path),
+            )?;
             let result = Command::new(command)
                 .args(cmd)
                 .current_dir(&full_path)

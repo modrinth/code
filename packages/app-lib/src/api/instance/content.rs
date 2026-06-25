@@ -1,6 +1,7 @@
 use crate::state::{
     CacheBehaviour, ContentFile, ContentItem, ContentSet, Dependency,
-    LinkedModpackInfo, State,
+    InstanceInstallCandidate, InstanceInstallTarget, LinkedModpackInfo,
+    ProjectType, State,
 };
 use dashmap::DashMap;
 
@@ -44,6 +45,22 @@ pub async fn get_installed_project_ids(
         instance_id,
         None,
         &state,
+    )
+    .await
+}
+
+#[tracing::instrument]
+pub async fn get_install_candidates(
+    project_id: &str,
+    project_type: ProjectType,
+    targets: Vec<InstanceInstallTarget>,
+) -> crate::Result<Vec<InstanceInstallCandidate>> {
+    let state = State::get().await?;
+    crate::state::get_instance_install_candidates(
+        project_id,
+        project_type,
+        &targets,
+        &state.pool,
     )
     .await
 }
