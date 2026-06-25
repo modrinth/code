@@ -502,7 +502,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onServerPrefetch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { createDataPackVersion } from '~/helpers/package.js'

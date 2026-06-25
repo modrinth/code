@@ -737,38 +737,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Kodu girin..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Parolanızı mı unuttunuz?</forgot-password-link> • <create-account-link>Yeni hesap oluştur</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Şununla giriş yap"
   },
   "auth.sign-in.title": {
     "message": "Giriş Yap"
   },
-  "auth.sign-in.use-password": {
-    "message": "Veya parola kullanın"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Hesap oluştur"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Bir hesap oluşturarak, Modrinth'in <terms-link>Kurallar</terms-link> ve <privacy-policy-link>Gizlilik İlkeleri </privacy-policy-link>'ni kabul etmiş bulunursunuz."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Parolalar uyuşmuyor!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Zaten bir hesabınız var mı?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Modrinth hakkında güncellemelere abone ol"
-  },
   "auth.sign-up.title": {
     "message": "Kaydol"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Veya kendiniz hesap oluşturun"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Şunlarla giriş yapın"
@@ -802,21 +784,6 @@
   },
   "auth.verify-email.title": {
     "message": "E-postayı Doğrula"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Modrinth'le ilgili güncellemelere abone ol"
-  },
-  "auth.welcome.description": {
-    "message": "Artık inanılmaz modlar yapan, indiren ve geride kalmayan yaratıcıların ve kaşiflerin havalı topluluğunun bir parçasısın."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Bir hesap oluşturarak, Modrinth'in <terms-link>Şartlar</terms-link>'ını ve <privacy-policy-link>Gizlilik İlkeleri</privacy-policy-link>'ni kabul etmiş sayılırsınız."
-  },
-  "auth.welcome.long-title": {
-    "message": "Modrinth'e hoş geldiniz!"
-  },
-  "auth.welcome.title": {
-    "message": "Hoş geldiniz"
   },
   "collection.button.edit-icon": {
     "message": "Simgeyi düzenle"

@@ -5,6 +5,7 @@ use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
@@ -310,5 +311,23 @@ impl DBSession {
         .await?;
 
         Ok(Some(()))
+    }
+
+    pub async fn remove_all_for_user(
+        user_id: DBUserId,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<Vec<(DBSessionId, String)>, sqlx::Error> {
+        let sessions = sqlx::query!(
+            "
+            DELETE FROM sessions WHERE user_id = $1 RETURNING id, session
+            ",
+            user_id.0
+        )
+        .fetch(&mut *transaction)
+        .map_ok(|x| (DBSessionId(x.id), x.session))
+        .try_collect()
+        .await?;
+
+        Ok(sessions)
     }
 }

@@ -47,17 +47,34 @@ defineExpose({
 	></div>
 </template>
 
-<style lang="scss">
+<style>
 .h-captcha {
 	display: flex;
+	align-items: center;
 	justify-content: center;
 	overflow: hidden;
 	border-radius: var(--radius-md);
 	border: 2px solid var(--color-button-bg);
-	height: 78px;
+	height: 100px;
+	width: 100%;
+	max-width: 100%;
+}
 
-	iframe {
-		margin: -1px;
+.h-captcha iframe {
+	transform: scale(1.33);
+	transform-origin: center;
+	margin: -1px;
+}
+
+@media screen and (max-width: 400px) {
+	.h-captcha {
+		height: auto;
+	}
+
+	.h-captcha iframe {
+		transform: scale(1.03);
+		margin: 0;
+		max-width: 100%;
 	}
 }
 </style>

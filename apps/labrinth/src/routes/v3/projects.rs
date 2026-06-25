@@ -1,4 +1,5 @@
 use std::any::type_name;
+use std::cmp::Reverse;
 use std::collections::HashMap;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
@@ -1389,10 +1390,10 @@ pub async fn dependency_list_internal(
         )
         .await?;
 
-        projects.sort_by_key(|b| std::cmp::Reverse(b.published));
+        projects.sort_by_key(|b| Reverse(b.published));
         projects.dedup_by(|a, b| a.id == b.id);
 
-        versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+        versions.sort_by_key(|b| Reverse(b.date_published));
         versions.dedup_by(|a, b| a.id == b.id);
 
         Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))
