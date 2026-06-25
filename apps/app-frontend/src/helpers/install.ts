@@ -70,7 +70,20 @@ export type InstallPhaseId =
 export interface InstallProgress {
 	current: number
 	total: number
+	secondary?: InstallProgressSecondary | null
 }
+
+export interface InstallProgressSecondary {
+	current: number
+	total: number
+}
+
+export type InstallJavaStep =
+	| 'resolving'
+	| 'fetching_metadata'
+	| 'downloading'
+	| 'extracting'
+	| 'validating'
 
 export interface InstallJobSnapshot {
 	job_id: string
@@ -92,6 +105,7 @@ export interface InstallJobSnapshot {
 		| { type: 'empty' }
 		| { type: 'instance'; name: string }
 		| { type: 'minecraft'; game_version: string; loader: InstanceLoader }
+		| { type: 'java'; major_version: number; step: InstallJavaStep }
 		| {
 				type: 'modpack'
 				project_id?: string | null

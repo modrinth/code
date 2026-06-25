@@ -330,7 +330,11 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
                 reporter
                     .update(
                         InstallPhaseId::DownloadingPackFile,
-                        Some(InstallProgress { current, total }),
+                        Some(InstallProgress {
+                            current,
+                            total,
+                            secondary: None,
+                        }),
                         details,
                     )
                     .await?;

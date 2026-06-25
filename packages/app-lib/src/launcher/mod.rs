@@ -3,7 +3,7 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_instance, emit_loading, init_loading};
 use crate::event::{InstancePayloadType, LoadingBarType};
 use crate::install::{
-    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallJavaStep, InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter,
 };
 use crate::instance::QuickPlayType;
@@ -357,7 +357,18 @@ pub async fn install_minecraft_with_reporter(
         .map_or(8, |it| it.major_version);
     if let Some(reporter) = &reporter {
         reporter
-            .update(InstallPhaseId::PreparingJava, None, phase_details.clone())
+            .update(
+                InstallPhaseId::PreparingJava,
+                Some(InstallProgress {
+                    current: 0,
+                    total: 4,
+                    secondary: None,
+                }),
+                InstallPhaseDetails::Java {
+                    major_version: key,
+                    step: InstallJavaStep::Resolving,
+                },
+            )
             .await?;
     }
     let (java_version, set_java) = if let Some(java_version) =
@@ -365,16 +376,36 @@ pub async fn install_minecraft_with_reporter(
     {
         (std::path::PathBuf::from(java_version.path), false)
     } else {
-        let path = crate::api::jre::auto_install_java_with_loading(
-            key,
-            reporter.is_none(),
-        )
-        .await?;
+        let path = if let Some(reporter) = &reporter {
+            crate::api::jre::auto_install_java_with_reporter(
+                key,
+                reporter.clone(),
+            )
+            .await?
+        } else {
+            crate::api::jre::auto_install_java_with_loading(key, true).await?
+        };
 
         (path, true)
     };
 
     // Test jre version
+    if let Some(reporter) = &reporter {
+        reporter
+            .update(
+                InstallPhaseId::PreparingJava,
+                Some(InstallProgress {
+                    current: 4,
+                    total: 4,
+                    secondary: None,
+                }),
+                InstallPhaseDetails::Java {
+                    major_version: key,
+                    step: InstallJavaStep::Validating,
+                },
+            )
+            .await?;
+    }
     let java_version = crate::api::jre::check_jre(java_version.clone()).await?;
 
     if set_java {
@@ -445,6 +476,7 @@ pub async fn install_minecraft_with_reporter(
                         Some(InstallProgress {
                             current: 0,
                             total: total_length as u64,
+                            secondary: None,
                         }),
                         phase_details.clone(),
                     )
@@ -463,6 +495,7 @@ pub async fn install_minecraft_with_reporter(
                                 Some(InstallProgress {
                                     current: (index + 1) as u64,
                                     total: total_length as u64,
+                                    secondary: None,
                                 }),
                                 phase_details.clone(),
                             )
@@ -536,6 +569,7 @@ pub async fn install_minecraft_with_reporter(
                             Some(InstallProgress {
                                 current: (index + 1) as u64,
                                 total: total_length as u64,
+                                secondary: None,
                             }),
                             phase_details.clone(),
                         )
@@ -735,7 +769,8 @@ pub async fn launch_minecraft(
         }
     }
 
-    let _ = download_log_config(&state, &version_info, None, false).await?;
+    let _ =
+        download_log_config(&state, &version_info, None, false, None).await?;
 
     let java_version =
         get_java_version_from_launch_context(context, &version_info)

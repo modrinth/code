@@ -397,6 +397,7 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
                 Some(InstallProgress {
                     current: (index + 1) as u64,
                     total: total_subfiles,
+                    secondary: None,
                 }),
                 details.clone(),
             )

@@ -16,6 +16,7 @@ import {
 	install_job_list,
 	install_job_retry,
 	installJobInstanceId,
+	type InstallProgress,
 	type InstallJobSnapshot,
 	type InstallJobStatus,
 } from '@/helpers/install'
@@ -67,7 +68,7 @@ const phaseMessages = defineMessages({
 	},
 	resolving_pack: {
 		id: 'app.install.phase.resolving_pack',
-		defaultMessage: 'Resolving pack',
+		defaultMessage: 'Resolving content',
 	},
 	downloading_pack_file: {
 		id: 'app.install.phase.downloading_pack_file',
@@ -115,6 +116,29 @@ const phaseMessages = defineMessages({
 	},
 })
 
+const javaStepMessages = defineMessages({
+	resolving: {
+		id: 'app.install.phase.preparing_java.resolving',
+		defaultMessage: 'Preparing Java {version}',
+	},
+	fetching_metadata: {
+		id: 'app.install.phase.preparing_java.fetching-metadata',
+		defaultMessage: 'Fetching Java {version}',
+	},
+	downloading: {
+		id: 'app.install.phase.preparing_java.downloading',
+		defaultMessage: 'Downloading Java {version}',
+	},
+	extracting: {
+		id: 'app.install.phase.preparing_java.extracting',
+		defaultMessage: 'Extracting Java {version}',
+	},
+	validating: {
+		id: 'app.install.phase.preparing_java.validating',
+		defaultMessage: 'Validating Java {version}',
+	},
+})
+
 const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
@@ -158,24 +182,51 @@ export async function useInstallJobNotifications(opts: {
 			}
 			return formatMessage(messages.installFailedUnknown)
 		}
+		if (job.phase === 'preparing_java' && job.details.type === 'java') {
+			return formatMessage(javaStepMessages[job.details.step], {
+				version: job.details.major_version,
+			})
+		}
 		return formatMessage(phaseMessages[job.phase])
 	}
 
 	function getProgressType(job: InstallJobSnapshot): PopupNotificationProgressType | undefined {
-		if (!job.progress) return undefined
-		if (job.phase === 'downloading_pack_file' || job.phase === 'extracting_overrides') {
+		if (!getEffectiveProgress(job)) return undefined
+		if (
+			job.phase === 'preparing_java' &&
+			job.details.type === 'java' &&
+			job.details.step === 'downloading'
+		) {
 			return 'bytes'
 		}
-		if (job.phase === 'downloading_content' || job.phase === 'running_loader_processors') {
+		if (job.phase === 'downloading_content') {
+			return job.progress?.secondary ? 'bytes' : 'count'
+		}
+		if (
+			job.phase === 'downloading_pack_file' ||
+			job.phase === 'extracting_overrides' ||
+			job.phase === 'downloading_minecraft'
+		) {
+			return 'bytes'
+		}
+		if (job.phase === 'running_loader_processors') {
 			return 'count'
 		}
 		return 'percentage'
 	}
 
+	function getEffectiveProgress(job: InstallJobSnapshot): InstallProgress | null | undefined {
+		if (job.phase === 'downloading_content' && job.progress?.secondary) {
+			return job.progress.secondary
+		}
+
+		return job.progress
+	}
+
 	function getProgress(job: InstallJobSnapshot): number {
 		if (job.status === 'succeeded') return 1
 		if (job.status === 'failed' || job.status === 'interrupted') return 0
-		const progress = job.progress
+		const progress = getEffectiveProgress(job)
 		if (!progress || progress.total <= 0) return 0
 		return Math.max(0, Math.min(1, progress.current / progress.total))
 	}
@@ -218,26 +269,30 @@ export async function useInstallJobNotifications(opts: {
 	}
 
 	const progressItems = computed<PopupNotificationProgressItem[]>(() =>
-		jobs.value.map((job) => ({
-			id: job.job_id,
-			title: getTitle(job),
-			text: getText(job),
-			iconUrl: iconUrls.value[job.job_id] ?? null,
-			progress: getProgress(job),
-			waiting: !job.progress && ['queued', 'running'].includes(job.status),
-			showProgress: !isTerminalJob(job),
-			wrapText: isTerminalJob(job),
-			progressType: isTerminalJob(job) ? undefined : getProgressType(job),
-			progressCurrent: isTerminalJob(job) ? undefined : job.progress?.current,
-			progressTotal: isTerminalJob(job) ? undefined : job.progress?.total,
-			buttons: getTerminalButtons(job),
-			onDismiss: isTerminalJob(job)
-				? async () => {
-						await install_job_dismiss(job.job_id).catch(opts.handleError)
-						await refresh()
-					}
-				: undefined,
-		})),
+		jobs.value.map((job) => {
+			const progress = getEffectiveProgress(job)
+
+			return {
+				id: job.job_id,
+				title: getTitle(job),
+				text: getText(job),
+				iconUrl: iconUrls.value[job.job_id] ?? null,
+				progress: getProgress(job),
+				waiting: !job.progress && ['queued', 'running'].includes(job.status),
+				showProgress: !isTerminalJob(job),
+				wrapText: isTerminalJob(job),
+				progressType: isTerminalJob(job) ? undefined : getProgressType(job),
+				progressCurrent: isTerminalJob(job) ? undefined : progress?.current,
+				progressTotal: isTerminalJob(job) ? undefined : progress?.total,
+				buttons: getTerminalButtons(job),
+				onDismiss: isTerminalJob(job)
+					? async () => {
+							await install_job_dismiss(job.job_id).catch(opts.handleError)
+							await refresh()
+						}
+					: undefined,
+			}
+		}),
 	)
 
 	const buttons = computed<PopupNotificationButton[] | undefined>(() => undefined)
