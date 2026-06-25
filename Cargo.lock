@@ -5372,6 +5372,7 @@ dependencies = [
  "labrinth",
  "lettre",
  "meilisearch-sdk",
+ "modrinth-content-management",
  "modrinth-util",
  "muralpay",
  "murmur2",
@@ -5945,6 +5946,17 @@ dependencies = [
  "log",
  "wasi 0.11.1+wasi-snapshot-preview1",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "modrinth-content-management"
+version = "0.0.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "serde",
+ "thiserror 2.0.17",
+ "tokio",
 ]
 
 [[package]]
@@ -10732,6 +10744,7 @@ dependencies = [
  "ariadne",
  "async-minecraft-ping",
  "async-recursion",
+ "async-trait",
  "async-tungstenite",
  "async-walkdir",
  "async_zip",
@@ -10761,6 +10774,7 @@ dependencies = [
  "hickory-resolver 0.25.2",
  "indicatif",
  "itertools 0.14.0",
+ "modrinth-content-management",
  "notify",
  "notify-debouncer-mini",
  "p256",

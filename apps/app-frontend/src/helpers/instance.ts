@@ -163,6 +163,35 @@ export async function update_project(instanceId: string, projectPath: string): P
 // Returns a path to the new project file
 export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
 
+export interface ResolutionPreferences {
+	game_versions?: string[]
+	loaders?: string[]
+}
+
+export interface ResolveContentRequest {
+	project_id: string
+	version_id?: string | null
+	content_type: Labrinth.Content.v3.ContentType
+	selected?: ResolutionPreferences
+}
+
+export interface ResolvedContent {
+	project_id: string
+	version_id: string
+	dependent_on_version_id?: string | null
+}
+
+export interface ResolveContentPlan {
+	primary: ResolvedContent
+	dependencies: ResolvedContent[]
+	skipped: Array<{
+		project_id: string
+		version_id?: string | null
+		dependent_on_version_id?: string | null
+		reason: string
+	}>
+}
+
 export async function add_project_from_version(
 	instanceId: string,
 	versionId: string,
@@ -174,6 +203,28 @@ export async function add_project_from_version(
 		versionId,
 		reason,
 		dependentOnVersionId,
+	})
+}
+
+export async function install_project_with_dependencies(
+	instanceId: string,
+	request: ResolveContentRequest,
+): Promise<ResolveContentPlan> {
+	return await invoke('plugin:instance|instance_install_project_with_dependencies', {
+		instanceId,
+		request,
+	})
+}
+
+export async function switch_project_version_with_dependencies(
+	instanceId: string,
+	projectPath: string,
+	versionId: string,
+): Promise<string> {
+	return await invoke('plugin:instance|instance_switch_project_version_with_dependencies', {
+		instanceId,
+		projectPath,
+		versionId,
 	})
 }
 

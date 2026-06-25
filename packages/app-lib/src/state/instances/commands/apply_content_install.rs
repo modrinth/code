@@ -3,11 +3,18 @@ use crate::state::instances::{
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    CachedEntry, KnownModrinthFile, ProjectType, State, cache_file_hash,
+    CacheBehaviour, CachedEntry, Dependency, DependencyType, KnownModrinthFile,
+    ModLoader, ProjectType, State, Version, cache_file_hash,
 };
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
+use async_trait::async_trait;
 use bytes::Bytes;
+use modrinth_content_management::{
+    ContentMetadataProvider, ContentType, Error as ResolveError,
+    ResolutionPreferences, ResolveContentPlan, ResolveContentRequest,
+    ResolvedContent,
+};
 use std::path::{Path, PathBuf};
 
 pub(crate) struct ContentScope {
@@ -28,6 +35,277 @@ pub(crate) struct DownloadedProjectVersion {
     pub project_type: ProjectType,
     pub project_id: String,
     pub version_id: String,
+}
+
+pub(crate) struct InstanceInstallProjectRequest {
+    pub project_id: String,
+    pub version_id: Option<String>,
+    pub content_type: ContentType,
+    pub selected: ResolutionPreferences,
+}
+
+struct CachedEntryContentProvider<'a> {
+    state: &'a State,
+    cache_behaviour: Option<CacheBehaviour>,
+}
+
+#[async_trait]
+impl ContentMetadataProvider for CachedEntryContentProvider<'_> {
+    async fn get_version(
+        &mut self,
+        version_id: &str,
+    ) -> Result<Option<modrinth_content_management::Version>, ResolveError>
+    {
+        let version = CachedEntry::get_version(
+            version_id,
+            self.cache_behaviour,
+            &self.state.pool,
+            &self.state.api_semaphore,
+        )
+        .await
+        .map_err(resolve_provider_error)?;
+
+        Ok(version.map(version_to_resolver))
+    }
+
+    async fn get_project_versions(
+        &mut self,
+        project_id: &str,
+    ) -> Result<Vec<modrinth_content_management::Version>, ResolveError> {
+        let versions = CachedEntry::get_project_versions(
+            project_id,
+            self.cache_behaviour,
+            &self.state.pool,
+            &self.state.api_semaphore,
+        )
+        .await
+        .map_err(resolve_provider_error)?;
+
+        Ok(versions
+            .unwrap_or_default()
+            .into_iter()
+            .map(version_to_resolver)
+            .collect())
+    }
+}
+
+fn resolve_provider_error(error: crate::Error) -> ResolveError {
+    ResolveError::Provider(error.to_string())
+}
+
+fn resolver_error(error: ResolveError) -> crate::Error {
+    crate::ErrorKind::InputError(error.to_string()).into()
+}
+
+fn version_to_resolver(
+    version: Version,
+) -> modrinth_content_management::Version {
+    modrinth_content_management::Version {
+        id: version.id,
+        project_id: version.project_id,
+        date_published: version.date_published,
+        dependencies: version
+            .dependencies
+            .into_iter()
+            .map(dependency_to_resolver)
+            .collect(),
+        game_versions: version.game_versions,
+        loaders: version.loaders,
+    }
+}
+
+fn dependency_to_resolver(
+    dependency: Dependency,
+) -> modrinth_content_management::Dependency {
+    modrinth_content_management::Dependency {
+        version_id: dependency.version_id,
+        project_id: dependency.project_id,
+        file_name: dependency.file_name,
+        dependency_type: match dependency.dependency_type {
+            DependencyType::Required => {
+                modrinth_content_management::DependencyType::Required
+            }
+            DependencyType::Optional => {
+                modrinth_content_management::DependencyType::Optional
+            }
+            DependencyType::Incompatible => {
+                modrinth_content_management::DependencyType::Incompatible
+            }
+            DependencyType::Embedded => {
+                modrinth_content_management::DependencyType::Embedded
+            }
+        },
+    }
+}
+
+fn target_preferences(
+    game_version: String,
+    loader: ModLoader,
+    content_type: ContentType,
+) -> ResolutionPreferences {
+    let loader = match content_type {
+        ContentType::DataPack => "datapack".to_string(),
+        ContentType::ResourcePack => "minecraft".to_string(),
+        ContentType::Shader => "iris".to_string(),
+        _ => loader.as_str().to_string(),
+    };
+
+    ResolutionPreferences {
+        game_versions: vec![game_version],
+        loaders: vec![loader],
+    }
+}
+
+pub(crate) async fn resolve_install_plan(
+    instance_id: &str,
+    request: InstanceInstallProjectRequest,
+    state: &State,
+) -> crate::Result<ResolveContentPlan> {
+    let content_set =
+        content_rows::get_applied_content_set(instance_id, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Instance {instance_id} has no applied content set"
+                ))
+            })?;
+    let existing_project_ids =
+        crate::state::get_installed_project_ids_for_instance(
+            instance_id,
+            None,
+            state,
+        )
+        .await?;
+    let provider = CachedEntryContentProvider {
+        state,
+        cache_behaviour: Some(CacheBehaviour::MustRevalidate),
+    };
+    let content_type = request.content_type;
+    let request = ResolveContentRequest {
+        project_id: request.project_id,
+        version_id: request.version_id,
+        content_type,
+        selected: request.selected,
+        target: target_preferences(
+            content_set.game_version,
+            content_set.loader,
+            content_type,
+        ),
+        existing_project_ids,
+    };
+
+    modrinth_content_management::resolve_content(provider, request)
+        .await
+        .map_err(resolver_error)
+}
+
+pub(crate) async fn install_resolved_content_plan(
+    instance_id: &str,
+    plan: &ResolveContentPlan,
+    state: &State,
+) -> crate::Result<()> {
+    add_resolved_content(
+        instance_id,
+        &plan.primary,
+        DownloadReason::Standalone,
+        state,
+    )
+    .await?;
+    for dependency in &plan.dependencies {
+        add_resolved_content(
+            instance_id,
+            dependency,
+            DownloadReason::Dependency,
+            state,
+        )
+        .await?;
+    }
+
+    Ok(())
+}
+
+pub(crate) async fn switch_project_version_with_dependencies(
+    instance_id: &str,
+    project_path: &str,
+    version_id: &str,
+    state: &State,
+) -> crate::Result<String> {
+    let version = CachedEntry::get_version(
+        version_id,
+        Some(CacheBehaviour::MustRevalidate),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Unable to install version id {version_id}. Not found."
+        ))
+    })?;
+    let content_type = ProjectType::get_from_loaders(version.loaders.clone())
+        .map(ContentType::from)
+        .unwrap_or(ContentType::Mod);
+    let plan = resolve_install_plan(
+        instance_id,
+        InstanceInstallProjectRequest {
+            project_id: version.project_id,
+            version_id: Some(version_id.to_string()),
+            content_type,
+            selected: ResolutionPreferences::default(),
+        },
+        state,
+    )
+    .await?;
+
+    let was_disabled = project_path.ends_with(".disabled");
+    let mut new_path = add_project_from_version(
+        instance_id,
+        &plan.primary.version_id,
+        DownloadReason::Update,
+        None,
+        ContentSourceKind::Local,
+        state,
+    )
+    .await?;
+
+    if was_disabled {
+        new_path =
+            toggle_disable_project(instance_id, &new_path, Some(false), state)
+                .await?;
+    }
+
+    for dependency in &plan.dependencies {
+        add_resolved_content(
+            instance_id,
+            dependency,
+            DownloadReason::Dependency,
+            state,
+        )
+        .await?;
+    }
+
+    if new_path != project_path {
+        remove_project(instance_id, project_path, state).await?;
+    }
+
+    Ok(new_path)
+}
+
+async fn add_resolved_content(
+    instance_id: &str,
+    content: &ResolvedContent,
+    reason: DownloadReason,
+    state: &State,
+) -> crate::Result<String> {
+    add_project_from_version(
+        instance_id,
+        &content.version_id,
+        reason,
+        content.dependent_on_version_id.clone(),
+        ContentSourceKind::Local,
+        state,
+    )
+    .await
 }
 
 pub(crate) async fn resolve_content_scope(

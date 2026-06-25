@@ -198,6 +198,8 @@ fn main() {
                         "instance_update_all",
                         "instance_update_project",
                         "instance_add_project_from_version",
+                        "instance_install_project_with_dependencies",
+                        "instance_switch_project_version_with_dependencies",
                         "instance_add_project_from_path",
                         "instance_toggle_disable_project",
                         "instance_remove_project",

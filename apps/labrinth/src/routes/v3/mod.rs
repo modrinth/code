@@ -6,6 +6,7 @@ use serde_json::json;
 pub mod analytics_event;
 pub mod analytics_get;
 pub mod collections;
+pub mod content;
 pub mod friends;
 pub mod images;
 pub mod limits;
@@ -34,6 +35,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .wrap(default_cors())
             .configure(limits::config)
             .configure(collections::config)
+            .configure(content::config)
             .configure(images::config)
             .configure(notifications::config)
             .configure(organizations::config)

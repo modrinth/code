@@ -12,8 +12,7 @@ import { process_listener } from '@/helpers/events'
 import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { add_server_to_instance, getServerLatency } from '@/helpers/worlds'
-import { getServerAddress } from '@/store/install.js'
+import { add_server_to_instance, getServerAddress, getServerLatency } from '@/helpers/worlds'
 
 interface BrowseServerInstance {
 	name: string

@@ -29,6 +29,10 @@ pub mod data {
         Settings, TeamMember, Theme, User, UserFriend, Version, WindowSize,
     };
     pub use ariadne::users::UserStatus;
+    pub use modrinth_content_management::{
+        ContentType, ResolutionPreferences, ResolveContentPlan,
+        ResolveContentRequest,
+    };
 }
 
 pub mod prelude {

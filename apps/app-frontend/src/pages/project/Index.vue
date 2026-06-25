@@ -313,12 +313,11 @@ import {
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerLatency } from '@/helpers/worlds'
+import { getServerAddress, getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
