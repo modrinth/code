@@ -117,4 +117,116 @@ export class LabrinthAuthV2Module extends AbstractModule {
 			body: data,
 		})
 	}
+
+	/**
+	 * List the current user's registered passkeys
+	 *
+	 * @returns A promise that resolves to a list of the user's registered passkeys
+	 */
+	public async listPasskeys(): Promise<Labrinth.Auth.v2.Passkey[]> {
+		return this.client.request<Labrinth.Auth.v2.Passkey[]>(`/auth/passkey`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+		})
+	}
+
+	/**
+	 * Begin registering a new passkey, returning the WebAuthn creation options and a flow
+	 *
+	 * @returns A promise that resolves to the WebAuthn creation options and flow
+	 */
+	public async registerPasskeyStart(): Promise<Labrinth.Auth.v2.PasskeyRegisterStartResponse> {
+		return this.client.request<Labrinth.Auth.v2.PasskeyRegisterStartResponse>(
+			`/auth/passkey/register/start`,
+			{
+				api: 'labrinth',
+				version: 2,
+				method: 'POST',
+			},
+		)
+	}
+
+	/**
+	 * Complete passkey registration with the created credential
+	 *
+	 * @param data The credential data and flow to complete registration with
+	 * @returns A promise that resolves to the newly registered passkey
+	 */
+	public async registerPasskeyFinish(
+		data: Labrinth.Auth.v2.PasskeyRegisterFinishRequest,
+	): Promise<Labrinth.Auth.v2.Passkey> {
+		return this.client.request<Labrinth.Auth.v2.Passkey>(`/auth/passkey/register/finish`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	/**
+	 * Begin a passkey authentication flow, returning the WebAuthn request options and a flow
+	 *
+	 * @returns A promise that resolves to the WebAuthn request options and a flow
+	 */
+	public async authenticatePasskeyStart(): Promise<Labrinth.Auth.v2.PasskeyAuthenticateStartResponse> {
+		return this.client.request<Labrinth.Auth.v2.PasskeyAuthenticateStartResponse>(
+			`/auth/passkey/start`,
+			{
+				api: 'labrinth',
+				version: 2,
+				method: 'POST',
+				skipAuth: true,
+			},
+		)
+	}
+
+	/**
+	 * Complete a passkey authentication flow, returning the new session
+	 *
+	 * @param data The credential data and flow to complete authentication with
+	 * @returns A promise that resolves to the new session
+	 */
+	public async authenticatePasskeyFinish(
+		data: Labrinth.Auth.v2.PasskeyAuthenticateFinishRequest,
+	): Promise<Labrinth.Sessions.v2.Session> {
+		return this.client.request<Labrinth.Sessions.v2.Session>(`/auth/passkey/finish`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'POST',
+			body: data,
+			skipAuth: true,
+		})
+	}
+
+	/**
+	 * Rename a passkey
+	 *
+	 * @param id The ID of the passkey to rename
+	 * @param data The new name for the passkey
+	 */
+	public async renamePasskey(
+		id: string,
+		data: Labrinth.Auth.v2.PasskeyRenameRequest,
+	): Promise<void> {
+		return this.client.request(`/auth/passkey/${id}`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'PATCH',
+			body: data,
+		})
+	}
+
+	/**
+	 * Delete a passkey
+	 *
+	 * @param id The ID of the passkey to delete
+	 */
+	public async deletePasskey(id: string): Promise<void> {
+		return this.client.request(`/auth/passkey/${id}`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'DELETE',
+		})
+	}
 }

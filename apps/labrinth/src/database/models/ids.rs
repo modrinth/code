@@ -4,7 +4,7 @@ use crate::models::ids::{
     AffiliateCodeId, AnalyticsEventId, AttributionGroupId, CampaignDonationId,
     ChargeId, CollectionId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
-    OAuthRedirectUriId, OrganizationId, PatId, PayoutId, ProductId,
+    OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId, ProductId,
     ProductPriceId, ProjectId, ReportId, SessionId, SharedInstanceId,
     SharedInstanceVersionId, TeamId, TeamMemberId, ThreadId, ThreadMessageId,
     UserSubscriptionId, VersionId,
@@ -281,6 +281,10 @@ db_id_interface!(
 db_id_interface!(
     AnalyticsEventId,
     generator: generate_analytics_event_id @ "analytics_events",
+);
+db_id_interface!(
+    PasskeyId,
+    generator: generate_passkey_id @ "user_passkeys",
 );
 
 id_type!(CategoryId as i32);
