@@ -67,11 +67,11 @@
 		<template #cell-name="{ row: version }">
 			<div class="flex min-w-0 flex-col gap-2">
 				<AutoLink
+					v-tooltip="`${version.version_number} - ${version.name}`"
 					:to="versionLink?.(version)"
 					class="flex min-w-0 flex-col gap-1 w-fit"
 					:link-class="versionLink ? 'focus-visible:underline' : ''"
 					:title="`${version.version_number} - ${version.name}`"
-					v-tooltip="`${version.version_number} - ${version.name}`"
 				>
 					<div class="flex min-w-0 items-center gap-2">
 						<div
@@ -108,10 +108,10 @@
 		<template #cell-gameVersions="{ row: version }">
 			<div class="flex flex-wrap gap-1">
 				<TagItem
-					data-no-row-click
 					v-for="gameVersion in getDisplayGameVersions(version).slice(0, maxGameVersionTags)"
 					:key="`version-tag-${gameVersion}`"
 					v-tooltip="`Toggle filter for ${gameVersion}`"
+					data-no-row-click
 					:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 				>
 					{{ gameVersion }}
@@ -148,10 +148,10 @@
 				</template>
 				<template v-else>
 					<TagItem
-						data-no-row-click
 						v-for="platform in version.loaders"
 						:key="`platform-tag-${platform}`"
 						v-tooltip="`Toggle filter for ${platform}`"
+						data-no-row-click
 						:style="`--_color: var(--color-platform-${platform})`"
 						:action="() => versionFilters?.toggleFilter('platform', platform)"
 					>
@@ -165,9 +165,9 @@
 		<template v-if="showEnvironmentColumn" #cell-environment="{ row: version }">
 			<div class="flex flex-wrap gap-1">
 				<TagItem
-					data-no-row-click
 					v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
 					:key="`env-tag-${tagIdx}`"
+					data-no-row-click
 					class="text-center"
 				>
 					<component :is="tag.icon" />
