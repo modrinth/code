@@ -8,12 +8,7 @@ import { nextTick, type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
-import {
-	get_organization,
-	get_project,
-	get_team,
-	get_version_many,
-} from '@/helpers/cache.js'
+import { get_organization, get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import {
 	install_create_instance,
 	install_create_modpack_instance,

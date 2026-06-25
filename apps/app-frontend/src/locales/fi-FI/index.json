@@ -221,12 +221,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Selaa palvelimia"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' tullaan **poistamaan pysyvästi**, eikä tule olemaan mitään tapaa palauttaa sitä."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Oletko varma että haluat pysyvästi poistaa tämän maailman?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modattu"
   },
@@ -245,20 +239,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Ei palvelimia tai maailmoja lisättynä"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' tullaan poistamaan sinun listaltasi, mukaan lukien pelin sisällä, eikä tule olemaan mitään tapaa palauttaa sitä."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) tullaan poistamaan sinun listaltasi, mukaan lukien pelin sisällä, eikä tule olemaan mitään tapaa palauttaa sitä."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Oletko varma että haluat poistaa {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hae {count} maailmasta..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "tämän palvelimen"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Sisältö vaaditaan"
