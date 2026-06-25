@@ -20,5 +20,4 @@ pub(crate) use self::commands::{
     list_content, list_content_sets, list_linked_modpack_content,
     sync_content_files,
 };
-mod domain;
 pub(crate) mod watcher;
