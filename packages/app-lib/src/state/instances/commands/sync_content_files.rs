@@ -39,9 +39,14 @@ pub(crate) async fn sync_instance_content_files(
         &state.api_semaphore,
     )
     .await?;
-    let hashes_by_path = hashes
+    let hashes_by_key = hashes
         .into_iter()
-        .map(|hash| (hash.path.clone(), hash))
+        .map(|hash| {
+            (
+                format!("{}-{}", hash.size, hash.path.trim_end_matches(".disabled")),
+                hash,
+            )
+        })
         .collect::<HashMap<_, _>>();
     let existing_files =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
@@ -55,8 +60,8 @@ pub(crate) async fn sync_instance_content_files(
     let mut files = Vec::new();
 
     for file in scanned {
-        let cache_path = format!("{}/{}", instance.path, file.relative_path);
-        let Some(hash) = hashes_by_path.get(&cache_path) else {
+        let hash_key = file.hash_cache_key.trim_end_matches(".disabled");
+        let Some(hash) = hashes_by_key.get(hash_key) else {
             continue;
         };
         let existing_file = existing_files_by_path.get(&file.relative_path);

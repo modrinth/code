@@ -744,6 +744,9 @@ async fn content_projects_for_scope(
                 update_version_id,
                 hash: file.sha1,
                 file_name: file.file_name,
+                enabled: entry.map_or(file.enabled, |entry| {
+                    entry.enabled && file.enabled
+                }),
                 size: file.size,
                 metadata: file_metadata_from_entry_or_cache(entry, metadata),
                 project_type,
@@ -891,7 +894,7 @@ async fn content_files_to_content_items(
                 file_path: path.clone(),
                 id: file.hash.clone(),
                 size: file.size,
-                enabled: !file.file_name.ends_with(".disabled"),
+                enabled: file.enabled,
                 project_type: file.project_type,
                 project: project.map(|project| ContentItemProject {
                     id: project.id.clone(),
