@@ -157,121 +157,124 @@
 			</div>
 		</NewModal>
 		<ModalCreation ref="modal_creation" />
-		<section class="universal-card">
-			<div class="header__row">
-				<h2 class="header__title text-2xl">{{ formatMessage(messages.headTitle) }}</h2>
-				<div class="input-group">
-					<ButtonStyled color="brand">
-						<button @click="$refs.modal_creation.show($event)">
-							<PlusIcon />
-							{{ formatMessage(commonMessages.createAProjectButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-			<p v-if="projects.length < 1">
-				{{ formatMessage(messages.noProjectsYet) }}
-			</p>
-			<template v-else>
-				<p>{{ formatMessage(messages.bulkEditHint) }}</p>
-				<div class="input-group">
-					<ButtonStyled>
-						<button :disabled="selectedProjects.length === 0" @click="$refs.editLinksModal.show()">
-							<EditIcon />
-							{{ formatMessage(messages.editLinksButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-				<Table
-					v-model:sort-column="sortColumn"
-					v-model:sort-direction="sortDirection"
-					class="mt-4"
-					:columns="projectTableColumns"
-					:data="sortedProjects"
-					row-key="id"
-					table-min-width="50rem"
-					table-layout="auto"
-				>
-					<template #header-select>
-						<div v-tooltip="formatMessage(messages.selectAllBulkEditableProjects)">
-							<Checkbox
-								:model-value="allBulkEditableProjectsSelected"
-								@update:model-value="toggleAllBulkEditableProjects()"
-							/>
+		<section class="relative overflow-hidden rounded-2xl">
+			<Table
+				v-model:sort-column="sortColumn"
+				v-model:sort-direction="sortDirection"
+				:columns="projectTableColumns"
+				:data="sortedProjects"
+				row-key="id"
+				table-min-width="50rem"
+				table-layout="auto"
+			>
+				<template #header>
+					<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+						<h2 class="m-0 text-2xl font-semibold text-contrast">
+							{{ formatMessage(messages.headTitle) }}
+						</h2>
+						<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
+							<ButtonStyled>
+								<button
+									:disabled="selectedProjects.length === 0"
+									@click="$refs.editLinksModal.show()"
+								>
+									<EditIcon />
+									{{ formatMessage(messages.editLinksButton) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand">
+								<button @click="$refs.modal_creation.show($event)">
+									<PlusIcon />
+									{{ formatMessage(commonMessages.createAProjectButton) }}
+								</button>
+							</ButtonStyled>
 						</div>
-					</template>
-					<template #cell-select="{ row: project }">
-						<div>
-							<Checkbox
-								v-tooltip="getBulkEditDisabledTooltip(project)"
-								:disabled="isProjectBulkEditDisabled(project)"
-								:model-value="isProjectSelected(project)"
-								@update:model-value="toggleProjectSelection(project)"
+					</div>
+				</template>
+				<template #empty-state>
+					<div class="flex h-64 items-center justify-center text-secondary">
+						{{ formatMessage(messages.noProjectsYet) }}
+					</div>
+				</template>
+				<template #header-select>
+					<div v-tooltip="formatMessage(messages.selectAllBulkEditableProjects)">
+						<Checkbox
+							:model-value="allBulkEditableProjectsSelected"
+							@update:model-value="toggleAllBulkEditableProjects()"
+						/>
+					</div>
+				</template>
+				<template #cell-select="{ row: project }">
+					<div>
+						<Checkbox
+							v-tooltip="getBulkEditDisabledTooltip(project)"
+							:disabled="isProjectBulkEditDisabled(project)"
+							:model-value="isProjectSelected(project)"
+							@update:model-value="toggleProjectSelection(project)"
+						/>
+					</div>
+				</template>
+				<template #cell-name="{ row: project }">
+					<nuxt-link class="project-name-cell" :to="getProjectUrl(project)">
+						<Avatar
+							class="shrink-0"
+							:src="project.icon_url"
+							aria-hidden="true"
+							:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
+							no-shadow
+						/>
+						<span class="project-title">
+							<IssuesIcon
+								v-if="project.moderator_message"
+								:aria-label="formatMessage(messages.projectModeratorMessageAriaLabel)"
 							/>
-						</div>
-					</template>
-					<template #cell-name="{ row: project }">
-						<nuxt-link class="project-name-cell" :to="getProjectUrl(project)">
-							<Avatar
-								class="shrink-0"
-								:src="project.icon_url"
-								aria-hidden="true"
-								:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
-								no-shadow
-							/>
-							<span class="project-title">
-								<IssuesIcon
-									v-if="project.moderator_message"
-									:aria-label="formatMessage(messages.projectModeratorMessageAriaLabel)"
-								/>
 
-								<span class="project-title-link wrap-as-needed">
-									{{ project.title }}
-								</span>
+							<span class="project-title-link wrap-as-needed">
+								{{ project.title }}
 							</span>
-						</nuxt-link>
-					</template>
-					<template #cell-id="{ row: project }">
-						<div class="flex items-center">
-							<CopyCode :text="project.id" />
-						</div>
-					</template>
-					<template #cell-type="{ row: project }">
-						<div class="flex items-center">
-							{{ getProjectDisplayType(project) }}
-						</div>
-					</template>
-					<template #cell-status="{ row: project }">
-						<div class="flex items-center">
-							<ProjectStatusBadge v-if="project.status" :status="project.status" />
-						</div>
-					</template>
-					<template #cell-actions="{ row: project }">
-						<div class="flex !flex-row items-center !justify-end gap-2">
-							<ButtonStyled
-								v-if="projectsWithMigrationWarning.includes(project.id)"
-								circular
-								color="orange"
+						</span>
+					</nuxt-link>
+				</template>
+				<template #cell-id="{ row: project }">
+					<div class="flex items-center">
+						<CopyCode :text="project.id" />
+					</div>
+				</template>
+				<template #cell-type="{ row: project }">
+					<div class="flex items-center">
+						{{ getProjectDisplayType(project) }}
+					</div>
+				</template>
+				<template #cell-status="{ row: project }">
+					<div class="flex items-center">
+						<ProjectStatusBadge v-if="project.status" :status="project.status" />
+					</div>
+				</template>
+				<template #cell-actions="{ row: project }">
+					<div class="flex !flex-row items-center !justify-end gap-2">
+						<ButtonStyled
+							v-if="projectsWithMigrationWarning.includes(project.id)"
+							circular
+							color="orange"
+						>
+							<nuxt-link
+								v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
+								:to="`${getProjectUrl(project)}?showEnvironmentMigrationWarning=true`"
 							>
-								<nuxt-link
-									v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
-									:to="`${getProjectUrl(project)}?showEnvironmentMigrationWarning=true`"
-								>
-									<TriangleAlertIcon />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled circular>
-								<nuxt-link
-									v-tooltip="formatMessage(commonMessages.settingsLabel)"
-									:to="`${getProjectUrl(project)}/settings`"
-								>
-									<SettingsIcon />
-								</nuxt-link>
-							</ButtonStyled>
-						</div>
-					</template>
-				</Table>
-			</template>
+								<TriangleAlertIcon />
+							</nuxt-link>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<nuxt-link
+								v-tooltip="formatMessage(commonMessages.settingsLabel)"
+								:to="`${getProjectUrl(project)}/settings`"
+							>
+								<SettingsIcon />
+							</nuxt-link>
+						</ButtonStyled>
+					</div>
+				</template>
+			</Table>
 		</section>
 	</div>
 </template>
@@ -401,10 +404,6 @@ const messages = defineMessages({
 	noProjectsYet: {
 		id: 'dashboard.projects.empty',
 		defaultMessage: "You don't have any projects yet. Click the green button above to begin.",
-	},
-	bulkEditHint: {
-		id: 'dashboard.projects.bulk-edit-hint',
-		defaultMessage: 'You can edit multiple projects at once by selecting them below.',
 	},
 	nameHeader: {
 		id: 'dashboard.projects.table.name',
