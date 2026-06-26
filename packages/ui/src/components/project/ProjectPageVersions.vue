@@ -197,7 +197,10 @@
 		</template>
 
 		<template #cell-actions="{ row: version }">
-			<div class="flex items-center justify-end gap-0.5 h-full cursor-default" data-no-row-click>
+			<div
+				class="flex h-full w-max items-center justify-end gap-0.5 whitespace-nowrap cursor-default"
+				data-no-row-click
+			>
 				<slot name="actions" :version="version"></slot>
 			</div>
 		</template>
@@ -396,7 +399,7 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
-const formatRelativeTime = useRelativeTime()
+const formatRelativeTime = useRelativeTime({ style: 'narrow' })
 const { formatCompactNumber } = useCompactNumber()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -503,8 +506,8 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		{
 			key: 'actions',
 			align: 'right',
-			width: '4.5rem',
 			headerClass: 'text-secondary',
+			width: '1%',
 			cellClass: '!overflow-visible align-middle',
 		},
 	)

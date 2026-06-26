@@ -9,13 +9,11 @@
 			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent">
+				<ButtonStyled circular type="transparent" color="green">
 					<button
-						v-tooltip="`Install`"
-						:class="{
-							'group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted':
-								!installed || version.id !== installedVersion,
-						}"
+						v-tooltip="
+							!installed ? 'Install' : version.id !== installedVersion ? 'Swap version' : ''
+						"
 						:disabled="installing || (installed && version.id === installedVersion)"
 						@click.stop="() => install(version.id)"
 					>
@@ -27,7 +25,6 @@
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
 						v-if="false"
-						class="group-hover:!bg-button-bg"
 						:options="[
 							{
 								id: 'install-elsewhere',
@@ -53,7 +50,6 @@
 					<a
 						v-else
 						v-tooltip="`Open in browser`"
-						class="group-hover:!bg-button-bg"
 						:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
 						target="_blank"
 					>
