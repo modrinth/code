@@ -18,24 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check.outputs.skip }}
-      internal: ${{ steps.check-internal.outputs.internal }}
     if: ${{ always() }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Check if workflow runs on an internal branch
-        id: check-internal
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-          REPO: ${{ github.repository }}
-        run: |
-          if [ "$EVENT_NAME" != "pull_request" ] || [ "$HEAD_REPO" = "$REPO" ]; then
-            echo "internal=true" >> $GITHUB_OUTPUT
-          else
-            echo "internal=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Merge Queue CI Check Skipper
         id: merge-queue-ci-skipper
@@ -62,7 +48,7 @@ jobs:
 
   build:
     name: Lint and Test
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
 
