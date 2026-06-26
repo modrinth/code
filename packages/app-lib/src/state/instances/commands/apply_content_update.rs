@@ -339,6 +339,7 @@ async fn plan_bulk_update(
         .collect::<HashMap<_, _>>();
     let version_ids = installed
         .iter()
+        .filter(|project| updateable_paths.contains(&project.relative_path))
         .filter_map(|project| project.version_id.clone())
         .chain(
             updates
@@ -362,6 +363,7 @@ async fn plan_bulk_update(
     let planned_versions = installed
         .iter()
         .filter(|project| project.enabled)
+        .filter(|project| updateable_paths.contains(&project.relative_path))
         .filter_map(|project| {
             let target_version_id = updates_by_path
                 .get(&project.relative_path)
