@@ -165,6 +165,7 @@ vars! {
     TYPESENSE_URL: String = "http://localhost:8108";
     TYPESENSE_API_KEY: String = "modrinth";
     TYPESENSE_INDEX_PREFIX: String = "labrinth";
+    TYPESENSE_DELETE_BATCH_SIZE: usize = 10_000usize;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;
