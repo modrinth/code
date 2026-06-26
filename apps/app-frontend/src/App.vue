@@ -1341,12 +1341,11 @@ async function processPendingSurveys() {
 	const creds = await getCreds().catch(handleError)
 	const userId = creds?.user_id
 
-	const instances = await list().catch(handleError)
-	const isActivePlayer =
-		instances.findIndex(
-			(instance) =>
-				isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
-		) >= 0
+	const instances = (await list().catch(handleError)) ?? []
+	const isActivePlayer = instances.some(
+		(instance) =>
+			isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
+	)
 
 	let surveys = []
 	try {

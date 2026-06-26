@@ -3,7 +3,7 @@ use crate::jre::check_jre;
 use crate::prelude::ModLoader;
 use crate::state;
 use crate::state::instances::{
-    InstanceLaunchOverrides, InstanceLaunchOverridesData,
+    InstanceLaunchOverrides, InstanceLaunchOverridesData, playtime_to_storage,
 };
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
@@ -443,8 +443,12 @@ where
     let created = input.created.timestamp();
     let modified = input.modified.timestamp();
     let last_played = input.last_played.map(|value| value.timestamp());
-    let submitted_time_played = input.submitted_time_played as i64;
-    let recent_time_played = input.recent_time_played as i64;
+    let submitted_time_played = playtime_to_storage(
+        input.submitted_time_played,
+        "submitted_time_played",
+    )?;
+    let recent_time_played =
+        playtime_to_storage(input.recent_time_played, "recent_time_played")?;
 
     sqlx::query!(
         "
