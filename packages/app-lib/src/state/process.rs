@@ -17,6 +17,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::sync::LazyLock;
+use std::time::Instant;
 #[cfg(feature = "tauri")]
 use tauri::Emitter;
 use tempfile::TempDir;
@@ -752,46 +753,46 @@ impl Process {
         uuid: Uuid,
     ) -> crate::Result<()> {
         async fn update_playtime(
-            last_updated_playtime: &mut DateTime<Utc>,
+            last_updated_playtime: &mut Instant,
             instance_id: &str,
             force_update: bool,
         ) {
-            let diff = Utc::now()
-                .signed_duration_since(*last_updated_playtime)
-                .num_seconds();
-            if diff >= 60 || force_update {
-                let state = match crate::State::get().await {
-                    Ok(state) => state,
-                    Err(e) => {
-                        tracing::warn!(
-                            "Failed to get state for playtime update on instance {}: {}",
-                            instance_id,
-                            e
-                        );
-                        return;
-                    }
-                };
-                if let Err(e) =
-					crate::state::instances::commands::add_instance_recent_playtime(
-                        instance_id,
-                        diff as u64,
-                        &state.pool,
-                    )
-                    .await
-                {
+            let elapsed = last_updated_playtime.elapsed().as_secs();
+            if elapsed == 0 || (!force_update && elapsed < 60) {
+                return;
+            }
+
+            let state = match crate::State::get().await {
+                Ok(state) => state,
+                Err(e) => {
                     tracing::warn!(
-                        "Failed to update playtime for instance {}: {}",
+                        "Failed to get state for playtime update on instance {}: {}",
                         instance_id,
                         e
                     );
+                    return;
                 }
-                *last_updated_playtime = Utc::now();
+            };
+            if let Err(e) =
+                crate::state::instances::commands::add_instance_recent_playtime(
+                    instance_id,
+                    elapsed,
+                    &state.pool,
+                )
+                .await
+            {
+                tracing::warn!(
+                    "Failed to update playtime for instance {}: {}",
+                    instance_id,
+                    e
+                );
             }
+            *last_updated_playtime = Instant::now();
         }
 
         // Wait on current Minecraft Child
         let mc_exit_status;
-        let mut last_updated_playtime = Utc::now();
+        let mut last_updated_playtime = Instant::now();
 
         let state = crate::State::get().await?;
         loop {

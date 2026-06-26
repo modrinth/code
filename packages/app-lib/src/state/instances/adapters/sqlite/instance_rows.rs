@@ -3,7 +3,7 @@
 use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSourceKind, Instance,
     InstanceLaunchContext, InstanceLaunchOverrides,
-    InstanceLaunchOverridesData, InstanceLink,
+    InstanceLaunchOverridesData, InstanceLink, playtime_to_storage,
 };
 use crate::state::{
     InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
@@ -831,8 +831,12 @@ pub(crate) async fn insert_instance(
     let created = instance.created.timestamp();
     let modified = instance.modified.timestamp();
     let last_played = instance.last_played.map(|value| value.timestamp());
-    let submitted_time_played = instance.submitted_time_played as i64;
-    let recent_time_played = instance.recent_time_played as i64;
+    let submitted_time_played = playtime_to_storage(
+        instance.submitted_time_played,
+        "submitted_time_played",
+    )?;
+    let recent_time_played =
+        playtime_to_storage(instance.recent_time_played, "recent_time_played")?;
 
     sqlx::query!(
         "
@@ -887,8 +891,12 @@ pub(crate) async fn update_instance(
     let icon_path = instance.icon_path.as_deref();
     let modified = instance.modified.timestamp();
     let last_played = instance.last_played.map(|value| value.timestamp());
-    let submitted_time_played = instance.submitted_time_played as i64;
-    let recent_time_played = instance.recent_time_played as i64;
+    let submitted_time_played = playtime_to_storage(
+        instance.submitted_time_played,
+        "submitted_time_played",
+    )?;
+    let recent_time_played =
+        playtime_to_storage(instance.recent_time_played, "recent_time_played")?;
 
     sqlx::query!(
         "
