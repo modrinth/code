@@ -181,98 +181,72 @@
 							{{ formatMessage(messages.editLinksButton) }}
 						</button>
 					</ButtonStyled>
-					<div class="push-right">
-						<div class="labeled-control-row">
-							{{ formatMessage(commonMessages.sortByLabel) }}
-							<Combobox
-								v-model="sortBy"
-								:searchable="false"
-								class="small-select"
-								:options="sortOptions"
-								@update:model-value="projects = updateSort(projects, sortBy, descending)"
-							/>
-							<ButtonStyled circular>
-								<button
-									v-tooltip="formatMessage(descending ? messages.descending : messages.ascending)"
-									@click="updateDescending()"
-								>
-									<SortDescIcon v-if="descending" />
-									<SortAscIcon v-else />
-								</button>
-							</ButtonStyled>
-						</div>
-					</div>
 				</div>
-				<div class="grid-table">
-					<div class="grid-table__row grid-table__header">
-						<div>
+				<Table
+					v-model:sort-column="sortColumn"
+					v-model:sort-direction="sortDirection"
+					class="mt-4"
+					:columns="projectTableColumns"
+					:data="sortedProjects"
+					row-key="id"
+					table-min-width="50rem"
+					table-layout="auto"
+				>
+					<template #header-select>
+						<div v-tooltip="formatMessage(messages.selectAllBulkEditableProjects)">
 							<Checkbox
 								:model-value="allBulkEditableProjectsSelected"
 								@update:model-value="toggleAllBulkEditableProjects()"
 							/>
 						</div>
-						<div>{{ formatMessage(messages.iconHeader) }}</div>
-						<div>{{ formatMessage(messages.nameHeader) }}</div>
-						<div>{{ formatMessage(messages.idHeader) }}</div>
-						<div>{{ formatMessage(messages.typeHeader) }}</div>
-						<div>{{ formatMessage(messages.statusHeader) }}</div>
-						<div />
-					</div>
-					<div v-for="project in projects" :key="`project-${project.id}`" class="grid-table__row">
+					</template>
+					<template #cell-select="{ row: project }">
 						<div>
 							<Checkbox
 								v-tooltip="getBulkEditDisabledTooltip(project)"
 								:disabled="isProjectBulkEditDisabled(project)"
-								:model-value="selectedProjects.includes(project)"
+								:model-value="isProjectSelected(project)"
 								@update:model-value="toggleProjectSelection(project)"
 							/>
 						</div>
-						<div>
-							<nuxt-link
-								tabindex="-1"
-								:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-									project.slug ? project.slug : project.id
-								}`"
-							>
-								<Avatar
-									:src="project.icon_url"
-									aria-hidden="true"
-									:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
-									no-shadow
-								/>
-							</nuxt-link>
-						</div>
-
-						<div>
+					</template>
+					<template #cell-name="{ row: project }">
+						<nuxt-link class="project-name-cell" :to="getProjectUrl(project)">
+							<Avatar
+								class="shrink-0"
+								:src="project.icon_url"
+								aria-hidden="true"
+								:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
+								no-shadow
+							/>
 							<span class="project-title">
 								<IssuesIcon
 									v-if="project.moderator_message"
 									:aria-label="formatMessage(messages.projectModeratorMessageAriaLabel)"
 								/>
 
-								<nuxt-link
-									class="hover-link wrap-as-needed"
-									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-										project.slug ? project.slug : project.id
-									}`"
-								>
+								<span class="project-title-link wrap-as-needed">
 									{{ project.title }}
-								</nuxt-link>
+								</span>
 							</span>
-						</div>
-
-						<div>
+						</nuxt-link>
+					</template>
+					<template #cell-id="{ row: project }">
+						<div class="flex items-center">
 							<CopyCode :text="project.id" />
 						</div>
-
-						<div>
-							{{ formatProjectType(getProjectTypeForUrl(project.project_type, project.loaders)) }}
+					</template>
+					<template #cell-type="{ row: project }">
+						<div class="flex items-center">
+							{{ getProjectDisplayType(project) }}
 						</div>
-
-						<div>
+					</template>
+					<template #cell-status="{ row: project }">
+						<div class="flex items-center">
 							<ProjectStatusBadge v-if="project.status" :status="project.status" />
 						</div>
-
+					</template>
+					<template #cell-actions="{ row: project }">
 						<div class="flex !flex-row items-center !justify-end gap-2">
 							<ButtonStyled
 								v-if="projectsWithMigrationWarning.includes(project.id)"
@@ -281,9 +255,7 @@
 							>
 								<nuxt-link
 									v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
-									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-										project.slug ? project.slug : project.id
-									}?showEnvironmentMigrationWarning=true`"
+									:to="`${getProjectUrl(project)}?showEnvironmentMigrationWarning=true`"
 								>
 									<TriangleAlertIcon />
 								</nuxt-link>
@@ -291,16 +263,14 @@
 							<ButtonStyled circular>
 								<nuxt-link
 									v-tooltip="formatMessage(commonMessages.settingsLabel)"
-									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-										project.slug ? project.slug : project.id
-									}/settings`"
+									:to="`${getProjectUrl(project)}/settings`"
 								>
 									<SettingsIcon />
 								</nuxt-link>
 							</ButtonStyled>
 						</div>
-					</div>
-				</div>
+					</template>
+				</Table>
 			</template>
 		</section>
 	</div>
@@ -313,8 +283,6 @@ import {
 	PlusIcon,
 	SaveIcon,
 	SettingsIcon,
-	SortAscIcon,
-	SortDescIcon,
 	TrashIcon,
 	TriangleAlertIcon,
 	XIcon,
@@ -323,7 +291,6 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
-	Combobox,
 	commonMessages,
 	CopyCode,
 	defineMessages,
@@ -332,6 +299,7 @@ import {
 	NewModal,
 	ProjectStatusBadge,
 	StyledInput,
+	Table,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
@@ -438,30 +406,6 @@ const messages = defineMessages({
 		id: 'dashboard.projects.bulk-edit-hint',
 		defaultMessage: 'You can edit multiple projects at once by selecting them below.',
 	},
-	ascending: {
-		id: 'dashboard.projects.sort.ascending',
-		defaultMessage: 'Ascending',
-	},
-	descending: {
-		id: 'dashboard.projects.sort.descending',
-		defaultMessage: 'Descending',
-	},
-	sortOptionName: {
-		id: 'dashboard.projects.sort.option.name',
-		defaultMessage: 'Name',
-	},
-	sortOptionStatus: {
-		id: 'dashboard.projects.sort.option.status',
-		defaultMessage: 'Status',
-	},
-	sortOptionType: {
-		id: 'dashboard.projects.sort.option.type',
-		defaultMessage: 'Type',
-	},
-	iconHeader: {
-		id: 'dashboard.projects.table.icon',
-		defaultMessage: 'Icon',
-	},
 	nameHeader: {
 		id: 'dashboard.projects.table.name',
 		defaultMessage: 'Name',
@@ -477,6 +421,10 @@ const messages = defineMessages({
 	statusHeader: {
 		id: 'dashboard.projects.table.status',
 		defaultMessage: 'Status',
+	},
+	selectAllBulkEditableProjects: {
+		id: 'dashboard.projects.table.select-all-bulk-editable',
+		defaultMessage: 'Select all projects that support bulk editing',
 	},
 	projectIconAlt: {
 		id: 'dashboard.projects.project.icon-alt',
@@ -505,14 +453,9 @@ useHead({ title: () => `${formatMessage(messages.headTitle)} - Modrinth` })
 const user = await useUser()
 const projects = ref([])
 const projectsWithMigrationWarning = ref([])
-const selectedProjects = ref([])
-const sortBy = ref('Name')
-const sortOptions = computed(() => [
-	{ value: 'Name', label: formatMessage(messages.sortOptionName) },
-	{ value: 'Status', label: formatMessage(messages.sortOptionStatus) },
-	{ value: 'Type', label: formatMessage(messages.sortOptionType) },
-])
-const descending = ref(false)
+const selectedProjectIds = ref([])
+const sortColumn = ref('name')
+const sortDirection = ref('asc')
 const editLinks = reactive({
 	showAffected: false,
 	source: { val: '', clear: false },
@@ -522,7 +465,61 @@ const editLinks = reactive({
 })
 
 const editLinksModal = ref(null)
-const modal_creation = ref(null)
+const sortCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+
+const projectTableColumns = computed(() => [
+	{
+		key: 'select',
+		width: '3rem',
+		headerClass: '!text-center',
+		cellClass: '!overflow-visible',
+	},
+	{
+		key: 'name',
+		label: formatMessage(messages.nameHeader),
+		enableSorting: true,
+		defaultSortDirection: 'asc',
+		width: '22rem',
+	},
+	{
+		key: 'id',
+		label: formatMessage(messages.idHeader),
+		width: '13rem',
+		cellClass: '!overflow-visible',
+	},
+	{
+		key: 'type',
+		label: formatMessage(messages.typeHeader),
+		enableSorting: true,
+		width: '11rem',
+	},
+	{
+		key: 'status',
+		label: formatMessage(messages.statusHeader),
+		enableSorting: true,
+		width: '10rem',
+		cellClass: '!overflow-visible',
+	},
+	{
+		key: 'actions',
+		width: '6rem',
+		align: 'right',
+		cellClass: '!overflow-visible',
+	},
+])
+
+const sortedProjects = computed(() => {
+	const direction = sortDirection.value === 'desc' ? -1 : 1
+
+	return projects.value.slice().sort((left, right) => {
+		const result = sortCollator.compare(
+			getProjectSortValue(left, sortColumn.value),
+			getProjectSortValue(right, sortColumn.value),
+		)
+
+		return result * direction
+	})
+})
 
 function getLinkInputPlaceholder(clearLink, isDiscord = false) {
 	if (clearLink) {
@@ -545,16 +542,24 @@ const bulkEditableProjects = computed(() =>
 	projects.value.filter((project) => !isProjectBulkEditDisabled(project)),
 )
 
+const selectedProjects = computed(() =>
+	projects.value.filter((project) => selectedProjectIds.value.includes(project.id)),
+)
+
 const allBulkEditableProjectsSelected = computed(
 	() =>
 		bulkEditableProjects.value.length > 0 &&
-		bulkEditableProjects.value.every((project) => selectedProjects.value.includes(project)),
+		bulkEditableProjects.value.every((project) => selectedProjectIds.value.includes(project.id)),
 )
 
 function toggleAllBulkEditableProjects() {
-	selectedProjects.value = allBulkEditableProjectsSelected.value
+	selectedProjectIds.value = allBulkEditableProjectsSelected.value
 		? []
-		: bulkEditableProjects.value.slice()
+		: bulkEditableProjects.value.map((project) => project.id)
+}
+
+function isProjectSelected(project) {
+	return selectedProjectIds.value.includes(project.id)
 }
 
 function toggleProjectSelection(project) {
@@ -562,12 +567,12 @@ function toggleProjectSelection(project) {
 		return
 	}
 
-	if (selectedProjects.value.includes(project)) {
-		selectedProjects.value = selectedProjects.value.filter((it) => it !== project)
+	if (isProjectSelected(project)) {
+		selectedProjectIds.value = selectedProjectIds.value.filter((id) => id !== project.id)
 		return
 	}
 
-	selectedProjects.value = [...selectedProjects.value, project]
+	selectedProjectIds.value = [...selectedProjectIds.value, project.id]
 }
 
 function getBulkEditDisabledTooltip(project) {
@@ -578,40 +583,28 @@ function getBulkEditDisabledTooltip(project) {
 	return ''
 }
 
-function updateSort(list, sort, desc) {
-	let sortedArray = list
-	switch (sort) {
-		case 'Name':
-			sortedArray = list.slice().sort((a, b) => a.title.localeCompare(b.title))
-			break
-		case 'Status':
-			sortedArray = list.slice().sort((a, b) => {
-				if (a.status < b.status) return -1
-				if (a.status > b.status) return 1
-				return 0
-			})
-			break
-		case 'Type':
-			sortedArray = list.slice().sort((a, b) => {
-				if (a.project_type < b.project_type) return -1
-				if (a.project_type > b.project_type) return 1
-				return 0
-			})
-			break
+function getProjectUrlType(project) {
+	return getProjectTypeForUrl(project.project_type, project.loaders)
+}
+
+function getProjectDisplayType(project) {
+	return formatProjectType(getProjectUrlType(project))
+}
+
+function getProjectUrl(project) {
+	return `/${getProjectUrlType(project)}/${project.slug ? project.slug : project.id}`
+}
+
+function getProjectSortValue(project, column) {
+	switch (column) {
+		case 'type':
+			return getProjectDisplayType(project)
+		case 'status':
+			return project.status ?? ''
+		case 'name':
 		default:
-			break
+			return project.title ?? ''
 	}
-	if (desc) sortedArray = sortedArray.reverse()
-	return sortedArray
-}
-
-function resort() {
-	projects.value = updateSort(projects.value, sortBy.value, descending.value)
-}
-
-function updateDescending() {
-	descending.value = !descending.value
-	resort()
 }
 
 async function bulkEditLinks() {
@@ -635,7 +628,7 @@ async function bulkEditLinks() {
 			text: formatMessage(messages.bulkEditSuccessText),
 			type: 'success',
 		})
-		selectedProjects.value = []
+		selectedProjectIds.value = []
 
 		editLinks.issues.val = ''
 		editLinks.source.val = ''
@@ -656,7 +649,7 @@ async function bulkEditLinks() {
 
 await initUserProjects()
 if (user.value?.projects) {
-	projects.value = updateSort(user.value.projects, 'Name', false)
+	projects.value = user.value.projects.slice()
 
 	// minecraft_java_server type determined from component on projectV3
 	projects.value = projects.value.map((project) => {
@@ -677,126 +670,20 @@ if (user.value?.projects) {
 }
 </script>
 <style lang="scss" scoped>
-.grid-table {
-	display: grid;
-	grid-template-columns:
-		min-content min-content minmax(min-content, 2fr)
-		minmax(min-content, 1fr) minmax(min-content, 1fr) minmax(min-content, 1fr) min-content;
-	border-radius: var(--size-rounded-sm);
-	overflow: hidden;
-	margin-top: var(--spacing-card-md);
-	outline: 1px solid transparent;
-
-	.grid-table__row {
-		display: contents;
-
-		> div {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			padding: var(--spacing-card-sm);
-
-			// Left edge of table
-			&:first-child {
-				padding-left: var(--spacing-card-bg);
-			}
-
-			// Right edge of table
-			&:last-child {
-				padding-right: var(--spacing-card-bg);
-			}
-		}
-
-		&:nth-child(2n + 1) > div {
-			background-color: var(--color-table-alternate-row);
-		}
-
-		&.grid-table__header > div {
-			background-color: var(--color-bg);
-			font-weight: bold;
-			color: var(--color-text-dark);
-			padding-top: var(--spacing-card-bg);
-			padding-bottom: var(--spacing-card-bg);
-		}
-	}
-
-	@media screen and (max-width: 750px) {
-		display: flex;
-		flex-direction: column;
-
-		.grid-table__row {
-			display: grid;
-			grid-template: 'checkbox icon name type settings' 'checkbox icon id status settings';
-			grid-template-columns:
-				min-content min-content minmax(min-content, 2fr)
-				minmax(min-content, 1fr) min-content;
-
-			:nth-child(1) {
-				grid-area: checkbox;
-			}
-
-			:nth-child(2) {
-				grid-area: icon;
-			}
-
-			:nth-child(3) {
-				grid-area: name;
-			}
-
-			:nth-child(4) {
-				grid-area: id;
-				padding-top: 0;
-			}
-
-			:nth-child(5) {
-				grid-area: type;
-			}
-
-			:nth-child(6) {
-				grid-area: status;
-				padding-top: 0;
-			}
-
-			:nth-child(7) {
-				grid-area: settings;
-			}
-		}
-
-		.grid-table__header {
-			grid-template: 'checkbox settings';
-			grid-template-columns: min-content minmax(min-content, 1fr);
-
-			:nth-child(2),
-			:nth-child(3),
-			:nth-child(4),
-			:nth-child(5),
-			:nth-child(6) {
-				display: none;
-			}
-		}
-	}
-
-	@media screen and (max-width: 560px) {
-		.grid-table__row {
-			display: grid;
-			grid-template: 'checkbox icon name settings' 'checkbox icon id settings' 'checkbox icon type settings' 'checkbox icon status settings';
-			grid-template-columns: min-content min-content minmax(min-content, 1fr) min-content;
-
-			:nth-child(5) {
-				padding-top: 0;
-			}
-		}
-
-		.grid-table__header {
-			grid-template: 'checkbox settings';
-			grid-template-columns: min-content minmax(min-content, 1fr);
-		}
-	}
+.project-name-cell {
+	display: flex;
+	min-width: 0;
+	min-height: 3.5rem;
+	align-items: center;
+	gap: var(--spacing-card-sm);
+	color: inherit;
+	text-decoration: none;
 }
 
 .project-title {
 	display: flex;
 	flex-direction: row;
+	min-width: 0;
 	gap: var(--spacing-card-xs);
 
 	svg {
@@ -804,27 +691,9 @@ if (user.value?.projects) {
 	}
 }
 
-.status {
-	margin-top: var(--spacing-card-xs);
-}
-
-.hover-link:hover {
+.project-name-cell:hover .project-title-link,
+.project-name-cell:focus-visible .project-title-link {
 	text-decoration: underline;
-}
-
-.labeled-control-row {
-	flex: 1;
-	display: flex;
-	flex-direction: row;
-	min-width: 0;
-	align-items: center;
-	gap: var(--spacing-card-md);
-	white-space: nowrap;
-}
-
-.small-select {
-	width: -moz-fit-content;
-	width: fit-content;
 }
 
 .label-button[data-active='true'] {
