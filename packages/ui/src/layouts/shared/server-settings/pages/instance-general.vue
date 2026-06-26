@@ -51,7 +51,7 @@
 							:disabled="isResetWorldFilesDisabled"
 							@click="resetWorldFilesModal?.show()"
 						>
-							<RotateCounterClockwiseIcon class="size-5" />
+							<EraserIcon class="size-5" />
 							{{ formatMessage(messages.resetWorldFilesButton) }}
 						</button>
 					</ButtonStyled>
@@ -63,7 +63,7 @@
 				<div class="flex flex-col items-start gap-2.5">
 					<ButtonStyled color="red">
 						<button class="!shadow-none" :disabled="isResetDisabled" @click="setupModal?.show()">
-							<TrashIcon class="size-5" />
+							<RefreshCcwIcon class="size-5" />
 							{{ formatMessage(messages.resetEverythingButton) }}
 						</button>
 					</ButtonStyled>
@@ -105,7 +105,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon, TrashIcon } from '@modrinth/assets'
+import { EraserIcon, RefreshCcwIcon, TrashIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -170,7 +170,7 @@ const messages = defineMessages({
 	},
 	resetWorldFilesButton: {
 		id: 'server.instance-settings.general.reset-world-files.button',
-		defaultMessage: 'Reset world',
+		defaultMessage: 'Clear world data',
 	},
 	resetWorldFilesDescription: {
 		id: 'server.instance-settings.general.reset-world-files.description',
@@ -179,7 +179,7 @@ const messages = defineMessages({
 	},
 	resetWorldFilesModalTitle: {
 		id: 'server.instance-settings.general.reset-world-files.modal.title',
-		defaultMessage: 'Reset world',
+		defaultMessage: 'Clear world data',
 	},
 	resetWorldFilesModalDescription: {
 		id: 'server.instance-settings.general.reset-world-files.modal.description',
@@ -237,10 +237,16 @@ const messages = defineMessages({
 		id: 'server.instance-settings.general.delete-instance.error',
 		defaultMessage: 'Failed to delete instance',
 	},
+	instanceSlotName: {
+		id: 'servers.manage.instances.slot-name',
+		defaultMessage: 'Instance #{index}',
+	},
 })
 
 type WorldSummaryCacheItem = {
 	id: string
+	type?: 'world' | 'empty'
+	name?: string
 }
 
 type DeleteInstanceOptimisticState = {
@@ -333,7 +339,9 @@ const deleteWorldMutation = useMutation({
 				: previous,
 		)
 		queryClient.setQueryData<WorldSummaryCacheItem[] | undefined>(worldSummaryKey, (previous) =>
-			previous?.filter((world) => world.id !== deletedWorldId),
+			previous?.map((world, index) =>
+				world.id === deletedWorldId ? createEmptyWorldSlot(index) : world,
+			),
 		)
 		queryClient.removeQueries({ queryKey: ['content', 'list', 'v1', serverId, deletedWorldId] })
 		queryClient.removeQueries({
@@ -444,6 +452,14 @@ function deleteInstance() {
 	if (isDeleteInstanceDisabled.value || !deletedWorldId) return
 
 	deleteWorldMutation.mutate(deletedWorldId)
+}
+
+function createEmptyWorldSlot(index: number): WorldSummaryCacheItem {
+	return {
+		type: 'empty',
+		id: `empty-world-slot-${index + 1}`,
+		name: formatMessage(messages.instanceSlotName, { index: index + 1 }),
+	}
 }
 
 function invalidateServerState(targetWorldId = worldId.value) {

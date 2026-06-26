@@ -3618,7 +3618,7 @@
     "defaultMessage": "Recreate this instance from scratch. World data, content, files, and settings are removed. Previous backups will remain available."
   },
   "server.instance-settings.general.reset-world-files.button": {
-    "defaultMessage": "Reset world"
+    "defaultMessage": "Clear world data"
   },
   "server.instance-settings.general.reset-world-files.description": {
     "defaultMessage": "Create a fresh world for this instance. Content, files, settings, and backups stay the same."
@@ -3630,7 +3630,7 @@
     "defaultMessage": "This deletes the world directory for this instance. Installed content and settings will stay the same."
   },
   "server.instance-settings.general.reset-world-files.modal.title": {
-    "defaultMessage": "Reset world"
+    "defaultMessage": "Clear world data"
   },
   "server.instance-settings.general.reset-world-files.started.description": {
     "defaultMessage": "The world directory is being reset."

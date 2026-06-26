@@ -111,6 +111,7 @@ import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
 import _EllipsisVerticalIcon from './icons/ellipsis-vertical.svg?component'
+import _EraserIcon from './icons/eraser.svg?component'
 import _ExpandIcon from './icons/expand.svg?component'
 import _ExternalIcon from './icons/external.svg?component'
 import _EyeIcon from './icons/eye.svg?component'
@@ -220,6 +221,7 @@ import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
+import _RefreshCcwIcon from './icons/refresh-ccw.svg?component'
 import _RefreshCwIcon from './icons/refresh-cw.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
@@ -542,6 +544,7 @@ export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
 export const EllipsisVerticalIcon = _EllipsisVerticalIcon
+export const EraserIcon = _EraserIcon
 export const ExpandIcon = _ExpandIcon
 export const ExternalIcon = _ExternalIcon
 export const EyeIcon = _EyeIcon
@@ -651,6 +654,7 @@ export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const RedoIcon = _RedoIcon
+export const RefreshCcwIcon = _RefreshCcwIcon
 export const RefreshCwIcon = _RefreshCwIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
