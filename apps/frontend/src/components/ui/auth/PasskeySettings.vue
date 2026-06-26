@@ -88,7 +88,7 @@
 					<ButtonStyled>
 						<button @click="registerPasskey()">
 							<PlusIcon />
-							{{ formatMessage(messages.managePasskeyAddPasskey) }}
+							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled>
@@ -104,7 +104,7 @@
 		<NewModal
 			ref="addPasskeyModal"
 			width="500px"
-			:header="formatMessage(messages.managePasskeyAddPasskey)"
+			:header="formatMessage(messages.passkeyAddModalTitle)"
 		>
 			<div class="flex flex-col gap-6">
 				<div class="flex flex-col gap-2.5">
@@ -133,7 +133,7 @@
 					<ButtonStyled color="brand">
 						<button :disabled="!pendingPasskeyName" @click="finishRegisterPasskey()">
 							<PlusIcon />
-							{{ formatMessage(messages.managePasskeyAddPasskey) }}
+							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -189,7 +189,7 @@
 			<div>
 				<ButtonStyled>
 					<button id="manage-passkeys" @click="showPasskeyModal">
-						<UserKeyIcon /> {{ formatMessage(messages.managePasskeyTitle) }}
+						<UserKeyIcon /> {{ formatMessage(messages.managePasskeyButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -247,12 +247,16 @@ const messages = defineMessages({
 		id: 'settings.account.security.passkey.title',
 		defaultMessage: 'Manage passkeys',
 	},
+	managePasskeyButton: {
+		id: 'settings.account.security.passkey.button',
+		defaultMessage: 'Manage passkeys',
+	},
 	managePasskeyDescription: {
 		id: 'settings.account.security.passkey.description',
 		defaultMessage: 'Manage your registered passkeys, or add a new one.',
 	},
-	managePasskeyAddPasskey: {
-		id: 'settings.account.security.passkey.add',
+	managePasskeyAddPasskeyButton: {
+		id: 'settings.account.security.passkey.add.button',
 		defaultMessage: 'Add passkey',
 	},
 	managePasskeyModalLoading: {
@@ -274,6 +278,10 @@ const messages = defineMessages({
 	managePasskeyModalNeverUsed: {
 		id: 'settings.account.security.passkey.modal.never-used',
 		defaultMessage: 'Never used',
+	},
+	passkeyAddModalTitle: {
+		id: 'settings.account.security.passkey.add-modal.title',
+		defaultMessage: 'Add passkey',
 	},
 	passkeyNameLabel: {
 		id: 'settings.account.security.passkey.add-modal.name.label',
