@@ -1,6 +1,5 @@
 use actix_web::web;
 use eyre::WrapErr;
-use futures::never::Never;
 use rdkafka::{
     Message,
     consumer::{CommitMode, Consumer, StreamConsumer},
@@ -215,8 +214,10 @@ pub async fn reindex_projects(
     search_backend: &dyn SearchBackend,
     project_ids: &[ProjectId],
 ) -> eyre::Result<()> {
+    info!("Removing documents for batch");
     search_backend.remove_project_documents(project_ids).await?;
 
+    info!("Creating project documents");
     let documents = index_project_documents(ro_pool, redis_pool, project_ids)
         .instrument(info_span!("index", batch_size = project_ids.len()))
         .await

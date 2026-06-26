@@ -7,7 +7,7 @@ use regex::Regex;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
@@ -1038,21 +1038,35 @@ impl SearchBackend for Typesense {
             self.config.get_alias_name("projects"),
             self.config.get_alias_name("projects_filtered"),
         ] {
+            debug!("Performing removal on alias {alias:?}");
+
             let live = self.client.get_alias(&alias).await?;
+            debug!("Got live alias {live:?}");
+
             let shadow_alt = self.config.get_next_collection_name(&alias, true);
+            debug!("Got shadow alt {shadow_alt:?}");
+
             let shadow_current =
                 self.config.get_next_collection_name(&alias, false);
+            debug!("Got shadow current {shadow_current:?}");
 
             for collection in
                 live.into_iter().chain([shadow_alt, shadow_current])
             {
+                debug!("Working on collection {collection:?}");
                 if self.client.collection_exists(&collection).await? {
+                    debug!(
+                        filter_len = filter.len(),
+                        "Collection exists, deleting by filter"
+                    );
                     self.client
                         .delete_documents_by_filter(&collection, &filter)
                         .await?;
                 }
             }
         }
+
+        debug!("Done");
         Ok(())
     }
 
