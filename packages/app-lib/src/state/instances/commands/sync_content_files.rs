@@ -43,7 +43,11 @@ pub(crate) async fn sync_instance_content_files(
         .into_iter()
         .map(|hash| {
             (
-                format!("{}-{}", hash.size, hash.path.trim_end_matches(".disabled")),
+                format!(
+                    "{}-{}",
+                    hash.size,
+                    hash.path.trim_end_matches(".disabled")
+                ),
                 hash,
             )
         })
