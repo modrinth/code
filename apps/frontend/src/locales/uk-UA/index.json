@@ -1313,9 +1313,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Завантаження сповіщень…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Ви можете редагувати кілька проєктів одночасно, вибравши їх нижче."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Проєкти сервера не підтримують масове редагування"
   },
@@ -1387,24 +1384,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Перегляньте метадані середовища"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Зростання"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Спадання"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Назва"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Статус"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Тип"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Значок"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

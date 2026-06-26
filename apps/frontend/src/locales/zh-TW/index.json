@@ -1532,9 +1532,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "正在載入通知..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "你可以透過在下方選擇專案來同時編輯多個專案。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "伺服器專案不支援大量編輯"
   },
@@ -1609,24 +1606,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "請審查環境詮釋資料"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "遞增"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "遞減"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名稱"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "狀態"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "類型"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "圖示"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

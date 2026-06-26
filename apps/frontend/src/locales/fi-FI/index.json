@@ -599,24 +599,6 @@
   "dashboard.projects.project.icon-alt": {
     "message": "Kuvake projektille {title}"
   },
-  "dashboard.projects.sort.ascending": {
-    "message": "Nouseva"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Laskeva"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nimi"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Tila"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tyyppi"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Kuvake"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },

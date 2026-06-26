@@ -1010,18 +1010,6 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Pakisuri sa metadata sa environment"
   },
-  "dashboard.projects.sort.option.name": {
-    "message": "Pangalan"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Estado"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Uri"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikono"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },

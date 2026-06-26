@@ -1490,9 +1490,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Đang tải thông báo..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Bạn có thể sửa đổi nhiều dự án cùng một lúc bằng cách chọn chúng ở dưới."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Dự án máy chủ không hỗ trợ sửa đổi nhiều mục cùng một lúc"
   },
@@ -1567,24 +1564,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Vui lòng xem lại thông tin dữ liệu"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Từ dưới lên"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Từ trên xuống"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Tên"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Trạng thái"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Loại"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "B.tượng"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

@@ -863,9 +863,6 @@
   "dashboard.organizations.title": {
     "message": "Organiseringer"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Du kan redigere flere prosjekt samtidig ved å velge dem nedafor."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverprosjekt støtter ikke massredigering"
   },

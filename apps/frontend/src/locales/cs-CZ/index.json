@@ -899,12 +899,6 @@
   "dashboard.projects.links.placeholder.valid-url": {
     "message": "Zadejte platnou URL"
   },
-  "dashboard.projects.sort.option.name": {
-    "message": "Jméno"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Stav"
-  },
   "dashboard.projects.table.name": {
     "message": "Jméno"
   },

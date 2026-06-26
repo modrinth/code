@@ -1529,9 +1529,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Cargando notificaciones..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Puedes editar múltiples proyectos a la vez seleccionándolos abajo."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Proyectos de servidor no soportan edición masiva"
   },
@@ -1603,24 +1600,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Por favor revise el entorno del metadata"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Ascendiendo"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Descendiendo"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nombre"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Estado"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tipo"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Icono"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

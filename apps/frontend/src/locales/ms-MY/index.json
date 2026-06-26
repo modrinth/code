@@ -1379,9 +1379,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Anda boleh menyunting berbilang projek sekaligus dengan memilihnya di bawah."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Projek pelayan tidak menyokong penyuntingan pukal"
   },
@@ -1450,24 +1447,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Sila semak metadata persekitaran"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Menaik"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Menurun"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nama"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Jenis"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

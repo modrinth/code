@@ -833,18 +833,6 @@
   "dashboard.projects.links.wiki-page.label": {
     "message": "Página da Wiki"
   },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nome"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tipo"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ícone"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
