@@ -11,6 +11,16 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-26T16:33:23+00:00`,
+		product: 'app',
+		version: '0.15.1',
+		body: `## Fixed
+- Fixed issue where previous logs would not load in the Logs tab of an instance.
+- Fixed issue where "Update all" would sometimes update linked modpack content.
+- Fixed issue where disabled additional content would sometimes not appear as disabled in the UI.
+- Fixed issue where instances with negative playtime fail to load. (How?)`,
+	},
+	{
 		date: `2026-06-25T21:22:14+00:00`,
 		product: 'app',
 		version: '0.15.0',
