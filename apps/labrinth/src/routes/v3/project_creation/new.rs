@@ -342,6 +342,7 @@ pub async fn create(
         .wrap_internal_err("failed to commit transaction")?;
 
     super::super::projects::clear_project_cache_and_queue_search(
+        &db,
         &redis,
         &search_state,
         project_id.into(),

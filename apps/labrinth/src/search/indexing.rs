@@ -7,7 +7,7 @@ use itertools::Itertools;
 use regex::Regex;
 use std::collections::HashMap;
 use std::sync::LazyLock;
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 
 use crate::database::PgPool;
 use crate::database::models::loader_fields::{

@@ -762,6 +762,7 @@ pub async fn version_edit_helper(
             database::models::DBVersion::clear_cache(&version_item, &redis)
                 .await?;
             super::projects::clear_project_cache_and_queue_search(
+                &pool,
                 &redis,
                 &search_state,
                 version_item.inner.project_id,
@@ -1098,6 +1099,7 @@ pub async fn version_delete(
     transaction.commit().await?;
 
     super::projects::clear_project_cache_and_queue_search(
+        &pool,
         &redis,
         &search_state,
         version.inner.project_id,

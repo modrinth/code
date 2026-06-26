@@ -148,6 +148,7 @@ pub async fn version_create(
     } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
         super::projects::clear_project_cache_and_queue_search(
+            &client,
             &redis,
             &search_state,
             *project_id,
@@ -565,7 +566,7 @@ pub async fn upload_file_to_version(
     let result = upload_file_to_version_inner(
         req,
         &mut payload,
-        client,
+        client.clone(),
         &mut transaction,
         redis.clone(),
         &**file_host,
@@ -591,6 +592,7 @@ pub async fn upload_file_to_version(
     } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
         super::projects::clear_project_cache_and_queue_search(
+            &client,
             &redis,
             &search_state,
             *project_id,

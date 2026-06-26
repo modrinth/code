@@ -75,6 +75,7 @@ pub fn utoipa_config(
 }
 
 pub async fn clear_project_cache_and_queue_search(
+    pool: &PgPool,
     redis: &RedisPool,
     search_state: &SearchState,
     project_id: db_ids::DBProjectId,
@@ -88,7 +89,21 @@ pub async fn clear_project_cache_and_queue_search(
         redis,
     )
     .await?;
-    search_state.queue.push(project_id.into()).await;
+    let version_ids = sqlx::query_scalar!(
+        "SELECT id FROM versions WHERE mod_id = $1",
+        project_id as db_ids::DBProjectId,
+    )
+    .fetch_all(pool)
+    .await
+    .wrap_internal_err("failed to fetch project version IDs")?
+    .into_iter()
+    .map(|version_id| VersionId::from(db_ids::DBVersionId(version_id)))
+    .collect::<Vec<_>>();
+
+    search_state
+        .queue
+        .push(project_id.into(), version_ids)
+        .await;
 
     Ok(())
 }
@@ -1135,6 +1150,7 @@ pub async fn project_edit_internal(
     transaction.commit().await?;
 
     clear_project_cache_and_queue_search(
+        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -1149,16 +1165,9 @@ pub async fn project_edit_internal(
         new_project.status.map(|status| status.is_searchable()),
     ) {
         search_state
-            .backend
-            .remove_documents(
-                &project_item
-                    .versions
-                    .into_iter()
-                    .map(|x| x.into())
-                    .collect::<Vec<_>>(),
-            )
-            .await
-            .wrap_internal_err("failed to remove documents")?;
+            .queue
+            .push_project_removal(project_item.inner.id.into())
+            .await;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1640,6 +1649,7 @@ pub async fn projects_edit(
 
     for (project_id, slug) in changed_projects {
         clear_project_cache_and_queue_search(
+            &pool,
             &redis,
             &search_state,
             project_id,
@@ -1862,6 +1872,7 @@ pub async fn project_icon_edit_internal(
 
     transaction.commit().await?;
     clear_project_cache_and_queue_search(
+        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -1977,6 +1988,7 @@ pub async fn delete_project_icon_internal(
 
     transaction.commit().await?;
     clear_project_cache_and_queue_search(
+        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2164,6 +2176,7 @@ pub async fn add_gallery_item_internal(
 
     transaction.commit().await?;
     clear_project_cache_and_queue_search(
+        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2370,6 +2383,7 @@ pub async fn edit_gallery_item_internal(
     transaction.commit().await?;
 
     clear_project_cache_and_queue_search(
+        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2510,6 +2524,7 @@ pub async fn delete_gallery_item_internal(
     transaction.commit().await?;
 
     clear_project_cache_and_queue_search(
+        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2652,27 +2667,18 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
-    search_state
-        .backend
-        .remove_documents(
-            &project
-                .versions
-                .into_iter()
-                .map(|x| x.into())
-                .collect::<Vec<_>>(),
-        )
-        .await
-        .wrap_internal_err("failed to remove project version documents")?;
-
     if result.is_some() {
-        clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        db_models::DBProject::clear_cache(
             project.inner.id,
             project.inner.slug,
             None,
+            &redis,
         )
         .await?;
+        search_state
+            .queue
+            .push_project_removal(project.inner.id.into())
+            .await;
         Ok(())
     } else {
         Err(ApiError::NotFound)

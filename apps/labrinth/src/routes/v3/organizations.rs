@@ -802,6 +802,7 @@ pub async fn organization_delete(
 
     for project_id in organization_project_ids {
         super::projects::clear_project_cache_and_queue_search(
+            &pool,
             &redis,
             &search_state,
             project_id,
@@ -969,6 +970,7 @@ pub async fn organization_projects_add(
         )
         .await?;
         super::projects::clear_project_cache_and_queue_search(
+            &pool,
             &redis,
             &search_state,
             project_item.inner.id,
@@ -1159,6 +1161,7 @@ pub async fn organization_projects_remove(
         )
         .await?;
         super::projects::clear_project_cache_and_queue_search(
+            &pool,
             &redis,
             &search_state,
             project_item.inner.id,

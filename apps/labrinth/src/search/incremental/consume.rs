@@ -15,7 +15,7 @@ use tracing::{Instrument, info, info_span};
 use crate::{
     database::{PgPool, redis::RedisPool},
     env::ENV,
-    models::ids::ProjectId,
+    models::ids::{ProjectId, VersionId},
     search::{
         SearchBackend, incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
         indexing::index_project_documents,
@@ -128,8 +128,9 @@ async fn consume_batch(
 ) -> eyre::Result<()> {
     let start = Instant::now();
 
-    let mut project_ids = Vec::new();
-    let mut seen_project_ids = HashSet::new();
+    let mut project_ids_to_change = HashSet::new();
+    let mut project_ids_to_remove = HashSet::new();
+    let mut version_ids_to_change = HashSet::new();
     let mut messages_to_commit = Vec::new();
 
     for message in messages {
@@ -164,24 +165,94 @@ async fn consume_batch(
             }
         };
 
-        if seen_project_ids.insert(event.project_id) {
-            project_ids.push(event.project_id);
+        match event.into_data() {
+            SearchProjectIndexQueueEventData::ProjectChange {
+                project_id,
+                version_ids,
+            } => {
+                project_ids_to_change.insert(project_id);
+                version_ids_to_change.extend(version_ids);
+            }
+            SearchProjectIndexQueueEventData::ProjectRemoval { project_id } => {
+                project_ids_to_remove.insert(project_id);
+            }
         }
         messages_to_commit.push(message);
     }
 
+    project_ids_to_change
+        .retain(|project_id| !project_ids_to_remove.contains(project_id));
+
+    let project_ids_to_change =
+        project_ids_to_change.into_iter().collect::<Vec<_>>();
+    let project_ids_to_remove =
+        project_ids_to_remove.into_iter().collect::<Vec<_>>();
+    let version_ids_to_change =
+        version_ids_to_change.into_iter().collect::<Vec<_>>();
+
     info!(
         kafka.message_count = messages_to_commit.len(),
-        "Read all Kafka messages in {:.2?}, found {} projects to reindex",
+        "Read all Kafka messages in {:.2?}, found {} projects to change, {} versions to change, and {} projects to remove",
         start.elapsed(),
-        project_ids.len(),
+        project_ids_to_change.len(),
+        version_ids_to_change.len(),
+        project_ids_to_remove.len(),
     );
     let start = Instant::now();
 
-    if !project_ids.is_empty() {
-        reindex_projects(ro_pool, redis_pool, search_backend, &project_ids)
+    if !project_ids_to_remove.is_empty() {
+        let operation_start = Instant::now();
+        info!(
+            project_count = project_ids_to_remove.len(),
+            "Removing project documents"
+        );
+        search_backend
+            .remove_project_documents(&project_ids_to_remove)
             .await
-            .wrap_err("failed to reindex project batch")?;
+            .wrap_err("failed to remove project documents")?;
+        info!(
+            project_count = project_ids_to_remove.len(),
+            "Removed project documents in {:.2?}",
+            operation_start.elapsed()
+        );
+    }
+
+    if !version_ids_to_change.is_empty() {
+        let operation_start = Instant::now();
+        info!(
+            version_count = version_ids_to_change.len(),
+            "Removing changed version documents"
+        );
+        search_backend
+            .remove_documents(&version_ids_to_change)
+            .await
+            .wrap_err("failed to remove changed version documents")?;
+        info!(
+            version_count = version_ids_to_change.len(),
+            "Removed changed version documents in {:.2?}",
+            operation_start.elapsed()
+        );
+    }
+
+    if !project_ids_to_change.is_empty() {
+        let operation_start = Instant::now();
+        info!(
+            project_count = project_ids_to_change.len(),
+            "Indexing changed projects"
+        );
+        index_changed_projects(
+            ro_pool,
+            redis_pool,
+            search_backend,
+            &project_ids_to_change,
+        )
+        .await
+        .wrap_err("failed to index changed project batch")?;
+        info!(
+            project_count = project_ids_to_change.len(),
+            "Indexed changed projects in {:.2?}",
+            operation_start.elapsed()
+        );
     }
 
     for message in messages_to_commit {
@@ -191,8 +262,9 @@ async fn consume_batch(
     }
 
     info!(
-        "Reindexed {} projects in {:.2?}",
-        project_ids.len(),
+        "Changed {} projects and removed {} projects in {:.2?}",
+        project_ids_to_change.len(),
+        project_ids_to_remove.len(),
         start.elapsed()
     );
 
@@ -218,6 +290,18 @@ pub async fn reindex_projects(
     search_backend.remove_project_documents(project_ids).await?;
 
     info!("Creating project documents");
+    index_changed_projects(ro_pool, redis_pool, search_backend, project_ids)
+        .await?;
+
+    Ok(())
+}
+
+async fn index_changed_projects(
+    ro_pool: &PgPool,
+    redis_pool: &RedisPool,
+    search_backend: &dyn SearchBackend,
+    project_ids: &[ProjectId],
+) -> eyre::Result<()> {
     let documents = index_project_documents(ro_pool, redis_pool, project_ids)
         .instrument(info_span!("index", batch_size = project_ids.len()))
         .await
@@ -236,6 +320,34 @@ pub async fn reindex_projects(
 }
 
 #[derive(Debug, Deserialize)]
-struct SearchProjectIndexQueueEvent {
-    project_id: ProjectId,
+#[serde(untagged)]
+enum SearchProjectIndexQueueEvent {
+    Current(SearchProjectIndexQueueEventData),
+    Legacy { project_id: ProjectId },
+}
+
+impl SearchProjectIndexQueueEvent {
+    fn into_data(self) -> SearchProjectIndexQueueEventData {
+        match self {
+            Self::Current(data) => data,
+            Self::Legacy { project_id } => {
+                SearchProjectIndexQueueEventData::ProjectChange {
+                    project_id,
+                    version_ids: Vec::new(),
+                }
+            }
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+enum SearchProjectIndexQueueEventData {
+    ProjectChange {
+        project_id: ProjectId,
+        version_ids: Vec<VersionId>,
+    },
+    ProjectRemoval {
+        project_id: ProjectId,
+    },
 }

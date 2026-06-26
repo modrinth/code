@@ -1,13 +1,18 @@
 pub mod consume;
 
-use std::{collections::HashSet, mem, sync::Arc, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    mem,
+    sync::Arc,
+    time::Duration,
+};
 
 use rdkafka::{producer::FutureRecord, util::Timeout};
 use serde::Serialize;
 use tokio::sync::Mutex;
 
 use crate::{
-    models::ids::ProjectId,
+    models::ids::{ProjectId, VersionId},
     util::kafka::{KAFKA_OPERATION_INTERVAL, KafkaClientState, KafkaEvent},
 };
 
@@ -17,20 +22,36 @@ const QUEUE_FLUSH_INTERVAL: Duration = Duration::from_secs(10);
 
 #[derive(Clone)]
 pub struct IncrementalSearchQueue {
-    project_ids: Arc<Mutex<HashSet<ProjectId>>>,
+    operations: Arc<Mutex<PendingSearchIndexOperations>>,
     kafka_client: actix_web::web::Data<KafkaClientState>,
 }
 
 impl IncrementalSearchQueue {
     pub fn new(kafka_client: actix_web::web::Data<KafkaClientState>) -> Self {
         Self {
-            project_ids: Arc::new(Mutex::new(HashSet::new())),
+            operations: Arc::new(Mutex::new(
+                PendingSearchIndexOperations::default(),
+            )),
             kafka_client,
         }
     }
 
-    pub async fn push(&self, project_id: ProjectId) {
-        self.project_ids.lock().await.insert(project_id);
+    pub async fn push(
+        &self,
+        project_id: ProjectId,
+        version_ids: impl IntoIterator<Item = VersionId>,
+    ) {
+        self.operations
+            .lock()
+            .await
+            .push_project_change(project_id, version_ids);
+    }
+
+    pub async fn push_project_removal(&self, project_id: ProjectId) {
+        self.operations
+            .lock()
+            .await
+            .push_project_removal(project_id);
     }
 
     pub async fn run(self) {
@@ -46,20 +67,20 @@ impl IncrementalSearchQueue {
     }
 
     pub async fn drain(&self) -> eyre::Result<()> {
-        let project_ids = {
-            let mut project_ids = self.project_ids.lock().await;
-            mem::take(&mut *project_ids)
+        let operations = {
+            let mut operations = self.operations.lock().await;
+            mem::take(&mut *operations)
         };
 
-        if project_ids.is_empty() {
+        if operations.is_empty() {
             return Ok(());
         }
 
-        let mut project_ids = project_ids.into_iter();
-        while let Some(project_id) = project_ids.next() {
+        let mut operations = operations.into_events().into_iter();
+        while let Some(operation) = operations.next() {
             let event = KafkaEvent::new(
                 SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-                SearchProjectIndexQueueEventData { project_id },
+                operation.clone(),
             );
             let event_id = event.event_metadata.event_id;
             let key = event_id.to_string();
@@ -74,9 +95,11 @@ impl IncrementalSearchQueue {
                 .send(record, Timeout::After(KAFKA_OPERATION_INTERVAL))
                 .await
             {
-                let mut queued_project_ids = self.project_ids.lock().await;
-                queued_project_ids.insert(project_id);
-                queued_project_ids.extend(project_ids);
+                let mut queued_operations = self.operations.lock().await;
+                queued_operations.push_event(operation);
+                for operation in operations {
+                    queued_operations.push_event(operation);
+                }
 
                 return Err(err.into());
             }
@@ -86,7 +109,76 @@ impl IncrementalSearchQueue {
     }
 }
 
-#[derive(Debug, Serialize)]
-pub struct SearchProjectIndexQueueEventData {
-    pub project_id: ProjectId,
+#[derive(Default)]
+struct PendingSearchIndexOperations {
+    changed_projects: HashMap<ProjectId, HashSet<VersionId>>,
+    removed_project_ids: HashSet<ProjectId>,
+}
+
+impl PendingSearchIndexOperations {
+    fn is_empty(&self) -> bool {
+        self.changed_projects.is_empty() && self.removed_project_ids.is_empty()
+    }
+
+    fn push_project_change(
+        &mut self,
+        project_id: ProjectId,
+        version_ids: impl IntoIterator<Item = VersionId>,
+    ) {
+        if !self.removed_project_ids.contains(&project_id) {
+            self.changed_projects
+                .entry(project_id)
+                .or_default()
+                .extend(version_ids);
+        }
+    }
+
+    fn push_project_removal(&mut self, project_id: ProjectId) {
+        self.changed_projects.remove(&project_id);
+        self.removed_project_ids.insert(project_id);
+    }
+
+    fn push_event(&mut self, event: SearchProjectIndexQueueEventData) {
+        match event {
+            SearchProjectIndexQueueEventData::ProjectChange {
+                project_id,
+                version_ids,
+            } => self.push_project_change(project_id, version_ids),
+            SearchProjectIndexQueueEventData::ProjectRemoval { project_id } => {
+                self.push_project_removal(project_id)
+            }
+        }
+    }
+
+    fn into_events(self) -> Vec<SearchProjectIndexQueueEventData> {
+        let mut events = Vec::with_capacity(
+            self.changed_projects.len() + self.removed_project_ids.len(),
+        );
+
+        events.extend(self.removed_project_ids.into_iter().map(|project_id| {
+            SearchProjectIndexQueueEventData::ProjectRemoval { project_id }
+        }));
+        events.extend(self.changed_projects.into_iter().map(
+            |(project_id, version_ids)| {
+                SearchProjectIndexQueueEventData::ProjectChange {
+                    project_id,
+                    version_ids: version_ids.into_iter().collect(),
+                }
+            },
+        ));
+
+        events
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum SearchProjectIndexQueueEventData {
+    ProjectChange {
+        project_id: ProjectId,
+        version_ids: Vec<VersionId>,
+    },
+    ProjectRemoval {
+        project_id: ProjectId,
+    },
 }
