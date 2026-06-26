@@ -7,7 +7,7 @@ use itertools::Itertools;
 use regex::Regex;
 use std::collections::HashMap;
 use std::sync::LazyLock;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::database::PgPool;
 use crate::database::models::loader_fields::{
@@ -121,10 +121,13 @@ pub async fn index_local(
 pub async fn index_project_documents(
     pool: &PgPool,
     redis: &RedisPool,
-    project_id: ProjectId,
+    project_ids: &[ProjectId],
 ) -> eyre::Result<Vec<UploadSearchProject>> {
     let searchable_statuses = searchable_statuses();
-    let project_ids = vec![DBProjectId::from(project_id).0];
+    let project_ids = project_ids
+        .iter()
+        .map(|project_id| DBProjectId::from(*project_id).0)
+        .collect::<Vec<_>>();
 
     let db_projects = sqlx::query!(
         r#"
@@ -177,7 +180,7 @@ async fn build_search_documents(
             .await
             .wrap_err("failed to fetch query context")?;
 
-    info!("Indexing local dependencies!");
+    debug!("Indexing local dependencies!");
 
     let dependencies: DashMap<DBProjectId, Vec<SearchProjectDependency>> =
         sqlx::query!(
@@ -231,7 +234,7 @@ async fn build_search_documents(
         ordering: i64,
     }
 
-    info!("Indexing local gallery!");
+    debug!("Indexing local gallery!");
 
     let mods_gallery: DashMap<DBProjectId, Vec<PartialGallery>> = sqlx::query!(
         "
@@ -257,7 +260,7 @@ async fn build_search_documents(
     )
     .await?;
 
-    info!("Indexing local categories!");
+    debug!("Indexing local categories!");
 
     let categories: DashMap<DBProjectId, Vec<(String, bool)>> = sqlx::query!(
         "
@@ -280,10 +283,10 @@ async fn build_search_documents(
     )
     .await?;
 
-    info!("Indexing local versions!");
+    debug!("Indexing local versions!");
     let mut versions = index_versions(pool, project_ids.clone()).await?;
 
-    info!("Indexing local org owners!");
+    debug!("Indexing local org owners!");
 
     let mods_org_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
@@ -308,7 +311,7 @@ async fn build_search_documents(
     })
     .await?;
 
-    info!("Indexing local team owners!");
+    debug!("Indexing local team owners!");
 
     let mods_team_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
@@ -332,7 +335,7 @@ async fn build_search_documents(
     })
     .await?;
 
-    info!("Getting all loader fields!");
+    debug!("Getting all loader fields!");
     let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
         "
         SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
@@ -353,7 +356,7 @@ async fn build_search_documents(
     .await?;
     let loader_fields: Vec<&QueryLoaderField> = loader_fields.iter().collect();
 
-    info!("Getting all loader field enum values!");
+    debug!("Getting all loader field enum values!");
 
     let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> =
         sqlx::query!(
@@ -375,7 +378,7 @@ async fn build_search_documents(
         .try_collect()
         .await?;
 
-    info!("Indexing loaders, project types!");
+    debug!("Indexing loaders, project types!");
     let mut uploads = Vec::new();
 
     let total_len = db_projects.len();
@@ -384,7 +387,7 @@ async fn build_search_documents(
         count += 1;
 
         if count % 1000 == 0 {
-            info!("projects index prog: {count}/{total_len}");
+            debug!("projects index prog: {count}/{total_len}");
         }
         let Some((
             _,

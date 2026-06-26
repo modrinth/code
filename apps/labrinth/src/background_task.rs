@@ -19,7 +19,7 @@ use crate::util::anrok;
 use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
-use tracing::info;
+use tracing::{info, instrument};
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
@@ -50,6 +50,7 @@ pub enum BackgroundTask {
 
 impl BackgroundTask {
     #[allow(clippy::too_many_arguments)]
+    #[instrument(skip_all, fields(background_task = ?self))]
     pub async fn run(
         self,
         pool: PgPool,

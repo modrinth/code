@@ -11,7 +11,7 @@ use std::{
     collections::HashSet,
     time::{Duration, Instant},
 };
-use tracing::info;
+use tracing::{Instrument, info, info_span};
 
 use crate::{
     database::{PgPool, redis::RedisPool},
@@ -214,18 +214,15 @@ pub async fn reindex_projects(
 ) -> eyre::Result<()> {
     search_backend.remove_project_documents(project_ids).await?;
 
-    let mut documents = Vec::new();
-    for project_id in project_ids {
-        documents.extend(
-            index_project_documents(ro_pool, redis_pool, *project_id)
-                .await
-                .wrap_err_with(|| {
-                    format!(
-                        "failed to build project {project_id} search documents"
-                    )
-                })?,
-        );
-    }
+    let documents = index_project_documents(ro_pool, redis_pool, project_ids)
+        .instrument(info_span!("index", batch_size = project_ids.len()))
+        .await
+        .wrap_err_with(|| {
+            format!(
+                "failed to build search documents for {} projects",
+                project_ids.len()
+            )
+        })?;
 
     search_backend.index_documents(&documents).await?;
 
