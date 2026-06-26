@@ -1016,6 +1016,7 @@ impl SearchBackend for Typesense {
             return Ok(());
         }
 
+        let num_documents = documents.len();
         let jsonl = documents_to_jsonl(documents)?;
         for alias in [
             self.config.get_alias_name("projects"),
@@ -1027,7 +1028,12 @@ impl SearchBackend for Typesense {
                 self.config.get_next_collection_name(&alias, false);
 
             debug!(
-                "Inserting into alias {alias:?}, live {live:?}, shadow alt {shadow_alt:?}, shadow current {shadow_current:?}"
+                ?alias,
+                ?live,
+                ?shadow_alt,
+                ?shadow_current,
+                num_documents,
+                "Inserting into alias",
             );
 
             for collection in
