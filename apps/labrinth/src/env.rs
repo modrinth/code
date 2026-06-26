@@ -38,7 +38,7 @@ macro_rules! vars {
                     )]
                     let $field: Option<$ty> = {
                         let mut default = None::<$ty>;
-                        $( default = Some({ $default }.into()); )?
+                        $( default = Some(<$ty>::from({ $default })); )?
 
                         match parse_value::<$ty>(stringify!($field), default) {
                             Ok(value) => Some(value),
@@ -161,6 +161,7 @@ vars! {
     SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
     SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
     SEARCH_INCREMENTAL_INDEX_BATCH_DELAY_SECONDS: u64 = 5u64;
+    SEARCH_INCREMENTAL_INDEX_BATCH_MAX_SIZE: usize = 1000usize;
     TYPESENSE_URL: String = "http://localhost:8108";
     TYPESENSE_API_KEY: String = "modrinth";
     TYPESENSE_INDEX_PREFIX: String = "labrinth";

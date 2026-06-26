@@ -83,21 +83,24 @@ async fn consume(
         );
 
         // ..then wait a while for more messages to batch up
-        // so that we can process a big batch to reindex
+        // so that we can process a big batch to reindex.
+        // we stop until either we've reached the max batch size,
+        // or we've waited enough time - whichever is first.
         //
         // do a little trick with an `AsyncFnMut` closure
         // so that we can explicitly specify the return type
-        let mut collect_more_messages = async || -> eyre::Result<Never> {
-            loop {
+        let mut collect_more_messages = async || -> eyre::Result<()> {
+            while messages.len() < ENV.SEARCH_INCREMENTAL_INDEX_BATCH_MAX_SIZE {
                 let message = consumer
                     .recv()
                     .await
                     .wrap_err("failed to receive Kafka message")?;
                 messages.push(message);
             }
+            eyre::Ok(())
         };
         match tokio::time::timeout(delay, collect_more_messages()).await {
-            Err(_elapsed) => {}
+            Ok(Ok(())) | Err(_) => {}
             Ok(Err(err)) => {
                 return Err(
                     err.wrap_err("failed to receive more Kafka messages")
@@ -223,6 +226,8 @@ pub async fn reindex_projects(
                 project_ids.len()
             )
         })?;
+
+    info!("Fetched all project documents, indexing into backend");
 
     search_backend.index_documents(&documents).await?;
 

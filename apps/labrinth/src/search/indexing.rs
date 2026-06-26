@@ -161,6 +161,8 @@ pub async fn index_project_documents(
     .await
     .wrap_err("failed to fetch project")?;
 
+    info!("Fetched partial projects");
+
     build_search_documents(pool, redis, db_projects).await
 }
 
@@ -180,7 +182,7 @@ async fn build_search_documents(
             .await
             .wrap_err("failed to fetch query context")?;
 
-    debug!("Indexing local dependencies!");
+    info!("Indexing local dependencies!");
 
     let dependencies: DashMap<DBProjectId, Vec<SearchProjectDependency>> =
         sqlx::query!(
@@ -234,7 +236,7 @@ async fn build_search_documents(
         ordering: i64,
     }
 
-    debug!("Indexing local gallery!");
+    info!("Indexing local gallery!");
 
     let mods_gallery: DashMap<DBProjectId, Vec<PartialGallery>> = sqlx::query!(
         "
@@ -260,7 +262,7 @@ async fn build_search_documents(
     )
     .await?;
 
-    debug!("Indexing local categories!");
+    info!("Indexing local categories!");
 
     let categories: DashMap<DBProjectId, Vec<(String, bool)>> = sqlx::query!(
         "
@@ -283,10 +285,10 @@ async fn build_search_documents(
     )
     .await?;
 
-    debug!("Indexing local versions!");
+    info!("Indexing local versions!");
     let mut versions = index_versions(pool, project_ids.clone()).await?;
 
-    debug!("Indexing local org owners!");
+    info!("Indexing local org owners!");
 
     let mods_org_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
@@ -311,7 +313,7 @@ async fn build_search_documents(
     })
     .await?;
 
-    debug!("Indexing local team owners!");
+    info!("Indexing local team owners!");
 
     let mods_team_owners: DashMap<DBProjectId, ProjectOwner> = sqlx::query!(
         "
@@ -335,7 +337,7 @@ async fn build_search_documents(
     })
     .await?;
 
-    debug!("Getting all loader fields!");
+    info!("Getting all loader fields!");
     let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
         "
         SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
@@ -356,7 +358,7 @@ async fn build_search_documents(
     .await?;
     let loader_fields: Vec<&QueryLoaderField> = loader_fields.iter().collect();
 
-    debug!("Getting all loader field enum values!");
+    info!("Getting all loader field enum values!");
 
     let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> =
         sqlx::query!(
@@ -378,7 +380,7 @@ async fn build_search_documents(
         .try_collect()
         .await?;
 
-    debug!("Indexing loaders, project types!");
+    info!("Indexing loaders, project types!");
     let mut uploads = Vec::new();
 
     let total_len = db_projects.len();
@@ -387,7 +389,7 @@ async fn build_search_documents(
         count += 1;
 
         if count % 1000 == 0 {
-            debug!("projects index prog: {count}/{total_len}");
+            info!("projects index prog: {count}/{total_len}");
         }
         let Some((
             _,
