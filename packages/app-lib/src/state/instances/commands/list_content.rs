@@ -208,6 +208,8 @@ pub(crate) async fn list_content(
     )
     .await?;
     let imported_modpack_scope = is_imported_modpack_scope(&resolved, &link);
+    let linked_modpack_source_kind = linked_modpack_source_kind(&link);
+    let mut failed_modpack_identifier_lookup = false;
     let modpack_ids = if imported_modpack_scope {
         None
     } else {
@@ -226,6 +228,7 @@ pub(crate) async fn list_content(
                         "Failed to fetch modpack identifiers: {}",
                         err
                     );
+                    failed_modpack_identifier_lookup = true;
                     None
                 }
             },
@@ -240,6 +243,12 @@ pub(crate) async fn list_content(
         }
     } else if let Some(ids) = modpack_ids.as_ref() {
         ContentFilter::ExcludeModpack(ids)
+    } else if failed_modpack_identifier_lookup {
+        ContentFilter::ExcludeSourceKind {
+            source_kind: linked_modpack_source_kind
+                .unwrap_or(ContentSourceKind::ModrinthModpack),
+            exclude_untracked: true,
+        }
     } else {
         ContentFilter::All
     };
@@ -1093,6 +1102,20 @@ fn linked_modpack_ids(link: &InstanceLink) -> Option<(String, String)> {
             version_id: Some(version_id),
             ..
         } => Some((project_id.clone(), version_id.clone())),
+        _ => None,
+    }
+}
+
+fn linked_modpack_source_kind(
+    link: &InstanceLink,
+) -> Option<ContentSourceKind> {
+    match link {
+        InstanceLink::ModrinthModpack { .. } => {
+            Some(ContentSourceKind::ModrinthModpack)
+        }
+        InstanceLink::ServerProjectModpack { .. } => {
+            Some(ContentSourceKind::ServerProject)
+        }
         _ => None,
     }
 }
