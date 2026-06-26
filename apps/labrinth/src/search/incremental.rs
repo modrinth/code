@@ -1,6 +1,6 @@
 pub mod consume;
 
-use std::{mem, sync::Arc};
+use std::{collections::HashSet, mem, sync::Arc, time::Duration};
 
 use rdkafka::{producer::FutureRecord, util::Timeout};
 use serde::Serialize;
@@ -13,31 +13,29 @@ use crate::{
 
 pub const SEARCH_PROJECT_INDEX_QUEUE_TOPIC: &str =
     "public.labrinth.search-project-index-queue.v1";
+const QUEUE_FLUSH_INTERVAL: Duration = Duration::from_secs(10);
 
 #[derive(Clone)]
 pub struct IncrementalSearchQueue {
-    operations: Arc<Mutex<Vec<SearchIndexOperation>>>,
+    project_ids: Arc<Mutex<HashSet<ProjectId>>>,
     kafka_client: actix_web::web::Data<KafkaClientState>,
 }
 
 impl IncrementalSearchQueue {
     pub fn new(kafka_client: actix_web::web::Data<KafkaClientState>) -> Self {
         Self {
-            operations: Arc::new(Mutex::new(Vec::new())),
+            project_ids: Arc::new(Mutex::new(HashSet::new())),
             kafka_client,
         }
     }
 
     pub async fn push(&self, project_id: ProjectId) {
-        self.operations
-            .lock()
-            .await
-            .push(SearchIndexOperation { project_id });
+        self.project_ids.lock().await.insert(project_id);
     }
 
     pub async fn run(self) {
         loop {
-            tokio::time::sleep(KAFKA_OPERATION_INTERVAL).await;
+            tokio::time::sleep(QUEUE_FLUSH_INTERVAL).await;
 
             if let Err(err) = self.drain().await {
                 tracing::error!(
@@ -48,22 +46,20 @@ impl IncrementalSearchQueue {
     }
 
     pub async fn drain(&self) -> eyre::Result<()> {
-        let operations = {
-            let mut operations = self.operations.lock().await;
-            mem::take(&mut *operations)
+        let project_ids = {
+            let mut project_ids = self.project_ids.lock().await;
+            mem::take(&mut *project_ids)
         };
 
-        if operations.is_empty() {
+        if project_ids.is_empty() {
             return Ok(());
         }
 
-        let mut operations = operations.into_iter();
-        while let Some(operation) = operations.next() {
+        let mut project_ids = project_ids.into_iter();
+        while let Some(project_id) = project_ids.next() {
             let event = KafkaEvent::new(
                 SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-                SearchProjectIndexQueueEventData {
-                    project_id: operation.project_id,
-                },
+                SearchProjectIndexQueueEventData { project_id },
             );
             let event_id = event.event_metadata.event_id;
             let key = event_id.to_string();
@@ -78,9 +74,9 @@ impl IncrementalSearchQueue {
                 .send(record, Timeout::After(KAFKA_OPERATION_INTERVAL))
                 .await
             {
-                let mut queued_operations = self.operations.lock().await;
-                queued_operations.push(operation);
-                queued_operations.extend(operations);
+                let mut queued_project_ids = self.project_ids.lock().await;
+                queued_project_ids.insert(project_id);
+                queued_project_ids.extend(project_ids);
 
                 return Err(err.into());
             }
@@ -88,11 +84,6 @@ impl IncrementalSearchQueue {
 
         Ok(())
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct SearchIndexOperation {
-    pub project_id: ProjectId,
 }
 
 #[derive(Debug, Serialize)]

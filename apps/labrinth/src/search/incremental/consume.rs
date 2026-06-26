@@ -1,16 +1,21 @@
 use actix_web::web;
 use eyre::WrapErr;
-use futures::FutureExt;
+use futures::never::Never;
 use rdkafka::{
     Message,
     consumer::{CommitMode, Consumer, StreamConsumer},
     message::BorrowedMessage,
 };
 use serde::Deserialize;
-use std::collections::HashSet;
+use std::{
+    collections::HashSet,
+    time::{Duration, Instant},
+};
+use tracing::info;
 
 use crate::{
     database::{PgPool, redis::RedisPool},
+    env::ENV,
     models::ids::ProjectId,
     search::{
         SearchBackend, incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
@@ -21,8 +26,6 @@ use crate::{
         KafkaClientState,
     },
 };
-
-const BATCH_SIZE: usize = 100;
 
 pub async fn run(
     ro_pool: PgPool,
@@ -60,25 +63,57 @@ async fn consume(
     search_backend: &dyn SearchBackend,
     consumer: &StreamConsumer,
 ) -> eyre::Result<()> {
+    // keep buffer capacity (pre-)allocated
+    let mut messages = Vec::with_capacity(1024);
     loop {
-        let mut messages = Vec::with_capacity(BATCH_SIZE);
-        messages.push(
-            consumer
-                .recv()
-                .await
-                .wrap_err("failed to receive Kafka message")?,
+        messages.clear();
+
+        // wait for a first message to come in...
+        let first_message = consumer
+            .recv()
+            .await
+            .wrap_err("failed to receive Kafka message")?;
+        messages.push(first_message);
+
+        let delay = Duration::from_secs(
+            ENV.SEARCH_INCREMENTAL_INDEX_BATCH_DELAY_SECONDS,
+        );
+        info!(
+            "Received initial Kafka message; waiting {delay:.2?} for more to batch",
         );
 
-        while messages.len() < BATCH_SIZE {
-            let Some(message) = consumer.recv().now_or_never() else {
-                break;
-            };
-
-            messages.push(message.wrap_err("failed to receive Kafka message")?);
+        // ..then wait a while for more messages to batch up
+        // so that we can process a big batch to reindex
+        //
+        // do a little trick with an `AsyncFnMut` closure
+        // so that we can explicitly specify the return type
+        let mut collect_more_messages = async || -> eyre::Result<Never> {
+            loop {
+                let message = consumer
+                    .recv()
+                    .await
+                    .wrap_err("failed to receive Kafka message")?;
+                messages.push(message);
+            }
+        };
+        match tokio::time::timeout(delay, collect_more_messages()).await {
+            Err(_elapsed) => {}
+            Ok(Err(err)) => {
+                return Err(
+                    err.wrap_err("failed to receive more Kafka messages")
+                );
+            }
         }
 
-        consume_batch(ro_pool, redis_pool, search_backend, consumer, messages)
-            .await?;
+        info!("Consuming batch of {} messages", messages.len());
+        consume_batch(
+            ro_pool,
+            redis_pool,
+            search_backend,
+            consumer,
+            messages.drain(..),
+        )
+        .await?;
     }
 }
 
@@ -87,8 +122,10 @@ async fn consume_batch(
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     consumer: &StreamConsumer,
-    messages: Vec<BorrowedMessage<'_>>,
+    messages: impl IntoIterator<Item = BorrowedMessage<'_>>,
 ) -> eyre::Result<()> {
+    let start = Instant::now();
+
     let mut project_ids = Vec::new();
     let mut seen_project_ids = HashSet::new();
     let mut messages_to_commit = Vec::new();
@@ -131,25 +168,31 @@ async fn consume_batch(
         messages_to_commit.push(message);
     }
 
-    if project_ids.is_empty() {
-        return Ok(());
-    }
-
-    tracing::info!(
+    info!(
         kafka.message_count = messages_to_commit.len(),
-        project_count = project_ids.len(),
-        "Consumed incremental search index event batch"
+        "Read all Kafka messages in {:.2?}, found {} projects to reindex",
+        start.elapsed(),
+        project_ids.len(),
     );
+    let start = Instant::now();
 
-    reindex_projects(ro_pool, redis_pool, search_backend, &project_ids)
-        .await
-        .wrap_err("failed to reindex project batch")?;
+    if !project_ids.is_empty() {
+        reindex_projects(ro_pool, redis_pool, search_backend, &project_ids)
+            .await
+            .wrap_err("failed to reindex project batch")?;
+    }
 
     for message in messages_to_commit {
         consumer
             .commit_message(&message, CommitMode::Async)
             .wrap_err("failed to commit Kafka message")?;
     }
+
+    info!(
+        "Reindexed {} projects in {:.2?}",
+        project_ids.len(),
+        start.elapsed()
+    );
 
     Ok(())
 }

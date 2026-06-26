@@ -160,6 +160,7 @@ vars! {
     // search
     SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
     SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
+    SEARCH_INCREMENTAL_INDEX_BATCH_DELAY_SECONDS: u64 = 5u64;
     TYPESENSE_URL: String = "http://localhost:8108";
     TYPESENSE_API_KEY: String = "modrinth";
     TYPESENSE_INDEX_PREFIX: String = "labrinth";
