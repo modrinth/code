@@ -1,6 +1,6 @@
 use crate::state::InstanceInstallStage;
 use crate::state::instances::{
-    InstanceLaunchContext, adapters::sqlite::instance_rows,
+    InstanceLaunchContext, adapters::sqlite::instance_rows, playtime_to_storage,
 };
 use chrono::{DateTime, Utc};
 use sqlx::SqlitePool;
@@ -120,15 +120,30 @@ pub(crate) async fn add_instance_recent_playtime(
     seconds: u64,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let seconds = seconds as i64;
+    if seconds == 0 {
+        return Ok(());
+    }
+
+    let seconds = playtime_to_storage(seconds, "recent_time_played")?;
+    let max_playtime = i64::MAX;
+    let max_playtime_before_increment = max_playtime - seconds;
     let modified = Utc::now().timestamp();
 
     sqlx::query!(
         "
 		UPDATE instances
-		SET recent_time_played = recent_time_played + ?, modified = ?
+		SET
+			recent_time_played = CASE
+				WHEN recent_time_played < 0 THEN ?
+				WHEN recent_time_played > ? THEN ?
+				ELSE recent_time_played + ?
+			END,
+			modified = ?
 		WHERE id = ?
 		",
+        seconds,
+        max_playtime_before_increment,
+        max_playtime,
         seconds,
         modified,
         instance_id,
@@ -144,18 +159,32 @@ pub(crate) async fn mark_instance_playtime_submitted(
     recent_time_played: u64,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let recent_time_played = recent_time_played as i64;
+    if recent_time_played == 0 {
+        return Ok(());
+    }
+
+    let recent_time_played =
+        playtime_to_storage(recent_time_played, "recent_time_played")?;
+    let max_playtime = i64::MAX;
+    let max_playtime_before_increment = max_playtime - recent_time_played;
     let modified = Utc::now().timestamp();
 
     sqlx::query!(
         "
 		UPDATE instances
 		SET
-			submitted_time_played = submitted_time_played + ?,
+			submitted_time_played = CASE
+				WHEN submitted_time_played < 0 THEN ?
+				WHEN submitted_time_played > ? THEN ?
+				ELSE submitted_time_played + ?
+			END,
 			recent_time_played = 0,
 			modified = ?
 		WHERE id = ?
 		",
+        recent_time_played,
+        max_playtime_before_increment,
+        max_playtime,
         recent_time_played,
         modified,
         instance_id,
