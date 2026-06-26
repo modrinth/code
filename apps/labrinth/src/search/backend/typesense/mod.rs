@@ -1026,10 +1026,15 @@ impl SearchBackend for Typesense {
             let shadow_current =
                 self.config.get_next_collection_name(&alias, false);
 
+            debug!(
+                "Inserting into alias {alias:?}, live {live:?}, shadow alt {shadow_alt:?}, shadow current {shadow_current:?}"
+            );
+
             for collection in
                 live.into_iter().chain([shadow_alt, shadow_current])
             {
                 if self.client.collection_exists(&collection).await? {
+                    debug!("Inserting into existing collection {collection:?}");
                     self.client
                         .import_documents(&collection, jsonl.clone())
                         .await?;
@@ -1037,6 +1042,7 @@ impl SearchBackend for Typesense {
             }
         }
 
+        debug!("Done importing");
         Ok(())
     }
 
