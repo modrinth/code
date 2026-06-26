@@ -173,15 +173,6 @@
 							{{ formatMessage(messages.headTitle) }}
 						</h2>
 						<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
-							<ButtonStyled>
-								<button
-									:disabled="selectedProjects.length === 0"
-									@click="$refs.editLinksModal.show()"
-								>
-									<EditIcon />
-									{{ formatMessage(messages.editLinksButton) }}
-								</button>
-							</ButtonStyled>
 							<ButtonStyled color="brand">
 								<button @click="$refs.modal_creation.show($event)">
 									<PlusIcon />
@@ -281,6 +272,72 @@
 				</template>
 			</Table>
 		</section>
+		<FloatingActionBar
+			:shown="selectedProjects.length > 0"
+			:aria-label="formatMessage(messages.selectionActionBarAriaLabel)"
+			hide-when-modal-open
+		>
+			<div class="flex items-center gap-0.5">
+				<div
+					class="relative h-8 shrink-0"
+					:style="{ width: `${selectedProjectIconStackWidth}px` }"
+					aria-hidden="true"
+				>
+					<div
+						v-for="(project, index) in visibleSelectedProjects"
+						:key="project.id"
+						v-tooltip="project.title"
+						class="absolute top-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4"
+						:style="{
+							left: `${index * SELECTED_PROJECT_ICON_STACK_OFFSET}px`,
+							zIndex: visibleSelectedProjects.length - index,
+						}"
+					>
+						<img
+							v-if="project.icon_url"
+							:src="project.icon_url"
+							:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
+							class="h-full w-full rounded-lg object-cover"
+						/>
+						<BoxIcon v-else class="h-full w-full text-primary" />
+					</div>
+					<div
+						v-if="selectedProjectOverflowCount > 0"
+						class="absolute top-0 flex h-8 w-8 items-center justify-center rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4 text-xs font-bold text-contrast"
+						:style="{
+							left: `${visibleSelectedProjects.length * SELECTED_PROJECT_ICON_STACK_OFFSET}px`,
+							zIndex: 0,
+						}"
+					>
+						+{{ selectedProjectOverflowCount }}
+					</div>
+				</div>
+
+				<span class="px-3 py-2 text-base font-semibold tabular-nums text-contrast">
+					{{ formatMessage(messages.selectedProjectsCount, { count: selectedProjects.length }) }}
+				</span>
+				<div class="mx-0.5 h-6 w-px bg-surface-5" />
+				<ButtonStyled type="transparent">
+					<button
+						v-tooltip="formatMessage(commonMessages.clearButton)"
+						class="!text-primary"
+						@click="clearProjectSelection()"
+					>
+						<XIcon class="cq-show-icon hidden" />
+						<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+					</button>
+				</ButtonStyled>
+			</div>
+
+			<div class="ml-auto flex items-center gap-0.5">
+				<ButtonStyled color="brand">
+					<button v-tooltip="formatMessage(messages.editLinksButton)" @click="showEditLinksModal()">
+						<EditIcon />
+						<span class="bar-label">{{ formatMessage(messages.editLinksButton) }}</span>
+					</button>
+				</ButtonStyled>
+			</div>
+		</FloatingActionBar>
 	</div>
 </template>
 
@@ -302,6 +359,7 @@ import {
 	commonMessages,
 	CopyCode,
 	defineMessages,
+	FloatingActionBar,
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
@@ -335,6 +393,14 @@ const messages = defineMessages({
 	editLinksButton: {
 		id: 'dashboard.projects.links.button.edit',
 		defaultMessage: 'Edit links',
+	},
+	selectedProjectsCount: {
+		id: 'dashboard.projects.selection-bar.selected-count',
+		defaultMessage: '{count, plural, one {# project selected} other {# projects selected}}',
+	},
+	selectionActionBarAriaLabel: {
+		id: 'dashboard.projects.selection-bar.aria-label',
+		defaultMessage: 'Selected projects actions',
 	},
 	editLinksHeader: {
 		id: 'dashboard.projects.links.header.edit',
@@ -470,6 +536,7 @@ const editLinks = reactive({
 
 const editLinksModal = ref(null)
 const sortCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+const SELECTED_PROJECT_ICON_STACK_OFFSET = 24
 
 const projectTableColumns = computed(() => [
 	{
@@ -549,6 +616,17 @@ const bulkEditableProjects = computed(() =>
 const selectedProjects = computed(() =>
 	projects.value.filter((project) => selectedProjectIds.value.includes(project.id)),
 )
+const visibleSelectedProjects = computed(() => selectedProjects.value.slice(0, 3))
+const selectedProjectOverflowCount = computed(() => Math.max(0, selectedProjects.value.length - 3))
+const selectedProjectIconStackWidth = computed(() => {
+	if (selectedProjects.value.length === 0) return 0
+
+	return (
+		32 +
+		(visibleSelectedProjects.value.length - 1 + (selectedProjectOverflowCount.value > 0 ? 1 : 0)) *
+			SELECTED_PROJECT_ICON_STACK_OFFSET
+	)
+})
 
 const allBulkEditableProjectsSelected = computed(
 	() =>
@@ -577,6 +655,18 @@ function toggleProjectSelection(project) {
 	}
 
 	selectedProjectIds.value = [...selectedProjectIds.value, project.id]
+}
+
+function clearProjectSelection() {
+	selectedProjectIds.value = []
+}
+
+function showEditLinksModal() {
+	if (selectedProjects.value.length === 0) {
+		return
+	}
+
+	editLinksModal.value?.show()
 }
 
 function getBulkEditDisabledTooltip(project) {
