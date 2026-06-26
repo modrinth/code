@@ -97,6 +97,7 @@ type ReleaseChannel = 'release' | 'beta' | 'alpha'
 export type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
 type ContentFile = {
+	enabled: boolean
 	metadata?: {
 		project_id: string
 		version_id: string

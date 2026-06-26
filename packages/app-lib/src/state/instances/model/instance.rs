@@ -20,3 +20,15 @@ pub struct Instance {
     pub submitted_time_played: u64,
     pub recent_time_played: u64,
 }
+
+pub(crate) fn playtime_to_storage(
+    value: u64,
+    column: &str,
+) -> crate::Result<i64> {
+    i64::try_from(value).map_err(|_| {
+        crate::ErrorKind::InputError(format!(
+            "Expected {column} to fit in SQLite INTEGER"
+        ))
+        .into()
+    })
+}
