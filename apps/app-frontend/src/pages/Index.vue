@@ -8,8 +8,8 @@ import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
 import { get_search_results } from '@/helpers/cache.js'
-import { profile_listener } from '@/helpers/events'
-import { list } from '@/helpers/profile.js'
+import { instance_listener } from '@/helpers/events'
+import { list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
@@ -49,8 +49,8 @@ async function fetchInstances() {
 
 	const filters = []
 	for (const instance of instances.value) {
-		if (instance.linked_data && instance.linked_data.project_id) {
-			filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)
+		if (instance.link && instance.link.project_id) {
+			filters.push(`NOT"project_id"="${instance.link.project_id}"`)
 		}
 	}
 	installedModpacksFilter.value = filters.join(' AND ')
@@ -85,8 +85,8 @@ async function refreshFeaturedProjects() {
 await fetchInstances()
 await refreshFeaturedProjects()
 
-const unlistenProfile = await profile_listener(
-	async (e: { event: string; profile_path_id: string }) => {
+const unlistenInstance = await instance_listener(
+	async (e: { event: string; instance_id: string }) => {
 		await fetchInstances()
 
 		if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
@@ -96,7 +96,7 @@ const unlistenProfile = await profile_listener(
 )
 
 onUnmounted(() => {
-	unlistenProfile()
+	unlistenInstance()
 })
 </script>
 

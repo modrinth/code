@@ -120,7 +120,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
-import { getAuthUrl, removeAuthProvider, useAuth } from '@/composables/auth.js'
+import { getAuthUrl, removeAuthProvider, useAuth } from '@/composables/auth.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees, saveStateToStorage } =
@@ -193,7 +193,6 @@ async function saveVenmoHandle() {
 			},
 		})
 
-		// @ts-expect-error auth.js is not typed
 		await useAuth(auth.value.token)
 
 		initialVenmoHandle.value = venmoHandle.value.trim()

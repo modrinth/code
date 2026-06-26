@@ -773,38 +773,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Inserisci il codice..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Password dimenticata?</forgot-password-link> • <create-account-link>Crea un account</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Accedi con"
   },
   "auth.sign-in.title": {
     "message": "Accedi"
   },
-  "auth.sign-in.use-password": {
-    "message": "O usa la password"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Crea account"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Creando un''account, accetti i <terms-link>termini d''uso</terms-link> e l''<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Le password non corrispondono!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Hai già un account?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Ricevi novità da Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registrati"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "O crea un account"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Accedi con"
@@ -838,21 +820,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifica email"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Ricevi novità riguardanti Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Fai ora parte della grandiosa comunità di creatori ed esploratori che già costruiscono, aggiornano e stanno sul pezzo con le fantastiche mod."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Creando un''account, hai accettato i <terms-link>termini d''utilizzo</terms-link> e l''<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Modrinth ti dà il benvenuto!"
-  },
-  "auth.welcome.title": {
-    "message": "Ciao"
   },
   "collection.button.edit-icon": {
     "message": "Modifica icona"

@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 use std::io::{Cursor, Read};
+use std::sync::Arc;
 
 use chrono::Utc;
 use eyre::{Result, eyre};
 use hex::ToHex;
 use sha1::Digest;
-use tokio::task::spawn_blocking;
+use tokio::task::{spawn, spawn_blocking};
 use tracing::{Instrument, info, info_span, warn};
 use zip::ZipArchive;
 
@@ -18,6 +19,7 @@ use crate::database::models::{DBFileId, DBUserId, DBVersion};
 use crate::database::{PgPool, PgTransaction, redis::RedisPool};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::error::ApiError;
 use crate::models::ids::FileId;
 use crate::models::projects::{
     AttributionResolution, AttributionResolutionKind, DependencyAttribution,
@@ -29,6 +31,17 @@ use crate::queue::moderation::{
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
 
+const PENDING_FILE_SCAN_BATCH_SIZE: i64 = 100;
+
+type FileScanResult<'a> = std::result::Result<(), ApiError<'a>>;
+
+#[derive(Clone)]
+struct PendingFileScan {
+    file_id: DBFileId,
+    url: String,
+    project_id: DBProjectId,
+}
+
 /// Attribution enforcement is version/project-scoped, not file-hash-scoped.
 ///
 /// Versions or projects listed in `attributions_exemptions` predate this
@@ -39,13 +52,53 @@ use crate::util::http::HTTP_CLIENT;
 /// versions must go through the `attribution_enforced_versions` view so
 /// grandfathered versions and projects are ignored without making the SHA1
 /// itself exempt.
-pub async fn scan_all_files(
+pub async fn scan_all_pending_files(
     db: &PgPool,
     redis: &RedisPool,
-    file_host: &dyn FileHost,
+    file_host: Arc<dyn FileHost>,
 ) -> Result<()> {
-    let mut txn = db.begin().await.wrap_err("beginning transaction")?;
+    let scan_concurrency = ENV.FILE_SCAN_CONCURRENCY.max(1);
 
+    let total_to_scan = sqlx::query_scalar!(
+        r#"
+        select count(*) as "count!"
+        from file_scans fa
+        inner join files f on f.id = fa.file_id
+        inner join attribution_enforced_versions aev on aev.id = f.version_id
+        where fa.attributions_scanned_at is null
+        "#,
+    )
+    .fetch_one(db)
+    .await
+    .wrap_err("fetching number of files to scan")?;
+
+    info!(
+        "Found {total_to_scan} total pending files to scan, running in batches of {PENDING_FILE_SCAN_BATCH_SIZE} with concurrency {scan_concurrency}"
+    );
+
+    loop {
+        let scanned_count = scan_pending_files_batch(
+            db,
+            redis,
+            file_host.clone(),
+            scan_concurrency * PENDING_FILE_SCAN_BATCH_SIZE,
+        )
+        .await?;
+
+        if scanned_count == 0 {
+            break;
+        }
+    }
+
+    Ok(())
+}
+
+async fn scan_pending_files_batch(
+    db: &PgPool,
+    redis: &RedisPool,
+    file_host: Arc<dyn FileHost>,
+    scan_limit: i64,
+) -> Result<usize> {
     let files_to_scan = sqlx::query!(
         r#"
         select
@@ -57,23 +110,94 @@ pub async fn scan_all_files(
         inner join attribution_enforced_versions aev on aev.id = f.version_id
         inner join versions v on v.id = f.version_id
         where fa.attributions_scanned_at is null
-        "#
+        order by fa.file_id
+        limit $1
+        "#,
+        scan_limit,
     )
-    .fetch_all(&mut txn)
+    .fetch_all(db)
     .await
     .wrap_err("fetching files to scan")?;
 
-    info!("Found {} files to scan", files_to_scan.len());
+    let fetched_count = files_to_scan.len();
 
-    let mut scanned_ids = Vec::new();
+    info!(
+        "Found {fetched_count} pending files to scan, splitting into jobs of {PENDING_FILE_SCAN_BATCH_SIZE}",
+    );
+
+    let files_to_scan: Vec<_> = files_to_scan
+        .into_iter()
+        .map(|row| PendingFileScan {
+            file_id: row.file_id,
+            url: row.url,
+            project_id: row.project_id,
+        })
+        .collect();
+
+    let mut tasks = Vec::new();
+    for chunk in files_to_scan.chunks(PENDING_FILE_SCAN_BATCH_SIZE as usize) {
+        let db = db.clone();
+        let redis = redis.clone();
+        let file_host = file_host.clone();
+        let chunk = chunk.to_vec();
+
+        tasks.push(spawn(async move {
+            scan_pending_files_chunk(&db, &redis, &*file_host, chunk).await
+        }));
+    }
+
+    let mut scanned_count = 0;
+    let mut errors = Vec::new();
+    for task in tasks {
+        match task.await.wrap_err("joining file scan task")? {
+            Ok(count) => scanned_count += count,
+            Err(err) => {
+                errors.push(err);
+            }
+        }
+    }
+
+    if !errors.is_empty() {
+        let error_count = errors.len();
+        let error_messages = errors
+            .into_iter()
+            .enumerate()
+            .map(|(index, err)| format!("chunk {}: {err:?}", index + 1))
+            .collect::<Vec<_>>()
+            .join("\n\n");
+
+        return Err(eyre!(
+            "failed to scan {error_count} pending file chunks:\n\n{error_messages}"
+        ));
+    }
+
+    if fetched_count > 0 && scanned_count == 0 {
+        return Err(eyre!(
+            "file scan batch made no progress after fetching {fetched_count} files"
+        ));
+    }
+
+    info!("Marked {} files as scanned", scanned_count);
+
+    Ok(scanned_count)
+}
+
+async fn scan_pending_files_chunk(
+    db: &PgPool,
+    redis: &RedisPool,
+    file_host: &dyn FileHost,
+    files_to_scan: Vec<PendingFileScan>,
+) -> Result<usize> {
+    info!("Scanning {} files", files_to_scan.len());
+    let mut scanned_count = 0;
 
     for row in files_to_scan {
         let human_file_id = FileId::from(row.file_id);
         let span = info_span!("scan", file_id = %human_file_id);
-        async {
-            info!("Scanning file");
 
-            let file_id = row.file_id;
+        let file_id = row.file_id;
+        let result = async {
+            info!("Scanning file");
 
             let overrides = extract_override_files_from_storage(
                 file_host, file_id, &row.url,
@@ -85,61 +209,87 @@ pub async fn scan_all_files(
 
             if overrides.is_empty() {
                 info!("Found no overrides");
-            } else {
-                info!("Found {} overrides", overrides.len());
 
-                let resolved = resolve_overrides(&overrides, redis, &mut txn)
-                    .await
-                    .wrap_err_with(|| {
-                        eyre!("resolving overrides for file {file_id:?}")
-                    })?;
-                info!("Resolved: {resolved:#?}");
-
-                persist_attribution_results(
-                    row.project_id,
-                    file_id,
-                    &overrides,
-                    &resolved,
-                    &mut txn,
-                )
-                .await
-                .wrap_err_with(|| {
-                    eyre!("persisting attribution results for file {file_id:?}")
-                })?;
+                return Ok(());
             }
 
-            scanned_ids.push(file_id.0);
+            info!("Found {} overrides", overrides.len());
+
+            let mut txn = db
+                .begin()
+                .await
+                .wrap_err("beginning file scan transaction")?;
+
+            let resolved = resolve_overrides(&overrides, redis, &mut txn)
+                .await
+                .wrap_err_with(|| {
+                    eyre!("resolving overrides for file {file_id:?}")
+                })?;
+            info!("Resolved: {resolved:#?}");
+
+            persist_attribution_results(
+                row.project_id,
+                file_id,
+                &overrides,
+                &resolved,
+                redis,
+                &mut txn,
+            )
+            .await
+            .wrap_err_with(|| {
+                eyre!("persisting attribution results for file {file_id:?}")
+            })?;
+
+            txn.commit()
+                .await
+                .wrap_err("committing file scan transaction")?;
+            log_marked_override_projects(&resolved);
+
             eyre::Ok(())
         }
         .instrument(span)
-        .await?;
+        .await;
+
+        let scan_result = file_scan_result(&result);
+        match result {
+            Ok(()) => {
+                info!(%human_file_id, "Successfully scanned file");
+            }
+            Err(err) => {
+                warn!(%human_file_id, "Failed to scan file: {err:?}");
+            }
+        }
+
+        update_file_scan_result(db, file_id, scan_result)
+            .await
+            .wrap_err("marking file as scanned")?;
+
+        scanned_count += 1;
     }
 
-    if !scanned_ids.is_empty() {
-        let now = Utc::now();
-        sqlx::query!(
-            "
-            update file_scans
-            set attributions_scanned_at = now
-            from unnest($1::bigint[], $2::timestamptz[]) as u(id, now)
-            where file_scans.file_id = u.id
-            ",
-            &scanned_ids,
-            &vec![now; scanned_ids.len()],
-        )
-        .execute(&mut txn)
-        .await
-        .wrap_err("marking files as scanned")?;
-    }
-
-    info!("Marked {} files as scanned", scanned_ids.len());
-
-    txn.commit().await.wrap_err("committing transaction")?;
-
-    Ok(())
+    Ok(scanned_count)
 }
 
 pub async fn scan_file(
+    txn: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    file_host: &dyn FileHost,
+    project_id: DBProjectId,
+    file_id: DBFileId,
+    file_url: &str,
+) -> Result<()> {
+    let result =
+        scan_file_inner(txn, redis, file_host, project_id, file_id, file_url)
+            .await;
+
+    upsert_file_scan_result(txn, file_id, file_scan_result(&result))
+        .await
+        .wrap_err("marking file as scanned")?;
+
+    result
+}
+
+async fn scan_file_inner(
     txn: &mut PgTransaction<'_>,
     redis: &RedisPool,
     file_host: &dyn FileHost,
@@ -162,25 +312,78 @@ pub async fn scan_file(
             })?;
 
         persist_attribution_results(
-            project_id, file_id, &overrides, &resolved, txn,
+            project_id, file_id, &overrides, &resolved, redis, txn,
         )
         .await
         .wrap_err_with(|| {
             eyre!("persisting attribution results for file {file_id:?}")
         })?;
+        log_marked_override_projects(&resolved);
     }
 
+    Ok(())
+}
+
+fn file_scan_result(result: &Result<()>) -> FileScanResult<'static> {
+    match result {
+        Ok(()) => Ok(()),
+        Err(err) => Err(ApiError {
+            error: "internal_error",
+            description: format!("{err:#}"),
+            details: None,
+        }),
+    }
+}
+
+async fn update_file_scan_result(
+    db: &PgPool,
+    file_id: DBFileId,
+    result: FileScanResult<'_>,
+) -> Result<()> {
+    let now = Utc::now();
+
     sqlx::query!(
-        "
-        insert into file_scans (file_id, attributions_scanned_at)
-        values ($1, now())
-        on conflict (file_id) do update set attributions_scanned_at = now()
-        ",
+        r#"
+        update file_scans
+        set
+            attributions_scanned_at = $2,
+            attributions_scan_result = $3
+        where file_id = $1
+        "#,
         file_id.0,
+        now,
+        sqlx::types::Json(result) as _,
+    )
+    .execute(db)
+    .await
+    .wrap_err("updating file scan result")?;
+
+    Ok(())
+}
+
+async fn upsert_file_scan_result(
+    txn: &mut PgTransaction<'_>,
+    file_id: DBFileId,
+    result: FileScanResult<'_>,
+) -> Result<()> {
+    sqlx::query!(
+        r#"
+        insert into file_scans (
+            file_id,
+            attributions_scanned_at,
+            attributions_scan_result
+        )
+        values ($1, now(), $2)
+        on conflict (file_id) do update set
+            attributions_scanned_at = now(),
+            attributions_scan_result = $2
+        "#,
+        file_id.0,
+        sqlx::types::Json(result) as _,
     )
     .execute(&mut *txn)
     .await
-    .wrap_err("marking file as scanned")?;
+    .wrap_err("upserting file scan result")?;
 
     Ok(())
 }
@@ -239,6 +442,33 @@ pub enum OverrideResolution {
     Unknown,
 }
 
+fn log_marked_override_projects(
+    resolved: &HashMap<String, OverrideResolution>,
+) {
+    let mut projects = resolved
+        .values()
+        .filter_map(|resolution| match resolution {
+            OverrideResolution::ExternalLicense {
+                flame_project: Some(flame_project),
+                ..
+            }
+            | OverrideResolution::Flame(flame_project) => {
+                Some(format!("{} ({})", flame_project.title, flame_project.id))
+            }
+            OverrideResolution::OnModrinth
+            | OverrideResolution::ExternalLicense { .. }
+            | OverrideResolution::Unknown => None,
+        })
+        .collect::<Vec<_>>();
+
+    projects.sort();
+    projects.dedup();
+
+    if !projects.is_empty() {
+        info!(override_projects = ?projects, "Marked projects as overrides");
+    }
+}
+
 const OVERRIDE_PREFIXES: &[&str] = &[
     "overrides/mods",
     "client-overrides/mods",
@@ -248,6 +478,23 @@ const OVERRIDE_PREFIXES: &[&str] = &[
     "overrides/resourcepacks",
     "client-overrides/resourcepacks",
 ];
+
+fn should_scan(name: &str) -> bool {
+    let should_skip = name.starts_with("mods/.connector/")
+        || name.starts_with(".sable/natives/")
+        || name.starts_with("local/crash_assistant/")
+        || name.starts_with("mods/mcef-libraries/")
+        || name.starts_with("mods/mcef-cache/")
+        || name.starts_with("config/super_resolution/libraries/")
+        || name.starts_with("config/Veinminer/update/")
+        || name.starts_with("config/epicfight/native/")
+        || name.starts_with("essential/")
+        || name.ends_with(".rpo")
+        || name.ends_with(".txt");
+    let is_archive = name.contains(".jar") || name.contains(".zip");
+
+    is_archive && !should_skip
+}
 
 fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
     let reader = Cursor::new(data);
@@ -273,10 +520,7 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
             continue;
         }
 
-        let should_scan_file = name.contains(".jar")
-            || (name.contains(".zip") && !name.ends_with(".zip.txt"));
-
-        if name.matches('/').count() > 2 || !should_scan_file {
+        if !should_scan(&name) {
             continue;
         }
 
@@ -301,6 +545,7 @@ async fn persist_attribution_results(
     file_id: DBFileId,
     overrides: &[OverrideFile],
     resolved: &HashMap<String, OverrideResolution>,
+    redis: &RedisPool,
     txn: &mut PgTransaction<'_>,
 ) -> Result<()> {
     let all_sha1s: Vec<Vec<u8>> = overrides
@@ -549,6 +794,22 @@ async fn persist_attribution_results(
         .await
         .wrap_err("inserting override file sources")?;
     }
+
+    let version_id = sqlx::query_scalar!(
+        r#"
+        select version_id as "version_id: DBVersionId"
+        from files
+        where id = $1
+        "#,
+        file_id as DBFileId,
+    )
+    .fetch_one(&mut *txn)
+    .await
+    .wrap_err("fetching scanned file version")?;
+
+    DBVersion::clear_cache_ids(&[version_id], redis)
+        .await
+        .wrap_err("clearing version cache after attribution scan")?;
 
     Ok(())
 }

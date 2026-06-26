@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "没有与 {compatibilityLabel} 匹配的可用版本。如果仍要安装，请选择一个版本。依赖项将不会自动安装。"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "正在安装整合包……"
-  },
   "app.export-modal.description-placeholder": {
     "message": "输入整合包描述……"
   },
@@ -242,9 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "浏览服务器"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "你确定要永久删除这个世界吗？"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "模组适配"
   },
@@ -263,14 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未添加服务器或世界"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "你确定要删除 {name} 吗？"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜索 {count} 个世界……"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "此服务器"
   },
   "app.modal.install-to-play.content-required": {
     "message": "需求内容"

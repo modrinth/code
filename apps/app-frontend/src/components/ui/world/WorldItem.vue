@@ -2,6 +2,7 @@
 import {
 	ClipboardCopyIcon,
 	EditIcon,
+	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
 	IssuesIcon,
@@ -23,6 +24,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	injectNotificationManager,
 	OverflowMenu,
 	SmartClickable,
 	TagItem,
@@ -39,7 +41,7 @@ import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { copyToClipboard } from '@/helpers/utils'
+import { copyToClipboard, createInstanceShortcut } from '@/helpers/utils'
 import type {
 	ProtocolVersion,
 	ServerStatus,
@@ -60,6 +62,7 @@ const formatDateTime = useFormatDateTime({
 })
 
 const router = useRouter()
+const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
 	(e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
@@ -91,9 +94,10 @@ const props = withDefaults(
 		managed?: boolean
 
 		// Instance
-		instancePath?: string
+		instanceId?: string
 		instanceName?: string
 		instanceIcon?: string
+		shortcutInstanceId?: string
 	}>(),
 	{
 		playingInstance: false,
@@ -110,9 +114,10 @@ const props = withDefaults(
 		gameMode: undefined,
 		managed: false,
 
-		instancePath: undefined,
+		instanceId: undefined,
 		instanceName: undefined,
 		instanceIcon: undefined,
+		shortcutInstanceId: undefined,
 	},
 )
 
@@ -131,6 +136,33 @@ const serverIncompatible = computed(
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
 const managed = computed(() => props.managed)
+const shortcutInstanceId = computed(() => props.shortcutInstanceId ?? props.instanceId)
+
+async function createShortcut() {
+	if (!shortcutInstanceId.value) return
+
+	try {
+		const shortcutPath = await createInstanceShortcut(
+			props.world.name,
+			shortcutInstanceId.value,
+			props.world.type === 'server'
+				? { server: (props.world as ServerWorld).address }
+				: { singleplayerWorld: (props.world as SingleplayerWorld).path },
+		)
+		if (!shortcutPath) return
+
+		addNotification({
+			type: 'success',
+			title: 'Shortcut created',
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Failed to create shortcut',
+			text: error instanceof Error ? error.message : '',
+		})
+	}
+}
 
 const messages = defineMessages({
 	hardcore: {
@@ -185,6 +217,10 @@ const messages = defineMessages({
 		id: 'instance.worlds.dont_show_on_home',
 		defaultMessage: `Don't show on Home`,
 	},
+	createShortcut: {
+		id: 'instance.worlds.create_shortcut',
+		defaultMessage: 'Create shortcut',
+	},
 	linkedServer: {
 		id: 'instance.worlds.linked_server',
 		defaultMessage: 'Managed by server project',
@@ -209,10 +245,10 @@ const messages = defineMessages({
 </script>
 <template>
 	<SmartClickable>
-		<template v-if="instancePath" #clickable>
+		<template v-if="instanceId" #clickable>
 			<router-link
 				class="no-click-animation"
-				:to="`/instance/${encodeURIComponent(instancePath)}/worlds?highlight=${encodeURIComponent(getWorldIdentifier(world))}`"
+				:to="`/instance/${encodeURIComponent(instanceId)}/worlds?highlight=${encodeURIComponent(getWorldIdentifier(world))}`"
 			/>
 		</template>
 		<div
@@ -324,16 +360,16 @@ const messages = defineMessages({
 						</template>
 						<template v-else> {{ formatMessage(messages.notPlayedYet) }} </template>
 					</div>
-					<template v-if="instancePath">
+					<template v-if="instanceId">
 						•
 						<router-link
 							class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
-							:to="`/instance/${instancePath}`"
+							:to="`/instance/${instanceId}`"
 						>
 							<Avatar
 								:src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
 								size="16px"
-								:tint-by="instancePath"
+								:tint-by="instanceId"
 								class="shrink-0"
 							/>
 							<span class="truncate">{{ instanceName }}</span>
@@ -420,14 +456,14 @@ const messages = defineMessages({
 						:options="[
 							{
 								id: 'play-instance',
-								shown: !!instancePath,
+								shown: !!instanceId,
 								disabled: playingInstance,
 								action: () => emit('play-instance'),
 							},
 							{
 								id: 'open-instance',
-								shown: !!instancePath,
-								action: () => router.push(encodeURI(`/instance/${instancePath}`)),
+								shown: !!instanceId,
+								action: () => router.push(`/instance/${encodeURIComponent(instanceId)}`),
 							},
 							{
 								id: 'refresh',
@@ -442,7 +478,7 @@ const messages = defineMessages({
 							{
 								id: 'edit',
 								action: () => emit('edit'),
-								shown: !instancePath,
+								shown: !instanceId,
 								disabled: locked || managed,
 								tooltip: locked
 									? formatMessage(messages.worldInUse)
@@ -457,14 +493,14 @@ const messages = defineMessages({
 							},
 							{
 								divider: true,
-								shown: !!instancePath,
+								shown: !!instanceId,
 							},
 							{
 								id: 'dont-show-on-home',
-								shown: !!instancePath,
+								shown: !!instanceId,
 								action: () => {
 									set_world_display_status(
-										instancePath,
+										instanceId,
 										world.type,
 										getWorldIdentifier(world),
 										'hidden',
@@ -474,15 +510,20 @@ const messages = defineMessages({
 								},
 							},
 							{
+								id: 'create-shortcut',
+								shown: !!shortcutInstanceId,
+								action: () => createShortcut(),
+							},
+							{
 								divider: true,
-								shown: !instancePath,
+								shown: !instanceId,
 							},
 							{
 								id: 'delete',
 								color: 'red',
 								hoverFilled: true,
 								action: () => emit('delete'),
-								shown: !instancePath,
+								shown: !instanceId,
 								disabled: locked || managed,
 								tooltip: locked
 									? formatMessage(messages.worldInUse)
@@ -516,6 +557,10 @@ const messages = defineMessages({
 						<template #refresh>
 							<UpdatedIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.refreshButton) }}
+						</template>
+						<template #create-shortcut>
+							<ExternalIcon aria-hidden="true" />
+							{{ formatMessage(messages.createShortcut) }}
 						</template>
 						<template #dont-show-on-home>
 							<XIcon aria-hidden="true" />

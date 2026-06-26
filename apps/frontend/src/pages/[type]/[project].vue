@@ -1125,7 +1125,7 @@ import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
@@ -2932,6 +2932,10 @@ provideProjectPageContext({
 	> div {
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 	}
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>
 

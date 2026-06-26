@@ -2,6 +2,57 @@ import type { RawDecimal } from '../../utils/types'
 import type { ISO3166 } from '../iso3166/types'
 
 export namespace Labrinth {
+	export namespace Content {
+		export namespace v3 {
+			export type ContentType =
+				| 'mod'
+				| 'plugin'
+				| 'datapack'
+				| 'resourcepack'
+				| 'shader'
+				| 'modpack'
+
+			export type ResolutionPreferences = {
+				game_versions?: string[]
+				loaders?: string[]
+			}
+
+			export type ResolveContentRequest = {
+				project_id: string
+				version_id?: string | null
+				content_type: ContentType
+				selected?: ResolutionPreferences
+				target?: ResolutionPreferences
+				existing_project_ids?: string[]
+			}
+
+			export type ResolveContentPlan = {
+				primary: ResolvedContent
+				dependencies: ResolvedContent[]
+				skipped: SkippedContent[]
+			}
+
+			export type ResolvedContent = {
+				project_id: string
+				version_id: string
+				dependent_on_version_id?: string | null
+			}
+
+			export type SkippedContent = {
+				project_id: string
+				version_id?: string | null
+				dependent_on_version_id?: string | null
+				reason:
+					| 'already_installed'
+					| 'duplicate_project'
+					| 'conflicting_dependency'
+					| 'no_compatible_version'
+					| 'missing_version'
+					| 'quilt_fabric_api'
+			}
+		}
+	}
+
 	export namespace Campaign {
 		export namespace Internal {
 			export type CampaignInfo = {
@@ -695,6 +746,23 @@ export namespace Labrinth {
 				session: string
 			}
 
+			export type ValidateCreateAccountRequest = {
+				username: string
+				password: string
+				email: string
+			}
+
+			export type CreateOAuthAccountRequest = {
+				username: string
+				state: string
+				challenge: string
+				sign_up_newsletter: boolean
+			}
+
+			export type CreateOAuthAccountResponse = {
+				session: string
+			}
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string
@@ -704,6 +772,38 @@ export namespace Labrinth {
 				flow?: string
 				old_password?: string
 				new_password?: string
+			}
+
+			export type Passkey = {
+				id: string
+				name: string
+				created_at: string
+				last_used: string | null
+			}
+
+			export type PasskeyRegisterStartResponse = {
+				options: Record<string, unknown>
+				flow: string
+			}
+
+			export type PasskeyRegisterFinishRequest = {
+				flow: string
+				name: string
+				credential: unknown
+			}
+
+			export type PasskeyAuthenticateStartResponse = {
+				options: Record<string, unknown>
+				flow: string
+			}
+
+			export type PasskeyAuthenticateFinishRequest = {
+				flow: string
+				credential: unknown
+			}
+
+			export type PasskeyRenameRequest = {
+				name: string
 			}
 		}
 	}

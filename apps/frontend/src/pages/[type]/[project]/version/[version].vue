@@ -16,23 +16,54 @@
 			:header="formatMessage(messages.packageDataPackHeader)"
 		>
 			<div class="flex max-w-[35rem] flex-col">
-				<p class="m-0 mb-4">
+				<p class="m-0 mb-6">
 					{{ formatMessage(messages.packageDataPackDescription) }}
 				</p>
-				<label for="package-mod-loaders" class="mb-2 flex flex-col gap-1">
+				<div for="package-mod-loaders" class="mb-2 flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
 						formatMessage(messages.modLoadersLabel)
 					}}</span>
+					<MultiSelect
+						id="package-mod-loaders"
+						v-model="packageLoaders"
+						:options="packageLoaderOptions"
+						:searchable="false"
+						:placeholder="formatMessage(messages.modLoadersPlaceholder)"
+					>
+						<template #input-content="{ selectedOptions, isOpen, openDirection }">
+							<div class="flex min-h-8 min-w-0 flex-1 flex-wrap items-center gap-1.5 pr-1">
+								<template v-if="selectedOptions.length > 0">
+									<span
+										v-for="{ value: loader, label } in selectedOptions"
+										:key="`package-loader-tag-${loader}`"
+										class="inline-flex cursor-pointer items-center gap-1 rounded-full border border-solid bg-surface-4 px-2 py-1 text-sm font-medium transition-all hover:brightness-[110%]"
+										:style="`color: var(--color-platform-${loader})`"
+										@click.stop="packageLoaders = packageLoaders.filter((x) => x !== loader)"
+									>
+										<component
+											:is="getLoaderIcon(loader)"
+											v-if="getLoaderIcon(loader)"
+											class="size-3.5 shrink-0"
+										/>
+										{{ label }}
+										<XIcon aria-hidden="true" class="size-3.5 shrink-0" />
+									</span>
+								</template>
+								<span v-else class="text-base font-medium text-primary opacity-50">
+									{{ formatMessage(messages.modLoadersPlaceholder) }}
+								</span>
+							</div>
+							<ChevronLeftIcon
+								class="ml-2 size-5 shrink-0 text-secondary transition-transform duration-150"
+								:class="
+									isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+								"
+							/>
+						</template>
+					</MultiSelect>
 					<span>{{ formatMessage(messages.modLoadersDescription) }}</span>
-				</label>
-				<MultiSelect
-					id="package-mod-loaders"
-					v-model="packageLoaders"
-					class="max-w-[20rem]"
-					:options="packageLoaderOptions"
-					:searchable="false"
-					:placeholder="formatMessage(messages.modLoadersPlaceholder)"
-				/>
+				</div>
+
 				<div class="ml-auto mt-4 flex items-center gap-2">
 					<ButtonStyled type="outlined">
 						<button @click="packageModal?.hide()">
@@ -82,6 +113,7 @@
 				<VersionPage
 					:version="version"
 					:enrichment="enrichment"
+					:enrichment-loading="dependenciesLoading"
 					:members="members"
 					:user-link-creator="(user) => (moderator ? `/user/${user.id}` : undefined)"
 					:dependency-link-creator="createDependencyLink"
@@ -191,7 +223,7 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</template>
-						<ButtonStyled v-else type="outlined" circular>
+						<ButtonStyled type="outlined" circular>
 							<OverflowMenu
 								v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
 								:options="[
@@ -201,12 +233,38 @@
 										action: () =>
 											auth.user ? reportVersion(version!.id) : navigateTo(signInRouteObj),
 									},
+									{ divider: true, shown: flags.developerMode },
+									{
+										id: 'copy-id',
+										action: () => copyToClipboard(version!.id),
+										shown: flags.developerMode,
+									},
+									{
+										id: 'copy-permalink',
+										action: () =>
+											copyToClipboard(
+												`https://modrinth.com/project/${project.id}/version/${version!.id}`,
+											),
+										shown: flags.developerMode,
+									},
 								]"
 							>
 								<MoreVerticalIcon />
 								<template #report>
 									<ReportIcon aria-hidden="true" />
 									{{ formatMessage(commonMessages.reportButton) }}
+								</template>
+								<template #copy-link>
+									<ReportIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.reportButton) }}
+								</template>
+								<template #copy-id>
+									<ClipboardCopyIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.copyIdButton) }}
+								</template>
+								<template #copy-permalink>
+									<ClipboardCopyIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.copyPermalinkButton) }}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -374,7 +432,7 @@
 				</pre
 				>
 			</template>
-			<template v-else>
+			<template v-else-if="showVersionSkeleton">
 				<div class="flex flex-col gap-4 pb-[30rem]">
 					<div
 						class="mt-4 flex h-[8rem] w-full animate-pulse items-center justify-center rounded-2xl bg-surface-3"
@@ -401,11 +459,13 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	ChevronLeftIcon,
+	ClipboardCopyIcon,
 	CopyIcon,
 	DownloadIcon,
 	DropdownIcon,
 	ExternalIcon,
 	FileIcon,
+	getLoaderIcon,
 	InfoIcon,
 	MoreVerticalIcon,
 	PackageClosedIcon,
@@ -439,10 +499,12 @@ import {
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { onServerPrefetch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
-import { STALE_TIME } from '~/composables/queries/project'
+import { getSignInRouteObj } from '~/composables/auth.ts'
+import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
+import { versionQueryOptions } from '~/composables/queries/version'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
@@ -472,6 +534,7 @@ const {
 	versionsLoading,
 	loadVersions,
 	dependencies: contextDependencies,
+	dependenciesLoading,
 	loadDependencies,
 	invalidate,
 	cdnDownloadReason,
@@ -495,26 +558,31 @@ const signInRouteObj = computed(() => getSignInRouteObj(route))
 const versionRouteParam = computed(() => route.params.version as string)
 const isLatestRoute = computed(() => versionRouteParam.value === 'latest')
 
+function filterVersionsForLatestRoute(allVersions: Labrinth.Versions.v3.Version[]) {
+	let filtered = allVersions
+
+	const loaderFilter = route.query.loader
+	if (typeof loaderFilter === 'string') {
+		filtered = filtered.filter((x) => x.loaders.includes(loaderFilter))
+	}
+
+	const gameVersionFilter = route.query.version
+	if (typeof gameVersionFilter === 'string') {
+		filtered = filtered.filter((x) => x.game_versions.includes(gameVersionFilter))
+	}
+
+	return filtered
+}
+
 const latestVersionId = computed(() => {
 	if (!isLatestRoute.value) {
 		return null
 	}
 
-	let allVersions = versions.value ?? []
+	const filtered = filterVersionsForLatestRoute(versions.value ?? [])
+	if (filtered.length === 0) return null
 
-	const loaderFilter = route.query.loader
-	if (typeof loaderFilter === 'string') {
-		allVersions = allVersions.filter((x) => x.loaders.includes(loaderFilter))
-	}
-
-	const gameVersionFilter = route.query.version
-	if (typeof gameVersionFilter === 'string') {
-		allVersions = allVersions.filter((x) => x.game_versions.includes(gameVersionFilter))
-	}
-
-	if (allVersions.length === 0) return null
-
-	return allVersions.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
+	return filtered.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
 })
 
 const versionLookupKey = computed(() =>
@@ -525,6 +593,7 @@ const {
 	data: version,
 	refetch: refetchVersion,
 	error: versionError,
+	isPending: versionPending,
 } = useQuery({
 	queryKey: computed(
 		() => ['project', project.value.id, 'version', 'v3', versionLookupKey.value] as const,
@@ -533,6 +602,30 @@ const {
 		client.labrinth.versions_v3.getVersionFromIdOrNumber(project.value.id, versionLookupKey.value!),
 	enabled: computed(() => !!project.value.id && !!versionLookupKey.value),
 	staleTime: STALE_TIME,
+})
+
+const showVersionSkeleton = computed(() => import.meta.client && versionPending.value)
+
+onServerPrefetch(async () => {
+	if (!project.value.id) return
+
+	let lookupKey = versionRouteParam.value
+
+	if (isLatestRoute.value) {
+		loadVersions()
+		const versionsData = await queryClient.ensureQueryData(
+			projectQueryOptions.versionsV3(project.value.id, client),
+		)
+		const filtered = filterVersionsForLatestRoute(versionsData ?? [])
+		if (filtered.length === 0) return
+		lookupKey = filtered.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
+	}
+
+	if (!lookupKey || lookupKey === 'latest') return
+
+	await queryClient.ensureQueryData(
+		versionQueryOptions.fromProject(project.value.id, lookupKey, client),
+	)
 })
 
 watch(
@@ -675,6 +768,7 @@ const createDataPackVersionMutation = useMutation({
 			game_versions: version.value.game_versions,
 			loaders: packageLoaders.value,
 			featured: version.value.featured,
+			environment: 'server_only',
 		}
 
 		const uploadHandle = client.labrinth.versions_v3.createVersion(draftVersion, [{ file }], 'mod')
@@ -795,7 +889,7 @@ const messages = defineMessages({
 	},
 	packageDataPackHeader: {
 		id: 'version.package-as-mod.header',
-		defaultMessage: 'Packaging data pack as a mod',
+		defaultMessage: 'Package data pack as mod',
 	},
 	packageDataPackDescription: {
 		id: 'version.package-as-mod.description',

@@ -152,12 +152,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tillgänglig version matchar {compatibilityLabel}. Välj en version att installera ändå. Beroenden kommer inte installeras automatiskt."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installerar modpaket..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."
   },
@@ -233,12 +227,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Utforska servrar"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' kommer ** tas bort permanent**, och det kommer inte finnas något sätt att återskapa den."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Är du säker på att du vill permanent radera denna värld?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Moddad"
   },
@@ -257,20 +245,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Inga servrar eller världar tillagda"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' kommer bli borttagen från din lista, inklusive i spelet, och det kommer inte finnas något sätt att återskapa den."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) kommer bli borttagen från din lista, inklusive i spelet, och det kommer inte finnas något sätt att återskapa den."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Är du säker på att du vill radera {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Sök {count} världar..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "denna server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Innehåll krävs"

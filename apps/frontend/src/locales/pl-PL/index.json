@@ -779,38 +779,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Wprowadź kod..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Zapomniałeś hasła?</forgot-password-link> • <create-account-link>Utwórz konto</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Zaloguj się przez"
   },
   "auth.sign-in.title": {
     "message": "Zaloguj się"
   },
-  "auth.sign-in.use-password": {
-    "message": "Lub użyj hasła"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Utwórz konto"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Tworząc konto, wyrażasz zgodę na <terms-link>Warunki</terms-link> i <privacy-policy-link>Politykę Prywatności</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Hasła się różnią!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Masz już konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Otrzymuj aktualności o Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Zarejestruj się"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Lub utwórz własne konto"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Zarejestruj się przez"
@@ -844,21 +826,6 @@
   },
   "auth.verify-email.title": {
     "message": "Zweryfikuj e-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Otrzymuj aktualności o Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Teraz jesteś częścią wspaniałej społeczności twórców i odkrywców, którzy już tworzą, pobierają i na bieżąco korzystają z niesamowitych modów."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Przez stworzenie konta, zgadzasz się na nasze<terms-link>Warunki</terms-link> oraz <privacy-policy-link>Politykę prywatności</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Witaj w Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Witaj"
   },
   "collection.button.edit-icon": {
     "message": "Edytuj ikonę"

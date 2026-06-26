@@ -477,7 +477,7 @@
 					v-if="organizations?.length > 0"
 					class="mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 pt-3"
 				>
-					<h2 class="m-0 mb-2 text-lg text-contrast">
+					<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
 					<div class="flex flex-wrap gap-2">
@@ -561,7 +561,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { projectUserSorting } from '~/utils/projects.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
 import { hasActiveMidas, hasPride26Badge } from '~/utils/user-membership.ts'
@@ -1039,5 +1039,9 @@ export default defineNuxtComponent({
 			}
 		}
 	}
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>

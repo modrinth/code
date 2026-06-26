@@ -734,38 +734,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "输入验证码…"
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>忘记密码？</forgot-password-link> • <create-account-link>创建新账户</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "通过以下方式登录"
   },
   "auth.sign-in.title": {
     "message": "登录"
   },
-  "auth.sign-in.use-password": {
-    "message": "或使用密码"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "创建账户"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "创建账户即表示你同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "密码不一致！"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "已有账户？"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "订阅有关 Modrinth 更新的邮件"
-  },
   "auth.sign-up.title": {
     "message": "注册"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "或者自己创建一个账户"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "通过以下方式注册"
@@ -799,21 +781,6 @@
   },
   "auth.verify-email.title": {
     "message": "验证电子邮箱"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "订阅有关 Modrinth 的更新邮件"
-  },
-  "auth.welcome.description": {
-    "message": "你现在是这个超棒社区的一员了——与创作者和社区玩家们一起创作、探索、获取模组并持续追踪最新的精彩模组动态吧。"
-  },
-  "auth.welcome.label.tos": {
-    "message": "创建账户即表示你已同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
-  },
-  "auth.welcome.long-title": {
-    "message": "欢迎来到 Modrinth！"
-  },
-  "auth.welcome.title": {
-    "message": "欢迎"
   },
   "collection.button.edit-icon": {
     "message": "编辑图标"

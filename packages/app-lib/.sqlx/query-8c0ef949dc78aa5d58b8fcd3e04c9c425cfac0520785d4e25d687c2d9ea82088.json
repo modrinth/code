@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instances\n\t\tSET recent_time_played = recent_time_played + ?, modified = ?\n\t\tWHERE id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "8c0ef949dc78aa5d58b8fcd3e04c9c425cfac0520785d4e25d687c2d9ea82088"
+}

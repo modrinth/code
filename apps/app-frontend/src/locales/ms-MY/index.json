@@ -146,12 +146,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Tiada versi tersedia yang sepadan dengan {compatibilityLabel}. Pilih versi untuk dipasang juga. Kebergantungan tidak akan dipasang secara automatik."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Sedang memasang pek mod..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan keterangan pek mod..."
   },
@@ -227,12 +221,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Layari pelayan"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' akan **dipadamkan secara kekal**, dan tiada cara untuk memulihkannya."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Adakah anda pasti mahu memadamkan dunia ini secara kekal?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Diubah Suai"
   },
@@ -251,20 +239,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Tiada pelayan atau dunia ditambah"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' akan dialih keluar daripada senarai anda, termasuk dalam permainan, dan tiada cara untuk memulihkannya."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) akan dialih keluar daripada senarai anda, termasuk dalam permainan, dan tiada cara untuk memulihkannya."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Adakah anda pasti mahu mengalih keluar {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "pelayan ini"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Kandungan yang diperlukan"

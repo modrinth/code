@@ -7,9 +7,9 @@ use io::IOError;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    event::{
-        LoadingBarId,
-        emit::{emit_loading, init_or_edit_loading},
+    install::{
+        InstallPhaseDetails, InstallPhaseId, InstallProgress,
+        InstallProgressReporter,
     },
     util::{
         fetch::{self, IoSemaphore},
@@ -114,23 +114,43 @@ pub async fn get_importable_instances(
     Ok(instances)
 }
 
-// Import an instance from a launcher type and base path
-// Note: this *deletes* the submitted empty profile
-
-// #[tracing::instrument]
-pub async fn import_instance(
-    profile_path: &str, // This should be a blank profile
+pub(crate) async fn import_instance_with_reporter(
+    instance_id: &str,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
+    reporter: InstallProgressReporter,
+) -> crate::Result<()> {
+    import_instance_inner(
+        instance_id,
+        launcher_type,
+        base_path,
+        instance_folder,
+        reporter,
+    )
+    .await
+}
+
+async fn import_instance_inner(
+    instance_id: &str,
+    launcher_type: ImportLauncherType,
+    base_path: PathBuf,
+    instance_folder: String,
+    reporter: InstallProgressReporter,
 ) -> crate::Result<()> {
     tracing::debug!("Importing instance from {instance_folder}");
+    let details = InstallPhaseDetails::Import {
+        launcher_type,
+        instance_folder: instance_folder.clone(),
+    };
     let res = match launcher_type {
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
                 base_path,       // path to base mmc folder
                 instance_folder, // instance folder in mmc_base_path
-                profile_path,    // path to profile
+                instance_id,
+                reporter.clone(),
+                details.clone(),
             )
             .await
         }
@@ -138,21 +158,27 @@ pub async fn import_instance(
             atlauncher::import_atlauncher(
                 base_path,       // path to atlauncher folder
                 instance_folder, // instance folder in atlauncher
-                profile_path,    // path to profile
+                instance_id,
+                reporter.clone(),
+                details.clone(),
             )
             .await
         }
         ImportLauncherType::GDLauncher => {
             gdlauncher::import_gdlauncher(
                 base_path.join("instances").join(instance_folder), // path to gdlauncher folder
-                profile_path, // path to profile
+                instance_id,
+                reporter.clone(),
+                details.clone(),
             )
             .await
         }
         ImportLauncherType::Curseforge => {
             curseforge::import_curseforge(
                 base_path.join("Instances").join(instance_folder), // path to curseforge folder
-                profile_path, // path to profile
+                instance_id,
+                reporter.clone(),
+                details.clone(),
             )
             .await
         }
@@ -172,11 +198,12 @@ pub async fn import_instance(
                     && instances.contains(&instance_folder)
                 {
                     matched = true;
-                    Box::pin(import_instance(
-                        profile_path,
+                    Box::pin(import_instance_inner(
+                        instance_id,
                         lt,
                         base_path,
                         instance_folder,
+                        reporter.clone(),
                     ))
                     .await?;
                     break;
@@ -198,7 +225,7 @@ pub async fn import_instance(
         Ok(_) => {}
         Err(e) => {
             tracing::warn!("Import failed: {:?}", e);
-            let _ = crate::api::profile::remove(profile_path).await;
+            let _ = crate::api::instance::remove(instance_id).await;
             return Err(e);
         }
     }
@@ -339,33 +366,19 @@ pub async fn recache_icon(
     }
 }
 
-pub async fn copy_dotminecraft(
-    profile_path_id: &str,
+pub(crate) async fn copy_dotminecraft_with_reporter(
+    instance_id: &str,
     dotminecraft: PathBuf,
     io_semaphore: &IoSemaphore,
-    existing_loading_bar: Option<LoadingBarId>,
-) -> crate::Result<LoadingBarId> {
-    // Get full path to profile
-    let profile_path =
-        crate::api::profile::get_full_path(profile_path_id).await?;
-
-    // Gets all subfiles recursively in src
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
+) -> crate::Result<()> {
+    let instance_path =
+        crate::api::instance::get_full_path(instance_id).await?;
     let subfiles = get_all_subfiles(&dotminecraft, false).await?;
     let total_subfiles = subfiles.len() as u64;
 
-    let loading_bar = init_or_edit_loading(
-        existing_loading_bar,
-        crate::LoadingBarType::CopyProfile {
-            import_location: dotminecraft.clone(),
-            profile_name: profile_path_id.to_string(),
-        },
-        total_subfiles as f64,
-        "Copying files in profile",
-    )
-    .await?;
-
-    // Copy each file
-    for src_child in subfiles {
+    for (index, src_child) in subfiles.into_iter().enumerate() {
         let dst_child =
             src_child.strip_prefix(&dotminecraft).map_err(|_| {
                 crate::ErrorKind::InputError(format!(
@@ -373,16 +386,51 @@ pub async fn copy_dotminecraft(
                     &src_child.display()
                 ))
             })?;
-        let dst_child = profile_path.join(dst_child);
+        let dst_child = instance_path.join(dst_child);
 
-        // sleep for cpu for 1 millisecond
         tokio::time::sleep(std::time::Duration::from_millis(1)).await;
 
         fetch::copy(&src_child, &dst_child, io_semaphore).await?;
-
-        emit_loading(&loading_bar, 1.0, None)?;
+        reporter
+            .update(
+                InstallPhaseId::PreparingInstance,
+                Some(InstallProgress {
+                    current: (index + 1) as u64,
+                    total: total_subfiles,
+                    secondary: None,
+                }),
+                details.clone(),
+            )
+            .await?;
     }
-    Ok(loading_bar)
+
+    Ok(())
+}
+
+pub(crate) async fn finish_import(
+    instance_id: &str,
+    dotminecraft: PathBuf,
+    io_semaphore: &IoSemaphore,
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
+) -> crate::Result<()> {
+    copy_dotminecraft_with_reporter(
+        instance_id,
+        dotminecraft,
+        io_semaphore,
+        reporter.clone(),
+        details,
+    )
+    .await?;
+
+    crate::launcher::install_minecraft_for_instance_id_with_reporter(
+        instance_id,
+        false,
+        Some(reporter),
+    )
+    .await?;
+
+    Ok(())
 }
 
 /// Recursively get a list of all subfiles in src
