@@ -216,13 +216,18 @@
 				</template>
 				<template #cell-name="{ row: project }">
 					<nuxt-link class="project-name-cell" :to="getProjectUrl(project)">
-						<Avatar
-							class="shrink-0"
-							:src="project.icon_url"
-							aria-hidden="true"
-							:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
-							no-shadow
-						/>
+						<span
+							v-tooltip="project.title"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<img
+								v-if="project.icon_url"
+								:src="project.icon_url"
+								:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
+								class="h-6 w-6 rounded object-cover"
+							/>
+							<BoxIcon v-else class="h-full w-full" />
+						</span>
 						<span class="project-title">
 							<IssuesIcon
 								v-if="project.moderator_message"
@@ -281,6 +286,7 @@
 
 <script setup>
 import {
+	BoxIcon,
 	EditIcon,
 	IssuesIcon,
 	PlusIcon,
@@ -291,7 +297,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Avatar,
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
