@@ -627,6 +627,7 @@ pub(crate) async fn rename_instance_file(
 			relative_path = ?,
 			file_name = ?,
 			enabled = ?,
+			missing = 0,
 			modified_at = ?
 		WHERE instance_id = ? AND relative_path = ?
 		",
@@ -856,11 +857,11 @@ pub(crate) async fn set_content_entry_enabled_for_file(
     file_id: &str,
     enabled: bool,
     pool: &SqlitePool,
-) -> crate::Result<()> {
+) -> crate::Result<bool> {
     let enabled = i64::from(enabled);
     let modified_at = Utc::now().timestamp();
 
-    sqlx::query!(
+    let result = sqlx::query!(
         "
 		UPDATE instance_content_entries
 		SET enabled = ?, modified_at = ?
@@ -874,7 +875,7 @@ pub(crate) async fn set_content_entry_enabled_for_file(
     .execute(pool)
     .await?;
 
-    Ok(())
+    Ok(result.rows_affected() > 0)
 }
 
 pub(crate) async fn remove_content_entries_for_file(
