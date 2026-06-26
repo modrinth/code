@@ -106,7 +106,7 @@
 		</template>
 
 		<template #cell-gameVersions="{ row: version }">
-			<div class="flex flex-wrap gap-1">
+			<div class="flex flex-wrap gap-1 w-fit">
 				<TagItem
 					v-for="gameVersion in getDisplayGameVersions(version).slice(0, MAX_GAME_VERSION_TAGS)"
 					:key="`version-tag-${gameVersion}`"
@@ -142,7 +142,7 @@
 		</template>
 
 		<template #cell-platforms="{ row: version }">
-			<div class="flex flex-wrap gap-1">
+			<div class="flex flex-wrap gap-1 w-fit">
 				<template v-if="version.noModLoader">
 					<TagItem class="border !border-solid border-surface-5"> No mod loader </TagItem>
 				</template>
@@ -455,7 +455,7 @@ const formatDateTime = useFormatDateTime({
 })
 const formatBytes = useFormatBytes()
 
-const MAX_GAME_VERSION_TAGS = 4
+const MAX_GAME_VERSION_TAGS = 5
 const MAX_PLATFORM_TAGS = 3
 
 type VersionWithDisplayUrlEnding = Version & {
@@ -520,19 +520,17 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		{
 			key: 'name',
 			label: 'Name',
-			cellClass: '!overflow-visible py-3 pr-4 min-w-[5rem]',
+			cellClass: '!overflow-visible py-3 pr-4 min-w-[7rem]',
 		},
 		{
 			key: 'gameVersions',
 			label: 'Game version',
-			width: '20%',
-			cellClass: visibleCellClass,
+			cellClass: '!overflow-visible py-3 align-middle pr-2.5 w-fit max-w-[10rem]',
 		},
 		{
 			key: 'platforms',
 			label: 'Platforms',
-			width: '20%',
-			cellClass: visibleCellClass,
+			cellClass: '!overflow-visible py-3 align-middle pr-2.5 w-fit max-w-[10rem]',
 		},
 	]
 
