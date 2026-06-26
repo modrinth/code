@@ -108,7 +108,7 @@
 		<template #cell-gameVersions="{ row: version }">
 			<div class="flex flex-wrap gap-1">
 				<TagItem
-					v-for="gameVersion in getDisplayGameVersions(version).slice(0, maxGameVersionTags)"
+					v-for="gameVersion in getDisplayGameVersions(version).slice(0, MAX_GAME_VERSION_TAGS)"
 					:key="`version-tag-${gameVersion}`"
 					v-tooltip="`Toggle filter for ${gameVersion}`"
 					data-no-row-click
@@ -117,19 +117,19 @@
 					{{ gameVersion }}
 				</TagItem>
 				<Menu
-					v-if="getDisplayGameVersions(version).length > maxGameVersionTags"
+					v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
 					data-no-row-click
 					:delay="{ hide: 50, show: 0 }"
 					no-auto-focus
 					class="cursor-default"
 				>
 					<TagItem tabindex="0">
-						+{{ getDisplayGameVersions(version).length - maxGameVersionTags }}
+						+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
 					</TagItem>
 					<template #popper>
 						<div class="flex max-w-[20rem] flex-wrap gap-1">
 							<TagItem
-								v-for="gameVersion in getDisplayGameVersions(version).slice(maxGameVersionTags)"
+								v-for="gameVersion in getDisplayGameVersions(version).slice(MAX_GAME_VERSION_TAGS)"
 								:key="`overflow-version-tag-${gameVersion}`"
 								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 							>
@@ -148,7 +148,7 @@
 				</template>
 				<template v-else>
 					<TagItem
-						v-for="platform in version.loaders"
+						v-for="platform in version.loaders.slice(0, MAX_PLATFORM_TAGS)"
 						:key="`platform-tag-${platform}`"
 						v-tooltip="`Toggle filter for ${platform}`"
 						data-no-row-click
@@ -158,6 +158,28 @@
 						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
 						<FormattedTag :tag="platform" enforce-type="loader" />
 					</TagItem>
+					<Menu
+						v-if="version.loaders.length > MAX_PLATFORM_TAGS"
+						data-no-row-click
+						:delay="{ hide: 50, show: 0 }"
+						no-auto-focus
+						class="cursor-default"
+					>
+						<TagItem tabindex="0"> +{{ version.loaders.length - MAX_PLATFORM_TAGS }} </TagItem>
+						<template #popper>
+							<div class="flex max-w-[20rem] flex-wrap gap-1">
+								<TagItem
+									v-for="platform in version.loaders.slice(MAX_PLATFORM_TAGS)"
+									:key="`overflow-platform-tag-${platform}`"
+									:style="`--_color: var(--color-platform-${platform})`"
+									:action="() => versionFilters?.toggleFilter('platform', platform)"
+								>
+									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+									<FormattedTag :tag="platform" enforce-type="loader" />
+								</TagItem>
+							</div>
+						</template>
+					</Menu>
 				</template>
 			</div>
 		</template>
@@ -269,7 +291,10 @@
 					<div class="flex flex-col justify-center gap-3">
 						<div class="flex flex-row flex-wrap items-center gap-1.5">
 							<TagItem
-								v-for="gameVersion in getDisplayGameVersions(version).slice(0, maxGameVersionTags)"
+								v-for="gameVersion in getDisplayGameVersions(version).slice(
+									0,
+									MAX_GAME_VERSION_TAGS,
+								)"
 								:key="`version-tag-${gameVersion}`"
 								v-tooltip="`Toggle filter for ${gameVersion}`"
 								class="smart-clickable:allow-pointer-events"
@@ -278,19 +303,19 @@
 								{{ gameVersion }}
 							</TagItem>
 							<Menu
-								v-if="getDisplayGameVersions(version).length > maxGameVersionTags"
+								v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
 								:delay="{ hide: 50, show: 0 }"
 								no-auto-focus
 								class="cursor-default smart-clickable:allow-pointer-events"
 							>
 								<TagItem tabindex="0">
-									+{{ getDisplayGameVersions(version).length - maxGameVersionTags }}
+									+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
 								</TagItem>
 								<template #popper>
 									<div class="flex max-w-[20rem] flex-wrap gap-1">
 										<TagItem
 											v-for="gameVersion in getDisplayGameVersions(version).slice(
-												maxGameVersionTags,
+												MAX_GAME_VERSION_TAGS,
 											)"
 											:key="`overflow-version-tag-${gameVersion}`"
 											:action="
@@ -307,7 +332,7 @@
 							</template>
 							<template v-else>
 								<TagItem
-									v-for="platform in version.loaders"
+									v-for="platform in version.loaders.slice(0, MAX_PLATFORM_TAGS)"
 									:key="`platform-tag-${platform}`"
 									v-tooltip="`Toggle filter for ${platform}`"
 									class="smart-clickable:allow-pointer-events"
@@ -317,6 +342,29 @@
 									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
 									<FormattedTag :tag="platform" enforce-type="loader" />
 								</TagItem>
+								<Menu
+									v-if="version.loaders.length > MAX_PLATFORM_TAGS"
+									:delay="{ hide: 50, show: 0 }"
+									no-auto-focus
+									class="cursor-default smart-clickable:allow-pointer-events"
+								>
+									<TagItem tabindex="0">
+										+{{ version.loaders.length - MAX_PLATFORM_TAGS }}
+									</TagItem>
+									<template #popper>
+										<div class="flex max-w-[20rem] flex-wrap gap-1">
+											<TagItem
+												v-for="platform in version.loaders.slice(MAX_PLATFORM_TAGS)"
+												:key="`overflow-platform-tag-${platform}`"
+												:style="`--_color: var(--color-platform-${platform})`"
+												:action="() => versionFilters?.toggleFilter('platform', platform)"
+											>
+												<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+												<FormattedTag :tag="platform" enforce-type="loader" />
+											</TagItem>
+										</div>
+									</template>
+								</Menu>
 							</template>
 							<template v-if="showEnvironmentColumn">
 								<TagItem
@@ -407,6 +455,9 @@ const formatDateTime = useFormatDateTime({
 })
 const formatBytes = useFormatBytes()
 
+const MAX_GAME_VERSION_TAGS = 4
+const MAX_PLATFORM_TAGS = 3
+
 type VersionWithDisplayUrlEnding = Version & {
 	displayUrlEnding: string
 	environment?: Labrinth.Projects.v3.Environment
@@ -473,13 +524,14 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		},
 		{
 			key: 'gameVersions',
-			width: '18%',
 			label: 'Game version',
+			width: '20%',
 			cellClass: visibleCellClass,
 		},
 		{
 			key: 'platforms',
 			label: 'Platforms',
+			width: '20%',
 			cellClass: visibleCellClass,
 		},
 	]
@@ -497,11 +549,13 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 			key: 'published',
 			label: 'Published',
 			cellClass: '!overflow-visible align-middle pr-2.5 w-max',
+			width: '12%',
 		},
 		{
 			key: 'downloads',
 			label: 'Downloads',
 			cellClass: '!overflow-visible align-middle',
+			width: '12%',
 		},
 		{
 			key: 'actions',
@@ -561,8 +615,6 @@ const normalizedVersions = computed<DisplayVersion[]>(() =>
 		}
 	}),
 )
-
-const maxGameVersionTags = 6
 
 const currentPage: Ref<number> = ref(1)
 const pageSize: Ref<number> = ref(20)

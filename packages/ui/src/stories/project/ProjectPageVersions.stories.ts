@@ -42,7 +42,7 @@ const versions: StoryVersion[] = [
 		dependencies: [],
 		game_versions: ['1.21.4', '1.21.3', '1.21.1'],
 		version_type: 'release',
-		loaders: ['fabric', 'quilt'],
+		loaders: ['fabric', 'quilt', 'forge', 'neoforge'],
 		featured: true,
 		status: 'listed',
 		date_published: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
