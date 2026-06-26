@@ -6,7 +6,7 @@
 			:description="
 				formatMessage(messages.removePasskeyConfirmDescription, { name: passkeyToRemove?.name })
 			"
-			:proceed-label="formatMessage(commonMessages.removeButton)"
+			:proceed-label="formatMessage(messages.deletePasskeyButton)"
 			@proceed="removePasskey()"
 		/>
 
@@ -70,7 +70,7 @@
 							</ButtonStyled>
 							<ButtonStyled circular>
 								<button
-									v-tooltip="formatMessage(commonMessages.removeButton)"
+									v-tooltip="formatMessage(messages.deletePasskeyButton)"
 									@click="
 										() => {
 											passkeyToRemove = passkey
@@ -291,6 +291,10 @@ const messages = defineMessages({
 	renamePasskeyModalHeader: {
 		id: 'settings.account.security.passkey.rename-modal.header',
 		defaultMessage: 'Rename passkey',
+	},
+	deletePasskeyButton: {
+		id: 'settings.account.security.passkey.remove.button',
+		defaultMessage: 'Delete passkey',
 	},
 	removePasskeyConfirmTitle: {
 		id: 'settings.account.security.passkey.remove.title',

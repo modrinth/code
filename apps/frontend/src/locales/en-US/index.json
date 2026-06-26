@@ -4130,6 +4130,9 @@
   "settings.account.security.passkey.modal.no-passkeys": {
     "message": "You do not have any passkeys registered."
   },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Delete passkey"
+  },
   "settings.account.security.passkey.remove.description": {
     "message": "This will permanently remove the passkey \"{name}\". You will no longer be able to sign in with it."
   },
