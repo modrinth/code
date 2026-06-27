@@ -661,13 +661,31 @@ pub(crate) async fn toggle_disable_project(
         }
         None => index_existing_file(&scope, &new_path, state).await?,
     };
-    content_rows::set_content_entry_enabled_for_file(
+    let updated_entry = content_rows::set_content_entry_enabled_for_file(
         &scope.content_set_id,
         &file.id,
         enabled,
         &state.pool,
     )
     .await?;
+    if !updated_entry {
+        let project_type = ProjectType::get_from_parent_folder(&new_path)
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Unable to infer project type from {new_path}"
+                ))
+            })?;
+        upsert_entry_for_file(
+            &scope,
+            &file,
+            project_type,
+            None,
+            None,
+            ContentSourceKind::Local,
+            &state.pool,
+        )
+        .await?;
+    }
 
     Ok(new_path)
 }
