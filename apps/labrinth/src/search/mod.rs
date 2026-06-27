@@ -232,16 +232,22 @@ impl FromStr for SearchBackendKind {
     }
 }
 
+/// Nullable fields in Typesense-bound documents should use
+/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
+/// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
     pub version_id: String,
     pub project_id: String,
     //
     pub project_types: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<String>,
     pub author: String,
     pub author_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub organization: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<String>,
     pub indexed_author: String,
     pub name: String,
@@ -252,9 +258,11 @@ pub struct UploadSearchProject {
     pub follows: i32,
     pub downloads: i32,
     pub log_downloads: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
     pub license: String,
     pub gallery: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub featured_gallery: Option<String>,
     /// RFC 3339 formatted creation date of the project
     pub date_created: DateTime<Utc>,
@@ -267,6 +275,7 @@ pub struct UploadSearchProject {
     /// Unix timestamp of the publication date of the version
     pub version_published_timestamp: i64,
     pub open_source: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<u32>,
     #[serde(default)]
     pub dependency_project_ids: Vec<String>,
@@ -285,12 +294,17 @@ pub struct UploadSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
+/// Nullable fields in Typesense-bound documents should use
+/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
+/// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SearchProjectDependency {
     pub project_id: String,
     pub dependency_type: DependencyType,
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
 }
 
