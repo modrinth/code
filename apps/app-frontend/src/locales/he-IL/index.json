@@ -8,6 +8,12 @@
   "app.action-bar.downloads": {
     "message": "הורדות"
   },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "החבא יותר התקנים רצים"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "הפוך למקרה ראשי"
+  },
   "app.action-bar.offline": {
     "message": "לא מקוון"
   },
@@ -113,12 +119,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "עיון בשרתים"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' יימחק לצמיתות, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "האם אתה בטוח שברצונך למחוק לצמיתות את העולם הזה?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "עם מודים"
   },
@@ -137,20 +137,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "אין שרתים אן עולמות שנוספו"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "אתה בטוח שאתה רוצה להסיר {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "חיפוש ב-{count} עולמות..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "השרת הזה"
   },
   "app.modal.install-to-play.content-required": {
     "message": "תוכן נדרש"
@@ -259,6 +247,9 @@
   },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count, plural, one {בקשת חברות אחת} other {# בקשות חברות}}"
   },
   "friends.add-friend.submit": {
     "message": "שליחת בקשת חברות"

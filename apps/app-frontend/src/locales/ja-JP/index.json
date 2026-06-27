@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Java {version} をダウンロード中"
   },
+  "app.action-bar.downloading-update": {
+    "message": "アップデートをダウンロード中"
+  },
   "app.action-bar.downloads": {
     "message": "ダウンロード"
   },
@@ -137,12 +140,6 @@
   "app.browse.server.installing": {
     "message": "インストール中"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modパックをインストール中..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
   },
@@ -212,12 +209,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "サーバーを探す"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' は **完全に削除**され、元に戻すことはできません。"
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "本当にこのワールドを完全に削除しますか？"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Mod導入済み"
   },
@@ -236,20 +227,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "サーバー、ワールドは追加されていません"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' はゲーム内を含むサーバーリストから削除され、元に戻すことはできません。"
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) はゲーム内を含むサーバーリストから削除され、元に戻すことはできません。"
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "本当に {name} を削除しますか？"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} 個のワールドを検索…"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "このサーバー"
   },
   "app.modal.install-to-play.content-required": {
     "message": "必須コンテンツ"
@@ -259,6 +238,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "インストール"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {#個のMod}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "必須のModパック"
@@ -308,6 +290,21 @@
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
   },
+  "app.skins.modal.arm-style-slim": {
+    "message": "スリム"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "ワイド"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "マント"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "マント"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "マントなし"
+  },
   "app.skins.modal.replace-texture-button": {
     "message": "置きかえる"
   },
@@ -316,6 +313,42 @@
   },
   "app.skins.preview.edit-button": {
     "message": "編集"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "ビルダーズ＆バイオーム"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "チェイス・ザ・スカイ"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth プライド"
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "マウント・オブ・メイヘム"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "保存済みのスキン"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "銅の時代"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "ガーデン・アウェイケンズ"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "タイニー・テイクオーバー"
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "ワクワクしている Modrinth ボット"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
@@ -364,6 +397,9 @@
   },
   "friends.action.add-friend": {
     "message": "フレンドを追加"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count}件の友達リクエスト"
   },
   "friends.add-friend.submit": {
     "message": "フレンド申請を送信"

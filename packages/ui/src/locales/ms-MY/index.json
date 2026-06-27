@@ -101,6 +101,15 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Projek yang dipilih"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Pasang {count, plural, other {# projek}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {# projek dipilih}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Anda telah memilih {count, plural, other {# projek}} untuk dipasang. Pasangnya sekarang atau kembali tanpa memasangnya."
+  },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Projek yang dipilih belum dipasang lagi"
   },
@@ -311,6 +320,9 @@
   "content.card.select-project": {
     "defaultMessage": "Pilih {project}"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Adakah anda pasti mahu mengemas kini {count, plural, other {# projek}} ke versi terkini yang serasi? Disyorkan untuk mengemas kini kandungan satu per satu."
+  },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Amaran kemas kini"
   },
@@ -319,6 +331,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Tahan Shift sambil mengklik \"Kemas kini semua\" untuk melangkau pengesahan ini pada masa akan datang."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Kemas kini {count, plural, other {# projek}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Pemadaman mod boleh menjejaskan dunia anda secara kekal dan mungkin menyebabkan kandungan yang hilang atau masalah yang tidak dijangka apabila ia dimuatkan semula."
@@ -532,6 +547,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "Import"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Import {count, plural, other {# pemasangan}}"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Sediakan pelayan"
@@ -1037,6 +1055,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Nama baharu"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, other {# item}}"
+  },
   "files.table-header.created": {
     "defaultMessage": "Dicipta"
   },
@@ -1234,6 +1255,9 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Masukkan negeri/wilayah"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, other {# bait}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1562,6 +1586,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod permainan yang tidak diketahui"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} {count, plural, other {pemasangan}} serasi"
+  },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Pemasangan sedia ada"
   },
@@ -1621,6 +1648,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Tiada projek yang sepadan dengan carian anda."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Cari {count, number} {count, plural, other {projek}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Semasa"
@@ -2351,29 +2381,77 @@
   "project-type.all": {
     "defaultMessage": "Semua"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {Pek Data}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Pek Data"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {pek data}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {Mod}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Mod"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {Pek Mod}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Pek Mod"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {pek mod}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {Pemalam}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Pemalam"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {pemalam}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, other {Projek}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Projek"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {projek}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {Pek Sumber}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Pek Sumber"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {pek sumber}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {Pelayan}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Pelayan"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {pelayan}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {Pembayang}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Pembayang"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {pembayang}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Persekitaran yang disokong"
@@ -2498,6 +2576,9 @@
   "project.about.tags.title": {
     "defaultMessage": "Tag"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {muat turun}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Diperlukan pada kedua-dua pelanggan dan pelayan."
   },
@@ -2564,8 +2645,20 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Persekitaran yang tidak diketahui"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {pengikut}}"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} dalam talian"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, other {pemain}} dalam talian"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}} daripada Modrinth dalam 2 minggu yang lalu"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Projek ini menggunakan pek mod tersuai"
@@ -3302,6 +3395,9 @@
   "servers.access-page.role.viewer": {
     "defaultMessage": "Terhad"
   },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Cari {count} {count, plural, other {pengguna}}..."
+  },
   "servers.access-role.editor": {
     "defaultMessage": "Penyunting"
   },
@@ -3373,6 +3469,9 @@
   },
   "servers.audit-log.event.modpack-unlinked-version": {
     "defaultMessage": "Pek mod versi <version></version> telah dinyahpautkan"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, number} CPU"
   },
   "servers.audit-log.event.server-plan.new-plan": {
     "defaultMessage": "pelan baharu"
@@ -3466,6 +3565,18 @@
   },
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Memulihkan daripada sandaran"
+  },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "{count, plural, other {Tindakan pukal untuk # sandaran yang dipilih}}"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "Sedang memadamkan {total, plural, other {# sandaran}}..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {# sandaran dipilih}}"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "Setelah dipadam, {count, plural, other {sandaran tersebut tidak boleh}} dipulihkan. Pemadaman adalah kekal."
   },
   "servers.backups.delete-modal.admonition-header": {
     "defaultMessage": "Amaran pemadaman"
@@ -3656,6 +3767,9 @@
   "servers.listing.new-label": {
     "defaultMessage": "Baharu"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Fail anda akan disimpan selama <days-remaining>{daysRemaining} {daysRemaining, plural, other {hari}} lagi</days-remaining>. Hubungi sokongan untuk memuat turun fail sebelum ia dipadamkan."
+  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Fail anda akan disimpan selama 30 hari selepas pembatalan."
   },
@@ -3770,6 +3884,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Berjaya"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Cari {count} {count, plural, other {pelayan}}..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3784,6 +3901,9 @@
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Pelayan anda"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "Tinggal <days-count>{days}</days-count> {days, plural, other {hari}} <hours-count>{hours}</hours-count> {hours, plural, other {jam}} <minutes-count>{minutes}</minutes-count> {minutes, plural, other {minit}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {saat}}..."
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Pelayan baharu"
@@ -4063,6 +4183,9 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Cari bahasa..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Tiada bahasa yang sepadan} other {Terdapat # bahasa yang sepadan}} dengan carian anda."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Tiada bahasa yang sepadan dengan carian anda."
@@ -4523,6 +4646,9 @@
   "time-frame-picker.end-date": {
     "defaultMessage": "Tarikh tamat"
   },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "Dalam {amount} {unit, select, hours {{amount, plural, other {jam}}} days {{amount, plural, other {hari}}} weeks {{amount, plural, other {minggu}}} months {{amount, plural, other {bulan}}} other {hari}} terakhir"
+  },
   "time-frame-picker.option.all-time": {
     "defaultMessage": "Sepanjang masa"
   },
@@ -4586,6 +4712,9 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Tinggalkan laman?"
   },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, other {# amaran}}"
+  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Ketepikan semua"
   },
@@ -4638,3 +4767,4 @@
     "defaultMessage": "Pasukan Modrinth"
   }
 }
+

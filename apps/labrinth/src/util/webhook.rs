@@ -198,13 +198,22 @@ impl PayoutSourceAlertType {
                 threshold,
                 current_balance,
             } => format!(
-                "\u{1f6a8} *Payout Source Alert*\n\nPayout source '{source}' has an available balance under the ${threshold} threshold.\nBalance: ${current_balance}."
+"\u{1f6a8} *Payout Source Alert*
+
+Payout source '{source}' has an available balance under the ${threshold} threshold.
+Balance: ${current_balance}."
             ),
             PayoutSourceAlertType::CheckFailure {
                 source,
                 display_error,
             } => format!(
-                "\u{1f6a8} *Payout Source Alert*\n\nFAILED TO CHECK payout source '{source}' balance.\nError: {display_error}"
+"\u{1f6a8} *Payout Source Alert*
+
+Failed to check payout source '{source}' balance.
+Error:
+```
+{display_error}
+```"
             ),
         }
     }

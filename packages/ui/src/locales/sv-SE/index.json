@@ -83,8 +83,14 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Valda projekt"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Installera {count, number} projekt"
+  },
   "browse.selected-projects-floating-bar.selected-count": {
     "defaultMessage": "{count, plural,one {# valt projekt} other {# valda projekt}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Du har valt {count, number} projekt att installera. Installera dem nu eller gå tillbaka utan att installera dem."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Valda projekt är inte installerade än"
@@ -290,6 +296,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Uppdatera projekt"
   },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Uppdatera {count} projekt"
+  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Att radera en mod kan ständigt påverka din värld och kan orsaka försvunnen innehåll eller oförväntade problem när den öppnas igen."
   },
@@ -322,6 +331,15 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Avlänka"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instans"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "server"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Vad hände?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} tillagd"
@@ -506,6 +524,9 @@
   "creation-flow.button.create-world": {
     "defaultMessage": "Skapa värld"
   },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Slut"
+  },
   "creation-flow.button.import": {
     "defaultMessage": "Importera"
   },
@@ -532,6 +553,9 @@
   },
   "creation-flow.modal.custom-setup.loader-version-type.stable": {
     "defaultMessage": "Stabil"
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Lastare"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Namn"
@@ -583,6 +607,15 @@
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
     "defaultMessage": "Platt"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "Värld namn"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "Skriva värld namn"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "Lämna tom för slumpmässig utsäde."
   },
   "creation-flow.modal.final-config.world-type.amplified": {
     "defaultMessage": "Förstärkt"
@@ -1013,6 +1046,9 @@
   "form.placeholder.state": {
     "defaultMessage": "Ange delstat/provins"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, number} byte"
+  },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
   },
@@ -1324,6 +1360,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Inga projekt matchar din sökning."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Sök genom {count, number} projekt"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -2240,8 +2279,14 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Okänd miljö"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} följare"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} spelare online"
   },
   "project.recent-plays": {
     "defaultMessage": "Spelades senast {count} {countPlural, plural, one {gång} other {gånger}}"
@@ -3023,6 +3068,9 @@
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Sök efter ett språk..."
   },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Inga språk matchar} other {# språk matchar}} din sökning."
+  },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Inget språk matchar din sökning."
   },
@@ -3444,3 +3492,4 @@
     "defaultMessage": "Du har osparade ändringar."
   }
 }
+

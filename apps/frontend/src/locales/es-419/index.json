@@ -23,6 +23,15 @@
   "analytics.breakdown.country": {
     "message": "País"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Dependiente de"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Proyecto dependiente"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Tipo de proyecto dependiente"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Razón de descarga"
   },
@@ -37,6 +46,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Miembro"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetización"
@@ -134,6 +146,24 @@
   "analytics.chart.render-limit.header": {
     "message": "¿Mostrar todas las {count} líneas en el gráfico?"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Mostrando {itemType, select, project {{count, plural, one {el proyecto} other {todos los proyectos}}} country {{count, plural, one {el país} other {todos los países}}} monetization {{count, plural, one {el valor de monetización} other {todos los valores de monetización}}} downloadSource {{count, plural, one {la fuente de descarga} other {todas las fuentes de descarga}}} downloadReason {{count, plural, one {el motivo de descarga} other {todos los motivos de descarga}}} member {{count, plural, one {el miembro} other {todos los miembros}}} projectVersion {{count, plural, one {la versión del proyecto} other {todas las versiones del proyecto}}} loader {{count, plural, one {el cargador} other {todos los cargadores}}} gameVersion {{count, plural, one {la versión del juego} other {todas las versiones del juego}}} other {{count, plural, one {el elemento} other {todos los elementos}}}} de la tabla"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Mostrando {count} {itemType, select, project {{count, plural, one {proyecto} other {proyectos}}} country {{count, plural, one {país} other {países}}} monetization {{count, plural, one {valor de monetización} other {valores de monetización}}} downloadSource {{count, plural, one {fuente de descarga} other {fuentes de descarga}}} downloadReason {{count, plural, one {motivo de descarga} other {motivos de descarga}}} member {{count, plural, one {miembro} other {miembros}}} projectVersion {{count, plural, one {versión del proyecto} other {versiones del proyecto}}} loader {{count, plural, one {cargador} other {cargadores}}} gameVersion {{count, plural, one {versión del juego} other {versiones del juego}}} other {{count, plural, one {elemento} other {elementos}}}} de la tabla"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "Mostrando {limit} {itemType, select, project {{limit, plural, one {proyecto} other {proyectos}}} country {{limit, plural, one {país} other {países}}} monetization {{limit, plural, one {valor de monetización} other {valores de monetización}}} downloadSource {{limit, plural, one {fuente de descarga} other {fuentes de descarga}}} downloadReason {{limit, plural, one {motivo de descarga} other {motivos de descarga}}} member {{limit, plural, one {miembro} other {miembros}}} projectVersion {{limit, plural, one {versión del proyecto} other {versiones del proyecto}}} loader {{limit, plural, one {cargador} other {cargadores}}} gameVersion {{limit, plural, one {versión del juego} other {versiones del juego}}} other {{limit, plural, one {elemento} other {elementos}}}} de la tabla"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Mostrando el top {count} de {itemType, select, project {{count, plural, one {proyecto} other {proyectos}}} country {{count, plural, one {país} other {países}}} monetization {{count, plural, one {valor de monetización} other {valores de monetización}}} downloadSource {{count, plural, one {fuente de descarga} other {fuentes de descarga}}} downloadReason {{count, plural, one {motivo de descarga} other {motivos de descarga}}} member {{count, plural, one {miembro} other {miembros}}} projectVersion {{count, plural, one {versión del proyecto} other {versiones del proyecto}}} loader {{count, plural, one {cargador} other {cargadores}}} gameVersion {{count, plural, one {versión del juego} other {versiones del juego}}} other {{count, plural, one {elemento} other {elementos}}}} de la tabla"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Dependiente de {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} depende de la {version} de {dependencyProject}"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# día} other {# días}}"
   },
@@ -218,8 +248,14 @@
   "analytics.filter.search.countries": {
     "message": "Buscar países..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Buscar proyectos..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Buscar fuentes de descarga..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Buscar miembros..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Buscar versiones del proyecto..."
@@ -466,6 +502,12 @@
   },
   "analytics.value.monetized": {
     "message": "Monetizado"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Nada"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Descargado por razones distintas a ser una dependencia"
   },
   "analytics.value.none": {
     "message": "Nada"
@@ -737,38 +779,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Introduce el código..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>¿Olvidaste tu contraseña?</forgot-password-link> • <create-account-link>Crear una cuenta</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Iniciar sesión con"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sesión"
   },
-  "auth.sign-in.use-password": {
-    "message": "O usa una contraseña"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Crear cuenta"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Al crear una cuenta, aceptas los <terms-link>Términos</terms-link> y la <privacy-policy-link>Política de privacidad</privacy-policy-link> de Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "¡Las contraseñas no coinciden!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "¿Ya tienes una cuenta?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Suscríbete para recibir actualizaciones sobre Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registrarse"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "O crea tu propia cuenta"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Registrarse con"
@@ -802,21 +826,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verificar correo electrónico"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Suscríbete para recibir actualizaciones sobre Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ahora formas parte de la increíble comunidad de creadores y exploradores que ya están construyendo, descargando y manteniéndose al día con mods asombrosos."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Al crear una cuenta, has aceptado los <terms-link>Términos</terms-link> y la <privacy-policy-link>Política de privacidad</privacy-policy-link> de Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "¡Bienvenido a Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Bienvenido"
   },
   "collection.button.edit-icon": {
     "message": "Editar ícono"
@@ -3290,9 +3299,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz click en la burbuja azúl para contactar con soporte."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Mostrar interfaz de miembros"
-  },
   "project.moderation.thread.private-description": {
     "message": "Este es un hilo de conversación con los moderadores de Modrinth. Es posible que te envíen mensajes sobre cuestiones relacionadas con este proyecto."
   },
@@ -3421,9 +3427,6 @@
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Esta versión está retenida y no listada} other {Estas versiones están retenidas y no listadas}} públicamente. Por favor, proporciona pruebas de que tienes permiso para redistribuir algunos de los archivos incluidos en {count, plural, one {la versión} other {las versiones}} del modpack."
-  },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Resolver"
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Versión {version_name} retenida} other {Versiones retenidas}} debido a que incluye contenido desconocido"

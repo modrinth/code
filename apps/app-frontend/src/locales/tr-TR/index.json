@@ -33,7 +33,7 @@
     "message": "Kurulumu durdur"
   },
   "app.action-bar.update": {
-    "message": "Güncelle"
+    "message": "Güncelleme"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Şu anda indirilienleri göster"
@@ -54,7 +54,7 @@
     "message": "Modrinth App için tercih ettiğiniz temayı seçin."
   },
   "app.appearance-settings.color-theme.title": {
-    "message": "Tema"
+    "message": "Tema Rengi"
   },
   "app.appearance-settings.default-landing-page.description": {
     "message": "Launcher açıldığında varsayılan olarak açılacak sayfayı seçin."
@@ -144,7 +144,7 @@
     "message": "İçerik keşfet"
   },
   "app.browse.discover-servers": {
-    "message": "Sunucu keşfet"
+    "message": "Sunucuları keşfet"
   },
   "app.browse.hide-added-servers": {
     "message": "Zaten eklenmiş sunucuları gizle"
@@ -160,12 +160,6 @@
   },
   "app.content-install.no-compatible-versions": {
     "message": "Kullanılabilir sürümler {compatibilityLabel} ile eşleşmiyor. Yine de kurulacak bir sürüm seçin. Bağımlılıklar otomatik olarak yüklenmeyecektir."
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Mod paketi indiriliyor..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Mod paketi açıklaması girin..."
@@ -242,12 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Sunucuları Keşfet"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' **kalıcı olarak silinecek** ve geri getirilmesi mümkün olmayacaktır."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Bu dünyayı kalıcı olarak silmek istediğinizden emin misiniz?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modlu"
   },
@@ -266,20 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Eklenmiş sunucu veya dünya yok"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' oyun içi dahil olmak üzere listenizden kaldırılacak ve geri getirilmesi mümkün olmayacaktır."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) oyun içi dahil olmak üzere listenizden kaldırılacak ve geri getirilmesi mümkün olmayacaktır."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "{name}'i kaldırmak istediğinizden emin misiniz?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "bu sunucu"
   },
   "app.modal.install-to-play.content-required": {
     "message": "İçerik gerekli"
@@ -547,6 +523,9 @@
   },
   "friends.action.add-friend": {
     "message": "Bir arkadaş ekle"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} arkadaşlık isteği"
   },
   "friends.add-friend.submit": {
     "message": "Arkadaşlık isteği gönder"

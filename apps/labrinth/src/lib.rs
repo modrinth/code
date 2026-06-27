@@ -28,6 +28,8 @@ use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use crate::util::tiltify::TiltifyClient;
 use sync::friends::handle_pubsub;
+use url::Url;
+use webauthn_rs::{Webauthn, WebauthnBuilder};
 
 pub mod auth;
 pub mod background_task;
@@ -58,7 +60,7 @@ pub struct LabrinthConfig {
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
-    pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
+    pub file_host: web::Data<dyn file_hosting::FileHost>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_state: web::Data<search::SearchState>,
@@ -76,6 +78,7 @@ pub struct LabrinthConfig {
     pub http_client: web::Data<HttpClient>,
     pub tiltify_client: web::Data<TiltifyClient>,
     pub kafka_client: web::Data<util::kafka::KafkaClientState>,
+    pub webauthn: web::Data<Webauthn>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -85,7 +88,7 @@ pub fn app_setup(
     redis_pool: RedisPool,
     search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
-    file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
+    file_host: web::Data<dyn file_hosting::FileHost>,
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
@@ -101,10 +104,11 @@ pub fn app_setup(
     {
         let automated_moderation_queue_ref = automated_moderation_queue.clone();
         let pool_ref = pool.clone();
+        let ro_pool_ref = ro_pool.clone();
         let redis_pool_ref = redis_pool.clone();
         actix_rt::spawn(async move {
             automated_moderation_queue_ref
-                .task(pool_ref, redis_pool_ref)
+                .task(pool_ref, ro_pool_ref, redis_pool_ref)
                 .await;
         });
     }
@@ -311,6 +315,19 @@ pub fn app_setup(
         });
     }
 
+    let webauthn_origin = Url::parse(&ENV.SITE_URL).expect("invalid SITE_URL");
+    let webauthn_rp_id = webauthn_origin
+        .host_str()
+        .expect("SITE_URL has no host")
+        .to_string();
+    let webauthn = web::Data::new(
+        WebauthnBuilder::new(&webauthn_rp_id, &webauthn_origin)
+            .expect("invalid webauthn configuration")
+            .rp_name(&ENV.WEBAUTHN_RP_NAME)
+            .build()
+            .expect("failed to build webauthn"),
+    );
+
     LabrinthConfig {
         pool,
         ro_pool,
@@ -337,6 +354,7 @@ pub fn app_setup(
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
         ),
         email_queue: web::Data::new(email_queue),
+        webauthn,
     }
 }
 
@@ -359,7 +377,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
-    .app_data(web::Data::new(labrinth_config.file_host.clone()))
+    .app_data(labrinth_config.file_host.clone())
     .app_data(web::Data::from(
         labrinth_config.search_state.backend.clone(),
     ))
@@ -380,6 +398,7 @@ pub fn app_config(
     .app_data(labrinth_config.rate_limiter.clone())
     .app_data(labrinth_config.kafka_client.clone())
     .app_data(labrinth_config.search_state.clone())
+    .app_data(labrinth_config.webauthn.clone())
     .configure(routes::v3::config)
     .configure(routes::internal::config)
     .configure(routes::root_config)

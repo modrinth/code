@@ -5,6 +5,7 @@ import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowM
 import { createContext } from '#ui/providers/create-context'
 
 import type {
+	BulkOperationStatus,
 	ContentCardTableItem,
 	ContentItem,
 	ContentModpackCardCategory,
@@ -46,6 +47,7 @@ export interface ContentManagerContext {
 	// Guards
 	isBusy: Ref<boolean> | ComputedRef<boolean>
 	busyMessage?: Ref<string | null> | ComputedRef<string | null>
+	skipNonEssentialWarnings?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContentTooltip?: string
 
@@ -70,6 +72,7 @@ export interface ContentManagerContext {
 	// Update support (optional per-platform)
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void
+	bulkUpdateAll?: (onProgress?: (status: BulkOperationStatus) => void) => Promise<void>
 	bulkUpdateItem?: (item: ContentItem) => Promise<void>
 	bulkUpdateItems?: (items: ContentItem[]) => Promise<void>
 

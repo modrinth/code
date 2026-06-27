@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Завантаження Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Завантаження оновлення"
+  },
   "app.action-bar.downloads": {
     "message": "Завантаження"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Основний профіль"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Перезавантаження для оновлення"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Показати більше запущених профілів"
   },
   "app.action-bar.stop-instance": {
     "message": "Зупинити профіль"
+  },
+  "app.action-bar.update": {
+    "message": "Оновлення"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Переглянути активні завантаження"
@@ -152,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Жодна доступна версія не сумісна з {compatibilityLabel}. Виберіть версію, щоб усе одно її встановити. Залежності не встановлюватимуться автоматично."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Установлення збірки…"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Уведіть опис збірки…"
   },
@@ -233,9 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Переглянути сервери"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Ви впевнені, що хочете назавжди видалити цей світ?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Модифіковано"
   },
@@ -254,14 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Сервера або світи не додано"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Ви впевнені, що хочете видалити «{name}»?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Пошук {count} світів…"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "цей сервер"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Потрібний уміст"
@@ -271,6 +265,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установити"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Потрібна збірка"
@@ -416,6 +413,12 @@
   "app.skins.rate-limit.title": {
     "message": "Повільніше!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Ваше замовлення скінів не вдалося зберегти."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Не вдалося змінити порядок скінів"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -488,6 +491,9 @@
   "app.update-popup.download-complete": {
     "message": "Завантаження завершено"
   },
+  "app.update-popup.reload": {
+    "message": "Перезавантаження для оновлення"
+  },
   "app.update-popup.title": {
     "message": "Доступне оновлення"
   },
@@ -517,6 +523,9 @@
   },
   "friends.action.add-friend": {
     "message": "Додати друга"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} запит{count, plural, one { у} few {и в} many {ів у} other {у в}} друзі"
   },
   "friends.add-friend.submit": {
     "message": "Надіслати запит у друзі"
@@ -682,6 +691,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Назва"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Випуск оновлення"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Альфа"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Випуски, бета- та альфа-версії будуть показуватися як доступні оновлення."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Бета"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Випуски та бета-версії будуть показуватися як доступні оновлення."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Випуск"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Тільки випуски версії будуть показуватися як доступні оновлення."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Оберіть випуск оновлення"
   },
   "instance.settings.tabs.hooks": {
     "message": "Гуки запуску"

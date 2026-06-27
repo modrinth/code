@@ -23,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primære instance"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Genindlæs for at opdater"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Vis flere kørende instances"
   },
   "app.action-bar.stop-instance": {
     "message": "Stop instance"
+  },
+  "app.action-bar.update": {
+    "message": "Opdater"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Vis aktive downloads"
@@ -146,11 +152,8 @@
   "app.browse.server.installing": {
     "message": "Installere"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installere modpack..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
   },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
@@ -227,9 +230,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Søg servere"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Er du sikker på din vil slette denne verden permanent?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Moddet"
   },
@@ -248,14 +248,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Ingen servere eller verdener tilføjet"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Er du sikker på din vil fjerne {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Søg {count} verdener..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "denne server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Indhold krævet"

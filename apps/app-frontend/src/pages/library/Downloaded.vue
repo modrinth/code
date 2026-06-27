@@ -12,6 +12,6 @@ defineProps({
 	<GridDisplay
 		v-if="instances && instances.length > 0"
 		label="Instances"
-		:instances="instances.filter((i) => i.linked_data)"
+		:instances="instances.filter((i) => i.link)"
 	/>
 </template>

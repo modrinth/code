@@ -1,6 +1,7 @@
 pub mod analytics;
 pub mod billing;
 pub mod email;
+pub mod file_scan;
 pub mod moderation;
 pub mod payouts;
 pub mod server_ping;

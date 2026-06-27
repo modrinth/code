@@ -190,7 +190,6 @@ import {
 	LinkIcon,
 } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
-import { type OverflowMenuOption, useFormatDateTime } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -198,6 +197,8 @@ import {
 	getProjectTypeIcon,
 	injectNotificationManager,
 	OverflowMenu,
+	type OverflowMenuOption,
+	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'

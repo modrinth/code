@@ -275,38 +275,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "코드 입력..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>비밀번호를 잊으셨나요?</forgot-password-link> • <create-account-link>계정 만들기</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "다음을 통해 로그인"
   },
   "auth.sign-in.title": {
     "message": "로그인"
   },
-  "auth.sign-in.use-password": {
-    "message": "또는 비밀번호 사용하기"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "계정 생성"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "계정을 생성함으로써, Modrinth의 <terms-link>이용 약관</terms-link> 및 <privacy-policy-link>개인정보 보호정책</privacy-policy-link>에 동의합니다."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "비밀번호가 일치하지 않습니다!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "이미 계정이 있으신가요?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Modrinth의 업데이트 소식 전달받기"
-  },
   "auth.sign-up.title": {
     "message": "회원 가입"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "또는 직접 계정을 만드세요"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "다음 계정으로 가입"
@@ -340,21 +322,6 @@
   },
   "auth.verify-email.title": {
     "message": "이메일 인증"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Modrinth의 업데이트 소식 전달받기"
-  },
-  "auth.welcome.description": {
-    "message": "이제 당신은 놀라운 모드를 만들고, 다운로드하고, 최신 상태로 유지하는 훌륭한 크리에이터 및 탐험가들의 모임의 일원이 되었습니다."
-  },
-  "auth.welcome.label.tos": {
-    "message": "계정을 생성함으로써, Modrinth의 <terms-link>이용 약관</terms-link> 및 <privacy-policy-link>개인정보 보호정책</privacy-policy-link>에 동의하게 됩니다."
-  },
-  "auth.welcome.long-title": {
-    "message": "Modrinth에 오신 걸 환영합니다!"
-  },
-  "auth.welcome.title": {
-    "message": "환영합니다"
   },
   "collection.button.edit-icon": {
     "message": "아이콘 수정"
@@ -530,6 +497,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "보조 파일은 소스 코드와 같은 지원용 리소스를 위한 것이며, 대체 버전이나 변형을 위한 것이 아닙니다."
   },
+  "create.collection.collection-info": {
+    "message": "새 컬렉션은 {count, plural, =0 {프로젝트 없음} other {#개의 프로젝트}}를 포함한 공개 컬렉션으로 생성됩니다."
+  },
   "create.collection.create-collection": {
     "message": "컬렉션 생성"
   },
@@ -685,6 +655,9 @@
   },
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "취소"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "'{title}' 제휴 링크를 정말 삭제하시겠습니까?"
   },
   "dashboard.affiliate-links.search": {
     "message": "제휴 링크 검색..."
@@ -998,6 +971,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "알림 기록 보기"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "알림 {extraNotifs}개 더 보기"
+  },
   "dashboard.organizations.button.create": {
     "message": "조직 생성"
   },
@@ -1006,6 +982,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "조직 정보 가져오기 실패"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "멤버 {count}명"
   },
   "dashboard.organizations.title": {
     "message": "조직"
@@ -1051,6 +1030,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "링크 편집"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "변경사항이 <strong>{count}개</strong>의 프로젝트에 적용됩니다."
   },
   "dashboard.projects.links.description": {
     "message": "아래 지정한 링크는 선택한 각 프로젝트에서 덮어쓰게 됩니다. 비워 둔 항목은 무시됩니다. 휴지통 버튼을 클릭하면 선택한 모든 프로젝트에서 링크를 삭제할 수 있습니다."
@@ -2423,6 +2405,9 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Modrinth에서 {username}의 프로젝트 다운로드"
   },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> 프로젝트 팔로워}}"
+  },
   "profile.user-id": {
     "message": "사용자 ID: {id}"
   },
@@ -2750,9 +2735,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "도움이 필요하거나 추가 문의 사항이 있다면 <help-center-link>Modrinth 도움말 센터</help-center-link>를 방문하여 파란색 말풍선을 클릭해 지원 센터에 문의해 주세요."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "멤버 UI 표시"
-  },
   "project.moderation.thread.private-description": {
     "message": "이곳은 Modrinth 운영진과의 비공개 대화 스레드입니다. 운영진이 이 프로젝트와 관련된 사항에 대해 메시지를 보낼 수 있습니다."
   },
@@ -2858,6 +2840,9 @@
   "project.settings.permissions.learn-more": {
     "message": "더보기"
   },
+  "project.settings.permissions.search-placeholder": {
+    "message": "{count}개의 {count, plural, other {외부 프로젝트}} 검색..."
+  },
   "project.settings.title": {
     "message": "설정"
   },
@@ -2870,8 +2855,11 @@
   "project.versions.title": {
     "message": "버전"
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "해결"
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {해당 버전은}} 현재 보류 상태이며 공개되지 않았습니다. 이 모드팩 {count, plural, other {버전에}} 포함된 특정 파일들을 재배포할 수 있는 권한이 있음을 증명하는 자료를 제출해주세요."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "알 수 없는 내장 콘텐츠로 인해 일부 {count, plural, other {버전}}은 공개되지 않았습니다"
   },
   "report.already-reported": {
     "message": "이미 {title} 을(를) 신고했습니다"

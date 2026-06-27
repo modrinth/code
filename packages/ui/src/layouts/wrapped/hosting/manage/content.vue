@@ -26,13 +26,15 @@ import {
 } from '#ui/utils/server-content-installing'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
+import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
 import {
 	flushStoredServerAddonInstallQueue,
 	getStoredServerAddonInstallQueue,
+	getTargetInstallPreferences,
 } from '../../../shared/browse-tab/composables/install-logic'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
+import ContentUpdaterModal from '../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
 import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
 import ContentPageLayout from '../../../shared/content-tab/layout.vue'
 import type { ContentModpackData } from '../../../shared/content-tab/providers/content-manager'
@@ -359,6 +361,57 @@ function getAddonInstallKeys(addons: Archon.Content.v1.Addon[]) {
 	return keys
 }
 
+function getInstalledProjectIds() {
+	return new Set(
+		(contentQuery.data.value?.addons ?? [])
+			.map((addon) => addon.project_id)
+			.filter((projectId): projectId is string => !!projectId),
+	)
+}
+
+function toResolvePreferences(
+	preferences?: BrowseInstallPlan['preferences'],
+): Labrinth.Content.v3.ResolutionPreferences {
+	return {
+		game_versions: preferences?.gameVersions,
+		loaders: preferences?.loaders,
+	}
+}
+
+async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
+	const existingProjectIds = getInstalledProjectIds()
+	const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
+
+	for (const plan of plans) {
+		const target = getTargetInstallPreferences(
+			{
+				gameVersion: server.value?.mc_version,
+				loader: server.value?.loader,
+			},
+			plan.contentType,
+		)
+		const resolved = await client.labrinth.content_v3.resolve({
+			project_id: plan.projectId,
+			version_id: plan.versionId,
+			content_type: plan.contentType as Labrinth.Content.v3.ContentType,
+			selected: toResolvePreferences(plan.preferences),
+			target: toResolvePreferences(target),
+			existing_project_ids: Array.from(existingProjectIds),
+		})
+
+		for (const item of [resolved.primary, ...resolved.dependencies]) {
+			if (existingProjectIds.has(item.project_id)) continue
+			existingProjectIds.add(item.project_id)
+			resolvedAddons.push({
+				project_id: item.project_id,
+				version_id: item.version_id,
+			})
+		}
+	}
+
+	return resolvedAddons
+}
+
 function addonMatchesPendingInstall(
 	addon: Archon.Content.v1.Addon,
 	pendingInstall: PendingServerContentInstall,
@@ -418,15 +471,12 @@ async function flushStoredServerInstalls() {
 		const result = await flushStoredServerAddonInstallQueue({
 			serverId,
 			worldId: wid,
-			install: (plans) =>
-				client.archon.content_v1.addAddons(
-					serverId,
-					wid,
-					plans.map((plan) => ({
-						project_id: plan.projectId,
-						version_id: plan.versionId,
-					})),
-				),
+			install: async (plans) => {
+				const addons = await resolveStoredServerAddonPlans(plans)
+				if (addons.length > 0) {
+					await client.archon.content_v1.addAddons(serverId, wid, addons)
+				}
+			},
 		})
 
 		if (!result.ok) {

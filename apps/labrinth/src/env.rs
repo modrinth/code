@@ -166,6 +166,7 @@ vars! {
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;
+    FILE_SCAN_CONCURRENCY: i64 = 8i64;
 
     // s3
     S3_PUBLIC_BUCKET_NAME: String = "";
@@ -310,4 +311,6 @@ vars! {
     SERVER_PING_MIN_INTERVAL_SEC: u64 = 30u64 * 60;
     SERVER_PING_TIMEOUT_MS: u64 = 3u64 * 1000;
     SERVER_PING_MAX_FAIL_COUNT: u64 = 3u64;
+
+    WEBAUTHN_RP_NAME: String = "Modrinth";
 }

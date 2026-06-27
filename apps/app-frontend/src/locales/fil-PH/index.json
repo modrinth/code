@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Dina-download ang Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Dina-download ang update"
+  },
   "app.action-bar.downloads": {
     "message": "Mga downloads"
   },
@@ -19,6 +22,9 @@
   },
   "app.action-bar.primary-instance": {
     "message": "Pangunahing instansiya"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Mag-reload upang ma-update"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Ipakita ang mas marami pang tumatakbong instansiya"
@@ -89,6 +95,9 @@
   "app.appearance-settings.select-option": {
     "message": "Pumili ng opsiyon"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Magpapakita ang katagal ng iyong paglalaro sa isang instansiya."
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Pagpapagana na mata-toggle ang sidebar."
   },
@@ -145,12 +154,6 @@
   },
   "app.browse.server.installing": {
     "message": "Ini-install"
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Ini-install ang modpack..."
   },
   "app.export-modal.description-placeholder": {
     "message": "Ilagay ang paglalarawan ng modpack..."
@@ -227,12 +230,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Mag-browse ng servers"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' ay **permanenteng mabubura**, at walang paraan upang maibalik muli."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Sigurado ka bang gusto mong permanenteng burahin ang world na ito?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modded"
   },
@@ -251,20 +248,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Walang servers o worlds ang nalalagay"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' ay matatangal sa iyong listahan, pati sa loob ng laro, at walang paraan upang maibalik ito."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) ay matatangal sa iyong listahan, pati sa loob ng laro, at walang paraan upang maibalik ito."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Sigurado ka bang gusto mong tanggalin ang {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hanapin sa {count} mundo..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "server na ito"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Nangangailangan ng kontento"

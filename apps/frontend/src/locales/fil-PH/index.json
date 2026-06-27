@@ -395,38 +395,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Ilagay ang code..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Nalimutan ang password?</forgot-password-link> • <create-account-link>Lumikha ng account</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Mag-sign in gamit ang"
   },
   "auth.sign-in.title": {
     "message": "Mag-sign In"
   },
-  "auth.sign-in.use-password": {
-    "message": "O gamitin ang password"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Lumikha ng account"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Sa paggawa ng account, sumasang-ayon ka sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Hindi magkatugma ang mga password!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Mayroon ka nang account?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Mag-subscribe ukol sa mga update sa Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Mag-sign Up"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "O sariling lumkiha account"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Mag-sign up gamit ang"
@@ -460,21 +442,6 @@
   },
   "auth.verify-email.title": {
     "message": "Patunayan ang Email"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Mag-subscribe ukol sa mga update ng Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ikaw ay parte na ngayon ng kahanga-hangang komunidad na ito ng mga tagagawa at manlalalakbay na nagtataguyod, nagda-download, at nananatiling napapanahon sa mga nakamamanghang na mga mod."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Sa paggawa ng account, sumang-ayon ka na sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Maligayang pagdating sa Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Maligayang Pagdating"
   },
   "collection.button.edit-icon": {
     "message": "Baguhin ang ikono"
@@ -1018,6 +985,9 @@
   },
   "dashboard.notifications.link.view-history": {
     "message": "Tingnan ang kasaysayan ng notipikasyon"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
   },
   "dashboard.organizations.button.create": {
     "message": "Lumikha ng organisasyon"

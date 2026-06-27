@@ -7,6 +7,8 @@ use crate::{
     },
     util::io,
 };
+use url::form_urlencoded;
+use urlencoding::decode;
 
 /// Handles external functions (such as through URL deep linkage)
 /// Link is extracted value (link) in somewhat URL format, such as
@@ -27,6 +29,53 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         // /server/{id}   -    Opens a server project page and triggers play flow
         Some(("server", id)) => {
             CommandPayload::InstallServer { id: id.to_string() }
+        }
+        // /launch/instance/{id}   -    Launches an instance
+        Some(("launch", rest)) if rest.starts_with("instance/") => {
+            let raw = rest.trim_start_matches("instance/");
+            let (raw, query) = raw.split_once('?').unwrap_or((raw, ""));
+            let mut server = None;
+            let mut singleplayer_world = None;
+
+            for (key, value) in form_urlencoded::parse(query.as_bytes()) {
+                match &*key {
+                    "server" => server = Some(value.into_owned()),
+                    "singleplayer_world" => {
+                        singleplayer_world = Some(value.into_owned());
+                    }
+                    _ => {}
+                }
+            }
+
+            if server.is_some() && singleplayer_world.is_some() {
+                emit_warning(
+                    "Invalid command, cannot launch both a server and a singleplayer world",
+                )
+                .await?;
+                return Err(crate::ErrorKind::InputError(
+                    "Cannot launch both a server and a singleplayer world"
+                        .to_string(),
+                )
+                .into());
+            }
+
+            match decode(raw) {
+                Ok(decoded) => CommandPayload::LaunchInstance {
+                    id: decoded.to_string(),
+                    server,
+                    singleplayer_world,
+                },
+                Err(e) => {
+                    emit_warning(&format!(
+                        "Invalid UTF-8 in instance path: {e}"
+                    ))
+                    .await?;
+                    return Err(crate::ErrorKind::InputError(format!(
+                        "Invalid UTF-8 in instance path: {e}"
+                    ))
+                    .into());
+                }
+            }
         }
         _ => {
             emit_warning(&format!(

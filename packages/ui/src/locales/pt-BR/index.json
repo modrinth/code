@@ -320,6 +320,9 @@
   "content-type.content.lowercase": {
     "defaultMessage": "conteúdo"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, =0 {Nenhum item} one {# item} other {# itens}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Selecionar {project}"
   },
@@ -373,6 +376,48 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Desvincular"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Este conteúdo é necessário para outro conteúdo"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {projeto afetado} other {projetos afetados}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Alguns projetos selecionados são instalados como dependências. Excluí-los talvez quebre seu {context} ou interrompa o conteúdo dependente de carregar devidamente."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instância"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "servidor"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Excluir mesmo assim"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Excluir {count, number} {itemType} mesmo assim"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Excluindo"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Desativar dependências após excluir"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "O conteúdo dependente talvez falhe ao carregar ou se desative automaticamente"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Seu {context} talvez feche, não inicie ou se comporte inesperadamente"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Alerta de dependência"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} está instalado como uma dependência. Excluí-lo talvez quebre seu {context} ou interrompa o conteúdo dependente de carregar devidamente."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "O que acontece?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} adicionado"
@@ -546,10 +591,10 @@
     "defaultMessage": "Atualizando {contentType}..."
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count, number} {contentType} selecionado(s)"
+    "defaultMessage": "{count, number} {contentType} {count, plural, one {selecionado} other {selecionados}}"
   },
   "content.selection-bar.selected-count-simple": {
-    "defaultMessage": "{count, number} selecionado(s)"
+    "defaultMessage": "{count, number} {count, plural, one {selecionado} other {selecionados}}"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Criar instância"
@@ -1091,6 +1136,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Novo nome"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, =0 {Nenhum item} one {# item} other {# itens}}"
+  },
   "files.table-header.created": {
     "defaultMessage": "Criado"
   },
@@ -1627,6 +1675,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count, plural, =0 {Nenhuma instância compatível} one {{count} instância compatível} other {{count} instâncias compatíveis}} "
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Instância existente"
@@ -2648,6 +2699,9 @@
   "project.about.tags.title": {
     "defaultMessage": "Etiquetas"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, plural, =0 {Nenhum download} one {{count} download} other {{count} downloads}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Necessário tanto no cliente quanto no servidor."
   },
@@ -2713,6 +2767,18 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente desconhecido"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, plural, =0 {Nenhum seguidor} one {{count} seguidor} other {{count} seguidores}}"
+  },
+  "project.online-player-count": {
+    "defaultMessage": "{count, plural, =0 {Ninguém online} other {{count} online}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{countPlural, plural, =0 {Nenhuma entrada recente} one {{count} entrada recente} other {{count} entradas recentes}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{countPlural, plural, =0 {Nenhuma entrada recente} one {{count} entrada recente} other {{count} entradas recentes}} do Modrinth nas últimas 2 semanas"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Este projeto utiliza um pacote de mods personalizado"
@@ -5149,6 +5215,9 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Sair da página?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, =0 {Nenhum alerta} one {# alerta} other {# alertas}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Dispensar tudo"

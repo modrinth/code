@@ -269,29 +269,14 @@
   "auth.sign-in.title": {
     "message": "Kirjaudu sisään"
   },
-  "auth.sign-in.use-password": {
-    "message": "Tai käytä salasanaa"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Luo tili"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Luomalla tilin, hyväksyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Salasanat eivät täsmää!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Onko sinulla jo käyttäjätili?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Tilaa päivityksiä Modrinthista"
-  },
   "auth.sign-up.title": {
     "message": "Rekisteröidy"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Tai luo tili itse"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Reskiteröidy käyttäen"
@@ -325,18 +310,6 @@
   },
   "auth.verify-email.title": {
     "message": "Vahvista sähköposti"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Tilaa päivityksiä Modrinthista"
-  },
-  "auth.welcome.label.tos": {
-    "message": "Luomalla tilin, olet hyväksynyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Tervetuloa Modrinthiin!"
-  },
-  "auth.welcome.title": {
-    "message": "Tervetuloa"
   },
   "collection.button.edit-icon": {
     "message": "Muokkaa kuvaketta"

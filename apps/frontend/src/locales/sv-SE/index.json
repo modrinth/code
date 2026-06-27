@@ -23,6 +23,9 @@
   "analytics.breakdown.country": {
     "message": "Land"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Beroende på"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Nedladdningsanledning"
   },
@@ -37,6 +40,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Laddare"
+  },
+  "analytics.breakdown.members": {
+    "message": "Medlem"
   },
   "analytics.breakdown.monetization": {
     "message": "Intäkter"
@@ -58,6 +64,9 @@
   },
   "analytics.chart.action.show-all": {
     "message": "Visa alla"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Visa begränsad"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Visa topp 8"
@@ -94,6 +103,9 @@
   },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "Se meddelande"
   },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (förhandsvisa)"
@@ -283,6 +295,9 @@
   },
   "analytics.project.all": {
     "message": "Alla projekt"
+  },
+  "analytics.project.count": {
+    "message": "{count, number} projekt"
   },
   "analytics.project.icon-alt": {
     "message": "{name} Ikon"
@@ -650,38 +665,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Ange kod..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Har du glömt lösenordet?</forgot-password-link> • <create-account-link>Skapa ett konto</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "Logga in med"
   },
   "auth.sign-in.title": {
     "message": "Logga in"
   },
-  "auth.sign-in.use-password": {
-    "message": "Eller använd ett lösenord"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Skapa konto"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Genom att skapa ett konto godkänner du Modrinths <terms-link>villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Lösenorden stämmer inte överens!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du redan ett konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Jag vill få uppdateringar om Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registrera dig"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Eller skapa ett konto själv"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Registrera dig med"
@@ -715,21 +712,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifiera e-post"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Prenumerera för uppdateringar om Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Du är nu en del av ett grymt community av skapare och utforskare som redan bygger, laddar ner och håller sig uppdaterade med fantastiska moddar."
-  },
-  "auth.welcome.label.tos": {
-    "message": "När du skapar ett konto godkänner du Modrinths <terms-link>villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Välkommen till Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Välkommen"
   },
   "collection.button.edit-icon": {
     "message": "Redigera-ikon"
@@ -1420,6 +1402,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "Ändra länkar"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Ändringar kommer appliceras till <strong>{count}</strong> projekt."
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discordinbjudan"

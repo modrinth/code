@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Не найдено доступных версий, совместимых с {compatibilityLabel}. Выберите версию для установки вручную. Зависимости не будут установлены автоматически."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Установка сборки..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Введите описание сборки..."
   },
@@ -239,9 +233,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Найти серверы"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Вы действительно хотите удалить этот мир?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Модовые"
   },
@@ -260,12 +251,6 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Нет серверов и миров"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Вы действительно хотите удалить {name}?"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "этот сервер"
-  },
   "app.modal.install-to-play.content-required": {
     "message": "Требуется дополнительный контент"
   },
@@ -274,6 +259,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Необходимая сборка"
@@ -529,6 +517,9 @@
   },
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
   },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"

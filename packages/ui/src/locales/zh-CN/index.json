@@ -104,6 +104,15 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "选定的项目"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "安装{count, plural, other {#个项目}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {#个已选择的项目}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "你已经选择了{count, plural, other {#个}}要安装的项目。立即安装它们，或不安装并返回。"
+  },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "选定的项目尚未安装"
   },
@@ -317,6 +326,9 @@
   "content.card.select-project": {
     "defaultMessage": "选择 {project}"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "是否确定要将 {count, plural,  other {# 个项目}}更新至最新的兼容版本？建议逐个更新内容。"
+  },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "更新警告"
   },
@@ -325,6 +337,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "在点击“全部更新”时按住 Shift 键，以后将跳过此确认。"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "更新 {count, plural, other {# 个项目}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "删除模组可能会对你的游戏世界造成永久性影响，并可能导致再次加载时出现内容缺失或意外问题。"
@@ -361,6 +376,48 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "解除关联"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "其他内容需要此内容"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "影响的{count, plural, other {项目}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "你选择的部分项目已作为依赖项安装。删除它们可能破坏你的 {context} 或者阻止依赖项内容正常加载。"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "实例"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "服务器"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "仍然删除"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "仍然删除这 {count, number} 个{itemType}"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "即将删除"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "删除后禁用依赖项"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "依赖项内容可能无法加载或者被自动禁用"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "你的 {context} 可能会崩溃、无法启动或无法正常工作"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "依赖项警告"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} 已作为依赖项安装。删除它可能破坏你的 {context} 或者阻止依赖项内容正常加载。"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "发生什么了？"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "添加了 {count} 项"
@@ -550,6 +607,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "导入"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "导入 {count} 个实例"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "初始化服务器"
@@ -1076,6 +1136,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "新名称"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count} 项"
+  },
   "files.table-header.created": {
     "defaultMessage": "创建时间"
   },
@@ -1276,6 +1339,9 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "输入州/省"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, other {# 字节}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1672,6 +1738,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "没有符合搜索条件的项目。"
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
@@ -2435,14 +2504,35 @@
   "project-type.all": {
     "defaultMessage": "全部"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "数据包"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {模组}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "模组"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {模组}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "整合包"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {插件}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "插件"
@@ -2450,17 +2540,41 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {插件} other {插件集}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "项目"
+  },
   "project-type.project.category": {
     "defaultMessage": "项目"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {项目}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {资源包}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "资源包"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {资源包}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {服务器}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "服务器"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {服务器}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {光影包}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "光影包"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {光影包}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "支持的运行环境"
@@ -2585,6 +2699,9 @@
   "project.about.tags.title": {
     "defaultMessage": "标签"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {次下载}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "客户端和服务端都需要。"
   },
@@ -2651,8 +2768,20 @@
   "project.environment.unknown.title": {
     "defaultMessage": "未知运行环境"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {人关注}}"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 在线"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, other {个玩家}} 在线"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, other {人最近游玩}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "在过去两周内共有 {count} {countPlural, plural, other {人}}通过 Modrinth 游玩"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "这个项目使用了自定义整合包"
@@ -3815,6 +3944,15 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "从备份中恢复"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "已选择 {count} 个备份的批量操作"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "正在删除 {total} 个备份……"
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count} 个备份被选中"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "一旦删除， {count, plural, one {这个备份将不能} other {这些备份将不能}}被恢复。删除是永久性的。"
   },
@@ -3826,6 +3964,9 @@
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "删除{count, plural, one {备份} other { # 个备份}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "删除备份"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "创建你的第一个备份"
@@ -4175,6 +4316,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "成功"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "搜索 {count} {count, plural, other {个服务器}}..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4192,6 +4336,9 @@
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "你的服务器"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, other {天}} <hours-count>{hours}</hours-count> {hours, plural, other {小时}} <minutes-count>{minutes}</minutes-count> {minutes, plural, other {分钟}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {秒}} 剩余……"
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "新服务器"
@@ -4516,6 +4663,9 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "搜索语言..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {没有符合搜索条件的语言} other {共有 # 个语言符合搜索条件}}。"
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "没有符合搜索条件的语言。"
@@ -5069,6 +5219,9 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "离开页面？"
   },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count} 个警报"
+  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "全部忽略"
   },
@@ -5169,3 +5322,4 @@
     "defaultMessage": "Modrinth 团队"
   }
 }
+

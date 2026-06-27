@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Improving Modpack review delays",
+			"summary": "Reducing the back-and-forth needed to get your modpack approved.",
+			"thumbnail": "https://modrinth.com/news/article/modpack-permissions/thumbnail.webp",
+			"date": "2026-06-23T20:00:00.000Z",
+			"link": "https://modrinth.com/news/article/modpack-permissions"
+		},
+		{
 			"title": "Modrinth joins Spark Universe",
 			"summary": "The next chapter. What it means and why we think it’s right for Modrinth.",
 			"thumbnail": "https://modrinth.com/news/article/joining-spark-universe/thumbnail.webp",

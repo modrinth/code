@@ -8,6 +8,231 @@
   "admin.billing.error.not-found": {
     "message": "ไม่พบผู้ใช้นี้"
   },
+  "analytics.action.add": {
+    "message": "เพิ่ม"
+  },
+  "analytics.action.cancel": {
+    "message": "ยกเลิก"
+  },
+  "analytics.action.refresh": {
+    "message": "รีเฟรช"
+  },
+  "analytics.action.reset": {
+    "message": "รีเซ็ต"
+  },
+  "analytics.breakdown.country": {
+    "message": "ประเทศ"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "เหตุผลในการดาวน์โหลด"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "แหล่งที่มาของการดาวน์โหลด"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "เวอร์ชันของเกม"
+  },
+  "analytics.breakdown.generic": {
+    "message": "รายละเอียดจำแนกตาม"
+  },
+  "analytics.breakdown.loader": {
+    "message": "โหลดเดอร์"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "การสร้างรายได้"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "ไม่มีรายละเอียดการจำแนก"
+  },
+  "analytics.breakdown.project": {
+    "message": "โปรเจกต์"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "สถานะของโปรเจกต์"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "เวอร์ชั่นของโปรเจกต์"
+  },
+  "analytics.breakdown.selected": {
+    "message": "การแยกตาม {breakdown}"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "แสดงทั้งหมด"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "แสดงแบบจำกัด"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "แสดง 8 อันดับแรก"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ชั่วโมง"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} กำลังเล่นอยู่"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "คำอธิบายประกอบ"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "ตัวควบคุมกราฟวิเคราะห์, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "ส่วนควบคุม"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "การควบคุมกราฟการวิเคราะห์"
+  },
+  "analytics.chart.controls.display": {
+    "message": "การแสดงผล"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "เหตุการณ์จาก Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "ไม่มีเหตุการณ์จาก Modrinth ในกราฟ"
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "ไม่มีเหตุการณ์ของโปรเจกต์ในกราฟ"
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "ช่วงเวลาก่อนหน้า"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "กิจกรรมโปรเจกต์"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "อัตราส่วน"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "เลือกรายการจากตารางด้านล่างเพื่อแสดงข้อมูลของคุณ"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "ดูประกาศ"
+  },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "ดูรายละเอียดการวิเคราะห์ที่สร้างรายได้"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "มีเพียงการดูและการดาวน์โหลดที่ทำผ่าน Modrinth เท่านั้นที่จะนับรวมเพื่อการสร้างรายได้ และการดาวน์โหลดต้องให้ผู้ใช้เข้าสู่ระบบก่อน"
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "ข้อมูลวิเคราะห์การสร้างรายได้"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (ก่อนหน้า)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "การแสดงเส้นกราฟที่เลือกทั้งหมดจากตาราง อาจทำให้หน้าเว็บทำงานช้าลง"
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "แสดงเส้นกราฟทั้ง {count} เส้นหรือไม่?"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# วัน} other {# วัน}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# ชั่วโมง} other {# ชั่วโมง}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# นาที} other {# นาที}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "ซ่อน {name} ในกราฟ"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "ปักหมุดคำแนะนำบนกราฟแล้ว"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "ปักหมุดแล้ว"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(ก่อนหน้า)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "แสดง {name} ในกราฟ"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "ทั้งหมด"
+  },
+  "analytics.chart.view.area": {
+    "message": "ขอบเขต"
+  },
+  "analytics.chart.view.bar": {
+    "message": "แผนภูมิแท่ง"
+  },
+  "analytics.chart.view.line": {
+    "message": "แผนภูมิเส้น"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "ม็อดเสริมที่จำเป็น"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "ม็อดแพ็ก"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "แบบแยกต่างหาก"
+  },
+  "analytics.download-reason.update": {
+    "message": "อัปเดต"
+  },
+  "analytics.download-source.app": {
+    "message": "แอป Modrinth"
+  },
+  "analytics.download-source.website": {
+    "message": "เว็ปไซต์ Modrinth"
+  },
+  "analytics.project.user": {
+    "message": "โปรเจกต์ของ {username}"
+  },
+  "analytics.project.your": {
+    "message": "โปรเจกต์ของคุณ"
+  },
+  "analytics.query.filter.add": {
+    "message": "เพิ่มตัวกรอง"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "รายละเอียดจำแนก:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "จัดกลุ่มโดย"
+  },
+  "analytics.query.label.project": {
+    "message": "โปรเจกต์:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "ช่วงเวลา:"
+  },
+  "analytics.stat.downloads": {
+    "message": "ดาวน์โหลด"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "เฉพาะยอดเข้าชมและยอดดาวน์โหลดที่ทำผ่าน Modrinth เท่านั้นที่มีสิทธิ์นำไปคิดสร้างรายได้ และจะต้องผ่านระบบกรองป้องกันการทุจริตด้วย นอกจากนี้ การดาวน์โหลดผ่านแอป Modrinth ยังกำหนดให้ผู้ใช้งานต้องเข้าสู่ระบบไว้ด้วยเช่นกัน เนื่องจากทุกๆ โปรเจกต์ต่างก็มีสัดส่วนของยอดดาวน์โหลดที่สร้างรายได้ในระดับที่ใกล้เคียงกัน ดังนั้น รายได้ของคุณจะไม่เปลี่ยนแปลงไปจากเดิมอย่างมีนัยสำคัญ ถึงแม้จะนับยอดดาวน์โหลดทั้งหมดก็ตาม"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "เรียนรู้เพิ่มเติม"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "ระบบสร้างรายได้ทำงานอย่างไร?"
+  },
+  "analytics.stat.playtime": {
+    "message": "เวลาเล่น"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} ชั่วโมง"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "เทียบกับช่วงเวลาก่อนหน้า"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "เทียบกับก่อนหน้า"
+  },
+  "analytics.stat.revenue": {
+    "message": "รายได้"
+  },
   "app-marketing.download.description": {
     "message": "แอปเดสก์ท็อปของเราพร้อมใช้งานบนทุกแพลตฟอร์ม เลือกเวอร์ชันที่คุณต้องการได้เลย"
   },
@@ -230,35 +455,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "ป้อนรหัส"
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link> ลืมรหัสผ่าน? </forgot-password-link> • <create-account-link> สร้างบัญชีใหม่ </create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "ลงชื่อเข้าใช้ด้วย"
   },
   "auth.sign-in.title": {
     "message": "ลงชื่อเข้าใช้"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "สร้างบัญชี"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "ในการสร้างบัญชี คุณยอมรับ <terms-link> ข้อกำหนด </terms-link> และ <privacy-policy-link> นโยบายความเป็นส่วนตัว </privacy-policy-link> ของ Modrinth"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "รหัสผ่านไม่ตรงกัน!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "มีบัญชีอยู่แล้ว?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "สมัครรับข้อมูลการอัพเดทเกี่ยวกับ Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "ลงทะเบียน"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "หรือจะสร้างบัญชีด้วยตัวคุณเอง"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "สมัครใช้งานด้วย"
@@ -292,18 +502,6 @@
   },
   "auth.verify-email.title": {
     "message": "ยืนยันอีเมล"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "สมัครรับข้อมูลอัปเดตเกี่ยวกับ Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "ตอนนี้คุณได้เป็นส่วนหนึ่งของคอมมูนิตี้สุดเจ๋งของเหล่าครีเอเตอร์และนักสำรวจ ที่กำลังสร้างสรรค์ ดาวน์โหลด และอัปเดตม็อดสุดยอดอยู่เสมอ"
-  },
-  "auth.welcome.long-title": {
-    "message": "ยินดีต้อนรับเข้าสู่ modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "ยินดีต้อนรับ"
   },
   "collection.button.edit-icon": {
     "message": "แก้ไขไอคอน"
@@ -420,7 +618,7 @@
     "message": "ประเภท"
   },
   "create.project.type-project": {
-    "message": "โปรเจ็ก"
+    "message": "โปรเจกต์"
   },
   "create.project.type-server": {
     "message": "เซิร์ฟเวอร์"
@@ -574,6 +772,9 @@
   },
   "landing.notifications.heading": {
     "message": "การแจ้งเตือน"
+  },
+  "landing.notifications.received-time": {
+    "message": ""
   },
   "settings.applications.button.upload-icon": {
     "message": "อัปโหลดไอคอน"

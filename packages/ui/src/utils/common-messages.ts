@@ -1,4 +1,6 @@
-import { defineMessages, type MessageDescriptor } from '../composables/i18n'
+import type { Labrinth } from '@modrinth/api-client'
+
+import { defineMessage, defineMessages, type MessageDescriptor } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
 	acceptButton: {
@@ -24,6 +26,10 @@ export const commonMessages = defineMessages({
 	beta: {
 		id: 'badge.beta',
 		defaultMessage: 'Beta',
+	},
+	release: {
+		id: 'badge.release',
+		defaultMessage: 'Release',
 	},
 	allProjectType: {
 		id: 'project-type.all',
@@ -239,7 +245,7 @@ export const commonMessages = defineMessages({
 	},
 	removeButton: {
 		id: 'button.remove',
-		defaultMessage: 'Remove',
+		defaultMessage: 'Delete passkey',
 	},
 	removeImageButton: {
 		id: 'button.remove-image',
@@ -1124,6 +1130,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.view.title',
 		defaultMessage: 'View',
 	},
+	withheldVersionsWarningResolve: {
+		id: 'project.versions.withheld-versions-warning.resolve-button',
+		defaultMessage: 'Resolve',
+	},
 })
 
 export const languageSelectorMessages = defineMessages({
@@ -1285,3 +1295,64 @@ export const externalProjectLicenseStatusMessages = defineMessages({
 		defaultMessage: 'Unidentified',
 	},
 })
+
+export const projectCompatibilityMessages = defineMessages({
+	title: {
+		id: `project.about.compatibility.title`,
+		defaultMessage: 'Compatibility',
+	},
+	minecraftJava: {
+		id: `project.about.compatibility.game.minecraftJava`,
+		defaultMessage: 'Minecraft: Java Edition',
+	},
+	platforms: {
+		id: `project.about.compatibility.platforms`,
+		defaultMessage: 'Platforms',
+	},
+	platformsPlural: {
+		id: `project.about.compatibility.platforms-plural`,
+		defaultMessage: '{count, plural, one {Platform} other {Platforms}}',
+	},
+	environments: {
+		id: `project.about.compatibility.environments`,
+		defaultMessage: 'Supported environments',
+	},
+})
+
+export const fileTypeMessages: Record<
+	Labrinth.Versions.v3.FileType | 'primary',
+	MessageDescriptor
+> = {
+	primary: defineMessage({
+		id: 'version.file-type.primary',
+		defaultMessage: 'Primary',
+	}),
+	unknown: defineMessage({
+		id: 'version.file-type.unknown',
+		defaultMessage: 'Other',
+	}),
+	'required-resource-pack': defineMessage({
+		id: 'version.file-type.required-resource-pack',
+		defaultMessage: 'Required resource pack',
+	}),
+	'optional-resource-pack': defineMessage({
+		id: 'version.file-type.optional-resource-pack',
+		defaultMessage: 'Optional resource pack',
+	}),
+	'sources-jar': defineMessage({
+		id: 'version.file-type.sources-jar',
+		defaultMessage: 'Source jar',
+	}),
+	'dev-jar': defineMessage({
+		id: 'version.file-type.dev-jar',
+		defaultMessage: 'Dev jar',
+	}),
+	'javadoc-jar': defineMessage({
+		id: 'version.file-type.javadoc-jar',
+		defaultMessage: 'Javadoc jar',
+	}),
+	signature: defineMessage({
+		id: 'version.file-type.signature',
+		defaultMessage: 'Signature file',
+	}),
+}

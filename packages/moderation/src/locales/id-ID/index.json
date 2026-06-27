@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Tambah tautan eksternal"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Anda memilih semua {totalAvailableTags, plural, other {(#) tag yang tersedia}}. Ini bertentangan dengan tujuan tag, yang bertujuan membantu pengguna mencari proyek yang relevan. Mohon hanya pilih tag yang relevan dengan proyek Anda."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Pilih tag yang tepat"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Panjang keterangan Anda adalah {length, plural, other {# karakter yang dapat dibaca}}. Setidaknya {minChars, plural, other {# karakter}} disarankan untuk membuat keterangan yang jelas dan informatif."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Kembangkan keterangan"
@@ -95,6 +101,9 @@
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Jangan gunakan pemendek tautan"
   },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, other {# tajuk}} dalam keterangan Anda{count, plural, other{}} terlalu panjang. Tajuk seharusnya ringkas dan bertindak sebagai judul suatu bagian, bukan kalimat penuh."
+  },
   "nags.long-headers.title": {
     "defaultMessage": "Tajuk hendaklah singkat"
   },
@@ -124,6 +133,9 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Tinjau umpan balik"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Anda memilih {count, plural, other {# tag resolusi}} ({tags}). Paket sumber seharusnya hanya memiliki satu tag resolusi yang sepadan dengan resolusi utamanya."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang benar"
@@ -188,6 +200,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Bersihkan ringkasan"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Panjang ringkasan Anda adalah {length, plural, other {# karakter yang dapat dibaca}}. Setidaknya {minChars, plural, other {# karakter}} disarankan untuk membuat keterangan yang informatif dan menarik."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Kembangkan ringkasan"
   },
@@ -197,8 +212,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Bersihkan nama"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Anda memilih {tagCount, plural, other {# tag}}. Mohon pertimbangkan untuk menguranginya menjadi sebanyak-banyaknya {maxTagCount} untuk memastikan server Anda muncul pada hasil pencarian yang relevan."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Pilih tag yang tepat"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Anda memilih {tagCount, plural, other {# tag}}. Pertimbangkan untuk menguranginya menjadi {maxTagCount} atau kurang untuk memastikan proyek Anda muncul pada hasil pencarian yang relevan."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Pilih tag yang tepat"
@@ -231,3 +252,4 @@
     "defaultMessage": "Kunjungi pengaturan tautan"
   }
 }
+

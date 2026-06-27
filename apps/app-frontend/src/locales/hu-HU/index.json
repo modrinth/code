@@ -78,7 +78,7 @@
     "message": "A kezdőlap „Folytasd itt” részében a legújabb világok is megtalálhatók."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "„Folytasd itt” a világokat is"
+    "message": "Visszaugrás a világokba"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizáld az indítót a Minecraft indításakor."
@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Nincs a(z) {compatibilityLabel} verziónak megfelelő elérhető verzió. Válassz ki egy verziót, ha mégis telepíteni szeretnéd. A függőségek nem települnek automatikusan."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modcsomag telepítése..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Írd be a modcsomag leírását..."
   },
@@ -242,12 +236,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Szerverek böngészése"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' **véglegesen törlődik**, és azt semmilyen módon nem lehet majd helyreállítani."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Biztosan véglegesen törölni szeretnéd ezt a világot?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modolt"
   },
@@ -266,20 +254,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nincs szerver vagy világ"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' eltávolításra kerül a listádról, beleértve a játékon belülieket is. Ezt a lépést nem tudod visszavonni."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) eltávolításra kerül a listádról, beleértve a játékon belülieket is. Ezt a lépést nem tudod visszavonni."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Biztosan el akarod távolítani ezt: {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "ez a szerver"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Szükséges tartalom"
@@ -289,6 +265,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count} mod"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Szükséges modcsomag"
@@ -539,6 +518,9 @@
   "friends.action.add-friend": {
     "message": "Barát hozzáadása"
   },
+  "friends.action.view-friend-requests": {
+    "message": "{count} barát {count, plural, other {kérelem}}"
+  },
   "friends.add-friend.submit": {
     "message": "Barátkérelem elküldése"
   },
@@ -708,19 +690,19 @@
     "message": "Frissítési csatorna"
   },
   "instance.settings.tabs.general.update-channel.alpha": {
-    "message": "Alpha"
+    "message": "Alfa"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "A release, béta és az alpha verziók is meg fognak jelenni az elérhető frissítések között."
+    "message": "A kiadás, béta és az alfa verziók is meg fognak jelenni az elérhető frissítések között."
   },
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Béta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "A release és a béta verziók is meg fognak jelenni az elérhető frissítések között."
+    "message": "A kiadás és a béta verziók is meg fognak jelenni az elérhető frissítések között."
   },
   "instance.settings.tabs.general.update-channel.release": {
-    "message": "Release"
+    "message": "Kiadás"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
     "message": "Csak a release verziók fognak megjelenni az elérhető frissítések között."

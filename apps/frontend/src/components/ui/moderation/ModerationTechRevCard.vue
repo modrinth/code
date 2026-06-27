@@ -11,11 +11,15 @@ import {
 	CopyIcon,
 	DownloadIcon,
 	EllipsisVerticalIcon,
+	EyeOffIcon,
 	LinkIcon,
 	LoaderCircleIcon,
+	ScaleIcon,
 	ShieldCheckIcon,
+	SpinnerIcon,
 	TimerIcon,
 	TriangleAlertIcon,
+	XIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
@@ -23,15 +27,17 @@ import {
 	ButtonStyled,
 	Collapsible,
 	CollapsibleRegion,
+	commonMessages,
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	NavTabs,
 	OverflowMenu,
 	type OverflowMenuOption,
 	useFormatBytes,
 	useFormatDateTime,
+	useVIntl,
 } from '@modrinth/ui'
-import { NavTabs } from '@modrinth/ui'
 import {
 	capitalizeString,
 	formatProjectType,
@@ -47,6 +53,7 @@ import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
 const auth = await useAuth()
 const featureFlags = useFeatureFlags()
+const { formatMessage } = useVIntl()
 
 const formatDateTimeUtc = useFormatDateTime({
 	year: 'numeric',
@@ -96,6 +103,16 @@ const emit = defineEmits<{
 	showMaliciousSummary: [unsafeFiles: UnsafeFile[]]
 }>()
 
+const projectStatus = ref<Labrinth.Projects.v2.ProjectStatus>(props.item.project.status)
+const isProjectApproved = computed(() => {
+	return (
+		projectStatus.value === 'approved' ||
+		projectStatus.value === 'archived' ||
+		projectStatus.value === 'unlisted' ||
+		projectStatus.value === 'private'
+	)
+})
+
 const quickActions = computed<OverflowMenuOption[]>(() => {
 	const actions: OverflowMenuOption[] = []
 
@@ -140,6 +157,53 @@ const quickActions = computed<OverflowMenuOption[]>(() => {
 
 	return actions
 })
+
+const isLoadingStatusAction = ref(false)
+const projectStatusActions = computed<OverflowMenuOption[]>(() => [
+	{
+		id: 'approve',
+		color: 'green',
+		action: () => setStatus('approved'),
+		hoverFilled: true,
+		disabled: isProjectApproved.value || isLoadingStatusAction.value,
+	},
+	{
+		id: 'withhold',
+		color: 'orange',
+		action: () => setStatus('withheld'),
+		hoverFilled: true,
+		disabled: projectStatus.value === 'withheld' || isLoadingStatusAction.value,
+	},
+	{
+		id: 'send-to-review',
+		action: () => setStatus('processing'),
+		hoverFilled: true,
+		disabled: projectStatus.value === 'processing' || isLoadingStatusAction.value,
+	},
+	{
+		id: 'reject',
+		color: 'red',
+		action: () => setStatus('rejected'),
+		hoverFilled: true,
+		disabled: projectStatus.value === 'rejected' || isLoadingStatusAction.value,
+	},
+])
+
+async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
+	isLoadingStatusAction.value = true
+	try {
+		await client.labrinth.projects_v2.edit(props.item.project.id, { status })
+
+		projectStatus.value = status
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: (err as any)?.data?.description ? (err as any).data.description : String(err),
+			type: 'error',
+		})
+	}
+	isLoadingStatusAction.value = false
+}
 
 type Tab = 'Thread' | 'Files' | 'File'
 const tabs: readonly ('Thread' | 'Files')[] = ['Thread', 'Files']
@@ -345,13 +409,6 @@ const severityColor = computed(() => {
 		default:
 			return 'text-blue bg-highlight-blue border-solid border-[1px] border-blue'
 	}
-})
-
-const isProjectApproved = computed(() => {
-	const status = props.item.project.status
-	return (
-		status === 'approved' || status === 'archived' || status === 'unlisted' || status === 'private'
-	)
 })
 
 const formattedDate = computed(() => {
@@ -1116,6 +1173,37 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									>
 										<BugIcon /> Fail
 									</button>
+								</ButtonStyled>
+								<ButtonStyled color="standard">
+									<OverflowMenu
+										class="btn-dropdown-animation"
+										:disabled="isLoadingStatusAction"
+										:options="projectStatusActions"
+									>
+										<SpinnerIcon
+											v-if="isLoadingStatusAction"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										<ScaleIcon v-else aria-hidden="true" />
+										Set Status
+										<template #approve>
+											<CheckIcon aria-hidden="true" />
+											Approve
+										</template>
+										<template #withhold>
+											<EyeOffIcon aria-hidden="true" />
+											Withhold
+										</template>
+										<template #send-to-review>
+											<ScaleIcon aria-hidden="true" />
+											Send to review
+										</template>
+										<template #reject>
+											<XIcon aria-hidden="true" />
+											Reject
+										</template>
+									</OverflowMenu>
 								</ButtonStyled>
 								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
 									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug Summary</button>

@@ -9,6 +9,7 @@ members = [
   "packages/ariadne",
   "packages/daedalus",
   "packages/labrinth-derive",
+  "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
   "packages/modrinth-util",
@@ -32,7 +33,6 @@ actix-ws = "0.3.0"
 arc-swap = "1.7.1"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
-async-compression = { version = "0.4.32", default-features = false }
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
@@ -119,6 +119,7 @@ lettre = { version = "0.11.19", default-features = false, features = [
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.30.0", default-features = false }
+modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
 modrinth-util = { path = "packages/modrinth-util" }
 muralpay = { path = "packages/muralpay" }
@@ -220,6 +221,8 @@ utoipa-actix-web = { version = "0.1.2" }
 utoipa-scalar = { version = "0.3.0", default-features = false }
 uuid = "1.18.1"
 validator = "0.20.0"
+webauthn-rs = "0.5.5"
+webauthn-rs-proto = "0.5.5"
 webp = { version = "0.3.1", default-features = false }
 webview2-com = "0.38.0"  # Should be updated in lockstep with wry
 whoami = "1.6.1"
@@ -270,6 +273,7 @@ redundant_type_annotations = "warn"
 result_large_err = "allow"
 todo = "warn"
 too_many_arguments = "allow"
+type_complexity = "allow"
 uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 wildcard_dependencies = "warn"

@@ -6,8 +6,11 @@ use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::database::redis::RedisPool;
+use crate::file_hosting::FileHost;
 use crate::models::exp;
+
 use crate::models::projects::{FileType, VersionStatus};
+use crate::queue::file_scan::scan_file;
 use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -17,9 +20,47 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::iter;
+use tracing::error;
 
 pub const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
+
+pub async fn cleanup_unused_attribution_files_and_groups(
+    transaction: &mut PgTransaction<'_>,
+) -> Result<(), DatabaseError> {
+    sqlx::query!(
+        "
+        DELETE FROM project_attribution_files paf
+        USING project_attribution_groups pag
+        WHERE pag.id = paf.group_id
+            AND NOT EXISTS (
+            SELECT 1
+            FROM override_file_sources ofs
+            INNER JOIN files f ON f.id = ofs.file_id
+            INNER JOIN versions v ON v.id = f.version_id
+            WHERE ofs.sha1 = paf.sha1
+                AND v.mod_id = pag.project_id
+        )
+        ",
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    sqlx::query!(
+        "
+        DELETE FROM project_attribution_groups g
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM project_attribution_files paf
+            WHERE paf.group_id = g.id
+        )
+        ",
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    Ok(())
+}
 
 #[derive(Clone)]
 pub struct VersionBuilder {
@@ -134,7 +175,10 @@ impl VersionFileBuilder {
     pub async fn insert(
         self,
         version_id: DBVersionId,
+        project_id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        file_host: &dyn FileHost,
         http: &reqwest::Client,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
@@ -169,6 +213,22 @@ impl VersionFileBuilder {
             .await?;
         }
 
+        let attribution_scan = sqlx::query!(
+            "
+            INSERT INTO file_scans (file_id)
+            SELECT $1
+            WHERE EXISTS (
+                SELECT 1
+                FROM attribution_enforced_versions
+                WHERE id = $2
+            )
+            ",
+            file_id as DBFileId,
+            version_id as DBVersionId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
         if let Err(err) = crate::routes::internal::delphi::run(
             &mut *transaction,
             DelphiRunParameters {
@@ -178,7 +238,21 @@ impl VersionFileBuilder {
         )
         .await
         {
-            tracing::error!("Error submitting new file to Delphi: {err}");
+            error!("Error submitting new file to Delphi: {err:?}");
+        }
+
+        if attribution_scan.rows_affected() > 0
+            && let Err(err) = scan_file(
+                &mut *transaction,
+                redis,
+                file_host,
+                project_id,
+                file_id,
+                &self.url,
+            )
+            .await
+        {
+            error!("Error scanning new file {file_id:?}: {err:?}");
         }
 
         Ok(file_id)
@@ -195,6 +269,8 @@ impl VersionBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+        file_host: &dyn FileHost,
         http: &reqwest::Client,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
@@ -236,7 +312,15 @@ impl VersionBuilder {
         } = self;
 
         for file in files {
-            file.insert(version_id, transaction, http).await?;
+            file.insert(
+                version_id,
+                self.project_id,
+                transaction,
+                redis,
+                file_host,
+                http,
+            )
+            .await?;
         }
 
         DependencyBuilder::insert_many(
@@ -425,6 +509,8 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await?;
+
+        cleanup_unused_attribution_files_and_groups(transaction).await?;
 
         // Sync dependencies
 
@@ -716,7 +802,7 @@ impl DBVersion {
 
                 let dependencies : DashMap<DBVersionId, Vec<DependencyQueryResult>> = sqlx::query!(
                     "
-                    SELECT DISTINCT dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type
+                    SELECT DISTINCT d.id as dependency_id, dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type
                     FROM dependencies d
                     WHERE dependent_id = ANY($1)
                     ",
@@ -724,10 +810,12 @@ impl DBVersion {
                 ).fetch(&mut exec)
                     .try_fold(DashMap::new(), |acc : DashMap<_,Vec<DependencyQueryResult>>, m| {
                         let dependency = DependencyQueryResult {
+                            id: m.dependency_id,
                             project_id: m.dependency_project_id.map(DBProjectId),
                             version_id: m.dependency_version_id.map(DBVersionId),
                             file_name: m.file_name,
                             dependency_type: m.dependency_type,
+                            attribution: None,
                         };
 
                         acc.entry(DBVersionId(m.version_id))
@@ -736,6 +824,18 @@ impl DBVersion {
                         async move { Ok(acc) }
                     }
                     ).await?;
+
+                let dependency_attributions =
+                    crate::queue::file_scan::get_dependency_attributions(
+                        &mut exec,
+                        &version_ids
+                            .iter()
+                            .copied()
+                            .map(DBVersionId)
+                            .collect_vec(),
+                    )
+                    .await
+                    .unwrap_or_default();
 
                 let res = sqlx::query!(
                     r#"
@@ -761,6 +861,19 @@ impl DBVersion {
                         let hashes = hashes.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let version_fields = version_fields.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let dependencies = dependencies.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        let dependencies = dependencies
+                            .into_iter()
+                            .map(|mut dependency| {
+                                if let Some(attr) = dependency_attributions.get(&dependency.id)
+                                    && (attr.attribution.flame_project.is_some()
+                                        || attr.attribution.resolution.is_some())
+                                {
+                                    dependency.attribution = Some(attr.attribution.clone());
+                                }
+
+                                dependency
+                            })
+                            .collect_vec();
 
                         let loader_fields = loader_fields.iter()
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
@@ -862,14 +975,14 @@ impl DBVersion {
             })
     }
 
-    pub async fn get_files_from_hash<'a, 'b, E>(
+    pub async fn get_files_from_hash<'a, E>(
         algorithm: String,
         hashes: &[String],
         executor: E,
         redis: &RedisPool,
     ) -> Result<Vec<DBFile>, DatabaseError>
     where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let val = redis.get_cached_keys(
             VERSION_FILES_NAMESPACE,
@@ -959,6 +1072,22 @@ impl DBVersion {
             .await?;
         Ok(())
     }
+
+    pub async fn clear_cache_ids(
+        version_ids: &[DBVersionId],
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
+
+        redis
+            .delete_many(
+                version_ids
+                    .iter()
+                    .map(|id| (VERSIONS_NAMESPACE, Some(id.0.to_string()))),
+            )
+            .await?;
+        Ok(())
+    }
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -977,10 +1106,12 @@ pub struct VersionQueryResult {
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct DependencyQueryResult {
+    pub id: i32,
     pub project_id: Option<DBProjectId>,
     pub version_id: Option<DBVersionId>,
     pub file_name: Option<String>,
     pub dependency_type: String,
+    pub attribution: Option<crate::models::projects::DependencyAttribution>,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]

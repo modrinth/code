@@ -23,14 +23,20 @@
   "analytics.breakdown.country": {
     "message": "国"
   },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "依存プロジェクト"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "依存プロジェクトの種類"
+  },
   "analytics.breakdown.download-reason": {
     "message": "理由"
   },
   "analytics.breakdown.download-source": {
-    "message": "流入元"
+    "message": "ソース"
   },
   "analytics.breakdown.game-version": {
-    "message": "マインクラフト"
+    "message": "ゲームのバージョン"
   },
   "analytics.breakdown.generic": {
     "message": "内訳"
@@ -38,8 +44,14 @@
   "analytics.breakdown.loader": {
     "message": "ローダー"
   },
+  "analytics.breakdown.members": {
+    "message": "メンバー"
+  },
   "analytics.breakdown.monetization": {
     "message": "収益化"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "分析 - デフォルト"
   },
   "analytics.breakdown.project": {
     "message": "プロジェクト"
@@ -48,7 +60,10 @@
     "message": "ステータス"
   },
   "analytics.breakdown.project-version": {
-    "message": "バージョン"
+    "message": "プロジェクトのバージョン"
+  },
+  "analytics.breakdown.selected": {
+    "message": "分析 - {breakdown}"
   },
   "analytics.chart.action.show-all": {
     "message": "すべて表示"
@@ -58,6 +73,45 @@
   },
   "analytics.chart.axis.playtime-hours": {
     "message": "{hours}時間"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count}件がアクティブ"
+  },
+  "analytics.chart.controls.annotations": {
+    "message": "注釈"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "アナリティクスのグラフ設定, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "設定"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "アナリティクスのグラフ設定"
+  },
+  "analytics.chart.controls.display": {
+    "message": "ディスプレイ"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Modrinthのイベントがありません。"
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "プロジェクトのイベントがありません。"
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "１期前の描画"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "プロジェクト"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": ""
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "合計"
   },
   "analytics.chart.view.area": {
     "message": "エリア"
@@ -75,7 +129,7 @@
     "message": "Modパック"
   },
   "analytics.download-reason.standalone": {
-    "message": "新規"
+    "message": "スタンドアローン"
   },
   "analytics.download-reason.update": {
     "message": "更新"
@@ -86,29 +140,77 @@
   "analytics.download-source.website": {
     "message": "Modrinth Web"
   },
+  "analytics.downloads.suffix": {
+    "message": "ダウンロード"
+  },
+  "analytics.empty.no-data": {
+    "message": "使用可能なデータがありません"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "統計に使用可能なデータがありません"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "全て"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "リリース"
+  },
   "analytics.filter.search.countries": {
-    "message": "国を検索..."
+    "message": "国を検索…"
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "プロジェクトバージョンを検索…"
+  },
+  "analytics.filter.search.versions": {
+    "message": "バージョンを検索…"
   },
   "analytics.graph.title.downloads": {
-    "message": "ダウンロード回数の推移"
+    "message": "ダウンロードの推移"
   },
   "analytics.graph.title.revenue": {
     "message": "収益の推移"
   },
   "analytics.project-event.project-approved": {
-    "message": "承認完了"
+    "message": "承認済み"
   },
   "analytics.project-status.approved": {
     "message": "承認済み"
   },
+  "analytics.project-status.private": {
+    "message": "非公開"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "限定公開"
+  },
+  "analytics.project.all": {
+    "message": "全てのプロジェクト"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "分析"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "時間足"
+  },
+  "analytics.query.label.project": {
+    "message": "プロジェクト"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "期間"
+  },
   "analytics.stat.downloads": {
-    "message": "ダウンロード回数"
+    "message": "ダウンロード"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Modrinthを通じて行われた閲覧およびダウンロードが収益の対象となります。\nまた、Webからの場合は不正防止のためのフィルターを通過する必要があり、アプリからの場合は先述のフィルターに加え、Modrinthにログインされたユーザーに限ります。\n注意として、すべてのプロジェクトにおいて、収益の対象となる操作の割合はほぼ均一に保たれるため、最終的な収益で不公平が生まれることはありません。"
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "もっと詳しく"
   },
+  "analytics.stat.monetization-banner.title": {
+    "message": "収益が発生する仕組みは？"
+  },
   "analytics.stat.playtime": {
-    "message": "プレイ時間"
+    "message": "プレイ"
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours}時間"
@@ -128,20 +230,56 @@
   "analytics.stat.unavailable": {
     "message": "N/A"
   },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "現在のクエリでは利用不可"
+  },
   "analytics.stat.views": {
-    "message": "表示回数"
+    "message": "表示"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start}から{end}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "プレイ時間 (秒)"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, number}日"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, number}時間"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, number}分"
+  },
+  "analytics.table.export-csv": {
+    "message": "CSVをエクスポート"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "{start}～{end}件目を表示中 (全{total}件)"
   },
   "analytics.table.search.placeholder": {
-    "message": "検索..."
+    "message": "検索…"
   },
   "analytics.title": {
     "message": "アナリティクス"
   },
   "analytics.value.monetized": {
-    "message": "設定済み"
+    "message": "発生済み"
+  },
+  "analytics.value.no-dependent": {
+    "message": "なし"
+  },
+  "analytics.value.none": {
+    "message": "デフォルト"
+  },
+  "analytics.value.other": {
+    "message": "その他"
+  },
+  "analytics.value.unknown": {
+    "message": "不明"
   },
   "analytics.value.unmonetized": {
-    "message": "未設定"
+    "message": "未発生"
   },
   "app-marketing.download.description": {
     "message": "我々のデスクトップアプリはすべてのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"
@@ -256,6 +394,9 @@
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ MB"
   },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
@@ -398,38 +539,20 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "コードを入力…"
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>パスワードをお忘れですか？</forgot-password-link> • <create-account-link>アカウントを作成する</create-account-link>"
-  },
   "auth.sign-in.sign-in-with": {
     "message": "外部アカウントでログイン"
   },
   "auth.sign-in.title": {
     "message": "ログイン"
   },
-  "auth.sign-in.use-password": {
-    "message": "パスワードでログイン"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "アカウントを作成"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "パスワードが一致しません！"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "すでにアカウントをお持ちですか？"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Modrinthのアップデートを受け取る"
-  },
   "auth.sign-up.title": {
     "message": "アカウント作成"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "メールアドレスで作成"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "外部アカウントで作成"
@@ -463,21 +586,6 @@
   },
   "auth.verify-email.title": {
     "message": "メールアドレスを確認"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Modrinthのアップデートを受け取る"
-  },
-  "auth.welcome.description": {
-    "message": "素晴らしいModの開発や導入、アップデートを日々行っている、クリエイターと冒険者たちの活気あるコミュニティへようこそ。"
-  },
-  "auth.welcome.label.tos": {
-    "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
-  },
-  "auth.welcome.long-title": {
-    "message": "Modrinthへようこそ！"
-  },
-  "auth.welcome.title": {
-    "message": "ようこそ"
   },
   "collection.button.edit-icon": {
     "message": "アイコンを編集"
@@ -546,10 +654,13 @@
     "message": "送信して承認"
   },
   "conversation-thread.reply-editor.placeholder.send": {
-    "message": "メッセージを送る..."
+    "message": "メッセージを送る…"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補足ファイルはソースコードなどの支援用リソースのためのものであり、別バージョンや派生版を配布するためのものではありません。"
+  },
+  "create.collection.collection-info": {
+    "message": "新しいコレクションは、{count, plural, =0 {空の} other {#個のプロジェクトを含む}}公開コレクションとして作成されます。"
   },
   "create.collection.create-collection": {
     "message": "コレクションを作成"
@@ -693,7 +804,7 @@
     "message": "アフィリエイトリンクを作成"
   },
   "dashboard.affiliate-links.empty.no-codes": {
-    "message": "アフィリエイトコードが見つかりませんでした"
+    "message": "アフィリエイトコードが見つかりませんでした。"
   },
   "dashboard.affiliate-links.error.title": {
     "message": "アフィリエイトリンクの読み込みエラー"
@@ -712,6 +823,9 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "アフィリエイトリンクを検索…"
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "{count} 件のプロジェクトから"
   },
   "dashboard.analytics.total-downloads": {
     "message": "総ダウンロード数"
@@ -744,7 +858,7 @@
     "message": "コレクション"
   },
   "dashboard.collections.placeholder.search": {
-    "message": "コレクションを検索"
+    "message": "コレクションを検索…"
   },
   "dashboard.collections.sort.name-ascending": {
     "message": "名前順(昇順)"
@@ -1016,6 +1130,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "通知履歴を表示"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "{extraNotifs} 件の通知をさらに表示"
+  },
   "dashboard.organizations.button.create": {
     "message": "組織を作成"
   },
@@ -1025,23 +1142,41 @@
   "dashboard.organizations.error.fetch": {
     "message": "組織の取得に失敗しました"
   },
+  "dashboard.organizations.member-count": {
+    "message": "{count} 人のメンバー"
+  },
   "dashboard.organizations.title": {
     "message": "組織"
   },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "全て既読にする"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "履歴を表示"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "履歴"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "通知履歴"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "通知を読み込み中…"
+  },
   "dashboard.projects.bulk-edit-hint": {
-    "message": "以下で選択することで、複数のプロジェクトを一括で編集できます"
+    "message": "以下で選択することで、複数のプロジェクトを一括で編集できます。"
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "サーバープロジェクトでは一括編集を利用できません"
   },
   "dashboard.projects.empty": {
-    "message": "まだプロジェクトがありません。上にある緑のボタンを押して始めましょう"
+    "message": "まだプロジェクトがありません。上にある緑のボタンを押して始めましょう。"
   },
   "dashboard.projects.head-title": {
     "message": "プロジェクト"
   },
   "dashboard.projects.links.and-more": {
-    "message": "さらに {count} 件..."
+    "message": "さらに {count} 件…"
   },
   "dashboard.projects.links.button.clear-link": {
     "message": "リンクを削除"
@@ -1049,17 +1184,23 @@
   "dashboard.projects.links.button.edit": {
     "message": "リンクを編集"
   },
+  "dashboard.projects.links.changes-applied": {
+    "message": "変更は <strong>{count}</strong> 件のプロジェクトに適用されます"
+  },
   "dashboard.projects.links.description": {
     "message": "下記に入力したリンクは、選択した各プロジェクトに上書きされます。空欄のままにしたリンクは無視されます。ゴミ箱ボタンを使用すると、選択したすべてのプロジェクトからリンクを削除できます。"
   },
   "dashboard.projects.links.discord-invite.description": {
-    "message": "Discordサーバーへの招待リンク"
+    "message": "Discordサーバーへの招待リンク。"
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discordの招待"
   },
+  "dashboard.projects.links.header.edit": {
+    "message": "リンクを編集"
+  },
   "dashboard.projects.links.issue-tracker.description": {
-    "message": "ユーザーがプロジェクトに関するバグ、問題、懸念事項を報告できる場所"
+    "message": "ユーザーがプロジェクトに関するバグ、問題、懸念事項を報告できる場所。"
   },
   "dashboard.projects.links.issue-tracker.label": {
     "message": "問題の報告と追跡"
@@ -1086,7 +1227,7 @@
     "message": "ウィキページ"
   },
   "dashboard.projects.notification.bulk-edit-success": {
-    "message": "選択されたプロジェクトのリンクを一括編集しました"
+    "message": "選択されたプロジェクトのリンクを一括編集しました。"
   },
   "dashboard.projects.project.icon-alt": {
     "message": "{title} のアイコン"
@@ -1347,7 +1488,7 @@
     "message": "コレクションが見つかりません"
   },
   "error.generic.401.signed-in-as": {
-    "message": "現在サインイン中のアカウント:"
+    "message": "現在サインイン中のアカウント："
   },
   "error.generic.401.title": {
     "message": "このページにアクセスする権限がありません"
@@ -2359,6 +2500,9 @@
   },
   "profile.label.collection": {
     "message": "コレクション"
+  },
+  "profile.label.downloads": {
+    "message": "{count}件のダウンロード"
   },
   "profile.label.joined": {
     "message": "参加: "
@@ -3537,7 +3681,7 @@
     "message": "{shared}個の共有されたCPU ({bursts}個のCPUに増加)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "このサブスクリプションに対応するサーバーが見つかりませんでした。これにはいくつか説明があります。あなたがサーバーを購入してすぐの場合、これは通常であり、サーバーが提供されるまで長くて1時間かかります。しばらく前にサーバーを購入していた場合はおそらくそれ以来サーバーが停止されています。これが期待したものではない場合は、以下の情報と共にModrinth Supportにお問い合わせください。"
+    "message": "このサブスクリプションに対応するサーバーが見つかりませんでした。これにはいくつか説明があります。あなたがサーバーを購入してすぐの場合、これは通常であり、サーバーが提供されるまで長くて1時間かかります。しばらく前にサーバーを購入していた場合はおそらくそれ以来サーバーが停止されています。これが期待したものではない場合は、以下の情報と共にModrinth Supportにお問い合わせください："
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "サーバーID: {id}"

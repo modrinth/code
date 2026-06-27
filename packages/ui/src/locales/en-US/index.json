@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "New"
   },
+  "badge.release": {
+    "defaultMessage": "Release"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -234,7 +237,7 @@
     "defaultMessage": "Re-install modpack"
   },
   "button.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Delete passkey"
   },
   "button.remove-image": {
     "defaultMessage": "Remove image"
@@ -569,11 +572,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Deleting {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "Deleting {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "Deleting {contentType}..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "Disabling {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "Disabling {count, number} {contentType}"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "Disabling {contentType}..."
@@ -581,11 +590,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "Enabling {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "Enabling {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "Enabling {contentType}..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "Updating {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "Updating {count, number} {contentType}"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Updating {contentType}..."
@@ -865,6 +880,258 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Set up server"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, one {Add file} other {Add files}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Select any files that should be moved into this group."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "There are no files in other groups that can be moved here."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Could not load files"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "No files match your search."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Search files…"
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {# file selected} other {# files selected}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Add files to this group"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Add files..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Could not add files"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "Content not allowed"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Passed"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Proof rejected"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Completed"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "No permission"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Not allowed"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Pending"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Information rejected"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Other"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "Add attribution"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "All Rights Reserved/No license"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Link to license"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "License name, preferably a SPDX identifier"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Please select a license."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "Link must be a valid URL."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "e.g. MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(optional)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "License"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "Link to work"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "link-to-license"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "link-to-work"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "This appears to be a Modrinth link. If this content is available on Modrinth, your pack was likely exported incorrectly. If you downloaded it from another site, try downloading the Modrinth version instead; sometimes they are not identical files."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Notes"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Write something here..."
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "Proof screenshot {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Remove image"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "Proof images"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "Drag and drop to upload or click to select an image"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "If you are found to have lied or manipulated the images uploaded, your project and account may be terminated."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth staff may verify submitted proof"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Save attribution"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Select a license..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "Permission reason"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Please include a link to your license. If you have none, you should likely select 'All Rights Reserved/No license'"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Please provide an explanation or upload at least one proof image."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Please provide a link."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Please provide a note or upload at least one proof image."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Please upload a PNG, JPEG, GIF, WebP, or BMP image."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Please upload at least one proof image."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "A short explanation or proof images are required."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Explanation"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Attribution group {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {# file} other {# files}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Included files:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Included in {count, plural, one {# version} other {# versions}}:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "Last updated on {date} by {user}"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Unknown"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Licensed:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Link to work:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Reason"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Could not save moderation review"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "These files are not currently used by any version."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Notes:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "None"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Original project"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Proof screenshot {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Proof images:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Automatically attributed"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "We've seen this file before and have prepared an attribution for you. If something seems wrong, please contact Modrinth Support via the Help Center"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "License"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "The license of this work permits you to redistribute it in your modpack."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Upload supporting documentation related to this license."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "My project"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Original work created by you."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Upload files that help verify you created this work."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "No permission"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "We've seen this file before and its license does not normally allow redistribution."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "You don't have permission to use this work."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Special permission"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Remove from group"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Could not split file"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + {count} more"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Moderator"
   },
   "external-project-license-status.no": {
     "defaultMessage": "No"
@@ -2603,6 +2870,9 @@
   "project.about.compatibility.platforms": {
     "defaultMessage": "Platforms"
   },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, one {Platform} other {Platforms}}"
+  },
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibility"
   },
@@ -3184,6 +3454,15 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "Withheld"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "Version withheld due to missing permissions"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Resolve"
   },
   "project.visibility.archived": {
     "defaultMessage": "Archived"
@@ -5320,5 +5599,95 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth Team"
+  },
+  "version.content.name": {
+    "defaultMessage": "Name"
+  },
+  "version.content.version": {
+    "defaultMessage": "Version"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "Dev jar"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadoc jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "Optional resource pack"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Primary"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Required resource pack"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "Signature file"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "Source jar"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Other"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Changes"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Compatibility"
+  },
+  "version.section.content": {
+    "defaultMessage": "Content"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Search content..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Any compatible version"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Any version"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Unavailable version"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "This version may have been deleted or is being reviewed by moderators."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "The required version may have been deleted or is being reviewed by moderators."
+  },
+  "version.section.files": {
+    "defaultMessage": "Files"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Included content"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Known incompatibilities"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "No changelog was provided."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "No mod loader"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Optional dependencies"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Required content"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Supplementary resources"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "File"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Size"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Type"
   }
 }
