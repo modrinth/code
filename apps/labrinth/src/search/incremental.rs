@@ -111,13 +111,16 @@ impl IncrementalSearchQueue {
 
 #[derive(Default)]
 struct PendingSearchIndexOperations {
-    changed_projects: HashMap<ProjectId, HashSet<VersionId>>,
+    changed_project_ids: HashSet<ProjectId>,
+    changed_project_versions: HashMap<ProjectId, HashSet<VersionId>>,
     removed_project_ids: HashSet<ProjectId>,
 }
 
 impl PendingSearchIndexOperations {
     fn is_empty(&self) -> bool {
-        self.changed_projects.is_empty() && self.removed_project_ids.is_empty()
+        self.changed_project_ids.is_empty()
+            && self.changed_project_versions.is_empty()
+            && self.removed_project_ids.is_empty()
     }
 
     fn push_project_change(
@@ -126,24 +129,38 @@ impl PendingSearchIndexOperations {
         version_ids: impl IntoIterator<Item = VersionId>,
     ) {
         if !self.removed_project_ids.contains(&project_id) {
-            self.changed_projects
-                .entry(project_id)
-                .or_default()
-                .extend(version_ids);
+            let version_ids = version_ids.into_iter().collect::<HashSet<_>>();
+            if version_ids.is_empty() {
+                self.changed_project_versions.remove(&project_id);
+                self.changed_project_ids.insert(project_id);
+            } else if !self.changed_project_ids.contains(&project_id) {
+                self.changed_project_versions
+                    .entry(project_id)
+                    .or_default()
+                    .extend(version_ids);
+            }
         }
     }
 
     fn push_project_removal(&mut self, project_id: ProjectId) {
-        self.changed_projects.remove(&project_id);
+        self.changed_project_ids.remove(&project_id);
+        self.changed_project_versions.remove(&project_id);
         self.removed_project_ids.insert(project_id);
     }
 
     fn push_event(&mut self, event: SearchProjectIndexQueueEventData) {
         match event {
-            SearchProjectIndexQueueEventData::ProjectChange {
+            SearchProjectIndexQueueEventData::ProjectChange { project_id } => {
+                self.push_project_change(project_id, [])
+            }
+            SearchProjectIndexQueueEventData::ProjectVersionChange {
                 project_id,
                 version_ids,
-            } => self.push_project_change(project_id, version_ids),
+            } => {
+                if !version_ids.is_empty() {
+                    self.push_project_change(project_id, version_ids)
+                }
+            }
             SearchProjectIndexQueueEventData::ProjectRemoval { project_id } => {
                 self.push_project_removal(project_id)
             }
@@ -152,15 +169,20 @@ impl PendingSearchIndexOperations {
 
     fn into_events(self) -> Vec<SearchProjectIndexQueueEventData> {
         let mut events = Vec::with_capacity(
-            self.changed_projects.len() + self.removed_project_ids.len(),
+            self.changed_project_ids.len()
+                + self.changed_project_versions.len()
+                + self.removed_project_ids.len(),
         );
 
         events.extend(self.removed_project_ids.into_iter().map(|project_id| {
             SearchProjectIndexQueueEventData::ProjectRemoval { project_id }
         }));
-        events.extend(self.changed_projects.into_iter().map(
+        events.extend(self.changed_project_ids.into_iter().map(|project_id| {
+            SearchProjectIndexQueueEventData::ProjectChange { project_id }
+        }));
+        events.extend(self.changed_project_versions.into_iter().map(
             |(project_id, version_ids)| {
-                SearchProjectIndexQueueEventData::ProjectChange {
+                SearchProjectIndexQueueEventData::ProjectVersionChange {
                     project_id,
                     version_ids: version_ids.into_iter().collect(),
                 }
@@ -175,6 +197,9 @@ impl PendingSearchIndexOperations {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum SearchProjectIndexQueueEventData {
     ProjectChange {
+        project_id: ProjectId,
+    },
+    ProjectVersionChange {
         project_id: ProjectId,
         version_ids: Vec<VersionId>,
     },

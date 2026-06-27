@@ -761,13 +761,13 @@ pub async fn version_edit_helper(
             transaction.commit().await?;
             database::models::DBVersion::clear_cache(&version_item, &redis)
                 .await?;
-            super::projects::clear_project_cache_and_queue_search(
-                &pool,
+            super::projects::clear_project_cache_and_queue_search_versions(
                 &redis,
                 &search_state,
                 version_item.inner.project_id,
                 None,
                 Some(true),
+                [VersionId::from(version_item.inner.id)],
             )
             .await?;
             Ok(HttpResponse::NoContent().body(""))
@@ -1098,13 +1098,13 @@ pub async fn version_delete(
 
     transaction.commit().await?;
 
-    super::projects::clear_project_cache_and_queue_search(
-        &pool,
+    super::projects::clear_project_cache_and_queue_search_versions(
         &redis,
         &search_state,
         version.inner.project_id,
         None,
         Some(true),
+        [VersionId::from(version.inner.id)],
     )
     .await?;
     search_backend

@@ -82,13 +82,6 @@ pub async fn clear_project_cache_and_queue_search(
     slug: Option<String>,
     clear_dependencies: Option<bool>,
 ) -> Result<(), ApiError> {
-    db_models::DBProject::clear_cache(
-        project_id,
-        slug,
-        clear_dependencies,
-        redis,
-    )
-    .await?;
     let version_ids = sqlx::query_scalar!(
         "SELECT id FROM versions WHERE mod_id = $1",
         project_id as db_ids::DBProjectId,
@@ -99,6 +92,33 @@ pub async fn clear_project_cache_and_queue_search(
     .into_iter()
     .map(|version_id| VersionId::from(db_ids::DBVersionId(version_id)))
     .collect::<Vec<_>>();
+
+    clear_project_cache_and_queue_search_versions(
+        redis,
+        search_state,
+        project_id,
+        slug,
+        clear_dependencies,
+        version_ids,
+    )
+    .await
+}
+
+pub async fn clear_project_cache_and_queue_search_versions(
+    redis: &RedisPool,
+    search_state: &SearchState,
+    project_id: db_ids::DBProjectId,
+    slug: Option<String>,
+    clear_dependencies: Option<bool>,
+    version_ids: impl IntoIterator<Item = VersionId>,
+) -> Result<(), ApiError> {
+    db_models::DBProject::clear_cache(
+        project_id,
+        slug,
+        clear_dependencies,
+        redis,
+    )
+    .await?;
 
     search_state
         .queue

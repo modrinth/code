@@ -17,8 +17,9 @@ use crate::{
     env::ENV,
     models::ids::{ProjectId, VersionId},
     search::{
-        SearchBackend, incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-        indexing::index_project_documents,
+        SearchBackend,
+        incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
+        indexing::{index_project_documents, index_project_version_documents},
     },
     util::kafka::{
         INCREMENTAL_INDEX_SEARCH_TASK, KAFKA_OPERATION_INTERVAL,
@@ -129,6 +130,7 @@ async fn consume_batch(
     let start = Instant::now();
 
     let mut project_ids_to_change = HashSet::new();
+    let mut project_ids_with_version_changes = HashSet::new();
     let mut project_ids_to_remove = HashSet::new();
     let mut version_ids_to_change = HashSet::new();
     let mut messages_to_commit = Vec::new();
@@ -166,12 +168,17 @@ async fn consume_batch(
         };
 
         match event.into_data() {
-            SearchProjectIndexQueueEventData::ProjectChange {
+            SearchProjectIndexQueueEventData::ProjectChange { project_id } => {
+                project_ids_to_change.insert(project_id);
+            }
+            SearchProjectIndexQueueEventData::ProjectVersionChange {
                 project_id,
                 version_ids,
             } => {
-                project_ids_to_change.insert(project_id);
-                version_ids_to_change.extend(version_ids);
+                if !version_ids.is_empty() {
+                    project_ids_with_version_changes.insert(project_id);
+                    version_ids_to_change.extend(version_ids);
+                }
             }
             SearchProjectIndexQueueEventData::ProjectRemoval { project_id } => {
                 project_ids_to_remove.insert(project_id);
@@ -182,9 +189,14 @@ async fn consume_batch(
 
     project_ids_to_change
         .retain(|project_id| !project_ids_to_remove.contains(project_id));
+    project_ids_with_version_changes
+        .retain(|project_id| !project_ids_to_remove.contains(project_id));
 
     let project_ids_to_change =
         project_ids_to_change.into_iter().collect::<Vec<_>>();
+    let project_ids_with_version_changes = project_ids_with_version_changes
+        .into_iter()
+        .collect::<Vec<_>>();
     let project_ids_to_remove =
         project_ids_to_remove.into_iter().collect::<Vec<_>>();
     let version_ids_to_change =
@@ -192,9 +204,10 @@ async fn consume_batch(
 
     info!(
         kafka.message_count = messages_to_commit.len(),
-        "Read all Kafka messages in {:.2?}, found {} projects to change, {} versions to change, and {} projects to remove",
+        "Read all Kafka messages in {:.2?}, found {} projects to change, {} projects with version changes, {} versions to change, and {} projects to remove",
         start.elapsed(),
         project_ids_to_change.len(),
+        project_ids_with_version_changes.len(),
         version_ids_to_change.len(),
         project_ids_to_remove.len(),
     );
@@ -221,7 +234,7 @@ async fn consume_batch(
         let operation_start = Instant::now();
         info!(
             version_count = version_ids_to_change.len(),
-            "Removing changed version documents"
+            "Removing changed version documents",
         );
         search_backend
             .remove_documents(&version_ids_to_change)
@@ -230,6 +243,30 @@ async fn consume_batch(
         info!(
             version_count = version_ids_to_change.len(),
             "Removed changed version documents in {:.2?}",
+            operation_start.elapsed()
+        );
+    }
+
+    if !project_ids_with_version_changes.is_empty() {
+        let operation_start = Instant::now();
+        info!(
+            project_count = project_ids_with_version_changes.len(),
+            version_count = version_ids_to_change.len(),
+            "Indexing changed project versions"
+        );
+        index_changed_project_versions(
+            ro_pool,
+            redis_pool,
+            search_backend,
+            &project_ids_with_version_changes,
+            &version_ids_to_change,
+        )
+        .await
+        .wrap_err("failed to index changed project version batch")?;
+        info!(
+            project_count = project_ids_with_version_changes.len(),
+            version_count = version_ids_to_change.len(),
+            "Indexed changed project versions in {:.2?}",
             operation_start.elapsed()
         );
     }
@@ -319,6 +356,40 @@ async fn index_changed_projects(
     Ok(())
 }
 
+async fn index_changed_project_versions(
+    ro_pool: &PgPool,
+    redis_pool: &RedisPool,
+    search_backend: &dyn SearchBackend,
+    project_ids: &[ProjectId],
+    version_ids: &[VersionId],
+) -> eyre::Result<()> {
+    let documents = index_project_version_documents(
+        ro_pool,
+        redis_pool,
+        project_ids,
+        version_ids,
+    )
+    .instrument(info_span!(
+        "index",
+        batch_size = project_ids.len(),
+        version_count = version_ids.len()
+    ))
+    .await
+    .wrap_err_with(|| {
+        format!(
+            "failed to build search documents for {} projects and {} versions",
+            project_ids.len(),
+            version_ids.len()
+        )
+    })?;
+
+    info!("Fetched all project version documents, indexing into backend");
+
+    search_backend.index_documents(&documents).await?;
+
+    Ok(())
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum SearchProjectIndexQueueEvent {
@@ -331,10 +402,7 @@ impl SearchProjectIndexQueueEvent {
         match self {
             Self::Current(data) => data,
             Self::Legacy { project_id } => {
-                SearchProjectIndexQueueEventData::ProjectChange {
-                    project_id,
-                    version_ids: Vec::new(),
-                }
+                SearchProjectIndexQueueEventData::ProjectChange { project_id }
             }
         }
     }
@@ -344,6 +412,9 @@ impl SearchProjectIndexQueueEvent {
 #[serde(tag = "type", rename_all = "snake_case")]
 enum SearchProjectIndexQueueEventData {
     ProjectChange {
+        project_id: ProjectId,
+    },
+    ProjectVersionChange {
         project_id: ProjectId,
         version_ids: Vec<VersionId>,
     },
