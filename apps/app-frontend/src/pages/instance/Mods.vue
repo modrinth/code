@@ -1443,7 +1443,7 @@ onMounted(() => {
 			props.instance &&
 			event.instance_id === props.instance.id &&
 			event.event === 'synced' &&
-			props.instance.install_stage !== 'pack_installing' &&
+			props.instance.install_stage === 'installed' &&
 			!isBulkOperating.value
 		) {
 			await initProjects()
