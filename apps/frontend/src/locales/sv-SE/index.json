@@ -2738,12 +2738,6 @@
   "project.download.game-version": {
     "message": "Spelversion: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "Fel: inga spelversioner hittades"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} är bara tillgängligt för {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
   },
@@ -2759,19 +2753,10 @@
   "project.download.platform": {
     "message": "Plattform: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "Fel: ingen plattform hittades"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} är bara tillgängligt för {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} stöttar inte {platform} för {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Sök spelversioner..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Sök spelversioner..."
   },
   "project.download.select-game-version": {

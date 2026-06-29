@@ -2816,12 +2816,6 @@
   "project.download.game-version": {
     "message": "Spel versie: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "Error: geen spel-versies gevonden"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} is alleen beschikbaar voor {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} steunt niet {gameVersion} voor {platform}"
   },
@@ -2837,20 +2831,11 @@
   "project.download.platform": {
     "message": "Platform: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "Error: geen platformen gevonden"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} is alleen beschikbaar voor {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} steunt niet {platform} voor {gameVersion}"
   },
   "project.download.search-game-versions": {
     "message": "Game-versies zoeken..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "Zoek game-versies..."
   },
   "project.download.select-game-version": {
     "message": "Selecteer game-versie"

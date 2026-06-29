@@ -3134,12 +3134,6 @@
   "project.download.game-version": {
     "message": "Versão do jogo: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "Erro: nenhuma versão do jogo encontrada"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} só está disponível para {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} não suporta a {gameVersion} para {platform}"
   },
@@ -3155,19 +3149,10 @@
   "project.download.platform": {
     "message": "Plataforma: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "Erro: nenhuma plataforma encontrada"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} só está disponível para {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} não suporta {platform} para {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Buscar versões do jogo..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Buscar versões do jogo..."
   },
   "project.download.select-game-version": {

@@ -2705,12 +2705,6 @@
   "project.download.game-version": {
     "message": "ゲームバージョン: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "エラー: ゲームバージョンが見つかりません"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title}は{version}でのみ利用可能です"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}は{platform}の{gameVersion}に対応していません"
   },
@@ -2726,19 +2720,10 @@
   "project.download.platform": {
     "message": "プラットフォーム: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "エラー: プラットフォームが見つかりません"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title}は{platform}でのみ利用可能です"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}は{gameVersion}の{platform}に対応していません"
   },
   "project.download.search-game-versions": {
-    "message": "ゲームバージョンを検索…"
-  },
-  "project.download.search-game-versions-label": {
     "message": "ゲームバージョンを検索…"
   },
   "project.download.select-game-version": {

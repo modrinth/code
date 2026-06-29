@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide">
+	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px">
 		<template #title>
 			<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
 			<div class="truncate text-lg font-extrabold text-contrast">
@@ -7,7 +7,7 @@
 			</div>
 		</template>
 		<template #default>
-			<div class="mx-auto flex max-w-[44rem] flex-col gap-4 md:w-[30rem]">
+			<div class="mx-auto flex w-full flex-col gap-4">
 				<div
 					v-if="
 						project.project_type !== 'plugin' ||
@@ -15,14 +15,29 @@
 					"
 					class="modrinth-app-section contents"
 				>
-					<div class="mx-auto flex w-fit flex-col">
-						<ButtonStyled color="brand">
-							<a class="w-fit" :href="`modrinth://mod/${project.slug}`" @click="installWithApp">
-								<ModrinthIcon aria-hidden="true" />
-								{{ formatMessage(messages.installWithModrinthApp) }}
-								<ExternalIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
+					<div class="flex flex-col">
+						<a
+							class="modrinth-app-install-card group flex items-center justify-between gap-3 rounded-2xl border border-solid border-brand-highlight bg-surface-1 px-4 py-3 text-primary no-underline transition-[filter] hover:brightness-110"
+							:href="`modrinth://mod/${project.slug}`"
+							@click="installWithApp"
+						>
+							<span class="flex w-full min-w-0 flex-col gap-1">
+								<div class="flex items-center justify-between">
+									<span class="flex min-w-0 items-center gap-1.5 font-medium text-contrast">
+										Install with
+										<span class="text-brand">Modrinth App</span>
+										<ModrinthIcon aria-hidden="true" class="size-4 flex-shrink-0 text-brand" />
+									</span>
+									<ExternalIcon
+										aria-hidden="true"
+										class="size-4 flex-shrink-0 text-contrast transition-colors group-hover:text-brand"
+									/>
+								</div>
+								<span class="truncate text-base text-secondary">
+									{{ formatMessage(messages.installWithModrinthAppDescription) }}
+								</span>
+							</span>
+						</a>
 						<Accordion ref="getModrinthAppAccordion">
 							<nuxt-link class="mt-2 flex justify-center text-brand-blue hover:underline" to="/app">
 								{{ formatMessage(messages.dontHaveModrinthApp) }}
@@ -30,199 +45,136 @@
 						</Accordion>
 					</div>
 
-					<div class="flex items-center gap-4 px-4">
+					<div class="flex items-center gap-4">
 						<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-						<span class="flex-shrink-0 text-sm font-semibold text-secondary">
-							{{ formatMessage(commonMessages.orLabel) }}
+						<span class="flex-shrink-0 text-sm font-medium text-secondary">
+							{{ formatMessage(messages.downloadManually) }}
 						</span>
 						<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
 					</div>
 				</div>
 
-				<div class="mx-auto flex w-fit flex-col gap-2">
-					<ButtonStyled v-if="project.game_versions.length === 1">
-						<div class="disabled button-like">
-							<GameIcon aria-hidden="true" />
-							{{
-								currentGameVersion
-									? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-									: formatMessage(messages.gameVersionError)
-							}}
-							<InfoIcon
-								v-tooltip="
-									formatMessage(messages.gameVersionTooltip, {
-										title: project.title,
-										version: currentGameVersion,
-									})
-								"
-								class="ml-auto size-5"
-							/>
-						</div>
-					</ButtonStyled>
-					<Accordion
-						v-else
-						ref="gameVersionAccordion"
-						class="accordion-with-bg"
-						@on-open="
-							() => {
-								platformAccordion?.close()
-							}
-						"
+				<div class="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+					<Combobox
+						:model-value="currentGameVersion || undefined"
+						class="w-full"
+						:options="gameVersionOptions"
+						:placeholder="formatMessage(messages.selectGameVersion)"
+						:searchable="project.game_versions.length > 4"
+						search-autocomplete="off"
+						:search-placeholder="formatMessage(messages.searchGameVersions)"
+						:no-options-message="formatMessage(messages.noGameVersionsFound)"
+						trigger-class="!rounded-xl !bg-button-bg !px-3 !py-2"
+						dropdown-class="!rounded-xl"
+						@update:model-value="selectGameVersion"
+						@search-input="(query) => (versionFilter = query)"
+						@close="versionFilter = ''"
 					>
-						<template #title>
-							<GameIcon aria-hidden="true" />
-							{{
-								currentGameVersion
-									? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-									: formatMessage(messages.selectGameVersion)
-							}}
-						</template>
-						<label for="game-versions-filtering" hidden>{{
-							formatMessage(messages.searchGameVersionsLabel)
-						}}</label>
-						<StyledInput
-							id="game-versions-filtering"
-							ref="gameVersionFilterInput"
-							v-model="versionFilter"
-							type="search"
-							autocomplete="off"
-							:icon="SearchIcon"
-							:placeholder="formatMessage(messages.searchGameVersions)"
-							wrapper-class="mb-2 w-full"
-						/>
-						<ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
-							<ButtonStyled
-								v-for="gameVersion in filteredGameVersions"
-								:key="gameVersion"
-								:color="currentGameVersion === gameVersion ? 'brand' : 'standard'"
-							>
-								<button
-									v-tooltip="
-										!possibleGameVersions.includes(gameVersion)
-											? formatMessage(messages.gameVersionUnsupportedTooltip, {
-													title: project.title,
-													gameVersion: gameVersion,
-													platform: currentPlatformText,
-												})
-											: null
-									"
-									:class="{
-										'looks-disabled !text-brand-red':
-											!possibleGameVersions.includes(gameVersion),
-									}"
-									@click="selectGameVersion(gameVersion)"
-								>
-									{{ gameVersion }}
-									<CheckIcon v-if="userSelectedGameVersion === gameVersion" />
-								</button>
-							</ButtonStyled>
-						</ScrollablePanel>
-						<Checkbox
-							v-if="showVersionsCheckbox"
-							v-model="showAllVersions"
-							class="mx-1"
-							:label="formatMessage(messages.showAllVersions)"
-							:disabled="!!versionFilter"
-						/>
-					</Accordion>
-					<ButtonStyled v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'">
-						<div class="disabled button-like">
-							<WrenchIcon aria-hidden="true" />
-							{{
-								currentPlatform
-									? formatMessage(messages.platformLabel, {
-											platform: currentPlatformText,
-										})
-									: formatMessage(messages.platformError)
-							}}
-							<InfoIcon
+						<template #option="{ item, isSelected }">
+							<div
 								v-tooltip="
-									formatMessage(messages.platformTooltip, {
-										title: project.title,
-										platform: currentPlatformText,
-									})
+									!possibleGameVersions.includes(item.value)
+										? formatMessage(messages.gameVersionUnsupportedTooltip, {
+												title: project.title,
+												gameVersion: item.value,
+												platform: currentPlatformText,
+											})
+										: null
 								"
-								class="ml-auto size-5"
-							/>
-						</div>
-					</ButtonStyled>
-					<Accordion
-						v-else-if="project.project_type !== 'resourcepack'"
-						ref="platformAccordion"
-						class="accordion-with-bg"
-						@on-open="
-							() => {
-								gameVersionAccordion?.close()
-							}
-						"
-					>
-						<template #title>
-							<WrenchIcon aria-hidden="true" />
-							{{
-								currentPlatform
-									? formatMessage(messages.platformLabel, {
-											platform: currentPlatformText,
-										})
-									: formatMessage(messages.selectPlatform)
-							}}
-						</template>
-						<ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
-							<ButtonStyled
-								v-for="platform in project.loaders.slice().reverse()"
-								:key="platform"
-								:color="currentPlatform === platform ? 'brand' : 'standard'"
+								class="flex w-full items-center justify-between gap-2"
+								:class="{
+									'text-brand-red': !possibleGameVersions.includes(item.value),
+									'text-green': isSelected,
+									'text-primary': possibleGameVersions.includes(item.value) && !isSelected,
+								}"
 							>
-								<button
-									v-tooltip="
-										!possiblePlatforms.includes(platform)
-											? formatMessage(messages.platformUnsupportedTooltip, {
-													title: project.title,
-													platform: currentPlatformText,
-													gameVersion: currentGameVersion,
-												})
-											: null
-									"
-									:class="{
-										'looks-disabled !text-brand-red': !possiblePlatforms.includes(platform),
-									}"
-									@click="selectPlatform(platform)"
-								>
-									{{ formatMessage(getTagMessage(platform, 'loader')) }}
-									<CheckIcon v-if="userSelectedPlatform === platform" />
-								</button>
-							</ButtonStyled>
-						</ScrollablePanel>
-					</Accordion>
+								<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
+								<CheckIcon v-if="isSelected" aria-hidden="true" class="size-5 flex-shrink-0" />
+							</div>
+						</template>
+						<template #dropdown-footer>
+							<div
+								v-if="showVersionsCheckbox"
+								class="border-0 border-t border-solid border-surface-5 p-3"
+							>
+								<Checkbox
+									v-model="showAllVersions"
+									:label="formatMessage(messages.showAllVersions)"
+									:disabled="!!versionFilter"
+								/>
+							</div>
+						</template>
+					</Combobox>
+					<Combobox
+						v-if="project.project_type !== 'resourcepack'"
+						:model-value="currentPlatform || undefined"
+						class="w-full"
+						:options="platformOptions"
+						:placeholder="formatMessage(messages.selectPlatform)"
+						trigger-class="!rounded-xl !bg-button-bg !px-3 !py-2"
+						dropdown-class="!rounded-xl"
+						@update:model-value="selectPlatform"
+					>
+						<template #option="{ item, isSelected }">
+							<div
+								v-tooltip="
+									!possiblePlatforms.includes(item.value)
+										? formatMessage(messages.platformUnsupportedTooltip, {
+												title: project.title,
+												platform: item.label,
+												gameVersion: currentGameVersion,
+											})
+										: null
+								"
+								class="flex w-full items-center justify-between gap-2"
+								:class="{
+									'text-brand-red': !possiblePlatforms.includes(item.value),
+									'text-green': isSelected,
+									'text-primary': possiblePlatforms.includes(item.value) && !isSelected,
+								}"
+							>
+								<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
+								<CheckIcon v-if="isSelected" aria-hidden="true" class="size-5 flex-shrink-0" />
+							</div>
+						</template>
+					</Combobox>
 				</div>
-				<AutomaticAccordion div class="flex flex-col gap-2">
-					<VersionSummary
-						v-if="filteredRelease"
-						:version="filteredRelease"
-						:decorate-download-url="decorateModalDownloadUrl"
-						@on-download="onDownload"
-						@on-navigate="onVersionNavigate"
-					/>
-					<VersionSummary
-						v-if="filteredBeta"
-						:version="filteredBeta"
-						:decorate-download-url="decorateModalDownloadUrl"
-						@on-download="onDownload"
-						@on-navigate="onVersionNavigate"
-					/>
-					<VersionSummary
-						v-if="filteredAlpha"
-						:version="filteredAlpha"
-						:decorate-download-url="decorateModalDownloadUrl"
-						@on-download="onDownload"
-						@on-navigate="onVersionNavigate"
-					/>
+				<div class="flex flex-col gap-4">
+					<div
+						v-if="selectedVersion"
+						class="grid grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-2xl bg-bg px-3 py-3"
+					>
+						<div class="flex min-w-0 flex-col gap-1">
+							<div class="flex min-w-0 items-center gap-2">
+								<span class="truncate font-bold text-contrast">
+									{{ selectedVersion.version_number }}
+								</span>
+								<VersionChannelTag :channel="selectedVersion.version_type" class="!py-0.5" />
+							</div>
+							<p class="m-0 truncate text-sm text-secondary">
+								{{ selectedVersion.name }}
+							</p>
+						</div>
+						<ButtonStyled v-if="selectedPrimaryFile" color="brand" circular>
+							<a
+								:href="decorateModalDownloadUrl(selectedPrimaryFile.url)"
+								:download="selectedPrimaryFile.filename"
+								:aria-label="
+									formatMessage(messages.downloadVersion, {
+										version: selectedVersion.version_number,
+									})
+								"
+								@click="onDownload"
+							>
+								<DownloadIcon aria-hidden="true" />
+							</a>
+						</ButtonStyled>
+					</div>
 					<p
 						v-if="
 							currentPlatform &&
 							currentGameVersion &&
-							!filteredRelease &&
-							!filteredBeta &&
-							!filteredAlpha &&
+							!selectedVersion &&
 							!versionsLoading &&
 							versions.length > 0
 						"
@@ -234,7 +186,111 @@
 							})
 						}}
 					</p>
-				</AutomaticAccordion>
+					<div v-if="dependencyRows.length > 0" class="flex flex-col gap-2">
+						<h3 class="m-0 text-sm font-bold text-contrast">
+							{{ formatMessage(messages.dependenciesTitle) }}
+						</h3>
+						<div class="flex flex-col gap-2">
+							<div
+								v-for="dependency in dependencyRows"
+								:key="dependency.key"
+								class="flex flex-col gap-1.5"
+							>
+								<component
+									:is="dependency.href ? 'a' : 'div'"
+									:href="dependency.href"
+									:download="dependency.filename"
+									class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary no-underline"
+									@click="onDependencyRowClick(dependency, $event)"
+								>
+									<span class="flex min-w-0 items-center gap-2">
+										<Avatar
+											v-if="dependency.icon"
+											:src="dependency.icon"
+											:alt="dependency.name"
+											size="20px"
+										/>
+										<PackageIcon
+											v-else
+											aria-hidden="true"
+											class="size-5 flex-shrink-0 text-secondary"
+										/>
+										<span class="min-w-0 truncate font-semibold text-contrast">
+											{{ dependency.name }}
+										</span>
+										<TagItem class="shrink-0 border !border-solid border-surface-5">
+											{{ dependency.typeLabel }}
+										</TagItem>
+									</span>
+									<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
+								</component>
+								<div
+									v-for="subDependency in dependency.subDependencies"
+									:key="subDependency.key"
+									class="grid grid-cols-[1.5rem_minmax(0,1fr)] items-center gap-1 pl-5"
+								>
+									<RightArrowIcon aria-hidden="true" class="size-4 text-secondary" />
+									<component
+										:is="subDependency.href ? 'a' : 'div'"
+										:href="subDependency.href"
+										:download="subDependency.filename"
+										class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary no-underline"
+										@click="onDependencyRowClick(subDependency, $event)"
+									>
+										<span class="flex min-w-0 items-center gap-2">
+											<Avatar
+												v-if="subDependency.icon"
+												:src="subDependency.icon"
+												:alt="subDependency.name"
+												size="20px"
+											/>
+											<PackageIcon
+												v-else
+												aria-hidden="true"
+												class="size-5 flex-shrink-0 text-secondary"
+											/>
+											<span class="min-w-0 truncate font-semibold text-contrast">
+												{{ subDependency.name }}
+											</span>
+											<TagItem class="shrink-0 border !border-solid border-surface-5">
+												{{ subDependency.typeLabel }}
+											</TagItem>
+										</span>
+										<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
+									</component>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div v-if="additionalFiles.length > 0" class="flex flex-col gap-2">
+						<h3 class="m-0 text-sm font-bold text-contrast">
+							{{ formatMessage(messages.additionalFilesTitle) }}
+						</h3>
+						<div class="flex flex-col gap-2">
+							<a
+								v-for="file in additionalFiles"
+								:key="file.hashes?.sha1 ?? file.filename"
+								:href="decorateModalDownloadUrl(file.url)"
+								:download="file.filename"
+								class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary no-underline"
+								@click="onDownload"
+							>
+								<span class="flex min-w-0 items-center gap-2">
+									<FileIcon aria-hidden="true" class="size-5 flex-shrink-0 text-secondary" />
+									<span class="min-w-0 truncate font-semibold text-contrast">
+										{{ file.filename }}
+									</span>
+									<span
+										class="rounded-full bg-button-bgSelected px-2 py-0.5 text-xs text-secondary"
+									>
+										{{ fileTypeLabel(file.file_type) }}
+									</span>
+								</span>
+								<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
+							</a>
+						</div>
+					</div>
+				</div>
 				<ServersPromo
 					v-if="flags.showProjectPageDownloadModalServersPromo"
 					:link="`/hosting#plan`"
@@ -253,34 +309,34 @@
 <script setup>
 import {
 	CheckIcon,
+	DownloadIcon,
 	ExternalIcon,
-	GameIcon,
-	InfoIcon,
+	FileIcon,
 	ModrinthIcon,
-	SearchIcon,
-	WrenchIcon,
+	PackageIcon,
+	RightArrowIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
-	commonMessages,
+	Combobox,
 	defineMessages,
 	getTagMessage,
+	injectModrinthClient,
 	NewModal,
-	ScrollablePanel,
 	ServersPromo,
-	StyledInput,
+	TagItem,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
+import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
-import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 
 const props = defineProps({
@@ -314,18 +370,17 @@ const emit = defineEmits(['download'])
 
 const route = useRoute()
 const flags = useFeatureFlags()
+const client = injectModrinthClient()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadModal')
 
 const modal = ref()
+const modalOpen = ref(false)
 const userSelectedGameVersion = ref(null)
 const userSelectedPlatform = ref(null)
 const showAllVersions = ref(false)
 const versionFilter = ref('')
-const gameVersionFilterInput = ref()
-const gameVersionAccordion = ref()
-const platformAccordion = ref()
 const getModrinthAppAccordion = ref()
 
 const currentGameVersion = computed(() => {
@@ -349,8 +404,7 @@ const possiblePlatforms = computed(() => {
 
 const currentPlatform = computed(() => {
 	return (
-		userSelectedPlatform.value ||
-		(props.project.loaders.length === 1 && props.project.loaders[0])
+		userSelectedPlatform.value || (props.project.loaders.length === 1 && props.project.loaders[0])
 	)
 })
 
@@ -407,6 +461,23 @@ const filteredGameVersions = computed(() => {
 		.reverse()
 })
 
+const gameVersionOptions = computed(() => {
+	return filteredGameVersions.value.map((gameVersion) => ({
+		value: gameVersion,
+		label: gameVersion,
+	}))
+})
+
+const platformOptions = computed(() => {
+	return props.project.loaders
+		.slice()
+		.reverse()
+		.map((platform) => ({
+			value: platform,
+			label: formatMessage(getTagMessage(platform, 'loader')),
+		}))
+})
+
 const filteredVersions = computed(() => {
 	const result = props.versions.filter(
 		(x) =>
@@ -447,6 +518,124 @@ const filteredAlpha = computed(() => {
 	)
 })
 
+const selectedVersion = computed(() => {
+	return filteredRelease.value || filteredBeta.value || filteredAlpha.value
+})
+
+const selectedPrimaryFile = computed(() => {
+	return (
+		selectedVersion.value?.files?.find((file) => file.primary) || selectedVersion.value?.files?.[0]
+	)
+})
+
+const additionalFiles = computed(() => {
+	if (!selectedVersion.value || !selectedPrimaryFile.value) return []
+	return selectedVersion.value.files.filter((file) => file !== selectedPrimaryFile.value)
+})
+
+const selectedDependencyVersionIds = computed(() => {
+	if (!selectedVersion.value) return []
+
+	return [
+		...new Set(
+			selectedVersion.value.dependencies.map((dependency) => dependency.version_id).filter(Boolean),
+		),
+	]
+})
+
+const { data: dependencyVersions } = useQuery({
+	queryKey: computed(() => [
+		'project-download-modal',
+		'versions',
+		selectedDependencyVersionIds.value,
+	]),
+	queryFn: () => client.labrinth.versions_v3.getVersions(selectedDependencyVersionIds.value),
+	enabled: computed(() => selectedDependencyVersionIds.value.length > 0),
+})
+
+const subDependencyVersionIds = computed(() => {
+	const ids = new Set()
+
+	for (const version of dependencyVersions.value || []) {
+		for (const dependency of version.dependencies || []) {
+			if (dependency.version_id) ids.add(dependency.version_id)
+		}
+	}
+
+	return [...ids]
+})
+
+const { data: subDependencyVersions } = useQuery({
+	queryKey: computed(() => [
+		'project-download-modal',
+		'sub-versions',
+		subDependencyVersionIds.value,
+	]),
+	queryFn: () => client.labrinth.versions_v3.getVersions(subDependencyVersionIds.value),
+	enabled: computed(() => subDependencyVersionIds.value.length > 0),
+})
+
+const dependencyVersionById = computed(() => {
+	const map = new Map()
+	for (const version of [
+		...(dependencyVersions.value || []),
+		...(subDependencyVersions.value || []),
+	]) {
+		map.set(version.id, version)
+	}
+	return map
+})
+
+const selectedDependencyProjectIds = computed(() => {
+	const ids = new Set()
+
+	for (const dependency of selectedVersion.value?.dependencies || []) {
+		if (dependency.project_id) ids.add(dependency.project_id)
+		const version = dependency.version_id
+			? dependencyVersionById.value.get(dependency.version_id)
+			: null
+		if (version?.project_id) ids.add(version.project_id)
+	}
+
+	for (const version of dependencyVersions.value || []) {
+		for (const dependency of version.dependencies || []) {
+			if (dependency.project_id) ids.add(dependency.project_id)
+			const dependencyVersion = dependency.version_id
+				? dependencyVersionById.value.get(dependency.version_id)
+				: null
+			if (dependencyVersion?.project_id) ids.add(dependencyVersion.project_id)
+		}
+	}
+
+	return [...ids]
+})
+
+const { data: dependencyProjects } = useQuery({
+	queryKey: computed(() => [
+		'project-download-modal',
+		'projects',
+		selectedDependencyProjectIds.value,
+	]),
+	queryFn: () => client.labrinth.projects_v2.getMultiple(selectedDependencyProjectIds.value),
+	enabled: computed(() => selectedDependencyProjectIds.value.length > 0),
+})
+
+const dependencyProjectById = computed(() => {
+	const map = new Map()
+	for (const project of dependencyProjects.value || []) {
+		map.set(project.id, project)
+	}
+	return map
+})
+
+const dependencyRows = computed(() => {
+	if (!selectedVersion.value) return []
+
+	return selectedVersion.value.dependencies
+		.filter((dependency) => ['required', 'optional'].includes(dependency.dependency_type))
+		.map((dependency) => createDependencyRow(dependency))
+})
+
 const messages = defineMessages({
 	dontHaveModrinthApp: {
 		id: 'project.download.no-app',
@@ -456,17 +645,9 @@ const messages = defineMessages({
 		id: 'project.download.title',
 		defaultMessage: 'Download {title}',
 	},
-	gameVersionError: {
-		id: 'project.download.game-version-error',
-		defaultMessage: 'Error: no game versions found',
-	},
 	gameVersionLabel: {
 		id: 'project.download.game-version',
 		defaultMessage: 'Game version: {version}',
-	},
-	gameVersionTooltip: {
-		id: 'project.download.game-version-tooltip',
-		defaultMessage: '{title} is only available for {version}',
 	},
 	gameVersionUnsupportedTooltip: {
 		id: 'project.download.game-version-unsupported-tooltip',
@@ -476,21 +657,37 @@ const messages = defineMessages({
 		id: 'project.download.install-with-app',
 		defaultMessage: 'Install with Modrinth App',
 	},
+	downloadManually: {
+		id: 'project.download.manually',
+		defaultMessage: 'Download manually',
+	},
+	installWithModrinthAppDescription: {
+		id: 'project.download.install-with-app-description',
+		defaultMessage: 'Automatically install the correct version and dependencies.',
+	},
+	downloadVersion: {
+		id: 'project.download.download-version',
+		defaultMessage: 'Download {version}',
+	},
+	dependenciesTitle: {
+		id: 'project.download.dependencies-title',
+		defaultMessage: 'Dependencies',
+	},
+	additionalFilesTitle: {
+		id: 'project.download.additional-files-title',
+		defaultMessage: 'Additional files',
+	},
 	noVersionsAvailable: {
 		id: 'project.download.no-versions-available',
 		defaultMessage: 'No versions available for {gameVersion} and {platform}.',
 	},
-	platformError: {
-		id: 'project.download.platform-error',
-		defaultMessage: 'Error: no platforms found',
+	noGameVersionsFound: {
+		id: 'project.download.no-game-versions-found',
+		defaultMessage: 'No game versions found',
 	},
 	platformLabel: {
 		id: 'project.download.platform',
 		defaultMessage: 'Platform: {platform}',
-	},
-	platformTooltip: {
-		id: 'project.download.platform-tooltip',
-		defaultMessage: '{title} is only available for {platform}',
 	},
 	platformUnsupportedTooltip: {
 		id: 'project.download.platform-unsupported-tooltip',
@@ -498,11 +695,7 @@ const messages = defineMessages({
 	},
 	searchGameVersions: {
 		id: 'project.download.search-game-versions',
-		defaultMessage: 'Search game versions...',
-	},
-	searchGameVersionsLabel: {
-		id: 'project.download.search-game-versions-label',
-		defaultMessage: 'Search game versions...',
+		defaultMessage: 'Select game version',
 	},
 	selectGameVersion: {
 		id: 'project.download.select-game-version',
@@ -517,6 +710,75 @@ const messages = defineMessages({
 		defaultMessage: 'Show all versions',
 	},
 })
+
+function dependencyTypeLabel(type) {
+	return (
+		{
+			required: 'Required',
+			optional: 'Optional',
+			embedded: 'Embedded',
+			incompatible: 'Incompatible',
+		}[type] || type
+	)
+}
+
+function fileTypeLabel(type) {
+	return (
+		{
+			'required-resource-pack': 'Resourcepack',
+			'optional-resource-pack': 'Resourcepack',
+			unknown: 'File',
+		}[type] || 'File'
+	)
+}
+
+function primaryFileForVersion(version) {
+	return version?.files?.find((file) => file.primary) || version?.files?.[0]
+}
+
+function createDependencyRow(dependency, includeSubDependencies = true) {
+	const version = dependency.version_id
+		? dependencyVersionById.value.get(dependency.version_id)
+		: null
+	const projectId = dependency.project_id || version?.project_id
+	const project = projectId ? dependencyProjectById.value.get(projectId) : null
+	const primaryFile = primaryFileForVersion(version)
+	const name =
+		project?.title ||
+		dependency.file_name ||
+		version?.name ||
+		version?.version_number ||
+		dependency.version_id ||
+		dependency.project_id ||
+		'Dependency'
+
+	return {
+		key: `${dependency.dependency_type}-${dependency.version_id ?? dependency.project_id ?? dependency.file_name ?? name}`,
+		name,
+		icon: project?.icon_url,
+		href: primaryFile
+			? decorateModalDownloadUrl(primaryFile.url)
+			: project
+				? `/${project.project_type}/${project.slug || project.id}`
+				: undefined,
+		filename: primaryFile?.filename,
+		downloadsFile: !!primaryFile,
+		typeLabel: dependencyTypeLabel(dependency.dependency_type),
+		subDependencies: includeSubDependencies
+			? (version?.dependencies || [])
+					.filter((subDependency) =>
+						['required', 'optional'].includes(subDependency.dependency_type),
+					)
+					.map((subDependency) => createDependencyRow(subDependency, false))
+			: [],
+	}
+}
+
+function onDependencyRowClick(row, event) {
+	if (row.downloadsFile) {
+		onDownload(event)
+	}
+}
 
 function decorateModalDownloadUrl(url) {
 	return createProjectDownloadUrl(url, {
@@ -552,23 +814,11 @@ function updateDownloadQuery() {
 
 function selectGameVersion(gameVersion) {
 	userSelectedGameVersion.value = gameVersion
-	gameVersionAccordion.value?.close()
-
-	if (!currentPlatform.value) {
-		platformAccordion.value?.open()
-	}
-
 	updateDownloadQuery()
 }
 
 function selectPlatform(platform) {
 	userSelectedPlatform.value = platform
-	platformAccordion.value?.close()
-
-	if (!currentGameVersion.value) {
-		gameVersionAccordion.value?.open()
-	}
-
 	updateDownloadQuery()
 }
 
@@ -579,20 +829,25 @@ function installWithApp() {
 }
 
 function onShow() {
+	modalOpen.value = true
 	debug('on-show fired')
 	props.loadVersions()
 	navigateTo({ query: route.query, hash: '#download' }, { replace: true })
 }
 
 function onHide() {
+	modalOpen.value = false
 	navigateTo({ query: route.query, hash: '' }, { replace: true })
 }
 
 function show(event) {
-	modal.value?.show(event)
+	if (!modal.value || modalOpen.value) return
+	modalOpen.value = true
+	modal.value.show(event)
 }
 
 function hide(event) {
+	if (!modal.value || !modalOpen.value) return
 	modal.value?.hide(event)
 	userSelectedPlatform.value = null
 	userSelectedGameVersion.value = null
@@ -614,11 +869,10 @@ function onVersionNavigate(url) {
 }
 
 function openFromHash() {
-	if (!modal.value || route.hash !== '#download') return
+	if (!modal.value || modalOpen.value || route.hash !== '#download') return
 
 	debug('hash #download watch fired, opening modal')
-	props.loadVersions()
-	modal.value.show()
+	show()
 }
 
 const { version, loader } = route.query
@@ -650,9 +904,8 @@ defineExpose({ show, hide })
 </script>
 
 <style lang="scss" scoped>
-:deep(.accordion-with-bg) {
-	@apply rounded-2xl bg-bg p-2;
-	--scrollable-pane-bg: var(--color-bg);
+.modrinth-app-install-card {
+	background: radial-gradient(circle at 50% 300%, #0d2f17 0%, var(--surface-1) 72%);
 }
 
 @media (hover: none) and (max-width: 767px) {

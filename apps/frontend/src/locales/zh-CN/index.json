@@ -3095,12 +3095,6 @@
   "project.download.game-version": {
     "message": "游戏版本：{version}"
   },
-  "project.download.game-version-error": {
-    "message": "错误：没有合适的游戏版本"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title}仅适用于{version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} 不支持 {platform} {gameVersion}"
   },
@@ -3116,19 +3110,10 @@
   "project.download.platform": {
     "message": "平台：{platform}"
   },
-  "project.download.platform-error": {
-    "message": "错误：没有合适的平台"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} 仅适用于 {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支持 {gameVersion} 的 {platform}"
   },
   "project.download.search-game-versions": {
-    "message": "搜索游戏版本…"
-  },
-  "project.download.search-game-versions-label": {
     "message": "搜索游戏版本…"
   },
   "project.download.select-game-version": {

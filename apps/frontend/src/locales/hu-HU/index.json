@@ -2948,12 +2948,6 @@
   "project.download.game-version": {
     "message": "Játékverzió: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "Hiba: nem található játékverzió"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} csak erre a verzióra érthető el: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "A(z) {title} nem támogatja ezt a verziót: {platform} {gameVersion}"
   },
@@ -2969,19 +2963,10 @@
   "project.download.platform": {
     "message": "Platform: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "Hiba: nem található platform"
-  },
-  "project.download.platform-tooltip": {
-    "message": "A(z) {title} csak erre érthető el: {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "A(z) {title} nem támogatja ezt a verziót: {platform} {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Játékverziók keresése..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Játékverziók keresése..."
   },
   "project.download.select-game-version": {

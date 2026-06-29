@@ -2435,12 +2435,6 @@
   "project.download.game-version": {
     "message": "Bersiyon ng laro: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "Error: walang mahanap na mga bersiyon ng laro"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "Ang {title} ay magagamit lamang sa {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "Hindi masuporta ng {title} ang {gameVersion} para sa {platform}"
   },
@@ -2456,19 +2450,10 @@
   "project.download.platform": {
     "message": "Plataporma: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "Error: walang mahanap na platform"
-  },
-  "project.download.platform-tooltip": {
-    "message": "Ang {title} ay magagamit lamang sa {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "Hindi masuport ng {title} ang {platform} para sa {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Maghanap ng mga bersiyon ng laro..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Maghanap ng mga bersiyon ng laro..."
   },
   "project.download.select-game-version": {

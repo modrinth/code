@@ -2954,12 +2954,6 @@
   "project.download.game-version": {
     "message": "Versi permainan: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "Ralat: tiada versi permainan dijumpai"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} hanya tersedia untuk {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak menyokong {gameVersion} untuk {platform}"
   },
@@ -2975,19 +2969,10 @@
   "project.download.platform": {
     "message": "Platform: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "Ralat: tiada platform dijumpai"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} hanya tersedia untuk {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak menyokong {platform} untuk {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Cari versi permainan..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Cari versi permainan..."
   },
   "project.download.select-game-version": {

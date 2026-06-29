@@ -1430,12 +1430,6 @@
   "project.download.game-version": {
     "message": "Versiunea jocului: {version}"
   },
-  "project.download.game-version-error": {
-    "message": "Eroare: nu s-au găsit versiuni ale jocului"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} este disponibil doar pentru {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {gameVersion} pentru {platform}"
   },
@@ -1451,19 +1445,10 @@
   "project.download.platform": {
     "message": "Platformă: {platform}"
   },
-  "project.download.platform-error": {
-    "message": "Eroare: nu s-au găsit platforme"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} este disponibil doar pentru {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {platform} pentru {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Caută versiuni ale jocului..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Caută versiuni ale jocului..."
   },
   "project.download.select-game-version": {
