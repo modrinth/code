@@ -1634,9 +1634,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Loading notifications..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "You can edit multiple projects at once by selecting them below."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Server projects do not support bulk editing"
   },
@@ -1712,29 +1709,20 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Please review environment metadata"
   },
-  "dashboard.projects.sort.ascending": {
-    "message": "Ascending"
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "Selected projects actions"
   },
-  "dashboard.projects.sort.descending": {
-    "message": "Descending"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Name"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Type"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Icon"
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count, plural, one {# project selected} other {# projects selected}}"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
   "dashboard.projects.table.name": {
     "message": "Name"
+  },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "Select all projects that support bulk editing"
   },
   "dashboard.projects.table.status": {
     "message": "Status"

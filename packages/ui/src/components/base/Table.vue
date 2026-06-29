@@ -8,7 +8,8 @@
 		</div>
 		<div class="overflow-x-auto overflow-y-hidden">
 			<table
-				class="w-full table-fixed border-separate border-spacing-0 border-surface-4"
+				class="w-full border-separate border-spacing-0 border-surface-4"
+				:class="tableLayout === 'auto' ? 'table-auto' : 'table-fixed'"
 				:style="tableMinWidth ? { minWidth: tableMinWidth } : undefined"
 			>
 				<colgroup>
@@ -36,6 +37,7 @@
 							:class="[
 								`text-${column.align ?? 'left'}`,
 								column.enableSorting ? 'cursor-pointer select-none' : '',
+								column.headerClass,
 							]"
 							:style="column.width ? { width: column.width } : undefined"
 							@click="column.enableSorting ? handleSort(column.key) : undefined"
@@ -80,7 +82,8 @@
 						<tr
 							v-for="(row, rowIndex) in renderedRows"
 							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-							:class="getRowClass(getAbsoluteRowIndex(rowIndex))"
+							:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+							@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 						>
 							<td
 								v-if="showSelection"
@@ -96,7 +99,7 @@
 								v-for="column in columns"
 								:key="column.key"
 								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="`text-${column.align ?? 'left'}`"
+								:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
 							>
 								<slot
 									:name="`cell-${column.key}`"
@@ -132,7 +135,8 @@
 						<tr
 							v-for="(row, rowIndex) in renderedRows"
 							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-							:class="getRowClass(getAbsoluteRowIndex(rowIndex))"
+							:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+							@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 						>
 							<td
 								v-if="showSelection"
@@ -148,7 +152,7 @@
 								v-for="column in columns"
 								:key="column.key"
 								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="`text-${column.align ?? 'left'}`"
+								:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
 							>
 								<slot
 									:name="`cell-${column.key}`"
@@ -188,6 +192,7 @@ import Checkbox from './Checkbox.vue'
 
 export type TableColumnAlign = 'left' | 'center' | 'right'
 export type SortDirection = 'asc' | 'desc'
+export type TableLayout = 'fixed' | 'auto'
 
 /**
  * Defines a table column configuration.
@@ -204,6 +209,8 @@ export interface TableColumn<K extends string = string> {
 	 * Accepts any valid CSS width (e.g., '200px', '20%', '10rem', 'auto', 'fit-content').
 	 */
 	width?: string
+	headerClass?: string
+	cellClass?: string
 }
 
 const props = withDefaults(
@@ -223,10 +230,14 @@ const props = withDefaults(
 		 * Sets a minimum width for the table content, allowing horizontal overflow below that width.
 		 */
 		tableMinWidth?: string
+		tableLayout?: TableLayout
+		rowClass?: string | ((row: T, index: number) => string)
+		rowClickable?: boolean | ((row: T, index: number) => boolean)
 	}>(),
 	{
 		showSelection: false,
 		rowKey: 'id' as keyof T,
+		tableLayout: 'fixed',
 		virtualized: false,
 		virtualRowHeight: 56,
 		virtualBufferSize: 5,
@@ -267,6 +278,7 @@ const bottomSpacerHeight = computed(() => {
 
 const emit = defineEmits<{
 	sort: [column: string, direction: SortDirection]
+	rowClick: [row: T, index: number, event: MouseEvent]
 }>()
 
 const selectableRows = computed(() => props.selectionData ?? props.data)
@@ -319,8 +331,37 @@ function getRowRenderKey(row: T, rowIndex: number): PropertyKey {
 	return rowIndex
 }
 
-function getRowClass(rowIndex: number): string {
-	return rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
+function getRowClass(row: T, rowIndex: number): string[] {
+	const baseClass = rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
+	const customClass =
+		typeof props.rowClass === 'function' ? props.rowClass(row, rowIndex) : props.rowClass
+
+	return customClass ? [baseClass, customClass] : [baseClass]
+}
+
+function isRowClickable(row: T, rowIndex: number): boolean {
+	return typeof props.rowClickable === 'function'
+		? props.rowClickable(row, rowIndex)
+		: props.rowClickable === true
+}
+
+function isNoRowClickTarget(event: MouseEvent): boolean {
+	const target = event.target
+	const currentTarget = event.currentTarget
+	if (!(target instanceof Element) || !(currentTarget instanceof Element)) {
+		return false
+	}
+
+	const noRowClickTarget = target.closest('[data-no-row-click]')
+	return noRowClickTarget !== null && noRowClickTarget !== currentTarget
+}
+
+function handleRowClick(row: T, rowIndex: number, event: MouseEvent) {
+	if (!isRowClickable(row, rowIndex) || isNoRowClickTarget(event)) {
+		return
+	}
+
+	emit('rowClick', row, rowIndex, event)
 }
 
 function isSelected(row: T): boolean {

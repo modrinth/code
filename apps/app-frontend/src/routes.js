@@ -247,6 +247,7 @@ export default new createRouter({
 					name: 'Logs',
 					component: Instance.Logs,
 					meta: {
+						renderMode: 'fixed',
 						useRootContext: true,
 						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Logs' }],
 					},
