@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-29T23:56:37+00:00`,
+		product: 'app',
+		version: '0.15.4',
+		body: `## Fixed
+- Fixes another issue causing the app to freeze up when going into an instance page.`,
+	},
+	{
 		date: `2026-06-29T22:52:04+00:00`,
 		product: 'app',
 		version: '0.15.3',
