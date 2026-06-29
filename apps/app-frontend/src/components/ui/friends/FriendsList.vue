@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MailIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
+import { MailIcon, SearchIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
@@ -301,11 +301,12 @@ const messages = defineMessages({
 			</ButtonStyled>
 			<StyledInput
 				v-model="search"
+				:icon="SearchIcon"
 				type="text"
 				:placeholder="formatMessage(messages.searchFriends)"
 				clearable
-				variant="outlined"
-				wrapper-class="flex-1"
+				input-class="!bg-transparent !border !border-solid !border-button-bg !text-primary !placeholder:text-primary"
+				wrapper-class="flex-1 [&>svg]:!text-primary [&>svg]:!opacity-100"
 				@keyup.esc="search = ''"
 			/>
 		</template>
