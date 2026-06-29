@@ -618,10 +618,7 @@ const filterOptions = computed(() => {
 	const hasSingleplayer = dedupedWorlds.value.some((x) => x.type === 'singleplayer')
 	const hasServer = dedupedWorlds.value.some((x) => x.type === 'server')
 
-	const hasStatusFilter =
-		selectedFilters.value.includes('online') || selectedFilters.value.includes('offline')
-
-	if (hasSingleplayer && hasServer && !hasStatusFilter) {
+	if (hasSingleplayer && hasServer) {
 		options.push({ id: 'singleplayer', label: formatMessage(commonMessages.singleplayerLabel) })
 	}
 
@@ -633,13 +630,11 @@ const filterOptions = computed(() => {
 			options.push({ id: 'vanilla', label: formatMessage(messages.vanillaFilter) })
 			options.push({ id: 'modded', label: formatMessage(messages.moddedFilter) })
 		}
-		if (!selectedFilters.value.includes('singleplayer')) {
-			const hasOnline = servers.some((x) => !!serverData.value[x.address]?.status)
-			const hasOffline = servers.some((x) => !serverData.value[x.address]?.status)
-			if (hasOnline && hasOffline) {
-				options.push({ id: 'online', label: formatMessage(messages.onlineFilter) })
-				options.push({ id: 'offline', label: formatMessage(messages.offlineFilter) })
-			}
+		const hasOnline = servers.some((x) => !!serverData.value[x.address]?.status)
+		const hasOffline = servers.some((x) => !serverData.value[x.address]?.status)
+		if (hasOnline && hasOffline) {
+			options.push({ id: 'online', label: formatMessage(messages.onlineFilter) })
+			options.push({ id: 'offline', label: formatMessage(messages.offlineFilter) })
 		}
 	}
 
