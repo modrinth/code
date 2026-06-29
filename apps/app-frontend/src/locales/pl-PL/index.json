@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ukryj włączone instancje"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Odrzuć"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Instalacja nie powiodła się"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Instalacja nie powiodła się z powodu zamknięcia aplikacji."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Instalacja nie powiodła się z powodu problemów z połączeniem."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Instalacja nie powiodła się z nieznanych przyczyn."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Otwórz instancję"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Spróbuj ponownie"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Nieznana instancja"
+  },
+  "app.action-bar.installs": {
+    "message": "Instalacje"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Ustaw jako główną instancję"
   },
@@ -51,7 +78,7 @@
     "message": "Zaawansowane renderowanie"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Wybierz preferowany motyw w Modrinth App."
+    "message": "Wybierz preferowany motyw w Modrinth app."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Motyw"
@@ -100,6 +127,12 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Pokaż czas gry"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Automatycznie pomija mało znaczące potwierdzenia takie jak duplikaty instalacji paczek modów, usuwanie zwykłej zawartości, masowe aktualizacje, odłączanie paczek modów i naprawianie. Ostrzeżenia o potencjalnie niebezpiecznych akcjach będą nadal pokazywane."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Pomiń mało znaczące ostrzeżenia"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Umożliwia przełączenie paska bocznego."
@@ -188,6 +221,60 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.install.phase.downloading_content": {
+    "message": "Pobieranie zawartości"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Pobieranie Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Pobieranie pliku paczki"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Wyodrębnianie nadpisań"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalizowanie"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Przygotowywanie instancji"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Przygotowywanie środowiska Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Pobieranie Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Wypakowywanie Javy {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Pobieranie Javy {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Przygotowywanie Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Sprawdzanie Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Ustalanie manifestu paczki"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Ustalanie programu ładującego"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Ustalanie wersji Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Ustalanie treści"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Przywracanie"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Uruchamianie procesorów programu ładującego"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
   },
@@ -212,6 +299,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instalacja"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Pobieranie {current, number}/{total, number} projektów..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Kończenie aktualizacji..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Sprawdzanie wersji..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
@@ -233,6 +329,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Szukaj serwerów"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Usuń świat"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Usuń świat"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Ten świat zostanie trwale usunięty z tej instancji. Tej akcji nie będzie można cofnąć."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Usuwanie {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Zmodowany"
   },
@@ -250,6 +358,18 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nie dodano żadnych światów ani serwerów"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Usuń serwer"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Usuń serwer"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Ten serwer zostanie trwale usunięty z tej instancji. Tej akcji nie będzie można cofnąć."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Usuwanie {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Szukaj wśród {count} światów..."
@@ -339,7 +459,7 @@
     "message": "To trwale usunie wybraną skórkę. Tej akcji nie można odwrócić."
   },
   "app.skins.delete-modal.title": {
-    "message": "Czy na pewno chcesz usunąć tą skórkę?"
+    "message": "Czy na pewno chcesz usunąć tę skórkę?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Nie udało się odczytać wybranego pliku."
@@ -835,6 +955,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Kopiuj adres"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Utwórz skrót"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nie pokazuj na stronie głównej"

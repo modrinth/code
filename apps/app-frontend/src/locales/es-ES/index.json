@@ -11,6 +11,18 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ocultar más instancias en ejecución"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Descartar"
+  },
+  "app.action-bar.install.failed": {
+    "message": "La instalación falló"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "La instalación falló porque la aplicación se cerró."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "La instalación falló debido a un error de red."
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Establecer como instancia principal"
   },

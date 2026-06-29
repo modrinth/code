@@ -386,17 +386,8 @@
   "auth.reset-password.title.long": {
     "message": "Baguhin ang iyong password"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Pakilagay ng two-factor code upang makapagpatuloy."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Ilagay ang two-factor code"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Ilagay ang code..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Mag-sign in gamit ang"
   },
   "auth.sign-in.title": {
     "message": "Mag-sign In"
@@ -409,9 +400,6 @@
   },
   "auth.sign-up.title": {
     "message": "Mag-sign Up"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Mag-sign up gamit ang"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
@@ -2584,9 +2572,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Kung magsasama ka ng mga kontentong hindi naka-host sa Modrinth, kailangan niyong ipaalam sa amin sa pinanggalingan nito at matiyak na pinahintulutang mapakalat ang mga file. Tingnan ang <link>aming gabay</link> upang matuto kung papaano ito magawa nang maayos!"
   },
   "project.settings.title": {
     "message": "Mga Setting"

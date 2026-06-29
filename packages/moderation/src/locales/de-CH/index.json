@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Stelle sicher, dass du einen Nachweis über deine Berechtigung zur Verbreitung externer Inhalte in deinem Modpack hinterlegt hast."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Externe Berechtigungen überprüfen"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Wähle, welche Versionen dein Server unterstützt, wähle ein Modpack, oder lade dein eigenes hoch."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Link-Einstellungen ansehen"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Berechtigung-Dashboard besuchen"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Tag-Einstellungen ansehen"

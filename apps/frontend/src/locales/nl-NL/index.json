@@ -617,17 +617,8 @@
   "auth.reset-password.title.long": {
     "message": "Uw wachtwoord opnieuw instellen"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Voer een tweestapsverificatie code in om verder te gaan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Voer twee factor code in"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Voer code in..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Log in met"
   },
   "auth.sign-in.title": {
     "message": "Log in"
@@ -637,9 +628,6 @@
   },
   "auth.sign-up.title": {
     "message": "Aanmelden"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Meld je aan met"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account instellingen"
