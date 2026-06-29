@@ -107,6 +107,7 @@ impl State {
             instances::watcher::watch_instances_init(
                 &state.file_watcher,
                 &state.directories,
+                &state.pool,
             )
             .await;
 
