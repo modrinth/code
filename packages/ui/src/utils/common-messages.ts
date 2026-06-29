@@ -245,7 +245,7 @@ export const commonMessages = defineMessages({
 	},
 	removeButton: {
 		id: 'button.remove',
-		defaultMessage: 'Remove',
+		defaultMessage: 'Delete passkey',
 	},
 	removeImageButton: {
 		id: 'button.remove-image',

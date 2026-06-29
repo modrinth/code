@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Masquer plus d'instances en exécution"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Rejeter"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Échec de l'installation"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Échec de l'installation dû à la fermeture de l'app."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Échec de l'installation dû à une erreur réseau."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Échec de l'installation dû à une erreur inconnue."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Ouvrir l'instance"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Réessayer"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instance inconnue"
+  },
+  "app.action-bar.installs": {
+    "message": "Installations"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Définir en tante qu'instance première"
   },
@@ -101,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Afficher le temps de jeu"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Ignore automatiquement les confirmations à faible risque, comme l'installation de modpacks en double, la suppression de contenu standard, les mises à jour groupées, la dissociation des modpacks et les demandes de réparation. Les avertissements concernant les actions dangereuses continueront d'être affichés."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Cacher les alertes non essentielles"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Permet d'ouvrir ou de fermer la barre latérale."
   },
@@ -161,12 +194,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Aucune version disponible ne correspond à {compatibilityLabel}. Sélectionnez une version pour l'installer malgré tout. Les dépendances ne seront pas installées automatiquement."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installation du modpack..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Saisir la description du modpack..."
   },
@@ -194,6 +221,60 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.install.phase.downloading_content": {
+    "message": "Téléchargement du contenu"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Téléchargement de Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Téléchargement du fichier de pack"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extraction des fichiers personnalisés"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalisation"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Préparation de l'instance"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Préparation de Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Téléchargement de Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Extraction de Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Récupération de Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Préparation de Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validation de Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Lecture du manifeste du pack"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Résolution du loader"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Résolution de Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Résolution du contenu"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Annulation"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Exécution des processeurs du chargeur"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Toutes les données pour votre instance seront supprimées à jamais, y compris vos mondes, vos configurations, et le contenu installé."
   },
@@ -217,6 +298,15 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Téléchargement de {current, number}/{total, number} projets..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Finalisation de la mise à jour..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Résolution des versions..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projet"
@@ -242,8 +332,17 @@
   "app.instance.worlds.browse-servers": {
     "message": "Parcourir des serveurs"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Êtes-vous sûr·e de vouloir supprimer ce monde pour toujours ?"
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Supprimer le monde"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Supprimer le monde"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Ce monde sera définitivement supprimé de cette instance. Cette action est irréversible."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Suppression de {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Moddé"
@@ -263,14 +362,20 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Aucun serveur ou monde ajoutés"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Êtes-vous sûr·e de vouloir retirer {name} ?"
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Enlever le serveur"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Enlever le serveur"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Ce serveur sera enlevé de votre liste de serveur et de la liste de serveur en jeu. Vous pourrez le rajouter plus tard si vous connaissez son adresse."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Retrait de {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Rechercher {count} mondes..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "ce serveur"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Contenu requis"
@@ -850,6 +955,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Copier l'adresse"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Créer un raccourci"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Ne pas montrer dans l'Accueil"

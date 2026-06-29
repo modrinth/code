@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "További futó példányok elrejtése"
   },
+  "app.action-bar.install.retry": {
+    "message": "Újra"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Ismeretlen profil"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Beállítás elsődleges példányként"
   },
@@ -161,12 +167,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Nincs a(z) {compatibilityLabel} verziónak megfelelő elérhető verzió. Válassz ki egy verziót, ha mégis telepíteni szeretnéd. A függőségek nem települnek automatikusan."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modcsomag telepítése..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Írd be a modcsomag leírását..."
   },
@@ -193,6 +193,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": ""
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Az profilodhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
@@ -242,12 +245,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Szerverek böngészése"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' **véglegesen törlődik**, és azt semmilyen módon nem lehet majd helyreállítani."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Biztosan véglegesen törölni szeretnéd ezt a világot?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modolt"
   },
@@ -266,20 +263,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nincs szerver vagy világ"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' eltávolításra kerül a listádról, beleértve a játékon belülieket is. Ezt a lépést nem tudod visszavonni."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) eltávolításra kerül a listádról, beleértve a játékon belülieket is. Ezt a lépést nem tudod visszavonni."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Biztosan el akarod távolítani ezt: {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "ez a szerver"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Szükséges tartalom"

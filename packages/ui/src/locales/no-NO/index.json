@@ -116,9 +116,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Re-installer modpakka"
   },
-  "button.remove": {
-    "defaultMessage": "Fjern"
-  },
   "button.remove-image": {
     "defaultMessage": "Fjern bilde"
   },

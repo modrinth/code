@@ -731,11 +731,71 @@
   "auth.authorize.authorize-app-name": {
     "message": "Autoriser {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Paramètres de requête d'authentification obligatoires manquants."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "Pas d'adresse de redirection trouvée dans la réponse"
   },
+  "auth.authorize.errro-title": {
+    "message": "Une Erreur est Survenue"
+  },
   "auth.authorize.redirect-url": {
     "message": "Vous serez redirigé vers <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Continuer avec {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Conditions d'âge"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Terminer l'inscription"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Veuillez entrer une année de naissance valide. L'année ne peut pas être 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Date de naissance invalide"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Date de naissance"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Choisissez votre date de naissance"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Veuillez entrer votre date de naissance avant de continuer."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Date de naissance requise"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Vous ne rencontrez pas les conditions d'âge requises pour créer un compte sur Modrinth."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Code source pertinent"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Nous ne conservons pas votre date de naissance. Nous l'utilisons uniquement lors de l'inscription pour vérifier la conformité avec la loi COPPA."
+  },
+  "auth.create-account.page-title": {
+    "message": "Créer un Compte"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Vérification de sécurité"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Me tenir au courant des trucs cools sur lesquels Modrinth travaille par e-mail"
+  },
+  "auth.create-account.title": {
+    "message": "Créer un Compte"
+  },
+  "auth.create-account.username.label": {
+    "message": "Pseudo"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Entrez un pseudo"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Envoyez un e-mail de récupération"
@@ -771,52 +831,67 @@
     "message": "Réinitialiser votre mot de passe"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Veuillez entrer un code à double facteur pour continuer."
+    "message": "Entrez le code à 6 chiffres de votre application d'authentification, ou un de vos codes de secours."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Saisir le code à double facteur"
+    "message": "Authentification à deux facteurs"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Saisir le code..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Mot de passe oublié ?</forgot-password-link> • <create-account-link>Créer un compte</create-account-link>"
+  "auth.sign-in.continue-with-email": {
+    "message": "Continuer avec un E-mail"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Continuer avec une clé d'accès"
+  },
+  "auth.sign-in.create-account": {
+    "message": "S'inscrire"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Mot de passe oublié"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Dernière utilisation"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Vous n'avez pas de compte ?"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Se connecter avec"
+    "message": "Se connecter à Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Se connecter"
   },
-  "auth.sign-in.use-password": {
-    "message": "Ou utiliser un mot de passe"
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Conditions d'âge"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "Créer un compte"
+  "auth.sign-up.continue-with-email": {
+    "message": "Continuer avec un E-mail"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
   },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Les mots de passe ne correspondent pas !"
+  "auth.sign-up.show-fewer-options": {
+    "message": "Voir moins d'options"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Voir plus d'options"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Vous avez déjà un compte ?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "S'abonner aux mises à jour de Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "S'inscrire"
   },
-  "auth.sign-up.title.create-account": {
-    "message": "Ou créez vous-même un compte"
-  },
   "auth.sign-up.title.sign-up-with": {
-    "message": "S'inscrire avec"
+    "message": "Créer un Compte"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Paramètres du compte"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Découvrez des mods"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Votre adresse e-mail est déjà vérifiée !"
@@ -836,6 +911,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "La vérification de l'adresse e-mail a échouée"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "Un e-mail avec un lien pour vérifier votre compte a été envoyé à {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "E-mail envoyé"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Une erreur est survenue"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "Votre adresse e-mail a été vérifiée avec succès !"
   },
@@ -844,21 +928,6 @@
   },
   "auth.verify-email.title": {
     "message": "Vérifier l'adresse e-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "S'abonner aux mises à jour de Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Vous faites maintenant partie de la formidable communauté de créateurs et d'explorateurs qui construisent, téléchargent et se tiennent au courant des incroyables mods."
-  },
-  "auth.welcome.label.tos": {
-    "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Bienvenue sur Modrinth !"
-  },
-  "auth.welcome.title": {
-    "message": "Bienvenue"
   },
   "collection.button.edit-icon": {
     "message": "Modifier l'icône"
@@ -3402,43 +3471,76 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Veuillez prouver que vous avez la permission de redistribuer tous les fichiers suivants et que toutes les versions retenues seront automatiquement publiées."
+    "message": "Veuillez fournir la preuve que vous êtes autorisé à redistribuer tous les fichiers suivants. Une fois cette étape terminée, les versions actuellement retenues seront automatiquement publiées."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Veuillez fournir la preuve que vous avez l'autorisation de redistribuer tous les fichiers suivants avant de pouvoir soumettre votre projet pour évaluation."
+    "message": "Veuillez fournir la preuve que vous êtes autorisé à redistribuer tous les fichiers suivants avant de soumettre votre projet pour examen."
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "Contenu intégré inconnu"
+    "message": "Contenu externe inconnu"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "L'équipe de modération de Modrinth a rejeté les informations d'autorisation que vous avez fournies pour certains contenus externes. Veuillez examiner les éléments rejetés ci-dessous et fournir une preuve acceptable lub supprimer le contenu."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Certaines preuves ont été rejetées"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Tout réduire"
   },
   "project.settings.permissions.completed.description": {
-    "message": "Tout le contenu externe est accompagné d'une attribution."
+    "message": "Toutes les informations d'autorisation et les attributions ont été fournies pour l'ensemble du contenu externe."
   },
   "project.settings.permissions.completed.title": {
-    "message": "Attributions terminées !"
+    "message": "Autorisations terminées !"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "Aucune de vos versions ne contient de contenu externe, vous n'avez donc pas à vous soucier d'obtenir d'autorisations."
+    "message": "Aucune des versions de votre projet ne contient de contenu externe, vous n'avez donc pas à vous soucier d'obtenir des autorisations."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "Vous êtes prêt !"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "Tout développer"
+  },
   "project.settings.permissions.fail.description": {
-    "message": "Vous n'êtes pas autorisé à rediffuser certains des contenus externes que vous avez ajoutés. Pour pouvoir publier sur Modrinth, veuillez supprimer les contenus litigieux."
+    "message": "Il se peut que vous n'ayez pas l'autorisation de redistribuer une partie du contenu externe de votre projet. Pour pouvoir publier na Modrinth, veuillez supprimer ce contenu ou fournir la preuve que vous avez l'autorisation de l'utiliser."
   },
   "project.settings.permissions.fail.title": {
     "message": "Certains contenus ne peuvent pas être inclus"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "Si vous incluez du contenu qui n’est pas sur Modrinth, vous devez nous faire savoir d’où il vient et vérifier que vous avez la permission de distribuer les fichiers. Jettez un coup d’œil à <link>notre guide</link> pour apprendre comment faire cela proprement !"
+    "message": "Si vous incluez du contenu qui n'est pas hébergé sur Modrinth, vous devez nous indiquer sa provenance et vérifier que vous avez l'autorisation de distribuer te pliki. Découvrez <link>notre annonce de ce nouveau système</link> pour en savoir plus !"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "Découvrez comment fonctionnent les attributions"
+    "message": "En savoir plus sur les autorisations de distribution"
   },
   "project.settings.permissions.learn-more": {
     "message": "En savoir plus"
   },
+  "project.settings.permissions.no-results": {
+    "message": "Aucun fichier externe ne correspond à votre recherche."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Une partie du contenu externe inclus ne peut pas être distribuée sur Modrinth car elle enfreint nos règles relatives au contenu et doit être supprimée."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {Aucune attribution n'a besoin d'approbation} one {# attribution a besoin d'approbation} other {# attributions ont besoin d'approbation}}"
+  },
   "project.settings.permissions.search-placeholder": {
-    "message": "Rechercher {count} {count, plural, one {projet externe} other {projets externes}}..."
+    "message": "Rechercher {count} {count, plural, one {projet} other {projets}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "La plupart des fichiers"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Modifié récemment"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Rejeté"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Statut"
   },
   "project.settings.title": {
     "message": "Paramètres"
@@ -3997,6 +4099,48 @@
   },
   "settings.account.security.email.title": {
     "message": "E-mail"
+  },
+  "settings.account.security.passkey.add": {
+    "message": "Ajouter une clé d'accès"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Veillez à choisir un nom facile à retenir, afin de pouvoir identifier tę klucz d'accès plus tard."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Nom"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Ma clé d'accès"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Gérez vos clés d'accès enregistrées ou ajoutez-en une nouvelle."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Ajouté il y a {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Dernière utilisation il y a {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Chargement des clés d'accès…"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Jamais utilisée"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Vous n'avez aucune clé d'accès enregistrée."
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "Cela supprimera définitivement la clé d'accès \"{name}\". Vous ne pourrez plus l'utiliser pour vous connecter."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer cette clé d'accès ?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Renommer la clé d'accès"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Gérer les clés d'accès"
   },
   "settings.account.security.password.action.add": {
     "message": "Ajouter un mot de passe"
@@ -4610,6 +4754,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "S'abonner au journal Modrinth"
   },
+  "version.all-versions": {
+    "message": "Toutes les versions"
+  },
+  "version.confirm-delete.description": {
+    "message": "Cette version sera définitivement supprimée. Cette action est irréversible."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Supprimer la version"
+  },
+  "version.confirm-delete.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer cette version ?"
+  },
+  "version.dependency.view-project": {
+    "message": "Voir le projet"
+  },
+  "version.dependency.view-version": {
+    "message": "Voir la version"
+  },
+  "version.download.download-dependency": {
+    "message": "Télécharger la dépendance"
+  },
+  "version.download.no-primary-file": {
+    "message": "Erreur : aucun fichier principal trouvé"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Pack de ressources facultatif"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Pack de ressources requis"
+  },
+  "version.edit.button": {
+    "message": "Modifier"
+  },
+  "version.edit.details": {
+    "message": "Modifier les détails"
+  },
+  "version.edit.files": {
+    "message": "Modifier los pliki"
+  },
+  "version.edit.metadata": {
+    "message": "Modifier les métadonnées"
+  },
   "version.environment.none.description": {
     "message": "L'environnement pour cette version n'a pas été spécifié."
   },
@@ -4621,5 +4807,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Environnement Inconnue"
+  },
+  "version.package-as-mod.button": {
+    "message": "Packager comme mod"
+  },
+  "version.package-as-mod.description": {
+    "message": "Cela créera une nouvelle version prenant en charge les chargeurs de mods sélectionnés. Vous serez redirigé vers la nouvelle version et pourrez la modifier à votre guise."
+  },
+  "version.package-as-mod.header": {
+    "message": "Empaqueter le pack de données en mod"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Chargeurs de mods"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "Les chargeurs de mods pour lesquels vous souhaitez packager votre data pack."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Choisir les chargeurs de mods..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Packager le data pack"
+  },
+  "version.section.content.dev-info": {
+    "message": "Informations de développement"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle :"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Coordonnées Maven :"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Les projets sur Modrinth sont automatiquement disponibles via un dépôt Maven pour une utilisation avec des outils de build JVM tels que <gradle-link>Gradle</gradle-link>. Pour en savoir plus sur l'API Maven de Modrinth, <article-link>cliquez ici</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Remarque : Lorsque cela est possible, il est préférable d'utiliser le dépôt Maven du créateur, car il contient des informations sur les dépendances transitives que l'API Maven de Modrinth ne fournit pas. Vous risquez également de vous retrouver avec des dépendances en double si vous combinez des dépôts Maven Modrinth et non-Modrinth pour vos dépendances, car l'identifiant de groupe (group ID) différera lorsqu'il est fourni via l'API Maven de Modrinth."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "ID de version :"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Copier SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Copier SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Cette version est actuellement retenue et ne figure pas dans la liste publique. Veuillez fournir la preuve que vous êtes autorisé à redistribuer certains des fichiers inclus."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Masqué en raison d'un contenu intégré inconnu"
   }
 }

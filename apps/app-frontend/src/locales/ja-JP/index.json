@@ -140,12 +140,6 @@
   "app.browse.server.installing": {
     "message": "インストール中"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modパックをインストール中..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
   },
@@ -215,12 +209,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "サーバーを探す"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' は **完全に削除**され、元に戻すことはできません。"
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "本当にこのワールドを完全に削除しますか？"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Mod導入済み"
   },
@@ -239,20 +227,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "サーバー、ワールドは追加されていません"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' はゲーム内を含むサーバーリストから削除され、元に戻すことはできません。"
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) はゲーム内を含むサーバーリストから削除され、元に戻すことはできません。"
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "本当に {name} を削除しますか？"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} 個のワールドを検索…"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "このサーバー"
   },
   "app.modal.install-to-play.content-required": {
     "message": "必須コンテンツ"
@@ -330,7 +306,7 @@
     "message": "マントなし"
   },
   "app.skins.modal.replace-texture-button": {
-    "message": "置きかえる"
+    "message": "アップロード"
   },
   "app.skins.modal.texture-section": {
     "message": "テクスチャ"

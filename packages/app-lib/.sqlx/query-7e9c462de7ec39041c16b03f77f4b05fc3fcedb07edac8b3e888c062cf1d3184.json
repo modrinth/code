@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                    UPDATE instances\n                    SET icon_path = replace(icon_path, ?, ?)\n                    WHERE icon_path IS NOT NULL\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "7e9c462de7ec39041c16b03f77f4b05fc3fcedb07edac8b3e888c062cf1d3184"
+}

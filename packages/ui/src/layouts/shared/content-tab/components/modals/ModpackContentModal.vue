@@ -313,7 +313,7 @@ function bulkDisable() {
 }
 
 function show(contentItems: ContentItem[]) {
-	items.value = contentItems
+	items.value = contentItems.map((item) => ({ ...item }))
 	searchQuery.value = ''
 	selectedFilters.value = []
 	selectedIds.value = []
@@ -358,7 +358,7 @@ function getState(): ModpackContentModalState | null {
 }
 
 async function restore(state: ModpackContentModalState) {
-	items.value = state.items
+	items.value = state.items.map((item) => ({ ...item }))
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
 	loading.value = false
@@ -381,16 +381,15 @@ function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled
 	}
 	const { disabled: _, ...itemUpdates } = updates
 	if (Object.keys(itemUpdates).length > 0) {
-		const index = items.value.findIndex((i) => i.file_name === fileName)
-		if (index !== -1) {
-			items.value[index] = { ...items.value[index], ...itemUpdates }
-		}
+		items.value = items.value.map((item) =>
+			item.file_name === fileName ? { ...item, ...itemUpdates } : item,
+		)
 	}
 }
 
 function setItems(contentItems: ContentItem[]) {
 	const contentFileNames = new Set(contentItems.map((item) => item.file_name))
-	items.value = contentItems
+	items.value = contentItems.map((item) => ({ ...item }))
 	selectedIds.value = selectedIds.value.filter((id) => contentFileNames.has(id))
 	disabledIds.value = new Set([...disabledIds.value].filter((id) => contentFileNames.has(id)))
 	loading.value = false

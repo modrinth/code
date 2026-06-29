@@ -233,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Modパックを再インストール"
   },
-  "button.remove": {
-    "defaultMessage": "削除"
-  },
   "button.remove-image": {
     "defaultMessage": "画像を削除"
   },

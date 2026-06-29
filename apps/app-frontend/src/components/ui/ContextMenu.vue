@@ -12,7 +12,7 @@
 			<div v-for="(option, index) in options" :key="index" @click.stop="optionClicked(option.name)">
 				<hr v-if="option.type === 'divider'" class="divider" />
 				<div
-					v-else-if="!(isLinkedData(item) && option.name === `add_content`)"
+					v-else-if="!(isInstanceLink(item) && option.name === `add_content`)"
 					class="item clickable"
 					:class="[option.color ?? 'base']"
 				>
@@ -64,10 +64,10 @@ defineExpose({
 	},
 })
 
-const isLinkedData = (item) => {
-	if (item.instance != undefined && item.instance.linked_data) {
+const isInstanceLink = (item) => {
+	if (item.instance != undefined && item.instance.link) {
 		return true
-	} else if (item != undefined && item.linked_data) {
+	} else if (item != undefined && item.link) {
 		return true
 	}
 	return false

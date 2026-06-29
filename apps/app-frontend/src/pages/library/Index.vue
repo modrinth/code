@@ -5,8 +5,8 @@ import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
-import { profile_listener } from '@/helpers/events.js'
-import { list } from '@/helpers/profile.js'
+import { instance_listener } from '@/helpers/events.js'
+import { list } from '@/helpers/instance'
 import { useBreadcrumbs } from '@/store/breadcrumbs.js'
 
 const { handleError } = injectNotificationManager()
@@ -26,11 +26,11 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const unlistenProfile = await profile_listener(async () => {
+const unlistenInstance = await instance_listener(async () => {
 	instances.value = await list().catch(handleError)
 })
 onUnmounted(() => {
-	unlistenProfile()
+	unlistenInstance()
 })
 </script>
 

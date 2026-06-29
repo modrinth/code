@@ -31,13 +31,13 @@ import {
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	NavTabs,
 	OverflowMenu,
 	type OverflowMenuOption,
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { NavTabs } from '@modrinth/ui'
 import {
 	capitalizeString,
 	formatProjectType,
@@ -193,6 +193,7 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	isLoadingStatusAction.value = true
 	try {
 		await client.labrinth.projects_v2.edit(props.item.project.id, { status })
+		emit('refetch')
 
 		projectStatus.value = status
 	} catch (err) {
@@ -1206,7 +1207,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									</OverflowMenu>
 								</ButtonStyled>
 								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug Summary</button>
+									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug</button>
 								</ButtonStyled>
 							</template>
 						</ThreadView>

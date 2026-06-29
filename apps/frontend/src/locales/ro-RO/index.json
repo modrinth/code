@@ -248,50 +248,20 @@
   "auth.reset-password.title.long": {
     "message": "Resetează-ți parola"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Te rugăm să introduci codul de autorizare în doi pași (2FA) pentru a continua."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Introduceți codul 2FA"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Introdu codul..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Ați uitat parola?</forgot-password-link> • <create-account-link>Creați un cont</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Conectează-te cu"
   },
   "auth.sign-in.title": {
     "message": "Conectare"
   },
-  "auth.sign-in.use-password": {
-    "message": "Sau folosiți o parolă"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Creare cont"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Prin crearea unui cont, ești de acord cu <terms-link>Termenii</terms-link> și <privacy-policy-link>Politica de confidențialitate</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Parolele nu se potrivesc!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Aveți deja un cont?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Abonați-vă la actualizările despre Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Înregistrare"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Sau creează-ți singur un cont"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Înregistrare cu"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Setările contului"
@@ -322,21 +292,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifică email-ul"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Abonați-vă la actualizările despre Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Acum faci parte din minunata comunitate de creatori și exploratori care deja creează, descarcă și rămân la curent cu moduri extraordinare."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Prin crearea unui cont, ești de acord cu <terms-link>Termenii</terms-link> și <privacy-policy-link>Politica de confidențialitate</privacy-policy-link> Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Bine ați venit pe Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Bine ați venit"
   },
   "collection.button.edit-icon": {
     "message": "Editează pictograma"

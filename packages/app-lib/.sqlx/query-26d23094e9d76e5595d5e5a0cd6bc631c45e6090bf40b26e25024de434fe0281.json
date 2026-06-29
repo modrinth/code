@@ -1,0 +1,98 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            instance_id,\n            link_kind,\n            modrinth_project_id,\n            modrinth_version_id,\n            server_project_id,\n            content_project_id,\n            content_version_id,\n            hosting_server_id,\n            json(hosting_instance_ids) AS \"hosting_instance_ids?: String\",\n            hosting_active_instance_id,\n            shared_instance_id,\n            imported_name,\n            imported_version_number,\n            imported_filename\n        FROM instance_links\n        WHERE instance_id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "instance_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "link_kind",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "modrinth_project_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "modrinth_version_id",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "server_project_id",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_project_id",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_version_id",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "hosting_server_id",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "hosting_instance_ids?: String",
+        "ordinal": 8,
+        "type_info": "Null"
+      },
+      {
+        "name": "hosting_active_instance_id",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "shared_instance_id",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "imported_name",
+        "ordinal": 11,
+        "type_info": "Text"
+      },
+      {
+        "name": "imported_version_number",
+        "ordinal": 12,
+        "type_info": "Text"
+      },
+      {
+        "name": "imported_filename",
+        "ordinal": 13,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      null,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "26d23094e9d76e5595d5e5a0cd6bc631c45e6090bf40b26e25024de434fe0281"
+}

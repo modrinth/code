@@ -38,6 +38,9 @@
   "analytics.breakdown.loader": {
     "message": "Betöltő"
   },
+  "analytics.breakdown.members": {
+    "message": "Tag"
+  },
   "analytics.breakdown.monetization": {
     "message": "Bevételszerzés"
   },
@@ -220,6 +223,9 @@
   },
   "analytics.filter.search.download-sources": {
     "message": "Letöltési források keresése..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Tagok keresése... "
   },
   "analytics.filter.search.project-versions": {
     "message": "Projektverziók keresése..."
@@ -680,50 +686,20 @@
   "auth.reset-password.title.long": {
     "message": "Jelszavad visszaállítása"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Kérlek írd be a kétlépcsős hitelesítés kódját a folytatáshoz."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Írd be a kétlépcsős hitelesítés kódját"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Kód beírása..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Elfelejtetted a jelszavad?</forgot-password-link> • <create-account-link>Hozz létre egy fiókot</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Bejelentkezés ezzel"
   },
   "auth.sign-in.title": {
     "message": "Bejelentkezés"
   },
-  "auth.sign-in.use-password": {
-    "message": "Vagy használj jelszót"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Fiók létrehozása"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "A jelszavak nem jegyeznek!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Már van fiókod?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
-  },
   "auth.sign-up.title": {
     "message": "Regisztráció"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Vagy hozz létre egyet magadnak"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Regisztráció ezzel"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Fiókbeállítások"
@@ -754,21 +730,6 @@
   },
   "auth.verify-email.title": {
     "message": "Email-cím hitelesítése"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Feliratkozás a Modrinth híreire és frissítéseire"
-  },
-  "auth.welcome.description": {
-    "message": "Most már része vagy annak a fantasztikus fejlesztők és felfedezők közösségének, akik már építenek, letöltenek és naprakészek maradnak a csodálatos modokkal kapcsolatban."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Üdvözlünk a Modrinthon!"
-  },
-  "auth.welcome.title": {
-    "message": "Üdvözlünk"
   },
   "collection.button.edit-icon": {
     "message": "Ikon szerkesztése"
@@ -3161,17 +3122,11 @@
   "project.settings.general.url.title": {
     "message": "Link"
   },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Egyik verziód sem tartalmaz külső tartalmat, így nem kell aggódnod a jogosultságok beszerzése miatt."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Kész is van!"
   },
   "project.settings.permissions.learn-more": {
     "message": "További információ"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Keresés {count} külső projekt között..."
   },
   "project.settings.title": {
     "message": "Beállítások"

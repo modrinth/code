@@ -11,6 +11,18 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ocultar más instancias en ejecución"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Descartar"
+  },
+  "app.action-bar.install.failed": {
+    "message": "La instalación falló"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "La instalación falló porque la aplicación se cerró."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "La instalación falló debido a un error de red."
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Establecer como instancia principal"
   },
@@ -161,12 +173,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "No hay versiones disponibles que coincidan con {compatibilityLabel}. Selecciona una versión para instalarla de todas formas. Las dependencias no se instalarán automáticamente."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Instalando modpack..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Escribe la descripción del modpack..."
   },
@@ -242,12 +248,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Explorar servidores"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' será **permanentemente eliminado**, y habrá forma de recuperarlo."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "¿Estás seguro de qué quieres eliminar permanentemente este mundo?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modeado"
   },
@@ -266,20 +266,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "No hay servidores o mundos añadidos"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' será eliminado de tu lista, incluyendo dentro del juego, y no habrá forma de recuperarlo."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) será eliminado de tu lista, incluyendo dentro del juego, y no habrá forma de recuperarlo."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "¿Estás seguro de qué quieres eliminar {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Buscar {count} mundos..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "este servidor"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Contenido obligatorio"

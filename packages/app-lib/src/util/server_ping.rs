@@ -13,6 +13,7 @@ const MAX_MODERN_STATUS_PACKET_LENGTH: usize =
     MAX_MINECRAFT_STATUS_STRING_LENGTH + 4;
 const MAX_LEGACY_STATUS_UTF16_LENGTH: usize =
     MAX_MINECRAFT_STATUS_STRING_LENGTH;
+const SERVER_STATUS_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Ensures the length of a packet as stated by a server is not longer than a
 /// hard-coded limit.
@@ -87,7 +88,7 @@ pub async fn get_server_status(
                 protocol => modern::status(address, original_address, protocol.map(|v| v.version)).await,
             }
         } => res,
-        _ = tokio::time::sleep(Duration::from_secs(30)) => Err(ErrorKind::OtherError(
+        _ = tokio::time::sleep(SERVER_STATUS_TIMEOUT) => Err(ErrorKind::OtherError(
             format!("Ping of {}:{} timed out", original_address.0, original_address.1)
         ).into())
     }
