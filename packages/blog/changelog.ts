@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-29T22:52:04+00:00`,
+		product: 'app',
+		version: '0.15.3',
+		body: `## Fixed
+- Fixed hanging on larger legacy instances when visiting the Instance page.`,
+	},
+	{
 		date: `2026-06-29T20:44:35+00:00`,
 		product: 'web',
 		body: `## Changed
