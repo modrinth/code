@@ -319,7 +319,7 @@ function isExportCandidateDisabled(path) {
 		ref="exportModal"
 		:header="formatMessage(messages.header)"
 		scrollable
-		width="40rem"
+		width="46rem"
 		max-width="calc(100vw - 2rem)"
 	>
 		<div class="flex flex-col gap-4">
@@ -358,7 +358,7 @@ function isExportCandidateDisabled(path) {
 					:max-height="240"
 				/>
 			</div>
-			<div class="flex flex-col gap-3">
+			<div class="flex min-w-0 flex-col gap-3">
 				<div class="flex w-full min-w-0 items-center justify-between gap-3">
 					<button
 						type="button"
@@ -379,6 +379,7 @@ function isExportCandidateDisabled(path) {
 					<FileTreeSelect
 						:key="fileTreeKey"
 						v-model="selectedFilePaths"
+						class="min-w-0"
 						:items="files"
 						@navigate="scrollFilesIntoView()"
 					>

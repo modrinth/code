@@ -1,16 +1,19 @@
 <template>
-	<div class="flex flex-col gap-2">
+	<div class="flex w-full min-w-0 flex-col gap-2">
 		<nav
 			:aria-label="formatMessage(messages.breadcrumbNavigation)"
-			class="m-0 flex w-full min-w-0 flex-shrink items-center justify-between gap-3 p-0 text-contrast"
+			class="m-0 flex w-full min-w-0 flex-shrink items-center justify-between gap-2 p-0 text-contrast"
 		>
 			<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-				<li class="mr-2 flex-shrink-0">
+				<li class="mr-1 flex-shrink-0">
 					<ButtonStyled circular size="small">
 						<button
+							v-tooltip="formatMessage(messages.backToHome)"
 							type="button"
 							class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand !shadow-none !size-8"
+							:class="{ 'cursor-not-allowed opacity-60': isHomePath }"
 							:aria-label="formatMessage(messages.backToHome)"
+							:disabled="isHomePath"
 							@click="navigateTo('')"
 						>
 							<HomeIcon />
@@ -53,10 +56,10 @@
 		</nav>
 
 		<div
-			class="flex flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
+			class="flex w-full min-w-0 flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
 		>
 			<div
-				class="flex h-10 w-full select-none flex-row items-center justify-between bg-surface-3 px-3 text-sm font-medium"
+				class="flex h-10 w-full min-w-0 select-none flex-row items-center justify-between bg-surface-3 px-3 text-sm font-medium"
 			>
 				<div class="flex min-w-0 flex-1 items-center gap-2">
 					<Checkbox
@@ -84,7 +87,7 @@
 						/>
 					</button>
 				</div>
-				<div class="flex shrink-0 items-center gap-4">
+				<div class="ml-2 flex shrink-0 items-center gap-4">
 					<button
 						type="button"
 						class="hidden w-[92px] appearance-none items-center gap-1 border-0 bg-transparent p-0 text-left font-semibold hover:text-primary sm:flex"
@@ -136,7 +139,7 @@
 				:key="`${entry.type}:${entry.path}`"
 				role="button"
 				tabindex="0"
-				class="group flex w-full select-none items-center gap-2 border-0 border-t border-solid border-surface-4 px-3 py-2 text-left first:border-t-0 focus:!outline-none"
+				class="group flex w-full min-w-0 select-none items-center gap-2 border-0 border-t border-solid border-surface-4 px-3 py-2 text-left first:border-t-0 focus:!outline-none"
 				:class="[
 					i % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
 					entry.disabled && entry.type === 'file'
@@ -162,11 +165,13 @@
 					/>
 				</div>
 				<span
+					:ref="(element) => setEntryNameRef(entry.path, element)"
+					v-tooltip="truncatedTooltip(entryNameRefs[entry.path], entry.name)"
 					class="min-w-0 flex-1 truncate text-sm font-medium text-primary group-hover:text-contrast group-focus:text-contrast"
 				>
 					{{ entry.name }}
 				</span>
-				<div class="flex shrink-0 items-center gap-4">
+				<div class="ml-2 flex shrink-0 items-center gap-4">
 					<span class="hidden w-[92px] truncate text-left text-sm text-secondary sm:block">
 						{{ formatSize(entry) }}
 					</span>
@@ -192,12 +197,13 @@ import {
 	FileIcon,
 	HomeIcon,
 } from '@modrinth/assets'
-import { type Component, computed, ref, watch } from 'vue'
+import { type Component, type ComponentPublicInstance, computed, ref, watch } from 'vue'
 
 import { useFormatBytes } from '../../composables/format-bytes'
 import { useFormatDateTime } from '../../composables/format-date-time'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getDirectoryIcon, getFileIcon } from '../../utils/auto-icons'
+import { truncatedTooltip } from '../../utils/truncate'
 import ButtonStyled from './ButtonStyled.vue'
 import Checkbox from './Checkbox.vue'
 
@@ -296,6 +302,8 @@ const emit = defineEmits<{
 const currentPath = ref('')
 const sortField = ref<FileTreeSelectSortField>('name')
 const sortDesc = ref(false)
+const entryNameRefs = ref<Record<string, HTMLElement | null>>({})
+const isHomePath = computed(() => currentPath.value === '')
 
 const normalizedItems = computed(() => {
 	const items = new Map<string, NormalizedFileTreeSelectItem>()
@@ -519,6 +527,14 @@ function buildFileEntry(item: NormalizedFileTreeSelectItem): FileTreeSelectEntry
 function navigateTo(path: string) {
 	currentPath.value = path
 	emit('navigate', path)
+}
+
+function setEntryNameRef(path: string, element: Element | ComponentPublicInstance | null) {
+	if (element instanceof HTMLElement) {
+		entryNameRefs.value[path] = element
+	} else {
+		delete entryNameRefs.value[path]
+	}
 }
 
 function selectEntry(entry: FileTreeSelectEntry) {
