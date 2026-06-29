@@ -189,14 +189,31 @@ function handleDocumentPointerDown(event: PointerEvent) {
 	terminal.value.clearSelection()
 }
 
+function handleDocumentKeyDown(event: KeyboardEvent) {
+	if (!event.metaKey || event.key.toLowerCase() !== 'a') return
+	const target = event.target as Node | null
+	const active = document.activeElement
+	if (
+		!(target && containerRef.value?.contains(target)) &&
+		!(active && containerRef.value?.contains(active))
+	) {
+		return
+	}
+
+	event.preventDefault()
+	terminal.value?.selectAll()
+}
+
 onMounted(() => {
 	window.addEventListener('resize', handleWindowResize)
 	document.addEventListener('pointerdown', handleDocumentPointerDown)
+	document.addEventListener('keydown', handleDocumentKeyDown, true)
 })
 
 onBeforeUnmount(() => {
 	window.removeEventListener('resize', handleWindowResize)
 	document.removeEventListener('pointerdown', handleDocumentPointerDown)
+	document.removeEventListener('keydown', handleDocumentKeyDown, true)
 	if (resizeDebounce) clearTimeout(resizeDebounce)
 })
 
