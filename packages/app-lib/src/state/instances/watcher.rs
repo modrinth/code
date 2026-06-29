@@ -134,8 +134,9 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 									None
 								};
 								if let Some(event) = event {
+									let instance_path_str = instance_path_str.clone();
 									tokio::spawn(async move {
-										let _ = emit_instance(
+										emit_instance_event_for_path(
 											&instance_path_str,
 											event,
 										)
@@ -153,6 +154,25 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
     });
 
     Ok(RwLock::new(file_watcher))
+}
+
+async fn emit_instance_event_for_path(
+    instance_path: &str,
+    event: InstancePayloadType,
+) {
+    let Ok(state) = State::get().await else {
+        tracing::warn!("Unable to get state for watcher event for {instance_path}");
+        return;
+    };
+
+    let Ok(Some(instance)) =
+        instance_rows::get_instance_by_path(instance_path, &state.pool).await
+    else {
+        tracing::debug!("Skipping watcher event for unknown instance path: {instance_path}");
+        return;
+    };
+
+    let _ = emit_instance(&instance.id, event).await;
 }
 
 pub(crate) async fn watch_instances_init(
