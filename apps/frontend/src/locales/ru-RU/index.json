@@ -1628,9 +1628,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Загрузка уведомлений..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Можно редактировать сразу несколько проектов, выбрав их ниже."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Серверные проекты не поддерживают массовое редактирование"
   },
@@ -1705,24 +1702,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Проверьте метаданные среды"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "По возрастанию"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "По убыванию"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Название"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Статус"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Тип"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Иконка"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

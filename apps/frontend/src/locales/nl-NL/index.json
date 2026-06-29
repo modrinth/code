@@ -1358,9 +1358,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Notificaties aan het laden..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "U kunt meerdere projecten tegelijkertijd bijwerken door ze hieronder te selecteren."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Massa wijzigingen worden niet ondersteund door server projecten"
   },
@@ -1411,12 +1408,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Controller project metadata alstublieft"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Naam"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
   },
   "dashboard.projects.table.name": {
     "message": "Naam"

@@ -1346,9 +1346,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Načítání oznámení..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Více projektů můžete upravit najednou jejich výběrem níže."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverové projekty nepodporují hromadné úpravy"
   },
@@ -1399,24 +1396,6 @@
   },
   "dashboard.projects.project.moderator-message-aria": {
     "message": "Projekt má zprávu od moderátorů. Další informace zobrazíte v projektu."
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Vzestupně"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Sestupně"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Jméno"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Stav"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Typ"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikona"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

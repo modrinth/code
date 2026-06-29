@@ -1634,9 +1634,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Ładowanie powiadomień..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Możesz edytować kilka projektów naraz, zaznaczając je poniżej."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Projekty serwerów nie wspierają grupowej edycji"
   },
@@ -1708,24 +1705,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Sprawdź metadane środowiska"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Rosnąco"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Malejąco"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nazwa"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Rodzaj"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikona"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
