@@ -533,7 +533,7 @@ function setEntryNameRef(path: string, element: Element | ComponentPublicInstanc
 	if (element instanceof HTMLElement) {
 		entryNameRefs.value[path] = element
 	} else {
-		delete entryNameRefs.value[path]
+		entryNameRefs.value[path] = null
 	}
 }
 
