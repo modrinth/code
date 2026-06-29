@@ -11,6 +11,41 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated analytics graph colors to be more accessible.
+- Updated project versions table UI and mobile view so columns overflow nicely.
+- Updates projects page in dashboard to use new table and action bar.
+- Updated translations`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'app',
+		version: '0.15.2',
+		body: `## Added
+- Added the ["Chaos Cubed"](https://minecraft.wiki/w/Chaos_Cubed_(skin_pack)) official skin pack to the Skin selector page.
+
+## Changed
+- Redesigned the modpack export modal to align with the rest of the instance pages.
+- Updated project versions table UI and mobile view so columns overflow nicely.
+- Updated translations
+
+## Fixed
+- Fixed an issue where sometimes the app would desynchronise from the file system when disabling, enabling or removing mods from the Content tab.
+- Fixed issue where server pinging in the Worlds tab of the instance page would be stuck in a loading state for too long.
+- Fixed the Logs page in Modrinth App overflowing past the window instead of keeping the console contained.
+- Fixed the Modrinth Hosting server panel in Modrinth App overflowing past the window instead of keeping the console contained.
+- Fixed issue where sometimes disabling linked modpack content would not work. Thanks [@creeperkatze](@creeperkatze)!
+- Fixed issue where unlinking a locally imported mrpack from an instance causes the content to never show up in the content list.`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
 		date: `2026-06-26T16:33:23+00:00`,
 		product: 'app',
 		version: '0.15.1',
