@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
-import { computed, ref, toValue } from 'vue'
+import { computed, toValue } from 'vue'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
@@ -13,22 +14,15 @@ import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { commonMessages, formatProjectTypeSentence } from '#ui/utils/common-messages'
 import type { SortType } from '#ui/utils/search'
 
-import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
-import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
-const stickyInstallHeaderRef = ref<HTMLElement | null>(null)
-const { isStuck: isInstallHeaderStuck } = useStickyObserver(
-	stickyInstallHeaderRef,
-	'BrowseInstallHeader',
-)
+const installWarning = computed(() => ctx.installContext?.value?.warning)
 
 const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
 	ctx.effectiveSortTypes.value.map((st) => ({
@@ -69,16 +63,9 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
-		<div
-			ref="stickyInstallHeaderRef"
-			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
-			:class="[isInstallHeaderStuck ? 'border-t' : '']"
-		>
-			<BrowseInstallHeader />
-		</div>
-	</template>
-	<SelectedProjectsFloatingBar v-if="ctx.installContext?.value && ctx.variant !== 'web'" />
+	<Admonition v-if="installWarning" type="warning">
+		{{ installWarning }}
+	</Admonition>
 
 	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
 

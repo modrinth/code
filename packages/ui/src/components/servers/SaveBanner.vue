@@ -14,7 +14,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="props.restart" color="brand">
-					<button :disabled="props.isUpdating || isTransitioning" @click="saveAndPower">
+					<button :disabled="props.isUpdating || isTransitioning || !worldId" @click="saveAndPower">
 						<SpinnerIcon v-if="props.isUpdating || isTransitioning" class="animate-spin" />
 						{{ powerButtonLabel }}
 					</button>
@@ -43,7 +43,7 @@ const props = defineProps<{
 
 const client = injectModrinthClient()
 
-const { powerState } = injectModrinthServerContext()
+const { powerState, worldId } = injectModrinthServerContext()
 
 const isStopped = computed(() => powerState.value === 'stopped' || powerState.value === 'crashed')
 
@@ -63,6 +63,9 @@ const saveAndPower = async () => {
 	} catch {
 		return
 	}
-	await client.archon.servers_v0.power(props.serverId, isStopped.value ? 'Start' : 'Restart')
+	if (!worldId.value) return
+	await client.archon.servers_v1.powerWorld(props.serverId, worldId.value, {
+		action: isStopped.value ? 'start' : 'restart',
+	})
 }
 </script>

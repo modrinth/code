@@ -18,7 +18,7 @@ import {
 	TextCursorInputIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
@@ -389,10 +389,11 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 	showDeletionConfirmation(event)
 }
 
-function showDeletionConfirmation(event?: MouseEvent) {
+async function showDeletionConfirmation(event?: MouseEvent) {
 	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
 		confirmDelete()
 	} else {
+		await nextTick()
 		confirmDeletionModal.value?.show()
 	}
 }
@@ -1039,6 +1040,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			:target-type="ctx.deletionContext ?? 'instance'"
 			@delete="confirmDelete"
 		/>
 		<ContentDependencyWarningModal
@@ -1059,6 +1061,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:server="ctx.deletionContext === 'server'"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			:target-type="ctx.deletionContext ?? 'instance'"
 			@update="confirmBulkUpdate"
 		/>
 		<ConfirmUnlinkModal
@@ -1068,6 +1071,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:backup-tip="ctx.modpack.value?.project.title"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			:target-type="ctx.deletionContext ?? 'instance'"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

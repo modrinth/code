@@ -7,10 +7,10 @@ import {
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref } from 'vue'
 
-import type { FileOperation } from '../layouts/shared/files-tab/types'
-import { injectModrinthClient, provideModrinthServerContext } from '../providers'
-import type { BusyReason, CancelUploadHandler, ServerStats } from '../providers/server-context'
-import { defineMessage } from './i18n'
+import type { FileOperation } from '../../layouts/shared/files-tab/types'
+import { injectModrinthClient, provideModrinthServerContext } from '../../providers'
+import type { BusyReason, CancelUploadHandler, ServerStats } from '../../providers/server-context'
+import { defineMessage } from '../i18n'
 import { useModrinthServersConsole } from './server-console'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
@@ -370,7 +370,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			dismissedOpIds.value = new Set([...dismissedOpIds.value, opId])
 		}
 		try {
-			await client.kyros.files_v0.modifyOperation(opId, action)
+			await client.kyros.files_v1.modifyOperation(opId, action)
 		} catch (error) {
 			if (action === 'dismiss') return
 			console.error(`Failed to ${action} operation:`, error)

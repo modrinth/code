@@ -146,6 +146,7 @@ const APP_LEFT_NAV_WIDTH = '4rem'
 const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
 const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
+const ROUTE_SUSPENSE_TIMEOUT_MS = 60_000
 const credentials = ref()
 const sidebarToggled = ref(true)
 const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
@@ -155,6 +156,22 @@ const forceSidebar = computed(
 	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
+const keepAliveRouteComponents = computed(() => [
+	...new Set(
+		router
+			.getRoutes()
+			.map((route) => route.meta.keepAliveComponent)
+			.filter((name) => typeof name === 'string'),
+	),
+])
+
+function getRouteViewKey(viewRoute) {
+	const keepAliveKey = viewRoute.meta.keepAliveKey
+	if (typeof keepAliveKey === 'function') return keepAliveKey(viewRoute)
+	if (typeof keepAliveKey === 'string') return keepAliveKey
+	return undefined
+}
+
 const hostingRouteActive = computed(() => route.path.startsWith('/hosting'))
 const prideFundraiserEnabled = computed(
 	() => themeStore.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
@@ -495,6 +512,11 @@ const sidebarOverlayScrollbarsOptions = Object.freeze({
 	},
 })
 
+router.beforeEach(async (to) => {
+	const redirect = await resolveLegacyServerInstanceTabRedirect(to)
+	if (redirect) return redirect
+})
+
 router.beforeEach(() => {
 	suspensePending = false
 	if (routerToken) loading.end(routerToken)
@@ -524,6 +546,50 @@ function onSuspensePending() {
 	suspensePending = true
 	if (suspenseToken) loading.end(suspenseToken)
 	suspenseToken = loading.begin()
+}
+
+async function resolveLegacyServerInstanceTabRedirect(to) {
+	if (!['ServerManageContent', 'ServerManageFiles', 'ServerManageBackups'].includes(to.name)) {
+		return null
+	}
+
+	const serverId = getRouteParam(to.params.id)
+	if (!serverId) return null
+
+	const tabPath =
+		to.name === 'ServerManageFiles' ? '/files' : to.name === 'ServerManageBackups' ? '/backups' : ''
+	const instancesPath = `/hosting/manage/${encodeURIComponent(serverId)}/instances`
+
+	try {
+		const serverFull = await tauriApiClient.archon.servers_v1.get(serverId)
+		const world = serverFull.worlds.find((item) => item.is_active) ?? serverFull.worlds[0]
+		if (world) {
+			return {
+				path: `${instancesPath}/${encodeURIComponent(world.id)}${tabPath}`,
+				query: to.query,
+				hash: to.hash,
+				replace: true,
+			}
+		}
+	} catch {
+		return {
+			path: instancesPath,
+			query: to.query,
+			hash: to.hash,
+			replace: true,
+		}
+	}
+
+	return {
+		path: instancesPath,
+		query: to.query,
+		hash: to.hash,
+		replace: true,
+	}
+}
+
+function getRouteParam(param) {
+	return Array.isArray(param) ? param[0] : param
 }
 
 function onSuspenseResolve() {
@@ -1624,11 +1690,17 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				{{ formatMessage(messages.authUnreachableBody) }}
 			</Admonition>
-			<RouterView v-slot="{ Component }">
+			<RouterView v-slot="{ Component, route: viewRoute }">
 				<template v-if="Component">
-					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
-						<component :is="Component"></component>
-					</Suspense>
+					<KeepAlive :include="keepAliveRouteComponents" :max="3">
+						<Suspense
+							:timeout="ROUTE_SUSPENSE_TIMEOUT_MS"
+							@pending="onSuspensePending"
+							@resolve="onSuspenseResolve"
+						>
+							<component :is="Component" :key="getRouteViewKey(viewRoute)"></component>
+						</Suspense>
+					</KeepAlive>
 				</template>
 			</RouterView>
 		</div>

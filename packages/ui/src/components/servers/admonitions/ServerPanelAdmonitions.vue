@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -11,8 +11,8 @@ import InstallingBanner, {
 	type SyncProgress,
 } from '#ui/components/servers/InstallingBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerBackupsQueue } from '#ui/composables/servers/server-backups-queue.ts'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
@@ -23,6 +23,7 @@ import UploadAdmonition from './UploadAdmonition.vue'
 const props = defineProps<{
 	syncProgress?: SyncProgress | null
 	contentError?: ContentError | null
+	showInstanceInfo?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -45,6 +46,15 @@ const messages = defineMessages({
 		id: 'servers.admonitions.background-task-running',
 		defaultMessage: 'Background task running',
 	},
+	instanceInfoHeader: {
+		id: 'servers.manage.instances.info.header',
+		defaultMessage: 'What is a server instance?',
+	},
+	instanceInfoBody: {
+		id: 'servers.manage.instances.info.body',
+		defaultMessage:
+			'An instance is a separate setup of your server with its own content, files, worlds, and settings. You can switch which instance your server runs at any time.',
+	},
 	contentBusyBody: {
 		id: 'content.page-layout.busy-description',
 		defaultMessage: 'Please wait for the operation to complete before editing content.',
@@ -55,8 +65,15 @@ const messages = defineMessages({
 	},
 })
 
-const isOnContentTab = computed(() => route.path.includes('/content'))
 const isOnFilesTab = computed(() => route.path.includes('/files'))
+const isOnInstancesList = computed(
+	() => route.path.includes('/instances') && !route.params.instance_id,
+)
+const isOnContentTab = computed(
+	() =>
+		route.path.includes('/content') ||
+		(!!route.params.instance_id && !isOnFilesTab.value && !route.path.includes('/backups')),
+)
 
 const bannerCoversInstalling = computed(
 	() =>
@@ -96,6 +113,29 @@ const dismissedIds = reactive(new Set<string>())
 const cancellingIds = reactive(new Set<string>())
 const uploadCancelling = ref(false)
 const dismissedContentErrorKey = ref<string | null>(null)
+const instanceInfoAdmonitionStorageLoaded = ref(false)
+const instanceInfoAdmonitionDismissed = ref(true)
+const INSTANCE_INFO_ADMONITION_KEY = 'server-instances-info-admonition-dismissed'
+
+const instanceCount = computed(() => ctx.serverFull.value?.worlds.length ?? null)
+const showInstanceInfoAdmonition = computed(
+	() =>
+		props.showInstanceInfo &&
+		isOnInstancesList.value &&
+		instanceInfoAdmonitionStorageLoaded.value &&
+		!instanceInfoAdmonitionDismissed.value &&
+		instanceCount.value === 1,
+)
+
+onMounted(() => {
+	try {
+		instanceInfoAdmonitionDismissed.value =
+			window.localStorage.getItem(INSTANCE_INFO_ADMONITION_KEY) === 'true'
+		instanceInfoAdmonitionStorageLoaded.value = true
+	} catch {
+		instanceInfoAdmonitionStorageLoaded.value = false
+	}
+})
 
 const contentErrorKey = computed(() =>
 	props.contentError ? `${props.contentError.step}:${props.contentError.description}` : null,
@@ -166,6 +206,7 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 		| { kind: 'upload' }
 		| { kind: 'fs-op'; op: FileOperation }
 		| { kind: 'backup'; entry: BackupAdmonitionEntry }
+		| { kind: 'instance-info' }
 		| { kind: 'busy-content' }
 		| { kind: 'busy-files' }
 	)
@@ -251,6 +292,17 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 			kind: 'backup',
 			entry,
 			priority: backupPriority(entry),
+			sortIndex: sortIndex++,
+		})
+	}
+
+	if (showInstanceInfoAdmonition.value) {
+		out.push({
+			id: 'instance-info',
+			type: 'info',
+			dismissible: true,
+			kind: 'instance-info',
+			priority: 6,
 			sortIndex: sortIndex++,
 		})
 	}
@@ -374,6 +426,8 @@ async function onDismissAll() {
 			}
 		} else if (it.kind === 'backup') {
 			tasks.push(onBackupDismiss(it.entry))
+		} else if (it.kind === 'instance-info') {
+			onInstanceInfoDismiss()
 		}
 	}
 	await Promise.all(tasks)
@@ -390,12 +444,22 @@ function onContentErrorDismiss() {
 		dismissedContentErrorKey.value = contentErrorKey.value
 	}
 }
+
+function onInstanceInfoDismiss() {
+	instanceInfoAdmonitionDismissed.value = true
+	try {
+		window.localStorage.setItem(INSTANCE_INFO_ADMONITION_KEY, 'true')
+	} catch {
+		instanceInfoAdmonitionStorageLoaded.value = false
+	}
+}
 </script>
 
 <template>
 	<StackedAdmonitions
 		:items="stackItems"
 		:dismiss-all-enabled="hasBulkDismissableItems"
+		:animate-single-item="false"
 		class="w-full"
 		@dismiss-all="onDismissAll"
 	>
@@ -440,6 +504,15 @@ function onContentErrorDismiss() {
 				:header="formatMessage(messages.backgroundTaskRunning)"
 			>
 				{{ formatMessage(messages.contentBusyBody) }}
+			</Admonition>
+			<Admonition
+				v-else-if="item.kind === 'instance-info'"
+				type="info"
+				:header="formatMessage(messages.instanceInfoHeader)"
+				:dismissible="dismissible"
+				@dismiss="onInstanceInfoDismiss"
+			>
+				{{ formatMessage(messages.instanceInfoBody) }}
 			</Admonition>
 			<Admonition
 				v-else-if="item.kind === 'busy-files'"

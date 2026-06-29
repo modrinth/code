@@ -407,6 +407,7 @@ export type PendingChange = {
 
 type ServerListingProps = {
 	server_id: string
+	worldId?: string | null
 	name: string
 	status: Archon.Servers.v0.Status
 	suspension_reason?: Archon.Servers.v0.SuspensionReason | null
@@ -546,16 +547,28 @@ async function dataURLToBlob(dataURL: string): Promise<Blob> {
 	return res.blob()
 }
 
+async function getActiveWorldId(serverId: string): Promise<string | null> {
+	const server = await archon.servers_v1.get(serverId)
+	const activeWorld = server.worlds.find((world) => world.is_active)
+	return activeWorld?.id ?? server.worlds[0]?.id ?? null
+}
+
+async function uploadWorldFile(worldId: string, path: string, file: File | Blob) {
+	await kyros.files_v1.ensureFile(worldId, path)
+	await kyros.files_v1.uploadFile(worldId, path, file).promise
+}
+
 const { data: image } = useQuery({
-	queryKey: ['server-icon', props.server_id] as const,
+	queryKey: computed(() => ['server-icon', props.server_id, props.worldId ?? null] as const),
 	queryFn: async (): Promise<string | null> => {
 		if (!props.server_id || props.status !== 'available') return null
 
 		try {
-			const fsAuth = await archon.servers_v0.getFilesystemAuth(props.server_id)
+			const worldId = props.worldId ?? (await getActiveWorldId(props.server_id))
+			if (!worldId) return null
 
 			try {
-				const blob = await kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
+				const blob = await kyros.files_v1.downloadRawFileContents(worldId, '/server-icon.png')
 				return await processImageBlob(blob, 64)
 			} catch (error) {
 				const statusCode = (error as { statusCode?: number })?.statusCode
@@ -564,8 +577,8 @@ const { data: image } = useQuery({
 				}
 
 				try {
-					const originalBlob = await kyros.files_v0.downloadFileWithAuth(
-						fsAuth,
+					const originalBlob = await kyros.files_v1.downloadRawFileContents(
+						worldId,
 						'/server-icon-original.png',
 					)
 					return await processImageBlob(originalBlob, 64)
@@ -585,13 +598,12 @@ const { data: image } = useQuery({
 					const scaledBlob = await dataURLToBlob(scaledDataUrl)
 					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
 
-					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
+					await uploadWorldFile(worldId, '/server-icon.png', scaledFile)
 
 					const originalFile = new File([blob], 'server-icon-original.png', {
 						type: 'image/png',
 					})
-					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', originalFile)
-						.promise
+					await uploadWorldFile(worldId, '/server-icon-original.png', originalFile)
 
 					return scaledDataUrl
 				}

@@ -713,6 +713,13 @@ export namespace Archon {
 		}
 
 		export namespace v1 {
+			export type WorldPowerAction = 'start' | 'stop' | 'restart' | 'kill'
+
+			export type WorldPowerActionRequest = {
+				action: WorldPowerAction
+				shutdown_strategy?: string | null
+			}
+
 			export type ServerFull = {
 				id: string
 				name: string
@@ -723,6 +730,10 @@ export namespace Archon {
 				tags: string[]
 				location: ServerLocation
 				worlds: WorldFull[]
+			}
+
+			export type ServerOnboardResponse = {
+				archived_worlds: string[]
 			}
 
 			export type ServerResources = {
@@ -757,6 +768,34 @@ export namespace Archon {
 				backups: Archon.Backups.v1.Backup[]
 				content: WorldContentInfo | null
 				readiness: WorldReadiness
+			}
+
+			export type WorldContent =
+				| {
+						content_variant: 'modpack'
+						spec: Archon.Content.v1.ModpackSpec
+				  }
+				| {
+						content_variant: 'bare'
+						loader: Archon.Content.v1.Modloader
+						version: string
+						game_version?: string | null
+				  }
+
+			export type CreateWorld = {
+				name: string
+				icon_data?: string | null
+				properties?: Archon.Content.v1.PropertiesFields | null
+				content: WorldContent
+			}
+
+			export type CreateWorldResponse = {
+				id: string
+			}
+
+			export type PatchWorld = {
+				name?: string | null
+				icon_data?: string | null
 			}
 
 			export type WorldReadiness = {

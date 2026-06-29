@@ -245,9 +245,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} fjerna"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Noe innhold til serveren din kunne ikke bli gjennomgått og kan bli påvirka av denne endringa."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} oppdatert"
   },
@@ -262,9 +259,6 @@
   },
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Ei sikkerhetskopiering holder på, det er anbefalt at du venter til den er ferdig før du går videre med handlinga."
-  },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Å lage ei sikkerhetskopiering kan ta flere minutt, angående størrelsen på serveren din."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Opprett sikkerhetskopiering"
@@ -440,9 +434,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Bekreft"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Endring til {gameVersion} kommer til å endre følgende innhold i serveren din."
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "Gå gjennom innholdsendringer"
   },
@@ -457,9 +448,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}-versjon"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Du kommer til å måtte starte serveren din på nytt att for å bytte loader."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Re-installer modpakke"
@@ -2136,4 +2124,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

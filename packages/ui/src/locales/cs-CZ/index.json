@@ -395,9 +395,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "Odstraněno {count}"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Některý obsah na vašem serveru nebylo možné analyzovat a tato změna se ho může týkat."
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "Aktualizováno {count}"
   },
@@ -425,20 +422,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Probíhá zálohování. Doporučujeme počkat na jeho dokončení, než tuto akci provedeš."
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "Vytvoření zálohy může trvat několik minut dle velikosti tvého serveru."
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Vytvořit zálohu"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "instance"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Podrž Shift a klikni, jestli chceš přeskočit potvrzení"
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "svět"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Obsah tvého modpacku nyní najdeš zde!"
@@ -946,9 +934,6 @@
   },
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Instalace CurseForge modpacku"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpack nebyl nalezen"
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "Nainstalovat"
@@ -2486,9 +2471,6 @@
   "servers.manage.reload-button": {
     "defaultMessage": "Načíst znovu"
   },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Znovu nezobrazovat"
-  },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Nový server"
   },
@@ -2952,4 +2934,3 @@
     "defaultMessage": "Modrinth tým"
   }
 }
-

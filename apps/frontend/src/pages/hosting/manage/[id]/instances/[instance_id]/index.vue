@@ -38,7 +38,7 @@ const contentWorldId = await getContentWorldId()
 if (contentWorldId) {
 	try {
 		const content = await queryClient.ensureQueryData({
-			queryKey: ['content', 'list', 'v1', serverId],
+			queryKey: ['content', 'list', 'v1', serverId, contentWorldId],
 			queryFn: () =>
 				client.archon.content_v1.getAddons(serverId, contentWorldId, { from_modpack: false }),
 			staleTime: 30_000,

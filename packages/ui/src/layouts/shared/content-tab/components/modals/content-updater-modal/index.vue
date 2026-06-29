@@ -205,11 +205,10 @@
 				<span>{{
 					warning ??
 					formatMessage(
-						incompatibilityWarningMode
-							? messages.incompatibilityWarning
-							: isApp
-								? messages.updateWarningApp
-								: messages.updateWarningWeb,
+						incompatibilityWarningMode ? messages.incompatibilityWarning : messages.updateWarning,
+						{
+							type: updateWarningTargetType,
+						},
 					)
 				}}</span>
 			</div>
@@ -352,14 +351,10 @@ const messages = defineMessages({
 		id: 'instances.updater-modal.select-version',
 		defaultMessage: 'Select a version to view its changelog',
 	},
-	updateWarningApp: {
-		id: 'instances.updater-modal.warning-app',
+	updateWarning: {
+		id: 'instances.updater-modal.warning',
 		defaultMessage:
-			'Updating can break your instance. Review version changelogs and back up first.',
-	},
-	updateWarningWeb: {
-		id: 'instances.updater-modal.warning-web',
-		defaultMessage: 'Updating can break your world. Review version changelogs and back up first.',
+			'Updating can break your {type, select, server {server} other {instance}}. Review version changelogs and back up first.',
 	},
 	incompatibilityWarning: {
 		id: 'instances.updater-modal.incompatibility-warning',
@@ -424,6 +419,7 @@ const props = withDefaults(
 		currentLoader: string
 		currentVersionId: string
 		isApp: boolean
+		targetType?: 'server' | 'instance'
 		/** The project type (e.g. mod, shader, resourcepack, datapack, modpack). */
 		projectType?: string
 		projectIconUrl?: string
@@ -440,6 +436,7 @@ const props = withDefaults(
 		actionDisabledTooltip?: string
 	}>(),
 	{
+		targetType: undefined,
 		projectType: undefined,
 		projectIconUrl: undefined,
 		projectName: undefined,
@@ -469,6 +466,7 @@ const defaultHeader = computed(() => {
 				: messages.updateVersionHeader,
 	)
 })
+const updateWarningTargetType = computed(() => props.targetType ?? 'instance')
 
 const emit = defineEmits<{
 	update: [version: Labrinth.Versions.v2.Version, event: MouseEvent]

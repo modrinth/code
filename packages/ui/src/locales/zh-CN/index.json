@@ -434,9 +434,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "移除了 {count} 项"
   },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "你服务器上的部分内容未能完成分析，可能受此变更影响。"
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "更新了 {count} 项"
   },
@@ -464,23 +461,11 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "正在进行备份，建议等待备份完成后再执行此操作。"
   },
-  "content.inline-backup.backup-takes-a-while": {
-    "defaultMessage": "创建备份可能需要几分钟，具体取决于你服务器的大小。"
-  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "创建备份"
   },
-  "content.inline-backup.instance-label": {
-    "defaultMessage": "实例"
-  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "在点击时按住 Shift 键可跳过确认步骤。"
-  },
-  "content.inline-backup.warning-body": {
-    "defaultMessage": "我们建议在进行下一步操作之前创建备份，以便在出现问题时可以恢复你的{type}。"
-  },
-  "content.inline-backup.world-label": {
-    "defaultMessage": "世界"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "你现在可以在这里找到你的整合包内容！"
@@ -1211,12 +1196,6 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "安装一个 CurseForge 整合包"
   },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "无法通过该链接找到 CurseForge 整合包。"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "未找到 CurseForge 整合包"
-  },
   "files.zip-url-modal.enter-link": {
     "defaultMessage": "输入链接"
   },
@@ -1427,9 +1406,6 @@
   "hosting.loader.failed-to-repair": {
     "defaultMessage": "修复服务器失败"
   },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "defaultMessage": "将服务器重置为初始设置失败"
-  },
   "hosting.loader.failed-to-save-settings": {
     "defaultMessage": "保存安装设置失败"
   },
@@ -1445,29 +1421,11 @@
   "hosting.loader.repair-started-title": {
     "defaultMessage": "修复完成"
   },
-  "hosting.loader.reset-server": {
-    "defaultMessage": "重置服务器"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "删除服务器上的所有数据，包括你的世界、模组和配置文件。备份将保留并可以恢复。"
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "重置为初始设置"
   },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "defaultMessage": "这会让服务器重新进入初始化流程，以便你再次完成配置。你确定要继续吗？"
-  },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "defaultMessage": "重置为初始设置"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "defaultMessage": "服务器已回到初始化流程。"
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "defaultMessage": "服务器已重置为初始设置"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "支持选项"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst 时最高 {cpus} CPU"
@@ -1526,9 +1484,6 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "确认"
   },
-  "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "切换到 {gameVersion} 将修改你服务器上的以下内容。"
-  },
   "installation-settings.confirm-version-change-header": {
     "defaultMessage": "审查内容更改"
   },
@@ -1559,9 +1514,6 @@
   "installation-settings.incompatible-content.header": {
     "defaultMessage": "安装了不兼容的内容"
   },
-  "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "切换加载器时 所有已经安装的内容都会被强制禁用 我们建议你直接重置服务器"
-  },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "更改加载器具有破坏性"
   },
@@ -1576,9 +1528,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} 版本"
-  },
-  "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "你需要重置服务器以切换加载器。"
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "重新安装整合包会将{type}内容重置到其初始状态，此操作将删除所有您自行添加的模组或内容。"
@@ -1807,12 +1756,6 @@
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "更新至 {version}"
-  },
-  "instances.updater-modal.warning-app": {
-    "defaultMessage": "更新可能会导致你的实例出现损坏。请先查看版本更新日志并进行备份。"
-  },
-  "instances.updater-modal.warning-web": {
-    "defaultMessage": "更新可能会导致你的世界出现损坏。请先查看版本更新日志并进行备份。"
   },
   "label.actions": {
     "defaultMessage": "操作"
@@ -3635,12 +3578,6 @@
   "servers.audit-log.column.world": {
     "defaultMessage": "实例"
   },
-  "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "服务器实例是独立的环境，各自拥有已安装的内容与世界存档。"
-  },
-  "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "即将到来！"
-  },
   "servers.audit-log.empty": {
     "defaultMessage": "没有符合筛选条件的活动记录。"
   },
@@ -4322,15 +4259,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "他们现在可以在这里找到！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "不再显示"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "你的服务器设置已移动"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享服务器"
   },
@@ -4564,12 +4492,6 @@
   },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "选择要游玩的内容"
-  },
-  "servers.setup.onboarding.step.configure-world.description": {
-    "defaultMessage": "像单人游戏一样设置你的世界。选择你的游戏模式和世界种子。"
-  },
-  "servers.setup.onboarding.step.configure-world.title": {
-    "defaultMessage": "配置你的世界"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
     "defaultMessage": "复制地址并与朋友分享你的服务器，同时告知他们加入需要哪些模组。"

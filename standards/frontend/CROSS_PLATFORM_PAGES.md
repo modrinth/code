@@ -177,15 +177,17 @@ import { injectModrinthClient, injectModrinthServerContext, ServersManageFilesPa
 import { useQueryClient } from '@tanstack/vue-query'
 
 const client = injectModrinthClient()
-const { serverId } = injectModrinthServerContext()
+const { worldId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 
 try {
-	await queryClient.ensureQueryData({
-		queryKey: ['files', serverId, '/'],
-		queryFn: () => client.kyros.files_v0.listDirectory('/', 1, 2000),
-		staleTime: 30_000,
-	})
+	if (worldId.value) {
+		await queryClient.ensureQueryData({
+			queryKey: ['files', 'v1', worldId.value, '/'],
+			queryFn: () => client.kyros.files_v1.listDescendants(worldId.value!, '/', 1, 200),
+			staleTime: 30_000,
+		})
+	}
 } catch {
 	// Let the mounted layout’s useQuery surface errors; do not fail route setup.
 }

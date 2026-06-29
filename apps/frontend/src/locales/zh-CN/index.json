@@ -1802,9 +1802,6 @@
   "discover.install.back-to-server": {
     "message": "返回服务器"
   },
-  "discover.install.back-to-setup": {
-    "message": "返回设置"
-  },
   "discover.install.cancel-reset": {
     "message": "取消重置"
   },

@@ -17,6 +17,7 @@ const props = defineProps<{
 	ariaLabel?: string
 	belowModal?: boolean
 	hideWhenModalOpen?: boolean
+	toolbarMaxWidth?: string
 }>()
 
 const INTERCOM_BUBBLE_GAP = 8
@@ -46,6 +47,11 @@ const barStyle = computed(() => ({
 	'--floating-action-bar-left-offset': leftOffset.value,
 	'--floating-action-bar-right-offset': rightOffset.value,
 }))
+const toolbarStyle = computed(() =>
+	props.toolbarMaxWidth
+		? { '--floating-action-bar-toolbar-max-width': props.toolbarMaxWidth }
+		: undefined,
+)
 
 function checkCompact() {
 	const el = toolbarEl.value
@@ -203,8 +209,9 @@ onUnmounted(() => {
 					ref="toolbarEl"
 					role="toolbar"
 					:aria-label="ariaLabel"
-					class="relative overflow-clip flex items-center gap-1.5 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto md:max-w-[60vw] px-3 py-2.5 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
+					class="floating-action-toolbar relative overflow-clip flex items-center gap-1.5 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto px-3 py-2.5 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
 					:class="{ 'bar-compact': compact }"
+					:style="toolbarStyle"
 				>
 					<slot />
 				</div>
@@ -218,6 +225,12 @@ onUnmounted(() => {
 	left: var(--floating-action-bar-left-offset, var(--left-bar-width, 0px));
 	right: var(--floating-action-bar-right-offset, var(--right-bar-width, 0px));
 	transition: bottom 0.25s ease-in-out;
+}
+
+@media (min-width: 768px) {
+	.floating-action-toolbar {
+		max-width: var(--floating-action-bar-toolbar-max-width, 60vw);
+	}
 }
 
 .floating-action-bar-enter-active {

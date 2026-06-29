@@ -4,8 +4,9 @@
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileUploadConflictModal ref="uploadConflictModal" @proceed="handleExtractConfirm" />
 	<FileUploadZipUrlModal
-		v-if="ctx.showInstallFromUrl"
+		v-if="showInstallFromUrl"
 		ref="uploadZipUrlModal"
+		:world-id="installFromUrlWorldId"
 		:disabled="isBusy"
 		:disabled-tooltip="busyTooltip"
 	/>
@@ -48,7 +49,7 @@
 					:is-editor-find-open="fileEditorRef?.isFindOpen"
 					:search-query="searchQuery"
 					:show-refresh-button="showRefreshButton"
-					:show-install-from-url="ctx.showInstallFromUrl"
+					:show-install-from-url="showInstallFromUrl"
 					:base-id="baseId"
 					:disabled="isBusy"
 					:disabled-tooltip="busyTooltip"
@@ -225,7 +226,7 @@ import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { injectFilePicker } from '#ui/providers/file-picker'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
-import { getFileExtension } from '#ui/utils/file-extensions'
+import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
 import FileEditor from './components/editor/FileEditor.vue'
 import FileContextMenu from './components/FileContextMenu.vue'
@@ -378,6 +379,8 @@ const selectedItem = ref<FileItem | null>(null)
 const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
 const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
+const installFromUrlWorldId = computed(() => ctx.worldId?.value ?? '')
+const showInstallFromUrl = computed(() => !!ctx.showInstallFromUrl && !!installFromUrlWorldId.value)
 
 async function confirmDiscardChanges(): Promise<boolean> {
 	if (!hasUnsavedChanges.value) return true
@@ -652,7 +655,9 @@ function handleItemHover(item: { type: string; path: string; name: string }) {
 		}, 150)
 	} else {
 		prefetchTimeout = setTimeout(() => {
-			ctx.prefetchFile?.(item.path)
+			if (canOpenInFileEditor(item.name)) {
+				ctx.prefetchFile?.(item.path)
+			}
 		}, 150)
 	}
 }
