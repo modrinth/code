@@ -38,6 +38,7 @@ import { LabrinthOAuthInternalModule } from './labrinth/oauth/internal'
 import { LabrinthOrganizationsV3Module } from './labrinth/organizations/v3'
 import { LabrinthPatsV2Module } from './labrinth/pats/v2'
 import { LabrinthPayoutV3Module } from './labrinth/payout/v3'
+import { LabrinthPayoutsInternalModule } from './labrinth/payouts/internal'
 import { LabrinthPayoutsV3Module } from './labrinth/payouts/v3'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
@@ -110,6 +111,7 @@ export const MODULE_REGISTRY = {
 	labrinth_pats_v2: LabrinthPatsV2Module,
 	labrinth_limits_v3: LabrinthLimitsV3Module,
 	labrinth_payout_v3: LabrinthPayoutV3Module,
+	labrinth_payouts_internal: LabrinthPayoutsInternalModule,
 	labrinth_payouts_v3: LabrinthPayoutsV3Module,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,

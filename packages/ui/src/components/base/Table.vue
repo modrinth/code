@@ -85,6 +85,7 @@
 							<td
 								v-if="showSelection"
 								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
+								:class="getBodyCellClass(row, getAbsoluteRowIndex(rowIndex))"
 							>
 								<Checkbox
 									:model-value="isSelected(row)"
@@ -96,7 +97,10 @@
 								v-for="column in columns"
 								:key="column.key"
 								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="`text-${column.align ?? 'left'}`"
+								:class="[
+									getBodyCellClass(row, getAbsoluteRowIndex(rowIndex)),
+									`text-${column.align ?? 'left'}`,
+								]"
 							>
 								<slot
 									:name="`cell-${column.key}`"
@@ -137,6 +141,7 @@
 							<td
 								v-if="showSelection"
 								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
+								:class="getBodyCellClass(row, getAbsoluteRowIndex(rowIndex))"
 							>
 								<Checkbox
 									:model-value="isSelected(row)"
@@ -148,7 +153,10 @@
 								v-for="column in columns"
 								:key="column.key"
 								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="`text-${column.align ?? 'left'}`"
+								:class="[
+									getBodyCellClass(row, getAbsoluteRowIndex(rowIndex)),
+									`text-${column.align ?? 'left'}`,
+								]"
 							>
 								<slot
 									:name="`cell-${column.key}`"
@@ -219,6 +227,7 @@ const props = withDefaults(
 		virtualRowHeight?: number
 		virtualBufferSize?: number /* The number of extra rows rendered above and below the visible viewport */
 		rowTransitionName?: string
+		bodyCellClass?: string | ((row: T, rowIndex: number) => string)
 		/**
 		 * Sets a minimum width for the table content, allowing horizontal overflow below that width.
 		 */
@@ -321,6 +330,14 @@ function getRowRenderKey(row: T, rowIndex: number): PropertyKey {
 
 function getRowClass(rowIndex: number): string {
 	return rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
+}
+
+function getBodyCellClass(row: T, rowIndex: number): string {
+	if (typeof props.bodyCellClass === 'function') {
+		return props.bodyCellClass(row, rowIndex)
+	}
+
+	return props.bodyCellClass ?? 'h-14'
 }
 
 function isSelected(row: T): boolean {
