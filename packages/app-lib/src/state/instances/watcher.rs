@@ -111,10 +111,10 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         .to_string_lossy()
                                         .to_string();
                                     if !e.path.is_file() {
-										let instance_id = instance_id.clone();
-										let world = world.clone();
-										tokio::spawn(async move {
-											if let Ok(state) = State::get().await
+                                        let instance_id = instance_id.clone();
+                                        let world = world.clone();
+                                        tokio::spawn(async move {
+                                            if let Ok(state) = State::get().await
 												&& let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
 													&instance_id,
 													WorldType::Singleplayer,
@@ -123,8 +123,8 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 												).await {
 													tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
 												}
-										});
-									}
+                                        });
+                                    }
                                     Some(InstancePayloadType::WorldUpdated {
                                         world,
                                     })
