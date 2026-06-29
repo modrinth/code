@@ -17,7 +17,11 @@ const MODPACK_FILES: FileTreeSelectItem[] = [
 	{ path: 'mods/modmenu-15.0.0-beta.3.jar', size: 824220, modified: modified - 1800 },
 	{ path: 'resourcepacks/FreshAnimations_v1.9.3.zip', size: 4382210, modified: modified - 2600 },
 	{ path: 'resourcepacks/Mod Menu Helper.zip', size: 104522, modified: modified - 2800 },
-	{ path: 'shaderpacks/ComplementaryUnbound_r5.5.1.zip', size: 23882210, modified: modified - 3400 },
+	{
+		path: 'shaderpacks/ComplementaryUnbound_r5.5.1.zip',
+		size: 23882210,
+		modified: modified - 3400,
+	},
 	{ path: 'datapacks/terralith.zip', size: 17452213, modified: modified - 4200 },
 	{ path: 'icon.png', size: 128044, modified: modified - 5000 },
 	{ path: 'profile.json', size: 928, modified: modified - 400, disabled: true },

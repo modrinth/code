@@ -335,7 +335,9 @@ function isExportCandidateDisabled(path) {
 					/>
 				</div>
 				<div class="labeled_input w-full">
-					<p class="text-contrast font-semibold">{{ formatMessage(messages.versionNumberLabel) }}</p>
+					<p class="text-contrast font-semibold">
+						{{ formatMessage(messages.versionNumberLabel) }}
+					</p>
 					<StyledInput
 						v-model="versionInput"
 						type="text"
@@ -443,11 +445,3 @@ function isExportCandidateDisabled(path) {
 		</template>
 	</NewModal>
 </template>
-
-<style lang="scss">
-.v-popper__popper.v-popper--theme-dismissable-prompt.export-selected-files-popper {
-	.v-popper__inner {
-		padding-right: 0 !important;
-	}
-}
-</style>
