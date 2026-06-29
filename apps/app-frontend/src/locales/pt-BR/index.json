@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ocultar mais instâncias em execução"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Dispensar"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Instalação falha"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "A instalação falhou devido ao aplicativo ter fechado."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "A instalação falhou devido a um erro na rede."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "A instalação falhou devido a um erro desconhecido."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Abrir instância"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Tentar novamente"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instância desconhecida"
+  },
+  "app.action-bar.installs": {
+    "message": "Instalações"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Tornar instância principal"
   },
@@ -101,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Exibir tempo jogado"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Pula automaticamente as confirmações desnecessárias como duplica de instalação de pacotes de mods, exclusão de conteúdo normal, atualizações em massa, desvinculo de pacotes de mods e diálogos de reparo. Os avisos de perigo ainda serão exibidos."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Pular avisos desnecessários"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Permite alternar a barra lateral."
   },
@@ -170,23 +203,71 @@
   "app.export-modal.header": {
     "message": "Exportar pacote de mods"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Incluir \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Nome do pacote de mods"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nome do pacote de mods"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Configure quais arquivos serão incluídos na exportação"
-  },
   "app.export-modal.version-number-label": {
     "message": "Número da versão"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Instalando conteúdo"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Instalando Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Instalando arquivo de pacote"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extraindo substitutos"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalizando"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Preparando instância"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Preparando Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Baixando Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Extraindo Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Obtendo Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Preparando Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validando Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Lendo manifestação de pacote"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Resolvendo loader"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Resolvendo Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Resolvendo conteúdo"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Indo de volta"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Executando processadores de loader"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Todos os dados para sua instância serão excluídos permanentemente, incluindo seus mundos, configs e todo o conteúdo instalado."
@@ -212,6 +293,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instância"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Instalando {current, number}/{total, number} projeto(s)..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Finalizando atualização..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Resolvendo versões..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "projeto"
   },
@@ -236,6 +326,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Explorar servidores"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Excluir mundo"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Excluir mundo"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Este mundo será permanentemente excluído desta instância. Esta ação não pode ser desfeita."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Excluindo {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Modificado"
   },
@@ -253,6 +355,18 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nenhum servidor ou mundo adicionado"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Remover servidor"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Remover servidor"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "O servidor será removido da lista de servidores e da lista de servidores no jogo. Você pode re-adicioná-lo depois se souber o endereço."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Removendo {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Buscar {count} mundos..."
@@ -838,6 +952,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Copiar endereço"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Criar atalho"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Não exibir na página inicial"

@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "隱藏更多執行中的實例"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "忽略"
+  },
+  "app.action-bar.install.failed": {
+    "message": "無法安裝"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "由於應用程式關閉，無法安裝。"
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "由於網路錯誤，無法安裝。"
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "由於未知錯誤，無法安裝。"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "開啟實例"
+  },
+  "app.action-bar.install.retry": {
+    "message": "重試"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "未知的實例"
+  },
+  "app.action-bar.installs": {
+    "message": "安裝"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "設為主要實例"
   },
@@ -101,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "顯示遊玩時數"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "自動跳過低風險操作的確認提示，例如重複安裝模組包、常規內容刪除、批次更新、取消連結模組包以及修復提示。高風險警告仍會顯示。"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "跳過非必要的警告"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "啟用切換側邊欄的功能。"
   },
@@ -162,7 +195,7 @@
     "message": "沒有符合 {compatibilityLabel} 的可用版本。請選擇一個版本強制安裝。不會自動安裝相依模組。"
   },
   "app.export-modal.description-placeholder": {
-    "message": "輸入模組包描述..."
+    "message": "輸入模組包描述……"
   },
   "app.export-modal.export-button": {
     "message": "匯出"
@@ -170,23 +203,71 @@
   "app.export-modal.header": {
     "message": "匯出模組包"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "要包含「{file}」嗎？"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "模組包名稱"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "模組包名稱"
   },
-  "app.export-modal.select-files-label": {
-    "message": "設定要包含在此匯出檔案中的檔案"
-  },
   "app.export-modal.version-number-label": {
     "message": "版本號碼"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "正在下載內容"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "正在下載 Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "正在下載模組包檔案"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "正在解壓縮覆寫檔案"
+  },
+  "app.install.phase.finalizing": {
+    "message": "即將完成"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "正在準備實例"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "正在準備 Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "正在下載 Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "正在解壓縮 Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "正在擷取 Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "正在準備 Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "正在驗證 Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "正在讀取模組包清單"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "正在解析載入器"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "正在解析 Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "正在解析內容"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "正在復原"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "正在執行載入器處理程式"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你實例中的所有資料將被永久刪除，包含你的世界、設定檔以及所有已安裝的內容。"
@@ -212,6 +293,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "實例"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "正在下載專案 {current, number}/{total, number}..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "正在結束更新..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "正在解析版本..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "專案"
   },
@@ -236,6 +326,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "瀏覽伺服器"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "刪除世界"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "刪除世界"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "此世界將會被永久刪除，此操作無法復原。"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "正在刪除 {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "模組"
   },
@@ -253,6 +355,18 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "未新增任何伺服器或世界"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "移除伺服器"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "移除伺服器"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "這個伺服器將從你的伺服器清單中移除。如果你記得伺服器位址，稍後可以將其重新新增回來。"
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "正在移除 {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
@@ -838,6 +952,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "複製位址"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "建立捷徑"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "不要在首頁顯示"

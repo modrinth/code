@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Göm fler aktiva instanser"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Avvisa"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Installationen misslyckades"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Installationen misslyckades för att appen stängdes."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Installationen misslyckades av ett nätverksfel."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Installationen misslyckades med ett okänt fel."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Öppna instans"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Försök igen"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Okänd instans"
+  },
+  "app.action-bar.installs": {
+    "message": "Installationer"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Gör till primärinstans"
   },
@@ -24,7 +51,7 @@
     "message": "Primärinstans"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Ladda om för att uppdatera"
+    "message": "Uppdatera (ladda om)"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Visa fler aktiva instanser"
@@ -74,8 +101,14 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
   },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Inkluderar de senaste världarna i \"Hoppa tillbaka i världar\" på hemsidan."
+  },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Hoppa tillbaka i världar"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimerar launchern när Minecraft startas."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimera programstartare"
@@ -94,6 +127,12 @@
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Visa speltid"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Hoppar över bekräftelser med låg risk, såsom installation av dubbla modpaket, radering av vanligt innehåll, massuppdateringar, avlänkning av modpaket och reparationsmeddelanden. Varningar om farliga händelser visas fortfarande."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Hoppa över icke nödvändiga varningar"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Låter dig växla sidofältet."
@@ -146,6 +185,9 @@
   "app.browse.project-type.modpacks": {
     "message": "Modpaket"
   },
+  "app.browse.server-instance-content-warning": {
+    "message": "Att lägga till innehåll kan bryta kompatibiliteten när du ansluter dig till servern. Allt tillagt innehåll kommer att förloras när du uppdaterar serverinstansen."
+  },
   "app.browse.server.installing": {
     "message": "Installerar"
   },
@@ -161,23 +203,65 @@
   "app.export-modal.header": {
     "message": "Exportera modpaket"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Inkludera \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpaketets namn"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketets namn"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Konfigurera vilka filer som inkluderas i denna export"
-  },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Laddar ner innehåll"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Laddar ner Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Laddar ner pack fil"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extraherar överskrivningar"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Avslutar"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Förbereder instans"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Förbereder Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Laddar ner Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Extraherar Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Hämtar Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Förbereder Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Bekräftar Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Läser pack information"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Laddar ner loadern"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Laddar ner Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Laddar ner innehåll"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data från din instans kommer permanent raderas, däribland dina världar, konfigurationer samt allt installerat innehåll."
@@ -203,6 +287,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instans"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Laddar ner {current, number}/{total, number} projekt..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Slutför uppdatering..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Laddar versioner..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
@@ -227,6 +320,15 @@
   "app.instance.worlds.browse-servers": {
     "message": "Utforska servrar"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Ta bort värld"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Ta bort värld"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Raderar {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Moddad"
   },
@@ -244,6 +346,15 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Inga servrar eller världar tillagda"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Ta bort server"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Ta bort server"
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Raderar {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Sök {count} världar..."
@@ -286,6 +397,9 @@
   },
   "app.project.install-button.already-installed": {
     "message": "Detta projekt är redan installerat"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Tillbaka till upptäck"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installera innehåll till instans"
@@ -401,6 +515,12 @@
   "app.skins.rate-limit.title": {
     "message": "Sakta ner!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Ditt utseende kunde inte sparas."
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
   },
@@ -424,6 +544,9 @@
   },
   "app.skins.section.saved-skins": {
     "message": "Sparade utseenden"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
   },
   "app.skins.section.the-copper-age": {
     "message": "The Copper Age"
@@ -814,6 +937,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Kopiera adress"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Skapa genväg"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Visa inte på Startsidan"

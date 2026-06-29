@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang benar"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Pastikan Anda telah menyediakan bukti izin pengedaran konten eksternal pada paket mod Anda."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Tinjau izin eksternal"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Pilih versi apa saja yang didukung oleh server Anda, pilih paket mod, atau unggah milik Anda sendiri."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Kunjungi pengaturan tautan"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Kunjungi dasbor perizinan"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Kunjungi pengaturan tag"

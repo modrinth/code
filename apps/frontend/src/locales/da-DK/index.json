@@ -254,17 +254,8 @@
   "auth.reset-password.title.long": {
     "message": "Nulstil din adgangskode"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Indtast en to-faktor-kode for at fortsætte."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Indtast to-faktor-kode"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Indtast kode..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Log ind med"
   },
   "auth.sign-in.title": {
     "message": "Log ind"
@@ -277,9 +268,6 @@
   },
   "auth.sign-up.title": {
     "message": "Tilmeld"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Tilmeld dig med"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoindstillinger"

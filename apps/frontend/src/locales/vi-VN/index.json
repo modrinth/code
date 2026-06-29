@@ -728,17 +728,8 @@
   "auth.reset-password.title.long": {
     "message": "Đặt lại mật khẩu của bạn"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Vui lòng nhập mã xác thực hai bước để tiếp tục."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Nhập mã xác thực hai bước"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Nhập mã..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Đăng nhập bằng"
   },
   "auth.sign-in.title": {
     "message": "Đăng nhập"
@@ -751,9 +742,6 @@
   },
   "auth.sign-up.title": {
     "message": "Đăng ký"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Đăng ký bằng"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Thiết đặt tài khoản"
@@ -1490,9 +1478,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Đang tải thông báo..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Bạn có thể sửa đổi nhiều dự án cùng một lúc bằng cách chọn chúng ở dưới."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Dự án máy chủ không hỗ trợ sửa đổi nhiều mục cùng một lúc"
   },
@@ -1567,24 +1552,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Vui lòng xem lại thông tin dữ liệu"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Từ dưới lên"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Từ trên xuống"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Tên"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Trạng thái"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Loại"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "B.tượng"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -3326,44 +3293,14 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Vui lòng đưa ra bằng chứng cho rằng bạn có quyền để đăng lại mọi tệp trên và bất kỳ phiên bản nào bị giữ lại sẽ tự động được đăng tải."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Vui lòng đưa ra bằng chứng cho rằng bạn có quyền để đăng lại mọi tệp trên trước khi bạn có thể đăng tải để kiểm duyệt."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Nội dung nhúng không xác định"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Mọi nội dung ngoài đều có sự quy kết."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Đã hoàn thành quy kết!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Không phiên bản nào của bạn đều có nội dung ngoài, nên bạn không cần lo lắng về quyền."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Mọi thứ đều sẵn sàng!"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "Bạn không có quyền đăng tải một số nội dung bạn đã thêm. Để đăng lên Modrinth, xóa nội dung bản quyền."
   },
   "project.settings.permissions.fail.title": {
     "message": "Một số nội dung không thể bao gồm"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Nếu bạn đăng nội dung không dược chủ trì trên modrinth, bạn cần cho chúng tôi biết nó đến từ đâu và xác minh mạn có quyền để đăng tải những tệp đó. Hãy xem <link>hướng dẫn</link> để biết về cách làm điều này đúng cách!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Tìm hiểu cách quy kết hoạt động"
-  },
   "project.settings.permissions.learn-more": {
     "message": "Tìm hiểu thêm"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Tìm kiếm trong {count} {count, plural,other {dự án ngoài}}..."
   },
   "project.settings.title": {
     "message": "Cài đặt"

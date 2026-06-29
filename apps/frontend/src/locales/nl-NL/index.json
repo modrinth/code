@@ -617,17 +617,8 @@
   "auth.reset-password.title.long": {
     "message": "Uw wachtwoord opnieuw instellen"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Voer een tweestapsverificatie code in om verder te gaan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Voer twee factor code in"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Voer code in..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Log in met"
   },
   "auth.sign-in.title": {
     "message": "Log in"
@@ -637,9 +628,6 @@
   },
   "auth.sign-up.title": {
     "message": "Aanmelden"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Meld je aan met"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account instellingen"
@@ -1370,9 +1358,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Notificaties aan het laden..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "U kunt meerdere projecten tegelijkertijd bijwerken door ze hieronder te selecteren."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Massa wijzigingen worden niet ondersteund door server projecten"
   },
@@ -1423,12 +1408,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Controller project metadata alstublieft"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Naam"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
   },
   "dashboard.projects.table.name": {
     "message": "Naam"

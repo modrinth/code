@@ -770,17 +770,8 @@
   "auth.reset-password.title.long": {
     "message": "Restablecer tu contraseña"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Por favor introduce el código de autenticación de dos factores para continuar."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Introduce el código de autenticación de dos factores"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Introducir código..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Iniciar sesión con"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sesión"
@@ -793,9 +784,6 @@
   },
   "auth.sign-up.title": {
     "message": "Registro"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Registrarse con"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Ajustes de cuenta"
@@ -1529,9 +1517,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Cargando notificaciones..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Puedes editar múltiples proyectos a la vez seleccionándolos abajo."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Proyectos de servidor no soportan edición masiva"
   },
@@ -1603,24 +1588,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Por favor revise el entorno del metadata"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Ascendiendo"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Descendiendo"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nombre"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Estado"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tipo"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Icono"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -3363,43 +3330,76 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Por favor, proporciona pruebas de que tienes permiso para redistribuir todos estos archivos y cualquier versión retenida se publicará automáticamente."
+    "message": "Por favor, proporciona una prueba de que tienes permiso para redistribuir todos los siguientes archivos. Una vez completado, las versiones retenidas se publicarán automáticamente."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Por favor, proporciona pruebas de que tienes permiso para redistribuir todos estos archivos antes de enviar tu proyecto a revisión."
+    "message": "Por favor, proporciona una prueba de que tiene permiso para redistribuir todos los siguientes archivos antes de enviar su proyecto para su revisión."
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "Incluye contenido desconocido"
+    "message": "Contenido externo desconocido"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "El equipo de moderación de Modrinth ha rechazado la información de permisos que proporcionaste para cierto contenido externo. Revisa los elementos rechazados a continuación y proporciona una prueba aceptable o elimina el contenido."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Algunas pruebas fueron rechazadas"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Desbloquear todo"
   },
   "project.settings.permissions.completed.description": {
-    "message": "Todo el contenido externo proporciona atribuciones."
+    "message": "Todo el contenido externo cuenta con información de permisos y se han proporcionado las atribuciones correspondientes."
   },
   "project.settings.permissions.completed.title": {
-    "message": "¡Atribuciones completadas!"
+    "message": "¡Permisos completados!"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "Ninguna de tus versiones presenta contenido externo, por lo que no necesitas preocuparte de obtener permisos."
+    "message": "Ninguna de las versiones de tu proyecto contiene contenido externo, por lo que no necesitas preocuparte por obtener permisos."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "¡Ya estás listo!"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "Expandir todo"
+  },
   "project.settings.permissions.fail.description": {
-    "message": "No tienes permiso de redistribuir parte del contenido externo que añadiste. Para poder publicar en Modrinth, quita el contenido infractor."
+    "message": "Es posible que no tengas permiso para redistribuir parte del contenido externo en tu proyecto. Para publicar en Modrinth, por favor elimina este contenido o proporciona una prueba de que tienes permiso para usarlo."
   },
   "project.settings.permissions.fail.title": {
     "message": "No se puede incluir parte del contenido"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "Si incluyes contenido que no está alojado en Modrinth, necesitas comunicarnos de dónde viene y verificar que tienes permiso para distribuir los archivos. ¡Mira <link>nuestra guía</link> para saber cómo hacerlo correctamente!"
+    "message": "Si incluyes contenido que no esté alojado en Modrinth, debes informarnos de dónde proviene y verificar que tienes permiso para distribuir los archivos. ¡Consulta <link>nuestro anuncio de este nuevo sistema</link> para obtener más información!"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "Aprende cómo funcionan las atribuciones"
+    "message": "Más información sobre los permisos de distribución"
   },
   "project.settings.permissions.learn-more": {
     "message": "Saber más"
   },
+  "project.settings.permissions.no-results": {
+    "message": "No hay archivos externos que coincidan con tu búsqueda."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Parte del contenido externo incluido no puede distribuirse en Modrinth porque infringe nuestras Normas de Contenido y debe eliminarse."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {No hay atribuciones que necesiten aprobación} one {Una atribución necesita aprobación} other {# atribuciones necesitan aprobación}}"
+  },
   "project.settings.permissions.search-placeholder": {
-    "message": "Buscar {count} {count, plural, one {proyecto externo} other {proyectos externos}}..."
+    "message": "Buscar {count} {count, plural, one {proyecto} other {proyectos}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "La mayoría de los archivos"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Recientemente editado"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Rechazado"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Estado"
   },
   "project.settings.title": {
     "message": "Ajustes"
@@ -4571,6 +4571,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "Suscríbete al boletín de noticias de Modrinth"
   },
+  "version.all-versions": {
+    "message": "Todas las versiones"
+  },
+  "version.confirm-delete.description": {
+    "message": "Esta versión será permanentemente eliminado. Esta acción no se puede deshacer."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Eliminar versión"
+  },
+  "version.confirm-delete.title": {
+    "message": "¿Estás seguro de que quieres eliminar esta versión?"
+  },
+  "version.dependency.view-project": {
+    "message": "Ver proyecto"
+  },
+  "version.dependency.view-version": {
+    "message": "Ver versión"
+  },
+  "version.download.download-dependency": {
+    "message": "Descargar dependencia"
+  },
+  "version.download.no-primary-file": {
+    "message": "Error: No se encontró el archivo principal"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Resourse pack opcional"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Resourse pack requerido"
+  },
+  "version.edit.button": {
+    "message": "Editar"
+  },
+  "version.edit.details": {
+    "message": "Editar detalles"
+  },
+  "version.edit.files": {
+    "message": "Editar archivos"
+  },
+  "version.edit.metadata": {
+    "message": "Editar metadatos"
+  },
   "version.environment.none.description": {
     "message": "El entorno para esta versión no ha sido especificado."
   },
@@ -4582,5 +4624,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Entorno desconocido"
+  },
+  "version.package-as-mod.button": {
+    "message": "Paquete como mod"
+  },
+  "version.package-as-mod.description": {
+    "message": "Esto creará una nueva versión con soporte a los loader seleccionados. Serás redireccionado a la nueva versión para que puedas editarla a tu gusto."
+  },
+  "version.package-as-mod.header": {
+    "message": "Empaquetar datapack como mod"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Loaders de mods"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "Los loaders para los que te gustaría empaquetar tu datapack."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Elige los loaders..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Empaquetar datapack"
+  },
+  "version.section.content.dev-info": {
+    "message": "Información del desarrollador"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Coordenadas de Maven:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Los proyectos en Modrinth están disponibles automáticamente a través de un repositorio Maven para su uso con herramientas de compilación JVM como <gradle-link>Gradle</gradle-link>. Para obtener más información sobre la API Maven de Modrinth, <article-link>presiona aquí</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Nota: Cuando esté disponible, debería usar el repositorio Maven del creador, ya que contendrá información de dependencia transitiva que la API Maven de Modrinth no tiene. También podría terminar con dependencias duplicadas si usa una combinación de repositorios Maven de Modrinth y de otros proveedores para sus dependencias, porque el identificador de grupo será diferente cuando se sirva a través de la API Maven de Modrinth."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "ID de la versión:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Copiar SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Copiar SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Esta versión está actualmente retenida y no está listada públicamente. Por favor, proporcione prueba de que tiene permiso para redistribuir ciertos archivos incluidos."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Retenido debido a contenido incrustado desconocido"
   }
 }

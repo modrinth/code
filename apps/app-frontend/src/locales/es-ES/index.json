@@ -11,6 +11,18 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ocultar más instancias en ejecución"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Descartar"
+  },
+  "app.action-bar.install.failed": {
+    "message": "La instalación falló"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "La instalación falló porque la aplicación se cerró."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "La instalación falló debido a un error de red."
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Establecer como instancia principal"
   },
@@ -170,17 +182,11 @@
   "app.export-modal.header": {
     "message": "Exportar modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "¿Incluir \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Nombre del modpack"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nombre del modpack"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Configura que archivos se incluirán en esta instancia"
   },
   "app.export-modal.version-number-label": {
     "message": "Número de versión"

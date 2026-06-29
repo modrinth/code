@@ -356,17 +356,8 @@
   "auth.reset-password.title.long": {
     "message": "تغيير كلمة المرور"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "يرجى إدخال رمز التحقق الثنائي للمتابعة."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "أدخل رمز التحقق الثنائي"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "أدخل الرمز..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "تسجيل الدخول باستخدام"
   },
   "auth.sign-in.title": {
     "message": "تسجيل الدخول"
@@ -379,9 +370,6 @@
   },
   "auth.sign-up.title": {
     "message": "إنشاء حساب"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "سجّل باستخدام"
   },
   "auth.verify-email.action.account-settings": {
     "message": "إعدادات الحساب"
@@ -925,18 +913,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "يرجى مراجعة بيانات تعريف البيئة"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "صعوداً"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "نزولا"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "الإسم"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "الحالة"
   },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"

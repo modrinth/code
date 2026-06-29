@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Vyberte správné rozlišení"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Ujistěte se, že jste poskytli důkaz o oprávnění k distribuci externího obsahu ve vašem modpacku."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Zkontrolujte oprávnění k externímu obsahu"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Vyberte, jaké verze váš server podporuje. Zvolte modpack nebo nahrajte vlastní."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Přejděte do nastavení odkazů"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Přejděte do panelu oprávnění"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Přejděte do nastavení štítků"

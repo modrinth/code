@@ -233,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Pasang ulang paket mod"
   },
-  "button.remove": {
-    "defaultMessage": "Hapus"
-  },
   "button.remove-image": {
     "defaultMessage": "Hapus gambar"
   },

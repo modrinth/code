@@ -107,9 +107,6 @@
   "button.refresh": {
     "defaultMessage": "Genindlæs"
   },
-  "button.remove": {
-    "defaultMessage": "Fjern"
-  },
   "button.remove-image": {
     "defaultMessage": "Fjern billede"
   },

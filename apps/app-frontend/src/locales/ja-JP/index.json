@@ -306,7 +306,7 @@
     "message": "マントなし"
   },
   "app.skins.modal.replace-texture-button": {
-    "message": "置きかえる"
+    "message": "アップロード"
   },
   "app.skins.modal.texture-section": {
     "message": "テクスチャ"
