@@ -445,7 +445,6 @@ async fn fetch_advanced_with_client_and_progress(
         }
 
         if let Some((name, value)) = &download_meta_header {
-            tracing::info!("Sending download analytics: {value}");
             req = req.header(name.as_str(), value.as_str());
         }
 
@@ -479,10 +478,18 @@ async fn fetch_advanced_with_client_and_progress(
                         let mut stream = resp.bytes_stream();
                         let mut bytes = Vec::new();
                         let mut downloaded = 0_u64;
+                        let mut result = Ok(());
                         while let Some(item) = stream.next().await {
-                            let chunk = item.or(Err(ErrorKind::NoValueFor(
-                                "fetch bytes".to_string(),
-                            )))?;
+                            let chunk = match item {
+                                Ok(chunk) => chunk,
+                                Err(err) => {
+                                    tracing::warn!(
+                                        "Failed to read response body from {url}: {err}"
+                                    );
+                                    result = Err(err);
+                                    break;
+                                }
+                            };
                             downloaded += chunk.len() as u64;
                             bytes.append(&mut chunk.to_vec());
                             if let Some((bar, total)) = &loading_bar {
@@ -498,7 +505,7 @@ async fn fetch_advanced_with_client_and_progress(
                             }
                         }
 
-                        Ok(bytes::Bytes::from(bytes))
+                        result.map(|()| bytes::Bytes::from(bytes))
                     } else {
                         resp.bytes().await
                     }
