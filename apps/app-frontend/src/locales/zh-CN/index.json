@@ -209,9 +209,6 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "整合包名称"
   },
-  "app.export-modal.select-files-label": {
-    "message": "配置此导出中包含哪些文件"
-  },
   "app.export-modal.version-number-label": {
     "message": "版本号"
   },

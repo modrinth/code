@@ -209,9 +209,6 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "模組包名稱"
   },
-  "app.export-modal.select-files-label": {
-    "message": "設定要包含在此匯出檔案中的檔案"
-  },
   "app.export-modal.version-number-label": {
     "message": "版本號碼"
   },

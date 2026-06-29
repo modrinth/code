@@ -1,60 +1,5 @@
 <template>
 	<div class="flex w-full min-w-0 flex-col gap-2">
-		<nav
-			:aria-label="formatMessage(messages.breadcrumbNavigation)"
-			class="m-0 flex w-full min-w-0 flex-shrink items-center justify-between gap-2 p-0 text-contrast"
-		>
-			<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-				<li class="mr-1 flex-shrink-0">
-					<ButtonStyled circular size="small">
-						<button
-							v-tooltip="formatMessage(messages.backToHome)"
-							type="button"
-							class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand !shadow-none !size-8"
-							:class="{ 'cursor-not-allowed opacity-60': isHomePath }"
-							:aria-label="formatMessage(messages.backToHome)"
-							:disabled="isHomePath"
-							@click="navigateTo('')"
-						>
-							<HomeIcon />
-							<span class="sr-only">{{ formatMessage(messages.home) }}</span>
-						</button>
-					</ButtonStyled>
-				</li>
-				<li class="m-0 min-w-0 flex-shrink p-0">
-					<ol class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0">
-						<li
-							v-for="(breadcrumb, index) in breadcrumbs"
-							:key="breadcrumb.path"
-							class="relative flex shrink-0 items-center text-sm"
-						>
-							<div class="flex shrink-0 items-center">
-								<ButtonStyled type="transparent" size="small">
-									<button
-										type="button"
-										class="cursor-pointer whitespace-nowrap text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-										:aria-current="index === breadcrumbs.length - 1 ? 'location' : undefined"
-										:class="{ '!text-contrast': index === breadcrumbs.length - 1 }"
-										@click="navigateTo(breadcrumb.path)"
-									>
-										{{ breadcrumb.name }}
-									</button>
-								</ButtonStyled>
-								<ChevronRightIcon
-									v-if="index < breadcrumbs.length - 1"
-									class="size-4 flex-shrink-0 text-secondary"
-									aria-hidden="true"
-								/>
-							</div>
-						</li>
-					</ol>
-				</li>
-			</ol>
-			<div v-if="$slots.actions" class="ml-auto flex shrink-0 items-center">
-				<slot name="actions" />
-			</div>
-		</nav>
-
 		<div
 			class="flex w-full min-w-0 flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
 		>
@@ -128,6 +73,29 @@
 				</div>
 			</div>
 			<div
+				v-if="!isHomePath"
+				role="button"
+				tabindex="0"
+				class="group flex w-full min-w-0 cursor-pointer select-none items-center gap-2 border-0 border-t border-solid border-surface-4 bg-surface-2 px-3 py-2 text-left hover:bg-surface-2.5 focus:!outline-none"
+				@click="navigateTo(parentPath)"
+				@keydown="(event) => event.key === 'Enter' && navigateTo(parentPath)"
+			>
+				<span class="size-5 shrink-0" aria-hidden="true" />
+				<div class="flex size-4 shrink-0 items-center justify-center text-secondary">
+					<UndoIcon class="size-4 group-hover:text-contrast group-focus:text-contrast" />
+				</div>
+				<span
+					class="min-w-0 flex-1 truncate text-sm font-medium text-primary group-hover:text-contrast group-focus:text-contrast"
+				>
+					{{ formatMessage(messages.parentFolder) }}
+				</span>
+				<div class="ml-2 flex shrink-0 items-center gap-4">
+					<span class="hidden w-[92px] text-left text-sm text-secondary sm:block" />
+					<span class="hidden w-[132px] text-left text-sm text-secondary sm:block" />
+					<span class="size-4 shrink-0" aria-hidden="true" />
+				</div>
+			</div>
+			<div
 				v-if="entries.length === 0"
 				class="flex items-center gap-2 bg-surface-2 px-3 py-2 text-sm text-secondary"
 			>
@@ -141,7 +109,7 @@
 				tabindex="0"
 				class="group flex w-full min-w-0 select-none items-center gap-2 border-0 border-t border-solid border-surface-4 px-3 py-2 text-left first:border-t-0 focus:!outline-none"
 				:class="[
-					i % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
+					getRowBackgroundClass(i + (isHomePath ? 0 : 1)),
 					entry.disabled && entry.type === 'file'
 						? 'cursor-not-allowed opacity-50'
 						: 'cursor-pointer hover:bg-surface-2.5',
@@ -185,6 +153,22 @@
 					/>
 				</div>
 			</div>
+			<div
+				v-for="row in fillerRowCount"
+				:key="`filler:${row}`"
+				class="flex w-full min-w-0 select-none items-center gap-2 border-0 border-t border-solid border-surface-4 px-3 py-2 text-left"
+				:class="getRowBackgroundClass(visibleRowCount + row - 1)"
+				aria-hidden="true"
+			>
+				<span class="size-5 shrink-0" />
+				<span class="size-4 shrink-0" />
+				<span class="min-w-0 flex-1 truncate text-sm font-medium opacity-0">.</span>
+				<div class="ml-2 flex shrink-0 items-center gap-4">
+					<span class="hidden w-[92px] text-left text-sm sm:block" />
+					<span class="hidden w-[132px] text-left text-sm sm:block" />
+					<span class="size-4 shrink-0" />
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -195,7 +179,7 @@ import {
 	ChevronRightIcon,
 	ChevronUpIcon,
 	FileIcon,
-	HomeIcon,
+	UndoIcon,
 } from '@modrinth/assets'
 import { type Component, type ComponentPublicInstance, computed, ref, watch } from 'vue'
 
@@ -204,7 +188,6 @@ import { useFormatDateTime } from '../../composables/format-date-time'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getDirectoryIcon, getFileIcon } from '../../utils/auto-icons'
 import { truncatedTooltip } from '../../utils/truncate'
-import ButtonStyled from './ButtonStyled.vue'
 import Checkbox from './Checkbox.vue'
 
 const { formatMessage } = useVIntl()
@@ -226,17 +209,9 @@ const messages = defineMessages({
 		id: 'files.row.item-count',
 		defaultMessage: '{count, plural, one {# item} other {# items}}',
 	},
-	breadcrumbNavigation: {
-		id: 'files.navbar.breadcrumb-navigation',
-		defaultMessage: 'Breadcrumb navigation',
-	},
-	backToHome: {
-		id: 'files.navbar.back-to-home',
-		defaultMessage: 'Back to home',
-	},
-	home: {
-		id: 'files.navbar.home',
-		defaultMessage: 'Home',
+	parentFolder: {
+		id: 'files.row.parent-folder',
+		defaultMessage: 'Parent folder',
 	},
 	emptyFolderTitle: {
 		id: 'files.layout.empty-folder-title',
@@ -304,6 +279,8 @@ const sortField = ref<FileTreeSelectSortField>('name')
 const sortDesc = ref(false)
 const entryNameRefs = ref<Record<string, HTMLElement | null>>({})
 const isHomePath = computed(() => currentPath.value === '')
+const parentPath = computed(() => currentPath.value.split('/').slice(0, -1).join('/'))
+const initialMinimumRowCount = ref(0)
 
 const normalizedItems = computed(() => {
 	const items = new Map<string, NormalizedFileTreeSelectItem>()
@@ -334,14 +311,6 @@ const folderPaths = computed(() => {
 		}
 	}
 	return paths
-})
-
-const breadcrumbs = computed(() => {
-	const segments = currentPath.value.split('/').filter(Boolean)
-	return segments.map((name, index) => ({
-		name,
-		path: segments.slice(0, index + 1).join('/'),
-	}))
 })
 
 const entries = computed<FileTreeSelectEntry[]>(() => {
@@ -397,6 +366,14 @@ const someVisibleSelected = computed(() =>
 	visibleSelectablePaths.value.some((path) => selectedPaths.value.has(path)),
 )
 
+const visibleRowCount = computed(
+	() => entries.value.length + (isHomePath.value ? 0 : 1) + (entries.value.length === 0 ? 1 : 0),
+)
+
+const fillerRowCount = computed(() =>
+	Math.max(0, initialMinimumRowCount.value - visibleRowCount.value),
+)
+
 watch(
 	normalizedItems,
 	() => {
@@ -405,6 +382,26 @@ watch(
 		}
 	},
 	{ immediate: true },
+)
+
+watch(
+	visibleRowCount,
+	(rowCount) => {
+		if (isHomePath.value && rowCount > 1 && initialMinimumRowCount.value === 0) {
+			initialMinimumRowCount.value = rowCount
+		}
+	},
+	{ immediate: true },
+)
+
+watch(
+	isHomePath,
+	() => {
+		if (isHomePath.value && visibleRowCount.value > 1 && initialMinimumRowCount.value === 0) {
+			initialMinimumRowCount.value = visibleRowCount.value
+		}
+	},
+	{ flush: 'post' },
 )
 
 function normalizePath(path: string) {
@@ -427,6 +424,10 @@ function handleSort(field: FileTreeSelectSortField) {
 		sortField.value = field
 		sortDesc.value = false
 	}
+}
+
+function getRowBackgroundClass(index: number) {
+	return index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
 }
 
 function compareEntries(a: FileTreeSelectEntry, b: FileTreeSelectEntry) {

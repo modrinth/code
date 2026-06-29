@@ -161,9 +161,6 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nama pek mod"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Konfigurasikan fail yang disertakan dalam eksport ini"
-  },
   "app.export-modal.version-number-label": {
     "message": "Nombor versi"
   },

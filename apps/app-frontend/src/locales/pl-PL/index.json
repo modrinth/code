@@ -209,9 +209,6 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nazwa paczki modów"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Skonfiguruje jakie pliki zostaną załączone w tym eksporcie"
-  },
   "app.export-modal.version-number-label": {
     "message": "Numer wersji"
   },

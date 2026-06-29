@@ -170,9 +170,6 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "모드팩 이름"
   },
-  "app.export-modal.select-files-label": {
-    "message": "내보내기에 어느 파일이 포함될지 구성"
-  },
   "app.export-modal.version-number-label": {
     "message": "버전 구분"
   },
