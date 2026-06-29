@@ -1406,6 +1406,9 @@
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
   },
+  "files.row.parent-folder": {
+    "defaultMessage": "Parent folder"
+  },
   "files.table-header.created": {
     "defaultMessage": "Created"
   },
