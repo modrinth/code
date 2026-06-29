@@ -213,12 +213,14 @@ pub(crate) async fn list_content(
         None
     } else {
         match linked_modpack_ids(&link) {
-            Some((_, version_id)) => get_cached_modpack_identifiers(
-                &version_id,
-                &state.pool,
-                &state.api_semaphore,
-            )
-            .await?,
+            Some((_, version_id)) => {
+                get_cached_modpack_identifiers(
+                    &version_id,
+                    &state.pool,
+                    &state.api_semaphore,
+                )
+                .await?
+            }
             None => None,
         }
     };
