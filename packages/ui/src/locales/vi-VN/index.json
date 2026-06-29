@@ -233,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Cài đặt lại modpack"
   },
-  "button.remove": {
-    "defaultMessage": "Xoá"
-  },
   "button.remove-image": {
     "defaultMessage": "Xóa ảnh"
   },

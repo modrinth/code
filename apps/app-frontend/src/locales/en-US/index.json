@@ -542,6 +542,9 @@
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
+  },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
   },

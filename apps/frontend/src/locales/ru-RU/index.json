@@ -23,6 +23,15 @@
   "analytics.breakdown.country": {
     "message": "Страна"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Зависит от"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Зависимый проект"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Тип зависимого проекта"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Причина скачивания"
   },
@@ -147,7 +156,7 @@
     "message": "Зависит от {project}"
   },
   "analytics.chart.tooltip.dependent-project-version": {
-    "message": "{dependentProject} зависит от {dependencyProject} версии {version}"
+    "message": "{dependentProject} зависит от {dependencyProject}, версия {version}"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# день} few {# дня} other {# дней}}"
@@ -491,6 +500,9 @@
   "analytics.value.no-dependent": {
     "message": "Нет"
   },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Скачано по иным причинам — не как зависимость"
+  },
   "analytics.value.none": {
     "message": "Нет"
   },
@@ -713,11 +725,71 @@
   "auth.authorize.authorize-app-name": {
     "message": "Авторизация {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Отсутствуют обязательные параметры запроса OAuth."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "В ответе не найдена информация для перенаправления"
   },
+  "auth.authorize.errro-title": {
+    "message": "Произошла ошибка"
+  },
   "auth.authorize.redirect-url": {
     "message": "Вы будете перенаправлены на <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Продолжить с {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Возрастное ограничение"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Завершить регистрацию"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Введите корректную дату рождения."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Неверная дата рождения"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Дата рождения"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Укажите дату рождения"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Сначала укажите дату рождения."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Необходима дата рождения"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Вы не подходите по возрастным требованиям для создания аккаунта на Modrinth."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Соответствующий исходный код"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Мы не храним вашу дату рождения. Она используется только при регистрации для соблюдения закона COPPA."
+  },
+  "auth.create-account.page-title": {
+    "message": "Создание аккаунта"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Проверка безопасности"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Держите меня в курсе всего крутого, над чем работает Modrinth"
+  },
+  "auth.create-account.title": {
+    "message": "Создание аккаунта"
+  },
+  "auth.create-account.username.label": {
+    "message": "Имя пользователя"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Введите имя"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Отправить письмо"
@@ -753,7 +825,7 @@
     "message": "Сброс пароля"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Введите код подтверждения из приложения."
+    "message": "Введите 6-значный код в вашем аутентификаторе, или один из резервных кодов."
   },
   "auth.sign-in.2fa.label": {
     "message": "Двухфакторная аутентификация"
@@ -761,14 +833,44 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
   },
+  "auth.sign-in.continue-with-email": {
+    "message": "Продолжить с почтой"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Продолжить с ключом доступа"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Зарегистрироваться"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Забыли пароль"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Активность"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Нет аккаунта?"
+  },
   "auth.sign-in.sign-in-with": {
-    "message": "Войдите через"
+    "message": "Вход на Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Вход"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Возрастное ограничение"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "Продолжить с почтой"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Регистрируясь, вы принимаете наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденци­аль­ности</privacy-policy-link>."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Меньше вариантов"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Другие варианты"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже есть аккаунт?"
@@ -777,10 +879,13 @@
     "message": "Регистрация"
   },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Зарегистрируйтесь через"
+    "message": "Создать аккаунт"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Настройки аккаунта"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Найти моды"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Ваша почта уже подтверждена!"
@@ -799,6 +904,15 @@
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Ошибка подтверждения"
+  },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "На {email} было отправлено письмо со ссылкой для подтверждения аккаунта."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "Письмо отправлено"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Произошла ошибка"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Адрес электронной почты успешно подтверждён!"
@@ -3246,7 +3360,7 @@
     "message": "Ваш проект не будет отображаться публично и будет доступен только по прямой ссылке.{requestedStatus, select, unlisted { В соответствии с выбранными вами <visibility-settings-link>настройками видимости</visibility-settings-link>, скорее всего, никаких действий не требуется.} other { Пожалуйста, устраните все замечания модерации, включая указанные в сообщениях ниже, прежде чем повторно отправлять проект на проверку.}}"
   },
   "project.moderation.admonition.withheld.header": {
-    "message": "Скрыто командой Modrinth"
+    "message": "Скрыт модератором"
   },
   "project.moderation.error.unauthorized": {
     "message": "Нет доступа"
@@ -3330,43 +3444,70 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Пожалуйста, предоставьте доказательства, что у вас есть разрешение на распространение всех следующих файлов, а также любые скрытые версии будут опубликованы."
+    "message": "Пожалуйста, предоставьте доказательства, что у вас есть разрешение на распространение всех следующих файлов. После этого скрытые версии будут опубликованы."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Прежде чем отправить проект на рассмотрение, пожалуйста, подтвердите наличие у вас разрешения на распространение всех перечисленных ниже файлов."
+    "message": "Прежде чем отправить проект на рассмотрение, подтвердите наличие у вас разрешения на распространение всех перечисленных ниже файлов."
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "Неизвестный встроенный контент"
+    "message": "Неизвестный внешний контент"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Команда модераторов Modrinth отклонила предоставленные вами данные для разрешения доступа к некоторому стороннему контенту. Пожалуйста, просмотрите список отклоненных материалов ниже и предоставьте убедительные доказательства или удалите контент."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Часть доказательств отклонена"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Свернуть всё"
   },
   "project.settings.permissions.completed.description": {
-    "message": "Весь внешний контент сопровождается указанием авторства."
+    "message": "Для всего стороннего контента указаны разрешения и источники."
   },
   "project.settings.permissions.completed.title": {
-    "message": "Указание авторства завершено!"
+    "message": "Разрешения получены!"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "Ни одна из ваших версий не содержит внешнего контента, поэтому вам не нужно беспокоиться о получении разрешений."
+    "message": "Ни одна из версий вашего проекта не содержит внешнего контента, поэтому вам не нужно беспокоиться о получении разрешений."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "Всё подтверждено!"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "Развернуть всё"
+  },
   "project.settings.permissions.fail.description": {
-    "message": "Вам запрещено распространять часть добавленного вами внешнего контента. Для публикации на Modrinth удалите контент, нарушающий авторские права."
+    "message": "Возможно, у вас нет разрешения на распространение части стороннего контента в вашем проекте. Чтобы опубликовать проект на Modrinth, удалите этот контент или предоставьте доказательства того, что у вас есть разрешение на его использование."
   },
   "project.settings.permissions.fail.title": {
     "message": "Некоторый контент не может быть включён"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Если вы используете контент, который не размещен на Modrinth, вам необходимо сообщить нам, откуда он взят, и подтвердить наличие у вас разрешения на распространение файлов. Ознакомьтесь с <link>нашим руководством</link>, чтобы узнать, как это сделать правильно!"
-  },
   "project.settings.permissions.info-banner.title": {
-    "message": "Узнайте, как работает атрибуция"
+    "message": "Узнайте о разрешениях на распространение"
   },
   "project.settings.permissions.learn-more": {
     "message": "Подробнее"
   },
+  "project.settings.permissions.no-results": {
+    "message": "Сторонние файлы не найдены."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Часть внешнего контента не может распространяться на Modrinth за нарушение правил контента и должна быть удалена."
+  },
   "project.settings.permissions.search-placeholder": {
-    "message": "Поиск среди {count} {count, plural, one {внешнего проекта} other {внешних проектов}}..."
+    "message": "Поиск по {count, plural, one {# проекту} other {# проектам}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Количество файлов"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Дата изменения"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Отклонённые"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Статус"
   },
   "project.settings.title": {
     "message": "Настройки"
@@ -3907,6 +4048,48 @@
   },
   "settings.account.security.email.title": {
     "message": "Почта"
+  },
+  "settings.account.security.passkey.add": {
+    "message": "Добавить ключ доступа"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Выберите что-то запоминающееся, чтобы потом опознать этот ключ доступа."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Название"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Мой ключ доступа"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Управляйте вашими кодами доступа, или добавьте новый."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Добавлен {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Активность {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Загрузка ключей доступа…"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Не использовался"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Ключи доступа отсутствуют."
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "Ключ доступа «{name}» будет удалён навсегда. Им нельзя будет воспользоваться для входа."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Вы действительно хотите удалить этот ключ доступа?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Переименовать ключ доступа"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Управление ключами доступа"
   },
   "settings.account.security.password.action.add": {
     "message": "Добавить пароль"
@@ -4514,6 +4697,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "Подписаться на рассылку от Modrinth"
   },
+  "version.all-versions": {
+    "message": "Все версии"
+  },
+  "version.confirm-delete.description": {
+    "message": "Эта версия будет удалена навсегда. Отменить это действие нельзя."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Удалить версию"
+  },
+  "version.confirm-delete.title": {
+    "message": "Вы действительно хотите удалить эту версию?"
+  },
+  "version.dependency.view-project": {
+    "message": "Посмотреть проект"
+  },
+  "version.dependency.view-version": {
+    "message": "Посмотреть версию"
+  },
+  "version.download.download-dependency": {
+    "message": "Скачать зависимость"
+  },
+  "version.download.no-primary-file": {
+    "message": "Ошибка: основной файл не найден"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Необязательный набор ресурсов"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Необходимый набор ресурсов"
+  },
+  "version.edit.button": {
+    "message": "Изменить"
+  },
+  "version.edit.details": {
+    "message": "Изменить сведения"
+  },
+  "version.edit.files": {
+    "message": "Изменить файлы"
+  },
+  "version.edit.metadata": {
+    "message": "Изменить метаданные"
+  },
   "version.environment.none.description": {
     "message": "Среда для этой версии не указана."
   },
@@ -4525,5 +4750,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Неизвестная среда"
+  },
+  "version.package-as-mod.button": {
+    "message": "Собрать в мод"
+  },
+  "version.package-as-mod.description": {
+    "message": "Это создаст новую версию с поддержкой выбранного загрузчика. Вас перенаправит на новую версию и сможете изменить её по своему усмотрению."
+  },
+  "version.package-as-mod.header": {
+    "message": "Сборка набора данных в мод"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Загрузчики"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "Загрузчики, для которых вы хотите собрать набор данных."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Выберите загрузчики..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Собрать набор данных"
+  },
+  "version.section.content.dev-info": {
+    "message": "Для разработчиков"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Координаты Maven:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Проекты на Modrinth автоматически доступны через репозиторий Maven для использования с инструментами сборки JVM, такими как <gradle-link>Gradle</gradle-link>. Чтобы узнать больше о Modrinth Maven API, <article-link>нажмите сюда</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Примечание: По возможности следует использовать Maven-репозиторий самого автора, так как он содержит информацию о транзитивных зависимостях, которой нет у Modrinth Maven API. Кроме того, вы можете столкнуться с дублированием зависимостей, если будете одновременно использовать Maven-репозитории Modrinth и сторонние репозитории для своих зависимостей, поскольку идентификатор группы будет отличаться при их получении через Modrinth Maven API."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "ID версии:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Копировать SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Копировать SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Эта версия скрыта и не отображается. Предоставьте доказательства наличия разрешения на распространение некоторых файлов."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Скрыто из-за неизвестного встроенного контента"
   }
 }

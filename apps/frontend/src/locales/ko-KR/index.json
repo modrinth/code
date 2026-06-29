@@ -266,17 +266,8 @@
   "auth.reset-password.title.long": {
     "message": "비밀번호 재설정"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "진행하려면 2단계 인증 코드를 입력해 주세요."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "2단계 인증 코드 입력"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "코드 입력..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "다음을 통해 로그인"
   },
   "auth.sign-in.title": {
     "message": "로그인"
@@ -289,9 +280,6 @@
   },
   "auth.sign-up.title": {
     "message": "회원 가입"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "다음 계정으로 가입"
   },
   "auth.verify-email.action.account-settings": {
     "message": "계정 설정"
@@ -2783,44 +2771,14 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "다음 파일들을 재배포할 권한이 있음을 증명하는 자료를 제출 바랍니다. 제출 시 보류된 버전은 자동으로 공개됩니다."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "프로젝트 검토를 위해 제출하기 전에 다음 파일들을 재배포할 권한이 있음을 증명하는 자료를 제출해 주세요."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "알 수 없는 내장 콘텐츠"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "모든 외부 콘텐츠에는 출처가 명시되어 있습니다."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "출처 표기 완료됨!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "어떤 버전에도 외부 콘텐츠가 포함되어 있지 않으므로 권한을 얻는 걸 걱정하지 않아도 됩니다."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "준비됨!"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "추가한 외부 콘텐츠 중 일부를 재배포할 권한이 없습니다. Modrinth에 게시하려면 저작권 침해 콘텐츠를 삭제해야 합니다."
   },
   "project.settings.permissions.fail.title": {
     "message": "일부 콘텐츠는 포함될 수 없습니다"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Modrinth에 호스팅되지 않은 콘텐츠를 포함하는 경우, 해당 콘텐츠의 출처를 알리고 파일 배포 권한이 있는지 확인해야 합니다. <link>저희 지침</link>을 참고해 어떻게 처리하는지 알아보세요!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "출처 표기 방식 알아보기"
-  },
   "project.settings.permissions.learn-more": {
     "message": "더보기"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "{count}개의 {count, plural, other {외부 프로젝트}} 검색..."
   },
   "project.settings.title": {
     "message": "설정"

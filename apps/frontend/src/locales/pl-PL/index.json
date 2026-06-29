@@ -387,7 +387,7 @@
     "message": "Rozkład:"
   },
   "analytics.query.label.grouped-by": {
-    "message": "Grupowane wg."
+    "message": "Grupowane wg"
   },
   "analytics.query.label.project": {
     "message": "Projekt:"
@@ -731,11 +731,71 @@
   "auth.authorize.authorize-app-name": {
     "message": "Autoryzuj {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Brak wymaganych parametrów zapytania OAuth."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "Nie znaleziono lokalizacji przekierowania w odpowiedzi"
   },
+  "auth.authorize.errro-title": {
+    "message": "Wystąpił błąd"
+  },
   "auth.authorize.redirect-url": {
     "message": "Zostaniesz przekierowany do <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Kontynuuj przez {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Wymaganie wiekowe"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Zakończ rejestrację"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Prosimy o podanie prawidłowej daty urodzenia. Rok 0000 jest nieprawidłowy."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Nieprawidłowa data urodzenia"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Data urodzenia"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Wprowadź datę urodzenia"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Prosimy o podanie twojej daty urodzenia przed kontynuowaniem."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Wymagana data urodzenia"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Nie spełniasz wymagań wiekowych, aby utworzyć konto na Modrinth."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Kod źródłowy funkcji"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Nie zapisujemy Twojej daty urodzenia. Sprawdzamy ją tylko podczas tworzenia konta, by potwierdzić zgodność z COPPA."
+  },
+  "auth.create-account.page-title": {
+    "message": "Utwórz konto"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Test bezpieczeństwa"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Wysyłaj mi nowinki o Modrinth przez e-mail"
+  },
+  "auth.create-account.title": {
+    "message": "Utwórz konto"
+  },
+  "auth.create-account.username.label": {
+    "message": "Nazwa użytkownika"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Wprowadź nazwę użytkownika"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Wyślij e-mail do odzyskania konta"
@@ -771,22 +831,52 @@
     "message": "Zresetuj swoje hasło"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Wprowadź otrzymany kod, aby kontynuować."
+    "message": "Wprowadź 6-znakowy kod z aplikacji autoryzującej lub jeden z kodów zapasowych."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Wprowadź otrzymany kod"
+    "message": "Weryfikacja dwuetapowa"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Wprowadź kod..."
   },
+  "auth.sign-in.continue-with-email": {
+    "message": "Kontynuuj przez e-mail"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Kontynuuj przez klucz logowania"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Zarejestruj się"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Nie pamiętam hasła"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Ostatnio użyty"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Nie masz konta?"
+  },
   "auth.sign-in.sign-in-with": {
-    "message": "Zaloguj się przez"
+    "message": "Zaloguj się na Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Zaloguj się"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Wymaganie wiekowe"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "Kontynuuj przez e-mail"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Tworząc konto, wyrażasz zgodę na <terms-link>Warunki</terms-link> i <privacy-policy-link>Politykę Prywatności</privacy-policy-link> Modrinth."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Pokaż mniej opcji"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Pokaż inne opcje"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Masz już konto?"
@@ -795,10 +885,13 @@
     "message": "Zarejestruj się"
   },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Zarejestruj się przez"
+    "message": "Utwórz konto"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Ustawienia konta"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Odkrywaj modyfikacje"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Twój e-mail jest już zweryfikowany!"
@@ -817,6 +910,15 @@
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Weryfikacja e-maila nie powiodła się"
+  },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "E-mail z linkiem do weryfikacji Twojego konta został wysłany na adres {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "E-mail wysłany"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Wystąpił błąd"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Twój adres e-mail został pomyślnie zweryfikowany!"
@@ -3342,43 +3444,76 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Prosimy o dostarczenie dowodu, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików, a wszelkie wstrzymane wersje zostaną automatycznie opublikowane."
+    "message": "Prosimy o dostarczenie dowodu, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików. Po dostarczeniu dowodu wszelkie wstrzymane wersje zostaną automatycznie opublikowane."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Przed przesłaniem projektu do oceny prosimy o pokazanie, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików."
+    "message": "Przed przesłaniem projektu do przeglądu prosimy o pokazanie, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików."
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "Nieznana osadzona treść"
+    "message": "Nieznana zewnętrzna zawartość"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Zespół moderatorów Modrinth odrzucił podane informacje o zezwoleniach dla niektórej zawartości. Podaj poprawne dowody lub usuń podaną niżej zawartość."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Niektóre dowody zostały odrzucone"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Zwiń wszystkie"
   },
   "project.settings.permissions.completed.description": {
-    "message": "Wszystkie zewnętrzne treści mają podane źródła."
+    "message": "Wszystkie zewnętrzne treści zawierają informacje o prawach autorskich, a źródła zostały podane."
   },
   "project.settings.permissions.completed.title": {
-    "message": "Atrybuty przypisane!"
+    "message": "Uprawnienia gotowe!"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "Żadna z Twoich wersji nie zawiera treści zewnętrznych, więc nie musisz martwić się o uzyskanie zezwoleń."
+    "message": "Żadne z wersji Twojego projektu nie zawierają zewnętrznej zawartości, więc nie musisz martwić się o uzyskanie zezwoleń."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "Wszystko gotowe!"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "Rozwiń wszytkie"
+  },
   "project.settings.permissions.fail.description": {
-    "message": "Nie masz uprawnień do redystrybucji części dodanych przez siebie treści zewnętrznych. Aby publikować na Modrinth, usuń treści naruszające prawa autorskie."
+    "message": "Możesz nie mieć uprawnień do redystrybucji kilku zewnętrznych treści w twoim projekcie. Żeby publikować na Modrinth, proszę usunąć tę treść albo \nwysłać dowód, który potwierdza, że masz permisje do użycia go."
   },
   "project.settings.permissions.fail.title": {
     "message": "Niektórych treści nie można uwzględnić"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "Jeśli zamieszczasz treści, które nie są hostowane na Modrinth, musisz poinformować nas, skąd pochodzą i potwierdzić, że masz pozwolenie na ich dystrybucję. Sprawdź <link>nasz poradnik</link>, aby dowiedzieć się, jak to zrobić poprawnie!"
+    "message": "Jeśli zamieszczasz treści, które nie są hostowane na Modrinth, musisz poinformować nas, skąd pochodzą i potwierdzić, że masz pozwolenie na ich dystrybucję. Zobacz <link>nasze ogłoszenie o nowym systemie</link>, aby dowiedzieć się więcej!"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "Dowiedz się, jak działają atrybuty"
+    "message": "Dowiedz się więcej o uprawnieniach dystrybucji"
   },
   "project.settings.permissions.learn-more": {
     "message": "Dowiedz się więcej"
   },
+  "project.settings.permissions.no-results": {
+    "message": "Nie znaleziono żadnego pliku zewnętrznego pasującego do Twojego wyszukiwania."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Niektóra zewnętrzna zawartość na może być dystrybuowana przez Modrinth i musi być usunięta, ponieważ jest niezgodna z naszymi Zasadami dotyczącymi treści."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {Żadna atrybucja nie potrzebuje sprawdzenia} one {# atrybucja potrzebuje sprawdzenia} few{# atrybucje potrzebują sprawdzenia} other {# atrybucji potrzebuje sprawdzenia}}"
+  },
   "project.settings.permissions.search-placeholder": {
-    "message": "Szukaj w {count} {count, plural, one {projekcie zewnętrznym} other {projektach zewnętrznych}}..."
+    "message": "Szukaj wśród {count} {count, plural, one {projektu} other {projektów}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Najwięcej plików"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Ostatnio edytowane"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Odrzucone"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
   },
   "project.settings.title": {
     "message": "Ustawienia"
@@ -3938,6 +4073,48 @@
   "settings.account.security.email.title": {
     "message": "E-mail"
   },
+  "settings.account.security.passkey.add": {
+    "message": "Dodaj klucz logowania"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Wybierz coś, co zapamiętasz, by móć później rozpoznać ten klucz logowania."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Nazwa"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Moje klucze logowania"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Zarządzaj kluczami logowania lub dodaj nowe."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Dodano {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Ostatnio użyty {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Ładowanie kluczy logowania…"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Nigdy nie użyty"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Nie masz żadnych kluczy logowania."
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "To trwale usunie klucz logowania \"{name}\". Nie będzie można się nim zalogować."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Czy na pewno chcesz usunąć ten klucz logowania?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Zmień nazwę klucza logowania"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Zarządzaj kluczami logowania"
+  },
   "settings.account.security.password.action.add": {
     "message": "Dodaj hasło"
   },
@@ -4125,7 +4302,7 @@
     "message": "Kiedy autoryzujesz aplikacje ze swoim kontem Modrinth, dajesz jej dostęp do swojego konta. Możesz tutaj zawsze zarządzać oraz przeglądać stan aplikacji z dostępem do Twojego konta."
   },
   "settings.authorizations.empty-state": {
-    "message": "Nie udało się nam wyświetlić twoich zautoryzowanych aplikacji, pracujemy nad tym, aby to naprawić. Odwiedź tę stronę później, w innym czasie!"
+    "message": "Nie udało się nam wyświetlić twoich zautoryzowanych aplikacji, pracujemy nad tym, aby to naprawić. Odwiedź tę stronę później!"
   },
   "settings.authorizations.head-title": {
     "message": "Autoryzacje"
@@ -4550,6 +4727,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "Subskrybuj do newslettera Modrinth"
   },
+  "version.all-versions": {
+    "message": "Wszystkie wersje"
+  },
+  "version.confirm-delete.description": {
+    "message": "Ta wersja zostanie trwale usunięta. Tej akcji nie będzie można cofnąć."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Usuń wersję"
+  },
+  "version.confirm-delete.title": {
+    "message": "Czy na pewno chcesz usunąć tę wersję?"
+  },
+  "version.dependency.view-project": {
+    "message": "Pokaż projekt"
+  },
+  "version.dependency.view-version": {
+    "message": "Pokaż wersję"
+  },
+  "version.download.download-dependency": {
+    "message": "Pobierz zależność"
+  },
+  "version.download.no-primary-file": {
+    "message": "Błąd: Nie znaleziono pliku głównego"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Opcjonalna paczka zasobów"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Wymagana paczka zasobów"
+  },
+  "version.edit.button": {
+    "message": "Edytuj"
+  },
+  "version.edit.details": {
+    "message": "Edytuj szczegóły"
+  },
+  "version.edit.files": {
+    "message": "Edytuj pliki"
+  },
+  "version.edit.metadata": {
+    "message": "Edytuj metadane"
+  },
   "version.environment.none.description": {
     "message": "Środowisko dla tej wersji nie zostało określone."
   },
@@ -4561,5 +4780,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Nieznane środowisko"
+  },
+  "version.package-as-mod.button": {
+    "message": "Zapakuj jako mod"
+  },
+  "version.package-as-mod.description": {
+    "message": "Stworzy to nową wersję wspierającą wybrane loadery modów. Po przekierowaniu możesz dalej edytować nową wersję."
+  },
+  "version.package-as-mod.header": {
+    "message": "Zapakuj paczkę danych jako mod"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Loadery modów"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "Loadery modów, dla których ma być zapakowana ta paczka danych."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Wybierz loadery modów..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Zapakuj paczkę danych"
+  },
+  "version.section.content.dev-info": {
+    "message": "Informacje dla twórców"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Koordynaty Maven:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Projekty na Modrinth są automatycznie dostępne przez repozytorium Maven do użytku z narzędziami takimi jak <gradle-link>Gradle</gradle-link>. By dowiedzieć się więcej o API Maven Modrinth, <article-link>kliknij tutaj</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Uwaga: Jeśli jest to możliwe, zalecanie jest używanie repozytorium Maven od twórcy projektu, ponieważ może zawierać przejściowe informacje o zależnościach, o których nie wie API Maven Modrinth. Możesz także skończyć z duplikatami niektórych zależności mieszając repozytoria Maven z i spoza Modrinth, ponieważ identyfikatory grup będą się różnić."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "Identyfikator wersji:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Kopiuj SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Kopiuj SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Ta wersja jest aktualnie wstrzymana i nie jest widoczna publicznie. Podaj dowód na to, że możesz rozpowszechniać niektóre zawarte pliki."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Wstrzymane z powodu nieznanej zewnętrznej zawartości"
   }
 }

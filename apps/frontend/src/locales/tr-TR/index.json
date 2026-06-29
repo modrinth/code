@@ -692,8 +692,56 @@
   "auth.authorize.error.no-redirect-url": {
     "message": "Yanıtta yönlendirme konumu bulunamadı"
   },
+  "auth.authorize.errro-title": {
+    "message": "Bir hata ile karşılaşıldı"
+  },
   "auth.authorize.redirect-url": {
     "message": "<redirect-url>{url}</redirect-url> adresine yönlendirileceksiniz"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Yaş gereksinimi"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Kaydolmayı bitir"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Lütfen geçerli bir doğum tarihi girin. Doğum tarihiniz 0000 olamaz."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Geçersiz doğum tarihi"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Doğum tarihi"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Doğum tarihinizi seçin"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Lütfen devam etmeden önce doğum tarihinizi girin."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Doğum tarihi gerekli"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Modrinth'de hesap oluşturmak için yaş gereksinimini karşılamıyorsunuz."
+  },
+  "auth.create-account.page-title": {
+    "message": "Hesap oluştur"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Güvenlik kontrolü"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Modrinth'in çalıştığı güzel şeylerden beni email ile bilgilendir"
+  },
+  "auth.create-account.title": {
+    "message": "Hesap oluştur"
+  },
+  "auth.create-account.username.label": {
+    "message": "Kullanıcı adı"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Kullanıcı adı giriniz"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Kurtarma e-postası gönder"
@@ -728,23 +776,50 @@
   "auth.reset-password.title.long": {
     "message": "Parolanızı sıfırlayın"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Lütfen devam etmek için bir çift aşamalı kod girin."
-  },
   "auth.sign-in.2fa.label": {
-    "message": "Çift aşamalı kodu girin"
+    "message": "İki aşamalı doğrulama"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Kodu girin..."
   },
+  "auth.sign-in.continue-with-email": {
+    "message": "Email ile devam et"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Giriş anahtarı ile devam et"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Kayıt ol"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Şifremi unuttum"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Son kullanılan hesap"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Hesabınız yok mu?"
+  },
   "auth.sign-in.sign-in-with": {
-    "message": "Şununla giriş yap"
+    "message": "Modrinth'e giriş yapın"
   },
   "auth.sign-in.title": {
     "message": "Giriş Yap"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Yaş zorunluluğu"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "Email ile devam edin"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Bir hesap oluşturarak, Modrinth'in <terms-link>Kurallar</terms-link> ve <privacy-policy-link>Gizlilik İlkeleri </privacy-policy-link>'ni kabul etmiş bulunursunuz."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Daha az seçenek göster"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Diğer seçenekleri göster"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Zaten bir hesabınız var mı?"
@@ -753,10 +828,13 @@
     "message": "Kaydol"
   },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Şunlarla giriş yapın"
+    "message": "Hesap oluştur"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Hesap ayarları"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Mod'ları keşfedin"
   },
   "auth.verify-email.already-verified.description": {
     "message": "E-postan zaten doğrulanmış!"
@@ -775,6 +853,12 @@
   },
   "auth.verify-email.failed-verification.title": {
     "message": "E-posta doğrulaması başarısız"
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "Sana bir Email gönderdik"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Bir hata yaşandı"
   },
   "auth.verify-email.post-verification.description": {
     "message": "E-posta adresiniz başarıyla doğrulandı!"
@@ -3296,44 +3380,32 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Lütfen aşağıdaki dosyaların tümünü yeniden dağıtma izniniz olduğuna dair kanıt sunun; böylece bekletilen tüm sürümler otomatik olarak yayınlanacaktır."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Projenizi inceleme için göndermeden önce, lütfen aşağıdaki dosyaların tümünü yeniden dağıtma izniniz olduğuna dair kanıt sunun."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Bilinmeyen gömülü içerik"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Tüm harici içeriklere atıfta bulunulmuştur."
-  },
   "project.settings.permissions.completed.title": {
-    "message": "Atamalar tamamlandı!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Sürümlerinizin hiçbiri harici içerik içermez, bu nedenle izin alma konusunda endişelenmenize gerek yoktur."
+    "message": "İzinler tamamlandı!"
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "Hazırsınız!"
   },
-  "project.settings.permissions.fail.description": {
-    "message": "Eklediğiniz bazı harici içerikleri yeniden dağıtma izniniz yok. Modrinth'te yayınlamak için lütfen ihlalde bulunan içeriği kaldırın."
+  "project.settings.permissions.expand-all": {
+    "message": "Hepsini genişlet"
   },
   "project.settings.permissions.fail.title": {
     "message": "Bazı içerikler dahil edilemez"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Eğer Modrinth'te barındırılmayan içerik ekliyorsanız, bu içeriğin nereden geldiğini ve dosyaları dağıtmak için yetkininize sahip olduğunuzu bize bildirmelisiniz. Bunu nasıl doğru bir şekilde yapacağınızı öğrenmek için <link>rehberimizi</link> inceleyin!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Atıfların nasıl çalıştığını öğrenin"
-  },
   "project.settings.permissions.learn-more": {
     "message": "Daha Fazla Bilgi edinin"
   },
-  "project.settings.permissions.search-placeholder": {
-    "message": "{count} {count, plural, one {harici proje} other {harici proje}} aranıyor..."
+  "project.settings.permissions.sort.most-files": {
+    "message": "Çoğu dosyalar"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Yakın zamanda düzenlenenler"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Reddedildi"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Durum"
   },
   "project.settings.title": {
     "message": "Ayarlar"
@@ -3892,6 +3964,42 @@
   },
   "settings.account.security.email.title": {
     "message": "Eposta"
+  },
+  "settings.account.security.passkey.add": {
+    "message": "Giriş anahtarı ekle"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Giriş anahtarınızı hatırlamanız için akılda kalıcı bir şey seçin."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "İsim"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Giriş anahtarım"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Giriş anahtarlarınızı yönetin, veya yeni bir tane ekleyin."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "{ago} eklendi"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Giriş anahtarları yükleniyor…"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Hiçbir zaman kullanılmadı"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Hiçbir giriş anahtarın kayıtlı değil."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Bu giriş anahtarını kaldırmak için emin misin?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Giriş anahtarını yeniden adlandır"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Giriş anahtarlarını yönet"
   },
   "settings.account.security.password.action.add": {
     "message": "Parola ekle"
@@ -4505,6 +4613,18 @@
   "ui.newsletter-button.tooltip": {
     "message": "Modrinth haber mektuplarına abone ol"
   },
+  "version.all-versions": {
+    "message": "Tüm sürümler"
+  },
+  "version.confirm-delete.description": {
+    "message": "Bu sürüm kalıcı olarak silinecektir. Bu seçim geri alınamaz."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Sürümü sil"
+  },
+  "version.confirm-delete.title": {
+    "message": "Bu sürümü silmek istediğinizden emin misiniz?"
+  },
   "version.environment.none.description": {
     "message": "Bu sürüm için ortam belirtilmemiş."
   },
@@ -4516,5 +4636,11 @@
   },
   "version.environment.unknown.title": {
     "message": "Bilinmeyen ortam"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Mod yükleyicileri"
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Mod yükleyici seç..."
   }
 }

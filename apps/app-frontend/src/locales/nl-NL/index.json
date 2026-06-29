@@ -33,7 +33,7 @@
     "message": "Stop instantie"
   },
   "app.action-bar.update": {
-    "message": "Updaten"
+    "message": "Bijwerken"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Bekijk actieve downloads"
@@ -60,7 +60,7 @@
     "message": "Wijzig de pagina waarop de launcher opent."
   },
   "app.appearance-settings.default-landing-page.home": {
-    "message": "Home"
+    "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotheek"

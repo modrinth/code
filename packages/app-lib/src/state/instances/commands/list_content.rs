@@ -207,7 +207,7 @@ pub(crate) async fn list_content(
         &state.pool,
     )
     .await?;
-    let imported_modpack_scope = is_imported_modpack_scope(&resolved, &link);
+    let imported_modpack_scope = is_imported_modpack_scope(&link);
     let linked_modpack_source_kind = linked_modpack_source_kind(&link);
     let mut failed_modpack_identifier_lookup = false;
     let modpack_ids = if imported_modpack_scope {
@@ -283,7 +283,7 @@ pub(crate) async fn list_linked_modpack_content(
         &state.pool,
     )
     .await?;
-    if is_imported_modpack_scope(&resolved, &link) {
+    if is_imported_modpack_scope(&link) {
         let files = content_projects_for_scope(
             &resolved,
             cache_behaviour,
@@ -1072,12 +1072,8 @@ fn file_metadata_from_entry_or_cache(
     })
 }
 
-fn is_imported_modpack_scope(
-    resolved: &ResolvedContentScope,
-    link: &InstanceLink,
-) -> bool {
-    resolved.content_set.source_kind == ContentSourceKind::ImportedModpack
-        || matches!(link, InstanceLink::ImportedModpack { .. })
+fn is_imported_modpack_scope(link: &InstanceLink) -> bool {
+    matches!(link, InstanceLink::ImportedModpack { .. })
 }
 
 async fn linked_modpack_ids_for_instance(

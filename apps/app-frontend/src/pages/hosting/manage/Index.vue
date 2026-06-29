@@ -1,7 +1,11 @@
 <template>
-	<div class="h-full w-full pt-6">
+	<div
+		class="h-full w-full pt-6"
+		:class="isContainedServerRoute ? 'box-border min-h-0 overflow-hidden' : ''"
+	>
 		<ServersManageRootLayout
 			:server-id="serverId"
+			:layout-mode="isContainedServerRoute ? 'contained' : 'page'"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="themeStore.devMode"
@@ -62,6 +66,8 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const themeStore = useTheming()
 const breadcrumbs = useBreadcrumbs()
+
+const isContainedServerRoute = computed(() => route.name === 'ServerManageOverview')
 
 const serverId = computed(() => {
 	const rawId = route.params.id
