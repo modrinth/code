@@ -203,9 +203,6 @@
   "app.export-modal.header": {
     "message": "匯出模組包"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "要包含「{file}」嗎？"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "模組包名稱"
   },

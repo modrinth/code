@@ -176,9 +176,6 @@
   "app.export-modal.header": {
     "message": "Modcsomag exportálása"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Tartalmaz „{file}” fájlokat?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "A modcsomag neve"
   },

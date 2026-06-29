@@ -203,9 +203,6 @@
   "app.export-modal.header": {
     "message": "导出整合包"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "包含 \"{file}\"？"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "整合包名称"
   },

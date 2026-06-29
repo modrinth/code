@@ -200,20 +200,26 @@
   "app.export-modal.export-button": {
     "message": "Export"
   },
+  "app.export-modal.file-selected-singular": {
+    "message": "file selected"
+  },
+  "app.export-modal.files-selected-plural": {
+    "message": "files selected"
+  },
   "app.export-modal.header": {
     "message": "Export modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Include \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpack Name"
+    "message": "Modpack name"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack name"
   },
   "app.export-modal.select-files-label": {
-    "message": "Configure which files are included in this export"
+    "message": "Configure included files"
+  },
+  "app.export-modal.selected-files-tooltip-title": {
+    "message": "{count, plural, one {# selected} other {# selected}}"
   },
   "app.export-modal.version-number-label": {
     "message": "Version number"

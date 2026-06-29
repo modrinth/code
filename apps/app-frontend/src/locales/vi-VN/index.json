@@ -170,9 +170,6 @@
   "app.export-modal.header": {
     "message": "Xuất modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Bao gồm \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Tên modpack"
   },

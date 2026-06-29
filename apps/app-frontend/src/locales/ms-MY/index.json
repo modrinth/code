@@ -155,9 +155,6 @@
   "app.export-modal.header": {
     "message": "Eksport pek mod"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Sertakan \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Nama Pek Mod"
   },

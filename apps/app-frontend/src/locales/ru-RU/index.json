@@ -203,9 +203,6 @@
   "app.export-modal.header": {
     "message": "Экспорт сборки"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Добавить «{file}» в экспорт?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Название сборки"
   },

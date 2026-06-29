@@ -170,9 +170,6 @@
   "app.export-modal.header": {
     "message": "Exporteer modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Betrek \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpack Naam"
   },

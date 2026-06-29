@@ -203,9 +203,6 @@
   "app.export-modal.header": {
     "message": "Vie modipaketti"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Sisällytä \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Modipaketin nimi"
   },

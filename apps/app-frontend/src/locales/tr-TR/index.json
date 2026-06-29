@@ -203,9 +203,6 @@
   "app.export-modal.header": {
     "message": "Mod paketini dışa aktar"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "\"{file}\" dahil mi?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Mod Paketi Adı"
   },

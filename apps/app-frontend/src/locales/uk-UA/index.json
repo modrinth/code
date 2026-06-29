@@ -170,9 +170,6 @@
   "app.export-modal.header": {
     "message": "Експортувати збірку"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Уключити «{file}»?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Назва збірки"
   },

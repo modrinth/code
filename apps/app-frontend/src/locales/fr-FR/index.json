@@ -203,9 +203,6 @@
   "app.export-modal.header": {
     "message": "Exporter le modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Inclure « {file} » ?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Nom du modpack"
   },

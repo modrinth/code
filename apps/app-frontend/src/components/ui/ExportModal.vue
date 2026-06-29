@@ -1,28 +1,35 @@
 <script setup>
-import { WrenchIcon, XIcon } from '@modrinth/assets'
+import { DropdownIcon, XIcon } from '@modrinth/assets'
 import {
-	Accordion,
 	ButtonStyled,
-	Checkbox,
+	Collapsible,
 	commonMessages,
 	defineMessages,
+	FileTreeSelect,
 	injectNotificationManager,
+	MarkdownEditor,
+	NewModal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { save } from '@tauri-apps/plugin-dialog'
-import { ref } from 'vue'
+import { readDir, stat } from '@tauri-apps/plugin-fs'
+import { Tooltip } from 'floating-vue'
+import { computed, nextTick, ref } from 'vue'
 
-import { PackageIcon, VersionIcon } from '@/assets/icons'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { export_instance_mrpack, get_pack_export_candidates } from '@/helpers/instance'
+import { PackageIcon } from '@/assets/icons'
+import {
+	export_instance_mrpack,
+	get_full_path,
+	get_pack_export_candidates,
+} from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	header: { id: 'app.export-modal.header', defaultMessage: 'Export modpack' },
-	modpackNameLabel: { id: 'app.export-modal.modpack-name-label', defaultMessage: 'Modpack Name' },
+	modpackNameLabel: { id: 'app.export-modal.modpack-name-label', defaultMessage: 'Modpack name' },
 	modpackNamePlaceholder: {
 		id: 'app.export-modal.modpack-name-placeholder',
 		defaultMessage: 'Modpack name',
@@ -41,12 +48,20 @@ const messages = defineMessages({
 	},
 	selectFilesLabel: {
 		id: 'app.export-modal.select-files-label',
-		defaultMessage: 'Configure which files are included in this export',
+		defaultMessage: 'Configure included files',
 	},
 	exportButton: { id: 'app.export-modal.export-button', defaultMessage: 'Export' },
-	includeFile: {
-		id: 'app.export-modal.include-file-accessibility-label',
-		defaultMessage: 'Include "{file}"?',
+	fileSelectedSingular: {
+		id: 'app.export-modal.file-selected-singular',
+		defaultMessage: 'file selected',
+	},
+	filesSelectedPlural: {
+		id: 'app.export-modal.files-selected-plural',
+		defaultMessage: 'files selected',
+	},
+	selectedFilesTooltipTitle: {
+		id: 'app.export-modal.selected-files-tooltip-title',
+		defaultMessage: '{count, plural, one {# selected} other {# selected}}',
 	},
 })
 
@@ -59,6 +74,7 @@ const props = defineProps({
 
 defineExpose({
 	show: () => {
+		resetExportState()
 		exportModal.value.show()
 		initFiles()
 	},
@@ -69,62 +85,53 @@ const nameInput = ref(props.instance.name)
 const exportDescription = ref('')
 const versionInput = ref('1.0.0')
 const files = ref([])
-const folders = ref([])
+const selectedFilePaths = ref([])
+const filesCollapsed = ref(true)
+const fileTreeKey = ref(0)
+const filesLoadId = ref(0)
 
 const initFiles = async () => {
-	const newFolders = new Map()
-	const sep = '/'
-	files.value = []
-	await get_pack_export_candidates(props.instance.id).then((filePaths) =>
-		filePaths
-			.map((folder) => ({
-				path: folder,
-				name: folder.split(sep).pop(),
-				selected:
-					folder.startsWith('mods') ||
-					folder.startsWith('datapacks') ||
-					folder.startsWith('resourcepacks') ||
-					folder.startsWith('shaderpacks') ||
-					folder.startsWith('config'),
-				disabled:
-					folder === 'profile.json' ||
-					folder.startsWith('modrinth_logs') ||
-					folder.startsWith('.fabric') ||
-					folder.startsWith('__MACOSX'),
-			}))
-			.forEach((pathData) => {
-				const parent = pathData.path.split(sep).slice(0, -1).join(sep)
-				if (parent !== '') {
-					if (newFolders.has(parent)) {
-						newFolders.get(parent).push(pathData)
-					} else {
-						newFolders.set(parent, [pathData])
-					}
-				} else {
-					files.value.push(pathData)
-				}
-			}),
-	)
-	folders.value = [...newFolders.entries()].map(([name, value]) => [
-		{
-			name,
-			showingMore: false,
-		},
-		value,
+	const loadId = ++filesLoadId.value
+	const [filePaths, instanceRoot] = await Promise.all([
+		get_pack_export_candidates(props.instance.id),
+		get_full_path(props.instance.id),
 	])
+	const expandedFiles = await Promise.all(
+		filePaths.map((path) => expandExportCandidate(instanceRoot, path)),
+	)
+	if (loadId !== filesLoadId.value) return
+
+	files.value = expandedFiles.flat()
+	selectedFilePaths.value = files.value
+		.filter(
+			(file) =>
+				!file.disabled &&
+				(file.path.startsWith('mods') ||
+					file.path.startsWith('datapacks') ||
+					file.path.startsWith('resourcepacks') ||
+					file.path.startsWith('shaderpacks') ||
+					file.path.startsWith('config')),
+		)
+		.map((file) => file.path)
 }
 
 await initFiles()
 
+const selectableFiles = computed(() => files.value.filter((file) => !file.disabled))
+
+const selectedFileCount = computed(() => selectedFilePaths.value.length)
+
+const selectedFileSummary = computed(() =>
+	compressSelectedPaths(selectedFilePaths.value, selectableFiles.value),
+)
+
+const selectedFileCountLabel = computed(() =>
+	selectedFileCount.value === 1
+		? formatMessage(messages.fileSelectedSingular)
+		: formatMessage(messages.filesSelectedPlural),
+)
+
 const exportPack = async () => {
-	const filesToExport = files.value.filter((file) => file.selected).map((file) => file.path)
-	folders.value.forEach((args) => {
-		args[1].forEach((child) => {
-			if (child.selected) {
-				filesToExport.push(child.path)
-			}
-		})
-	})
 	const outputPath = await save({
 		defaultPath: `${nameInput.value} ${versionInput.value}.mrpack`,
 		filters: [
@@ -139,7 +146,7 @@ const exportPack = async () => {
 		export_instance_mrpack(
 			props.instance.id,
 			outputPath,
-			filesToExport,
+			selectedFilePaths.value,
 			versionInput.value,
 			exportDescription.value,
 			nameInput.value,
@@ -147,94 +154,278 @@ const exportPack = async () => {
 		exportModal.value.hide()
 	}
 }
+
+function resetExportState() {
+	nameInput.value = props.instance.name
+	exportDescription.value = ''
+	versionInput.value = '1.0.0'
+	files.value = []
+	selectedFilePaths.value = []
+	filesCollapsed.value = true
+	fileTreeKey.value += 1
+}
+
+const scrollFilesIntoView = async (delay = 0) => {
+	await nextTick()
+	const scrollToBottom = () => requestAnimationFrame(() => exportModal.value?.scrollToBottom())
+	if (delay > 0) {
+		window.setTimeout(scrollToBottom, delay)
+		return
+	}
+	scrollToBottom()
+}
+
+const toggleFilesCollapsed = () => {
+	filesCollapsed.value = !filesCollapsed.value
+	if (!filesCollapsed.value) {
+		scrollFilesIntoView(320)
+	}
+}
+
+function compressSelectedPaths(selectedPaths, allFiles) {
+	const selected = new Set(selectedPaths)
+
+	function summarizeFolder(folderPath) {
+		const directChildren = getDirectChildren(folderPath, allFiles)
+		const summaries = []
+
+		for (const child of directChildren) {
+			if (child.type === 'file') {
+				if (selected.has(child.path)) {
+					summaries.push(child.path)
+				}
+			} else {
+				const descendants = allFiles.filter((file) => file.path.startsWith(`${child.path}/`))
+				if (selected.has(child.path)) {
+					summaries.push(`${child.path}/**`)
+				} else if (descendants.length > 0 && descendants.every((file) => selected.has(file.path))) {
+					summaries.push(`${child.path}/**`)
+				} else {
+					summaries.push(...summarizeFolder(child.path))
+				}
+			}
+		}
+
+		return summaries
+	}
+
+	return summarizeFolder('')
+}
+
+function getDirectChildren(folderPath, paths) {
+	const children = new Map()
+	const prefix = folderPath ? `${folderPath}/` : ''
+
+	for (const item of paths) {
+		const path = item.path
+		if (prefix && !path.startsWith(prefix)) continue
+
+		const relativePath = prefix ? path.slice(prefix.length) : path
+		const segments = relativePath.split('/')
+		const name = segments[0]
+		const childPath = prefix ? `${prefix}${name}` : name
+
+		if (segments.length === 1) {
+			const type = item.type === 'directory' ? 'directory' : 'file'
+			const existing = children.get(childPath)
+			if (!existing || type === 'directory') {
+				children.set(childPath, { type, path: childPath })
+			}
+		} else if (!children.has(childPath)) {
+			children.set(childPath, { type: 'directory', path: childPath })
+		}
+	}
+
+	return [...children.values()].sort((a, b) => {
+		if (a.type !== b.type) return a.type === 'directory' ? -1 : 1
+		return a.path.localeCompare(b.path, undefined, { numeric: true, sensitivity: 'base' })
+	})
+}
+
+async function expandExportCandidate(instanceRoot, path) {
+	try {
+		const entries = await readDir(`${instanceRoot}/${path}`)
+		if (entries.length === 0) {
+			const metadata = await getExportCandidateMetadata(instanceRoot, path)
+			return [
+				{
+					path,
+					type: 'directory',
+					disabled: true,
+					modified: metadata.modified,
+					count: 0,
+				},
+			]
+		}
+
+		const children = await Promise.all(
+			entries.map(async (entry) => {
+				const childPath = `${path}/${entry.name}`
+				if (entry.isDirectory) {
+					return expandExportCandidate(instanceRoot, childPath)
+				}
+
+				const metadata = await getExportCandidateMetadata(instanceRoot, childPath)
+				return [
+					{
+						path: childPath,
+						type: 'file',
+						disabled: isExportCandidateDisabled(childPath),
+						size: metadata.size,
+						modified: metadata.modified,
+					},
+				]
+			}),
+		)
+		return children.flat()
+	} catch {
+		const metadata = await getExportCandidateMetadata(instanceRoot, path)
+		return [
+			{
+				path,
+				type: 'file',
+				disabled: isExportCandidateDisabled(path),
+				size: metadata.size,
+				modified: metadata.modified,
+			},
+		]
+	}
+}
+
+async function getExportCandidateMetadata(instanceRoot, path) {
+	try {
+		const metadata = await stat(`${instanceRoot}/${path}`)
+		return {
+			size: metadata.size,
+			modified: metadata.mtime ? Math.floor(metadata.mtime.getTime() / 1000) : undefined,
+		}
+	} catch {
+		return {}
+	}
+}
+
+function isExportCandidateDisabled(path) {
+	return (
+		path === 'profile.json' ||
+		path.startsWith('modrinth_logs') ||
+		path.startsWith('.fabric') ||
+		path.startsWith('__MACOSX')
+	)
+}
 </script>
 
 <template>
-	<ModalWrapper ref="exportModal" :header="formatMessage(messages.header)">
-		<div class="flex flex-col gap-4 w-[40rem]">
+	<NewModal
+		ref="exportModal"
+		:header="formatMessage(messages.header)"
+		scrollable
+		width="40rem"
+		max-width="calc(100vw - 2rem)"
+	>
+		<div class="flex flex-col gap-4">
 			<div class="grid grid-cols-2 gap-4">
-				<div class="labeled_input">
-					<p>{{ formatMessage(messages.modpackNameLabel) }}</p>
+				<div class="labeled_input w-full">
+					<p class="text-contrast font-semibold">{{ formatMessage(messages.modpackNameLabel) }}</p>
 					<StyledInput
 						v-model="nameInput"
-						:icon="PackageIcon"
 						type="text"
 						:placeholder="formatMessage(messages.modpackNamePlaceholder)"
 						clearable
+						wrapper-class="w-full"
 					/>
 				</div>
-				<div class="labeled_input">
-					<p>{{ formatMessage(messages.versionNumberLabel) }}</p>
+				<div class="labeled_input w-full">
+					<p class="text-contrast font-semibold">{{ formatMessage(messages.versionNumberLabel) }}</p>
 					<StyledInput
 						v-model="versionInput"
-						:icon="VersionIcon"
 						type="text"
 						:placeholder="formatMessage(messages.versionNumberPlaceholder)"
 						clearable
+						wrapper-class="w-full"
 					/>
 				</div>
 			</div>
-			<div class="flex flex-col gap-2">
-				<p class="m-0">{{ formatMessage(commonMessages.descriptionLabel) }}</p>
-				<StyledInput
+			<div class="flex flex-col gap-2 min-w-0">
+				<p class="m-0 text-contrast font-semibold">
+					{{ formatMessage(commonMessages.descriptionLabel) }}
+				</p>
+				<MarkdownEditor
 					v-model="exportDescription"
-					multiline
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
+					:min-height="120"
+					:max-height="240"
 				/>
 			</div>
-			<Accordion
-				class="w-full bg-surface-4 border border-solid border-surface-5 rounded-2xl overflow-clip"
-				button-class="p-4 w-full border-b border-solid border-b-surface-5 bg-surface-2 -mb-px hover:brightness-[--hover-brightness] group"
-			>
-				<template #title>
-					<span class="flex items-center gap-3 text-contrast group-active:scale-[0.98]">
-						<WrenchIcon aria-hidden="true" class="size-5 text-secondary" />
-						Configure which files are included in this export
-					</span>
-				</template>
-				<div class="flex flex-col [&>*:nth-child(even)]:bg-surface-3">
-					<div v-for="[path, children] in folders" :key="path.name" class="flex flex-col">
-						<Accordion
-							class="flex flex-col"
-							button-class="flex gap-3 pr-4 hover:bg-surface-5 group"
-						>
-							<template #title>
-								<Checkbox
-									:model-value="children.every((child) => child.selected)"
-									:indeterminate="
-										!children.every((child) => child.selected) &&
-										children.some((child) => child.selected)
-									"
-									:description="formatMessage(messages.includeFile, { file: path.name })"
-									class="pl-4 py-2"
-									:disabled="children.every((x) => x.disabled)"
-									@update:model-value="
-										(newValue) => children.forEach((child) => (child.selected = newValue))
-									"
-									@click.stop
-								/>
-								<span class="ml-2 group-active:scale-95">{{ path.name }}/</span>
-							</template>
-							<div v-for="child in children" :key="child.path">
-								<Checkbox
-									v-model="child.selected"
-									:label="child.name"
-									class="w-full px-8 py-2 hover:bg-surface-4 text-primary"
-									:disabled="child.disabled"
-								/>
-							</div>
-						</Accordion>
-					</div>
-					<Checkbox
-						v-for="file in files"
-						:key="file.path"
-						v-model="file.selected"
-						:label="file.name"
-						:disabled="file.disabled"
-						class="w-full px-4 py-2 hover:bg-surface-4 text-primary"
-					/>
+			<div class="flex flex-col gap-3">
+				<div class="flex w-full min-w-0 items-center justify-between gap-3">
+					<button
+						type="button"
+						class="group m-0 flex w-full min-w-0 cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
+						:aria-expanded="!filesCollapsed"
+						@click="toggleFilesCollapsed"
+					>
+						<span class="min-w-0 truncate font-semibold text-contrast">
+							{{ formatMessage(messages.selectFilesLabel) }}
+						</span>
+						<DropdownIcon
+							class="size-5 shrink-0 text-contrast transition-transform duration-300"
+							:class="{ 'rotate-180': !filesCollapsed }"
+						/>
+					</button>
 				</div>
-			</Accordion>
+				<Collapsible :collapsed="filesCollapsed" overflow-visible>
+					<FileTreeSelect
+						:key="fileTreeKey"
+						v-model="selectedFilePaths"
+						:items="files"
+						@navigate="scrollFilesIntoView()"
+					>
+						<template #actions>
+							<span class="shrink-0 text-sm font-medium text-secondary">
+								<Tooltip
+									class="inline-flex shrink-0 items-center"
+									:triggers="['hover', 'focus']"
+									:popper-triggers="['hover', 'focus']"
+									popper-class="v-popper--interactive export-selected-files-popper"
+									placement="top"
+									:delay="{ show: 200, hide: 100 }"
+									no-auto-focus
+								>
+									<button
+										type="button"
+										class="inline-flex cursor-help items-center border-0 border-b border-dashed border-secondary bg-transparent p-0 text-sm font-semibold leading-none text-contrast"
+										:aria-label="
+											formatMessage(messages.selectedFilesTooltipTitle, {
+												count: selectedFileCount,
+											})
+										"
+									>
+										{{ selectedFileCount }}
+									</button>
+									<template #popper>
+										<div class="grid max-w-[34rem]">
+											<div
+												class="flex max-h-64 min-w-0 flex-col gap-2 overflow-y-auto overscroll-contain pr-2"
+											>
+												<span
+													v-for="path in selectedFileSummary"
+													:key="path"
+													class="truncate whitespace-nowrap text-sm font-medium text-secondary"
+												>
+													{{ path }}
+												</span>
+											</div>
+										</div>
+									</template>
+								</Tooltip>
+								{{ selectedFileCountLabel }}
+							</span>
+						</template>
+					</FileTreeSelect>
+				</Collapsible>
+			</div>
+		</div>
+		<template #actions>
 			<div class="flex items-center justify-end gap-2">
 				<ButtonStyled type="outlined">
 					<button @click="exportModal.hide">
@@ -249,6 +440,14 @@ const exportPack = async () => {
 					</button>
 				</ButtonStyled>
 			</div>
-		</div>
-	</ModalWrapper>
+		</template>
+	</NewModal>
 </template>
+
+<style lang="scss">
+.v-popper__popper.v-popper--theme-dismissable-prompt.export-selected-files-popper {
+	.v-popper__inner {
+		padding-right: 0 !important;
+	}
+}
+</style>
