@@ -407,6 +407,7 @@ export async function refreshServerData(
 	try {
 		const status = await get_server_status(address, protocolVersion)
 		if (serverData.lastSuccessfulRefresh && serverData.lastSuccessfulRefresh > refreshTime) {
+			// Don't update if there was a more recent successful refresh
 			return
 		}
 		serverData.lastSuccessfulRefresh = Date.now()
