@@ -60,9 +60,9 @@ export const LIGHT_LEGEND_PALETTE = [
 
 export const DARK_LEGEND_PALETTE = [
 	'hsl(145, 78%, 48%)',
-	'hsl(41, 100%, 50%)',
+	'hsl(41, 100%, 45%)',
 	'hsl(202, 77%, 63%)',
-	'hsl(323, 66%, 72%)',
+	'hsl(313, 66%, 67%)',
 	'hsl(56, 85%, 60%)',
 	'hsl(255, 92%, 80%)',
 	'hsl(12, 100%, 67%)',
