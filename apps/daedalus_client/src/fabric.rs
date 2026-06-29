@@ -1,3 +1,21 @@
+//! Fetches Fabric-compatible loader metadata.
+//!
+//! Fabric and Quilt both expose loader profiles for a concrete Minecraft
+//! version, but Daedalus publishes templated profiles using
+//! `${modrinth.gameVersion}`. A group is a set of Minecraft versions whose
+//! upstream loader profiles have the same structure after the concrete
+//! Minecraft version is replaced with `${modrinth.gameVersion}`. Fabric uses
+//! one universal group, so its public profile paths stay as
+//! `versions/{loader}.json`. Quilt has more than one group: versions before
+//! 26.x include hashed/intermediary libraries, while 26.x versions do not. For
+//! Quilt, Daedalus writes one templated profile per group at
+//! `versions/{loader}/{group}.json`.
+//!
+//! The Quilt top-level manifest intentionally remains backwards-compatible
+//! with old app builds: it still lists concrete Minecraft version IDs and the
+//! full loader list on each row. Only the loader profile URL points at the
+//! appropriate group, such as `pre-26-x` or `26-x`.
+
 use crate::util::{download_file, fetch_json, format_url};
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
