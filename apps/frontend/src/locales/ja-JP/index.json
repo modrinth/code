@@ -1211,9 +1211,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "通知を読み込み中…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "以下で選択することで、複数のプロジェクトを一括で編集できます。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "サーバープロジェクトでは一括編集を利用できません"
   },
@@ -1285,24 +1282,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "環境メタデータを確認してください"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "昇順"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "降順"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名前"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "ステータス"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "種類"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "アイコン"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

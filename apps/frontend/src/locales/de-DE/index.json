@@ -1634,9 +1634,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Benachrichtigungen werden geladen..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unten auswählst."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverprojekte unterstützen Massenbearbeitung nicht"
   },
@@ -1711,24 +1708,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Bitte überprüfe die Umgebungsmetadaten"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Aufsteigend"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Absteigend"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Name"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Typ"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Icon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
