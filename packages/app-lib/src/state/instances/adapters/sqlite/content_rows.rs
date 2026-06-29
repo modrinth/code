@@ -619,6 +619,83 @@ pub(crate) async fn rename_instance_file(
 ) -> crate::Result<Option<InstanceFile>> {
     let enabled = i64::from(enabled);
     let modified_at = Utc::now().timestamp();
+    let mut tx = pool.begin().await?;
+
+    let source_id = sqlx::query_scalar!(
+        "
+		SELECT id
+		FROM instance_files
+		WHERE instance_id = ? AND relative_path = ?
+		",
+        instance_id,
+        old_relative_path,
+    )
+    .fetch_optional(&mut *tx)
+    .await?;
+    let target_id = sqlx::query_scalar!(
+        "
+		SELECT id
+		FROM instance_files
+		WHERE instance_id = ? AND relative_path = ?
+		",
+        instance_id,
+        new_relative_path,
+    )
+    .fetch_optional(&mut *tx)
+    .await?;
+
+    if let (Some(source_id), Some(target_id)) =
+        (source_id.as_deref(), target_id.as_deref())
+        && source_id != target_id
+    {
+        sqlx::query!(
+            "
+				DELETE FROM instance_content_entries
+				WHERE id IN (
+					SELECT target_entry.id
+					FROM instance_content_entries target_entry
+					WHERE target_entry.instance_id = ?
+						AND target_entry.file_id = ?
+						AND EXISTS (
+							SELECT 1
+							FROM instance_content_entries source_entry
+							WHERE source_entry.instance_id = target_entry.instance_id
+								AND source_entry.content_set_id = target_entry.content_set_id
+								AND source_entry.file_id = ?
+						)
+				)
+				",
+            instance_id,
+            target_id,
+            source_id,
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        sqlx::query!(
+            "
+				UPDATE instance_content_entries
+				SET file_id = ?, modified_at = ?
+				WHERE instance_id = ? AND file_id = ?
+				",
+            source_id,
+            modified_at,
+            instance_id,
+            target_id,
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        sqlx::query!(
+            "
+				DELETE FROM instance_files
+				WHERE id = ?
+				",
+            target_id,
+        )
+        .execute(&mut *tx)
+        .await?;
+    }
 
     sqlx::query!(
         "
@@ -638,8 +715,10 @@ pub(crate) async fn rename_instance_file(
         instance_id,
         old_relative_path,
     )
-    .execute(pool)
+    .execute(&mut *tx)
     .await?;
+
+    tx.commit().await?;
 
     get_instance_file_by_relative_path(instance_id, new_relative_path, pool)
         .await
