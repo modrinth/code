@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "新"
   },
+  "badge.release": {
+    "defaultMessage": "正式版"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "取消"
   },
@@ -234,7 +237,7 @@
     "defaultMessage": "重新安装整合包"
   },
   "button.remove": {
-    "defaultMessage": "移除"
+    "defaultMessage": "删除通行密钥"
   },
   "button.remove-image": {
     "defaultMessage": "移除图片"
@@ -569,11 +572,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "正在删除 {progress}/{total} {contentType}……"
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "正在删除 {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "正在删除 {contentType}……"
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "正在禁用 {progress}/{total} {contentType}……"
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "正在禁用 {count, number} {contentType}"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "正在禁用 {contentType}……"
@@ -581,11 +590,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "正在启用 {progress}/{total} {contentType}……"
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "正在启用 {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "正在启用 {contentType}……"
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "正在更新 {progress}/{total} {contentType}……"
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "正在更新 {count, number} {contentType}"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "正在更新 {contentType}……"
@@ -865,6 +880,258 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "初始化服务器"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, one {添加文件} other {添加文件}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "选择应移入此组的文件。"
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "其他组内没有可移入此处的文件。"
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "无法加载文件"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "没有符合搜索条件的文件。"
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "搜索文件…"
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, other {已选择 # 个文件}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "将文件添加至此组"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "添加文件……"
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "无法添加文件"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "内容不被允许"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "已通过"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "证据被驳回"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "完成"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "无许可"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "不允许"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "待处理"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "信息被驳回"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "其它"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "添加归属信息"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "保留所有权利/无许可证"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "许可证链接"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "许可证名称，最好使用一个SPDX标识符"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "请选择一个许可证"
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "链接必须是有效的网址"
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "例如 MPL-1.1 许可证"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(可选的)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "许可证"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "工作链接"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "许可证链接"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "工作链接"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "这看起来像是一个Modrinth链接，如果这个内容存在于Modrinrh平台上，你的包很可能导出不正确。如果你是从其他网站下载的，尝试下载Modrinth版本的文件，有时它们不是相同文件。"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "笔记"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "在这里写些东西"
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "校样截图 {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "移除图像"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "校样图像"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "拖放操作以上传图片或是选择一个图像"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "如果您被发现造假或者篡改上传的图像，您的项目和帐户可能会被终止。"
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth 工作人员可能核验上传的证据"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "保存归属信息"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "选择一种许可证……"
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "权限依据"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "请附上您的许可证链接。如果您没有许可证，则应该选择\"保留所有权利 / 无授权许可\""
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "请提供文字说明，或至少上传一张证明图片。"
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "请提供链接。"
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "请提供一些文字说明，或至少上传一张证明图片。"
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "请上传一张PNG、JPEG、GIF、WebP、或BMP格式的图片。"
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "请上传至少一张证明图片。"
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "需要提供简短说明或证明图片。"
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "说明"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "归属组 {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, other {# 文件}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "所含文件："
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "包含于 {count, plural, other {# 个版本中}}："
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "最后由 {user} 在 {date} 更新"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "未知"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "已许可："
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "作品链接："
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "原因"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "无法保存审核结果"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "这些文件目前未被用于任何版本中。"
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "备注："
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "无"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "原始项目"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "证据截图 {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "证明图片："
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "已自动署名"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "我们之前已经见过这个文件，并为您准备好了署名信息。如果有什么地方看起来不对劲，请通过帮助中心联系 Modrinth"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "许可协议"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "本作品的许可证允许您将其再分发至您的整合包中。"
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "请上传与此许可证相关的证明文件。"
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "我的项目"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "您的原创作品。"
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "请上传有助于验证您是本作品作者的文件。"
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "无许可"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "我们之前已经见过这个文件，其许可证通常不允许再分发。"
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "您无权使用本作品。"
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "特殊权限"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "您已获得特殊许可，可将本作品再分发至您的整合包中。"
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "从组中移除"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "无法拆分文件"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} 及其他 {count} 个文件"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "版主"
   },
   "external-project-license-status.no": {
     "defaultMessage": "否"
@@ -2439,7 +2706,7 @@
     "defaultMessage": "Diners Club"
   },
   "payment-method.discover": {
-    "defaultMessage": "Discover"
+    "defaultMessage": "发现"
   },
   "payment-method.eftpos": {
     "defaultMessage": "EFTPOS"
@@ -2602,6 +2869,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "平台"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, other {平台}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "兼容性"
@@ -3099,7 +3369,7 @@
     "defaultMessage": "请复核以下选项"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
-    "defaultMessage": "只有模组或模组包项目才能包含运行环境元数据。"
+    "defaultMessage": "只有模组或整合包项目才能包含运行环境元数据。"
   },
   "project.settings.environment.notice.wrong-project-type.title": {
     "defaultMessage": "此类项目不支持运行环境元数据"
@@ -3184,6 +3454,15 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "保留"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "由于缺少权限，版本信息未予提供"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "解决"
   },
   "project.visibility.archived": {
     "defaultMessage": "归档"
@@ -5320,6 +5599,96 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth 团队"
+  },
+  "version.content.name": {
+    "defaultMessage": "名称"
+  },
+  "version.content.version": {
+    "defaultMessage": "版本"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "开发用 jar 文件"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadoc jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "可选资源包"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "主要的"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "必需的资源包"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "签名文件"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "源 jar 文件"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "其他"
+  },
+  "version.section.changes": {
+    "defaultMessage": "更新"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "兼容性"
+  },
+  "version.section.content": {
+    "defaultMessage": "内容"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "搜索内容……"
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "任意兼容的版本"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "任意版本"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "不可用的版本"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "此版本可能已被删除，或正在接受管理员审查。"
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "此版本可能已被删除，或正在接受管理员审查。"
+  },
+  "version.section.files": {
+    "defaultMessage": "文件"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "包含的内容"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "已知不兼容"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "未提供更新日志。"
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "没有模组加载器"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "可选的依赖"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "必选的内容"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "附加的资源"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "文件"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "大小"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "类型"
   }
 }
 

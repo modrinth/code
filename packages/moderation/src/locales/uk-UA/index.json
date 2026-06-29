@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Виберіть правильну роздільність"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Переконайтеся, що ви надали підтвердження дозволу на поширення будь-якого стороннього контенту у своєму мод паку."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Перевірити дозволи на використання стороннього контенту"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Виберіть, які версії підтримує ваш сервер, виберіть збірку або завантажте власну."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Відвідайте налаштування посилань"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Перейти до панелі керування дозволами"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Відвідайте налаштування теґів"

@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Mostra meno istanze in esecuzione"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Ignora"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Installazione fallita"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Installazione fallita: l'app è stata chiusa."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Installazione fallita: errore di rete."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Installazione fallita: errore sconosciuto."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Apri istanza"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Riprova"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Istanza sconosciuta"
+  },
+  "app.action-bar.installs": {
+    "message": "Installazioni"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Rendi primaria"
   },
@@ -101,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostra le ore di gioco"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Salta automaticamente le conferme a basso rischio, come l'installazione di pacchetti di mod duplicati, la normale eliminazione di contenuti, gli aggiornamenti simultanei, lo scollegare i pacchetti di mod e le richieste di riparazione. Le avvertenze verranno comunque mostrate."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Salta le conferme poco importanti"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Mostra o nascondi la barra laterale."
   },
@@ -188,6 +221,60 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.install.phase.downloading_content": {
+    "message": "Download dei contenuti"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Download di Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Download del pacchetto"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Estrazione degli override"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalizzazione"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Preparazione dell'istanza"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Preparazione di Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Download di Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Estrazione di Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Recupero di Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Preparazione di Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validazione di Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Lettura del manifesto"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Risoluzione del loader"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Risoluzione di Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Risoluzione dei contenuti"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Tornando indietro"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Esecuzione dei processori del loader"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Tutti i dati della tua istanza verranno eliminati permanentemente, inclusi i tuoi mondi, configurazioni e tutti i contenuti installati."
   },
@@ -212,6 +299,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Istanza"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "{current, number}/{total, number} progetti scaricati..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Finalizzando l'aggiornamento..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Risolvendo le versioni..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "progetto"
   },
@@ -233,6 +329,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Esplora i server"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Elimina mondo"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Eliminare il mondo"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Questo mondo verrà eliminato permanentemente da questa istanza. Questa azione non può essere annullata."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Eliminare {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Moddato"
   },
@@ -250,6 +358,18 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nessun server o mondo aggiunto"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Rimuovi server"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Rimuovere il server"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Questo server verrà rimosso dalla tua lista di server nell'app e nel gioco. Potrai aggiungerlo nuovamente se conosci l'indirizzo."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Rimuovere {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cerca tra {count} mondi..."
@@ -835,6 +955,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Copia indirizzo"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Crea collegamento"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Non mostrare nella home"

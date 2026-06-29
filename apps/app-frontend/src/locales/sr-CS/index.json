@@ -1,4 +1,10 @@
 {
+  "app.action-bar.install.failed": {
+    "message": "Neuspešna instalacija"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Neuspešna instalacija zbog zatvaranja aplikacije."
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft serveri za autentifikaciju su možda trenutno nedostupni. Molimo vas da proverite vašu internet vezu i pokušajte ponovo kasnije."
   },
@@ -156,10 +162,13 @@
     "message": "Minecraft svet"
   },
   "instance.edit-world.title": {
-    "message": "Izmeni svet"
+    "message": "Promeni svet"
   },
   "instance.server-modal.placeholder-name": {
     "message": "Minecraft Server"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Generalno"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Brisanje..."

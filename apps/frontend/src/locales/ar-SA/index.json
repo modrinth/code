@@ -356,17 +356,8 @@
   "auth.reset-password.title.long": {
     "message": "تغيير كلمة المرور"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "يرجى إدخال رمز التحقق الثنائي للمتابعة."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "أدخل رمز التحقق الثنائي"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "أدخل الرمز..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "تسجيل الدخول باستخدام"
   },
   "auth.sign-in.title": {
     "message": "تسجيل الدخول"
@@ -379,9 +370,6 @@
   },
   "auth.sign-up.title": {
     "message": "إنشاء حساب"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "سجّل باستخدام"
   },
   "auth.verify-email.action.account-settings": {
     "message": "إعدادات الحساب"

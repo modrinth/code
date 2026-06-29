@@ -137,9 +137,6 @@
   "button.refresh": {
     "defaultMessage": "I-refresh"
   },
-  "button.remove": {
-    "defaultMessage": "Tanggalin"
-  },
   "button.remove-image": {
     "defaultMessage": "Tanggalin ang imahe"
   },

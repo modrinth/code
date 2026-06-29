@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "Новое"
   },
+  "badge.release": {
+    "defaultMessage": "Релиз"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Отмена"
   },
@@ -228,7 +231,7 @@
     "defaultMessage": "Переустановить сборку"
   },
   "button.remove": {
-    "defaultMessage": "Удалить"
+    "defaultMessage": "Удалить ключ доступа"
   },
   "button.remove-image": {
     "defaultMessage": "Удалить изображение"
@@ -818,6 +821,237 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Установка сервера"
   },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, =1 {Добавить файл} other {Добавить файлы}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Выберите файлы для переноса в эту группу."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "В других группах нет файлов, которые можно было бы перенести сюда."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Не удалось загрузить файлы"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "Не найдены файлы, соответствующие запросу."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Поиск файлов..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {# файл выбран} few {# файла выбрано} other {# файлов выбрано}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Добавление файлов в группу"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Добавить файлы..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Не удалось добавить файлы"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "Контент запрещён"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Одобрено"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Доказательства отклонены"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Готово"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "Нет разрешения"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Запрещено"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "В ожидании"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Информация отклонена"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Другое"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "Добавить атрибуцию"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Все права защищены/Без лицензии"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Ссылка на лицензию"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "Название лицензии, желательно идентификатор SPDX"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Выберите лицензию."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "Ссылка должна быть корректным URL."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "Например: MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(необязательно)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Лицензия"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "Ссылка на работу"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "ссылка-на-лицензию"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "ссылка-на-работу"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Похоже, это ссылка на Modrinth. Если этот контент доступен на Modrinth, вероятно, ваш набор был экспортирован неправильно. Если вы скачали его с другого сайта, попробуйте скачать версию с Modrinth; иногда эти файлы различаются."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Примечания"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Напишите что‑нибудь..."
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Удалить изображение"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "Перетащите изображение или нажмите, чтобы выбрать"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Если будет выявлена ложь или подделка загруженных изображений, то ваш проект и аккаунт могут быть заблокированы."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Модераторы могут проверить предоставленные доказательства"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Сохранить атрибуцию"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Выберите лицензию..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "Тип разрешения"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Укажите ссылку на лицензию. Если у вас её нет, лучше указать «Все права защищены/Без лицензии»"
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Введите ссылку."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Загрузите изображение в формате PNG, JPEG, GIF, WebP, или BMP."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Предоставьте краткое объяснение или изображение."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Обоснование"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Группа атрибуции {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Включённые файлы:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Включён в {count, plural, one {# версию} few {# версии} other {# версий}}:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "Последнее обновление: {date} пользователем {user}"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Неизвестно"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Лицензия:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Ссылка на работу:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Причина"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Не удалось сохранить проверку модерации"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Ни одна версия не использует эти файлы."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Примечания:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Нет"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Оригинальный проект"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Атрибутировано автоматически"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Мы уже видели этот файл и подготовили для вас ссылку на источник. Если что-то не так, пожалуйста, обратитесь в службу поддержки Modrinth через справочный центр"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Лицензия"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "Лицензия данной работы допускает её распространение в вашей сборке."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Загрузите подтверждающую документацию, относящиеся к данной лицензии."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Свой проект"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Оригинальная работа, созданная вами."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Загрузите файлы для подтверждения авторства."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Нет разрешения"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Мы уже видели этот файл, и его лицензия не допускает распространение."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "У вас нет разрешения на использование этой работы."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Особое разрешение"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "Вы получили особое разрешение на распространение этой работы в вашей сборке."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Удалить из группы"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Не удалось разделить файл"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} и ещё {count}"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Модератор"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Нет"
   },
@@ -984,7 +1218,7 @@
     "defaultMessage": "Возможно, папка не существует."
   },
   "files.layout.error-title": {
-    "defaultMessage": "Не удалось загрузить файлы"
+    "defaultMessage": "Не удалось загрузить файлы"
   },
   "files.layout.extraction-started-title": {
     "defaultMessage": "Извлечение началось"
@@ -1167,10 +1401,10 @@
     "defaultMessage": "Установка не удалась"
   },
   "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Скопируйте URL страницы выбранной версии и вставьте его ниже."
+    "defaultMessage": "Скопируйте ссылку на страницу версии и вставьте его ниже."
   },
   "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Скопируйте URL"
+    "defaultMessage": "Скопируйте ссылку"
   },
   "files.zip-url-modal.step-find-description": {
     "defaultMessage": "Найдите необходимую вам сборку модов на CurseForge."
@@ -2528,6 +2762,9 @@
   "project.about.compatibility.platforms": {
     "defaultMessage": "Платформы"
   },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, =1 {Платформа} other {Платформы}}"
+  },
   "project.about.compatibility.title": {
     "defaultMessage": "Совместимость"
   },
@@ -2943,7 +3180,7 @@
     "defaultMessage": "Европа"
   },
   "project.server.region.middle_east": {
-    "defaultMessage": "Средний Восток"
+    "defaultMessage": "Ближний Восток"
   },
   "project.server.region.russia": {
     "defaultMessage": "Россия"
@@ -3109,6 +3346,15 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "Р"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "На удержании"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "Версия недоступна из-за отсутствия разрешений"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Решить"
   },
   "project.visibility.archived": {
     "defaultMessage": "Архивирован"
@@ -4206,13 +4452,13 @@
     "defaultMessage": "Новый сервер"
   },
   "servers.manage.no-owned-servers-found": {
-    "defaultMessage": "Не найдено серверов, соответствующих запросу."
+    "defaultMessage": "Не найдены личные серверы, соответствующие запросу."
   },
   "servers.manage.no-servers-found": {
     "defaultMessage": "Серверы не найдены."
   },
   "servers.manage.no-shared-servers-found": {
-    "defaultMessage": "Не найдено доступных серверов, соответствующих запросу."
+    "defaultMessage": "Не найдены совместные серверы, соответствующие запросу."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Платёжная информация загружается. Оформление заказа откроется автоматически после загрузки."
@@ -4257,10 +4503,10 @@
     "defaultMessage": "Настройки сервера перемещены"
   },
   "servers.manage.shared-servers-title": {
-    "defaultMessage": "Общие серверы"
+    "defaultMessage": "Совместные серверы"
   },
   "servers.manage.your-servers-title": {
-    "defaultMessage": "Ваши серверы"
+    "defaultMessage": "Личные серверы"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {день} few {дня} other {дней}} <hours-count>{hours}</hours-count> {hours, plural, one {час} few {часа} other {часов}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {минута} few {минуты} other {минут}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {секунда} few {секунды} other {секунд}} осталось..."
@@ -5245,5 +5491,95 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Команда Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Название"
+  },
+  "version.content.version": {
+    "defaultMessage": "Версия"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "JAR для разработки"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "JAR с Javadoc"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "Необязательный набор ресурсов"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Основной"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Необходимый набор ресурсов"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "Файл подписи"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "JAR с исходным кодом"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Другое"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Изменения"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Совместимость"
+  },
+  "version.section.content": {
+    "defaultMessage": "Контент"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Поиск контента..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Любая совместимая версия"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Любая версия"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Недоступная версия"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "Эта версия либо удалена, либо на рассмотрении."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "Обязательная версия либо удалена, либо на рассмотрении."
+  },
+  "version.section.files": {
+    "defaultMessage": "Файлы"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Включённый контент"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Известные несовместимости"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "Описание изменений отсутствует."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Без загрузчика"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Необязательные зависимости"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Необходимый контент"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Дополнительные ресурсы"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Файл"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Размер"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Тип"
   }
 }
