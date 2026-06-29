@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "請確保你提供了證據證明你有權在模組包中發布任何外部內容。"
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "審查外部內容授權"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "選擇你的伺服器支援的版本、挑選一個模組包，或是上傳你自己的檔案。"
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "前往連結設定"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "前往授權資訊主頁"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "前往標籤設定"

@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "További futó példányok elrejtése"
   },
+  "app.action-bar.install.retry": {
+    "message": "Újra"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Ismeretlen profil"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Beállítás elsődleges példányként"
   },
@@ -187,6 +193,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": ""
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Az profilodhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."

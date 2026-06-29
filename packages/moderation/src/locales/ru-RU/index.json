@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Предоставьте подтверждение на включение стороннего контента в свою сборку."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Укажите атрибуции"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Настройте поддерживаемые версии, выберите сборку или добавьте собственную."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Настроить ссылки"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Перейти к атрибуциям"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Настроить теги"

@@ -8,6 +8,24 @@
   "admin.billing.error.not-found": {
     "message": "Käyttäjää ei löydetty"
   },
+  "analytics.action.add": {
+    "message": "Lisää"
+  },
+  "analytics.action.cancel": {
+    "message": "Peruuta"
+  },
+  "analytics.action.refresh": {
+    "message": "Päivitä"
+  },
+  "analytics.action.reset": {
+    "message": "Palauta"
+  },
+  "analytics.breakdown.country": {
+    "message": "Valtio"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "Riippuu kohteesta"
+  },
   "app-marketing.download.description": {
     "message": "Työpöytä sovelluksemme on saatavilla kaikilla alustoilla, valitse haluamasi versio."
   },
@@ -254,17 +272,8 @@
   "auth.reset-password.title.long": {
     "message": "Palauta salasanasi"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Syötä 2-vaiheisen tunnistautumisen koodi jatkaaksesi."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Syötä 2-vaiheisen tunnistautumisen koodi"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Anna koodi..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Kirjaudu sisään käyttäen"
   },
   "auth.sign-in.title": {
     "message": "Kirjaudu sisään"
@@ -277,9 +286,6 @@
   },
   "auth.sign-up.title": {
     "message": "Rekisteröidy"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Reskiteröidy käyttäen"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tilin asetukset"
@@ -334,6 +340,12 @@
   },
   "collection.delete-modal.title": {
     "message": "Oletko varma että haluat poistaa tämän kokoelman?"
+  },
+  "collection.description": {
+    "message": "{description} - Katso kokoelma {name}, jonka on luonut {username}, Modrinthissa"
+  },
+  "collection.description.following": {
+    "message": "Automattisesti luotu kokoelma kaikista projekteista joita seuraat."
   },
   "collection.editing": {
     "message": "Muokataan kokoelmaa"

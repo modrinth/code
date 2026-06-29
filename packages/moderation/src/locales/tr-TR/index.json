@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Mod paketinizdeki harici içerikleri dağıtma izniniz olduğuna dair kanıt sağladığınızdan emin olun."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Harici izinleri incele"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Sunucunuzun desteklediği sürümleri seçin ve bir Mod Paketi seçin ya da kendinizinkini yükleyin."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Bağlantı ayarlarına göz at"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "İzinler panelini ziyaret et"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Etiket ayarlarına göz at"
