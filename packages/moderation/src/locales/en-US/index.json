@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Add a Java address"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Add a valid URL and name or SPDX identifier for your custom license."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Add license details"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as a website, store, or a Discord invite."
   },

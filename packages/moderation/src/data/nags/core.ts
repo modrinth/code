@@ -203,6 +203,39 @@ export const coreNags: Nag[] = [
 		},
 	},
 	{
+		id: 'add-custom-license-details',
+		title: defineMessage({
+			id: 'nags.add-license-details.title',
+			defaultMessage: 'Add license details',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.add-license-details.description',
+					defaultMessage: 'Add a valid URL and name or SPDX identifier for your custom license.',
+				}),
+				{
+					type: formatProjectTypeSentence(formatMessage, context.project.project_type),
+				},
+			)
+		},
+		status: 'required',
+		shouldShow: (context: NagContext) =>
+			context.project.license.id === 'LicenseRef-' ||
+			((!context.project.license.url || context.project.license.url === '') &&
+				!context.projectV3?.minecraft_server &&
+				context.project.license.id !== 'LicenseRef-Unknown'),
+		link: {
+			path: 'settings/license',
+			title: defineMessage({
+				id: 'nags.settings.license.title',
+				defaultMessage: 'Visit license settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-license',
+		},
+	},
+	{
 		id: 'review-permissions',
 		title: defineMessage({
 			id: 'nags.review-permissions.title',
