@@ -25,6 +25,18 @@
 				<template #title>
 					{{ instance.name }}
 				</template>
+				<template #title-suffix v-if="instance.shared_instance">
+					<div
+						class="inline-flex h-7 items-center gap-1 rounded-full border border-solid border-blue bg-highlight-blue px-2.5 !text-base !font-normal leading-none text-blue"
+					>
+						Shared
+						<UnknownIcon
+							v-tooltip="'This instance is being shared to other users.'"
+							class="size-4 cursor-help"
+							aria-label="Shared instance information"
+						/>
+					</div>
+				</template>
 				<template #stats>
 					<div class="flex items-center flex-wrap gap-2">
 						<template v-if="!isServerInstance">
@@ -87,6 +99,23 @@
 								>
 									{{ linkedProjectV3.name }}
 								</router-link>
+							</div>
+						</template>
+
+						<template v-if="sharedInstanceManager">
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex min-w-0 items-center gap-[5px] font-medium">
+								Managed by
+								<Avatar
+									:src="sharedInstanceManager.avatarUrl"
+									:alt="sharedInstanceManager.username"
+									:tint-by="sharedInstanceManager.tintBy"
+									size="24px"
+									circle
+									no-shadow
+								/>
+								<span class="min-w-0 truncate">{{ sharedInstanceManager.username }}</span>
 							</div>
 						</template>
 					</div>
@@ -288,6 +317,7 @@ import {
 	SettingsIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
+	UnknownIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
@@ -296,6 +326,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	ContentPageHeader,
+	injectAuth,
 	injectNotificationManager,
 	NavTabs,
 	OverflowMenu,
@@ -336,6 +367,7 @@ dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { addNotification, handleError } = injectNotificationManager()
+const auth = injectAuth()
 const { playServerProject } = injectServerInstall()
 const queryClient = useQueryClient()
 const route = useRoute()
@@ -379,6 +411,25 @@ const recentPlays = computed(
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
+
+const sharedInstanceManager = computed(() => {
+	if (!instance.value?.shared_instance) return null
+
+	if (instance.value.shared_instance.role === 'owner') {
+		const user = auth.user.value
+		return {
+			username: user?.username ?? 'Example user',
+			avatarUrl: user?.avatar_url ?? undefined,
+			tintBy: user?.id ?? 'Example user',
+		}
+	}
+
+	return {
+		username: 'Example user',
+		avatarUrl: undefined,
+		tintBy: 'Example user',
+	}
+})
 
 watch(
 	() => router.currentRoute.value,

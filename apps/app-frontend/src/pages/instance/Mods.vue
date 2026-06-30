@@ -4,6 +4,7 @@
 			<Admonition
 				v-if="showSharedInstancePublishAdmonition"
 				type="warning"
+				inline-actions
 				:header="formatMessage(messages.sharedInstanceChangesHeader)"
 			>
 				{{ formatMessage(messages.sharedInstanceChangesBody) }}
