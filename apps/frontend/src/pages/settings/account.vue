@@ -183,24 +183,24 @@
 		>
 			<div class="flex flex-col gap-6">
 				<template v-if="auth.user.has_totp && twoFactorStep === 0">
-					<label for="two-factor-code">
+					<div class="flex flex-col gap-2.5">
 						<span class="text-md font-semibold text-contrast">{{
 							formatMessage(messages.twoFactorEnterCodeLabel)
 						}}</span>
+						<StyledInput
+							id="two-factor-code"
+							v-model="twoFactorCode"
+							:maxlength="11"
+							:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
+							@keyup.enter="removeTwoFactor()"
+						/>
 						<span class="label__description">{{
 							formatMessage(messages.twoFactorEnterCodeDescription)
 						}}</span>
-					</label>
-					<StyledInput
-						id="two-factor-code"
-						v-model="twoFactorCode"
-						:maxlength="11"
-						:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
-						@keyup.enter="removeTwoFactor()"
-					/>
-					<p v-if="twoFactorIncorrect" class="known-errors m-0">
-						{{ formatMessage(messages.twoFactorIncorrectError) }}
-					</p>
+						<p v-if="twoFactorIncorrect" class="known-errors m-0">
+							{{ formatMessage(messages.twoFactorIncorrectError) }}
+						</p>
+					</div>
 					<div class="flex justify-end gap-2.5">
 						<ButtonStyled>
 							<button @click="$refs.manageTwoFactorModal.hide()">
@@ -222,12 +222,13 @@
 						<p class="m-0">
 							<IntlFormatted :message-id="messages.twoFactorSetupScan">
 								<template #authy-link="{ children }">
-									<a href="https://authy.com/" target="_blank" rel="noreferrer">
+									<a class="underline" href="https://authy.com/" target="_blank" rel="noreferrer">
 										<component :is="() => children" />
 									</a>
 								</template>
 								<template #microsoft-authenticator-link="{ children }">
 									<a
+										class="underline"
 										href="https://www.microsoft.com/en-us/security/mobile-authenticator-app"
 										target="_blank"
 										rel="noreferrer"
@@ -252,25 +253,22 @@
 						</p>
 					</template>
 					<template v-if="twoFactorStep === 1">
-						<label for="verify-code">
+						<div class="flex flex-col gap-2.5">
 							<span class="text-md font-semibold text-contrast">{{
 								formatMessage(messages.twoFactorVerifyCodeLabel)
 							}}</span>
+							<TwoFactorAuthCodeInput
+								ref="twoFactorCodeInput"
+								v-model="twoFactorCode"
+								@keyup.enter="verifyTwoFactorCode()"
+							/>
 							<span class="label__description">{{
 								formatMessage(messages.twoFactorVerifyCodeDescription)
 							}}</span>
-						</label>
-						<StyledInput
-							id="verify-code"
-							v-model="twoFactorCode"
-							:maxlength="6"
-							autocomplete="one-time-code"
-							:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
-							@keyup.enter="verifyTwoFactorCode()"
-						/>
-						<p v-if="twoFactorIncorrect" class="known-errors m-0">
-							{{ formatMessage(messages.twoFactorIncorrectError) }}
-						</p>
+							<p v-if="twoFactorIncorrect" class="known-errors m-0">
+								{{ formatMessage(messages.twoFactorIncorrectError) }}
+							</p>
+						</div>
 					</template>
 					<template v-if="twoFactorStep === 2">
 						<p class="m-0">{{ formatMessage(messages.twoFactorBackupCodesIntro) }}</p>
@@ -478,6 +476,7 @@
 </template>
 
 <script setup>
+import { nextTick, watch } from 'vue'
 import {
 	CheckIcon,
 	DownloadIcon,
@@ -503,6 +502,7 @@ import {
 	NewModal,
 	StyledInput,
 	Table,
+	TwoFactorAuthCodeInput,
 	useVIntl,
 } from '@modrinth/ui'
 import KeyIcon from 'assets/icons/auth/key.svg'
@@ -878,9 +878,10 @@ const manageTwoFactorModal = ref()
 const twoFactorSecret = ref(null)
 const twoFactorFlow = ref(null)
 const twoFactorStep = ref(0)
+const twoFactorCodeInput = ref()
 async function showTwoFactorModal() {
 	twoFactorStep.value = 0
-	twoFactorCode.value = null
+	twoFactorCode.value = ''
 	twoFactorIncorrect.value = false
 	if (auth.value.user.has_totp) {
 		manageTwoFactorModal.value.show()
@@ -890,7 +891,6 @@ async function showTwoFactorModal() {
 	twoFactorSecret.value = null
 	twoFactorFlow.value = null
 	backupCodes.value = []
-	manageTwoFactorModal.value.show()
 
 	startLoading()
 	try {
@@ -908,11 +908,22 @@ async function showTwoFactorModal() {
 		})
 	}
 	stopLoading()
+	manageTwoFactorModal.value.show()
 }
 
 const twoFactorIncorrect = ref(false)
-const twoFactorCode = ref(null)
+const twoFactorCode = ref('')
 const backupCodes = ref([])
+
+watch(twoFactorStep, async (step) => {
+	if (step !== 1) {
+		return
+	}
+
+	await nextTick()
+	twoFactorCodeInput.value?.focus()
+})
+
 async function verifyTwoFactorCode() {
 	startLoading()
 	try {
