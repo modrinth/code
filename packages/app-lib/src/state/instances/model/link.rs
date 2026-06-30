@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use super::ContentSetSyncStatus;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum InstanceLink {
@@ -32,7 +34,38 @@ pub enum InstanceLink {
         version_number: Option<String>,
         filename: Option<String>,
     },
-    SharedInstance {
-        shared_instance_id: Uuid,
-    },
+    SharedInstance,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SharedInstanceRole {
+    Owner,
+    Member,
+}
+
+impl SharedInstanceRole {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Owner => "owner",
+            Self::Member => "member",
+        }
+    }
+
+    pub fn from_str(value: &str) -> crate::Result<Self> {
+        match value {
+            "owner" => Ok(Self::Owner),
+            "member" => Ok(Self::Member),
+            other => Err(super::unknown_value("shared instance role", other)),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SharedInstanceAttachment {
+    pub id: String,
+    pub role: SharedInstanceRole,
+    pub status: ContentSetSyncStatus,
+    pub applied_version: Option<i32>,
+    pub latest_version: Option<i32>,
 }

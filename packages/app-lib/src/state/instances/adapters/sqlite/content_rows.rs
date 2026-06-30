@@ -374,6 +374,56 @@ where
     rows.into_iter().map(TryInto::try_into).collect()
 }
 
+pub(crate) async fn upsert_content_set_remote_ref(
+    remote_ref: &ContentSetRemoteRef,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    let content_set_id = remote_ref.content_set_id.as_str();
+    let ref_type = remote_ref.ref_type.as_str();
+    let ref_id = remote_ref.ref_id.as_str();
+
+    sqlx::query!(
+        "
+		INSERT INTO instance_content_set_remote_refs (
+			content_set_id,
+			ref_type,
+			ref_id
+		)
+		VALUES (?, ?, ?)
+		ON CONFLICT (content_set_id, ref_type) DO UPDATE SET
+			ref_id = excluded.ref_id
+		",
+        content_set_id,
+        ref_type,
+        ref_id,
+    )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn delete_content_set_remote_ref(
+    content_set_id: &str,
+    ref_type: ContentSetRemoteRefType,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    let ref_type = ref_type.as_str();
+
+    sqlx::query!(
+        "
+		DELETE FROM instance_content_set_remote_refs
+		WHERE content_set_id = ? AND ref_type = ?
+		",
+        content_set_id,
+        ref_type,
+    )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
 pub(crate) async fn get_content_set_sync_state<'e, E>(
     content_set_id: &str,
     exec: E,
@@ -394,6 +444,66 @@ where
     .await?;
 
     row.map(TryInto::try_into).transpose()
+}
+
+pub(crate) async fn upsert_content_set_sync_state(
+    sync_state: &ContentSetSyncState,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    let content_set_id = sync_state.content_set_id.as_str();
+    let provider = sync_state.provider.as_str();
+    let applied_update_id = sync_state.applied_update_id.as_deref();
+    let latest_available_update_id =
+        sync_state.latest_available_update_id.as_deref();
+    let checked_at = sync_state.checked_at.map(|value| value.timestamp());
+    let status = sync_state.status.as_str();
+
+    sqlx::query!(
+        "
+		INSERT INTO instance_content_set_sync_state (
+			content_set_id,
+			provider,
+			applied_update_id,
+			latest_available_update_id,
+			checked_at,
+			status
+		)
+		VALUES (?, ?, ?, ?, ?, ?)
+		ON CONFLICT (content_set_id) DO UPDATE SET
+			provider = excluded.provider,
+			applied_update_id = excluded.applied_update_id,
+			latest_available_update_id = excluded.latest_available_update_id,
+			checked_at = excluded.checked_at,
+			status = excluded.status
+		",
+        content_set_id,
+        provider,
+        applied_update_id,
+        latest_available_update_id,
+        checked_at,
+        status,
+    )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn delete_content_set_sync_state(
+    content_set_id: &str,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    sqlx::query!(
+        "
+		DELETE FROM instance_content_set_sync_state
+		WHERE content_set_id = ?
+		",
+        content_set_id,
+    )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
 }
 
 pub(crate) async fn get_instance_files<'e, E>(

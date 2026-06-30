@@ -20,4 +20,8 @@ pub(crate) use self::commands::{
     get_linked_modpack_info, list_content, list_content_sets,
     list_linked_modpack_content, sync_content_files,
 };
+pub(crate) use self::commands::{
+    attach_shared_instance, mark_shared_instance_stale,
+    set_shared_instance_sync_status,
+};
 pub(crate) mod watcher;

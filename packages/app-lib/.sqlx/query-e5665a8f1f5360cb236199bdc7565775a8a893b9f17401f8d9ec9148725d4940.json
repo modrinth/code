@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            instance_id,\n            link_kind,\n            modrinth_project_id,\n            modrinth_version_id,\n            server_project_id,\n            content_project_id,\n            content_version_id,\n            hosting_server_id,\n            json(hosting_instance_ids) AS \"hosting_instance_ids?: String\",\n            hosting_active_instance_id,\n            shared_instance_id,\n            imported_name,\n            imported_version_number,\n            imported_filename\n        FROM instance_links\n        WHERE instance_id = ?\n        ",
+  "query": "\n        SELECT\n            instance_id,\n            link_kind,\n            modrinth_project_id,\n            modrinth_version_id,\n            server_project_id,\n            content_project_id,\n            content_version_id,\n            hosting_server_id,\n            json(hosting_instance_ids) AS \"hosting_instance_ids?: String\",\n            hosting_active_instance_id,\n            shared_instance_id,\n            shared_instance_role,\n            imported_name,\n            imported_version_number,\n            imported_filename\n        FROM instance_links\n        WHERE instance_id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -59,18 +59,23 @@
         "type_info": "Text"
       },
       {
-        "name": "imported_name",
+        "name": "shared_instance_role",
         "ordinal": 11,
         "type_info": "Text"
       },
       {
-        "name": "imported_version_number",
+        "name": "imported_name",
         "ordinal": 12,
         "type_info": "Text"
       },
       {
-        "name": "imported_filename",
+        "name": "imported_version_number",
         "ordinal": 13,
+        "type_info": "Text"
+      },
+      {
+        "name": "imported_filename",
+        "ordinal": 14,
         "type_info": "Text"
       }
     ],
@@ -91,8 +96,9 @@
       true,
       true,
       true,
+      true,
       true
     ]
   },
-  "hash": "26d23094e9d76e5595d5e5a0cd6bc631c45e6090bf40b26e25024de434fe0281"
+  "hash": "e5665a8f1f5360cb236199bdc7565775a8a893b9f17401f8d9ec9148725d4940"
 }

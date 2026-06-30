@@ -14,6 +14,7 @@ import type {
 	ContentFileProjectType,
 	GameInstance,
 	InstanceLoader,
+	SharedInstanceAttachment,
 } from './types'
 
 export async function remove(instanceId: string): Promise<void> {
@@ -330,4 +331,34 @@ export async function edit(instanceId: string, editInstance: Partial<GameInstanc
 // Edits an instance's icon
 export async function edit_icon(instanceId: string, iconPath: string | null): Promise<void> {
 	return await invoke('plugin:instance|instance_edit_icon', { instanceId, iconPath })
+}
+
+export type SharedInstanceUsers = {
+	user_ids: string[]
+}
+
+export async function get_shared_instance_users(
+	instanceId: string,
+): Promise<SharedInstanceUsers> {
+	return await invoke('plugin:instance|instance_share_get_users', { instanceId })
+}
+
+export async function invite_shared_instance_users(
+	instanceId: string,
+	userIds: string[],
+): Promise<SharedInstanceUsers> {
+	return await invoke('plugin:instance|instance_share_invite_users', { instanceId, userIds })
+}
+
+export async function remove_shared_instance_users(
+	instanceId: string,
+	userIds: string[],
+): Promise<SharedInstanceUsers> {
+	return await invoke('plugin:instance|instance_share_remove_users', { instanceId, userIds })
+}
+
+export async function publish_shared_instance(
+	instanceId: string,
+): Promise<SharedInstanceAttachment> {
+	return await invoke('plugin:instance|instance_share_publish', { instanceId })
 }

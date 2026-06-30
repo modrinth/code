@@ -138,7 +138,25 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 };
                                 if let Some(event) = event {
                                     let emit_instance_id = instance_id.clone();
+                                    let mark_shared_stale = matches!(
+                                        &event,
+                                        InstancePayloadType::Synced
+                                    );
                                     tokio::spawn(async move {
+                                        if mark_shared_stale
+                                            && let Ok(state) =
+                                                State::get().await
+                                            && let Err(error) =
+                                                super::commands::mark_shared_instance_stale(
+                                                    &emit_instance_id,
+                                                    &state.pool,
+                                                )
+                                                .await
+                                        {
+                                            tracing::error!(
+                                                "Failed to mark shared instance stale after filesystem sync: {error}"
+                                            );
+                                        }
                                         let _ = emit_instance(
                                             &emit_instance_id,
                                             event,

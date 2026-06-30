@@ -17,6 +17,7 @@ export type GameInstance = {
 	groups: string[]
 
 	link?: InstanceLink | null
+	shared_instance?: SharedInstanceAttachment | null
 	update_channel: ReleaseChannel
 
 	created: Date
@@ -86,9 +87,16 @@ export type InstanceLink = InstanceLinkIdentity &
 		  }
 		| {
 				type: 'shared_instance'
-				shared_instance_id: string
 		  }
 	)
+
+export type SharedInstanceAttachment = {
+	id: string
+	role: 'owner' | 'member'
+	status: 'unknown' | 'up_to_date' | 'update_available' | 'applying' | 'stale' | 'not_ready' | 'error'
+	applied_version?: number | null
+	latest_version?: number | null
+}
 
 export type Instance = GameInstance
 

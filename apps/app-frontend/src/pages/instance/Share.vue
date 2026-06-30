@@ -243,6 +243,12 @@ import {
 	getFriendUserId,
 	upsertCachedFriend,
 } from '@/helpers/friends.ts'
+import { get_user_many } from '@/helpers/cache.js'
+import {
+	get_shared_instance_users,
+	invite_shared_instance_users,
+	remove_shared_instance_users,
+} from '@/helpers/instance'
 import { get as getCredentials } from '@/helpers/mr_auth.ts'
 import type { GameInstance } from '@/helpers/types'
 import { search_user } from '@/helpers/users.ts'
@@ -274,7 +280,7 @@ const sortColumn = ref<string | undefined>('joined')
 const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 
-const rows = ref<ShareRow[]>([])
+const pendingRows = ref<Record<string, ShareRow>>({})
 
 const messages = defineMessages({
 	signInToShareHeading: {
@@ -318,6 +324,7 @@ const inviteModalHeader = computed(() =>
 )
 const shareRoutePath = computed(() => `/instance/${encodeURIComponent(props.instance.id)}/share`)
 const friendsKey = computed(() => friendsQueryKey(currentUserId.value))
+const sharedUsersKey = computed(() => ['sharedInstanceUsers', props.instance.id] as const)
 const friendsQuery = useQuery({
 	queryKey: friendsKey,
 	queryFn: async () => getFriendsWithUserData(await getCredentials()),
@@ -325,6 +332,21 @@ const friendsQuery = useQuery({
 	staleTime: 30_000,
 })
 const userFriends = computed(() => friendsQuery.data.value ?? [])
+const sharedUsersQuery = useQuery({
+	queryKey: sharedUsersKey,
+	queryFn: loadSharedRows,
+	enabled: () => isSignedIn.value && !!props.instance.id,
+	staleTime: Infinity,
+})
+const sharedRows = computed(() => sharedUsersQuery.data.value ?? [])
+const rows = computed(() => {
+	const sharedKeys = new Set(sharedRows.value.map((row) => normalizeInviteKey(row.id)))
+	const pending = Object.values(pendingRows.value).filter(
+		(row) => !sharedKeys.has(normalizeInviteKey(row.id)),
+	)
+
+	return [...pending, ...sharedRows.value]
+})
 
 const methodLabels: Record<ShareMethod, string> = {
 	direct: 'Direct invite',
@@ -524,6 +546,11 @@ type FriendsMutationContext = {
 	previousFriends?: FriendWithUserData[]
 }
 
+type SharedRowsMutationContext = {
+	queryKey: typeof sharedUsersKey.value
+	previousRows?: ShareRow[]
+}
+
 const addFriendMutation = useMutation({
 	mutationFn: (user: InvitePlayersUser) => add_friend(user.id),
 	onMutate: async (user): Promise<FriendsMutationContext> => {
@@ -550,11 +577,77 @@ const addFriendMutation = useMutation({
 	},
 })
 
+const inviteShareMutation = useMutation({
+	mutationFn: async (user: InvitePlayersUser) => {
+		await invite_shared_instance_users(props.instance.id, [user.id])
+	},
+	onMutate: async (user): Promise<SharedRowsMutationContext> => {
+		const queryKey = sharedUsersKey.value
+		await queryClient.cancelQueries({ queryKey })
+		const previousRows = queryClient.getQueryData<ShareRow[]>(queryKey)
+		setPendingRow(user)
+
+		return { queryKey, previousRows }
+	},
+	onError: (error, user, context) => {
+		removePendingRow(user.id)
+		restoreSharedRowsQuery(context)
+		handleError(toError(error))
+	},
+	onSuccess: (_data, user) => {
+		upsertSharedRow(inviteUserToShareRow(user))
+		removePendingRow(user.id)
+	},
+})
+
+const removeShareMutation = useMutation({
+	mutationFn: async (id: string) => {
+		await remove_shared_instance_users(props.instance.id, [id])
+	},
+	onMutate: async (id): Promise<SharedRowsMutationContext> => {
+		const queryKey = sharedUsersKey.value
+		await queryClient.cancelQueries({ queryKey })
+		const previousRows = queryClient.getQueryData<ShareRow[]>(queryKey)
+		queryClient.setQueryData<ShareRow[]>(queryKey, (rows = []) =>
+			rows.filter((row) => normalizeInviteKey(row.id) !== normalizeInviteKey(id)),
+		)
+
+		return { queryKey, previousRows }
+	},
+	onError: (error, _id, context) => {
+		restoreSharedRowsQuery(context)
+		handleError(toError(error))
+	},
+})
+
+async function loadSharedRows(): Promise<ShareRow[]> {
+	const users = await get_shared_instance_users(props.instance.id)
+	if (users.user_ids.length === 0) return []
+
+	const profiles = (await get_user_many(users.user_ids)) as Array<{
+		id: string
+		username?: string
+		avatar_url?: string | null
+	}>
+
+	return users.user_ids.map((id) => {
+		const profile = profiles.find((user) => user.id === id)
+
+		return {
+			id,
+			username: profile?.username ?? id,
+			avatarUrl: profile?.avatar_url ?? undefined,
+			lastPlayedAt: null,
+			joinedAt: null,
+			method: 'direct',
+		} satisfies ShareRow
+	})
+}
+
 function invitePlayer(payload: InvitePlayersInvitePayload) {
 	const user = payload.user
 	if (payload.source === 'search') {
 		addPendingFriend(user)
-		return
 	}
 
 	inviteShareUser(user)
@@ -563,32 +656,10 @@ function invitePlayer(payload: InvitePlayersInvitePayload) {
 function inviteShareUser(user: InvitePlayersUser) {
 	const existingRow = findInviteRow(user.id, user.username)
 	if (existingRow) {
-		if (existingRow.pending) return
-
-		rows.value = rows.value.map((row) =>
-			row.id === existingRow.id
-				? {
-						...row,
-						pending: true,
-						method: 'direct',
-					}
-				: row,
-		)
 		return
 	}
 
-	rows.value = [
-		{
-			id: user.id,
-			username: user.username,
-			avatarUrl: user.avatarUrl,
-			lastPlayedAt: null,
-			joinedAt: null,
-			method: 'direct',
-			pending: true,
-		},
-		...rows.value,
-	]
+	inviteShareMutation.mutate(user)
 }
 
 function addPendingFriend(user: InvitePlayersUser) {
@@ -605,7 +676,54 @@ function cancelInvite(user: InvitePlayersUser) {
 }
 
 function removeRow(id: string) {
-	rows.value = rows.value.filter((row) => row.id !== id)
+	if (pendingRows.value[id]) {
+		removePendingRow(id)
+		return
+	}
+
+	removeShareMutation.mutate(id)
+}
+
+function setPendingRow(user: InvitePlayersUser) {
+	pendingRows.value = {
+		...pendingRows.value,
+		[user.id]: {
+			id: user.id,
+			username: user.username,
+			avatarUrl: user.avatarUrl,
+			lastPlayedAt: null,
+			joinedAt: null,
+			method: 'direct',
+			pending: true,
+		},
+	}
+}
+
+function removePendingRow(id: string) {
+	const { [id]: _removed, ...rest } = pendingRows.value
+	pendingRows.value = rest
+}
+
+function inviteUserToShareRow(user: InvitePlayersUser): ShareRow {
+	return {
+		id: user.id,
+		username: user.username,
+		avatarUrl: user.avatarUrl ?? undefined,
+		lastPlayedAt: null,
+		joinedAt: null,
+		method: 'direct',
+	}
+}
+
+function upsertSharedRow(row: ShareRow) {
+	queryClient.setQueryData<ShareRow[]>(sharedUsersKey.value, (rows = []) => {
+		const normalizedId = normalizeInviteKey(row.id)
+		const withoutExisting = rows.filter(
+			(existing) => normalizeInviteKey(existing.id) !== normalizedId,
+		)
+
+		return [row, ...withoutExisting]
+	})
 }
 
 function restoreFriendsQuery(context?: FriendsMutationContext) {
@@ -617,6 +735,17 @@ function restoreFriendsQuery(context?: FriendsMutationContext) {
 	}
 
 	queryClient.setQueryData(context.queryKey, context.previousFriends)
+}
+
+function restoreSharedRowsQuery(context?: SharedRowsMutationContext) {
+	if (!context) return
+
+	if (context.previousRows === undefined) {
+		queryClient.removeQueries({ queryKey: context.queryKey, exact: true })
+		return
+	}
+
+	queryClient.setQueryData(context.queryKey, context.previousRows)
 }
 
 function userProfileLink(username: string) {
@@ -673,7 +802,15 @@ function normalizeInviteKey(value: string) {
 }
 
 function toError(error: unknown) {
-	return error instanceof Error ? error : new Error(String(error))
+	if (error instanceof Error) return error
+	if (typeof error === 'string') return new Error(error)
+	if (error && typeof error === 'object') {
+		const record = error as Record<string, unknown>
+		const message = record.message ?? record.error
+		if (typeof message === 'string') return new Error(message)
+		return new Error(JSON.stringify(error))
+	}
+	return new Error(String(error))
 }
 
 const unlistenFriends = await friend_listener(() => {

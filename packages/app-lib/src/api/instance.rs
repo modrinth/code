@@ -8,6 +8,7 @@ mod lifecycle;
 mod paths;
 mod projects;
 mod run;
+mod shared;
 
 pub use self::content::{
     get_content_items, get_dependencies_as_content_items,
@@ -32,4 +33,9 @@ pub use self::projects::{
 };
 pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,
+};
+pub use self::shared::{
+    SharedInstanceUsers, get_shared_instance_users,
+    invite_shared_instance_users, publish_shared_instance,
+    remove_shared_instance_users,
 };
