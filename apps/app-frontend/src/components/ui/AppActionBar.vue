@@ -14,28 +14,7 @@
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
 		</div>
-		<ButtonStyled color="brand" type="outlined" hover-color-fill="background">
-			<button
-				v-if="showUpdatePill"
-				type="button"
-				class="!h-[34px] text-sm !transition-[opacity,transform,background-color,color,filter] !duration-200 ease-out"
-				:class="{
-					'opacity-0 scale-[0.96]': finishedDownloading && !animateReadyPill,
-					'opacity-100 scale-100': finishedDownloading && animateReadyPill,
-				}"
-				:disabled="isUpdateDownloading"
-				:aria-busy="isUpdateDownloading"
-				@click="handleUpdateClick"
-			>
-				<RefreshCwIcon v-if="finishedDownloading" :class="{ 'animate-spin': restarting }" />
-				<DownloadIcon v-else />
-				<span v-if="isUpdateDownloading">
-					{{ formatMessage(messages.downloadingUpdate) }}
-					<span class="inline-block w-[3ch] text-right tabular-nums">{{ downloadPercent }}%</span>
-				</span>
-				<span v-else>{{ updateLabel }}</span>
-			</button>
-		</ButtonStyled>
+		<AppUpdateButton />
 		<div
 			class="flex border-solid border-surface-5 text-sm items-center gap-2 py-1.5 px-3 rounded-xl border"
 		>
@@ -141,7 +120,6 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	OnlineIndicatorIcon,
-	RefreshCwIcon,
 	StarIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
@@ -158,9 +136,10 @@ import {
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { Dropdown } from 'floating-vue'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
 import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
 import { trackEvent } from '@/helpers/analytics'
 import { loading_listener, process_listener } from '@/helpers/events'
@@ -169,11 +148,6 @@ import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/p
 import type { LoadingBar } from '@/helpers/state'
 import { progress_bars_list } from '@/helpers/state'
 import type { GameInstance } from '@/helpers/types'
-import {
-	appUpdateState,
-	downloadAvailableAppUpdate,
-	installAvailableAppUpdate,
-} from '@/providers/app-update'
 
 const { handleError } = injectNotificationManager()
 const popupNotificationManager = injectPopupNotificationManager()
@@ -238,84 +212,7 @@ const messages = defineMessages({
 		id: 'app.action-bar.view-active-downloads',
 		defaultMessage: 'View active downloads',
 	},
-	update: {
-		id: 'app.action-bar.update',
-		defaultMessage: 'Update',
-	},
-	downloadingUpdate: {
-		id: 'app.action-bar.downloading-update',
-		defaultMessage: 'Downloading update',
-	},
-	reloadToUpdate: {
-		id: 'app.action-bar.reload-to-update',
-		defaultMessage: 'Reload to update',
-	},
 })
-
-const {
-	downloading,
-	downloadPercent,
-	downloadProgress,
-	finishedDownloading,
-	isVisible: isUpdateVisible,
-	metered,
-	restarting,
-} = appUpdateState
-
-const isUpdateDownloading = computed(
-	() =>
-		downloading.value ||
-		(downloadProgress.value > 0 && downloadProgress.value < 1 && !finishedDownloading.value),
-)
-const showUpdatePill = computed(
-	() => isUpdateVisible.value && (finishedDownloading.value || metered.value),
-)
-const animateReadyPill = ref(false)
-const updateLabel = computed(() => {
-	if (isUpdateDownloading.value) {
-		return formatMessage(messages.downloadingUpdate)
-	}
-
-	if (finishedDownloading.value) {
-		return formatMessage(messages.reloadToUpdate)
-	}
-
-	return formatMessage(messages.update)
-})
-let readyPillAnimationFrame: number | null = null
-watch([showUpdatePill, finishedDownloading], async ([show, ready], [wasShown, wasReady]) => {
-	if (readyPillAnimationFrame !== null) {
-		cancelAnimationFrame(readyPillAnimationFrame)
-		readyPillAnimationFrame = null
-	}
-
-	if (!show || !ready) {
-		animateReadyPill.value = false
-		return
-	}
-
-	if (wasShown && wasReady) {
-		return
-	}
-
-	animateReadyPill.value = false
-	await nextTick()
-	readyPillAnimationFrame = requestAnimationFrame(() => {
-		animateReadyPill.value = true
-		readyPillAnimationFrame = null
-	})
-})
-async function handleUpdateClick() {
-	if (isUpdateDownloading.value) {
-		return
-	}
-
-	if (finishedDownloading.value) {
-		await installAvailableAppUpdate()
-	} else {
-		await downloadAvailableAppUpdate()
-	}
-}
 
 const currentProcesses = ref<RunningProcess[]>([])
 const selectedProcess = ref<RunningProcess | undefined>()
@@ -605,8 +502,5 @@ onBeforeUnmount(() => {
 	unlistenProcess()
 	unlistenLoading()
 	installJobNotifications.dispose()
-	if (readyPillAnimationFrame !== null) {
-		cancelAnimationFrame(readyPillAnimationFrame)
-	}
 })
 </script>
