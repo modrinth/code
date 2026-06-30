@@ -1,6 +1,6 @@
 import type { RouteLocationRaw } from 'vue-router'
 
-export type InvitePlayersUserStatus = 'available' | 'pending' | 'added'
+export type InvitePlayersUserStatus = 'available' | 'requested' | 'pending' | 'added'
 export type InvitePlayersUserProfileLink =
 	| RouteLocationRaw
 	| (() => void | Promise<void>)

@@ -1,11 +1,13 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<GrantAccessModal
-			ref="grantAccessModal"
-			:members="accessMembers"
-			:friend-ids="[]"
+		<InvitePlayersModal
+			ref="invitePlayersModal"
+			:header="inviteModalHeader"
+			:friends="inviteFriends"
 			:search-users="searchInviteUsers"
-			@grant="grantAccess"
+			:user-profile-link="userProfileLink"
+			@invite="invitePlayer"
+			@cancel="cancelInvite"
 		/>
 
 		<template v-if="rows.length > 0">
@@ -22,10 +24,10 @@
 					<ButtonStyled color="brand">
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
-							@click="grantAccessModal?.show($event)"
+							@click="invitePlayersModal?.show($event)"
 						>
 							<UserPlusIcon aria-hidden="true" />
-							Invite friends
+							{{ formatMessage(messages.inviteFriendsButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -79,8 +81,8 @@
 				<template #cell-username="{ row }">
 					<div class="flex min-w-0 max-w-full items-center gap-2">
 						<AutoLink
-							:to="userProfileLink(row.username)"
 							v-tooltip="truncatedTooltip(usernameRefs[row.id], row.username)"
+							:to="userProfileLink(row.username)"
 							class="inline-flex max-w-full min-w-0 items-center gap-2 text-primary hover:underline"
 						>
 							<Avatar
@@ -122,7 +124,11 @@
 
 				<template #cell-method="{ row }">
 					<span class="inline-flex min-w-0 items-center gap-2">
-						<UserPlusIcon v-if="row.method === 'direct'" class="size-5 shrink-0" aria-hidden="true" />
+						<UserPlusIcon
+							v-if="row.method === 'direct'"
+							class="size-5 shrink-0"
+							aria-hidden="true"
+						/>
 						<LinkIcon v-else class="size-5 shrink-0" aria-hidden="true" />
 						<span class="min-w-0 truncate">{{ compactMethodLabels[row.method] }}</span>
 					</span>
@@ -163,14 +169,27 @@
 			</Table>
 		</template>
 
-		<EmptyState v-else type="empty-inbox">
-			<template #heading>No friends invited</template>
-			<template #description>You can share an instance with your friends!</template>
+		<EmptyState v-else-if="!isSignedIn" type="empty-inbox">
+			<template #heading>{{ formatMessage(messages.signInToShareHeading) }}</template>
+			<template #description>{{ formatMessage(messages.signInToShareDescription) }}</template>
 			<template #actions>
 				<ButtonStyled color="brand">
-					<button class="!h-10" @click="grantAccessModal?.show($event)">
+					<button class="!h-10" @click="signInToShare">
+						<LogInIcon aria-hidden="true" />
+						{{ formatMessage(messages.signInButton) }}
+					</button>
+				</ButtonStyled>
+			</template>
+		</EmptyState>
+
+		<EmptyState v-else type="empty-inbox">
+			<template #heading>{{ formatMessage(messages.noFriendsInvitedHeading) }}</template>
+			<template #description>{{ formatMessage(messages.noFriendsInvitedDescription) }}</template>
+			<template #actions>
+				<ButtonStyled color="brand">
+					<button class="!h-10" @click="invitePlayersModal?.show($event)">
 						<UserPlusIcon aria-hidden="true" />
-						Invite friends
+						{{ formatMessage(messages.inviteFriendsButton) }}
 					</button>
 				</ButtonStyled>
 			</template>
@@ -182,6 +201,7 @@
 import {
 	FilterIcon,
 	LinkIcon,
+	LogInIcon,
 	MoreVerticalIcon,
 	SearchIcon,
 	UserPlusIcon,
@@ -191,24 +211,41 @@ import {
 	AutoLink,
 	Avatar,
 	ButtonStyled,
+	defineMessages,
 	EmptyState,
-	GrantAccessModal,
-	type GrantServerAccessPayload,
+	injectAuth,
+	injectNotificationManager,
+	type InvitePlayersInvitePayload,
+	InvitePlayersModal,
+	type InvitePlayersSearchUser,
+	type InvitePlayersUser,
 	OverflowMenu,
+	type SortDirection,
 	StyledInput,
 	Table,
-	type SortDirection,
 	type TableColumn,
-	type ServerAccessInviteSuggestion,
-	type ServerAccessMember,
 	truncatedTooltip,
 	useFormatDateTime,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 
-import { search_user } from '@/helpers/users.js'
+import { friend_listener } from '@/helpers/events.js'
+import {
+	add_friend,
+	createPendingFriend,
+	friendsQueryKey,
+	type FriendWithUserData,
+	getFriendsWithUserData,
+	getFriendUserId,
+	upsertCachedFriend,
+} from '@/helpers/friends.ts'
+import { get as getCredentials } from '@/helpers/mr_auth.ts'
+import type { GameInstance } from '@/helpers/types'
+import { search_user } from '@/helpers/users.ts'
 
 type ShareMethod = 'direct' | 'link'
 type MethodFilter = ShareMethod | 'all'
@@ -224,65 +261,70 @@ type ShareRow = {
 	pending?: boolean
 }
 
-const HOUR_MS = 60 * 60 * 1000
-const DAY_MS = 24 * HOUR_MS
-const now = Date.now()
+const props = defineProps<{
+	instance: GameInstance
+}>()
 
-const grantAccessModal = ref<InstanceType<typeof GrantAccessModal> | null>(null)
+const auth = injectAuth()
+const { handleError } = injectNotificationManager()
+const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
 const memberSearch = ref('')
 const methodFilter = ref<MethodFilter>('all')
 const sortColumn = ref<string | undefined>('joined')
 const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 
-const rows = ref<ShareRow[]>([
-	{
-		id: 'coolbot',
-		username: 'Coolbot',
-		lastPlayedAt: null,
-		joinedAt: null,
-		method: 'direct',
-		pending: true,
-	},
-	{
-		id: 'geometrically',
-		username: 'Geometrically',
-		lastPlayedAt: new Date(now - 50 * 60 * 1000),
-		joinedAt: new Date(now - 2 * HOUR_MS),
-		method: 'link',
-	},
-	{
-		id: 'josh',
-		username: 'Josh',
-		lastPlayedAt: new Date(now - 1 * HOUR_MS),
-		joinedAt: new Date(now - 3 * HOUR_MS),
-		method: 'link',
-	},
-	{
-		id: 'boris',
-		username: 'Boris',
-		lastPlayedAt: new Date(now - 4 * DAY_MS),
-		joinedAt: new Date(now - 7 * DAY_MS),
-		method: 'direct',
-	},
-	{
-		id: 'prospector',
-		username: 'Prospector',
-		lastPlayedAt: new Date(now - 4 * DAY_MS),
-		joinedAt: new Date(now - 30 * DAY_MS),
-		method: 'direct',
-	},
-	{
-		id: 'imb',
-		username: 'IMB',
-		lastPlayedAt: new Date(now - 14 * DAY_MS),
-		joinedAt: new Date(now - 90 * DAY_MS),
-		method: 'direct',
-	},
-])
+const rows = ref<ShareRow[]>([])
 
+const messages = defineMessages({
+	signInToShareHeading: {
+		id: 'app.instance.share.sign-in.heading',
+		defaultMessage: 'Sign in to share',
+	},
+	signInToShareDescription: {
+		id: 'app.instance.share.sign-in.description',
+		defaultMessage: 'You need a Modrinth account to share instances.',
+	},
+	signInButton: {
+		id: 'app.instance.share.sign-in.button',
+		defaultMessage: 'Sign in',
+	},
+	noFriendsInvitedHeading: {
+		id: 'app.instance.share.empty.heading',
+		defaultMessage: 'No friends invited',
+	},
+	noFriendsInvitedDescription: {
+		id: 'app.instance.share.empty.description',
+		defaultMessage: 'You can share this instance with your friends!',
+	},
+	inviteFriendsButton: {
+		id: 'app.instance.share.empty.invite-friends-button',
+		defaultMessage: 'Invite friends',
+	},
+	shareModalHeader: {
+		id: 'app.instance.share.invite-modal.heading',
+		defaultMessage: 'Share {name}',
+	},
+})
+
+const { formatMessage } = useVIntl()
 const formatCompactRelativeTime = useRelativeTime({ style: 'narrow' })
 const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+const queryClient = useQueryClient()
+const currentUserId = computed(() => auth.user.value?.id ?? null)
+const isSignedIn = computed(() => !!auth.session_token.value)
+const inviteModalHeader = computed(() =>
+	formatMessage(messages.shareModalHeader, { name: props.instance.name }),
+)
+const shareRoutePath = computed(() => `/instance/${encodeURIComponent(props.instance.id)}/share`)
+const friendsKey = computed(() => friendsQueryKey(currentUserId.value))
+const friendsQuery = useQuery({
+	queryKey: friendsKey,
+	queryFn: async () => getFriendsWithUserData(await getCredentials()),
+	enabled: () => isSignedIn.value && !!currentUserId.value,
+	staleTime: 30_000,
+})
+const userFriends = computed(() => friendsQuery.data.value ?? [])
 
 const methodLabels: Record<ShareMethod, string> = {
 	direct: 'Direct invite',
@@ -342,19 +384,52 @@ const methodFilterOptions = computed<Array<{ id: ShareMethod; label: string }>>(
 	{ id: 'link', label: methodLabels.link },
 ])
 
-const accessMembers = computed<ServerAccessMember[]>(() =>
-	rows.value.map((row) => ({
-		id: row.id,
-		user: {
-			id: row.id,
-			username: row.username,
-			avatarUrl: row.avatarUrl,
-		},
-		role: 'viewer',
-		joinedAt: row.joinedAt?.toISOString() ?? null,
-		pending: row.pending,
-	})),
+const invitedRows = computed(() => {
+	const invited = new Map<string, ShareRow>()
+
+	for (const row of rows.value) {
+		invited.set(normalizeInviteKey(row.id), row)
+		invited.set(normalizeInviteKey(row.username), row)
+	}
+
+	return invited
+})
+
+const inviteFriends = computed<InvitePlayersUser[]>(() =>
+	userFriends.value
+		.filter((friend) => friend.username)
+		.map((friend) => {
+			const id = getFriendUserId(friend, currentUserId.value)
+			const invitedRow =
+				invitedRows.value.get(normalizeInviteKey(id)) ??
+				invitedRows.value.get(normalizeInviteKey(friend.username))
+
+			return {
+				id,
+				username: friend.username,
+				avatarUrl: friend.avatar,
+				online: friend.online,
+				status: friend.accepted
+					? invitedRow
+						? invitedRow.pending
+							? 'pending'
+							: 'added'
+						: 'available'
+					: 'requested',
+			} satisfies InvitePlayersUser
+		}),
 )
+
+const inviteFriendKeys = computed(() => {
+	const keys = new Set<string>()
+
+	for (const friend of inviteFriends.value) {
+		keys.add(normalizeInviteKey(friend.id))
+		keys.add(normalizeInviteKey(friend.username))
+	}
+
+	return keys
+})
 
 const filteredRows = computed(() => {
 	const normalizedSearch = memberSearch.value.trim().toLowerCase()
@@ -369,8 +444,7 @@ const filteredRows = computed(() => {
 			formattedJoined(row),
 			methodLabels[row.method],
 			compactMethodLabels[row.method],
-		]
-			.some((value) => value.toLowerCase().includes(normalizedSearch))
+		].some((value) => value.toLowerCase().includes(normalizedSearch))
 	})
 })
 
@@ -398,7 +472,9 @@ function compareJoined(a: ShareRow, b: ShareRow, direction: SortDirection) {
 }
 
 function joinedSortValue(row: ShareRow) {
-	return row.pending ? Number.MAX_SAFE_INTEGER : row.joinedAt?.getTime() ?? Number.NEGATIVE_INFINITY
+	return row.pending
+		? Number.MAX_SAFE_INTEGER
+		: (row.joinedAt?.getTime() ?? Number.NEGATIVE_INFINITY)
 }
 
 function compareDate(a: Date | null, b: Date | null, direction: SortDirection) {
@@ -426,24 +502,80 @@ function toggleMethodFilter(filter: ShareMethod) {
 	methodFilter.value = methodFilter.value === filter ? 'all' : filter
 }
 
-async function searchInviteUsers(query: string): Promise<ServerAccessInviteSuggestion[]> {
+async function searchInviteUsers(query: string): Promise<InvitePlayersSearchUser[]> {
 	const users = await search_user(query)
 
-	return users.map((user) => ({
-		id: user.id,
-		username: user.username,
-		avatarUrl: user.avatar_url || undefined,
-	}))
+	return users
+		.filter((user) => user.id !== currentUserId.value)
+		.filter(
+			(user) =>
+				!inviteFriendKeys.value.has(normalizeInviteKey(user.id)) &&
+				!inviteFriendKeys.value.has(normalizeInviteKey(user.username)),
+		)
+		.map((user) => ({
+			id: user.id,
+			username: user.username,
+			avatarUrl: user.avatar_url || undefined,
+		}))
 }
 
-function grantAccess(payload: GrantServerAccessPayload) {
+type FriendsMutationContext = {
+	queryKey: ReturnType<typeof friendsQueryKey>
+	previousFriends?: FriendWithUserData[]
+}
+
+const addFriendMutation = useMutation({
+	mutationFn: (user: InvitePlayersUser) => add_friend(user.id),
+	onMutate: async (user): Promise<FriendsMutationContext> => {
+		const queryKey = friendsKey.value
+		await queryClient.cancelQueries({ queryKey })
+		const previousFriends = queryClient.getQueryData<FriendWithUserData[]>(queryKey)
+
+		queryClient.setQueryData<FriendWithUserData[]>(queryKey, (friends = []) =>
+			upsertCachedFriend(
+				friends,
+				createPendingFriend(user, currentUserId.value),
+				currentUserId.value,
+			),
+		)
+
+		return { queryKey, previousFriends }
+	},
+	onError: (error, _user, context) => {
+		restoreFriendsQuery(context)
+		handleError(toError(error))
+	},
+	onSettled: (_data, _error, _user, context) => {
+		void queryClient.invalidateQueries({ queryKey: context?.queryKey ?? friendsKey.value })
+	},
+})
+
+function invitePlayer(payload: InvitePlayersInvitePayload) {
 	const user = payload.user
-	const existingRow = rows.value.find(
-		(row) =>
-			row.id.toLowerCase() === user.id.toLowerCase() ||
-			row.username.toLowerCase() === user.username.toLowerCase(),
-	)
-	if (existingRow) return
+	if (payload.source === 'search') {
+		addPendingFriend(user)
+		return
+	}
+
+	inviteShareUser(user)
+}
+
+function inviteShareUser(user: InvitePlayersUser) {
+	const existingRow = findInviteRow(user.id, user.username)
+	if (existingRow) {
+		if (existingRow.pending) return
+
+		rows.value = rows.value.map((row) =>
+			row.id === existingRow.id
+				? {
+						...row,
+						pending: true,
+						method: 'direct',
+					}
+				: row,
+		)
+		return
+	}
 
 	rows.value = [
 		{
@@ -459,13 +591,41 @@ function grantAccess(payload: GrantServerAccessPayload) {
 	]
 }
 
+function addPendingFriend(user: InvitePlayersUser) {
+	if (findInviteFriend(user.id, user.username)) return
+
+	addFriendMutation.mutate(user)
+}
+
+function cancelInvite(user: InvitePlayersUser) {
+	const existingRow = findInviteRow(user.id, user.username)
+	if (existingRow) {
+		removeRow(existingRow.id)
+	}
+}
+
 function removeRow(id: string) {
 	rows.value = rows.value.filter((row) => row.id !== id)
+}
+
+function restoreFriendsQuery(context?: FriendsMutationContext) {
+	if (!context) return
+
+	if (context.previousFriends === undefined) {
+		queryClient.removeQueries({ queryKey: context.queryKey, exact: true })
+		return
+	}
+
+	queryClient.setQueryData(context.queryKey, context.previousFriends)
 }
 
 function userProfileLink(username: string) {
 	if (!username || username.includes('@')) return undefined
 	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
+}
+
+function signInToShare() {
+	void auth.requestSignIn(shareRoutePath.value)
 }
 
 function setUsernameRef(id: string, element: Element | null) {
@@ -485,4 +645,41 @@ function formattedLastPlayed(row: ShareRow) {
 function formattedJoined(row: ShareRow) {
 	return row.pending ? 'Pending' : row.joinedAt ? formatCompactRelativeTime(row.joinedAt) : ''
 }
+
+function findInviteRow(id: string, username: string) {
+	const normalizedId = normalizeInviteKey(id)
+	const normalizedUsername = normalizeInviteKey(username)
+
+	return rows.value.find(
+		(row) =>
+			normalizeInviteKey(row.id) === normalizedId ||
+			normalizeInviteKey(row.username) === normalizedUsername,
+	)
+}
+
+function findInviteFriend(id: string, username: string) {
+	const normalizedId = normalizeInviteKey(id)
+	const normalizedUsername = normalizeInviteKey(username)
+
+	return inviteFriends.value.find(
+		(friend) =>
+			normalizeInviteKey(friend.id) === normalizedId ||
+			normalizeInviteKey(friend.username) === normalizedUsername,
+	)
+}
+
+function normalizeInviteKey(value: string) {
+	return value.trim().toLowerCase()
+}
+
+function toError(error: unknown) {
+	return error instanceof Error ? error : new Error(String(error))
+}
+
+const unlistenFriends = await friend_listener(() => {
+	void queryClient.invalidateQueries({ queryKey: friendsKey.value })
+})
+onUnmounted(() => {
+	unlistenFriends()
+})
 </script>

@@ -4973,6 +4973,60 @@
   "settings.sessions.title": {
     "defaultMessage": "Sessions"
   },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Add"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Added"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "This user has already been invited."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Your friends - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Invite"
+  },
+  "sharing.invite-players-modal.invite-link-description": {
+    "defaultMessage": "This link invites your friends as players and automatically shares all required files!"
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Or use an invite link"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "The invite link has been copied to your clipboard."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Link copied"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Failed to copy link"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "No friends found."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "No matching users found."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Request sent"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} needs to accept your friend request first"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Enter Modrinth username"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Searching..."
+  },
   "tag.category.128x": {
     "defaultMessage": "128x"
   },

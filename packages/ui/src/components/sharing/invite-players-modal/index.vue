@@ -56,7 +56,7 @@
 					<ButtonStyled color="brand">
 						<button
 							v-tooltip="searchInviteTooltip"
-							class="!h-10 shrink-0 !rounded-[14px] !px-4"
+							class="shrink-0"
 							:disabled="!canInviteSearchTarget"
 							@click="inviteSearchTarget"
 						>
@@ -71,7 +71,10 @@
 				<div class="mb-2 text-base font-semibold text-primary">
 					{{ friendsHeading }}
 				</div>
-				<div v-if="friends.length === 0" class="flex min-h-32 items-center justify-center text-secondary">
+				<div
+					v-if="friends.length === 0"
+					class="flex min-h-32 items-center justify-center text-secondary"
+				>
 					{{ emptyFriendsLabel }}
 				</div>
 				<div v-else class="-mx-6 flex flex-col">
@@ -83,6 +86,8 @@
 						:added-label="addedButtonLabel"
 						:cancel-label="cancelButtonLabel"
 						:invite-label="inviteButtonLabel"
+						:requested-label="requestedButtonLabel"
+						:requested-tooltip="requestedTooltip(friend.username)"
 						:user-profile-link="userProfileLink"
 						@invite="inviteFriend"
 						@cancel="cancelInvite"
@@ -148,6 +153,7 @@ const props = withDefaults(
 		inviteLabel?: string
 		addedLabel?: string
 		cancelLabel?: string
+		requestedLabel?: string
 		emptyFriendsLabel?: string
 		canInvite?: boolean
 		inviteDisabledMessage?: string
@@ -210,6 +216,14 @@ const messages = defineMessages({
 		id: 'sharing.invite-players-modal.cancel',
 		defaultMessage: 'Cancel',
 	},
+	requestedButton: {
+		id: 'sharing.invite-players-modal.requested',
+		defaultMessage: 'Request sent',
+	},
+	requestedTooltip: {
+		id: 'sharing.invite-players-modal.requested-tooltip',
+		defaultMessage: '{username} needs to accept your friend request first',
+	},
 	noFriends: {
 		id: 'sharing.invite-players-modal.no-friends',
 		defaultMessage: 'No friends found.',
@@ -269,6 +283,13 @@ const addButtonLabel = computed(() => props.addLabel ?? formatMessage(messages.a
 const inviteButtonLabel = computed(() => props.inviteLabel ?? formatMessage(messages.inviteButton))
 const addedButtonLabel = computed(() => props.addedLabel ?? formatMessage(messages.addedButton))
 const cancelButtonLabel = computed(() => props.cancelLabel ?? formatMessage(messages.cancelButton))
+const requestedButtonLabel = computed(
+	() => props.requestedLabel ?? formatMessage(messages.requestedButton),
+)
+const requestedTooltip = (username: string) =>
+	formatMessage(messages.requestedTooltip, {
+		username,
+	})
 const emptyFriendsLabel = computed(
 	() => props.emptyFriendsLabel ?? formatMessage(messages.noFriends),
 )
@@ -386,10 +407,12 @@ function friendStatusSort(friend: InvitePlayersUser) {
 	switch (friendStatus(friend)) {
 		case 'available':
 			return 0
-		case 'pending':
+		case 'requested':
 			return 1
-		case 'added':
+		case 'pending':
 			return 2
+		case 'added':
+			return 3
 	}
 }
 

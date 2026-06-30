@@ -1,5 +1,7 @@
 <template>
-	<div class="flex h-10 items-center justify-between gap-3 px-6 transition-colors hover:bg-surface-3">
+	<div
+		class="flex h-10 items-center justify-between gap-3 px-6 transition-colors hover:bg-surface-3"
+	>
 		<div class="flex min-w-0 items-center gap-1.5">
 			<AutoLink
 				v-tooltip="user.username"
@@ -29,18 +31,25 @@
 		</div>
 
 		<ButtonStyled v-if="status === 'added'" type="standard" color-fill="none">
-			<button class="!h-8 !rounded-xl !bg-surface-4 !px-2.5" disabled>
+			<button disabled>
 				<CheckIcon aria-hidden="true" />
 				{{ addedLabel }}
 			</button>
 		</ButtonStyled>
 		<ButtonStyled v-else-if="status === 'pending'" type="outlined">
-			<button class="!h-8 !rounded-xl !px-2.5" @click="$emit('cancel', user)">
+			<button @click="$emit('cancel', user)">
 				{{ cancelLabel }}
 			</button>
 		</ButtonStyled>
+		<span v-else-if="status === 'requested'" v-tooltip="requestedTooltip" class="inline-flex">
+			<ButtonStyled type="standard" color-fill="none">
+				<button disabled>
+					{{ requestedLabel }}
+				</button>
+			</ButtonStyled>
+		</span>
 		<ButtonStyled v-else color-fill="none">
-			<button class="!h-8 !rounded-xl !bg-surface-4 !px-2.5" @click="$emit('invite', user)">
+			<button @click="$emit('invite', user)">
 				{{ inviteLabel }}
 			</button>
 		</ButtonStyled>
@@ -63,6 +72,8 @@ const props = withDefaults(
 		addedLabel: string
 		cancelLabel: string
 		inviteLabel: string
+		requestedLabel: string
+		requestedTooltip: string
 		userProfileLink?: (username: string) => InvitePlayersUserProfileLink
 	}>(),
 	{
@@ -78,7 +89,9 @@ defineEmits<{
 const status = computed(() => props.user.status ?? 'available')
 const profileLink = computed(() => getUserProfileLink(props.user.username))
 const profileTarget = computed(() =>
-	typeof profileLink.value === 'string' && profileLink.value.startsWith('http') ? '_blank' : undefined,
+	typeof profileLink.value === 'string' && profileLink.value.startsWith('http')
+		? '_blank'
+		: undefined,
 )
 
 function getUserProfileLink(username: string): InvitePlayersUserProfileLink {
