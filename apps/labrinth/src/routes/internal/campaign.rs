@@ -8,7 +8,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use std::collections::HashSet;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use uuid::Uuid;
 
 use crate::{
