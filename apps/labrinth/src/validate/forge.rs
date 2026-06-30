@@ -1,5 +1,6 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult, filter_out_packs,
+    SupportedGameVersions, ValidationError, ValidationResult,
+    validate_pack_formats,
 };
 use chrono::DateTime;
 use std::io::Cursor;
@@ -36,9 +37,7 @@ impl super::Validator for ForgeValidator {
             ));
         }
 
-        filter_out_packs(archive)?;
-
-        Ok(ValidationResult::Pass)
+        Ok(validate_pack_formats(archive))
     }
 }
 
@@ -74,8 +73,6 @@ impl super::Validator for LegacyForgeValidator {
             ));
         };
 
-        filter_out_packs(archive)?;
-
-        Ok(ValidationResult::Pass)
+        Ok(validate_pack_formats(archive))
     }
 }
