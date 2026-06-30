@@ -11,6 +11,187 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-06-29T23:56:37+00:00`,
+		product: 'app',
+		version: '0.15.4',
+		body: `## Fixed
+- Fixes another issue causing the app to freeze up when going into an instance page.`,
+	},
+	{
+		date: `2026-06-29T22:52:04+00:00`,
+		product: 'app',
+		version: '0.15.3',
+		body: `## Fixed
+- Fixed hanging on larger legacy instances when visiting the Instance page.`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated analytics graph colors to be more accessible.
+- Updated project versions table UI and mobile view so columns overflow nicely.
+- Updates projects page in dashboard to use new table and action bar.
+- Updated translations`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'app',
+		version: '0.15.2',
+		body: `## Added
+- Added the ["Chaos Cubed"](https://minecraft.wiki/w/Chaos_Cubed_(skin_pack)) official skin pack to the Skin selector page.
+
+## Changed
+- Redesigned the modpack export modal to align with the rest of the instance pages.
+- Updated project versions table UI and mobile view so columns overflow nicely.
+- Updated translations
+
+## Fixed
+- Fixed an issue where sometimes the app would desynchronise from the file system when disabling, enabling or removing mods from the Content tab.
+- Fixed issue where server pinging in the Worlds tab of the instance page would be stuck in a loading state for too long.
+- Fixed the Logs page in Modrinth App overflowing past the window instead of keeping the console contained.
+- Fixed the Modrinth Hosting server panel in Modrinth App overflowing past the window instead of keeping the console contained.
+- Fixed issue where sometimes disabling linked modpack content would not work. Thanks [@creeperkatze](@creeperkatze)!
+- Fixed issue where unlinking a locally imported mrpack from an instance causes the content to never show up in the content list.`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-06-26T16:33:23+00:00`,
+		product: 'app',
+		version: '0.15.1',
+		body: `## Fixed
+- Fixed issue where previous logs would not load in the Logs tab of an instance.
+- Fixed issue where "Update all" would sometimes update linked modpack content.
+- Fixed issue where disabled additional content would sometimes not appear as disabled in the UI.
+- Fixed issue where instances with negative playtime fail to load. (How?)`,
+	},
+	{
+		date: `2026-06-25T21:22:14+00:00`,
+		product: 'app',
+		version: '0.15.0',
+		body: `## Added
+- Existing app data is now backed up after the app updates.
+- Added an option to open the folder which contains the app database backups in the Resource management tab in the app settings.
+- Added an option to skip non-essential warnings across the app.
+- Added the ability to create desktop shortcuts for your instances.
+
+## Changed
+- Instance installs in the Modrinth App now show detailed progress for preparing Java, downloading modpack files, downloading content, extracting overrides, and downloading Minecraft.
+- Java, modpack, content, overrides and Minecraft downloads/extracting now show downloaded/extracted and total size.
+- The Content tab’s "Update all" action now shows live progress while resolving versions, downloading projects, and finishing updates.
+- Changed the visual style of the Delete server/Delete world modal on the Worlds tab of instances to match the Content tab's modals.
+
+## Fixed
+- Fixed broken Delete server modal on the Worlds tab of instances.
+- Fixed the navigation bars across the app not animating when clicking between pages.
+- Fixed fade in animation incorrectly playing on the Mods page even when the instance content is already loaded into the UI.
+- Failed or interrupted instance installs now roll back partial changes instead of leaving incomplete new instances or modified/broken existing instances behind.
+- Failed or interrupted instance installs now explain why the failure or interruption occurred, and provide a retry action.
+- The Home page, Library page, and the quick instance switcher in the left sidebar now correctly refresh when an instance begins or finishes installing.
+- Fixed issue where going from an instance page to the browse page via the left sidebar would cause the app to completely freeze up.
+- Fixed issue where using the "Add to instance" button on search results in the browse page would take a long time to process if you have a lot of instances.
+- Fixed many performance issues with loading/editing of instances.`,
+	},
+	{
+		date: `2026-06-25T21:22:14+00:00`,
+		product: 'web',
+		body: `## Added
+- Create account page where user can input username for new account.
+- Log in with passkeys support, thanks [@DeDiamondPro](https://github.com/DeDiamondPro)!
+
+## Changed
+- Refreshed sign in and sign up page styles.
+- Refreshed forget password and verify email pages.
+- Updated account settings modals to match website styles for consistency.`,
+	},
+	{
+		date: `2026-06-24T00:30:00-07:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed a number of consistency issues across collection, project, and user pages.
+- Fixed a number of bugs with the new modpack permissions system.
+- Fxied some issues with the new version page.`,
+	},
+	{
+		date: `2026-06-23T19:31:16+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new modpack permissions system. Read our blog post about it [here](/news/article/modpack-permissions/).`,
+	},
+	{
+		date: `2026-06-22T18:12:52+00:00`,
+		product: 'web',
+		body: `## Added
+- Added dependents project breakdown and filter to download analytics, handling for case when there are multiple projects selected.
+- Added project icons to table for project columns in analytics.
+- Added members breakdown/filter to revenue analytics.
+
+## Changed
+- Overhauled the version page.
+- Removed project version's project column when there were multiple projects selected with project version breakdown as it's redundant when project breakdown can be added.
+
+## Fixed
+- Fixed all project selection geting unselected when reload page in analytics.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'app',
+		version: '0.14.8',
+		body: `## Changed
+- Improved performance of the instance settings modal.
+- Updated translations
+
+## Fixed
+- Fixed issue in the Content tab where pressing the "Content" button on the linked modpack card would show zero mods in the Modpack content modal for a few seconds.
+- Fixed issue with modal close animations.
+- Fixed not being able to click scroll bar on "game version" menu when creating new instance.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Improved performance of the server settings modal.
+- Updated translations
+
+## Fixed
+- Fixed issue where users were not able to upgrade their Medal servers after the trial expired.`,
+	},
+	{
+		date: `2026-06-19T20:29:45+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-06-16T18:58:45+00:00`,
+		product: 'app',
+		version: '0.14.7',
+		body: `## Added
+- Warning modal before deleting content that other content in the instance depends on.
+
+## Changed
+- Improved folder filtering when exporting a modpack from an instance.
+- Improved error messages when parts of the Modrinth API are unavailable.
+
+## Fixed
+- Fixed the Content tab showing updates for installed content when the recommended version used the same file as installed.
+- Fixed automatically installed dependencies not appearing as installed when installing content from the Discover page.
+- Fixed the search filter for older game versions.
+- Fixed bulk action content modals sometimes saying no projects were selected.
+- Fixed the Content tab multi-select bar shifting when modals were opened.`,
+	},
+	{
+		date: `2026-06-16T18:58:45+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed Babric project versions being detected as Fabric versions.
+- Fixed the search filter for older game versions.`,
+	},
+	{
 		date: `2026-06-11T19:05:19+00:00`,
 		product: 'app',
 		version: '0.14.6',

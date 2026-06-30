@@ -145,6 +145,8 @@ import {
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
 
+import { generateUrlSlug } from '~/utils/slugs'
+
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 type ProjectTypes = 'server' | 'project'
@@ -164,9 +166,7 @@ defineExpose({
 	show,
 })
 
-const auth = (await useAuth()) as Ref<{
-	user: { id: string; username: string; avatar_url: string } | null
-}>
+const auth = await useAuth()
 
 const messages = defineMessages({
 	title: {
@@ -461,12 +461,7 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 
 function updatedName() {
 	if (!manualSlug.value) {
-		slug.value = name.value
-			.trim()
-			.toLowerCase()
-			.replaceAll(' ', '-')
-			.replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-			.replaceAll(/--+/gm, '-')
+		slug.value = generateUrlSlug(name.value)
 	}
 }
 </script>

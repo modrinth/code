@@ -12,6 +12,7 @@
 				:placeholder="formatMessage(analyticsMessages.selectProjects)"
 				:no-options-message="noProjectsMessage"
 				:searchable="projectOptions.length > 6"
+				fuzzy-search
 				:max-tag-rows="1"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
@@ -79,7 +80,7 @@
 							@keydown.enter.stop
 							@keydown.space.stop
 						>
-							<LayersIcon
+							<UserIcon
 								class="h-5 w-5 shrink-0 text-primary"
 								:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 							/>
@@ -211,6 +212,7 @@
 						:placeholder="formatMessage(analyticsMessages.selectProjects)"
 						:no-options-message="noProjectsMessage"
 						:searchable="projectOptions.length > 6"
+						fuzzy-search
 						:max-tag-rows="1"
 						checkbox-position="right"
 						show-selection-actions
@@ -290,7 +292,7 @@
 									@keydown.enter.stop
 									@keydown.space.stop
 								>
-									<LayersIcon
+									<UserIcon
 										class="h-5 w-5 shrink-0 text-primary"
 										:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 									/>
@@ -449,6 +451,7 @@ import {
 	ClockIcon,
 	FolderOpenIcon,
 	LayersIcon,
+	UserIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -499,7 +502,7 @@ import {
 import TimeFramePicker from './TimeframePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
-const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
+const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '14rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
 const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
@@ -544,7 +547,7 @@ function getProjectOption(
 	return {
 		value: project.id,
 		label: project.name,
-		searchTerms: groupTitle ? [groupTitle] : undefined,
+		searchTerms: [project.id, groupTitle].filter((term): term is string => Boolean(term)),
 	}
 }
 
@@ -1008,14 +1011,33 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 				value: 'game_version',
 				label: formatAnalyticsBreakdownLabel('game_version', formatMessage),
 			},
+			{
+				value: 'dependent_project_download',
+				label: formatAnalyticsBreakdownLabel('dependent_project_download', formatMessage),
+			},
+			{
+				value: 'user_id',
+				label: formatAnalyticsBreakdownLabel('user_id', formatMessage),
+			},
 		)
 
-		return options.map((option) => ({
-			...option,
-			disabled: hasReachedBreakdownLimit && !selectedBreakdownSet.has(option.value),
-		}))
+		return options.map((option) => {
+			const isSelected = selectedBreakdownSet.has(option.value)
+			return {
+				...option,
+				disabled:
+					!isSelected && (hasReachedBreakdownLimit || !canSelectBreakdownOption(option.value)),
+			}
+		})
 	},
 )
+
+function canSelectBreakdownOption(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): boolean {
+	return getAnalyticsBreakdownPresetsForProjectSelection(
+		[...selectedBreakdownValue.value, breakdown],
+		selectedProjectIds.value,
+	).includes(breakdown)
+}
 
 function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
 	return (
@@ -1133,6 +1155,17 @@ function withBreakdownFields(
 				break
 			case 'download_reason':
 				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('reason')
+				}
+				break
+			case 'user_id':
+				if (includesStat(breakdownStats, 'revenue') && includesStat(enabledStats, 'revenue')) {
+					revenue.push('user_id')
+				}
+				break
+			case 'dependent_project_download':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('dependent_project_id')
 					downloads.push('reason')
 				}
 				break
@@ -1264,6 +1297,12 @@ function buildMetricFilters(
 				filters.game_version,
 			),
 			loader: getFilterValuesForStat('loader_type', 'downloads', enabledStats, filters.loader_type),
+			dependent_project_id: getFilterValuesForStat(
+				'dependent_project_id',
+				'downloads',
+				enabledStats,
+				filters.dependent_project_id,
+			),
 		},
 		playtime: {
 			country: getFilterValuesForStat('country', 'playtime', enabledStats, filters.country),
@@ -1281,7 +1320,9 @@ function buildMetricFilters(
 			),
 			loader: getFilterValuesForStat('loader_type', 'playtime', enabledStats, filters.loader_type),
 		},
-		revenue: {},
+		revenue: {
+			user_id: getFilterValuesForStat('user_id', 'revenue', enabledStats, filters.user_id),
+		},
 	}
 }
 
@@ -1295,6 +1336,15 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 
 	const bucketBy = withBreakdownFields(selectedBreakdowns.value, selectedFilters.value)
 	const filterBy = buildMetricFilters(selectedBreakdowns.value, selectedFilters.value)
+	if (
+		includesStat(
+			getEnabledAnalyticsStatsForState(selectedBreakdowns.value, selectedFilters.value),
+			'revenue',
+		) &&
+		!bucketBy.revenue.includes('user_id')
+	) {
+		bucketBy.revenue.push('user_id')
+	}
 	const filteredProjectIds = getProjectIdsMatchingStatusFilter(
 		selectedProjectIds.value,
 		projectStatusById.value,

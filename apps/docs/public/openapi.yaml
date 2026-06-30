@@ -414,7 +414,7 @@ components:
         - unknown
         - signature
       example: required-resource-pack
-    # https://github.com/modrinth/labrinth/blob/master/src/routes/version_creation.rs#L27-L57
+    # https://github.com/modrinth/code/blob/main/apps/labrinth/src/routes/v2/version_creation.rs#L32-L76
     CreatableVersion:
       allOf:
         - $ref: '#/components/schemas/BaseVersion'
@@ -432,6 +432,25 @@ components:
             primary_file:
               type: string
               description: The multipart field name of the primary file
+            environment:
+              type: string
+              enum:
+                - client_and_server
+                - client_only
+                - client_only_server_optional
+                - singleplayer_only
+                - server_only
+                - server_only_client_optional
+                - dedicated_server_only
+                - client_or_server
+                - client_or_server_prefers_both
+                - unknown
+              description: The environment that this version is for.
+            file_types:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/FileTypeEnum'
+              description: A map of file parts to their associated file type, a file type is used for additional files such as sources jars.
           required:
             - file_parts
             - project_id

@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Java {version} aan het downloaden"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Update aan het downloaden"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primaire instantie"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Herlaadt om te updaten"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Toon meer actieve instanties"
   },
   "app.action-bar.stop-instance": {
     "message": "Stop instantie"
+  },
+  "app.action-bar.update": {
+    "message": "Bijwerken"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Bekijk actieve downloads"
@@ -51,7 +60,7 @@
     "message": "Wijzig de pagina waarop de launcher opent."
   },
   "app.appearance-settings.default-landing-page.home": {
-    "message": "Home"
+    "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotheek"
@@ -85,6 +94,12 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Selecteer een optie"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Toont hoeveel tijd je aan een instantie hebt besteed."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Speeltijd laten zien"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Schakelt de mogelijkheid om de zijbalk in- of uit te schakelen in."
@@ -143,11 +158,8 @@
   "app.browse.server.installing": {
     "message": "Installeren"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Modpack aan het installeren..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Er zijn geen beschikbare versies die overeenkomen met {compatibilityLabel}. Selecteer toch een versie om te installeren. Afhankelijkheden worden niet automatisch geïnstalleerd."
   },
   "app.export-modal.description-placeholder": {
     "message": "Voeg modpack beschrijving in..."
@@ -158,17 +170,11 @@
   "app.export-modal.header": {
     "message": "Exporteer modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Betrek \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpack Naam"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack naam"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Configureer welke bestanden bij deze export zijn betrokken"
   },
   "app.export-modal.version-number-label": {
     "message": "Versie nummer"
@@ -224,9 +230,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Zoek servers"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Weet je zeker dat je deze wereld definitief wilt verwijderen?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Gemod"
   },
@@ -245,17 +248,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Noch servers noch werelden toegevoegd"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) wordt uit je lijst verwijderd, ook in de game, en kan op geen enkele manier worden hersteld."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Ben je zeker dat je {name} wil verwijderen?"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "deze server"
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Zoek werelden"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content vereist"
@@ -296,6 +290,9 @@
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
   },
+  "app.project.install-context.back-to-browse": {
+    "message": "Terug naar Ontdekken"
+  },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installeer content naar instantie"
   },
@@ -323,6 +320,153 @@
   "app.settings.tabs.resource-management": {
     "message": "Bronnenbeheer"
   },
+  "app.skins.add-button": {
+    "message": "Skin toevoegen"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Slepen en neerzetten"
+  },
+  "app.skins.apply-button": {
+    "message": "Toepassen"
+  },
+  "app.skins.delete-button": {
+    "message": "Skin verwijderen"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "De geselecteerde skin wordt permanent verwijderd. Deze actie kan niet ongedaan worden gemaakt."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Weet u zeker dat u deze skin wilt verwijderen?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Kan het neergezette bestand niet lezen."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Fout bij het verwerken van het bestand"
+  },
+  "app.skins.edit-button": {
+    "message": "Skin aanpassen"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Skin toevoegen"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Voeg een skin toe"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Armstijl"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Slank"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Breed"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Cape"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Cape"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Skin aan het aanpassen"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Verander eerst iets aan de skin!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Geen cape"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Geen"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Texture vervangen"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Skin opslaan"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Opslaan..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Textuur"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Upload eerst een skin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Skin aanpassen"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Voorvertonen"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "U verandert te snel van skin. Mojang's servers hebben nieuwe aanvragen tijdelijk geblokkeerd. Wacht een moment voordat u het opnieuw probeert."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Rustig aan!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "Je skinvolgorde kon niet worden opgeslagen."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Het herschikken van skins is mislukt."
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Standaardskins"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "U heeft deze skins ontvangen omdat u tijdens Pride Month heeft gedoneerd aan een Modrinth Pride-inzamelingsactie."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Opgeslagen skins"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Inloggen"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Log in op je Minecraft-account om de skinbeheerfuncties van de Modrinth-app te gebruiken."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Excited Modrinth Bot"
+  },
+  "app.skins.sign-in.title": {
+    "message": "Log in"
+  },
+  "app.skins.title": {
+    "message": "Skinkiezer"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
@@ -342,7 +486,7 @@
     "message": "Downloaden voltooid"
   },
   "app.update-popup.reload": {
-    "message": "Herlaad"
+    "message": "Herladen om te updaten"
   },
   "app.update-popup.title": {
     "message": "Update beschikbaar"
@@ -542,6 +686,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Naam"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Updatekanaal"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release-, beta- en alfaversies worden als beschikbare updates weergegeven."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release- en beta-versies worden als beschikbare updates weergegeven.\n"
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Release"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Alleen releaseversies worden als beschikbare updates weergegeven."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Selecteer updatekanaal"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Opstart haakjes"
   },
@@ -590,6 +758,24 @@
   "instance.settings.tabs.java": {
     "message": "Java en geheugen"
   },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Aangepaste omgevingsvariabelen"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Aangepaste Java-argumenten"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Aangepaste Java-installatie"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Aangepaste geheugentoewijzing"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Voer omgevingsvariabelen in…"
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Voer Java-argumenten in…"
+  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Environment variabelen"
   },
@@ -604,6 +790,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Voorgeschreven geheugen"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "//pad/naar/java"
   },
   "instance.settings.tabs.window": {
     "message": "Venster"

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_content_entries (\n\t\t\tid,\n\t\t\tinstance_id,\n\t\t\tcontent_set_id,\n\t\t\tfile_id,\n\t\t\tproject_type,\n\t\t\tproject_id,\n\t\t\tversion_id,\n\t\t\tsource_kind,\n\t\t\tserver_requirement,\n\t\t\tclient_requirement,\n\t\t\tenabled,\n\t\t\tadded_at,\n\t\t\tmodified_at\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\tON CONFLICT(id) DO UPDATE SET\n\t\t\tfile_id = excluded.file_id,\n\t\t\tproject_type = excluded.project_type,\n\t\t\tproject_id = excluded.project_id,\n\t\t\tversion_id = excluded.version_id,\n\t\t\tsource_kind = excluded.source_kind,\n\t\t\tserver_requirement = excluded.server_requirement,\n\t\t\tclient_requirement = excluded.client_requirement,\n\t\t\tenabled = excluded.enabled,\n\t\t\tmodified_at = excluded.modified_at\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 13
+    },
+    "nullable": []
+  },
+  "hash": "81e6135eeba87a5f2084e0747b4675ff87456469e98c07520023981e3b3d121a"
+}

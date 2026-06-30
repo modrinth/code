@@ -1,6 +1,7 @@
+use std::cmp::Reverse;
 use std::collections::HashMap;
 
-use crate::database::PgPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
@@ -36,6 +37,7 @@ pub async fn forge_updates(
     web::Query(neo): web::Query<NeoForge>,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -64,7 +66,7 @@ pub async fn forge_updates(
 
     let versions = database::models::DBVersion::get_many(
         &project.versions,
-        &**pool,
+        &***ro_pool,
         &redis,
     )
     .await?;
@@ -82,11 +84,12 @@ pub async fn forge_updates(
             .collect(),
         &user_option,
         &pool,
+        &ro_pool,
         &redis,
     )
     .await?;
 
-    versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+    versions.sort_by_key(|b| Reverse(b.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {

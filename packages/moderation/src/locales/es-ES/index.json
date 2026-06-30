@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecciona la resolución correcta"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Asegúrate de haber proporcionado prueba de que cuentas con permiso para distribuir cualquier contenido externo en tu modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Revisar los permisos externos"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Selecciona qué versiones admite tu servidor, elige un Modpack o carga el tuyo propio."
   },
@@ -182,6 +188,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "Visitar la configuración de enlaces"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visitar el panel de proyectos"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Visitar la configuración de etiquetas"
   },
@@ -207,7 +216,7 @@
     "defaultMessage": "Expandir el resumen"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el cargador se muestra automáticamente junto a tu proyecto."
+    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el loader se muestra automáticamente junto a tu proyecto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpiar el nombre"

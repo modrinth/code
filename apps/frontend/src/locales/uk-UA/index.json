@@ -107,6 +107,9 @@
   "analytics.chart.empty.select-table-items": {
     "message": "Виберіть елементи з таблиці знизу щоб відобразити ваші дані."
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# подія аналітики} few {# події аналітики} other {# подій аналітики}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
@@ -130,6 +133,39 @@
   },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Закріплено"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Сайт Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "завантажень"
+  },
+  "analytics.empty.no-data": {
+    "message": "Данні не доступні"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "Данні не доступні для аналітики"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Немає доступних проєктів"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "Немає доступних проєктів для аналітики"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Усі"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Випуск"
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Пошук версій проєкту…"
+  },
+  "analytics.filter.search.versions": {
+    "message": "Пошук версії…"
   },
   "analytics.graph.title.downloads": {
     "message": "Динаміка завантажень"
@@ -221,6 +257,9 @@
   "analytics.project.all": {
     "message": "Усі проєкти"
   },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєктів}}"
+  },
   "analytics.project.icon-alt": {
     "message": "Значок {name}"
   },
@@ -247,6 +286,30 @@
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} год"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "Показано {start} до {end} з {total}"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Пошук…"
+  },
+  "analytics.title": {
+    "message": "Аналітика"
+  },
+  "analytics.value.monetized": {
+    "message": "Монетизація"
+  },
+  "analytics.value.none": {
+    "message": "Немає"
+  },
+  "analytics.value.other": {
+    "message": "Інше"
+  },
+  "analytics.value.unknown": {
+    "message": "Невідомо"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Прибрати монетизацію"
   },
   "app-marketing.download.description": {
     "message": "Наш застосунок доступний на всіх платформах, виберіть бажану вами версію."
@@ -497,50 +560,20 @@
   "auth.reset-password.title.long": {
     "message": "Скидання пароля"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Будь ласка, укажіть код двофакторної автентифікації, щоб продовжити."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Укажіть код двофакторної автентифікації"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Уведіть код…"
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Забули пароль?</forgot-password-link> • <create-account-link>Створити обліковий запис</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Увійдіть за допомогою"
   },
   "auth.sign-in.title": {
     "message": "Вхід"
   },
-  "auth.sign-in.use-password": {
-    "message": "Або ж з паролем"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Створити обліковий запис"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Створивши обліковий запис, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Паролі не збігаються!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже маєте обліковий запис?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Підписатися на оновлення Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Реєстрація"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Або зробіть обліковий запис самотужки"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Реєстрація за допомогою"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Налаштування облікового запису"
@@ -571,21 +604,6 @@
   },
   "auth.verify-email.title": {
     "message": "Підтвердити електронну пошту"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Підписатися на оновлення Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ви тепер частина чудової спільноти авторів і дослідників, що вже створюють, завантажують та оновлюють дивовижні моди."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Створивши обліковий запис, ви погодилися з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Вітаємо в Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Вітаємо"
   },
   "collection.button.edit-icon": {
     "message": "Редагувати значок"
@@ -761,6 +779,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Додаткові файли призначені для допоміжних ресурсів, таких як початковий код, а не для альтернативних версій чи варіантів."
   },
+  "create.collection.collection-info": {
+    "message": "Ваша нова добірка після створення буде публічною {count, plural,=0 {без проєктів} one {і міститиме # проєкт} few {і міститиме # проєкти} other {і міститиме # проєктів}}."
+  },
   "create.collection.create-collection": {
     "message": "Створити добірку"
   },
@@ -923,6 +944,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Пошук партнерських посилань…"
   },
+  "dashboard.analytics.from-projects": {
+    "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Всього завантажень"
   },
@@ -943,6 +967,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Спробуйте налаштувати фільтри або пошукові терміни."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Пошук у ваших добірках"
@@ -1214,6 +1241,15 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Ви використали свій ліміт зняття коштів <b>{withdrawLimit}</b>. Щоб зняти більше, вам потрібно заповнити податкову форму."
   },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Посилання Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Забрати ваші Discord ролі"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "понад 1млн завантажень"
+  },
   "dashboard.head-title": {
     "message": "Панель керування"
   },
@@ -1226,6 +1262,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Побачити історію сповіщень"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Побачити {extraNotifs} ще {extraNotifs, plural, one {повідомлення} few {повідомлень} many {повідомлень} other {повідомлень}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Створити організацію"
   },
@@ -1234,6 +1273,9 @@
   },
   "dashboard.organizations.error.fetch": {
     "message": "Не вдалося отримати організації"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {учасник} few {учасники} many {учасників} other {учасників}}"
   },
   "dashboard.organizations.title": {
     "message": "Організації"
@@ -1258,9 +1300,6 @@
   },
   "dashboard.overview.notifications.loading": {
     "message": "Завантаження сповіщень…"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Ви можете редагувати кілька проєктів одночасно, вибравши їх нижче."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Проєкти сервера не підтримують масове редагування"
@@ -1291,6 +1330,9 @@
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Запрошення до Discord"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Редагувати посилання"
   },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "Місце, де користувачі можуть повідомляти про помилки, проблеми та сумніви щодо вашого проєкту."
@@ -1330,24 +1372,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Перегляньте метадані середовища"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Зростання"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Спадання"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Назва"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Статус"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Тип"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Значок"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2621,6 +2645,9 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, one {завантаження} few {завантаження} many {завантажень} other {завантажень}}"
+  },
   "profile.label.joined": {
     "message": "Приєднався"
   },
@@ -2639,6 +2666,9 @@
   "profile.label.organizations": {
     "message": "Організації"
   },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
+  },
   "profile.label.saving": {
     "message": "Збереження…"
   },
@@ -2647,6 +2677,9 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — Завантажуйте проєкти {username} на Modrinth"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> відстежує} few {<stat>{count}</stat> відстежує} other {<stat>{count}</stat> відстежують}}"
   },
   "profile.user-id": {
     "message": "ID користувача: {id}"
@@ -2975,9 +3008,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Якщо вам потрібна допомога або у вас є додаткові запитання, відвідайте <help-center-link>довідковий центр Modrinth</help-center-link> і натисніть синю підказку, щоб зв’язатися зі службою підтримки."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Показати інтерфейс учасника"
-  },
   "project.moderation.thread.private-description": {
     "message": "Це тема приватної розмови з модераторами Modrinth. Вони можуть надіслати вам повідомлення про проблеми щодо цього проєкту."
   },
@@ -3047,38 +3077,11 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження всіх наведених нижче файлів, і будь-які приховані версії буде автоматично опубліковано."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Будь ласка, надайте підтвердження того, що у вас є дозвіл на повторне розповсюдження всіх наведених нижче файлів, перш ніж ви зможете подати свій проєкт на розгляд."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Невідомий убудований уміст"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Весь зовнішній вміст має посилання на авторство."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Авторство завершено!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Жодна з ваших версій не містить зовнішнього вмісту, тому вам не потрібно турбуватися про отримання дозволів."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Усе готово!"
   },
-  "project.settings.permissions.fail.description": {
-    "message": "Ви не маєте дозволу на повторне розповсюдження зовнішнього вмісту, який ви додали. Щоб опублікувати на Modrinth, видаліть правопорушний вміст."
-  },
   "project.settings.permissions.fail.title": {
     "message": "Деякий уміст не можна включити"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Якщо ви додаєте вміст, який не розміщено на Modrinth, вам потрібно повідомити нам, звідки він походить, і підтвердити, що у вас є дозвіл на розповсюдження файлів. Перегляньте <link>наш посібник</link>, щоб дізнатися, як це зробити правильно!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Дізнайтеся, як працює авторство"
   },
   "project.settings.permissions.learn-more": {
     "message": "Дізнатися більше"
@@ -3095,8 +3098,8 @@
   "project.versions.title": {
     "message": "Версії"
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Розв'язати"
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Версія{version_name}} other {Версії}} утримано через невідомий убудований уміст"
@@ -3985,6 +3988,9 @@
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Щомісячна оплата обійдеться вам у додаткові {amount} на рік"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Змінено на {interval, select, monthly {monthly} yearly {yearly} other {{interval}}} оплату  {date}"
   },
   "settings.billing.update-method": {
     "message": "Оновити спосіб"

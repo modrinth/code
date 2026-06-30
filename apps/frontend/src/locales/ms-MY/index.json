@@ -107,6 +107,9 @@
   "analytics.chart.empty.select-table-items": {
     "message": "Pilih item daripada jadual di bawah untuk menggambarkan data anda."
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, other {# peristiwa analitik}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
@@ -124,6 +127,15 @@
   },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (Sblm.)"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, other {# hari}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, other {# jam}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, other {# minit}}"
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Sembunyikan {name} dalam graf"
@@ -293,6 +305,9 @@
   "analytics.project.all": {
     "message": "Semua projek"
   },
+  "analytics.project.count": {
+    "message": "{count, plural, other {# projek}}"
+  },
   "analytics.project.icon-alt": {
     "message": "Ikon {name}"
   },
@@ -349,6 +364,15 @@
   },
   "analytics.stat.views": {
     "message": "Tontonan"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, other {# hari}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, other {# jam}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, other {# minit}}"
   },
   "analytics.table.export-csv": {
     "message": "Eksport CSV"
@@ -632,50 +656,20 @@
   "auth.reset-password.title.long": {
     "message": "Tetap semula kata laluan anda"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Sila masukkan kod dua faktor untuk meneruskan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Masukkan kod dua faktor"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Masukkan kod..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Lupa kata laluan?</forgot-password-link> • <create-account-link>Cipta akaun</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Daftar masuk dengan"
   },
   "auth.sign-in.title": {
     "message": "Daftar Masuk"
   },
-  "auth.sign-in.use-password": {
-    "message": "Atau gunakan kata laluan"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Cipta akaun"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Dengan mencipta akaun, anda bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-policy-link>Dasar Privasi</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Kata laluan tidak sepadan!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Sudah mempunyai akaun?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Langgan kepada kemas kini tentang Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Daftar"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Atau cipta akaun anda sendiri"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Daftar dengan"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tetapan akaun"
@@ -706,21 +700,6 @@
   },
   "auth.verify-email.title": {
     "message": "Sahkan E-mel"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Langgan kepada kemas kini tentang Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Anda kini sebahagian daripada komuniti hebat pencipta & peneroka yang sudah membina, memuat turun dan sentiasa mengikuti perkembangan terkini mengenai mod yang menakjubkan."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Dengan mencipta akaun, anda telah bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-policy-link>Dasar Privasi</privacy-policy-link> Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Selamat Datang ke Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Selamat Datang"
   },
   "collection.button.edit-icon": {
     "message": "Sunting ikon"
@@ -887,6 +866,9 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
   },
+  "create.collection.collection-info": {
+    "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
+  },
   "create.collection.create-collection": {
     "message": "Cipta koleksi"
   },
@@ -1046,6 +1028,9 @@
   "dashboard.affiliate-links.search": {
     "message": "Cari pautan afiliasi..."
   },
+  "dashboard.analytics.from-projects": {
+    "message": "daripada {count} {count, plural, other {projek}}"
+  },
   "dashboard.analytics.total-downloads": {
     "message": "Jumlah muat turun"
   },
@@ -1066,6 +1051,9 @@
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "Cuba laraskan penapis atau istilah carian anda."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi anda"
@@ -1349,6 +1337,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Lihat sejarah pemberitahuan"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Lihat {extraNotifs} lagi {extraNotifs, plural, other {pemberitahuan}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Cipta organisasi"
   },
@@ -1376,9 +1367,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Anda boleh menyunting berbilang projek sekaligus dengan memilihnya di bawah."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Projek pelayan tidak menyokong penyuntingan pukal"
   },
@@ -1393,6 +1381,9 @@
   },
   "dashboard.projects.links.button.edit": {
     "message": "Sunting pautan"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Perubahan akan diterapkan kepada <strong>{count}</strong> {count, plural, other {projek}}."
   },
   "dashboard.projects.links.description": {
     "message": "Sebarang pautan yang anda nyatakan di bawah akan ditulis ganti pada setiap projek yang dipilih. Sebarang pautan yang anda biarkan kosong akan diabaikan. Anda boleh memadamkan pautan daripada semua projek yang dipilih menggunakan butang tong sampah."
@@ -1444,24 +1435,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Sila semak metadata persekitaran"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Menaik"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Menurun"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nama"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Jenis"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2672,6 +2645,9 @@
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "Pemasangan akan diterapkan kepada {count, plural, other {# projek}}."
+  },
   "profile.bio.fallback.creator": {
     "message": "Seorang pencipta Modrinth."
   },
@@ -2695,6 +2671,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Tetapkan sebagai rakan afiliasi"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, other {# projek}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Penyedia pengesahan"
@@ -2732,6 +2711,9 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, other {muat turun}}"
+  },
   "profile.label.joined": {
     "message": "Telah menyertai"
   },
@@ -2750,6 +2732,9 @@
   "profile.label.organizations": {
     "message": "Organisasi"
   },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, other {projek}}"
+  },
   "profile.label.saving": {
     "message": "Sedang menyimpan..."
   },
@@ -2761,6 +2746,9 @@
   },
   "profile.official-account.bio": {
     "message": "Akaun pengguna rasmi Modrinth. Dapatkan sokongan di <support-link></support-link> atau melalui e-mel di <email></email>"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, other {<stat>{count}</stat> pengikut projek}}"
   },
   "profile.user-id": {
     "message": "ID Pengguna: {id}"
@@ -3089,9 +3077,6 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "Jika anda memerlukan bantuan atau mempunyai pertanyaan tambahan, sila lawati <help-center-link>Pusat Bantuan Modrinth</help-center-link> dan klik gelembung biru untuk menghubungi sokongan."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Tunjukkan antara muka ahli"
-  },
   "project.moderation.thread.private-description": {
     "message": "Ini adalah bebenang perbualan peribadi dengan penyederhana Modrinth. Mereka mungkin akan menghantar mesej kepada anda tentang isu-isu berkaitan projek ini."
   },
@@ -3161,38 +3146,11 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula semua fail berikut dan sebarang versi yang ditahan akan diterbitkan secara automatik."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula semua fail berikut sebelum anda boleh menghantar projek anda untuk semakan."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Kandungan terbenam yang tidak diketahui"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Semua kandungan luaran mempunyai atribusi yang disediakan."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Atribusi selesai!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Tiada satu pun versi anda mengandungi kandungan luaran, jadi anda tidak perlu risau tentang mendapatkan kebenaran."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Semuanya sudah siap!"
   },
-  "project.settings.permissions.fail.description": {
-    "message": "Anda tidak mempunyai kebenaran untuk mengedarkan semula beberapa kandungan luaran yang ditambahkan. Untuk menerbitkan projek ini di Modrinth, sila buang kandungan yang melanggar hak."
-  },
   "project.settings.permissions.fail.title": {
     "message": "Sesetengah kandungan tidak boleh disertakan"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Jika anda memasukkan kandungan yang tidak dihoskan di Modrinth, anda perlu memberitahu kami dari mana ia berasal dan mengesahkan bahawa anda mempunyai kebenaran untuk mengedarkan fail tersebut. Lihat <link>panduan kami</link> untuk mengetahui cara untuk melakukannya dengan betul!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Ketahui cara atribusi berfungsi"
   },
   "project.settings.permissions.learn-more": {
     "message": "Ketahui lebih lanjut"
@@ -3203,14 +3161,20 @@
   "project.settings.visit-dashboard": {
     "message": "Kunjungi papan pemuka projek"
   },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, other {muat turun}}"
+  },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
   },
   "project.versions.title": {
     "message": "Versi"
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Selesaikan"
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, other {Versi ini}} kini ditahan dan tidak disenaraikan secara umum. Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula fail tertentu yang disertakan dalam {count, plural, other {versi}} pek mod ini."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, other {Versi}} telah ditahan kerana kandungan terbenam yang tidak diketahui"
   },
   "report.already-reported": {
     "message": "Anda telah melaporkan {title}"

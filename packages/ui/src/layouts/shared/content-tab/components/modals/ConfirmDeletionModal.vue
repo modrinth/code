@@ -6,15 +6,12 @@
 				itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
 			})
 		"
-		:fade="props.variant === 'server' ? 'warning' : 'danger'"
+		fade="warning"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition
-				:type="props.variant === 'server' ? 'warning' : 'critical'"
-				:header="formatMessage(messages.admonitionHeader)"
-			>
+			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
 				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
 			<InlineBackupCreator
@@ -32,7 +29,7 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled :color="props.variant === 'server' ? 'orange' : 'red'">
+				<ButtonStyled color="orange">
 					<button
 						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
 						:disabled="buttonsDisabled || props.actionDisabled"
@@ -54,7 +51,7 @@
 
 <script setup lang="ts">
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -113,7 +110,8 @@ const buttonsDisabled = ref(false)
 const visibleCount = ref(props.count)
 const visibleItemType = ref(props.itemType)
 
-function show() {
+async function show() {
+	await nextTick()
 	visibleCount.value = props.count
 	visibleItemType.value = props.itemType
 	modal.value?.show()

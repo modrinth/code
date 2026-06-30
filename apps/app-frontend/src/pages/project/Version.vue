@@ -5,7 +5,7 @@
 				:current-title="version.name"
 				:link-stack="[
 					{
-						href: `/project/${route.params.id}/versions`,
+						href: buildProjectHref(`/project/${route.params.id}/versions`),
 						label: 'Versions',
 					},
 				]"
@@ -249,6 +249,19 @@ const author = computed(() =>
 
 const displayDependencies = ref({})
 
+function buildProjectHref(path) {
+	const params = new URLSearchParams()
+	for (const [key, val] of Object.entries(route.query)) {
+		if (Array.isArray(val)) {
+			for (const v of val) params.append(key, v)
+		} else if (val) {
+			params.append(key, String(val))
+		}
+	}
+	const qs = params.toString()
+	return qs ? `${path}?${qs}` : path
+}
+
 async function refreshDisplayDependencies() {
 	const projectIds = new Set()
 	const versionIds = new Set()
@@ -282,7 +295,7 @@ async function refreshDisplayDependencies() {
 				icon: project?.icon_url,
 				title: project?.title || project?.name,
 				subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
-				link: `/project/${project.slug}/version/${version.id}`,
+				link: buildProjectHref(`/project/${project.slug}/version/${version.id}`),
 			}
 		} else {
 			const project = dependencies.projects.find((obj) => obj.id === dependency.project_id)
@@ -292,7 +305,7 @@ async function refreshDisplayDependencies() {
 					icon: project?.icon_url,
 					title: project?.title || project?.name,
 					subtitle: `${dependency.dependency_type}`,
-					link: `/project/${project.slug}`,
+					link: buildProjectHref(`/project/${project.slug}`),
 				}
 			} else {
 				return {

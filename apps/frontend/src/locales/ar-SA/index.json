@@ -8,6 +8,108 @@
   "admin.billing.error.not-found": {
     "message": "المستخدم غير موجود"
   },
+  "analytics.action.add": {
+    "message": "إضافة"
+  },
+  "analytics.action.cancel": {
+    "message": "إلغاء"
+  },
+  "analytics.action.refresh": {
+    "message": "تحديث"
+  },
+  "analytics.action.reset": {
+    "message": "إعادة ضبط"
+  },
+  "analytics.breakdown.country": {
+    "message": "الدولة"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "سبب التنزيل"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "مصدر التنزيل"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "إصدار اللُعبة"
+  },
+  "analytics.breakdown.project": {
+    "message": "المشروع"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "حالة المشروع"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "إصدار المشروع"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "أظهار الكل"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} ساعة"
+  },
+  "analytics.chart.controls.display": {
+    "message": "عرض"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "مجموع"
+  },
+  "analytics.downloads.suffix": {
+    "message": "التنزيلات"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "الكل"
+  },
+  "analytics.group-by.week": {
+    "message": "الأسبوع"
+  },
+  "analytics.group-by.year": {
+    "message": "السنة"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "جلب البيانات..."
+  },
+  "analytics.options.loading": {
+    "message": "تحميل..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "المشروع قُبل"
+  },
+  "analytics.project-event.project-private": {
+    "message": "وضع المشروع خاص"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "تم تغيير حالة المشروع"
+  },
+  "analytics.project-event.version-released": {
+    "message": ""
+  },
+  "analytics.project-status.draft": {
+    "message": "مسودة"
+  },
+  "analytics.project-status.private": {
+    "message": "خاص"
+  },
+  "analytics.project-status.rejected": {
+    "message": "رُفض المشروع"
+  },
+  "analytics.project.your": {
+    "message": "مشاريعك"
+  },
+  "analytics.query.label.project": {
+    "message": "المشروع:"
+  },
+  "analytics.stat.downloads": {
+    "message": "التنزيلات"
+  },
+  "analytics.stat.playtime": {
+    "message": "وقت اللعب"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} ساعة"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "بحث..."
+  },
   "app-marketing.download.description": {
     "message": "تطبيقنا لسطح المكتب متاح على جميع المنصات، اختر الإصدار الذي تريده."
   },
@@ -254,50 +356,20 @@
   "auth.reset-password.title.long": {
     "message": "تغيير كلمة المرور"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "يرجى إدخال رمز التحقق الثنائي للمتابعة."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "أدخل رمز التحقق الثنائي"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "أدخل الرمز..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>هل نسيت كلمة المرور؟</forgot-password-link> • <create-account-link>إنشاء حساب</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "تسجيل الدخول باستخدام"
   },
   "auth.sign-in.title": {
     "message": "تسجيل الدخول"
   },
-  "auth.sign-in.use-password": {
-    "message": "أو استخدم كلمة المرور"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "إنشاء حساب"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link> الخاصة بها."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "كلمتا المرور غير متطابقتين!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "هل لديك حساب بالفعل؟"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "اشترك لتصلك التحديثات حول مودرنث"
-  },
   "auth.sign-up.title": {
     "message": "إنشاء حساب"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "أو أنشئ حسابًا بنفسك"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "سجّل باستخدام"
   },
   "auth.verify-email.action.account-settings": {
     "message": "إعدادات الحساب"
@@ -328,21 +400,6 @@
   },
   "auth.verify-email.title": {
     "message": "تحقّق من البريد الإلكتروني"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "اشترك في التحديثات حول مودرنث"
-  },
-  "auth.welcome.description": {
-    "message": "أنت الآن جزء من مجتمع رائع من المبدعين والمستكشفين الذين يقومون بالفعل بإنشاء المودات المذهلة، تثبيتها، والبقاء على اطلاع بآخر التحديثات."
-  },
-  "auth.welcome.label.tos": {
-    "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "مرحبًا بك في مودرنث!"
-  },
-  "auth.welcome.title": {
-    "message": "مرحبًا"
   },
   "collection.button.edit-icon": {
     "message": "تعديل الأيقونة"
@@ -406,6 +463,9 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "الملفات التكميلية تستخدم لدعم الموارد مثل كود المصدر، وليس للإصدارات أو الأنواع البديلة."
+  },
+  "create.collection.collection-info": {
+    "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
   },
   "create.collection.create-collection": {
     "message": "إنشاء مجموعة"
@@ -853,18 +913,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "يرجى مراجعة بيانات تعريف البيئة"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "صعوداً"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "نزولا"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "الإسم"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "الحالة"
   },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"

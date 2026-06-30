@@ -1,20 +1,24 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type {
-	AnalyticsBreakdownPreset,
-	AnalyticsDashboardProject,
-	AnalyticsDashboardStat,
-	AnalyticsGroupByPreset,
+import {
+	type AnalyticsBreakdownPreset,
+	type AnalyticsDashboardProject,
+	type AnalyticsDashboardStat,
+	type AnalyticsGroupByPreset,
+	type AnalyticsSelectedFilters,
+	doesAnalyticsPointMatchNormalizedFilters,
+	normalizeAnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
+import type { FormatMessage } from '../analytics-messages'
 import {
 	analyticsChartMessages,
 	analyticsMessages,
 	analyticsStatCardMessages,
+	formatAnalyticsDependentProjectFallbackLabel,
 	formatAnalyticsDownloadReasonLabel,
 	formatAnalyticsLoaderLabel,
 	formatAnalyticsMonetizationLabel,
-	type FormatMessage,
 } from '../analytics-messages'
 import {
 	ALL_BREAKDOWN_VALUE,
@@ -22,6 +26,8 @@ import {
 	getAnalyticsBreakdownDatasetId,
 	getAnalyticsBreakdownKey,
 	getAnalyticsBreakdownValues,
+	isNoDependentAnalyticsBreakdownValue,
+	isUnknownAnalyticsBreakdownValue,
 	UNKNOWN_BREAKDOWN_VALUE,
 } from '../breakdown'
 import { PREVIOUS_PERIOD_DATASET_ID_PREFIX } from './analytics-chart-constants'
@@ -30,6 +36,7 @@ export type ChartDataset = {
 	projectId: string
 	label: string
 	projectName?: string
+	tooltip?: string
 	data: number[]
 	borderColor: string
 	backgroundColor: string
@@ -136,6 +143,7 @@ export function formatBreakdownLabel(
 	breakdownValue: string,
 	selectedBreakdown: AnalyticsBreakdownPreset,
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
+	userNamesById: ReadonlyMap<string, string> | undefined,
 	formatMessage: FormatMessage,
 ): string {
 	const normalizedValue = breakdownValue.trim()
@@ -160,6 +168,15 @@ export function formatBreakdownLabel(
 	if (selectedBreakdown === 'download_reason') {
 		return formatAnalyticsDownloadReasonLabel(normalizedLowercaseValue, formatMessage)
 	}
+	if (selectedBreakdown === 'dependent_project_download') {
+		if (isNoDependentAnalyticsBreakdownValue(breakdownValue)) {
+			return formatMessage(analyticsMessages.noDependent)
+		}
+		return breakdownValue
+	}
+	if (selectedBreakdown === 'user_id') {
+		return userNamesById?.get(breakdownValue) ?? breakdownValue
+	}
 	if (selectedBreakdown === 'version_id') {
 		return getVersionDisplayName?.(breakdownValue) ?? breakdownValue
 	}
@@ -174,19 +191,34 @@ export function formatBreakdownLabels(
 	breakdownValues: readonly string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
+	userNamesById: ReadonlyMap<string, string> | undefined,
 	formatMessage: FormatMessage,
 ): string {
+	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
+	const downloadReasonBreakdownIndex = normalizedBreakdowns.indexOf('download_reason')
+
 	return collapseRepeatedUnknownBreakdownLabels(
-		selectedBreakdowns
-			.filter((breakdown) => breakdown !== 'none')
-			.map((breakdown, index) =>
-				formatBreakdownLabel(
-					breakdownValues[index] ?? '',
-					breakdown,
-					getVersionDisplayName,
+		normalizedBreakdowns.map((breakdown, index) => {
+			const breakdownValue = breakdownValues[index] ?? ''
+			if (
+				breakdown === 'dependent_project_download' &&
+				downloadReasonBreakdownIndex !== -1 &&
+				isUnknownAnalyticsBreakdownValue(breakdownValue)
+			) {
+				return formatAnalyticsDependentProjectFallbackLabel(
+					breakdownValues[downloadReasonBreakdownIndex],
 					formatMessage,
-				),
-			),
+				)
+			}
+
+			return formatBreakdownLabel(
+				breakdownValue,
+				breakdown,
+				getVersionDisplayName,
+				userNamesById,
+				formatMessage,
+			)
+		}),
 		formatMessage,
 	).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
 }
@@ -256,6 +288,34 @@ type PaletteRankEntry = {
 	key: string
 	label: string
 	total: number
+	excludedFromRank?: boolean
+}
+
+function formatDatasetTooltip(projectName: string | undefined): string | undefined {
+	return projectName
+}
+
+function formatDependentProjectDatasetTooltip(
+	versionName: string | undefined,
+	dependentProjectName: string | undefined,
+	dependencyProjectNames: readonly string[],
+	formatMessage: FormatMessage,
+): string | undefined {
+	if (dependencyProjectNames.length === 0) {
+		return undefined
+	}
+
+	if (versionName && dependentProjectName) {
+		return formatMessage(analyticsChartMessages.dependentProjectVersionTooltip, {
+			dependentProject: dependentProjectName,
+			dependencyProject: dependencyProjectNames.join(', '),
+			version: versionName,
+		})
+	}
+
+	return formatMessage(analyticsChartMessages.dependentOnProjectTooltip, {
+		project: dependencyProjectNames.join(', '),
+	})
 }
 
 function getPaletteColorForIndex(index: number, palette: string[]): string {
@@ -271,14 +331,38 @@ function buildPaletteColorsByDownloadRank(
 	const colorsByKey = new Map<string, string>()
 	if (palette.length === 0) return colorsByKey
 
-	const sortedEntries = [...entries].sort(
-		(a, b) => b.total - a.total || a.label.localeCompare(b.label) || a.key.localeCompare(b.key),
-	)
+	const compareEntries = (a: PaletteRankEntry, b: PaletteRankEntry) =>
+		b.total - a.total || a.label.localeCompare(b.label) || a.key.localeCompare(b.key)
+	const rankedEntries = entries.filter((entry) => !entry.excludedFromRank).sort(compareEntries)
+	const excludedEntries = entries.filter((entry) => entry.excludedFromRank).sort(compareEntries)
+	const sortedEntries = [...rankedEntries, ...excludedEntries]
+
 	sortedEntries.forEach((entry, index) => {
 		colorsByKey.set(entry.key, getPaletteColorForIndex(index, palette))
 	})
 
 	return colorsByKey
+}
+
+function isExcludedFromPaletteRank(breakdownValues: readonly string[]): boolean {
+	return breakdownValues.some(
+		(value) =>
+			isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value),
+	)
+}
+
+function buildPaletteRankEntry(
+	key: string,
+	breakdownValues: readonly string[],
+	total: number,
+	formatLabel: (breakdownValues: readonly string[]) => string,
+): PaletteRankEntry {
+	return {
+		key,
+		label: formatLabel(breakdownValues),
+		total,
+		excludedFromRank: isExcludedFromPaletteRank(breakdownValues),
+	}
 }
 
 export function getMetricValue(
@@ -320,6 +404,10 @@ export function buildChartDatasets(
 	activeStat: AnalyticsDashboardStat,
 	palette: string[],
 	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	selectedFilters: AnalyticsSelectedFilters,
+	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>,
+	projectNamesById: ReadonlyMap<string, string>,
+	userNamesById: ReadonlyMap<string, string>,
 	getVersionDisplayName: ((versionId: string) => string) | undefined,
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
@@ -332,17 +420,43 @@ export function buildChartDatasets(
 
 	const dataLength = Math.max(sliceCount, timeSlices.length)
 	const normalizedBreakdowns = selectedBreakdowns.filter((breakdown) => breakdown !== 'none')
-	const projectNamesById = new Map(selectedProjects.map((project) => [project.id, project.name]))
+	const normalizedFilters = normalizeAnalyticsSelectedFilters(selectedFilters)
 
 	function formatChartBreakdownLabels(breakdownValues: readonly string[]): string {
+		const downloadReasonBreakdownIndex = normalizedBreakdowns.indexOf('download_reason')
+
 		return collapseRepeatedUnknownBreakdownLabels(
 			normalizedBreakdowns.map((breakdown, index) => {
 				const breakdownValue = breakdownValues[index] ?? ''
-				if (breakdown === 'project') {
+				if (breakdown === 'project' || breakdown === 'dependent_project_download') {
+					if (
+						breakdown === 'dependent_project_download' &&
+						isNoDependentAnalyticsBreakdownValue(breakdownValue)
+					) {
+						return formatMessage(analyticsMessages.noDependent)
+					}
+					if (
+						breakdown === 'dependent_project_download' &&
+						isUnknownAnalyticsBreakdownValue(breakdownValue)
+					) {
+						return downloadReasonBreakdownIndex === -1
+							? formatMessage(analyticsMessages.unknown)
+							: formatAnalyticsDependentProjectFallbackLabel(
+									breakdownValues[downloadReasonBreakdownIndex],
+									formatMessage,
+								)
+					}
+
 					return projectNamesById.get(breakdownValue) ?? breakdownValue
 				}
 
-				return formatBreakdownLabel(breakdownValue, breakdown, getVersionDisplayName, formatMessage)
+				return formatBreakdownLabel(
+					breakdownValue,
+					breakdown,
+					getVersionDisplayName,
+					userNamesById,
+					formatMessage,
+				)
 			}),
 			formatMessage,
 		).join(COMBINED_BREAKDOWN_LABEL_SEPARATOR)
@@ -352,13 +466,27 @@ export function buildChartDatasets(
 		normalizedBreakdowns.length > 0 &&
 		!(normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'project')
 	) {
+		const hasVersionBreakdown = normalizedBreakdowns.includes('version_id')
+		const hasDependentProjectBreakdown = normalizedBreakdowns.includes('dependent_project_download')
+		const shouldShowDependentProjectTooltip =
+			hasDependentProjectBreakdown && (selectedProjects.length > 1 || hasVersionBreakdown)
 		const dataByBreakdown = new Map<string, number[]>()
 		const breakdownValuesByKey = new Map<string, string[]>()
 		const downloadTotalsByBreakdown = new Map<string, number>()
+		const dependentOnProjectIdsByBreakdown = new Map<string, Set<string>>()
 
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
+				if (
+					!doesAnalyticsPointMatchNormalizedFilters(
+						point,
+						normalizedFilters,
+						dependentProjectTypesById,
+					)
+				) {
+					continue
+				}
 
 				const breakdownValues = getAnalyticsBreakdownValues(
 					point,
@@ -373,6 +501,11 @@ export function buildChartDatasets(
 				if (!dataByBreakdown.has(breakdownKey)) {
 					dataByBreakdown.set(breakdownKey, new Array(dataLength).fill(0))
 					breakdownValuesByKey.set(breakdownKey, breakdownValues)
+				}
+				if (shouldShowDependentProjectTooltip && point.metric_kind === 'downloads') {
+					const projectIds = dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? new Set<string>()
+					projectIds.add(point.source_project)
+					dependentOnProjectIdsByBreakdown.set(breakdownKey, projectIds)
 				}
 
 				if (point.metric_kind === 'downloads') {
@@ -391,17 +524,56 @@ export function buildChartDatasets(
 		})
 
 		const colorsByBreakdown = buildPaletteColorsByDownloadRank(
-			Array.from(dataByBreakdown.keys()).map((breakdownKey) => ({
-				key: breakdownKey,
-				label: formatChartBreakdownLabels(breakdownValuesByKey.get(breakdownKey) ?? []),
-				total: downloadTotalsByBreakdown.get(breakdownKey) ?? 0,
-			})),
+			Array.from(dataByBreakdown.keys()).map((breakdownKey) =>
+				buildPaletteRankEntry(
+					breakdownKey,
+					breakdownValuesByKey.get(breakdownKey) ?? [],
+					downloadTotalsByBreakdown.get(breakdownKey) ?? 0,
+					formatChartBreakdownLabels,
+				),
+			),
 			palette,
 		)
 
 		return Array.from(dataByBreakdown.entries()).map(([breakdownKey, data]) => {
 			const breakdownValues = breakdownValuesByKey.get(breakdownKey) ?? []
 			const fallbackColor = colorsByBreakdown.get(breakdownKey) ?? ''
+			const versionBreakdownIndex = normalizedBreakdowns.indexOf('version_id')
+			const dependentProjectBreakdownIndex = normalizedBreakdowns.indexOf(
+				'dependent_project_download',
+			)
+			const versionName =
+				hasVersionBreakdown && versionBreakdownIndex !== -1
+					? getVersionDisplayName?.(breakdownValues[versionBreakdownIndex] ?? '')
+					: undefined
+			const dependentProjectId =
+				dependentProjectBreakdownIndex !== -1
+					? breakdownValues[dependentProjectBreakdownIndex]
+					: undefined
+			const dependentProjectName = dependentProjectId
+				? isMissingDependentProjectValue(dependentProjectId)
+					? undefined
+					: (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
+				: undefined
+			const versionProjectName =
+				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
+					? getVersionProjectName?.(breakdownValues[0] ?? '')
+					: undefined
+			const dependencyProjectNames = [...(dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? [])]
+				.map((projectId) => projectNamesById.get(projectId) ?? projectId)
+				.sort((left, right) => left.localeCompare(right))
+			const dependentProjectTooltip = dependentProjectId
+				? isNoDependentAnalyticsBreakdownValue(dependentProjectId)
+					? formatMessage(analyticsMessages.noDependentTooltip)
+					: isUnknownAnalyticsBreakdownValue(dependentProjectId)
+						? formatMessage(analyticsMessages.unknown)
+						: formatDependentProjectDatasetTooltip(
+								versionName,
+								dependentProjectName,
+								dependencyProjectNames,
+								formatMessage,
+							)
+				: undefined
 			const color =
 				normalizedBreakdowns.length === 1
 					? getBreakdownColor(
@@ -414,10 +586,8 @@ export function buildChartDatasets(
 			return {
 				projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
 				label: formatChartBreakdownLabels(breakdownValues),
-				projectName:
-					normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
-						? getVersionProjectName?.(breakdownValues[0] ?? '')
-						: undefined,
+				projectName: versionProjectName,
+				tooltip: dependentProjectTooltip ?? formatDatasetTooltip(versionProjectName),
 				data,
 				borderColor: color,
 				backgroundColor: color,
@@ -432,6 +602,15 @@ export function buildChartDatasets(
 		timeSlices.forEach((slice, sliceIndex) => {
 			for (const point of slice) {
 				if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
+				if (
+					!doesAnalyticsPointMatchNormalizedFilters(
+						point,
+						normalizedFilters,
+						dependentProjectTypesById,
+					)
+				) {
+					continue
+				}
 
 				if (point.metric_kind === 'downloads') {
 					downloadTotal += getMetricValue(point, 'downloads')
@@ -481,6 +660,15 @@ export function buildChartDatasets(
 	timeSlices.forEach((slice, sliceIndex) => {
 		for (const point of slice) {
 			if (!isProjectAnalyticsPointInSelectedProjects(point, selectedProjectIds)) continue
+			if (
+				!doesAnalyticsPointMatchNormalizedFilters(
+					point,
+					normalizedFilters,
+					dependentProjectTypesById,
+				)
+			) {
+				continue
+			}
 
 			const breakdownValues = getAnalyticsBreakdownValues(
 				point,
@@ -515,17 +703,24 @@ export function buildChartDatasets(
 	})
 
 	const colorsByBreakdown = buildPaletteColorsByDownloadRank(
-		Array.from(dataByProjectBreakdown.keys()).map((breakdownKey) => ({
-			key: breakdownKey,
-			label: formatChartBreakdownLabels(breakdownValuesByKey.get(breakdownKey) ?? []),
-			total: downloadTotalsByProjectBreakdown.get(breakdownKey) ?? 0,
-		})),
+		Array.from(dataByProjectBreakdown.keys()).map((breakdownKey) =>
+			buildPaletteRankEntry(
+				breakdownKey,
+				breakdownValuesByKey.get(breakdownKey) ?? [],
+				downloadTotalsByProjectBreakdown.get(breakdownKey) ?? 0,
+				formatChartBreakdownLabels,
+			),
+		),
 		palette,
 	)
 
 	return Array.from(dataByProjectBreakdown.entries()).map(([breakdownKey, data]) => {
 		const breakdownValues = breakdownValuesByKey.get(breakdownKey) ?? []
 		const fallbackColor = colorsByBreakdown.get(breakdownKey) ?? ''
+		const versionProjectName =
+			normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
+				? getVersionProjectName?.(breakdownValues[0] ?? '')
+				: undefined
 		const color =
 			normalizedBreakdowns.length === 1
 				? getBreakdownColor(
@@ -538,15 +733,17 @@ export function buildChartDatasets(
 		return {
 			projectId: getAnalyticsBreakdownDatasetId(breakdownValues, normalizedBreakdowns),
 			label: formatChartBreakdownLabels(breakdownValues),
-			projectName:
-				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
-					? getVersionProjectName?.(breakdownValues[0] ?? '')
-					: undefined,
+			projectName: versionProjectName,
+			tooltip: formatDatasetTooltip(versionProjectName),
 			data,
 			borderColor: color,
 			backgroundColor: color,
 		}
 	})
+}
+
+function isMissingDependentProjectValue(value: string | undefined): boolean {
+	return isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value)
 }
 
 export function getSliceCount(

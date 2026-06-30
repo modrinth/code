@@ -2,11 +2,41 @@
   "app.action-bar.downloading-java": {
     "message": "Скачивание Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Скачивание"
+  },
   "app.action-bar.downloads": {
     "message": "Загрузки"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Скрыть другие активные сборки"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Закрыть"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Установка не удалась"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Установка не удалась из-за закрытия приложения."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Установка не удалась из-за сетевой ошибки."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Установка не удалась из-за неизвестной ошибки."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Открыть сборку"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Повторить"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Неизвестная сборка"
+  },
+  "app.action-bar.installs": {
+    "message": "Установки"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Сделать основной сборкой"
@@ -20,11 +50,17 @@
   "app.action-bar.primary-instance": {
     "message": "Основная сборка"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Перезапустить"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Показать другие активные сборки"
   },
   "app.action-bar.stop-instance": {
     "message": "Остановить сборку"
+  },
+  "app.action-bar.update": {
+    "message": "Обновить"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Посмотреть текущие загрузки"
@@ -92,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Время игры"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Автоматически пропускает подтверждения с низким уровнем риска, такие как установка дубликатов сборок, обычное удаление контента, массовые обновления, отключение сборок и запросы на восстановление. Опасные предупреждения по-прежнему будут отображаться."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Пропустить несущественные предупреждения"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Показывать кнопку скрытия боковой панели."
   },
@@ -152,12 +194,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "Не найдено доступных версий, совместимых с {compatibilityLabel}. Выберите версию для установки вручную. Зависимости не будут установлены автоматически."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Установка сборки..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Введите описание сборки..."
   },
@@ -167,23 +203,68 @@
   "app.export-modal.header": {
     "message": "Экспорт сборки"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Добавить «{file}» в экспорт?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Название сборки"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Название сборки"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Выберите файлы для экспорта"
-  },
   "app.export-modal.version-number-label": {
     "message": "Номер версии"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Скачивание контента"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Скачивание Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Скачивание файла сборки"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Извлечение переопределений"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Завершение"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Подготовка сборки"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Подготовка Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Скачивание Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Распаковка Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Получение Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Подготовка Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Проверка Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Чтение манифеста сборки"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Загрузка версий"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Загрузка контента"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Откат"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Запуск процессоров загрузчика"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Все данные сборки будут удалены навсегда, в том числе миры, настройки и весь установленный контент."
@@ -209,6 +290,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Сборка"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Скачивание {current, number}/{total, number} проектов..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Завершение обновления..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Загрузка версий..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "проект"
   },
@@ -230,8 +320,17 @@
   "app.instance.worlds.browse-servers": {
     "message": "Найти серверы"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Вы действительно хотите удалить этот мир?"
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Удалить"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Удаление мира"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Этот мир будет удалён навсегда из этой сборки. Отменить это действие нельзя."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Удаление {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Модовые"
@@ -251,11 +350,17 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Нет серверов и миров"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Вы действительно хотите удалить {name}?"
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Удалить"
   },
-  "app.instance.worlds.this-server": {
-    "message": "этот сервер"
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Удаление сервера"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Этот сервер будет удалён из списка серверов, в том числе и в игре. Его можно вернуть, зная адрес."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Удаление {name}"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Требуется дополнительный контент"
@@ -265,6 +370,9 @@
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Необходимая сборка"
@@ -410,6 +518,12 @@
   "app.skins.rate-limit.title": {
     "message": "Не так быстро!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Ваш порядок скинов не удалось сохранить."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Не удалось изменить порядок скинов"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -514,6 +628,9 @@
   },
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {запрос} few {запроса} other {запросов}} дружбы"
   },
   "friends.add-friend.submit": {
     "message": "Отправить запрос дружбы"
@@ -677,6 +794,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Название"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Канал обновления"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Альфа"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Релизные, бета и альфа версии будут отображаться как доступные обновления."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Бета"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Релизные и бета версии будут отображаться как доступные обновления."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Релиз"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Только релизные версии будут отображаться как доступные обновления."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Выберите канал обновления"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Команды запуска"
   },
@@ -799,6 +940,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Копировать адрес"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Создать ярлык"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Не показывать на главной"

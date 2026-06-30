@@ -107,13 +107,17 @@
 		}"
 		:class="[
 			'server-panel-' + revealState,
-			constrainWidth ? 'min-h-[100svh] max-w-[1280px] pb-16' : 'min-h-[calc(100svh-100px)] pb-6',
+			containedLayout
+				? 'h-full min-h-0 overflow-hidden pb-6'
+				: constrainWidth
+					? 'min-h-[100svh] max-w-[1280px] pb-16'
+					: 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
 		<template v-if="revealState !== 'pending' || isOnboarding">
 			<ServerManageHeader
 				v-if="!isOnboarding"
-				class="server-stagger-item"
+				:class="['server-stagger-item', containedLayout ? 'shrink-0' : '']"
 				:style="{ '--si': 0 }"
 				:server="serverData"
 				:server-image="serverImage"
@@ -180,6 +184,7 @@
 				<div
 					data-pyro-navigation
 					class="server-stagger-item isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+					:class="containedLayout ? 'shrink-0' : ''"
 					:style="{ '--si': 1 }"
 				>
 					<NavTabs :links="navLinks" replace />
@@ -187,7 +192,8 @@
 
 				<div
 					data-pyro-mount
-					class="server-stagger-item h-full w-full flex-1"
+					class="server-stagger-item w-full flex-1"
+					:class="containedLayout ? 'flex min-h-0 flex-col overflow-hidden' : 'h-full'"
 					:style="{ '--si': 2 }"
 				>
 					<div
@@ -308,7 +314,7 @@
 					</div>
 
 					<ServerPanelAdmonitions
-						class="mb-4"
+						class="mb-4 shrink-0"
 						:sync-progress="syncProgress"
 						:content-error="contentError"
 						@content-retry="handleContentRetry"
@@ -344,7 +350,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError } from '@modrinth/api-client'
+import { getNodeWebSocketUrl, ModrinthApiError } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -447,6 +453,7 @@ const props = withDefaults(
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
 		constrainWidth?: boolean
+		layoutMode?: 'page' | 'contained'
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -462,6 +469,7 @@ const props = withDefaults(
 		browseModpacks: undefined,
 		browseContent: undefined,
 		constrainWidth: false,
+		layoutMode: 'page',
 	},
 )
 
@@ -499,6 +507,7 @@ const DISABLE_LOADING_ANIM = true
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const constrainWidth = computed(() => props.constrainWidth)
+const containedLayout = computed(() => props.layoutMode === 'contained')
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -1299,9 +1308,15 @@ async function testNodeReachability(): Promise<boolean> {
 	const nodeInstance = serverData.value?.node?.instance
 	if (!nodeInstance) return false
 
-	const wsUrl = `wss://${nodeInstance}/pingtest`
-
 	try {
+		const auth = await client.archon.servers_v0.getWebSocketAuth(props.serverId)
+		const authUrl = getNodeWebSocketUrl(auth.url)
+		const protocol = authUrl.toLowerCase().startsWith('ws://') ? 'ws' : 'wss'
+		const wsUrl = getNodeWebSocketUrl(`${nodeInstance}/pingtest`).replace(
+			/^wss?:\/\//i,
+			`${protocol}://`,
+		)
+
 		return await new Promise((resolve) => {
 			const socket = new WebSocket(wsUrl)
 			const timeout = setTimeout(() => {
@@ -1326,7 +1341,7 @@ async function testNodeReachability(): Promise<boolean> {
 			}
 		})
 	} catch (error) {
-		console.error(`Failed to ping node ${wsUrl}:`, error)
+		console.error(`Failed to ping node ${nodeInstance}:`, error)
 		return false
 	}
 }

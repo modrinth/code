@@ -5,16 +5,15 @@
 			:game-versions="gameVersions"
 			:versions="versions"
 			:project="project"
-			:version-link="(version) => `/project/${project.id}/version/${version.id}`"
+			:show-environment-column="themeStore.featureFlags.show_version_environment_column"
+			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent">
+				<ButtonStyled circular type="transparent" color="green">
 					<button
-						v-tooltip="`Install`"
-						:class="{
-							'group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted':
-								!installed || version.id !== installedVersion,
-						}"
+						v-tooltip="
+							!installed ? 'Install' : version.id !== installedVersion ? 'Swap version' : ''
+						"
 						:disabled="installing || (installed && version.id === installedVersion)"
 						@click.stop="() => install(version.id)"
 					>
@@ -26,7 +25,6 @@
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
 						v-if="false"
-						class="group-hover:!bg-button-bg"
 						:options="[
 							{
 								id: 'install-elsewhere',
@@ -52,7 +50,6 @@
 					<a
 						v-else
 						v-tooltip="`Open in browser`"
-						class="group-hover:!bg-button-bg"
 						:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
 						target="_blank"
 					>
@@ -73,9 +70,13 @@ import {
 	ProjectPageVersions,
 } from '@modrinth/ui'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
+import { useTheming } from '@/store/theme.ts'
+
+const themeStore = useTheming()
 
 defineProps({
 	project: {
@@ -109,6 +110,20 @@ defineProps({
 })
 
 const { handleError } = injectNotificationManager()
+const route = useRoute()
+
+function buildProjectHref(path) {
+	const params = new URLSearchParams()
+	for (const [key, val] of Object.entries(route.query)) {
+		if (Array.isArray(val)) {
+			for (const v of val) params.append(key, v)
+		} else if (val) {
+			params.append(key, String(val))
+		}
+	}
+	const qs = params.toString()
+	return qs ? `${path}?${qs}` : path
+}
 
 const [loaders, gameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),

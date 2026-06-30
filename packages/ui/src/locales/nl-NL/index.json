@@ -209,9 +209,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Herinstalleer modpack"
   },
-  "button.remove": {
-    "defaultMessage": "Verwijder"
-  },
   "button.remove-image": {
     "defaultMessage": "Verwijder afbeelding"
   },
@@ -291,7 +288,7 @@
     "defaultMessage": "Platform"
   },
   "collections.label.private": {
-    "defaultMessage": "Prive"
+    "defaultMessage": "Privé"
   },
   "content.card.select-project": {
     "defaultMessage": "Selecteer {project}"
@@ -532,6 +529,9 @@
   },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Als u doorgaat met het uitpakken, worden meer dan 100 bestanden overschreven; hier zijn er een paar."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": ""
   },
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} Overschreven"

@@ -24,11 +24,13 @@ async fn set_project_processing(
     pool: &labrinth::database::PgPool,
     redis: &labrinth::database::redis::RedisPool,
 ) {
-    sqlx::query("UPDATE mods SET status = 'processing' WHERE id = $1")
-        .bind(project_id)
-        .execute(pool)
-        .await
-        .expect("failed to set project to processing status");
+    sqlx::query!(
+        "UPDATE mods SET status = 'processing' WHERE id = $1",
+        project_id
+    )
+    .execute(pool)
+    .await
+    .expect("failed to set project to processing status");
 
     DBProject::clear_cache(
         DBProjectId(project_id),
@@ -42,11 +44,11 @@ async fn set_project_processing(
 
 /// Back-date a lock's `locked_at` so it appears expired.
 async fn expire_lock(project_id: i64, pool: &labrinth::database::PgPool) {
-    sqlx::query(
+    sqlx::query!(
         "UPDATE moderation_locks SET locked_at = NOW() - ($1::bigint * INTERVAL '1 minute') - INTERVAL '1 second' WHERE project_id = $2",
+        LOCK_EXPIRY_MINUTES,
+        project_id,
     )
-    .bind(LOCK_EXPIRY_MINUTES)
-    .bind(project_id)
     .execute(pool)
     .await
     .expect("failed to expire lock");

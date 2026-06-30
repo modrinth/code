@@ -1,7 +1,7 @@
 //! Theseus error type
 use std::sync::Arc;
 
-use crate::{profile, util};
+use crate::util;
 use data_url::DataUrlError;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
@@ -68,8 +68,8 @@ pub enum ErrorKind {
     #[error("Error fetching URL: {0}")]
     FetchError(#[from] reqwest::Error),
 
-    #[error("Too many API errors; temporarily blocked")]
-    ApiIsDownError,
+    #[error("Too many API errors, try again in {0} minutes")]
+    ApiIsDownError(u32),
 
     #[error("{0}")]
     LabrinthError(LabrinthError),
@@ -101,11 +101,8 @@ pub enum ErrorKind {
     #[error("Error acquiring semaphore: {0}")]
     AcquireError(#[from] tokio::sync::AcquireError),
 
-    #[error("Profile {0} is not managed by the app!")]
-    UnmanagedProfileError(String),
-
-    #[error("Could not create profile: {0}")]
-    ProfileCreationError(#[from] profile::create::ProfileCreationError),
+    #[error("Instance {0} is not managed by the app!")]
+    UnmanagedInstanceError(String),
 
     #[error("User is not logged in, no credentials available!")]
     NoCredentialsError,

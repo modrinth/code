@@ -16,7 +16,8 @@ import {
 	type TabbedModalTab,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import type { PlatformTag } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -26,12 +27,15 @@ import InstallationSettings from '@/components/ui/instance_settings/Installation
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import { get_project_v3 } from '@/helpers/cache'
-import { get_linked_modpack_info } from '@/helpers/profile'
+import { get_linked_modpack_info } from '@/helpers/instance'
+import { get_loader_versions } from '@/helpers/metadata'
+import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { provideInstanceSettings } from '@/providers/instance-settings'
 
 import type { GameInstance } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
+const queryClient = useQueryClient()
 
 const props = defineProps<{
 	instance: GameInstance
@@ -45,7 +49,6 @@ const isMinecraftServer = ref(false)
 const handleUnlinked = () => emit('unlinked')
 
 const instanceRef = computed(() => props.instance)
-const queryClient = useQueryClient()
 const tabbedModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
 function hide() {
@@ -64,8 +67,8 @@ watch(
 	() => props.instance,
 	(instance) => {
 		isMinecraftServer.value = false
-		if (instance.linked_data?.project_id) {
-			get_project_v3(instance.linked_data.project_id, 'must_revalidate')
+		if (instance.link?.project_id) {
+			get_project_v3(instance.link.project_id, 'must_revalidate')
 				.then((project: Labrinth.Projects.v3.Project | undefined) => {
 					if (project?.minecraft_server != null) {
 						isMinecraftServer.value = true
@@ -120,11 +123,50 @@ const tabs = computed<TabbedModalTab[]>(() => [
 	},
 ])
 
+function getSupportedModpackLoaders() {
+	return get_loaders().then((value: PlatformTag[]) =>
+		value
+			.filter((item) => item.supported_project_types.includes('modpack') || item.name === 'vanilla')
+			.sort((a, b) => (a.name === 'vanilla' ? -1 : b.name === 'vanilla' ? 1 : 0)),
+	)
+}
+
+// Preload
+useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'fabric'],
+	queryFn: () => get_loader_versions('fabric'),
+})
+useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'forge'],
+	queryFn: () => get_loader_versions('forge'),
+})
+useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'quilt'],
+	queryFn: () => get_loader_versions('quilt'),
+})
+useQuery({
+	queryKey: ['instance-settings', 'loader-versions', 'neo'],
+	queryFn: () => get_loader_versions('neo'),
+})
+useQuery({
+	queryKey: ['instance-settings', 'game-versions'],
+	queryFn: get_game_versions,
+})
+useQuery({
+	queryKey: ['instance-settings', 'loaders', 'modpack'],
+	queryFn: getSupportedModpackLoaders,
+})
+useQuery({
+	queryKey: computed(() => ['linkedModpackInfo', props.instance.id]),
+	queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
+	enabled: computed(() => !!props.instance.link?.project_id && !props.offline),
+})
+
 function show(tabIndex?: number) {
-	if (props.instance.linked_data?.project_id) {
+	if (props.instance.link?.project_id) {
 		queryClient.prefetchQuery({
-			queryKey: ['linkedModpackInfo', props.instance.path],
-			queryFn: () => get_linked_modpack_info(props.instance.path, 'stale_while_revalidate'),
+			queryKey: ['linkedModpackInfo', props.instance.id],
+			queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
 		})
 	}
 	tabbedModal.value?.show()
@@ -147,7 +189,7 @@ defineExpose({ show, hide })
 				<Avatar
 					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
 					size="24px"
-					:tint-by="props.instance.path"
+					:tint-by="props.instance.id"
 				/>
 				{{ instance.name }} <ChevronRightIcon />
 				<span class="font-extrabold text-contrast">{{

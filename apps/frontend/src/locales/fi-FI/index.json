@@ -8,6 +8,24 @@
   "admin.billing.error.not-found": {
     "message": "Käyttäjää ei löydetty"
   },
+  "analytics.action.add": {
+    "message": "Lisää"
+  },
+  "analytics.action.cancel": {
+    "message": "Peruuta"
+  },
+  "analytics.action.refresh": {
+    "message": "Päivitä"
+  },
+  "analytics.action.reset": {
+    "message": "Palauta"
+  },
+  "analytics.breakdown.country": {
+    "message": "Valtio"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "Riippuu kohteesta"
+  },
   "app-marketing.download.description": {
     "message": "Työpöytä sovelluksemme on saatavilla kaikilla alustoilla, valitse haluamasi versio."
   },
@@ -254,47 +272,20 @@
   "auth.reset-password.title.long": {
     "message": "Palauta salasanasi"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Syötä 2-vaiheisen tunnistautumisen koodi jatkaaksesi."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Syötä 2-vaiheisen tunnistautumisen koodi"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Anna koodi..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Kirjaudu sisään käyttäen"
   },
   "auth.sign-in.title": {
     "message": "Kirjaudu sisään"
   },
-  "auth.sign-in.use-password": {
-    "message": "Tai käytä salasanaa"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Luo tili"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Luomalla tilin, hyväksyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Salasanat eivät täsmää!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Onko sinulla jo käyttäjätili?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Tilaa päivityksiä Modrinthista"
-  },
   "auth.sign-up.title": {
     "message": "Rekisteröidy"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Tai luo tili itse"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Reskiteröidy käyttäen"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tilin asetukset"
@@ -326,18 +317,6 @@
   "auth.verify-email.title": {
     "message": "Vahvista sähköposti"
   },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Tilaa päivityksiä Modrinthista"
-  },
-  "auth.welcome.label.tos": {
-    "message": "Luomalla tilin, olet hyväksynyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Tervetuloa Modrinthiin!"
-  },
-  "auth.welcome.title": {
-    "message": "Tervetuloa"
-  },
   "collection.button.edit-icon": {
     "message": "Muokkaa kuvaketta"
   },
@@ -361,6 +340,12 @@
   },
   "collection.delete-modal.title": {
     "message": "Oletko varma että haluat poistaa tämän kokoelman?"
+  },
+  "collection.description": {
+    "message": "{description} - Katso kokoelma {name}, jonka on luonut {username}, Modrinthissa"
+  },
+  "collection.description.following": {
+    "message": "Automattisesti luotu kokoelma kaikista projekteista joita seuraat."
   },
   "collection.editing": {
     "message": "Muokataan kokoelmaa"
@@ -625,24 +610,6 @@
   },
   "dashboard.projects.project.icon-alt": {
     "message": "Kuvake projektille {title}"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Nouseva"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Laskeva"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nimi"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Tila"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tyyppi"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Kuvake"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "جاز تنزيل إصدار جافا {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "تحميل التحديث"
+  },
   "app.action-bar.downloads": {
     "message": "التنزيلات"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "النسخة ألرئيسية"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "أعد التشغيل للتحديث"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "عرض المزيد من النسخ قيد التشغيل"
   },
   "app.action-bar.stop-instance": {
     "message": "إيقاف النسخة"
+  },
+  "app.action-bar.update": {
+    "message": "تحديث"
   },
   "app.action-bar.view-active-downloads": {
     "message": "عرض التحميلات الفعالة"
@@ -35,11 +44,35 @@
   "app.action-bar.view-logs": {
     "message": "عرض التسجيل"
   },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "يتيح العرض المتقدم لتأثيرات مثل التشويش الذي قد تسبب مشكلات في الأداء دون استخدام العرض المسرع بالأجهزة."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "العرض المتقدم"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "اختر لون سمتك المفضل من أجل تطبيق Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "لون السمة"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "غير الصفحة التي يفتح عليها المشغل."
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "صفحة الرئيسية"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "مكتبة"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "الصفحة الرئيسة الافتراضية"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "ألغ تفعيل عرض الاسم فوق لاعبك في صفحة المظاهر."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "إخفاء عرض الاسم"
   },
   "app.auth-servers.unreachable.body": {
     "message": "قد تكون خوادم مصادقة ماينكرافت معطلة حاليًا. تحقق من اتصالك بالإنترنت وحاول مرة أخرى لاحقًا."
@@ -59,11 +92,17 @@
   "app.browse.already-added": {
     "message": "مضاف فعلا"
   },
+  "app.browse.back-to-instance": {
+    "message": "العودة للنموذج"
+  },
   "app.browse.discover-content": {
     "message": "استكشف محتوى"
   },
   "app.browse.discover-servers": {
     "message": "استكشف خوادم"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "إخفاء الخوادم المضافة مسبقًا"
   },
   "app.browse.server.installing": {
     "message": "جاري التثبيت"
@@ -102,13 +141,13 @@
     "message": "حذف النموذج"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "حُزْمَة التعديل هذه مثبته فعلًا في نموذج <bold>{instanceName}</bold>. هل انت متأكد بإرادة نسخه؟"
+    "message": "حُزْمَة التعديل مثبته مسبقًا فعلًا في نموذج <bold>{instanceName}</bold>. هل أنت متأكد بإرادة نسخه؟"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "إنشاء"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "حُزْمَة التعديل مثبتة بالفعل"
+    "message": "حُزْمَة التعديل مثبتة فعلًا"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "النموذج"
@@ -126,7 +165,7 @@
     "message": "تحقق من المشاريع التي أستخدمها في حزمة التعديل الخاص بي!"
   },
   "app.instance.mods.share-title": {
-    "message": "مشاركة محتوى حزمة التعديل"
+    "message": "مشاركة محتوى حُزْمَة التعديل"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "تم الرفع بنجاح"
@@ -136,12 +175,6 @@
   },
   "app.instance.worlds.browse-servers": {
     "message": "تصفح الخوادم"
-  },
-  "app.instance.worlds.delete-world-description": {
-    "message": "سيتم حذف '{name}' **نهائيا**, و لن هناك أي طريقة لاسترداده."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "هل أنت متيقِّن من رغبتك بحذف هذا العالم نهائيا؟"
   },
   "app.instance.worlds.filter-modded": {
     "message": "معدّل"
@@ -161,20 +194,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "لم تتم إضافة أي من الخوادم أو العوالم"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "ستتم إزالة '{name}' من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "ستتم إزالة '{name}' ({address}) من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "هل أنت متيقِّن من رغبتك في إزالة {name}؟"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ابحث بين ال{count} عوالم..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "هذا الخادم"
   },
   "app.modal.install-to-play.content-required": {
     "message": "المحتوى مطلوب"
@@ -189,7 +210,7 @@
     "message": "{count, plural, one {# تعديل} other {# تعديلات}}"
   },
   "app.modal.install-to-play.required-modpack": {
-    "message": "حزمة التعديل مطلوبة"
+    "message": "حُزْمَة التعديل مطلوبة"
   },
   "app.modal.install-to-play.server-requires-mods": {
     "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
@@ -210,7 +231,13 @@
     "message": "يلزم التحديث"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "هناك تحديث مطلوب للعب بـ {name}. الرجاء التحديث إلى آخر اصدار لتشغيل اللعبة."
+    "message": "هناك تحديث مطلوب للعب بـ {name}. الرجاء التحديث إلى أحدث اصدار لتشغيل اللعبة."
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "العودة إلى الاستكشاف"
+  },
+  "app.project.install-context.install-content-to-instance": {
+    "message": "تثبيت المحتويات الى النموذج"
   },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
@@ -236,6 +263,75 @@
   "app.settings.tabs.resource-management": {
     "message": "إدارة الموارد"
   },
+  "app.skins.add-button": {
+    "message": "إضافة مظهر"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "أسحب ثم أفلت"
+  },
+  "app.skins.apply-button": {
+    "message": "تطبيق"
+  },
+  "app.skins.delete-button": {
+    "message": "حذف المظهر"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "سيتم حذف المظهر بشكل نهائي، ولايمكن إرجاعه."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "هل أنت متأكد من حذف المظهر هذا؟"
+  },
+  "app.skins.edit-button": {
+    "message": "تعديل المظهر"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "إضافة المظهر"
+  },
+  "app.skins.modal.add-title": {
+    "message": "إضافة المظهر"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "رداء"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "رداء"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "تعديل المظهر"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "عدل المظهر أولا للحفظ !"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "بدون رداء"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "لا شيء"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "حفظ المظهر"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "حفظ..."
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "أرفع المظهر أولا !"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "تعديل المظهر"
+  },
+  "app.skins.previewing-badge": {
+    "message": "أستعراض"
+  },
+  "app.skins.rate-limit.title": {
+    "message": "تمهل !"
+  },
+  "app.skins.sign-in.title": {
+    "message": "الرجاء تسجيل الدخول"
+  },
+  "app.skins.title": {
+    "message": "اختيار المظهر"
+  },
   "app.update-popup.body.download-complete": {
     "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
   },
@@ -254,9 +350,6 @@
   "app.update-popup.download-complete": {
     "message": "اكتمل التنزيل"
   },
-  "app.update-popup.reload": {
-    "message": "إعادة تحميل"
-  },
   "app.update-popup.title": {
     "message": "تحديث متاح"
   },
@@ -267,7 +360,7 @@
     "message": "تم تثبيت الإصدار {version} بنجاح!"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "مثال.مودرنث.جج"
+    "message": "مثال (example.modrinth.gg)"
   },
   "app.world.server-modal.select-an-option": {
     "message": "حدد خيارا"
@@ -518,6 +611,9 @@
   "instance.settings.tabs.java.java-memory": {
     "message": "الذاكرة المخصَّصة"
   },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/path/to/java"
+  },
   "instance.settings.tabs.window": {
     "message": "النافذة"
   },
@@ -592,6 +688,9 @@
   },
   "minecraft-account.add-account": {
     "message": "إضافة حساب"
+  },
+  "minecraft-account.label": {
+    "message": "حساب ماينكرافت"
   },
   "minecraft-account.select-account": {
     "message": "اختيار الحساب"

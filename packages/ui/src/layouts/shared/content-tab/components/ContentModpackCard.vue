@@ -154,9 +154,18 @@ onUnmounted(() => {
 						>
 							{{ project.title }}
 						</AutoLink>
-						<span v-if="project.filename" class="truncate text-secondary mb-2">
+						<span
+							v-if="project.filename && (owner || version)"
+							class="truncate text-secondary mb-2"
+						>
 							{{ project.filename }}
 						</span>
+					</div>
+					<div
+						v-if="project.filename && !(owner || version)"
+						class="flex min-h-8 min-w-0 items-center text-secondary"
+					>
+						<span class="truncate">{{ project.filename }}</span>
 					</div>
 					<div
 						v-if="owner || version"

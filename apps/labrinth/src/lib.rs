@@ -28,6 +28,8 @@ use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use crate::util::tiltify::TiltifyClient;
 use sync::friends::handle_pubsub;
+use url::Url;
+use webauthn_rs::{Webauthn, WebauthnBuilder};
 
 pub mod auth;
 pub mod background_task;
@@ -58,10 +60,10 @@ pub struct LabrinthConfig {
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
-    pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
+    pub file_host: web::Data<dyn file_hosting::FileHost>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
-    pub search_backend: web::Data<dyn search::SearchBackend>,
+    pub search_state: web::Data<search::SearchState>,
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
@@ -75,6 +77,8 @@ pub struct LabrinthConfig {
     pub gotenberg_client: GotenbergClient,
     pub http_client: web::Data<HttpClient>,
     pub tiltify_client: web::Data<TiltifyClient>,
+    pub kafka_client: web::Data<util::kafka::KafkaClientState>,
+    pub webauthn: web::Data<Webauthn>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -84,11 +88,12 @@ pub fn app_setup(
     redis_pool: RedisPool,
     search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
-    file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
+    file_host: web::Data<dyn file_hosting::FileHost>,
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
     gotenberg_client: GotenbergClient,
+    kafka_client: web::Data<util::kafka::KafkaClientState>,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!("Starting labrinth on {}", &ENV.BIND_ADDR);
@@ -99,10 +104,11 @@ pub fn app_setup(
     {
         let automated_moderation_queue_ref = automated_moderation_queue.clone();
         let pool_ref = pool.clone();
+        let ro_pool_ref = ro_pool.clone();
         let redis_pool_ref = redis_pool.clone();
         actix_rt::spawn(async move {
             automated_moderation_queue_ref
-                .task(pool_ref, redis_pool_ref)
+                .task(pool_ref, ro_pool_ref, redis_pool_ref)
                 .await;
         });
     }
@@ -112,6 +118,18 @@ pub fn app_setup(
     let http_client = web::Data::new(HttpClient::new());
     let tiltify_client =
         web::Data::new(TiltifyClient::new(http_client.get_ref().clone()));
+    let search_state = web::Data::new(search::SearchState {
+        backend: search_backend.clone().into_inner(),
+        queue: search::incremental::IncrementalSearchQueue::new(
+            kafka_client.clone(),
+        ),
+    });
+    {
+        let incremental_search_queue = search_state.queue.clone();
+        actix_rt::spawn(async move {
+            incremental_search_queue.run().await;
+        });
+    }
     {
         let pool_ref = pool.clone();
         let http_ref = http_client.clone();
@@ -297,6 +315,19 @@ pub fn app_setup(
         });
     }
 
+    let webauthn_origin = Url::parse(&ENV.SITE_URL).expect("invalid SITE_URL");
+    let webauthn_rp_id = webauthn_origin
+        .host_str()
+        .expect("SITE_URL has no host")
+        .to_string();
+    let webauthn = web::Data::new(
+        WebauthnBuilder::new(&webauthn_rp_id, &webauthn_origin)
+            .expect("invalid webauthn configuration")
+            .rp_name(&ENV.WEBAUTHN_RP_NAME)
+            .build()
+            .expect("failed to build webauthn"),
+    );
+
     LabrinthConfig {
         pool,
         ro_pool,
@@ -305,7 +336,7 @@ pub fn app_setup(
         file_host,
         scheduler: Arc::new(scheduler),
         ip_salt,
-        search_backend,
+        search_state,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
@@ -317,11 +348,13 @@ pub fn app_setup(
         gotenberg_client,
         http_client,
         tiltify_client,
+        kafka_client,
         archon_client: web::Data::new(
             ArchonClient::from_env()
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
         ),
         email_queue: web::Data::new(email_queue),
+        webauthn,
     }
 }
 
@@ -344,8 +377,10 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
-    .app_data(web::Data::new(labrinth_config.file_host.clone()))
-    .app_data(labrinth_config.search_backend.clone())
+    .app_data(labrinth_config.file_host.clone())
+    .app_data(web::Data::from(
+        labrinth_config.search_state.backend.clone(),
+    ))
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.http_client.clone())
     .app_data(labrinth_config.tiltify_client.clone())
@@ -361,6 +396,9 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
+    .app_data(labrinth_config.kafka_client.clone())
+    .app_data(labrinth_config.search_state.clone())
+    .app_data(labrinth_config.webauthn.clone())
     .configure(routes::v3::config)
     .configure(routes::internal::config)
     .configure(routes::root_config)

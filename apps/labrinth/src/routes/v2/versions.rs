@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::projects::{
@@ -11,7 +11,7 @@ use crate::models::projects::{
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
-use crate::search::SearchBackend;
+use crate::search::{SearchBackend, SearchState};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -89,6 +89,7 @@ pub async fn version_list(
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -147,6 +148,7 @@ pub async fn version_list(
         info,
         web::Query(filters),
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -196,6 +198,7 @@ pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -204,6 +207,7 @@ pub async fn version_project_get(
         req,
         id,
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -238,6 +242,7 @@ pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -249,6 +254,7 @@ pub async fn versions_get(
         req,
         web::Query(ids),
         pool,
+        ro_pool,
         redis,
         session_queue,
     )
@@ -286,15 +292,22 @@ pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let response =
-        v3::versions::version_get_helper(req, id, pool, redis, session_queue)
-            .await
-            .map(|b| HttpResponse::Ok().json(b))
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::versions::version_get_helper(
+        req,
+        id,
+        pool,
+        ro_pool,
+        redis,
+        session_queue,
+    )
+    .await
+    .map(|b| HttpResponse::Ok().json(b))
+    .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -314,7 +327,7 @@ pub struct EditVersion {
     pub name: Option<String>,
     #[validate(
         length(min = 1, max = 32),
-        regex(path = *crate::util::validate::RE_URL_SAFE)
+        regex(path = *crate::util::validate::RE_URL_SAFE_RELAXED)
     )]
     pub version_number: Option<String>,
     #[validate(length(max = 65536))]
@@ -364,9 +377,11 @@ pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let new_version = new_version.into_inner();
 
@@ -383,6 +398,7 @@ pub async fn version_edit(
         req.clone(),
         (*info).0,
         pool.clone(),
+        ro_pool.clone(),
         redis.clone(),
         session_queue.clone(),
     )
@@ -445,6 +461,7 @@ pub async fn version_edit(
         redis,
         web::Json(serde_json::to_value(new_version)?),
         session_queue,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -477,6 +494,7 @@ pub async fn version_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_backend: web::Data<dyn SearchBackend>,
+    search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::versions::version_delete(
@@ -486,6 +504,7 @@ pub async fn version_delete(
         redis,
         session_queue,
         search_backend,
+        search_state,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)

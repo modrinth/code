@@ -104,6 +104,15 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Dự án được chọn"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Tải {count, plural, other {# dự án}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {# dự án được chọn}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Bạn đã chọn {count, plural, other {{count} dự án}}. Tải chúng hoặc quay lại mà kệ chúng."
+  },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Dự án được chọn chưa được cài"
   },
@@ -224,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Cài đặt lại modpack"
   },
-  "button.remove": {
-    "defaultMessage": "Xoá"
-  },
   "button.remove-image": {
     "defaultMessage": "Xóa ảnh"
   },
@@ -311,8 +317,14 @@
   "content-type.content.lowercase": {
     "defaultMessage": "nội dung"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, other {vật phẩm}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "Chọn {project}"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Bạn có chắc chắn muốn cập nhật {count, plural, other {# dự án}} lên phiên bản tương thích mới nhất không? Đề xuất: Bạn nên cập nhật từng cái một."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Cảnh báo cập nhật"
@@ -322,6 +334,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Nhẫn giữ phím Shift trong khi ấn \"Cập nhật tất cả\" để bỏ qua bước xác nhận."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Cập nhật {count, plural, other {# dự án}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Việc xóa một bản mod có thể ảnh hưởng vĩnh viễn đến thế giới của bạn, đồng thời có thể gây thiếu hụt nội dung hoặc phát sinh các lỗi không mong muốn khi tải lại thế giới đó."
@@ -358,6 +373,48 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Huỷ liên kết"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Nội dung này đang được sử dụng bởi thành phần khác"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {project} other {projects}} bị ảnh hưởng"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Một số mục bạn chọn là thành phần bắt buộc để chạy các nội dung khác. Nếu xóa chúng, {context} có thể bị lỗi hoặc các nội dung liên quan sẽ không thể hoạt động bình thường."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "cấu hình"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "máy chủ"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Vẫn tiếp tục xoá"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Vẫn tiếp tục xoá {count, number} {itemType}"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Đang xoá"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Vô hiệu hoá nội dung phụ thuộc sau khi xoá"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Nội dung phụ thuộc có thể không tải được hoặc tự vô hiệu hóa"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "{context} của bạn có thể sập, từ chối khởi động hoặc hoạt động bất thường"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Cảnh báo phụ thuộc"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} đang được cài đặt dưới dạng nội dung phụ thuộc. Việc xoá nó có thể khiến {context} hỏng hoặc ngăn nội dung phụ thuộc nó tải đúng cách."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Chuyện gì sẽ xảy ra?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "Đã thêm {count}"
@@ -415,6 +472,9 @@
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Giữ nút Shift khi click để bỏ qua xác nhận."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Chúng tôi khuyên bạn nên tạo bản dự phòng trước để khi có gì hỏng thì bạn có thể hoàn tác lại."
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "thế giới"
@@ -544,6 +604,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "Nhập"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Nhập {count, plural, other {# cấu hình}}"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Tạo máy chủ"
@@ -1070,6 +1133,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Tên mới"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, other {# mục}}"
+  },
   "files.table-header.created": {
     "defaultMessage": "Thời gian tạo"
   },
@@ -1108,6 +1174,9 @@
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "Tệp"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "Tải lên"
   },
   "files.upload-dropdown.incorrect-file-type": {
     "defaultMessage": "Sai định dạng khi tải lên"
@@ -1267,6 +1336,9 @@
   },
   "form.placeholder.state": {
     "defaultMessage": "Nhập bang/tỉnh"
+  },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, other {byte}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1601,6 +1673,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Chế độ chơi không xác định"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "Tương thích {count} cái với {count, plural, other {instance}}"
+  },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Phiên chơi có sẵn"
   },
@@ -1609,6 +1684,9 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Cài đặt dự án"
+  },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "Cấu hình này dùng trình tải hoặc phiên bản khác mà nội dung này hỗ trợ."
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Cài đặt"
@@ -1658,6 +1736,9 @@
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Không có dự án nào phù hợp với kết quả tìm kiếm."
   },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Tìm {count, number} {count, plural, other {dự án}}"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
   },
@@ -1679,6 +1760,9 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Ẩn không tương thích"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "Phiên bản này được đánh dấu không tương thích với cấu hình này. Các nội dung phụ thuộc sẽ không được cài đặt ự động."
+  },
   "instances.updater-modal.incompatibility-warning-header": {
     "defaultMessage": "Chọn phiên bản"
   },
@@ -1690,6 +1774,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "Kệ và cập nhật"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Vẫn cài đặt"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Đang tải nhật ký thay đổi..."
@@ -2414,29 +2501,77 @@
   "project-type.all": {
     "defaultMessage": "Tất cả"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {Gói dữ liệu}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Gói dữ liệu"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {gói dữ liệu}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {Mod}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Mod"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {Modpack}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Modpack"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {modpack}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {Plugin}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Plugin"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {plugin}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, other {Dự án}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Dự án"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {dự án}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {Gói tài nguyên}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Gói tài nguyên"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {gói tài nguyên}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {Máy chủ}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Máy chủ"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {máy chủ}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {Shader}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Shader"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {shader}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Môi trường được hỗ trợ"
@@ -2561,6 +2696,9 @@
   "project.about.tags.title": {
     "defaultMessage": "Thẻ"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {lượt tải xuống}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Yêu cầu cài đặt trên cả máy khách và máy chủ."
   },
@@ -2626,6 +2764,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Môi trường không xác định"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {lượt theo dõi}}"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} trực tuyến"
@@ -3173,8 +3314,464 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Bản sao lưu"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Nội dung và modpack"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Tệp tin và SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Nguồn và bảng điều khiển"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Máy chủ"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Cài đặt và môi trường chạy"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Người dùng và lời mời"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Hành động"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "Tìm hành động..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "Nội dung đã được thêm"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Nội dung đã bị xoá"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "Nội dung bị vô hiệu hoá"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "Nội dung đã bật"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Nội dung đã cập nhật"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Nội dung đã tải lên"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Bản sao lưu đã tạo"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Bản sao lưu đã bị xoá"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Bản sao lưu đã bị đổi tên"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "Bảo sao lưu đã được khôi phục"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "Tên máy chủ bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "Tên miền máy chủ bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "Nhật ký bảng điều khiển bị xoá"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "Lệnh bảng điều khiển được chạy"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "Tệp tin đã bị xoá"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "Tệp tin đã bị chỉnh sửa"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "Tệp tin đã bị đổi tên"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "Tệp tin đã được tải lên"
+  },
+  "servers.access-page.activity-log-filter.action.game-version-edited": {
+    "defaultMessage": "Phiên bản Minecraft bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.java-runtime-modified": {
+    "defaultMessage": "Môi trường chạy Java bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "Phiên bản Java bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "Phiên bản trình chạy bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "Modpack bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Modpack bị huỷ liên kết"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "Cổng đã được cấp thêm"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "Cổng bị xoá"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "Máy chủ được tạo"
+  },
+  "servers.access-page.activity-log-filter.action.server-killed": {
+    "defaultMessage": "Máy chủ bị buộc tắt"
+  },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "Gói cước bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.server-properties-modified": {
+    "defaultMessage": "Thuộc tính máy chủ bị chỉnh sửa"
+  },
+  "servers.access-page.activity-log-filter.action.server-reallocated": {
+    "defaultMessage": "Máy chủ bị tái cấp phát"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "Máy chủ bị sửa chữa"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "Máy chủ bị đặt lại"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "Máy chủ bị khởi động lại"
+  },
+  "servers.access-page.activity-log-filter.action.server-started": {
+    "defaultMessage": "Máy chủ được bật"
+  },
+  "servers.access-page.activity-log-filter.action.server-stopped": {
+    "defaultMessage": "Máy chủ bị tắt"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-login": {
+    "defaultMessage": "Đã đăng nhập qua SFTP"
+  },
+  "servers.access-page.activity-log-filter.action.startup-command-modified": {
+    "defaultMessage": "Lệnh bắt đầu bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.user-invite-revoked": {
+    "defaultMessage": "Lời mời bị thu hồi"
+  },
+  "servers.access-page.activity-log-filter.action.user-invited": {
+    "defaultMessage": "Người dùng được mời"
+  },
+  "servers.access-page.activity-log-filter.action.user-permission-modified": {
+    "defaultMessage": "Quyền hạn người dùng bị đổi"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "Quyền truy cập bị thu hồi"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "Thêm bộ lọc"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "Xoá bộ lọc"
+  },
+  "servers.access-page.activity-log-filter.empty-options": {
+    "defaultMessage": "Không có mục khả dụng."
+  },
+  "servers.access-page.activity-log-filter.empty-search": {
+    "defaultMessage": "Không mục nào được tìm thấy."
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Cấu hình"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Máy chủ"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "Hỗ trợ"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Người dùng"
+  },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "Nhật ký hoạt động"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "Thêm người dùng"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "Không thể gửi lời mời kết bạn"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "Đã thu hồi lời mời cho {target}."
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "Lời mời đã thu hồi"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "Lời mời không thể được gửi"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "Đã gửi lời mời khác cho {target}."
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Lời mời đã được gửi lại"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "Đã mời {target} cho vai trò {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Lời mời đã gửi"
+  },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "Làm mới trang để thử lại."
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Quyền truy cập không thể tải"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Đã thu hồi quyền truy cập của {target}."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Quyền truy cập đã bị thu hồi"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Quyền truy cập không thể bị xoá"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "Không thể cập nhật vai trò"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Tất cả"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "Vai trò: {role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "Người chỉnh sửa"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "Quản lý nội dung, tệp tin, bản sao lưu và các cài đặt khác của cấu hình."
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Chủ sở hữu"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "Toàn quyền truy cập bao gồm thanh toán, quản lý thành viên và các hành động gây ảnh hưởng cấu hình."
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Bị giới hạn"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Bắt đầu, dừng và xem máy chủ mà không được chỉnh sửa."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Tìm kiếm {count} {count, plural, one {user} other {users}}..."
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "Người chỉnh sửa"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Chủ sở hữu"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Bị giới hạn"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "Thu hồi lời mời"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Thu hồi quyền truy cập"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "Gửi lại lời mời"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "Gửi lại trong {seconds}s"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Hành động"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "Tham gia"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Vai trò"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Người dùng"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "Không người dùng nào thoả bộ lọc."
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "Hành động cho {username}"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "Đang chờ"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Đang chạy tác vụ nền"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Hỗ trợ"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Hành động"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Thời gian"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Người dùng"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "Cấu hình"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Các cấu hình của máy chủ là các môi trường độc lập, chứa nội dung cài đặt và các tệp thế giới riêng."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Sắp có!"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "Không hành động nào thoả bộ lọc."
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "Làm gì đó với máy chủ và bạn sẽ thấy nó ở đây!"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "Đã thêm nội dung <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "Đã thay đổi nội dung <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "Đã xoá nội dung <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "Nội dung đã bị xoá"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "Đã vô hiệu hoá <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "Đã bật <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Đã cập nhật <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "Đã tải lên <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "Đã thay đổi bản sao lưu <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "Bản sao lưu đã bị thay đổi"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "Đã tạo bản sao lưu <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "Bản sao lưu đã được tạo"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "Đã xoá bản sao lưu <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "Bản sao lưu đã bị xoá"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "Đã đổi tên bản sao lưu từ <from></from> thành <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "Bản sao lưu đã bị đổi tên"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "Đã khôi phục bản sao lưu <backup></backup>"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "Bản sao lưu đã được khôi phục"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "Đã thay đổi cấu hình máy chủ"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "Đã xoá nhật ký bản điều khiển"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "Đã chạy lệnh bảng điều khiển <command></command>"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "Đã thay đổi tệp <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "Đã xoá tệp <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Đã chỉnh sửa tệp <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "Đã đổi tên tệp từ <from></from> thành <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "Đã tải lên tệp <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Đã đổi phiên bản Minecraft thành <version></version>"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Đã đổi môi trường chạy Java thành <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Đã đổi phiên bản Java thành <java-version></java-version>"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Đã đổi trình chạy thành <loader></loader> <version></version>"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Đã đổi trình chạy thành <loader></loader>"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "Đã đổi phiên bản trình chạy thành <version></version>"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "Đã đổi phiên bản trình chạy"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Đã đổi modpack"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Đã đổi modpack thành <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "Đã đổi phiên bản modpack thành <version></version>"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Đã huỷ liên kết modpack"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Đã huỷ liên kết modpack <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Đã huỷ liên kết phiên bản modpack<version></version>"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "Đã thêm cổng <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Đã xoá cổng <port></port>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "Đã tạo server"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Bản sao lưu {backupName} đã bị hủy."
@@ -3251,8 +3848,29 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Đang khôi phục từ bản sao lưu"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "{count, plural, other {Hành động cho # bản sao lưu}}"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "Đang xóa {total, plural, other {# bản sao lưu}}..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {Đã chọn # bản sao lưu}}"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "Khi đã bị xóa, {count, plural, other {mấy bản sao lưu này}} sẽ không thể lấy lại được. Nó sẽ bị xóa vĩnh viễn."
+  },
   "servers.backups.delete-modal.admonition-header": {
     "defaultMessage": "Cảnh báo về việc xóa"
+  },
+  "servers.backups.delete-modal.backups-label": {
+    "defaultMessage": "{count, plural, other {Bản sao lưu ({count})}}"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "Xóa {count, plural,other {# bản sao lưu}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "Xóa {count, plural,other {bản sao lưu}}"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Tạo bản sao lưu mới của bạn"
@@ -3416,6 +4034,9 @@
   "servers.listing.new-label": {
     "defaultMessage": "Mới"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Tệp của bạn vẫn được giữ trong vòng <days-remaining>{daysRemaining} ngày{daysRemaining, plural, other {nữa}}</days-remaining>. liên hệ với bên hỗ trợ để tải tệp về trước khi chúng bị xóa."
+  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Tệp của bạn sẽ được giữ trong vòng 30 ngày trước khi bị xóa."
   },
@@ -3530,6 +4151,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Thành công"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Tìm kiếm trong {count} {count, plural, other {máy chủ}}..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3541,6 +4165,9 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Cài đặt máy chủ của bạn đã được di chuyển"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "còn <days-count>{days}</days-count> {days, plural, other {ngày}} <hours-count>{hours}</hours-count> {hours, plural,  other {giờ}} <minutes-count>{minutes}</minutes-count> {minutes, plural,  other {phút}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {giây}}..."
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Máy chủ mới"
@@ -3811,6 +4438,9 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Tìm kiếm một ngôn ngữ..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Không có ngôn ngữ nào} other {Có # ngôn ngữ}} khớp với tìm kiếm của bạn."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Không có ngôn ngữ phù hợp với tìm kiếm của bạn."
@@ -4283,6 +4913,9 @@
   "time-frame-picker.increase-amount": {
     "defaultMessage": "Tăng lượng thời gian"
   },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "Trong {amount} {unit, select, hours {{amount, plural, other {giờ}}} days {{amount, plural,  other {ngày}}} weeks {{amount, plural, other {tuần}}} months {{amount, plural, other {tháng}}} other {ngày}} vừa qua"
+  },
   "time-frame-picker.last-timeframe-prefix": {
     "defaultMessage": "Trong vòng"
   },
@@ -4360,6 +4993,9 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Rời khỏi trang nhé?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, other {# thông báo}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Tắt hết"
@@ -4461,3 +5097,4 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
+

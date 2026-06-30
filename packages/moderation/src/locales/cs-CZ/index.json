@@ -3,76 +3,85 @@
     "defaultMessage": "Je vyžadován popis, který jasně popisuje účel a funkci projektu."
   },
   "nags.add-description.title": {
-    "defaultMessage": "Přidat popisek"
+    "defaultMessage": "Přidejte popis"
   },
   "nags.add-icon.description": {
     "defaultMessage": "Přidání jedinečné, relevantní a poutavé ikony zvýší rozpoznatelnost vašeho projektu a pomůže mu vyniknout."
   },
   "nags.add-icon.title": {
-    "defaultMessage": "Přidat ikonu"
+    "defaultMessage": "Přidejte ikonu"
   },
   "nags.add-java-address.description": {
     "defaultMessage": "Zadejte IP adresu a port, přes které se mohou hráči s Java Edition připojit k vašemu serveru."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Přidat adresu Java"
+    "defaultMessage": "Přidejte adresu Javy"
   },
   "nags.add-links-server.description": {
     "defaultMessage": "Přidejte jakékoli relevantní odkazy směřující mimo Modrinth, například na webové stránky, do obchodu nebo na pozvánku na Discord."
   },
   "nags.add-links-server.title": {
-    "defaultMessage": "Přidat externí odkazy"
+    "defaultMessage": "Přidejte externí odkazy"
   },
   "nags.add-links.description": {
     "defaultMessage": "Přidejte relevantní odkazy směřující mimo Modrinth, například zdrojový kód, issue tracker nebo pozvánku na Discord."
   },
   "nags.add-links.title": {
-    "defaultMessage": "Přidat externí odkazy"
+    "defaultMessage": "Přidejte externí odkazy"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Vybrali jste všechny dostupné značky {totalAvailableTags,plural,one {#Dostupný tag} other {#Dostupný tags}}. To popírá účel značek, které mají uživatelům pomoci najít relevantní projekty. Vyberte prosím pouze tagy, které jsou pro váš projekt relevantní."
+    "defaultMessage": "Vybrali jste {totalAvailableTags, plural, one {# dostupný tag} few {všechny # dostupné štítky} other {všech # dostupných štítků}}. Tím štítky ztrácejí účel, protože mají uživatelům pomáhat najít relevantní projekty. Vyberte prosím pouze štítky, které jsou pro váš projekt relevantní."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Vyberte vhodné tagy"
+    "defaultMessage": "Vyberte odpovídající štítky"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "Rozšířit popisek"
+    "defaultMessage": "Rozšiřte popis"
   },
   "nags.edit-description.title": {
-    "defaultMessage": "Upravit popisek"
+    "defaultMessage": "Upravte popis"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Upravit licenci"
+    "defaultMessage": "Upravte licenci"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "Upravit souhrn"
+    "defaultMessage": "Upravte souhrn"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Upravit tagy"
+    "defaultMessage": "Upravte štítky"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "Upravit titul"
+    "defaultMessage": "Upravte název"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Obrázek v galerii často určuje první dojem z vašeho projektu."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Zobrazení obrázku v galerii"
+    "defaultMessage": "Doplňte obrázek do galerie"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Navštivte stránku galerie"
+    "defaultMessage": "Přejděte na stránku galerie"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Váš {type} používá licenci vyžadující dostupnost zdrojového kódu. Uveďte prosím odkaz na zdrojový kód nebo soubor se zdroji pro každou další verzi, případně zvažte použití jiné licence."
   },
   "nags.gpl-license-source-required.title": {
-    "defaultMessage": "Poskytnutí zdrojového kódu"
+    "defaultMessage": "Uveďte zdrojový kód"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Některé z vašich externích odkazů se zdají být duplicitní. Každý odkaz by měl být zadán pouze jednou a s příslušným typem odkazu."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Odstraňte duplicitní odkazy"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Popis by měl obsahovat dostatečné množství prostého textu nebo popisků u obrázku, aby byl přístupný i těm, kteří používají čtečky obrazovky nebo mají pomalé připojení k internetu."
   },
   "nags.image-heavy-description.title": {
-    "defaultMessage": "Zajištění přístupnosti"
+    "defaultMessage": "Zajistěte přístupnost"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL licence je neplatná."
@@ -114,10 +123,10 @@
     "defaultMessage": "Odkazy na Discord lze použít pouze ve vyhrazeném poli. Prosím, vložte odkaz na Discord do pole „Odkaz na Discord“, nikoli do jiných typů odkazů."
   },
   "nags.misused-discord-link.title": {
-    "defaultMessage": "Přesunutí pozvánky na Discord"
+    "defaultMessage": "Přesuňte Discord pozvánku"
   },
   "nags.moderation.title": {
-    "defaultMessage": "Navštivte vlákno moderace"
+    "defaultMessage": "Přejděte do moderátorského vlákna"
   },
   "nags.moderator-feedback.description": {
     "defaultMessage": "Před opětovným odesláním zkontrolujte a vyřešte všechny připomínky moderátorského týmu."
@@ -126,19 +135,25 @@
     "defaultMessage": "Zpětná vazba k recenzi"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Vybrali jste {count, plural, one {# tag rozlišení} other {# tagů rozlišení}} ({tags}). Resource packy by měly mít zpravidla pouze jedno, které odpovídá jejich primárnímu rozlišení."
+    "defaultMessage": "Vybrali jste {count, plural, one {# štítek rozlišení} few {# štítky rozlišení} other {# štítků rozlišení}} ({tags}). Resource packy by měly mít zpravidla pouze jeden štítek, který odpovídá jejich hlavnímu rozlišení."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Vyberte správné rozlišení"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Ujistěte se, že jste poskytli důkaz o oprávnění k distribuci externího obsahu ve vašem modpacku."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Zkontrolujte oprávnění k externímu obsahu"
+  },
   "nags.select-compatibility.description": {
-    "defaultMessage": "Vyberte, které verze váš server podporuje, vyberte si modpack nebo nahrajte svůj vlastní."
+    "defaultMessage": "Vyberte, jaké verze váš server podporuje. Zvolte modpack nebo nahrajte vlastní."
   },
   "nags.select-compatibility.title": {
     "defaultMessage": "Vyberte kompatibilitu"
   },
   "nags.select-country.description": {
-    "defaultMessage": "Povolit hráčům vidět, v jakém regionu se váš server nachází."
+    "defaultMessage": "Povolte hráčům zobrazit, v jaké oblasti se váš server nachází."
   },
   "nags.select-country.title": {
     "defaultMessage": "Vyberte oblast"
@@ -149,44 +164,53 @@
   "nags.select-language.title": {
     "defaultMessage": "Vyberte jazyk"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Zvolte licenci, pod kterou je váš {type} distribuován."
+  },
   "nags.select-license.title": {
-    "defaultMessage": "Vybrat licenci"
+    "defaultMessage": "Vyberte licenci"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "Vyberte štítky, které správně vystihují váš projekt, abyste pomohli uživatelům ho najít."
+    "defaultMessage": "Vyberte štítky, které správně vystihují váš projekt, abyste ho uživatelům pomohli najít."
   },
   "nags.select-tags.title": {
-    "defaultMessage": "Vybrat štítky"
+    "defaultMessage": "Vyberte štítky"
   },
   "nags.server.title": {
-    "defaultMessage": "Navštívit nastavení serveru"
+    "defaultMessage": "Přejděte do nastavení serveru"
   },
   "nags.settings.description.title": {
-    "defaultMessage": "Navštívit nastavení popisu"
+    "defaultMessage": "Přejděte do nastavení popisu"
   },
   "nags.settings.license.title": {
-    "defaultMessage": "Navštívit nastavení licence"
+    "defaultMessage": "Přejděte do nastavení licence"
   },
   "nags.settings.links.title": {
-    "defaultMessage": "Navštívit nastavení odkazů"
+    "defaultMessage": "Přejděte do nastavení odkazů"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Přejděte do panelu oprávnění"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Navštívit nastavení štítků"
+    "defaultMessage": "Přejděte do nastavení štítků"
   },
   "nags.settings.title": {
-    "defaultMessage": "Navštívit obecné nastavení"
+    "defaultMessage": "Přejděte do obecného nastavení"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Vaše shrnutí se nesmí shodovat s názvem projektu. Je důležité vytvořit informativní a lákavé shrnutí."
+    "defaultMessage": "Souhrn se nesmí shodovat s názvem projektu. Je důležité vytvořit informativní a poutavý souhrn."
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "Vytvořte jedinečné shrnutí"
+    "defaultMessage": "Vytvořte jedinečný souhrn"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Shrnutí by nemělo obsahovat formátování, zalomení řádků, speciální znaky ani odkazy, protože se v něm zobrazí pouze prostý text."
+    "defaultMessage": "Souhrn by neměl obsahovat formátování, zalomení řádků, speciální znaky ani odkazy, protože zobrazí pouze prostý text."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Vyjasněte si shrnutí"
+    "defaultMessage": "Odstraňte nevhodné formátování ze souhrnu"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Rozšířte shrnutí"
@@ -195,39 +219,46 @@
     "defaultMessage": "Udržování mít jméno svého projektu čisté usnadňuje si ho zapamatovat a vyhledat. Verze a informace o modovim načítači se automaticky zobrazují vedle vašeho projektu."
   },
   "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Vyčistěte název"
+    "defaultMessage": "Odstraňte technické údaje z názvu"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "Vybrali jste si {tagCount, plural, one {# tag} other {# tagů}}. Prosíme, snižte na {maxTagCount} či níže abyste zajistili, že se váš server zobrazí v relevantních výsledcích vyhledávání."
+    "defaultMessage": "Vybrali jste {tagCount, plural, one {# štítek} few {# štítky} other {# štítků}}. Prosíme, snižte je na {maxTagCount} nebo méně, abyste zajistili, že se váš server zobrazí v relevantních výsledcích vyhledávání."
   },
   "nags.too-many-tags-server.title": {
-    "defaultMessage": "Vyberte odpovídající tagy"
+    "defaultMessage": "Vyberte odpovídající štítky"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Vybral jsi {tagCount, plural, one {# štítek} other {# štítků}}. Zvaž zúžení na {maxTagCount} nebo méně, aby se tvůj projekt zobrazoval ve relevantních výsledcích vyhledávání."
+    "defaultMessage": "Vybrali jste {tagCount, plural, one {# štítek} few {# štítky} other {# štítků}}. Zvažte snížení jejich počtu na {maxTagCount} nebo méně, aby se váš projekt zobrazoval v relevantních výsledcích vyhledávání."
   },
   "nags.too-many-tags.title": {
-    "defaultMessage": "Vyberte odpovídající tagy"
+    "defaultMessage": "Vyberte odpovídající štítky"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Je vyžadován alespoň jeden obrázek v galerii pro zobrazení obsahu vašeho {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resource packu, s výjimkou audia nebo lokalizačních balíčků. Pokud popis odpovídá vašemu balíčku, vyberte prosím příslušný štítek"
   },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "Nahrání obrázku do galerie"
+    "defaultMessage": "Nahrajte obrázek do galerie"
   },
   "nags.upload-version.description": {
     "defaultMessage": "Pro předložení projektu k posouzení je nutná alespoň jedna verze."
   },
   "nags.upload-version.title": {
-    "defaultMessage": "Nahrát verzi"
+    "defaultMessage": "Nahrajte verzi"
   },
   "nags.verify-external-links.description": {
     "defaultMessage": "Některé z vašich externích odkazů mohou používat domény, které nejsou pro daný typ odkazu vhodné."
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "Ověřit externí odkaz"
+    "defaultMessage": "Ověřte externí odkazy"
   },
   "nags.versions.title": {
-    "defaultMessage": "Navštivte stránku verzí"
+    "defaultMessage": "Přejděte na stránku verzí"
   },
   "nags.visit-links-settings.title": {
-    "defaultMessage": "Navštívit nastavení odkazů"
+    "defaultMessage": "Přejděte do nastavení odkazů"
   }
 }
+

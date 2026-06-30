@@ -20,14 +20,17 @@ import { KyrosUploadSessionsV1Module } from './kyros/upload-sessions/v1'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
 import { LabrinthAnalyticsV3Module } from './labrinth/analytics/v3'
+import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
 import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
 import { LabrinthAuthV2Module } from './labrinth/auth/v2'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCampaignInternalModule } from './labrinth/campaign/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
+import { LabrinthContentV3Module } from './labrinth/content/v3'
 import { LabrinthExternalProjectsInternalModule } from './labrinth/external-projects/internal'
 import { LabrinthFriendsV3Module } from './labrinth/friends/v3'
 import { LabrinthGlobalsInternalModule } from './labrinth/globals/internal'
+import { LabrinthImagesV3Module } from './labrinth/images/v3'
 import { LabrinthLimitsV3Module } from './labrinth/limits/v3'
 import { LabrinthModerationInternalModule } from './labrinth/moderation/internal'
 import { LabrinthNotificationsV2Module } from './labrinth/notifications/v2'
@@ -91,12 +94,15 @@ export const MODULE_REGISTRY = {
 	labrinth_analytics_v3: LabrinthAnalyticsV3Module,
 	labrinth_auth_internal: LabrinthAuthInternalModule,
 	labrinth_auth_v2: LabrinthAuthV2Module,
+	labrinth_attribution_internal: LabrinthAttributionInternalModule,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_campaign_internal: LabrinthCampaignInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
+	labrinth_content_v3: LabrinthContentV3Module,
 	labrinth_external_projects_internal: LabrinthExternalProjectsInternalModule,
 	labrinth_friends_v3: LabrinthFriendsV3Module,
 	labrinth_globals_internal: LabrinthGlobalsInternalModule,
+	labrinth_images_v3: LabrinthImagesV3Module,
 	labrinth_moderation_internal: LabrinthModerationInternalModule,
 	labrinth_notifications_v2: LabrinthNotificationsV2Module,
 	labrinth_oauth_internal: LabrinthOAuthInternalModule,

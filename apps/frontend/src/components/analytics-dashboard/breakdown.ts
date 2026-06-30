@@ -6,6 +6,7 @@ import { formatAnalyticsDownloadSourceLabel, type FormatMessage } from './analyt
 
 export const ALL_BREAKDOWN_VALUE = '__all__'
 export const UNKNOWN_BREAKDOWN_VALUE = '__unknown__'
+export const NO_DEPENDENT_BREAKDOWN_VALUE = '__no_dependent__'
 export const COMBINED_BREAKDOWN_LABEL_SEPARATOR = ' + '
 export const COMBINED_BREAKDOWN_DATASET_ID_PREFIX = 'breakdowns:'
 
@@ -41,6 +42,19 @@ export function getAnalyticsBreakdownValue(
 				'reason' in point ? point.reason : undefined,
 				UNKNOWN_BREAKDOWN_VALUE,
 			)
+		case 'user_id':
+			return normalizeBreakdownValue('user_id' in point ? point.user_id : undefined)
+		case 'dependent_project_download': {
+			const dependentProjectId = normalizeBreakdownValue(
+				'dependent_project_id' in point ? point.dependent_project_id : undefined,
+				UNKNOWN_BREAKDOWN_VALUE,
+			)
+			const downloadReason = 'reason' in point ? point.reason?.trim().toLowerCase() : undefined
+			return dependentProjectId === UNKNOWN_BREAKDOWN_VALUE &&
+				(downloadReason === 'standalone' || downloadReason === 'update')
+				? NO_DEPENDENT_BREAKDOWN_VALUE
+				: dependentProjectId
+		}
 		case 'version_id':
 			return normalizeBreakdownValue('version_id' in point ? point.version_id : undefined)
 		case 'loader':
@@ -94,16 +108,30 @@ export function getDownloadSourceLabel(value: string, formatMessage: FormatMessa
 	return formatAnalyticsDownloadSourceLabel(value, formatMessage)
 }
 
+export function isUnknownAnalyticsBreakdownValue(value: string | null | undefined): boolean {
+	const normalized = value?.trim()
+	if (!normalized) {
+		return false
+	}
+
+	const normalizedLowercase = normalized.toLowerCase()
+	return (
+		normalized === UNKNOWN_BREAKDOWN_VALUE ||
+		normalizedLowercase === 'unknown' ||
+		normalizedLowercase === 'other'
+	)
+}
+
+export function isNoDependentAnalyticsBreakdownValue(value: string | null | undefined): boolean {
+	return value?.trim() === NO_DEPENDENT_BREAKDOWN_VALUE
+}
+
 function normalizeBreakdownValue(
 	value: string | undefined,
 	fallback = ALL_BREAKDOWN_VALUE,
 ): string {
 	const normalized = value?.trim()
-	const normalizedLowercase = normalized?.toLowerCase()
-	if (
-		fallback === UNKNOWN_BREAKDOWN_VALUE &&
-		(normalizedLowercase === 'unknown' || normalizedLowercase === 'other')
-	) {
+	if (fallback === UNKNOWN_BREAKDOWN_VALUE && isUnknownAnalyticsBreakdownValue(normalized)) {
 		return fallback
 	}
 	return normalized && normalized.length > 0 ? normalized : fallback

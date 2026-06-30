@@ -29,14 +29,17 @@
   "nags.add-links.title": {
     "defaultMessage": "Lägg till externa länkar"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Du har valt {totalAvailableTags, plural, one {den enda tillgängliga taggen} other {alla # tillgängliga taggarna}}. Detta motverkar syftet med taggar, som är att hjälpa användare att hitta relevanta projekt. Vänligen välj endast de taggar som är relevanta för ditt projekt."
+  },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Välj korrekta taggar"
+    "defaultMessage": "Välj lämpliga taggar"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Din beskrivning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en klar och informativ beskrivning."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "Expandera beskrivning"
+    "defaultMessage": "Expandera beskrivningen"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Redigera beskrivning"
@@ -62,11 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Besök gallerisida"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Din {type} använder en licens som kräver att källkoden är tillgänglig. Vänligen ge en länk till källkoden eller källfiler för varje ytterligare version eller överväg att använda en annan licens."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Tillförse källkod"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Några av dina externa länkar ser ut att vara likadana. Varje länk ska bara anges en gång och med den passande länktypen."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Städa upp de identiska länkarna"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Din beskrivning ska ha tillräckligt med vanlig text eller bild-alternativtext, för att hålla det tillgängligt till de som använder skärmavläsare eller de med långsamma internetkopplingar."
@@ -123,13 +132,19 @@
     "defaultMessage": "Kolla igenom och ta upp problemen från moderationsteamet innan du skickar in det igen."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Granska feedback"
+    "defaultMessage": "Läs återkoppling"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Du har valt {count, plural, one {# upplösningstagg} other {# upplösningstaggar}} ({tags}). Resurspaket bör normalt endast ha en upplösningstagg som matchar dess primära upplösning."
+    "defaultMessage": "Du har valt {count, plural, one {# upplösningstagg} other {# upplösningstaggar}} ({tags}). Normalt sett bör resurspaket endast ha en upplösningstagg som matchar dess primära upplösning."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Välj korrekt upplösning"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Se till att du har visat bevis för din tillåtelse att använda externt innehåll i ditt Modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Läs externa behörigheter"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Välj vilka versioner din server stödjer, välj ett modpaket, eller ladda upp ditt egna."
@@ -138,7 +153,7 @@
     "defaultMessage": "Välj kompatibilitet"
   },
   "nags.select-country.description": {
-    "defaultMessage": "Berätta för dina spelare vilken region din server ligger i."
+    "defaultMessage": "Låt spelare veta vilken region din server ligger i."
   },
   "nags.select-country.title": {
     "defaultMessage": "Välj en region"
@@ -148,6 +163,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Välj språk"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Välj licensen din {type} är utgiven under."
   },
   "nags.select-license.title": {
     "defaultMessage": "Välj en licens"
@@ -169,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Besök länkinställningar"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Gå till behörighets kontrollpanel"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Besök tagginställningar"
@@ -212,6 +233,12 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Välj korrekta taggar"
   },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Åtminstone en galleribild måste visa innehållet av din {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resurspaket, förutom ljud eller lokaliseringspaket. Om detta beskriver ditt paket, vänligen välj den passande taggen"
+  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ladda upp en galleribild"
   },
@@ -234,3 +261,4 @@
     "defaultMessage": "Besök länkinställningar"
   }
 }
+
