@@ -18,14 +18,11 @@
 			<button
 				v-if="showUpdatePill"
 				type="button"
-				class="!h-[34px] overflow-hidden text-sm !transition-[width,opacity,transform,background-color,color,filter] !duration-200 ease-out"
-				:class="[
-					updatePillWidthClass,
-					{
-						'update-pill-ready-hidden': finishedDownloading && !animateReadyPill,
-						'update-pill-ready-visible': finishedDownloading && animateReadyPill,
-					},
-				]"
+				class="!h-[34px] text-sm !transition-[opacity,transform,background-color,color,filter] !duration-200 ease-out"
+				:class="{
+					'opacity-0 scale-[0.96]': finishedDownloading && !animateReadyPill,
+					'opacity-100 scale-100': finishedDownloading && animateReadyPill,
+				}"
 				:disabled="isUpdateDownloading"
 				:aria-busy="isUpdateDownloading"
 				@click="handleUpdateClick"
@@ -284,17 +281,6 @@ const updateLabel = computed(() => {
 	}
 
 	return formatMessage(messages.update)
-})
-const updatePillWidthClass = computed(() => {
-	if (isUpdateDownloading.value) {
-		return 'w-[219px]'
-	}
-
-	if (finishedDownloading.value) {
-		return 'w-[166px]'
-	}
-
-	return '!w-[96px]'
 })
 let readyPillAnimationFrame: number | null = null
 watch([showUpdatePill, finishedDownloading], async ([show, ready], [wasShown, wasReady]) => {
@@ -624,15 +610,3 @@ onBeforeUnmount(() => {
 	}
 })
 </script>
-
-<style scoped>
-.update-pill-ready-hidden {
-	opacity: 0;
-	transform: scale(0.96);
-}
-
-.update-pill-ready-visible {
-	opacity: 1;
-	transform: scale(1);
-}
-</style>
