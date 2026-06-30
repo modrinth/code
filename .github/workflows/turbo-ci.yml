@@ -18,24 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check.outputs.skip }}
-      internal: ${{ steps.check-internal.outputs.internal }}
     if: ${{ always() }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Check if workflow runs on an internal branch
-        id: check-internal
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-          REPO: ${{ github.repository }}
-        run: |
-          if [ "$EVENT_NAME" != "pull_request" ] || [ "$HEAD_REPO" = "$REPO" ]; then
-            echo "internal=true" >> $GITHUB_OUTPUT
-          else
-            echo "internal=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Merge Queue CI Check Skipper
         id: merge-queue-ci-skipper
@@ -62,7 +48,7 @@ jobs:
 
   build:
     name: Lint and Test
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
 
@@ -76,19 +62,6 @@ jobs:
       # since we don't want warnings to become errors
       # while developing)
       RUSTFLAGS: -Dwarnings
-      # sccache config (only populated for internal branches; secrets aren't
-      # available to forked PRs, and blacksmith stickydisk requires a
-      # blacksmith runner)
-      SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
-      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
-      SCCACHE_MULTILEVEL_CHAIN: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'disk,s3' || '' }}
-      SCCACHE_S3_KEY_PREFIX: ${{ needs.skip-if-clean.outputs.internal == 'true' && format('{0}/', github.repository) || '' }}
-      SCCACHE_BUCKET: ${{ secrets.SCCACHE_BUCKET }}
-      SCCACHE_REGION: ${{ secrets.SCCACHE_REGION }}
-      SCCACHE_ENDPOINT: ${{ secrets.SCCACHE_ENDPOINT }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.SCCACHE_S3_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SCCACHE_S3_SECRET_ACCESS_KEY }}
-      RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
 
     steps:
       - name: Check out code
@@ -129,9 +102,6 @@ jobs:
           components: clippy, rustfmt
           cache: false
 
-      - name: Setup mold
-        uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
-
       - name: Cache Cargo registry and index
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
         with:
@@ -140,17 +110,6 @@ jobs:
             ~/.cargo/git
             ~/.cargo/bin
           key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Mount sccache disk cache
-        if: needs.skip-if-clean.outputs.internal == 'true'
-        uses: useblacksmith/stickydisk@13af8883542ca949a717e70fef89d15edbb29d88 # v1.2.0
-        with:
-          key: ${{ github.repository }}-turbo-sccache
-          path: /mnt/sccache
-
-      - name: Setup sccache
-        if: needs.skip-if-clean.outputs.internal == 'true'
-        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Setup binstall
         uses: cargo-bins/cargo-binstall@dc19f1e48450eefe5a29b8da6c6b00a87d730b37 # v1.18.1
