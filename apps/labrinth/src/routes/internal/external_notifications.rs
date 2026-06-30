@@ -18,9 +18,7 @@ use crate::sync::friends::RedisFriendsMessage;
 use crate::util::guards::external_notification_key_guard;
 use actix_web::http::StatusCode;
 use actix_web::web;
-use actix_web::{
-    CustomizeResponder, HttpRequest, HttpResponse, Responder, delete, post,
-};
+use actix_web::{HttpRequest, HttpResponse, delete, post};
 use ariadne::ids::UserId;
 use eyre::eyre;
 use lettre::message::Mailbox;
@@ -33,66 +31,50 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(send_custom_email);
 }
 
+#[derive(Deserialize, PartialEq)]
+enum EmailStrategy {
+    Async,
+    Sync,
+    None,
+}
+
+impl Default for EmailStrategy {
+    fn default() -> Self {
+        EmailStrategy::Async
+    }
+}
+
 #[derive(Deserialize)]
 struct CreateNotification {
     pub body: NotificationBody,
     pub user_ids: Vec<UserId>,
+    #[serde(default)]
+    pub email: EmailStrategy,
 }
 
 #[post("external_notifications", guard = "external_notification_key_guard")]
 pub async fn create(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    email_queue: web::Data<EmailQueue>,
     create_notification: web::Json<CreateNotification>,
-) -> Result<HttpResponse, ApiError> {
-    let CreateNotification { body, user_ids } =
-        create_notification.into_inner();
-    let user_ids = user_ids
-        .into_iter()
-        .map(|x| DBUserId(x.0 as i64))
-        .collect::<Vec<_>>();
-
-    let mut txn = pool.begin().await?;
-
-    if !DBUser::exists_many(&user_ids, &mut txn).await? {
-        return Err(ApiError::InvalidInput(
-            "One of the specified users do not exist.".to_owned(),
-        ));
-    }
-
-    let notification_ids = NotificationBuilder { body }
-        .insert_many(user_ids, &mut txn, &redis)
-        .await?;
-
-    let notifications =
-        get_site_exposed_notifications(&notification_ids, &mut txn).await?;
-
-    txn.commit().await?;
-
-    broadcast_notifications(&redis, notifications).await;
-
-    Ok(HttpResponse::Accepted().finish())
+) -> Result<(web::Json<Vec<UserId>>, StatusCode), ApiError> {
+    create_impl(pool, redis, email_queue, create_notification.into_inner())
+        .await
 }
 
-/// Inserts notifications for all users and tries to send emails immediately.
-///
-/// Responds with the user IDs that could not be emailed:
-/// - `200` if every recipient was emailed (empty list)
-/// - `207` if some recipients could not be emailed (list of failed IDs)
-#[post(
-    "external_notifications/email-sync",
-    guard = "external_notification_key_guard"
-)]
-pub async fn create_email_sync(
+async fn create_impl(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     email_queue: web::Data<EmailQueue>,
-    create_notification: web::Json<CreateNotification>,
-) -> Result<CustomizeResponder<web::Json<Vec<UserId>>>, ApiError> {
-    let CreateNotification { body, user_ids } =
-        create_notification.into_inner();
+    data: CreateNotification,
+) -> Result<(web::Json<Vec<UserId>>, StatusCode), ApiError> {
+    let CreateNotification {
+        body,
+        user_ids,
+        email: email_strategy,
+    } = data;
     let raw_user_ids = user_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>();
-
     let user_ids = raw_user_ids
         .iter()
         .map(|x| DBUserId(*x))
@@ -129,9 +111,21 @@ pub async fn create_email_sync(
         .filter(|id| !already_notified.contains(id))
         .collect::<Vec<_>>();
 
-    let notification_ids = NotificationBuilder { body: body.clone() }
-        .insert_many_without_delivery(notification_user_ids, &mut txn, &redis)
-        .await?;
+    let notification_builder = NotificationBuilder { body: body.clone() };
+
+    let notification_ids = if email_strategy == EmailStrategy::Async {
+        notification_builder
+            .insert_many(notification_user_ids, &mut txn, &redis)
+            .await?
+    } else {
+        notification_builder
+            .insert_many_without_delivery(
+                notification_user_ids,
+                &mut txn,
+                &redis,
+            )
+            .await?
+    };
 
     let notifications =
         get_site_exposed_notifications(&notification_ids, &mut txn).await?;
@@ -140,42 +134,80 @@ pub async fn create_email_sync(
 
     broadcast_notifications(&redis, notifications).await;
 
-    let mut email_txn = pool.begin().await?;
+    if email_strategy == EmailStrategy::Sync {
+        let mut email_txn = pool.begin().await?;
 
-    let mut failed = Vec::new();
-    for user_id in &user_ids {
-        let Some(user) =
-            DBUser::get_id(*user_id, &mut email_txn, &redis).await?
-        else {
-            failed.push(UserId(user_id.0 as u64));
-            continue;
-        };
+        let mut failed = Vec::new();
+        for user_id in &user_ids {
+            let Some(user) =
+                DBUser::get_id(*user_id, &mut email_txn, &redis).await?
+            else {
+                failed.push(UserId(user_id.0 as u64));
+                continue;
+            };
 
-        let delivered = match user
-            .email
-            .and_then(|email| email.parse::<Mailbox>().ok())
-        {
-            Some(mailbox) => {
-                email_queue
-                    .send_one(&mut email_txn, body.clone(), *user_id, mailbox)
-                    .await?
-                    == NotificationDeliveryStatus::Delivered
+            let delivered = match user
+                .email
+                .and_then(|email| email.parse::<Mailbox>().ok())
+            {
+                Some(mailbox) => {
+                    email_queue
+                        .send_one(
+                            &mut email_txn,
+                            body.clone(),
+                            *user_id,
+                            mailbox,
+                        )
+                        .await?
+                        == NotificationDeliveryStatus::Delivered
+                }
+                None => false,
+            };
+
+            if !delivered {
+                failed.push(UserId(user_id.0 as u64));
             }
-            None => false,
+        }
+
+        let status = if failed.is_empty() {
+            StatusCode::ACCEPTED
+        } else {
+            StatusCode::MULTI_STATUS
         };
 
-        if !delivered {
-            failed.push(UserId(user_id.0 as u64));
-        }
+        return Ok((web::Json(failed), status));
     }
 
-    let status = if failed.is_empty() {
-        StatusCode::OK
-    } else {
-        StatusCode::MULTI_STATUS
-    };
+    Ok((web::Json(vec![]), StatusCode::ACCEPTED))
+}
 
-    Ok(web::Json(failed).customize().with_status(status))
+/// Inserts notifications for all users and tries to send emails immediately.
+///
+/// Responds with the user IDs that could not be emailed:
+/// - `202` if every recipient was emailed (empty list)
+/// - `207` if some recipients could not be emailed (list of failed IDs)
+#[post(
+    "external_notifications/email-sync",
+    guard = "external_notification_key_guard"
+)]
+pub async fn create_email_sync(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    email_queue: web::Data<EmailQueue>,
+    data: web::Json<CreateNotification>,
+) -> Result<(web::Json<Vec<UserId>>, StatusCode), ApiError> {
+    let data = data.into_inner();
+    create_impl(
+        pool,
+        redis,
+        email_queue,
+        CreateNotification {
+            body: data.body,
+            user_ids: data.user_ids,
+            email: EmailStrategy::Sync,
+        },
+    )
+    .await
 }
 
 #[derive(Deserialize)]
