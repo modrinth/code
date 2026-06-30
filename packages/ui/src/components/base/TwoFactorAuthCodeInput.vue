@@ -21,6 +21,7 @@
 			:aria-label="`Code digit ${index}`"
 			class="h-12 w-11 appearance-none rounded-xl border-none bg-surface-4 p-1 text-center text-base font-medium text-primary focus:text-primary focus:ring-4 focus:ring-brand-shadow disabled:cursor-not-allowed"
 			:class="[inputClass, 'outline-none']"
+			@focus="handleFocus($event)"
 			@input="handleInput($event, index - 1)"
 			@keydown="handleKeydown($event, index - 1)"
 			@paste.prevent="handlePaste"
@@ -84,7 +85,7 @@ function setCodeInput(element: Element | ComponentPublicInstance | null, index: 
 function focusInput(index: number) {
 	const input = codeInputs.value[index]
 	input?.focus()
-	input?.setSelectionRange(input.value.length, input.value.length)
+	selectInputValue(input)
 }
 
 function focusFirstUnfilledCodeInput() {
@@ -94,12 +95,27 @@ function focusFirstUnfilledCodeInput() {
 }
 
 function handlePointerDown(event: PointerEvent) {
-	if (disabledOrReadonly()) {
+	if (props.disabled) {
+		return
+	}
+
+	if (event.target instanceof HTMLInputElement && event.target.value) {
+		event.preventDefault()
+		event.target.focus()
+		selectInputValue(event.target)
 		return
 	}
 
 	event.preventDefault()
 	focusFirstUnfilledCodeInput()
+}
+
+function handleFocus(event: FocusEvent) {
+	if (props.disabled) {
+		return
+	}
+
+	selectInputValue(event.target as HTMLInputElement)
 }
 
 function handleInput(event: Event, index: number) {
@@ -172,6 +188,18 @@ function handlePaste(event: ClipboardEvent) {
 
 function disabledOrReadonly() {
 	return props.disabled || props.readonly
+}
+
+function selectInputValue(input?: HTMLInputElement) {
+	if (!input) {
+		return
+	}
+
+	if (input.value) {
+		input.select()
+	} else {
+		input.setSelectionRange(input.value.length, input.value.length)
+	}
 }
 
 function clear() {
