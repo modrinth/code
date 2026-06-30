@@ -1,104 +1,76 @@
 <template>
 	<ReadyTransition :pending="loading">
-		<div class="flex flex-col gap-4">
-			<Admonition
-				v-if="showSharedInstancePublishAdmonition"
-				type="warning"
-				inline-actions
-				:header="formatMessage(messages.sharedInstanceChangesHeader)"
-			>
-				{{ formatMessage(messages.sharedInstanceChangesBody) }}
-				<template #actions>
-					<ButtonStyled color="orange">
-						<button
-							class="!h-10"
-							:disabled="isPublishingSharedInstance"
-							@click="publishSharedInstanceChanges"
-						>
-							<UploadIcon aria-hidden="true" />
-							{{
-								isPublishingSharedInstance
-									? formatMessage(messages.sharedInstancePublishingButton)
-									: formatMessage(messages.sharedInstancePublishButton)
-							}}
-						</button>
-					</ButtonStyled>
-				</template>
-			</Admonition>
-			<ContentPageLayout>
-				<template #modals>
-					<ShareModalWrapper
-						ref="shareModal"
-						:share-title="formatMessage(messages.shareTitle)"
-						:share-text="formatMessage(messages.shareText)"
-						:open-in-new-tab="false"
-					/>
-					<ModpackContentModal
-						ref="modpackContentModal"
-						:modpack-name="displayedModpackProject?.title"
-						:modpack-icon-url="displayedModpackProject?.icon_url ?? undefined"
-						:enable-toggle="!props.isServerInstance"
-						:busy="isBulkOperating"
-						:get-overflow-options="getOverflowOptions"
-						:switch-version="handleSwitchVersion"
-						@update:enabled="handleModpackContentToggle"
-						@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
-						@bulk:disable="(items) => handleModpackContentBulkToggle(items, false)"
-					/>
-					<ConfirmModpackUpdateModal
-						ref="modpackUpdateConfirmModal"
-						:downgrade="isModpackUpdateDowngrade"
-						:backup-tip="
-							[displayedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
-								.filter(Boolean)
-								.join(' ')
-						"
-						@confirm="handleModpackUpdateConfirm"
-						@cancel="handleModpackUpdateCancel"
-					/>
-					<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
-					<ContentUpdaterModal
-						v-if="updatingProject || updatingModpack"
-						ref="contentUpdaterModal"
-						:versions="updatingProjectVersions"
-						:current-game-version="instance.game_version"
-						:current-loader="instance.loader"
-						:current-version-id="
-							updatingModpack
-								? (instance.link?.version_id ?? '')
-								: (updatingProject?.version?.id ?? '')
-						"
-						:is-app="true"
-						:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
-						:project-icon-url="
-							updatingModpack
-								? displayedModpackProject?.icon_url
-								: updatingProject?.project?.icon_url
-						"
-						:project-name="
-							updatingModpack
-								? (displayedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
-								: (updatingProject?.project?.title ?? updatingProject?.file_name)
-						"
-						:loading="loadingVersions"
-						:loading-changelog="loadingChangelog"
-						@update="handleModalUpdate"
-						@cancel="resetUpdateState"
-						@version-select="handleVersionSelect"
-						@version-hover="handleVersionHover"
-					/>
-				</template>
-			</ContentPageLayout>
-		</div>
+		<ContentPageLayout>
+			<template #modals>
+				<ShareModalWrapper
+					ref="shareModal"
+					:share-title="formatMessage(messages.shareTitle)"
+					:share-text="formatMessage(messages.shareText)"
+					:open-in-new-tab="false"
+				/>
+				<ModpackContentModal
+					ref="modpackContentModal"
+					:modpack-name="displayedModpackProject?.title"
+					:modpack-icon-url="displayedModpackProject?.icon_url ?? undefined"
+					:enable-toggle="!props.isServerInstance"
+					:busy="isBulkOperating"
+					:get-overflow-options="getOverflowOptions"
+					:switch-version="handleSwitchVersion"
+					@update:enabled="handleModpackContentToggle"
+					@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
+					@bulk:disable="(items) => handleModpackContentBulkToggle(items, false)"
+				/>
+				<ConfirmModpackUpdateModal
+					ref="modpackUpdateConfirmModal"
+					:downgrade="isModpackUpdateDowngrade"
+					:backup-tip="
+						[displayedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
+							.filter(Boolean)
+							.join(' ')
+					"
+					@confirm="handleModpackUpdateConfirm"
+					@cancel="handleModpackUpdateCancel"
+				/>
+				<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
+				<ContentUpdaterModal
+					v-if="updatingProject || updatingModpack"
+					ref="contentUpdaterModal"
+					:versions="updatingProjectVersions"
+					:current-game-version="instance.game_version"
+					:current-loader="instance.loader"
+					:current-version-id="
+						updatingModpack
+							? (instance.link?.version_id ?? '')
+							: (updatingProject?.version?.id ?? '')
+					"
+					:is-app="true"
+					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
+					:project-icon-url="
+						updatingModpack
+							? displayedModpackProject?.icon_url
+							: updatingProject?.project?.icon_url
+					"
+					:project-name="
+						updatingModpack
+							? (displayedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
+							: (updatingProject?.project?.title ?? updatingProject?.file_name)
+					"
+					:loading="loadingVersions"
+					:loading-changelog="loadingChangelog"
+					@update="handleModalUpdate"
+					@cancel="resetUpdateState"
+					@version-select="handleVersionSelect"
+					@version-hover="handleVersionHover"
+				/>
+			</template>
+		</ContentPageLayout>
 	</ReadyTransition>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, FolderOpenIcon, UploadIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
-	Admonition,
-	ButtonStyled,
 	type BulkOperationStatus,
 	commonMessages,
 	ConfirmModpackUpdateModal,
@@ -145,7 +117,6 @@ import {
 	get_linked_modpack_content,
 	list,
 	remove_project,
-	publish_shared_instance,
 	switch_project_version_with_dependencies,
 	toggle_disable_project,
 	update_all,
@@ -193,22 +164,6 @@ const messages = defineMessages({
 	bulkUpdateFinishing: {
 		id: 'app.instance.mods.bulk-update.finishing',
 		defaultMessage: 'Finishing update...',
-	},
-	sharedInstanceChangesHeader: {
-		id: 'app.instance.mods.shared-instance.changes-header',
-		defaultMessage: "Your changes haven't been shared yet",
-	},
-	sharedInstanceChangesBody: {
-		id: 'app.instance.mods.shared-instance.changes-body',
-		defaultMessage: 'Your local instance is ahead of the users you’ve shared it with.',
-	},
-	sharedInstancePublishButton: {
-		id: 'app.instance.mods.shared-instance.publish-button',
-		defaultMessage: 'Push update',
-	},
-	sharedInstancePublishingButton: {
-		id: 'app.instance.mods.shared-instance.publishing-button',
-		defaultMessage: 'Pushing...',
 	},
 })
 
@@ -319,13 +274,7 @@ watch(
 
 const isModpackUpdating = ref(false)
 const isBulkOperating = ref(false)
-const isPublishingSharedInstance = ref(false)
 const isInstanceBusy = computed(() => props.instance?.install_stage !== 'installed')
-const showSharedInstancePublishAdmonition = computed(
-	() =>
-		props.instance.shared_instance?.role === 'owner' &&
-		props.instance.shared_instance.status === 'stale',
-)
 const isPackLocked = computed(
 	() =>
 		props.instance?.link?.type === 'modrinth_modpack' ||
@@ -977,20 +926,6 @@ async function refreshModpackContentItems(cacheBehaviour?: CacheBehaviour) {
 async function refreshContentState(cacheBehaviour?: CacheBehaviour) {
 	await initProjects(cacheBehaviour)
 	await refreshModpackContentItems(cacheBehaviour)
-}
-
-async function publishSharedInstanceChanges() {
-	if (isPublishingSharedInstance.value) return
-
-	isPublishingSharedInstance.value = true
-	try {
-		await publish_shared_instance(props.instance.id)
-		await refreshContentState('must_revalidate')
-	} catch (err) {
-		handleError(err as Error)
-	} finally {
-		isPublishingSharedInstance.value = false
-	}
 }
 
 watch(
