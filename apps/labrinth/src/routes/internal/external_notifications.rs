@@ -31,17 +31,12 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(send_custom_email);
 }
 
-#[derive(Deserialize, PartialEq)]
+#[derive(Deserialize, PartialEq, Default)]
 enum EmailStrategy {
+    #[default]
     Async,
     Sync,
     None,
-}
-
-impl Default for EmailStrategy {
-    fn default() -> Self {
-        EmailStrategy::Async
-    }
 }
 
 #[derive(Deserialize)]
