@@ -251,6 +251,16 @@ fn main() {
                     ),
             )
             .plugin(
+                "users",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "search_user",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "utils",
                 InlinedPlugin::new()
                     .commands(&[

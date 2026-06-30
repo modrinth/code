@@ -520,6 +520,11 @@ const tabs = computed(() => [
 		href: `${basePath.value}/logs`,
 		icon: TerminalSquareIcon,
 	},
+	{
+		label: 'Share',
+		href: `${basePath.value}/share`,
+		icon: UserPlusIcon,
+	},
 ])
 
 if (instance.value) {

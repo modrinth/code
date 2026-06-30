@@ -14,6 +14,7 @@ pub mod process;
 pub mod server_address;
 pub mod settings;
 pub mod tags;
+pub mod users;
 pub mod worlds;
 
 pub mod data {
@@ -27,7 +28,7 @@ pub mod data {
         ModrinthCredentials, Organization, OwnerType, ProcessMetadata, Project,
         ProjectType, ProjectV3, SearchResult, SearchResults, SearchResultsV3,
         Settings, TeamMember, Theme, User, UserFriend, Version, WindowSize,
-    };
+	};
     pub use ariadne::users::UserStatus;
     pub use modrinth_content_management::{
         ContentType, ResolutionPreferences, ResolveContentPlan,
