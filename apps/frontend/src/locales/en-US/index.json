@@ -518,6 +518,9 @@
   "analytics.value.unknown": {
     "message": "Unknown"
   },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "There's no metadata to determine which dependent project this download attributes to."
+  },
   "analytics.value.unmonetized": {
     "message": "Unmonetized"
   },
