@@ -60,13 +60,7 @@ pub async fn get_shared_instance_users(
         return Ok(SharedInstanceUsers { user_ids: Vec::new() });
     };
 
-    tracing::debug!(
-        instance_id,
-        shared_instance_id = %attachment.id,
-        role = attachment.role.as_str(),
-        "Skipping shared instance users fetch because the service does not expose a users GET endpoint"
-    );
-    Ok(SharedInstanceUsers { user_ids: Vec::new() })
+    get_remote_users(&attachment.id, &state).await
 }
 
 #[tracing::instrument]
@@ -156,9 +150,15 @@ pub async fn remove_shared_instance_users(
         remove_remote_users(&attachment.id, user_ids, &state).await?;
     }
 
+    let remaining_users = get_remote_users(&attachment.id, &state).await?;
+    if remaining_users.user_ids.is_empty() {
+        delete_remote_instance(&attachment.id, &state).await?;
+        crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+    }
+
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-    Ok(SharedInstanceUsers { user_ids: Vec::new() })
+    Ok(remaining_users)
 }
 
 #[tracing::instrument]
@@ -441,6 +441,34 @@ async fn create_remote_instance(
 ) -> crate::Result<CreateInstanceResponse> {
     request_json("create_instance", Method::POST, "/instances", None, state)
         .await
+}
+
+async fn delete_remote_instance(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    request_empty(
+        "delete_instance",
+        Method::DELETE,
+        &format!("/instances/{shared_instance_id}"),
+        None,
+        state,
+    )
+    .await
+}
+
+async fn get_remote_users(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<SharedInstanceUsers> {
+    request_json(
+        "get_instance_users",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/users"),
+        None,
+        state,
+    )
+    .await
 }
 
 async fn add_remote_users(

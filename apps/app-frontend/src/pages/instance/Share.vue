@@ -248,6 +248,7 @@ import {
 	get_shared_instance_users,
 	invite_shared_instance_users,
 	remove_shared_instance_users,
+	type SharedInstanceUsers,
 } from '@/helpers/instance'
 import { get as getCredentials } from '@/helpers/mr_auth.ts'
 import type { GameInstance } from '@/helpers/types'
@@ -602,7 +603,7 @@ const inviteShareMutation = useMutation({
 
 const removeShareMutation = useMutation({
 	mutationFn: async (id: string) => {
-		await remove_shared_instance_users(props.instance.id, [id])
+		return await remove_shared_instance_users(props.instance.id, [id])
 	},
 	onMutate: async (id): Promise<SharedRowsMutationContext> => {
 		const queryKey = sharedUsersKey.value
@@ -618,10 +619,21 @@ const removeShareMutation = useMutation({
 		restoreSharedRowsQuery(context)
 		handleError(toError(error))
 	},
+	onSuccess: async (users) => {
+		try {
+			queryClient.setQueryData<ShareRow[]>(sharedUsersKey.value, await sharedUsersToRows(users))
+		} catch (error) {
+			handleError(toError(error))
+			await queryClient.invalidateQueries({ queryKey: sharedUsersKey.value })
+		}
+	},
 })
 
 async function loadSharedRows(): Promise<ShareRow[]> {
-	const users = await get_shared_instance_users(props.instance.id)
+	return sharedUsersToRows(await get_shared_instance_users(props.instance.id))
+}
+
+async function sharedUsersToRows(users: SharedInstanceUsers): Promise<ShareRow[]> {
 	if (users.user_ids.length === 0) return []
 
 	const profiles = (await get_user_many(users.user_ids)) as Array<{
