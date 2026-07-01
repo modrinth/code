@@ -26,7 +26,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     operation_id = "getThread",
     params(("id" = ThreadId, Path, description = "The ID of the thread")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Thread),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -59,7 +59,7 @@ pub struct ThreadIds {
     operation_id = "getThreads",
     params(("ids" = String, Query, description = "The JSON array of thread IDs")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyThread>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"

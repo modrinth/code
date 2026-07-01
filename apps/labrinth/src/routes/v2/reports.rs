@@ -23,7 +23,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     post,
     operation_id = "submitReport",
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyReport),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -83,7 +83,7 @@ fn default_all() -> bool {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -146,7 +146,7 @@ pub struct ReportIds {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -194,7 +194,7 @@ pub async fn reports_get(
     operation_id = "getReport",
     params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyReport),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

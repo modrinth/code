@@ -5,7 +5,7 @@ use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::version_file::HashQuery;
+use crate::routes::v3::version_file::{DownloadRedirect, HashQuery};
 use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
@@ -54,7 +54,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -115,7 +115,7 @@ pub async fn get_version_from_hash(
         )
     ),
     responses(
-        (status = 302, description = "Temporary redirect to file URL"),
+        (status = 302, description = "Temporary redirect to file URL", body = DownloadRedirect),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -168,7 +168,7 @@ pub async fn download_version(
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -233,7 +233,7 @@ pub struct UpdateData {
     ),
     request_body = UpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 404,
@@ -303,7 +303,7 @@ pub struct FileHashes {
     operation_id = "versionsFromHashes",
     request_body = FileHashes,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -355,7 +355,7 @@ pub async fn get_versions_from_hashes(
     operation_id = "projectsFromHashes",
     request_body = FileHashes,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyProject>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -433,7 +433,7 @@ pub struct ManyUpdateData {
     operation_id = "getLatestVersionsFromHashes",
     request_body = ManyUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -483,7 +483,7 @@ pub async fn update_files(
     operation_id = "getLatestVersionsFromHashesMany",
     request_body = ManyUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, Vec<LegacyVersion>>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -550,7 +550,7 @@ pub struct ManyFileUpdateData {
     operation_id = "getLatestVersionsFromHashesIndividual",
     request_body = ManyFileUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]

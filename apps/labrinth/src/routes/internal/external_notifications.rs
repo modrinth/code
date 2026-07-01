@@ -53,7 +53,10 @@ struct CreateNotification {
 }
 
 /// Create external notifications.  
-#[utoipa::path(tag = "external notifications")]
+#[utoipa::path(
+	tag = "external notifications",
+	responses((status = ACCEPTED))
+)]
 #[post("/external_notifications", guard = "external_notification_key_guard")]
 pub async fn create(
     pool: web::Data<PgPool>,
@@ -95,10 +98,16 @@ pub async fn create(
 /// - `200` if every recipient was emailed (empty list)
 /// - `207` if some recipients could not be emailed (list of failed IDs)
 /// Create email sync.
-#[utoipa::path(tag = "external notifications")]
+#[utoipa::path(
+	tag = "external notifications",
+	responses(
+		(status = OK, body = inline(Vec<UserId>)),
+		(status = 207, body = inline(Vec<UserId>)),
+	)
+)]
 #[post(
-    "/external_notifications/email-sync",
-    guard = "external_notification_key_guard"
+	"/external_notifications/email-sync",
+	guard = "external_notification_key_guard"
 )]
 pub async fn create_email_sync(
     pool: web::Data<PgPool>,
@@ -203,7 +212,10 @@ struct NotificationFilter {
 }
 
 /// Remove external notifications.  
-#[utoipa::path(tag = "external notifications")]
+#[utoipa::path(
+	tag = "external notifications",
+	responses((status = NO_CONTENT))
+)]
 #[delete("/external_notifications", guard = "external_notification_key_guard")]
 pub async fn remove(
     pool: web::Data<PgPool>,
@@ -253,7 +265,10 @@ struct SendEmail {
 }
 
 /// Send a custom email.  
-#[utoipa::path(tag = "external notifications")]
+#[utoipa::path(
+	tag = "external notifications",
+	responses((status = ACCEPTED))
+)]
 #[post("/external_notifications/send_custom_email")]
 pub async fn send_custom_email(
     req: HttpRequest,

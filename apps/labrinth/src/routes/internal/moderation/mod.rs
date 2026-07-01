@@ -295,7 +295,7 @@ pub async fn get_projects_internal(
 /// Get project moderation metadata.  
 #[utoipa::path(
 	tag = "moderation",
-    responses((status = OK, body = inline(Vec<Project>)))
+	responses((status = OK, body = MissingMetadata))
 )]
 #[get("/project/{id}")]
 async fn get_project_meta(
@@ -450,7 +450,10 @@ pub enum Judgement {
 }
 
 /// Update project moderation judgements.  
-#[utoipa::path(tag = "moderation")]
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = NO_CONTENT))
+)]
 #[post("/project")]
 async fn set_project_meta(
     req: HttpRequest,

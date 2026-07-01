@@ -77,7 +77,7 @@ fn default_true() -> bool {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -188,7 +188,7 @@ pub async fn version_list(
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -238,7 +238,7 @@ pub struct VersionIds {
     get,
     operation_id = "getVersions",
     params(("ids" = String, Query, description = "The JSON array of version IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+    responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>))
 )]
 #[get("/versions")]
 pub async fn versions_get(
@@ -284,7 +284,7 @@ pub async fn versions_get(
     operation_id = "getVersion",
     params(("version_id" = models::ids::VersionId, Path, description = "The ID of the version")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -365,7 +365,7 @@ pub struct EditVersionFileType {
     params(("id" = VersionId, Path, description = "The ID of the version")),
     request_body = EditVersion,
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -480,7 +480,7 @@ pub async fn version_edit(
     operation_id = "deleteVersion",
     params(("version_id" = VersionId, Path, description = "The ID of the version")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

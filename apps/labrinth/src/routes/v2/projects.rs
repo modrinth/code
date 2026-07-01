@@ -81,7 +81,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacySearchResults),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -195,7 +195,7 @@ pub struct RandomProjects {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -238,7 +238,7 @@ pub async fn random_projects_get(
             description = "The JSON array of project IDs or slugs"
         )
     ),
-    responses((status = 200, description = "Expected response to a valid request"))
+    responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>))
 )]
 #[get("/projects")]
 pub async fn projects_get(
@@ -278,7 +278,7 @@ pub async fn projects_get(
     operation_id = "getProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyProject),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -328,7 +328,7 @@ pub async fn project_get(
     operation_id = "checkProjectValidity",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = v3::projects::ProjectCheckResponse),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -360,7 +360,7 @@ struct DependencyInfo {
     operation_id = "getDependencies",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = DependencyInfo),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -522,7 +522,7 @@ pub struct EditProject {
     params(("id" = String, Path, description = "The ID or slug of the project")),
     request_body = EditProject,
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -787,7 +787,7 @@ pub struct BulkEditProject {
     ),
     request_body = BulkEditProject,
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -924,7 +924,7 @@ pub struct Extension {
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error")
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
@@ -965,7 +965,7 @@ pub async fn project_icon_edit(
     operation_id = "deleteProjectIcon",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1052,7 +1052,7 @@ pub struct GalleryCreateQuery {
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1153,7 +1153,7 @@ pub struct GalleryEditQuery {
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -1208,7 +1208,7 @@ pub struct GalleryDeleteQuery {
         ("url" = String, Query, description = "URL of the image to delete")
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1248,7 +1248,7 @@ pub async fn delete_gallery_item(
     operation_id = "deleteProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1287,7 +1287,7 @@ pub async fn project_delete(
     operation_id = "followProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1317,7 +1317,7 @@ pub async fn project_follow(
     operation_id = "unfollowProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,

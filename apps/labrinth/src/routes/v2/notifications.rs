@@ -40,7 +40,7 @@ pub struct NotificationIds {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -88,7 +88,7 @@ pub async fn notifications_get(
     operation_id = "getNotification",
     params(("id" = NotificationId, Path, description = "The ID of the notification")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyNotification),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

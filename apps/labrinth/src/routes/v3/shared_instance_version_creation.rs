@@ -36,6 +36,26 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+/// Create a shared instance version.
+#[utoipa::path(
+	tag = "versions",
+	post,
+	path = "/v3/shared-instance/{id}/version",
+	params(("id" = SharedInstanceId, Path, description = "The ID of the shared instance")),
+	responses(
+		(status = 201, description = "Expected response to a valid request", body = SharedInstanceVersion),
+		(status = 400, description = "Request was invalid, see given error"),
+		(
+			status = 401,
+			description = "Incorrect token scopes or no authorization to access the requested item(s)"
+		),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	),
+	security(("bearer_auth" = ["SHARED_INSTANCE_VERSION_CREATE"]))
+)]
 #[allow(clippy::too_many_arguments)]
 pub async fn shared_instance_version_create(
     req: HttpRequest,

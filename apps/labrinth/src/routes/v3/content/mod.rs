@@ -38,7 +38,11 @@ pub fn utoipa_config(
 }
 
 /// Resolve content.  
-#[utoipa::path(tag = "content", request_body = serde_json::Value)]
+#[utoipa::path(
+	tag = "content",
+	request_body = serde_json::Value,
+	responses((status = OK, body = serde_json::Value)),
+)]
 #[post("/content/resolve")]
 async fn resolve_content(
     req: HttpRequest,

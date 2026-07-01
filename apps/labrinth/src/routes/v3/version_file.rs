@@ -753,7 +753,7 @@ pub async fn update_individual_files(
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -931,7 +931,7 @@ pub struct DownloadRedirect {
         )
     ),
     responses(
-        (status = 302, description = "Temporary redirect to file URL"),
+        (status = 302, description = "Temporary redirect to file URL", body = DownloadRedirect),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"

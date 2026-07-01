@@ -41,7 +41,10 @@ pub struct IngestClick {
 }
 
 /// Ingest an affiliate click.  
-#[utoipa::path(tag = "affiliates")]
+#[utoipa::path(
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[post("/ingest-click")]
 async fn ingest_click(
     req: HttpRequest,
@@ -310,7 +313,10 @@ async fn get(
 }
 
 /// Delete an affiliate code.  
-#[utoipa::path(tag = "affiliates")]
+#[utoipa::path(
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
 async fn delete(
     req: HttpRequest,
@@ -359,7 +365,10 @@ pub struct PatchRequest {
 }
 
 /// Update an affiliate code.  
-#[utoipa::path(tag = "affiliates")]
+#[utoipa::path(
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}")]
 async fn patch(
     req: HttpRequest,

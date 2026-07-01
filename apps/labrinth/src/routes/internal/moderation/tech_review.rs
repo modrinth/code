@@ -668,7 +668,7 @@ async fn fetch_project_reports(
 #[utoipa::path(
 	tag = "moderation",
     security(("bearer_auth" = [])),
-    responses((status = OK, body = inline(Vec<SearchResponse>)))
+	responses((status = OK, body = SearchResponse))
 )]
 #[post("/search")]
 async fn search_projects(
@@ -1281,7 +1281,10 @@ pub struct AddReport {
 
 /// Add a technical review report.  
 /// does not already exist for it.
-#[utoipa::path(tag = "moderation")]
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = DelphiReportId))
+)]
 #[put("/report")]
 async fn add_report(
     req: HttpRequest,

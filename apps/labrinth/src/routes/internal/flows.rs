@@ -1427,11 +1427,11 @@ struct NewOAuthAccount {
 #[utoipa::path(
 	tag = "auth",
     post,
-    operation_id = "createOAuthAccount",
-    responses(
-        (status = 200, description = "OAuth account created"),
-        (status = 400, description = "Invalid input")
-    )
+	operation_id = "createOAuthAccount",
+	responses(
+		(status = 200, description = "OAuth account created", body = serde_json::Value),
+		(status = 400, description = "Invalid input")
+	)
 )]
 #[post("/create/oauth")]
 async fn create_oauth_account(
@@ -1933,7 +1933,7 @@ impl ReadyAccountRegisterFlow {
     post,
     operation_id = "validateCreateAccountWithPassword",
     responses(
-        (status = 200, description = "Account input is valid"),
+        (status = NO_CONTENT, description = "Account input is valid"),
         (status = 400, description = "Invalid input")
     )
 )]
@@ -1958,11 +1958,11 @@ pub async fn validate_create_account_with_password(
 #[utoipa::path(
 	tag = "auth",
     post,
-    operation_id = "createAccountPassword",
-    responses(
-        (status = 200, description = "Account created"),
-        (status = 400, description = "Invalid input")
-    )
+	operation_id = "createAccountPassword",
+	responses(
+		(status = 200, description = "Account created", body = serde_json::Value),
+		(status = 400, description = "Invalid input")
+	)
 )]
 #[post("/create")]
 pub async fn create_account_with_password(
@@ -2006,11 +2006,11 @@ pub struct Login {
 #[utoipa::path(
 	tag = "auth",
     post,
-    operation_id = "loginPassword",
-    responses(
-        (status = 200, description = "Login successful"),
-        (status = 401, description = "Invalid credentials")
-    )
+	operation_id = "loginPassword",
+	responses(
+		(status = 200, description = "Login successful", body = serde_json::Value),
+		(status = 401, description = "Invalid credentials")
+	)
 )]
 #[post("/login")]
 pub async fn login_password(
@@ -2166,11 +2166,11 @@ async fn validate_2fa_code(
 #[utoipa::path(
 	tag = "auth",
     post,
-    operation_id = "login2fa",
-    responses(
-        (status = 200, description = "2FA login successful"),
-        (status = 401, description = "Invalid credentials")
-    )
+	operation_id = "login2fa",
+	responses(
+		(status = 200, description = "2FA login successful", body = serde_json::Value),
+		(status = 401, description = "Invalid credentials")
+	)
 )]
 #[post("/login/2fa")]
 pub async fn login_2fa(
@@ -2225,11 +2225,11 @@ pub async fn login_2fa(
 #[utoipa::path(
 	tag = "auth",
     post,
-    operation_id = "begin2faFlow",
-    responses(
-        (status = 200, description = "2FA secret generated"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "begin2faFlow",
+	responses(
+		(status = 200, description = "2FA secret generated", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = []))
 )]
 #[post("/2fa/get_secret")]
@@ -2275,11 +2275,11 @@ pub async fn begin_2fa_flow(
 #[utoipa::path(
 	tag = "auth",
     post,
-    operation_id = "finish2faFlow",
-    responses(
-        (status = 200, description = "2FA enabled"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "finish2faFlow",
+	responses(
+		(status = 200, description = "2FA enabled", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = []))
 )]
 #[post("/2fa")]
@@ -3086,11 +3086,11 @@ pub async fn subscribe_newsletter(
 #[utoipa::path(
 	tag = "auth",
     get,
-    operation_id = "getNewsletterSubscriptionStatus",
-    responses(
-        (status = 200, description = "Subscription status"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "getNewsletterSubscriptionStatus",
+	responses(
+		(status = 200, description = "Subscription status", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = []))
 )]
 #[get("/email/subscribe")]
@@ -3384,11 +3384,11 @@ pub struct AuthenticatePasskeyFinish {
 #[utoipa::path(
 	tag = "auth",
     post,
-    operation_id = "authenticatePasskeyFinish",
-    responses(
-        (status = 200, description = "Passkey authentication successful"),
-        (status = 400, description = "Invalid input")
-    )
+	operation_id = "authenticatePasskeyFinish",
+	responses(
+		(status = 200, description = "Passkey authentication successful", body = serde_json::Value),
+		(status = 400, description = "Invalid input")
+	)
 )]
 #[post("/passkey/finish")]
 pub async fn authenticate_passkey_finish(

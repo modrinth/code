@@ -37,7 +37,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     operation_id = "getProjectTeamMembers",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyTeamMember>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -81,7 +81,7 @@ pub async fn team_members_get_project(
     get,
     operation_id = "getTeamMembers",
     params(("id" = TeamId, Path, description = "The ID of the team")),
-    responses((status = 200, description = "Expected response to a valid request")),
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyTeamMember>)),
     security(("bearer_auth" = ["PROJECT_READ"]))
 )]
 #[get("/{id}/members")]
@@ -120,7 +120,7 @@ pub struct TeamIds {
     get,
     operation_id = "getTeams",
     params(("ids" = String, Query, description = "The JSON array of team IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<Vec<LegacyTeamMember>>))
 )]
 #[get("/teams")]
 pub async fn teams_get(

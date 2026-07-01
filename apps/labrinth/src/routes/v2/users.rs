@@ -35,7 +35,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     get,
     operation_id = "getUserFromAuth",
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyUser),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -75,7 +75,7 @@ pub struct UserIds {
     get,
     operation_id = "getUsers",
     params(("ids" = String, Query, description = "The JSON array of user IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyUser>))
 )]
 #[get("/users")]
 pub async fn users_get(
@@ -113,7 +113,7 @@ pub async fn users_get(
     operation_id = "getUser",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyUser),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -149,7 +149,7 @@ pub async fn user_get(
     operation_id = "getUserProjects",
     params(("user_id" = String, Path, description = "The ID or username of the user")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -402,7 +402,7 @@ pub async fn user_delete(
     operation_id = "getFollowedProjects",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -450,7 +450,7 @@ pub async fn user_follows(
     operation_id = "getUserNotifications",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

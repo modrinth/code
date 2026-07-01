@@ -10,7 +10,14 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 }
 
 /// Get a heap profile.  
-#[utoipa::path(tag = "debug")]
+#[utoipa::path(
+	tag = "debug",
+	responses((
+		status = OK,
+		body = Vec<u8>,
+		content_type = "application/octet-stream"
+	))
+)]
 #[get("/pprof/heap", guard = "admin_key_guard")]
 pub async fn heap() -> Result<HttpResponse, ApiError> {
     let mut prof_ctl = jemalloc_pprof::PROF_CTL.as_ref().unwrap().lock().await;
@@ -25,7 +32,10 @@ pub async fn heap() -> Result<HttpResponse, ApiError> {
 }
 
 /// Get a heap flame graph.  
-#[utoipa::path(tag = "debug")]
+#[utoipa::path(
+	tag = "debug",
+	responses((status = OK, body = String, content_type = "image/svg+xml"))
+)]
 #[get("/pprof/heap/flamegraph", guard = "admin_key_guard")]
 pub async fn flame_graph() -> Result<HttpResponse, ApiError> {
     let mut prof_ctl = jemalloc_pprof::PROF_CTL.as_ref().unwrap().lock().await;

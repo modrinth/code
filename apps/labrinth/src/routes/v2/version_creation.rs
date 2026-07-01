@@ -86,7 +86,7 @@ pub struct InitialVersionData {
         description = "Multipart payload containing `data` and uploaded files"
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -317,7 +317,7 @@ async fn get_example_version_fields(
         description = "Multipart payload containing files to upload"
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

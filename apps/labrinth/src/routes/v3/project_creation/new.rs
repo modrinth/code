@@ -114,7 +114,7 @@ pub struct ProjectCreate {
 ///
 /// Components must include `base` ([`exp::base::Project`]), and at least one
 /// other component.
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = OK, body = ProjectId)))]
 #[put("")]
 pub async fn create(
     req: HttpRequest,

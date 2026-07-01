@@ -144,7 +144,7 @@ struct ProjectCreateData {
         description = "Multipart payload containing `data` and uploaded files"
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyProject),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,

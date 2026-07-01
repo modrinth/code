@@ -101,7 +101,10 @@ pub async fn get_user_clients(
 }
 
 /// Get an OAuth client.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(
+	tag = "oauth clients",
+	responses((status = OK, body = models::oauth_clients::OAuthClient)),
+)]
 #[get("/app/{id}")]
 pub async fn get_client(
     id: web::Path<OAuthClientId>,
@@ -116,7 +119,10 @@ pub async fn get_client(
 }
 
 /// List OAuth clients.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(
+	tag = "oauth clients",
+	responses((status = OK, body = Vec<models::oauth_clients::OAuthClient>)),
+)]
 #[get("/apps")]
 pub async fn get_clients(
     info: web::Query<GetOAuthClientsRequest>,
@@ -159,7 +165,10 @@ pub struct NewOAuthApp {
 }
 
 /// Create an OAuth client.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(
+	tag = "oauth clients",
+	responses((status = OK, body = OAuthClientCreationResult)),
+)]
 #[post("/app")]
 pub async fn oauth_client_create(
     req: HttpRequest,
@@ -222,7 +231,7 @@ pub async fn oauth_client_create(
 }
 
 /// Delete an OAuth client.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
 #[delete("/app/{id}")]
 pub async fn oauth_client_delete(
     req: HttpRequest,
@@ -280,7 +289,7 @@ pub struct OAuthClientEdit {
 }
 
 /// Update an OAuth client.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
 #[patch("/app/{id}")]
 pub async fn oauth_client_edit(
     req: HttpRequest,
@@ -357,7 +366,7 @@ pub struct Extension {
 }
 
 /// Update an OAuth client icon.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
 #[patch("/app/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn oauth_client_icon_edit(
@@ -431,7 +440,7 @@ pub async fn oauth_client_icon_edit(
 }
 
 /// Delete an OAuth client icon.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
 #[delete("/app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
     req: HttpRequest,
@@ -483,7 +492,10 @@ pub async fn oauth_client_icon_delete(
 }
 
 /// List OAuth authorizations.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(
+	tag = "oauth clients",
+	responses((status = OK, body = Vec<models::oauth_clients::OAuthClientAuthorization>)),
+)]
 #[get("/authorizations")]
 pub async fn get_user_oauth_authorizations(
     req: HttpRequest,
@@ -514,7 +526,7 @@ pub async fn get_user_oauth_authorizations(
 }
 
 /// Revoke OAuth authorization.  
-#[utoipa::path(tag = "oauth clients")]
+#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
 #[delete("/authorizations")]
 pub async fn revoke_oauth_authorization(
     req: HttpRequest,

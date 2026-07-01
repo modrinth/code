@@ -19,7 +19,10 @@ pub fn utoipa_config(
 }
 
 /// Get bank details.  
-#[utoipa::path(tag = "mural")]
+#[utoipa::path(
+	tag = "mural",
+	responses((status = OK, body = serde_json::Value))
+)]
 #[get("/mural/bank-details")]
 async fn get_bank_details(
     payouts_queue: web::Data<PayoutsQueue>,

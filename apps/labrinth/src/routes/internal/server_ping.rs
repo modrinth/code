@@ -23,7 +23,10 @@ pub struct PingRequest {
 }
 
 /// Ping Minecraft server.  
-#[utoipa::path(tag = "server ping")]
+#[utoipa::path(
+	tag = "server ping",
+	responses((status = NO_CONTENT))
+)]
 #[post("/minecraft-java")]
 pub async fn ping_minecraft_java(
     req: HttpRequest,

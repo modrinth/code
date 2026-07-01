@@ -41,7 +41,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
 /// Get a project's team members.  
-#[utoipa::path(tag = "teams")]
+#[utoipa::path(tag = "teams", responses((status = OK, body = Vec<crate::models::teams::TeamMember>)))]
 #[get("/{project_id}/members")]
 async fn team_members_get_project(
     req: HttpRequest,

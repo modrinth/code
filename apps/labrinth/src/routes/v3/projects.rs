@@ -43,7 +43,6 @@ use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -141,9 +140,14 @@ pub async fn random_projects_get(
     Ok(HttpResponse::Ok().json(projects_data))
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectIds {
     pub ids: String,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct ProjectCheckResponse {
+    pub id: ProjectId,
 }
 
 pub async fn projects_get(
@@ -176,7 +180,7 @@ pub async fn projects_get(
 }
 
 /// Get a project.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
 #[get("/{id}")]
 async fn project_get(
     req: HttpRequest,
@@ -308,7 +312,7 @@ pub struct EditProject {
 
 #[allow(clippy::too_many_arguments)]
 /// Update a project.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[patch("/{id}")]
 async fn project_edit(
     req: HttpRequest,
@@ -1263,7 +1267,7 @@ pub async fn edit_project_categories(
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = SearchResults),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -1294,7 +1298,11 @@ pub async fn project_search(
 
 // for more complicated search queries
 /// Search projects.  
-#[utoipa::path(tag = "search", request_body = serde_json::Value)]
+#[utoipa::path(
+	tag = "search",
+	request_body = serde_json::Value,
+	responses((status = OK, body = SearchResults))
+)]
 #[post("/search")]
 pub async fn project_search_post(
     web::Json(info): web::Json<SearchRequest>,
@@ -1307,7 +1315,7 @@ pub async fn project_search_post(
 
 //checks the validity of a project id or slug
 /// Check project availability.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = OK, body = ProjectCheckResponse)))]
 #[get("/{id}/check")]
 async fn project_get_check(
     info: web::Path<(String,)>,
@@ -1328,22 +1336,22 @@ pub async fn project_get_check_internal(
         db_models::DBProject::get(&slug, &**pool, &redis).await?;
 
     if let Some(project) = project_data {
-        Ok(HttpResponse::Ok().json(json! ({
-            "id": models::ids::ProjectId::from(project.inner.id)
-        })))
+        Ok(HttpResponse::Ok().json(ProjectCheckResponse {
+            id: models::ids::ProjectId::from(project.inner.id),
+        }))
     } else {
         Err(ApiError::NotFound)
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DependencyInfo {
     pub projects: Vec<Project>,
     pub versions: Vec<models::projects::Version>,
 }
 
 /// List project dependencies.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = OK, body = DependencyInfo)))]
 #[get("/{project_id}/dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
@@ -1790,7 +1798,7 @@ pub struct Extension {
 
 #[allow(clippy::too_many_arguments)]
 /// Update a project icon.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[patch("/{id}/icon")]
 async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -1935,7 +1943,7 @@ pub async fn project_icon_edit_internal(
 }
 
 /// Delete a project icon.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[delete("/{id}/icon")]
 async fn delete_project_icon(
     req: HttpRequest,
@@ -2062,7 +2070,7 @@ pub struct GalleryCreateQuery {
 
 #[allow(clippy::too_many_arguments)]
 /// Add a gallery item.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[post("/{id}/gallery")]
 pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
@@ -2261,7 +2269,7 @@ pub struct GalleryEditQuery {
 }
 
 /// Update a gallery item.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[patch("/{id}/gallery")]
 async fn edit_gallery_item(
     req: HttpRequest,
@@ -2451,7 +2459,7 @@ pub struct GalleryDeleteQuery {
 }
 
 /// Delete a gallery item.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[delete("/{id}/gallery")]
 async fn delete_gallery_item(
     req: HttpRequest,
@@ -2587,7 +2595,7 @@ pub async fn delete_gallery_item_internal(
 }
 
 /// Delete a project.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[delete("/{id}")]
 async fn project_delete(
     req: HttpRequest,
@@ -2746,7 +2754,7 @@ pub async fn project_delete_internal(
 }
 
 /// Follow a project.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[post("/{id}/follow")]
 async fn project_follow(
     req: HttpRequest,
@@ -2839,7 +2847,7 @@ pub async fn project_follow_internal(
 }
 
 /// Unfollow a project.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[delete("/{id}/follow")]
 async fn project_unfollow(
     req: HttpRequest,
@@ -2928,7 +2936,7 @@ pub async fn project_unfollow_internal(
 }
 
 /// Get a project's organization.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = OK, body = models::organizations::Organization)))]
 #[get("/{id}/organization")]
 pub async fn project_get_organization(
     req: HttpRequest,

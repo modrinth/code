@@ -17,7 +17,10 @@ pub fn utoipa_config(
 }
 
 /// Export GDPR data.  
-#[utoipa::path(tag = "GDPR")]
+#[utoipa::path(
+	tag = "GDPR",
+	responses((status = OK, body = serde_json::Value))
+)]
 #[post("/export")]
 pub async fn export(
     req: HttpRequest,

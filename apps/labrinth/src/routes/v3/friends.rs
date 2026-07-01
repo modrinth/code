@@ -24,7 +24,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 /// Add a friend.  
-#[utoipa::path(tag = "friends")]
+#[utoipa::path(tag = "friends", responses((status = NO_CONTENT)))]
 #[post("/friend/{id}")]
 pub async fn add_friend(
     req: HttpRequest,
@@ -136,7 +136,7 @@ pub async fn add_friend(
 }
 
 /// Remove a friend.  
-#[utoipa::path(tag = "friends")]
+#[utoipa::path(tag = "friends", responses((status = NO_CONTENT)))]
 #[delete("/friend/{id}")]
 pub async fn remove_friend(
     req: HttpRequest,
@@ -180,7 +180,7 @@ pub async fn remove_friend(
 }
 
 /// List friends.  
-#[utoipa::path(tag = "friends")]
+#[utoipa::path(tag = "friends", responses((status = OK, body = Vec<UserFriend>)))]
 #[get("/friends")]
 pub async fn friends(
     req: HttpRequest,

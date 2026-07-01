@@ -15,7 +15,7 @@ use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectStatus,
+    License, Link, MonetizationStatus, Project, ProjectStatus,
     SideTypesMigrationReviewStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
@@ -284,7 +284,7 @@ pub async fn undo_uploads(
 }
 
 /// Create a project.  
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
 #[post("")]
 pub async fn project_create(
     req: HttpRequest,
@@ -365,7 +365,7 @@ pub async fn project_create_internal(
 /// Create a project with a specific ID.  
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[utoipa::path(tag = "projects")]
+#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,

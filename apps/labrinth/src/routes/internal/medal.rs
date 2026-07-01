@@ -29,11 +29,20 @@ pub fn utoipa_config(
 
 #[derive(Deserialize)]
 struct MedalQuery {
-    username: String,
+	username: String,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+struct VerifyResponse {
+	user_id: UserId,
+	redeemed: bool,
 }
 
 /// Verify Medal credentials.  
-#[utoipa::path(tag = "medal")]
+#[utoipa::path(
+	tag = "medal",
+	responses((status = OK, body = VerifyResponse))
+)]
 #[post("/verify", guard = "medal_key_guard")]
 pub async fn verify(
     pool: web::Data<PgPool>,
@@ -47,14 +56,8 @@ pub async fn verify(
         )
         .await?;
 
-    #[derive(Serialize)]
-    struct VerifyResponse {
-        user_id: UserId,
-        redeemed: bool,
-    }
-
-    match maybe_fields {
-        None => Err(ApiError::NotFound),
+	match maybe_fields {
+		None => Err(ApiError::NotFound),
         Some(fields) => Ok(HttpResponse::Ok().json(VerifyResponse {
             user_id: fields.user_id.into(),
             redeemed: fields.redeemal_status.is_some(),
@@ -63,7 +66,10 @@ pub async fn verify(
 }
 
 /// Redeem Medal credit.  
-#[utoipa::path(tag = "medal")]
+#[utoipa::path(
+	tag = "medal",
+	responses((status = ACCEPTED), (status = CREATED))
+)]
 #[post("/redeem", guard = "medal_key_guard")]
 pub async fn redeem(
     pool: web::Data<PgPool>,

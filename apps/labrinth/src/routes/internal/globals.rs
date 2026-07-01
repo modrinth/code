@@ -90,10 +90,13 @@ pub fn tax_compliance_payout_threshold_for_year(
 }
 
 /// Get backend globals.  
-#[utoipa::path(tag = "globals")]
+#[utoipa::path(
+	tag = "globals",
+	responses((status = OK, body = Globals))
+)]
 #[get("")]
 pub async fn get_globals() -> web::Json<Globals> {
-    web::Json(GLOBALS.clone())
+	web::Json(GLOBALS.clone())
 }
 
 #[cfg(test)]

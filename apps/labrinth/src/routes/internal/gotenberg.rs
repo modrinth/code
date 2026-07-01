@@ -39,7 +39,11 @@ pub fn utoipa_config(
 }
 
 /// Receive a Gotenberg success callback.  
-#[utoipa::path(tag = "gotenberg", request_body = Vec<u8>)]
+#[utoipa::path(
+	tag = "gotenberg",
+	request_body = Vec<u8>,
+	responses((status = NO_CONTENT))
+)]
 #[post("/gotenberg/success", guard = "internal_network_guard")]
 pub async fn success_callback(
     web::Header(header::ContentDisposition {
@@ -114,7 +118,10 @@ impl fmt::Display for GotenbergError {
 }
 
 /// Receive a Gotenberg error callback.  
-#[utoipa::path(tag = "gotenberg")]
+#[utoipa::path(
+	tag = "gotenberg",
+	responses((status = NO_CONTENT))
+)]
 #[post("/gotenberg/error", guard = "internal_network_guard")]
 pub async fn error_callback(
     web::Header(GotenbergTrace(trace)): web::Header<GotenbergTrace>,

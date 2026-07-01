@@ -49,7 +49,10 @@ pub struct GetData {
 }
 
 /// Get playtime data.  
-#[utoipa::path(tag = "analytics")]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<u32, u64>>)),
+)]
 #[get("/playtime")]
 pub async fn playtimes_get(
     req: HttpRequest,
@@ -121,7 +124,10 @@ pub async fn playtimes_get(
 ///    }
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
-#[utoipa::path(tag = "analytics")]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<u32, u64>>)),
+)]
 #[get("/views")]
 pub async fn views_get(
     req: HttpRequest,
@@ -193,7 +199,10 @@ pub async fn views_get(
 ///    }
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
-#[utoipa::path(tag = "analytics")]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<u32, u64>>)),
+)]
 #[get("/downloads")]
 pub async fn downloads_get(
     req: HttpRequest,
@@ -266,7 +275,10 @@ pub async fn downloads_get(
 ///    }
 ///}
 /// ONLY project IDs can be used. Unauthorized projects will be filtered out.
-#[utoipa::path(tag = "analytics")]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<i64, rust_decimal::Decimal>>)),
+)]
 #[get("/revenue")]
 pub async fn revenue_get(
     req: HttpRequest,
@@ -408,7 +420,10 @@ pub async fn revenue_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
-#[utoipa::path(tag = "analytics")]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<String, u64>>)),
+)]
 #[get("/countries/downloads")]
 pub async fn countries_downloads_get(
     req: HttpRequest,
@@ -484,7 +499,10 @@ pub async fn countries_downloads_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
-#[utoipa::path(tag = "analytics")]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<String, u64>>)),
+)]
 #[get("/countries/views")]
 pub async fn countries_views_get(
     req: HttpRequest,

@@ -154,7 +154,10 @@ pub struct DelphiRunParameters {
 }
 
 /// Ingest a Delphi report.  
-#[utoipa::path(tag = "delphi")]
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = NO_CONTENT))
+)]
 #[post("/ingest", guard = "admin_key_guard")]
 async fn ingest_report(
     pool: web::Data<PgPool>,
@@ -481,7 +484,10 @@ pub async fn send_tech_review_exit_file_deleted_message_if_exited(
 }
 
 /// Run Delphi.  
-#[utoipa::path(tag = "delphi")]
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = NO_CONTENT))
+)]
 #[post("/run")]
 async fn _run(
     req: HttpRequest,
@@ -504,7 +510,10 @@ async fn _run(
 }
 
 /// Get the Delphi version.  
-#[utoipa::path(tag = "delphi")]
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = OK, body = inline(Option<i32>)))
+)]
 #[get("/version")]
 async fn version(
     req: HttpRequest,
@@ -529,7 +538,10 @@ async fn version(
 }
 
 /// Get the Delphi issue type schema.  
-#[utoipa::path(tag = "delphi")]
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = OK, body = serde_json::Value))
+)]
 #[get("/issue_type/schema")]
 async fn issue_type_schema(
     req: HttpRequest,
