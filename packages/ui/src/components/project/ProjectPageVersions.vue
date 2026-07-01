@@ -550,7 +550,7 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		},
 		{
 			key: 'platforms',
-			label: 'Platforms',
+			label: 'Platform',
 			cellClass: '!overflow-visible py-3 align-middle pr-2.5 min-w-0 max-w-[12rem]',
 		},
 	]
