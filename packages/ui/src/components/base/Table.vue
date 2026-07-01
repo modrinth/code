@@ -33,7 +33,7 @@
 						<th
 							v-for="column in columns"
 							:key="column.key"
-							class="h-12 first:pl-4 last:pr-4"
+							class="h-12 pr-2 first:pl-4 last:pr-4"
 							:class="[
 								`text-${column.align ?? 'left'}`,
 								column.enableSorting ? 'cursor-pointer select-none' : '',

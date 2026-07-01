@@ -88,7 +88,10 @@
 								'--_color': 'var(--color-orange)',
 							}"
 						>
-							<TagItem> <CircleAlertIcon /> {{ formatMessage(messages.withheld) }}</TagItem>
+							<TagItem class="w-fit max-w-full truncate">
+								<CircleAlertIcon />
+								<span class="min-w-0 truncate">{{ formatMessage(messages.withheld) }}</span>
+							</TagItem>
 						</div>
 					</div>
 				</AutoLink>
@@ -106,34 +109,38 @@
 		</template>
 
 		<template #cell-gameVersions="{ row: version }">
-			<div class="flex flex-wrap gap-1 w-fit">
+			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<TagItem
 					v-for="gameVersion in getDisplayGameVersions(version).slice(0, MAX_GAME_VERSION_TAGS)"
 					:key="`version-tag-${gameVersion}`"
 					v-tooltip="getFilterTooltip(gameVersion)"
 					data-no-row-click
+					class="w-fit max-w-full truncate"
 					:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 				>
-					{{ gameVersion }}
+					<span class="min-w-0 truncate">{{ gameVersion }}</span>
 				</TagItem>
 				<Menu
 					v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
 					data-no-row-click
 					:delay="{ hide: 50, show: 0 }"
 					no-auto-focus
-					class="cursor-default"
+					class="w-full min-w-0 cursor-default"
 				>
-					<TagItem tabindex="0">
-						+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
+					<TagItem class="w-fit max-w-full truncate" tabindex="0">
+						<span class="min-w-0 truncate">
+							+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
+						</span>
 					</TagItem>
 					<template #popper>
 						<div class="flex max-w-[20rem] flex-wrap gap-1">
 							<TagItem
 								v-for="gameVersion in getDisplayGameVersions(version).slice(MAX_GAME_VERSION_TAGS)"
 								:key="`overflow-version-tag-${gameVersion}`"
+								class="w-fit max-w-full truncate"
 								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 							>
-								{{ gameVersion }}
+								<span class="min-w-0 truncate">{{ gameVersion }}</span>
 							</TagItem>
 						</div>
 					</template>
@@ -142,9 +149,11 @@
 		</template>
 
 		<template #cell-platforms="{ row: version }">
-			<div class="flex flex-wrap gap-1 w-fit">
+			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<template v-if="version.noModLoader">
-					<TagItem class="border !border-solid border-surface-5"> No mod loader </TagItem>
+					<TagItem class="w-fit max-w-full truncate border !border-solid border-surface-5">
+						<span class="min-w-0 truncate">No mod loader</span>
+					</TagItem>
 				</template>
 				<template v-else>
 					<TagItem
@@ -152,31 +161,37 @@
 						:key="`platform-tag-${platform}`"
 						v-tooltip="getPlatformTooltip(platform)"
 						data-no-row-click
+						class="w-fit max-w-full truncate"
 						:style="`--_color: var(--color-platform-${platform})`"
 						:action="() => versionFilters?.toggleFilter('platform', platform)"
 					>
 						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-						{{ getPlatformLabel(platform) }}
+						<span class="min-w-0 truncate">{{ getPlatformLabel(platform) }}</span>
 					</TagItem>
 					<Menu
 						v-if="version.loaders.length > MAX_PLATFORM_TAGS"
 						data-no-row-click
 						:delay="{ hide: 50, show: 0 }"
 						no-auto-focus
-						class="cursor-default"
+						class="w-full min-w-0 cursor-default"
 					>
-						<TagItem tabindex="0"> +{{ version.loaders.length - MAX_PLATFORM_TAGS }} </TagItem>
+						<TagItem class="w-fit max-w-full truncate" tabindex="0">
+							<span class="min-w-0 truncate">
+								+{{ version.loaders.length - MAX_PLATFORM_TAGS }}
+							</span>
+						</TagItem>
 						<template #popper>
 							<div class="flex max-w-[20rem] flex-wrap gap-1">
 								<TagItem
 									v-for="platform in version.loaders.slice(MAX_PLATFORM_TAGS)"
 									:key="`overflow-platform-tag-${platform}`"
 									v-tooltip="getPlatformTooltip(platform)"
+									class="w-fit max-w-full truncate"
 									:style="`--_color: var(--color-platform-${platform})`"
 									:action="() => versionFilters?.toggleFilter('platform', platform)"
 								>
 									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-									{{ getPlatformLabel(platform) }}
+									<span class="min-w-0 truncate">{{ getPlatformLabel(platform) }}</span>
 								</TagItem>
 							</div>
 						</template>
@@ -186,15 +201,15 @@
 		</template>
 
 		<template v-if="showEnvironmentColumn" #cell-environment="{ row: version }">
-			<div class="flex flex-wrap gap-1">
+			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<TagItem
 					v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
 					:key="`env-tag-${tagIdx}`"
 					data-no-row-click
-					class="text-center"
+					class="w-fit max-w-full truncate text-center"
 				>
 					<component :is="tag.icon" />
-					{{ formatMessage(tag.label).replace('and', '&') }}
+					<span class="min-w-0 truncate">{{ formatMessage(tag.label).replace('and', '&') }}</span>
 				</TagItem>
 			</div>
 		</template>
@@ -283,7 +298,7 @@
 						</div>
 
 						<div
-							class="flex items-start justify-end gap-1 max-[400px]:flex-col max-[400px]:justify-start smart-clickable:allow-pointer-events"
+							class="flex items-start justify-end gap-1 max-[350px]:flex-col max-[350px]:justify-start smart-clickable:allow-pointer-events"
 						>
 							<slot name="actions" :version="version"></slot>
 						</div>
@@ -527,12 +542,12 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		{
 			key: 'gameVersions',
 			label: 'Game version',
-			cellClass: '!overflow-visible py-3 align-middle pr-2.5 w-fit max-w-[10rem]',
+			cellClass: '!overflow-visible py-3 align-middle pr-2.5 min-w-0 max-w-[12rem]',
 		},
 		{
 			key: 'platforms',
 			label: 'Platforms',
-			cellClass: '!overflow-visible py-3 align-middle pr-2.5 w-fit max-w-[10rem]',
+			cellClass: '!overflow-visible py-3 align-middle pr-2.5 min-w-0 max-w-[12rem]',
 		},
 	]
 
@@ -540,7 +555,7 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		columns.push({
 			key: 'environment',
 			label: 'Environment',
-			cellClass: visibleCellClass,
+			cellClass: `${visibleCellClass} min-w-0 max-w-[12rem]`,
 		})
 	}
 
