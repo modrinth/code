@@ -505,7 +505,7 @@ function buildDirectoryEntry(
 		indeterminate: !selected && selectedCount > 0 && selectedCount < descendants.length,
 		disabled: item?.disabled ?? descendants.length === 0,
 		modified: item?.modified ?? getLatestModified(descendants),
-		count: item?.count ?? getFolderChildCount(path),
+		count: item?.count ?? (item ? undefined : getFolderChildCount(path)),
 		item,
 	}
 }
@@ -590,6 +590,7 @@ function toggleAllVisible(selected: boolean) {
 
 function formatSize(entry: FileTreeSelectEntry) {
 	if (entry.type === 'directory') {
+		if (entry.count === undefined) return ''
 		return formatMessage(messages.itemCount, { count: entry.count ?? 0 })
 	}
 

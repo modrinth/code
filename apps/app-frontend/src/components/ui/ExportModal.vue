@@ -11,15 +11,10 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { save } from '@tauri-apps/plugin-dialog'
-import { readDir, stat } from '@tauri-apps/plugin-fs'
 import { ref } from 'vue'
 
 import { PackageIcon } from '@/assets/icons'
-import {
-	export_instance_mrpack,
-	get_full_path,
-	get_pack_export_candidates,
-} from '@/helpers/instance'
+import { export_instance_mrpack, get_pack_export_candidates } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -69,26 +64,16 @@ const files = ref([])
 const selectedFilePaths = ref([])
 const fileTreeKey = ref(0)
 const filesLoadId = ref(0)
-const instanceRoot = ref('')
 const loadedDirectories = ref(new Set())
 
 async function initFiles() {
 	const loadId = ++filesLoadId.value
-	const [filePaths, root] = await Promise.all([
-		get_pack_export_candidates(props.instance.id),
-		get_full_path(props.instance.id),
-	])
-	if (loadId !== filesLoadId.value) return
-
-	instanceRoot.value = root
-	const exportCandidates = await Promise.all(
-		filePaths.map((path) => buildExportCandidateItem(root, path)),
-	)
+	const exportCandidates = await get_pack_export_candidates(props.instance.id)
 	if (loadId !== filesLoadId.value) return
 
 	files.value = exportCandidates
 	selectedFilePaths.value = files.value
-		.filter((file) => !file.disabled && isDefaultSelectedExportCandidate(file.path))
+		.filter((file) => !file.disabled && file.defaultSelected)
 		.map((file) => file.path)
 }
 
@@ -123,68 +108,32 @@ function resetExportState() {
 	files.value = []
 	selectedFilePaths.value = []
 	fileTreeKey.value += 1
-	instanceRoot.value = ''
 	loadedDirectories.value = new Set()
 }
 
 async function loadExportDirectory(path) {
-	if (!path || !instanceRoot.value || loadedDirectories.value.has(path)) return
+	const normalizedPath = normalizeExportPath(path)
+	if (!normalizedPath) return
+
+	if (loadedDirectories.value.has(normalizedPath)) {
+		replaceSelectedDirectoryWithLoadedChildren(
+			normalizedPath,
+			getLoadedDirectoryChildren(normalizedPath),
+		)
+		return
+	}
 
 	const loadId = filesLoadId.value
-	loadedDirectories.value.add(path)
+	loadedDirectories.value.add(normalizedPath)
 
 	try {
-		const entries = await readDir(`${instanceRoot.value}/${path}`)
-		const childItems = await Promise.all(
-			entries.map((entry) => buildExportDirectoryChildItem(instanceRoot.value, path, entry)),
-		)
+		const childItems = await get_pack_export_candidates(props.instance.id, normalizedPath)
 		if (loadId !== filesLoadId.value) return
 
 		appendExportItems(childItems)
+		replaceSelectedDirectoryWithLoadedChildren(normalizedPath, childItems)
 	} catch {
-		loadedDirectories.value.delete(path)
-	}
-}
-
-async function buildExportCandidateItem(instanceRoot, path) {
-	try {
-		const entries = await readDir(`${instanceRoot}/${path}`)
-		const metadata = await getExportCandidateMetadata(instanceRoot, path)
-		return {
-			path,
-			type: 'directory',
-			disabled: isExportCandidateDisabled(path),
-			modified: metadata.modified,
-			count: entries.length,
-		}
-	} catch {
-		return buildExportFileItem(instanceRoot, path)
-	}
-}
-
-async function buildExportDirectoryChildItem(instanceRoot, parentPath, entry) {
-	const path = `${parentPath}/${entry.name}`
-	if (entry.isDirectory) {
-		const metadata = await getExportCandidateMetadata(instanceRoot, path)
-		return {
-			path,
-			type: 'directory',
-			disabled: isExportCandidateDisabled(path),
-			modified: metadata.modified,
-		}
-	}
-
-	return buildExportFileItem(instanceRoot, path)
-}
-
-async function buildExportFileItem(instanceRoot, path) {
-	const metadata = await getExportCandidateMetadata(instanceRoot, path)
-	return {
-		path,
-		type: 'file',
-		disabled: isExportCandidateDisabled(path),
-		size: metadata.size,
-		modified: metadata.modified,
+		loadedDirectories.value.delete(normalizedPath)
 	}
 }
 
@@ -196,39 +145,33 @@ function appendExportItems(items) {
 	files.value = [...nextFiles.values()]
 }
 
-async function getExportCandidateMetadata(instanceRoot, path) {
-	try {
-		const metadata = await stat(`${instanceRoot}/${path}`)
-		return {
-			size: metadata.size,
-			modified: metadata.mtime ? Math.floor(metadata.mtime.getTime() / 1000) : undefined,
+function getLoadedDirectoryChildren(path) {
+	const normalizedPath = normalizeExportPath(path)
+	const prefix = `${normalizedPath}/`
+
+	return files.value.filter((item) => {
+		const itemPath = normalizeExportPath(item.path)
+		if (!itemPath.startsWith(prefix)) return false
+
+		return itemPath.slice(prefix.length).split('/').filter(Boolean).length === 1
+	})
+}
+
+function replaceSelectedDirectoryWithLoadedChildren(path, items) {
+	const nextSelectedPaths = new Set(selectedFilePaths.value.map(normalizeExportPath))
+	if (!nextSelectedPaths.delete(normalizeExportPath(path))) return
+
+	for (const item of items) {
+		if (item && !item.disabled) {
+			nextSelectedPaths.add(normalizeExportPath(item.path))
 		}
-	} catch {
-		return {}
 	}
+
+	selectedFilePaths.value = [...nextSelectedPaths]
 }
 
 function normalizeExportPath(path) {
 	return path.replaceAll('\\', '/').split('/').filter(Boolean).join('/')
-}
-
-function isDefaultSelectedExportCandidate(path) {
-	return (
-		path.startsWith('mods') ||
-		path.startsWith('datapacks') ||
-		path.startsWith('resourcepacks') ||
-		path.startsWith('shaderpacks') ||
-		path.startsWith('config')
-	)
-}
-
-function isExportCandidateDisabled(path) {
-	return (
-		path === 'profile.json' ||
-		path.startsWith('modrinth_logs') ||
-		path.startsWith('.fabric') ||
-		path.startsWith('__MACOSX')
-	)
 }
 </script>
 

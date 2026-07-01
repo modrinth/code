@@ -699,8 +699,13 @@ pub async fn instance_export_mrpack(
 #[tauri::command]
 pub async fn instance_get_pack_export_candidates(
     instance_id: &str,
-) -> Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
-    Ok(theseus::instance::get_pack_export_candidates(instance_id).await?)
+    parent: Option<SafeRelativeUtf8UnixPathBuf>,
+) -> Result<Vec<theseus::instance::PackExportCandidate>> {
+    Ok(theseus::instance::get_pack_export_candidates_for_parent(
+        instance_id,
+        parent,
+    )
+    .await?)
 }
 
 #[tauri::command]

@@ -297,16 +297,26 @@ export async function export_instance_mrpack(
 	})
 }
 
-// Given a folder path, populate an array of all the subfolders
-// Intended to be used for finding potential override folders
-// profile
-// -- mods
-// -- resourcepacks
-// -- file1
-// => [mods, resourcepacks]
-// allows selection for 'included_overrides' in export_instance_mrpack
-export async function get_pack_export_candidates(instanceId: string): Promise<string[]> {
-	return await invoke('plugin:instance|instance_get_pack_export_candidates', { instanceId })
+export type PackExportCandidate = {
+	path: string
+	type: 'directory' | 'file'
+	size?: number
+	modified?: number
+	count?: number
+	disabled: boolean
+	defaultSelected: boolean
+}
+
+// Given a folder path, populate an array of exportable direct children.
+// Allows selection for 'included_overrides' in export_instance_mrpack.
+export async function get_pack_export_candidates(
+	instanceId: string,
+	parent?: string,
+): Promise<PackExportCandidate[]> {
+	return await invoke('plugin:instance|instance_get_pack_export_candidates', {
+		instanceId,
+		parent: parent ?? null,
+	})
 }
 
 // Run Minecraft using an instance
