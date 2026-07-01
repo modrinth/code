@@ -58,7 +58,7 @@ pub struct UrlInput {
 }
 
 //this route should be behind the cloudflare WAF to prevent non-browsers from calling it
-#[post("view")]
+#[post("/view")]
 async fn page_view_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
@@ -179,7 +179,7 @@ pub struct PlaytimeInput {
     parent: Option<crate::models::ids::VersionId>,
 }
 
-#[post("playtime")]
+#[post("/playtime")]
 async fn playtime_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
@@ -258,7 +258,7 @@ pub struct MinecraftJavaServerPlayInput {
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
 
-#[post("minecraft-server-play")]
+#[post("/minecraft-server-play")]
 async fn minecraft_server_play_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,

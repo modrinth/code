@@ -34,7 +34,7 @@ struct MedalQuery {
 
 /// Verify Medal credentials.  
 #[utoipa::path(tag = "medal")]
-#[post("verify", guard = "medal_key_guard")]
+#[post("/verify", guard = "medal_key_guard")]
 pub async fn verify(
     pool: web::Data<PgPool>,
     web::Query(MedalQuery { username }): web::Query<MedalQuery>,
@@ -64,7 +64,7 @@ pub async fn verify(
 
 /// Redeem Medal credit.  
 #[utoipa::path(tag = "medal")]
-#[post("redeem", guard = "medal_key_guard")]
+#[post("/redeem", guard = "medal_key_guard")]
 pub async fn redeem(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

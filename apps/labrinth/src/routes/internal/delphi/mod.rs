@@ -155,7 +155,7 @@ pub struct DelphiRunParameters {
 
 /// Ingest a Delphi report.  
 #[utoipa::path(tag = "delphi")]
-#[post("ingest", guard = "admin_key_guard")]
+#[post("/ingest", guard = "admin_key_guard")]
 async fn ingest_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -482,7 +482,7 @@ pub async fn send_tech_review_exit_file_deleted_message_if_exited(
 
 /// Run Delphi.  
 #[utoipa::path(tag = "delphi")]
-#[post("run")]
+#[post("/run")]
 async fn _run(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -505,7 +505,7 @@ async fn _run(
 
 /// Get the Delphi version.  
 #[utoipa::path(tag = "delphi")]
-#[get("version")]
+#[get("/version")]
 async fn version(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -530,7 +530,7 @@ async fn version(
 
 /// Get the Delphi issue type schema.  
 #[utoipa::path(tag = "delphi")]
-#[get("issue_type/schema")]
+#[get("/issue_type/schema")]
 async fn issue_type_schema(
     req: HttpRequest,
     pool: web::Data<PgPool>,

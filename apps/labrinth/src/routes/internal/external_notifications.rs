@@ -54,7 +54,7 @@ struct CreateNotification {
 
 /// Create external notifications.  
 #[utoipa::path(tag = "external notifications")]
-#[post("external_notifications", guard = "external_notification_key_guard")]
+#[post("/external_notifications", guard = "external_notification_key_guard")]
 pub async fn create(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -97,7 +97,7 @@ pub async fn create(
 /// Create email sync.
 #[utoipa::path(tag = "external notifications")]
 #[post(
-    "external_notifications/email-sync",
+    "/external_notifications/email-sync",
     guard = "external_notification_key_guard"
 )]
 pub async fn create_email_sync(
@@ -204,7 +204,7 @@ struct NotificationFilter {
 
 /// Remove external notifications.  
 #[utoipa::path(tag = "external notifications")]
-#[delete("external_notifications", guard = "external_notification_key_guard")]
+#[delete("/external_notifications", guard = "external_notification_key_guard")]
 pub async fn remove(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -254,7 +254,7 @@ struct SendEmail {
 
 /// Send a custom email.  
 #[utoipa::path(tag = "external notifications")]
-#[post("external_notifications/send_custom_email")]
+#[post("/external_notifications/send_custom_email")]
 pub async fn send_custom_email(
     req: HttpRequest,
     pool: web::Data<PgPool>,

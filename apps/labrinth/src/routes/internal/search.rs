@@ -11,7 +11,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 
 /// List search tasks.  
 #[utoipa::path(tag = "search")]
-#[get("tasks", guard = "admin_key_guard")]
+#[get("/tasks", guard = "admin_key_guard")]
 pub async fn tasks(
     search: web::Data<dyn SearchBackend>,
 ) -> Result<web::Json<serde_json::Value>, ApiError> {
@@ -20,7 +20,7 @@ pub async fn tasks(
 
 /// Cancel search tasks.  
 #[utoipa::path(tag = "search")]
-#[delete("tasks", guard = "admin_key_guard")]
+#[delete("/tasks", guard = "admin_key_guard")]
 pub async fn tasks_cancel(
     search: web::Data<dyn SearchBackend>,
     body: web::Json<TasksCancelFilter>,

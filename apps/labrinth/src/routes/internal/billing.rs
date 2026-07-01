@@ -87,7 +87,7 @@ pub fn utoipa_config(
 
 /// List products.  
 #[utoipa::path(tag = "billing")]
-#[get("products")]
+#[get("/products")]
 pub async fn products(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -126,7 +126,7 @@ struct SubscriptionsQuery {
 
 /// List subscriptions.  
 #[utoipa::path(tag = "billing")]
-#[get("subscriptions")]
+#[get("/subscriptions")]
 pub async fn subscriptions(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -185,7 +185,7 @@ pub struct ChargeRefund {
 
 /// Refund a charge.  
 #[utoipa::path(tag = "billing")]
-#[post("charge/{id}/refund")]
+#[post("/charge/{id}/refund")]
 #[allow(clippy::too_many_arguments)]
 pub async fn refund_charge(
     req: HttpRequest,
@@ -450,7 +450,7 @@ pub async fn refund_charge(
 
 /// Reprocess tax for a charge.  
 #[utoipa::path(tag = "billing")]
-#[post("charge/{id}/tax/reprocess")]
+#[post("/charge/{id}/tax/reprocess")]
 pub async fn reprocess_charge_tax(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -635,7 +635,7 @@ pub struct SubscriptionEditQuery {
 
 /// Update a subscription.  
 #[utoipa::path(tag = "billing")]
-#[patch("subscription/{id}")]
+#[patch("/subscription/{id}")]
 #[allow(clippy::too_many_arguments)]
 pub async fn edit_subscription(
     req: HttpRequest,
@@ -1127,7 +1127,7 @@ pub async fn edit_subscription(
 
 /// Get the current customer.  
 #[utoipa::path(tag = "billing")]
-#[get("customer")]
+#[get("/customer")]
 pub async fn user_customer(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1167,7 +1167,7 @@ pub struct ChargesQuery {
 
 /// List payments.  
 #[utoipa::path(tag = "billing")]
-#[get("payments")]
+#[get("/payments")]
 pub async fn charges(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1228,7 +1228,7 @@ pub async fn charges(
 
 /// Start a payment method flow.  
 #[utoipa::path(tag = "billing")]
-#[post("payment_method")]
+#[post("/payment_method")]
 pub async fn add_payment_method_flow(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1283,7 +1283,7 @@ pub struct EditPaymentMethod {
 
 /// Update a payment method.  
 #[utoipa::path(tag = "billing")]
-#[patch("payment_method/{id}")]
+#[patch("/payment_method/{id}")]
 pub async fn edit_payment_method(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1349,7 +1349,7 @@ pub async fn edit_payment_method(
 
 /// Remove a payment method.  
 #[utoipa::path(tag = "billing")]
-#[delete("payment_method/{id}")]
+#[delete("/payment_method/{id}")]
 pub async fn remove_payment_method(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1434,7 +1434,7 @@ pub async fn remove_payment_method(
 
 /// List payment methods.  
 #[utoipa::path(tag = "billing")]
-#[get("payment_methods")]
+#[get("/payment_methods")]
 pub async fn payment_methods(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1480,7 +1480,7 @@ pub struct ActiveServersQuery {
 
 /// List active servers.  
 #[utoipa::path(tag = "billing")]
-#[get("active_servers")]
+#[get("/active_servers")]
 pub async fn active_servers(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1598,7 +1598,7 @@ pub struct PaymentRequest {
 
 /// Initiate a payment.  
 #[utoipa::path(tag = "billing")]
-#[post("payment")]
+#[post("/payment")]
 pub async fn initiate_payment(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1664,7 +1664,7 @@ pub async fn initiate_payment(
 
 /// Receive a Stripe webhook.  
 #[utoipa::path(tag = "billing")]
-#[post("_stripe")]
+#[post("/_stripe")]
 pub async fn stripe_webhook(
     req: HttpRequest,
     payload: String,
@@ -2582,7 +2582,7 @@ pub enum CreditTarget {
 
 /// Credit subscriptions.  
 #[utoipa::path(tag = "billing")]
-#[post("credit")]
+#[post("/credit")]
 pub async fn credit(
     req: HttpRequest,
     pool: web::Data<PgPool>,

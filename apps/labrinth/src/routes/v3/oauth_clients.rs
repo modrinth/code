@@ -102,7 +102,7 @@ pub async fn get_user_clients(
 
 /// Get an OAuth client.  
 #[utoipa::path(tag = "oauth clients")]
-#[get("app/{id}")]
+#[get("/app/{id}")]
 pub async fn get_client(
     id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
@@ -117,7 +117,7 @@ pub async fn get_client(
 
 /// List OAuth clients.  
 #[utoipa::path(tag = "oauth clients")]
-#[get("apps")]
+#[get("/apps")]
 pub async fn get_clients(
     info: web::Query<GetOAuthClientsRequest>,
     pool: web::Data<PgPool>,
@@ -160,7 +160,7 @@ pub struct NewOAuthApp {
 
 /// Create an OAuth client.  
 #[utoipa::path(tag = "oauth clients")]
-#[post("app")]
+#[post("/app")]
 pub async fn oauth_client_create(
     req: HttpRequest,
     new_oauth_app: web::Json<NewOAuthApp>,
@@ -223,7 +223,7 @@ pub async fn oauth_client_create(
 
 /// Delete an OAuth client.  
 #[utoipa::path(tag = "oauth clients")]
-#[delete("app/{id}")]
+#[delete("/app/{id}")]
 pub async fn oauth_client_delete(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -281,7 +281,7 @@ pub struct OAuthClientEdit {
 
 /// Update an OAuth client.  
 #[utoipa::path(tag = "oauth clients")]
-#[patch("app/{id}")]
+#[patch("/app/{id}")]
 pub async fn oauth_client_edit(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -358,7 +358,7 @@ pub struct Extension {
 
 /// Update an OAuth client icon.  
 #[utoipa::path(tag = "oauth clients")]
-#[patch("app/{id}/icon")]
+#[patch("/app/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn oauth_client_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -432,7 +432,7 @@ pub async fn oauth_client_icon_edit(
 
 /// Delete an OAuth client icon.  
 #[utoipa::path(tag = "oauth clients")]
-#[delete("app/{id}/icon")]
+#[delete("/app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -484,7 +484,7 @@ pub async fn oauth_client_icon_delete(
 
 /// List OAuth authorizations.  
 #[utoipa::path(tag = "oauth clients")]
-#[get("authorizations")]
+#[get("/authorizations")]
 pub async fn get_user_oauth_authorizations(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -515,7 +515,7 @@ pub async fn get_user_oauth_authorizations(
 
 /// Revoke OAuth authorization.  
 #[utoipa::path(tag = "oauth clients")]
-#[delete("authorizations")]
+#[delete("/authorizations")]
 pub async fn revoke_oauth_authorization(
     req: HttpRequest,
     info: web::Query<DeleteOAuthClientQueryParam>,

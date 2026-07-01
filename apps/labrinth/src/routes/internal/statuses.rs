@@ -53,7 +53,7 @@ struct LauncherHeartbeatInit {
 // TODO: Move launcher-specific tunnel traffic to a proper launcher websocket endpoint.
 /// Start launcher socket.  
 #[utoipa::path(tag = "statuses")]
-#[get("launcher_socket")]
+#[get("/launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
     pool: Data<PgPool>,
