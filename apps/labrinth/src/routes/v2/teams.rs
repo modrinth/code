@@ -30,13 +30,14 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
-/// Get a project's team members.
+/// Get a project's team members.  
 #[utoipa::path(
+	tag = "teams",
     get,
     operation_id = "getProjectTeamMembers",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyTeamMember>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -74,12 +75,13 @@ pub async fn team_members_get_project(
 }
 
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
-/// Get a team's members.
+/// Get a team's members.  
 #[utoipa::path(
+	tag = "teams",
     get,
     operation_id = "getTeamMembers",
     params(("id" = TeamId, Path, description = "The ID of the team")),
-    responses((status = 200, description = "Expected response to a valid request")),
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyTeamMember>)),
     security(("bearer_auth" = ["PROJECT_READ"]))
 )]
 #[get("/{id}/members")]
@@ -112,12 +114,13 @@ pub struct TeamIds {
     pub ids: String,
 }
 
-/// Get the members of multiple teams.
+/// Get the members of multiple teams.  
 #[utoipa::path(
+	tag = "teams",
     get,
     operation_id = "getTeams",
     params(("ids" = String, Query, description = "The JSON array of team IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<Vec<LegacyTeamMember>>))
 )]
 #[get("/teams")]
 pub async fn teams_get(
@@ -154,8 +157,9 @@ pub async fn teams_get(
     }
 }
 
-/// Join a team with a pending invite.
+/// Join a team with a pending invite.  
 #[utoipa::path(
+	tag = "teams",
     post,
     operation_id = "joinTeam",
     params(("id" = TeamId, Path, description = "The ID of the team")),
@@ -210,8 +214,9 @@ pub struct NewTeamMember {
     pub ordering: i64,
 }
 
-/// Add a member to a team.
+/// Add a member to a team.  
 #[utoipa::path(
+	tag = "teams",
     post,
     operation_id = "addTeamMember",
     params(("id" = TeamId, Path, description = "The ID of the team")),
@@ -267,8 +272,9 @@ pub struct EditTeamMember {
     pub ordering: Option<i64>,
 }
 
-/// Modify a team member.
+/// Update a team member.  
 #[utoipa::path(
+	tag = "teams",
     patch,
     operation_id = "modifyTeamMember",
     params(
@@ -326,8 +332,9 @@ pub struct TransferOwnership {
     pub user_id: UserId,
 }
 
-/// Transfer team ownership.
+/// Transfer team ownership.  
 #[utoipa::path(
+	tag = "teams",
     patch,
     operation_id = "transferTeamOwnership",
     params(("id" = TeamId, Path, description = "The ID of the team")),
@@ -369,8 +376,9 @@ pub async fn transfer_ownership(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Remove a member from a team.
+/// Remove a member from a team.  
 #[utoipa::path(
+	tag = "teams",
     delete,
     operation_id = "deleteTeamMember",
     params(

@@ -3,7 +3,7 @@ use crate::routes::ApiError;
 use actix_web::{HttpResponse, web};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("statistics", web::get().to(get_stats));
+    cfg.route("/statistics", web::get().to(get_stats));
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]

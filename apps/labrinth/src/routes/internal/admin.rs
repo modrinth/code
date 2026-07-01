@@ -130,7 +130,9 @@ async fn resolve_download_attribution_version(
 }
 
 // This is an internal route, cannot be used without key
+/// Count a download.  
 #[utoipa::path(
+	tag = "v2 admin",
     patch,
     operation_id = "countDownload",
     responses(
@@ -308,7 +310,9 @@ pub async fn count_download(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+/// Reindex all projects.  
 #[utoipa::path(
+	tag = "v2 admin",
     post,
     operation_id = "forceReindex",
     responses(
@@ -330,7 +334,9 @@ pub async fn force_reindex(
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Reindex a project.  
 #[utoipa::path(
+	tag = "v2 admin",
     post,
     operation_id = "forceReindexProject",
     responses(

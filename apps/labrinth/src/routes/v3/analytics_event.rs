@@ -37,8 +37,8 @@ pub struct AnalyticsEventUpsert {
     pub ends: DateTime<Utc>,
 }
 
-/// Fetches all analytics events.
-#[utoipa::path(responses((status = OK, body = Vec<AnalyticsEvent>)))]
+/// List analytics events.  
+#[utoipa::path(tag = "v3 analytics", responses((status = OK, body = Vec<AnalyticsEvent>)))]
 #[get("")]
 pub async fn analytics_events_get(
     pool: web::Data<PgPool>,
@@ -54,8 +54,8 @@ pub async fn analytics_events_get(
     Ok(web::Json(events))
 }
 
-/// Creates an analytics event.
-#[utoipa::path(responses((status = OK, body = AnalyticsEvent)))]
+/// Create an analytics event.  
+#[utoipa::path(tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent)))]
 #[post("")]
 pub async fn analytics_event_create(
     req: HttpRequest,
@@ -110,8 +110,8 @@ pub async fn analytics_event_create(
     Ok(web::Json(event.into()))
 }
 
-/// Edits an analytics event.
-#[utoipa::path(responses((status = OK, body = AnalyticsEvent)))]
+/// Update an analytics event.  
+#[utoipa::path(tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent)))]
 #[patch("/{id}")]
 pub async fn analytics_event_edit(
     req: HttpRequest,
@@ -158,8 +158,8 @@ pub async fn analytics_event_edit(
     Ok(web::Json(event.into()))
 }
 
-/// Deletes an analytics event.
-#[utoipa::path(responses((status = NO_CONTENT)))]
+/// Delete an analytics event.  
+#[utoipa::path(tag = "v3 analytics", responses((status = NO_CONTENT)))]
 #[delete("/{id}")]
 pub async fn analytics_event_delete(
     req: HttpRequest,

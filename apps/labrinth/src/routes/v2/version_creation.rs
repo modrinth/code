@@ -76,8 +76,9 @@ pub struct InitialVersionData {
 }
 
 // under `/api/v1/version`
-/// Create a version on an existing project.
+/// Create a version on an existing project.  
 #[utoipa::path(
+	tag = "version creation",
     post,
     operation_id = "createVersion",
     request_body(
@@ -85,7 +86,7 @@ pub struct InitialVersionData {
         description = "Multipart payload containing `data` and uploaded files"
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -305,8 +306,9 @@ async fn get_example_version_fields(
 }
 
 // under /api/v1/version/{version_id}
-/// Add files to an existing version.
+/// Add files to an existing version.  
 #[utoipa::path(
+	tag = "version creation",
     post,
     operation_id = "addFilesToVersion",
     params(("version_id" = VersionId, Path, description = "The ID of the version")),
@@ -315,7 +317,7 @@ async fn get_example_version_fields(
         description = "Multipart payload containing files to upload"
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

@@ -10,6 +10,19 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get_bank_details);
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal").service(get_bank_details),
+    );
+}
+
+/// Get bank details.  
+#[utoipa::path(
+	tag = "mural",
+	responses((status = OK, body = serde_json::Value))
+)]
 #[get("/mural/bank-details")]
 async fn get_bank_details(
     payouts_queue: web::Data<PayoutsQueue>,

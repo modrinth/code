@@ -10,6 +10,17 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/gdpr").service(export));
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(utoipa_actix_web::scope("/_internal/gdpr").service(export));
+}
+
+/// Export GDPR data.  
+#[utoipa::path(
+	tag = "GDPR",
+	responses((status = OK, body = serde_json::Value))
+)]
 #[post("/export")]
 pub async fn export(
     req: HttpRequest,

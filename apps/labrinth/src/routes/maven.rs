@@ -70,7 +70,7 @@ pub struct MavenPom {
     description: String,
 }
 
-#[get("maven/modrinth/{id}/maven-metadata.xml")]
+#[get("/maven/modrinth/{id}/maven-metadata.xml")]
 pub async fn maven_metadata(
     req: HttpRequest,
     params: web::Path<(String,)>,
@@ -349,7 +349,7 @@ pub async fn version_file(
     Err(ApiError::NotFound)
 }
 
-#[get("maven/modrinth/{id}/{versionnum}/{file}.sha1")]
+#[get("/maven/modrinth/{id}/{versionnum}/{file}.sha1")]
 pub async fn version_file_sha1(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
@@ -396,7 +396,7 @@ pub async fn version_file_sha1(
         ))
 }
 
-#[get("maven/modrinth/{id}/{versionnum}/{file}.sha512")]
+#[get("/maven/modrinth/{id}/{versionnum}/{file}.sha512")]
 pub async fn version_file_sha512(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,

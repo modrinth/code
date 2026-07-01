@@ -30,6 +30,15 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(countries_views_get);
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(playtimes_get)
+        .service(views_get)
+        .service(downloads_get)
+        .service(revenue_get)
+        .service(countries_downloads_get)
+        .service(countries_views_get);
+}
+
 /// The json data to be passed to fetch analytic data.
 ///
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
@@ -48,7 +57,11 @@ pub struct GetData {
     pub resolution_minutes: Option<NonZeroU32>, // defaults to 1 day. Ignored in routes that do not aggregate over a resolution (eg: /countries)
 }
 
-#[utoipa::path]
+/// Get playtime data.  
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<u32, u64>>)),
+)]
 #[get("/playtime")]
 pub async fn playtimes_get(
     req: HttpRequest,
@@ -110,7 +123,7 @@ pub async fn playtimes_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get view data for a set of projects or versions.
+/// Get view data.  
 ///
 /// Data is returned as a hashmap of project/version ids to a hashmap of days to views
 /// eg:
@@ -120,7 +133,10 @@ pub async fn playtimes_get(
 ///    }
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
-#[utoipa::path]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<u32, u64>>)),
+)]
 #[get("/views")]
 pub async fn views_get(
     req: HttpRequest,
@@ -182,7 +198,7 @@ pub async fn views_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get download data for a set of projects or versions.
+/// Get download data.  
 ///
 /// Data is returned as a hashmap of project/version ids to a hashmap of days to downloads
 /// eg:
@@ -192,7 +208,10 @@ pub async fn views_get(
 ///    }
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
-#[utoipa::path]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<u32, u64>>)),
+)]
 #[get("/downloads")]
 pub async fn downloads_get(
     req: HttpRequest,
@@ -255,7 +274,7 @@ pub async fn downloads_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get payout data for a set of projects.
+/// Get payout data.  
 ///
 /// Data is returned as a hashmap of project ids to a hashmap of days to amount earned per day
 /// eg:
@@ -265,7 +284,10 @@ pub async fn downloads_get(
 ///    }
 ///}
 /// ONLY project IDs can be used. Unauthorized projects will be filtered out.
-#[utoipa::path]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<i64, rust_decimal::Decimal>>)),
+)]
 #[get("/revenue")]
 pub async fn revenue_get(
     req: HttpRequest,
@@ -394,7 +416,7 @@ pub async fn revenue_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get country data for a set of projects or versions.
+/// Get download country data.  
 ///
 /// Data is returned as a hashmap of project/version ids to a hashmap of coutnry to downloads.
 /// Unknown countries are labeled "".
@@ -407,7 +429,10 @@ pub async fn revenue_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
-#[utoipa::path]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<String, u64>>)),
+)]
 #[get("/countries/downloads")]
 pub async fn countries_downloads_get(
     req: HttpRequest,
@@ -470,7 +495,7 @@ pub async fn countries_downloads_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get country data for a set of projects or versions.
+/// Get view country data.  
 ///
 /// Data is returned as a hashmap of project/version ids to a hashmap of coutnry to views.
 /// Unknown countries are labeled "".
@@ -483,7 +508,10 @@ pub async fn countries_downloads_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
-#[utoipa::path]
+#[utoipa::path(
+	tag = "analytics",
+	responses((status = OK, body = HashMap<String, HashMap<String, u64>>)),
+)]
 #[get("/countries/views")]
 pub async fn countries_views_get(
     req: HttpRequest,

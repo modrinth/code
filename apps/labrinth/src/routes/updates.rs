@@ -31,7 +31,7 @@ fn default_neoforge() -> String {
     "none".into()
 }
 
-#[get("{id}/forge_updates.json")]
+#[get("/{id}/forge_updates.json")]
 pub async fn forge_updates(
     req: HttpRequest,
     web::Query(neo): web::Query<NeoForge>,

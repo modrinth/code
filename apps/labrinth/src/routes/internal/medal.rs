@@ -17,12 +17,33 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/medal").service(verify).service(redeem));
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal/medal")
+            .service(verify)
+            .service(redeem),
+    );
+}
+
 #[derive(Deserialize)]
 struct MedalQuery {
     username: String,
 }
 
-#[post("verify", guard = "medal_key_guard")]
+#[derive(Serialize, utoipa::ToSchema)]
+struct VerifyResponse {
+    user_id: UserId,
+    redeemed: bool,
+}
+
+/// Verify Medal credentials.  
+#[utoipa::path(
+	tag = "medal",
+	responses((status = OK, body = VerifyResponse))
+)]
+#[post("/verify", guard = "medal_key_guard")]
 pub async fn verify(
     pool: web::Data<PgPool>,
     web::Query(MedalQuery { username }): web::Query<MedalQuery>,
@@ -35,12 +56,6 @@ pub async fn verify(
         )
         .await?;
 
-    #[derive(Serialize)]
-    struct VerifyResponse {
-        user_id: UserId,
-        redeemed: bool,
-    }
-
     match maybe_fields {
         None => Err(ApiError::NotFound),
         Some(fields) => Ok(HttpResponse::Ok().json(VerifyResponse {
@@ -50,7 +65,12 @@ pub async fn verify(
     }
 }
 
-#[post("redeem", guard = "medal_key_guard")]
+/// Redeem Medal credit.  
+#[utoipa::path(
+	tag = "medal",
+	responses((status = ACCEPTED), (status = CREATED))
+)]
+#[post("/redeem", guard = "medal_key_guard")]
 pub async fn redeem(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

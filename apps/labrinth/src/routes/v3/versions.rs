@@ -39,25 +39,35 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route(
-        "version",
+        "/version",
         web::post().to(super::version_creation::version_create),
     );
-    cfg.route("versions", web::get().to(versions_get));
+    cfg.route("/versions", web::get().to(versions_get));
 
     cfg.service(
-        web::scope("version")
-            .route("{id}", web::get().to(version_get))
-            .route("{id}", web::patch().to(version_edit))
-            .route("{id}", web::delete().to(version_delete))
+        web::scope("/version")
+            .route("/{id}", web::get().to(version_get))
+            .route("/{id}", web::patch().to(version_edit))
+            .route("/{id}", web::delete().to(version_delete))
             .route(
-                "{version_id}/file",
+                "/{version_id}/file",
                 web::post().to(super::version_creation::upload_file_to_version),
             ),
     );
 }
 
 // Given a project ID/slug and a version slug
-#[utoipa::path]
+/// Get a project version.  
+#[utoipa::path(
+	tag = "versions",
+	responses(
+		(status = 200, description = "Expected response to a valid request", body = models::projects::Version),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	)
+)]
 #[get("/{project_id}/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
@@ -162,6 +172,21 @@ fn default_true() -> bool {
     true
 }
 
+/// Get multiple versions by ID.
+#[utoipa::path(
+	tag = "versions",
+	get,
+	path = "/v3/versions",
+	params(
+		("ids" = String, Query, description = "The JSON array of version IDs"),
+		(
+			"include_changelog" = Option<bool>,
+			Query,
+			description = "Whether to include changelog fields"
+		)
+	),
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>))
+)]
 pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
@@ -211,6 +236,20 @@ pub async fn versions_get(
     Ok(HttpResponse::Ok().json(versions))
 }
 
+/// Get a version by ID.
+#[utoipa::path(
+	tag = "versions",
+	get,
+	path = "/v3/version/{id}",
+	params(("id" = VersionId, Path, description = "The ID of the version")),
+	responses(
+		(status = 200, description = "Expected response to a valid request", body = models::projects::Version),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	)
+)]
 pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
@@ -330,6 +369,25 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
+/// Update an existing version.
+#[utoipa::path(
+	tag = "versions",
+	patch,
+	path = "/v3/version/{id}",
+	params(("id" = VersionId, Path, description = "The ID of the version")),
+	responses(
+		(status = NO_CONTENT, description = "Expected response to a valid request"),
+		(
+			status = 401,
+			description = "Incorrect token scopes or no authorization to access the requested item(s)"
+		),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	),
+	security(("bearer_auth" = ["VERSION_WRITE"]))
+)]
 pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
@@ -798,7 +856,17 @@ pub struct VersionListFilters {
     pub include_changelog: bool,
 }
 
-#[utoipa::path]
+/// List project versions.  
+#[utoipa::path(
+	tag = "versions",
+	responses(
+		(status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	)
+)]
 #[get("/{project_id}/version")]
 async fn version_list(
     req: HttpRequest,
@@ -990,6 +1058,25 @@ pub async fn version_list_internal(
     }
 }
 
+/// Delete a version by ID.
+#[utoipa::path(
+	tag = "versions",
+	delete,
+	path = "/v3/version/{id}",
+	params(("id" = VersionId, Path, description = "The ID of the version")),
+	responses(
+		(status = NO_CONTENT, description = "Expected response to a valid request"),
+		(
+			status = 401,
+			description = "Incorrect token scopes or no authorization to access the requested item(s)"
+		),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	),
+	security(("bearer_auth" = ["VERSION_DELETE"]))
+)]
 pub async fn version_delete(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,

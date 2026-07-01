@@ -15,7 +15,7 @@ use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectStatus,
+    License, Link, MonetizationStatus, Project, ProjectStatus,
     SideTypesMigrationReviewStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
@@ -50,6 +50,12 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(project_create)
         .service(project_create_with_id)
         .configure(new::config);
+}
+
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.route("", web::post().to(project_create_web))
+        .service(project_create_with_id)
+        .configure(new::web_config);
 }
 
 #[derive(Error, Debug)]
@@ -283,9 +289,33 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[utoipa::path]
+/// Create a project.  
+#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
 #[post("")]
 pub async fn project_create(
+    req: HttpRequest,
+    payload: Multipart,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<dyn FileHost>,
+    session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
+    search_state: Data<SearchState>,
+) -> Result<HttpResponse, CreateError> {
+    project_create_internal(
+        req,
+        payload,
+        client,
+        redis,
+        file_host,
+        session_queue,
+        http,
+        search_state,
+    )
+    .await
+}
+
+async fn project_create_web(
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -361,10 +391,10 @@ pub async fn project_create_internal(
     result
 }
 
-/// Allows creating a project with a specific ID.
+/// Create a project with a specific ID.  
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[utoipa::path]
+#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,

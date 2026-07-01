@@ -7,7 +7,9 @@ use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
-use crate::models::payouts::{PayoutMethodType, PayoutStatus, Withdrawal};
+use crate::models::payouts::{
+    PayoutMethod, PayoutMethodType, PayoutStatus, Withdrawal,
+};
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -32,9 +34,7 @@ const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(paypal_webhook)
-        .service(tremendous_webhook)
-        .service(transaction_history)
+    cfg.service(transaction_history)
         .service(calculate_fees)
         .service(create_payout)
         .service(cancel_payout)
@@ -44,12 +44,34 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(post_compliance_form);
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/payout")
+            .service(transaction_history)
+            .service(calculate_fees)
+            .service(create_payout)
+            .service(cancel_payout)
+            .service(payment_methods)
+            .service(get_balance)
+            .service(platform_revenue)
+            .service(post_compliance_form),
+    );
+}
+
+pub fn webhook_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(paypal_webhook).service(tremendous_webhook);
+}
+
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct RequestForm {
     form_type: users_compliance::FormType,
 }
 
-#[utoipa::path]
+/// Submit a compliance form.  
+#[utoipa::path(
+	tag = "payouts",
+	responses((status = OK, body = serde_json::Value)),
+)]
 #[post("/compliance")]
 pub async fn post_compliance_form(
     req: HttpRequest,
@@ -148,7 +170,7 @@ pub async fn post_compliance_form(
     }
 }
 
-#[utoipa::path]
+/// Receive PayPal webhook.
 #[post("/_paypal")]
 pub async fn paypal_webhook(
     req: HttpRequest,
@@ -306,7 +328,7 @@ pub async fn paypal_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[utoipa::path]
+/// Receive Tremendous webhook.
 #[post("/_tremendous")]
 pub async fn tremendous_webhook(
     req: HttpRequest,
@@ -417,14 +439,18 @@ pub async fn tremendous_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct WithdrawalFees {
     pub net_usd: Decimal2dp,
     pub fee: Decimal2dp,
     pub exchange_rate: Option<Decimal>,
 }
 
-#[utoipa::path]
+/// Calculate payout fees.  
+#[utoipa::path(
+	tag = "payouts",
+	responses((status = OK, body = WithdrawalFees)),
+)]
 #[post("/fees")]
 pub async fn calculate_fees(
     req: HttpRequest,
@@ -457,7 +483,8 @@ pub async fn calculate_fees(
     }))
 }
 
-#[utoipa::path]
+/// Create a payout.  
+#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
 #[post("")]
 pub async fn create_payout(
     req: HttpRequest,
@@ -670,9 +697,9 @@ pub enum PayoutSource {
     Affilites,
 }
 
-/// Get the history of when the authorized user got payouts available, and when
+/// Get transaction history.  
 /// the user withdrew their payouts.
-#[utoipa::path(responses((status = OK, body = Vec<TransactionItem>)))]
+#[utoipa::path(tag = "payouts", responses((status = OK, body = Vec<TransactionItem>)))]
 #[get("/history")]
 pub async fn transaction_history(
     req: HttpRequest,
@@ -754,7 +781,8 @@ pub async fn transaction_history(
     Ok(web::Json(txn_items))
 }
 
-#[utoipa::path]
+/// Cancel a payout.  
+#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
 #[delete("/{id}")]
 pub async fn cancel_payout(
     info: web::Path<(PayoutId,)>,
@@ -863,7 +891,7 @@ pub struct MethodFilter {
     pub country: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "kebab-case")]
 pub enum FormCompletionStatus {
     Unknown,
@@ -873,7 +901,11 @@ pub enum FormCompletionStatus {
     Complete,
 }
 
-#[utoipa::path]
+/// List payment methods.  
+#[utoipa::path(
+	tag = "payouts",
+	responses((status = OK, body = Vec<PayoutMethod>)),
+)]
 #[get("/methods")]
 pub async fn payment_methods(
     payouts_queue: web::Data<PayoutsQueue>,
@@ -897,7 +929,7 @@ pub async fn payment_methods(
     Ok(HttpResponse::Ok().json(methods))
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 pub struct UserBalance {
     pub available: Decimal,
     pub withdrawn_lifetime: Decimal,
@@ -906,7 +938,19 @@ pub struct UserBalance {
     pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
-#[utoipa::path]
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct BalanceResponse {
+    #[serde(flatten)]
+    balance: UserBalance,
+    requested_form_type: Option<users_compliance::FormType>,
+    form_completion_status: Option<FormCompletionStatus>,
+}
+
+/// Get account balance.  
+#[utoipa::path(
+	tag = "payouts",
+	responses((status = OK, body = BalanceResponse)),
+)]
 #[get("/balance")]
 pub async fn get_balance(
     req: HttpRequest,
@@ -923,14 +967,6 @@ pub async fn get_balance(
     )
     .await?
     .1;
-
-    #[derive(Serialize)]
-    struct Response {
-        #[serde(flatten)]
-        balance: UserBalance,
-        requested_form_type: Option<users_compliance::FormType>,
-        form_completion_status: Option<FormCompletionStatus>,
-    }
 
     let balance = get_user_balance(user.id.into(), &pool).await?;
 
@@ -965,7 +1001,7 @@ pub async fn get_balance(
         );
     }
 
-    Ok(HttpResponse::Ok().json(Response {
+    Ok(HttpResponse::Ok().json(BalanceResponse {
         balance,
         requested_form_type,
         form_completion_status,
@@ -1123,21 +1159,25 @@ pub struct RevenueQuery {
     pub end: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct RevenueResponse {
     pub all_time: Decimal,
     pub all_time_available: Decimal,
     pub data: Vec<RevenueData>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct RevenueData {
     pub time: u64,
     pub revenue: Decimal,
     pub creator_revenue: Decimal,
 }
 
-#[utoipa::path]
+/// Get platform revenue.  
+#[utoipa::path(
+	tag = "payouts",
+	responses((status = OK, body = RevenueResponse)),
+)]
 #[get("/platform_revenue")]
 pub async fn platform_revenue(
     query: web::Query<RevenueQuery>,

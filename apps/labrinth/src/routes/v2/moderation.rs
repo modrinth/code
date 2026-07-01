@@ -22,8 +22,9 @@ fn default_count() -> u16 {
     100
 }
 
-/// Get projects in the moderation queue.
+/// List projects in the moderation queue.  
 #[utoipa::path(
+	tag = "v2 moderation",
     get,
     operation_id = "getModerationProjects",
     params(
@@ -34,7 +35,7 @@ fn default_count() -> u16 {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

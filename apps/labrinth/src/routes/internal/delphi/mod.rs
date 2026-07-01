@@ -45,6 +45,18 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal/delphi")
+            .service(ingest_report)
+            .service(_run)
+            .service(version)
+            .service(issue_type_schema),
+    );
+}
+
 /// Type of [`DelphiReportIssueDetails::key`].
 ///
 /// Delphi may provide `null` for the key, but we require a key for storing
@@ -141,7 +153,12 @@ pub struct DelphiRunParameters {
     pub file_id: crate::models::ids::FileId,
 }
 
-#[post("ingest", guard = "admin_key_guard")]
+/// Ingest a Delphi report.  
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = NO_CONTENT))
+)]
+#[post("/ingest", guard = "admin_key_guard")]
 async fn ingest_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -466,7 +483,12 @@ pub async fn send_tech_review_exit_file_deleted_message_if_exited(
     Ok(())
 }
 
-#[post("run")]
+/// Run Delphi.  
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = NO_CONTENT))
+)]
+#[post("/run")]
 async fn _run(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -487,7 +509,12 @@ async fn _run(
     run(&**pool, run_parameters.into_inner(), &http).await
 }
 
-#[get("version")]
+/// Get the Delphi version.  
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = OK, body = inline(Option<i32>)))
+)]
+#[get("/version")]
 async fn version(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -510,7 +537,12 @@ async fn version(
     ))
 }
 
-#[get("issue_type/schema")]
+/// Get the Delphi issue type schema.  
+#[utoipa::path(
+	tag = "delphi",
+	responses((status = OK, body = serde_json::Value))
+)]
+#[get("/issue_type/schema")]
 async fn issue_type_schema(
     req: HttpRequest,
     pool: web::Data<PgPool>,

@@ -329,7 +329,11 @@ async fn fetch_by_flame_ids(
     Ok(results)
 }
 
-#[utoipa::path]
+/// Search external licenses.  
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = inline(Vec<ExternalProject>)))
+)]
 #[post("/search")]
 async fn search(
     req: HttpRequest,
@@ -393,7 +397,11 @@ async fn search(
     Ok(web::Json(results))
 }
 
-#[utoipa::path]
+/// Look up external license metadata.  
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = ExternalLicenseLookupResponse))
+)]
 #[post("/lookup")]
 async fn lookup(
     req: HttpRequest,
@@ -422,7 +430,11 @@ async fn lookup(
     }))
 }
 
-#[utoipa::path]
+/// Get external license by SHA-1.  
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[get("/by-sha1/{sha1}")]
 async fn get_by_sha1(
     req: HttpRequest,
@@ -448,7 +460,11 @@ async fn get_by_sha1(
     Ok(web::Json(result))
 }
 
-#[utoipa::path]
+/// Get external licenses by SHA-1.  
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = inline(HashMap<String, ExternalProject>)))
+)]
 #[post("/by-sha1")]
 async fn get_by_sha1_bulk(
     req: HttpRequest,
@@ -472,7 +488,11 @@ async fn get_by_sha1_bulk(
     Ok(web::Json(results))
 }
 
-#[utoipa::path]
+/// Add an external license file.  
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[post("/file")]
 async fn add_file(
     req: HttpRequest,
@@ -484,7 +504,11 @@ async fn add_file(
     upsert_file_license(req, pool, redis, session_queue, body).await
 }
 
-#[utoipa::path]
+/// Reassign an external license file.  
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[post("/file/reassign")]
 async fn reassign_file(
     req: HttpRequest,
@@ -584,7 +608,11 @@ async fn upsert_file_license(
     ))
 }
 
-#[utoipa::path]
+/// Update an external license.  
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[patch("/{id}")]
 async fn update_license(
     req: HttpRequest,

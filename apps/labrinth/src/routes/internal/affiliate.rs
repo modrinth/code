@@ -40,7 +40,11 @@ pub struct IngestClick {
     pub affiliate_code_id: AffiliateCodeId,
 }
 
-#[utoipa::path]
+/// Ingest an affiliate click.  
+#[utoipa::path(
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[post("/ingest-click")]
 async fn ingest_click(
     req: HttpRequest,
@@ -136,7 +140,9 @@ async fn ingest_click(
     Ok(())
 }
 
+/// List affiliate codes.  
 #[utoipa::path(
+	tag = "affiliates",
     responses((status = OK, body = inline(Vec<AffiliateCode>)))
 )]
 #[get("")]
@@ -187,7 +193,9 @@ pub struct CreateRequest {
     pub source_name: String,
 }
 
+/// Create an affiliate code.  
 #[utoipa::path(
+	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[put("")]
@@ -263,7 +271,9 @@ async fn create(
     Ok(web::Json(AffiliateCode::from(code, is_admin)))
 }
 
+/// Get an affiliate code.  
 #[utoipa::path(
+	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[get("/{id}")]
@@ -302,7 +312,11 @@ async fn get(
     }
 }
 
-#[utoipa::path]
+/// Delete an affiliate code.  
+#[utoipa::path(
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
 async fn delete(
     req: HttpRequest,
@@ -350,7 +364,11 @@ pub struct PatchRequest {
     pub source_name: String,
 }
 
-#[utoipa::path]
+/// Update an affiliate code.  
+#[utoipa::path(
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}")]
 async fn patch(
     req: HttpRequest,

@@ -31,15 +31,23 @@ pub mod oauth_clients;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("v3")
+        web::scope("/v3")
             .wrap(default_cors())
             .configure(limits::config)
             .configure(collections::config)
             .configure(content::config)
             .configure(images::config)
             .configure(notifications::config)
+            .configure(oauth_clients::config)
             .configure(organizations::config)
+            .configure(payouts::webhook_config)
+            .configure(payouts::web_config)
             .configure(projects::config)
+            .service(
+                web::scope("/project")
+                    .configure(project_creation::web_config)
+                    .configure(projects::project_config),
+            )
             .configure(reports::config)
             .configure(shared_instance_version_creation::config)
             .configure(shared_instances::config)
@@ -50,6 +58,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(users::config)
             .configure(version_file::config)
             .configure(versions::config)
+            .service(
+                web::scope("/analytics").configure(analytics_get::web_config),
+            )
             .configure(friends::config),
     );
 }
@@ -63,11 +74,6 @@ pub fn utoipa_config(
             .configure(analytics_get::config),
     );
     cfg.service(
-        utoipa_actix_web::scope("/v3/analytics-event")
-            .wrap(default_cors())
-            .configure(analytics_event::config),
-    );
-    cfg.service(
         utoipa_actix_web::scope("/v3/payout")
             .wrap(default_cors())
             .configure(payouts::config),
@@ -78,6 +84,25 @@ pub fn utoipa_config(
             .configure(projects::utoipa_config)
             .configure(project_creation::config),
     );
+    cfg.service(
+        utoipa_actix_web::scope("/v3")
+            .wrap(default_cors())
+            .service(friends::add_friend)
+            .service(friends::remove_friend)
+            .service(friends::friends)
+            .service(projects::project_search)
+            .service(projects::project_search_post)
+            .service(oauth_clients::get_client)
+            .service(oauth_clients::get_clients)
+            .service(oauth_clients::oauth_client_create)
+            .service(oauth_clients::oauth_client_delete)
+            .service(oauth_clients::oauth_client_edit)
+            .service(oauth_clients::oauth_client_icon_edit)
+            .service(oauth_clients::oauth_client_icon_delete)
+            .service(oauth_clients::get_user_oauth_authorizations)
+            .service(oauth_clients::revoke_oauth_authorization),
+    );
+    cfg.configure(content::utoipa_config);
 }
 
 pub async fn hello_world() -> Result<HttpResponse, ApiError> {

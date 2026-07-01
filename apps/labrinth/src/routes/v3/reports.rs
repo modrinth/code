@@ -26,12 +26,12 @@ use serde::Deserialize;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("report", web::post().to(report_create));
-    cfg.route("report", web::get().to(reports));
-    cfg.route("reports", web::get().to(reports_get));
-    cfg.route("report/{id}", web::get().to(report_get));
-    cfg.route("report/{id}", web::patch().to(report_edit));
-    cfg.route("report/{id}", web::delete().to(report_delete));
+    cfg.route("/report", web::post().to(report_create));
+    cfg.route("/report", web::get().to(reports));
+    cfg.route("/reports", web::get().to(reports_get));
+    cfg.route("/report/{id}", web::get().to(report_get));
+    cfg.route("/report/{id}", web::patch().to(report_edit));
+    cfg.route("/report/{id}", web::delete().to(report_delete));
 }
 
 #[derive(Deserialize, Validate)]

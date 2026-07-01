@@ -40,6 +40,10 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(create);
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(create);
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum CreateError {
     #[error("project limit reached")]
@@ -110,11 +114,11 @@ pub struct ProjectCreate {
     pub components: exp::ProjectEdit,
 }
 
-/// Creates a new project with the given components.
+/// Create a project from components.  
 ///
 /// Components must include `base` ([`exp::base::Project`]), and at least one
 /// other component.
-#[utoipa::path]
+#[utoipa::path(tag = "projects", responses((status = OK, body = ProjectId)))]
 #[put("")]
 pub async fn create(
     req: HttpRequest,

@@ -33,13 +33,31 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(send_custom_email);
 }
 
-#[derive(Deserialize)]
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal")
+            .service(create)
+            .service(create_email_sync)
+            .service(remove)
+            .service(send_custom_email),
+    );
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
 struct CreateNotification {
+    #[schema(value_type = serde_json::Value)]
     pub body: NotificationBody,
     pub user_ids: Vec<UserId>,
 }
 
-#[post("external_notifications", guard = "external_notification_key_guard")]
+/// Create external notifications.  
+#[utoipa::path(
+	tag = "external notifications",
+	responses((status = ACCEPTED))
+)]
+#[post("/external_notifications", guard = "external_notification_key_guard")]
 pub async fn create(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -74,13 +92,21 @@ pub async fn create(
     Ok(HttpResponse::Accepted().finish())
 }
 
-/// Inserts notifications for all users and tries to send emails immediately.
+/// Create notifications and send emails.  
 ///
 /// Responds with the user IDs that could not be emailed:
 /// - `200` if every recipient was emailed (empty list)
 /// - `207` if some recipients could not be emailed (list of failed IDs)
+/// Create email sync.
+#[utoipa::path(
+	tag = "external notifications",
+	responses(
+		(status = OK, body = inline(Vec<UserId>)),
+		(status = 207, body = inline(Vec<UserId>)),
+	)
+)]
 #[post(
-    "external_notifications/email-sync",
+    "/external_notifications/email-sync",
     guard = "external_notification_key_guard"
 )]
 pub async fn create_email_sync(
@@ -178,14 +204,19 @@ pub async fn create_email_sync(
     Ok(web::Json(failed).customize().with_status(status))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 struct NotificationFilter {
     pub user_ids: Vec<UserId>,
     #[serde(flatten)]
     pub body: serde_json::Map<String, serde_json::Value>,
 }
 
-#[delete("external_notifications", guard = "external_notification_key_guard")]
+/// Remove external notifications.  
+#[utoipa::path(
+	tag = "external notifications",
+	responses((status = NO_CONTENT))
+)]
+#[delete("/external_notifications", guard = "external_notification_key_guard")]
 pub async fn remove(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -225,7 +256,7 @@ pub async fn remove(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 struct SendEmail {
     pub users: Vec<UserId>,
     pub key: String,
@@ -233,7 +264,12 @@ struct SendEmail {
     pub title: String,
 }
 
-#[post("external_notifications/send_custom_email")]
+/// Send a custom email.  
+#[utoipa::path(
+	tag = "external notifications",
+	responses((status = ACCEPTED))
+)]
+#[post("/external_notifications/send_custom_email")]
 pub async fn send_custom_email(
     req: HttpRequest,
     pool: web::Data<PgPool>,

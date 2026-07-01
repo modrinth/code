@@ -31,7 +31,19 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(resolve_content);
 }
 
-#[post("content/resolve")]
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(utoipa_actix_web::scope("/v3").service(resolve_content));
+}
+
+/// Resolve content.  
+#[utoipa::path(
+	tag = "content",
+	request_body = serde_json::Value,
+	responses((status = OK, body = serde_json::Value)),
+)]
+#[post("/content/resolve")]
 async fn resolve_content(
     req: HttpRequest,
     request: web::Json<ResolveContentRequest>,

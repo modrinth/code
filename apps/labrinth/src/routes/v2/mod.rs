@@ -1,4 +1,4 @@
-mod moderation;
+pub(crate) mod moderation;
 mod notifications;
 pub(crate) mod project_creation;
 mod projects;
@@ -21,10 +21,10 @@ pub fn utoipa_config(
     cfg.service(
         utoipa_actix_web::scope("/v2")
             .wrap(default_cors())
-            .configure(super::internal::admin::config)
             .configure(super::internal::session::config)
             .configure(super::internal::flows::config)
             .configure(super::internal::pats::config)
+            .configure(super::internal::admin::config)
             .configure(moderation::config)
             .configure(notifications::config)
             .configure(project_creation::config)

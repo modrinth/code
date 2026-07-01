@@ -29,24 +29,24 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("organizations", web::get().to(organizations_get));
+    cfg.route("/organizations", web::get().to(organizations_get));
     cfg.service(
-        web::scope("organization")
+        web::scope("/organization")
             .route("", web::post().to(organization_create))
-            .route("{id}/projects", web::get().to(organization_projects_get))
-            .route("{id}/notes", web::patch().to(organization_notes_edit))
-            .route("{id}", web::get().to(organization_get))
-            .route("{id}", web::patch().to(organizations_edit))
-            .route("{id}", web::delete().to(organization_delete))
-            .route("{id}/projects", web::post().to(organization_projects_add))
+            .route("/{id}/projects", web::get().to(organization_projects_get))
+            .route("/{id}/notes", web::patch().to(organization_notes_edit))
+            .route("/{id}", web::get().to(organization_get))
+            .route("/{id}", web::patch().to(organizations_edit))
+            .route("/{id}", web::delete().to(organization_delete))
+            .route("/{id}/projects", web::post().to(organization_projects_add))
             .route(
-                "{id}/projects/{project_id}",
+                "/{id}/projects/{project_id}",
                 web::delete().to(organization_projects_remove),
             )
-            .route("{id}/icon", web::patch().to(organization_icon_edit))
-            .route("{id}/icon", web::delete().to(delete_organization_icon))
+            .route("/{id}/icon", web::patch().to(organization_icon_edit))
+            .route("/{id}/icon", web::delete().to(delete_organization_icon))
             .route(
-                "{id}/members",
+                "/{id}/members",
                 web::get().to(super::teams::team_members_get_organization),
             ),
     );

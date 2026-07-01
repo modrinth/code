@@ -48,8 +48,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 }
 
-/// Search projects.
+/// Search projects.  
 #[utoipa::path(
+	tag = "search",
     get,
     operation_id = "searchProjects",
     params(
@@ -80,7 +81,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacySearchResults),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -181,8 +182,9 @@ pub struct RandomProjects {
     pub count: u32,
 }
 
-/// Get random projects.
+/// Get random projects.  
 #[utoipa::path(
+	tag = "projects",
     get,
     operation_id = "randomProjects",
     params(
@@ -193,7 +195,7 @@ pub struct RandomProjects {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -224,8 +226,9 @@ pub async fn random_projects_get(
     }
 }
 
-/// Get multiple projects by ID or slug.
+/// Get multiple projects by ID or slug.  
 #[utoipa::path(
+	tag = "projects",
     get,
     operation_id = "getProjects",
     params(
@@ -235,7 +238,7 @@ pub async fn random_projects_get(
             description = "The JSON array of project IDs or slugs"
         )
     ),
-    responses((status = 200, description = "Expected response to a valid request"))
+    responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>))
 )]
 #[get("/projects")]
 pub async fn projects_get(
@@ -268,13 +271,14 @@ pub async fn projects_get(
     }
 }
 
-/// Get a project by ID or slug.
+/// Get a project by ID or slug.  
 #[utoipa::path(
+	tag = "projects",
     get,
     operation_id = "getProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyProject),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -317,13 +321,14 @@ pub async fn project_get(
 }
 
 //checks the validity of a project id or slug
-/// Check that a project ID or slug exists.
+/// Check that a project ID or slug exists.  
 #[utoipa::path(
+	tag = "projects",
     get,
     operation_id = "checkProjectValidity",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = v3::projects::ProjectCheckResponse),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -348,13 +353,14 @@ struct DependencyInfo {
     pub versions: Vec<LegacyVersion>,
 }
 
-/// Get dependency projects and versions for a project.
+/// Get dependency projects and versions for a project.  
 #[utoipa::path(
+	tag = "projects",
     get,
     operation_id = "getDependencies",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = DependencyInfo),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -508,14 +514,15 @@ pub struct EditProject {
     pub monetization_status: Option<MonetizationStatus>,
 }
 
-/// Modify a project.
+/// Update a project.  
 #[utoipa::path(
+	tag = "projects",
     patch,
     operation_id = "modifyProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     request_body = EditProject,
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -766,8 +773,9 @@ pub struct BulkEditProject {
     pub discord_url: Option<Option<String>>,
 }
 
-/// Bulk-edit multiple projects.
+/// Bulk-edit multiple projects.  
 #[utoipa::path(
+	tag = "projects",
     patch,
     operation_id = "patchProjects",
     params(
@@ -779,7 +787,7 @@ pub struct BulkEditProject {
     ),
     request_body = BulkEditProject,
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -892,8 +900,9 @@ pub struct Extension {
     pub ext: String,
 }
 
-/// Change a project's icon.
+/// Change a project's icon.  
 #[utoipa::path(
+	tag = "projects",
     patch,
     operation_id = "changeProjectIcon",
     params(
@@ -915,7 +924,7 @@ pub struct Extension {
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error")
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
@@ -949,13 +958,14 @@ pub async fn project_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a project's icon.
+/// Delete a project's icon.  
 #[utoipa::path(
+	tag = "projects",
     delete,
     operation_id = "deleteProjectIcon",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -998,8 +1008,9 @@ pub struct GalleryCreateQuery {
     pub ordering: Option<i64>,
 }
 
-/// Add a gallery image to a project.
+/// Add a gallery image to a project.  
 #[utoipa::path(
+	tag = "projects",
     post,
     operation_id = "addGalleryImage",
     params(
@@ -1041,7 +1052,7 @@ pub struct GalleryCreateQuery {
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1112,8 +1123,9 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
-/// Modify a gallery image.
+/// Update a gallery image.  
 #[utoipa::path(
+	tag = "projects",
     patch,
     operation_id = "modifyGalleryImage",
     params(
@@ -1141,7 +1153,7 @@ pub struct GalleryEditQuery {
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -1186,8 +1198,9 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
-/// Delete a gallery image.
+/// Delete a gallery image.  
 #[utoipa::path(
+	tag = "projects",
     delete,
     operation_id = "deleteGalleryImage",
     params(
@@ -1195,7 +1208,7 @@ pub struct GalleryDeleteQuery {
         ("url" = String, Query, description = "URL of the image to delete")
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1228,13 +1241,14 @@ pub async fn delete_gallery_item(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a project by ID or slug.
+/// Delete a project by ID or slug.  
 #[utoipa::path(
+	tag = "projects",
     delete,
     operation_id = "deleteProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1266,13 +1280,14 @@ pub async fn project_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Follow a project.
+/// Follow a project.  
 #[utoipa::path(
+	tag = "projects",
     post,
     operation_id = "followProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -1295,13 +1310,14 @@ pub async fn project_follow(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Unfollow a project.
+/// Unfollow a project.  
 #[utoipa::path(
+	tag = "projects",
     delete,
     operation_id = "unfollowProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,

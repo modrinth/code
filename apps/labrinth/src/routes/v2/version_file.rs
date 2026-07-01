@@ -5,7 +5,7 @@ use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::version_file::HashQuery;
+use crate::routes::v3::version_file::{DownloadRedirect, HashQuery};
 use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
@@ -31,8 +31,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 }
 
 // under /api/v1/version_file/{hash}
-/// Get version metadata by file hash.
+/// Get version metadata by file hash.  
 #[utoipa::path(
+	tag = "version file",
     get,
     operation_id = "versionFromHash",
     params(
@@ -53,7 +54,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         )
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -91,8 +92,9 @@ pub async fn get_version_from_hash(
 }
 
 // under /api/v1/version_file/{hash}/download
-/// Download a file by hash.
+/// Download a file by hash.  
 #[utoipa::path(
+	tag = "version file",
     get,
     operation_id = "downloadVersionFromHash",
     params(
@@ -113,7 +115,7 @@ pub async fn get_version_from_hash(
         )
     ),
     responses(
-        (status = 302, description = "Temporary redirect to file URL"),
+        (status = 302, description = "Temporary redirect to file URL", body = DownloadRedirect),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -143,8 +145,9 @@ pub async fn download_version(
 }
 
 // under /api/v1/version_file/{hash}
-/// Delete a file by hash.
+/// Delete a file by hash.  
 #[utoipa::path(
+	tag = "version file",
     delete,
     operation_id = "deleteFileFromHash",
     params(
@@ -165,7 +168,7 @@ pub async fn download_version(
         )
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -206,8 +209,9 @@ pub struct UpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
-/// Get the latest compatible version from a file hash.
+/// Get the latest compatible version from a file hash.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionFromHash",
     params(
@@ -229,7 +233,7 @@ pub struct UpdateData {
     ),
     request_body = UpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 404,
@@ -292,13 +296,14 @@ pub struct FileHashes {
 }
 
 // under /api/v2/version_files
-/// Get versions from file hashes.
+/// Get versions from file hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "versionsFromHashes",
     request_body = FileHashes,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -343,13 +348,14 @@ pub async fn get_versions_from_hashes(
     }
 }
 
-/// Get projects from file hashes.
+/// Get projects from file hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "projectsFromHashes",
     request_body = FileHashes,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyProject>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -420,13 +426,14 @@ pub struct ManyUpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
-/// Get latest compatible versions for multiple hashes.
+/// Get latest compatible versions for multiple hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashes",
     request_body = ManyUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -469,13 +476,14 @@ pub async fn update_files(
     Ok(HttpResponse::Ok().json(v3_versions))
 }
 
-/// Get all latest compatible versions for multiple hashes.
+/// Get all latest compatible versions for multiple hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashesMany",
     request_body = ManyUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, Vec<LegacyVersion>>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -535,13 +543,14 @@ pub struct ManyFileUpdateData {
     pub hashes: Vec<FileUpdateData>,
 }
 
-/// Get latest versions with per-hash filters.
+/// Get latest versions with per-hash filters.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashesIndividual",
     request_body = ManyFileUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]

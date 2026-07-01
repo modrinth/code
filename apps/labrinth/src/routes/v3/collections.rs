@@ -28,16 +28,16 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("collections", web::get().to(collections_get));
-    cfg.route("collection", web::post().to(collection_create));
+    cfg.route("/collections", web::get().to(collections_get));
+    cfg.route("/collection", web::post().to(collection_create));
 
     cfg.service(
-        web::scope("collection")
-            .route("{id}", web::get().to(collection_get))
-            .route("{id}", web::delete().to(collection_delete))
-            .route("{id}", web::patch().to(collection_edit))
-            .route("{id}/icon", web::patch().to(collection_icon_edit))
-            .route("{id}/icon", web::delete().to(delete_collection_icon)),
+        web::scope("/collection")
+            .route("/{id}", web::get().to(collection_get))
+            .route("/{id}", web::delete().to(collection_delete))
+            .route("/{id}", web::patch().to(collection_edit))
+            .route("/{id}/icon", web::patch().to(collection_icon_edit))
+            .route("/{id}/icon", web::delete().to(delete_collection_icon)),
     );
 }
 

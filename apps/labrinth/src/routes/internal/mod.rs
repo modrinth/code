@@ -63,6 +63,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
                 cfg.service(pats::create_pat);
                 cfg.service(pats::edit_pat);
                 cfg.service(pats::delete_pat);
+                cfg.service(
+                    actix_web::web::scope("/moderation")
+                        .configure(moderation::web_config),
+                );
             })
             .configure(oauth_clients::config)
             .configure(billing::config)
@@ -113,5 +117,24 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/attribution")
             .wrap(default_cors())
             .configure(attribution::config),
-    );
+    )
+    .service(
+        utoipa_actix_web::scope("/v2")
+            .wrap(default_cors())
+            .configure(admin::config)
+            .configure(super::v2::moderation::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/v3/analytics-event")
+            .wrap(default_cors())
+            .configure(super::v3::analytics_event::config),
+    )
+    .configure(billing::utoipa_config)
+    .configure(delphi::utoipa_config)
+    .configure(external_notifications::utoipa_config)
+    .configure(gdpr::utoipa_config)
+    .configure(gotenberg::utoipa_config)
+    .configure(medal::utoipa_config)
+    .configure(mural::utoipa_config)
+    .configure(statuses::utoipa_config);
 }

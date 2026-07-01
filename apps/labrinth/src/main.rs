@@ -2,7 +2,7 @@
 
 use actix_web::dev::Service;
 use actix_web::middleware::from_fn;
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpResponse, HttpServer, web};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 
@@ -15,17 +15,21 @@ use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::utoipa_app_config;
-use labrinth::{app_config, env};
+use labrinth::{app_base_config, app_fallback_config, env};
 use labrinth::{clickhouse, database, file_hosting};
+use labrinth::{
+    utoipa_app_config_internal, utoipa_app_config_v2, utoipa_app_config_v3,
+};
+use scalar_api_reference::actix_web::config as scalar_config;
+use serde_json::json;
 use std::ffi::CStr;
 use std::sync::Arc;
 use tracing::{Instrument, info, info_span};
 use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
+use utoipa::openapi::extensions::ExtensionsBuilder;
+use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa_actix_web::AppExt;
-use utoipa_scalar::Servable;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -223,7 +227,7 @@ async fn app() -> std::io::Result<()> {
     info!("Starting Actix HTTP server!");
 
     HttpServer::new(move || {
-        App::new()
+        let (app, docs_v2) = App::new()
             .wrap(TracingLogger::default())
             .wrap_fn(|req, srv| {
                 // We capture the same fields as `tracing-actix-web`'s `RootSpanBuilder`.
@@ -260,12 +264,87 @@ async fn app() -> std::io::Result<()> {
             // transactions out of HTTP requests. However, we have to use our
             // own - See `sentry::SentryErrorReporting` for why.
             .wrap(labrinth::util::sentry::SentryErrorReporting)
-            // Use `utoipa` for OpenAPI generation
+            .configure(|cfg| app_base_config(cfg, labrinth_config.clone()))
             .into_utoipa_app()
-            .configure(|cfg| utoipa_app_config(cfg, labrinth_config.clone()))
-            .openapi_service(|api| utoipa_scalar::Scalar::with_url("/docs", ApiDoc::openapi().merge_from(api)))
-            .into_app()
-            .configure(|cfg| app_config(cfg, labrinth_config.clone()))
+            .openapi(DocsV2::openapi())
+            .configure(|cfg| utoipa_app_config_v2(cfg, labrinth_config.clone()))
+            .split_for_parts();
+        let (app, docs_v3) = app
+            .into_utoipa_app()
+            .openapi(DocsV3::openapi())
+            .configure(|cfg| utoipa_app_config_v3(cfg, labrinth_config.clone()))
+            .split_for_parts();
+        let (app, docs_internal) = app
+            .into_utoipa_app()
+            .openapi(DocsInternal::openapi())
+            .configure(|cfg| {
+                utoipa_app_config_internal(cfg, labrinth_config.clone())
+            })
+            .split_for_parts();
+
+        let scalar_configuration = json!({
+            "sources": [
+                {
+                    "title": "API v2",
+                    "slug": "v2",
+                    "url": "/openapi/v2.json",
+                    "default": true
+                },
+                {
+                    "title": "API v3 (UNSTABLE - DO NOT USE)",
+                    "slug": "v3",
+                    "url": "/openapi/v3.json"
+                },
+                {
+                    "title": "Internal API - HIGHLY UNSTABLE - DO NOT USE",
+                    "slug": "internal",
+                    "url": "/openapi/internal.json"
+                }
+            ],
+            "agent": {
+                "disabled": true
+            },
+            "mcp": {
+                "disabled": true
+            },
+            "telemetry": false,
+
+            "metaData": {
+                "title": "Modrinth API Documentation",
+                "description": "Reference documentation for the Modrinth API.",
+                "ogTitle": "Modrinth API Documentation",
+                "ogDescription": "Reference documentation for the Modrinth API."
+            },
+
+            "modelsSectionLabel": "Schemas",
+            "defaultOpenFirstTag": true,
+            "defaultOpenAllTags": false,
+            "expandAllResponses": false,
+            "expandAllSchemaProperties": false,
+            "expandAllModelSections": false,
+            "orderSchemaPropertiesBy": "preserve",
+            "orderRequiredPropertiesFirst": true,
+            "hideSearch": false,
+            "searchHotKey": "k",
+            "showOperationId": false,
+
+            "defaultHttpClient": {
+                "targetKey": "shell",
+                "clientKey": "curl"
+            },
+
+            "persistAuth": false,
+            "showDeveloperTools": "never",
+        });
+
+        app.service(openapi_json_service("/openapi/v2.json", docs_v2))
+            .service(openapi_json_service("/openapi/v3.json", docs_v3))
+            .service(openapi_json_service(
+                "/openapi/internal.json",
+                docs_internal,
+            ))
+            .configure(scalar_config("/docs", &scalar_configuration))
+            .configure(app_fallback_config)
     })
     .bind(&ENV.BIND_ADDR)?
     .run()
@@ -273,19 +352,98 @@ async fn app() -> std::io::Result<()> {
 }
 
 #[derive(utoipa::OpenApi)]
-#[openapi(info(title = "Labrinth"), modifiers(&SecurityAddon))]
-struct ApiDoc;
+#[openapi(
+    info(title = "Modrinth API v2", version = "2.0.0"),
+    modifiers(&SecurityAddon, &V2DescriptionAddon)
+)]
+struct DocsV2;
+
+const API_V2_DESCRIPTION: &str = include_str!("api_v2_description.md");
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+    paths(
+        labrinth::routes::v3::version_file::get_version_from_hash,
+        labrinth::routes::v3::version_file::get_update_from_hash,
+        labrinth::routes::v3::version_file::get_versions_from_hashes,
+        labrinth::routes::v3::version_file::get_projects_from_hashes,
+        labrinth::routes::v3::version_file::update_files_many,
+        labrinth::routes::v3::version_file::update_files,
+        labrinth::routes::v3::version_file::update_individual_files,
+        labrinth::routes::v3::version_file::delete_file,
+        labrinth::routes::v3::version_file::download_version
+    ),
+    info(
+        title = "API v3 (UNSTABLE - DO NOT USE)",
+        version = "3.0.0"
+    ),
+    modifiers(&SecurityAddon)
+)]
+struct DocsV3;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+    info(
+        title = "Internal API - HIGHLY UNSTABLE - DO NOT USE",
+        version = "internal"
+    ),
+    modifiers(&SecurityAddon)
+)]
+struct DocsInternal;
+
+struct V2DescriptionAddon;
+
+impl utoipa::Modify for V2DescriptionAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        openapi.info.description = Some(API_V2_DESCRIPTION.to_string());
+    }
+}
+
+fn openapi_json_service(
+    path: &'static str,
+    openapi: utoipa::openapi::OpenApi,
+) -> actix_web::Resource {
+    web::resource(path).route(web::get().to(move || {
+        let openapi = openapi.clone();
+        async move { openapi_json(openapi) }
+    }))
+}
+
+fn openapi_json(openapi: utoipa::openapi::OpenApi) -> HttpResponse {
+    match serde_json::to_string_pretty(&openapi) {
+        Ok(body) => HttpResponse::Ok()
+            .content_type("application/json; charset=utf-8")
+            .body(body),
+        Err(error) => {
+            tracing::error!(%error, "Failed to serialize OpenAPI schema");
+            HttpResponse::InternalServerError().finish()
+        }
+    }
+}
 
 struct SecurityAddon;
 
 impl utoipa::Modify for SecurityAddon {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
         let components = openapi.components.as_mut().unwrap();
+        let mut bearer_auth = HttpBuilder::new()
+			.scheme(HttpAuthScheme::Bearer)
+			.description(Some(
+				"Use a personal access token. Example: `mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic`.",
+			))
+			.build();
+        bearer_auth.extensions = Some(
+			ExtensionsBuilder::new()
+				.add(
+					"x-example",
+					"mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic",
+				)
+				.build(),
+		);
+
         components.add_security_scheme(
             "bearer_auth",
-            SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new(
-                "authorization",
-            ))),
+            SecurityScheme::Http(bearer_auth),
         );
     }
 }

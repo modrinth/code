@@ -193,8 +193,9 @@ pub enum FlagReason {
     Delphi,
 }
 
-/// Get info on an issue in a Delphi report.
+/// Get a Delphi report issue.  
 #[utoipa::path(
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(FileIssue)))
 )]
@@ -252,8 +253,9 @@ async fn get_issue(
     Ok(web::Json(row.data.0))
 }
 
-/// Get info on a specific report for a project.
+/// Get a project technical report.  
 #[utoipa::path(
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(FileReport)))
 )]
@@ -662,10 +664,11 @@ async fn fetch_project_reports(
     Ok(project_reports)
 }
 
-/// Searches all projects which are awaiting technical review.
+/// Search projects awaiting technical review.  
 #[utoipa::path(
+	tag = "moderation",
     security(("bearer_auth" = [])),
-    responses((status = OK, body = inline(Vec<SearchResponse>)))
+	responses((status = OK, body = SearchResponse))
 )]
 #[post("/search")]
 async fn search_projects(
@@ -872,8 +875,9 @@ async fn search_projects(
     }))
 }
 
-/// Gets the technical review report for a specific project.
+/// Get a project technical review report.  
 #[utoipa::path(
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(ProjectReportResponse)))
 )]
@@ -963,13 +967,14 @@ pub struct SubmitReport {
     pub message: Option<String>,
 }
 
-/// Submits a verdict for a project based on its technical reports.
+/// Submit a technical review verdict.  
 ///
 /// Before this is called, all issues for this project's reports must have been
 /// marked as either safe or unsafe. Otherwise, this will error with
 /// [`ApiError::TechReviewIssuesWithNoVerdict`], providing the issue IDs which
 /// are still unmarked.
 #[utoipa::path(
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
@@ -1163,11 +1168,12 @@ pub struct UpdateIssue {
     pub verdict: DelphiVerdict,
 }
 
-/// Updates the state of a technical review issue detail.
+/// Update technical review issue details.  
 ///
 /// This will not automatically reject the project for malware, but just flag
 /// this issue with a verdict.
 #[utoipa::path(
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
@@ -1273,9 +1279,12 @@ pub struct AddReport {
     pub file_id: FileId,
 }
 
-/// Adds a file to the technical review queue by adding an empty report, if one
+/// Add a technical review report.  
 /// does not already exist for it.
-#[utoipa::path]
+#[utoipa::path(
+	tag = "moderation",
+	responses((status = OK, body = DelphiReportId))
+)]
 #[put("/report")]
 async fn add_report(
     req: HttpRequest,

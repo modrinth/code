@@ -34,7 +34,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(split);
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct AttributionGroupResponse {
     id: crate::models::ids::AttributionGroupId,
     flame_project: Option<FlameProject>,
@@ -45,7 +45,7 @@ struct AttributionGroupResponse {
     versions: Vec<VersionInfo>,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, utoipa::ToSchema)]
 struct VersionInfo {
     id: VersionId,
     name: String,
@@ -53,7 +53,7 @@ struct VersionInfo {
     date_created: chrono::DateTime<chrono::Utc>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct AttributionFileResponse {
     name: String,
     sha1: String,
@@ -64,7 +64,7 @@ struct AttributionFileResponse {
     moderation_external_license: Option<ModerationExternalLicenseResponse>,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, utoipa::ToSchema)]
 struct ModerationExternalLicenseResponse {
     id: i64,
     title: Option<String>,
@@ -89,7 +89,11 @@ struct ScanResponse {
     queued_files: u64,
 }
 
-#[utoipa::path]
+/// Queue an attribution scan.  
+#[utoipa::path(
+	tag = "attribution",
+	responses((status = OK, body = ScanResponse))
+)]
 #[post("/scan")]
 async fn scan(
     req: HttpRequest,
@@ -201,7 +205,11 @@ async fn scan(
     }))
 }
 
-#[utoipa::path]
+/// List project attribution groups.  
+#[utoipa::path(
+	tag = "attribution",
+	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
+)]
 #[get("/{project_id}")]
 async fn list(
     req: HttpRequest,
@@ -451,7 +459,11 @@ struct UpdateGroupBody {
     attribution: AttributionResolution,
 }
 
-#[utoipa::path]
+/// Update an attribution group.  
+#[utoipa::path(
+	tag = "attribution",
+	responses((status = NO_CONTENT))
+)]
 #[patch("/group/{group_id}")]
 async fn update_group(
     req: HttpRequest,
@@ -532,7 +544,11 @@ struct AssignBody {
     project_id: ProjectId,
 }
 
-#[utoipa::path]
+/// Move a file to an attribution group.  
+#[utoipa::path(
+	tag = "attribution",
+	responses((status = NO_CONTENT))
+)]
 #[post("/assign")]
 async fn assign(
     req: HttpRequest,
@@ -688,7 +704,11 @@ struct SplitBody {
     project_id: ProjectId,
 }
 
-#[utoipa::path]
+/// Split a file into a new attribution group.  
+#[utoipa::path(
+	tag = "attribution",
+	responses((status = NO_CONTENT))
+)]
 #[post("/split")]
 async fn split(
     req: HttpRequest,

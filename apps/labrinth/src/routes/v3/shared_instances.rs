@@ -25,21 +25,24 @@ use serde::Deserialize;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("shared-instance", web::post().to(shared_instance_create));
-    cfg.route("shared-instance", web::get().to(shared_instance_list));
+    cfg.route("/shared-instance", web::post().to(shared_instance_create));
+    cfg.route("/shared-instance", web::get().to(shared_instance_list));
     cfg.service(
-        web::scope("shared-instance")
-            .route("{id}", web::get().to(shared_instance_get))
-            .route("{id}", web::patch().to(shared_instance_edit))
-            .route("{id}", web::delete().to(shared_instance_delete))
-            .route("{id}/version", web::get().to(shared_instance_version_list)),
+        web::scope("/shared-instance")
+            .route("/{id}", web::get().to(shared_instance_get))
+            .route("/{id}", web::patch().to(shared_instance_edit))
+            .route("/{id}", web::delete().to(shared_instance_delete))
+            .route(
+                "/{id}/version",
+                web::get().to(shared_instance_version_list),
+            ),
     );
     cfg.service(
-        web::scope("shared-instance-version")
-            .route("{id}", web::get().to(shared_instance_version_get))
-            .route("{id}", web::delete().to(shared_instance_version_delete))
+        web::scope("/shared-instance-version")
+            .route("/{id}", web::get().to(shared_instance_version_get))
+            .route("/{id}", web::delete().to(shared_instance_version_delete))
             .route(
-                "{id}/download",
+                "/{id}/download",
                 web::get().to(shared_instance_version_download),
             ),
     );

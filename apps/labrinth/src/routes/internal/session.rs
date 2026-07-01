@@ -133,13 +133,15 @@ pub async fn issue_session(
     Ok(session)
 }
 
+/// List sessions.  
 #[utoipa::path(
+	tag = "sessions",
     get,
-    operation_id = "listSessions",
-    responses(
-        (status = 200, description = "List of active sessions"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "listSessions",
+	responses(
+		(status = 200, description = "List of active sessions", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = ["SESSION_READ"]))
 )]
 #[get("/list")]
@@ -178,7 +180,9 @@ pub async fn list(
     Ok(HttpResponse::Ok().json(sessions))
 }
 
+/// Delete a session.  
 #[utoipa::path(
+	tag = "sessions",
     delete,
     operation_id = "deleteSession",
     params(("id" = String, Path, description = "The session ID")),
@@ -228,13 +232,15 @@ pub async fn delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+/// Refresh a session.  
 #[utoipa::path(
+	tag = "sessions",
     post,
-    operation_id = "refreshSession",
-    responses(
-        (status = 200, description = "Session refreshed"),
-        (status = 401, description = "Unauthorized")
-    )
+	operation_id = "refreshSession",
+	responses(
+		(status = 200, description = "Session refreshed", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	)
 )]
 #[post("/refresh")]
 pub async fn refresh(

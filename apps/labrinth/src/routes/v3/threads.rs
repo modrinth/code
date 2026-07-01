@@ -22,14 +22,14 @@ use serde::Deserialize;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("thread")
-            .route("{id}", web::get().to(thread_get))
-            .route("{id}", web::post().to(thread_send_message)),
+        web::scope("/thread")
+            .route("/{id}", web::get().to(thread_get))
+            .route("/{id}", web::post().to(thread_send_message)),
     );
     cfg.service(
-        web::scope("message").route("{id}", web::delete().to(message_delete)),
+        web::scope("/message").route("/{id}", web::delete().to(message_delete)),
     );
-    cfg.route("threads", web::get().to(threads_get));
+    cfg.route("/threads", web::get().to(threads_get));
 }
 
 pub async fn is_authorized_thread(
