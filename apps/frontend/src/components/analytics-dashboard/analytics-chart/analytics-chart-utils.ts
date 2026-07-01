@@ -566,7 +566,7 @@ export function buildChartDatasets(
 				? isNoDependentAnalyticsBreakdownValue(dependentProjectId)
 					? formatMessage(analyticsMessages.noDependentTooltip)
 					: isUnknownAnalyticsBreakdownValue(dependentProjectId)
-						? formatMessage(analyticsMessages.unknown)
+						? formatMessage(analyticsMessages.unknownDependentTooltip)
 						: formatDependentProjectDatasetTooltip(
 								versionName,
 								dependentProjectName,
