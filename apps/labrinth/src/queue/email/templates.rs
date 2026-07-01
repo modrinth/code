@@ -772,6 +772,7 @@ async fn collect_template_variables(
         }
 
         NotificationBody::ProjectUpdate { .. }
+        | NotificationBody::SharedInstanceInvite { .. }
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(EmailTemplate::Static(map)),

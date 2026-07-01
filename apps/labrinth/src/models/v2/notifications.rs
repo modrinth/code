@@ -73,6 +73,10 @@ pub enum LegacyNotificationBody {
         invited_by: UserId,
         role: String,
     },
+    SharedInstanceInvite {
+        shared_instance_id: String,
+        shared_instance_name: String,
+    },
     StatusChange {
         project_id: ProjectId,
         old_status: ProjectStatus,
@@ -176,6 +180,9 @@ impl LegacyNotification {
             }
             NotificationBody::ServerInvite { .. } => {
                 Some("server_invite".to_string())
+            }
+            NotificationBody::SharedInstanceInvite { .. } => {
+                Some("shared_instance_invite".to_string())
             }
             NotificationBody::StatusChange { .. } => {
                 Some("status_change".to_string())
@@ -293,6 +300,13 @@ impl LegacyNotification {
                 server_name,
                 invited_by,
                 role,
+            },
+            NotificationBody::SharedInstanceInvite {
+                shared_instance_id,
+                shared_instance_name,
+            } => LegacyNotificationBody::SharedInstanceInvite {
+                shared_instance_id,
+                shared_instance_name,
             },
             NotificationBody::StatusChange {
                 project_id,
