@@ -29,8 +29,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 }
 
-/// Get the current user from the authorization header.
+/// Get the current user.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getUserFromAuth",
     responses(
@@ -68,8 +69,9 @@ pub struct UserIds {
     pub ids: String,
 }
 
-/// Get multiple users by ID.
+/// Get multiple users by ID.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getUsers",
     params(("ids" = String, Query, description = "The JSON array of user IDs")),
@@ -104,8 +106,9 @@ pub async fn users_get(
     }
 }
 
-/// Get a user by ID or username.
+/// Get a user by ID or username.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getUser",
     params(("id" = String, Path, description = "The ID or username of the user")),
@@ -139,8 +142,9 @@ pub async fn user_get(
     }
 }
 
-/// Get a user's projects.
+/// Get a user's projects.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getUserProjects",
     params(("user_id" = String, Path, description = "The ID or username of the user")),
@@ -204,8 +208,9 @@ pub struct EditUser {
     pub allow_friend_requests: Option<bool>,
 }
 
-/// Modify a user.
+/// Update a user.  
 #[utoipa::path(
+	tag = "users",
     patch,
     operation_id = "modifyUser",
     params(("id" = String, Path, description = "The ID or username of the user")),
@@ -258,8 +263,9 @@ pub struct Extension {
     pub ext: String,
 }
 
-/// Change a user's avatar.
+/// Change a user's avatar.  
 #[utoipa::path(
+	tag = "users",
     patch,
     operation_id = "changeUserIcon",
     params(
@@ -317,8 +323,9 @@ pub async fn user_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Remove a user's avatar.
+/// Remove a user's avatar.  
 #[utoipa::path(
+	tag = "users",
     delete,
     operation_id = "deleteUserIcon",
     params(("id" = String, Path, description = "The ID or username of the user")),
@@ -354,8 +361,9 @@ pub async fn user_icon_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a user by ID or username.
+/// Delete a user by ID or username.  
 #[utoipa::path(
+	tag = "users",
     delete,
     operation_id = "deleteUser",
     params(("id" = String, Path, description = "The ID or username of the user")),
@@ -387,8 +395,9 @@ pub async fn user_delete(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get projects followed by a user.
+/// Get projects followed by a user.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getFollowedProjects",
     params(("id" = String, Path, description = "The ID or username of the user")),
@@ -434,8 +443,9 @@ pub async fn user_follows(
     }
 }
 
-/// Get notifications for a user.
+/// Get notifications for a user.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getUserNotifications",
     params(("id" = String, Path, description = "The ID or username of the user")),

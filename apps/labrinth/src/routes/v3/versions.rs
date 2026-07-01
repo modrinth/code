@@ -57,7 +57,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 // Given a project ID/slug and a version slug
-#[utoipa::path]
+/// Get a project version.  
+#[utoipa::path(tag = "versions")]
 #[get("/{project_id}/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
@@ -798,7 +799,8 @@ pub struct VersionListFilters {
     pub include_changelog: bool,
 }
 
-#[utoipa::path]
+/// List project versions.  
+#[utoipa::path(tag = "versions")]
 #[get("/{project_id}/version")]
 async fn version_list(
     req: HttpRequest,

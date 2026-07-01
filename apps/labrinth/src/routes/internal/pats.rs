@@ -29,7 +29,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(delete_pat);
 }
 
+/// List personal access tokens.  
 #[utoipa::path(
+	tag = "personal access tokens",
     get,
     operation_id = "getPats",
     responses(
@@ -82,7 +84,9 @@ pub struct NewPersonalAccessToken {
     pub expires: DateTime<Utc>,
 }
 
+/// Create a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     post,
     operation_id = "createPat",
     responses(
@@ -185,7 +189,9 @@ pub struct ModifyPersonalAccessToken {
     pub expires: Option<DateTime<Utc>>,
 }
 
+/// Update a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     patch,
     operation_id = "editPat",
     params(("id" = String, Path, description = "The PAT ID")),
@@ -293,7 +299,9 @@ pub async fn edit_pat(
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Delete a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     delete,
     operation_id = "deletePat",
     params(("id" = String, Path, description = "The PAT ID")),

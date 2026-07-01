@@ -17,11 +17,23 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/medal").service(verify).service(redeem));
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal/medal")
+            .service(verify)
+            .service(redeem),
+    );
+}
+
 #[derive(Deserialize)]
 struct MedalQuery {
     username: String,
 }
 
+/// Verify Medal credentials.  
+#[utoipa::path(tag = "medal")]
 #[post("verify", guard = "medal_key_guard")]
 pub async fn verify(
     pool: web::Data<PgPool>,
@@ -50,6 +62,8 @@ pub async fn verify(
     }
 }
 
+/// Redeem Medal credit.  
+#[utoipa::path(tag = "medal")]
 #[post("redeem", guard = "medal_key_guard")]
 pub async fn redeem(
     pool: web::Data<PgPool>,

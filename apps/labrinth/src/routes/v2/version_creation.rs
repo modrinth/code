@@ -76,8 +76,9 @@ pub struct InitialVersionData {
 }
 
 // under `/api/v1/version`
-/// Create a version on an existing project.
+/// Create a version on an existing project.  
 #[utoipa::path(
+	tag = "version creation",
     post,
     operation_id = "createVersion",
     request_body(
@@ -305,8 +306,9 @@ async fn get_example_version_fields(
 }
 
 // under /api/v1/version/{version_id}
-/// Add files to an existing version.
+/// Add files to an existing version.  
 #[utoipa::path(
+	tag = "version creation",
     post,
     operation_id = "addFilesToVersion",
     params(("version_id" = VersionId, Path, description = "The ID of the version")),

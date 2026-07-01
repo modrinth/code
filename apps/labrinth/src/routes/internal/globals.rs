@@ -89,8 +89,8 @@ pub fn tax_compliance_payout_threshold_for_year(
     value
 }
 
-/// Gets configured global non-secret variables for this backend instance.
-#[utoipa::path]
+/// Get backend globals.  
+#[utoipa::path(tag = "globals")]
 #[get("")]
 pub async fn get_globals() -> web::Json<Globals> {
     web::Json(GLOBALS.clone())

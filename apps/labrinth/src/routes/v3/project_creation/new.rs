@@ -110,11 +110,11 @@ pub struct ProjectCreate {
     pub components: exp::ProjectEdit,
 }
 
-/// Creates a new project with the given components.
+/// Create a project from components.  
 ///
 /// Components must include `base` ([`exp::base::Project`]), and at least one
 /// other component.
-#[utoipa::path]
+#[utoipa::path(tag = "projects")]
 #[put("")]
 pub async fn create(
     req: HttpRequest,

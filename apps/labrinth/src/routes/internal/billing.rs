@@ -62,6 +62,31 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal/billing")
+            .service(products)
+            .service(subscriptions)
+            .service(user_customer)
+            .service(edit_subscription)
+            .service(payment_methods)
+            .service(add_payment_method_flow)
+            .service(edit_payment_method)
+            .service(remove_payment_method)
+            .service(charges)
+            .service(credit)
+            .service(active_servers)
+            .service(initiate_payment)
+            .service(stripe_webhook)
+            .service(refund_charge)
+            .service(reprocess_charge_tax),
+    );
+}
+
+/// List products.  
+#[utoipa::path(tag = "billing")]
 #[get("products")]
 pub async fn products(
     pool: web::Data<PgPool>,
@@ -99,6 +124,8 @@ struct SubscriptionsQuery {
     pub user_id: Option<ariadne::ids::UserId>,
 }
 
+/// List subscriptions.  
+#[utoipa::path(tag = "billing")]
 #[get("subscriptions")]
 pub async fn subscriptions(
     req: HttpRequest,
@@ -141,7 +168,7 @@ pub async fn subscriptions(
     Ok(HttpResponse::Ok().json(subscriptions))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ChargeRefundAmount {
     Full,
@@ -149,13 +176,15 @@ pub enum ChargeRefundAmount {
     None,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ChargeRefund {
     #[serde(flatten)]
     pub amount: ChargeRefundAmount,
     pub unprovision: Option<bool>,
 }
 
+/// Refund a charge.  
+#[utoipa::path(tag = "billing")]
 #[post("charge/{id}/refund")]
 #[allow(clippy::too_many_arguments)]
 pub async fn refund_charge(
@@ -419,6 +448,8 @@ pub async fn refund_charge(
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Reprocess tax for a charge.  
+#[utoipa::path(tag = "billing")]
 #[post("charge/{id}/tax/reprocess")]
 pub async fn reprocess_charge_tax(
     req: HttpRequest,
@@ -587,8 +618,9 @@ pub async fn reprocess_charge_tax(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct SubscriptionEdit {
+    #[schema(value_type = String)]
     pub interval: Option<PriceDuration>,
     pub payment_method: Option<String>,
     pub cancelled: Option<bool>,
@@ -601,6 +633,8 @@ pub struct SubscriptionEditQuery {
     pub dry: Option<bool>,
 }
 
+/// Update a subscription.  
+#[utoipa::path(tag = "billing")]
 #[patch("subscription/{id}")]
 #[allow(clippy::too_many_arguments)]
 pub async fn edit_subscription(
@@ -1091,6 +1125,8 @@ pub async fn edit_subscription(
     }
 }
 
+/// Get the current customer.  
+#[utoipa::path(tag = "billing")]
 #[get("customer")]
 pub async fn user_customer(
     req: HttpRequest,
@@ -1129,6 +1165,8 @@ pub struct ChargesQuery {
     pub user_id: Option<ariadne::ids::UserId>,
 }
 
+/// List payments.  
+#[utoipa::path(tag = "billing")]
 #[get("payments")]
 pub async fn charges(
     req: HttpRequest,
@@ -1188,6 +1226,8 @@ pub async fn charges(
     ))
 }
 
+/// Start a payment method flow.  
+#[utoipa::path(tag = "billing")]
 #[post("payment_method")]
 pub async fn add_payment_method_flow(
     req: HttpRequest,
@@ -1241,6 +1281,8 @@ pub struct EditPaymentMethod {
     pub primary: bool,
 }
 
+/// Update a payment method.  
+#[utoipa::path(tag = "billing")]
 #[patch("payment_method/{id}")]
 pub async fn edit_payment_method(
     req: HttpRequest,
@@ -1305,6 +1347,8 @@ pub async fn edit_payment_method(
     }
 }
 
+/// Remove a payment method.  
+#[utoipa::path(tag = "billing")]
 #[delete("payment_method/{id}")]
 pub async fn remove_payment_method(
     req: HttpRequest,
@@ -1388,6 +1432,8 @@ pub async fn remove_payment_method(
     }
 }
 
+/// List payment methods.  
+#[utoipa::path(tag = "billing")]
 #[get("payment_methods")]
 pub async fn payment_methods(
     req: HttpRequest,
@@ -1432,6 +1478,8 @@ pub struct ActiveServersQuery {
     pub subscription_status: Option<SubscriptionStatus>,
 }
 
+/// List active servers.  
+#[utoipa::path(tag = "billing")]
 #[get("active_servers")]
 pub async fn active_servers(
     req: HttpRequest,
@@ -1487,7 +1535,7 @@ pub async fn active_servers(
     Ok(HttpResponse::Ok().json(server_ids))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum PaymentRequestType {
     PaymentMethod { id: String },
@@ -1507,7 +1555,7 @@ impl PaymentRequestType {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ChargeRequestType {
     Existing {
@@ -1515,11 +1563,12 @@ pub enum ChargeRequestType {
     },
     New {
         product_id: crate::models::ids::ProductId,
+        #[schema(value_type = String)]
         interval: Option<PriceDuration>,
     },
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct PaymentRequestMetadata {
     #[serde(flatten)]
@@ -1527,7 +1576,7 @@ pub struct PaymentRequestMetadata {
     pub affiliate_code: Option<AffiliateCodeId>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum PaymentRequestMetadataKind {
     Pyro {
@@ -1537,15 +1586,18 @@ pub enum PaymentRequestMetadataKind {
     },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct PaymentRequest {
     #[serde(flatten)]
     pub type_: PaymentRequestType,
     pub charge: ChargeRequestType,
+    #[schema(value_type = String)]
     pub existing_payment_intent: Option<stripe::PaymentIntentId>,
     pub metadata: Option<PaymentRequestMetadata>,
 }
 
+/// Initiate a payment.  
+#[utoipa::path(tag = "billing")]
 #[post("payment")]
 pub async fn initiate_payment(
     req: HttpRequest,
@@ -1610,6 +1662,8 @@ pub async fn initiate_payment(
     }
 }
 
+/// Receive a Stripe webhook.  
+#[utoipa::path(tag = "billing")]
 #[post("_stripe")]
 pub async fn stripe_webhook(
     req: HttpRequest,
@@ -2503,7 +2557,7 @@ async fn apply_credit_many(
     Ok(())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct CreditRequest {
     #[serde(flatten)]
     pub target: CreditTarget,
@@ -2512,7 +2566,7 @@ pub struct CreditRequest {
     pub message: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(untagged)]
 pub enum CreditTarget {
     Subscriptions {
@@ -2526,6 +2580,8 @@ pub enum CreditTarget {
     },
 }
 
+/// Credit subscriptions.  
+#[utoipa::path(tag = "billing")]
 #[post("credit")]
 pub async fn credit(
     req: HttpRequest,

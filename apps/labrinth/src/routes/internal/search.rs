@@ -9,7 +9,8 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(tasks).service(tasks_cancel);
 }
 
-#[utoipa::path]
+/// List search tasks.  
+#[utoipa::path(tag = "search")]
 #[get("tasks", guard = "admin_key_guard")]
 pub async fn tasks(
     search: web::Data<dyn SearchBackend>,
@@ -17,7 +18,8 @@ pub async fn tasks(
     Ok(web::Json(search.tasks().await.map_err(ApiError::Internal)?))
 }
 
-#[utoipa::path]
+/// Cancel search tasks.  
+#[utoipa::path(tag = "search")]
 #[delete("tasks", guard = "admin_key_guard")]
 pub async fn tasks_cancel(
     search: web::Data<dyn SearchBackend>,

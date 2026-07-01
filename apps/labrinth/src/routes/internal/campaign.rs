@@ -143,7 +143,8 @@ impl CampaignDonation {
     }
 }
 
-#[utoipa::path]
+/// Receive a Tiltify webhook.  
+#[utoipa::path(tag = "campaigns")]
 #[post("/webhook")]
 pub async fn tiltify_webhook(
     req: HttpRequest,
@@ -301,7 +302,8 @@ fn verify_tiltify_webhook_signature(
     Ok(())
 }
 
-#[utoipa::path]
+/// Get Pride campaign data.  
+#[utoipa::path(tag = "campaigns")]
 #[get("/pride-26")]
 pub async fn pride_26(
     http: web::Data<HttpClient>,

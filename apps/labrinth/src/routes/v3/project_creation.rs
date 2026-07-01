@@ -283,7 +283,8 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[utoipa::path]
+/// Create a project.  
+#[utoipa::path(tag = "projects")]
 #[post("")]
 pub async fn project_create(
     req: HttpRequest,
@@ -361,10 +362,10 @@ pub async fn project_create_internal(
     result
 }
 
-/// Allows creating a project with a specific ID.
+/// Create a project with a specific ID.  
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[utoipa::path]
+#[utoipa::path(tag = "projects")]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,

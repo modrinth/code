@@ -162,8 +162,9 @@ pub struct DeleteAllLocksResponse {
     pub deleted_count: u64,
 }
 
-/// Fetch all projects which are in the moderation queue.
+/// List projects in the moderation queue.  
 #[utoipa::path(
+	tag = "moderation",
     responses((status = OK, body = inline(Vec<FetchedProject>)))
 )]
 #[get("/projects")]
@@ -291,8 +292,9 @@ pub async fn get_projects_internal(
     Ok(web::Json(projects))
 }
 
-/// Fetch moderation metadata for a specific project.
+/// Get project moderation metadata.  
 #[utoipa::path(
+	tag = "moderation",
     responses((status = OK, body = inline(Vec<Project>)))
 )]
 #[get("/project/{id}")]
@@ -447,8 +449,8 @@ pub enum Judgement {
     },
 }
 
-/// Update moderation judgements for projects in the review queue.
-#[utoipa::path]
+/// Update project moderation judgements.  
+#[utoipa::path(tag = "moderation")]
 #[post("/project")]
 async fn set_project_meta(
     req: HttpRequest,
@@ -536,9 +538,10 @@ async fn set_project_meta(
     Ok(())
 }
 
-/// Acquire or refresh a moderation lock on a project.
+/// Acquire a moderation lock.  
 /// Returns success if acquired, or info about who holds the lock if blocked.
 #[utoipa::path(
+	tag = "moderation",
     responses(
         (status = OK, body = LockAcquireResponse),
         (status = NOT_FOUND, description = "Project not found")
@@ -594,8 +597,9 @@ async fn acquire_lock(
     }
 }
 
-/// Force-acquire a moderation lock on a project (moderator override).
+/// Override a moderation lock.  
 #[utoipa::path(
+	tag = "moderation",
     responses(
         (status = OK, body = LockAcquireResponse),
         (status = NOT_FOUND, description = "Project not found")
@@ -639,8 +643,9 @@ async fn override_lock(
     }))
 }
 
-/// Check the lock status for a project
+/// Get moderation lock status.  
 #[utoipa::path(
+	tag = "moderation",
     responses(
         (status = OK, body = LockStatusResponse),
         (status = NOT_FOUND, description = "Project not found")
@@ -699,8 +704,9 @@ async fn get_lock_status(
     }
 }
 
-/// Release a moderation lock on a project
+/// Release a moderation lock.  
 #[utoipa::path(
+	tag = "moderation",
     responses(
         (status = OK, body = LockReleaseResponse),
         (status = NOT_FOUND, description = "Project not found")
@@ -740,12 +746,13 @@ async fn release_lock(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Release a moderation lock using credentials in the request body.
+/// Release a moderation lock by beacon.  
 ///
 /// For use with `navigator.sendBeacon`, which cannot set `Authorization` or send `DELETE`.
 /// The body must be `text/plain` containing the same token value as the `Authorization` header
 /// (optional `Bearer ` prefix). This avoids a CORS preflight compared to `application/json`.
 #[utoipa::path(
+	tag = "moderation",
     request_body(
         content = String,
         description = "Token value (same as Authorization header)",
@@ -811,8 +818,9 @@ async fn release_lock_beacon(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Delete all moderation locks (admin only)
+/// Delete all moderation locks.  
 #[utoipa::path(
+	tag = "moderation",
     responses(
         (status = OK, body = DeleteAllLocksResponse),
         (status = UNAUTHORIZED, description = "Not an admin")

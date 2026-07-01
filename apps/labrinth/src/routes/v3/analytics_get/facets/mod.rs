@@ -58,7 +58,9 @@ pub struct ProjectPlaytimeFacets {
     pub country: Vec<String>,
 }
 
+/// Get analytics facets.  
 #[utoipa::path(
+	tag = "analytics",
 	responses((status = OK, body = inline(FacetsResponse))),
 )]
 #[post("/facets")]

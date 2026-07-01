@@ -22,7 +22,8 @@ pub struct PingRequest {
     pub timeout_ms: Option<u64>,
 }
 
-#[utoipa::path]
+/// Ping Minecraft server.  
+#[utoipa::path(tag = "server ping")]
 #[post("/minecraft-java")]
 pub async fn ping_minecraft_java(
     req: HttpRequest,

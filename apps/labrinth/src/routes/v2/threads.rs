@@ -19,8 +19,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(threads_get);
 }
 
-/// Get a thread by ID.
+/// Get a thread by ID.  
 #[utoipa::path(
+	tag = "threads",
     get,
     operation_id = "getThread",
     params(("id" = ThreadId, Path, description = "The ID of the thread")),
@@ -51,8 +52,9 @@ pub struct ThreadIds {
     pub ids: String,
 }
 
-/// Get multiple threads by ID.
+/// Get multiple threads by ID.  
 #[utoipa::path(
+	tag = "threads",
     get,
     operation_id = "getThreads",
     params(("ids" = String, Query, description = "The JSON array of thread IDs")),
@@ -101,8 +103,9 @@ pub struct NewThreadMessage {
     pub body: MessageBody,
 }
 
-/// Send a message to a thread.
+/// Send a message to a thread.  
 #[utoipa::path(
+	tag = "threads",
     post,
     operation_id = "sendThreadMessage",
     params(("id" = ThreadId, Path, description = "The ID of the thread")),
@@ -142,8 +145,9 @@ pub async fn thread_send_message(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a thread message by ID.
+/// Delete a thread message by ID.  
 #[utoipa::path(
+	tag = "threads",
     delete,
     operation_id = "deleteThreadMessage",
     params(("id" = ThreadMessageId, Path, description = "The ID of the message")),

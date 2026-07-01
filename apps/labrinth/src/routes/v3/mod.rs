@@ -39,6 +39,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(images::config)
             .configure(notifications::config)
             .configure(organizations::config)
+            .configure(payouts::webhook_config)
             .configure(projects::config)
             .configure(reports::config)
             .configure(shared_instance_version_creation::config)
@@ -63,11 +64,6 @@ pub fn utoipa_config(
             .configure(analytics_get::config),
     );
     cfg.service(
-        utoipa_actix_web::scope("/v3/analytics-event")
-            .wrap(default_cors())
-            .configure(analytics_event::config),
-    );
-    cfg.service(
         utoipa_actix_web::scope("/v3/payout")
             .wrap(default_cors())
             .configure(payouts::config),
@@ -78,6 +74,25 @@ pub fn utoipa_config(
             .configure(projects::utoipa_config)
             .configure(project_creation::config),
     );
+    cfg.service(
+        utoipa_actix_web::scope("/v3")
+            .wrap(default_cors())
+            .service(friends::add_friend)
+            .service(friends::remove_friend)
+            .service(friends::friends)
+            .service(projects::project_search)
+            .service(projects::project_search_post)
+            .service(oauth_clients::get_client)
+            .service(oauth_clients::get_clients)
+            .service(oauth_clients::oauth_client_create)
+            .service(oauth_clients::oauth_client_delete)
+            .service(oauth_clients::oauth_client_edit)
+            .service(oauth_clients::oauth_client_icon_edit)
+            .service(oauth_clients::oauth_client_icon_delete)
+            .service(oauth_clients::get_user_oauth_authorizations)
+            .service(oauth_clients::revoke_oauth_authorization),
+    );
+    cfg.configure(content::utoipa_config);
 }
 
 pub async fn hello_world() -> Result<HttpResponse, ApiError> {

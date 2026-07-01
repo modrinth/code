@@ -89,7 +89,8 @@ struct ScanResponse {
     queued_files: u64,
 }
 
-#[utoipa::path]
+/// Queue an attribution scan.  
+#[utoipa::path(tag = "attribution")]
 #[post("/scan")]
 async fn scan(
     req: HttpRequest,
@@ -201,7 +202,8 @@ async fn scan(
     }))
 }
 
-#[utoipa::path]
+/// List project attribution groups.  
+#[utoipa::path(tag = "attribution")]
 #[get("/{project_id}")]
 async fn list(
     req: HttpRequest,
@@ -451,7 +453,8 @@ struct UpdateGroupBody {
     attribution: AttributionResolution,
 }
 
-#[utoipa::path]
+/// Update an attribution group.  
+#[utoipa::path(tag = "attribution")]
 #[patch("/group/{group_id}")]
 async fn update_group(
     req: HttpRequest,
@@ -532,7 +535,8 @@ struct AssignBody {
     project_id: ProjectId,
 }
 
-#[utoipa::path]
+/// Move a file to an attribution group.  
+#[utoipa::path(tag = "attribution")]
 #[post("/assign")]
 async fn assign(
     req: HttpRequest,
@@ -688,7 +692,8 @@ struct SplitBody {
     project_id: ProjectId,
 }
 
-#[utoipa::path]
+/// Split a file into a new attribution group.  
+#[utoipa::path(tag = "attribution")]
 #[post("/split")]
 async fn split(
     req: HttpRequest,

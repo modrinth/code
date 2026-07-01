@@ -40,7 +40,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
-#[utoipa::path]
+/// Get a project's team members.  
+#[utoipa::path(tag = "teams")]
 #[get("/{project_id}/members")]
 async fn team_members_get_project(
     req: HttpRequest,

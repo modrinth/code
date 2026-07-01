@@ -22,8 +22,9 @@ fn default_count() -> u16 {
     100
 }
 
-/// Get projects in the moderation queue.
+/// List projects in the moderation queue.  
 #[utoipa::path(
+	tag = "v2 moderation",
     get,
     operation_id = "getModerationProjects",
     params(

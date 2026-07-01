@@ -17,8 +17,9 @@ pub struct V2Stats {
     pub files: Option<i64>,
 }
 
-/// Get aggregate instance statistics.
+/// Get aggregate instance statistics.  
 #[utoipa::path(
+	tag = "statistics",
     get,
     operation_id = "statistics",
     responses(

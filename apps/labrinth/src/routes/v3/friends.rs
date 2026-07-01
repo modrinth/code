@@ -23,7 +23,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(friends);
 }
 
-#[post("friend/{id}")]
+/// Add a friend.  
+#[utoipa::path(tag = "friends")]
+#[post("/friend/{id}")]
 pub async fn add_friend(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -133,7 +135,9 @@ pub async fn add_friend(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[delete("friend/{id}")]
+/// Remove a friend.  
+#[utoipa::path(tag = "friends")]
+#[delete("/friend/{id}")]
 pub async fn remove_friend(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -175,7 +179,9 @@ pub async fn remove_friend(
     }
 }
 
-#[get("friends")]
+/// List friends.  
+#[utoipa::path(tag = "friends")]
+#[get("/friends")]
 pub async fn friends(
     req: HttpRequest,
     pool: web::Data<PgPool>,

@@ -17,8 +17,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(report_get);
 }
 
-/// Create a report for a project, version, or user.
+/// Create a report for a project, version, or user.  
 #[utoipa::path(
+	tag = "reports",
     post,
     operation_id = "submitReport",
     responses(
@@ -69,8 +70,9 @@ fn default_all() -> bool {
     true
 }
 
-/// Get open reports for the current user.
+/// Get open reports for the current user.  
 #[utoipa::path(
+	tag = "reports",
     get,
     operation_id = "getOpenReports",
     params(
@@ -131,8 +133,9 @@ pub struct ReportIds {
     pub ids: String,
 }
 
-/// Get multiple reports by ID.
+/// Get multiple reports by ID.  
 #[utoipa::path(
+	tag = "reports",
     get,
     operation_id = "getReports",
     params(
@@ -184,8 +187,9 @@ pub async fn reports_get(
     }
 }
 
-/// Get a report by ID.
+/// Get a report by ID.  
 #[utoipa::path(
+	tag = "reports",
     get,
     operation_id = "getReport",
     params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
@@ -232,8 +236,9 @@ pub struct EditReport {
     pub closed: Option<bool>,
 }
 
-/// Modify a report.
+/// Update a report.  
 #[utoipa::path(
+	tag = "reports",
     patch,
     operation_id = "modifyReport",
     params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
@@ -278,8 +283,9 @@ pub async fn report_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a report by ID.
+/// Delete a report by ID.  
 #[utoipa::path(
+	tag = "reports",
     delete,
     operation_id = "deleteReport",
     params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),

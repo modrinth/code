@@ -402,12 +402,12 @@ pub fn app_config(
     .configure(routes::v3::config)
     .configure(routes::internal::config)
     .configure(routes::root_config)
-    .default_service(web::get().wrap(default_cors()).to(routes::not_found));
+    .default_service(web::get().to(routes::not_found).wrap(default_cors()));
 }
 
 pub fn utoipa_app_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-    _labrinth_config: LabrinthConfig,
+    labrinth_config: LabrinthConfig,
 ) {
     cfg.configure({
         #[cfg(target_os = "linux")]
@@ -419,7 +419,28 @@ pub fn utoipa_app_config(
             |_cfg| ()
         }
     })
-    .configure(routes::v2::utoipa_config)
-    .configure(routes::v3::utoipa_config)
-    .configure(routes::internal::utoipa_config);
+    .configure(|cfg| utoipa_app_config_v2(cfg, labrinth_config.clone()))
+    .configure(|cfg| utoipa_app_config_v3(cfg, labrinth_config.clone()))
+    .configure(|cfg| utoipa_app_config_internal(cfg, labrinth_config));
+}
+
+pub fn utoipa_app_config_v2(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+    _labrinth_config: LabrinthConfig,
+) {
+    cfg.configure(routes::v2::utoipa_config);
+}
+
+pub fn utoipa_app_config_v3(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+    _labrinth_config: LabrinthConfig,
+) {
+    cfg.configure(routes::v3::utoipa_config);
+}
+
+pub fn utoipa_app_config_internal(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+    _labrinth_config: LabrinthConfig,
+) {
+    cfg.configure(routes::internal::utoipa_config);
 }

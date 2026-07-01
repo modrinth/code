@@ -133,7 +133,9 @@ pub async fn issue_session(
     Ok(session)
 }
 
+/// List sessions.  
 #[utoipa::path(
+	tag = "sessions",
     get,
     operation_id = "listSessions",
     responses(
@@ -178,7 +180,9 @@ pub async fn list(
     Ok(HttpResponse::Ok().json(sessions))
 }
 
+/// Delete a session.  
 #[utoipa::path(
+	tag = "sessions",
     delete,
     operation_id = "deleteSession",
     params(("id" = String, Path, description = "The session ID")),
@@ -228,7 +232,9 @@ pub async fn delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+/// Refresh a session.  
 #[utoipa::path(
+	tag = "sessions",
     post,
     operation_id = "refreshSession",
     responses(

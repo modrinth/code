@@ -134,8 +134,9 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
-/// Create a new project with initial versions.
+/// Create a new project with initial versions.  
 #[utoipa::path(
+	tag = "project creation",
     post,
     operation_id = "createProject",
     request_body(

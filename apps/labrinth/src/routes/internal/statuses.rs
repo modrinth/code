@@ -39,12 +39,20 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(ws_init);
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(utoipa_actix_web::scope("/_internal").service(ws_init));
+}
+
 #[derive(Deserialize)]
 struct LauncherHeartbeatInit {
     code: String,
 }
 
 // TODO: Move launcher-specific tunnel traffic to a proper launcher websocket endpoint.
+/// Start launcher socket.  
+#[utoipa::path(tag = "statuses")]
 #[get("launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,

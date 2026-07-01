@@ -44,8 +44,9 @@ fn default_true() -> bool {
     true
 }
 
-/// List versions for a project.
+/// List versions for a project.  
 #[utoipa::path(
+	tag = "versions",
     get,
     operation_id = "getProjectVersions",
     params(
@@ -169,8 +170,9 @@ pub async fn version_list(
 }
 
 // Given a project ID/slug and a version slug
-/// Get a project version by ID or version number.
+/// Get a project version by ID or version number.  
 #[utoipa::path(
+	tag = "versions",
     get,
     operation_id = "getVersionFromIdOrNumber",
     params(
@@ -230,8 +232,9 @@ pub struct VersionIds {
     pub include_changelog: bool,
 }
 
-/// Get multiple versions by ID.
+/// Get multiple versions by ID.  
 #[utoipa::path(
+	tag = "versions",
     get,
     operation_id = "getVersions",
     params(("ids" = String, Query, description = "The JSON array of version IDs")),
@@ -274,8 +277,9 @@ pub async fn versions_get(
     }
 }
 
-/// Get a version by ID.
+/// Get a version by ID.  
 #[utoipa::path(
+	tag = "versions",
     get,
     operation_id = "getVersion",
     params(("version_id" = models::ids::VersionId, Path, description = "The ID of the version")),
@@ -353,8 +357,9 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
-/// Modify an existing version.
+/// Update an existing version.  
 #[utoipa::path(
+	tag = "versions",
     patch,
     operation_id = "modifyVersion",
     params(("id" = VersionId, Path, description = "The ID of the version")),
@@ -468,8 +473,9 @@ pub async fn version_edit(
     Ok(response)
 }
 
-/// Delete a version by ID.
+/// Delete a version by ID.  
 #[utoipa::path(
+	tag = "versions",
     delete,
     operation_id = "deleteVersion",
     params(("version_id" = VersionId, Path, description = "The ID of the version")),

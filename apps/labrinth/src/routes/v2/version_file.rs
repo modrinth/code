@@ -31,8 +31,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 }
 
 // under /api/v1/version_file/{hash}
-/// Get version metadata by file hash.
+/// Get version metadata by file hash.  
 #[utoipa::path(
+	tag = "version file",
     get,
     operation_id = "versionFromHash",
     params(
@@ -91,8 +92,9 @@ pub async fn get_version_from_hash(
 }
 
 // under /api/v1/version_file/{hash}/download
-/// Download a file by hash.
+/// Download a file by hash.  
 #[utoipa::path(
+	tag = "version file",
     get,
     operation_id = "downloadVersionFromHash",
     params(
@@ -143,8 +145,9 @@ pub async fn download_version(
 }
 
 // under /api/v1/version_file/{hash}
-/// Delete a file by hash.
+/// Delete a file by hash.  
 #[utoipa::path(
+	tag = "version file",
     delete,
     operation_id = "deleteFileFromHash",
     params(
@@ -206,8 +209,9 @@ pub struct UpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
-/// Get the latest compatible version from a file hash.
+/// Get the latest compatible version from a file hash.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionFromHash",
     params(
@@ -292,8 +296,9 @@ pub struct FileHashes {
 }
 
 // under /api/v2/version_files
-/// Get versions from file hashes.
+/// Get versions from file hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "versionsFromHashes",
     request_body = FileHashes,
@@ -343,8 +348,9 @@ pub async fn get_versions_from_hashes(
     }
 }
 
-/// Get projects from file hashes.
+/// Get projects from file hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "projectsFromHashes",
     request_body = FileHashes,
@@ -420,8 +426,9 @@ pub struct ManyUpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
-/// Get latest compatible versions for multiple hashes.
+/// Get latest compatible versions for multiple hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashes",
     request_body = ManyUpdateData,
@@ -469,8 +476,9 @@ pub async fn update_files(
     Ok(HttpResponse::Ok().json(v3_versions))
 }
 
-/// Get all latest compatible versions for multiple hashes.
+/// Get all latest compatible versions for multiple hashes.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashesMany",
     request_body = ManyUpdateData,
@@ -535,8 +543,9 @@ pub struct ManyFileUpdateData {
     pub hashes: Vec<FileUpdateData>,
 }
 
-/// Get latest versions with per-hash filters.
+/// Get latest versions with per-hash filters.  
 #[utoipa::path(
+	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashesIndividual",
     request_body = ManyFileUpdateData,

@@ -28,6 +28,18 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(success_callback).service(error_callback);
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal")
+            .service(success_callback)
+            .service(error_callback),
+    );
+}
+
+/// Receive a Gotenberg success callback.  
+#[utoipa::path(tag = "gotenberg", request_body = Vec<u8>)]
 #[post("/gotenberg/success", guard = "internal_network_guard")]
 pub async fn success_callback(
     web::Header(header::ContentDisposition {
@@ -82,7 +94,7 @@ pub async fn success_callback(
     Ok(())
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Error)]
+#[derive(Debug, Clone, Serialize, Deserialize, Error, utoipa::ToSchema)]
 pub struct GotenbergError {
     pub status: Option<String>,
     pub message: Option<String>,
@@ -101,6 +113,8 @@ impl fmt::Display for GotenbergError {
     }
 }
 
+/// Receive a Gotenberg error callback.  
+#[utoipa::path(tag = "gotenberg")]
 #[post("/gotenberg/error", guard = "internal_network_guard")]
 pub async fn error_callback(
     web::Header(GotenbergTrace(trace)): web::Header<GotenbergTrace>,

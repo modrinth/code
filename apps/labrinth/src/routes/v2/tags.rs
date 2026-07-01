@@ -35,8 +35,9 @@ pub struct CategoryData {
     pub header: String,
 }
 
-/// Get the list of project categories.
+/// List project categories.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "categoryList",
     responses(
@@ -81,8 +82,9 @@ pub struct LoaderData {
     pub supported_project_types: Vec<String>,
 }
 
-/// Get the list of loaders.
+/// List loaders.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "loaderList",
     responses(
@@ -155,8 +157,9 @@ pub struct GameVersionQuery {
     major: Option<bool>,
 }
 
-/// Get the list of game versions.
+/// List game versions.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "versionList",
     params(
@@ -239,8 +242,9 @@ pub struct License {
     pub name: String,
 }
 
-/// Get SPDX license identifiers and names.
+/// List SPDX license identifiers and names.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "licenseList",
     responses(
@@ -278,8 +282,9 @@ pub struct LicenseText {
     pub body: String,
 }
 
-/// Get full license text by SPDX ID.
+/// Get full license text by SPDX ID.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "licenseText",
     params(("id" = String, Path, description = "The license ID to get the text for")),
@@ -325,8 +330,9 @@ pub struct DonationPlatformQueryData {
     pub name: String,
 }
 
-/// Get available donation platforms.
+/// List donation platforms.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "donationPlatformList",
     responses(
@@ -383,8 +389,9 @@ pub async fn donation_platform_list(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get valid report types.
+/// List valid report types.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "reportTypeList",
     responses(
@@ -406,8 +413,9 @@ pub async fn report_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get valid project types.
+/// List valid project types.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "projectTypeList",
     responses(
@@ -429,8 +437,9 @@ pub async fn project_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get valid side-type values.
+/// List valid side-type values.  
 #[utoipa::path(
+	tag = "tags",
     get,
     operation_id = "sideTypeList",
     responses(

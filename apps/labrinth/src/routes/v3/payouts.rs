@@ -32,9 +32,7 @@ const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(paypal_webhook)
-        .service(tremendous_webhook)
-        .service(transaction_history)
+    cfg.service(transaction_history)
         .service(calculate_fees)
         .service(create_payout)
         .service(cancel_payout)
@@ -44,12 +42,17 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(post_compliance_form);
 }
 
+pub fn webhook_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(paypal_webhook).service(tremendous_webhook);
+}
+
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct RequestForm {
     form_type: users_compliance::FormType,
 }
 
-#[utoipa::path]
+/// Submit a compliance form.  
+#[utoipa::path(tag = "payouts")]
 #[post("/compliance")]
 pub async fn post_compliance_form(
     req: HttpRequest,
@@ -148,7 +151,7 @@ pub async fn post_compliance_form(
     }
 }
 
-#[utoipa::path]
+/// Receive PayPal webhook.
 #[post("/_paypal")]
 pub async fn paypal_webhook(
     req: HttpRequest,
@@ -306,7 +309,7 @@ pub async fn paypal_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[utoipa::path]
+/// Receive Tremendous webhook.
 #[post("/_tremendous")]
 pub async fn tremendous_webhook(
     req: HttpRequest,
@@ -424,7 +427,8 @@ pub struct WithdrawalFees {
     pub exchange_rate: Option<Decimal>,
 }
 
-#[utoipa::path]
+/// Calculate payout fees.  
+#[utoipa::path(tag = "payouts")]
 #[post("/fees")]
 pub async fn calculate_fees(
     req: HttpRequest,
@@ -457,7 +461,8 @@ pub async fn calculate_fees(
     }))
 }
 
-#[utoipa::path]
+/// Create a payout.  
+#[utoipa::path(tag = "payouts")]
 #[post("")]
 pub async fn create_payout(
     req: HttpRequest,
@@ -670,9 +675,9 @@ pub enum PayoutSource {
     Affilites,
 }
 
-/// Get the history of when the authorized user got payouts available, and when
+/// Get transaction history.  
 /// the user withdrew their payouts.
-#[utoipa::path(responses((status = OK, body = Vec<TransactionItem>)))]
+#[utoipa::path(tag = "payouts", responses((status = OK, body = Vec<TransactionItem>)))]
 #[get("/history")]
 pub async fn transaction_history(
     req: HttpRequest,
@@ -754,7 +759,8 @@ pub async fn transaction_history(
     Ok(web::Json(txn_items))
 }
 
-#[utoipa::path]
+/// Cancel a payout.  
+#[utoipa::path(tag = "payouts")]
 #[delete("/{id}")]
 pub async fn cancel_payout(
     info: web::Path<(PayoutId,)>,
@@ -873,7 +879,8 @@ pub enum FormCompletionStatus {
     Complete,
 }
 
-#[utoipa::path]
+/// List payment methods.  
+#[utoipa::path(tag = "payouts")]
 #[get("/methods")]
 pub async fn payment_methods(
     payouts_queue: web::Data<PayoutsQueue>,
@@ -906,7 +913,8 @@ pub struct UserBalance {
     pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
-#[utoipa::path]
+/// Get account balance.  
+#[utoipa::path(tag = "payouts")]
 #[get("/balance")]
 pub async fn get_balance(
     req: HttpRequest,
@@ -1137,7 +1145,8 @@ pub struct RevenueData {
     pub creator_revenue: Decimal,
 }
 
-#[utoipa::path]
+/// Get platform revenue.  
+#[utoipa::path(tag = "payouts")]
 #[get("/platform_revenue")]
 pub async fn platform_revenue(
     query: web::Query<RevenueQuery>,

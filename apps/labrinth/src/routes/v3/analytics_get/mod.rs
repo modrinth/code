@@ -172,8 +172,9 @@ pub enum ProjectAnalyticsEventKind {
 
 // logic
 
-/// Fetches analytics data for the authorized user's projects.
+/// Fetch analytics data.  
 #[utoipa::path(
+	tag = "analytics",
     responses((status = OK, body = inline(GetResponse))),
 )]
 #[post("")]
