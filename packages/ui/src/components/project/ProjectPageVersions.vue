@@ -49,6 +49,7 @@
 		row-key="id"
 		:row-class="getVersionRowClass"
 		:row-clickable="!!versionLink"
+		:row-below-visible="isFileRowVisible"
 		table-layout="auto"
 		@row-click="openVersionRow"
 	>
@@ -95,15 +96,18 @@
 						</div>
 					</div>
 				</AutoLink>
-				<div v-if="showFiles" class="tag-list">
-					<div
-						v-for="(file, fileIdx) in version.files"
-						:key="`file-tag-${fileIdx}`"
-						:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
-					>
-						<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
-						{{ file.filename }} - {{ formatBytes(file.size) }}
-					</div>
+			</div>
+		</template>
+
+		<template #row-below="{ row: version }">
+			<div class="tag-list px-4 pb-3 -mt-0.5">
+				<div
+					v-for="(file, fileIdx) in version.files"
+					:key="`file-tag-${fileIdx}`"
+					:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'text-contrast' : 'text-primary'}`"
+				>
+					<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
+					{{ file.filename }} - {{ formatBytes(file.size) }}
 				</div>
 			</div>
 		</template>
@@ -632,6 +636,10 @@ function getPlatformTooltip(platform: string): string {
 	return getFilterTooltip(formatTag(formatMessage, platform, 'loader'))
 }
 
+function isFileRowVisible(version: VersionTableRow): boolean {
+	return props.showFiles && Array.isArray(version.files) && version.files.length > 0
+}
+
 const normalizedVersions = computed<DisplayVersion[]>(() =>
 	props.versions.map((version) => {
 		const loaders = getModpackLoaders(version)
@@ -707,9 +715,7 @@ function switchPage(page: number) {
 }
 
 function getVersionRowClass(): string {
-	return props.versionLink
-		? 'group version-row-link cursor-pointer transition-[filter] [&:hover:not(:has([data-no-row-click]:hover))]:brightness-[115%]'
-		: 'group'
+	return props.versionLink ? 'group version-row-link cursor-pointer transition-[filter]' : 'group'
 }
 
 function openVersionRow(version: VersionTableRow) {
@@ -754,7 +760,15 @@ const messages = defineMessages({
 </script>
 
 <style scoped>
-:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) .version-row-name) {
+:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover))),
+:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) + .table-row-below),
+:deep(.version-row-link:has(+ .table-row-below:hover)),
+:deep(.version-row-link:has(+ .table-row-below:hover) + .table-row-below) {
+	filter: brightness(115%);
+}
+
+:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) .version-row-name),
+:deep(.version-row-link:has(+ .table-row-below:hover) .version-row-name) {
 	text-decoration-line: underline;
 }
 </style>
