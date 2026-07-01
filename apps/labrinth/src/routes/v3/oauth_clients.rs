@@ -43,7 +43,7 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        scope("oauth")
+        scope("/oauth")
             .configure(crate::auth::oauth::config)
             .service(revoke_oauth_authorization)
             .service(oauth_client_create)

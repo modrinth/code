@@ -49,7 +49,9 @@ pub enum LegacyMessageBody {
     },
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone, utoipa::ToSchema)]
+#[derive(
+    Serialize, Deserialize, Eq, PartialEq, Copy, Clone, utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum LegacyThreadType {
     Report,

@@ -40,6 +40,10 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(create);
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(create);
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum CreateError {
     #[error("project limit reached")]

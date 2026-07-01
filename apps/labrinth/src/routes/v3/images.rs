@@ -18,7 +18,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("image", web::post().to(images_add));
+    cfg.route("/image", web::post().to(images_add));
 }
 
 #[derive(Serialize, Deserialize)]

@@ -96,7 +96,7 @@ pub fn tax_compliance_payout_threshold_for_year(
 )]
 #[get("")]
 pub async fn get_globals() -> web::Json<Globals> {
-	web::Json(GLOBALS.clone())
+    web::Json(GLOBALS.clone())
 }
 
 #[cfg(test)]

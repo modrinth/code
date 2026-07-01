@@ -362,6 +362,14 @@ pub fn app_config(
     cfg: &mut web::ServiceConfig,
     labrinth_config: LabrinthConfig,
 ) {
+    app_base_config(cfg, labrinth_config);
+    app_fallback_config(cfg);
+}
+
+pub fn app_base_config(
+    cfg: &mut web::ServiceConfig,
+    labrinth_config: LabrinthConfig,
+) {
     cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
         routes::ApiError::Validation(err.to_string()).into()
     }))
@@ -400,9 +408,12 @@ pub fn app_config(
     .app_data(labrinth_config.search_state.clone())
     .app_data(labrinth_config.webauthn.clone())
     .configure(routes::v3::config)
-    .configure(routes::internal::config)
-    .configure(routes::root_config)
-    .default_service(web::get().to(routes::not_found).wrap(default_cors()));
+    .configure(routes::internal::config);
+}
+
+pub fn app_fallback_config(cfg: &mut web::ServiceConfig) {
+    cfg.configure(routes::root_config)
+        .default_service(web::get().to(routes::not_found).wrap(default_cors()));
 }
 
 pub fn utoipa_app_config(

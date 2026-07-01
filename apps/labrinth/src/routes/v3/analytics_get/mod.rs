@@ -60,6 +60,12 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.configure(old::config);
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(fetch_analytics);
+    cfg.configure(facets::web_config);
+    cfg.configure(old::web_config);
+}
+
 // request
 
 /// Requests analytics data, aggregating over all possible analytics sources

@@ -16,17 +16,17 @@ use serde_json::Value;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("tag")
-            .route("category", web::get().to(category_list))
-            .route("loader", web::get().to(loader_list)),
+        web::scope("/tag")
+            .route("/category", web::get().to(category_list))
+            .route("/loader", web::get().to(loader_list)),
     )
-    .route("games", web::get().to(games_list))
-    .route("loader_field", web::get().to(loader_fields_list))
-    .route("license", web::get().to(license_list))
-    .route("license/{id}", web::get().to(license_text))
-    .route("link_platform", web::get().to(link_platform_list))
-    .route("report_type", web::get().to(report_type_list))
-    .route("project_type", web::get().to(project_type_list));
+    .route("/games", web::get().to(games_list))
+    .route("/loader_field", web::get().to(loader_fields_list))
+    .route("/license", web::get().to(license_list))
+    .route("/license/{id}", web::get().to(license_text))
+    .route("/link_platform", web::get().to(link_platform_list))
+    .route("/report_type", web::get().to(report_type_list))
+    .route("/project_type", web::get().to(project_type_list));
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]

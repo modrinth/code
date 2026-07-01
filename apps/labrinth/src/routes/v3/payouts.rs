@@ -8,7 +8,7 @@ use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{
-	PayoutMethod, PayoutMethodType, PayoutStatus, Withdrawal,
+    PayoutMethod, PayoutMethodType, PayoutStatus, Withdrawal,
 };
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
@@ -42,6 +42,20 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(get_balance)
         .service(platform_revenue)
         .service(post_compliance_form);
+}
+
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/payout")
+            .service(transaction_history)
+            .service(calculate_fees)
+            .service(create_payout)
+            .service(cancel_payout)
+            .service(payment_methods)
+            .service(get_balance)
+            .service(platform_revenue)
+            .service(post_compliance_form),
+    );
 }
 
 pub fn webhook_config(cfg: &mut web::ServiceConfig) {
@@ -926,10 +940,10 @@ pub struct UserBalance {
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct BalanceResponse {
-	#[serde(flatten)]
-	balance: UserBalance,
-	requested_form_type: Option<users_compliance::FormType>,
-	form_completion_status: Option<FormCompletionStatus>,
+    #[serde(flatten)]
+    balance: UserBalance,
+    requested_form_type: Option<users_compliance::FormType>,
+    form_completion_status: Option<FormCompletionStatus>,
 }
 
 /// Get account balance.  

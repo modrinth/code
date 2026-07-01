@@ -76,7 +76,15 @@ impl Price {
 }
 
 #[derive(
-	Serialize, Deserialize, Hash, Eq, PartialEq, Debug, Copy, Clone, utoipa::ToSchema,
+    Serialize,
+    Deserialize,
+    Hash,
+    Eq,
+    PartialEq,
+    Debug,
+    Copy,
+    Clone,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "kebab-case")]
 pub enum PriceDuration {

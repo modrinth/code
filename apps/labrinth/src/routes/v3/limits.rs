@@ -10,10 +10,10 @@ use actix_web::{HttpRequest, web};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("limits")
-            .route("projects", web::get().to(get_project_limits))
-            .route("organizations", web::get().to(get_organization_limits))
-            .route("collections", web::get().to(get_collection_limits)),
+        web::scope("/limits")
+            .route("/projects", web::get().to(get_project_limits))
+            .route("/organizations", web::get().to(get_organization_limits))
+            .route("/collections", web::get().to(get_collection_limits)),
     );
 }
 

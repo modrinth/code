@@ -24,6 +24,8 @@ pub fn utoipa_config(
             .configure(super::internal::session::config)
             .configure(super::internal::flows::config)
             .configure(super::internal::pats::config)
+            .configure(super::internal::admin::config)
+            .configure(moderation::config)
             .configure(notifications::config)
             .configure(project_creation::config)
             .configure(projects::config)

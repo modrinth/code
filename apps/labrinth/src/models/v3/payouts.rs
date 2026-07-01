@@ -275,12 +275,12 @@ impl PayoutMethodFee {
 pub struct PayoutDecimal(pub Decimal);
 
 impl utoipa::PartialSchema for PayoutDecimal {
-	fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
-		utoipa::openapi::ObjectBuilder::new()
-			.schema_type(utoipa::openapi::schema::Type::Number)
-			.build()
-			.into()
-	}
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::ObjectBuilder::new()
+            .schema_type(utoipa::openapi::schema::Type::Number)
+            .build()
+            .into()
+    }
 }
 
 impl utoipa::ToSchema for PayoutDecimal {}

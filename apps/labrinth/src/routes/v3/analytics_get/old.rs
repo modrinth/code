@@ -30,6 +30,15 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(countries_views_get);
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(playtimes_get)
+        .service(views_get)
+        .service(downloads_get)
+        .service(revenue_get)
+        .service(countries_downloads_get)
+        .service(countries_views_get);
+}
+
 /// The json data to be passed to fetch analytic data.
 ///
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.

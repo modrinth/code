@@ -63,6 +63,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
                 cfg.service(pats::create_pat);
                 cfg.service(pats::edit_pat);
                 cfg.service(pats::delete_pat);
+                cfg.service(
+                    actix_web::web::scope("/moderation")
+                        .configure(moderation::web_config),
+                );
             })
             .configure(oauth_clients::config)
             .configure(billing::config)

@@ -37,26 +37,26 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("user", web::get().to(user_auth_get));
-    cfg.route("users", web::get().to(users_get));
-    cfg.route("users/search", web::get().to(users_search));
-    cfg.route("user_email", web::get().to(admin_user_email));
+    cfg.route("/user", web::get().to(user_auth_get));
+    cfg.route("/users", web::get().to(users_get));
+    cfg.route("/users/search", web::get().to(users_search));
+    cfg.route("/user_email", web::get().to(admin_user_email));
 
     cfg.service(
-        web::scope("user")
-            .route("{user_id}/all-projects", web::get().to(all_projects))
-            .route("{user_id}/projects", web::get().to(projects_list))
-            .route("{id}/notes", web::patch().to(user_notes_edit))
-            .route("{id}", web::get().to(user_get))
-            .route("{user_id}/collections", web::get().to(collections_list))
-            .route("{user_id}/organizations", web::get().to(orgs_list))
-            .route("{id}", web::patch().to(user_edit))
-            .route("{id}/icon", web::patch().to(user_icon_edit))
-            .route("{id}/icon", web::delete().to(user_icon_delete))
-            .route("{id}", web::delete().to(user_delete))
-            .route("{id}/follows", web::get().to(user_follows))
-            .route("{id}/notifications", web::get().to(user_notifications))
-            .route("{id}/oauth_apps", web::get().to(get_user_clients)),
+        web::scope("/user")
+            .route("/{user_id}/all-projects", web::get().to(all_projects))
+            .route("/{user_id}/projects", web::get().to(projects_list))
+            .route("/{id}/notes", web::patch().to(user_notes_edit))
+            .route("/{id}", web::get().to(user_get))
+            .route("/{user_id}/collections", web::get().to(collections_list))
+            .route("/{user_id}/organizations", web::get().to(orgs_list))
+            .route("/{id}", web::patch().to(user_edit))
+            .route("/{id}/icon", web::patch().to(user_icon_edit))
+            .route("/{id}/icon", web::delete().to(user_icon_delete))
+            .route("/{id}", web::delete().to(user_delete))
+            .route("/{id}/follows", web::get().to(user_follows))
+            .route("/{id}/notifications", web::get().to(user_notifications))
+            .route("/{id}/oauth_apps", web::get().to(get_user_clients)),
     );
 }
 

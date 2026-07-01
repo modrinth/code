@@ -31,16 +31,23 @@ pub mod oauth_clients;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("v3")
+        web::scope("/v3")
             .wrap(default_cors())
             .configure(limits::config)
             .configure(collections::config)
             .configure(content::config)
             .configure(images::config)
             .configure(notifications::config)
+            .configure(oauth_clients::config)
             .configure(organizations::config)
             .configure(payouts::webhook_config)
+            .configure(payouts::web_config)
             .configure(projects::config)
+            .service(
+                web::scope("/project")
+                    .configure(project_creation::web_config)
+                    .configure(projects::project_config),
+            )
             .configure(reports::config)
             .configure(shared_instance_version_creation::config)
             .configure(shared_instances::config)
@@ -51,6 +58,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(users::config)
             .configure(version_file::config)
             .configure(versions::config)
+            .service(
+                web::scope("/analytics").configure(analytics_get::web_config),
+            )
             .configure(friends::config),
     );
 }

@@ -11,15 +11,15 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("notifications", web::get().to(notifications_get));
-    cfg.route("notifications", web::patch().to(notifications_read));
-    cfg.route("notifications", web::delete().to(notifications_delete));
+    cfg.route("/notifications", web::get().to(notifications_get));
+    cfg.route("/notifications", web::patch().to(notifications_read));
+    cfg.route("/notifications", web::delete().to(notifications_delete));
 
     cfg.service(
-        web::scope("notification")
-            .route("{id}", web::get().to(notification_get))
-            .route("{id}", web::patch().to(notification_read))
-            .route("{id}", web::delete().to(notification_delete)),
+        web::scope("/notification")
+            .route("/{id}", web::get().to(notification_get))
+            .route("/{id}", web::patch().to(notification_read))
+            .route("/{id}", web::delete().to(notification_delete)),
     );
 }
 

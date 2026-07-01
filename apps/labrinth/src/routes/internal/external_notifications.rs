@@ -106,8 +106,8 @@ pub async fn create(
 	)
 )]
 #[post(
-	"/external_notifications/email-sync",
-	guard = "external_notification_key_guard"
+    "/external_notifications/email-sync",
+    guard = "external_notification_key_guard"
 )]
 pub async fn create_email_sync(
     pool: web::Data<PgPool>,

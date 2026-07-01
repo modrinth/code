@@ -19,19 +19,19 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("teams", web::get().to(teams_get));
+    cfg.route("/teams", web::get().to(teams_get));
 
     cfg.service(
-        web::scope("team")
-            .route("{id}/members", web::get().to(team_members_get))
-            .route("{id}/members/{user_id}", web::patch().to(edit_team_member))
+        web::scope("/team")
+            .route("/{id}/members", web::get().to(team_members_get))
+            .route("/{id}/members/{user_id}", web::patch().to(edit_team_member))
             .route(
-                "{id}/members/{user_id}",
+                "/{id}/members/{user_id}",
                 web::delete().to(remove_team_member),
             )
-            .route("{id}/members", web::post().to(add_team_member))
-            .route("{id}/join", web::post().to(join_team))
-            .route("{id}/owner", web::patch().to(transfer_ownership)),
+            .route("/{id}/members", web::post().to(add_team_member))
+            .route("/{id}/join", web::post().to(join_team))
+            .route("/{id}/owner", web::patch().to(transfer_ownership)),
     );
 }
 

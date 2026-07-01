@@ -16,7 +16,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 )]
 #[get("/tasks", guard = "admin_key_guard")]
 pub async fn tasks(
-	search: web::Data<dyn SearchBackend>,
+    search: web::Data<dyn SearchBackend>,
 ) -> Result<web::Json<serde_json::Value>, ApiError> {
     Ok(web::Json(search.tasks().await.map_err(ApiError::Internal)?))
 }

@@ -18,6 +18,10 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(fetch_facets);
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(fetch_facets);
+}
+
 #[derive(Debug, Serialize, utoipa::ToSchema)]
 pub struct FacetsResponse {
     pub facets: AnalyticsFacets,

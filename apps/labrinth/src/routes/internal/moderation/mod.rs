@@ -45,6 +45,18 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         );
 }
 
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(get_projects)
+        .service(get_project_meta)
+        .service(set_project_meta)
+        .service(acquire_lock)
+        .service(override_lock)
+        .service(get_lock_status)
+        .service(release_lock)
+        .service(release_lock_beacon)
+        .service(delete_all_locks);
+}
+
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct ProjectsRequestOptions {
     /// How many projects to fetch.

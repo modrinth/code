@@ -1,3 +1,5 @@
+#![allow(clippy::large_stack_arrays)]
+
 use crate::models::ids::{ThreadMessageId, VersionId};
 use crate::models::v3::billing::PriceDuration;
 use crate::models::{

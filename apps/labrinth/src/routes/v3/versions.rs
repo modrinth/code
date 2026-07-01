@@ -39,18 +39,18 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route(
-        "version",
+        "/version",
         web::post().to(super::version_creation::version_create),
     );
-    cfg.route("versions", web::get().to(versions_get));
+    cfg.route("/versions", web::get().to(versions_get));
 
     cfg.service(
-        web::scope("version")
-            .route("{id}", web::get().to(version_get))
-            .route("{id}", web::patch().to(version_edit))
-            .route("{id}", web::delete().to(version_delete))
+        web::scope("/version")
+            .route("/{id}", web::get().to(version_get))
+            .route("/{id}", web::patch().to(version_edit))
+            .route("/{id}", web::delete().to(version_delete))
             .route(
-                "{version_id}/file",
+                "/{version_id}/file",
                 web::post().to(super::version_creation::upload_file_to_version),
             ),
     );

@@ -20,20 +20,23 @@ use std::collections::HashMap;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("version_file")
-            .route("{version_id}", web::get().to(get_version_from_hash))
-            .route("{version_id}/update", web::post().to(get_update_from_hash))
-            .route("project", web::post().to(get_projects_from_hashes))
-            .route("{version_id}", web::delete().to(delete_file))
-            .route("{version_id}/download", web::get().to(download_version)),
+        web::scope("/version_file")
+            .route("/{version_id}", web::get().to(get_version_from_hash))
+            .route("/{version_id}/update", web::post().to(get_update_from_hash))
+            .route("/project", web::post().to(get_projects_from_hashes))
+            .route("/{version_id}", web::delete().to(delete_file))
+            .route("/{version_id}/download", web::get().to(download_version)),
     );
     cfg.service(
-        web::scope("version_files")
+        web::scope("/version_files")
             // DEPRECATED - use `update_many` instead
             // see `fn update_files` comment
-            .route("update", web::post().to(update_files))
-            .route("update_many", web::post().to(update_files_many))
-            .route("update_individual", web::post().to(update_individual_files))
+            .route("/update", web::post().to(update_files))
+            .route("/update_many", web::post().to(update_files_many))
+            .route(
+                "/update_individual",
+                web::post().to(update_individual_files),
+            )
             .route("", web::post().to(get_versions_from_hashes)),
     );
 }

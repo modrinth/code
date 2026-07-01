@@ -29,13 +29,13 @@ pub fn utoipa_config(
 
 #[derive(Deserialize)]
 struct MedalQuery {
-	username: String,
+    username: String,
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
 struct VerifyResponse {
-	user_id: UserId,
-	redeemed: bool,
+    user_id: UserId,
+    redeemed: bool,
 }
 
 /// Verify Medal credentials.  
@@ -56,8 +56,8 @@ pub async fn verify(
         )
         .await?;
 
-	match maybe_fields {
-		None => Err(ApiError::NotFound),
+    match maybe_fields {
+        None => Err(ApiError::NotFound),
         Some(fields) => Ok(HttpResponse::Ok().json(VerifyResponse {
             user_id: fields.user_id.into(),
             redeemed: fields.redeemal_status.is_some(),

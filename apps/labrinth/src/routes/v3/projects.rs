@@ -48,9 +48,28 @@ use validator::Validate;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(project_search);
     cfg.service(project_search_post);
-    cfg.route("projects", web::get().to(projects_get));
-    cfg.route("projects", web::patch().to(projects_edit));
-    cfg.route("projects_random", web::get().to(random_projects_get));
+    cfg.route("/projects", web::get().to(projects_get));
+    cfg.route("/projects", web::patch().to(projects_edit));
+    cfg.route("/projects_random", web::get().to(random_projects_get));
+}
+
+pub fn project_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(project_get)
+        .service(project_get_check)
+        .service(project_delete)
+        .service(project_edit)
+        .service(project_icon_edit)
+        .service(delete_project_icon)
+        .service(add_gallery_item)
+        .service(edit_gallery_item)
+        .service(delete_gallery_item)
+        .service(project_follow)
+        .service(project_unfollow)
+        .service(project_get_organization)
+        .service(super::teams::team_members_get_project)
+        .service(super::versions::version_list)
+        .service(super::versions::version_project_get)
+        .service(dependency_list);
 }
 
 pub fn utoipa_config(

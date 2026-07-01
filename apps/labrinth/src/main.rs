@@ -15,7 +15,7 @@ use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::{app_config, env};
+use labrinth::{app_base_config, app_fallback_config, env};
 use labrinth::{clickhouse, database, file_hosting};
 use labrinth::{
     utoipa_app_config_internal, utoipa_app_config_v2, utoipa_app_config_v3,
@@ -264,6 +264,7 @@ async fn app() -> std::io::Result<()> {
             // transactions out of HTTP requests. However, we have to use our
             // own - See `sentry::SentryErrorReporting` for why.
             .wrap(labrinth::util::sentry::SentryErrorReporting)
+            .configure(|cfg| app_base_config(cfg, labrinth_config.clone()))
             .into_utoipa_app()
             .openapi(DocsV2::openapi())
             .configure(|cfg| utoipa_app_config_v2(cfg, labrinth_config.clone()))
@@ -343,7 +344,7 @@ async fn app() -> std::io::Result<()> {
                 docs_internal,
             ))
             .configure(scalar_config("/docs", &scalar_configuration))
-            .configure(|cfg| app_config(cfg, labrinth_config.clone()))
+            .configure(app_fallback_config)
     })
     .bind(&ENV.BIND_ADDR)?
     .run()

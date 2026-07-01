@@ -1514,17 +1514,17 @@ pub async fn payment_methods(
 
 #[derive(Deserialize)]
 pub struct ActiveServersQuery {
-	pub subscription_status: Option<SubscriptionStatus>,
+    pub subscription_status: Option<SubscriptionStatus>,
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
 struct ActiveServerResponse {
-	pub user_id: ariadne::ids::UserId,
-	pub server_id: String,
-	pub price_id: crate::models::ids::ProductPriceId,
-	#[schema(value_type = String)]
-	pub interval: PriceDuration,
-	pub region: Option<String>,
+    pub user_id: ariadne::ids::UserId,
+    pub server_id: String,
+    pub price_id: crate::models::ids::ProductPriceId,
+    #[schema(value_type = String)]
+    pub interval: PriceDuration,
+    pub region: Option<String>,
 }
 
 /// List active servers.  
@@ -1557,25 +1557,25 @@ pub async fn active_servers(
     )
     .await?;
 
-	let server_ids = servers
-		.into_iter()
-		.filter_map(|x| {
-			x.metadata.as_ref().and_then(|metadata| match metadata {
-				SubscriptionMetadata::Pyro { id, region } => {
-					Some(ActiveServerResponse {
-						user_id: x.user_id.into(),
-						server_id: id.clone(),
-						price_id: x.price_id.into(),
+    let server_ids = servers
+        .into_iter()
+        .filter_map(|x| {
+            x.metadata.as_ref().and_then(|metadata| match metadata {
+                SubscriptionMetadata::Pyro { id, region } => {
+                    Some(ActiveServerResponse {
+                        user_id: x.user_id.into(),
+                        server_id: id.clone(),
+                        price_id: x.price_id.into(),
                         interval: x.interval,
                         region: region.clone(),
                     })
                 }
                 SubscriptionMetadata::Medal { .. } => None,
             })
-		})
-		.collect::<Vec<ActiveServerResponse>>();
+        })
+        .collect::<Vec<ActiveServerResponse>>();
 
-	Ok(HttpResponse::Ok().json(server_ids))
+    Ok(HttpResponse::Ok().json(server_ids))
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
