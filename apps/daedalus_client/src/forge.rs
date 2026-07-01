@@ -761,21 +761,23 @@ async fn fetch(
                 .into_iter()
                 .map(|(game_version, loaders)| {
                     daedalus::modded::Version {
-                    id: game_version,
-                    stable: true,
-                    loaders: loaders
-                        .map(|x| daedalus::modded::LoaderVersion {
-                            url: format_url(&format!(
-                        "{mod_loader}/v{format_version}/versions/{}.json",
-                        x.loader_version
-                    )),
-                            id: x.loader_version,
-                            stable: false,
-                        })
-                        .collect(),
-                }
+                        id: game_version,
+                        stable: true,
+                        version_group: None,
+                        loaders: loaders
+                            .map(|x| daedalus::modded::LoaderVersion {
+                                url: format_url(&format!(
+                                    "{mod_loader}/v{format_version}/versions/{}.json",
+                                    x.loader_version
+                                )),
+                                id: x.loader_version,
+                                stable: false,
+                            })
+                            .collect(),
+                    }
                 })
                 .collect(),
+            version_groups: Vec::new(),
         };
 
         upload_files.insert(

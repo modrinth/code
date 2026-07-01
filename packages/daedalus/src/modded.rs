@@ -10,7 +10,7 @@ pub const CURRENT_FABRIC_FORMAT_VERSION: usize = 0;
 /// The latest version of the format the fabric model structs deserialize to
 pub const CURRENT_FORGE_FORMAT_VERSION: usize = 0;
 /// The latest version of the format the quilt model structs deserialize to
-pub const CURRENT_QUILT_FORMAT_VERSION: usize = 0;
+pub const CURRENT_QUILT_FORMAT_VERSION: usize = 1;
 /// The latest version of the format the neoforge model structs deserialize to
 pub const CURRENT_NEOFORGE_FORMAT_VERSION: usize = 0;
 
@@ -188,16 +188,33 @@ pub fn merge_partial_version(
 pub struct Manifest {
     /// The game versions the mod loader supports
     pub game_versions: Vec<Version>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    /// Groups of game versions that share compatible loader version profiles
+    pub version_groups: Vec<VersionGroup>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 ///  A game version of Minecraft
 pub struct Version {
     /// The minecraft version ID
     pub id: String,
     /// Whether the release is stable or not
     pub stable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// The loader profile group for this Minecraft version
+    pub version_group: Option<String>,
     /// A map that contains loader versions for the game version
+    pub loaders: Vec<LoaderVersion>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+/// A group of Minecraft versions that share loader version profiles
+pub struct VersionGroup {
+    /// The version group ID
+    pub id: String,
+    /// The loader versions for this version group
     pub loaders: Vec<LoaderVersion>,
 }
 

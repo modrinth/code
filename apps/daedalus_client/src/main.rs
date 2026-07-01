@@ -12,6 +12,7 @@ use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 mod error;
 mod fabric;
 mod forge;
+mod metadata_groups;
 mod minecraft;
 pub mod util;
 

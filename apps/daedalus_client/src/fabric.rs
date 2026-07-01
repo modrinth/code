@@ -9,13 +9,11 @@
 //! `versions/{loader}.json`. Quilt has more than one group: versions before
 //! 26.x include hashed/intermediary libraries, while 26.x versions do not. For
 //! Quilt, Daedalus writes one templated profile per group at
-//! `versions/{loader}/{group}.json`.
-//!
-//! The Quilt top-level manifest intentionally remains backwards-compatible
-//! with old app builds: it still lists concrete Minecraft version IDs and the
-//! full loader list on each row. Only the loader profile URL points at the
-//! appropriate group, such as `pre-26-x` or `26-x`.
+//! `version-group/{group}/loader-version/{loader}`.
 
+use crate::metadata_groups::{
+    UNIVERSAL_METADATA_GROUP, metadata_group_for_game_version, metadata_groups,
+};
 use crate::util::{download_file, fetch_json, format_url};
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
@@ -84,7 +82,10 @@ async fn fetch(
     .await?;
     let all_loader_versions = fabric_manifest.loader.clone();
     let all_game_versions = fabric_manifest.game.clone();
-    let metadata_groups = metadata_groups(mod_loader, &all_game_versions);
+    let metadata_groups = metadata_groups(
+        mod_loader,
+        all_game_versions.iter().map(|x| x.version.as_str()),
+    );
 
     if metadata_groups
         .iter()
@@ -100,11 +101,15 @@ async fn fetch(
             .flat_map(|group| {
                 loaders.iter().map(move |loader| ProfileRequest {
                     group: group.id.to_string(),
-                    template_game_version: group.template_game_version.clone(),
+                    loader_profile_template_game_version: group
+                        .loader_profile_template_game_version
+                        .clone(),
                     loader_version: loader.version.clone(),
                     url: format!(
                         "{}/versions/loader/{}/{}/profile/json",
-                        meta_url, group.template_game_version, loader.version
+                        meta_url,
+                        group.loader_profile_template_game_version,
+                        loader.version
                     ),
                 })
             })
@@ -121,38 +126,50 @@ async fn fetch(
         )
         .await?;
 
+        let version_groups = metadata_groups
+            .iter()
+            .map(|group| daedalus::modded::VersionGroup {
+                id: group.id.to_string(),
+                loaders: loaders
+                    .iter()
+                    .map(|loader| {
+                        let version_path = metadata_version_path(
+                            mod_loader,
+                            format_version,
+                            &loader.version,
+                            group.id,
+                        );
+
+                        daedalus::modded::LoaderVersion {
+                            id: loader.version.clone(),
+                            url: format_url(&version_path),
+                            stable: loader.stable,
+                        }
+                    })
+                    .collect(),
+            })
+            .collect();
+
         let manifest = daedalus::modded::Manifest {
             game_versions: all_game_versions
                 .into_iter()
                 .map(|game_version| {
-                    let group = metadata_group_id_for_game_version(
+                    let group = metadata_group_for_game_version(
+                        &metadata_groups,
                         mod_loader,
                         &game_version.version,
-                    );
+                    )
+                    .expect("game version should have a metadata group");
 
                     daedalus::modded::Version {
                         id: game_version.version.clone(),
                         stable: game_version.stable,
-                        loaders: loaders
-                            .iter()
-                            .map(|loader| {
-                                let version_path = metadata_version_path(
-                                    mod_loader,
-                                    format_version,
-                                    &loader.version,
-                                    group,
-                                );
-
-                                daedalus::modded::LoaderVersion {
-                                    id: loader.version.clone(),
-                                    url: format_url(&version_path),
-                                    stable: loader.stable,
-                                }
-                            })
-                            .collect(),
+                        version_group: Some(group.id.to_string()),
+                        loaders: Vec::new(),
                     }
                 })
                 .collect(),
+            version_groups,
         };
 
         upload_files.insert(
@@ -249,14 +266,14 @@ async fn fetch(
             .iter()
             .map(|loader| ProfileRequest {
                 group: universal_group.id.to_string(),
-                template_game_version: universal_group
-                    .template_game_version
+                loader_profile_template_game_version: universal_group
+                    .loader_profile_template_game_version
                     .clone(),
                 loader_version: loader.version.clone(),
                 url: format!(
                     "{}/versions/loader/{}/{}/profile/json",
                     meta_url,
-                    universal_group.template_game_version,
+                    universal_group.loader_profile_template_game_version,
                     loader.version
                 ),
             })
@@ -284,6 +301,7 @@ async fn fetch(
         let loader_versions = daedalus::modded::Version {
             id: DUMMY_REPLACE_STRING.to_string(),
             stable: true,
+            version_group: None,
             loaders: all_loader_versions
                 .iter()
                 .filter(|x| !skip_versions.contains(&&*x.version))
@@ -310,10 +328,12 @@ async fn fetch(
                     daedalus::modded::Version {
                         id: x.version,
                         stable: x.stable,
+                        version_group: None,
                         loaders: vec![],
                     }
                 }))
                 .collect(),
+            version_groups: Vec::new(),
         };
 
         upload_files.insert(
@@ -331,84 +351,11 @@ async fn fetch(
     })
 }
 
-struct MetadataGroup {
-    id: &'static str,
-    template_game_version: String,
-}
-
-const UNIVERSAL_METADATA_GROUP: &str = "universal";
-
 struct ProfileRequest {
     group: String,
-    template_game_version: String,
+    loader_profile_template_game_version: String,
     loader_version: String,
     url: String,
-}
-
-fn metadata_groups(
-    mod_loader: &str,
-    game_versions: &[FabricGameVersion],
-) -> Vec<MetadataGroup> {
-    if mod_loader != "quilt" {
-        return vec![MetadataGroup {
-            id: UNIVERSAL_METADATA_GROUP,
-            template_game_version: "1.21".to_string(),
-        }];
-    }
-
-    let pre_26_game_versions = game_versions
-        .iter()
-        .filter(|x| {
-            metadata_group_id_for_game_version(mod_loader, &x.version)
-                == "pre-26-x"
-        })
-        .cloned()
-        .collect::<Vec<_>>();
-    let game_versions_26 = game_versions
-        .iter()
-        .filter(|x| {
-            metadata_group_id_for_game_version(mod_loader, &x.version) == "26-x"
-        })
-        .cloned()
-        .collect::<Vec<_>>();
-
-    let mut groups = Vec::new();
-
-    if !pre_26_game_versions.is_empty() {
-        groups.push(MetadataGroup {
-            id: "pre-26-x",
-            template_game_version: pre_26_game_versions
-                .iter()
-                .find(|x| x.version == "1.21")
-                .unwrap_or(&pre_26_game_versions[0])
-                .version
-                .clone(),
-        });
-    }
-
-    if !game_versions_26.is_empty() {
-        groups.push(MetadataGroup {
-            id: "26-x",
-            template_game_version: game_versions_26[0].version.clone(),
-        });
-    }
-
-    groups
-}
-
-fn metadata_group_id_for_game_version(
-    mod_loader: &str,
-    game_version: &str,
-) -> &'static str {
-    if mod_loader == "quilt"
-        && (game_version.starts_with("26.") || game_version.starts_with("26w"))
-    {
-        "26-x"
-    } else if mod_loader == "quilt" {
-        "pre-26-x"
-    } else {
-        UNIVERSAL_METADATA_GROUP
-    }
 }
 
 fn metadata_version_path(
@@ -421,7 +368,7 @@ fn metadata_version_path(
         format!("{mod_loader}/v{format_version}/versions/{loader_version}.json")
     } else {
         format!(
-            "{mod_loader}/v{format_version}/versions/{loader_version}/{group}.json"
+            "{mod_loader}/v{format_version}/version-group/{group}/loader-version/{loader_version}"
         )
     }
 }
@@ -451,7 +398,7 @@ async fn fetch_metadata_profiles(
         .map(|(mut version_info, request)| {
             patch_version_info(
                 &mut version_info,
-                &request.template_game_version,
+                &request.loader_profile_template_game_version,
                 maven_url,
                 mirror_artifacts,
             )?;
