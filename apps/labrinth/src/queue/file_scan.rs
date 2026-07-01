@@ -480,6 +480,7 @@ const OVERRIDE_PREFIXES: &[&str] = &[
 ];
 
 fn should_scan(name: &str) -> bool {
+    let name = name.to_lowercase();
     let should_skip = name.starts_with("mods/.connector/")
         || name.starts_with(".sable/natives/")
         || name.starts_with("local/crash_assistant/")
@@ -491,8 +492,10 @@ fn should_scan(name: &str) -> bool {
         || name.starts_with("essential/")
         || name.ends_with(".rpo")
         || name.ends_with(".txt");
-    let is_archive = name.contains(".jar") || name.contains(".zip");
-
+    let is_archive = name.ends_with(".jar")
+        || name.ends_with(".zip")
+        || name.ends_with(".jar.disabled")
+        || name.ends_with(".zip.disabled");
     is_archive && !should_skip
 }
 
