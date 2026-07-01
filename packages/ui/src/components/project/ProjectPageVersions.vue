@@ -55,7 +55,7 @@
 		<template #cell-channel="{ row: version }">
 			<div class="flex items-center justify-center">
 				<VersionChannelIndicator
-					v-tooltip="`Toggle filter for ${version.version_type}`"
+					v-tooltip="getFilterTooltip(version.version_type)"
 					:channel="version.version_type"
 					class="cursor-pointer"
 					data-no-row-click
@@ -110,7 +110,7 @@
 				<TagItem
 					v-for="gameVersion in getDisplayGameVersions(version).slice(0, MAX_GAME_VERSION_TAGS)"
 					:key="`version-tag-${gameVersion}`"
-					v-tooltip="`Toggle filter for ${gameVersion}`"
+					v-tooltip="getFilterTooltip(gameVersion)"
 					data-no-row-click
 					:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 				>
@@ -150,13 +150,13 @@
 					<TagItem
 						v-for="platform in version.loaders.slice(0, MAX_PLATFORM_TAGS)"
 						:key="`platform-tag-${platform}`"
-						v-tooltip="`Toggle filter for ${platform}`"
+						v-tooltip="getPlatformTooltip(platform)"
 						data-no-row-click
 						:style="`--_color: var(--color-platform-${platform})`"
 						:action="() => versionFilters?.toggleFilter('platform', platform)"
 					>
 						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-						<FormattedTag :tag="platform" enforce-type="loader" />
+						{{ getPlatformLabel(platform) }}
 					</TagItem>
 					<Menu
 						v-if="version.loaders.length > MAX_PLATFORM_TAGS"
@@ -171,11 +171,12 @@
 								<TagItem
 									v-for="platform in version.loaders.slice(MAX_PLATFORM_TAGS)"
 									:key="`overflow-platform-tag-${platform}`"
+									v-tooltip="getPlatformTooltip(platform)"
 									:style="`--_color: var(--color-platform-${platform})`"
 									:action="() => versionFilters?.toggleFilter('platform', platform)"
 								>
 									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-									<FormattedTag :tag="platform" enforce-type="loader" />
+									{{ getPlatformLabel(platform) }}
 								</TagItem>
 							</div>
 						</template>
@@ -258,7 +259,7 @@
 						<div class="flex items-center gap-1.5">
 							<div class="self-center">
 								<VersionChannelIndicator
-									v-tooltip="`Toggle filter for ${version.version_type}`"
+									v-tooltip="getFilterTooltip(version.version_type)"
 									:channel="version.version_type"
 									class="cursor-pointer smart-clickable:allow-pointer-events"
 									size="sm"
@@ -296,7 +297,7 @@
 									MAX_GAME_VERSION_TAGS,
 								)"
 								:key="`version-tag-${gameVersion}`"
-								v-tooltip="`Toggle filter for ${gameVersion}`"
+								v-tooltip="getFilterTooltip(gameVersion)"
 								class="smart-clickable:allow-pointer-events"
 								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 							>
@@ -334,13 +335,13 @@
 								<TagItem
 									v-for="platform in version.loaders.slice(0, MAX_PLATFORM_TAGS)"
 									:key="`platform-tag-${platform}`"
-									v-tooltip="`Toggle filter for ${platform}`"
+									v-tooltip="getPlatformTooltip(platform)"
 									class="smart-clickable:allow-pointer-events"
 									:style="`--_color: var(--color-platform-${platform})`"
 									:action="() => versionFilters?.toggleFilter('platform', platform)"
 								>
 									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-									<FormattedTag :tag="platform" enforce-type="loader" />
+									{{ getPlatformLabel(platform) }}
 								</TagItem>
 								<Menu
 									v-if="version.loaders.length > MAX_PLATFORM_TAGS"
@@ -356,11 +357,12 @@
 											<TagItem
 												v-for="platform in version.loaders.slice(MAX_PLATFORM_TAGS)"
 												:key="`overflow-platform-tag-${platform}`"
+												v-tooltip="getPlatformTooltip(platform)"
 												:style="`--_color: var(--color-platform-${platform})`"
 												:action="() => versionFilters?.toggleFilter('platform', platform)"
 											>
 												<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-												<FormattedTag :tag="platform" enforce-type="loader" />
+												{{ getPlatformLabel(platform) }}
 											</TagItem>
 										</div>
 									</template>
@@ -425,7 +427,6 @@ import {
 import {
 	AutoLink,
 	ButtonStyled,
-	FormattedTag,
 	Pagination,
 	SmartClickable,
 	Table,
@@ -444,6 +445,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { formatTag } from '../../utils/tag-messages'
 import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
@@ -519,7 +521,7 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		},
 		{
 			key: 'name',
-			label: 'Name',
+			label: 'Version',
 			cellClass: '!overflow-visible py-3 pr-4 min-w-[7rem]',
 		},
 		{
@@ -597,6 +599,22 @@ function hasNoModLoader(loaders: string[]): boolean {
 
 function getDisplayGameVersions(version: DisplayVersion): string[] {
 	return formatVersionsForDisplay(version.game_versions, props.gameVersions)
+}
+
+function getFilterTooltip(filter: string): string {
+	return formatMessage(messages.toggleFilterTooltip, { filter })
+}
+
+function getPlatformLabel(platform: string): string {
+	if (platform === 'modloader') {
+		return formatMessage(messages.modloaderShort)
+	}
+
+	return formatTag(formatMessage, platform, 'loader')
+}
+
+function getPlatformTooltip(platform: string): string {
+	return getFilterTooltip(formatTag(formatMessage, platform, 'loader'))
 }
 
 const normalizedVersions = computed<DisplayVersion[]>(() =>
@@ -708,6 +726,14 @@ const messages = defineMessages({
 	withheldTooltip: {
 		id: 'project.versions.version.withheld.tooltip',
 		defaultMessage: 'Version withheld due to missing permissions',
+	},
+	toggleFilterTooltip: {
+		id: 'project.versions.filter.toggle-tooltip',
+		defaultMessage: 'Toggle filter for {filter}',
+	},
+	modloaderShort: {
+		id: 'project.versions.platform.modloader.short',
+		defaultMessage: 'ModLoader',
 	},
 })
 </script>
