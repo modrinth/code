@@ -8,167 +8,29 @@
 		</template>
 		<template #default>
 			<div class="mx-auto flex w-full flex-col gap-4">
-				<div
-					v-if="
-						project.project_type !== 'plugin' ||
-						project.loaders.some((x) => !tags.loaderData.allPluginLoaders.includes(x))
-					"
-					class="modrinth-app-section contents"
-				>
-					<div class="flex flex-col">
-						<a
-							class="modrinth-app-install-card flex items-center justify-between gap-3 rounded-2xl border border-solid border-brand-highlight bg-surface-1 px-4 py-3 text-primary no-underline transition-[filter] hover:brightness-110"
-							:href="`modrinth://mod/${project.slug}`"
-							@click="installWithApp"
-						>
-							<span class="flex w-full min-w-0 flex-col gap-1">
-								<div class="flex items-center justify-between">
-									<span class="flex min-w-0 items-center gap-1.5 font-medium text-contrast">
-										Install with
-										<span class="text-brand">Modrinth App</span>
-										<ModrinthIcon aria-hidden="true" class="size-4 flex-shrink-0 text-brand" />
-									</span>
-									<ExternalIcon
-										aria-hidden="true"
-										class="size-4 flex-shrink-0 text-contrast transition-colors"
-									/>
-								</div>
-								<span class="truncate text-base text-secondary">
-									{{ formatMessage(messages.installWithModrinthAppDescription) }}
-								</span>
-							</span>
-						</a>
-						<Accordion ref="getModrinthAppAccordion">
-							<nuxt-link class="mt-2 flex justify-center text-brand-blue hover:underline" to="/app">
-								{{ formatMessage(messages.dontHaveModrinthApp) }}
-							</nuxt-link>
-						</Accordion>
-					</div>
-
-					<div class="flex items-center gap-4">
-						<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-						<span class="flex-shrink-0 text-sm font-medium text-secondary">
-							{{ formatMessage(messages.downloadManually) }}
-						</span>
-						<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-					</div>
-				</div>
-
-				<div class="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
-					<Combobox
-						:model-value="currentGameVersion || undefined"
-						class="w-full"
-						:options="gameVersionOptions"
-						:placeholder="formatMessage(messages.selectGameVersion)"
-						:searchable="project.game_versions.length > 4"
-						search-autocomplete="off"
-						:search-placeholder="formatMessage(messages.searchGameVersions)"
-						:no-options-message="formatMessage(messages.noGameVersionsFound)"
-						trigger-class="!rounded-xl !bg-button-bg !px-3 !py-2"
-						dropdown-class="!rounded-xl"
-						@update:model-value="selectGameVersion"
-						@search-input="(query) => (versionFilter = query)"
-						@close="versionFilter = ''"
-					>
-						<template #option="{ item, isSelected }">
-							<div
-								v-tooltip="
-									!possibleGameVersions.includes(item.value)
-										? formatMessage(messages.gameVersionUnsupportedTooltip, {
-												title: project.title,
-												gameVersion: item.value,
-												platform: currentPlatformText,
-											})
-										: null
-								"
-								class="flex w-full items-center justify-between gap-2"
-								:class="{
-									'text-brand-red opacity-40': !possibleGameVersions.includes(item.value),
-									'text-green': isSelected,
-									'text-primary': possibleGameVersions.includes(item.value) && !isSelected,
-								}"
-							>
-								<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
-							</div>
-						</template>
-						<template #dropdown-footer>
-							<div
-								v-if="showVersionsCheckbox"
-								class="border-0 border-t border-solid border-surface-5 p-3"
-							>
-								<Checkbox
-									v-model="showAllVersions"
-									:label="formatMessage(messages.showAllVersions)"
-									:disabled="!!versionFilter"
-								/>
-							</div>
-						</template>
-					</Combobox>
-					<Combobox
-						v-if="project.project_type !== 'resourcepack'"
-						:model-value="currentPlatform || undefined"
-						class="w-full"
-						:options="platformOptions"
-						:placeholder="formatMessage(messages.selectPlatform)"
-						trigger-class="!rounded-xl !bg-button-bg !px-3 !py-2"
-						dropdown-class="!rounded-xl"
-						@update:model-value="selectPlatform"
-					>
-						<template #option="{ item, isSelected }">
-							<div
-								v-tooltip="
-									!possiblePlatforms.includes(item.value)
-										? formatMessage(messages.platformUnsupportedTooltip, {
-												title: project.title,
-												platform: item.label,
-												gameVersion: currentGameVersion,
-											})
-										: null
-								"
-								class="flex w-full items-center justify-between gap-2"
-								:class="{
-									'text-brand-red opacity-40': !possiblePlatforms.includes(item.value),
-									'text-green': isSelected,
-									'text-primary': possiblePlatforms.includes(item.value) && !isSelected,
-								}"
-							>
-								<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
-							</div>
-						</template>
-					</Combobox>
-				</div>
+				<InstallWithModrinthApp :project="project" :tags="tags" />
+				<DownloadProject
+					:project="project"
+					:game-version-options="gameVersionOptions"
+					:current-game-version="currentGameVersion"
+					:possible-game-versions="possibleGameVersions"
+					:current-platform-text="currentPlatformText"
+					:show-versions-checkbox="showVersionsCheckbox"
+					:show-all-versions="showAllVersions"
+					:version-filter="versionFilter"
+					:current-platform="currentPlatform"
+					:platform-options="platformOptions"
+					:possible-platforms="possiblePlatforms"
+					:selected-version="selectedVersion"
+					:selected-primary-file="selectedPrimaryFile"
+					:selected-primary-file-download-url="selectedPrimaryFileDownloadUrl"
+					@select-game-version="selectGameVersion"
+					@select-platform="selectPlatform"
+					@update:show-all-versions="showAllVersions = $event"
+					@update:version-filter="versionFilter = $event"
+					@download="onDownload"
+				/>
 				<div class="flex flex-col gap-4">
-					<div
-						v-if="selectedVersion"
-						class="grid grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-2xl bg-bg px-3 py-3"
-					>
-						<div class="flex min-w-0 flex-col gap-1">
-							<div class="flex min-w-0 items-center gap-2">
-								<span class="truncate font-bold text-contrast">
-									{{ selectedVersion.version_number }}
-								</span>
-								<VersionChannelTag :channel="selectedVersion.version_type" class="!py-0.5" />
-							</div>
-							<p class="m-0 truncate text-sm text-secondary">
-								{{ selectedVersion.name }}
-							</p>
-						</div>
-						<ButtonStyled v-if="selectedPrimaryFile" color="brand" circular>
-							<a
-								:href="getDownloadUrl(selectedPrimaryFile.url)"
-								:download="selectedPrimaryFile.filename"
-								:aria-label="
-									formatMessage(messages.downloadVersion, {
-										version: selectedVersion.version_number,
-									})
-								"
-								v-tooltip="'Download'"
-								@click="onDownload"
-							>
-								<DownloadIcon aria-hidden="true" />
-							</a>
-						</ButtonStyled>
-					</div>
 					<p
 						v-if="
 							currentPlatform &&
@@ -185,7 +47,7 @@
 							})
 						}}
 					</p>
-					<DownloadDependenciesSection :dependencies="dependencyRows" @download="onDownload" />
+					<DownloadDependencies :dependencies="dependencyRows" @download="onDownload" />
 					<div v-if="additionalFiles.length > 0" class="flex flex-col gap-2">
 						<h3 class="m-0 text-sm font-bold text-contrast">
 							{{ formatMessage(messages.additionalFilesTitle) }}
@@ -231,12 +93,9 @@
 </template>
 
 <script setup>
-import { DownloadIcon, ExternalIcon, FileIcon, ModrinthIcon } from '@modrinth/assets'
+import { DownloadIcon, FileIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
-	Checkbox,
-	Combobox,
 	defineMessages,
 	getTagMessage,
 	injectModrinthClient,
@@ -245,16 +104,16 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
-import Accordion from '~/components/ui/Accordion.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 
-import DownloadDependenciesSection from './DownloadDependenciesSection.vue'
+import DownloadDependencies from './DownloadDependencies.vue'
+import DownloadProject from './DownloadProject.vue'
+import InstallWithModrinthApp from './InstallWithModrinthApp.vue'
 
 const props = defineProps({
 	project: {
@@ -298,7 +157,6 @@ const userSelectedGameVersion = ref(null)
 const userSelectedPlatform = ref(null)
 const showAllVersions = ref(false)
 const versionFilter = ref('')
-const getModrinthAppAccordion = ref()
 
 const currentGameVersion = computed(() => {
 	return (
@@ -443,6 +301,11 @@ const selectedPrimaryFile = computed(() => {
 	return (
 		selectedVersion.value?.files?.find((file) => file.primary) || selectedVersion.value?.files?.[0]
 	)
+})
+
+const selectedPrimaryFileDownloadUrl = computed(() => {
+	if (!selectedPrimaryFile.value) return null
+	return getDownloadUrl(selectedPrimaryFile.value.url)
 })
 
 const additionalFiles = computed(() => {
@@ -667,37 +530,9 @@ const dependencyRows = computed(() => {
 })
 
 const messages = defineMessages({
-	dontHaveModrinthApp: {
-		id: 'project.download.no-app',
-		defaultMessage: "Don't have Modrinth App?",
-	},
 	downloadTitle: {
 		id: 'project.download.title',
 		defaultMessage: 'Download {title}',
-	},
-	gameVersionLabel: {
-		id: 'project.download.game-version',
-		defaultMessage: 'Game version: {version}',
-	},
-	gameVersionUnsupportedTooltip: {
-		id: 'project.download.game-version-unsupported-tooltip',
-		defaultMessage: '{title} does not support {gameVersion} for {platform}',
-	},
-	installWithModrinthApp: {
-		id: 'project.download.install-with-app',
-		defaultMessage: 'Install with Modrinth App',
-	},
-	downloadManually: {
-		id: 'project.download.manually',
-		defaultMessage: 'Download manually',
-	},
-	installWithModrinthAppDescription: {
-		id: 'project.download.install-with-app-description',
-		defaultMessage: 'Automatically install the correct version and dependencies.',
-	},
-	downloadVersion: {
-		id: 'project.download.download-version',
-		defaultMessage: 'Download {version}',
 	},
 	additionalFilesTitle: {
 		id: 'project.download.additional-files-title',
@@ -706,34 +541,6 @@ const messages = defineMessages({
 	noVersionsAvailable: {
 		id: 'project.download.no-versions-available',
 		defaultMessage: 'No versions available for {gameVersion} and {platform}.',
-	},
-	noGameVersionsFound: {
-		id: 'project.download.no-game-versions-found',
-		defaultMessage: 'No game versions found',
-	},
-	platformLabel: {
-		id: 'project.download.platform',
-		defaultMessage: 'Platform: {platform}',
-	},
-	platformUnsupportedTooltip: {
-		id: 'project.download.platform-unsupported-tooltip',
-		defaultMessage: '{title} does not support {platform} for {gameVersion}',
-	},
-	searchGameVersions: {
-		id: 'project.download.search-game-versions',
-		defaultMessage: 'Select game version',
-	},
-	selectGameVersion: {
-		id: 'project.download.select-game-version',
-		defaultMessage: 'Select game version',
-	},
-	selectPlatform: {
-		id: 'project.download.select-platform',
-		defaultMessage: 'Select platform',
-	},
-	showAllVersions: {
-		id: 'project.download.show-all-versions',
-		defaultMessage: 'Show all versions',
 	},
 })
 
@@ -859,12 +666,6 @@ function selectPlatform(platform) {
 	updateDownloadQuery()
 }
 
-function installWithApp() {
-	setTimeout(() => {
-		getModrinthAppAccordion.value?.open()
-	}, 1500)
-}
-
 function onShow() {
 	modalOpen.value = true
 	debug('on-show fired')
@@ -936,15 +737,3 @@ watch(() => route.hash, openFromHash)
 
 defineExpose({ show, hide })
 </script>
-
-<style lang="scss" scoped>
-.modrinth-app-install-card {
-	background: radial-gradient(circle at 50% 300%, #0d2f17 0%, var(--surface-1) 72%);
-}
-
-@media (hover: none) and (max-width: 767px) {
-	.modrinth-app-section {
-		display: none;
-	}
-}
-</style>

@@ -95,7 +95,7 @@ import { DownloadIcon, PackageIcon, RightArrowIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, defineMessages, TagItem, useVIntl } from '@modrinth/ui'
 
 defineOptions({
-	name: 'DownloadDependenciesSection',
+	name: 'DownloadDependencies',
 })
 
 defineProps({
