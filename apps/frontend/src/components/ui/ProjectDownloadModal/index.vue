@@ -1,19 +1,17 @@
 <template>
 	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px">
-		<template #title>
+		<template v-if="project" #title>
 			<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
 			<div class="truncate text-lg font-extrabold text-contrast">
 				{{ formatMessage(messages.downloadTitle, { title: project.title }) }}
 			</div>
 		</template>
 		<template #default>
-			<div class="mx-auto flex w-full flex-col gap-4">
-				<InstallWithModrinthApp :project="project" :tags="tags" />
+			<div v-if="project" class="mx-auto flex w-full flex-col gap-4">
+				<InstallWithModrinthApp :project="project" />
 				<DownloadProject
 					:project="project"
 					:versions="versions"
-					:versions-loading="versionsLoading"
-					:tags="tags"
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
@@ -76,77 +74,145 @@
 	</NewModal>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, FileIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	type CdnDownloadReason,
 	defineMessages,
+	injectModrinthClient,
 	NewModal,
 	ServersPromo,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
+import type { DisplayProjectType } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 
 import DownloadDependencies from './DownloadDependencies.vue'
 import DownloadProject from './DownloadProject.vue'
 import InstallWithModrinthApp from './InstallWithModrinthApp.vue'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		required: true,
-	},
-	versions: {
-		type: Array,
-		default: () => [],
-	},
-	versionsLoading: {
-		type: Boolean,
-		default: false,
-	},
-	tags: {
-		type: Object,
-		required: true,
-	},
-	downloadReason: {
-		type: String,
-		default: 'standalone',
-	},
-	loadVersions: {
-		type: Function,
-		required: true,
-	},
-})
+type DownloadModalProject = Omit<Labrinth.Projects.v2.Project, 'project_type'> & {
+	project_type: DisplayProjectType
+	actualProjectType: Labrinth.Projects.v2.ProjectType
+}
 
-const emit = defineEmits(['download'])
+type ProjectDownloadSelection = {
+	currentGameVersion: string | null
+	currentPlatform: string | null
+	selectedVersion: Labrinth.Versions.v3.Version | null
+	selectedPrimaryFile: Labrinth.Versions.v3.VersionFile | null
+}
+
+type NewModalRef = {
+	show: (event?: MouseEvent) => void
+	hide: () => void
+}
+
+const props = withDefaults(
+	defineProps<{
+		projectId: string
+		downloadReason?: CdnDownloadReason
+	}>(),
+	{
+		downloadReason: 'standalone',
+	},
+)
+
+const emit = defineEmits<{
+	download: []
+}>()
 
 const route = useRoute()
 const flags = useFeatureFlags()
+const tags = useGeneratedState()
+const client = injectModrinthClient()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadModal')
 
-const modal = ref()
+const modal = ref<NewModalRef | null>(null)
 const modalOpen = ref(false)
 const downloadProjectResetKey = ref(0)
-const projectDownloadSelection = ref({
+const projectDownloadSelection = ref<ProjectDownloadSelection>({
 	currentGameVersion: null,
 	currentPlatform: null,
 	selectedVersion: null,
 	selectedPrimaryFile: null,
 })
 
-const { version, loader } = route.query
-const initialGameVersion = ref(
-	typeof version === 'string' && props.project.game_versions.includes(version) ? version : null,
-)
-const initialPlatform = ref(
-	typeof loader === 'string' && props.project.loaders.includes(loader) ? loader : null,
-)
+const routeProjectId = computed(() => props.projectId)
+
+const { data: projectRaw, error: projectV2Error } = useQuery({
+	queryKey: computed(() => ['project', 'v2', routeProjectId.value]),
+	queryFn: () => client.labrinth.projects_v2.get(routeProjectId.value),
+	staleTime: STALE_TIME,
+})
+
+const resolvedProjectId = computed(() => projectRaw.value?.id)
+
+const project = computed<DownloadModalProject | null>(() => {
+	if (!projectRaw.value) return null
+
+	return {
+		...projectRaw.value,
+		actualProjectType: projectRaw.value.project_type,
+		project_type: getProjectTypeForUrl(projectRaw.value.project_type, projectRaw.value.loaders),
+	}
+})
+
+const versionsEnabled = ref(false)
+const {
+	data: versionsV3,
+	error: _versionsV3Error,
+	isFetching: versionsV3Loading,
+} = useQuery({
+	queryKey: computed(() => ['project', resolvedProjectId.value, 'versions', 'v3']),
+	queryFn: () =>
+		client.labrinth.versions_v3.getProjectVersions(resolvedProjectId.value!, {
+			include_changelog: false,
+			apiVersion: 3,
+		}),
+	staleTime: STALE_TIME_LONG,
+	enabled: computed(() => !!resolvedProjectId.value && versionsEnabled.value),
+})
+
+const versions = computed<Labrinth.Versions.v3.Version[]>(() => {
+	const isModpack =
+		project.value?.actualProjectType === 'modpack' || project.value?.project_type === 'modpack'
+
+	return (versionsV3.value ?? []).map((version) => {
+		const files = Array.isArray(version.files) ? version.files : []
+		const gameVersions = Array.isArray(version.game_versions) ? version.game_versions : []
+		const loaders = Array.isArray(version.loaders) ? version.loaders : []
+		const mrpackLoaders = Array.isArray(version.mrpack_loaders) ? version.mrpack_loaders : []
+
+		return {
+			...version,
+			files,
+			game_versions: gameVersions,
+			loaders: isModpack && mrpackLoaders.length ? mrpackLoaders : loaders,
+		}
+	})
+})
+
+const initialGameVersion = computed(() => {
+	const version = route.query.version
+	if (typeof version !== 'string' || !project.value?.game_versions.includes(version)) return null
+	return version
+})
+const initialPlatform = computed(() => {
+	const loader = route.query.loader
+	if (typeof loader !== 'string' || !project.value?.loaders.includes(loader)) return null
+	return loader
+})
 
 const currentGameVersion = computed(() => projectDownloadSelection.value.currentGameVersion)
 const currentPlatform = computed(() => projectDownloadSelection.value.currentPlatform)
@@ -156,6 +222,12 @@ const selectedPrimaryFile = computed(() => projectDownloadSelection.value.select
 const additionalFiles = computed(() => {
 	if (!selectedVersion.value || !selectedPrimaryFile.value) return []
 	return selectedVersion.value.files.filter((file) => file !== selectedPrimaryFile.value)
+})
+
+watch(projectV2Error, (error) => {
+	if (error) {
+		debug('project query failed', error)
+	}
 })
 
 const messages = defineMessages({
@@ -169,17 +241,36 @@ const messages = defineMessages({
 	},
 })
 
-function fileTypeLabel(type) {
-	return (
-		{
-			'required-resource-pack': 'Resourcepack',
-			'optional-resource-pack': 'Resourcepack',
-			unknown: 'File',
-		}[type] || 'File'
-	)
+const fileTypeLabels: Partial<Record<Labrinth.Versions.v3.FileType, string>> = {
+	'required-resource-pack': 'Resourcepack',
+	'optional-resource-pack': 'Resourcepack',
+	unknown: 'File',
 }
 
-function getDownloadUrl(url) {
+function fileTypeLabel(type?: Labrinth.Versions.v3.FileType) {
+	return fileTypeLabels[type ?? 'unknown'] || 'File'
+}
+
+function getProjectTypeForUrl(
+	type: Labrinth.Projects.v2.ProjectType,
+	loaders: string[],
+): DisplayProjectType {
+	if (type !== 'mod') return type as DisplayProjectType
+
+	const isMod = loaders.some((loader) => tags.value.loaderData.modLoaders.includes(loader))
+	const isPlugin = loaders.some((loader) => tags.value.loaderData.allPluginLoaders.includes(loader))
+	const isDataPack = loaders.some((loader) =>
+		tags.value.loaderData.dataPackLoaders.includes(loader),
+	)
+
+	if (isDataPack) return 'datapack'
+	if (isPlugin) return 'plugin'
+	if (isMod) return 'mod'
+
+	return 'mod'
+}
+
+function getDownloadUrl(url: string) {
 	return createProjectDownloadUrl(url, {
 		reason: props.downloadReason,
 		gameVersion: currentGameVersion.value ?? undefined,
@@ -187,7 +278,13 @@ function getDownloadUrl(url) {
 	})
 }
 
-function updateDownloadQuery({ gameVersion, platform }) {
+function updateDownloadQuery({
+	gameVersion,
+	platform,
+}: {
+	gameVersion: string | null
+	platform: string | null
+}) {
 	navigateTo(
 		{
 			query: {
@@ -205,14 +302,14 @@ function updateDownloadQuery({ gameVersion, platform }) {
 	)
 }
 
-function selectGameVersion(gameVersion) {
+function selectGameVersion(gameVersion: string) {
 	updateDownloadQuery({
 		gameVersion,
 		platform: currentPlatform.value,
 	})
 }
 
-function selectPlatform(platform) {
+function selectPlatform(platform: string) {
 	updateDownloadQuery({
 		gameVersion: currentGameVersion.value,
 		platform,
@@ -222,7 +319,7 @@ function selectPlatform(platform) {
 function onShow() {
 	modalOpen.value = true
 	debug('on-show fired')
-	props.loadVersions()
+	versionsEnabled.value = true
 	navigateTo({ query: route.query, hash: '#download' }, { replace: true })
 }
 
@@ -231,15 +328,15 @@ function onHide() {
 	navigateTo({ query: route.query, hash: '' }, { replace: true })
 }
 
-function show(event) {
+function show(event?: MouseEvent) {
 	if (!modal.value || modalOpen.value) return
 	modalOpen.value = true
 	modal.value.show(event)
 }
 
-function hide(event) {
+function hide() {
 	if (!modal.value || !modalOpen.value) return
-	modal.value?.hide(event)
+	modal.value?.hide()
 	downloadProjectResetKey.value += 1
 }
 
@@ -254,9 +351,18 @@ function openFromHash() {
 	show()
 }
 
-if (route.hash === '#download' || version !== undefined || loader !== undefined) {
-	debug('eager loadVersions from setup', { hash: route.hash, version, loader })
-	props.loadVersions()
+if (
+	route.hash === '#download' ||
+	route.query.version !== undefined ||
+	route.query.loader !== undefined
+) {
+	debug('eager loadVersions from setup', {
+		hash: route.hash,
+		version: route.query.version,
+		loader: route.query.loader,
+		loading: versionsV3Loading.value,
+	})
+	versionsEnabled.value = true
 }
 
 watch(modal, openFromHash)

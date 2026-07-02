@@ -63,7 +63,7 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
 
@@ -71,12 +71,23 @@ defineOptions({
 	name: 'DownloadDependency',
 })
 
-defineProps({
-	dependency: {
-		type: Object,
-		required: true,
-	},
-})
+interface DownloadDependencyRow {
+	key: string
+	name: string
+	icon?: string
+	projectHref?: string
+	downloadHref?: string
+	filename?: string
+	typeLabel: string
+	unavailableTooltip: string
+	dependencies: DownloadDependencyRow[]
+}
 
-const emit = defineEmits(['download'])
+defineProps<{
+	dependency: DownloadDependencyRow
+}>()
+
+const emit = defineEmits<{
+	download: []
+}>()
 </script>

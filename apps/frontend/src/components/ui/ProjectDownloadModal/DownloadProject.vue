@@ -100,6 +100,7 @@
 		</div>
 		<ButtonStyled v-if="selectedPrimaryFile" color="brand" circular>
 			<a
+				v-tooltip="'Download'"
 				:href="selectedPrimaryFileDownloadUrl"
 				:download="selectedPrimaryFile.filename"
 				:aria-label="
@@ -107,14 +108,13 @@
 						version: selectedVersion.version_number,
 					})
 				"
-				v-tooltip="'Download'"
 				@click="emit('download')"
 			>
 				<DownloadIcon aria-hidden="true" />
 			</a>
 		</ButtonStyled>
 	</div>
-	<p v-else-if="currentPlatform && currentGameVersion && !versionsLoading && versions.length > 0">
+	<p v-else-if="currentPlatform && currentGameVersion && versions.length > 0">
 		{{
 			formatMessage(messages.noVersionsAvailable, {
 				gameVersion: currentGameVersion,
@@ -124,18 +124,22 @@
 	</p>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	type CdnDownloadReason,
 	Checkbox,
 	Combobox,
+	type ComboboxOption,
 	defineMessages,
 	getTagMessage,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
+import type { DisplayProjectType } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
@@ -143,48 +147,49 @@ defineOptions({
 	name: 'DownloadProject',
 })
 
-const props = defineProps({
-	project: {
-		type: Object,
-		required: true,
-	},
-	versions: {
-		type: Array,
-		default: () => [],
-	},
-	versionsLoading: {
-		type: Boolean,
-		default: false,
-	},
-	tags: {
-		type: Object,
-		required: true,
-	},
-	downloadReason: {
-		type: String,
-		default: 'standalone',
-	},
-	initialGameVersion: {
-		type: String,
-		default: null,
-	},
-	initialPlatform: {
-		type: String,
-		default: null,
-	},
-	resetKey: {
-		type: Number,
-		default: 0,
-	},
-})
+type DownloadModalProject = Omit<Labrinth.Projects.v2.Project, 'project_type'> & {
+	project_type: DisplayProjectType
+	actualProjectType: Labrinth.Projects.v2.ProjectType
+}
 
-const emit = defineEmits(['download', 'selectGameVersion', 'selectPlatform', 'update:selection'])
+type ProjectDownloadSelection = {
+	currentGameVersion: string | null
+	currentPlatform: string | null
+	selectedVersion: Labrinth.Versions.v3.Version | null
+	selectedPrimaryFile: Labrinth.Versions.v3.VersionFile | null
+}
+
+const props = withDefaults(
+	defineProps<{
+		project: DownloadModalProject
+		versions?: Labrinth.Versions.v3.Version[]
+		downloadReason?: CdnDownloadReason
+		initialGameVersion?: string | null
+		initialPlatform?: string | null
+		resetKey?: number
+	}>(),
+	{
+		versions: () => [],
+		downloadReason: 'standalone',
+		initialGameVersion: null,
+		initialPlatform: null,
+		resetKey: 0,
+	},
+)
+
+const emit = defineEmits<{
+	download: []
+	selectGameVersion: [gameVersion: string]
+	selectPlatform: [platform: string]
+	'update:selection': [selection: ProjectDownloadSelection]
+}>()
 const { formatMessage } = useVIntl()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
 const debug = useDebugLogger('DownloadProject')
+const tags = useGeneratedState()
 
-const userSelectedGameVersion = ref(props.initialGameVersion)
-const userSelectedPlatform = ref(props.initialPlatform)
+const userSelectedGameVersion = ref<string | null>(props.initialGameVersion)
+const userSelectedPlatform = ref<string | null>(props.initialPlatform)
 const showAllVersions = ref(defaultShowAllVersions())
 const versionFilter = ref('')
 
@@ -197,39 +202,36 @@ const showAllVersionsModel = computed({
 	},
 })
 
-const currentGameVersion = computed(() => {
-	return (
-		userSelectedGameVersion.value ||
-		(props.project.game_versions.length === 1 && props.project.game_versions[0])
-	)
+const currentGameVersion = computed<string | null>(() => {
+	if (userSelectedGameVersion.value) return userSelectedGameVersion.value
+	return props.project.game_versions.length === 1 ? props.project.game_versions[0] : null
 })
 
-const possibleGameVersions = computed(() => {
+const possibleGameVersions = computed<string[]>(() => {
 	return props.versions
 		.filter((x) => !currentPlatform.value || x.loaders.includes(currentPlatform.value))
 		.flatMap((x) => x.game_versions)
 })
 
-const possiblePlatforms = computed(() => {
+const possiblePlatforms = computed<string[]>(() => {
 	return props.versions
 		.filter((x) => !currentGameVersion.value || x.game_versions.includes(currentGameVersion.value))
 		.flatMap((x) => x.loaders)
 })
 
-const currentPlatform = computed(() => {
-	return (
-		userSelectedPlatform.value || (props.project.loaders.length === 1 && props.project.loaders[0])
-	)
+const currentPlatform = computed<string | null>(() => {
+	if (userSelectedPlatform.value) return userSelectedPlatform.value
+	return props.project.loaders.length === 1 ? props.project.loaders[0] : null
 })
 
 const currentPlatformText = computed(() => {
-	if (!currentPlatform.value) return null
-	return formatMessage(getTagMessage(currentPlatform.value, 'loader'))
+	if (!currentPlatform.value) return ''
+	return loaderLabel(currentPlatform.value)
 })
 
-const releaseVersions = computed(() => {
-	const set = new Set()
-	for (const gameVersion of props.tags.gameVersions || []) {
+const releaseVersions = computed<Set<string>>(() => {
+	const set = new Set<string>()
+	for (const gameVersion of tags.value.gameVersions || []) {
 		if (gameVersion?.version && gameVersion.version_type === 'release') {
 			set.add(gameVersion.version)
 		}
@@ -237,9 +239,9 @@ const releaseVersions = computed(() => {
 	return set
 })
 
-const nonReleaseVersions = computed(() => {
-	const set = new Set()
-	for (const gameVersion of props.tags.gameVersions || []) {
+const nonReleaseVersions = computed<Set<string>>(() => {
+	const set = new Set<string>()
+	for (const gameVersion of tags.value.gameVersions || []) {
 		if (gameVersion?.version && gameVersion.version_type !== 'release') {
 			set.add(gameVersion.version)
 		}
@@ -275,29 +277,34 @@ const filteredGameVersions = computed(() => {
 		.reverse()
 })
 
-const gameVersionOptions = computed(() => {
+const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	return filteredGameVersions.value.map((gameVersion) => ({
 		value: gameVersion,
 		label: gameVersion,
 	}))
 })
 
-const platformOptions = computed(() => {
+const platformOptions = computed<ComboboxOption<string>[]>(() => {
 	return props.project.loaders
 		.slice()
 		.reverse()
 		.map((platform) => ({
 			value: platform,
-			label: formatMessage(getTagMessage(platform, 'loader')),
+			label: loaderLabel(platform),
 		}))
 })
 
-const filteredVersions = computed(() => {
-	const result = props.versions.filter(
-		(x) =>
-			x.game_versions?.includes(currentGameVersion.value) &&
-			(x.loaders?.includes(currentPlatform.value) || props.project.project_type === 'resourcepack'),
-	)
+const filteredVersions = computed<Labrinth.Versions.v3.Version[]>(() => {
+	const gameVersion = currentGameVersion.value
+	if (!gameVersion) return []
+
+	const platform = currentPlatform.value
+	const result = props.versions.filter((x) => {
+		const matchesPlatform =
+			props.project.project_type === 'resourcepack' || (!!platform && x.loaders.includes(platform))
+
+		return x.game_versions.includes(gameVersion) && matchesPlatform
+	})
 	debug('filteredVersions', {
 		total: props.versions.length,
 		filtered: result.length,
@@ -308,11 +315,11 @@ const filteredVersions = computed(() => {
 	return result
 })
 
-const filteredRelease = computed(() => {
+const filteredRelease = computed<Labrinth.Versions.v3.Version | undefined>(() => {
 	return filteredVersions.value.find((x) => x.version_type === 'release')
 })
 
-const filteredBeta = computed(() => {
+const filteredBeta = computed<Labrinth.Versions.v3.Version | undefined>(() => {
 	return filteredVersions.value.find(
 		(x) =>
 			x.version_type === 'beta' &&
@@ -321,7 +328,7 @@ const filteredBeta = computed(() => {
 	)
 })
 
-const filteredAlpha = computed(() => {
+const filteredAlpha = computed<Labrinth.Versions.v3.Version | undefined>(() => {
 	return filteredVersions.value.find(
 		(x) =>
 			x.version_type === 'alpha' &&
@@ -332,18 +339,20 @@ const filteredAlpha = computed(() => {
 	)
 })
 
-const selectedVersion = computed(() => {
-	return filteredRelease.value || filteredBeta.value || filteredAlpha.value
+const selectedVersion = computed<Labrinth.Versions.v3.Version | null>(() => {
+	return filteredRelease.value || filteredBeta.value || filteredAlpha.value || null
 })
 
-const selectedPrimaryFile = computed(() => {
+const selectedPrimaryFile = computed<Labrinth.Versions.v3.VersionFile | null>(() => {
 	return (
-		selectedVersion.value?.files?.find((file) => file.primary) || selectedVersion.value?.files?.[0]
+		selectedVersion.value?.files?.find((file) => file.primary) ||
+		selectedVersion.value?.files?.[0] ||
+		null
 	)
 })
 
 const selectedPrimaryFileDownloadUrl = computed(() => {
-	if (!selectedPrimaryFile.value) return null
+	if (!selectedPrimaryFile.value) return '#'
 	return getDownloadUrl(selectedPrimaryFile.value.url)
 })
 
@@ -370,17 +379,19 @@ watch(
 	},
 )
 
-function selectGameVersion(gameVersion) {
+function selectGameVersion(gameVersion?: string) {
+	if (!gameVersion) return
 	userSelectedGameVersion.value = gameVersion
 	emit('selectGameVersion', gameVersion)
 }
 
-function selectPlatform(platform) {
+function selectPlatform(platform?: string) {
+	if (!platform) return
 	userSelectedPlatform.value = platform
 	emit('selectPlatform', platform)
 }
 
-function getDownloadUrl(url) {
+function getDownloadUrl(url: string) {
 	return createProjectDownloadUrl(url, {
 		reason: props.downloadReason,
 		gameVersion: currentGameVersion.value ?? undefined,
@@ -388,7 +399,11 @@ function getDownloadUrl(url) {
 	})
 }
 
-function isReleaseGameVersion(version) {
+function loaderLabel(loader: string) {
+	return formatMessage(getTagMessage(loader, 'loader') ?? messages.unknownLoader)
+}
+
+function isReleaseGameVersion(version: string) {
 	if (releaseVersions.value.has(version)) return true
 	if (nonReleaseVersions.value.has(version)) return false
 	return true
@@ -398,8 +413,8 @@ function defaultShowAllVersions() {
 	return (
 		props.project.game_versions.length > 0 &&
 		props.project.game_versions.every((projectVersion) => {
-			const gameVersion = props.tags.gameVersions?.find((x) => x.version === projectVersion)
-			return gameVersion?.version_type && gameVersion.version_type !== 'release'
+			const gameVersion = tags.value.gameVersions?.find((x) => x.version === projectVersion)
+			return !!gameVersion?.version_type && gameVersion.version_type !== 'release'
 		})
 	)
 }
@@ -440,6 +455,10 @@ const messages = defineMessages({
 	showAllVersions: {
 		id: 'project.download.show-all-versions',
 		defaultMessage: 'Show all versions',
+	},
+	unknownLoader: {
+		id: 'project.download.unknown-loader',
+		defaultMessage: 'Unknown loader',
 	},
 })
 </script>

@@ -14,8 +14,15 @@
 	</div>
 </template>
 
-<script setup>
-import { defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
+import {
+	type CdnDownloadReason,
+	defineMessages,
+	injectModrinthClient,
+	useVIntl,
+} from '@modrinth/ui'
+import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
@@ -25,38 +32,49 @@ defineOptions({
 	name: 'DownloadDependencies',
 })
 
-const props = defineProps({
-	dependencies: {
-		type: Array,
-		default: null,
-	},
-	project: {
-		type: Object,
-		default: null,
-	},
-	selectedVersion: {
-		type: Object,
-		default: null,
-	},
-	currentGameVersion: {
-		type: [String, Boolean],
-		default: null,
-	},
-	currentPlatform: {
-		type: [String, Boolean],
-		default: null,
-	},
-	downloadReason: {
-		type: String,
-		default: 'standalone',
-	},
-	showTitle: {
-		type: Boolean,
-		default: true,
-	},
-})
+type DownloadModalProject = Omit<Labrinth.Projects.v2.Project, 'project_type'> & {
+	project_type: DisplayProjectType
+	actualProjectType: Labrinth.Projects.v2.ProjectType
+}
 
-const emit = defineEmits(['download'])
+type ResolvedContent = Labrinth.Content.v3.ResolvedContent | Labrinth.Content.v3.SkippedContent
+
+interface DownloadDependencyRow {
+	key: string
+	name: string
+	icon?: string
+	projectHref?: string
+	downloadHref?: string
+	filename?: string
+	typeLabel: string
+	unavailableTooltip: string
+	dependencies: DownloadDependencyRow[]
+}
+
+const props = withDefaults(
+	defineProps<{
+		dependencies?: DownloadDependencyRow[] | null
+		project?: DownloadModalProject | null
+		selectedVersion?: Labrinth.Versions.v3.Version | null
+		currentGameVersion?: string | null
+		currentPlatform?: string | null
+		downloadReason?: CdnDownloadReason
+		showTitle?: boolean
+	}>(),
+	{
+		dependencies: null,
+		project: null,
+		selectedVersion: null,
+		currentGameVersion: null,
+		currentPlatform: null,
+		downloadReason: 'standalone',
+		showTitle: true,
+	},
+)
+
+const emit = defineEmits<{
+	download: []
+}>()
 const client = injectModrinthClient()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
 const { formatMessage } = useVIntl()
@@ -65,7 +83,7 @@ const shouldResolveDependencies = computed(
 	() => !props.dependencies && !!props.project && !!props.selectedVersion,
 )
 
-const dependencyResolutionPreferences = computed(() => ({
+const dependencyResolutionPreferences = computed<Labrinth.Content.v3.ResolutionPreferences>(() => ({
 	game_versions: props.selectedVersion?.game_versions || [],
 	loaders: props.selectedVersion?.loaders || [],
 }))
@@ -81,16 +99,16 @@ const { data: dependencyResolution } = useQuery({
 	]),
 	queryFn: () =>
 		client.labrinth.content_v3.resolve({
-			project_id: props.project.id,
-			version_id: props.selectedVersion.id,
-			content_type: resolveContentType(props.project.project_type),
+			project_id: props.project!.id,
+			version_id: props.selectedVersion!.id,
+			content_type: resolveContentType(props.project!.project_type),
 			selected: dependencyResolutionPreferences.value,
 			target: dependencyResolutionPreferences.value,
 		}),
 	enabled: shouldResolveDependencies,
 })
 
-const dependencyVersionIds = computed(() => {
+const dependencyVersionIds = computed<string[]>(() => {
 	return [
 		...new Set(
 			[
@@ -98,7 +116,7 @@ const dependencyVersionIds = computed(() => {
 				...(dependencyResolution.value?.skipped || []),
 			]
 				.map((dependency) => dependency.version_id)
-				.filter(Boolean),
+				.filter((versionId): versionId is string => !!versionId),
 		),
 	]
 })
@@ -114,7 +132,7 @@ const { data: dependencyVersions } = useQuery({
 })
 
 const dependencyVersionById = computed(() => {
-	const map = new Map()
+	const map = new Map<string, Labrinth.Versions.v3.Version>()
 	for (const version of dependencyVersions.value || []) {
 		if (!version) continue
 		map.set(version.id, version)
@@ -122,7 +140,7 @@ const dependencyVersionById = computed(() => {
 	return map
 })
 
-const dependencyProjectIds = computed(() => {
+const dependencyProjectIds = computed<string[]>(() => {
 	return [
 		...new Set(
 			[
@@ -130,7 +148,7 @@ const dependencyProjectIds = computed(() => {
 				...(dependencyResolution.value?.skipped || []),
 			]
 				.map((dependency) => dependency.project_id)
-				.filter(Boolean),
+				.filter((projectId): projectId is string => !!projectId),
 		),
 	]
 })
@@ -146,7 +164,7 @@ const { data: dependencyProjects } = useQuery({
 })
 
 const dependencyProjectById = computed(() => {
-	const map = new Map()
+	const map = new Map<string, Labrinth.Projects.v2.Project>()
 	for (const project of dependencyProjects.value || []) {
 		map.set(project.id, project)
 	}
@@ -154,7 +172,7 @@ const dependencyProjectById = computed(() => {
 })
 
 const dependenciesByParentVersionId = computed(() => {
-	const map = new Map()
+	const map = new Map<string, ResolvedContent[]>()
 
 	for (const dependency of [
 		...(dependencyResolution.value?.dependencies || []),
@@ -170,7 +188,7 @@ const dependenciesByParentVersionId = computed(() => {
 	return map
 })
 
-const resolvedDependencyRows = computed(() => {
+const resolvedDependencyRows = computed<DownloadDependencyRow[]>(() => {
 	const primaryVersionId =
 		dependencyResolution.value?.primary.version_id || props.selectedVersion?.id
 	if (!primaryVersionId) return []
@@ -180,44 +198,46 @@ const resolvedDependencyRows = computed(() => {
 	return dependencies.map((dependency) => createDependencyRow(dependency))
 })
 
-const dependencyRows = computed(() => props.dependencies || resolvedDependencyRows.value)
+const dependencyRows = computed<DownloadDependencyRow[]>(
+	() => props.dependencies || resolvedDependencyRows.value,
+)
 
-function primaryFileForVersion(version) {
+function primaryFileForVersion(version?: Labrinth.Versions.v3.Version) {
 	return version?.files?.find((file) => file.primary) || version?.files?.[0]
 }
 
-function createDependencyRow(dependency) {
-	const version = dependencyVersionById.value.get(dependency.version_id)
+function createDependencyRow(dependency: ResolvedContent): DownloadDependencyRow {
+	const versionId = dependency.version_id ?? undefined
+	const version = versionId ? dependencyVersionById.value.get(versionId) : undefined
 	const project = dependencyProjectById.value.get(dependency.project_id)
 	const primaryFile = primaryFileForVersion(version)
-	const unavailableTooltip = dependency.reason
-		? skippedReasonLabel(dependency.reason)
-		: formatMessage(messages.unavailableDependency)
+	const unavailableTooltip =
+		'reason' in dependency && dependency.reason
+			? skippedReasonLabel(dependency.reason)
+			: formatMessage(messages.unavailableDependency)
 	const name =
-		project?.title ||
-		version?.name ||
-		version?.version_number ||
-		dependency.version_id ||
-		dependency.project_id ||
-		'Dependency'
+		project?.title || version?.name || version?.version_number || versionId || dependency.project_id
 
 	return {
-		key: `${dependency.project_id}-${dependency.version_id ?? 'unresolved'}-${dependency.reason ?? 'resolved'}`,
+		key: `${dependency.project_id}-${versionId ?? 'unresolved'}-${
+			'reason' in dependency ? dependency.reason : 'resolved'
+		}`,
 		name,
 		icon: project?.icon_url,
 		projectHref: project ? `/${project.project_type}/${project.slug || project.id}` : undefined,
-		downloadHref: dependency.reason || !primaryFile ? undefined : getDownloadUrl(primaryFile.url),
+		downloadHref:
+			'reason' in dependency || !primaryFile ? undefined : getDownloadUrl(primaryFile.url),
 		filename: primaryFile?.filename,
 		typeLabel: 'Required',
 		unavailableTooltip,
-		dependencies: (
-			(dependency.version_id && dependenciesByParentVersionId.value.get(dependency.version_id)) ||
-			[]
+		dependencies: (versionId && dependenciesByParentVersionId.value.get(versionId)
+			? dependenciesByParentVersionId.value.get(versionId)!
+			: []
 		).map((subDependency) => createDependencyRow(subDependency)),
 	}
 }
 
-function skippedReasonLabel(reason) {
+function skippedReasonLabel(reason: Labrinth.Content.v3.SkippedContent['reason']) {
 	return (
 		{
 			already_installed: formatMessage(messages.alreadyInstalledDependency),
@@ -230,13 +250,13 @@ function skippedReasonLabel(reason) {
 	)
 }
 
-function resolveContentType(projectType) {
+function resolveContentType(projectType: DisplayProjectType): Labrinth.Content.v3.ContentType {
 	return ['mod', 'plugin', 'datapack', 'resourcepack', 'shader', 'modpack'].includes(projectType)
-		? projectType
+		? (projectType as Labrinth.Content.v3.ContentType)
 		: 'mod'
 }
 
-function getDownloadUrl(url) {
+function getDownloadUrl(url: string) {
 	return createProjectDownloadUrl(url, {
 		reason: props.downloadReason,
 		gameVersion: props.currentGameVersion ?? undefined,

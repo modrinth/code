@@ -46,9 +46,11 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { ExternalIcon, ModrinthIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
+import type { DisplayProjectType } from '@modrinth/utils'
 import { ref } from 'vue'
 
 import Accordion from '~/components/ui/Accordion.vue'
@@ -57,19 +59,18 @@ defineOptions({
 	name: 'InstallWithModrinthApp',
 })
 
-defineProps({
-	project: {
-		type: Object,
-		required: true,
-	},
-	tags: {
-		type: Object,
-		required: true,
-	},
-})
+type DownloadModalProject = Omit<Labrinth.Projects.v2.Project, 'project_type'> & {
+	project_type: DisplayProjectType
+	actualProjectType: Labrinth.Projects.v2.ProjectType
+}
+
+defineProps<{
+	project: DownloadModalProject
+}>()
 
 const { formatMessage } = useVIntl()
-const getModrinthAppAccordion = ref()
+const tags = useGeneratedState()
+const getModrinthAppAccordion = ref<InstanceType<typeof Accordion> | null>(null)
 
 const messages = defineMessages({
 	dontHaveModrinthApp: {

@@ -90,12 +90,8 @@
 			</div>
 			<ProjectDownloadModal
 				ref="downloadModal"
-				:project="project"
-				:versions="versions"
-				:versions-loading="versionsLoading"
-				:tags="tags"
+				:project-id="routeProjectId"
 				:download-reason="downloadReason"
-				:load-versions="loadVersions"
 				@download="triggerDownloadAnimation"
 			/>
 			<CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
@@ -2240,8 +2236,8 @@ provideProjectPageContext({
 	display: none;
 }
 
-	.over-the-top-download-animation {
-		position: fixed;
+.over-the-top-download-animation {
+	position: fixed;
 	z-index: 100;
 	inset: 0;
 	display: flex;
@@ -2290,7 +2286,7 @@ provideProjectPageContext({
 	}
 }
 
-	.servers-popup {
+.servers-popup {
 	box-shadow:
 		0 0 12px 1px rgba(0, 175, 92, 0.6),
 		var(--shadow-floating);
