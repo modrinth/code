@@ -1,43 +1,62 @@
 pub mod consume;
 
-use std::{mem, sync::Arc};
+use std::{
+    collections::{HashMap, HashSet},
+    mem,
+    sync::Arc,
+    time::Duration,
+};
 
 use rdkafka::{producer::FutureRecord, util::Timeout};
 use serde::Serialize;
 use tokio::sync::Mutex;
 
 use crate::{
-    models::ids::ProjectId,
+    models::ids::{ProjectId, VersionId},
     util::kafka::{KAFKA_OPERATION_INTERVAL, KafkaClientState, KafkaEvent},
 };
 
 pub const SEARCH_PROJECT_INDEX_QUEUE_TOPIC: &str =
     "public.labrinth.search-project-index-queue.v1";
+const QUEUE_FLUSH_INTERVAL: Duration = Duration::from_secs(10);
 
 #[derive(Clone)]
 pub struct IncrementalSearchQueue {
-    operations: Arc<Mutex<Vec<SearchIndexOperation>>>,
+    operations: Arc<Mutex<PendingSearchIndexOperations>>,
     kafka_client: actix_web::web::Data<KafkaClientState>,
 }
 
 impl IncrementalSearchQueue {
     pub fn new(kafka_client: actix_web::web::Data<KafkaClientState>) -> Self {
         Self {
-            operations: Arc::new(Mutex::new(Vec::new())),
+            operations: Arc::new(Mutex::new(
+                PendingSearchIndexOperations::default(),
+            )),
             kafka_client,
         }
     }
 
-    pub async fn push(&self, project_id: ProjectId) {
+    pub async fn push(
+        &self,
+        project_id: ProjectId,
+        version_ids: impl IntoIterator<Item = VersionId>,
+    ) {
         self.operations
             .lock()
             .await
-            .push(SearchIndexOperation { project_id });
+            .push_project_change(project_id, version_ids);
+    }
+
+    pub async fn push_project_removal(&self, project_id: ProjectId) {
+        self.operations
+            .lock()
+            .await
+            .push_project_removal(project_id);
     }
 
     pub async fn run(self) {
         loop {
-            tokio::time::sleep(KAFKA_OPERATION_INTERVAL).await;
+            tokio::time::sleep(QUEUE_FLUSH_INTERVAL).await;
 
             if let Err(err) = self.drain().await {
                 tracing::error!(
@@ -57,13 +76,11 @@ impl IncrementalSearchQueue {
             return Ok(());
         }
 
-        let mut operations = operations.into_iter();
+        let mut operations = operations.into_events().into_iter();
         while let Some(operation) = operations.next() {
             let event = KafkaEvent::new(
                 SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-                SearchProjectIndexQueueEventData {
-                    project_id: operation.project_id,
-                },
+                operation.clone(),
             );
             let event_id = event.event_metadata.event_id;
             let key = event_id.to_string();
@@ -79,8 +96,10 @@ impl IncrementalSearchQueue {
                 .await
             {
                 let mut queued_operations = self.operations.lock().await;
-                queued_operations.push(operation);
-                queued_operations.extend(operations);
+                queued_operations.push_event(operation);
+                for operation in operations {
+                    queued_operations.push_event(operation);
+                }
 
                 return Err(err.into());
             }
@@ -90,12 +109,101 @@ impl IncrementalSearchQueue {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct SearchIndexOperation {
-    pub project_id: ProjectId,
+#[derive(Default)]
+struct PendingSearchIndexOperations {
+    changed_project_ids: HashSet<ProjectId>,
+    changed_project_versions: HashMap<ProjectId, HashSet<VersionId>>,
+    removed_project_ids: HashSet<ProjectId>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct SearchProjectIndexQueueEventData {
-    pub project_id: ProjectId,
+impl PendingSearchIndexOperations {
+    fn is_empty(&self) -> bool {
+        self.changed_project_ids.is_empty()
+            && self.changed_project_versions.is_empty()
+            && self.removed_project_ids.is_empty()
+    }
+
+    fn push_project_change(
+        &mut self,
+        project_id: ProjectId,
+        version_ids: impl IntoIterator<Item = VersionId>,
+    ) {
+        if !self.removed_project_ids.contains(&project_id) {
+            let version_ids = version_ids.into_iter().collect::<HashSet<_>>();
+            if version_ids.is_empty() {
+                self.changed_project_versions.remove(&project_id);
+                self.changed_project_ids.insert(project_id);
+            } else if !self.changed_project_ids.contains(&project_id) {
+                self.changed_project_versions
+                    .entry(project_id)
+                    .or_default()
+                    .extend(version_ids);
+            }
+        }
+    }
+
+    fn push_project_removal(&mut self, project_id: ProjectId) {
+        self.changed_project_ids.remove(&project_id);
+        self.changed_project_versions.remove(&project_id);
+        self.removed_project_ids.insert(project_id);
+    }
+
+    fn push_event(&mut self, event: SearchProjectIndexQueueEventData) {
+        match event {
+            SearchProjectIndexQueueEventData::ProjectChange { project_id } => {
+                self.push_project_change(project_id, [])
+            }
+            SearchProjectIndexQueueEventData::ProjectVersionChange {
+                project_id,
+                version_ids,
+            } => {
+                if !version_ids.is_empty() {
+                    self.push_project_change(project_id, version_ids)
+                }
+            }
+            SearchProjectIndexQueueEventData::ProjectRemoval { project_id } => {
+                self.push_project_removal(project_id)
+            }
+        }
+    }
+
+    fn into_events(self) -> Vec<SearchProjectIndexQueueEventData> {
+        let mut events = Vec::with_capacity(
+            self.changed_project_ids.len()
+                + self.changed_project_versions.len()
+                + self.removed_project_ids.len(),
+        );
+
+        events.extend(self.removed_project_ids.into_iter().map(|project_id| {
+            SearchProjectIndexQueueEventData::ProjectRemoval { project_id }
+        }));
+        events.extend(self.changed_project_ids.into_iter().map(|project_id| {
+            SearchProjectIndexQueueEventData::ProjectChange { project_id }
+        }));
+        events.extend(self.changed_project_versions.into_iter().map(
+            |(project_id, version_ids)| {
+                SearchProjectIndexQueueEventData::ProjectVersionChange {
+                    project_id,
+                    version_ids: version_ids.into_iter().collect(),
+                }
+            },
+        ));
+
+        events
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum SearchProjectIndexQueueEventData {
+    ProjectChange {
+        project_id: ProjectId,
+    },
+    ProjectVersionChange {
+        project_id: ProjectId,
+        version_ids: Vec<VersionId>,
+    },
+    ProjectRemoval {
+        project_id: ProjectId,
+    },
 }

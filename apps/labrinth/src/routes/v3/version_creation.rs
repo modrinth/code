@@ -145,19 +145,20 @@ pub async fn version_create(
         if let Err(e) = rollback_result {
             return Err(e.into());
         }
-    } else if let Ok((_, project_id)) = &result {
+    } else if let Ok((_, project_id, version_id)) = &result {
         transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
+        super::projects::clear_project_cache_and_queue_search_versions(
             &redis,
             &search_state,
             *project_id,
             None,
             Some(true),
+            [VersionId::from(*version_id)],
         )
         .await?;
     }
 
-    result.map(|(response, _)| response)
+    result.map(|(response, _, _)| response)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -172,7 +173,8 @@ async fn version_create_inner(
     session_queue: &AuthQueue,
     moderation_queue: &AutomatedModerationQueue,
     http: &reqwest::Client,
-) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
+) -> Result<(HttpResponse, models::DBProjectId, models::DBVersionId), CreateError>
+{
     let mut initial_version_data = None;
     let mut version_builder = None;
     let mut selected_loaders = None;
@@ -543,7 +545,11 @@ async fn version_create_inner(
         moderation_queue.projects.insert(project_id.into());
     }
 
-    Ok((HttpResponse::Ok().json(response), project_id))
+    Ok((
+        HttpResponse::Ok().json(response),
+        project_id,
+        models::DBVersionId::from(version_id),
+    ))
 }
 
 pub async fn upload_file_to_version(
@@ -560,17 +566,18 @@ pub async fn upload_file_to_version(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let version_id = models::DBVersionId::from(url_data.into_inner().0);
+    let version_id = url_data.into_inner().0;
+    let db_version_id = models::DBVersionId::from(version_id);
 
     let result = upload_file_to_version_inner(
         req,
         &mut payload,
-        client,
+        client.clone(),
         &mut transaction,
         redis.clone(),
         &**file_host,
         &mut uploaded_files,
-        version_id,
+        db_version_id,
         &session_queue,
         &http,
     )
@@ -590,12 +597,13 @@ pub async fn upload_file_to_version(
         }
     } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
+        super::projects::clear_project_cache_and_queue_search_versions(
             &redis,
             &search_state,
             *project_id,
             None,
             Some(true),
+            [version_id],
         )
         .await?;
     }

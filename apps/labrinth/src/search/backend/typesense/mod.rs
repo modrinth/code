@@ -7,7 +7,7 @@ use regex::Regex;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
@@ -32,6 +32,7 @@ pub struct TypesenseConfig {
     pub index_prefix: String,
     pub meta_namespace: String,
     pub index_chunk_size: i64,
+    pub delete_batch_size: usize,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -160,6 +161,7 @@ impl TypesenseConfig {
             index_prefix: ENV.TYPESENSE_INDEX_PREFIX.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
             index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
+            delete_batch_size: ENV.TYPESENSE_DELETE_BATCH_SIZE,
         }
     }
 
@@ -323,12 +325,13 @@ impl TypesenseClient {
         &self,
         collection: &str,
         filter_by: &str,
+        batch_size: usize,
     ) -> Result<()> {
         let resp = self
             .request(
                 Method::DELETE,
                 &format!(
-					"/collections/{collection}/documents?filter_by={}&batch_size=1000",
+					"/collections/{collection}/documents?filter_by={}&batch_size={batch_size}",
 					urlencoding::encode(filter_by)
 				),
             )
@@ -721,6 +724,24 @@ impl Typesense {
         self.client.upsert_alias(alias, &name).await?;
         Ok(())
     }
+
+    async fn delete_documents_by_filter_if_exists(
+        &self,
+        collection: &str,
+        filter: &str,
+    ) -> Result<()> {
+        if self.client.collection_exists(collection).await? {
+            self.client
+                .delete_documents_by_filter(
+                    collection,
+                    filter,
+                    self.config.delete_batch_size,
+                )
+                .await?;
+        }
+
+        Ok(())
+    }
 }
 
 #[async_trait]
@@ -995,6 +1016,7 @@ impl SearchBackend for Typesense {
             return Ok(());
         }
 
+        let num_documents = documents.len();
         let jsonl = documents_to_jsonl(documents)?;
         for alias in [
             self.config.get_alias_name("projects"),
@@ -1005,10 +1027,20 @@ impl SearchBackend for Typesense {
             let shadow_current =
                 self.config.get_next_collection_name(&alias, false);
 
+            debug!(
+                ?alias,
+                ?live,
+                ?shadow_alt,
+                ?shadow_current,
+                num_documents,
+                "Inserting into alias",
+            );
+
             for collection in
                 live.into_iter().chain([shadow_alt, shadow_current])
             {
                 if self.client.collection_exists(&collection).await? {
+                    debug!("Inserting into existing collection {collection:?}");
                     self.client
                         .import_documents(&collection, jsonl.clone())
                         .await?;
@@ -1016,6 +1048,7 @@ impl SearchBackend for Typesense {
             }
         }
 
+        debug!("Done importing");
         Ok(())
     }
 
@@ -1038,21 +1071,68 @@ impl SearchBackend for Typesense {
             self.config.get_alias_name("projects"),
             self.config.get_alias_name("projects_filtered"),
         ] {
+            debug!("Performing removal on alias {alias:?}");
+
             let live = self.client.get_alias(&alias).await?;
+            debug!("Got live alias {live:?}");
+
             let shadow_alt = self.config.get_next_collection_name(&alias, true);
+            debug!("Got shadow alt {shadow_alt:?}");
+
             let shadow_current =
                 self.config.get_next_collection_name(&alias, false);
+            debug!("Got shadow current {shadow_current:?}");
 
-            for collection in
-                live.into_iter().chain([shadow_alt, shadow_current])
-            {
-                if self.client.collection_exists(&collection).await? {
-                    self.client
-                        .delete_documents_by_filter(&collection, &filter)
-                        .await?;
+            let delete_live = async {
+                if let Some(collection) = live.as_deref() {
+                    debug!("Working on collection {collection:?}");
+                    debug!(
+                        filter_len = filter.len(),
+                        "Collection exists, deleting by filter"
+                    );
+                    self.delete_documents_by_filter_if_exists(
+                        collection, &filter,
+                    )
+                    .await?;
                 }
-            }
+
+                Ok::<(), eyre::Report>(())
+            };
+            let delete_shadow_alt = async {
+                if live.as_deref() != Some(shadow_alt.as_str()) {
+                    debug!("Working on collection {shadow_alt:?}");
+                    self.delete_documents_by_filter_if_exists(
+                        &shadow_alt,
+                        &filter,
+                    )
+                    .await?;
+                }
+
+                Ok::<(), eyre::Report>(())
+            };
+            let delete_shadow_current = async {
+                if live.as_deref() != Some(shadow_current.as_str()) {
+                    debug!("Working on collection {shadow_current:?}");
+                    self.delete_documents_by_filter_if_exists(
+                        &shadow_current,
+                        &filter,
+                    )
+                    .await?;
+                }
+
+                Ok::<(), eyre::Report>(())
+            };
+            let (live_result, shadow_alt_result, shadow_current_result) = tokio::join!(
+                delete_live,
+                delete_shadow_alt,
+                delete_shadow_current
+            );
+            live_result?;
+            shadow_alt_result?;
+            shadow_current_result?;
         }
+
+        debug!("Done");
         Ok(())
     }
 
@@ -1078,15 +1158,46 @@ impl SearchBackend for Typesense {
             let shadow_current =
                 self.config.get_next_collection_name(&alias, false);
 
-            for collection in
-                live.into_iter().chain([shadow_alt, shadow_current])
-            {
-                if self.client.collection_exists(&collection).await? {
-                    self.client
-                        .delete_documents_by_filter(&collection, &filter)
-                        .await?;
+            let delete_live = async {
+                if let Some(collection) = live.as_deref() {
+                    self.delete_documents_by_filter_if_exists(
+                        collection, &filter,
+                    )
+                    .await?;
                 }
-            }
+
+                Ok::<(), eyre::Report>(())
+            };
+            let delete_shadow_alt = async {
+                if live.as_deref() != Some(shadow_alt.as_str()) {
+                    self.delete_documents_by_filter_if_exists(
+                        &shadow_alt,
+                        &filter,
+                    )
+                    .await?;
+                }
+
+                Ok::<(), eyre::Report>(())
+            };
+            let delete_shadow_current = async {
+                if live.as_deref() != Some(shadow_current.as_str()) {
+                    self.delete_documents_by_filter_if_exists(
+                        &shadow_current,
+                        &filter,
+                    )
+                    .await?;
+                }
+
+                Ok::<(), eyre::Report>(())
+            };
+            let (live_result, shadow_alt_result, shadow_current_result) = tokio::join!(
+                delete_live,
+                delete_shadow_alt,
+                delete_shadow_current
+            );
+            live_result?;
+            shadow_alt_result?;
+            shadow_current_result?;
         }
         Ok(())
     }

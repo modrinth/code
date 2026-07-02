@@ -5,7 +5,7 @@ use futures::TryStreamExt;
 use heck::ToKebabCase;
 use itertools::Itertools;
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::LazyLock;
 use tracing::{info, warn};
 
@@ -20,7 +20,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::exp;
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::{DependencyType, from_duplicate_version_fields};
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
@@ -114,17 +114,21 @@ pub async fn index_local(
         return Ok((vec![], i64::MAX));
     };
 
-    let uploads = build_search_documents(pool, redis, db_projects).await?;
+    let uploads =
+        build_search_documents(pool, redis, db_projects, None).await?;
     Ok((uploads, *largest))
 }
 
 pub async fn index_project_documents(
     pool: &PgPool,
     redis: &RedisPool,
-    project_id: ProjectId,
+    project_ids: &[ProjectId],
 ) -> eyre::Result<Vec<UploadSearchProject>> {
     let searchable_statuses = searchable_statuses();
-    let project_ids = vec![DBProjectId::from(project_id).0];
+    let project_ids = project_ids
+        .iter()
+        .map(|project_id| DBProjectId::from(*project_id).0)
+        .collect::<Vec<_>>();
 
     let db_projects = sqlx::query!(
         r#"
@@ -158,13 +162,67 @@ pub async fn index_project_documents(
     .await
     .wrap_err("failed to fetch project")?;
 
-    build_search_documents(pool, redis, db_projects).await
+    info!("Fetched partial projects");
+
+    build_search_documents(pool, redis, db_projects, None).await
+}
+
+pub async fn index_project_version_documents(
+    pool: &PgPool,
+    redis: &RedisPool,
+    project_ids: &[ProjectId],
+    version_ids: &[VersionId],
+) -> eyre::Result<Vec<UploadSearchProject>> {
+    let searchable_statuses = searchable_statuses();
+    let project_ids = project_ids
+        .iter()
+        .map(|project_id| DBProjectId::from(*project_id).0)
+        .collect::<Vec<_>>();
+    let version_ids = version_ids
+        .iter()
+        .map(|version_id| DBVersionId::from(*version_id))
+        .collect::<HashSet<_>>();
+
+    let db_projects = sqlx::query!(
+        r#"
+		SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
+		m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
+		m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
+		FROM mods m
+		WHERE m.status = ANY($1) AND m.id = ANY($2)
+		GROUP BY m.id
+		ORDER BY m.id ASC;
+		"#,
+        &searchable_statuses,
+        &project_ids,
+    )
+    .fetch(pool)
+    .map_ok(|m| PartialProject {
+        id: DBProjectId(m.id),
+        name: m.name,
+        summary: m.summary,
+        downloads: m.downloads,
+        follows: m.follows,
+        icon_url: m.icon_url,
+        updated: m.updated,
+        approved: m.approved.unwrap_or(m.published),
+        slug: m.slug,
+        color: m.color,
+        license: m.license,
+        components: m.components.0,
+    })
+    .try_collect::<Vec<PartialProject>>()
+    .await
+    .wrap_err("failed to fetch project")?;
+
+    build_search_documents(pool, redis, db_projects, Some(&version_ids)).await
 }
 
 async fn build_search_documents(
     pool: &PgPool,
     redis: &RedisPool,
     db_projects: Vec<PartialProject>,
+    version_ids_to_index: Option<&HashSet<DBVersionId>>,
 ) -> eyre::Result<Vec<UploadSearchProject>> {
     let searchable_statuses = searchable_statuses();
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
@@ -496,6 +554,12 @@ async fn build_search_documents(
                 .collect::<Vec<_>>();
 
             for version in versions {
+                if let Some(version_ids_to_index) = version_ids_to_index
+                    && !version_ids_to_index.contains(&version.id)
+                {
+                    continue;
+                }
+
                 let version_fields = VersionField::from_query_json(
                     version.version_fields,
                     &loader_fields,
