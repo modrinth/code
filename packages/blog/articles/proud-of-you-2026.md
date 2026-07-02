@@ -35,7 +35,7 @@ Mr. Pack was created as a small thank-you to everyone who supported the fundrais
 
 ![All of Mr. Pack’s variants (MLM, Genderfluid, Lesbian, Transgender, Asexual, Intersex, Pride, Bisexual, and Nonbinary) posed and lined up in a row.](./pride-skins.webp)
 
-Special thanks to Drago for creating Mr. Pack’s updated design and pride variants.
+_Special thanks to [Drago](https://x.com/iDragolyte) for creating Mr. Pack’s updated design and pride variants._
 
 ### Badges and Modrinth+
 
