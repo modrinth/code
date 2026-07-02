@@ -17,6 +17,7 @@ export type GameInstance = {
 	groups: string[]
 
 	link?: InstanceLink | null
+	shared_instance?: SharedInstanceAttachment | null
 	update_channel: ReleaseChannel
 
 	created: Date
@@ -86,9 +87,23 @@ export type InstanceLink = InstanceLinkIdentity &
 		  }
 		| {
 				type: 'shared_instance'
-				shared_instance_id: string
 		  }
 	)
+
+export type SharedInstanceAttachment = {
+	id: string
+	role: 'owner' | 'member'
+	status:
+		| 'unknown'
+		| 'up_to_date'
+		| 'update_available'
+		| 'applying'
+		| 'stale'
+		| 'not_ready'
+		| 'error'
+	applied_version?: number | null
+	latest_version?: number | null
+}
 
 export type Instance = GameInstance
 
@@ -96,8 +111,17 @@ type ReleaseChannel = 'release' | 'beta' | 'alpha'
 
 export type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
+export type ContentSourceKind =
+	| 'local'
+	| 'modrinth_modpack'
+	| 'server_project'
+	| 'modrinth_hosting'
+	| 'imported_modpack'
+	| 'shared_instance'
+
 type ContentFile = {
 	enabled: boolean
+	source_kind?: ContentSourceKind | null
 	metadata?: {
 		project_id: string
 		version_id: string

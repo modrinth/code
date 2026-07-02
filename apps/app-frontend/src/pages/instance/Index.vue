@@ -25,6 +25,18 @@
 				<template #title>
 					{{ instance.name }}
 				</template>
+				<template v-if="instance.shared_instance" #title-suffix>
+					<div
+						class="inline-flex h-7 items-center gap-1 rounded-full border border-solid border-blue bg-highlight-blue px-2.5 !text-base !font-normal leading-none text-blue"
+					>
+						Shared
+						<UnknownIcon
+							v-tooltip="'This instance is being shared to other users.'"
+							class="size-4 cursor-help"
+							aria-label="Shared instance information"
+						/>
+					</div>
+				</template>
 				<template #stats>
 					<div class="flex items-center flex-wrap gap-2">
 						<template v-if="!isServerInstance">
@@ -87,6 +99,23 @@
 								>
 									{{ linkedProjectV3.name }}
 								</router-link>
+							</div>
+						</template>
+
+						<template v-if="sharedInstanceManager">
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex min-w-0 items-center gap-[5px] font-medium">
+								Managed by
+								<Avatar
+									:src="sharedInstanceManager.avatarUrl"
+									:alt="sharedInstanceManager.username"
+									:tint-by="sharedInstanceManager.tintBy"
+									size="24px"
+									circle
+									no-shadow
+								/>
+								<span class="min-w-0 truncate">{{ sharedInstanceManager.username }}</span>
 							</div>
 						</template>
 					</div>
@@ -217,6 +246,7 @@
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
+			<InstanceAdmonitions class="mt-4" :instance="instance" @published="fetchInstance" />
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
 			<RouterView v-slot="{ Component }" :key="instance.id" :route="displayedInstanceRoute">
@@ -288,6 +318,7 @@ import {
 	SettingsIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
+	UnknownIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
@@ -296,6 +327,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	ContentPageHeader,
+	injectAuth,
 	injectNotificationManager,
 	NavTabs,
 	OverflowMenu,
@@ -315,13 +347,18 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import InstanceAdmonitions from '@/components/ui/instance/InstanceAdmonitions.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
-import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
+import {
+	install_existing_instance,
+	install_get_shared_instance_update_preview,
+	install_pack_to_existing_instance,
+} from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
@@ -336,6 +373,7 @@ dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { addNotification, handleError } = injectNotificationManager()
+const auth = injectAuth()
 const { playServerProject } = injectServerInstall()
 const queryClient = useQueryClient()
 const route = useRoute()
@@ -379,6 +417,25 @@ const recentPlays = computed(
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
+
+const sharedInstanceManager = computed(() => {
+	if (!instance.value?.shared_instance) return null
+
+	if (instance.value.shared_instance.role === 'owner') {
+		const user = auth.user.value
+		return {
+			username: user?.username ?? 'Example user',
+			avatarUrl: user?.avatar_url ?? undefined,
+			tintBy: user?.id ?? 'Example user',
+		}
+	}
+
+	return {
+		username: 'Example user',
+		avatarUrl: undefined,
+		tintBy: 'Example user',
+	}
+})
 
 watch(
 	() => router.currentRoute.value,
@@ -498,29 +555,50 @@ const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
 	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
 )
+const showShareTab = computed(() => {
+	const linkType = instance.value?.link?.type
 
-const tabs = computed(() => [
-	{
-		label: 'Content',
-		href: `${basePath.value}`,
-		icon: BoxesIcon,
-	},
-	{
-		label: 'Files',
-		href: `${basePath.value}/files`,
-		icon: FolderOpenIcon,
-	},
-	{
-		label: 'Worlds',
-		href: `${basePath.value}/worlds`,
-		icon: GlobeIcon,
-	},
-	{
-		label: 'Logs',
-		href: `${basePath.value}/logs`,
-		icon: TerminalSquareIcon,
-	},
-])
+	return (
+		instance.value?.shared_instance?.role !== 'member' &&
+		linkType !== 'server_project' &&
+		linkType !== 'server_project_modpack'
+	)
+})
+
+const tabs = computed(() => {
+	const instanceTabs = [
+		{
+			label: 'Content',
+			href: `${basePath.value}`,
+			icon: BoxesIcon,
+		},
+		{
+			label: 'Files',
+			href: `${basePath.value}/files`,
+			icon: FolderOpenIcon,
+		},
+		{
+			label: 'Worlds',
+			href: `${basePath.value}/worlds`,
+			icon: GlobeIcon,
+		},
+		{
+			label: 'Logs',
+			href: `${basePath.value}/logs`,
+			icon: TerminalSquareIcon,
+		},
+	]
+
+	if (showShareTab.value) {
+		instanceTabs.push({
+			label: 'Share',
+			href: `${basePath.value}/share`,
+			icon: UserPlusIcon,
+		})
+	}
+
+	return instanceTabs
+})
 
 if (instance.value) {
 	breadcrumbs.setName(
@@ -538,13 +616,7 @@ if (instance.value) {
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const startInstance = async (context: string) => {
-	if (!instance.value) return
-	if (updateToPlayModal.value?.hasUpdate) {
-		updateToPlayModal.value.show(instance.value)
-		return
-	}
-
+const launchInstance = async (context: string) => {
 	loading.value = true
 	try {
 		await run(route.params.id as string)
@@ -554,11 +626,40 @@ const startInstance = async (context: string) => {
 	}
 	loading.value = false
 
+	if (!instance.value) return
 	trackEvent('InstanceStart', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 		source: context,
 	})
+}
+
+const startInstance = async (context: string) => {
+	if (!instance.value) return
+	if (instance.value.shared_instance?.role === 'member') {
+		let preview: Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
+		try {
+			preview = await install_get_shared_instance_update_preview(instance.value.id)
+		} catch (error) {
+			handleError(error as Error)
+			return
+		}
+
+		if (preview?.updateAvailable) {
+			updateToPlayModal.value?.showSharedInstance(instance.value, preview, async () => {
+				await fetchInstance()
+				await launchInstance(context)
+			})
+			return
+		}
+	}
+
+	if (updateToPlayModal.value?.hasUpdate) {
+		updateToPlayModal.value.show(instance.value)
+		return
+	}
+
+	await launchInstance(context)
 }
 
 const stopInstance = async (context: string) => {

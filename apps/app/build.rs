@@ -148,6 +148,10 @@ fn main() {
                         "install_get_modpack_preview",
                         "install_create_instance",
                         "install_create_modpack_instance",
+                        "install_get_shared_instance_preview",
+                        "install_get_shared_instance_update_preview",
+                        "install_shared_instance",
+                        "install_update_shared_instance",
                         "install_import_instance",
                         "install_duplicate_instance",
                         "install_existing_instance",
@@ -209,6 +213,10 @@ fn main() {
                         "instance_kill",
                         "instance_edit",
                         "instance_edit_icon",
+                        "instance_share_get_users",
+                        "instance_share_invite_users",
+                        "instance_share_remove_users",
+                        "instance_share_publish",
                         "instance_export_mrpack",
                         "instance_get_pack_export_candidates",
                     ])
@@ -246,6 +254,14 @@ fn main() {
                 "shortcuts",
                 InlinedPlugin::new()
                     .commands(&["create_instance_shortcut"])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "users",
+                InlinedPlugin::new()
+                    .commands(&["search_user"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

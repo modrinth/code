@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_content_set_remote_refs (\n\t\t\tcontent_set_id,\n\t\t\tref_type,\n\t\t\tref_id\n\t\t)\n\t\tVALUES (?, ?, ?)\n\t\tON CONFLICT (content_set_id, ref_type) DO UPDATE SET\n\t\t\tref_id = excluded.ref_id\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "2bf4029dd68e983460b8a0b06e1209885ef8e87ad2a8666a9cf1c851a2948cbc"
+}

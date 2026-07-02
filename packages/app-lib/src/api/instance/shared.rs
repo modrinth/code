@@ -1,0 +1,1262 @@
+use crate::event::InstancePayloadType;
+use crate::event::emit::emit_instance;
+use crate::install::{
+    InstallJobSnapshot, SharedInstanceExternalFileData,
+    SharedInstanceInstallData, SharedInstanceInstallModpack,
+};
+use crate::state::instances::{InstanceLink, SharedInstanceAttachment};
+use crate::state::{
+    CacheBehaviour, CachedEntry, ContentSetSyncStatus, ModLoader,
+    ModrinthCredentials, ProjectType, SharedInstanceRole, State,
+};
+use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
+use reqwest::Method;
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
+use std::collections::{HashMap, HashSet};
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SharedInstanceUsers {
+    pub user_ids: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceInstallPreview {
+    pub name: String,
+    pub icon_url: Option<String>,
+    pub game_version: String,
+    pub loader: ModLoader,
+    pub mod_count: usize,
+    pub external_file_count: usize,
+    pub content_version_ids: Vec<String>,
+    pub external_files: Vec<SharedInstanceExternalFilePreview>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceExternalFilePreview {
+    pub file_name: String,
+    pub file_type: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceUpdatePreview {
+    pub shared_instance_id: String,
+    pub current_version: Option<i32>,
+    pub latest_version: i32,
+    pub update_available: bool,
+    pub diffs: Vec<SharedInstanceUpdateDiff>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceUpdateDiff {
+    #[serde(rename = "type")]
+    pub type_: SharedInstanceUpdateDiffType,
+    pub project_id: Option<String>,
+    pub project_name: Option<String>,
+    pub file_name: Option<String>,
+    pub current_version_name: Option<String>,
+    pub new_version_name: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SharedInstanceUpdateDiffType {
+    Added,
+    Removed,
+    Updated,
+}
+
+#[derive(Clone, Debug)]
+struct ExternalFileCandidate {
+    file_name: String,
+    file_type: String,
+    file_path: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+struct ExternalFileData {
+    file_name: String,
+    file_type: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct CreateInstanceResponse {
+    #[serde(alias = "instance_id")]
+    id: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct InstanceVersionResponse {
+    version: i32,
+    #[serde(default)]
+    modrinth_ids: Vec<String>,
+    ready: bool,
+    #[serde(default)]
+    external_files: Vec<ExternalFileResponse>,
+    modpack_id: Option<String>,
+    #[serde(default)]
+    game_version: String,
+    #[serde(default)]
+    loader: String,
+    #[serde(default)]
+    loader_version: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct ExternalFileResponse {
+    file_name: String,
+    file_type: String,
+    url: String,
+}
+
+#[tracing::instrument]
+pub async fn get_shared_instance_users(
+    instance_id: &str,
+) -> crate::Result<SharedInstanceUsers> {
+    let state = State::get().await?;
+    let Some(attachment) = shared_attachment(instance_id, &state).await? else {
+        return Ok(SharedInstanceUsers {
+            user_ids: Vec::new(),
+        });
+    };
+
+    get_remote_users(&attachment.id, &state).await
+}
+
+#[tracing::instrument]
+pub async fn invite_shared_instance_users(
+    instance_id: &str,
+    user_ids: Vec<String>,
+) -> crate::Result<SharedInstanceUsers> {
+    let state = State::get().await?;
+    let attachment = match shared_attachment(instance_id, &state).await? {
+        Some(attachment) => {
+            tracing::debug!(
+                instance_id,
+                shared_instance_id = %attachment.id,
+                role = attachment.role.as_str(),
+                user_count = user_ids.len(),
+                "Using existing shared instance attachment for invite"
+            );
+            attachment
+        }
+        None => {
+            ensure_shareable_instance(instance_id, &state).await?;
+            tracing::info!(
+                instance_id,
+                user_count = user_ids.len(),
+                "Creating shared instance before first invite"
+            );
+            let remote = create_remote_instance(&state).await?;
+            tracing::info!(
+                instance_id,
+                shared_instance_id = %remote.id,
+                "Created remote shared instance"
+            );
+            crate::state::attach_shared_instance(
+                instance_id,
+                &remote.id,
+                SharedInstanceRole::Owner,
+                ContentSetSyncStatus::Unknown,
+                None,
+                None,
+                &state.pool,
+            )
+            .await?;
+            tracing::debug!(
+                instance_id,
+                shared_instance_id = %remote.id,
+                "Attached local instance as shared instance owner"
+            );
+            publish_shared_instance_inner(instance_id, &state).await?;
+            shared_attachment(instance_id, &state)
+                .await?
+                .ok_or_else(|| {
+                    crate::ErrorKind::InputError(
+                        "Shared instance attachment was not persisted"
+                            .to_string(),
+                    )
+                })?
+        }
+    };
+
+    ensure_owner(&attachment)?;
+    if !user_ids.is_empty() {
+        tracing::info!(
+            instance_id,
+            shared_instance_id = %attachment.id,
+            user_count = user_ids.len(),
+            "Adding users to shared instance"
+        );
+        add_remote_users(&attachment.id, user_ids.clone(), &state).await?;
+    }
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+    Ok(SharedInstanceUsers { user_ids })
+}
+
+#[tracing::instrument]
+pub async fn remove_shared_instance_users(
+    instance_id: &str,
+    user_ids: Vec<String>,
+) -> crate::Result<SharedInstanceUsers> {
+    let state = State::get().await?;
+    let Some(attachment) = shared_attachment(instance_id, &state).await? else {
+        return Ok(SharedInstanceUsers {
+            user_ids: Vec::new(),
+        });
+    };
+    ensure_owner(&attachment)?;
+
+    if !user_ids.is_empty() {
+        remove_remote_users(&attachment.id, user_ids, &state).await?;
+    }
+
+    let remaining_users = get_remote_users(&attachment.id, &state).await?;
+    if remaining_users.user_ids.is_empty() {
+        delete_remote_instance(&attachment.id, &state).await?;
+        crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+    }
+
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+    Ok(remaining_users)
+}
+
+#[tracing::instrument]
+pub async fn publish_shared_instance(
+    instance_id: &str,
+) -> crate::Result<SharedInstanceAttachment> {
+    let state = State::get().await?;
+    publish_shared_instance_inner(instance_id, &state).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+    shared_attachment(instance_id, &state)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance attachment was not persisted".to_string(),
+            )
+            .into()
+        })
+}
+
+#[tracing::instrument]
+pub async fn install_shared_instance(
+    shared_instance_id: &str,
+    name: String,
+) -> crate::Result<InstallJobSnapshot> {
+    let state = State::get().await?;
+    let version = get_latest_remote_version(shared_instance_id, &state).await?;
+    let data =
+        shared_instance_install_data(shared_instance_id, name, version, &state)
+            .await?;
+
+    crate::install::create_shared_instance(data).await
+}
+
+#[tracing::instrument]
+pub async fn get_shared_instance_install_preview(
+    shared_instance_id: &str,
+    name: String,
+) -> crate::Result<SharedInstanceInstallPreview> {
+    let state = State::get().await?;
+    let version = get_latest_remote_version(shared_instance_id, &state).await?;
+    let name = match name.trim() {
+        "" => "Shared instance".to_string(),
+        name => name.to_string(),
+    };
+    let mut icon_url = None;
+    let mut game_version = version.game_version.clone();
+    let mut loader = ModLoader::from_string(&version.loader);
+    let mut content_version_ids = version.modrinth_ids.clone();
+
+    if let Some(version_id) = version.modpack_id.as_deref() {
+        let modpack_version = CachedEntry::get_version(
+            version_id,
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance modpack version could not be found"
+                    .to_string(),
+            )
+        })?;
+
+        if let Some(project) = CachedEntry::get_project(
+            &modpack_version.project_id,
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+        {
+            icon_url = project.icon_url;
+        }
+        if let Some(version_game_version) = modpack_version.game_versions.first()
+        {
+            game_version = version_game_version.clone();
+        }
+        if let Some(version_loader) = modpack_version.loaders.first() {
+            loader = ModLoader::from_string(version_loader);
+        }
+        content_version_ids.extend(
+            modpack_version
+                .dependencies
+                .iter()
+                .filter_map(|dependency| dependency.version_id.clone()),
+        );
+    }
+    let mut seen_content_version_ids = HashSet::new();
+    content_version_ids.retain(|id| seen_content_version_ids.insert(id.clone()));
+
+    let external_files = version
+        .external_files
+        .iter()
+        .map(|file| SharedInstanceExternalFilePreview {
+            file_name: file.file_name.clone(),
+            file_type: file.file_type.clone(),
+        })
+        .collect::<Vec<_>>();
+    let external_file_count = external_files.len();
+
+    Ok(SharedInstanceInstallPreview {
+        name,
+        icon_url,
+        game_version,
+        loader,
+        mod_count: content_version_ids.len() + external_file_count,
+        external_file_count,
+        content_version_ids,
+        external_files,
+    })
+}
+
+#[tracing::instrument]
+pub async fn get_shared_instance_update_preview(
+    instance_id: &str,
+) -> crate::Result<Option<SharedInstanceUpdatePreview>> {
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let Some(attachment) = metadata.shared_instance.clone() else {
+        return Ok(None);
+    };
+    if attachment.role != SharedInstanceRole::Member {
+        return Ok(None);
+    }
+
+    let version = get_latest_remote_version(&attachment.id, &state).await?;
+    if !version.ready {
+        return Ok(Some(SharedInstanceUpdatePreview {
+            shared_instance_id: attachment.id,
+            current_version: attachment.applied_version,
+            latest_version: version.version,
+            update_available: false,
+            diffs: Vec::new(),
+        }));
+    }
+
+    let update_available = attachment
+        .applied_version
+        .map_or(true, |current| current < version.version);
+    let diffs = if update_available {
+        shared_instance_update_diffs(&metadata, &version, &state).await?
+    } else {
+        Vec::new()
+    };
+
+    Ok(Some(SharedInstanceUpdatePreview {
+        shared_instance_id: attachment.id,
+        current_version: attachment.applied_version,
+        latest_version: version.version,
+        update_available,
+        diffs,
+    }))
+}
+
+#[tracing::instrument]
+pub async fn update_shared_instance(
+    instance_id: &str,
+) -> crate::Result<InstallJobSnapshot> {
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let attachment = metadata.shared_instance.clone().ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Instance is not attached to a shared instance".to_string(),
+        )
+    })?;
+    if attachment.role != SharedInstanceRole::Member {
+        return Err(crate::ErrorKind::InputError(
+            "Only shared instance members can update from shared instances"
+                .to_string(),
+        )
+        .into());
+    }
+
+    let version = get_latest_remote_version(&attachment.id, &state).await?;
+    let data = shared_instance_install_data(
+        &attachment.id,
+        metadata.instance.name,
+        version,
+        &state,
+    )
+    .await?;
+
+    crate::install::update_shared_instance(instance_id.to_string(), data).await
+}
+
+async fn shared_instance_install_data(
+    shared_instance_id: &str,
+    name: String,
+    version: InstanceVersionResponse,
+    state: &State,
+) -> crate::Result<SharedInstanceInstallData> {
+    if !version.ready {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance version is not ready to install".to_string(),
+        )
+        .into());
+    }
+
+    let name = shared_instance_name(name);
+    let modpack = match version.modpack_id.as_deref() {
+        Some(version_id) => {
+            Some(shared_instance_modpack(version_id, &name, state).await?)
+        }
+        None => None,
+    };
+    if modpack.is_none() && version.game_version.trim().is_empty() {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance version is missing Minecraft metadata".to_string(),
+        )
+        .into());
+    }
+    let loader_version = match version.loader_version.trim() {
+        "" => None,
+        _ => Some(version.loader_version.clone()),
+    };
+
+    Ok(SharedInstanceInstallData {
+        shared_instance_id: shared_instance_id.to_string(),
+        name,
+        version: version.version,
+        modrinth_ids: version.modrinth_ids,
+        external_files: version
+            .external_files
+            .into_iter()
+            .map(|file| SharedInstanceExternalFileData {
+                file_name: file.file_name,
+                file_type: file.file_type,
+                url: file.url,
+            })
+            .collect(),
+        modpack,
+        game_version: version.game_version,
+        loader: ModLoader::from_string(&version.loader),
+        loader_version,
+    })
+}
+
+async fn shared_instance_update_diffs(
+    metadata: &crate::state::InstanceMetadata,
+    version: &InstanceVersionResponse,
+    state: &State,
+) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
+    let (current_version_ids, current_external_files) =
+        current_shared_content(metadata, state).await?;
+    let (latest_version_ids, latest_external_files) =
+        remote_shared_content(version, state).await?;
+    let current_versions =
+        shared_versions_by_project(&current_version_ids, state).await?;
+    let latest_versions =
+        shared_versions_by_project(&latest_version_ids, state).await?;
+    let project_ids = current_versions
+        .keys()
+        .chain(latest_versions.keys())
+        .cloned()
+        .collect::<HashSet<_>>();
+    let project_names = shared_project_names(&project_ids, state).await?;
+
+    let mut diffs = Vec::new();
+    for project_id in project_ids {
+        let current = current_versions.get(&project_id);
+        let latest = latest_versions.get(&project_id);
+        let project_name = Some(
+            project_names
+                .get(&project_id)
+                .cloned()
+                .unwrap_or_else(|| project_id.clone()),
+        );
+
+        match (current, latest) {
+            (None, Some(latest)) => {
+                diffs.push(SharedInstanceUpdateDiff {
+                    type_: SharedInstanceUpdateDiffType::Added,
+                    project_id: Some(project_id),
+                    project_name,
+                    file_name: None,
+                    current_version_name: None,
+                    new_version_name: Some(latest.version_number.clone()),
+                });
+            }
+            (Some(current), None) => {
+                diffs.push(SharedInstanceUpdateDiff {
+                    type_: SharedInstanceUpdateDiffType::Removed,
+                    project_id: Some(project_id),
+                    project_name,
+                    file_name: None,
+                    current_version_name: Some(current.version_number.clone()),
+                    new_version_name: None,
+                });
+            }
+            (Some(current), Some(latest)) if current.id != latest.id => {
+                diffs.push(SharedInstanceUpdateDiff {
+                    type_: SharedInstanceUpdateDiffType::Updated,
+                    project_id: Some(project_id),
+                    project_name,
+                    file_name: None,
+                    current_version_name: Some(current.version_number.clone()),
+                    new_version_name: Some(latest.version_number.clone()),
+                });
+            }
+            _ => {}
+        }
+    }
+
+    for file_name in latest_external_files.difference(&current_external_files) {
+        diffs.push(SharedInstanceUpdateDiff {
+            type_: SharedInstanceUpdateDiffType::Added,
+            project_id: None,
+            project_name: None,
+            file_name: Some(file_name.clone()),
+            current_version_name: None,
+            new_version_name: None,
+        });
+    }
+    for file_name in current_external_files.difference(&latest_external_files) {
+        diffs.push(SharedInstanceUpdateDiff {
+            type_: SharedInstanceUpdateDiffType::Removed,
+            project_id: None,
+            project_name: None,
+            file_name: Some(file_name.clone()),
+            current_version_name: None,
+            new_version_name: None,
+        });
+    }
+
+    diffs.sort_by(|a, b| {
+        a.project_name
+            .as_deref()
+            .or(a.file_name.as_deref())
+            .cmp(&b.project_name.as_deref().or(b.file_name.as_deref()))
+    });
+    Ok(diffs)
+}
+
+async fn remote_shared_content(
+    version: &InstanceVersionResponse,
+    state: &State,
+) -> crate::Result<(Vec<String>, HashSet<String>)> {
+    let mut version_ids = version.modrinth_ids.clone();
+    if let Some(modpack_id) = version.modpack_id.as_deref() {
+        let modpack_version = CachedEntry::get_version(
+            modpack_id,
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance modpack version could not be found"
+                    .to_string(),
+            )
+        })?;
+        version_ids.extend(
+            modpack_version
+                .dependencies
+                .iter()
+                .filter_map(|dependency| dependency.version_id.clone()),
+        );
+    }
+    dedupe_strings(&mut version_ids);
+
+    Ok((
+        version_ids,
+        version
+            .external_files
+            .iter()
+            .map(|file| file.file_name.clone())
+            .collect(),
+    ))
+}
+
+async fn current_shared_content(
+    metadata: &crate::state::InstanceMetadata,
+    state: &State,
+) -> crate::Result<(Vec<String>, HashSet<String>)> {
+    let entries =
+        crate::state::instances::adapters::sqlite::content_rows::get_content_entries(
+            &metadata.applied_content_set.id,
+            &state.pool,
+        )
+        .await?;
+    let files = crate::state::instances::adapters::sqlite::content_rows::get_instance_files(
+        &metadata.instance.id,
+        &state.pool,
+    )
+    .await?
+    .into_iter()
+    .map(|file| (file.id.clone(), file))
+    .collect::<HashMap<_, _>>();
+    let mut version_ids = Vec::new();
+    let mut external_files = HashSet::new();
+
+    for entry in entries {
+        if !matches!(
+            entry.source_kind,
+            crate::state::ContentSourceKind::SharedInstance
+                | crate::state::ContentSourceKind::ModrinthModpack
+                | crate::state::ContentSourceKind::ImportedModpack
+        ) {
+            continue;
+        }
+
+        if let Some(version_id) = entry.version_id {
+            version_ids.push(version_id);
+            continue;
+        }
+
+        if entry.source_kind != crate::state::ContentSourceKind::SharedInstance
+        {
+            continue;
+        }
+
+        let Some(file_id) = entry.file_id else {
+            continue;
+        };
+        if let Some(file) = files.get(&file_id) {
+            external_files.insert(file.file_name.clone());
+        }
+    }
+    dedupe_strings(&mut version_ids);
+
+    Ok((version_ids, external_files))
+}
+
+async fn shared_versions_by_project(
+    version_ids: &[String],
+    state: &State,
+) -> crate::Result<HashMap<String, crate::state::Version>> {
+    let version_id_refs =
+        version_ids.iter().map(String::as_str).collect::<Vec<_>>();
+    let versions = CachedEntry::get_version_many(
+        &version_id_refs,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+
+    Ok(versions
+        .into_iter()
+        .map(|version| (version.project_id.clone(), version))
+        .collect())
+}
+
+async fn shared_project_names(
+    project_ids: &HashSet<String>,
+    state: &State,
+) -> crate::Result<HashMap<String, String>> {
+    let project_id_refs =
+        project_ids.iter().map(String::as_str).collect::<Vec<_>>();
+    let projects = CachedEntry::get_project_many(
+        &project_id_refs,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+
+    Ok(projects
+        .into_iter()
+        .map(|project| (project.id, project.title))
+        .collect())
+}
+
+fn dedupe_strings(values: &mut Vec<String>) {
+    let mut seen = HashSet::new();
+    values.retain(|value| seen.insert(value.clone()));
+}
+
+fn shared_instance_name(name: String) -> String {
+    match name.trim() {
+        "" => "Shared instance".to_string(),
+        name => name.to_string(),
+    }
+}
+
+pub(crate) async fn mark_shared_instance_stale(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    crate::state::mark_shared_instance_stale(instance_id, &state.pool).await
+}
+
+async fn publish_shared_instance_inner(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let attachment =
+        shared_attachment(instance_id, state)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(
+                    "Instance is not attached to a shared instance".to_string(),
+                )
+            })?;
+    ensure_owner(&attachment)?;
+    tracing::info!(
+        instance_id,
+        shared_instance_id = %attachment.id,
+        applied_version = attachment.applied_version,
+        latest_version = attachment.latest_version,
+        "Publishing shared instance content"
+    );
+
+    crate::state::set_shared_instance_sync_status(
+        instance_id,
+        ContentSetSyncStatus::Applying,
+        attachment.applied_version,
+        attachment.latest_version,
+        &state.pool,
+    )
+    .await?;
+
+    let result =
+        publish_current_content(instance_id, &attachment.id, state).await;
+
+    match result {
+        Ok(version) => {
+            tracing::info!(
+                instance_id,
+                shared_instance_id = %attachment.id,
+                version,
+                "Published shared instance content"
+            );
+            crate::state::set_shared_instance_sync_status(
+                instance_id,
+                ContentSetSyncStatus::UpToDate,
+                Some(version),
+                Some(version),
+                &state.pool,
+            )
+            .await?;
+            Ok(())
+        }
+        Err(error) => {
+            tracing::warn!(
+                instance_id,
+                shared_instance_id = %attachment.id,
+                error = %error,
+                "Failed to publish shared instance content"
+            );
+            crate::state::set_shared_instance_sync_status(
+                instance_id,
+                ContentSetSyncStatus::Error,
+                attachment.applied_version,
+                attachment.latest_version,
+                &state.pool,
+            )
+            .await?;
+            Err(error)
+        }
+    }
+}
+
+async fn publish_current_content(
+    instance_id: &str,
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<i32> {
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    ensure_shareable_link(&metadata.link)?;
+    let modpack_id = shared_modpack_id(&metadata.link);
+    let (modrinth_ids, external_files) =
+        collect_publish_content(instance_id, modpack_id.is_some(), state)
+            .await?;
+    tracing::debug!(
+        instance_id,
+        shared_instance_id,
+        modpack_id = modpack_id.as_deref().unwrap_or("none"),
+        modrinth_id_count = modrinth_ids.len(),
+        external_file_count = external_files.len(),
+        "Creating shared instance version"
+    );
+    let external_file_data = external_files
+        .iter()
+        .map(|file| ExternalFileData {
+            file_name: file.file_name.clone(),
+            file_type: file.file_type.clone(),
+        })
+        .collect::<Vec<_>>();
+    let response = request_json::<InstanceVersionResponse>(
+        "create_instance_version",
+        Method::POST,
+        &format!("/instances/{shared_instance_id}/versions"),
+        Some(json!({
+            "modrinth_ids": modrinth_ids,
+            "external_files": external_file_data,
+            "modpack_id": modpack_id,
+            "game_version": metadata.applied_content_set.game_version.clone(),
+            "loader": metadata.applied_content_set.loader.as_str(),
+            "loader_version": metadata
+                .applied_content_set
+                .loader_version
+                .clone()
+                .unwrap_or_default(),
+        })),
+        state,
+    )
+    .await?;
+
+    if !response.external_files.is_empty() {
+        upload_external_files(
+            &metadata.instance.path,
+            &external_files,
+            &response.external_files,
+            state,
+        )
+        .await?;
+        request_empty(
+            "mark_version_files_ready",
+            Method::POST,
+            &format!(
+                "/instances/{shared_instance_id}/versions/{}/files",
+                response.version
+            ),
+            None,
+            state,
+        )
+        .await?;
+    } else if !response.ready {
+        tracing::debug!(
+            "Shared instance version {} was not ready but had no external files",
+            response.version
+        );
+    }
+
+    Ok(response.version)
+}
+
+async fn collect_publish_content(
+    instance_id: &str,
+    exclude_linked_modpack_content: bool,
+    state: &State,
+) -> crate::Result<(Vec<String>, Vec<ExternalFileCandidate>)> {
+    let items =
+        crate::state::list_content(instance_id, None, None, state).await?;
+    let linked_modpack_items = if exclude_linked_modpack_content {
+        crate::state::list_linked_modpack_content(
+            instance_id,
+            None,
+            None,
+            state,
+        )
+        .await?
+    } else {
+        Vec::new()
+    };
+    let linked_modpack_version_ids = linked_modpack_items
+        .iter()
+        .filter_map(|item| {
+            item.version.as_ref().map(|version| version.id.clone())
+        })
+        .collect::<HashSet<_>>();
+    let linked_modpack_file_paths = linked_modpack_items
+        .iter()
+        .map(|item| item.file_path.clone())
+        .collect::<HashSet<_>>();
+
+    let mut modrinth_ids = Vec::new();
+    let mut seen_modrinth_ids = HashSet::new();
+    let mut external_files = Vec::new();
+    let mut seen_external_files = HashSet::new();
+
+    for item in items {
+        if !item.enabled {
+            continue;
+        }
+
+        if let Some(version) = item.version {
+            if linked_modpack_version_ids.contains(&version.id) {
+                continue;
+            }
+            if seen_modrinth_ids.insert(version.id.clone()) {
+                modrinth_ids.push(version.id);
+            }
+            continue;
+        }
+
+        if item.file_path.is_empty() {
+            continue;
+        }
+        if linked_modpack_file_paths.contains(&item.file_path) {
+            continue;
+        }
+
+        let file_type = file_type(item.project_type);
+        let external_key = format!("{}:{file_type}", item.file_path);
+        if seen_external_files.insert(external_key) {
+            external_files.push(ExternalFileCandidate {
+                file_name: item.file_name,
+                file_type,
+                file_path: item.file_path,
+            });
+        }
+    }
+
+    Ok((modrinth_ids, external_files))
+}
+
+fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
+    match link {
+        InstanceLink::ModrinthModpack { version_id, .. } => {
+            Some(version_id.clone())
+        }
+        InstanceLink::ServerProjectModpack {
+            content_version_id, ..
+        } => Some(content_version_id.clone()),
+        _ => None,
+    }
+}
+
+async fn ensure_shareable_instance(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    ensure_shareable_link(&metadata.link)
+}
+
+fn ensure_shareable_link(link: &InstanceLink) -> crate::Result<()> {
+    if matches!(link, InstanceLink::ImportedModpack { .. }) {
+        return Err(crate::ErrorKind::InputError(
+            "You must unlink this modpack to share your instance".to_string(),
+        )
+        .into());
+    }
+
+    Ok(())
+}
+
+async fn upload_external_files(
+    instance_path: &str,
+    candidates: &[ExternalFileCandidate],
+    uploads: &[ExternalFileResponse],
+    state: &State,
+) -> crate::Result<()> {
+    for upload in uploads {
+        let candidate = candidates
+            .iter()
+            .find(|candidate| {
+                candidate.file_name == upload.file_name
+                    && candidate.file_type == upload.file_type
+            })
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Shared instance service requested unknown external file {}",
+                    upload.file_name
+                ))
+            })?;
+        let path = state
+            .directories
+            .instances_dir()
+            .join(instance_path)
+            .join(&candidate.file_path);
+        let bytes = crate::util::io::read(path).await?;
+        let response =
+            REQWEST_CLIENT.put(&upload.url).body(bytes).send().await?;
+
+        if !response.status().is_success() {
+            return Err(crate::ErrorKind::OtherError(format!(
+                "External file upload failed with status {}",
+                response.status()
+            ))
+            .into());
+        }
+    }
+
+    Ok(())
+}
+
+async fn shared_attachment(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<Option<SharedInstanceAttachment>> {
+    Ok(crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .and_then(|metadata| metadata.shared_instance))
+}
+
+fn ensure_owner(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
+    if attachment.role == SharedInstanceRole::Owner {
+        return Ok(());
+    }
+
+    Err(crate::ErrorKind::InputError(
+        "Only the owner instance can manage shared instance users".to_string(),
+    )
+    .into())
+}
+
+fn file_type(project_type: ProjectType) -> String {
+    project_type.get_name().to_string()
+}
+
+async fn create_remote_instance(
+    state: &State,
+) -> crate::Result<CreateInstanceResponse> {
+    request_json("create_instance", Method::POST, "/instances", None, state)
+        .await
+}
+
+async fn delete_remote_instance(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    request_empty(
+        "delete_instance",
+        Method::DELETE,
+        &format!("/instances/{shared_instance_id}"),
+        None,
+        state,
+    )
+    .await
+}
+
+async fn get_remote_users(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<SharedInstanceUsers> {
+    request_json(
+        "get_instance_users",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/users"),
+        None,
+        state,
+    )
+    .await
+}
+
+async fn get_latest_remote_version(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<InstanceVersionResponse> {
+    request_json(
+        "get_latest_instance_version",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/versions"),
+        None,
+        state,
+    )
+    .await
+}
+
+async fn shared_instance_modpack(
+    version_id: &str,
+    title: &str,
+    state: &State,
+) -> crate::Result<SharedInstanceInstallModpack> {
+    let version = CachedEntry::get_version(
+        version_id,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Shared instance modpack version could not be found".to_string(),
+        )
+    })?;
+
+    Ok(SharedInstanceInstallModpack {
+        project_id: version.project_id,
+        version_id: version_id.to_string(),
+        title: title.to_string(),
+        icon_url: None,
+    })
+}
+
+async fn add_remote_users(
+    shared_instance_id: &str,
+    user_ids: Vec<String>,
+    state: &State,
+) -> crate::Result<()> {
+    request_empty(
+        "add_instance_users",
+        Method::POST,
+        &format!("/instances/{shared_instance_id}/users"),
+        Some(json!({ "user_ids": user_ids })),
+        state,
+    )
+    .await
+}
+
+async fn remove_remote_users(
+    shared_instance_id: &str,
+    user_ids: Vec<String>,
+    state: &State,
+) -> crate::Result<()> {
+    request_empty(
+        "remove_instance_users",
+        Method::DELETE,
+        &format!("/instances/{shared_instance_id}/users"),
+        Some(json!({ "user_ids": user_ids })),
+        state,
+    )
+    .await
+}
+
+async fn request_json<T>(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    body: Option<serde_json::Value>,
+    state: &State,
+) -> crate::Result<T>
+where
+    T: DeserializeOwned,
+{
+    let response = request(operation, method, path, body, state).await?;
+    let status = response.status();
+    let body = response.text().await?;
+    tracing::debug!(
+        operation,
+        path,
+        status = status.as_u16(),
+        response_body = %body,
+        "Decoding shared instances API response"
+    );
+
+    serde_json::from_str::<T>(&body).map_err(|error| {
+        crate::ErrorKind::OtherError(format!(
+            "Shared instances API request {operation} {path} failed to decode JSON response with status {status}: {error}; body: {body}"
+        ))
+        .into()
+    })
+}
+
+async fn request_empty(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    body: Option<serde_json::Value>,
+    state: &State,
+) -> crate::Result<()> {
+    request(operation, method, path, body, state).await?;
+    Ok(())
+}
+
+async fn request(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    body: Option<serde_json::Value>,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    let credentials =
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?
+            .ok_or(crate::ErrorKind::NoCredentialsError)?;
+    let _permit = state.api_semaphore.0.acquire().await?;
+    let base_url = service_base_url();
+    let url = service_url(base_url, path);
+    tracing::debug!(
+        operation,
+        method = method.as_str(),
+        path,
+        url = %url,
+        user_id = %credentials.user_id,
+        has_body = body.is_some(),
+        "Sending shared instances API request"
+    );
+    let mut request = shared_instances_client(base_url)
+        .request(method.clone(), &url)
+        .bearer_auth(credentials.session);
+
+    if let Some(body) = body {
+        request = request.json(&body);
+    }
+
+    let response = request.send().await?;
+    if response.status().is_success() {
+        tracing::debug!(
+            operation,
+            method = method.as_str(),
+            path,
+            url = %url,
+            status = response.status().as_u16(),
+            "Shared instances API request succeeded"
+        );
+        return Ok(response);
+    }
+
+    let status = response.status();
+    let body = response.text().await.unwrap_or_default();
+    tracing::warn!(
+        operation,
+        method = method.as_str(),
+        path,
+        url = %url,
+        user_id = %credentials.user_id,
+        status = status.as_u16(),
+        response_body = %body,
+        "Shared instances API request failed"
+    );
+    Err(crate::ErrorKind::OtherError(format!(
+        "Shared instances API request {operation} {method} {path} failed with status {status}: {body}"
+    ))
+    .into())
+}
+
+fn service_url(base_url: &str, path: &str) -> String {
+    format!("{base_url}/v1{path}")
+}
+
+fn service_base_url() -> &'static str {
+    env!("SHARED_INSTANCES_API_BASE_URL").trim_end_matches('/')
+}
+
+fn shared_instances_client(base_url: &str) -> &'static reqwest::Client {
+    if base_url.starts_with("https://") {
+        &REQWEST_CLIENT
+    } else {
+        &INSECURE_REQWEST_CLIENT
+    }
+}

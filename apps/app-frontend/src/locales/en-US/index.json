@@ -269,6 +269,18 @@
   "app.install.phase.running_loader_processors": {
     "message": "Running loader processors"
   },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Your local instance is ahead of the users you've shared it with."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Your changes haven't been shared yet"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Push update"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Pushing..."
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
   },
@@ -319,6 +331,27 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
+  },
+  "app.instance.share.empty.description": {
+    "message": "You can share this instance with your friends!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "No friends invited"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Invite friends"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Share {name}"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Sign in"
+  },
+  "app.instance.share.sign-in.description": {
+    "message": "You need a Modrinth account to share instances."
+  },
+  "app.instance.share.sign-in.heading": {
+    "message": "Sign in to share"
   },
   "app.instance.worlds.add-server": {
     "message": "Add server"

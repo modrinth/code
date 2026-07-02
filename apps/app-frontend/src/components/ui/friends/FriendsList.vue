@@ -10,17 +10,22 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, onUnmounted, ref } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { friend_listener } from '@/helpers/events'
 import {
+	acceptCachedFriend,
 	add_friend,
-	friends,
+	createPendingFriend,
+	friendsQueryKey,
 	type FriendWithUserData,
+	getFriendsWithUserData,
 	remove_friend,
-	transformFriends,
+	removeCachedFriend,
+	upsertCachedFriend,
 } from '@/helpers/friends.ts'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
 
@@ -28,6 +33,7 @@ const { formatMessage } = useVIntl()
 
 const { handleError } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
+const queryClient = useQueryClient()
 
 const props = defineProps<{
 	credentials: ModrinthCredentials | null
@@ -35,36 +41,22 @@ const props = defineProps<{
 }>()
 
 const userCredentials = computed(() => props.credentials)
+const friendsKey = computed(() => friendsQueryKey(userCredentials.value?.user_id))
 
 const search = ref('')
 const friendInvitesModal = ref()
 
 const username = ref('')
 const addFriendModal = ref()
-async function addFriendFromModal() {
-	addFriendModal.value.hide()
-	await add_friend(username.value).catch(handleError)
-	username.value = ''
-	await loadFriends()
-}
 
-async function addFriend(friend: FriendWithUserData) {
-	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
-	if (id) {
-		await add_friend(id).catch(handleError)
-		await loadFriends()
-	}
-}
+const friendsQuery = useQuery({
+	queryKey: friendsKey,
+	queryFn: () => getFriendsWithUserData(userCredentials.value),
+	enabled: () => !!userCredentials.value,
+	staleTime: 30_000,
+})
 
-async function removeFriend(friend: FriendWithUserData) {
-	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
-	if (id) {
-		await remove_friend(id).catch(handleError)
-		await loadFriends()
-	}
-}
-
-const userFriends = ref<FriendWithUserData[]>([])
+const userFriends = computed(() => friendsQuery.data.value ?? [])
 const sortedFriends = computed<FriendWithUserData[]>(() =>
 	userFriends.value.slice().sort((a, b) => {
 		if (a.last_updated === null && b.last_updated === null) {
@@ -108,39 +100,144 @@ const incomingRequests = computed(() =>
 		.sort((a, b) => b.created.diff(a.created)),
 )
 
-const loading = ref(true)
-async function loadFriends(timeout = false) {
-	loading.value = timeout
+type FriendsMutationContext = {
+	queryKey: ReturnType<typeof friendsQueryKey>
+	previousFriends?: FriendWithUserData[]
+}
 
-	try {
-		const friendsList = await friends()
-		userFriends.value = await transformFriends(friendsList, userCredentials.value)
-		loading.value = false
-	} catch (e) {
-		console.error('Error loading friends', e)
-		if (timeout) {
-			setTimeout(() => loadFriends(), 15 * 1000)
-		}
+type AddFriendMutationVariables = {
+	userId: string
+	user: {
+		id: string
+		username: string
+		avatarUrl?: string | null
+	}
+	acceptExisting?: boolean
+}
+
+type RemoveFriendMutationVariables = {
+	userId: string
+	user: FriendWithUserData
+}
+
+const loading = computed(() => !!userCredentials.value && friendsQuery.isLoading.value)
+
+const addFriendMutation = useMutation({
+	mutationFn: ({ userId }: AddFriendMutationVariables) => add_friend(userId),
+	onMutate: async ({ user, acceptExisting }): Promise<FriendsMutationContext> => {
+		const queryKey = friendsKey.value
+		await queryClient.cancelQueries({ queryKey })
+		const previousFriends = queryClient.getQueryData<FriendWithUserData[]>(queryKey)
+
+		queryClient.setQueryData<FriendWithUserData[]>(queryKey, (friends = []) =>
+			acceptExisting
+				? acceptCachedFriend(friends, user.id, user.username, userCredentials.value?.user_id)
+				: upsertCachedFriend(
+						friends,
+						createPendingFriend(user, userCredentials.value?.user_id),
+						userCredentials.value?.user_id,
+					),
+		)
+
+		return { queryKey, previousFriends }
+	},
+	onError: (error, _variables, context) => {
+		restoreFriendsQuery(context)
+		handleError(toError(error))
+	},
+	onSettled: (_data, _error, _variables, context) => {
+		void queryClient.invalidateQueries({ queryKey: context?.queryKey ?? friendsKey.value })
+	},
+})
+
+const removeFriendMutation = useMutation({
+	mutationFn: ({ userId }: RemoveFriendMutationVariables) => remove_friend(userId),
+	onMutate: async ({ user, userId }): Promise<FriendsMutationContext> => {
+		const queryKey = friendsKey.value
+		await queryClient.cancelQueries({ queryKey })
+		const previousFriends = queryClient.getQueryData<FriendWithUserData[]>(queryKey)
+
+		queryClient.setQueryData<FriendWithUserData[]>(queryKey, (friends = []) =>
+			removeCachedFriend(friends, userId, user.username, userCredentials.value?.user_id),
+		)
+
+		return { queryKey, previousFriends }
+	},
+	onError: (error, _variables, context) => {
+		restoreFriendsQuery(context)
+		handleError(toError(error))
+	},
+	onSettled: (_data, _error, _variables, context) => {
+		void queryClient.invalidateQueries({ queryKey: context?.queryKey ?? friendsKey.value })
+	},
+})
+
+function restoreFriendsQuery(context?: FriendsMutationContext) {
+	if (!context) return
+
+	if (context.previousFriends === undefined) {
+		queryClient.removeQueries({ queryKey: context.queryKey, exact: true })
+		return
+	}
+
+	queryClient.setQueryData(context.queryKey, context.previousFriends)
+}
+
+function toError(error: unknown) {
+	if (error instanceof Error) return error
+	if (typeof error === 'string') return new Error(error)
+	if (error && typeof error === 'object') {
+		const record = error as Record<string, unknown>
+		const message = record.message ?? record.error
+		if (typeof message === 'string') return new Error(message)
+		return new Error(JSON.stringify(error))
+	}
+	return new Error(String(error))
+}
+
+function addFriendFromModal() {
+	const target = username.value.trim()
+	if (!target) return
+
+	addFriendModal.value.hide()
+	addFriendMutation.mutate({
+		userId: target,
+		user: {
+			id: target,
+			username: target,
+		},
+	})
+	username.value = ''
+}
+
+function addFriend(friend: FriendWithUserData) {
+	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
+	if (id) {
+		addFriendMutation.mutate({
+			userId: id,
+			user: {
+				id,
+				username: friend.username,
+				avatarUrl: friend.avatar,
+			},
+			acceptExisting: true,
+		})
 	}
 }
 
-watch(
-	userCredentials,
-	() => {
-		if (userCredentials.value === undefined) {
-			userFriends.value = []
-			loading.value = false
-		} else if (userCredentials.value === null) {
-			userFriends.value = []
-			loading.value = false
-		} else {
-			loadFriends(true)
-		}
-	},
-	{ immediate: true },
-)
+function removeFriend(friend: FriendWithUserData) {
+	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
+	if (id) {
+		removeFriendMutation.mutate({
+			userId: id,
+			user: friend,
+		})
+	}
+}
 
-const unlisten = await friend_listener(() => loadFriends())
+const unlisten = await friend_listener(() => {
+	void queryClient.invalidateQueries({ queryKey: friendsKey.value })
+})
 onUnmounted(() => {
 	unlisten()
 })

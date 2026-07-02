@@ -33,6 +33,7 @@ import ContentModpackCard from './components/ContentModpackCard.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
 import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.vue'
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
+import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
 import {
@@ -45,7 +46,12 @@ import {
 	useContentSelection,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { BulkOperationStatus, ContentCardTableItem, ContentItem } from './types'
+import type {
+	BulkOperationStatus,
+	ContentActionWarningMode,
+	ContentCardTableItem,
+	ContentItem,
+} from './types'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
@@ -280,13 +286,14 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 			toggleDisabled: ctx.isBusy.value,
 			toggleDisabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
 			installing: item.installing === true,
-			hasUpdate: item.has_update,
+			hasUpdate: base.hasUpdate ?? item.has_update,
 			isClientOnly:
 				isClientOnlyEnvironment(item.environment) ||
 				!!item.pack_client_retained ||
 				!!item.pack_client_depends,
 			clientWarning: getClientWarningType(item),
-			hideSwitchVersion: !base.versionLink,
+			hideDelete: base.hideDelete,
+			hideSwitchVersion: base.hideSwitchVersion ?? !base.versionLink,
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
 	})
@@ -322,8 +329,11 @@ const hasOutdatedProjects = computed(() => {
 
 //  Deletion
 const pendingDeletionItems = ref<ContentItem[]>([])
+const pendingDeletionWarningMode = ref<ContentActionWarningMode>('default')
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
+const confirmDisableModal = ref<InstanceType<typeof ConfirmDisableModal>>()
 const contentDependencyWarningModal = ref<InstanceType<typeof ContentDependencyWarningModal>>()
+const pendingDisableItems = ref<ContentItem[]>([])
 const pendingDependencyWarningItems = ref<ContentCardTableItem[]>([])
 const pendingDependencyWarningDependents = ref<
 	Array<{
@@ -340,17 +350,25 @@ function mapToDisplayItem(item: ContentItem) {
 	}
 }
 
+function canDeleteItem(item: ContentItem) {
+	return ctx.canDeleteItem?.(item) ?? true
+}
+
+const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
+
 async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
-	if (items.length === 0) return
-	pendingDeletionItems.value = items
+	const deletableItems = items.filter(canDeleteItem)
+	if (deletableItems.length === 0) return
+	pendingDeletionItems.value = deletableItems
+	pendingDeletionWarningMode.value = ctx.getDeleteWarningMode?.(deletableItems) ?? 'default'
 	pendingDependencyWarningItems.value = []
 	pendingDependencyWarningDependents.value = []
 	pendingDependencyWarningDisableTargets.value = []
-	const deletingIds = new Set(items.map(getItemId))
+	const deletingIds = new Set(deletableItems.map(getItemId))
 
 	const warning = ctx.getDeleteDependencyWarning
 		? await Promise.resolve()
-				.then(() => ctx.getDeleteDependencyWarning!(items))
+				.then(() => ctx.getDeleteDependencyWarning!(deletableItems))
 				.catch(() => null)
 		: null
 	if (warning) {
@@ -366,7 +384,9 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 		const relevantDependencyIds = new Set(
 			remainingDependents.flatMap((dependent) => dependent.dependencies.map(getItemId)),
 		)
-		const warningItems = items.filter((item) => relevantDependencyIds.has(getItemId(item)))
+		const warningItems = deletableItems.filter((item) =>
+			relevantDependencyIds.has(getItemId(item)),
+		)
 		if (warningItems.length === 0) {
 			showDeletionConfirmation(event)
 			return
@@ -390,7 +410,11 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 }
 
 function showDeletionConfirmation(event?: MouseEvent) {
-	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
+	if (
+		pendingDeletionWarningMode.value === 'default' &&
+		(event?.shiftKey || skipNonEssentialWarnings.value) &&
+		!ctx.isBusy.value
+	) {
 		confirmDelete()
 	} else {
 		confirmDeletionModal.value?.show()
@@ -418,6 +442,11 @@ async function confirmDependencyWarningDelete(disableDependentsAfterDeleting: bo
 
 	pendingDependencyWarningItems.value = []
 	pendingDependencyWarningDependents.value = []
+	if (pendingDeletionWarningMode.value === 'shared-instance') {
+		confirmDeletionModal.value?.show()
+		return
+	}
+
 	await confirmDelete()
 }
 
@@ -426,6 +455,10 @@ async function disablePendingDependencyWarningDependents() {
 	pendingDependencyWarningDisableTargets.value = []
 	if (items.length === 0) return
 
+	await promptDisableItems(items)
+}
+
+async function disableItemsWithoutWarning(items: ContentItem[]) {
 	if (ctx.bulkDisableItems) {
 		await ctx.bulkDisableItems(items)
 		return
@@ -446,6 +479,7 @@ async function confirmDelete() {
 	if (ctx.isBusy.value) return
 	const itemsToDelete = [...pendingDeletionItems.value]
 	pendingDeletionItems.value = []
+	pendingDeletionWarningMode.value = 'default'
 	if (itemsToDelete.length === 0) return
 
 	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
@@ -494,10 +528,72 @@ async function confirmDelete() {
 	await disablePendingDependencyWarningDependents()
 }
 
+async function promptDisableItems(items: ContentItem[]) {
+	if (items.length === 0) return
+	pendingDisableItems.value = items
+	const warningMode = ctx.getDisableWarningMode?.(items) ?? 'default'
+	if (warningMode === 'shared-instance') {
+		confirmDisableModal.value?.show()
+		return
+	}
+
+	await confirmDisable()
+}
+
+async function confirmDisable() {
+	if (ctx.isBusy.value) return
+	const itemsToDisable = [...pendingDisableItems.value]
+	pendingDisableItems.value = []
+	if (itemsToDisable.length === 0) return
+
+	if (ctx.bulkDisableItems && itemsToDisable.length > 1) {
+		isBulkOperating.value = true
+		bulkOperation.value = 'disable'
+		bulkProgress.value = 0
+		bulkTotal.value = itemsToDisable.length
+		bulkWaiting.value = true
+		try {
+			await disableItemsWithoutWarning(itemsToDisable)
+		} finally {
+			clearSelection()
+			isBulkOperating.value = false
+			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
+			bulkWaiting.value = false
+		}
+		return
+	}
+
+	if (itemsToDisable.length === 1) {
+		const item = itemsToDisable[0]
+		const id = getItemId(item)
+		markChanging(id)
+		try {
+			if (ctx.bulkDisableItems) {
+				await ctx.bulkDisableItems(itemsToDisable)
+			} else {
+				await ctx.toggleEnabled(item)
+			}
+		} finally {
+			unmarkChanging(id)
+		}
+		return
+	}
+
+	await runBulk('disable', itemsToDisable, (item) => disableItemsWithoutWarning([item]), {
+		onComplete: clearSelection,
+	})
+}
+
 async function handleToggleEnabledById(id: string, _value: boolean) {
 	if (ctx.isBusy.value) return
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
+	if (!_value) {
+		await promptDisableItems([item])
+		return
+	}
 	markChanging(id)
 	try {
 		await ctx.toggleEnabled(item)
@@ -535,25 +631,7 @@ async function bulkDisable() {
 	if (ctx.isBusy.value) return
 	const items = selectedItems.value.filter((item) => item.enabled)
 	if (items.length === 0) return
-	if (ctx.bulkDisableItems) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'disable'
-		bulkProgress.value = 0
-		bulkTotal.value = items.length
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkDisableItems(items)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
-		}
-		return
-	}
-	await runBulk('disable', items, (item) => ctx.toggleEnabled(item), { onComplete: clearSelection })
+	await promptDisableItems(items)
 }
 
 function handleUpdateById(id: string) {
@@ -1012,9 +1090,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</template>
 
 			<template #actions-end>
-				<div class="mx-1 h-6 w-px bg-surface-5" />
+				<div v-if="deletableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
 
 				<ButtonStyled
+					v-if="deletableSelectedItems.length > 0"
 					type="transparent"
 					color="red"
 					color-fill="text"
@@ -1035,11 +1114,20 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			ref="confirmDeletionModal"
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
+			:mode="pendingDeletionWarningMode"
 			:variant="ctx.deletionContext ?? 'instance'"
 			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@delete="confirmDelete"
+		/>
+		<ConfirmDisableModal
+			ref="confirmDisableModal"
+			:count="pendingDisableItems.length"
+			:item-type="ctx.contentTypeLabel.value"
+			:action-disabled="ctx.isBusy.value"
+			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			@disable="confirmDisable"
 		/>
 		<ContentDependencyWarningModal
 			ref="contentDependencyWarningModal"

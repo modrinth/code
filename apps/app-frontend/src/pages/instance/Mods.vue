@@ -15,10 +15,17 @@
 					:enable-toggle="!props.isServerInstance"
 					:busy="isBulkOperating"
 					:get-overflow-options="getOverflowOptions"
-					:switch-version="handleSwitchVersion"
+					:switch-version="isSharedMember ? undefined : handleSwitchVersion"
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
 					@bulk:disable="(items) => handleModpackContentBulkToggle(items, false)"
+				/>
+				<ConfirmDisableModal
+					ref="sharedDisableConfirmModal"
+					:count="pendingModpackDisableItems.length"
+					:item-type="formatMessage(messages.contentTypeProject)"
+					:action-disabled="isInstanceBusy"
+					@disable="confirmPendingModpackContentDisable"
 				/>
 				<ConfirmModpackUpdateModal
 					ref="modpackUpdateConfirmModal"
@@ -78,6 +85,7 @@ import {
 	type ContentModpackCardProject,
 	type ContentModpackCardVersion,
 	type ContentOwner,
+	ConfirmDisableModal,
 	ContentUpdaterModal,
 	defineMessages,
 	injectNotificationManager,
@@ -273,6 +281,7 @@ watch(
 const isModpackUpdating = ref(false)
 const isBulkOperating = ref(false)
 const isInstanceBusy = computed(() => props.instance?.install_stage !== 'installed')
+const isSharedMember = computed(() => props.instance.shared_instance?.role === 'member')
 const isPackLocked = computed(
 	() =>
 		props.instance?.link?.type === 'modrinth_modpack' ||
@@ -284,6 +293,8 @@ const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
 const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
+const sharedDisableConfirmModal = ref<InstanceType<typeof ConfirmDisableModal> | null>()
+const pendingModpackDisableItems = ref<ContentItem[]>([])
 
 const modpackContentQueryKey = computed(() => ['linkedModpackContent', props.instance.id])
 const modpackContentQuery = useQuery({
@@ -362,8 +373,36 @@ function hasContentOperation(item: ContentItem) {
 	return keys.some((key) => activeContentOperationKeys.value.has(key))
 }
 
+function isSharedExtraContent(item: ContentItem) {
+	return isSharedMember.value && item.source_kind === 'shared_instance'
+}
+
+function isSharedLinkedModpackContent(item: ContentItem) {
+	return (
+		isSharedMember.value &&
+		(item.source_kind === 'modrinth_modpack' || item.source_kind === 'imported_modpack')
+	)
+}
+
+function canDeleteContent(item: ContentItem) {
+	return !isSharedLinkedModpackContent(item)
+}
+
+function shouldWarnBeforeDelete(items: ContentItem[]) {
+	return items.some(isSharedExtraContent)
+}
+
+function shouldWarnBeforeDisable(items: ContentItem[]) {
+	return items.some((item) => isSharedExtraContent(item) || isSharedLinkedModpackContent(item))
+}
+
 function canUpdateProject(item: ContentItem) {
-	return !!item.file_path && !!item.has_update && !!item.update_version_id
+	return (
+		!isSharedLinkedModpackContent(item) &&
+		!!item.file_path &&
+		!!item.has_update &&
+		!!item.update_version_id
+	)
 }
 
 function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
@@ -852,6 +891,7 @@ async function handleUpdate(id: string) {
 }
 
 async function handleSwitchVersion(item: ContentItem) {
+	if (isSharedLinkedModpackContent(item)) return
 	if (!item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
@@ -879,10 +919,32 @@ async function handleSwitchVersion(item: ContentItem) {
 }
 
 async function handleModpackContentToggle(item: ContentItem, enabled: boolean) {
+	if (!enabled && shouldWarnBeforeDisable([item])) {
+		pendingModpackDisableItems.value = [item]
+		sharedDisableConfirmModal.value?.show()
+		return
+	}
+
 	await toggleDisableDebounced(item, enabled)
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[], enabled: boolean) {
+	if (!enabled && shouldWarnBeforeDisable(items)) {
+		pendingModpackDisableItems.value = items
+		sharedDisableConfirmModal.value?.show()
+		return
+	}
+
+	await setModpackContentEnabled(items, enabled)
+}
+
+async function confirmPendingModpackContentDisable() {
+	const items = [...pendingModpackDisableItems.value]
+	pendingModpackDisableItems.value = []
+	await setModpackContentEnabled(items, false)
+}
+
+async function setModpackContentEnabled(items: ContentItem[], enabled: boolean) {
 	await Promise.all(items.map((item) => toggleDisableMod(item, enabled)))
 }
 
@@ -1325,6 +1387,11 @@ provideContentManager({
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
 		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+	canDeleteItem: canDeleteContent,
+	getDeleteWarningMode: (items: ContentItem[]) =>
+		shouldWarnBeforeDelete(items) ? 'shared-instance' : 'default',
+	getDisableWarningMode: (items: ContentItem[]) =>
+		shouldWarnBeforeDisable(items) ? 'shared-instance' : 'default',
 	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
@@ -1371,6 +1438,9 @@ provideContentManager({
 			: undefined,
 		enabled: item.enabled,
 		installing: item.installing,
+		hideDelete: !canDeleteContent(item),
+		hideSwitchVersion: isSharedLinkedModpackContent(item),
+		hasUpdate: isSharedLinkedModpackContent(item) ? false : item.has_update,
 	}),
 	filterPersistKey: props.instance.id,
 })

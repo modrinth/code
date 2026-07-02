@@ -1,6 +1,6 @@
 use crate::state::instances::{
     ContentSet, Instance, InstanceLaunchOverrides, InstanceLink,
-    adapters::sqlite::instance_rows,
+    SharedInstanceAttachment, adapters::sqlite::instance_rows,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -10,6 +10,7 @@ pub struct InstanceMetadata {
     pub instance: Instance,
     pub applied_content_set: ContentSet,
     pub link: InstanceLink,
+    pub shared_instance: Option<SharedInstanceAttachment>,
     pub groups: Vec<String>,
     pub launch_overrides: InstanceLaunchOverrides,
 }
@@ -61,6 +62,7 @@ impl From<instance_rows::InstanceMetadataRecord> for InstanceMetadata {
             instance: record.instance,
             applied_content_set: record.applied_content_set,
             link: record.link,
+            shared_instance: record.shared_instance,
             groups: record.groups,
             launch_overrides: record.launch_overrides,
         }

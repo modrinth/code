@@ -9,7 +9,7 @@
 		:diffs="normalizedDiffs"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
-		:show-report-button="true"
+		:show-report-button="showReportButton"
 		@confirm="handleUpdate"
 		@cancel="handleDecline"
 		@report="handleReport"
@@ -31,7 +31,11 @@ import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
-import { wait_for_install_job } from '@/helpers/install'
+import {
+	install_update_shared_instance,
+	type SharedInstanceUpdatePreview,
+	wait_for_install_job,
+} from '@/helpers/install'
 import { update_managed_modrinth_version } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { injectServerInstall } from '@/providers/server-install'
@@ -79,20 +83,35 @@ type UpdateCompleteCallback = () => void | Promise<void>
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
+const mode = ref<'server-project' | 'shared-instance'>('server-project')
 const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
 const diffs = ref<DependencyDiff[]>([])
+const sharedInstancePreview = ref<SharedInstanceUpdatePreview | null>(null)
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Version | null>(null)
 
-const normalizedDiffs = computed<ContentDiffItem[]>(() =>
-	diffs.value.map((diff) => ({
+const normalizedDiffs = computed<ContentDiffItem[]>(() => {
+	if (mode.value === 'shared-instance') {
+		return (
+			sharedInstancePreview.value?.diffs.map((diff) => ({
+				type: diff.type,
+				projectName: diff.projectName ?? undefined,
+				fileName: diff.fileName ?? undefined,
+				currentVersionName: diff.currentVersionName ?? undefined,
+				newVersionName: diff.newVersionName ?? undefined,
+			})) ?? []
+		)
+	}
+
+	return diffs.value.map((diff) => ({
 		type: diff.type,
 		projectName: diff.project?.title,
 		fileName: diff.fileName,
 		currentVersionName: diff.currentVersion?.version_number,
 		newVersionName: diff.newVersion?.version_number,
-	})),
-)
+	}))
+})
+const showReportButton = computed(() => mode.value !== 'shared-instance')
 
 async function computeDependencyDiffs(
 	currentDeps: Dependency[],
@@ -239,6 +258,19 @@ watch(
 
 async function handleUpdate() {
 	hide()
+	if (mode.value === 'shared-instance') {
+		try {
+			if (instance.value) {
+				const job = await install_update_shared_instance(instance.value.id)
+				await wait_for_install_job(job.job_id)
+				await onUpdateComplete.value()
+			}
+		} catch (error) {
+			console.error('Error updating shared instance:', error)
+		}
+		return
+	}
+
 	const serverProjectId = instance.value?.link?.project_id
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
@@ -270,8 +302,25 @@ function show(
 	callback: UpdateCompleteCallback = () => {},
 	e?: MouseEvent,
 ) {
+	mode.value = 'server-project'
 	instance.value = instanceVal
+	sharedInstancePreview.value = null
 	modpackVersionId.value = modpackVersionIdVal
+	onUpdateComplete.value = callback
+	diffModal.value?.show(e)
+}
+
+function showSharedInstance(
+	instanceVal: GameInstance,
+	preview: SharedInstanceUpdatePreview,
+	callback: UpdateCompleteCallback = () => {},
+	e?: MouseEvent,
+) {
+	mode.value = 'shared-instance'
+	instance.value = instanceVal
+	sharedInstancePreview.value = preview
+	modpackVersionId.value = null
+	diffs.value = []
 	onUpdateComplete.value = callback
 	diffModal.value?.show(e)
 }
@@ -292,7 +341,7 @@ const messages = defineMessages({
 	updateRequiredDescription: {
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
-			'An update is required to play {name}. Please update to the latest version to launch the game.',
+			'An update is required to play {name}. Please update to latest version to launch the game.',
 	},
 })
 
@@ -301,5 +350,5 @@ const hasUpdate = computed(() => {
 	return modpackVersionId.value != null && modpackVersionId.value !== instance.value.link.version_id
 })
 
-defineExpose({ show, hide, hasUpdate })
+defineExpose({ show, showSharedInstance, hide, hasUpdate })
 </script>

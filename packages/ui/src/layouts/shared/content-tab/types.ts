@@ -23,6 +23,16 @@ export interface ContentOwner {
 
 export type ClientWarningType = 'retained' | 'depends' | 'environment'
 
+export type ContentSourceKind =
+	| 'local'
+	| 'modrinth_modpack'
+	| 'server_project'
+	| 'modrinth_hosting'
+	| 'imported_modpack'
+	| 'shared_instance'
+
+export type ContentActionWarningMode = 'default' | 'shared-instance'
+
 export interface ContentCardTableItem {
 	id: string
 	project: ContentCardProject
@@ -39,6 +49,7 @@ export interface ContentCardTableItem {
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
+	hideDelete?: boolean
 	hideSwitchVersion?: boolean
 	overflowOptions?: OverflowMenuOption[]
 }
@@ -70,6 +81,7 @@ export interface ContentItem extends Omit<
 	pack_client_retained?: boolean
 	pack_client_depends?: boolean
 	installing?: boolean
+	source_kind?: ContentSourceKind | null
 }
 
 export type ContentModpackCardProject = Pick<

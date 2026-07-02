@@ -1,5 +1,6 @@
 use crate::state::instances::{
     ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
+    SharedInstanceRole,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
@@ -52,6 +53,7 @@ struct InstalledProject {
     relative_path: String,
     project_id: Option<String>,
     version_id: Option<String>,
+    source_kind: ContentSourceKind,
     enabled: bool,
 }
 
@@ -316,6 +318,36 @@ async fn plan_bulk_update(
             })?;
     let installed =
         installed_projects(instance_id, &content_set, state).await?;
+    let updateable_paths = if is_shared_instance_member(instance_id, state).await? {
+        let linked_modpack_paths = installed
+            .iter()
+            .filter(|project| {
+                matches!(
+                    project.source_kind,
+                    ContentSourceKind::ModrinthModpack
+                        | ContentSourceKind::ImportedModpack
+                )
+            })
+            .map(|project| project.relative_path.clone())
+            .collect::<HashSet<_>>();
+
+        updateable_paths
+            .into_iter()
+            .filter(|path| !linked_modpack_paths.contains(path))
+            .collect::<HashSet<_>>()
+    } else {
+        updateable_paths
+    };
+    let updates = updates
+        .into_iter()
+        .filter(|update| updateable_paths.contains(&update.relative_path))
+        .collect::<Vec<_>>();
+    if updates.is_empty() {
+        return Ok(BulkUpdatePlan {
+            project_updates: Vec::new(),
+            dependency_additions: Vec::new(),
+        });
+    }
     let installed_by_project = installed
         .iter()
         .filter_map(|project| {
@@ -457,8 +489,25 @@ fn installed_project_from_row(
         relative_path: file.relative_path.clone(),
         project_id: entry.project_id.clone(),
         version_id: entry.version_id.clone(),
+        source_kind: entry.source_kind,
         enabled: entry.enabled && file.enabled,
     })
+}
+
+async fn is_shared_instance_member(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<bool> {
+    let Some(metadata) =
+        instance_rows::get_instance_metadata_by_id(instance_id, &state.pool)
+            .await?
+    else {
+        return Ok(false);
+    };
+
+    Ok(metadata
+        .shared_instance
+        .is_some_and(|attachment| attachment.role == SharedInstanceRole::Member))
 }
 
 async fn dependency_closure(

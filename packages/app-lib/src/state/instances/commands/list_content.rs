@@ -528,6 +528,7 @@ pub(crate) async fn dependencies_to_content_items(
                 has_update: false,
                 update_version_id: None,
                 date_added: None,
+                source_kind: None,
             })
         })
         .collect::<Vec<_>>();
@@ -738,6 +739,7 @@ async fn content_projects_for_scope(
                 size: file.size,
                 metadata: file_metadata_from_entry_or_cache(entry, metadata),
                 project_type,
+                source_kind: entry.map(|entry| entry.source_kind),
             },
         );
     }
@@ -900,6 +902,7 @@ async fn content_files_to_content_items(
                 has_update: file.update_version_id.is_some(),
                 update_version_id: file.update_version_id.clone(),
                 date_added: modification_times[index].clone(),
+                source_kind: file.source_kind,
             }
         })
         .collect::<Vec<_>>();
@@ -1348,12 +1351,7 @@ async fn get_modpack_identifiers(
 }
 
 fn project_type_from_api_name(project_type: &str) -> ProjectType {
-    match project_type {
-        "resourcepack" => ProjectType::ResourcePack,
-        "shader" => ProjectType::ShaderPack,
-        "datapack" => ProjectType::DataPack,
-        _ => ProjectType::Mod,
-    }
+    ProjectType::from_name(project_type).unwrap_or(ProjectType::Mod)
 }
 
 fn sort_content_items(items: &mut [ContentItem]) {

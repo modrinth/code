@@ -72,6 +72,15 @@ fn display_from_request(state: &InstallJobState) -> Option<InstallJobDisplay> {
 			}),
 			crate::api::pack::install_from::CreatePackLocation::FromFile { .. } => None,
 		},
+		InstallRequest::CreateSharedInstance { data } => {
+			Some(InstallJobDisplay {
+				title: data.name.clone(),
+				icon: data
+					.modpack
+					.as_ref()
+					.and_then(|modpack| modpack.icon_url.clone()),
+			})
+		}
 		InstallRequest::ImportInstance {
 			instance_folder, ..
 		} => Some(InstallJobDisplay {
@@ -80,7 +89,8 @@ fn display_from_request(state: &InstallJobState) -> Option<InstallJobDisplay> {
 		}),
 		InstallRequest::DuplicateInstance { .. }
 		| InstallRequest::InstallExistingInstance { .. }
-		| InstallRequest::InstallPackToExistingInstance { .. } => {
+		| InstallRequest::InstallPackToExistingInstance { .. }
+		| InstallRequest::UpdateSharedInstance { .. } => {
 			state.rollback.as_ref().map(|rollback| InstallJobDisplay {
 				title: rollback.instance.instance.name.clone(),
 				icon: rollback.instance.instance.icon_path.clone(),
