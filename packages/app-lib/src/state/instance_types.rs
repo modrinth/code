@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
+use super::instances::ContentSourceKind;
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum InstanceInstallStage {
@@ -122,6 +124,7 @@ pub struct ContentFile {
     pub metadata: Option<FileMetadata>,
     pub update_version_id: Option<String>,
     pub project_type: ProjectType,
+    pub source_kind: Option<ContentSourceKind>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

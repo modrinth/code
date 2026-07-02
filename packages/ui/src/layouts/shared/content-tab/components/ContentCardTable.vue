@@ -67,7 +67,8 @@ const hasEnabledListener = computed(
 const hasAnyActions = computed(() => {
 	// Check if there are listeners for actions
 	const hasListeners =
-		(hasDeleteListener.value && !props.hideDelete) ||
+		(hasDeleteListener.value &&
+			props.items.some((item) => !props.hideDelete && !item.hideDelete)) ||
 		hasUpdateListener.value ||
 		hasSwitchVersionListener.value ||
 		hasEnabledListener.value
@@ -273,7 +274,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:toggle-disabled="item.toggleDisabled"
 					:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 					:show-checkbox="showSelection"
-					:hide-delete="hideDelete"
+					:hide-delete="hideDelete || item.hideDelete"
 					:hide-actions="!hasAnyActions"
 					:selected="isItemSelected(item.id)"
 					:class="[
@@ -326,13 +327,14 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:has-update="item.hasUpdate"
 				:is-client-only="item.isClientOnly"
 				:client-warning="item.clientWarning"
+				:hide-switch-version="item.hideSwitchVersion"
 				:overflow-options="item.overflowOptions"
 				:disabled="item.disabled"
 				:disabled-tooltip="item.disabledTooltip"
 				:toggle-disabled="item.toggleDisabled"
 				:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 				:show-checkbox="showSelection"
-				:hide-delete="hideDelete"
+				:hide-delete="hideDelete || item.hideDelete"
 				:hide-actions="!hasAnyActions"
 				:selected="isItemSelected(item.id)"
 				:class="[
