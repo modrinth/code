@@ -374,6 +374,7 @@ function selectGameVersion(gameVersion?: string) {
 	if (!gameVersion) return
 	userSelectedGameVersion.value = gameVersion
 	emit('selectGameVersion', gameVersion)
+	selectOnlyCompatiblePlatform()
 }
 
 function selectPlatform(platform?: string) {
@@ -419,6 +420,18 @@ function isGameVersionUnavailable(gameVersion: string) {
 
 function isPlatformUnavailable(platform: string) {
 	return incompatibleLoadersSet.value.has(platform) || !possiblePlatforms.value.includes(platform)
+}
+
+function selectOnlyCompatiblePlatform() {
+	const compatiblePlatforms = props.project.loaders.filter(
+		(platform) =>
+			possiblePlatforms.value.includes(platform) && !incompatibleLoadersSet.value.has(platform),
+	)
+
+	if (compatiblePlatforms.length !== 1) return
+
+	userSelectedPlatform.value = compatiblePlatforms[0]
+	emit('selectPlatform', compatiblePlatforms[0])
 }
 
 function gameVersionOptionTooltip(gameVersion: string) {
