@@ -1,0 +1,82 @@
+<template>
+	<div class="flex min-w-0 flex-col gap-2">
+		<div
+			class="grid min-h-[3.75rem] grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-2xl bg-button-bg px-4 py-3 text-primary"
+		>
+			<span class="flex min-w-0 items-center gap-3">
+				<Avatar v-if="dependency.icon" :src="dependency.icon" :alt="dependency.name" size="32px" />
+				<span
+					v-else
+					class="flex size-8 flex-shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 text-secondary"
+				>
+					<PackageIcon aria-hidden="true" class="size-5" />
+				</span>
+				<a
+					v-if="dependency.projectHref"
+					:href="dependency.projectHref"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="min-w-0 truncate text-lg font-bold text-contrast no-underline hover:underline"
+				>
+					{{ dependency.name }}
+				</a>
+				<span v-else class="min-w-0 truncate text-lg font-bold text-contrast">
+					{{ dependency.name }}
+				</span>
+				<TagItem class="shrink-0 border !border-solid border-surface-5 !px-3 !py-1 text-base">
+					{{ dependency.typeLabel }}
+				</TagItem>
+			</span>
+			<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
+				<a
+					v-tooltip="'Download'"
+					:href="dependency.downloadHref"
+					:download="dependency.filename"
+					:aria-label="`Download ${dependency.name}`"
+					@click="emit('download')"
+				>
+					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+				</a>
+			</ButtonStyled>
+			<ButtonStyled v-else circular type="transparent">
+				<button
+					v-tooltip="dependency.unavailableTooltip"
+					disabled
+					:aria-label="dependency.unavailableTooltip"
+				>
+					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+				</button>
+			</ButtonStyled>
+		</div>
+		<div
+			v-for="childDependency in dependency.dependencies"
+			:key="childDependency.key"
+			class="group/dependency relative pl-10"
+		>
+			<div
+				aria-hidden="true"
+				class="absolute -top-2 left-6 h-20 w-0.5 bg-surface-5 group-last/dependency:h-10"
+			/>
+			<div aria-hidden="true" class="absolute left-6 top-[1.875rem] h-0.5 w-4 bg-surface-5" />
+			<DownloadDependency :dependency="childDependency" @download="emit('download')" />
+		</div>
+	</div>
+</template>
+
+<script setup>
+import { DownloadIcon, PackageIcon } from '@modrinth/assets'
+import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
+
+defineOptions({
+	name: 'DownloadDependency',
+})
+
+defineProps({
+	dependency: {
+		type: Object,
+		required: true,
+	},
+})
+
+const emit = defineEmits(['download'])
+</script>

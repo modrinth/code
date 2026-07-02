@@ -4,74 +4,22 @@
 			{{ formatMessage(messages.dependenciesTitle) }}
 		</h3>
 		<div class="flex flex-col gap-2">
-			<div v-for="dependency in dependencyRows" :key="dependency.key" class="flex flex-col gap-1.5">
-				<div
-					class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary"
-				>
-					<span class="flex min-w-0 items-center gap-2">
-						<Avatar
-							v-if="dependency.icon"
-							:src="dependency.icon"
-							:alt="dependency.name"
-							size="20px"
-						/>
-						<PackageIcon v-else aria-hidden="true" class="size-5 flex-shrink-0 text-secondary" />
-						<a
-							v-if="dependency.projectHref"
-							:href="dependency.projectHref"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="min-w-0 truncate font-semibold text-contrast no-underline hover:underline"
-						>
-							{{ dependency.name }}
-						</a>
-						<span v-else class="min-w-0 truncate font-semibold text-contrast">
-							{{ dependency.name }}
-						</span>
-						<TagItem class="shrink-0 border !border-solid border-surface-5">
-							{{ dependency.typeLabel }}
-						</TagItem>
-					</span>
-					<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
-						<a
-							v-tooltip="'Download'"
-							:href="dependency.downloadHref"
-							:download="dependency.filename"
-							:aria-label="`Download ${dependency.name}`"
-							@click="emit('download')"
-						>
-							<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
-						</a>
-					</ButtonStyled>
-				</div>
-				<div
-					v-if="dependency.subDependencies.length > 0"
-					class="grid grid-cols-[1.5rem_minmax(0,1fr)] items-start gap-1 pl-5"
-				>
-					<RightArrowIcon aria-hidden="true" class="mt-2.5 size-4 text-secondary" />
-					<DownloadDependencies
-						:dependencies="dependency.subDependencies"
-						:show-title="false"
-						@download="emit('download')"
-					/>
-				</div>
-			</div>
+			<DownloadDependency
+				v-for="dependency in dependencyRows"
+				:key="dependency.key"
+				:dependency="dependency"
+				@download="emit('download')"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { DownloadIcon, PackageIcon, RightArrowIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	defineMessages,
-	injectModrinthClient,
-	TagItem,
-	useVIntl,
-} from '@modrinth/ui'
+import { defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
+
+import DownloadDependency from './DownloadDependency.vue'
 
 defineOptions({
 	name: 'DownloadDependencies',
@@ -113,9 +61,13 @@ const client = injectModrinthClient()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
 const { formatMessage } = useVIntl()
 
+const shouldResolveDependencies = computed(
+	() => !props.dependencies && !!props.project && !!props.selectedVersion,
+)
+
 const dependencyResolutionPreferences = computed(() => ({
-	game_versions: props.currentGameVersion ? [props.currentGameVersion] : [],
-	loaders: props.currentPlatform ? [props.currentPlatform] : [],
+	game_versions: props.selectedVersion?.game_versions || [],
+	loaders: props.selectedVersion?.loaders || [],
 }))
 
 const { data: dependencyResolution } = useQuery({
@@ -135,13 +87,18 @@ const { data: dependencyResolution } = useQuery({
 			selected: dependencyResolutionPreferences.value,
 			target: dependencyResolutionPreferences.value,
 		}),
-	enabled: computed(() => !!props.project && !!props.selectedVersion),
+	enabled: shouldResolveDependencies,
 })
 
 const dependencyVersionIds = computed(() => {
 	return [
 		...new Set(
-			(dependencyResolution.value?.dependencies || []).map((dependency) => dependency.version_id),
+			[
+				...(dependencyResolution.value?.dependencies || []),
+				...(dependencyResolution.value?.skipped || []),
+			]
+				.map((dependency) => dependency.version_id)
+				.filter(Boolean),
 		),
 	]
 })
@@ -153,7 +110,7 @@ const { data: dependencyVersions } = useQuery({
 		dependencyVersionIds.value,
 	]),
 	queryFn: () => client.labrinth.versions_v3.getVersions(dependencyVersionIds.value),
-	enabled: computed(() => dependencyVersionIds.value.length > 0),
+	enabled: computed(() => shouldResolveDependencies.value && dependencyVersionIds.value.length > 0),
 })
 
 const dependencyVersionById = computed(() => {
@@ -168,7 +125,12 @@ const dependencyVersionById = computed(() => {
 const dependencyProjectIds = computed(() => {
 	return [
 		...new Set(
-			(dependencyResolution.value?.dependencies || []).map((dependency) => dependency.project_id),
+			[
+				...(dependencyResolution.value?.dependencies || []),
+				...(dependencyResolution.value?.skipped || []),
+			]
+				.map((dependency) => dependency.project_id)
+				.filter(Boolean),
 		),
 	]
 })
@@ -180,7 +142,7 @@ const { data: dependencyProjects } = useQuery({
 		dependencyProjectIds.value,
 	]),
 	queryFn: () => client.labrinth.projects_v2.getMultiple(dependencyProjectIds.value),
-	enabled: computed(() => dependencyProjectIds.value.length > 0),
+	enabled: computed(() => shouldResolveDependencies.value && dependencyProjectIds.value.length > 0),
 })
 
 const dependencyProjectById = computed(() => {
@@ -194,7 +156,10 @@ const dependencyProjectById = computed(() => {
 const dependenciesByParentVersionId = computed(() => {
 	const map = new Map()
 
-	for (const dependency of dependencyResolution.value?.dependencies || []) {
+	for (const dependency of [
+		...(dependencyResolution.value?.dependencies || []),
+		...(dependencyResolution.value?.skipped || []),
+	]) {
 		if (!dependency.dependent_on_version_id) continue
 
 		const dependencies = map.get(dependency.dependent_on_version_id) || []
@@ -210,9 +175,9 @@ const resolvedDependencyRows = computed(() => {
 		dependencyResolution.value?.primary.version_id || props.selectedVersion?.id
 	if (!primaryVersionId) return []
 
-	return (dependenciesByParentVersionId.value.get(primaryVersionId) || []).map((dependency) =>
-		createDependencyRow(dependency),
-	)
+	const dependencies = dependenciesByParentVersionId.value.get(primaryVersionId) || []
+
+	return dependencies.map((dependency) => createDependencyRow(dependency))
 })
 
 const dependencyRows = computed(() => props.dependencies || resolvedDependencyRows.value)
@@ -225,6 +190,9 @@ function createDependencyRow(dependency) {
 	const version = dependencyVersionById.value.get(dependency.version_id)
 	const project = dependencyProjectById.value.get(dependency.project_id)
 	const primaryFile = primaryFileForVersion(version)
+	const unavailableTooltip = dependency.reason
+		? skippedReasonLabel(dependency.reason)
+		: formatMessage(messages.unavailableDependency)
 	const name =
 		project?.title ||
 		version?.name ||
@@ -234,17 +202,32 @@ function createDependencyRow(dependency) {
 		'Dependency'
 
 	return {
-		key: `${dependency.project_id}-${dependency.version_id}`,
+		key: `${dependency.project_id}-${dependency.version_id ?? 'unresolved'}-${dependency.reason ?? 'resolved'}`,
 		name,
 		icon: project?.icon_url,
 		projectHref: project ? `/${project.project_type}/${project.slug || project.id}` : undefined,
-		downloadHref: primaryFile ? getDownloadUrl(primaryFile.url) : undefined,
+		downloadHref: dependency.reason || !primaryFile ? undefined : getDownloadUrl(primaryFile.url),
 		filename: primaryFile?.filename,
 		typeLabel: 'Required',
-		subDependencies: (dependenciesByParentVersionId.value.get(dependency.version_id) || []).map(
-			(subDependency) => createDependencyRow(subDependency),
-		),
+		unavailableTooltip,
+		dependencies: (
+			(dependency.version_id && dependenciesByParentVersionId.value.get(dependency.version_id)) ||
+			[]
+		).map((subDependency) => createDependencyRow(subDependency)),
 	}
+}
+
+function skippedReasonLabel(reason) {
+	return (
+		{
+			already_installed: formatMessage(messages.alreadyInstalledDependency),
+			duplicate_project: formatMessage(messages.duplicateDependency),
+			conflicting_dependency: formatMessage(messages.conflictingDependency),
+			no_compatible_version: formatMessage(messages.noCompatibleDependency),
+			missing_version: formatMessage(messages.missingDependencyVersion),
+			quilt_fabric_api: formatMessage(messages.quiltFabricApiDependency),
+		}[reason] || formatMessage(messages.unavailableDependency)
+	)
 }
 
 function resolveContentType(projectType) {
@@ -265,6 +248,34 @@ const messages = defineMessages({
 	dependenciesTitle: {
 		id: 'project.download.dependencies-title',
 		defaultMessage: 'Dependencies',
+	},
+	alreadyInstalledDependency: {
+		id: 'project.download.dependency-already-installed',
+		defaultMessage: 'This dependency is already installed',
+	},
+	conflictingDependency: {
+		id: 'project.download.dependency-conflicting',
+		defaultMessage: 'This dependency conflicts with another dependency',
+	},
+	duplicateDependency: {
+		id: 'project.download.dependency-duplicate',
+		defaultMessage: 'This dependency is already included',
+	},
+	missingDependencyVersion: {
+		id: 'project.download.dependency-missing-version',
+		defaultMessage: 'This dependency version is unavailable',
+	},
+	noCompatibleDependency: {
+		id: 'project.download.dependency-no-compatible-version',
+		defaultMessage: 'No compatible version is available for this dependency',
+	},
+	quiltFabricApiDependency: {
+		id: 'project.download.dependency-quilt-fabric-api',
+		defaultMessage: 'Fabric API is skipped for Quilt',
+	},
+	unavailableDependency: {
+		id: 'project.download.dependency-unavailable',
+		defaultMessage: 'This dependency cannot be downloaded',
 	},
 })
 </script>
