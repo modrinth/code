@@ -14,11 +14,11 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_limited_from_payload;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("/image", web::post().to(images_add));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(images_add);
 }
 
 #[derive(Serialize, Deserialize)]
@@ -36,6 +36,8 @@ pub struct ImageUpload {
     pub report_id: Option<ReportId>,
 }
 
+#[utoipa::path(tag = "images", responses((status = OK)))]
+#[post("/image")]
 pub async fn images_add(
     req: HttpRequest,
     web::Query(data): web::Query<ImageUpload>,
@@ -253,3 +255,8 @@ pub async fn images_add(
 
     Ok(HttpResponse::Ok().json(image))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(images_add,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

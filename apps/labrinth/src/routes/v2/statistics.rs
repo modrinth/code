@@ -5,7 +5,7 @@ use crate::routes::{
 };
 use actix_web::{HttpResponse, get, web};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_stats);
 }
 
@@ -51,3 +51,8 @@ pub async fn get_stats(
         Err(response) => Ok(response),
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(get_stats,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

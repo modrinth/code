@@ -25,7 +25,7 @@ use validator::Validate;
 
 use super::version_creation::InitialVersionData;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create);
 }
 
@@ -305,3 +305,8 @@ pub async fn project_create(
         Err(response) => Ok(response),
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(project_create,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

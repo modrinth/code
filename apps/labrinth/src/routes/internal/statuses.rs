@@ -35,14 +35,8 @@ use std::sync::atomic::Ordering;
 use tokio::sync::oneshot::error::TryRecvError;
 use tokio::time::{Duration, sleep};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ws_init);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(utoipa_actix_web::scope("/_internal").service(ws_init));
 }
 
 #[derive(Deserialize)]
@@ -565,3 +559,8 @@ pub async fn close_socket(
 
     Ok(())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(ws_init,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

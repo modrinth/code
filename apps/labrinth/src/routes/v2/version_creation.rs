@@ -356,3 +356,16 @@ pub async fn upload_file_to_version(
     .await?;
     Ok(response)
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(version_create, upload_file_to_version,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(version_create,))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(upload_file_to_version,))]
+pub(crate) struct VersionRoutesDoc;

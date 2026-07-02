@@ -27,14 +27,8 @@ const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat";
 const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v1";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(resolve_content);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(utoipa_actix_web::scope("/v3").service(resolve_content));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(web::scope("/v3").service(resolve_content));
 }
 
 /// Resolve content.  
@@ -654,3 +648,8 @@ fn resolve_error_to_api(error: ResolveError) -> ApiError {
         }
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(resolve_content,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

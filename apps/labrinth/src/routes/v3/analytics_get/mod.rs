@@ -54,16 +54,10 @@ use crate::{
 pub(crate) use metrics::normalize_download_source;
 pub use metrics::*;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(fetch_analytics);
     cfg.configure(facets::config);
     cfg.configure(old::config);
-}
-
-pub fn web_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(fetch_analytics);
-    cfg.configure(facets::web_config);
-    cfg.configure(old::web_config);
 }
 
 // request
@@ -1076,5 +1070,21 @@ mod tests {
         });
 
         assert_eq!(serde_json::to_value(src).unwrap(), target);
+    }
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(fetch_analytics,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let mut openapi = RouteDoc::openapi();
+        openapi.merge(facets::RouteDoc::openapi());
+        openapi.merge(old::RouteDoc::openapi());
+        openapi
     }
 }

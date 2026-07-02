@@ -12,9 +12,9 @@ use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/tag")
+        web::scope("/tag")
             .service(category_list)
             .service(loader_list)
             .service(game_version_list)
@@ -463,3 +463,26 @@ pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
     let side_types = side_types.iter().map(|s| s.to_string()).collect_vec();
     Ok(HttpResponse::Ok().json(side_types))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    category_list,
+    loader_list,
+    game_version_list,
+    license_list,
+    license_text,
+    donation_platform_list,
+    report_type_list,
+    project_type_list,
+    side_type_list,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	nest(
+		(path = "/tag", api = RouteDoc),
+	)
+)]
+pub(crate) struct ApiDoc;

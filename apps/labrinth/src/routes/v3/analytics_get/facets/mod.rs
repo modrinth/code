@@ -14,11 +14,7 @@ use crate::{
     routes::ApiError,
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(fetch_facets);
-}
-
-pub fn web_config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(fetch_facets);
 }
 
@@ -88,3 +84,8 @@ pub async fn fetch_facets(
 
     Ok(web::Json(FacetsResponse { facets }))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(fetch_facets,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

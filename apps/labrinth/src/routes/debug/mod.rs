@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use actix_web::web;
 use eyre::Context;
 use eyre::eyre;
 use prometheus::IntGauge;
@@ -9,21 +10,17 @@ use crate::util::cors::default_cors;
 #[cfg(target_os = "linux")]
 mod pprof;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(
-        utoipa_actix_web::scope("/debug")
-            .wrap(default_cors())
-            .configure({
-                #[cfg(target_os = "linux")]
-                {
-                    pprof::config
-                }
-                #[cfg(not(target_os = "linux"))]
-                {
-                    |_cfg| ()
-                }
-            }),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(web::scope("/debug").wrap(default_cors()).configure({
+        #[cfg(target_os = "linux")]
+        {
+            pprof::config
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            |_cfg| ()
+        }
+    }));
 }
 
 pub fn register_and_set_metrics(

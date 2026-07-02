@@ -8,7 +8,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(reports_get);
     cfg.service(reports);
     cfg.service(report_create);
@@ -315,3 +315,15 @@ pub async fn report_delete(
         .await
         .or_else(v2_reroute::flatten_404_error)
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    report_create,
+    reports,
+    reports_get,
+    report_get,
+    report_edit,
+    report_delete,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

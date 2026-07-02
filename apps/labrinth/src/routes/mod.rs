@@ -25,6 +25,28 @@ pub use self::not_found::not_found;
 
 pub fn root_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
+        web::scope("/api/v1")
+            .wrap(default_cors())
+            .wrap_fn(|req, _srv| {
+            async {
+                Ok(req.into_response(
+                    HttpResponse::Gone()
+                        .content_type("application/json")
+                        .body(r#"{"error":"api_deprecated","description":"You are using an application that uses an outdated version of Modrinth's API. Please either update it or switch to another application. For developers: https://docs.modrinth.com/api/#versioning"}"#)
+                ))
+            }.boxed_local()
+        })
+    );
+    cfg.service(
+        web::scope("")
+            .wrap(default_cors())
+            .service(index::index_get)
+            .service(Files::new("/", "assets/")),
+    );
+}
+
+pub fn public_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
         web::scope("/maven")
             .wrap(default_cors())
             .configure(maven::config),
@@ -58,26 +80,17 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             )
             .configure(analytics::config),
     );
-    cfg.service(
-        web::scope("/api/v1")
-            .wrap(default_cors())
-            .wrap_fn(|req, _srv| {
-            async {
-                Ok(req.into_response(
-                    HttpResponse::Gone()
-                        .content_type("application/json")
-                        .body(r#"{"error":"api_deprecated","description":"You are using an application that uses an outdated version of Modrinth's API. Please either update it or switch to another application. For developers: https://docs.modrinth.com/api/#versioning"}"#)
-                ))
-            }.boxed_local()
-        })
-    );
-    cfg.service(
-        web::scope("")
-            .wrap(default_cors())
-            .service(index::index_get)
-            .service(Files::new("/", "assets/")),
-    );
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+    nest(
+        (path = "/maven", api = maven::RouteDoc),
+        (path = "/updates", api = updates::RouteDoc),
+        (path = "/analytics", api = analytics::RouteDoc),
+    )
+)]
+pub struct PublicApiDoc;
 
 /// Error when calling an HTTP endpoint.
 #[derive(thiserror::Error, Debug)]

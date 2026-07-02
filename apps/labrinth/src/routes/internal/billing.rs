@@ -42,31 +42,9 @@ use stripe::{
 };
 use tracing::warn;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/billing")
-            .service(products)
-            .service(subscriptions)
-            .service(user_customer)
-            .service(edit_subscription)
-            .service(payment_methods)
-            .service(add_payment_method_flow)
-            .service(edit_payment_method)
-            .service(remove_payment_method)
-            .service(charges)
-            .service(credit)
-            .service(active_servers)
-            .service(initiate_payment)
-            .service(stripe_webhook)
-            .service(refund_charge),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal/billing")
             .service(products)
             .service(subscriptions)
             .service(user_customer)
@@ -2757,3 +2735,24 @@ pub async fn credit(
 }
 
 pub mod payments;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    products,
+    subscriptions,
+    refund_charge,
+    reprocess_charge_tax,
+    edit_subscription,
+    user_customer,
+    charges,
+    add_payment_method_flow,
+    edit_payment_method,
+    remove_payment_method,
+    payment_methods,
+    active_servers,
+    initiate_payment,
+    stripe_webhook,
+    credit,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

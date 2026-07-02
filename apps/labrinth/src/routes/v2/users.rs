@@ -13,11 +13,11 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(user_auth_get);
     cfg.service(users_get);
     cfg.service(
-        utoipa_actix_web::scope("/user")
+        web::scope("/user")
             .service(user_get)
             .service(projects_list)
             .service(user_delete)
@@ -484,5 +484,48 @@ pub async fn user_notifications(
             Ok(HttpResponse::Ok().json(legacy_notifications))
         }
         Err(response) => Ok(response),
+    }
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    user_auth_get,
+    users_get,
+    user_get,
+    projects_list,
+    user_edit,
+    user_icon_edit,
+    user_icon_delete,
+    user_delete,
+    user_follows,
+    user_notifications,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(users_get,))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    user_auth_get,
+    user_get,
+    projects_list,
+    user_edit,
+    user_icon_edit,
+    user_icon_delete,
+    user_delete,
+    user_follows,
+    user_notifications,
+))]
+pub(crate) struct UserRoutesDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let openapi = RootRoutesDoc::openapi();
+        openapi.nest("/user", UserRoutesDoc::openapi())
     }
 }

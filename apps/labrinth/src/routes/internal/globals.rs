@@ -10,7 +10,7 @@ use chrono::{Datelike, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_globals);
 }
 
@@ -121,3 +121,8 @@ mod tests {
         assert_eq!(second, Some(Decimal::from(2000_u64)));
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(get_globals,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

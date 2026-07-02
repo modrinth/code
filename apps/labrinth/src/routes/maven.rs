@@ -18,7 +18,7 @@ use quick_xml::escape::escape;
 use std::collections::HashSet;
 use yaserde::YaSerialize;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(maven_metadata);
     cfg.service(version_file_sha512);
     cfg.service(version_file_sha1);
@@ -70,6 +70,10 @@ pub struct MavenPom {
     description: String,
 }
 
+#[utoipa::path(
+	tag = "maven",
+	responses((status = OK, body = String, content_type = "text/xml"))
+)]
 #[get("/maven/modrinth/{id}/maven-metadata.xml")]
 pub async fn maven_metadata(
     req: HttpRequest,
@@ -279,8 +283,15 @@ fn find_file<'a>(
     None
 }
 
+#[utoipa::path(
+	tag = "maven",
+	responses(
+		(status = OK, body = String, content_type = "text/xml"),
+		(status = TEMPORARY_REDIRECT)
+	)
+)]
 #[route(
-    "maven/modrinth/{id}/{versionnum}/{file}",
+    "/maven/modrinth/{id}/{versionnum}/{file}",
     method = "GET",
     method = "HEAD"
 )]
@@ -349,6 +360,7 @@ pub async fn version_file(
     Err(ApiError::NotFound)
 }
 
+#[utoipa::path(tag = "maven", responses((status = OK, body = String)))]
 #[get("/maven/modrinth/{id}/{versionnum}/{file}.sha1")]
 pub async fn version_file_sha1(
     req: HttpRequest,
@@ -396,6 +408,7 @@ pub async fn version_file_sha1(
         ))
 }
 
+#[utoipa::path(tag = "maven", responses((status = OK, body = String)))]
 #[get("/maven/modrinth/{id}/{versionnum}/{file}.sha512")]
 pub async fn version_file_sha512(
     req: HttpRequest,
@@ -442,3 +455,13 @@ pub async fn version_file_sha512(
             |hash_str| HttpResponse::Ok().body(hash_str.clone()),
         ))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    maven_metadata,
+    version_file,
+    version_file_sha1,
+    version_file_sha512,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

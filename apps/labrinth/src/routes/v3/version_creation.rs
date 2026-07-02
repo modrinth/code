@@ -34,7 +34,7 @@ use crate::util::validate::validation_errors_to_string;
 use crate::validate::{ValidationResult, validate_file};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use hex::ToHex;
@@ -109,7 +109,6 @@ struct InitialFileData {
 #[utoipa::path(
 	tag = "versions",
 	post,
-	path = "/v3/version",
 	request_body(
 		content(("multipart/form-data")),
 		description = "Multipart payload containing `data` and uploaded files"
@@ -124,6 +123,32 @@ struct InitialFileData {
 	),
 	security(("bearer_auth" = ["VERSION_CREATE"]))
 )]
+#[post("/version")]
+pub async fn version_create_route(
+    req: HttpRequest,
+    payload: Multipart,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<dyn FileHost>,
+    session_queue: Data<AuthQueue>,
+    moderation_queue: web::Data<AutomatedModerationQueue>,
+    http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
+) -> Result<HttpResponse, CreateError> {
+    version_create(
+        req,
+        payload,
+        client,
+        redis,
+        file_host,
+        session_queue,
+        moderation_queue,
+        http,
+        search_state,
+    )
+    .await
+}
+
 pub async fn version_create(
     req: HttpRequest,
     mut payload: Multipart,
@@ -569,7 +594,6 @@ async fn version_create_inner(
 #[utoipa::path(
 	tag = "versions",
 	post,
-	path = "/v3/version/{version_id}/file",
 	params(("version_id" = VersionId, Path, description = "The ID of the version")),
 	request_body(
 		content(("multipart/form-data")),
@@ -588,6 +612,32 @@ async fn version_create_inner(
 	),
 	security(("bearer_auth" = ["VERSION_WRITE"]))
 )]
+#[post("/version/{version_id}/file")]
+pub async fn upload_file_to_version_route(
+    req: HttpRequest,
+    url_data: web::Path<(VersionId,)>,
+    payload: Multipart,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<dyn FileHost>,
+    session_queue: web::Data<AuthQueue>,
+    http: web::Data<HttpClient>,
+    search_state: Data<SearchState>,
+) -> Result<HttpResponse, CreateError> {
+    upload_file_to_version(
+        req,
+        url_data,
+        payload,
+        client,
+        redis,
+        file_host,
+        session_queue,
+        http,
+        search_state,
+    )
+    .await
+}
+
 pub async fn upload_file_to_version(
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,
@@ -1144,3 +1194,8 @@ pub fn try_create_version_fields(
     }
     Ok(version_fields)
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(version_create_route, upload_file_to_version_route,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

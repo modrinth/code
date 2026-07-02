@@ -6,17 +6,16 @@ use crate::{
     queue::session::AuthQueue,
     routes::ApiError,
 };
-use actix_web::{HttpRequest, web};
+use actix_web::{HttpRequest, get, web};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/limits")
-            .route("/projects", web::get().to(get_project_limits))
-            .route("/organizations", web::get().to(get_organization_limits))
-            .route("/collections", web::get().to(get_collection_limits)),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(get_project_limits)
+        .service(get_organization_limits)
+        .service(get_collection_limits);
 }
 
+#[utoipa::path(tag = "limits", responses((status = OK)))]
+#[get("/limits/projects")]
 async fn get_project_limits(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -36,6 +35,8 @@ async fn get_project_limits(
     Ok(web::Json(limits))
 }
 
+#[utoipa::path(tag = "limits", responses((status = OK)))]
+#[get("/limits/organizations")]
 async fn get_organization_limits(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -55,6 +56,8 @@ async fn get_organization_limits(
     Ok(web::Json(limits))
 }
 
+#[utoipa::path(tag = "limits", responses((status = OK)))]
+#[get("/limits/collections")]
 async fn get_collection_limits(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -73,3 +76,12 @@ async fn get_collection_limits(
     let limits = UserLimits::get_for_collections(&user, &pool).await?;
     Ok(web::Json(limits))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    get_project_limits,
+    get_organization_limits,
+    get_collection_limits,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

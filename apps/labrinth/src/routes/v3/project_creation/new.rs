@@ -36,11 +36,7 @@ use crate::{
     },
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(create);
-}
-
-pub fn web_config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(create);
 }
 
@@ -412,3 +408,8 @@ mod tests {
         }
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(create,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

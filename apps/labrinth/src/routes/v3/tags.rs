@@ -8,25 +8,22 @@ use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
 use crate::database::redis::RedisPool;
-use actix_web::{HttpResponse, web};
+use actix_web::{HttpResponse, get, web};
 
 use crate::database::PgPool;
 use itertools::Itertools;
 use serde_json::Value;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/tag")
-            .route("/category", web::get().to(category_list))
-            .route("/loader", web::get().to(loader_list)),
-    )
-    .route("/games", web::get().to(games_list))
-    .route("/loader_field", web::get().to(loader_fields_list))
-    .route("/license", web::get().to(license_list))
-    .route("/license/{id}", web::get().to(license_text))
-    .route("/link_platform", web::get().to(link_platform_list))
-    .route("/report_type", web::get().to(report_type_list))
-    .route("/project_type", web::get().to(project_type_list));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(category_list_route)
+        .service(loader_list_route)
+        .service(games_list_route)
+        .service(loader_fields_list_route)
+        .service(license_list_route)
+        .service(license_text_route)
+        .service(link_platform_list_route)
+        .service(report_type_list_route)
+        .service(project_type_list_route);
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -35,6 +32,15 @@ pub struct GameData {
     pub name: String,
     pub icon: Option<String>,
     pub banner: Option<String>,
+}
+
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/games")]
+async fn games_list_route(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    games_list(pool, redis).await
 }
 
 pub async fn games_list(
@@ -63,6 +69,15 @@ pub struct CategoryData {
     pub header: String,
 }
 
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/tag/category")]
+async fn category_list_route(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    category_list(pool, redis).await
+}
+
 pub async fn category_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -89,6 +104,15 @@ pub struct LoaderData {
     pub supported_games: Vec<String>,
     pub supported_fields: Vec<String>, // Available loader fields for this loader
     pub metadata: Value,
+}
+
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/tag/loader")]
+async fn loader_list_route(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    loader_list(pool, redis).await
 }
 
 pub async fn loader_list(
@@ -131,6 +155,16 @@ pub struct LoaderFieldsEnumQuery {
 }
 
 // Provides the variants for any enumerable loader field.
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/loader_field")]
+async fn loader_fields_list_route(
+    pool: web::Data<PgPool>,
+    web::Query(query): web::Query<LoaderFieldsEnumQuery>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    loader_fields_list(pool, web::Query(query), redis).await
+}
+
 pub async fn loader_fields_list(
     pool: web::Data<PgPool>,
     query: web::Query<LoaderFieldsEnumQuery>,
@@ -181,6 +215,12 @@ pub struct License {
     pub name: String,
 }
 
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/license")]
+async fn license_list_route() -> HttpResponse {
+    license_list().await
+}
+
 pub async fn license_list() -> HttpResponse {
     let licenses = spdx::identifiers::LICENSES;
     let mut results: Vec<License> = Vec::with_capacity(licenses.len());
@@ -199,6 +239,14 @@ pub async fn license_list() -> HttpResponse {
 pub struct LicenseText {
     pub title: String,
     pub body: String,
+}
+
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/license/{id}")]
+async fn license_text_route(
+    params: web::Path<(String,)>,
+) -> Result<HttpResponse, ApiError> {
+    license_text(params).await
 }
 
 pub async fn license_text(
@@ -231,6 +279,15 @@ pub struct LinkPlatformQueryData {
     pub donation: bool,
 }
 
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/link_platform")]
+async fn link_platform_list_route(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    link_platform_list(pool, redis).await
+}
+
 pub async fn link_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -247,12 +304,30 @@ pub async fn link_platform_list(
     Ok(HttpResponse::Ok().json(results))
 }
 
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/report_type")]
+async fn report_type_list_route(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    report_type_list(pool, redis).await
+}
+
 pub async fn report_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results = ReportType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))
+}
+
+#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[get("/project_type")]
+async fn project_type_list_route(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    project_type_list(pool, redis).await
 }
 
 pub async fn project_type_list(
@@ -262,3 +337,18 @@ pub async fn project_type_list(
     let results = ProjectType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    games_list_route,
+    category_list_route,
+    loader_list_route,
+    loader_fields_list_route,
+    license_list_route,
+    license_text_route,
+    link_platform_list_route,
+    report_type_list_route,
+    project_type_list_route,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

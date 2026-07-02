@@ -29,10 +29,7 @@ use crate::{
     file_hosting::FileHost, models::oauth_clients::DeleteOAuthClientQueryParam,
     util::routes::read_limited_from_payload,
 };
-use actix_web::{
-    HttpRequest, HttpResponse, delete, get, patch, post,
-    web::{self, scope},
-};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
@@ -41,9 +38,9 @@ use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        scope("/oauth")
+        web::scope("/oauth")
             .configure(crate::auth::oauth::config)
             .service(revoke_oauth_authorization)
             .service(oauth_client_create)
@@ -57,6 +54,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+#[utoipa::path(tag = "oauth clients", responses((status = OK)))]
+#[get("/user/{id}/oauth_apps")]
 pub async fn get_user_clients(
     req: HttpRequest,
     info: web::Path<String>,
@@ -622,3 +621,28 @@ pub async fn get_clients_inner(
 
     Ok(clients.into_iter().map(|c| c.into()).collect_vec())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    get_user_clients,
+    get_client,
+    get_clients,
+    oauth_client_create,
+    oauth_client_delete,
+    oauth_client_edit,
+    oauth_client_icon_edit,
+    oauth_client_icon_delete,
+    get_user_oauth_authorizations,
+    revoke_oauth_authorization,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	nest(
+		(path = "/oauth", api = RouteDoc),
+		(path = "/oauth", api = crate::auth::oauth::RouteDoc),
+	)
+)]
+pub(crate) struct ApiDoc;

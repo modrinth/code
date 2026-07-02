@@ -11,9 +11,9 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/version_file")
+        web::scope("/version_file")
             .service(delete_file)
             .service(get_version_from_hash)
             .service(download_version)
@@ -22,7 +22,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 
     cfg.service(
-        utoipa_actix_web::scope("/version_files")
+        web::scope("/version_files")
             .service(get_versions_from_hashes)
             .service(update_files)
             .service(update_files_many)
@@ -615,3 +615,46 @@ pub async fn update_individual_files(
         Err(response) => Ok(response),
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    get_version_from_hash,
+    download_version,
+    delete_file,
+    get_update_from_hash,
+    get_versions_from_hashes,
+    get_projects_from_hashes,
+    update_files,
+    update_files_many,
+    update_individual_files,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    get_version_from_hash,
+    download_version,
+    delete_file,
+    get_update_from_hash,
+    get_projects_from_hashes,
+))]
+pub(crate) struct VersionFileRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    get_versions_from_hashes,
+    update_files,
+    update_files_many,
+    update_individual_files,
+))]
+pub(crate) struct VersionFilesRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	nest(
+		(path = "/version_file", api = VersionFileRoutesDoc),
+		(path = "/version_files", api = VersionFilesRoutesDoc),
+	)
+)]
+pub(crate) struct ApiDoc;

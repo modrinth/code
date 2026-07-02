@@ -33,7 +33,7 @@ use tracing::error;
 const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(transaction_history)
         .service(calculate_fees)
         .service(create_payout)
@@ -42,24 +42,6 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(get_balance)
         .service(platform_revenue)
         .service(post_compliance_form);
-}
-
-pub fn web_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/payout")
-            .service(transaction_history)
-            .service(calculate_fees)
-            .service(create_payout)
-            .service(cancel_payout)
-            .service(payment_methods)
-            .service(get_balance)
-            .service(platform_revenue)
-            .service(post_compliance_form),
-    );
-}
-
-pub fn webhook_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(paypal_webhook).service(tremendous_webhook);
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -171,6 +153,7 @@ pub async fn post_compliance_form(
 }
 
 /// Receive PayPal webhook.
+#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
 #[post("/_paypal")]
 pub async fn paypal_webhook(
     req: HttpRequest,
@@ -329,6 +312,7 @@ pub async fn paypal_webhook(
 }
 
 /// Receive Tremendous webhook.
+#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
 #[post("/_tremendous")]
 pub async fn tremendous_webhook(
     req: HttpRequest,
@@ -1242,3 +1226,36 @@ pub async fn platform_revenue(
 
     Ok(HttpResponse::Ok().json(res))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    post_compliance_form,
+    paypal_webhook,
+    tremendous_webhook,
+    calculate_fees,
+    create_payout,
+    transaction_history,
+    cancel_payout,
+    payment_methods,
+    get_balance,
+    platform_revenue,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    post_compliance_form,
+    calculate_fees,
+    create_payout,
+    transaction_history,
+    cancel_payout,
+    payment_methods,
+    get_balance,
+    platform_revenue,
+))]
+pub(crate) struct PayoutRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(paypal_webhook, tremendous_webhook,))]
+pub(crate) struct WebhookRoutesDoc;

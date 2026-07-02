@@ -12,10 +12,10 @@ use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(teams_get);
     cfg.service(
-        utoipa_actix_web::scope("/team")
+        web::scope("/team")
             .service(team_members_get)
             .service(edit_team_member)
             .service(transfer_ownership)
@@ -414,4 +414,48 @@ pub async fn remove_team_member(
     v3::teams::remove_team_member(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    team_members_get_project,
+    team_members_get,
+    teams_get,
+    join_team,
+    add_team_member,
+    edit_team_member,
+    transfer_ownership,
+    remove_team_member,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(teams_get,))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(team_members_get_project,))]
+pub(crate) struct ProjectRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    team_members_get,
+    join_team,
+    add_team_member,
+    edit_team_member,
+    transfer_ownership,
+    remove_team_member,
+))]
+pub(crate) struct TeamRoutesDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let openapi = RootRoutesDoc::openapi();
+        openapi
+            .nest("/project", ProjectRoutesDoc::openapi())
+            .nest("/team", TeamRoutesDoc::openapi())
+    }
 }

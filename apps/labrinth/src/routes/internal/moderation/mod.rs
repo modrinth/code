@@ -25,7 +25,7 @@ mod external_license;
 mod ownership;
 mod tech_review;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_projects)
         .service(get_project_meta)
         .service(set_project_meta)
@@ -35,26 +35,10 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
+        .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
-            utoipa_actix_web::scope("/tech-review")
-                .configure(tech_review::config),
-        )
-        .service(
-            utoipa_actix_web::scope("/external-license")
-                .configure(external_license::config),
+            web::scope("/external-license").configure(external_license::config),
         );
-}
-
-pub fn web_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_projects)
-        .service(get_project_meta)
-        .service(set_project_meta)
-        .service(acquire_lock)
-        .service(override_lock)
-        .service(get_lock_status)
-        .service(release_lock)
-        .service(release_lock_beacon)
-        .service(delete_all_locks);
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -872,4 +856,30 @@ async fn delete_all_locks(
     let deleted_count = DBModerationLock::delete_all(&pool).await?;
 
     Ok(web::Json(DeleteAllLocksResponse { deleted_count }))
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    get_projects,
+    get_project_meta,
+    set_project_meta,
+    acquire_lock,
+    override_lock,
+    get_lock_status,
+    release_lock,
+    release_lock_beacon,
+    delete_all_locks,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let openapi = RouteDoc::openapi();
+        openapi
+            .nest("/tech-review", tech_review::RouteDoc::openapi())
+            .nest("/external-license", external_license::RouteDoc::openapi())
+    }
 }

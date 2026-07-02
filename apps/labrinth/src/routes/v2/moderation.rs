@@ -8,8 +8,8 @@ use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::Deserialize;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(utoipa_actix_web::scope("/moderation").service(get_projects));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(web::scope("/moderation").service(get_projects));
 }
 
 #[derive(Deserialize)]
@@ -80,3 +80,16 @@ pub async fn get_projects(
         Err(response) => Ok(response),
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(get_projects,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	nest(
+		(path = "/moderation", api = RouteDoc),
+	)
+)]
+pub(crate) struct ApiDoc;

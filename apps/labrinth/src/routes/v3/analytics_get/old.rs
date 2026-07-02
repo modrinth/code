@@ -21,16 +21,7 @@ use std::collections::HashMap;
 use std::convert::TryInto;
 use std::num::NonZeroU32;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(playtimes_get)
-        .service(views_get)
-        .service(downloads_get)
-        .service(revenue_get)
-        .service(countries_downloads_get)
-        .service(countries_views_get);
-}
-
-pub fn web_config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(playtimes_get)
         .service(views_get)
         .service(downloads_get)
@@ -730,3 +721,15 @@ async fn filter_allowed_ids(
     // Only one of project_ids or version_ids will be Some
     Ok(project_ids)
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    playtimes_get,
+    views_get,
+    downloads_get,
+    revenue_get,
+    countries_downloads_get,
+    countries_views_get,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

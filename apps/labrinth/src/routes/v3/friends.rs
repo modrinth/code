@@ -17,7 +17,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(add_friend);
     cfg.service(remove_friend);
     cfg.service(friends);
@@ -206,3 +206,8 @@ pub async fn friends(
 
     Ok(HttpResponse::Ok().json(friends))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(add_friend, remove_friend, friends,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

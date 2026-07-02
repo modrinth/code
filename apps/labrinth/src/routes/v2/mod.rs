@@ -14,12 +14,11 @@ mod versions;
 
 pub use super::ApiError;
 use crate::util::cors::default_cors;
+use actix_web::web;
 
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/v2")
+        web::scope("/v2")
             .wrap(default_cors())
             .configure(super::internal::session::config)
             .configure(super::internal::flows::config)
@@ -39,3 +38,26 @@ pub fn utoipa_config(
             .configure(versions::config),
     );
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+    nest(
+        (path = "/v2", api = super::internal::session::ApiDoc),
+        (path = "/v2", api = super::internal::flows::ApiDoc),
+        (path = "/v2", api = super::internal::pats::RouteDoc),
+        (path = "/v2", api = super::internal::admin::ApiDoc),
+        (path = "/v2", api = moderation::ApiDoc),
+        (path = "/v2", api = notifications::ApiDoc),
+        (path = "/v2", api = project_creation::RouteDoc),
+        (path = "/v2", api = projects::ApiDoc),
+        (path = "/v2", api = reports::RouteDoc),
+        (path = "/v2", api = statistics::RouteDoc),
+        (path = "/v2", api = tags::ApiDoc),
+        (path = "/v2", api = teams::ApiDoc),
+        (path = "/v2", api = threads::ApiDoc),
+        (path = "/v2", api = users::ApiDoc),
+        (path = "/v2", api = version_file::ApiDoc),
+        (path = "/v2", api = versions::ApiDoc),
+    )
+)]
+pub struct ApiDoc;

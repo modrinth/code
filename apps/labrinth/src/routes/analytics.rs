@@ -46,18 +46,19 @@ pub const FILTERED_HEADERS: &[&str] = &[
     "x-vercel-ip-country",
 ];
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(page_view_ingest)
         .service(playtime_ingest)
         .service(minecraft_server_play_ingest);
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct UrlInput {
     url: String,
 }
 
 //this route should be behind the cloudflare WAF to prevent non-browsers from calling it
+#[utoipa::path(tag = "analytics", responses((status = NO_CONTENT)))]
 #[post("/view")]
 async fn page_view_ingest(
     req: HttpRequest,
@@ -171,7 +172,7 @@ async fn page_view_ingest(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, utoipa::ToSchema)]
 pub struct PlaytimeInput {
     seconds: u16,
     loader: String,
@@ -179,6 +180,7 @@ pub struct PlaytimeInput {
     parent: Option<crate::models::ids::VersionId>,
 }
 
+#[utoipa::path(tag = "analytics", responses((status = NO_CONTENT)))]
 #[post("/playtime")]
 async fn playtime_ingest(
     req: HttpRequest,
@@ -249,7 +251,7 @@ struct MinecraftProfile {
     name: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
     username: String,
@@ -258,6 +260,7 @@ pub struct MinecraftJavaServerPlayInput {
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
 
+#[utoipa::path(tag = "analytics", responses((status = NO_CONTENT)))]
 #[post("/minecraft-server-play")]
 async fn minecraft_server_play_ingest(
     req: HttpRequest,
@@ -355,3 +358,12 @@ async fn minecraft_server_play_ingest(
 
     Ok(())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    page_view_ingest,
+    playtime_ingest,
+    minecraft_server_play_ingest,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

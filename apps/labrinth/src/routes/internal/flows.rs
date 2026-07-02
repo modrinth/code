@@ -60,9 +60,11 @@ use webauthn_rs::prelude::{
 };
 use zxcvbn::Score;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/auth")
+        web::scope("/auth")
+            .service(init)
+            .service(auth_callback)
             .service(delete_auth_provider)
             .service(create_oauth_account)
             .service(validate_create_account_with_password)
@@ -1065,6 +1067,7 @@ pub struct Authorization {
 
 // Init link takes us to GitHub API and calls back to callback endpoint with a code and state
 // http://localhost:8000/auth/init?url=https://modrinth.com
+#[utoipa::path(tag = "auth", responses((status = TEMPORARY_REDIRECT), (status = OK)))]
 #[get("/init")]
 pub async fn init(
     req: HttpRequest,
@@ -1155,6 +1158,7 @@ pub async fn init(
         .json(serde_json::json!({ "url": url })))
 }
 
+#[utoipa::path(tag = "auth", responses((status = OK)))]
 #[get("/callback")]
 pub async fn auth_callback(
     req: HttpRequest,
@@ -3646,3 +3650,43 @@ pub async fn delete_passkey(
     transaction.commit().await?;
     Ok(HttpResponse::NoContent().finish())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    init,
+    auth_callback,
+    create_oauth_account,
+    discord_community_link,
+    delete_auth_provider,
+    validate_create_account_with_password,
+    create_account_with_password,
+    login_password,
+    login_2fa,
+    begin_2fa_flow,
+    finish_2fa_flow,
+    remove_2fa,
+    reset_password_begin,
+    change_password,
+    set_email,
+    resend_verify_email,
+    verify_email,
+    subscribe_newsletter,
+    get_newsletter_subscription_status,
+    register_passkey_start,
+    register_passkey_finish,
+    authenticate_passkey_start,
+    authenticate_passkey_finish,
+    list_passkeys,
+    rename_passkey,
+    delete_passkey,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	nest(
+		(path = "/auth", api = RouteDoc),
+	)
+)]
+pub(crate) struct ApiDoc;

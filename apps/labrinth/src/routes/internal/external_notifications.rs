@@ -26,23 +26,11 @@ use eyre::eyre;
 use lettre::message::Mailbox;
 use serde::Deserialize;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(create)
         .service(create_email_sync)
         .service(remove)
         .service(send_custom_email);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal")
-            .service(create)
-            .service(create_email_sync)
-            .service(remove)
-            .service(send_custom_email),
-    );
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -375,3 +363,8 @@ async fn broadcast_notifications(
         }
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(create, create_email_sync, remove, send_custom_email,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

@@ -27,7 +27,7 @@ use crate::{
     util::{error::Context, http::HttpClient, tiltify::TiltifyClient},
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(tiltify_webhook).service(pride_26);
 }
 
@@ -480,3 +480,8 @@ async fn amount_raised_usd(
 
     Ok(amount.value / usd_to_currency)
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(tiltify_webhook, pride_26,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

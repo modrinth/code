@@ -26,7 +26,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(list)
         .service(update_group)
         .service(scan)
@@ -987,3 +987,8 @@ fn hex_to_bytes(hex: &str) -> Option<Vec<u8>> {
         .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).ok())
         .collect()
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(scan, list, update_group, assign, split,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

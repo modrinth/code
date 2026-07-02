@@ -362,11 +362,11 @@ pub fn app_config(
     cfg: &mut web::ServiceConfig,
     labrinth_config: LabrinthConfig,
 ) {
-    app_base_config(cfg, labrinth_config);
+    app_data_config(cfg, labrinth_config);
     app_fallback_config(cfg);
 }
 
-pub fn app_base_config(
+pub fn app_data_config(
     cfg: &mut web::ServiceConfig,
     labrinth_config: LabrinthConfig,
 ) {
@@ -406,9 +406,7 @@ pub fn app_base_config(
     .app_data(labrinth_config.rate_limiter.clone())
     .app_data(labrinth_config.kafka_client.clone())
     .app_data(labrinth_config.search_state.clone())
-    .app_data(labrinth_config.webauthn.clone())
-    .configure(routes::v3::config)
-    .configure(routes::internal::config);
+    .app_data(labrinth_config.webauthn.clone());
 }
 
 pub fn app_fallback_config(cfg: &mut web::ServiceConfig) {
@@ -416,8 +414,8 @@ pub fn app_fallback_config(cfg: &mut web::ServiceConfig) {
         .default_service(web::get().to(routes::not_found).wrap(default_cors()));
 }
 
-pub fn utoipa_app_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+pub fn app_routes_config(
+    cfg: &mut web::ServiceConfig,
     labrinth_config: LabrinthConfig,
 ) {
     cfg.configure({
@@ -430,28 +428,29 @@ pub fn utoipa_app_config(
             |_cfg| ()
         }
     })
-    .configure(|cfg| utoipa_app_config_v2(cfg, labrinth_config.clone()))
-    .configure(|cfg| utoipa_app_config_v3(cfg, labrinth_config.clone()))
-    .configure(|cfg| utoipa_app_config_internal(cfg, labrinth_config));
+    .configure(|cfg| app_routes_config_v2(cfg, labrinth_config.clone()))
+    .configure(|cfg| app_routes_config_v3(cfg, labrinth_config.clone()))
+    .configure(|cfg| app_routes_config_internal(cfg, labrinth_config));
 }
 
-pub fn utoipa_app_config_v2(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+pub fn app_routes_config_v2(
+    cfg: &mut web::ServiceConfig,
     _labrinth_config: LabrinthConfig,
 ) {
-    cfg.configure(routes::v2::utoipa_config);
+    cfg.configure(routes::v2::config);
 }
 
-pub fn utoipa_app_config_v3(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+pub fn app_routes_config_v3(
+    cfg: &mut web::ServiceConfig,
     _labrinth_config: LabrinthConfig,
 ) {
-    cfg.configure(routes::v3::utoipa_config);
+    cfg.configure(routes::public_config)
+        .configure(routes::v3::config);
 }
 
-pub fn utoipa_app_config_internal(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+pub fn app_routes_config_internal(
+    cfg: &mut web::ServiceConfig,
     _labrinth_config: LabrinthConfig,
 ) {
-    cfg.configure(routes::internal::utoipa_config);
+    cfg.configure(routes::internal::config);
 }

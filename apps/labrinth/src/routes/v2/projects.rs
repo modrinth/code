@@ -20,13 +20,13 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_search);
     cfg.service(projects_get);
     cfg.service(projects_edit);
     cfg.service(random_projects_get);
     cfg.service(
-        utoipa_actix_web::scope("/project")
+        web::scope("/project")
             .service(project_get)
             .service(project_get_check)
             .service(project_delete)
@@ -40,7 +40,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
             .service(project_unfollow)
             .service(super::teams::team_members_get_project)
             .service(
-                utoipa_actix_web::scope("/{project_id}")
+                web::scope("/{project_id}")
                     .service(super::versions::version_list)
                     .service(super::versions::version_project_get)
                     .service(dependency_list),
@@ -1369,4 +1369,66 @@ pub async fn project_unfollow(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    project_search,
+    random_projects_get,
+    projects_get,
+    project_get,
+    project_get_check,
+    dependency_list,
+    project_edit,
+    projects_edit,
+    project_icon_edit,
+    delete_project_icon,
+    add_gallery_item,
+    edit_gallery_item,
+    delete_gallery_item,
+    project_delete,
+    project_follow,
+    project_unfollow,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    project_search,
+    random_projects_get,
+    projects_get,
+    projects_edit,
+))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    project_get,
+    project_get_check,
+    project_edit,
+    project_icon_edit,
+    delete_project_icon,
+    add_gallery_item,
+    edit_gallery_item,
+    delete_gallery_item,
+    project_delete,
+    project_follow,
+    project_unfollow,
+))]
+pub(crate) struct ProjectRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(dependency_list,))]
+pub(crate) struct ProjectIdRoutesDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let openapi = RootRoutesDoc::openapi();
+        openapi
+            .nest("/project", ProjectRoutesDoc::openapi())
+            .nest("/project/{project_id}", ProjectIdRoutesDoc::openapi())
+    }
 }

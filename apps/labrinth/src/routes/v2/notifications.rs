@@ -10,12 +10,12 @@ use crate::routes::v3;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(notifications_get);
     cfg.service(notifications_delete);
     cfg.service(notifications_read);
     cfg.service(
-        utoipa_actix_web::scope("/notification")
+        web::scope("/notification")
             .service(notification_get)
             .service(notification_read)
             .service(notification_delete),
@@ -286,4 +286,33 @@ pub async fn notifications_delete(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    notifications_get,
+    notification_get,
+    notification_read,
+    notification_delete,
+    notifications_read,
+    notifications_delete,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(notifications_get, notifications_read, notifications_delete,))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(notification_get, notification_read, notification_delete,))]
+pub(crate) struct NotificationRoutesDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let openapi = RootRoutesDoc::openapi();
+        openapi.nest("/notification", NotificationRoutesDoc::openapi())
+    }
 }

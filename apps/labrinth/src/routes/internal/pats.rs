@@ -22,7 +22,7 @@ use crate::util::validate::validation_errors_to_string;
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_pats);
     cfg.service(create_pat);
     cfg.service(edit_pat);
@@ -353,3 +353,8 @@ pub async fn delete_pat(
 
     Ok(HttpResponse::NoContent().finish())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(get_pats, create_pat, edit_pat, delete_pat,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

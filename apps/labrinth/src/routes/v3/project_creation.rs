@@ -46,16 +46,10 @@ use validator::Validate;
 
 mod new;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create)
         .service(project_create_with_id)
         .configure(new::config);
-}
-
-pub fn web_config(cfg: &mut web::ServiceConfig) {
-    cfg.route("", web::post().to(project_create_web))
-        .service(project_create_with_id)
-        .configure(new::web_config);
 }
 
 #[derive(Error, Debug)]
@@ -293,29 +287,6 @@ pub async fn undo_uploads(
 #[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
 #[post("")]
 pub async fn project_create(
-    req: HttpRequest,
-    payload: Multipart,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    file_host: Data<dyn FileHost>,
-    session_queue: Data<AuthQueue>,
-    http: Data<HttpClient>,
-    search_state: Data<SearchState>,
-) -> Result<HttpResponse, CreateError> {
-    project_create_internal(
-        req,
-        payload,
-        client,
-        redis,
-        file_host,
-        session_queue,
-        http,
-        search_state,
-    )
-    .await
-}
-
-async fn project_create_web(
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -1206,4 +1177,19 @@ async fn process_icon_upload(
         upload_result.raw_url,
         upload_result.color,
     ))
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(project_create, project_create_with_id,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let mut openapi = RouteDoc::openapi();
+        openapi.merge(new::RouteDoc::openapi());
+        openapi
+    }
 }

@@ -35,21 +35,9 @@ use crate::{
 
 pub mod rescan;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/delphi")
-            .service(ingest_report)
-            .service(_run)
-            .service(version)
-            .service(issue_type_schema),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal/delphi")
             .service(ingest_report)
             .service(_run)
             .service(version)
@@ -588,3 +576,8 @@ async fn issue_type_schema(
         )),
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(ingest_report, _run, version, issue_type_schema,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

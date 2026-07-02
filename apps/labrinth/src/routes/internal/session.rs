@@ -19,9 +19,9 @@ use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use woothee::parser::Parser;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/session")
+        web::scope("/session")
             .service(list)
             .service(delete)
             .service(refresh),
@@ -316,3 +316,16 @@ pub async fn refresh(
         ))
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(list, delete, refresh,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	nest(
+		(path = "/session", api = RouteDoc),
+	)
+)]
+pub(crate) struct ApiDoc;

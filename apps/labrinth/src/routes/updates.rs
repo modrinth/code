@@ -17,11 +17,11 @@ use crate::queue::session::AuthQueue;
 
 use super::ApiError;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(forge_updates);
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct NeoForge {
     #[serde(default = "default_neoforge")]
     pub neoforge: String,
@@ -31,6 +31,7 @@ fn default_neoforge() -> String {
     "none".into()
 }
 
+#[utoipa::path(tag = "updates", responses((status = OK)))]
 #[get("/{id}/forge_updates.json")]
 pub async fn forge_updates(
     req: HttpRequest,
@@ -134,3 +135,8 @@ pub async fn forge_updates(
 
     Ok(HttpResponse::Ok().json(response))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(forge_updates,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

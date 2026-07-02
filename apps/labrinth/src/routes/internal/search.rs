@@ -5,7 +5,7 @@ use crate::{
 };
 use actix_web::{delete, get, web};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(tasks).service(tasks_cancel);
 }
 
@@ -37,3 +37,8 @@ pub async fn tasks_cancel(
         .map_err(ApiError::Internal)?;
     Ok(())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(tasks, tasks_cancel,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

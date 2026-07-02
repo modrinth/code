@@ -16,11 +16,11 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(versions_get);
     cfg.service(super::version_creation::version_create);
     cfg.service(
-        utoipa_actix_web::scope("/version")
+        web::scope("/version")
             .service(version_get)
             .service(version_delete)
             .service(version_edit)
@@ -536,4 +536,44 @@ pub async fn version_delete(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    version_list,
+    version_project_get,
+    versions_get,
+    version_get,
+    version_edit,
+    version_delete,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(versions_get,))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(version_get, version_edit, version_delete,))]
+pub(crate) struct VersionRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(version_list, version_project_get,))]
+pub(crate) struct ProjectRoutesDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let mut openapi = RootRoutesDoc::openapi();
+        openapi.merge(super::version_creation::RootRoutesDoc::openapi());
+        openapi
+            .nest("/version", VersionRoutesDoc::openapi())
+            .nest("/project/{project_id}", ProjectRoutesDoc::openapi())
+            .nest(
+                "/version",
+                super::version_creation::VersionRoutesDoc::openapi(),
+            )
+    }
 }

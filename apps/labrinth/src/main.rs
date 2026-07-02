@@ -15,11 +15,11 @@ use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::{app_base_config, app_fallback_config, env};
-use labrinth::{clickhouse, database, file_hosting};
+use labrinth::{app_data_config, app_fallback_config, env};
 use labrinth::{
-    utoipa_app_config_internal, utoipa_app_config_v2, utoipa_app_config_v3,
+    app_routes_config_internal, app_routes_config_v2, app_routes_config_v3,
 };
+use labrinth::{clickhouse, database, file_hosting};
 use scalar_api_reference::actix_web::config as scalar_config;
 use serde_json::json;
 use std::ffi::CStr;
@@ -29,7 +29,6 @@ use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
 use utoipa::openapi::extensions::ExtensionsBuilder;
 use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
-use utoipa_actix_web::AppExt;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -227,7 +226,15 @@ async fn app() -> std::io::Result<()> {
     info!("Starting Actix HTTP server!");
 
     HttpServer::new(move || {
-        let (app, docs_v2) = App::new()
+        let docs_v2 = DocsV2::openapi()
+            .merge_from(labrinth::routes::v2::ApiDoc::openapi());
+        let docs_v3 = DocsV3::openapi()
+            .merge_from(labrinth::routes::PublicApiDoc::openapi())
+            .merge_from(labrinth::routes::v3::ApiDoc::openapi());
+        let docs_internal = DocsInternal::openapi()
+            .merge_from(labrinth::routes::internal::ApiDoc::openapi());
+
+        let app = App::new()
             .wrap(TracingLogger::default())
             .wrap_fn(|req, srv| {
                 // We capture the same fields as `tracing-actix-web`'s `RootSpanBuilder`.
@@ -264,23 +271,12 @@ async fn app() -> std::io::Result<()> {
             // transactions out of HTTP requests. However, we have to use our
             // own - See `sentry::SentryErrorReporting` for why.
             .wrap(labrinth::util::sentry::SentryErrorReporting)
-            .configure(|cfg| app_base_config(cfg, labrinth_config.clone()))
-            .into_utoipa_app()
-            .openapi(DocsV2::openapi())
-            .configure(|cfg| utoipa_app_config_v2(cfg, labrinth_config.clone()))
-            .split_for_parts();
-        let (app, docs_v3) = app
-            .into_utoipa_app()
-            .openapi(DocsV3::openapi())
-            .configure(|cfg| utoipa_app_config_v3(cfg, labrinth_config.clone()))
-            .split_for_parts();
-        let (app, docs_internal) = app
-            .into_utoipa_app()
-            .openapi(DocsInternal::openapi())
+            .configure(|cfg| app_data_config(cfg, labrinth_config.clone()))
+            .configure(|cfg| app_routes_config_v2(cfg, labrinth_config.clone()))
+            .configure(|cfg| app_routes_config_v3(cfg, labrinth_config.clone()))
             .configure(|cfg| {
-                utoipa_app_config_internal(cfg, labrinth_config.clone())
-            })
-            .split_for_parts();
+                app_routes_config_internal(cfg, labrinth_config.clone())
+            });
 
         let scalar_configuration = json!({
             "sources": [
@@ -362,17 +358,6 @@ const API_V2_DESCRIPTION: &str = include_str!("api_v2_description.md");
 
 #[derive(utoipa::OpenApi)]
 #[openapi(
-    paths(
-        labrinth::routes::v3::version_file::get_version_from_hash,
-        labrinth::routes::v3::version_file::get_update_from_hash,
-        labrinth::routes::v3::version_file::get_versions_from_hashes,
-        labrinth::routes::v3::version_file::get_projects_from_hashes,
-        labrinth::routes::v3::version_file::update_files_many,
-        labrinth::routes::v3::version_file::update_files,
-        labrinth::routes::v3::version_file::update_individual_files,
-        labrinth::routes::v3::version_file::delete_file,
-        labrinth::routes::v3::version_file::download_version
-    ),
     info(
         title = "API v3 (UNSTABLE - DO NOT USE)",
         version = "3.0.0"

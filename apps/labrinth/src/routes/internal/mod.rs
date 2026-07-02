@@ -21,120 +21,64 @@ pub mod statuses;
 pub use super::ApiError;
 use super::v3::oauth_clients;
 use crate::util::cors::default_cors;
+use actix_web::web;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        actix_web::web::scope("/_internal")
+        web::scope("/_internal")
             .wrap(default_cors())
-            .configure(|cfg| {
-                cfg.service(
-                    actix_web::web::scope("/admin")
-                        .service(admin::count_download)
-                        .service(admin::force_reindex)
-                        .service(admin::force_reindex_project),
-                );
-                cfg.service(
-                    actix_web::web::scope("/session")
-                        .service(session::list)
-                        .service(session::delete)
-                        .service(session::refresh),
-                );
-                cfg.service(
-                    actix_web::web::scope("/auth")
-                        .service(flows::init)
-                        .service(flows::auth_callback)
-                        .service(flows::delete_auth_provider)
-                        .service(flows::create_account_with_password)
-                        .service(flows::login_password)
-                        .service(flows::login_2fa)
-                        .service(flows::begin_2fa_flow)
-                        .service(flows::finish_2fa_flow)
-                        .service(flows::remove_2fa)
-                        .service(flows::reset_password_begin)
-                        .service(flows::change_password)
-                        .service(flows::resend_verify_email)
-                        .service(flows::set_email)
-                        .service(flows::verify_email)
-                        .service(flows::subscribe_newsletter)
-                        .service(flows::get_newsletter_subscription_status)
-                        .service(flows::discord_community_link),
-                );
-                cfg.service(pats::get_pats);
-                cfg.service(pats::create_pat);
-                cfg.service(pats::edit_pat);
-                cfg.service(pats::delete_pat);
-                cfg.service(
-                    actix_web::web::scope("/moderation")
-                        .configure(moderation::web_config),
-                );
-            })
+            .configure(admin::config)
+            .configure(session::config)
+            .configure(flows::config)
+            .configure(pats::config)
             .configure(oauth_clients::config)
+            .service(web::scope("/moderation").configure(moderation::config))
+            .service(web::scope("/affiliate").configure(affiliate::config))
+            .service(web::scope("/campaign").configure(campaign::config))
+            .service(web::scope("/search-management").configure(search::config))
+            .service(web::scope("/globals").configure(globals::config))
+            .service(web::scope("/server-ping").configure(server_ping::config))
+            .service(web::scope("/attribution").configure(attribution::config))
             .configure(billing::config)
+            .configure(delphi::config)
+            .configure(external_notifications::config)
             .configure(gdpr::config)
             .configure(gotenberg::config)
-            .configure(statuses::config)
             .configure(medal::config)
-            .configure(external_notifications::config)
             .configure(mural::config)
-            .configure(delphi::config),
+            .configure(statuses::config),
+    )
+    .service(
+        web::scope("/v3/analytics-event")
+            .wrap(default_cors())
+            .configure(super::v3::analytics_event::config),
     );
 }
 
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal/moderation")
-            .wrap(default_cors())
-            .configure(moderation::config),
+#[derive(utoipa::OpenApi)]
+#[openapi(
+    nest(
+        (path = "/_internal", api = admin::ApiDoc),
+        (path = "/_internal", api = session::ApiDoc),
+        (path = "/_internal", api = flows::ApiDoc),
+        (path = "/_internal", api = pats::RouteDoc),
+        (path = "/_internal", api = oauth_clients::ApiDoc),
+        (path = "/_internal/moderation", api = moderation::ApiDoc),
+        (path = "/_internal/affiliate", api = affiliate::RouteDoc),
+        (path = "/_internal/campaign", api = campaign::RouteDoc),
+        (path = "/_internal/search-management", api = search::RouteDoc),
+        (path = "/_internal/globals", api = globals::RouteDoc),
+        (path = "/_internal/server-ping", api = server_ping::RouteDoc),
+        (path = "/_internal/attribution", api = attribution::RouteDoc),
+        (path = "/_internal/billing", api = billing::RouteDoc),
+        (path = "/_internal/delphi", api = delphi::RouteDoc),
+        (path = "/_internal", api = external_notifications::RouteDoc),
+        (path = "/_internal/gdpr", api = gdpr::RouteDoc),
+        (path = "/_internal", api = gotenberg::RouteDoc),
+        (path = "/_internal/medal", api = medal::RouteDoc),
+        (path = "/_internal", api = mural::RouteDoc),
+        (path = "/_internal", api = statuses::RouteDoc),
+        (path = "/v3/analytics-event", api = super::v3::analytics_event::RouteDoc),
     )
-    .service(
-        utoipa_actix_web::scope("/_internal/affiliate")
-            .wrap(default_cors())
-            .configure(affiliate::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/campaign")
-            .wrap(default_cors())
-            .configure(campaign::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/search-management")
-            .wrap(default_cors())
-            .configure(search::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/globals")
-            .wrap(default_cors())
-            .configure(globals::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/server-ping")
-            .wrap(default_cors())
-            .configure(server_ping::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/attribution")
-            .wrap(default_cors())
-            .configure(attribution::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/v2")
-            .wrap(default_cors())
-            .configure(admin::config)
-            .configure(super::v2::moderation::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/v3/analytics-event")
-            .wrap(default_cors())
-            .configure(super::v3::analytics_event::config),
-    )
-    .configure(billing::utoipa_config)
-    .configure(delphi::utoipa_config)
-    .configure(external_notifications::utoipa_config)
-    .configure(gdpr::utoipa_config)
-    .configure(gotenberg::utoipa_config)
-    .configure(medal::utoipa_config)
-    .configure(mural::utoipa_config)
-    .configure(statuses::utoipa_config);
-}
+)]
+pub struct ApiDoc;

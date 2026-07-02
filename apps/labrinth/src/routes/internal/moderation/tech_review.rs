@@ -37,7 +37,7 @@ use crate::{
 };
 use eyre::eyre;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search_projects)
         .service(get_project_report)
         .service(get_report)
@@ -1346,3 +1346,16 @@ async fn add_report(
 
     Ok(web::Json(report_id))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    get_issue,
+    get_report,
+    search_projects,
+    get_project_report,
+    submit_report,
+    update_issue_details,
+    add_report,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

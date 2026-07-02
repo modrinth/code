@@ -13,18 +13,8 @@ use crate::queue::billing::try_process_user_redeemal;
 use crate::routes::ApiError;
 use crate::util::guards::medal_key_guard;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(web::scope("/medal").service(verify).service(redeem));
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal/medal")
-            .service(verify)
-            .service(redeem),
-    );
 }
 
 #[derive(Deserialize)]
@@ -127,3 +117,8 @@ pub async fn redeem(
         Ok(HttpResponse::Created().finish())
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(verify, redeem,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

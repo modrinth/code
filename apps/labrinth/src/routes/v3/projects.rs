@@ -45,36 +45,15 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(project_search);
-    cfg.service(project_search_post);
-    cfg.route("/projects", web::get().to(projects_get));
-    cfg.route("/projects", web::patch().to(projects_edit));
-    cfg.route("/projects_random", web::get().to(random_projects_get));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(project_search)
+        .service(project_search_post)
+        .service(projects_get_route)
+        .service(projects_edit_route)
+        .service(random_projects_get_route);
 }
 
-pub fn project_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(project_get)
-        .service(project_get_check)
-        .service(project_delete)
-        .service(project_edit)
-        .service(project_icon_edit)
-        .service(delete_project_icon)
-        .service(add_gallery_item)
-        .service(edit_gallery_item)
-        .service(delete_gallery_item)
-        .service(project_follow)
-        .service(project_unfollow)
-        .service(project_get_organization)
-        .service(super::teams::team_members_get_project)
-        .service(super::versions::version_list)
-        .service(super::versions::version_project_get)
-        .service(dependency_list);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_get)
         .service(project_get_check)
         .service(project_delete)
@@ -116,6 +95,16 @@ pub async fn clear_project_cache_and_queue_search(
 pub struct RandomProjects {
     #[validate(range(min = 1, max = 100))]
     pub count: u32,
+}
+
+#[utoipa::path(tag = "projects", responses((status = OK)))]
+#[get("/projects_random")]
+async fn random_projects_get_route(
+    count: web::Query<RandomProjects>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    random_projects_get(count, pool, redis).await
 }
 
 pub async fn random_projects_get(
@@ -167,6 +156,18 @@ pub struct ProjectIds {
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct ProjectCheckResponse {
     pub id: ProjectId,
+}
+
+#[utoipa::path(tag = "projects", responses((status = OK)))]
+#[get("/projects")]
+async fn projects_get_route(
+    req: HttpRequest,
+    ids: web::Query<ProjectIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    projects_get(req, ids, pool, redis, session_queue).await
 }
 
 pub async fn projects_get(
@@ -1494,7 +1495,7 @@ pub struct CategoryChanges<'a> {
     pub remove_categories: &'a Option<Vec<String>>,
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct BulkEditProject {
     #[validate(length(max = 3))]
     pub categories: Option<Vec<String>>,
@@ -1512,6 +1513,29 @@ pub struct BulkEditProject {
         function = " crate::util::validate::validate_url_hashmap_optional_values"
     ))]
     pub link_urls: Option<HashMap<String, Option<String>>>,
+}
+
+#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[patch("/projects")]
+async fn projects_edit_route(
+    req: HttpRequest,
+    ids: web::Query<ProjectIds>,
+    pool: web::Data<PgPool>,
+    bulk_edit_project: web::Json<BulkEditProject>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
+) -> Result<HttpResponse, ApiError> {
+    projects_edit(
+        req,
+        ids,
+        pool,
+        bulk_edit_project,
+        redis,
+        session_queue,
+        search_state,
+    )
+    .await
 }
 
 pub async fn projects_edit(
@@ -3077,3 +3101,55 @@ pub async fn project_get_organization(
         Err(ApiError::NotFound)
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    random_projects_get_route,
+    projects_get_route,
+    project_get,
+    project_edit,
+    project_search,
+    project_search_post,
+    project_get_check,
+    dependency_list,
+    projects_edit_route,
+    project_icon_edit,
+    delete_project_icon,
+    add_gallery_item,
+    edit_gallery_item,
+    delete_gallery_item,
+    project_delete,
+    project_follow,
+    project_unfollow,
+    project_get_organization,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    project_search,
+    project_search_post,
+    projects_get_route,
+    projects_edit_route,
+    random_projects_get_route,
+))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    project_get,
+    project_get_check,
+    project_delete,
+    project_edit,
+    project_icon_edit,
+    delete_project_icon,
+    add_gallery_item,
+    edit_gallery_item,
+    delete_gallery_item,
+    project_follow,
+    project_unfollow,
+    project_get_organization,
+    dependency_list,
+))]
+pub(crate) struct ProjectRoutesDoc;

@@ -13,7 +13,7 @@ use crate::queue::moderation::ApprovalType;
 use crate::routes::ApiError;
 use crate::{auth::check_is_moderator_from_headers, queue::session::AuthQueue};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search)
         .service(get_by_sha1)
         .service(get_by_sha1_bulk)
@@ -682,3 +682,16 @@ async fn update_license(
         .into_external_project(linked_files),
     ))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    search,
+    lookup,
+    get_by_sha1,
+    get_by_sha1_bulk,
+    add_file,
+    reassign_file,
+    update_license,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

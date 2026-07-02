@@ -7,25 +7,33 @@ use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("/notifications", web::get().to(notifications_get));
-    cfg.route("/notifications", web::patch().to(notifications_read));
-    cfg.route("/notifications", web::delete().to(notifications_delete));
-
-    cfg.service(
-        web::scope("/notification")
-            .route("/{id}", web::get().to(notification_get))
-            .route("/{id}", web::patch().to(notification_read))
-            .route("/{id}", web::delete().to(notification_delete)),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(notifications_get_route)
+        .service(notifications_read_route)
+        .service(notifications_delete_route)
+        .service(notification_get_route)
+        .service(notification_read_route)
+        .service(notification_delete_route);
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct NotificationIds {
     pub ids: String,
+}
+
+#[utoipa::path(tag = "notifications", responses((status = OK)))]
+#[get("/notifications")]
+async fn notifications_get_route(
+    req: HttpRequest,
+    ids: web::Query<NotificationIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    notifications_get(req, ids, pool, redis, session_queue).await
 }
 
 pub async fn notifications_get(
@@ -70,6 +78,18 @@ pub async fn notifications_get(
     Ok(HttpResponse::Ok().json(notifications))
 }
 
+#[utoipa::path(tag = "notifications", responses((status = OK)))]
+#[get("/notification/{id}")]
+async fn notification_get_route(
+    req: HttpRequest,
+    info: web::Path<(NotificationId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    notification_get(req, info, pool, redis, session_queue).await
+}
+
 pub async fn notification_get(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -105,6 +125,18 @@ pub async fn notification_get(
     } else {
         Err(ApiError::NotFound)
     }
+}
+
+#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[patch("/notification/{id}")]
+async fn notification_read_route(
+    req: HttpRequest,
+    info: web::Path<(NotificationId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    notification_read(req, info, pool, redis, session_queue).await
 }
 
 pub async fn notification_read(
@@ -157,6 +189,18 @@ pub async fn notification_read(
     }
 }
 
+#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[delete("/notification/{id}")]
+async fn notification_delete_route(
+    req: HttpRequest,
+    info: web::Path<(NotificationId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    notification_delete(req, info, pool, redis, session_queue).await
+}
+
 pub async fn notification_delete(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -206,6 +250,18 @@ pub async fn notification_delete(
     } else {
         Err(ApiError::NotFound)
     }
+}
+
+#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[patch("/notifications")]
+async fn notifications_read_route(
+    req: HttpRequest,
+    ids: web::Query<NotificationIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    notifications_read(req, ids, pool, redis, session_queue).await
 }
 
 pub async fn notifications_read(
@@ -261,6 +317,18 @@ pub async fn notifications_read(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[delete("/notifications")]
+async fn notifications_delete_route(
+    req: HttpRequest,
+    ids: web::Query<NotificationIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    notifications_delete(req, ids, pool, redis, session_queue).await
+}
+
 pub async fn notifications_delete(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
@@ -313,3 +381,15 @@ pub async fn notifications_delete(
 
     Ok(HttpResponse::NoContent().body(""))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    notifications_get_route,
+    notification_get_route,
+    notification_read_route,
+    notification_delete_route,
+    notifications_read_route,
+    notifications_delete_route,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

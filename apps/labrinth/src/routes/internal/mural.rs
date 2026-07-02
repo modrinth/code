@@ -6,16 +6,8 @@ use crate::{
     queue::payouts::PayoutsQueue, routes::ApiError, util::error::Context,
 };
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_bank_details);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal").service(get_bank_details),
-    );
 }
 
 /// Get bank details.  
@@ -39,3 +31,8 @@ async fn get_bank_details(
         .wrap_internal_err("failed to fetch bank details")?;
     Ok(web::Json(details))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(get_bank_details,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

@@ -9,13 +9,13 @@ use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::Deserialize;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/thread")
+        web::scope("/thread")
             .service(thread_get)
             .service(thread_send_message),
     );
-    cfg.service(utoipa_actix_web::scope("/message").service(message_delete));
+    cfg.service(web::scope("/message").service(message_delete));
     cfg.service(threads_get);
 }
 
@@ -184,4 +184,32 @@ pub async fn message_delete(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
+}
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(thread_get, threads_get, thread_send_message, message_delete,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(threads_get,))]
+pub(crate) struct RootRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(thread_get, thread_send_message,))]
+pub(crate) struct ThreadRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(message_delete,))]
+pub(crate) struct MessageRoutesDoc;
+
+pub(crate) struct ApiDoc;
+
+impl utoipa::OpenApi for ApiDoc {
+    fn openapi() -> utoipa::openapi::OpenApi {
+        let openapi = RootRoutesDoc::openapi();
+        openapi
+            .nest("/thread", ThreadRoutesDoc::openapi())
+            .nest("/message", MessageRoutesDoc::openapi())
+    }
 }

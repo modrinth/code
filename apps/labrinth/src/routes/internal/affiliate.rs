@@ -25,7 +25,7 @@ use url::Url;
 
 use crate::routes::ApiError;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ingest_click)
         .service(get_all)
         .service(create)
@@ -417,3 +417,8 @@ async fn patch(
 
     Ok(())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(ingest_click, get_all, create, get, delete, patch,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

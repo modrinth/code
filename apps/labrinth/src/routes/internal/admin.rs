@@ -23,9 +23,9 @@ use std::str::FromStr;
 use std::sync::Arc;
 use tracing::trace;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/admin")
+        web::scope("/admin")
             .service(count_download)
             .service(force_reindex)
             .service(force_reindex_project),
@@ -365,3 +365,16 @@ pub async fn force_reindex_project(
 
     Ok(HttpResponse::NoContent().finish())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(count_download, force_reindex, force_reindex_project,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	nest(
+		(path = "/admin", api = RouteDoc),
+	)
+)]
+pub(crate) struct ApiDoc;

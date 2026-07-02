@@ -12,7 +12,7 @@ use crate::{
     util::error::Context,
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ping_minecraft_java);
 }
 
@@ -51,3 +51,8 @@ pub async fn ping_minecraft_java(
 
     Ok(())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(ping_minecraft_java,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

@@ -22,7 +22,7 @@ use crate::{
     util::error::Context,
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(analytics_events_get)
         .service(analytics_event_create)
         .service(analytics_event_edit)
@@ -199,3 +199,13 @@ pub async fn analytics_event_delete(
 
     Ok(())
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    analytics_events_get,
+    analytics_event_create,
+    analytics_event_edit,
+    analytics_event_delete,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

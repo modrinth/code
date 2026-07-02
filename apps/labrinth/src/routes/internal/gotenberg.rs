@@ -28,16 +28,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(success_callback).service(error_callback);
 }
 
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal")
-            .service(success_callback)
-            .service(error_callback),
-    );
-}
-
 /// Receive a Gotenberg success callback.  
 #[utoipa::path(
 	tag = "gotenberg",
@@ -248,3 +238,8 @@ impl header::Header for ModrinthPaymentId {
             .map(|id| Self(PayoutId(id)))
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(success_callback, error_callback,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;

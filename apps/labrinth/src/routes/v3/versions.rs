@@ -31,29 +31,19 @@ use crate::search::{SearchBackend, SearchState};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{HttpRequest, HttpResponse, get, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route(
-        "/version",
-        web::post().to(super::version_creation::version_create),
-    );
-    cfg.route("/versions", web::get().to(versions_get));
-
-    cfg.service(
-        web::scope("/version")
-            .route("/{id}", web::get().to(version_get))
-            .route("/{id}", web::patch().to(version_edit))
-            .route("/{id}", web::delete().to(version_delete))
-            .route(
-                "/{version_id}/file",
-                web::post().to(super::version_creation::upload_file_to_version),
-            ),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(super::version_creation::version_create_route)
+        .service(versions_get_route)
+        .service(version_get_route)
+        .service(version_edit_route)
+        .service(version_delete_route)
+        .service(super::version_creation::upload_file_to_version_route);
 }
 
 // Given a project ID/slug and a version slug
@@ -176,7 +166,6 @@ fn default_true() -> bool {
 #[utoipa::path(
 	tag = "versions",
 	get,
-	path = "/v3/versions",
 	params(
 		("ids" = String, Query, description = "The JSON array of version IDs"),
 		(
@@ -187,6 +176,18 @@ fn default_true() -> bool {
 	),
 	responses((status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>))
 )]
+#[get("/versions")]
+async fn versions_get_route(
+    req: HttpRequest,
+    ids: web::Query<VersionIds>,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    versions_get(req, ids, pool, ro_pool, redis, session_queue).await
+}
+
 pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
@@ -240,7 +241,6 @@ pub async fn versions_get(
 #[utoipa::path(
 	tag = "versions",
 	get,
-	path = "/v3/version/{id}",
 	params(("id" = VersionId, Path, description = "The ID of the version")),
 	responses(
 		(status = 200, description = "Expected response to a valid request", body = models::projects::Version),
@@ -250,6 +250,18 @@ pub async fn versions_get(
 		)
 	)
 )]
+#[get("/version/{id}")]
+async fn version_get_route(
+    req: HttpRequest,
+    info: web::Path<(models::ids::VersionId,)>,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<models::projects::Version>, ApiError> {
+    version_get(req, info, pool, ro_pool, redis, session_queue).await
+}
+
 pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
@@ -373,7 +385,6 @@ pub struct EditVersionFileType {
 #[utoipa::path(
 	tag = "versions",
 	patch,
-	path = "/v3/version/{id}",
 	params(("id" = VersionId, Path, description = "The ID of the version")),
 	responses(
 		(status = NO_CONTENT, description = "Expected response to a valid request"),
@@ -388,6 +399,28 @@ pub struct EditVersionFileType {
 	),
 	security(("bearer_auth" = ["VERSION_WRITE"]))
 )]
+#[patch("/version/{id}")]
+async fn version_edit_route(
+    req: HttpRequest,
+    info: web::Path<(VersionId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    new_version: web::Json<serde_json::Value>,
+    session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
+) -> Result<HttpResponse, ApiError> {
+    version_edit(
+        req,
+        info,
+        pool,
+        redis,
+        new_version,
+        session_queue,
+        search_state,
+    )
+    .await
+}
+
 pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
@@ -1071,7 +1104,6 @@ pub async fn version_list_internal(
 #[utoipa::path(
 	tag = "versions",
 	delete,
-	path = "/v3/version/{id}",
 	params(("id" = VersionId, Path, description = "The ID of the version")),
 	responses(
 		(status = NO_CONTENT, description = "Expected response to a valid request"),
@@ -1086,6 +1118,28 @@ pub async fn version_list_internal(
 	),
 	security(("bearer_auth" = ["VERSION_DELETE"]))
 )]
+#[delete("/version/{id}")]
+async fn version_delete_route(
+    req: HttpRequest,
+    info: web::Path<(VersionId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    search_backend: web::Data<dyn SearchBackend>,
+    search_state: web::Data<SearchState>,
+) -> Result<HttpResponse, ApiError> {
+    version_delete(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        search_backend,
+        search_state,
+    )
+    .await
+}
+
 pub async fn version_delete(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
@@ -1211,3 +1265,28 @@ pub async fn version_delete(
         Err(ApiError::NotFound)
     }
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    version_project_get,
+    versions_get_route,
+    version_get_route,
+    version_edit_route,
+    version_list,
+    version_delete_route,
+))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(version_project_get, version_list,))]
+pub(crate) struct ProjectRoutesDoc;
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(
+    versions_get_route,
+    version_get_route,
+    version_edit_route,
+    version_delete_route,
+))]
+pub(crate) struct RootRoutesDoc;

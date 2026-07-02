@@ -20,7 +20,7 @@ use crate::routes::v3::project_creation::UploadedFile;
 use crate::util::ext::MRPACK_MIME_TYPE;
 use actix_web::http::header::ContentLength;
 use actix_web::web::Data;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, post, web};
 use bytes::BytesMut;
 use chrono::Utc;
 use futures_util::StreamExt;
@@ -29,18 +29,14 @@ use hex::FromHex;
 const MAX_FILE_SIZE: usize = 500 * 1024 * 1024;
 const MAX_FILE_SIZE_TEXT: &str = "500 MB";
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route(
-        "shared-instance/{id}/version",
-        web::post().to(shared_instance_version_create),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(shared_instance_version_create);
 }
 
 /// Create a shared instance version.
 #[utoipa::path(
 	tag = "versions",
 	post,
-	path = "/v3/shared-instance/{id}/version",
 	params(("id" = SharedInstanceId, Path, description = "The ID of the shared instance")),
 	responses(
 		(status = 201, description = "Expected response to a valid request", body = SharedInstanceVersion),
@@ -56,6 +52,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 	),
 	security(("bearer_auth" = ["SHARED_INSTANCE_VERSION_CREATE"]))
 )]
+#[post("/shared-instance/{id}/version")]
 #[allow(clippy::too_many_arguments)]
 pub async fn shared_instance_version_create(
     req: HttpRequest,
@@ -217,3 +214,8 @@ async fn shared_instance_version_create_inner(
     let version: SharedInstanceVersion = new_version.into();
     Ok(HttpResponse::Created().json(version))
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(paths(shared_instance_version_create,))]
+#[allow(dead_code)]
+pub(crate) struct RouteDoc;
