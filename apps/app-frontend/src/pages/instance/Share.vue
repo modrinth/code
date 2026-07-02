@@ -9,6 +9,12 @@
 			@invite="invitePlayer"
 			@cancel="cancelInvite"
 		/>
+		<ConfirmUnlinkModal
+			ref="shareUnlinkModal"
+			mode="share-instance"
+			:backup-tip="importedModpackBackupTip"
+			@unlink="unlinkImportedModpackForShare"
+		/>
 
 		<template v-if="rows.length > 0">
 			<div class="flex flex-col gap-4">
@@ -24,7 +30,7 @@
 					<ButtonStyled color="brand">
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
-							@click="invitePlayersModal?.show($event)"
+							@click="showInvitePlayers($event)"
 						>
 							<UserPlusIcon aria-hidden="true" />
 							{{ formatMessage(messages.inviteFriendsButton) }}
@@ -187,7 +193,7 @@
 			<template #description>{{ formatMessage(messages.noFriendsInvitedDescription) }}</template>
 			<template #actions>
 				<ButtonStyled color="brand">
-					<button class="!h-10" @click="invitePlayersModal?.show($event)">
+					<button class="!h-10" @click="showInvitePlayers($event)">
 						<UserPlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.inviteFriendsButton) }}
 					</button>
@@ -211,6 +217,7 @@ import {
 	AutoLink,
 	Avatar,
 	ButtonStyled,
+	ConfirmUnlinkModal,
 	defineMessages,
 	EmptyState,
 	injectAuth,
@@ -220,6 +227,7 @@ import {
 	type InvitePlayersSearchUser,
 	type InvitePlayersUser,
 	OverflowMenu,
+	provideAppBackup,
 	type SortDirection,
 	StyledInput,
 	Table,
@@ -231,7 +239,7 @@ import {
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { friend_listener } from '@/helpers/events.js'
 import {
@@ -244,9 +252,12 @@ import {
 	upsertCachedFriend,
 } from '@/helpers/friends.ts'
 import { get_user_many } from '@/helpers/cache.js'
+import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
 import {
+	edit,
 	get_shared_instance_users,
 	invite_shared_instance_users,
+	list,
 	remove_shared_instance_users,
 	type SharedInstanceUsers,
 } from '@/helpers/instance'
@@ -275,11 +286,13 @@ const props = defineProps<{
 const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
+const shareUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal> | null>(null)
 const memberSearch = ref('')
 const methodFilter = ref<MethodFilter>('all')
 const sortColumn = ref<string | undefined>('joined')
 const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
+const importedModpackUnlinkedForShare = ref(false)
 
 const pendingRows = ref<Record<string, ShareRow>>({})
 
@@ -326,6 +339,18 @@ const inviteModalHeader = computed(() =>
 const shareRoutePath = computed(() => `/instance/${encodeURIComponent(props.instance.id)}/share`)
 const friendsKey = computed(() => friendsQueryKey(currentUserId.value))
 const sharedUsersKey = computed(() => ['sharedInstanceUsers', props.instance.id] as const)
+const requiresUnlinkBeforeShare = computed(
+	() =>
+		props.instance.link?.type === 'imported_modpack' &&
+		!props.instance.shared_instance &&
+		!importedModpackUnlinkedForShare.value,
+)
+const importedModpackBackupTip = computed(() => {
+	const link = props.instance.link
+	if (link?.type !== 'imported_modpack') return undefined
+
+	return link.name ?? link.filename ?? undefined
+})
 const friendsQuery = useQuery({
 	queryKey: friendsKey,
 	queryFn: async () => getFriendsWithUserData(await getCredentials()),
@@ -687,6 +712,28 @@ function cancelInvite(user: InvitePlayersUser) {
 	}
 }
 
+function showInvitePlayers(event?: MouseEvent) {
+	if (requiresUnlinkBeforeShare.value) {
+		shareUnlinkModal.value?.show()
+		return
+	}
+
+	invitePlayersModal.value?.show(event)
+}
+
+async function unlinkImportedModpackForShare() {
+	try {
+		await edit(props.instance.id, {
+			link: null as unknown as undefined,
+		})
+		importedModpackUnlinkedForShare.value = true
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', props.instance.id] })
+		invitePlayersModal.value?.show()
+	} catch (error) {
+		handleError(toError(error))
+	}
+}
+
 function removeRow(id: string) {
 	if (pendingRows.value[id]) {
 		removePendingRow(id)
@@ -824,6 +871,30 @@ function toError(error: unknown) {
 	}
 	return new Error(String(error))
 }
+
+watch(
+	() => props.instance.id,
+	() => {
+		importedModpackUnlinkedForShare.value = false
+	},
+)
+
+provideAppBackup({
+	async createBackup() {
+		const allInstances = await list()
+		const prefix = `${props.instance.name} - Backup #`
+		const existingNums = allInstances
+			.filter((instance) => instance.name.startsWith(prefix))
+			.map((instance) => parseInt(instance.name.slice(prefix.length), 10))
+			.filter((value) => !isNaN(value))
+		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
+		const job = await install_duplicate_instance(props.instance.id)
+		const newInstanceId = installJobInstanceId(job)
+		if (newInstanceId) {
+			await edit(newInstanceId, { name: `${prefix}${nextNum}` })
+		}
+	},
+})
 
 const unlistenFriends = await friend_listener(() => {
 	void queryClient.invalidateQueries({ queryKey: friendsKey.value })

@@ -1,6 +1,6 @@
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
-use crate::state::instances::SharedInstanceAttachment;
+use crate::state::instances::{InstanceLink, SharedInstanceAttachment};
 use crate::state::{
     ContentSetSyncStatus, ModrinthCredentials, ProjectType,
     SharedInstanceRole, State,
@@ -81,6 +81,7 @@ pub async fn invite_shared_instance_users(
             attachment
         }
         None => {
+            ensure_shareable_instance(instance_id, &state).await?;
             tracing::info!(
                 instance_id,
                 user_count = user_ids.len(),
@@ -265,11 +266,14 @@ async fn publish_current_content(
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
+    ensure_shareable_link(&metadata.link)?;
+    let modpack_id = shared_modpack_id(&metadata.link);
     let (modrinth_ids, external_files) =
         collect_publish_content(instance_id, state).await?;
     tracing::debug!(
         instance_id,
         shared_instance_id,
+        modpack_id = modpack_id.as_deref().unwrap_or("none"),
         modrinth_id_count = modrinth_ids.len(),
         external_file_count = external_files.len(),
         "Creating shared instance version"
@@ -288,6 +292,14 @@ async fn publish_current_content(
         Some(json!({
             "modrinth_ids": modrinth_ids,
             "external_files": external_file_data,
+            "modpack_id": modpack_id,
+            "game_version": metadata.applied_content_set.game_version.clone(),
+            "loader": metadata.applied_content_set.loader.as_str(),
+            "loader_version": metadata
+                .applied_content_set
+                .loader_version
+                .clone()
+                .unwrap_or_default(),
         })),
         state,
     )
@@ -326,17 +338,8 @@ async fn collect_publish_content(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<(Vec<String>, Vec<ExternalFileCandidate>)> {
-    let mut items = crate::state::list_content(instance_id, None, None, state)
+    let items = crate::state::list_content(instance_id, None, None, state)
         .await?;
-    items.extend(
-        crate::state::list_linked_modpack_content(
-            instance_id,
-            None,
-            None,
-            state,
-        )
-        .await?,
-    );
 
     let mut modrinth_ids = Vec::new();
     let mut seen_modrinth_ids = HashSet::new();
@@ -371,6 +374,42 @@ async fn collect_publish_content(
     }
 
     Ok((modrinth_ids, external_files))
+}
+
+fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
+    match link {
+        InstanceLink::ModrinthModpack { version_id, .. } => {
+            Some(version_id.clone())
+        }
+        InstanceLink::ServerProjectModpack {
+            content_version_id,
+            ..
+        } => Some(content_version_id.clone()),
+        _ => None,
+    }
+}
+
+async fn ensure_shareable_instance(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    ensure_shareable_link(&metadata.link)
+}
+
+fn ensure_shareable_link(link: &InstanceLink) -> crate::Result<()> {
+    if matches!(link, InstanceLink::ImportedModpack { .. }) {
+        return Err(crate::ErrorKind::InputError(
+            "You must unlink this modpack to share your instance".to_string(),
+        )
+        .into());
+    }
+
+    Ok(())
 }
 
 async fn upload_external_files(
