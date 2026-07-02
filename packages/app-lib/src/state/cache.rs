@@ -1102,8 +1102,13 @@ impl CachedEntry {
                 .collect::<Vec<_>>()
                 .chunks(MAX_REQUEST_SIZE)
                 .map(|chunk| {
-                    serde_json::to_string(&chunk)
-                        .map(|keys| format!("{api_url}{url}{keys}"))
+                    serde_json::to_string(&chunk).map(|keys| {
+                        format!(
+                            "{api_url}{url}{}",
+                            url::form_urlencoded::byte_serialize(keys.as_bytes())
+                                .collect::<String>()
+                        )
+                    })
                 })
                 .collect::<Result<Vec<_>, _>>()?;
 
