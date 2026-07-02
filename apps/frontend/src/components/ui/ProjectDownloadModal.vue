@@ -17,7 +17,7 @@
 				>
 					<div class="flex flex-col">
 						<a
-							class="modrinth-app-install-card group flex items-center justify-between gap-3 rounded-2xl border border-solid border-brand-highlight bg-surface-1 px-4 py-3 text-primary no-underline transition-[filter] hover:brightness-110"
+							class="modrinth-app-install-card flex items-center justify-between gap-3 rounded-2xl border border-solid border-brand-highlight bg-surface-1 px-4 py-3 text-primary no-underline transition-[filter] hover:brightness-110"
 							:href="`modrinth://mod/${project.slug}`"
 							@click="installWithApp"
 						>
@@ -30,7 +30,7 @@
 									</span>
 									<ExternalIcon
 										aria-hidden="true"
-										class="size-4 flex-shrink-0 text-contrast transition-colors group-hover:text-brand"
+										class="size-4 flex-shrink-0 text-contrast transition-colors"
 									/>
 								</div>
 								<span class="truncate text-base text-secondary">
@@ -83,13 +83,12 @@
 								"
 								class="flex w-full items-center justify-between gap-2"
 								:class="{
-									'text-brand-red': !possibleGameVersions.includes(item.value),
+									'text-brand-red opacity-40': !possibleGameVersions.includes(item.value),
 									'text-green': isSelected,
 									'text-primary': possibleGameVersions.includes(item.value) && !isSelected,
 								}"
 							>
 								<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
-								<CheckIcon v-if="isSelected" aria-hidden="true" class="size-5 flex-shrink-0" />
 							</div>
 						</template>
 						<template #dropdown-footer>
@@ -128,13 +127,12 @@
 								"
 								class="flex w-full items-center justify-between gap-2"
 								:class="{
-									'text-brand-red': !possiblePlatforms.includes(item.value),
+									'text-brand-red opacity-40': !possiblePlatforms.includes(item.value),
 									'text-green': isSelected,
 									'text-primary': possiblePlatforms.includes(item.value) && !isSelected,
 								}"
 							>
 								<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
-								<CheckIcon v-if="isSelected" aria-hidden="true" class="size-5 flex-shrink-0" />
 							</div>
 						</template>
 					</Combobox>
@@ -157,13 +155,14 @@
 						</div>
 						<ButtonStyled v-if="selectedPrimaryFile" color="brand" circular>
 							<a
-								:href="decorateModalDownloadUrl(selectedPrimaryFile.url)"
+								:href="getDownloadUrl(selectedPrimaryFile.url)"
 								:download="selectedPrimaryFile.filename"
 								:aria-label="
 									formatMessage(messages.downloadVersion, {
 										version: selectedVersion.version_number,
 									})
 								"
+								v-tooltip="'Download'"
 								@click="onDownload"
 							>
 								<DownloadIcon aria-hidden="true" />
@@ -196,12 +195,8 @@
 								:key="dependency.key"
 								class="flex flex-col gap-1.5"
 							>
-								<component
-									:is="dependency.href ? 'a' : 'div'"
-									:href="dependency.href"
-									:download="dependency.filename"
-									class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary no-underline"
-									@click="onDependencyRowClick(dependency, $event)"
+								<div
+									class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary"
 								>
 									<span class="flex min-w-0 items-center gap-2">
 										<Avatar
@@ -215,27 +210,42 @@
 											aria-hidden="true"
 											class="size-5 flex-shrink-0 text-secondary"
 										/>
-										<span class="min-w-0 truncate font-semibold text-contrast">
+										<a
+											v-if="dependency.projectHref"
+											:href="dependency.projectHref"
+											target="_blank"
+											rel="noopener noreferrer"
+											class="min-w-0 truncate font-semibold text-contrast no-underline hover:underline"
+										>
+											{{ dependency.name }}
+										</a>
+										<span v-else class="min-w-0 truncate font-semibold text-contrast">
 											{{ dependency.name }}
 										</span>
 										<TagItem class="shrink-0 border !border-solid border-surface-5">
 											{{ dependency.typeLabel }}
 										</TagItem>
 									</span>
-									<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
-								</component>
+									<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
+										<a
+											v-tooltip="'Download'"
+											:href="dependency.downloadHref"
+											:download="dependency.filename"
+											:aria-label="`Download ${dependency.name}`"
+											@click="onDownload"
+										>
+											<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
+										</a>
+									</ButtonStyled>
+								</div>
 								<div
 									v-for="subDependency in dependency.subDependencies"
 									:key="subDependency.key"
 									class="grid grid-cols-[1.5rem_minmax(0,1fr)] items-center gap-1 pl-5"
 								>
 									<RightArrowIcon aria-hidden="true" class="size-4 text-secondary" />
-									<component
-										:is="subDependency.href ? 'a' : 'div'"
-										:href="subDependency.href"
-										:download="subDependency.filename"
-										class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary no-underline"
-										@click="onDependencyRowClick(subDependency, $event)"
+									<div
+										class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary"
 									>
 										<span class="flex min-w-0 items-center gap-2">
 											<Avatar
@@ -249,15 +259,34 @@
 												aria-hidden="true"
 												class="size-5 flex-shrink-0 text-secondary"
 											/>
-											<span class="min-w-0 truncate font-semibold text-contrast">
+											<a
+												v-if="subDependency.projectHref"
+												:href="subDependency.projectHref"
+												target="_blank"
+												rel="noopener noreferrer"
+												class="min-w-0 truncate font-semibold text-contrast no-underline hover:underline"
+											>
+												{{ subDependency.name }}
+											</a>
+											<span v-else class="min-w-0 truncate font-semibold text-contrast">
 												{{ subDependency.name }}
 											</span>
 											<TagItem class="shrink-0 border !border-solid border-surface-5">
 												{{ subDependency.typeLabel }}
 											</TagItem>
 										</span>
-										<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
-									</component>
+										<ButtonStyled v-if="subDependency.downloadHref" circular type="transparent">
+											<a
+												v-tooltip="'Download'"
+												:href="subDependency.downloadHref"
+												:download="subDependency.filename"
+												:aria-label="`Download ${subDependency.name}`"
+												@click="onDownload"
+											>
+												<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
+											</a>
+										</ButtonStyled>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -270,7 +299,7 @@
 							<a
 								v-for="file in additionalFiles"
 								:key="file.hashes?.sha1 ?? file.filename"
-								:href="decorateModalDownloadUrl(file.url)"
+								:href="getDownloadUrl(file.url)"
 								:download="file.filename"
 								class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary no-underline"
 								@click="onDownload"
@@ -553,10 +582,51 @@ const { data: dependencyVersions } = useQuery({
 	enabled: computed(() => selectedDependencyVersionIds.value.length > 0),
 })
 
+const fallbackDependencyProjectIds = computed(() => {
+	if (!selectedVersion.value) return []
+
+	return [
+		...new Set(
+			selectedVersion.value.dependencies
+				.filter(
+					(dependency) =>
+						['required', 'optional'].includes(dependency.dependency_type) &&
+						!dependency.version_id &&
+						dependency.project_id,
+				)
+				.map((dependency) => dependency.project_id),
+		),
+	]
+})
+
+const { data: fallbackDependencyVersions } = useQuery({
+	queryKey: computed(() => [
+		'project-download-modal',
+		'fallback-versions',
+		fallbackDependencyProjectIds.value,
+	]),
+	queryFn: async () =>
+		Promise.all(
+			fallbackDependencyProjectIds.value.map(async (projectId) => {
+				const versions = await client.labrinth.versions_v3.getProjectVersions(projectId, {
+					include_changelog: false,
+					limit: 1,
+				})
+
+				return versions[0]
+			}),
+		),
+	enabled: computed(() => fallbackDependencyProjectIds.value.length > 0),
+})
+
 const subDependencyVersionIds = computed(() => {
 	const ids = new Set()
 
-	for (const version of dependencyVersions.value || []) {
+	for (const version of [
+		...(dependencyVersions.value || []),
+		...(fallbackDependencyVersions.value || []),
+	]) {
+		if (!version) continue
 		for (const dependency of version.dependencies || []) {
 			if (dependency.version_id) ids.add(dependency.version_id)
 		}
@@ -575,13 +645,70 @@ const { data: subDependencyVersions } = useQuery({
 	enabled: computed(() => subDependencyVersionIds.value.length > 0),
 })
 
+const fallbackSubDependencyProjectIds = computed(() => {
+	const ids = new Set()
+
+	for (const version of [
+		...(dependencyVersions.value || []),
+		...(fallbackDependencyVersions.value || []),
+	]) {
+		if (!version) continue
+		for (const dependency of version.dependencies || []) {
+			if (
+				['required', 'optional'].includes(dependency.dependency_type) &&
+				!dependency.version_id &&
+				dependency.project_id
+			) {
+				ids.add(dependency.project_id)
+			}
+		}
+	}
+
+	return [...ids]
+})
+
+const { data: fallbackSubDependencyVersions } = useQuery({
+	queryKey: computed(() => [
+		'project-download-modal',
+		'fallback-sub-versions',
+		fallbackSubDependencyProjectIds.value,
+	]),
+	queryFn: async () =>
+		Promise.all(
+			fallbackSubDependencyProjectIds.value.map(async (projectId) => {
+				const versions = await client.labrinth.versions_v3.getProjectVersions(projectId, {
+					include_changelog: false,
+					limit: 1,
+				})
+
+				return versions[0]
+			}),
+		),
+	enabled: computed(() => fallbackSubDependencyProjectIds.value.length > 0),
+})
+
 const dependencyVersionById = computed(() => {
 	const map = new Map()
 	for (const version of [
 		...(dependencyVersions.value || []),
 		...(subDependencyVersions.value || []),
+		...(fallbackDependencyVersions.value || []),
+		...(fallbackSubDependencyVersions.value || []),
 	]) {
+		if (!version) continue
 		map.set(version.id, version)
+	}
+	return map
+})
+
+const fallbackDependencyVersionByProjectId = computed(() => {
+	const map = new Map()
+	for (const version of [
+		...(fallbackDependencyVersions.value || []),
+		...(fallbackSubDependencyVersions.value || []),
+	]) {
+		if (!version) continue
+		map.set(version.project_id, version)
 	}
 	return map
 })
@@ -597,7 +724,11 @@ const selectedDependencyProjectIds = computed(() => {
 		if (version?.project_id) ids.add(version.project_id)
 	}
 
-	for (const version of dependencyVersions.value || []) {
+	for (const version of [
+		...(dependencyVersions.value || []),
+		...(fallbackDependencyVersions.value || []),
+	]) {
+		if (!version) continue
 		for (const dependency of version.dependencies || []) {
 			if (dependency.project_id) ids.add(dependency.project_id)
 			const dependencyVersion = dependency.version_id
@@ -605,6 +736,13 @@ const selectedDependencyProjectIds = computed(() => {
 				: null
 			if (dependencyVersion?.project_id) ids.add(dependencyVersion.project_id)
 		}
+	}
+
+	for (const version of [
+		...(fallbackDependencyVersions.value || []),
+		...(fallbackSubDependencyVersions.value || []),
+	]) {
+		if (version?.project_id) ids.add(version.project_id)
 	}
 
 	return [...ids]
@@ -633,6 +771,10 @@ const dependencyRows = computed(() => {
 
 	return selectedVersion.value.dependencies
 		.filter((dependency) => ['required', 'optional'].includes(dependency.dependency_type))
+		.sort(
+			(a, b) =>
+				dependencyTypeSortOrder(a.dependency_type) - dependencyTypeSortOrder(b.dependency_type),
+		)
 		.map((dependency) => createDependencyRow(dependency))
 })
 
@@ -722,6 +864,15 @@ function dependencyTypeLabel(type) {
 	)
 }
 
+function dependencyTypeSortOrder(type) {
+	return (
+		{
+			required: 0,
+			optional: 1,
+		}[type] ?? 2
+	)
+}
+
 function fileTypeLabel(type) {
 	return (
 		{
@@ -737,9 +888,16 @@ function primaryFileForVersion(version) {
 }
 
 function createDependencyRow(dependency, includeSubDependencies = true) {
-	const version = dependency.version_id
+	const explicitVersion = dependency.version_id
 		? dependencyVersionById.value.get(dependency.version_id)
 		: null
+	// todo: need algorithm for picking version.
+	// try to match same game version and loader. and if cannot, then disable button and have tooltip saying cannot find any compatible versions to download.
+	const version =
+		explicitVersion ||
+		(dependency.project_id
+			? fallbackDependencyVersionByProjectId.value.get(dependency.project_id)
+			: null)
 	const projectId = dependency.project_id || version?.project_id
 	const project = projectId ? dependencyProjectById.value.get(projectId) : null
 	const primaryFile = primaryFileForVersion(version)
@@ -756,31 +914,26 @@ function createDependencyRow(dependency, includeSubDependencies = true) {
 		key: `${dependency.dependency_type}-${dependency.version_id ?? dependency.project_id ?? dependency.file_name ?? name}`,
 		name,
 		icon: project?.icon_url,
-		href: primaryFile
-			? decorateModalDownloadUrl(primaryFile.url)
-			: project
-				? `/${project.project_type}/${project.slug || project.id}`
-				: undefined,
+		projectHref: project ? `/${project.project_type}/${project.slug || project.id}` : undefined,
+		downloadHref: primaryFile ? getDownloadUrl(primaryFile.url) : undefined,
 		filename: primaryFile?.filename,
-		downloadsFile: !!primaryFile,
 		typeLabel: dependencyTypeLabel(dependency.dependency_type),
 		subDependencies: includeSubDependencies
 			? (version?.dependencies || [])
 					.filter((subDependency) =>
 						['required', 'optional'].includes(subDependency.dependency_type),
 					)
+					.sort(
+						(a, b) =>
+							dependencyTypeSortOrder(a.dependency_type) -
+							dependencyTypeSortOrder(b.dependency_type),
+					)
 					.map((subDependency) => createDependencyRow(subDependency, false))
 			: [],
 	}
 }
 
-function onDependencyRowClick(row, event) {
-	if (row.downloadsFile) {
-		onDownload(event)
-	}
-}
-
-function decorateModalDownloadUrl(url) {
+function getDownloadUrl(url) {
 	return createProjectDownloadUrl(url, {
 		reason: props.downloadReason,
 		gameVersion: currentGameVersion.value ?? undefined,
@@ -854,11 +1007,8 @@ function hide(event) {
 	showAllVersions.value = false
 }
 
-function onDownload(event) {
+function onDownload() {
 	emit('download')
-	setTimeout(() => {
-		hide(event)
-	}, 400)
 }
 
 function onVersionNavigate(url) {
