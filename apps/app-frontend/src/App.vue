@@ -96,6 +96,7 @@ import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import {
 	install_create_modpack_instance,
+	install_get_shared_instance_preview,
 	install_get_modpack_preview,
 	install_shared_instance,
 } from '@/helpers/install'
@@ -853,10 +854,40 @@ function getSharedInstanceInvite(notification) {
 
 async function acceptSharedInstanceInviteNotification(notification) {
 	try {
-		const { sharedInstanceId, sharedInstanceName } = getSharedInstanceInvite(notification)
-		await install_shared_instance(sharedInstanceId, sharedInstanceName)
-		await markLiveNotificationRead(notification)
-		queryClient.invalidateQueries({ queryKey: ['instances'] })
+		const sharedInstanceInvite = getSharedInstanceInvite(notification)
+		const invitedBy = sharedInstanceInvite.invitedById
+			? await get_user(sharedInstanceInvite.invitedById, 'bypass').catch(() => null)
+			: null
+		const invitedByUsername = sharedInstanceInvite.invitedByUsername ?? invitedBy?.username ?? null
+		const preview = await install_get_shared_instance_preview(
+			sharedInstanceInvite.sharedInstanceId,
+			sharedInstanceInvite.sharedInstanceName,
+		)
+		const showInstallModal = installToPlayModal.value?.showSharedInstance
+
+		if (!showInstallModal) {
+			throw new Error('Install to play modal is not available.')
+		}
+
+		showInstallModal(
+			{
+				preview,
+				invitedByUsername,
+			},
+			async () => {
+				try {
+					await install_shared_instance(
+						sharedInstanceInvite.sharedInstanceId,
+						sharedInstanceInvite.sharedInstanceName,
+					)
+					await markLiveNotificationRead(notification)
+					queryClient.invalidateQueries({ queryKey: ['instances'] })
+				} catch (error) {
+					handleError(error)
+					throw error
+				}
+			},
+		)
 	} catch (error) {
 		handleError(error)
 	}

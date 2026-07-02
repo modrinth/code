@@ -44,6 +44,22 @@ export interface InstallPostInstallEdit {
 	link?: InstanceLink | null
 }
 
+export interface SharedInstanceInstallPreview {
+	name: string
+	iconUrl?: string | null
+	gameVersion: string
+	loader: InstanceLoader
+	modCount: number
+	externalFileCount: number
+	contentVersionIds: string[]
+	externalFiles: SharedInstanceExternalFilePreview[]
+}
+
+export interface SharedInstanceExternalFilePreview {
+	fileName: string
+	fileType: string
+}
+
 export type InstallJobStatus =
 	| 'queued'
 	| 'running'
@@ -139,6 +155,16 @@ export async function install_create_modpack_instance(
 		location,
 		postInstallEdit,
 	})
+}
+
+export async function install_get_shared_instance_preview(sharedInstanceId: string, name: string) {
+	return await invoke<SharedInstanceInstallPreview>(
+		'plugin:install|install_get_shared_instance_preview',
+		{
+			sharedInstanceId,
+			name,
+		},
+	)
 }
 
 export async function install_shared_instance(sharedInstanceId: string, name: string) {

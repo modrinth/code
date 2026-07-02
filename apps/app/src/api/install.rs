@@ -6,6 +6,7 @@ use theseus::data::ModLoader;
 use theseus::install::{
     InstallJobSnapshot, InstallModpackPreview, InstallPostInstallEdit,
 };
+use theseus::instance::SharedInstanceInstallPreview;
 use theseus::pack::import::ImportLauncherType;
 use theseus::pack::install_from::CreatePackLocation;
 use uuid::Uuid;
@@ -16,6 +17,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_get_modpack_preview,
             install_create_instance,
             install_create_modpack_instance,
+            install_get_shared_instance_preview,
             install_shared_instance,
             install_import_instance,
             install_duplicate_instance,
@@ -97,6 +99,18 @@ pub async fn install_create_modpack_instance(
     Ok(theseus::install::create_modpack_instance(
         location,
         post_install_edit.map(|edit| edit.into_core()).transpose()?,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn install_get_shared_instance_preview(
+    shared_instance_id: String,
+    name: String,
+) -> Result<SharedInstanceInstallPreview> {
+    Ok(theseus::instance::get_shared_instance_install_preview(
+        &shared_instance_id,
+        name,
     )
     .await?)
 }

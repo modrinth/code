@@ -35,7 +35,9 @@ pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,
 };
 pub use self::shared::{
-    SharedInstanceUsers, get_shared_instance_users, install_shared_instance,
+    SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
+    SharedInstanceUsers, get_shared_instance_install_preview,
+    get_shared_instance_users, install_shared_instance,
     invite_shared_instance_users, publish_shared_instance,
     remove_shared_instance_users,
 };

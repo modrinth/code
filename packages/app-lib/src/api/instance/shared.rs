@@ -21,6 +21,26 @@ pub struct SharedInstanceUsers {
     pub user_ids: Vec<String>,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceInstallPreview {
+    pub name: String,
+    pub icon_url: Option<String>,
+    pub game_version: String,
+    pub loader: ModLoader,
+    pub mod_count: usize,
+    pub external_file_count: usize,
+    pub content_version_ids: Vec<String>,
+    pub external_files: Vec<SharedInstanceExternalFilePreview>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceExternalFilePreview {
+    pub file_name: String,
+    pub file_type: String,
+}
+
 #[derive(Clone, Debug)]
 struct ExternalFileCandidate {
     file_name: String,
@@ -252,6 +272,86 @@ pub async fn install_shared_instance(
         loader_version,
     })
     .await
+}
+
+#[tracing::instrument]
+pub async fn get_shared_instance_install_preview(
+    shared_instance_id: &str,
+    name: String,
+) -> crate::Result<SharedInstanceInstallPreview> {
+    let state = State::get().await?;
+    let version = get_latest_remote_version(shared_instance_id, &state).await?;
+    let name = match name.trim() {
+        "" => "Shared instance".to_string(),
+        name => name.to_string(),
+    };
+    let mut icon_url = None;
+    let mut game_version = version.game_version.clone();
+    let mut loader = ModLoader::from_string(&version.loader);
+    let mut content_version_ids = version.modrinth_ids.clone();
+
+    if let Some(version_id) = version.modpack_id.as_deref() {
+        let modpack_version = CachedEntry::get_version(
+            version_id,
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance modpack version could not be found"
+                    .to_string(),
+            )
+        })?;
+
+        if let Some(project) = CachedEntry::get_project(
+            &modpack_version.project_id,
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+        {
+            icon_url = project.icon_url;
+        }
+        if let Some(version_game_version) = modpack_version.game_versions.first()
+        {
+            game_version = version_game_version.clone();
+        }
+        if let Some(version_loader) = modpack_version.loaders.first() {
+            loader = ModLoader::from_string(version_loader);
+        }
+        content_version_ids.extend(
+            modpack_version
+                .dependencies
+                .iter()
+                .filter_map(|dependency| dependency.version_id.clone()),
+        );
+    }
+    let mut seen_content_version_ids = HashSet::new();
+    content_version_ids.retain(|id| seen_content_version_ids.insert(id.clone()));
+
+    let external_files = version
+        .external_files
+        .iter()
+        .map(|file| SharedInstanceExternalFilePreview {
+            file_name: file.file_name.clone(),
+            file_type: file.file_type.clone(),
+        })
+        .collect::<Vec<_>>();
+    let external_file_count = external_files.len();
+
+    Ok(SharedInstanceInstallPreview {
+        name,
+        icon_url,
+        game_version,
+        loader,
+        mod_count: content_version_ids.len() + external_file_count,
+        external_file_count,
+        content_version_ids,
+        external_files,
+    })
 }
 
 pub(crate) async fn mark_shared_instance_stale(
