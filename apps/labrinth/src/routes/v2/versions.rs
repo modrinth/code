@@ -71,6 +71,21 @@ fn default_true() -> bool {
             description = "Filter by featured status"
         ),
         (
+            "version_type" = Option<VersionType>,
+            Query,
+            description = "Filter by version type"
+        ),
+        (
+            "limit" = Option<usize>,
+            Query,
+            description = "Maximum number of versions"
+        ),
+        (
+            "offset" = Option<usize>,
+            Query,
+            description = "Version offset"
+        ),
+        (
             "include_changelog" = Option<bool>,
             Query,
             description = "Whether to include changelog fields"
@@ -237,7 +252,14 @@ pub struct VersionIds {
 	tag = "versions",
     get,
     operation_id = "getVersions",
-    params(("ids" = String, Query, description = "The JSON array of version IDs")),
+    params(
+		("ids" = String, Query, description = "The JSON array of version IDs"),
+		(
+			"include_changelog" = Option<bool>,
+			Query,
+			description = "Whether to include changelog fields"
+		)
+	),
     responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>))
 )]
 #[get("/versions")]

@@ -859,6 +859,15 @@ pub struct VersionListFilters {
 /// List project versions.  
 #[utoipa::path(
 	tag = "versions",
+	params(
+		("loaders" = Option<String>, Query),
+		("featured" = Option<bool>, Query),
+		("version_type" = Option<VersionType>, Query),
+		("limit" = Option<usize>, Query),
+		("offset" = Option<usize>, Query),
+		("loader_fields" = Option<String>, Query),
+		("include_changelog" = Option<bool>, Query)
+	),
 	responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>),
 		(

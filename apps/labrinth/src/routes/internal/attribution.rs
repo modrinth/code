@@ -208,6 +208,7 @@ async fn scan(
 /// List project attribution groups.  
 #[utoipa::path(
 	tag = "attribution",
+	params(("project_id" = ProjectId, Path)),
 	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
 )]
 #[get("/{project_id}")]

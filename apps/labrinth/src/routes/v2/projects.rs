@@ -78,6 +78,31 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
             "limit" = Option<String>,
             Query,
             description = "Maximum number of search results"
+        ),
+        (
+            "show_metadata" = Option<bool>,
+            Query,
+            description = "Whether to include search metadata"
+        ),
+        (
+            "typesense_config" = Option<String>,
+            Query,
+            description = "Typesense request configuration"
+        ),
+        (
+            "new_filters" = Option<String>,
+            Query,
+            description = "Search filters"
+        ),
+        (
+            "filters" = Option<String>,
+            Query,
+            description = "Legacy search filters"
+        ),
+        (
+            "version" = Option<String>,
+            Query,
+            description = "Legacy search version"
         )
     ),
     responses(

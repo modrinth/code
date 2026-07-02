@@ -904,6 +904,7 @@ pub enum FormCompletionStatus {
 /// List payment methods.  
 #[utoipa::path(
 	tag = "payouts",
+	params(("country" = Option<String>, Query)),
 	responses((status = OK, body = Vec<PayoutMethod>)),
 )]
 #[get("/methods")]
@@ -1176,6 +1177,10 @@ pub struct RevenueData {
 /// Get platform revenue.  
 #[utoipa::path(
 	tag = "payouts",
+	params(
+		("start" = Option<String>, Query),
+		("end" = Option<String>, Query)
+	),
 	responses((status = OK, body = RevenueResponse)),
 )]
 #[get("/platform_revenue")]

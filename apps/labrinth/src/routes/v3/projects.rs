@@ -1817,7 +1817,11 @@ pub struct Extension {
 
 #[allow(clippy::too_many_arguments)]
 /// Update a project icon.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "projects",
+	params(("ext" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}/icon")]
 async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -2089,7 +2093,17 @@ pub struct GalleryCreateQuery {
 
 #[allow(clippy::too_many_arguments)]
 /// Add a gallery item.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "projects",
+	params(
+		("ext" = String, Query),
+		("featured" = bool, Query),
+		("name" = Option<String>, Query),
+		("description" = Option<String>, Query),
+		("ordering" = Option<i64>, Query)
+	),
+	responses((status = NO_CONTENT))
+)]
 #[post("/{id}/gallery")]
 pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
@@ -2288,7 +2302,17 @@ pub struct GalleryEditQuery {
 }
 
 /// Update a gallery item.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "projects",
+	params(
+		("url" = String, Query),
+		("featured" = Option<bool>, Query),
+		("name" = Option<String>, Query),
+		("description" = Option<String>, Query),
+		("ordering" = Option<i64>, Query)
+	),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}/gallery")]
 async fn edit_gallery_item(
     req: HttpRequest,
@@ -2478,7 +2502,11 @@ pub struct GalleryDeleteQuery {
 }
 
 /// Delete a gallery item.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "projects",
+	params(("url" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[delete("/{id}/gallery")]
 async fn delete_gallery_item(
     req: HttpRequest,

@@ -177,6 +177,11 @@ pub struct DeleteAllLocksResponse {
 /// List projects in the moderation queue.  
 #[utoipa::path(
 	tag = "moderation",
+	params(
+		("count" = Option<u16>, Query),
+		("offset" = Option<u32>, Query),
+		("has_external_dependencies" = Option<bool>, Query)
+	),
     responses((status = OK, body = inline(Vec<FetchedProject>)))
 )]
 #[get("/projects")]
