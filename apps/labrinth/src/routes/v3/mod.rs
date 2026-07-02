@@ -77,8 +77,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[derive(utoipa::OpenApi)]
 #[openapi(
 	info(
-		title = "API v3 (UNSTABLE - DO NOT USE)",
-		version = "3.0.0"
+		title = "API v3 (UNSTABLE)",
+		version = "3.0.0",
+		description = include_str!("../../api_v3_description.md"),
 	),
 	paths(
 		analytics_get::fetch_analytics,
@@ -246,11 +247,10 @@ pub struct ApiDoc;
 struct V3PathModifier;
 
 impl utoipa::Modify for V3PathModifier {
-	fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-		super::prefix_openapi_paths(openapi, "/v3", |_| false);
-	}
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        super::prefix_openapi_paths(openapi, "/v3", |_| false);
+    }
 }
-
 
 pub async fn hello_world() -> Result<HttpResponse, ApiError> {
     Ok(HttpResponse::Ok().json(json!({

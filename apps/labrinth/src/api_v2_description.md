@@ -1,4 +1,5 @@
-API v2 is Modrinth's official API. It is the recommended API for integrations and applications, and it will receive long-term support.
+> [!success]
+> API v2 is Modrinth's current, official API. It is the recommended API for integrations and applications and will receive long-term support.
 
 ## Authentication
 This API has two options for authentication: personal access tokens and [OAuth2](https://en.wikipedia.org/wiki/OAuth).
@@ -9,21 +10,21 @@ Example:
 Authorization: mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic
 ```
 
-You do not need a token for most requests. Generally speaking, only the following types of requests require a token:
-- those which create data (such as version creation)
-- those which modify data (such as editing a project)
-- those which access private data (such as draft projects, notifications, emails, and payout data)
+> [!tip] You do not need a token for most requests.
+>
+> Generally speaking, only the following types of requests require a token:
+> - those which create data (such as version creation)
+> - those which modify data (such as editing a project)
+> - those which access private data (such as draft projects, notifications, emails, and payout data)
 
 Each request requiring authentication has a certain scope. For example, to view the email of the user being requested, the token must have the `USER_READ_EMAIL` scope.
-You can find the list of available scopes [on GitHub](https://github.com/modrinth/labrinth/blob/master/src/models/pats.rs#L15). Making a request with an invalid scope will return a 401 error.
+You can find the list of available scopes [on GitHub](https://github.com/modrinth/code/blob/main/apps/labrinth/src/models/v3/pats.rs#L9). Making a request with an invalid scope will return a 401 error.
 
 Please note that certain scopes and requests cannot be completed with a personal access token or using OAuth.
 For example, deleting a user account can only be done through Modrinth's frontend.
 
-A detailed guide on OAuth has been published in [Modrinth's technical documentation](https://docs.modrinth.com/guide/oauth).
-
 ### Personal access tokens
-Personal access tokens (PATs) can be generated in from [the user settings](https://modrinth.com/settings/account).
+Personal access tokens (PATs) can be generated from [the user settings](https://modrinth.com/settings/account).
 
 ### GitHub tokens
 For backwards compatibility purposes, some types of GitHub tokens also work for authenticating a user with Modrinth's API, granting all scopes.
@@ -49,8 +50,11 @@ The API has a ratelimit defined per IP. Limits and remaining amounts are given i
 - `X-Ratelimit-Remaining`: the number of requests remaining in the current ratelimit window
 - `X-Ratelimit-Reset`: the time in seconds until the ratelimit window resets
 
-Ratelimits are the same no matter whether you use a token or not.
-The ratelimit is currently 300 requests per minute. If you have a use case requiring a higher limit, please [contact us](mailto:support@modrinth.com).
+**Ratelimits are the same no matter whether you use a token or not.**
+
+The ratelimit is currently 300 requests per minute per IP. If your application is hitting rate limits, try caching responses, using batch requests, or spreading out your requests over time.
+
+Higher rate limits are granted only in very rare cases. If you believe your use case requires an exception, please [contact us](mailto:support@modrinth.com).
 
 ## User Agents
 To access the Modrinth API, you **must** use provide a uniquely-identifying `User-Agent` header.
@@ -66,12 +70,8 @@ This allows us to contact you if we would like a change in your application's be
 Modrinth follows a simple pattern for its API versioning.
 In the event of a breaking API change, the API version in the URL path is bumped, and migration steps will be published below.
 
-API v2 is the current official API and will receive long-term support.
-
 ### Migrations
 Inside the following spoiler, you will be able to find all changes between versions of the Modrinth API, accompanied by tips and a guide to migrate applications to newer versions.
-
-Here, you can also find changes for [Minotaur](https://github.com/modrinth/minotaur), Modrinth's official Gradle plugin. Major versions of Minotaur directly correspond to major versions of the Modrinth API.
 
 <details><summary>API v1 to API v2</summary>
 
@@ -95,22 +95,6 @@ These bullet points cover most changes in the v2 API, but please note that field
 - Notifications now have a `type` field, such as `project_update`
 
 Along with this, project subroutes (such as `/v2/project/{id}/version`) now allow the slug to be used as the ID. This is also the case with user routes.
-
-</details><details><summary>Minotaur v1 to Minotaur v2</summary>
-
-Minotaur 2.x introduced a few breaking changes to how your buildscript is formatted.
-
-First, instead of registering your own `publishModrinth` task, Minotaur now automatically creates a `modrinth` task. As such, you can replace the `task publishModrinth(type: TaskModrinthUpload) {` line with just `modrinth {`.
-
-To declare supported Minecraft versions and mod loaders, the `gameVersions` and `loaders` arrays must now be used. The syntax for these are pretty self-explanatory.
-
-Instead of using `releaseType`, you must now use `versionType`. This was actually changed in v1.2.0, but very few buildscripts have moved on from v1.1.0.
-
-Dependencies have been changed to a special DSL. Create a `dependencies` block within the `modrinth` block, and then use `scope.type("project/version")`. For example, `required.project("fabric-api")` adds a required project dependency on Fabric API.
-
-You may now use the slug anywhere that a project ID was previously required.
-
-</details>
 
 <br />
 

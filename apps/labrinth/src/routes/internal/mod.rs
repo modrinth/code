@@ -59,8 +59,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[derive(utoipa::OpenApi)]
 #[openapi(
 	info(
-		title = "Internal API - HIGHLY UNSTABLE - DO NOT USE",
-		version = "internal"
+		title = "Internal API (UNSTABLE)",
+		version = "internal",
+		description = include_str!("../../api_internal_description.md"),
 	),
 	paths(
 		admin::count_download,
@@ -181,7 +182,9 @@ pub struct ApiDoc;
 struct InternalPathModifier;
 
 impl utoipa::Modify for InternalPathModifier {
-	fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-		super::prefix_openapi_paths(openapi, "/_internal", |path| path.starts_with("/v3/"));
-	}
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        super::prefix_openapi_paths(openapi, "/_internal", |path| {
+            path.starts_with("/v3/")
+        });
+    }
 }
