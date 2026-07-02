@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        select\n            (\n                select count(*)\n                from project_attribution_groups\n                where project_id = $1\n            ) as \"groups!\",\n            (\n                select count(*)\n                from project_attribution_files paf\n                inner join project_attribution_groups pag on pag.id = paf.group_id\n                where pag.project_id = $1\n            ) as \"files!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "groups!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "files!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "686994a5bfc061b4c6e1ca594fae9d5d3fb18974de6605a650f666d440dfe684"
+}
