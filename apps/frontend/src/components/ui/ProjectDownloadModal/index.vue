@@ -135,10 +135,12 @@ const props = withDefaults(
 		projectId?: string
 		downloadReason?: CdnDownloadReason
 		useRouteHash?: boolean
+		updateRouteSelection?: boolean
 	}>(),
 	{
 		downloadReason: 'standalone',
 		useRouteHash: true,
+		updateRouteSelection: true,
 	},
 )
 
@@ -305,6 +307,7 @@ function updateDownloadQuery({
 	gameVersion: string | null
 	platform: string | null
 }) {
+	if (!props.updateRouteSelection) return
 	navigateTo(
 		{
 			query: {

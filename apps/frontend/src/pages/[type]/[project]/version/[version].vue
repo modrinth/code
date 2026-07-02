@@ -84,6 +84,7 @@
 			ref="dependencyDownloadModal"
 			download-reason="dependency"
 			:use-route-hash="false"
+			:update-route-selection="false"
 			@download="emit('onDownload')"
 		/>
 		<div class="flex flex-col">
