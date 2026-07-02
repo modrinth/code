@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-02T00:44:14+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added pride backdrop to the Pride collection, projects featured in the Pride collection, and the pride blog posts.
+
+## Fixed
+- Fixed issue where you cannot create a project directly with an organization as the owner.`,
+	},
+	{
 		date: `2026-06-29T23:56:37+00:00`,
 		product: 'app',
 		version: '0.15.4',
