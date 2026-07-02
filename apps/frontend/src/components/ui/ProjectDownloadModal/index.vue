@@ -89,7 +89,7 @@ import {
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
@@ -118,11 +118,13 @@ type NewModalRef = {
 
 const props = withDefaults(
 	defineProps<{
-		projectId: string
+		projectId?: string
 		downloadReason?: CdnDownloadReason
+		useRouteHash?: boolean
 	}>(),
 	{
 		downloadReason: 'standalone',
+		useRouteHash: true,
 	},
 )
 
@@ -140,19 +142,20 @@ const debug = useDebugLogger('DownloadModal')
 
 const modal = ref<NewModalRef | null>(null)
 const modalOpen = ref(false)
+const showProjectId = ref<string | null>(null)
 const downloadProjectResetKey = ref(0)
-const projectDownloadSelection = ref<ProjectDownloadSelection>({
-	currentGameVersion: null,
-	currentPlatform: null,
-	selectedVersion: null,
-	selectedPrimaryFile: null,
-})
+const projectDownloadSelection = ref<ProjectDownloadSelection>(getDefaultProjectDownloadSelection())
 
-const routeProjectId = computed(() => props.projectId)
+const routeProjectId = computed(() => showProjectId.value ?? props.projectId ?? null)
 
-const { data: projectRaw, error: projectV2Error } = useQuery({
+const {
+	data: projectRaw,
+	error: projectV2Error,
+	refetch: refetchProject,
+} = useQuery({
 	queryKey: computed(() => ['project', 'v2', routeProjectId.value]),
-	queryFn: () => client.labrinth.projects_v2.get(routeProjectId.value),
+	queryFn: () => client.labrinth.projects_v2.get(routeProjectId.value!),
+	enabled: computed(() => !!routeProjectId.value),
 	staleTime: STALE_TIME,
 })
 
@@ -320,23 +323,33 @@ function onShow() {
 	modalOpen.value = true
 	debug('on-show fired')
 	versionsEnabled.value = true
-	navigateTo({ query: route.query, hash: '#download' }, { replace: true })
+	if (props.useRouteHash && !showProjectId.value) {
+		navigateTo({ query: route.query, hash: '#download' }, { replace: true })
+	}
 }
 
 function onHide() {
+	const hadShowProjectId = !!showProjectId.value
 	modalOpen.value = false
-	navigateTo({ query: route.query, hash: '' }, { replace: true })
+	showProjectId.value = null
+	if (props.useRouteHash && !hadShowProjectId) {
+		navigateTo({ query: route.query, hash: '' }, { replace: true })
+	}
 }
 
-function show(event?: MouseEvent) {
+async function show(event?: MouseEvent, projectId?: string): Promise<void> {
 	if (!modal.value || modalOpen.value) return
+	showProjectId.value = projectId ?? null
+	await nextTick()
+	if (!(await loadProjectForModal(!!projectId))) return
 	modalOpen.value = true
 	modal.value.show(event)
 }
 
-function hide() {
+async function hide() {
 	if (!modal.value || !modalOpen.value) return
 	modal.value?.hide()
+	await nextTick()
 	downloadProjectResetKey.value += 1
 }
 
@@ -344,17 +357,43 @@ function onDownload() {
 	emit('download')
 }
 
+function getDefaultProjectDownloadSelection(): ProjectDownloadSelection {
+	return {
+		currentGameVersion: null,
+		currentPlatform: null,
+		selectedVersion: null,
+		selectedPrimaryFile: null,
+	}
+}
+
+async function loadProjectForModal(forceRefetch: boolean) {
+	if (!routeProjectId.value) return false
+	if (!forceRefetch && projectRaw.value) return true
+
+	const { data } = await refetchProject()
+	return !!data
+}
+
 function openFromHash() {
-	if (!modal.value || modalOpen.value || route.hash !== '#download') return
+	if (
+		!props.useRouteHash ||
+		!modal.value ||
+		modalOpen.value ||
+		showProjectId.value ||
+		route.hash !== '#download'
+	) {
+		return
+	}
 
 	debug('hash #download watch fired, opening modal')
 	show()
 }
 
 if (
-	route.hash === '#download' ||
-	route.query.version !== undefined ||
-	route.query.loader !== undefined
+	props.useRouteHash &&
+	(route.hash === '#download' ||
+		route.query.version !== undefined ||
+		route.query.loader !== undefined)
 ) {
 	debug('eager loadVersions from setup', {
 		hash: route.hash,
@@ -367,6 +406,10 @@ if (
 
 watch(modal, openFromHash)
 watch(() => route.hash, openFromHash)
+watch(routeProjectId, () => {
+	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
+	downloadProjectResetKey.value += 1
+})
 
 defineExpose({ show, hide })
 </script>

@@ -80,6 +80,12 @@
 				</div>
 			</div>
 		</NewModal>
+		<ProjectDownloadModal
+			ref="dependencyDownloadModal"
+			download-reason="dependency"
+			:use-route-hash="false"
+			@download="emit('onDownload')"
+		/>
 		<div class="flex flex-col">
 			<nuxt-link
 				class="mb-4 flex w-fit items-center gap-2 rounded-lg px-2 py-0.5 pl-0 text-link"
@@ -364,14 +370,14 @@
 							>
 								<DownloadIcon />
 							</a>
-							<a
+							<button
 								v-else-if="dependency.project"
 								v-tooltip="formatMessage(messages.downloadProject)"
-								:href="`/project/${dependency.project.id}#download`"
-								target="_blank"
+								:aria-label="formatMessage(messages.downloadProject)"
+								@click="openDependencyDownloadModal(dependency.project.id, $event)"
 							>
 								<DownloadIcon />
-							</a>
+							</button>
 						</ButtonStyled>
 					</template>
 				</VersionPage>
@@ -519,6 +525,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onServerPrefetch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
@@ -774,6 +781,7 @@ useSeoMeta({
 const editModal = useTemplateRef('editModal')
 const confirmModal = useTemplateRef('confirmModal')
 const packageModal = useTemplateRef('packageModal')
+const dependencyDownloadModal = useTemplateRef('dependencyDownloadModal')
 
 const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
 const packageLoaderOptions = [
@@ -794,6 +802,10 @@ async function handleVersionSaved() {
 function handleOpenEditVersionModal(versionId: string, projectId: string, stageId: string) {
 	if (!currentMember.value) return
 	editModal.value?.openEditVersionModal(versionId, projectId, stageId)
+}
+
+function openDependencyDownloadModal(projectId: string, event: MouseEvent) {
+	dependencyDownloadModal.value?.show(event, projectId)
 }
 
 const deleteVersionMutation = useMutation({
@@ -1065,7 +1077,11 @@ function getDependencyVersion(dependency: Labrinth.Versions.v3.Dependency) {
 		return undefined
 	}
 
-	return projectOnlyDependencyVersions.value?.[dependency.project_id]
+	return (
+		(Object.keys(projectOnlyDependencyVersions.value || {}).length === 1 &&
+			projectOnlyDependencyVersions.value?.[dependency.project_id]) ||
+		undefined
+	)
 }
 
 function getDependencyPrimaryFile(version?: Labrinth.Versions.v2.Version) {
